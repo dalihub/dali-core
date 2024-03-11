@@ -20,8 +20,8 @@
 
 // INTERNAL HEADERS
 #include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-buffer.h>
 
 
 namespace Dali
@@ -35,10 +35,9 @@ PropertyBuffer::PropertyBuffer()
 : mGraphicsController( nullptr ),
   mFormat( nullptr ),
   mData( nullptr ),
+  mGpuBuffer(nullptr),
   mSize(0),
-  mDataChanged(true),
-  mGraphicsBuffer{ nullptr },
-  mGraphicsBufferUsage{ 0u | Graphics::BufferUsage::VERTEX_BUFFER }
+  mDataChanged(true)
 {
 }
 
@@ -62,34 +61,28 @@ void PropertyBuffer::SetData( OwnerPointer< Dali::Vector<uint8_t> >& data, uint3
   mData.Swap( data );
   mSize = size;
   mDataChanged = true;
-
-  if( mGraphicsController )
-  {
-    mGraphicsBuffer = mGraphicsController->CreateBuffer( mGraphicsController->GetBufferFactory()
-                                                         .SetSize( uint32_t( mFormat->size * size) )
-                                                         .SetUsageFlags( 0u | Graphics::BufferUsage::VERTEX_BUFFER ));
-  }
 }
 
-bool PropertyBuffer::Update( Dali::Graphics::Controller& controller )
+bool PropertyBuffer::Update( Dali::Graphics::Controller& graphicsController )
 {
   if( !mData || !mFormat || !mSize )
   {
     return false;
   }
 
-  if( mDataChanged || !mGraphicsBuffer )
+  if(!mGpuBuffer || mDataChanged)
   {
-    if( !mGraphicsBuffer )
+    if(!mGpuBuffer)
     {
-      mGraphicsBuffer = mGraphicsController->CreateBuffer( mGraphicsController->GetBufferFactory()
-                                                           .SetUsageFlags( mGraphicsBufferUsage )
-                                                           .SetSize( mSize ) );
+      mGpuBuffer = new GpuBuffer(0 | Graphics::BufferUsage::VERTEX_BUFFER, GpuBuffer::WritePolicy::DISCARD);
     }
 
-    // schedule deferred write
-    mGraphicsBuffer->Write( mData.Get()->begin(), GetDataSize(), 0u );
-
+    // Update the GpuBuffer
+    if(mGpuBuffer && mData)
+    {
+      DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
+      mGpuBuffer->UpdateDataBuffer(graphicsController, GetDataSize(), &((*mData)[0]));
+    }
     mDataChanged = false;
   }
 

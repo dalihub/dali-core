@@ -1,8 +1,8 @@
-#ifndef TEST_GRAPHICS_BUFFER_H
-#define TEST_GRAPHICS_BUFFER_H
+#ifndef DALI_TEST_GRAPHICS_BUFFER_H
+#define DALI_TEST_GRAPHICS_BUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,35 +17,50 @@
  * limitations under the License.
  */
 
-#include <dali/graphics-api/graphics-api-buffer.h>
-#include <dali/graphics-api/graphics-api-types.h>
-#include <vector>
+#include <dali/graphics-api/graphics-buffer-create-info.h>
+#include <dali/graphics-api/graphics-buffer.h>
+#include <dali/graphics-api/graphics-types.h>
 
-namespace Test
+#include "test-trace-call-stack.h"
+
+namespace Dali
 {
-class GraphicsController;
+class TestGraphicsProgram;
+class TestGraphicsController;
+class UniformBufferBindingDescriptor;
 
-class GraphicsBuffer : public Dali::Graphics::Buffer
+class TestGraphicsBuffer : public Graphics::Buffer
 {
 public:
-  GraphicsBuffer( GraphicsController& controller, Dali::Graphics::BufferUsageFlags usage, uint32_t size );
-  ~GraphicsBuffer();
+  TestGraphicsBuffer(const Graphics::BufferCreateInfo& createInfo,
+                     TestGraphicsController& controller,
+                     TraceCallStack& callStack);
+  ~TestGraphicsBuffer();
+  void DiscardResource();
 
-  void* Map() override;
+  void   Bind();
+  void   Unbind();
+  void   Upload(uint32_t offset, uint32_t size);
+  Graphics::BufferUsage GetTarget() const;
 
-  void Unmap() override;
+  bool IsCPUAllocated() const
+  {
+    return mCpuOnly;
+  }
 
-  void Write( void* src, uint32_t srcSize, uint32_t dstOffset ) override;
+  void BindAsUniformBuffer(const TestGraphicsProgram* program, const Dali::UniformBufferBindingDescriptor& uboBinding) const;
 
-  void Flush() override;
+  TraceCallStack&         mCallStack;
+  TestGraphicsController& mController;
+  std::vector<uint8_t>    memory;
 
-  void DestroyNow() override;
+  Graphics::BufferCreateInfo mCreateInfo;
 
-public:
-  GraphicsController& mController;
-  std::vector<uint8_t> mBuffer;
+  uint32_t                   mId{0};
+  bool                       mCreated{false};
+  bool                       mCpuOnly{false};
 };
 
-} // Test
+} // namespace Dali
 
-#endif //TEST_GRAPHICS_BUFFER_H
+#endif //DALI_TEST_GRAPHICS_BUFFER_H

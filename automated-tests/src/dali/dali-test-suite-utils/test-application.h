@@ -66,7 +66,7 @@ public:
   static void LogContext( bool start, const char* tag );
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
-  Test::GraphicsController& GetGraphicsController();
+  TestGraphicsController& GetGraphicsController();
   TestRenderController& GetRenderController();
   TestGestureManager& GetGestureManager();
   void ProcessEvent(const Integration::Event& event);
@@ -92,7 +92,7 @@ private:
 
 protected:
   TestPlatformAbstraction             mPlatformAbstraction;
-  std::unique_ptr<Test::GraphicsController> mGraphicsController;
+  std::unique_ptr<TestGraphicsController> mGraphicsController;
   TestRenderController                mRenderController;
   TestGestureManager                  mGestureManager;
   TestRenderSurface*        mRenderSurface;

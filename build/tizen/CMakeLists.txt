@@ -148,7 +148,7 @@ ELSEIF( UNIX )
   # TODO: Clang is a lot more strict with warnings, we should address
   # those issues at some point.
   IF( NOT ${CMAKE_CXX_COMPILER_ID} MATCHES "Clang" )
-    ADD_COMPILE_OPTIONS( -Werror )
+    ADD_COMPILE_OPTIONS( -Werror -Wno-error=unknown-pragmas -Wno-unknown-pragmas)
   ENDIF()
 
   ADD_COMPILE_OPTIONS( -Wall -Wextra -Wno-unused-parameter -Wfloat-equal )
@@ -363,27 +363,25 @@ IF( ENABLE_LINK_TEST )
   SET( DALI_TEST_SUITE_DIR ${ROOT_SRC_DIR}/automated-tests/src/dali/dali-test-suite-utils )
   SET( LINKER_TEST_NAME ${DALI_CORE_PREFIX}linker-test )
   SET( LINKER_TEST_SOURCES
-    linker-test.cpp
-    ${DALI_TEST_SUITE_DIR}/test-application.cpp
-    ${DALI_TEST_SUITE_DIR}/test-gesture-manager.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-buffer.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-buffer-factory.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-render-command.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-controller.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-framebuffer.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-framebuffer-factory.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-pipeline.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-pipeline-factory.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-sampler.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-sampler-factory.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-shader.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-shader-factory.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-texture.cpp
-    ${DALI_TEST_SUITE_DIR}/test-graphics-texture-factory.cpp
-    ${DALI_TEST_SUITE_DIR}/test-platform-abstraction.cpp
-    ${DALI_TEST_SUITE_DIR}/test-render-controller.cpp
-    ${DALI_TEST_SUITE_DIR}/test-render-surface.cpp
-    ${DALI_TEST_SUITE_DIR}/test-trace-call-stack.cpp
+          linker-test.cpp
+          ${DALI_TEST_SUITE_DIR}/test-application.cpp
+          ${DALI_TEST_SUITE_DIR}/test-gesture-manager.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-controller.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-sync-impl.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-sync-object.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-buffer.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-command-buffer.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-framebuffer.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-pipeline.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-program.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-reflection.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-sampler.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-shader.cpp
+          ${DALI_TEST_SUITE_DIR}/test-graphics-texture.cpp
+          ${DALI_TEST_SUITE_DIR}/test-platform-abstraction.cpp
+          ${DALI_TEST_SUITE_DIR}/test-render-controller.cpp
+          ${DALI_TEST_SUITE_DIR}/test-render-surface.cpp
+          ${DALI_TEST_SUITE_DIR}/test-trace-call-stack.cpp
   )
   ADD_EXECUTABLE( ${LINKER_TEST_NAME} ${LINKER_TEST_SOURCES} )
   TARGET_LINK_LIBRARIES(${LINKER_TEST_NAME} ${name} )

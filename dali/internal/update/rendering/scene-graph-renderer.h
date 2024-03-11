@@ -17,50 +17,46 @@
  * limitations under the License.
  */
 
+#include "render-item.h"
+
+#include <cstring>
+
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
+
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/common/collected-uniform-map.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
-#include <dali/internal/update/rendering/render-command-container.h>
+#include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
+#include <dali/internal/update/graphics/uniform-buffer.h>
+
 #include <dali/internal/update/rendering/stencil-parameters.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-pipeline.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
-#include <cstring>
 
-namespace Dali
-{
-
-namespace Internal
-{
-
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 class Geometry;
 class SceneController;
 class TextureSet;
 class Shader;
-class GraphicsBuffer;
+
 class RenderInstruction;
 class Renderer;
 typedef Dali::Vector< Renderer* > RendererContainer;
-typedef RendererContainer::Iterator RendererIter;
-typedef RendererContainer::ConstIterator RendererConstIter;
 
-typedef Dali::Vector< const UniformPropertyMapping* > CollectedUniformMap;
 
 class Renderer : public PropertyOwner,
-                 public UniformMap::Observer,
                  public ConnectionChangePropagator::Observer
 {
 public:
-
   enum OpacityType
   {
     OPAQUE,
@@ -76,7 +72,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~Renderer();
+  ~Renderer() override;
 
   /**
    * Overriden delete operator
@@ -101,7 +97,7 @@ public:
    * Returns current texture set object
    * @return Pointer to the texture set
    */
-  const TextureSet* GetTextures() const
+  [[nodiscard]] const TextureSet* GetTextures() const
   {
     return mTextureSet;
   }
@@ -361,69 +357,33 @@ public:
    * Gets the rendering behavior
    * @return The rendering behavior
    */
-  DevelRenderer::Rendering::Type GetRenderingBehavior() const;
+  [[nodiscard]] DevelRenderer::Rendering::Type GetRenderingBehavior() const;
+
+  /**
+   * Ensure that the associated shader is compiled and linked before we generate a pipeline/draw call
+   */
+  Shader* PrepareShader();
 
   /**
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
+   * @param[in] commandBuffer The command buffer to record commands to.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] renderInstruction The render instruction for this render command
+   * @param[in] item The render item.
    */
-  void PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction );
-
-  /**
-   * Frees all the render commands and associated data for the given render instruction
-   * @param[in] renderInstruction The render instruction for this render command
-   */
-  void FreeRenderCommand( RenderInstruction* renderInstruction );
-
-  /**
-   * Gets the render command associated with the render instruction
-   * @param[in] renderInstruction The render instruction for this render command
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  RenderCommand& GetRenderCommand( RenderInstruction* renderInstruction, BufferIndex updateBufferIndex );
+  void PrepareRender( Graphics::CommandBuffer& commandBuffer,
+                      const Matrix& viewMatrix,
+                      const Matrix& projectionMatrix,
+                      BufferIndex              updateBufferIndex,
+                      const RenderInstruction& renderInstruction,
+                      RenderItem&              item );
 
   template<class T>
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const T& data )
-  {
-    WriteUniform( ubo, bindings, name, hash, &data, sizeof(T) );
-  }
+  bool WriteDefaultUniform(const Graphics::UniformInfo*                           uniformInfo,
+                           const std::vector<std::unique_ptr<UniformBufferView>>& uboViews,
+                           const T&                                               data);
 
-  template<class T>
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const T& data )
-  {
-    WriteUniform( ubo, bindings, uniformInfo, &data, sizeof(T) );
-  }
-
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const Matrix3& data )
-  {
-    // Matrix3 has to take stride in account ( 16 )
-    float values[12];
-
-    // todo: optimise this case, ideally by stopping using Matrix3
-    std::memcpy( &values[0], data.AsFloat(), sizeof(float)*3 );
-    std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
-    std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
-
-    WriteUniform( ubo, bindings, name, hash, &values, sizeof(float)*12 );
-  }
-
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const Matrix3& data )
-  {
-    // Matrix3 has to take stride in account ( 16 )
-    float values[12];
-
-    // todo: optimise this case, ideally by stopping using Matrix3
-    std::memcpy( &values[0], data.AsFloat(), sizeof(float)*3 );
-    std::memcpy( &values[4], &data.AsFloat()[3], sizeof(float)*3 );
-    std::memcpy( &values[8], &data.AsFloat()[6], sizeof(float)*3 );
-
-    WriteUniform( ubo, bindings, uniformInfo, &values, sizeof(float)*12 );
-  }
-
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size );
-  void WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const void* data, uint32_t size );
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
@@ -431,20 +391,6 @@ public:
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
   OpacityType GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const;
-
-  /**
-   * Updates uniform buffer at index. Writes uniforms into given memory address
-   * @param[in,out] ubo Target uniform buffer object
-   * @param[out] outBindings output bindings vector
-   * @param[out] offset output offset of the next uniform buffer memory address
-   * @param[in] updateBufferIndex update buffer index
-   * @return true whether uniform buffer has been updated
-   */
-  bool UpdateUniformBuffers( RenderInstruction& instruction,
-                             GraphicsBuffer& ubo,
-                             std::vector<Graphics::RenderCommand::UniformBufferBinding>*& outBindings,
-                             uint32_t& offset,
-                             BufferIndex updateBufferIndex );
 
   /**
    * Called by the TextureSet to notify to the renderer that it has changed
@@ -456,24 +402,14 @@ public:
    */
   void TextureSetDeleted();
 
-  void BindPipeline( std::unique_ptr<Graphics::Pipeline> pipeline, BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
+  void SetPipeline( Graphics::UniquePtr<Graphics::Pipeline>&& pipeline )
   {
-    GetRenderCommand( renderInstruction, updateBufferIndex ).BindPipeline( std::move(pipeline), updateBufferIndex );
+    mPipeline = std::move(pipeline);
   }
 
-  std::unique_ptr<Graphics::Pipeline> ReleaseGraphicsPipeline( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
-  {
-    return GetRenderCommand( renderInstruction, updateBufferIndex ) .ReleaseGraphicsPipeline( updateBufferIndex );
-  }
-
-  void CheckRenderCommandCount(BufferIndex bufferIndex);
-
-  /**
-   * Destroy all graphics objects
-   */
-  void DestroyGraphicsObjects();
 
 public: // Implementation of ConnectionChangePropagator
+
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
    */
@@ -484,28 +420,22 @@ public: // Implementation of ConnectionChangePropagator
    */
   void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer){};
 
-public: // UniformMap::Observer
-  /**
-   * @copydoc UniformMap::Observer::UniformMappingsChanged
-   */
-  virtual void UniformMappingsChanged( const UniformMap& mappings );
-
 public: // ConnectionChangePropagator::Observer
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectionsChanged
    */
-  virtual void ConnectionsChanged( PropertyOwner& owner );
+  void ConnectionsChanged( PropertyOwner& owner ) override;
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
-  virtual void ConnectedUniformMapChanged( );
+  void ConnectedUniformMapChanged( ) override;
 
   /**
    * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
-  virtual void ObservedObjectDestroyed(PropertyOwner& owner);
+  void ObservedObjectDestroyed(PropertyOwner& owner) override;
 
 public: // PropertyOwner implementation
   /**
@@ -514,19 +444,86 @@ public: // PropertyOwner implementation
   virtual void ResetDefaultProperties( BufferIndex updateBufferIndex ){};
 
 private:
-
   /**
    * Protected constructor; See also Renderer::New()
    */
   Renderer();
 
+  void BindTextures( Graphics::CommandBuffer& commandBuffer, const Graphics::Reflection& reflection );
+
+  Graphics::Pipeline& PrepareGraphicsPipeline( Graphics::Program&       program,
+                                               const RenderInstruction& instruction,
+                                               Node*                    node,
+                                               bool                     blend );
+
+
+  std::size_t BuildUniformIndexMap(BufferIndex bufferIndex, const Node& node, Graphics::Program* program);
+
+  void WriteUniformBuffer(
+    BufferIndex                          bufferIndex,
+    Graphics::CommandBuffer&             commandBuffer,
+    SceneGraph::Shader&                  shader,
+    const RenderItem& item,
+    const Matrix&                        viewMatrix,
+    const Matrix&                        projectionMatrix,
+    std::size_t nodeIndex);
+
+  /**
+   * @brief Fill uniform buffer at index. Writes uniforms into given memory address
+   *
+   * @param[in] instruction The render instruction
+   * @param[in] uboViews Target uniform buffer object
+   * @param[in] updateBufferIndex update buffer index
+   * @param[in] nodeIndex Index of node/renderer pair in mUniformIndexMaps
+   */
+  void FillUniformBuffer(SceneGraph::Shader& shader,
+                         const std::vector<std::unique_ptr<UniformBufferView>>& uboViews,
+                         BufferIndex updateBufferIndex,
+                         std::size_t nodeIndex);
+
+
 private:
   Graphics::Controller*        mGraphicsController;               ///< Graphics controller
+  Graphics::UniquePtr<Graphics::Pipeline> mPipeline;
+  UniformBufferManager*        mUniformBufferManager{};
+  std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
-  CollectedUniformMap          mCollectedUniformMap[2];           ///< Uniform maps collected by the renderer
+  using Hash = std::size_t;
+
+  struct UniformIndexMap
+  {
+    std::string        uniformName;            ///< The uniform name
+    const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
+    Hash                     uniformNameHash{0u};
+    Hash                     uniformNameHashNoArray{0u};
+    int32_t                  arrayIndex{-1}; ///< The array index
+
+    int16_t  uniformLocation{0u};
+    uint16_t uniformOffset{0u};
+    uint16_t uniformBlockIndex{0u};
+    bool     initialized{false};
+  };
+  struct RenderItemLookup
+  {
+    const Node* node{nullptr};    ///< Node key. It can be nullptr if this NodeIndex don't need node uniform
+    const Graphics::Program* program{nullptr}; ///< Program key.
+
+    std::size_t index{0};                       ///<Index into mUniformIndexMap
+    std::size_t nodeChangeCounter{0};           ///<The last known change counter for this node's uniform map
+    std::size_t renderItemMapChangeCounter{0u}; ///< Change counter of the renderer & shader collected uniform map for this render item (node/renderer pair)
+  };
+  std::vector<RenderItemLookup> mNodeIndexMap; ///< usually only 1 element.
+  using UniformIndexMappings = std::vector<UniformIndexMap>;
+  std::vector<UniformIndexMappings> mUniformIndexMaps; ///< Cached map per node/renderer/shader.
+
+  UniformMap::SizeType mUniformMapChangeCounter{0u};
+  UniformMap::SizeType mShaderMapChangeCounter{0u};
+
+  CollectedUniformMap          mCollectedUniformMap;           ///< Uniform maps collected by the renderer
   TextureSet*                  mTextureSet;                       ///< The texture set this renderer uses. (Not owned)
   SceneGraph::Geometry*        mGeometry;                         ///< The geometry this renderer uses. (Not owned)
   Shader*                      mShader;                           ///< The shader this renderer uses. (Not owned)
+
   OwnerPointer< Vector4 >      mBlendColor;                       ///< The blend color for blending operation
 
   StencilParameters            mStencilParameters;                ///< Struct containing all stencil related options
@@ -535,7 +532,7 @@ private:
   uint32_t                     mIndexedDrawElementsCount;         ///< number of elements to be drawn using indexed draw
 
   uint32_t                     mRegenerateUniformMap;             ///< 2 if the map should be regenerated, 1 if it should be copied.
-  uint32_t                     mResendFlag;                       ///< Indicate whether data should be resent to the renderer
+  uint32_t                     mResendFlag{};                       ///< Indicate whether data should be resent to the renderer
 
   BlendingOptions              mBlendOptions;                     ///< The blending options
 
@@ -548,14 +545,14 @@ private:
   DepthTestMode::Type          mDepthTestMode:3;                  ///< Local copy of the depth test mode
   DevelRenderer::Rendering::Type mRenderingBehavior:2;            ///< The rendering behavior
 
-  bool                         mPremultipledAlphaEnabled:1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool mPremultipliedAlphaEnabled :1;       ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
-  RenderCommandContainer       mRenderCommands;
-  std::vector<Graphics::RenderCommand::TextureBinding> mTextureBindings;
+  std::vector<Graphics::TextureBinding> mTextureBindings;
 
 public:
   AnimatableProperty< float >  mOpacity;                          ///< The opacity value
   int32_t                      mDepthIndex;                       ///< Used only in PrepareRenderInstructions
+
 };
 
 
@@ -804,8 +801,8 @@ inline void SetRenderingBehaviorMessage( EventThreadServices& eventThreadService
   new (slot) LocalType( &renderer, &Renderer::SetRenderingBehavior, renderingBehavior );
 }
 
-} // namespace SceneGraph
-} // namespace Internal
-} // namespace Dali
+} // namespace Dali::Internal::SceneGraph
+
+
 
 #endif //  DALI_INTERNAL_SCENE_GRAPH_RENDERER_H

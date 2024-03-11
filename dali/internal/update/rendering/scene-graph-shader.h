@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_SHADER_H
+#define DALI_INTERNAL_SCENE_GRAPH_SHADER_H
 
 /*
  * Copyright (c) 2019 Samsung Electronics Co., Ltd.
@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-shader.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-shader.h>
 
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/shader-data.h>
@@ -29,25 +29,22 @@
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/rendering/shader-cache.h>
 
-namespace Dali
-{
-namespace Internal
-{
-
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 
 class ConnectionObserver;
 class SceneController;
+class UniformBufferManager;
 
 /**
- * Owner of Graphics Shader; also enables sharing of uniform properties.
+ * Owner of Graphics Program; also enables sharing of uniform properties.
  * Owned by UpdateManager.
+ *
+ * Equivalent of Render::Program in modern GLES world, but it's (also) the scene graph object of Dali::Shader,
  */
-class Shader : public PropertyOwner, public UniformMap::Observer
+class Shader : public PropertyOwner
 {
 public:
-
   /**
    * Indices of default uniforms
    */
@@ -63,16 +60,27 @@ public:
     COLOR
   };
 
+  struct UniformBlockMemoryRequirements
+  {
+    uint32_t blockCount{ 0u };
+    uint32_t totalSizeRequired {0u};
+    uint32_t totalCpuSizeRequired{ 0u };
+    uint32_t totalGpuSizeRequired{ 0u };
+
+    std::vector<uint32_t> blockSize{};
+    std::vector<uint32_t> blockSizeAligned{};
+  };
+
   /**
    * Devel constructor
    * @param hints
    */
-  Shader( Dali::Shader::Hint::Value& hints );
+  explicit Shader( Dali::Shader::Hint::Value& hints );
 
   /**
    * Virtual destructor
    */
-  virtual ~Shader();
+  ~Shader() override;
 
   /**
    * Initialize the shader object with the Graphics API when added to UpdateManager
@@ -80,7 +88,7 @@ public:
    * @param[in] graphics The Graphics API
    * @param[in] shaderCache A cache
    */
-  void Initialize( Graphics::Controller& graphics, ShaderCache& shaderCache );
+  void Initialize( Graphics::Controller& graphics, ShaderCache& shaderCache, UniformBufferManager& uboManager );
 
   /**
    * Query whether a shader hint is set.
@@ -88,35 +96,32 @@ public:
    * @param[in] hint The hint to check.
    * @return True if the given hint is set.
    */
-  bool HintEnabled( Dali::Shader::Hint::Value hint ) const
+  [[nodiscard]] bool HintEnabled( Dali::Shader::Hint::Value hint ) const
   {
     return mHints & hint;
   }
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties
+   * Get the graphics shader object
+   * @return the graphics shader object
    */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex )
-  {
-    // no default properties
-  }
+  [[nodiscard]] const Graphics::Program* GetGraphicsObject() const;
 
   /**
    * Get the graphics shader object
    * @return the graphics shader object
    */
-  const Graphics::Shader* GetGfxObject() const;
-
-  /**
-   * Get the graphics shader object
-   * @return the graphics shader object
-   */
-  Graphics::Shader* GetGfxObject();
+  Graphics::Program* GetGraphicsObject();
 
   /**
    * Destroy any graphics objects owned by this scene graph object
    */
   void DestroyGraphicsObjects();
+
+  [[nodiscard]] const UniformBlockMemoryRequirements& GetUniformBlockMemoryRequirements()
+  {
+    return mUniformBlockMemoryRequirements;
+  }
 
   /**
    * Retrieves uniform data.
@@ -130,22 +135,16 @@ public:
    *
    * @return False when uniform is not found or due to hash collision the result is ambiguous
    */
-  bool GetUniform( const std::string& name, size_t hashedName, Graphics::ShaderDetails::UniformInfo& out ) const;
+  bool GetUniform( const std::string& name, size_t hashedName, Graphics::UniformInfo& out ) const;
 
-  /**
-   * Retrieves default uniform
-   * @param[in] defaultUniformIndex index of the uniform
-   * @param[out] outputUniformInfo the reference to UniformInfo object
-   * @return True is uniform found, false otherwise
-   */
-  bool GetDefaultUniform( DefaultUniformIndex defaultUniformIndex, Graphics::ShaderDetails::UniformInfo& outputUniformInfo ) const;
+  bool GetUniform( const std::string& name, size_t hashedName, size_t hashNoArray, Graphics::UniformInfo& out ) const;
 
   /**
    * Retrievs default uniform
    * @param[in] defaultUniformIndex index of the uniform
    * @return Valid pointer to the UniformInfo object or nullptr
    */
-  const Graphics::ShaderDetails::UniformInfo* GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const;
+  [[nodiscard]] const Graphics::UniformInfo* GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const;
 
 public: // Messages
   /**
@@ -168,12 +167,6 @@ public: // Implementation of ConnectionChangePropagator
    */
   void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
 
-public: // UniformMap::Observer
-  /**
-   * @copydoc UniformMap::Observer::UniformMappingsChanged
-   */
-  virtual void UniformMappingsChanged( const UniformMap& mappings );
-
 private:
 
   /**
@@ -182,10 +175,9 @@ private:
    */
   struct ReflectionUniformInfo
   {
-    size_t                               hashValue { 0 };
-    bool                                 hasCollision { false };
-    Graphics::Shader*                    graphicsShader { nullptr };
-    Graphics::ShaderDetails::UniformInfo uniformInfo {};
+    Graphics::UniformInfo uniformInfo {};
+    size_t hashValue { 0 };
+    bool   hasCollision { false };
   };
 
   /**
@@ -194,9 +186,11 @@ private:
   void BuildReflection();
 
 private: // Data
-  Graphics::Controller*           mGraphicsController; ///< Graphics interface object
-  Graphics::Shader*               mGraphicsShader; ///< The graphics object ( owned by cache )
-  ShaderCache*                    mShaderCache;
+  Graphics::Controller*           mController; ///< Graphics interface object
+  Graphics::Program*              mGraphicsProgram{nullptr}; ///< The graphics object
+  ShaderCache*                    mShaderCache; ///< The Program cache (Owns assoc Graphics::Program)
+  UniformBufferManager*           mUboManager;
+
   Dali::Shader::Hint::Value       mHints; ///< Hints for the shader
   ConnectionChangePropagator      mConnectionObservers; ///< Watch for connection changes
 
@@ -204,12 +198,14 @@ private: // Data
 
   UniformReflectionContainer      mReflection; ///< Contains reflection build per shader
   UniformReflectionContainer      mReflectionDefaultUniforms; ///< Contains default uniforms
+
+  UniformBlockMemoryRequirements mUniformBlockMemoryRequirements;
 };
 
 
 inline void SetShaderProgramMessage( EventThreadServices& eventThreadServices,
                                      Shader& shader,
-                                     Internal::ShaderDataPtr shaderData,
+                                     const Internal::ShaderDataPtr& shaderData,
                                      bool modifiesGeometry )
 {
   typedef MessageValue2< Shader, Internal::ShaderDataPtr, bool > LocalType;
@@ -223,10 +219,6 @@ inline void SetShaderProgramMessage( EventThreadServices& eventThreadServices,
 
 
 
-} // namespace SceneGraph
-
-} // namespace Internal
-
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_SHADER_H

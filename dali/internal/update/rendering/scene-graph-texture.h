@@ -24,8 +24,8 @@
 #include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-texture.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-texture.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
@@ -107,7 +107,7 @@ public:
    * Get the Graphics object associated with this texture
    * @return The graphics object.
    */
-  Graphics::Texture* GetGfxObject() const;
+  Graphics::Texture* GetGraphicsObject() const;
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -130,7 +130,7 @@ public: // From messages
   /**
    * Create a graphics texture using the parameters defined in this object
    */
-  void CreateTexture(Usage usage);
+  void CreateTexture(Graphics::TextureUsageFlags);
 
   /**
    * Called when the texture is about to be used for drawing.
@@ -142,11 +142,11 @@ public:
    * Creates a texture with the specified buffer and buffer size.
    * Buffer may be null.
    */
-  void CreateTextureInternal( Usage usage, unsigned char* buffer, unsigned int bufferSize );
+  void CreateTextureInternal( Graphics::TextureUsageFlags usage, unsigned char* buffer, unsigned int bufferSize );
 
 private:
   Graphics::Controller*   mGraphicsController; ///< Graphics interface object
-  std::unique_ptr<Graphics::Texture> mGraphicsTexture; ///< Graphics texture
+  Graphics::UniquePtr<Graphics::Texture> mGraphicsTexture; ///< Graphics texture
 
   NativeImageInterfacePtr mNativeImage;      ///< Pointer to native image
   SceneGraph::Sampler     mSampler;          ///< The current sampler state

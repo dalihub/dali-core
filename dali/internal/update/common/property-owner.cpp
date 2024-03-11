@@ -161,18 +161,6 @@ const UniformMap& PropertyOwner::GetUniformMap() const
   return mUniformMaps;
 }
 
-void PropertyOwner::AddUniformMapObserver( UniformMap::Observer& observer )
-{
-  mUniformMaps.AddObserver( observer );
-}
-
-void PropertyOwner::RemoveUniformMapObserver( UniformMap::Observer& observer )
-{
-  mUniformMaps.RemoveObserver( observer );
-}
-
-
-
 } // namespace SceneGraph
 
 } // namespace Internal

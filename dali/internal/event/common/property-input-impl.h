@@ -48,9 +48,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~PropertyInputImpl()
-  {
-  }
+  virtual ~PropertyInputImpl() = default;
 
   /**
    * Query the type of property input.
@@ -177,6 +175,18 @@ public:
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix&>(*this);
   }
+
+  /**
+   * Retrieve the address of the property value. Only for use
+   * when writing uniforms.
+   */
+  virtual const void* GetValueAddress(BufferIndex bufferIndex) const = 0;
+
+  /**
+   * Retrieve the size of the property value for use in copying.
+   * Only for use when writing uniforms.
+   */
+  virtual size_t GetValueSize() const = 0;
 
   // Accessors for Constraint functions
 

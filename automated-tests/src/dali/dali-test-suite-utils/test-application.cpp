@@ -36,7 +36,7 @@ TestApplication::TestApplication( uint32_t surfaceWidth,
   mLastVSyncTime(0u),
   mDataRetentionPolicy( policy )
 {
-  mGraphicsController = std::unique_ptr<Test::GraphicsController>( new Test::GraphicsController() );
+  mGraphicsController = std::unique_ptr<TestGraphicsController>( new TestGraphicsController() );
 
   Initialize();
 }
@@ -94,6 +94,9 @@ void TestApplication::LogMessage(Dali::Integration::Log::DebugPriority level, st
   {
     switch(level)
     {
+      case Dali::Integration::Log::DebugDebug:
+        fprintf(stderr, "DEBUG: %s", message.c_str());
+        break;
       case Dali::Integration::Log::DebugInfo:
         fprintf(stderr, "INFO: %s", message.c_str());
         break;
@@ -120,7 +123,7 @@ TestPlatformAbstraction& TestApplication::GetPlatform()
   return mPlatformAbstraction;
 }
 
-Test::GraphicsController& TestApplication::GetGraphicsController()
+TestGraphicsController& TestApplication::GetGraphicsController()
 {
   return *mGraphicsController.get();
 }

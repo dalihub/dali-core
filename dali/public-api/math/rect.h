@@ -197,10 +197,37 @@ struct Rect
    */
   bool Intersects(const Rect<T>& other) const
   {
-    return (other.x + other.width)  > x           &&
-      other.x                 < (x + width) &&
-                                (other.y + other.height) > y           &&
-      other.y                 < (y + height);
+    return (other.x + other.width)  > x && other.x < (x + width) &&
+           (other.y + other.height) > y && other.y < (y + height);
+  }
+
+  /**
+   * @brief Intersects this rectangle and the specified rectangle.
+   * The result of the intersection is stored in this rectangle.
+   *
+   * @SINCE_1_9.18
+   * @param[in] rect The other rectangle to intersect with
+   * @return True if the rectangles intersect
+   */
+  bool Intersect(const Rect<T>& rect)
+  {
+    const int left   = std::max(rect.x, x);
+    const int top    = std::max(rect.y, y);
+    const int right  = std::min(rect.x + rect.width, x + width);
+    const int bottom = std::min(rect.y + rect.height, y + height);
+
+    const int width  = right - left;
+    const int height = bottom - top;
+    if(!(width < 0 || height < 0))
+    {
+      x            = left;
+      y            = top;
+      this->width  = width;
+      this->height = height;
+      return true;
+    }
+
+    return false;
   }
 
   /**

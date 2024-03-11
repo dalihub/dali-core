@@ -1,8 +1,8 @@
-#ifndef TEST_GRAPHICS_TEXTURE_H
-#define TEST_GRAPHICS_TEXTURE_H
+#ifndef DALI_TEST_GRAPHICS_TEXTURE_H
+#define DALI_TEST_GRAPHICS_TEXTURE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,60 +15,78 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include <dali/graphics-api/graphics-api-texture.h>
-#include <memory>
+#include <dali/graphics-api/graphics-texture-create-info.h>
+#include <dali/graphics-api/graphics-texture.h>
+#include <dali/graphics-api/graphics-types.h>
 
-namespace Test
+#include "test-graphics-sampler.h"
+
+namespace Dali
 {
-class GraphicsController;
-
-struct GraphicsTextureCreateInfo
-{
-  Dali::Graphics::TextureDetails::Type type;
-  Dali::Graphics::Extent2D size;
-  Dali::Graphics::TextureDetails::Format format;
-  Dali::Graphics::TextureDetails::MipMapFlag mipMapFlag;
-  Dali::Graphics::TextureDetails::Usage usage;
-  void* pData;
-  uint32_t dataSizeInBytes;
-};
-
-class GraphicsTexture : public Dali::Graphics::Texture
+class TestGraphicsTexture : public Graphics::Texture
 {
 public:
-  explicit GraphicsTexture(GraphicsController& controller, const GraphicsTextureCreateInfo& createInfo);
+  TestGraphicsTexture( const Graphics::TextureCreateInfo& createInfo );
 
-  ~GraphicsTexture() override;
+  ~TestGraphicsTexture() override;
 
-  void CopyMemory( const void *srcMemory, uint32_t srcMemorySize, Dali::Graphics::Extent2D srcExtent,
-                   Dali::Graphics::Offset2D dstOffset, uint32_t layer, uint32_t level,
-                   Dali::Graphics::TextureDetails::UpdateMode updateMode ) override;
+  /**
+   * Initialize the texture: allocate gpu mem, apply default samplers
+   */
+  void Initialize( uint32_t target );
 
-  void CopyTexture( const Dali::Graphics::Texture &srcTexture, Dali::Graphics::Rect2D srcRegion,
-                    Dali::Graphics::Offset2D dstOffset, uint32_t layer, uint32_t level,
-                    Dali::Graphics::TextureDetails::UpdateMode updateMode ) override;
+  /**
+   * Ensure native resource is created, bound and targeted.
+   */
+  void InitializeNativeImage( uint32_t target );
 
-  void CopyBuffer( const Dali::Graphics::Buffer &srcBuffer,
-                   uint32_t bufferOffset,
-                   Dali::Graphics::Extent2D srcExtent,
-                   Dali::Graphics::Offset2D dstOffset,
-                   uint32_t layer,
-                   uint32_t level,
-                   Dali::Graphics::TextureUpdateFlags flags ) override;
+  /**
+   * Get the GL target of this texture
+   */
+  uint32_t GetTarget();
 
-  Dali::Graphics::MemoryRequirements GetMemoryRequirements() const override;
+  /**
+   * Get the texture type
+   */
+  Graphics::TextureType GetType()
+  {
+    return mCreateInfo.textureType;
+  }
 
-  const Dali::Graphics::TextureProperties& GetProperties() override;
+  /**
+   * Get the texture format
+   */
+  Graphics::Format GetFormat()
+  {
+    return mCreateInfo.format;
+  }
 
-public:
-  GraphicsController& mController;
-  GraphicsTextureCreateInfo mCreateInfo;
-  std::unique_ptr<Dali::Graphics::TextureProperties> mProperties;
+  /**
+   * Bind this texture, ensure Native image is initialized if necessary.
+   */
+  void Bind( uint32_t textureUnit );
+
+  /**
+   * Prepare ensures that the native texture is updated if necessary
+   */
+  void Prepare();
+
+  /**
+   * Writes actual texture data to GL.
+   */
+  void Update( Graphics::TextureUpdateInfo updateInfo, Graphics::TextureUpdateSourceInfo source );
+
+  uint32_t mId{ 0 };
+
+  Graphics::TextureCreateInfo mCreateInfo;
+  bool                        mIsCompressed{ false };
+  uint32_t                    mGlInternalFormat; ///< The gl internal format of the pixel data
+  uint32_t                    mGlFormat;         ///< The gl format of the pixel data
+  uint32_t                    mPixelDataType;    ///< The data type of the pixel data
 };
 
-} // namespace Test
+} // namespace Dali
 
-#endif // TEST_GRAPHICS_TEXTURE_H
+#endif //DALI_TEST_GRAPHICS_TEXTURE_H

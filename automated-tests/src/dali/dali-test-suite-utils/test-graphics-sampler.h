@@ -1,8 +1,8 @@
-#ifndef TEST_GRAPHICS_SAMPLER_H
-#define TEST_GRAPHICS_SAMPLER_H
+#ifndef DALI_TEST_GRAPHICS_SAMPLER_H
+#define DALI_TEST_GRAPHICS_SAMPLER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,53 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include <dali/graphics-api/graphics-api-sampler.h>
-#include <dali/graphics-api/graphics-api-types.h>
+#include <dali/graphics-api/graphics-sampler-create-info.h>
+#include <dali/graphics-api/graphics-sampler.h>
+#include <dali/graphics-api/graphics-types.h>
 
-namespace Test
+#include <cstdint>
+#include <map>
+
+
+namespace Dali
 {
-class GraphicsController;
-
-struct GraphicsSamplerCreateInfo
-{
-  Dali::Graphics::SamplerAddressMode mAddressModeU {};
-  Dali::Graphics::SamplerAddressMode mAddressModeW {};
-  Dali::Graphics::SamplerAddressMode mAddressModeV {};
-  Dali::Graphics::SamplerFilter      mMinFilter {};
-  Dali::Graphics::SamplerFilter      mMagFilter {};
-  Dali::Graphics::SamplerMipmapMode  mMipmapMode {};
-  Dali::Graphics::CompareOp          mCompareOp {};
-  float                              mMaxAnisotropy { 0.0f };
-  float                              mMinLod { 0.0f };
-  float                              mMaxLod { 0.0f };
-  bool                               mCompareEnable {};
-  bool                               mAnisotropyEnable { false };
-  bool                               mUnnormalizedCoordinates { false };
-};
-
-class GraphicsSampler : public Dali::Graphics::Sampler
+/**
+ * Maintains a cache of parameters per texture/texture target
+ */
+class TestGraphicsSampler : public Graphics::Sampler
 {
 public:
-  explicit GraphicsSampler(GraphicsController& controller, GraphicsSamplerCreateInfo createInfo);
+  TestGraphicsSampler(const Graphics::SamplerCreateInfo& createInfo);
 
-  ~GraphicsSampler() override;
+  /**
+   * Apply sampler to target texture.
+   */
+  void Apply(uint32_t target);
+
+  static void SetTexParameter(uint32_t target, uint32_t pname, int32_t value);
+
+  static int32_t FilterModeToGL(Graphics::SamplerFilter filterMode);
+
+  static int32_t FilterModeToGL(Graphics::SamplerFilter filterMode, Graphics::SamplerMipmapMode mipmapMode);
+
+  /**
+   * @brief Convert from a WrapMode to its corresponding GL enumeration
+   * @param[in] wrapMode The wrap mode
+   * @param[in] defaultWrapMode The mode to use if WrapMode is Default
+   * @return The equivalent GL wrap mode
+   */
+  static int32_t WrapModeToGL(Graphics::SamplerAddressMode wrapMode);
+
+  static uint32_t GetTexParamHash(uint32_t target, uint32_t pname);
 
 public:
-  GraphicsController& mController;
-  GraphicsSamplerCreateInfo mCreateInfo;
+  static std::map<uint32_t, int32_t> mParamCache;
+
+  Graphics::SamplerCreateInfo mCreateInfo;
 };
 
-} // namespace Test
+} // namespace Dali
 
-#endif // TEST_GRAPHICS_SAMPLER_H
+#endif //DALI_TEST_GRAPHICS_SAMPLER_H

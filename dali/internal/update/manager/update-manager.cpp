@@ -26,7 +26,7 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/threading/mutex.h>
@@ -60,9 +60,10 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/rendering/shader-cache.h>
+#include <dali/internal/update/rendering/scene-graph-scene.h>
 
-#include <dali/graphics-api/graphics-api-buffer-factory.h>
-#include <dali/graphics-api/graphics-api-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-buffer.h>
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -187,8 +188,7 @@ struct UpdateManager::Impl
     animationPlaylist( animationPlaylist ),
     propertyNotifier( propertyNotifier ),
     discardQueue( discardQueue ),
-    renderController( renderController ),
-    sceneController( NULL ),
+    sceneController( nullptr ),
     graphicsAlgorithms( graphicsController ),
     renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
@@ -197,9 +197,9 @@ struct UpdateManager::Impl
     renderers(),
     textureSets(),
     shaders(),
-    panGestureProcessor( NULL ),
+    panGestureProcessor( nullptr ),
     messageQueue( renderController, sceneGraphBuffers ),
-    frameCallbackProcessor( NULL ),
+    frameCallbackProcessor( nullptr ),
     keepRenderingSeconds( 0.0f ),
     nodeDirtyFlags( NodePropertyFlags::TRANSFORM ), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter( 0 ),
@@ -235,7 +235,7 @@ struct UpdateManager::Impl
       RenderTaskList::RenderTaskContainer& tasks = taskList->GetTasks();
       for ( auto&& task : tasks )
       {
-        task->SetSourceNode( NULL );
+        task->SetSourceNode( nullptr );
       }
     }
 
@@ -286,7 +286,7 @@ struct UpdateManager::Impl
     /**
      * Worker thread lambda function
      */
-    auto workerFunction = [&, processParallel, useSingleStagingBuffer]( int workerThread )
+    auto workerFunction = [&, useSingleStagingBuffer]( int workerThread )
     {
       textureUpdateInfoArray.clear();
       textureUpdateSourceInfoArray.clear();
@@ -298,19 +298,19 @@ struct UpdateManager::Impl
       {
         auto pixelData = request.pixelData;
 
-        // Intialise texture
+        // Initialise texture
         if( useSingleStagingBuffer )
         {
           auto info = Graphics::TextureUpdateInfo{};
 
           // initialise texture object without allocating memory for it yet
-          if(!request.texture->GetGfxObject())
+          if(!request.texture->GetGraphicsObject())
           {
-            request.texture->CreateTextureInternal( Texture::Usage::SAMPLE, nullptr, 0u );
+            request.texture->CreateTextureInternal( 0|Graphics::TextureUsageFlagBits::SAMPLE, nullptr, 0u );
           }
 
           // prepare transfer info structure
-          info.dstTexture = request.texture->GetGfxObject();
+          info.dstTexture = request.texture->GetGraphicsObject();
           info.dstOffset2D = { request.uploadParams.xOffset, request.uploadParams.yOffset };
           info.srcOffset = 0u;
           info.srcSize = request.pixelData->GetBufferSize();
@@ -320,8 +320,8 @@ struct UpdateManager::Impl
 
           // store source
           auto source = Graphics::TextureUpdateSourceInfo{};
-          source.sourceType = Graphics::TextureUpdateSourceInfo::Type::Memory;
-          source.memorySource.pMemory = pixelData->GetBuffer();
+          source.sourceType = Graphics::TextureUpdateSourceInfo::Type::MEMORY;
+          source.memorySource.memory = pixelData->GetBuffer();
           textureUpdateSourceInfoArray.emplace_back( source );
         }
         else
@@ -360,7 +360,6 @@ struct UpdateManager::Impl
   PropertyNotifier&                    propertyNotifier;              ///< Provides notification to applications when properties are modified.
 
   DiscardQueue&                        discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
-  RenderController&                    renderController;              ///< render controller
   SceneControllerImpl*                 sceneController;               ///< scene controller
   GraphicsAlgorithms                   graphicsAlgorithms;            ///< Graphics algorithms
   RenderInstructionContainer           renderInstructions;            ///< List of current instructions per frame
@@ -418,6 +417,8 @@ struct UpdateManager::Impl
   std::vector<Graphics::TextureUpdateInfo> textureUpdateInfoArray;
   std::vector<Graphics::TextureUpdateSourceInfo> textureUpdateSourceInfoArray;
 
+  OwnerPointer<Scene> defaultScene;
+
 private:
 
   Impl( const Impl& ); ///< Undefined
@@ -440,6 +441,10 @@ UpdateManager::UpdateManager( NotificationManager&             notificationManag
                    renderTaskProcessor,
                    graphicsController) )
 {
+  mImpl->defaultScene = new SceneGraph::Scene();
+  Integration::DepthBufferAvailable depthNeeded=Integration::DepthBufferAvailable::TRUE;
+  Integration::StencilBufferAvailable stencilBufferAvailable = Integration::StencilBufferAvailable::TRUE;
+  mImpl->defaultScene->Initialize(graphicsController, depthNeeded, stencilBufferAvailable);
 }
 
 UpdateManager::~UpdateManager()
@@ -628,7 +633,7 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
 
 void UpdateManager::AddShader( OwnerPointer< Shader >& shader )
 {
-  shader->Initialize( mImpl->graphicsController, mImpl->shaderCache );
+  shader->Initialize( mImpl->graphicsController, mImpl->shaderCache, mImpl->graphicsAlgorithms.GetUniformBufferManager());
   mImpl->shaders.PushBack( shader.Release() );
 }
 
@@ -840,34 +845,6 @@ void UpdateManager::PrepareNodes( BufferIndex updateBufferIndex )
   }
 }
 
-void UpdateManager::PrepareRenderers( BufferIndex bufferIndex )
-{
-  // Prepare renderers. Each render item maps to a render
-  // command. There may be more than one render item per renderer if
-  // the actor containing the renderer is in more than one render
-  // task. The renderer owns the render commands.
-
-  const auto renderInstructionCount = mImpl->renderInstructions.Count( bufferIndex );
-  for( auto i=0u; i < renderInstructionCount; ++i )
-  {
-    auto& renderInstruction = mImpl->renderInstructions.At( bufferIndex, i);
-    const auto renderListCount = renderInstruction.RenderListCount();
-    for( auto j=0u; j < renderListCount; ++j )
-    {
-      auto renderList = renderInstruction.GetRenderList( j );
-      const auto renderItemCount = renderList->Count();
-      for( auto k=0u; k < renderItemCount; ++k )
-      {
-        auto& renderItem = renderList->GetItem( k );
-        if( renderItem.mRenderer )
-        {
-          renderItem.mRenderer->PrepareRender( bufferIndex, &renderInstruction );
-        }
-      }
-    }
-  }
-}
-
 void UpdateManager::UploadTexture( Texture* texture,
                                    PixelDataPtr pixelData,
                                    const Internal::Texture::UploadParams& params )
@@ -897,7 +874,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
   //Clear nodes/resources which were previously discarded
-  size_t numberOfDiscardedRenderers = mImpl->discardQueue.GetRendererCount( bufferIndex );
   mImpl->discardQueue.Clear( bufferIndex );
 
   //Process Touches & Gestures
@@ -1013,13 +989,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         }
       }
 
-      // Pass the total number of renderers that were discarded this frame to the graphics backend.
-      // This may trigger garbage collection.
-      if( numberOfDiscardedRenderers > 0 )
-      {
-        mImpl->graphicsController.RunGarbageCollector( numberOfDiscardedRenderers );
-      }
-
       // generate graphics objects
       PrepareNodes( bufferIndex );
       if( future )
@@ -1027,14 +996,10 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         future->Wait();
         future.reset();
       }
-      PrepareRenderers( bufferIndex );
-      mImpl->graphicsAlgorithms.SubmitRenderInstructions( mImpl->graphicsController, mImpl->renderInstructions, bufferIndex );
+      mImpl->graphicsAlgorithms.ResetCommandBuffer();
+      mImpl->graphicsAlgorithms.RenderScene(mImpl->defaultScene.Get(), bufferIndex, true);
+      mImpl->graphicsAlgorithms.RenderScene(mImpl->defaultScene.Get(), bufferIndex, false);
     }
-  }
-  else
-  {
-    // Discard graphics resources
-    mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphicsController );
   }
 
   for( auto taskList : mImpl->taskLists )
@@ -1094,7 +1059,7 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
 
-  mImpl->graphicsController.SwapBuffers();
+  //mImpl->graphicsController.SwapBuffers();
 
   // Clear texture upload requests
   if( !mImpl->textureUploadRequestContainer.empty() )
@@ -1332,11 +1297,6 @@ void UpdateManager::DestroyGraphicsObjects()
 
   mImpl->renderInstructions.Shutdown(); //Prevent further access of dangling renderer ptrs
 
-  for( auto& renderer : mImpl->renderers )
-  {
-    renderer->DestroyGraphicsObjects();
-  }
-
   for( auto& geometry : mImpl->geometryContainer )
   {
     geometry->DestroyGraphicsObjects();
@@ -1368,9 +1328,6 @@ void UpdateManager::DestroyGraphicsObjects()
   }
 
   mImpl->shaderCache.DestroyGraphicsObjects();
-
-  // Ensure resources are discarded
-  mImpl->graphicsAlgorithms.DiscardUnusedResources( mImpl->graphicsController );
 
   mImpl->graphicsShutdown = true;
 

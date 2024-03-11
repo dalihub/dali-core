@@ -2,7 +2,7 @@
 #define TEST_GRAPHICS_FRAMEBUFFER_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,33 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include <dali/graphics-api/graphics-api-framebuffer.h>
-#include <test-graphics-framebuffer-factory.h>
+#include <dali/graphics-api/graphics-framebuffer-create-info.h>
+#include <dali/graphics-api/graphics-framebuffer.h>
+#include <dali/graphics-api/graphics-types.h>
+#include "test-trace-call-stack.h"
 
-namespace Test
+namespace Dali
 {
-class GraphicsController;
-
-class GraphicsFramebuffer : public Dali::Graphics::Framebuffer
+class TestGraphicsFramebuffer : public Graphics::Framebuffer
 {
 public:
-  explicit GraphicsFramebuffer( GraphicsController& mController,
-                                Dali::Graphics::Extent2D size,
-                                const std::vector<GraphicsFramebufferFactory::ColorAttachment>& colorAttachments,
-                                const GraphicsFramebufferFactory::DepthAttachment& depthAttachment );
+  TestGraphicsFramebuffer(TraceCallStack& callStack, const Graphics::FramebufferCreateInfo& createInfo);
+  ~TestGraphicsFramebuffer();
 
-  ~GraphicsFramebuffer() override;
+  void Initialize();
+  void AttachTexture(Graphics::Texture* texture, uint32_t attachmentId, uint32_t layerId, uint32_t levelId);
+  void Bind();
 
-public:
-  GraphicsController& mController;
-  Dali::Graphics::Extent2D mSize;
-  const std::vector<GraphicsFramebufferFactory::ColorAttachment>& mColorAttachments;
-  const GraphicsFramebufferFactory::DepthAttachment& mDepthAttachment;
+  Graphics::FramebufferCreateInfo mCreateInfo;
+  TraceCallStack&                 mCallStack;
+
+  uint32_t mId{0};
+  uint32_t mDepthBuffer{0};
+  uint32_t mStencilBuffer{0};
 };
 
-} // namespace Test
+} // namespace Dali
 
-#endif // TEST_GRAPHICS_FRAMEBUFFER_H
+#endif //TEST_GRAPHICS_FRAMEBUFFER_H

@@ -25,11 +25,7 @@
 #include <dali/internal/update/rendering/render-list.h>
 #include <dali/internal/update/rendering/scene-graph-frame-buffer.h>
 
-namespace Dali
-{
-namespace Internal
-{
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 
 /**
@@ -70,7 +66,7 @@ public:
   /**
    * @return the count of active Renderlists
    */
-  RenderListContainer::SizeType RenderListCount() const;
+  [[nodiscard]] RenderListContainer::SizeType RenderListCount() const;
 
   /**
    * Return the renderlist at given index
@@ -78,7 +74,7 @@ public:
    * @param index of list to return
    * @return pointer to the renderlist, or null if the index is out of bounds.
    */
-  const RenderList* GetRenderList( RenderListContainer::SizeType index ) const;
+  [[nodiscard]] const RenderList* GetRenderList( RenderListContainer::SizeType index ) const;
 
   /**
    * Reset render-instruction
@@ -100,7 +96,7 @@ public:
    * @param index of the rendering side
    * @return the view matrix
    */
-  const Matrix* GetViewMatrix( BufferIndex index ) const
+  [[nodiscard]] const Matrix* GetViewMatrix( BufferIndex index ) const
   {
     // inlined as this is called once per frame per render instruction
     return &mCamera->GetViewMatrix( index );
@@ -111,29 +107,20 @@ public:
    * @param index of the rendering side
    * @return the projection matrix
    */
-  const Matrix* GetProjectionMatrix( BufferIndex index ) const
+  [[nodiscard]] const Matrix* GetProjectionMatrix( BufferIndex index ) const
   {
     // inlined as this is called once per frame per render instruction
     return &mCamera->GetProjectionMatrix( index );
   }
 
   /**
-   * Frees render commands associated with this render instruction. Only call if the system
-   * is not being shutdown (e.g. if the render task is disabled/removed by app)
-   */
-  void FreeRenderCommands();
-
-  /**
    * Signls that the system is being shutdown
    */
   void Shutdown();
 
-private:
-
-  // Undefined
-  RenderInstruction(const RenderInstruction&);
-  // Undefined
-  RenderInstruction& operator=(const RenderInstruction& rhs);
+  // Remove copy constructor and copy assignment
+  RenderInstruction(const RenderInstruction&) = delete;
+  RenderInstruction& operator=(const RenderInstruction& rhs) = delete;
 
 public: // Data
 
@@ -147,17 +134,15 @@ public: // Data
   SceneGraph::FrameBuffer* mFrameBuffer;
 
 private: // Data
-
   Camera* mCamera;  ///< camera that is used
   RenderListContainer mRenderLists;     ///< container of all render lists
   RenderListContainer::SizeType mNextFreeRenderList;     ///< index for the next free render list
-
 };
 
-} // namespace SceneGraph
+} // namespace Dali::Internal::SceneGraph
 
-} // namespace Internal
 
-} // namespace Dali
+
+
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H

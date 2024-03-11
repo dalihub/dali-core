@@ -24,13 +24,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/update/nodes/node.h>
 
-namespace Dali
-{
-
-namespace Internal
-{
-
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 
 /**
@@ -62,7 +56,7 @@ struct RenderItem
    * @param[in]    viewportHeight    The height of the viewport to calculate for
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  ClippingBox CalculateViewportSpaceAABB( const int viewportWidth, const int viewportHeight ) const;
+  ClippingBox CalculateViewportSpaceAABB( int viewportWidth, int viewportHeight ) const;
 
   /**
    * Overriden delete operator.
@@ -93,10 +87,10 @@ private:
 
 };
 
-} // namespace SceneGraph
+} // namespace Dali::Internal::SceneGraph
 
-} // namespace Internal
 
-} // namespace Dali
+
+
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H

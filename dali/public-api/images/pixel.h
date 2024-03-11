@@ -114,6 +114,16 @@ enum Format
   RGB16F, ///< Color depth 48-bit, 16-16-16 half floating point. @SINCE_1_2.60
   RGB32F, ///< Color depth 96-bit, 32-32-32 floating point. @SINCE_1_2.60
 
+  DEPTH_UNSIGNED_INT, ///< Unsigned int depth format 32-bit. @SINCE_1_9.9
+  DEPTH_FLOAT,        ///< Float depth format 32-bit. @SINCE_1_9.9
+
+  DEPTH_STENCIL, ///< Depth stencil 32-bit, 24 bit for depth, 8 bit for stencil. @SINCE_1_9.9
+
+  R11G11B10F, ///< Packed 32-bit, 11-11-10 unsigned floating point.
+
+  CHROMINANCE_U, ///< Color depth 8-bit, chrominance U
+  CHROMINANCE_V  ///< Color depth 8-bit, chrominance V
+
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
 
@@ -129,7 +139,7 @@ const Format FIRST_VALID_PIXEL_FORMAT = A8;
  *
  * Sync it to the last value above.
  */
-const Format LAST_VALID_PIXEL_FORMAT = RGB32F;
+const Format LAST_VALID_PIXEL_FORMAT = CHROMINANCE_V;
 
 /**
  * @brief Whether specified pixel format contains an alpha value.

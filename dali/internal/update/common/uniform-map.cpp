@@ -33,42 +33,9 @@ UniformMap::~UniformMap()
   // Nothing to do - let the owner container delete the maps
 }
 
-void UniformMap::AddObserver( Observer& observer )
-{
-  bool foundObserver = false;
-  for( ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
-  {
-    if( *iter == &observer )
-    {
-      foundObserver = true;
-      break;
-    }
-  }
-  if( !foundObserver )
-  {
-    mObservers.PushBack( &observer );
-  }
-}
-
-void UniformMap::RemoveObserver( Observer& observer )
-{
-  for( ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
-  {
-    if( *iter == &observer )
-    {
-      mObservers.Erase(iter);
-      return;
-    }
-  }
-}
-
 void UniformMap::MappingChanged()
 {
-  for( ObserversIter iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
-  {
-    Observer* observer = (*iter);
-    observer->UniformMappingsChanged( *this );
-  }
+  ++mChangeCounter;
 }
 
 void UniformMap::Add( UniformPropertyMapping* newMap )
@@ -77,7 +44,7 @@ void UniformMap::Add( UniformPropertyMapping* newMap )
 
   bool found = false;
 
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
+  for( auto iter = mUniformMaps.Begin() ;
        iter != mUniformMaps.End() ;
        ++iter )
   {
@@ -109,7 +76,7 @@ void UniformMap::Remove( const std::string& uniformName )
 
   bool found=false;
 
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
+  for( auto iter = mUniformMaps.Begin() ;
        iter != mUniformMaps.End() ;
        ++iter )
   {
@@ -135,7 +102,7 @@ const PropertyInputImpl* UniformMap::Find( const std::string& uniformName )
 {
   UniformPropertyMapping::Hash nameHash = CalculateHash( uniformName );
 
-  for( UniformMapIter iter = mUniformMaps.Begin() ;
+  for( auto iter = mUniformMaps.Begin() ;
        iter != mUniformMaps.End() ;
        ++iter )
   {

@@ -17,9 +17,9 @@
  * limitations under the License.
  */
 
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-shader.h>
-#include <dali/graphics-api/graphics-api-shader-details.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-shader.h>
+#include <dali/graphics-api/graphics-types.h>
 #include <memory>
 
 namespace Dali
@@ -30,29 +30,27 @@ namespace SceneGraph
 {
 
 /**
- * Caches graphics shaders as they are created by SceneGraph::Shader.
+ * Caches graphics programs as they are created by SceneGraph::Shader.
  */
 struct ShaderCache
 {
   struct Item
   {
-    Item() = default;
     Item( const Item& ) = delete;
     Item( Item&& ) = default;
-
-    Item( std::unique_ptr<Dali::Graphics::Shader> _shader,
-          Dali::Graphics::ShaderDetails::ShaderSource _vertexSource,
-          Dali::Graphics::ShaderDetails::ShaderSource _fragmentSource )
-    : shader(std::move(_shader)),
+    Item( Graphics::UniquePtr<Graphics::Program>&& _program,
+          const std::vector<char>& _vertexSource,
+          const std::vector<char>& _fragmentSource )
+    : program(std::move(_program)),
       vertexSource( _vertexSource ),
       fragmentSource( _fragmentSource )
     {}
 
     ~Item() = default;
 
-    std::unique_ptr<Dali::Graphics::Shader>               shader{ nullptr };
-    Dali::Graphics::ShaderDetails::ShaderSource           vertexSource{""};
-    Dali::Graphics::ShaderDetails::ShaderSource           fragmentSource{""};
+    Graphics::UniquePtr<Graphics::Program> program;
+    const std::vector<char>& vertexSource;
+    const std::vector<char>& fragmentSource;
   };
 
   /**
@@ -65,9 +63,8 @@ struct ShaderCache
   /**
    * Get a shader from it's source code
    */
-  Dali::Graphics::Shader& GetShader(
-    const Dali::Graphics::ShaderDetails::ShaderSource& vsh,
-    const Dali::Graphics::ShaderDetails::ShaderSource& fsh );
+  Graphics::Program& GetShader( const std::vector<char>& vsh,
+                                const std::vector<char>& fsh );
 
   /**
    * Destroy any graphics objects owned by this scene graph object

@@ -25,7 +25,7 @@
 
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/integration-api/resource-policies.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/event/animation/animation-playlist-declarations.h>

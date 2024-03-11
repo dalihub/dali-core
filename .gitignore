@@ -44,6 +44,12 @@ libdali2-core.so.2.0.0
 /docs/generated/*
 /build/tizen/doc
 /build/tizen/.cov
+/build/tizen/.ninja_deps
+/build/tizen/.ninja_log
+/build/tizen/build.ninja
+/build/tizen/rules.ninja
+/build/tizen/cmake-build-debug
+/build/tizen/cmake-build-release
 /build/desktop
 /packaging/home*
 compile_commands.json

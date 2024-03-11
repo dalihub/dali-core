@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,37 @@
  */
 
 #include "test-graphics-framebuffer.h"
+#include "test-graphics-texture.h"
 
-namespace Test
+namespace Dali
 {
+TestGraphicsFramebuffer::TestGraphicsFramebuffer(
+  TraceCallStack&                        callStack,
+  const Graphics::FramebufferCreateInfo& createInfo)
+:  mCallStack(callStack)
+{
+  mCreateInfo.colorAttachments       = std::move(createInfo.colorAttachments);
+  mCreateInfo.depthStencilAttachment = createInfo.depthStencilAttachment;
+  mCreateInfo.size                   = createInfo.size;
+}
 
-GraphicsFramebuffer::GraphicsFramebuffer(
-  GraphicsController& controller,
-  Dali::Graphics::Extent2D size,
-  const std::vector<GraphicsFramebufferFactory::ColorAttachment>& colorAttachments,
-  const GraphicsFramebufferFactory::DepthAttachment& depthAttachment )
-: mController( controller ),
-  mSize ( size ),
-  mColorAttachments( colorAttachments ),
-  mDepthAttachment( depthAttachment )
+TestGraphicsFramebuffer::~TestGraphicsFramebuffer()
 {
 }
 
-GraphicsFramebuffer::~GraphicsFramebuffer()
+void TestGraphicsFramebuffer::Initialize()
 {
+  mCallStack.PushCall("Initialize", "");
 }
 
-}//Test
+void TestGraphicsFramebuffer::AttachTexture(Graphics::Texture* texture, uint32_t attachmentId, uint32_t layerId, uint32_t levelId)
+{
+  mCallStack.PushCall("AttachTexture", "");
+}
+
+void TestGraphicsFramebuffer::Bind()
+{
+  mCallStack.PushCall("Bind", "");
+}
+
+} // namespace Dali

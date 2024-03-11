@@ -178,6 +178,21 @@ struct TransformManagerPropertyVector3 : public TransformManagerPropertyHandler<
     return Get(bufferIndex);
   }
 
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &GetVector3(bufferIndex);
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector3);
+  }
   const float& GetFloatComponent( uint32_t component )
   {
     return mTxManager->GetVector3PropertyComponentValue( mId, mProperty, component );
@@ -289,6 +304,21 @@ public:
     return Get(bufferIndex);
   }
 
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &Get(bufferIndex);
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
+  }
 };
 
 /**
@@ -378,6 +408,22 @@ public:
   {
     ComputeTransformComponent();
     return mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &GetVector3(bufferIndex);
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector3);
   }
 
   /**
@@ -534,6 +580,22 @@ public:
   }
 
   /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &GetQuaternion(bufferIndex);
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
+  }
+
+  /**
    * @copydoc Dali::PropertyInput::GetConstraintInputQuaternion()
    */
   virtual const Quaternion& GetConstraintInputQuaternion( BufferIndex bufferIndex ) const
@@ -672,6 +734,27 @@ public:
     }
 
     return Matrix::IDENTITY;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    static const Matrix identityMatrix(Matrix::IDENTITY);
+    if(mTxManager)
+    {
+      return &mTxManager->GetWorldMatrix(mId);
+    }
+    return &identityMatrix;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Matrix);
   }
 
   /**

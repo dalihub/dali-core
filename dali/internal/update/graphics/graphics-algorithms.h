@@ -19,25 +19,23 @@
  */
 
 // EXTERNAL INCLUDES
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/core-enumerations.h>
+
+#include <dali/internal/common/buffer-index.h>
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
 #include <dali/internal/update/rendering/render-instruction-container.h>
 #include <dali/internal/update/rendering/render-instruction.h>
-#include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/graphics/graphics-buffer-manager.h>
 
-namespace Dali
-{
-namespace Internal
-{
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 class UniformBuffer;
+
 class GraphicsAlgorithms
 {
 public:
-
   GraphicsAlgorithms() = delete;
   explicit GraphicsAlgorithms( Graphics::Controller& controller );
 
@@ -46,21 +44,24 @@ public:
   GraphicsAlgorithms(const GraphicsAlgorithms&) = delete;
   GraphicsAlgorithms& operator=(const GraphicsAlgorithms&) = delete;
 
-  GraphicsAlgorithms(GraphicsAlgorithms&&) = default;
-  GraphicsAlgorithms& operator=(GraphicsAlgorithms&&) = default;
+  GraphicsAlgorithms(GraphicsAlgorithms&&) = delete;
+  GraphicsAlgorithms& operator=(GraphicsAlgorithms&&) = delete;
 
+  /**
+   * Clear down and re-create primary command buffer.
+   */
+  void ResetCommandBuffer();
 
   /**
    * Submits render instructions
-   * @param graphics Instance of the Graphics object
    * @param renderInstructions container of render instructions
    * @param bufferIndex current buffer index
    */
-  void SubmitRenderInstructions( Graphics::Controller &graphics,
-                                 SceneGraph::RenderInstructionContainer &renderInstructions,
-                                 BufferIndex bufferIndex );
+  void RenderScene( const SceneGraph::Scene* scene,
+                    BufferIndex bufferIndex,
+                    bool renderToFbo);
 
-  void DiscardUnusedResources( Graphics::Controller& controller );
+    UniformBufferManager& GetUniformBufferManager();
 
 private:
 
@@ -76,52 +77,49 @@ private:
 
   bool SetupPipelineViewportState( Graphics::ViewportState& outViewportState );
 
-  void RecordRenderItemList( Graphics::Controller& graphics,
+  void RecordRenderItemList( const RenderList& renderList,
                              BufferIndex bufferIndex,
-                             Graphics::RenderCommand::RenderTargetBinding& renderTargetBinding,
-                             Matrix viewProjection,
-                             RenderInstruction& instruction,
-                             const RenderList& renderItemList,
-                             std::vector<Graphics::RenderCommand*>& commandList);
+                             const Matrix& viewMatrix,
+                             const Matrix& projectionMatrix,
+                             const RenderInstruction& instruction,
+                             bool depthBufferAvailable);
 
-  void RecordInstruction( Graphics::Controller& graphics,
-                          BufferIndex bufferIndex,
-                          RenderInstruction& instruction,
-                          std::vector<Graphics::RenderCommand*>& commandList);
+  void RecordInstruction( const RenderInstruction& instruction,
+                          bool renderToFbo,
+                          bool depthBufferAvailable,
+                          BufferIndex bufferIndex);
 
-  bool PrepareGraphicsPipeline( Graphics::Controller& controller,
-                                RenderInstruction& instruction,
-                                const RenderList* renderList,
-                                RenderItem& item,
+  bool PrepareGraphicsPipeline(const RenderInstruction& instruction,
+                               const RenderList* renderList,
+                               RenderItem& item,
+                               bool& usesDepth,
+                               bool& usesStencil,
+                               BufferIndex bufferIndex );
+
+  void PrepareRendererPipelines(const RenderInstructionContainer& renderInstructions,
                                 bool& usesDepth,
                                 bool& usesStencil,
                                 BufferIndex bufferIndex );
 
-  void PrepareRendererPipelines( Graphics::Controller& controller,
-                                 RenderInstructionContainer& renderInstructions,
-                                 bool& usesDepth,
-                                 bool& usesStencil,
-                                 BufferIndex bufferIndex );
-
+private:
   using ScissorStackType = std::vector<Dali::ClippingBox>;      ///< The container type used to maintain the applied scissor hierarchy
 
-  ScissorStackType                        mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
+  Graphics::Controller& mGraphicsController;
 
-  std::unique_ptr<GraphicsBufferManager> mGraphicsBufferManager;
+  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
+  std::unique_ptr<UniformBufferManager> mUniformBufferManager;
+  ScissorStackType mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
 
-  using UniformBufferList = std::array<std::unique_ptr<GraphicsBuffer>, 2u>;
-  UniformBufferList           mUniformBuffer;
-
-  uint32_t mUniformBlockAllocationCount;
-  uint32_t mUniformBlockAllocationBytes;
-  uint32_t mUniformBlockMaxSize;
+  uint32_t mUniformBlockAllocationCount{};
+  uint32_t mUniformBlockAllocationBytes{};
+  uint32_t mUniformBlockMaxSize{};
   uint32_t mUboOffset { 0u };
+
   uint32_t mCurrentFrameIndex { 0u };
 
   Dali::Graphics::DepthStencilState mCurrentStencilState{};
 };
-} // namespace SceneGraph
-} // namespace Internal
-} // namespace Dali
+
+} // namespace Dali::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_GRAPHICS_ALGORITHMS_H

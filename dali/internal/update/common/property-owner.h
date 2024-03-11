@@ -27,14 +27,7 @@
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
 
-
-namespace Dali
-{
-
-namespace Internal
-{
-
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 
 class PropertyOwner;
@@ -196,16 +189,6 @@ public:
    */
   const UniformMap& GetUniformMap() const;
 
-  /**
-   * @copydoc UniformMap::AddUniformMapObserver
-   */
-  void AddUniformMapObserver( UniformMap::Observer& observer );
-
-  /**
-   * @copydoc UniformMap::RemoveUniformMapObserver
-   */
-  void RemoveUniformMapObserver( UniformMap::Observer& observer );
-
 
 protected:
 
@@ -238,10 +221,10 @@ private:
   ConstraintOwnerContainer mConstraints; ///< Container of owned constraints
 };
 
-} // namespace SceneGraph
+} // namespace Dali::Internal::SceneGraph
 
-} // namespace Internal
 
-} // namespace Dali
+
+
 
 #endif // __DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H__

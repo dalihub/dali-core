@@ -17,18 +17,19 @@
 
 // CLASS HEADER
 #include <dali/internal/update/rendering/scene-graph-shader.h>
-#include <dali/graphics-api/graphics-api-shader-details.h>
 
-#include <tuple>
+// INTERNAL HEADERS
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
+#include <dali/graphics-api/graphics-types.h>
+#include <dali/devel-api/common/hash.h>
+
+// EXTERNAL HEADERS
 #include <map>
+#include <tuple>
 
-namespace Dali
-{
+#include <dali/integration-api/debug.h>
 
-namespace Internal
-{
-
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 
 /**
@@ -48,16 +49,25 @@ std::array<size_t, 8> DEFAULT_UNIFORM_HASHTABLE = {
   CalculateHash( std::string("uColor") )
 };
 
+/**
+ * Helper function to calculate the correct alignment of data for uniform buffers
+ * @param dataSize size of uniform buffer
+ * @return size of data aligned to given size
+ */
+inline uint32_t AlignSize(uint32_t dataSize, uint32_t alignSize)
+{
+  return ((dataSize / alignSize) + ((dataSize % alignSize) ? 1u : 0u)) * alignSize;
+}
+
 }
 
 Shader::Shader( Dali::Shader::Hint::Value& hints )
-: mGraphicsController( nullptr ),
-  mGraphicsShader( nullptr ),
+: mController( nullptr ),
+  mGraphicsProgram( nullptr ),
   mShaderCache( nullptr ),
   mHints( hints ),
   mConnectionObservers()
 {
-  AddUniformMapObserver( *this );
 }
 
 Shader::~Shader()
@@ -65,20 +75,23 @@ Shader::~Shader()
   mConnectionObservers.Destroy( *this );
 }
 
-void Shader::Initialize( Graphics::Controller& graphicsController, ShaderCache& shaderCache )
+void Shader::Initialize( Graphics::Controller& graphicsController,
+                         ShaderCache& shaderCache,
+                         UniformBufferManager& uboManager )
 {
-  mGraphicsController = &graphicsController;
+  mController  = &graphicsController;
   mShaderCache = &shaderCache;
+  mUboManager = &uboManager;
 }
 
-const Graphics::Shader* Shader::GetGfxObject() const
+const Graphics::Program* Shader::GetGraphicsObject() const
 {
-  return mGraphicsShader;
+  return mGraphicsProgram;
 }
 
-Graphics::Shader* Shader::GetGfxObject()
+Graphics::Program* Shader::GetGraphicsObject()
 {
-  return mGraphicsShader;
+  return mGraphicsProgram;
 }
 
 void Shader::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
@@ -91,24 +104,17 @@ void Shader::RemoveConnectionObserver( ConnectionChangePropagator::Observer& obs
   mConnectionObservers.Remove(observer);
 }
 
-void Shader::UniformMappingsChanged( const UniformMap& mappings )
-{
-  // Our uniform map, or that of one of the watched children has changed.
-  // Inform connected observers.
-  mConnectionObservers.ConnectedUniformMapChanged();
-}
-
 void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
   // @todo: we should handle non-binary shaders as well in the future
   if (shaderData->GetType() == ShaderData::Type::BINARY)
   {
-    mGraphicsShader = &mShaderCache->GetShader(
-      Graphics::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX)),
-      Graphics::ShaderDetails::ShaderSource(shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT)));
+    mGraphicsProgram = &mShaderCache->GetShader(
+      shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX),
+      shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT));
   }
 
-  if( mGraphicsShader )
+  if( mGraphicsProgram )
   {
     BuildReflection();
   }
@@ -116,39 +122,40 @@ void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifies
 
 void Shader::DestroyGraphicsObjects()
 {
-  mGraphicsShader = nullptr;
+  mGraphicsProgram = nullptr;
 }
 
 void Shader::BuildReflection()
 {
-  if( mGraphicsShader )
+  if( mGraphicsProgram )
   {
+    auto& reflection = mController->GetProgramReflection( *mGraphicsProgram );
     mReflectionDefaultUniforms.clear();
     mReflectionDefaultUniforms.resize( DEFAULT_UNIFORM_HASHTABLE.size() );
 
-    auto uniformBlockCount = mGraphicsShader->GetUniformBlockCount();
+    auto uniformBlockCount = reflection.GetUniformBlockCount();
 
     // add uniform block fields
     for( auto i = 0u; i < uniformBlockCount; ++i )
     {
-      Graphics::ShaderDetails::UniformBlockInfo uboInfo;
-      mGraphicsShader->GetUniformBlock( i, uboInfo );
+      Graphics::UniformBlockInfo uboInfo;
+      reflection.GetUniformBlock( i, uboInfo );
 
       // for each member store data
       for( const auto& item : uboInfo.members )
       {
         auto hashValue = CalculateHash( item.name );
-        mReflection.emplace_back( ReflectionUniformInfo{ hashValue, false, mGraphicsShader, item } );
+        mReflection.emplace_back( ReflectionUniformInfo{ item, hashValue, false } );
 
         // update buffer index
         mReflection.back().uniformInfo.bufferIndex = i;
 
         // Update default uniforms
-        for( auto i = 0u; i < DEFAULT_UNIFORM_HASHTABLE.size(); ++i )
+        for( auto j = 0u; j < DEFAULT_UNIFORM_HASHTABLE.size(); ++j )
         {
-          if( hashValue == DEFAULT_UNIFORM_HASHTABLE[i] )
+          if( hashValue == DEFAULT_UNIFORM_HASHTABLE[j] )
           {
-            mReflectionDefaultUniforms[i] = mReflection.back();
+            mReflectionDefaultUniforms[j] = mReflection.back();
             break;
           }
         }
@@ -156,25 +163,25 @@ void Shader::BuildReflection()
     }
 
     // add samplers
-    auto samplers = mGraphicsShader->GetSamplers();
+    auto samplers = reflection.GetSamplers();
     for( const auto& sampler : samplers )
     {
-      mReflection.emplace_back( ReflectionUniformInfo{ CalculateHash( sampler.name ), false, mGraphicsShader, sampler } );
+      mReflection.emplace_back( ReflectionUniformInfo{ sampler, CalculateHash( sampler.name ), false } );
     }
 
     // check for potential collisions
     std::map<size_t, bool> hashTest;
-    bool hasCollisions( false );
+    bool                   hasCollisions( false );
     for( auto&& item : mReflection )
     {
       if( hashTest.find( item.hashValue ) == hashTest.end() )
       {
-        hashTest[ item.hashValue ] = false;
+        hashTest[item.hashValue] = false;
       }
       else
       {
-        hashTest[ item.hashValue ] = true;
-        hasCollisions = true;
+        hashTest[item.hashValue] = true;
+        hasCollisions            = true;
       }
     }
 
@@ -183,13 +190,38 @@ void Shader::BuildReflection()
     {
       for( auto&& item : mReflection )
       {
-        item.hasCollision = hashTest[ item.hashValue ];
+        item.hasCollision = hashTest[item.hashValue];
       }
+    }
+
+    mUniformBlockMemoryRequirements.blockSize.resize( uniformBlockCount );
+    mUniformBlockMemoryRequirements.blockSizeAligned.resize( uniformBlockCount );
+    mUniformBlockMemoryRequirements.blockCount           = uniformBlockCount;
+    mUniformBlockMemoryRequirements.totalSizeRequired    = 0u;
+    mUniformBlockMemoryRequirements.totalCpuSizeRequired = 0u;
+    mUniformBlockMemoryRequirements.totalGpuSizeRequired = 0u;
+
+    for( auto i = 0u; i < uniformBlockCount; ++i )
+    {
+      Graphics::UniformBlockInfo uboInfo;
+      reflection.GetUniformBlock( i, uboInfo );
+      bool standaloneUniformBlock = ( i == 0 );
+
+      auto     blockSize        = reflection.GetUniformBlockSize( i );
+      uint32_t blockAlignment   = mUboManager->GetUniformBlockAlignment( standaloneUniformBlock );
+      auto     alignedBlockSize = AlignSize( blockSize, blockAlignment );
+
+      mUniformBlockMemoryRequirements.blockSize[i]        = blockSize;
+      mUniformBlockMemoryRequirements.blockSizeAligned[i] = alignedBlockSize;
+
+      mUniformBlockMemoryRequirements.totalSizeRequired += alignedBlockSize;
+      mUniformBlockMemoryRequirements.totalCpuSizeRequired += ( standaloneUniformBlock ) ? alignedBlockSize : 0;
+      mUniformBlockMemoryRequirements.totalGpuSizeRequired += ( standaloneUniformBlock ) ? 0 : alignedBlockSize;
     }
   }
 }
 
-bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::ShaderDetails::UniformInfo& out ) const
+bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::UniformInfo& out ) const
 {
   if( mReflection.empty() )
   {
@@ -216,29 +248,63 @@ bool Shader::GetUniform( const std::string& name, size_t hashedName, Graphics::S
   return false;
 }
 
-bool Shader::GetDefaultUniform( DefaultUniformIndex defaultUniformIndex, Graphics::ShaderDetails::UniformInfo& out ) const
+bool Shader::GetUniform( const std::string& name, size_t hashedName, size_t hashNoArray, Graphics::UniformInfo& out ) const
 {
-  auto& value = mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
-  if( !value.graphicsShader )
+  if( mReflection.empty() )
   {
     return false;
   }
-  out = value.uniformInfo;
-  return true;
+  size_t hash = hashedName;
+  std::string_view match=name;
+
+  int arrayIndex=0;
+  if(!name.empty() && name.back() == ']')
+  {
+    auto pos = name.rfind('[');
+    if(pos != std::string::npos)
+    {
+      hash = hashNoArray;
+      match=name.substr(0, pos); // Remove subscript
+      arrayIndex = atoi(&name[pos+1]);
+    }
+  }
+  for(const ReflectionUniformInfo& item : mReflection)
+  {
+    if(item.hashValue == hash)
+    {
+      if(!item.hasCollision || item.uniformInfo.name == match)
+      {
+        out = item.uniformInfo;
+        if(item.uniformInfo.elementCount > 0 &&
+            arrayIndex >= int(item.uniformInfo.elementCount))
+        {
+          DALI_LOG_ERROR("Uniform %s, array index out of bound [%d >= %d]!\n",
+                          item.uniformInfo.name.c_str(),
+                          int(arrayIndex),
+                          int(item.uniformInfo.elementCount));
+          return false;
+        }
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+  }
+  return false;
 }
 
-const Graphics::ShaderDetails::UniformInfo* Shader::GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const
+const Graphics::UniformInfo* Shader::GetDefaultUniform( DefaultUniformIndex defaultUniformIndex ) const
 {
-  const auto value = &mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
-  if( !value->graphicsShader )
+  if(mReflectionDefaultUniforms.empty())
   {
     return nullptr;
   }
+  const auto value = &mReflectionDefaultUniforms[static_cast<uint32_t>(defaultUniformIndex)];
   return &value->uniformInfo;
 }
 
-} // namespace SceneGraph
 
-} // namespace Internal
 
 } // namespace Dali

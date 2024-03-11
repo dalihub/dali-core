@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H
+#define DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,34 +24,30 @@
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/property.h>
+#include <dali/public-api/math/math-utils.h> // Clamp
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-types.h>
-#include <dali/public-api/math/math-utils.h> // Clamp
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 /**
  * An inherited Vector3 property.
  */
 class InheritedVector3 : public PropertyInputImpl
 {
 public:
-
   /**
    * Create an inherited Vector3.
    */
   InheritedVector3()
   : mValue(),
-    mInheritedFlag( false ),
-    mReinheritedFlag( true )
+    mInheritedFlag(false),
+    mReinheritedFlag(true)
   {
   }
 
@@ -59,23 +55,21 @@ public:
    * Create an inherited Vector3.
    * @param [in] initialValue The initial value of the property.
    */
-  InheritedVector3( const Vector3& initialValue )
-  : mValue( initialValue ),
-    mInheritedFlag( false ),
-    mReinheritedFlag( true )
+  InheritedVector3(const Vector3& initialValue)
+  : mValue(initialValue),
+    mInheritedFlag(false),
+    mReinheritedFlag(true)
   {
   }
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedVector3()
-  {
-  }
+  ~InheritedVector3() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Vector3>();
   }
@@ -84,9 +78,9 @@ public:
    * Called once per Update (only) if the property did not need to be re-inherited.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void CopyPrevious( BufferIndex updateBufferIndex )
+  void CopyPrevious(BufferIndex updateBufferIndex)
   {
-    if ( mReinheritedFlag )
+    if(mReinheritedFlag)
     {
       mValue[updateBufferIndex] = mValue[updateBufferIndex ? 0 : 1];
 
@@ -99,13 +93,13 @@ public:
    */
   virtual bool IsClean() const
   {
-    return ( false == mReinheritedFlag );
+    return (false == mReinheritedFlag);
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -115,7 +109,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -123,21 +117,37 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector3()
    */
-  virtual const Vector3& GetVector3( BufferIndex bufferIndex ) const
+  const Vector3& GetVector3(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector3);
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputVector3()
    */
-  virtual const Vector3& GetConstraintInputVector3( BufferIndex bufferIndex ) const
+  const Vector3& GetConstraintInputVector3(BufferIndex bufferIndex) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.
     BufferIndex eventBufferIndex = bufferIndex ? 0u : 1u;
 
-    return mValue[ eventBufferIndex ];
+    return mValue[eventBufferIndex];
   }
 
   /**
@@ -159,7 +169,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Vector3& Get( BufferIndex bufferIndex )
+  Vector3& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -167,7 +177,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Vector3& Get( BufferIndex bufferIndex ) const
+  const Vector3& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -177,13 +187,12 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector3& operator[]( BufferIndex bufferIndex ) const
+  const Vector3& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
 
 private:
-
   // Undefined
   InheritedVector3(const InheritedVector3& property);
 
@@ -191,11 +200,10 @@ private:
   InheritedVector3& operator=(const InheritedVector3& rhs);
 
 private:
-
   DoubleBuffered<Vector3> mValue; ///< The double-buffered property value
 
-  bool mInheritedFlag   :1; ///< Flag whether the value has ever been inherited
-  bool mReinheritedFlag :1; ///< Flag whether value was re-inherited in previous frame
+  bool mInheritedFlag : 1;   ///< Flag whether the value has ever been inherited
+  bool mReinheritedFlag : 1; ///< Flag whether value was re-inherited in previous frame
 };
 
 /**
@@ -204,29 +212,26 @@ private:
 class InheritedColor : public PropertyInputImpl
 {
 public:
-
   /**
    * Create an inherited property.
    * @param [in] initialValue The initial value of the property.
    */
-  InheritedColor( const Vector4& initialValue )
-  : mValue( initialValue ),
-    mInheritedFlag( false ),
-    mReinheritedFlag( true )
+  InheritedColor(const Vector4& initialValue)
+  : mValue(initialValue),
+    mInheritedFlag(false),
+    mReinheritedFlag(true)
   {
   }
 
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedColor()
-  {
-  }
+  ~InheritedColor() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Vector4>();
   }
@@ -235,9 +240,9 @@ public:
    * Called once per Update (only) if the property did not need to be re-inherited.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void CopyPrevious( BufferIndex updateBufferIndex )
+  void CopyPrevious(BufferIndex updateBufferIndex)
   {
-    if ( mReinheritedFlag )
+    if(mReinheritedFlag)
     {
       mValue[updateBufferIndex] = mValue[updateBufferIndex ? 0 : 1];
 
@@ -250,13 +255,13 @@ public:
    */
   virtual bool IsClean() const
   {
-    return ( false == mReinheritedFlag );
+    return (false == mReinheritedFlag);
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -266,7 +271,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -274,21 +279,37 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector4()
    */
-  virtual const Vector4& GetVector4( BufferIndex bufferIndex ) const
+  const Vector4& GetVector4(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputVector4()
    */
-  virtual const Vector4& GetConstraintInputVector4( BufferIndex bufferIndex ) const
+  const Vector4& GetConstraintInputVector4(BufferIndex bufferIndex) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.
     BufferIndex eventBufferIndex = bufferIndex ? 0u : 1u;
 
-    return mValue[ eventBufferIndex ];
+    return mValue[eventBufferIndex];
   }
 
   /**
@@ -299,10 +320,10 @@ public:
    */
   void Set(BufferIndex bufferIndex, const Vector4& value)
   {
-    mValue[bufferIndex] = Clamp( value, 0.0f, 1.0f ); // color values are clamped between 0 and 1
+    mValue[bufferIndex] = Clamp(value, 0.0f, 1.0f); // color values are clamped between 0 and 1
 
     // The value has been inherited for the first time
-    mInheritedFlag = true;
+    mInheritedFlag   = true;
     mReinheritedFlag = true;
   }
 
@@ -315,22 +336,22 @@ public:
    * @param[in] b The new blue value.
    * @param[in] a The new alpha value.
    */
-  void Set(BufferIndex bufferIndex, float r, float g, float b, float a )
+  void Set(BufferIndex bufferIndex, float r, float g, float b, float a)
   {
-    mValue[bufferIndex].r = Clamp( r, 0.0f, 1.0f ); // color values are clamped between 0 and 1
-    mValue[bufferIndex].g = Clamp( g, 0.0f, 1.0f ); // color values are clamped between 0 and 1
-    mValue[bufferIndex].b = Clamp( b, 0.0f, 1.0f ); // color values are clamped between 0 and 1
-    mValue[bufferIndex].a = Clamp( a, 0.0f, 1.0f ); // color values are clamped between 0 and 1
+    mValue[bufferIndex].r = Clamp(r, 0.0f, 1.0f); // color values are clamped between 0 and 1
+    mValue[bufferIndex].g = Clamp(g, 0.0f, 1.0f); // color values are clamped between 0 and 1
+    mValue[bufferIndex].b = Clamp(b, 0.0f, 1.0f); // color values are clamped between 0 and 1
+    mValue[bufferIndex].a = Clamp(a, 0.0f, 1.0f); // color values are clamped between 0 and 1
 
     // The value has been inherited for the first time
-    mInheritedFlag = true;
+    mInheritedFlag   = true;
     mReinheritedFlag = true;
   }
 
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Vector4& Get( BufferIndex bufferIndex )
+  Vector4& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -338,7 +359,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Vector4& Get( BufferIndex bufferIndex ) const
+  const Vector4& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -348,24 +369,22 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Vector4& operator[]( BufferIndex bufferIndex ) const
+  const Vector4& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
 
 private:
-
   // Undefined
   InheritedColor(const InheritedColor& property);
   // Undefined
   InheritedColor& operator=(const InheritedColor& rhs);
 
 private:
-
   DoubleBuffered<Vector4> mValue; ///< The double-buffered property value
 
-  bool mInheritedFlag   :1; ///< Flag whether the value has ever been inherited
-  bool mReinheritedFlag :1; ///< Flag whether value was re-inherited in previous frame
+  bool mInheritedFlag : 1;   ///< Flag whether the value has ever been inherited
+  bool mReinheritedFlag : 1; ///< Flag whether value was re-inherited in previous frame
 };
 
 /**
@@ -374,28 +393,25 @@ private:
 class InheritedQuaternion : public PropertyInputImpl
 {
 public:
-
   /**
    * Create an inherited property.
    */
   InheritedQuaternion()
   : mValue(),
-    mInheritedFlag( false ),
-    mReinheritedFlag( true )
+    mInheritedFlag(false),
+    mReinheritedFlag(true)
   {
   }
 
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedQuaternion()
-  {
-  }
+  ~InheritedQuaternion() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Quaternion>();
   }
@@ -404,9 +420,9 @@ public:
    * Called once per Update (only) if the property did not need to be re-inherited.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void CopyPrevious( BufferIndex updateBufferIndex )
+  void CopyPrevious(BufferIndex updateBufferIndex)
   {
-    if ( mReinheritedFlag )
+    if(mReinheritedFlag)
     {
       mValue[updateBufferIndex] = mValue[updateBufferIndex ? 0 : 1];
 
@@ -419,13 +435,13 @@ public:
    */
   virtual bool IsClean() const
   {
-    return ( false == mReinheritedFlag );
+    return (false == mReinheritedFlag);
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -435,7 +451,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -443,21 +459,37 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetQuaternion()
    */
-  virtual const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const
+  const Quaternion& GetQuaternion(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputQuaternion()
    */
-  virtual const Quaternion& GetConstraintInputQuaternion( BufferIndex bufferIndex ) const
+  const Quaternion& GetConstraintInputQuaternion(BufferIndex bufferIndex) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.
     BufferIndex eventBufferIndex = bufferIndex ? 0u : 1u;
 
-    return mValue[ eventBufferIndex ];
+    return mValue[eventBufferIndex];
   }
 
   /**
@@ -479,7 +511,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Quaternion& Get( BufferIndex bufferIndex )
+  Quaternion& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -487,7 +519,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Quaternion& Get( BufferIndex bufferIndex ) const
+  const Quaternion& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -497,13 +529,12 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Quaternion& operator[]( BufferIndex bufferIndex ) const
+  const Quaternion& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
 
 private:
-
   // Undefined
   InheritedQuaternion(const InheritedQuaternion& property);
 
@@ -511,11 +542,10 @@ private:
   InheritedQuaternion& operator=(const InheritedQuaternion& rhs);
 
 private:
-
   DoubleBuffered<Quaternion> mValue; ///< The double-buffered property value
 
-  bool mInheritedFlag   :1;   ///< Flag whether the value has ever been inherited
-  bool mReinheritedFlag :1;   ///< Flag whether value was re-inherited in previous frame
+  bool mInheritedFlag : 1;   ///< Flag whether the value has ever been inherited
+  bool mReinheritedFlag : 1; ///< Flag whether value was re-inherited in previous frame
 };
 
 /**
@@ -524,28 +554,25 @@ private:
 class InheritedMatrix : public PropertyInputImpl
 {
 public:
-
   /**
    * Create an inherited property.
    */
   InheritedMatrix()
   : mValue(),
-    mInheritedFlag( false ),
-    mReinheritedFlag( true )
+    mInheritedFlag(false),
+    mReinheritedFlag(true)
   {
   }
 
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedMatrix()
-  {
-  }
+  ~InheritedMatrix() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Matrix>();
   }
@@ -554,9 +581,9 @@ public:
    * Called once per Update (only) if the property did not need to be re-inherited.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void CopyPrevious( BufferIndex updateBufferIndex )
+  void CopyPrevious(BufferIndex updateBufferIndex)
   {
-    if ( mReinheritedFlag )
+    if(mReinheritedFlag)
     {
       mValue[updateBufferIndex] = mValue[updateBufferIndex ? 0 : 1];
 
@@ -569,13 +596,13 @@ public:
    */
   virtual bool IsClean() const
   {
-    return ( false == mReinheritedFlag );
+    return (false == mReinheritedFlag);
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
@@ -585,7 +612,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return !IsClean();
   }
@@ -593,21 +620,37 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix()
    */
-  virtual const Matrix& GetMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetMatrix(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Matrix);
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputMatrix()
    */
-  virtual const Matrix& GetConstraintInputMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetConstraintInputMatrix(BufferIndex bufferIndex) const override
   {
     // For inherited properties, constraints work with the value from the previous frame.
     // This is because constraints are applied to position etc, before world-position is calculated.
     BufferIndex eventBufferIndex = bufferIndex ? 0u : 1u;
 
-    return mValue[ eventBufferIndex ];
+    return mValue[eventBufferIndex];
   }
 
   /**
@@ -629,7 +672,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Matrix& Get( BufferIndex bufferIndex )
+  Matrix& Get(BufferIndex bufferIndex)
   {
     return mValue[bufferIndex];
   }
@@ -637,7 +680,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Matrix& Get( BufferIndex bufferIndex ) const
+  const Matrix& Get(BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
@@ -647,12 +690,12 @@ public:
    * @param[in] bufferIndex The buffer to read.
    * @return The property value.
    */
-  const Matrix& operator[]( BufferIndex bufferIndex ) const
+  const Matrix& operator[](BufferIndex bufferIndex) const
   {
     return mValue[bufferIndex];
   }
 
-  void SetDirty( BufferIndex bufferIndex )
+  void SetDirty(BufferIndex bufferIndex)
   {
     mReinheritedFlag = true;
 
@@ -661,7 +704,6 @@ public:
   }
 
 private:
-
   // Undefined
   InheritedMatrix(const InheritedMatrix& property);
 
@@ -669,12 +711,10 @@ private:
   InheritedMatrix& operator=(const InheritedMatrix& rhs);
 
 private:
-
   DoubleBuffered<Matrix> mValue; ///< The double-buffered property value
 
-  bool mInheritedFlag   :1;   ///< Flag whether the value has ever been inherited
-  bool mReinheritedFlag :1;   ///< Flag whether value was re-inherited in previous frame
-
+  bool mInheritedFlag : 1;   ///< Flag whether the value has ever been inherited
+  bool mReinheritedFlag : 1; ///< Flag whether value was re-inherited in previous frame
 };
 
 } // namespace SceneGraph
@@ -683,4 +723,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_INHERITED_PROPERTY_H

@@ -21,44 +21,30 @@
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-types.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-types.h>
 
 #include <memory>
 
-
-namespace Dali
-{
-namespace Internal
-{
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 
 struct Sampler
 {
-
   typedef Dali::FilterMode::Type FilterMode;
   typedef Dali::WrapMode::Type   WrapMode;
 
   /**
    * Constructor
    */
-  Sampler()
-  : mGraphicsController( nullptr ),
-    mGfxSampler( nullptr ),
-    mMinificationFilter(FilterMode::DEFAULT),
-    mMagnificationFilter(FilterMode::DEFAULT),
-    mSWrapMode(WrapMode::DEFAULT),
-    mTWrapMode(WrapMode::DEFAULT),
-    mRWrapMode(WrapMode::DEFAULT),
-    mIsDirty(true)
-  {}
+  Sampler();
 
   /**
    * Destructor
    */
-  ~Sampler()
-  {}
+  ~Sampler();
+
+  void Initialize( Graphics::Controller& graphicsController );
 
   /**
    * Sets the filter modes for an existing sampler
@@ -88,6 +74,18 @@ struct Sampler
     mIsDirty = true;
   }
 
+  /**
+   * Check if the sampler has default values
+   */
+  [[nodiscard]] inline bool IsDefaultSampler() const
+  {
+    return (mMagnificationFilter == FilterMode::DEFAULT &&
+             mMinificationFilter == FilterMode::DEFAULT &&
+             mSWrapMode == WrapMode::DEFAULT &&
+             mTWrapMode == WrapMode::DEFAULT &&
+             mRWrapMode == WrapMode::DEFAULT);
+  }
+
   bool operator==(const Sampler& rhs) const
   {
     return ( ( mMinificationFilter == rhs.mMinificationFilter ) &&
@@ -106,17 +104,16 @@ struct Sampler
    * Returns Graphics API sampler object
    * @return Pointer to API sampler or nullptr
    */
-  const Dali::Graphics::Sampler* GetGfxObject() const
-  {
-    return mGfxSampler.get();
-  }
+  const Dali::Graphics::Sampler* GetGraphicsObject();
+
+  Graphics::Sampler* CreateGraphicsObject();
 
   void DestroyGraphicsObjects()
   {
-    mGfxSampler.reset();
+    mGraphicsSampler.reset();
   }
 
-  inline Graphics::SamplerAddressMode GetGfxSamplerAddressMode( WrapMode mode ) const
+  inline Graphics::SamplerAddressMode GetGraphicsSamplerAddressMode( WrapMode mode ) const
   {
     switch(mode)
     {
@@ -128,7 +125,7 @@ struct Sampler
     return {};
   }
 
-  inline Graphics::SamplerMipmapMode GetGfxSamplerMipmapMode( FilterMode mode ) const
+  inline Graphics::SamplerMipmapMode GetGraphicsSamplerMipmapMode( FilterMode mode ) const
   {
     switch(mode)
     {
@@ -142,7 +139,7 @@ struct Sampler
     return {};
   }
 
-  inline Graphics::SamplerFilter GetGfxFilter( FilterMode mode ) const
+  inline Graphics::SamplerFilter GetGraphicsFilter( FilterMode mode ) const
   {
     switch(mode)
     {
@@ -155,24 +152,11 @@ struct Sampler
     return {};
   }
 
-  void Initialize( Graphics::Controller& graphicsController )
-  {
-    mGraphicsController = &graphicsController;
-    mGfxSampler.reset( nullptr );
-    mGfxSampler = graphicsController.CreateSampler(
-                    graphicsController.GetSamplerFactory()
-                    .SetMinFilter( GetGfxFilter( mMinificationFilter ) )
-                    .SetMagFilter( GetGfxFilter( mMagnificationFilter ) )
-                    .SetAddressModeU( GetGfxSamplerAddressMode( mSWrapMode ) )
-                    .SetAddressModeV( GetGfxSamplerAddressMode( mTWrapMode ) )
-                    .SetAddressModeW( GetGfxSamplerAddressMode( mRWrapMode ) )
-                    .SetMipmapMode( GetGfxSamplerMipmapMode( mMinificationFilter ) )
-                    );
-  }
-
+private:
   Graphics::Controller* mGraphicsController;   ///< Graphics interface
-  std::unique_ptr<Dali::Graphics::Sampler> mGfxSampler; ///< Graphics Sampler object, default sampler is nullptr
+  Graphics::UniquePtr<Dali::Graphics::Sampler> mGraphicsSampler; ///< Graphics Sampler object, default sampler is nullptr
 
+public:
   FilterMode  mMinificationFilter   : 4;    ///< The minify filter
   FilterMode  mMagnificationFilter  : 4;    ///< The magnify filter
   WrapMode    mSWrapMode            : 4;    ///< The horizontal wrap mode
@@ -204,11 +188,11 @@ inline void SetWrapModeMessage( EventThreadServices& eventThreadServices, SceneG
   new (slot) LocalType( &sampler, &Sampler::SetWrapMode, rWrapMode, sWrapMode, tWrapMode );
 }
 
-} // namespace SceneGraph
+} // namespace Dali::Internal::SceneGraph
 
-} // namespace Internal
 
-} // namespace Dali
+
+
 
 
 #endif //  DALI_INTERNAL_SCENE_GRAPH_SAMPLER_H

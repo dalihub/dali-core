@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,35 @@
 
 #include "test-graphics-pipeline.h"
 
-namespace Test
+namespace Dali
 {
+TestGraphicsPipeline::TestGraphicsPipeline(const Graphics::PipelineCreateInfo& createInfo)
+{
+  // Need to deep copy, otherwise pointed at memory will go out of scope. @todo Probably should do something about this.
 
-GraphicsPipeline::GraphicsPipeline( GraphicsController& controller, const GraphicsPipelineCreateInfo& createInfo )
-: mController(controller),
-  mCreateInfo( createInfo )
-{
+  if(createInfo.colorBlendState)
+    colorBlendState = *createInfo.colorBlendState;
+
+  if(createInfo.programState)
+    programState = *createInfo.programState;
+
+  if(createInfo.viewportState)
+    viewportState = *createInfo.viewportState;
+
+  if(createInfo.depthStencilState)
+    depthStencilState = *createInfo.depthStencilState;
+
+  if(createInfo.rasterizationState)
+    rasterizationState = *createInfo.rasterizationState;
+
+  if(createInfo.vertexInputState)
+    vertexInputState = *createInfo.vertexInputState;
+
+  if(createInfo.inputAssemblyState)
+    inputAssemblyState = *createInfo.inputAssemblyState;
+
+  if(createInfo.dynamicStateMask)
+    dynamicStateMask = createInfo.dynamicStateMask;
 }
 
-GraphicsPipeline::~GraphicsPipeline()
-{
-}
-
-bool GraphicsPipeline::Equals( const Dali::Graphics::Pipeline& ) const
-{
-  // There is no caching - always false;
-  return false;
-}
-
-} // Test namespace
+} // namespace Dali

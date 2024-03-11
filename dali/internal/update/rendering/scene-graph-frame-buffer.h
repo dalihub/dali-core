@@ -20,15 +20,10 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-framebuffer.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-framebuffer.h>
 
-namespace Dali
-{
-namespace Internal
-{
-
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 
 class FrameBuffer
@@ -79,13 +74,13 @@ public:
    * @brief Get the width of the FrameBuffer
    * @return The width of the framebuffer
    */
-  unsigned int GetWidth() const;
+  [[nodiscard]] unsigned int GetWidth() const;
 
   /**
    * @brief Get the height of the FrameBuffer
    * @return The height of the framebuffer
    */
-  unsigned int GetHeight() const;
+  [[nodiscard]] unsigned int GetHeight() const;
 
   /**
    * Prepare the Graphics API framebuffer object when it's required
@@ -95,7 +90,28 @@ public:
   /**
    * Get the graphics object associated with this framebuffer
    */
-  const Graphics::Framebuffer* GetGfxObject() const;
+  [[nodiscard]] const Graphics::Framebuffer* GetGraphicsObject() const
+  {
+    return mGraphicsObject.get();
+  }
+
+  [[nodiscard]] Graphics::RenderTarget* GetGraphicsRenderTarget() const
+  {
+    return mRenderTarget.get();
+  }
+
+  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass(Graphics::AttachmentLoadOp  colorLoadOp,
+                                                            Graphics::AttachmentStoreOp colorStoreOp) const;
+
+  /**
+   * The function returns initialized array of clear values
+   * which then can be modified and assed to BeginRenderPass()
+   * command.
+   */
+  [[nodiscard]] auto& GetGraphicsRenderPassClearValues()
+  {
+    return mClearValues;
+  }
 
   /**
    * Destroy any graphics objects owned by this scene graph object
@@ -103,30 +119,28 @@ public:
   void DestroyGraphicsObjects();
 
 private:
-  Graphics::Controller* mGraphicsController;
-  std::unique_ptr<Graphics::Framebuffer> mGraphicsFramebuffer;
+  Graphics::Controller* mGraphicsController{nullptr};
+  Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
 
-  struct Attachment
-  {
-    Attachment()
-    : texture( nullptr ),
-      format( Dali::FrameBuffer::Attachment::NONE ),
-      mipmapLevel( 0u ),
-      layer( 0u )
-    {
-    }
+  Graphics::FramebufferCreateInfo mCreateInfo;
 
-    SceneGraph::Texture* texture;
-    Dali::FrameBuffer::Attachment::Mask format;
-    unsigned int mipmapLevel;
-    unsigned int layer;
-  };
+  // Render pass and render target
 
-  Attachment mColorAttachment;
-  Attachment mDepthAttachment; // Should also specify depth/stencil choice in DALi API.
+  /**
+   * Render passes are created on fly depending on Load and Store operations
+   * The default render pass (most likely to be used) is the load = CLEAR
+   * amd store = STORE for color attachment.
+   */
+  std::vector<Graphics::UniquePtr<Graphics::RenderPass>> mRenderPass{};
+  Graphics::UniquePtr<Graphics::RenderTarget>            mRenderTarget{nullptr};
+
+  // clear colors
+  std::vector<Graphics::ClearValue> mClearValues{};
 
   unsigned int mWidth;
   unsigned int mHeight;
+  bool mDepthBuffer;
+  bool mStencilBuffer;
 };
 
 inline void AttachColorTextureMessage( EventThreadServices& eventThreadServices,
@@ -144,11 +158,11 @@ inline void AttachColorTextureMessage( EventThreadServices& eventThreadServices,
   new (slot) LocalType( &frameBuffer, &FrameBuffer::AttachColorTexture, texture, mipmapLevel, layer );
 }
 
-} // namespace SceneGraph
+} // namespace Dali::Internal::SceneGraph
 
-} // namespace Internal
 
-} // namespace Dali
+
+
 
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_FRAME_BUFFER_H

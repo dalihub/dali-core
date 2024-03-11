@@ -77,8 +77,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatablePropertyBase()
-  {}
+  ~AnimatablePropertyBase() override = default;
 
 protected: // for derived classes
 
@@ -103,7 +102,7 @@ public: // From PropertyBase
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::IsClean()
    */
-  virtual bool IsClean() const
+  bool IsClean() const override
   {
     return ( CLEAN_FLAG == mDirtyFlags );
   }
@@ -111,7 +110,7 @@ public: // From PropertyBase
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     return true; // Animatable properties are always valid
   }
@@ -144,14 +143,12 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatableProperty()
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<bool>();
   }
@@ -159,7 +156,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
     if (CLEAN_FLAG != mDirtyFlags)
     {
@@ -172,9 +169,25 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetBoolean()
    */
-  virtual const bool& GetBoolean( BufferIndex bufferIndex ) const
+  const bool& GetBoolean(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(bool);
   }
 
   /**
@@ -274,8 +287,8 @@ public:
    */
   void BakeRelative(BufferIndex bufferIndex, bool delta)
   {
-    mValue[bufferIndex] += delta;
-    mBaseValue = mValue[bufferIndex];
+    mValue[bufferIndex] = mValue[bufferIndex] || delta;
+    mBaseValue          = mValue[bufferIndex];
 
     OnBake();
   }
@@ -317,14 +330,12 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatableProperty()
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<int>();
   }
@@ -332,7 +343,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
     if (CLEAN_FLAG != mDirtyFlags)
     {
@@ -345,9 +356,25 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetInteger()
    */
-  virtual const int& GetInteger( BufferIndex bufferIndex ) const
+  const int& GetInteger(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(int);
   }
 
   /**
@@ -498,14 +525,12 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatableProperty()
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<float>();
   }
@@ -513,22 +538,38 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetFloat()
    */
-  virtual const float& GetFloat( BufferIndex bufferIndex ) const
+  const float& GetFloat(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(float);
   }
 
   /**
@@ -687,7 +728,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Vector2>();
   }
@@ -695,7 +736,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
     if (CLEAN_FLAG != mDirtyFlags)
     {
@@ -708,9 +749,25 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
-  virtual const Vector2& GetVector2( BufferIndex bufferIndex ) const
+  const Vector2& GetVector2(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector2);
   }
 
   /**
@@ -959,7 +1016,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Vector3>();
   }
@@ -967,7 +1024,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
     if (CLEAN_FLAG != mDirtyFlags)
     {
@@ -980,9 +1037,25 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector3()
    */
-  virtual const Vector3& GetVector3( BufferIndex bufferIndex ) const
+  const Vector3& GetVector3(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector3);
   }
 
   /**
@@ -1278,14 +1351,12 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatableProperty()
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Vector4>();
   }
@@ -1293,7 +1364,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
     if (CLEAN_FLAG != mDirtyFlags)
     {
@@ -1306,9 +1377,25 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector4()
    */
-  virtual const Vector4& GetVector4( BufferIndex bufferIndex ) const
+  const Vector4& GetVector4(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
   }
 
   /**
@@ -1663,14 +1750,12 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatableProperty()
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Quaternion>();
   }
@@ -1678,7 +1763,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
     if (CLEAN_FLAG != mDirtyFlags)
     {
@@ -1691,9 +1776,9 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetQuaternion()
    */
-  virtual const Quaternion& GetQuaternion( BufferIndex bufferIndex ) const
+  const Quaternion& GetQuaternion(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
   }
 
   /**
@@ -1707,6 +1792,22 @@ public:
     mValue[bufferIndex] = value;
 
     OnSet();
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector4);
   }
 
   /**
@@ -1822,14 +1923,12 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatableProperty()
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Matrix>();
   }
@@ -1837,7 +1936,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
     if (CLEAN_FLAG != mDirtyFlags)
     {
@@ -1850,9 +1949,25 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix()
    */
-  virtual const Matrix& GetMatrix( BufferIndex bufferIndex ) const
+  const Matrix& GetMatrix(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Matrix);
   }
 
   /**
@@ -1985,14 +2100,12 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~AnimatableProperty()
-  {
-  }
+  ~AnimatableProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
     return Dali::PropertyTypes::Get<Matrix3>();
   }
@@ -2000,22 +2113,38 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void ResetToBaseValue(BufferIndex updateBufferIndex) override
   {
-    if (CLEAN_FLAG != mDirtyFlags)
+    if(CLEAN_FLAG != mDirtyFlags)
     {
       mValue[updateBufferIndex] = mBaseValue;
 
-      mDirtyFlags = ( mDirtyFlags >> 1 );
+      mDirtyFlags = (mDirtyFlags >> 1);
     }
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix3()
    */
-  virtual const Matrix3& GetMatrix3( BufferIndex bufferIndex ) const
+  const Matrix3& GetMatrix3(BufferIndex bufferIndex) const override
   {
-    return mValue[ bufferIndex ];
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Matrix3);
   }
 
   /**

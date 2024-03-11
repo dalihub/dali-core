@@ -91,6 +91,12 @@ bool Pixel::HasAlpha(Format pixelformat)
     case COMPRESSED_RGB_PVRTC_4BPPV1:
     case RGB16F:
     case RGB32F:
+    case DEPTH_UNSIGNED_INT:
+    case DEPTH_FLOAT:
+    case DEPTH_STENCIL:
+    case R11G11B10F:
+    case CHROMINANCE_U:
+    case CHROMINANCE_V:
     case INVALID:
     {
       return false;
@@ -105,6 +111,8 @@ uint32_t Pixel::GetBytesPerPixel(Format pixelFormat)
   {
     case L8:
     case A8:
+    case CHROMINANCE_U:
+    case CHROMINANCE_V:
     {
       return 1;
     }
@@ -129,6 +137,10 @@ uint32_t Pixel::GetBytesPerPixel(Format pixelFormat)
     case BGR8888:
     case RGBA8888:
     case BGRA8888:
+    case DEPTH_UNSIGNED_INT:
+    case DEPTH_FLOAT:
+    case DEPTH_STENCIL:
+    case R11G11B10F:
     {
       return 4;
     }
@@ -288,6 +300,12 @@ void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitM
     case COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
     case RGB16F:
     case RGB32F:
+    case DEPTH_UNSIGNED_INT:
+    case DEPTH_FLOAT:
+    case DEPTH_STENCIL:
+    case R11G11B10F:
+    case CHROMINANCE_U:
+    case CHROMINANCE_V:
     case INVALID:
     {
       DALI_LOG_ERROR("Pixel formats for compressed images are not compatible with simple masking-out of per-pixel alpha.\n");

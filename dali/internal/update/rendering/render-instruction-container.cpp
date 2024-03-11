@@ -52,12 +52,19 @@ void RenderInstructionContainer::ResetAndReserve( BufferIndex bufferIndex, uint3
   mInstructions[bufferIndex].clear();
 }
 
-uint32_t RenderInstructionContainer::Count( BufferIndex bufferIndex )
+uint32_t RenderInstructionContainer::Count( BufferIndex bufferIndex ) const
 {
   return static_cast<uint32_t>( mInstructions[bufferIndex].size() );
 }
 
 RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, uint32_t index )
+{
+  DALI_ASSERT_DEBUG( index < mInstructions[bufferIndex].size() );
+
+  return *mInstructions[bufferIndex][ index ];
+}
+
+const RenderInstruction& RenderInstructionContainer::At( BufferIndex bufferIndex, uint32_t index ) const
 {
   DALI_ASSERT_DEBUG( index < mInstructions[bufferIndex].size() );
 

@@ -18,6 +18,9 @@
  *
  */
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-builtins"
+
 namespace Dali
 {
 /**
@@ -71,4 +74,7 @@ struct TypeTraits : public BasicTypes< Type >
  */
 } // namespace Dali
 
+#pragma clang diagnostic pop
+
 #endif /* __DALI_TYPE_TRAITS_H__ */
+

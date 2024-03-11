@@ -54,13 +54,7 @@ RenderInstruction::RenderInstruction()
   mRenderLists.Reserve( 6 );
 }
 
-RenderInstruction::~RenderInstruction()
-{
-  // Ensure renderers remove this from the list of owned render commands
-  FreeRenderCommands();
-
-  // pointer container releases the renderlists
-}
+RenderInstruction::~RenderInstruction() = default;
 
 RenderList& RenderInstruction::GetNextFreeRenderList( size_t capacityRequired )
 {
@@ -138,32 +132,6 @@ void RenderInstruction::Reset( Camera*                  camera,
     // as it ends up releasing and later reallocating loads of vectors
     // reset the renderlist
     (*iter)->Reset();
-  }
-}
-
-// @todo This needs cleaning up / removing. Find a better way of managing render command ownership
-void RenderInstruction::FreeRenderCommands()
-{
-  if( !mShuttingDown )
-  {
-    DALI_LOG_INFO(gLogFilter, Debug::General, "RenderInstruction(%p)::FreeRenderCommands()\n", this);
-
-    // Ensure renderers remove this from the list of owned render commands
-    for( auto renderList : mRenderLists )
-    {
-      const auto renderItemCount = renderList->Count();
-      for( auto renderItemIndex=0u; renderItemIndex < renderItemCount; ++renderItemIndex )
-      {
-        auto& renderItem = renderList->GetItem( renderItemIndex );
-
-        // On shutdown, renderer may have already been destroyed, and this becomes a
-        // dangling pointer, in which case, can't use it.
-        if( renderItem.mRenderer )
-        {
-          renderItem.mRenderer->FreeRenderCommand( this );
-        }
-      }
-    }
   }
 }
 

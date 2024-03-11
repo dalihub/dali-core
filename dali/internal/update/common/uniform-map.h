@@ -40,7 +40,7 @@ namespace SceneGraph
 class UniformPropertyMapping
 {
 public:
-  typedef unsigned long Hash;
+  using Hash = unsigned long;
 
   /**
    * Constructor
@@ -68,13 +68,11 @@ public:
 
   UniformPropertyMapping()
     : propertyPtr( NULL ),
-      uniformName( "" ),
       uniformNameHash( 0 ),
       uniformNameHashNoArray( 0 ),
       arrayIndex( 0 )
   {
   }
-
 
   const PropertyInputImpl* propertyPtr;
   std::string uniformName;
@@ -124,16 +122,6 @@ public:
   ~UniformMap();
 
   /**
-   * Add an observer that watches for changes in the mappings
-   */
-  void AddObserver( Observer& observer );
-
-  /**
-   * Remove an observer
-   */
-  void RemoveObserver( Observer& observer );
-
-  /**
    * Add a map to the mappings table.
    */
   void Add( UniformPropertyMapping* map );
@@ -162,21 +150,22 @@ public:
    */
   const UniformPropertyMapping& operator[]( SizeType index ) const;
 
-private:
   /**
-   * Helper to call the observers when the mappings have changed
+   * Return the change counter
    */
+  inline std::size_t GetChangeCounter() const
+  {
+    return mChangeCounter;
+  }
+
+private:
   void MappingChanged();
 
 private:
   typedef OwnerContainer< UniformPropertyMapping* > UniformMapContainer;
-  typedef UniformMapContainer::Iterator UniformMapIter;
-  typedef Dali::Vector< Observer* > Observers;
-  typedef Observers::Iterator ObserversIter;
 
-  UniformMapContainer mUniformMaps; // Owner container of uniform maps
-
-  Observers mObservers;
+  UniformMapContainer mUniformMaps;       ///< container of uniform maps
+  std::size_t         mChangeCounter{0u}; ///< Counter that is incremented when the map changes
 };
 
 

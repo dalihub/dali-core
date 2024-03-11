@@ -23,13 +23,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
-namespace Dali
-{
-
-namespace Internal
-{
-
-namespace SceneGraph
+namespace Dali::Internal::SceneGraph
 {
 class RenderInstruction;
 
@@ -63,7 +57,7 @@ public:
    * @param bufferIndex to use
    * @return the count of elements
    */
-  uint32_t Count( BufferIndex bufferIndex );
+  [[nodiscard]] uint32_t Count( BufferIndex bufferIndex ) const;
 
   /**
    * Get a reference to the instruction at index
@@ -71,6 +65,13 @@ public:
    * @param index to use
    */
   RenderInstruction& At( BufferIndex bufferIndex, uint32_t index );
+
+  /**
+   * Get a reference to the instruction at index
+   * @param bufferIndex to use
+   * @param index to use
+   */
+  [[nodiscard]] const RenderInstruction& At( BufferIndex bufferIndex, uint32_t index ) const;
 
   /**
    * Add an instruction to the end of the container
@@ -93,10 +94,10 @@ private:
   std::vector<RenderInstruction*> mInstructions[2u];
 };
 
-} // namespace SceneGraph
+} // namespace Dali::Internal::SceneGraph
 
-} // namespace Internal
 
-} // namespace Dali
+
+
 
 #endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_CONTAINER_H__

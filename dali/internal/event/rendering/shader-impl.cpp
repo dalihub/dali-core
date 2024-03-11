@@ -27,9 +27,7 @@
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-namespace Dali
-{
-namespace Internal
+namespace Dali::Internal
 {
 
 namespace
@@ -61,7 +59,7 @@ TypeRegistration mType( typeid( Dali::Shader ), typeid( Dali::Handle ), Create, 
 
 void AppendString(std::string& to, const std::string& append)
 {
-  if(to.size())
+  if(!to.empty())
   {
     to += ",";
   }
@@ -257,5 +255,5 @@ Shader::~Shader()
 }
 
 
-} // namespace Internal
-} // namespace Dali
+} // namespace Dali::Internal
+

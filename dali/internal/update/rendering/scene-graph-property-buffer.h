@@ -21,11 +21,12 @@
 #include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/sampler.h>
-#include <dali/graphics-api/graphics-api-buffer.h>
-#include <dali/graphics-api/graphics-api-controller.h>
+#include <dali/graphics-api/graphics-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/rendering/gpu-buffer.h>
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
 
 namespace Dali
@@ -89,7 +90,6 @@ public:
    * @param[in] format The format for the PropertyBuffer
    */
   void SetFormat( OwnerPointer<PropertyBuffer::Format>& format );
-
 
   /**
    * @brief Set the data of the PropertyBuffer
@@ -167,26 +167,27 @@ public:
   {
     return mFormat.Get();
   }
-  inline Graphics::Buffer* GetGfxObject() const
+
+  [[nodiscard]] inline const GpuBuffer* GetGpuBuffer() const
   {
-    return mGraphicsBuffer.get();
+    return mGpuBuffer.Get();
   }
 
   inline void DestroyGraphicsObjects()
   {
-    mGraphicsBuffer.reset();
+    mGpuBuffer.Reset();
   }
 
 private:
   Graphics::Controller* mGraphicsController;  ///< Graphics controller
   OwnerPointer< PropertyBuffer::Format >  mFormat;    ///< Format of the buffer
   OwnerPointer< Dali::Vector< uint8_t > > mData;      ///< Data
+  OwnerPointer<GpuBuffer>                 mGpuBuffer;
 
   uint32_t mSize;       ///< Number of Elements in the buffer
   bool mDataChanged;  ///< Flag to know if data has changed in a frame
 
   // GRAPHICS
-  std::unique_ptr<Graphics::Buffer> mGraphicsBuffer;
   Graphics::BufferUsageFlags mGraphicsBufferUsage;
 };
 

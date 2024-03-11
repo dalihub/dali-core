@@ -87,7 +87,7 @@ void TextureSet::SetSampler( uint32_t index, SceneGraph::Sampler* sampler )
 void TextureSet::SetTexture( uint32_t index, SceneGraph::Texture* texture )
 {
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::TS(%p)::SetTexture( SG::T:%p )\n  GfxTexture:%p\n",
-                 this, texture, texture?texture->GetGfxObject():nullptr );
+                 this, texture, texture?texture->GetGraphicsObject():nullptr );
 
   const uint32_t textureCount = static_cast<uint32_t>( mTextures.Size() );
   if( textureCount < index + 1 )

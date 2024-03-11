@@ -1,26 +1,34 @@
-#
-# Add graphics-api source files here
-#
-SET( graphics_api_src_dir ${ROOT_SRC_DIR}/dali/graphics-api )
+# Set the header directory
+
+SET( graphics_src_dir ${ROOT_SRC_DIR}/dali/graphics-api )
 
 SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
-    ${graphics_api_src_dir}/graphics-api-base-factory.h
-    ${graphics_api_src_dir}/graphics-api-buffer-factory.h
-    ${graphics_api_src_dir}/graphics-api-buffer.h
-    ${graphics_api_src_dir}/graphics-api-controller.h
-    ${graphics_api_src_dir}/graphics-api-framebuffer-factory.h
-    ${graphics_api_src_dir}/graphics-api-framebuffer.h
-    ${graphics_api_src_dir}/graphics-api-pipeline-factory.h
-    ${graphics_api_src_dir}/graphics-api-pipeline.h
-    ${graphics_api_src_dir}/graphics-api-render-command.h
-    ${graphics_api_src_dir}/graphics-api-sampler-factory.h
-    ${graphics_api_src_dir}/graphics-api-sampler.h
-    ${graphics_api_src_dir}/graphics-api-shader-details.h
-    ${graphics_api_src_dir}/graphics-api-shader-factory.h
-    ${graphics_api_src_dir}/graphics-api-shader.h
-    ${graphics_api_src_dir}/graphics-api-texture-details.h
-    ${graphics_api_src_dir}/graphics-api-texture-factory.h
-    ${graphics_api_src_dir}/graphics-api-texture.h
-    ${graphics_api_src_dir}/graphics-api-types-debug.h
-    ${graphics_api_src_dir}/graphics-api-types.h
+   ${graphics_src_dir}/graphics-buffer-create-info.h
+   ${graphics_src_dir}/graphics-buffer.h
+   ${graphics_src_dir}/graphics-command-buffer-create-info.h
+   ${graphics_src_dir}/graphics-command-buffer.h
+   ${graphics_src_dir}/graphics-controller.h
+   ${graphics_src_dir}/graphics-debug.h
+   ${graphics_src_dir}/graphics-framebuffer-create-info.h
+   ${graphics_src_dir}/graphics-framebuffer.h
+   ${graphics_src_dir}/graphics-memory.h
+   ${graphics_src_dir}/graphics-pipeline-create-info.h
+   ${graphics_src_dir}/graphics-pipeline.h
+   ${graphics_src_dir}/graphics-program-create-info.h
+   ${graphics_src_dir}/graphics-program.h
+   ${graphics_src_dir}/graphics-reflection.h
+   ${graphics_src_dir}/graphics-render-pass-create-info.h
+   ${graphics_src_dir}/graphics-render-pass.h
+   ${graphics_src_dir}/graphics-render-target-create-info.h
+   ${graphics_src_dir}/graphics-render-target.h
+   ${graphics_src_dir}/graphics-sampler-create-info.h
+   ${graphics_src_dir}/graphics-sampler.h
+   ${graphics_src_dir}/graphics-shader-create-info.h
+   ${graphics_src_dir}/graphics-shader.h
+   ${graphics_src_dir}/graphics-sync-object-create-info.h
+   ${graphics_src_dir}/graphics-sync-object.h
+   ${graphics_src_dir}/graphics-texture-create-info.h
+   ${graphics_src_dir}/graphics-texture.h
+   ${graphics_src_dir}/graphics-texture-upload-helper.h
+   ${graphics_src_dir}/graphics-types.h
 )

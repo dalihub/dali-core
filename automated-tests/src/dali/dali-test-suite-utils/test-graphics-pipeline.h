@@ -1,8 +1,8 @@
-#ifndef TEST_GRAPHICS_PIPELINE_H
-#define TEST_GRAPHICS_PIPELINE_H
+#ifndef DALI_TEST_GRAPHICS_PIPELINE_H
+#define DALI_TEST_GRAPHICS_PIPELINE_H
 
 /*
- * Copyright (c) 2019 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,47 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 
-#include <dali/graphics-api/graphics-api-pipeline.h>
+#include <dali/graphics-api/graphics-pipeline-create-info.h>
+#include <dali/graphics-api/graphics-pipeline.h>
 
-namespace Test
+#include "test-graphics-program.h"
+#include "test-graphics-reflection.h"
+
+namespace Dali
 {
-class GraphicsController;
-class GraphicsPipeline;
+class TestGraphicsReflection;
 
-
-struct GraphicsPipelineCreateInfo
+template<typename T>
+T* Uncast(const Graphics::Program* object)
 {
-  Dali::Graphics::ColorBlendState mColorBlendState;
-  Dali::Graphics::ShaderState mShaderState;
-  Dali::Graphics::ViewportState mViewportState;
-  Dali::Graphics::FramebufferState mFramebufferState;
-  Test::GraphicsPipeline* mBasePipeline;
-  Dali::Graphics::DepthStencilState mDepthStencilState;
-  Dali::Graphics::RasterizationState mRasterizationState;
-  Dali::Graphics::VertexInputState mVertexInputState;
-  Dali::Graphics::InputAssemblyState mInputAssemblyState;
-  Dali::Graphics::PipelineDynamicStateMask mDynamicStateMask;
-};
+  return const_cast<T*>(static_cast<const T*>(object));
+}
 
-class GraphicsPipeline : public Dali::Graphics::Pipeline
+class TestGraphicsPipeline : public Graphics::Pipeline
 {
 public:
-  explicit GraphicsPipeline( GraphicsController& controller, const GraphicsPipelineCreateInfo& createInfo ) ;
+  TestGraphicsPipeline(const Graphics::PipelineCreateInfo& createInfo);
 
-  ~GraphicsPipeline() override;
-
-  bool Equals( const Dali::Graphics::Pipeline& ) const;
+  const TestGraphicsReflection& GetReflection() const
+  {
+    return Uncast<TestGraphicsProgram>(programState.program)->GetReflection();
+  }
 
 public:
-  GraphicsController& mController;
-  GraphicsPipelineCreateInfo mCreateInfo;
+  Graphics::ColorBlendState          colorBlendState;
+  Graphics::ProgramState             programState;
+  Graphics::ViewportState            viewportState;
+  Graphics::FramebufferState         framebufferState;
+  Graphics::Pipeline                 basePipeline;
+  Graphics::DepthStencilState        depthStencilState;
+  Graphics::RasterizationState       rasterizationState;
+  Graphics::VertexInputState         vertexInputState;
+  Graphics::InputAssemblyState       inputAssemblyState;
+  Graphics::PipelineDynamicStateMask dynamicStateMask{0u};
 };
 
-} // namespace Test
+} // namespace Dali
 
-#endif // TEST_GRAPHICS_PIPELINE_H
+#endif //DALI_TEST_GRAPHICS_PIPELINE_H

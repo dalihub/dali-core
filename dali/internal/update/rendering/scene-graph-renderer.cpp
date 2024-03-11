@@ -19,7 +19,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/internal-constants.h>
+#include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
+
+#include <dali/internal/update/common/collected-uniform-map.h>
+
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/rendering/render-instruction.h>
 #include <dali/internal/update/rendering/scene-graph-geometry.h>
@@ -28,15 +32,14 @@
 #include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/internal/update/rendering/scene-graph-texture.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/internal/update/graphics/graphics-buffer-manager.h>
+#include <dali/internal/update/graphics/uniform-buffer-manager.h>
+#include <dali/internal/update/graphics/uniform-buffer-view.h>
 
-#include <dali/graphics-api/graphics-api-controller.h>
-#include <dali/graphics-api/graphics-api-render-command.h>
-#include <dali/graphics-api/graphics-api-shader.h>
-#include <dali/graphics-api/graphics-api-shader-details.h>
-#include <dali/graphics-api/graphics-api-pipeline-factory.h>
-#include <dali/graphics-api/graphics-api-sampler.h>
-#include <dali/graphics-api/graphics-api-sampler-factory.h>
+#include <dali/graphics-api/graphics-controller.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-shader.h>
+#include <dali/graphics-api/graphics-types.h>
+#include <dali/graphics-api/graphics-sampler.h>
 
 #include <cstring>
 #include <dali/integration-api/debug.h>
@@ -49,11 +52,10 @@ namespace SceneGraph
 {
 namespace // unnamed namespace
 {
-#if defined(DEBUG_ENABLED)
-Debug::Filter* gVulkanFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_VULKAN_UNIFORMS");
-Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
+#if defined( DEBUG_ENABLED )
+Debug::Filter* gVulkanFilter  = Debug::Filter::New( Debug::NoLogging, false, "LOG_VULKAN_UNIFORMS" );
+Debug::Filter* gTextureFilter = Debug::Filter::New( Debug::NoLogging, false, "LOG_TEXTURE" );
 #endif
-
 
 const uint32_t UNIFORM_MAP_READY      = 0;
 const uint32_t COPY_UNIFORM_MAP       = 1;
@@ -62,46 +64,6 @@ const uint32_t REGENERATE_UNIFORM_MAP = 2;
 //Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
 MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
 
-void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
-{
-  // Iterate thru uniformMap.
-  //   Any maps that aren't in localMap should be added in a single step
-  CollectedUniformMap newUniformMappings;
-
-  for( UniformMap::SizeType i = 0, count=uniformMap.Count(); i<count; ++i )
-  {
-    UniformPropertyMapping::Hash nameHash = uniformMap[i].uniformNameHash;
-    bool found = false;
-
-    for( auto map : localMap )
-    {
-      if( map->uniformNameHash == nameHash )
-      {
-        if( map->uniformName == uniformMap[i].uniformName )
-        {
-          found = true;
-          break;
-        }
-      }
-    }
-    if( !found )
-    {
-      // it's a new mapping. Add raw ptr to temporary list
-      newUniformMappings.PushBack( &uniformMap[i] );
-    }
-  }
-
-  if( newUniformMappings.Count() > 0 )
-  {
-    localMap.Reserve( localMap.Count() + newUniformMappings.Count() );
-
-    for( auto map : newUniformMappings )
-    {
-      localMap.PushBack( map );
-    }
-  }
-}
-
 /**
  * Helper function computing correct alignment of data for uniform buffers
  * @param dataSize size of uniform buffer
@@ -109,14 +71,43 @@ void AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
  */
 inline uint32_t GetUniformBufferDataAlignment( uint32_t dataSize )
 {
-  return ( (dataSize / 256u) + ( (dataSize % 256u) ? 1u : 0u ) ) * 256u;
+  return ( ( dataSize / 256u ) + ( ( dataSize % 256u ) ? 1u : 0u ) ) * 256u;
+}
+
+void WriteUniform( UniformBufferView& ubo,
+                   const Graphics::UniformInfo& uniformInfo,
+                   const void* data, uint32_t size)
+{
+  ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
+}
+template<class T>
+void WriteUniform(UniformBufferView&   ubo,
+                  const Graphics::UniformInfo& uniformInfo,
+                  const T&                     data)
+{
+  WriteUniform(ubo, uniformInfo, &data, sizeof(T));
+}
+
+template<>
+void WriteUniform( UniformBufferView& ubo,
+                   const Graphics::UniformInfo& uniformInfo,
+                   const Matrix3&               data )
+{
+  // Matrix3 has to take stride in account ( 16 )
+  float values[12];
+
+  std::memcpy( &values[0], data.AsFloat(), sizeof( float ) * 3 );
+  std::memcpy( &values[4], &data.AsFloat()[3], sizeof( float ) * 3 );
+  std::memcpy( &values[8], &data.AsFloat()[6], sizeof( float ) * 3 );
+
+  WriteUniform( ubo, uniformInfo, &values, sizeof( float ) * 12 );
 }
 
 } // Anonymous namespace
 
 Renderer* Renderer::New()
 {
-  return new ( gRendererMemoryPool.AllocateRawThreadSafe() ) Renderer();
+  return new( gRendererMemoryPool.AllocateRawThreadSafe() ) Renderer();
 }
 
 Renderer::Renderer()
@@ -125,7 +116,14 @@ Renderer::Renderer()
   mGeometry( NULL ),
   mShader( NULL ),
   mBlendColor( NULL ),
-  mStencilParameters( RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP ),
+  mStencilParameters( RenderMode::AUTO,
+                      StencilFunction::ALWAYS,
+                      0xFF,
+                      0x00,
+                      0xFF,
+                      StencilOperation::KEEP,
+                      StencilOperation::KEEP,
+                      StencilOperation::KEEP ),
   mIndexedDrawFirstElement( 0u ),
   mIndexedDrawElementsCount( 0u ),
   mRegenerateUniformMap( 0u ),
@@ -136,14 +134,11 @@ Renderer::Renderer()
   mDepthWriteMode( DepthWriteMode::AUTO ),
   mDepthTestMode( DepthTestMode::AUTO ),
   mRenderingBehavior( DevelRenderer::Rendering::IF_REQUIRED ),
-  mPremultipledAlphaEnabled( false ),
-  mRenderCommands{},
+  mPremultipliedAlphaEnabled( false ),
   mTextureBindings{},
   mOpacity( 1.0f ),
   mDepthIndex( 0 )
 {
-  // Observe our own PropertyOwner's uniform map
-  AddUniformMapObserver( *this );
 }
 
 Renderer::~Renderer()
@@ -174,92 +169,96 @@ void Renderer::Initialize( Graphics::Controller& graphicsController )
 
 void Renderer::UpdateUniformMap( BufferIndex updateBufferIndex, Node& node )
 {
-  // Called every frame. Well, it is now...
-  CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
-
-  // See if we need to update the collected map:
-  if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP || // renderer or shader's uniform map has changed
-      node.GetUniformMapChanged( updateBufferIndex ) )   // node's uniform map has change
+  auto shaderMapChangeCounter = mShader ? mShader->GetUniformMap().GetChangeCounter() : 0u;
+  bool shaderMapChanged       = mShader && (mShaderMapChangeCounter != shaderMapChangeCounter);
+  if(shaderMapChanged)
   {
-    localMap.Resize(0);
+    mShaderMapChangeCounter = shaderMapChangeCounter;
+  }
 
-    // Priority is: High: Node, Renderer, Shader, to Low
-    AddMappings( localMap, node.GetUniformMap() );
+  if(mUniformMapChangeCounter != mUniformMaps.GetChangeCounter() || shaderMapChanged)
+  {
+    mRegenerateUniformMap = true;
+
+    // Update local counters to identify any future changes to maps
+    // (unlikely, but allowed by API).
+    mUniformMapChangeCounter = mUniformMaps.GetChangeCounter();
+  }
+
+  if(mRegenerateUniformMap)
+  {
+    CollectedUniformMap& localMap = mCollectedUniformMap;
+    localMap.Clear();
 
     const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
-    AddMappings( localMap, rendererUniformMap );
 
+    auto size = rendererUniformMap.Count();
     if( mShader )
     {
-      AddMappings( localMap, mShader->GetUniformMap() );
+      size += mShader->GetUniformMap().Count();
     }
-  }
-  else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
-  {
-    // Copy old map into current map
-    CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
 
-    localMap.Resize( oldMap.Count() );
-
-      uint32_t index=0;
-    for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
+    localMap.Reserve( size );
+    localMap.AddMappings( rendererUniformMap );
+    if( mShader )
     {
-      localMap[index] = *iter;
+      localMap.AddMappings( mShader->GetUniformMap() );
     }
-  }
+    localMap.UpdateChangeCounter();
 
-  if( mRegenerateUniformMap > 0 )
-  {
-    mRegenerateUniformMap--;
+    mRegenerateUniformMap = false;
   }
 }
 
-void Renderer::FreeRenderCommand( RenderInstruction* renderInstruction )
+void Renderer::PrepareRender( Graphics::CommandBuffer& commandBuffer,
+                              const Matrix& viewMatrix,
+                              const Matrix& projectionMatrix,
+                              BufferIndex              bufferIndex,
+                              const RenderInstruction& renderInstruction,
+                              RenderItem&              item )
 {
-
-  mRenderCommands.DestroyRenderCommand( renderInstruction );
-}
-
-RenderCommand& Renderer::GetRenderCommand( RenderInstruction* renderInstruction,
-                                           BufferIndex updateBufferIndex )
-{
-  return mRenderCommands.GetRenderCommand( renderInstruction, updateBufferIndex );
-}
-
-void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* renderInstruction )
-{
-  auto& renderCmd = mRenderCommands.AllocRenderCommand( renderInstruction, *mGraphicsController, updateBufferIndex );
-  auto& cmd = renderCmd.GetGfxRenderCommand( updateBufferIndex );
-
-  if (!mShader->GetGfxObject())
+  if( !mShader->GetGraphicsObject() || !mGraphicsController )
   {
     return;
   }
 
-  /**
-   * Prepare vertex attribute buffer bindings
-   */
-  std::vector<const Graphics::Buffer*> vertexBuffers{};
+  auto& program    = *mShader->GetGraphicsObject();
+  auto& reflection = mGraphicsController->GetProgramReflection( program );
 
-  for(auto&& vertexBuffer : mGeometry->GetVertexBuffers())
-  {
-    vertexBuffers.push_back( vertexBuffer->GetGfxObject() );
-  }
+  BindTextures( commandBuffer, reflection );
 
-  auto& shader = *mShader->GetGfxObject();
+  uint32_t instanceCount = 1u;
+  auto& pipeline = PrepareGraphicsPipeline(program, renderInstruction, item.mNode, !item.mIsOpaque);
 
-  /**
+  commandBuffer.BindPipeline(pipeline);
+
+  auto nodeIndex = BuildUniformIndexMap(bufferIndex, *item.mNode, &program);
+  WriteUniformBuffer(bufferIndex, commandBuffer, *mShader, item, viewMatrix, projectionMatrix, nodeIndex);
+
+  mGeometry->BindVertexAttributes( commandBuffer );
+
+  mGeometry->Draw(*mGraphicsController, commandBuffer,
+                   mIndexedDrawFirstElement, mIndexedDrawElementsCount,
+                   instanceCount );
+
+  DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose, "done\n" );
+}
+
+void Renderer::BindTextures( Graphics::CommandBuffer& commandBuffer, const Graphics::Reflection& reflection )
+{
+   /**
    * Prepare textures
    */
-  auto samplers = shader.GetSamplers();
-  if(mTextureSet)
+  auto samplers = reflection.GetSamplers();
+  if( mTextureSet )
   {
-    if (!samplers.empty())
+    if( !samplers.empty() )
     {
       mTextureBindings.clear();
-      for (auto i = 0u; i < mTextureSet->GetTextureCount(); ++i)
+      uint32_t textureUnit=0;
+      for( auto i = 0u; i < mTextureSet->GetTextureCount(); ++i )
       {
-        auto texture = mTextureSet->GetTexture(i);
+        auto texture = mTextureSet->GetTexture( i );
         if( texture )
         {
           auto sampler = mTextureSet->GetTextureSampler( i );
@@ -267,12 +266,11 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
           if( sampler && sampler->mIsDirty )
           {
             // if default sampler
-            if( sampler->mMagnificationFilter == FilterMode::DEFAULT && sampler->mMinificationFilter == FilterMode::DEFAULT &&
-                sampler->mSWrapMode == WrapMode::DEFAULT &&
-                sampler->mTWrapMode == WrapMode::DEFAULT &&
-                sampler->mRWrapMode == WrapMode::DEFAULT )
+            if( sampler->mMagnificationFilter == FilterMode::DEFAULT &&
+                sampler->mMinificationFilter == FilterMode::DEFAULT && sampler->mSWrapMode == WrapMode::DEFAULT &&
+                sampler->mTWrapMode == WrapMode::DEFAULT && sampler->mRWrapMode == WrapMode::DEFAULT )
             {
-              sampler->mGfxSampler.reset( nullptr );
+              sampler->DestroyGraphicsObjects();
             }
             else
             {
@@ -284,234 +282,268 @@ void Renderer::PrepareRender( BufferIndex updateBufferIndex, RenderInstruction* 
 
           texture->PrepareTexture(); // Ensure that a native texture is ready to be drawn
 
-          auto binding    = Graphics::RenderCommand::TextureBinding{}
-            .SetBinding(samplers[i].binding)
-            .SetTexture(texture->GetGfxObject())
-            .SetSampler(sampler ? sampler->GetGfxObject() : nullptr);
+          auto binding = Graphics::TextureBinding{}
+                           .SetBinding( textureUnit /*samplers[i].binding*/ )
+                           .SetTexture( texture->GetGraphicsObject() )
+                           .SetSampler( sampler ? sampler->GetGraphicsObject() : nullptr );
 
-          mTextureBindings.emplace_back(binding);
+          mTextureBindings.emplace_back( binding );
         }
+        ++textureUnit;
       }
-      renderCmd.BindTextures( mTextureBindings, updateBufferIndex );
+      commandBuffer.BindTextures( mTextureBindings );
     }
   }
+}
 
+std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const Node& node, Graphics::Program* program)
+{
+  const SceneGraph::CollectedUniformMap&    uniformMap             = mCollectedUniformMap;
+  const SceneGraph::UniformMap&             uniformMapNode         = node.GetUniformMap();
 
-  // Build render command
-  // todo: this may be deferred until all render items are sorted, otherwise
-  // certain optimisations cannot be done
+  bool updateMaps;
 
-  const auto &vb = mGeometry->GetVertexBuffers()[0];
-
-  // set optional index buffer
-  bool usesIndexBuffer{false};
-  if ((usesIndexBuffer = mGeometry->HasIndexBuffer()))
+  auto shaderMapChangeCounter = mShader ? mShader->GetUniformMap().GetChangeCounter() : 0u;
+  bool shaderMapChanged       = mShader && (mShaderMapChangeCounter != shaderMapChangeCounter);
+  if(shaderMapChanged)
   {
-    cmd.BindIndexBuffer(Graphics::RenderCommand::IndexBufferBinding()
-                        .SetBuffer(mGeometry->GetIndexBuffer())
-                        .SetOffset(0)
-    );
+    mShaderMapChangeCounter = shaderMapChangeCounter;
   }
 
-  cmd.BindVertexBuffers(std::move(vertexBuffers) );
+  // Usual case is to only have 1 node, however we do allow multiple nodes to reuse the same
+  // renderer, so we have to cache uniform map per render item (node / renderer pair).
 
-  if(usesIndexBuffer)
+  // Specially, if node don't have uniformMap, we mark nodePtr as nullptr.
+  // So, all nodes without uniformMap will share same UniformIndexMap, contains only render data providers.
+  const auto nodePtr    = uniformMapNode.Count() ? &node : nullptr;
+
+  const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
+  const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
+
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, program](RenderItemLookup& element) { return (element.node == nodePtr && element.program == program); });
+
+  std::size_t renderItemMapIndex;
+  if(iter == mNodeIndexMap.end())
   {
-    cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
-                                        .SetFirstIndex( uint32_t(mIndexedDrawFirstElement) )
-                                        .SetDrawType( Graphics::RenderCommand::DrawType::INDEXED_DRAW )
-                                        .SetFirstInstance( 0u )
-                                        .SetIndicesCount(
-                                          mIndexedDrawElementsCount ?
-                                            uint32_t( mIndexedDrawElementsCount ) :
-                                            mGeometry->GetIndexBufferElementCount() )
-                                        .SetInstanceCount( 1u )));
+    renderItemMapIndex = mUniformIndexMaps.size();
+    RenderItemLookup renderItemLookup;
+    renderItemLookup.node                       = nodePtr;
+    renderItemLookup.program                    = program;
+    renderItemLookup.index                      = renderItemMapIndex;
+    renderItemLookup.nodeChangeCounter          = nodeChangeCounter;
+    renderItemLookup.renderItemMapChangeCounter = renderItemMapChangeCounter;
+    mNodeIndexMap.emplace_back(renderItemLookup);
+
+    updateMaps = true;
+    mUniformIndexMaps.resize(mUniformIndexMaps.size() + 1);
   }
   else
   {
-    cmd.Draw(std::move(Graphics::RenderCommand::DrawCommand{}
-                                        .SetFirstVertex(0u)
-                                        .SetDrawType(Graphics::RenderCommand::DrawType::VERTEX_DRAW)
-                                        .SetFirstInstance(0u)
-                                        .SetVertexCount(vb->GetElementCount())
-                                        .SetInstanceCount(1u)));
+    renderItemMapIndex = iter->index;
+
+    updateMaps = (nodeChangeCounter != iter->nodeChangeCounter) ||
+                 (renderItemMapChangeCounter != iter->renderItemMapChangeCounter) ||
+                 (mUniformIndexMaps[renderItemMapIndex].empty());
+
+    iter->nodeChangeCounter          = nodeChangeCounter;
+    iter->renderItemMapChangeCounter = renderItemMapChangeCounter;
   }
 
-  DALI_LOG_STREAM( gVulkanFilter, Debug::Verbose,  "done\n" );
-}
-
-void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const std::string& name, size_t hash, const void* data, uint32_t size )
-{
-  if( !mShader->GetGfxObject() )
+  if(updateMaps || shaderMapChanged)
   {
-    // Invalid pipeline
-    return;
-  }
-  auto uniformInfo = Graphics::ShaderDetails::UniformInfo{};
-  if( mShader->GetUniform( name, hash, uniformInfo ) )
-  {
-    ubo.Write( data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset, false );
-  }
-}
+    const uint32_t mapCount     = uniformMap.Count();
+    const uint32_t mapNodeCount = uniformMapNode.Count();
 
-void Renderer::WriteUniform( GraphicsBuffer& ubo, const std::vector<Graphics::RenderCommand::UniformBufferBinding>& bindings, const Graphics::ShaderDetails::UniformInfo& uniformInfo, const void* data, uint32_t size )
-{
-  if( !mShader->GetGfxObject() )
-  {
-    // Invalid pipeline
-    return;
-  }
+    mUniformIndexMaps[renderItemMapIndex].clear(); // Clear contents, but keep memory if we don't change size
+    mUniformIndexMaps[renderItemMapIndex].resize(mapCount + mapNodeCount);
 
-  ubo.Write( data, size, bindings[uniformInfo.bufferIndex].offset + uniformInfo.offset, false );
-}
-
-bool Renderer::UpdateUniformBuffers( RenderInstruction& instruction,
-                                     GraphicsBuffer& ubo,
-                                     std::vector<Graphics::RenderCommand::UniformBufferBinding>*& outBindings,
-                                     uint32_t& offset,
-                                     BufferIndex updateBufferIndex )
-{
-  int updates( 0u );
-
-  const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
-  const auto& collectedMap = mCollectedUniformMap[updateBufferIndex];
-  if( collectedMap.Count() < rendererUniformMap.Count() )
-  {
-    DALI_LOG_ERROR("%p, i:%u - FAILED TO REGENERATE UNIFORM MAP", this, updateBufferIndex );
-  }
-
-  auto uboCount = mShader->GetGfxObject()->GetUniformBlockCount();
-  auto gfxShader = mShader->GetGfxObject();
-
-  RenderCommand* renderCommand;
-  if( !mRenderCommands.Find( &instruction, renderCommand, updateBufferIndex ) )
-  {
-    DALI_ASSERT_DEBUG( 0 && "Can't find render command for this instruction" );
-    return false;
-  }
-
-  auto& currentUboBindings = renderCommand->mUboBindings;
-
-
-  if(currentUboBindings.size() != uboCount )
-  {
-    currentUboBindings.resize( uboCount );
-    ++updates;
-  }
-
-  // setup bindings
-  uint32_t dataOffset = offset;
-  for (auto i = 0u; i < uboCount; ++i)
-  {
-    currentUboBindings[i].dataSize = gfxShader->GetUniformBlockSize(i);
-    currentUboBindings[i].binding = gfxShader->GetUniformBlockBinding(i);
-
-    if( currentUboBindings[i].offset != dataOffset )
+    // Copy uniform map into mUniformIndexMap
+    uint32_t mapIndex = 0;
+    for(; mapIndex < mapCount; ++mapIndex)
     {
-      currentUboBindings[i].offset = dataOffset;
-      ++updates;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].propertyValue          = uniformMap.mUniformMap[mapIndex]->propertyPtr;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformName            = uniformMap.mUniformMap[mapIndex]->uniformName;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHash        = uniformMap.mUniformMap[mapIndex]->uniformNameHash;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHashNoArray = uniformMap.mUniformMap[mapIndex]->uniformNameHashNoArray;
+      mUniformIndexMaps[renderItemMapIndex][mapIndex].arrayIndex             = uniformMap.mUniformMap[mapIndex]->arrayIndex;
     }
 
-    dataOffset += GetUniformBufferDataAlignment( currentUboBindings[i].dataSize );
-
-    if( currentUboBindings[i].buffer != ubo.GetBuffer() )
+    for(uint32_t nodeMapIndex = 0; nodeMapIndex < mapNodeCount; ++nodeMapIndex)
     {
-      currentUboBindings[i].buffer = ubo.GetBuffer();
-      ++updates;
-    }
-  }
-
-  // write to memory
-  for (auto&& uniformMap : mCollectedUniformMap[updateBufferIndex])
-  {
-    // Convert uniform name into hash value
-    auto uniformInfo = Graphics::ShaderDetails::UniformInfo{};
-
-    // test for array ( special case )
-    // @todo This means parsing the uniform string every frame. Instead, store the array index if present.
-    int arrayIndex = uniformMap->arrayIndex;
-
-    auto uniformFound = mShader->GetUniform( uniformMap->uniformName,
-                                             uniformMap->uniformNameHashNoArray ?
-                                             uniformMap->uniformNameHashNoArray :
-                                             uniformMap->uniformNameHash, uniformInfo );
-
-    if( uniformFound )
-    {
-      auto dst = currentUboBindings[uniformInfo.bufferIndex].offset + uniformInfo.offset;
-
-      switch (uniformMap->propertyPtr->GetType())
+      auto  hash = uniformMapNode[nodeMapIndex].uniformNameHash;
+      auto& name = uniformMapNode[nodeMapIndex].uniformName;
+      bool  found(false);
+      for(uint32_t i = 0; i < mapCount; ++i)
       {
-        case Property::Type::FLOAT:
-        case Property::Type::INTEGER:
-        case Property::Type::BOOLEAN:
+        if(mUniformIndexMaps[renderItemMapIndex][i].uniformNameHash == hash &&
+            mUniformIndexMaps[renderItemMapIndex][i].uniformName == name)
         {
-          ubo.Write( &uniformMap->propertyPtr->GetFloat(updateBufferIndex),
-                     sizeof(float),
-                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
-                     false );
+          mUniformIndexMaps[renderItemMapIndex][i].propertyValue = uniformMapNode[nodeMapIndex].propertyPtr;
+          found                                                  = true;
           break;
-        }
-        case Property::Type::VECTOR2:
-        {
-          ubo.Write( &uniformMap->propertyPtr->GetVector2(updateBufferIndex),
-                     sizeof(Vector2),
-                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
-                     false );
-          break;
-        }
-        case Property::Type::VECTOR3:
-        {
-          ubo.Write( &uniformMap->propertyPtr->GetVector3(updateBufferIndex),
-                     sizeof(Vector3),
-                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
-                     false );
-          break;
-        }
-        case Property::Type::VECTOR4:
-        {
-          ubo.Write( &uniformMap->propertyPtr->GetVector4(updateBufferIndex),
-                     sizeof(Vector4),
-                     dst + static_cast<uint32_t>(sizeof(Vector4)) * arrayIndex,
-                     false );
-          break;
-        }
-        case Property::Type::MATRIX:
-        {
-          ubo.Write( &uniformMap->propertyPtr->GetMatrix(updateBufferIndex),
-                     sizeof(Matrix),
-                     dst + static_cast<uint32_t>(sizeof(Matrix)) * arrayIndex,
-                     false );
-          break;
-        }
-        case Property::Type::MATRIX3:
-        {
-          const auto& matrix = uniformMap->propertyPtr->GetMatrix3(updateBufferIndex);
-          for( int i = 0; i < 3; ++i )
-          {
-            ubo.Write( &matrix.AsFloat()[i*3],
-                       sizeof(float)*3,
-                       dst + (i * static_cast<uint32_t>(sizeof(Vector4))),
-                       false );
-          }
-
-          break;
-        }
-        default:
-        {
         }
       }
+
+      if(!found)
+      {
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].propertyValue          = uniformMapNode[nodeMapIndex].propertyPtr;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformName            = uniformMapNode[nodeMapIndex].uniformName;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHash        = uniformMapNode[nodeMapIndex].uniformNameHash;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHashNoArray = uniformMapNode[nodeMapIndex].uniformNameHashNoArray;
+        mUniformIndexMaps[renderItemMapIndex][mapIndex].arrayIndex             = uniformMapNode[nodeMapIndex].arrayIndex;
+        ++mapIndex;
+      }
+    }
+
+    mUniformIndexMaps[renderItemMapIndex].resize(mapIndex);
+  }
+  return renderItemMapIndex;
+}
+
+void Renderer::WriteUniformBuffer(
+  BufferIndex                          bufferIndex,
+  Graphics::CommandBuffer&             commandBuffer,
+  SceneGraph::Shader&                  shader,
+  const RenderItem&                    item,
+  const Matrix&                        viewMatrix,
+  const Matrix&                        projectionMatrix,
+  std::size_t nodeIndex)
+{
+  auto program = shader.GetGraphicsObject();
+  auto& reflection = mGraphicsController->GetProgramReflection(*program);
+
+  const auto& programRequirements = shader.GetUniformBlockMemoryRequirements();
+
+  // Allocate UBO view per each block (include standalone block)
+  auto blockCount = programRequirements.blockCount;
+
+  std::vector<std::unique_ptr<UniformBufferView>> uboViews;
+  uboViews.resize(blockCount);
+
+  // Prepare bindings
+  auto uboCount = reflection.GetUniformBlockCount();
+  mUniformBufferBindings.resize(uboCount);
+
+  for(auto i = 0u; i < blockCount; ++i)
+  {
+    bool standaloneUniforms = (i == 0);
+    if(programRequirements.blockSize[i])
+    {
+      auto uniformBufferView             = mUniformBufferManager->CreateUniformBufferView(programRequirements.blockSize[i], standaloneUniforms);
+      mUniformBufferBindings[i].buffer   = uniformBufferView->GetBuffer();
+      mUniformBufferBindings[i].offset   = uniformBufferView->GetOffset();
+      mUniformBufferBindings[i].binding  = standaloneUniforms ? 0 : i - 1;
+      mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
+      uboViews[i].reset(uniformBufferView.release());
     }
   }
 
-  // write output bindings
-  outBindings = &currentUboBindings;
+  // update the uniform buffer
+  // pass shared UBO and offset, return new offset for next item to be used
+  // don't process bindings if there are no uniform buffers allocated
+  if(!uboViews.empty())
+  {
+    // Write default uniforms
+    WriteDefaultUniform(shader.GetDefaultUniform(Shader::DefaultUniformIndex::MODEL_MATRIX), uboViews, item.mModelMatrix);
+    WriteDefaultUniform(shader.GetDefaultUniform(Shader::DefaultUniformIndex::VIEW_MATRIX), uboViews, viewMatrix);
+    WriteDefaultUniform(shader.GetDefaultUniform(Shader::DefaultUniformIndex::PROJECTION_MATRIX), uboViews, projectionMatrix);
+    WriteDefaultUniform(shader.GetDefaultUniform(Shader::DefaultUniformIndex::MODEL_VIEW_MATRIX), uboViews, item.mModelViewMatrix);
 
-  // update offset
-  offset = dataOffset;
+    auto mvpUniformInfo = shader.GetDefaultUniform(Shader::DefaultUniformIndex::MVP_MATRIX);
+    if(mvpUniformInfo && !mvpUniformInfo->name.empty())
+    {
+      Matrix modelViewProjectionMatrix(false);
+      MatrixUtils::MultiplyProjectionMatrix(modelViewProjectionMatrix, item.mModelViewMatrix, projectionMatrix);
+      WriteDefaultUniform(mvpUniformInfo, uboViews, modelViewProjectionMatrix);
+    }
 
-  // return update status
-  return (0 != updates);
+    auto normalUniformInfo = shader.GetDefaultUniform(Shader::DefaultUniformIndex::NORMAL_MATRIX);
+    if(normalUniformInfo && !normalUniformInfo->name.empty())
+    {
+      Matrix3 normalMatrix(item.mModelViewMatrix);
+      normalMatrix.Invert();
+      normalMatrix.Transpose();
+      WriteDefaultUniform(normalUniformInfo, uboViews, normalMatrix);
+    }
+
+    Vector4        finalColor;                               ///< Applied renderer's opacity color
+    const Vector4& color = item.mNode->GetWorldColor(bufferIndex); ///< Actor's original color
+    if(mPremultipliedAlphaEnabled)
+    {
+      const float& alpha = color.a * GetOpacity(bufferIndex);
+      finalColor         = Vector4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
+    }
+    else
+    {
+      finalColor = Vector4(color.r, color.g, color.b, color.a * GetOpacity(bufferIndex));
+    }
+    WriteDefaultUniform(shader.GetDefaultUniform(Shader::DefaultUniformIndex::COLOR), uboViews, finalColor);
+
+    // Write uniforms from the uniform map
+    FillUniformBuffer(shader, uboViews, bufferIndex, nodeIndex);
+
+    // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
+    WriteDefaultUniform(shader.GetDefaultUniform(Shader::DefaultUniformIndex::SIZE), uboViews, item.mSize);
+
+    commandBuffer.BindUniformBuffers(mUniformBufferBindings);
+  }
+}
+
+void Renderer::FillUniformBuffer(SceneGraph::Shader& shader,
+                        const std::vector<std::unique_ptr<UniformBufferView>>& uboViews,
+                        BufferIndex updateBufferIndex,
+                        std::size_t nodeIndex)
+{
+  for(auto& iter : mUniformIndexMaps[nodeIndex])
+  {
+    auto& uniform = iter;
+    int arrayIndex = uniform.arrayIndex;
+    if(!uniform.initialized)
+    {
+      auto uniformInfo = Graphics::UniformInfo{};
+      auto uniformFound = shader.GetUniform( uniform.uniformName, uniform.uniformNameHash,
+                                             uniform.uniformNameHashNoArray, uniformInfo);
+      UniformBufferView* ubo = nullptr;
+      if(uniformFound)
+      {
+        ubo = uboViews[uniformInfo.bufferIndex].get();
+      }
+      else
+      {
+        continue;
+      }
+      uniform.uniformOffset = uniformInfo.offset;
+      uniform.uniformLocation = uniformInfo.location;
+      uniform.uniformBlockIndex = uniformInfo.bufferIndex;
+      uniform.initialized = true;
+
+      auto offset = ubo->GetOffset() + uniformInfo.offset;
+      const auto typeSize = iter.propertyValue->GetValueSize();
+      const auto dest = offset + static_cast<uint32_t>(typeSize)*arrayIndex;
+      ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
+                  typeSize, dest);
+    }
+    else
+    {
+      UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
+      auto offset = ubo->GetOffset()+uniform.uniformOffset;
+      const auto typeSize = iter.propertyValue->GetValueSize();
+      const auto dest = offset + static_cast<uint32_t>(typeSize) * arrayIndex;
+      ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
+                 typeSize, dest);
+    }
+  }
+}
+
+template<class T>
+bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, const std::vector<std::unique_ptr<UniformBufferView>>& uboViews, const T& data)
+{
+  if(uniformInfo && !uniformInfo->name.empty())
+  {
+    WriteUniform(*uboViews[uniformInfo->bufferIndex], *uniformInfo, data);
+    return true;
+  }
+  return false;
 }
 
 void Renderer::SetTextures( TextureSet* textureSet )
@@ -526,14 +558,10 @@ void Renderer::SetTextures( TextureSet* textureSet )
   mTextureSet = textureSet;
   mTextureSet->AddObserver( this );
 
-  // Rebind textures to make sure old data won't be used. Ensure this
-  // occurs for both buffers.
-  mRenderCommands.BindTextures( mTextureBindings );
-
   DALI_LOG_INFO( gTextureFilter, Debug::General, "SG::Renderer(%p)::SetTextures( SG::TS:%p )\n"
                  "  SG:Texture:%p  GfxTexture:%p\n", this, textureSet,
                  textureSet?textureSet->GetTexture(0):nullptr,
-                 textureSet?(textureSet->GetTexture(0)?textureSet->GetTexture(0)->GetGfxObject():nullptr):nullptr );
+                 textureSet?(textureSet->GetTexture(0)?textureSet->GetTexture(0)->GetGraphicsObject():nullptr):nullptr );
 }
 
 void Renderer::SetShader( Shader* shader )
@@ -547,7 +575,7 @@ void Renderer::SetShader( Shader* shader )
 
   mShader = shader;
   mShader->AddConnectionObserver( *this );
-  mRenderCommands.ClearUniformBindings();
+
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
@@ -607,7 +635,7 @@ void Renderer::SetBlendColor( const Vector4& blendColor )
 {
   if( blendColor == Color::TRANSPARENT )
   {
-    mBlendColor = NULL;
+    mBlendColor = nullptr;
   }
   else
   {
@@ -653,12 +681,12 @@ uint32_t Renderer::GetIndexedDrawElementsCount() const
 
 void Renderer::EnablePreMultipliedAlpha( bool preMultipled )
 {
-  mPremultipledAlphaEnabled = preMultipled;
+  mPremultipliedAlphaEnabled = preMultipled;
 }
 
 bool Renderer::IsPreMultipliedAlphaEnabled() const
 {
-  return mPremultipledAlphaEnabled;
+  return mPremultipliedAlphaEnabled;
 }
 
 void Renderer::SetDepthWriteMode( DepthWriteMode::Type depthWriteMode )
@@ -813,7 +841,7 @@ void Renderer::TextureSetChanged()
 
 void Renderer::TextureSetDeleted()
 {
-  mTextureSet = NULL;
+  mTextureSet = nullptr;
 }
 
 void Renderer::ConnectionsChanged( PropertyOwner& object )
@@ -829,23 +857,28 @@ void Renderer::ConnectedUniformMapChanged()
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
-void Renderer::UniformMappingsChanged( const UniformMap& mappings )
-{
-  // The mappings are from PropertyOwner base class
-  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-}
-
 void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 {
   if( reinterpret_cast<PropertyOwner*>(mShader) == &owner )
   {
-    mShader = NULL;
+    mShader = nullptr;
   }
 }
 
-void Renderer::DestroyGraphicsObjects()
+Shader* Renderer::PrepareShader()
 {
-  mRenderCommands.DestroyAll();
+  DALI_ASSERT_ALWAYS(mShader->GetGraphicsObject());
+  return mShader;
+}
+
+Graphics::Pipeline& Renderer::PrepareGraphicsPipeline( Graphics::Program&       program,
+                                                       const RenderInstruction& instruction,
+                                                       Node*                    node,
+                                                       bool                     blend )
+{
+  //@todo CACHE ME!
+  DALI_ASSERT_ALWAYS(mPipeline != nullptr);
+  return *mPipeline.get();
 }
 
 } // namespace SceneGraph

@@ -1,8 +1,8 @@
-#ifndef __DALI_VECTOR_H__
-#define __DALI_VECTOR_H__
+#ifndef DALI_VECTOR_H
+#define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2018 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstddef>
 #include <algorithm>
+#include <cstddef>
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
@@ -32,13 +32,13 @@
  * @brief For DALi internal use, asserts are enabled in debug builds.
  *
  * For Application use, asserts can be enabled manually.
- * @SINCE_1_0.0
+ * @SINCE_2_1.23
  */
-#if defined( DEBUG_ENABLED )
+#if defined(DEBUG_ENABLED)
 #define ENABLE_VECTOR_ASSERTS
 #endif
 
-#if defined( ENABLE_VECTOR_ASSERTS )
+#if defined(ENABLE_VECTOR_ASSERTS)
 #define DALI_ASSERT_VECTOR(cond) DALI_ASSERT_ALWAYS(cond)
 #else
 #define DALI_ASSERT_VECTOR(cond)
@@ -62,11 +62,9 @@ namespace Dali
 class DALI_CORE_API VectorBase
 {
 public: // Typedefs
-
-  typedef std::size_t SizeType;
+  using SizeType = std::size_t;
 
 protected: // Construction
-
   /**
    * @brief Default constructor. Does not allocate space.
    * @SINCE_1_0.0
@@ -84,7 +82,6 @@ protected: // Construction
   ~VectorBase();
 
 public: // API
-
   /**
    * @brief This method is inlined as it's needed frequently for Vector::End() iterator.
    *
@@ -94,10 +91,10 @@ public: // API
   SizeType Count() const
   {
     SizeType items = 0u;
-    if( mData )
+    if(mData)
     {
-      SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-      items = *(metadata - 1u);
+      SizeType* metadata = reinterpret_cast<SizeType*>(mData);
+      items              = *(metadata - 1u);
     }
     return items;
   }
@@ -138,14 +135,13 @@ public: // API
   void Release();
 
 protected: // for Derived classes
-
   /**
    * @brief Helper to set the count.
    *
    * @SINCE_1_0.0
    * @param[in] count Number of elements in the vector
    */
-  void SetCount( SizeType count );
+  void SetCount(SizeType count);
 
   /**
    * @brief Reserves space in the vector.
@@ -154,7 +150,7 @@ protected: // for Derived classes
    * @param[in] count Count of elements to reserve
    * @param[in] elementSize Size of a single element
    */
-  void Reserve( SizeType count, SizeType elementSize );
+  void Reserve(SizeType count, SizeType elementSize);
 
   /**
    * @brief Copy a vector.
@@ -163,7 +159,7 @@ protected: // for Derived classes
    * @param[in] vector Vector to copy from
    * @param[in] elementSize Size of a single element
    */
-  void Copy( const VectorBase& vector, SizeType elementSize );
+  void Copy(const VectorBase& vector, SizeType elementSize);
 
   /**
    * @brief Swaps the contents of two vectors.
@@ -171,7 +167,7 @@ protected: // for Derived classes
    * @SINCE_1_0.0
    * @param[in] vector Vector to swap with
    */
-  void Swap( VectorBase& vector );
+  void Swap(VectorBase& vector);
 
   /**
    * @brief Erases an element.
@@ -182,7 +178,7 @@ protected: // for Derived classes
    * @param[in] elementSize Size to erase
    * @pre Last element cannot be erased as there is nothing to move.
    */
-  void Erase( char* address, SizeType elementSize );
+  void Erase(char* address, SizeType elementSize);
 
   /**
    * @brief Erases a range of elements.
@@ -194,7 +190,7 @@ protected: // for Derived classes
    * @param[in] elementSize Size of one of the elements to be erased
    * @return Address pointing to the next element of the last one
    */
-  char* Erase( char* first, char* last, SizeType elementSize );
+  char* Erase(char* first, char* last, SizeType elementSize);
 
   /**
    * @brief Copies a number of bytes from \e source to \e destination.
@@ -206,46 +202,56 @@ protected: // for Derived classes
    * @param[in] source Pointer to the source address
    * @param[in] numberOfBytes The number of bytes to be copied
    */
-  void CopyMemory( char* destination, const char* source, size_t numberOfBytes );
+  void CopyMemory(char* destination, const char* source, size_t numberOfBytes);
+
+  /**
+   * @brief Replace the data as new data address.
+   * After replace, release the old data.
+   *
+   * It will be used when we want to keep the mData integrity.
+   *
+   * Does not call destructors on objects held.
+   * @param[in] newData new data address to be replaced
+   */
+  void Replace(void* newData) noexcept;
 
 private:
-
   // not copyable as it does not know the size of elements
-  VectorBase( const VectorBase& ); ///< Undefined @SINCE_1_0.0
-  VectorBase& operator=( const VectorBase& ); ///< Undefined @SINCE_1_0.0
+  VectorBase(const VectorBase&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  VectorBase& operator=(const VectorBase&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
 
-protected: // Data
+  // not movable as this is handled by deriving classes
+  VectorBase(VectorBase&&) = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+  VectorBase& operator=(VectorBase&&) = delete; ///< Deleted copy assignment operator. @SINCE_1_9.25
 
+protected:     // Data
   void* mData; ///< Pointer to the data.
-
 };
 
+/// @cond internal
 /**
  * @brief Vector algorithm variant for trivial types.
  *
  * Trivial types do not need destructor or copy constructor called.
  * @SINCE_1_0.0
  */
-template< bool IsTrivial >
+template<bool IsTrivial>
 class VectorAlgorithms : public VectorBase
 {
 protected: // API for deriving classes
-
-  typedef VectorBase::SizeType SizeType;
+  using SizeType = VectorBase::SizeType;
 
   /**
    * @brief Empty constructor.
    * @SINCE_1_0.0
    */
-  VectorAlgorithms()
-  { }
+  VectorAlgorithms() = default;
 
   /**
    * @brief Empty destructor.
    * @SINCE_1_0.0
    */
-  ~VectorAlgorithms()
-  { }
+  ~VectorAlgorithms() = default;
 
   /**
    * @brief Copy vector contents.
@@ -254,11 +260,11 @@ protected: // API for deriving classes
    * @param[in] rhs VectorBase object to copy from
    * @param[in] elementSize Size of the content
    */
-  void Copy( const VectorBase& rhs, SizeType elementSize )
+  void Copy(const VectorBase& rhs, SizeType elementSize)
   {
-    if( rhs.Capacity() > 0u )
+    if(rhs.Capacity() > 0u)
     {
-      VectorBase::Copy( rhs, elementSize );
+      VectorBase::Copy(rhs, elementSize);
     }
     else
     {
@@ -273,9 +279,9 @@ protected: // API for deriving classes
    * @param[in] count Count of elements to reserve
    * @param[in] elementSize Size of a single element
    */
-  void Reserve( SizeType count, SizeType elementSize )
+  void Reserve(SizeType count, SizeType elementSize)
   {
-    VectorBase::Reserve( count, elementSize );
+    VectorBase::Reserve(count, elementSize);
   }
 
   /**
@@ -285,10 +291,10 @@ protected: // API for deriving classes
    * @param[in] count Count to resize to
    * @param[in] elementSize Size of a single element
    */
-  void Resize( SizeType count, SizeType elementSize )
+  void Resize(SizeType count, SizeType elementSize)
   {
     // reserve will copy old elements as well
-    Reserve( count, elementSize );
+    Reserve(count, elementSize);
   }
 
   /**
@@ -299,9 +305,9 @@ protected: // API for deriving classes
    */
   void Clear()
   {
-    if( mData )
+    if(mData)
     {
-      VectorBase::SetCount( 0u );
+      VectorBase::SetCount(0u);
     }
   }
 
@@ -321,9 +327,9 @@ protected: // API for deriving classes
    * @param[in] address Address to erase from
    * @param[in] elementSize Size to erase
    */
-  void Erase( uint8_t* address, SizeType elementSize )
+  void Erase(uint8_t* address, SizeType elementSize)
   {
-    VectorBase::Erase( reinterpret_cast< char* >( address ), elementSize );
+    VectorBase::Erase(reinterpret_cast<char*>(address), elementSize);
   }
 
   /**
@@ -335,9 +341,9 @@ protected: // API for deriving classes
    * @param[in] elementSize Size of one of the elements to be erased
    * @return Address pointing to the next element of the last one
    */
-  uint8_t* Erase( uint8_t* first, uint8_t* last, SizeType elementSize )
+  uint8_t* Erase(uint8_t* first, uint8_t* last, SizeType elementSize)
   {
-    return reinterpret_cast< uint8_t* >( VectorBase::Erase( reinterpret_cast< char* >( first ), reinterpret_cast< char *>( last ), elementSize ) );
+    return reinterpret_cast<uint8_t*>(VectorBase::Erase(reinterpret_cast<char*>(first), reinterpret_cast<char*>(last), elementSize));
   }
 
   /**
@@ -349,36 +355,38 @@ protected: // API for deriving classes
    * @param[in] to Address to the last element to be inserted
    * @param[in] elementSize Size of one of the elements to be inserted
    */
-  void Insert( uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize )
+  void Insert(uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize)
   {
-    const SizeType size = to - from;
-    const SizeType count = Count();
+    const SizeType size     = to - from;
+    const SizeType count    = Count();
     const SizeType newCount = count + size / elementSize;
 
-    if( newCount > Capacity() )
+    if(newCount > Capacity())
     {
       // Calculate the at offset as the pointer is invalid after the Reserve() call.
-      std::size_t offset = at - reinterpret_cast<uint8_t*>( mData );
+      std::size_t offset = at - reinterpret_cast<uint8_t*>(mData);
 
       // need more space
-      Reserve( NextPowerOfTwo( static_cast<uint32_t>( newCount ) ), elementSize ); // reserve enough space to store at least the next power of two elements of the new required size.
+      Reserve(NextPowerOfTwo(static_cast<uint32_t>(newCount)), elementSize); // reserve enough space to store at least the next power of two elements of the new required size.
 
       // Set the new at pointer.
-      at = reinterpret_cast<uint8_t*>( mData ) + offset;
+      at = reinterpret_cast<uint8_t*>(mData) + offset;
     }
     // set new count first as otherwise the debug assert will hit us
-    SetCount( newCount );
+    SetCount(newCount);
 
     // Move current items to a new position inside the vector.
-    CopyMemory( reinterpret_cast< char* >( at + size ),
-                reinterpret_cast< const char* >( at ),
-                ( reinterpret_cast<uint8_t*>( mData ) + count * elementSize ) - at );
+    CopyMemory(reinterpret_cast<char*>(at + size),
+               reinterpret_cast<const char*>(at),
+               (reinterpret_cast<uint8_t*>(mData) + count * elementSize) - at);
 
     // Copy the given items.
-    CopyMemory( reinterpret_cast< char* >( at ), reinterpret_cast< const char* >( from ), size );
+    CopyMemory(reinterpret_cast<char*>(at), reinterpret_cast<const char*>(from), size);
   }
 };
+/// @endcond
 
+/// @cond internal
 /**
  * @brief Vector algorithm variant for complex types.
  *
@@ -388,14 +396,13 @@ protected: // API for deriving classes
  * @SINCE_1_0.0
  */
 template<>
-class VectorAlgorithms< false > : public VectorBase
+class VectorAlgorithms<false> : public VectorBase
 {
 private:
-  VectorAlgorithms()
-  { }
-  ~VectorAlgorithms()
-  { }
+  VectorAlgorithms()  = default;
+  ~VectorAlgorithms() = default;
 };
+/// @endcond
 
 /**
  * @brief Vector class with minimum space allocation when it's empty.
@@ -403,19 +410,18 @@ private:
  * @SINCE_1_0.0
  * @param type The type of the data that the vector holds
  */
-template< class T, bool IsTrivialType = TypeTraits<T>::IS_TRIVIAL_TYPE == true >
-class Vector : public VectorAlgorithms< IsTrivialType >
+template<class T, bool IsTrivialType = TypeTraits<T>::IS_TRIVIAL_TYPE == true>
+class Vector : public VectorAlgorithms<IsTrivialType>
 {
 public: // API
-
   /**
    * @brief Type definitions.
    * @SINCE_1_0.0
    */
-  typedef VectorBase::SizeType SizeType; ///< Size type @SINCE_1_0.0
-  typedef T* Iterator;  ///< Most simple Iterator is a pointer @SINCE_1_0.0
-  typedef const T* ConstIterator; ///< Const iterator @SINCE_1_0.0
-  typedef T  ItemType; ///< Item type @SINCE_1_0.0
+  using SizeType      = VectorBase::SizeType; ///< Size type @SINCE_1_0.0
+  using Iterator      = T*;                   ///< Most simple Iterator is a pointer @SINCE_1_0.0
+  using ConstIterator = const T*;             ///< Const iterator @SINCE_1_0.0
+  using ItemType      = T;                    ///< Item type @SINCE_1_0.0
 
   /**
    * @brief Enumeration for BaseType.
@@ -430,8 +436,7 @@ public: // API
    * @brief Default constructor. Does not allocate any space.
    * @SINCE_1_0.0
    */
-  Vector()
-  { }
+  Vector() = default;
 
   /**
    * @brief Destructor. Releases the allocated space.
@@ -448,10 +453,22 @@ public: // API
    * @SINCE_1_0.0
    * @param[in] vector Vector to copy from
    */
-  Vector( const Vector& vector )
+  Vector(const Vector& vector)
   {
-    // reuse assignment
-    operator=( vector );
+    // reuse copy assignment
+    operator=(vector);
+  }
+
+  /**
+   * @brief Default move constructor.
+   *
+   * @SINCE_1_9.25
+   * @param[in] vector Vector to move
+   */
+  Vector(Vector&& vector) noexcept
+  {
+    // reuse move assignment
+    operator=(std::move(vector));
   }
 
   /**
@@ -461,11 +478,27 @@ public: // API
    * @param[in] vector Vector to assign from
    * @return Reference to self for chaining
    */
-  Vector& operator=( const Vector& vector )
+  Vector& operator=(const Vector& vector)
   {
-    if( this != &vector )
+    if(this != &vector)
     {
-      VectorAlgorithms<BaseType>::Copy( vector, sizeof( ItemType ) );
+      VectorAlgorithms<BaseType>::Copy(vector, sizeof(ItemType));
+    }
+    return *this;
+  }
+
+  /**
+   * @brief Default move assignment operator.
+   *
+   * @SINCE_1_9.25
+   * @param[in] vector Vector to move
+   */
+  Vector& operator=(Vector&& vector) noexcept
+  {
+    if(this != &vector)
+    {
+      VectorAlgorithms<BaseType>::Replace(vector.mData);
+      vector.mData = nullptr;
     }
     return *this;
   }
@@ -477,7 +510,7 @@ public: // API
    */
   Iterator Begin() const
   {
-    ItemType* address = reinterpret_cast<ItemType*>( VectorBase::mData );
+    ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     return address;
   }
 
@@ -488,7 +521,7 @@ public: // API
    */
   Iterator End() const
   {
-    ItemType* address = reinterpret_cast<ItemType*>( VectorBase::mData );
+    ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     address += VectorBase::Count();
     return address;
   }
@@ -520,10 +553,10 @@ public: // API
    * @return Reference to the element for given index
    * @pre Index must be in the vector's range.
    */
-  ItemType& operator[]( SizeType index )
+  ItemType& operator[](SizeType index)
   {
     // reuse the const version
-    return const_cast< ItemType& >( const_cast< const Vector< ItemType >& >( *this )[ index ] );
+    return const_cast<ItemType&>(const_cast<const Vector<ItemType>&>(*this)[index]);
   }
 
   /**
@@ -533,11 +566,11 @@ public: // API
    * @return Reference to the element for given index
    * @pre Index must be in the vector's range.
    */
-  const ItemType& operator[]( SizeType index ) const
+  const ItemType& operator[](SizeType index) const
   {
-    DALI_ASSERT_VECTOR( VectorBase::mData && "Vector is empty" );
-    DALI_ASSERT_VECTOR( index < VectorBase::Count() && "Index out of bounds" );
-    ItemType* address = reinterpret_cast<ItemType*>( VectorBase::mData );
+    DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
+    DALI_ASSERT_VECTOR(index < VectorBase::Count() && "Index out of bounds");
+    ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     address += index;
     return *address;
   }
@@ -552,19 +585,19 @@ public: // API
    * @SINCE_1_0.0
    * @param[in] element Element to be added
    */
-  void PushBack( const ItemType& element )
+  void PushBack(const ItemType& element)
   {
-    const SizeType count = VectorBase::Count();
+    const SizeType count    = VectorBase::Count();
     const SizeType newCount = count + 1u;
     const SizeType capacity = VectorBase::Capacity();
-    if( newCount > capacity )
+    if(newCount > capacity)
     {
       // need more space
-      Reserve( newCount << 1u ); // reserve double the current count
+      Reserve(newCount << 1u); // reserve double the current count
     }
     // set new count first as otherwise the debug assert will hit us
-    VectorBase::SetCount( newCount );
-    operator[]( count ) = element;
+    VectorBase::SetCount(newCount);
+    operator[](count) = element;
   }
 
   /**
@@ -581,15 +614,15 @@ public: // API
    * @param[in] element An element to be added
    * @pre Iterator at must be in the vector's range ( Vector::Begin(), Vector::End() ).
    */
-  void Insert( Iterator at, const ItemType& element )
+  void Insert(Iterator at, const ItemType& element)
   {
-    DALI_ASSERT_VECTOR( ( at <= End() ) && ( at >= Begin() ) && "Iterator not inside vector" );
-    const SizeType size = sizeof( ItemType );
-    uint8_t* address = const_cast<uint8_t*>( reinterpret_cast<const uint8_t*>( &element ) );
-    VectorAlgorithms<BaseType>::Insert( reinterpret_cast< uint8_t* >( at ),
-                                        address,
-                                        address + size,
-                                        size );
+    DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
+    const SizeType size    = sizeof(ItemType);
+    uint8_t*       address = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(&element));
+    VectorAlgorithms<BaseType>::Insert(reinterpret_cast<uint8_t*>(at),
+                                       address,
+                                       address + size,
+                                       size);
   }
 
   /**
@@ -610,21 +643,21 @@ public: // API
    * @pre Iterator \e from must not be grater than Iterator \e to.
    *
    */
-  void Insert( Iterator at, Iterator from, Iterator to )
+  void Insert(Iterator at, Iterator from, Iterator to)
   {
-    DALI_ASSERT_VECTOR( ( at <= End() ) && ( at >= Begin() ) && "Iterator not inside vector" );
-    DALI_ASSERT_VECTOR( ( from <= to ) && "from address can't be greater than to" );
+    DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
+    DALI_ASSERT_VECTOR((from <= to) && "from address can't be greater than to");
 
-    if( from == to )
+    if(from == to)
     {
       // nothing to copy.
       return;
     }
 
-    VectorAlgorithms<BaseType>::Insert( reinterpret_cast< uint8_t* >( at ),
-                                        reinterpret_cast< uint8_t* >( from ),
-                                        reinterpret_cast< uint8_t* >( to ),
-                                        sizeof( ItemType ) );
+    VectorAlgorithms<BaseType>::Insert(reinterpret_cast<uint8_t*>(at),
+                                       reinterpret_cast<uint8_t*>(from),
+                                       reinterpret_cast<uint8_t*>(to),
+                                       sizeof(ItemType));
   }
 
   /**
@@ -634,9 +667,9 @@ public: // API
    * @SINCE_1_0.0
    * @param[in] count Count of elements to reserve
    */
-  void Reserve( SizeType count )
+  void Reserve(SizeType count)
   {
-    VectorAlgorithms<BaseType>::Reserve( count, sizeof( ItemType ) );
+    VectorAlgorithms<BaseType>::Reserve(count, sizeof(ItemType));
   }
 
   /**
@@ -645,10 +678,23 @@ public: // API
    * @SINCE_1_0.0
    * @param[in] count Count to resize to
    */
-  void Resize( SizeType count )
+  void Resize(SizeType count)
   {
     ItemType item = ItemType();
     Resize(count, item);
+  }
+
+  /**
+   * @brief Resizes the vector without initializing the data.
+   *
+   * Can be used as a data container for reading whole file content.
+   * @SINCE_1_9.27
+   * @param[in] count Count to resize to
+   */
+  void ResizeUninitialized(SizeType count)
+  {
+    Reserve(count);
+    VectorBase::SetCount(count);
   }
 
   /**
@@ -658,22 +704,22 @@ public: // API
    * @param[in] count Count to resize to
    * @param[in] item An item to insert to the new indices
    */
-  void Resize( SizeType count, const ItemType& item )
+  void Resize(SizeType count, const ItemType& item)
   {
     const SizeType oldCount = VectorBase::Count();
-    if( count <= oldCount )
+    if(count <= oldCount)
     {
       // getting smaller so just set count
-      VectorBase::SetCount( count );
+      VectorBase::SetCount(count);
     }
     else
     {
       // remember how many new items get added
       SizeType newItems = count - oldCount;
-      Reserve( count );
-      for( ; newItems > 0u; --newItems )
+      Reserve(count);
+      for(; newItems > 0u; --newItems)
       {
-        PushBack( item );
+        PushBack(item);
       }
     }
   }
@@ -689,17 +735,17 @@ public: // API
    * @pre Iterator \e iterator must be within the vector's range ( Vector::Begin(), Vector::End() - 1 ).
    *
    */
-  Iterator Erase( Iterator iterator )
+  Iterator Erase(Iterator iterator)
   {
-    DALI_ASSERT_VECTOR( (iterator < End()) && (iterator >= Begin()) && "Iterator not inside vector" );
-    if( iterator < ( End() - 1u ) )
+    DALI_ASSERT_VECTOR((iterator < End()) && (iterator >= Begin()) && "Iterator not inside vector");
+    if(iterator < (End() - 1u))
     {
-      VectorAlgorithms<BaseType>::Erase( reinterpret_cast< uint8_t* >( iterator ), sizeof( ItemType ) );
+      VectorAlgorithms<BaseType>::Erase(reinterpret_cast<uint8_t*>(iterator), sizeof(ItemType));
     }
     else
     {
       // just remove the element
-      Remove( iterator );
+      Remove(iterator);
     }
     return iterator;
   }
@@ -719,25 +765,25 @@ public: // API
    * @pre Iterator \e first must not be grater than Iterator \e last.
    *
    */
-  Iterator Erase( Iterator first, Iterator last )
+  Iterator Erase(Iterator first, Iterator last)
   {
-    DALI_ASSERT_VECTOR( ( first <= End() ) && ( first >= Begin() ) && "Iterator not inside vector" );
-    DALI_ASSERT_VECTOR( ( last <= End() ) && ( last >= Begin() ) && "Iterator not inside vector" );
-    DALI_ASSERT_VECTOR( ( first <= last ) && "first iterator greater than last" );
+    DALI_ASSERT_VECTOR((first <= End()) && (first >= Begin()) && "Iterator not inside vector");
+    DALI_ASSERT_VECTOR((last <= End()) && (last >= Begin()) && "Iterator not inside vector");
+    DALI_ASSERT_VECTOR((first <= last) && "first iterator greater than last");
 
     Iterator nextElement;
 
-    if( last == End() )
+    if(last == End())
     {
       // Erase up to the end.
-      VectorBase::SetCount( VectorBase::Count() - ( last - first ) );
+      VectorBase::SetCount(VectorBase::Count() - (last - first));
       nextElement = End();
     }
     else
     {
-      nextElement = reinterpret_cast<Iterator>( VectorAlgorithms<BaseType>::Erase( reinterpret_cast< uint8_t* >( first ),
-                                                                                   reinterpret_cast< uint8_t* >( last ),
-                                                                                   sizeof( ItemType ) ) );
+      nextElement = reinterpret_cast<Iterator>(VectorAlgorithms<BaseType>::Erase(reinterpret_cast<uint8_t*>(first),
+                                                                                 reinterpret_cast<uint8_t*>(last),
+                                                                                 sizeof(ItemType)));
     }
 
     return nextElement;
@@ -755,16 +801,16 @@ public: // API
    * @pre Iterator \e iterator must be in the vector's range ( Vector::Begin(), Vector::End() - 1 ).
    *
    */
-  void Remove( Iterator iterator )
+  void Remove(Iterator iterator)
   {
-    DALI_ASSERT_VECTOR( (iterator < End()) && (iterator >= Begin()) && "Iterator not inside vector" );
+    DALI_ASSERT_VECTOR((iterator < End()) && (iterator >= Begin()) && "Iterator not inside vector");
 
     Iterator last = End() - 1u;
-    if( last > iterator )
+    if(last > iterator)
     {
-      std::swap( *iterator, *last );
+      std::swap(*iterator, *last);
     }
-    VectorBase::SetCount( VectorBase::Count() - 1u );
+    VectorBase::SetCount(VectorBase::Count() - 1u);
   }
 
   /**
@@ -773,9 +819,9 @@ public: // API
    * @SINCE_1_0.0
    * @param[in] vector Vector to swap with
    */
-  void Swap( Vector& vector )
+  void Swap(Vector& vector)
   {
-    VectorBase::Swap( vector );
+    VectorBase::Swap(vector);
   }
 
   /**
@@ -798,8 +844,40 @@ public: // API
 };
 
 /**
+ * @brief Erases all elements that compare equal to value from the vector.
+ *
+ * @SINCE_1_9.33
+ * @param[in] vector The vector
+ * @param[in] value The value to be removed.
+ */
+template<class T, class U>
+inline void Erase(Dali::Vector<T>& vector, const U& value)
+{
+  auto begin = vector.Begin();
+  auto end   = vector.End();
+
+  vector.Erase(std::remove(begin, end, value), end);
+}
+
+/**
+ * @brief Erases all elements that satisfy the predicate from the vector.
+ *
+ * @SINCE_1_9.33
+ * @param[in] vector The vector
+ * @param[in] predicate The predicate
+ */
+template<class T, class Predicate>
+inline void EraseIf(Dali::Vector<T>& vector, Predicate predicate)
+{
+  auto begin = vector.Begin();
+  auto end   = vector.End();
+
+  vector.Erase(std::remove_if(begin, end, predicate), end);
+}
+
+/**
  * @}
  */
 } // namespace Dali
 
-#endif /* __DALI_VECTOR_H__ */
+#endif // DALI_VECTOR_H

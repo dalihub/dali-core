@@ -25,24 +25,19 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/update/rendering/render-item.h>
+#include <dali/graphics-api/graphics-command-buffer.h>
+#include <dali/graphics-api/graphics-controller.h>
 
 namespace Dali
 {
-
 typedef Rect<int> ClippingBox;
 
-namespace Internal
+namespace Internal::SceneGraph
 {
-
-namespace SceneGraph
-{
-
 class Layer;
-
-typedef OwnerContainer< RenderItem* > RenderItemContainer;
-
 struct RenderList;
 typedef OwnerContainer< RenderList* > RenderListContainer;
+typedef OwnerContainer< RenderItem* > RenderItemContainer;
 
 /**
  * The RenderList structure provides the renderer with a list of renderers.
@@ -56,8 +51,8 @@ public:
    */
   RenderList()
   : mNextFree( 0 ),
-    mClippingBox( NULL ),
-    mSourceLayer( NULL ),
+    mClippingBox( nullptr ),
+    mSourceLayer( nullptr ),
     mHasColorRenderItems( false )
   {
   }
@@ -80,7 +75,7 @@ public:
     mNextFree = 0;
 
     delete mClippingBox;
-    mClippingBox = NULL;
+    mClippingBox = nullptr;
   }
 
   /**
@@ -170,7 +165,7 @@ public:
     if( clipping )
     {
       delete mClippingBox;
-      mClippingBox = new ClippingBox( box );;
+      mClippingBox = new ClippingBox( box );
     }
   }
 
@@ -179,7 +174,7 @@ public:
    */
   bool IsClipping() const
   {
-    return ( NULL != mClippingBox );
+    return ( nullptr != mClippingBox );
   }
 
   /**
@@ -244,25 +239,36 @@ public:
     return mHasColorRenderItems;
   }
 
-private:
+  Graphics::CommandBuffer& GetCommandBuffer(Graphics::Controller& controller)
+  {
+    if(!mGraphicsCommandBuffer)
+    {
+      mGraphicsCommandBuffer = controller.CreateCommandBuffer(
+        Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::SECONDARY), nullptr);
+    }
+    return *mGraphicsCommandBuffer.get();
+  }
+
+  const Graphics::CommandBuffer* GetCommandBufferPtr() const
+  {
+    return mGraphicsCommandBuffer.get();
+  }
 
   /*
-   * Copy constructor and assignment operator not defined
+   * Copy constructor and assignment operator deleted
    */
-  RenderList( const RenderList& rhs );
-  const RenderList& operator=( const RenderList& rhs );
+  RenderList( const RenderList& rhs ) = delete;
+  const RenderList& operator=( const RenderList& rhs ) = delete;
 
+private:
   RenderItemContainer mItems; ///< Each item is a renderer and matrix pair
   uint32_t mNextFree;         ///< index for the next free item to use
+  mutable Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{nullptr};
 
   ClippingBox* mClippingBox;               ///< The clipping box, in window coordinates, when clipping is enabled
   Layer*       mSourceLayer;              ///< The originating layer where the renderers are from
   bool         mHasColorRenderItems : 1;  ///< True if list contains color render items
-
 };
-
-
-} // namespace SceneGraph
 
 } // namespace Internal
 

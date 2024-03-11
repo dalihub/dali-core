@@ -1,8 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H__
+#ifndef DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H
+#define DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,34 +19,30 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-types.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/event/common/property-input-impl.h>
+#include <dali/public-api/object/property-types.h>
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 namespace SceneGraph
 {
-
 /**
  * A template for a read only properties used by Gestures.
  */
-template < class T >
+template<class T>
 class GestureProperty : public PropertyInputImpl
 {
 public:
-
   /**
    * Create a read-only gesture property.
    * @param [in] initialValue The initial value of the property.
    */
-  GestureProperty( const T& initialValue )
-  : mValue( initialValue ),
-    mInputChanged( false )
+  GestureProperty(const T& initialValue)
+  : mValue(initialValue),
+    mInputChanged(false)
   {
   }
 
@@ -55,23 +51,21 @@ public:
    */
   GestureProperty()
   : mValue(),
-    mInputChanged( false )
+    mInputChanged(false)
   {
   }
 
   /**
    * Virtual destructor.
    */
-  virtual ~GestureProperty()
-  {
-  }
+  ~GestureProperty() override = default;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
    */
-  virtual Dali::Property::Type GetType() const
+  Dali::Property::Type GetType() const override
   {
-    return Dali::PropertyTypes::Get< T >();
+    return Dali::PropertyTypes::Get<T>();
   }
 
   /**
@@ -85,7 +79,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
-  virtual bool InputInitialized() const
+  bool InputInitialized() const override
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return true;
@@ -95,7 +89,7 @@ public:
    * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
    * @note A constraint can only receive the inherited property from the previous frame.
    */
-  virtual bool InputChanged() const
+  bool InputChanged() const override
   {
     return mInputChanged;
   }
@@ -114,7 +108,7 @@ public:
    */
   void Set(const T& value)
   {
-    mValue = value;
+    mValue        = value;
     mInputChanged = true;
   }
 
@@ -128,7 +122,6 @@ public:
   }
 
 private:
-
   // Undefined
   GestureProperty(const GestureProperty& property);
 
@@ -136,54 +129,79 @@ private:
   GestureProperty& operator=(const GestureProperty& rhs);
 
 protected:
-
-  T mValue;             ///< The property value
-  bool mInputChanged:1; ///< Whether the property has been modified
+  T    mValue;            ///< The property value
+  bool mInputChanged : 1; ///< Whether the property has been modified
 };
 
 /**
  * A read only Vector2 property used by Gestures.
  */
-class GesturePropertyVector2 : public GestureProperty< Vector2 >
+class GesturePropertyVector2 : public GestureProperty<Vector2>
 {
 public:
-
   /**
    * Virtual destructor.
    */
-  virtual ~GesturePropertyVector2()
-  {
-  }
+  ~GesturePropertyVector2() override = default;
 
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
-  virtual const Vector2& GetVector2( BufferIndex bufferIndex ) const
+  const Vector2& GetVector2(BufferIndex bufferIndex) const override
   {
     return mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(Vector2);
   }
 };
 
 /**
  * A read only bool property used by Gestures.
  */
-class GesturePropertyBool : public GestureProperty< bool >
+class GesturePropertyBool : public GestureProperty<bool>
 {
 public:
-
   /**
    * Virtual destructor.
    */
-  virtual ~GesturePropertyBool()
-  {
-  }
+  ~GesturePropertyBool() override = default;
 
   /**
    * @copydoc Dali::PropertyInput::GetBoolean()
    */
-  virtual const bool& GetBoolean( BufferIndex bufferIndex ) const
+  const bool& GetBoolean(BufferIndex bufferIndex) const override
   {
     return mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    return &mValue;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(bool);
   }
 };
 
@@ -193,4 +211,4 @@ public:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H__
+#endif // DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H

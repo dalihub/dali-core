@@ -24,7 +24,7 @@ namespace Dali
 {
 
 TestPlatformAbstraction::TestPlatformAbstraction()
-: mTrace(),
+: mTrace(false, ""),
   mIsLoadingResult( false ),
   mClosestSize(),
   mLoadFileResult(),
@@ -45,13 +45,13 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( const std::string&
                                                               bool orientationCorrection )
 {
   ImageDimensions closestSize = ImageDimensions( mClosestSize );
-  Test::TraceCallStack::NamedParams namedParams;
-  namedParams["filename"] = Dali::Any(filename);
-  namedParams["size"] = Dali::Any(size);
-  namedParams["fittingMode"] = Dali::Any(fittingMode);
-  namedParams["samplingMode"] = Dali::Any(samplingMode);
-  namedParams["orientationCorrection"] = Dali::Any(orientationCorrection);
-  mTrace.PushCall("GetClosestImageSize", namedParams);
+  TraceCallStack::NamedParams namedParams;
+  namedParams["filename"] << filename;
+  namedParams["size"] << size.GetWidth() << ", " << size.GetHeight();
+  namedParams["fittingMode"] << fittingMode;
+  namedParams["samplingMode"] << samplingMode;
+  namedParams["orientationCorrection"] << orientationCorrection;
+  mTrace.PushCall("GetClosestImageSize", "", namedParams);
   return closestSize;
 }
 
@@ -62,34 +62,27 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize( Integration::Resou
                                                    bool orientationCorrection )
 {
   ImageDimensions closestSize = ImageDimensions( mClosestSize );
-  Test::TraceCallStack::NamedParams namedParams;
-  namedParams["size"] = Dali::Any(size);
-  namedParams["fittingMode"] = Dali::Any(int(fittingMode));
-  namedParams["samplingMode"] = Dali::Any(int(samplingMode));
-  namedParams["orientationCorrection"] = Dali::Any(orientationCorrection);
-  mTrace.PushCall("GetClosestImageSize", namedParams);
+  mTrace.PushCall("GetClosestImageSize","");
   return closestSize;
 }
 
 Integration::ResourcePointer TestPlatformAbstraction::LoadImageSynchronously( const Integration::BitmapResourceType& resourceType, const std::string& resourcePath )
 {
-  Test::TraceCallStack::NamedParams namedParams;
-  namedParams["resourcePath"] = Dali::Any(resourcePath);
-  mTrace.PushCall("LoadResourceSynchronously", namedParams);
+  mTrace.PushCall("LoadResourceSynchronously", "");
   return mSynchronouslyLoadedResource;
 }
 
 Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer( const Integration::BitmapResourceType& resourceType, uint8_t * buffer, size_t size )
 {
-  mTrace.PushCall("DecodeBuffer");
+  mTrace.PushCall("DecodeBuffer", "");
   return mDecodedBitmap;
 }
 
 bool TestPlatformAbstraction::LoadShaderBinaryFile( const std::string& filename, Dali::Vector< unsigned char >& buffer ) const
 {
-  Test::TraceCallStack::NamedParams namedParams;
-  namedParams["filename"]=Dali::Any(filename);
-  mTrace.PushCall("LoadShaderBinaryFile", namedParams);
+  TraceCallStack::NamedParams namedParams;
+  namedParams["filename"]<<filename;
+  mTrace.PushCall("LoadShaderBinaryFile", "", namedParams);
   if( mLoadFileResult.loadResult )
   {
     buffer = mLoadFileResult.buffer;

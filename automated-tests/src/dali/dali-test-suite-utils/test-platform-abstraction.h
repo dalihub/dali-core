@@ -105,7 +105,7 @@ public: // TEST FUNCTIONS
 
   inline void EnableTrace(bool enable) { mTrace.Enable(enable); }
   inline void ResetTrace() { mTrace.Reset(); }
-  inline Test::TraceCallStack& GetTrace() { return mTrace; }
+  inline TraceCallStack& GetTrace() { return mTrace; }
 
   /**
    * @brief Checks if a platform function was called
@@ -175,7 +175,7 @@ private:
     Dali::Vector< unsigned char> buffer;
   };
 
-  mutable Test::TraceCallStack  mTrace;
+  mutable TraceCallStack  mTrace;
   bool                          mIsLoadingResult;
   ImageDimensions               mClosestSize;
 
