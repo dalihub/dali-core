@@ -185,6 +185,11 @@ public:
   void UnregisterProcessor(Dali::Integration::Processor& processor, bool postProcessor = false);
 
   /**
+   * @copydoc Dali::Integration::Core::UnregisterProcessors
+   */
+  void UnregisterProcessors();
+
+  /**
    * @copydoc Dali::Internal::ThreadLocalStorage::AddScene()
    */
   void AddScene(Scene* scene);
