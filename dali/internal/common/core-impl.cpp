@@ -421,6 +421,14 @@ void Core::UnregisterProcessor(Integration::Processor& processor, bool postProce
   }
 }
 
+void Core::UnregisterProcessors()
+{
+  mPostProcessors.Clear();
+  mPostProcessorUnregistered = true;
+  mProcessors.Clear();
+  mProcessorUnregistered = true;
+}
+
 void Core::RunProcessors()
 {
   if(mProcessors.Count() != 0)
