@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,6 @@ Renderer::Renderer()
   mUpdateDecay(Renderer::Decay::INITIAL),
   mRegenerateUniformMap(false),
   mPremultipledAlphaEnabled(false),
-  mDirtyFlag(true),
   mOpacity(1.0f),
   mDepthIndex(0)
 {
@@ -146,7 +145,7 @@ RendererKey Renderer::GetKey(Renderer* renderer)
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 {
-  bool rendererUpdated        = mDirtyFlag || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
+  bool rendererUpdated        = Updated() || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
   auto shaderMapChangeCounter = mShader ? mShader->GetUniformMap().GetChangeCounter() : 0u;
   bool shaderMapChanged       = mShader && (mShaderMapChangeCounter != shaderMapChangeCounter);
   if(shaderMapChanged)
@@ -170,7 +169,7 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
     mUpdateDecay = static_cast<Renderer::Decay>(static_cast<int>(mUpdateDecay) - 1);
   }
 
-  if(mDirtyFlag || mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY) // We don't check mUpdateDecay
+  if(mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY) // We don't check mUpdateDecay
   {
     SetUpdated(true);
   }
@@ -337,10 +336,12 @@ void Renderer::SetTextures(TextureSet* textureSet)
 {
   DALI_ASSERT_DEBUG(textureSet != NULL && "Texture set pointer is NULL");
 
-  mTextureSet = textureSet;
+  if(mTextureSet != textureSet)
+  {
+    mTextureSet = textureSet;
 
-  mDirtyFlag = true;
-  SetUpdated(true);
+    SetUpdated(true);
+  }
 }
 
 const Vector<Render::TextureKey>* Renderer::GetTextures() const
@@ -357,37 +358,51 @@ void Renderer::SetShader(Shader* shader)
 {
   DALI_ASSERT_DEBUG(shader != NULL && "Shader pointer is NULL");
 
-  mShader                 = shader;
-  mShaderMapChangeCounter = 0u;
-  mRegenerateUniformMap   = true;
-  mResendFlag |= RESEND_GEOMETRY | RESEND_SHADER;
-  mDirtyFlag = true;
+  if(mShader != shader)
+  {
+    mShader                 = shader;
+    mShaderMapChangeCounter = 0u;
+    mRegenerateUniformMap   = true;
+    mResendFlag |= RESEND_GEOMETRY | RESEND_SHADER;
+
+    SetUpdated(true);
+  }
 }
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   DALI_ASSERT_DEBUG(geometry != NULL && "Geometry pointer is NULL");
-  mGeometry = geometry;
-
-  mDirtyFlag = true;
-  if(mRenderer)
+  if(mGeometry != geometry)
   {
-    mResendFlag |= RESEND_GEOMETRY;
+    mGeometry = geometry;
+
+    if(mRenderer)
+    {
+      mResendFlag |= RESEND_GEOMETRY;
+    }
+    SetUpdated(true);
   }
 }
 
 void Renderer::SetDepthIndex(int depthIndex)
 {
-  mDepthIndex = depthIndex;
+  if(mDepthIndex != depthIndex)
+  {
+    mDepthIndex = depthIndex;
 
-  mDirtyFlag = true;
-  SetUpdated(true);
+    SetUpdated(true);
+  }
 }
 
 void Renderer::SetFaceCullingMode(FaceCullingMode::Type faceCullingMode)
 {
-  mFaceCullingMode = faceCullingMode;
-  mResendFlag |= RESEND_FACE_CULLING_MODE;
+  if(mFaceCullingMode != faceCullingMode)
+  {
+    mFaceCullingMode = faceCullingMode;
+    mResendFlag |= RESEND_FACE_CULLING_MODE;
+
+    SetUpdated(true);
+  }
 }
 
 FaceCullingMode::Type Renderer::GetFaceCullingMode() const
@@ -397,10 +412,12 @@ FaceCullingMode::Type Renderer::GetFaceCullingMode() const
 
 void Renderer::SetBlendMode(BlendMode::Type blendingMode)
 {
-  mBlendMode = blendingMode;
+  if(mBlendMode != blendingMode)
+  {
+    mBlendMode = blendingMode;
 
-  mDirtyFlag = true;
-  SetUpdated(true);
+    SetUpdated(true);
+  }
 }
 
 BlendMode::Type Renderer::GetBlendMode() const
@@ -414,7 +431,8 @@ void Renderer::SetBlendingOptions(uint32_t options)
   {
     mBlendBitmask = options;
     mResendFlag |= RESEND_BLEND_BIT_MASK;
-    mDirtyFlag = true;
+
+    SetUpdated(true);
   }
 }
 
@@ -442,6 +460,8 @@ void Renderer::SetBlendColor(const Vector4& blendColor)
   }
 
   mResendFlag |= RESEND_BLEND_COLOR;
+
+  SetUpdated(true);
 }
 
 Vector4 Renderer::GetBlendColor() const
@@ -455,8 +475,13 @@ Vector4 Renderer::GetBlendColor() const
 
 void Renderer::SetIndexedDrawFirstElement(uint32_t firstElement)
 {
-  mIndexedDrawFirstElement = firstElement;
-  mResendFlag |= RESEND_INDEXED_DRAW_FIRST_ELEMENT;
+  if(mIndexedDrawFirstElement != firstElement)
+  {
+    mIndexedDrawFirstElement = firstElement;
+    mResendFlag |= RESEND_INDEXED_DRAW_FIRST_ELEMENT;
+
+    SetUpdated(true);
+  }
 }
 
 uint32_t Renderer::GetIndexedDrawFirstElement() const
@@ -466,8 +491,13 @@ uint32_t Renderer::GetIndexedDrawFirstElement() const
 
 void Renderer::SetIndexedDrawElementsCount(uint32_t elementsCount)
 {
-  mIndexedDrawElementsCount = elementsCount;
-  mResendFlag |= RESEND_INDEXED_DRAW_ELEMENTS_COUNT;
+  if(mIndexedDrawElementsCount != elementsCount)
+  {
+    mIndexedDrawElementsCount = elementsCount;
+    mResendFlag |= RESEND_INDEXED_DRAW_ELEMENTS_COUNT;
+
+    SetUpdated(true);
+  }
 }
 
 uint32_t Renderer::GetIndexedDrawElementsCount() const
@@ -477,8 +507,13 @@ uint32_t Renderer::GetIndexedDrawElementsCount() const
 
 void Renderer::EnablePreMultipliedAlpha(bool preMultipled)
 {
-  mPremultipledAlphaEnabled = preMultipled;
-  mResendFlag |= RESEND_PREMULTIPLIED_ALPHA;
+  if(mPremultipledAlphaEnabled != preMultipled)
+  {
+    mPremultipledAlphaEnabled = preMultipled;
+    mResendFlag |= RESEND_PREMULTIPLIED_ALPHA;
+
+    SetUpdated(true);
+  }
 }
 
 bool Renderer::IsPreMultipliedAlphaEnabled() const
@@ -569,9 +604,13 @@ void Renderer::SetStencilOperationOnZPass(StencilOperation::Type stencilOperatio
 
 void Renderer::SetRenderCallback(RenderCallback* callback)
 {
-  mRenderCallback = callback;
-  mResendFlag |= RESEND_SET_RENDER_CALLBACK;
-  mDirtyFlag = true;
+  if(mRenderCallback != callback)
+  {
+    mRenderCallback = callback;
+    mResendFlag |= RESEND_SET_RENDER_CALLBACK;
+
+    SetUpdated(true);
+  }
 }
 
 const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const
@@ -583,7 +622,6 @@ void Renderer::BakeOpacity(BufferIndex updateBufferIndex, float opacity)
 {
   mOpacity.Bake(updateBufferIndex, opacity);
 
-  mDirtyFlag = true;
   SetUpdated(true);
 }
 
@@ -594,10 +632,12 @@ float Renderer::GetOpacity(BufferIndex updateBufferIndex) const
 
 void Renderer::SetRenderingBehavior(DevelRenderer::Rendering::Type renderingBehavior)
 {
-  mRenderingBehavior = renderingBehavior;
+  if(mRenderingBehavior != renderingBehavior)
+  {
+    mRenderingBehavior = renderingBehavior;
 
-  mDirtyFlag = true;
-  SetUpdated(true);
+    SetUpdated(true);
+  }
 }
 
 DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
@@ -777,14 +817,7 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
 bool Renderer::IsDirty() const
 {
   // Check whether the opacity property has changed
-  return (mDirtyFlag || !mOpacity.IsClean());
-}
-
-void Renderer::ResetDirtyFlag()
-{
-  mDirtyFlag = false;
-
-  SetUpdated(false);
+  return (Updated() || !mOpacity.IsClean());
 }
 
 void Renderer::ResetToBaseValues(BufferIndex updateBufferIndex)

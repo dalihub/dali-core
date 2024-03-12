@@ -1251,7 +1251,7 @@ void UpdateManager::PostRender()
   // Reset dirty flag
   for(auto&& renderer : mImpl->renderers)
   {
-    renderer->ResetDirtyFlag();
+    renderer->SetUpdated(false);
   }
 
   for(auto&& shader : mImpl->shaders)
