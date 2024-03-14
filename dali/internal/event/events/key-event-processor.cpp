@@ -66,7 +66,11 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   });
 
   // Emit the key event signal from the scene.
-  bool consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
+  bool consumed = false;
+  if(!keyEventHandle.IsNoInterceptModifier())
+  {
+    consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
+  }
   if(!consumed)
   {
     consumed = mScene.EmitKeyEventGeneratedSignal(keyEventHandle);

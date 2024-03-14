@@ -67,6 +67,11 @@ void SetKeyModifier(KeyEvent keyEvent, int32_t keyModifier)
   GetImplementation(keyEvent).SetKeyModifier(keyModifier);
 }
 
+void SetNoInterceptModifier(KeyEvent keyEvent, bool noIntercept)
+{
+  GetImplementation(keyEvent).SetNoInterceptModifier(noIntercept);
+}
+
 void SetTime(KeyEvent keyEvent, unsigned long time)
 {
   GetImplementation(keyEvent).SetTime(time);

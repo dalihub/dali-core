@@ -25,10 +25,11 @@ namespace Dali
 {
 namespace
 {
-const uint32_t MODIFIER_SHIFT   = 0x1;
-const uint32_t MODIFIER_CTRL    = 0x2;
-const uint32_t MODIFIER_ALT     = 0x4;
-const int32_t  KEY_INVALID_CODE = -1;
+const uint32_t MODIFIER_SHIFT        = 0x1;
+const uint32_t MODIFIER_CTRL         = 0x2;
+const uint32_t MODIFIER_ALT          = 0x4;
+const uint32_t MODIFIER_NO_INTERCEPT = (1U << 31);
+const int32_t  KEY_INVALID_CODE      = -1;
 } // namespace
 
 namespace Internal
@@ -114,6 +115,11 @@ bool KeyEvent::IsAltModifier() const
   return ((MODIFIER_ALT & mKeyModifier) == MODIFIER_ALT);
 }
 
+bool KeyEvent::IsNoInterceptModifier() const
+{
+  return ((MODIFIER_NO_INTERCEPT & mKeyModifier) == MODIFIER_NO_INTERCEPT);
+}
+
 const std::string& KeyEvent::GetCompose() const
 {
   return mCompose;
@@ -197,6 +203,18 @@ void KeyEvent::SetKeyCode(int32_t keyCode)
 void KeyEvent::SetKeyModifier(int32_t keyModifier)
 {
   mKeyModifier = keyModifier;
+}
+
+void KeyEvent::SetNoInterceptModifier(bool noIntercept)
+{
+  if(noIntercept)
+  {
+    mKeyModifier |= MODIFIER_NO_INTERCEPT;
+  }
+  else
+  {
+    mKeyModifier &= ~MODIFIER_NO_INTERCEPT;
+  }
 }
 
 void KeyEvent::SetTime(unsigned long time)

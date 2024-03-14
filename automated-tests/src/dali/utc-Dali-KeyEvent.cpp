@@ -361,6 +361,24 @@ int UtcDaliKeyEventIsAltModifier(void)
   END_TEST;
 }
 
+int UtcDaliKeyEventIsNoInterceptModifier(void)
+{
+  TestApplication application;
+
+  Dali::KeyEvent event = DevelKeyEvent::New(TEST_STRING_1, "I", "i", 99, SHIFT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE); // set name to test, key string to i and modifier to shift
+  DALI_TEST_CHECK(event);
+
+  DALI_TEST_EQUALS(false, event.IsNoInterceptModifier(), TEST_LOCATION);
+
+  DevelKeyEvent::SetNoInterceptModifier(event, true);
+  DALI_TEST_EQUALS(true, event.IsNoInterceptModifier(), TEST_LOCATION);
+
+  DevelKeyEvent::SetNoInterceptModifier(event, false);
+  DALI_TEST_EQUALS(false, event.IsNoInterceptModifier(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 // Positive fail test case for a method
 int UtcDaliKeyEventIsNotShiftModifier(void)
 {
