@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -546,6 +546,8 @@ public:
        * @brief The draw mode of an actor.
        * @details Name "drawMode", type DrawMode::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_0.0
+       * @note DrawMode::OVERLAY_2D and CLIPPING_MODE set to ClippingMode::CLIP_TO_BOUNDING_BOX cannot be used together.
+       *       In this scenario the clipping is ignored.
        */
       DRAW_MODE,
 
@@ -629,6 +631,8 @@ public:
        * @details Name "clippingMode", type ClippingMode::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_2_5
        * @see ClippingMode::Type for supported values.
+       * @note ClippingMode::CLIP_TO_BOUNDING_BOX and DRAW_MODE set to DrawMode::OVERLAY_2D cannot be used together.
+       *       In this scenario the clipping is ignored.
        */
       CLIPPING_MODE,
 
