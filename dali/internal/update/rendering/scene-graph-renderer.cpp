@@ -307,6 +307,11 @@ void Renderer::SetTextures(TextureSet* textureSet)
   DALI_ASSERT_DEBUG(textureSet != NULL && "Texture set pointer is NULL");
 
   mTextureSet = textureSet;
+
+  // Temperal way to notify renderer updated flag.
+  mUpdateDecay = Decay::INITIAL;
+
+  SetUpdated(true);
 }
 
 const Vector<Render::Texture*>* Renderer::GetTextures() const
@@ -343,6 +348,8 @@ void Renderer::SetGeometry(Render::Geometry* geometry)
   {
     mResendFlag |= RESEND_GEOMETRY;
   }
+
+  SetUpdated(true);
 }
 
 void Renderer::SetDepthIndex(int depthIndex)
