@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,11 @@ bool KeyEvent::IsCtrlModifier() const
 bool KeyEvent::IsAltModifier() const
 {
   return GetImplementation(*this).IsAltModifier();
+}
+
+bool KeyEvent::IsNoInterceptModifier() const
+{
+  return GetImplementation(*this).IsNoInterceptModifier();
 }
 
 const std::string& KeyEvent::GetCompose() const
