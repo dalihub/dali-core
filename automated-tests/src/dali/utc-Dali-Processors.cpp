@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -282,6 +282,60 @@ int UtcDaliCoreProcessorGetProcessorName(void)
 
   DALI_TEST_EQUALS(std::string(testProcessor1.GetProcessorName()), "NewTestProcessor", TEST_LOCATION);
   DALI_TEST_EQUALS(std::string(testProcessor2.GetProcessorName()), "TestProcessor", TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCoreProcessorUnregisterProcessors(void)
+{
+  TestApplication application;
+
+  TestProcessor testProcessor1;
+  TestProcessor testProcessor2;
+  TestProcessor testProcessor3;
+
+  Integration::Core& core = application.GetCore();
+  core.RegisterProcessor(testProcessor1);
+
+  tet_infoline("Test that the processor has not been executed yet:");
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processor has been executed:");
+  DALI_TEST_CHECK(testProcessor1.processRun);
+
+  // Clear down for next part of test
+  testProcessor1.processRun = false;
+
+  core.RegisterProcessor(testProcessor2);
+  core.RegisterProcessor(testProcessor3, true); // Register as post processor
+
+  tet_infoline("Test that the processors have not been executed yet:");
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processors have been executed:");
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun);
+  DALI_TEST_CHECK(testProcessor3.processRun);
+
+  // Clear down for next part of test
+  testProcessor1.processRun = false;
+  testProcessor2.processRun = false;
+  testProcessor3.processRun = false;
+
+  core.UnregisterProcessors();
+  application.SendNotification();
+  tet_infoline("Test that all processors has not been executed again");
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun == false);
+
+  END_TEST;
 
   END_TEST;
 }
