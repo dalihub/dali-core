@@ -232,10 +232,10 @@ public:
   bool Stop(BufferIndex bufferIndex);
 
   /**
-   * Clear the animation. It will clear all animator, and make this animation never played before.
+   * Clear the animator. It will stop animation, clear all animators, and make this animation never played before.
    * @param[in] bufferIndex The buffer to update when mEndAction == Bake.
    */
-  void Clear(BufferIndex bufferIndex);
+  void ClearAnimator(BufferIndex bufferIndex);
 
   /**
    * Called shortly before the animation is destroyed.
@@ -302,11 +302,11 @@ public:
    * @pre The animation is playing or paused.
    * @param[in] bufferIndex The buffer to update.
    * @param[in] elapsedSeconds The time elapsed since the previous frame.
-   * @param[out] looped True if the animation looped
+   * @param[out] stopped True if the animation stopped this loop
    * @param[out] finished True if the animation has finished.
    * @param[out] progressReached True if progress marker reached
    */
-  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached);
+  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stopped, bool& finished, bool& progressReached);
 
   static uint32_t GetMemoryPoolCapacity();
 
@@ -372,6 +372,7 @@ protected:
   bool mAnimatorSortRequired;          // Flag to whether we need to sort animator or not.
   bool mIsActive[2];                   // Flag to indicate whether the animation is active in the current frame (which is double buffered)
   bool mIsFirstLoop;
+  bool mIsStopped; // Flag to whether this animation call stoped by user at this frame.
 };
 
 }; // namespace SceneGraph
@@ -495,6 +496,7 @@ inline void PlayAnimationMessage(EventThreadServices& eventThreadServices, const
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&animation, &Animation::Play);
 }
+
 inline void PlayAnimationFromMessage(EventThreadServices& eventThreadServices, const Animation& animation, float progress)
 {
   using LocalType = MessageValue1<Animation, float>;
