@@ -604,7 +604,10 @@ void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
   if(mRenderPassTag != renderPassTag)
   {
     mRenderPassTag = renderPassTag;
-    SetRenderPassTagMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), renderPassTag);
+    if(GetRenderTaskSceneObject())
+    {
+      SetRenderPassTagMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), renderPassTag);
+    }
   }
 }
 
