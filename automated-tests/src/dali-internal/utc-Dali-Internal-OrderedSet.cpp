@@ -473,3 +473,87 @@ int UtcDaliOrderedSetFalseIteratorOrderCheck(void)
 
   END_TEST;
 }
+
+int UtcDaliOrderedSetReorderCacheMap(void)
+{
+  // Ensure that order of iterator is equal with Order of Insertion.
+  // And also check the order is valid even if change the order by user, after we call ReorderCacheMap.
+
+  // Reset refcount of class
+  ClassWithId::gRefCount = 0;
+
+  // To avoid lucky pass, run this test multiple time.
+  int tryCnt = 3;
+  while(tryCnt--)
+  {
+    int baseId = tryCnt; // random id
+    int id     = baseId;
+    int n      = 10 + 5 * (tryCnt + 1); // random count
+
+    OrderedSet<ClassWithId> set;
+
+    for(int i = 0; i < n; ++i)
+    {
+      ClassWithId* object = new ClassWithId(id++);
+      set.PushBack(object);
+    }
+
+    int expectId;
+    // Check by for iteration
+    expectId = baseId;
+    for(auto iter = set.Begin(), iterEnd = set.End(); iter != iterEnd; ++iter)
+    {
+      DALI_TEST_EQUALS(expectId++, (*iter)->mId, TEST_LOCATION);
+    }
+    DALI_TEST_EQUALS(expectId, id, TEST_LOCATION);
+
+    // Shuffle it randomly.
+    std::vector<std::pair<int, ClassWithId*>> shuffleList;
+    shuffleList.reserve(n);
+    for(auto iter = set.Begin(), iterEnd = set.End(); iter != iterEnd; ++iter)
+    {
+      shuffleList.emplace_back((*iter)->mId, (*iter));
+    }
+    std::random_shuffle(shuffleList.begin(), shuffleList.end());
+
+    // Change the value of container as shuffled order. After then, call ReorderCacheMap().
+    int shuffleIndex = 0;
+    for(auto iter = set.Begin(), iterEnd = set.End(); iter != iterEnd; ++iter)
+    {
+      (*iter) = shuffleList[shuffleIndex++].second;
+    }
+    set.ReorderCacheMap();
+
+    // Check by iterator. And randomly erase item
+    shuffleIndex = 0;
+    for(auto iter = set.Begin(), iterEnd = set.End(); iter != iterEnd; ++iter)
+    {
+      DALI_TEST_EQUALS(shuffleList[shuffleIndex++].first, (*iter)->mId, TEST_LOCATION);
+    }
+
+    // Randomly erase item, and check again until all items removed.
+    while(!set.IsEmpty())
+    {
+      int removeIndex = rand()%set.Count();
+      auto iter = set.Find(shuffleList[removeIndex].second);
+      DALI_TEST_CHECK(iter != set.End());
+      set.Erase(iter);
+      for(int i = removeIndex + 1; i < n; ++i)
+      {
+        shuffleList[i - 1] = shuffleList[i];
+      }
+      --n;
+
+      shuffleIndex = 0;
+      for(auto iter = set.Begin(), iterEnd = set.End(); iter != iterEnd; ++iter)
+      {
+        DALI_TEST_EQUALS(shuffleList[shuffleIndex++].first, (*iter)->mId, TEST_LOCATION);
+      }
+    }
+  }
+
+  // Check whether leak exist.
+  DALI_TEST_EQUALS(ClassWithId::gRefCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}

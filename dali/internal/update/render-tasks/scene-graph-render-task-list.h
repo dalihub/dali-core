@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/owner-container.h>
+#include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
@@ -42,7 +42,7 @@ class ResetterManager;
 class RenderTaskList
 {
 public:
-  using RenderTaskContainer = OwnerContainer<RenderTask*>;
+  using RenderTaskContainer = Dali::Integration::OrderedSet<RenderTask>;
 
   /**
    * Construct a new RenderTaskList.
