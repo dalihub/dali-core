@@ -84,7 +84,8 @@ Animation::Animation(float durationSeconds, float speedFactor, const Vector2& pl
   mAutoReverseEnabled(false),
   mAnimatorSortRequired(false),
   mIsActive{false, false},
-  mIsFirstLoop{true}
+  mIsFirstLoop{true},
+  mIsStopped{false}
 {
 }
 
