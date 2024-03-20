@@ -234,6 +234,11 @@ RenderManager::~RenderManager()
   delete mImpl;
 }
 
+void RenderManager::ContextDestroyed()
+{
+  mImpl->uniformBufferManager->ContextDestroyed();
+}
+
 RenderQueue& RenderManager::GetRenderQueue()
 {
   return mImpl->renderQueue;

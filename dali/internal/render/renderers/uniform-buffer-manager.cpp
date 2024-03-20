@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,13 @@ UniformBufferManager::UniformBufferManager(Dali::Graphics::Controller* controlle
 }
 
 UniformBufferManager::~UniformBufferManager() = default;
+
+void UniformBufferManager::ContextDestroyed()
+{
+  mUBOMap.clear();
+  mCurrentUBOSet = nullptr;
+  mCurrentScene  = nullptr;
+}
 
 void UniformBufferManager::SetCurrentSceneRenderInfo(SceneGraph::Scene* scene, bool offscreen)
 {

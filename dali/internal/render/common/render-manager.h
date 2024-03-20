@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,11 @@ public:
    * Non-virtual destructor; not intended as a base class
    */
   ~RenderManager();
+
+  /**
+   * The graphics context is being shutdown. Clean down any outstanding graphics resources.
+   */
+  void ContextDestroyed();
 
   /**
    * Retrieve the RenderQueue. Messages should only be added to this from the update-thread.
