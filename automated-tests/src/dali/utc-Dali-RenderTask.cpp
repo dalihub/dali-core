@@ -4384,3 +4384,28 @@ int UtcDaliRenderTaskOrderIndex02(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskGetRenderTaskId(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask Id get");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+
+  RenderTask renderTask1 = renderTaskList.CreateTask();
+  RenderTask renderTask2 = renderTaskList.CreateTask();
+  RenderTask renderTask3 = renderTaskList.CreateTask();
+
+  DALI_TEST_CHECK(renderTask1.GetRenderTaskId() != 0u);
+  DALI_TEST_CHECK(renderTask2.GetRenderTaskId() != 0u);
+  DALI_TEST_CHECK(renderTask3.GetRenderTaskId() != 0u);
+  
+  DALI_TEST_CHECK(renderTask1.GetRenderTaskId() != renderTask2.GetRenderTaskId());
+  DALI_TEST_CHECK(renderTask2.GetRenderTaskId() != renderTask3.GetRenderTaskId());
+  DALI_TEST_CHECK(renderTask3.GetRenderTaskId() != renderTask1.GetRenderTaskId());
+
+  END_TEST;
+}

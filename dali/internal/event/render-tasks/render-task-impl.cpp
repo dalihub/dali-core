@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstring> // for strcmp
+#include "render-task-impl.h"
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/actor-impl.h>
@@ -603,7 +604,10 @@ void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
   if(mRenderPassTag != renderPassTag)
   {
     mRenderPassTag = renderPassTag;
-    SetRenderPassTagMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), renderPassTag);
+    if(GetRenderTaskSceneObject())
+    {
+      SetRenderPassTagMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), renderPassTag);
+    }
   }
 }
 
@@ -617,13 +621,23 @@ void RenderTask::SetOrderIndex(int32_t orderIndex)
   if(mOrderIndex != orderIndex)
   {
     mOrderIndex = orderIndex;
-    mRenderTaskList.RequestToSort();
+
+    // We only need to sort render task list if it is valid.
+    if(GetRenderTaskSceneObject())
+    {
+      mRenderTaskList.RequestToSort();
+    }
   }
 }
 
 int32_t RenderTask::GetOrderIndex() const
 {
   return mOrderIndex;
+}
+
+uint32_t RenderTask::GetRenderTaskId() const
+{
+  return mRenderTaskId;
 }
 
 const SceneGraph::RenderTask* RenderTask::GetRenderTaskSceneObject() const
@@ -939,6 +953,9 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
   mCullMode(Dali::RenderTask::DEFAULT_CULL_MODE),
   mRequiresSync(false)
 {
+  // Set id of render task
+  mRenderTaskId = sceneObject->GetNotifyId();
+
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::RenderTask(this:%p)\n", this);
   // scene object handles observation of source and camera
 }

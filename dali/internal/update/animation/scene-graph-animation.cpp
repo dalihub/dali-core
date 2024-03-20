@@ -84,7 +84,8 @@ Animation::Animation(float durationSeconds, float speedFactor, const Vector2& pl
   mAutoReverseEnabled(false),
   mAnimatorSortRequired(false),
   mIsActive{false, false},
-  mIsFirstLoop{true}
+  mIsFirstLoop{true},
+  mIsStopped{false}
 {
 }
 
@@ -170,7 +171,8 @@ void Animation::Play()
   // Let we don't change current loop value if the state was paused.
   if(mState != Paused)
   {
-    mCurrentLoop = 0;
+    mCurrentLoop  = 0;
+    mDelaySeconds = 0.0f;
   }
   mState = Playing;
 
@@ -192,7 +194,8 @@ void Animation::PlayFrom(float progress)
     // Let we don't change current loop value if the state was paused.
     if(mState != Paused)
     {
-      mCurrentLoop = 0;
+      mCurrentLoop  = 0;
+      mDelaySeconds = 0.0f;
     }
     mState = Playing;
 
@@ -261,6 +264,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
   if(mState == Playing || mState == Paused)
   {
     animationFinished = true; // The actor-thread should be notified of this
+    mIsStopped        = true;
 
     if(mEndAction != Dali::Animation::DISCARD)
     {
@@ -278,6 +282,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
     mCurrentLoop = 0;
   }
 
+  mDelaySeconds   = 0.0f;
   mElapsedSeconds = mPlayRange.x * mDurationSeconds;
   mState          = Stopped;
   mIsFirstLoop    = true;
@@ -285,7 +290,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
   return animationFinished;
 }
 
-void Animation::Clear(BufferIndex bufferIndex)
+void Animation::ClearAnimator(BufferIndex bufferIndex)
 {
   // Stop animation immediatly.
   Stop(bufferIndex);
@@ -295,6 +300,7 @@ void Animation::Clear(BufferIndex bufferIndex)
   mAnimatorSortRequired = false;
 
   // Reset animation state values.
+  mIsStopped   = false; ///< Do not make notify.
   mPlayedCount = 0;
   mCurrentLoop = 0;
 }
@@ -315,7 +321,8 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
     }
   }
 
-  mState = Destroyed;
+  mIsStopped = false; ///< Do not make notify.
+  mState     = Destroyed;
 }
 
 void Animation::SetLoopingMode(bool loopingMode)
@@ -349,9 +356,12 @@ void Animation::AddAnimator(OwnerPointer<AnimatorBase>& animator)
   mAnimators.PushBack(animator.Release());
 }
 
-void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& looped, bool& finished, bool& progressReached)
+void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stopped, bool& finished, bool& progressReached)
 {
-  looped   = false;
+  // Reset mIsStopped flag now.
+  stopped    = mIsStopped;
+  mIsStopped = false;
+
   finished = false;
 
   // Short circuit when animation isn't running
@@ -402,7 +412,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& loop
     float markerFactor  = signSpeedFactor * mProgressMarker;
 
     // check it is looped
-    looped = (elapsedFactor > edgeFactor);
+    const bool looped = (elapsedFactor > edgeFactor);
 
     if(looped)
     {

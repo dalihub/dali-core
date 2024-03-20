@@ -302,6 +302,11 @@ int32_t RenderTask::GetOrderIndex() const
   return GetImplementation(*this).GetOrderIndex();
 }
 
+uint32_t RenderTask::GetRenderTaskId() const
+{
+  return GetImplementation(*this).GetRenderTaskId();
+}
+
 RenderTask::RenderTask(Internal::RenderTask* internal)
 : Handle(internal)
 {

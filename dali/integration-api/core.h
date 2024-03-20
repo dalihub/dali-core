@@ -410,6 +410,11 @@ public:
   void UnregisterProcessor(Processor& processor, bool postProcessor = false);
 
   /**
+   * @brief Unregister all processors and post processors what we registered before.
+   */
+  void UnregisterProcessors();
+
+  /**
    * @brief Gets the Object registry.
    * @return The object registry
    */
