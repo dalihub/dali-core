@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,11 @@ UniformBufferV2::UniformBufferV2(Dali::Graphics::Controller* controller, bool em
   mEmulated(emulated)
 {
   mBufferList.resize(emulated ? 1 : INTERNAL_UBO_BUFFER_COUNT);
+  for(size_t i = 0; i < mBufferList.size(); ++i)
+  {
+    mBufferList[i].graphicsBuffer = nullptr;
+    mBufferList[i].graphicsMemory = nullptr;
+  }
 }
 
 void UniformBufferV2::ReSpecify(uint32_t sizeInBytes)
@@ -114,6 +119,7 @@ void UniformBufferV2::Flush()
     // Swap buffers for GPU UBOs
     auto s                      = mBufferList.size();
     mCurrentGraphicsBufferIndex = ((mCurrentGraphicsBufferIndex + 1) % s);
+    DALI_ASSERT_DEBUG(mCurrentGraphicsBufferIndex < mBufferList.size());
   }
 }
 
