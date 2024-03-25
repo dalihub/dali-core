@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,17 +106,17 @@ private:
 
   struct GfxBuffer
   {
-    Graphics::UniquePtr<Graphics::Buffer> graphicsBuffer;
-    Graphics::UniquePtr<Graphics::Memory> graphicsMemory;
-    uint32_t                              capacity;
-    uint32_t                              currentOffset;
+    Graphics::UniquePtr<Graphics::Buffer> graphicsBuffer{nullptr};
+    Graphics::UniquePtr<Graphics::Memory> graphicsMemory{nullptr};
+    uint32_t                              capacity{0};
+    uint32_t                              currentOffset{0};
   };
 
   // List of buffers, in case of CPU one buffer will be sufficient
   std::vector<GfxBuffer> mBufferList;
   void*                  mMappedPtr{nullptr};
   uint32_t               mCurrentGraphicsBufferIndex{0u};
-  bool                   mEmulated;
+  bool                   mEmulated{false};
 };
 } // namespace Dali::Internal::Render
 #endif //DALI_INTERNAL_UNIFORM_BUFFER_H
