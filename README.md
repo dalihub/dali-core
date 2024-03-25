@@ -25,7 +25,7 @@
 
 ### Minimum Requirements
 
- - Ubuntu 16.04 or later
+ - Ubuntu 20.04 or later
  - GCC version 9
  - Cmake version 3.8.2 or later
 
@@ -36,8 +36,10 @@ DALi requires a compiler supporting C++17 features.
 To build for desktop first ensure ALL sources are selected:
  - Go to Ubuntu Settings and then to "Software & Updates"
  - In the "Ubuntu Software" tab, ensure ALL software sources are ticked
+   (This is required because we install some community-maintained free & open-source software)
+ - Install Perl Recursive support:
 
-(This is required because we install some community-maintained free & open-source software)
+         $ sudo apt install libfile-copy-recursive-perl
 
 Then you can create a dali-env folder in your home folder with:
 
