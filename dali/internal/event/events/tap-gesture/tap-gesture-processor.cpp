@@ -142,6 +142,11 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
         {
           hitTestResults.actor = Dali::Actor(GetFeededActor());
           hitTestResults.renderTask = GetFeededRenderTask();
+
+          Vector2 actorCoords;
+          GetFeededActor()->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, tapEvent.point.x, tapEvent.point.y);
+          hitTestResults.actorCoordinates = actorCoords;
+
           // Check that this actor is still the one that was used for the last touch down ?
           if(mCurrentTapActor.GetActor() == &GetImplementation(hitTestResults.actor))
           {
