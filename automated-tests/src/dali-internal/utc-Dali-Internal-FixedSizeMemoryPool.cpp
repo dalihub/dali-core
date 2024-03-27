@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 #include <dali/public-api/dali-core.h>
 
 // Internal headers are allowed here
-
 #include <dali/internal/common/fixed-size-memory-pool.h>
 
 using namespace Dali;
@@ -40,8 +39,6 @@ unsigned int gTestObjectConstructed = 0;
 unsigned int gTestObjectDestructed  = 0;
 unsigned int gTestObjectMethod      = 0;
 unsigned int gTestObjectDataAccess  = 0;
-
-} // namespace
 
 class TestObject
 {
@@ -75,6 +72,8 @@ private:
   unsigned int mData1;
   bool         mData2;
 };
+
+} // namespace
 
 int UtcDaliFixedSizeMemoryPoolCreate(void)
 {

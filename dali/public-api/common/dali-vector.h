@@ -2,7 +2,7 @@
 #define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,8 @@ class DALI_CORE_API VectorBase
 {
 public: // Typedefs
   using SizeType = std::size_t;
+
+  constexpr static uint32_t SHRINK_REQUIRED_RATIO = 4; ///< The ratio of auto shrink to fit calling. @SINCE_2_3.22
 
 protected: // Construction
   /**
@@ -214,6 +216,15 @@ protected: // for Derived classes
    * @param[in] newData new data address to be replaced
    */
   void Replace(void* newData) noexcept;
+
+  /**
+   * @brief Fit the capacity of vector as item counts.
+   * It will be used when we want to remove unused memory.
+   *
+   * @SINCE_2_3.22
+   * @param[in] elementSize Size of a single element
+   */
+  void ShrinkToFit(SizeType elementSize);
 
 private:
   // not copyable as it does not know the size of elements
@@ -437,6 +448,17 @@ public: // API
    * @SINCE_1_0.0
    */
   Vector() = default;
+
+  /**
+   * @brief Create vector with count, without initialize value.
+   *
+   * @SINCE_2_3.22
+   * @param[in] count The count of vector.
+   */
+  Vector(SizeType count)
+  {
+    ResizeUninitialized(count);
+  }
 
   /**
    * @brief Destructor. Releases the allocated space.
@@ -840,6 +862,32 @@ public: // API
   void Release()
   {
     VectorAlgorithms<BaseType>::Release();
+  }
+
+  /**
+   * @brief Fit the capacity of vector as item counts.
+   *
+   * @SINCE_2_3.22
+   */
+  void ShrinkToFit()
+  {
+    VectorBase::ShrinkToFit(sizeof(ItemType));
+  }
+
+  /**
+   * @brief Fit the capacity of vector as item counts
+   * only if low spec memory management enabled, and the count is much smaller than capacity.
+   * It will be used when we want to remove unused memory.
+   *
+   * @SINCE_2_3.22
+   */
+  void ShrinkToFitIfNeeded()
+  {
+    // Run ShrinkToFit only if VectorBase::Capacity() is bigger than the smallest malloc block size.
+    if(DALI_UNLIKELY(VectorBase::Count() * VectorBase::SHRINK_REQUIRED_RATIO < VectorBase::Capacity()))
+    {
+      VectorBase::ShrinkToFit(sizeof(ItemType));
+    }
   }
 };
 

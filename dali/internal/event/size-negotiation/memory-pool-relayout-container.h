@@ -48,6 +48,15 @@ public:
   {
     Dali::Actor actor; ///< The actor to relayout
     Vector2     size;  ///< The desired size of the actor
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    struct RelayoutInfoCompareLess
+    {
+      bool operator()(const RelayoutInfo* lhs, const RelayoutInfo* rhs) const noexcept
+      {
+        return lhs->actor < rhs->actor;
+      }
+    };
+#else
     struct RelayoutInfoHash
     {
       std::size_t operator()(const RelayoutInfo* x) const noexcept
@@ -62,6 +71,7 @@ public:
         return lhs->actor == rhs->actor;
       }
     };
+#endif
   };
 
   /**
@@ -124,7 +134,11 @@ private:
   bool Contains(const Dali::Actor& actor);
 
 private:
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  using RelayoutInfoContainer = Dali::Integration::OrderedSet<RelayoutInfo, false, RelayoutInfo::RelayoutInfoCompareLess>;
+#else
   using RelayoutInfoContainer = Dali::Integration::OrderedSet<RelayoutInfo, false, RelayoutInfo::RelayoutInfoHash, RelayoutInfo::RelayoutInfoCompare>;
+#endif
 
   RelayoutInfoContainer mRelayoutInfos; ///< The list of relayout infos
 

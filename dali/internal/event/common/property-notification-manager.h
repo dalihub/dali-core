@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <unordered_map>
-
 // INTERNAL INCLUDES
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/event/common/property-notifier.h>

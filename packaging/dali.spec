@@ -81,6 +81,9 @@ cmake \
 %endif
       -DENABLE_TRACE=ON \
       -DENABLE_BACKTRACE=ON \
+%if 0%{?enable_low_spec_memory_management}
+      -DENABLE_LOW_SPEC_MEMORY_MANAGEMENT=ON \
+%endif
       -DCMAKE_INSTALL_PREFIX=%{_prefix} \
       -DCMAKE_INSTALL_LIBDIR=%{_libdir} \
       -DCMAKE_INSTALL_INCLUDEDIR=%{_includedir}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,49 @@ void VectorBase::Release()
     // adjust pointer to real beginning
     SizeType* metadata = reinterpret_cast<SizeType*>(mData);
 
-    delete[](metadata - 2u);
+    free(reinterpret_cast<void*>(metadata - 2u));
     mData = nullptr;
+  }
+}
+
+void VectorBase::ShrinkToFit(SizeType elementSize)
+{
+  if(mData)
+  {
+    auto count = Count();
+    if(count)
+    {
+      auto oldCapacity = Capacity();
+      if(count != oldCapacity)
+      {
+        DALI_ASSERT_VECTOR(count < oldCapacity && "Count is bigger than capacity!");
+
+        // Calculate real size of memory
+        const SizeType wholeAllocation = sizeof(SizeType) * 2u + count * elementSize;
+
+        // adjust pointer to real beginning
+        SizeType* oldMetaData = reinterpret_cast<SizeType*>(mData);
+
+        // Reallocation. We can assume that old data keep well. So don't need to copy the old data.
+        SizeType* newMetaData = reinterpret_cast<SizeType*>(realloc(reinterpret_cast<void*>(oldMetaData - 2u), wholeAllocation));
+        if(newMetaData)
+        {
+          *newMetaData++ = count;
+          *newMetaData++ = count;
+        }
+        else
+        {
+          free(reinterpret_cast<void*>(oldMetaData - 2u));
+          DALI_ASSERT_VECTOR(0 && "realloc failed!\n");
+        }
+
+        mData = reinterpret_cast<void*>(newMetaData);
+      }
+    }
+    else
+    {
+      Release();
+    }
   }
 }
 
@@ -64,7 +105,7 @@ void VectorBase::Replace(void* newData) noexcept
     mData = newData;
 
     // delete metadata address after mData setup safety.
-    delete[](metadata - 2u);
+    free(reinterpret_cast<void*>(metadata - 2u));
   }
   else
   {
@@ -90,7 +131,7 @@ void VectorBase::Reserve(SizeType capacity, SizeType elementSize)
   if(capacity > oldCapacity)
   {
     const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
-    void*          wholeData       = reinterpret_cast<void*>(new uint8_t[wholeAllocation]);
+    void*          wholeData       = malloc(wholeAllocation);
     DALI_ASSERT_ALWAYS(wholeData && "VectorBase::Reserve - Memory allocation failed");
 
 #if defined(DEBUG_ENABLED)
@@ -115,7 +156,7 @@ void VectorBase::Copy(const VectorBase& vector, SizeType elementSize)
   // reserve space based on source capacity
   const SizeType capacity        = vector.Capacity();
   const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
-  void*          wholeData       = reinterpret_cast<void*>(new uint8_t[wholeAllocation]);
+  void*          wholeData       = malloc(wholeAllocation);
   DALI_ASSERT_ALWAYS(wholeData && "VectorBase::Copy - Memory allocation failed");
 
   // copy over whole data

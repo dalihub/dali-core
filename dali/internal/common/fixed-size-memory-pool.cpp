@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ namespace Internal
  */
 struct FixedSizeMemoryPool::Impl
 {
+public:
   /**
    * @brief Struct to represent a block of memory from which allocations can be made.
    *
@@ -117,14 +118,7 @@ struct FixedSizeMemoryPool::Impl
    */
   ~Impl()
   {
-    // Clean up memory block linked list (mMemoryBlocks will be auto-destroyed by its destructor)
-    Block* block = mMemoryBlocks.nextBlock;
-    while(block)
-    {
-      Block* nextBlock = block->nextBlock;
-      delete block;
-      block = nextBlock;
-    }
+    ReleaseBlocks();
   }
 
   /**
@@ -185,6 +179,32 @@ struct FixedSizeMemoryPool::Impl
 
     mCurrentBlockSize = 0;
   }
+
+  /**
+   * @brief Release all newly added blocks, and remain only mMemoryBlocks which were allocated at constructor time.
+   */
+  void ResetMemoryBlock()
+  {
+    ReleaseBlocks();
+
+    // Initialize values
+    mCurrentBlock         = &mMemoryBlocks;
+    mCurrentBlockCapacity = mMemoryBlocks.mBlockSize / mFixedSize;
+    mCurrentBlockSize     = 0;
+
+    mMemoryBlocks.nextBlock = nullptr;
+    mDeletedObjects         = nullptr;
+
+#if defined(__LP64__)
+    mMemoryBlocks.mIndexOffset = 0;
+    if(mBlockShift) // Key contains block id & index within block
+    {
+      mBlocks.clear();
+      mBlocks.push_back(&mMemoryBlocks);
+    }
+#endif
+  }
+
 #ifdef DEBUG_ENABLED
 
   /**
@@ -211,6 +231,22 @@ struct FixedSizeMemoryPool::Impl
   }
 #endif
 
+private:
+  /**
+   * @brief Clean up memory block linked list instead of mMemoryBlocks. (mMemoryBlocks will be auto-destroyed by its destructor)
+   */
+  void ReleaseBlocks()
+  {
+    Block* block = mMemoryBlocks.nextBlock;
+    while(block)
+    {
+      Block* nextBlock = block->nextBlock;
+      delete block;
+      block = nextBlock;
+    }
+  }
+
+public:
   Mutex mMutex; ///< Mutex for thread-safe allocation and deallocation
 
   SizeType mFixedSize; ///< The size of each allocation in bytes
@@ -242,13 +278,10 @@ FixedSizeMemoryPool::FixedSizeMemoryPool(
   SizeType maximumBlockCapacity,
   SizeType maximumBlockCount)
 {
-  mImpl = new Impl(fixedSize, initialCapacity, maximumBlockCapacity, maximumBlockCount);
+  mImpl = std::make_unique<Impl>(fixedSize, initialCapacity, maximumBlockCapacity, maximumBlockCount);
 }
 
-FixedSizeMemoryPool::~FixedSizeMemoryPool()
-{
-  delete mImpl;
-}
+FixedSizeMemoryPool::~FixedSizeMemoryPool() = default;
 
 void* FixedSizeMemoryPool::Allocate()
 {
@@ -409,6 +442,11 @@ uint32_t FixedSizeMemoryPool::GetCapacity() const
   }
 #endif
   return totalAllocation;
+}
+
+void FixedSizeMemoryPool::ResetMemoryPool()
+{
+  mImpl->ResetMemoryBlock();
 }
 
 } // namespace Internal
