@@ -228,6 +228,22 @@ DALI_CORE_API void SetTapMaximumAllowedTime(uint32_t time);
  */
 DALI_CORE_API void SetTapRecognizerTime(uint32_t time);
 
+/**
+ * @brief Sets the recognizer distance required to be recognized as a tap gesture
+ *
+ * This distance is from touch down to touch up to recognize the tap gesture.
+ *
+ * @note The tab is like below:
+ * touch down <--distance--> touch up
+ * If the distance between touch down and touch up is longer than distance, it is not recognized as a tap gesture.
+ * Default value is 20
+ *
+ * @see SetTapMaximumMotionAllowedDistance()
+ *
+ * @param[in] distance The distance
+ */
+DALI_CORE_API void SetTapMaximumMotionAllowedDistance(float distance);
+
 } // namespace Integration
 
 } // namespace Dali

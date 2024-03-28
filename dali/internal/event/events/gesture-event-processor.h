@@ -310,6 +310,15 @@ public: // Called by Core
    */
   void SetTapRecognizerTime(uint32_t time);
 
+  /**
+   * @brief Sets the recognizer distance required to be recognized as a tap gesture
+   *
+   * This distance is from touch down to touch up to recognize the tap gesture.
+   *
+   * @param[in] distance The distance
+   */
+  void SetTapMaximumMotionAllowedDistance(float distance);
+
 public: // needed for PanGesture
   /**
    * @return the pan gesture processor
