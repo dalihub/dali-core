@@ -107,6 +107,15 @@ public: // To be called by GestureEventProcessor
    */
   void SetRecognizerTime(uint32_t time);
 
+  /**
+   * @brief This method sets the recognizer distance required to be recognized as a tap gesture
+   *
+   * This distance is from touch down to touch up to recognize the tap gesture.
+   *
+   * @param[in] distance The distance
+   */
+  void SetMaximumMotionAllowedDistance(float distance);
+
 private:
   // Undefined
   TapGestureProcessor(const TapGestureProcessor&);
@@ -141,15 +150,16 @@ private:
 private:
   TapGestureDetectorContainer mTapGestureDetectors;
 
-  unsigned int mMinTouchesRequired;
-  unsigned int mMaxTouchesRequired;
+  uint32_t mMinTouchesRequired;
+  uint32_t mMaxTouchesRequired;
 
   ActorObserver          mCurrentTapActor;   ///< Observer for the current gesture actor
   const TapGestureEvent* mCurrentTapEvent;   ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
   bool                   mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
 
-  uint32_t mMaximumAllowedTime; ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
-  uint32_t mRecognizerTime;     ///< The recognizer time required to be recognized as a tap gesture (millisecond)
+  uint32_t mMaximumAllowedTime;              ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+  uint32_t mRecognizerTime;                  ///< The recognizer time required to be recognized as a tap gesture (millisecond)
+  float    mMaximumMotionAllowedDistance;    ///< The recognizer distance required to be recognized as a tap gesture
 };
 
 } // namespace Internal

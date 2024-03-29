@@ -53,8 +53,9 @@ public:
    * @param[in]  request     The tap gesture request.
    * @param[in]  maximumAllowedTime    The maximum allowed time required in milliseconds.
    * @param[in]  recognizerTime    This recognizer time required in milliseconds.
+   * @param[in]  maximumMotionAllowedDistance    This recognizer distance required.
    */
-  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime, uint32_t recognizerTime);
+  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime, uint32_t recognizerTime, float maximumMotionAllowedDistance);
 
   /**
    * Virtual destructor.
@@ -85,6 +86,17 @@ public:
    * @param[in] time The time value in milliseconds
    */
   void SetRecognizerTime(uint32_t time);
+
+
+  /**
+   * @brief This method sets the recognizer distance required to be recognized as a tap gesture
+   *
+   * This distance is from touch down to touch up to recognize the tap gesture.
+   *
+   * @param[in] distance The distance
+   */
+  void SetMaximumMotionAllowedDistance(float distance);
+
 
 private:
   /**
@@ -157,6 +169,7 @@ private:
   uint32_t mDeltaBetweenTouchDownTouchUp; ///< Time from touchdown to touchup
   uint32_t mMaximumAllowedTime;           ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
   uint32_t mRecognizerTime;               ///< The recognizer time required to be recognized as a tap gesture (millisecond)
+  float    mMaximumMotionAllowedDistance; ///< The recognizer distance required to be recognized as a tap gesture
 };
 
 } // namespace Internal
