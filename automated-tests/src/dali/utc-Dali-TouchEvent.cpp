@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/events/touch-event-devel.h>
 #include <dali/integration-api/events/touch-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -156,6 +157,21 @@ int UtcDaliTouchEventMoveConstructorWithPointP(void)
   DALI_TEST_CHECK(!touchEvent);
   DALI_TEST_CHECK(touchEvent2);
   DALI_TEST_EQUALS(refCount, touchEvent2.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTouchEventSetTime(void)
+{
+  TestApplication application;
+
+  TouchEvent touchEvent = Integration::NewTouchEvent(123u, GenerateTouchPoint());
+  DALI_TEST_CHECK(touchEvent);
+
+  DALI_TEST_EQUALS(123lu, touchEvent.GetTime(), TEST_LOCATION);
+
+  DevelTouchEvent::SetTime(touchEvent, 200lu);
+  DALI_TEST_EQUALS(200lu, touchEvent.GetTime(), TEST_LOCATION);
 
   END_TEST;
 }
