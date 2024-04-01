@@ -19,6 +19,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/events/hit-test-algorithm.cpp
   ${devel_api_src_dir}/events/hover-event-devel.cpp
   ${devel_api_src_dir}/events/key-event-devel.cpp
+  ${devel_api_src_dir}/events/touch-event-devel.cpp
   ${devel_api_src_dir}/events/long-press-gesture-devel.cpp
   ${devel_api_src_dir}/events/long-press-gesture-detector-devel.cpp
   ${devel_api_src_dir}/events/pan-gesture-devel.cpp
@@ -85,6 +86,7 @@ SET( devel_api_core_events_header_files
   ${devel_api_src_dir}/events/hit-test-algorithm.h
   ${devel_api_src_dir}/events/hover-event-devel.h
   ${devel_api_src_dir}/events/key-event-devel.h
+  ${devel_api_src_dir}/events/touch-event-devel.h
   ${devel_api_src_dir}/events/long-press-gesture-devel.h
   ${devel_api_src_dir}/events/long-press-gesture-detector-devel.h
   ${devel_api_src_dir}/events/pan-gesture-devel.h
