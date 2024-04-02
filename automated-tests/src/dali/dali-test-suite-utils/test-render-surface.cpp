@@ -40,10 +40,6 @@ void TestRenderSurface::GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVe
   dpiHorizontal = dpiVertical = 96;
 };
 
-void TestRenderSurface::InitializeGraphics( Dali::Graphics::GraphicsInterface& graphics )
-{
-}
-
 void TestRenderSurface::CreateSurface()
 {
 }

@@ -505,6 +505,7 @@ public:
 
   std::vector<TestGraphicsBuffer*> mAllocatedBuffers;
 
+  std::vector<Graphics::Texture*> mTextures;// unowned
   std::unordered_map<uint32_t, Graphics::UniquePtr<Graphics::Texture>> mTextureUploadBindMapper;
 
   struct PipelineCache

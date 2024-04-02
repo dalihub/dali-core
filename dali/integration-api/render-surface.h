@@ -27,14 +27,8 @@
 
 namespace Dali
 {
-
-class DisplayConnection;
 class ThreadSynchronizationInterface;
 
-namespace Graphics
-{
-class GraphicsInterface;
-}
 
 /**
  * @brief The position and size of the render surface.
@@ -43,8 +37,6 @@ typedef Dali::Rect<int> PositionSize;
 
 namespace Integration
 {
-
-class GlAbstraction;
 
 /**
  * @brief Interface for a render surface onto which Dali draws.
@@ -94,11 +86,6 @@ public:
    * @param[out] dpiVertical set to the vertical dpi
    */
   virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) = 0;
-
-  /**
-   * @brief InitializeGraphics the platform specific graphics surface interfaces
-   */
-  virtual void InitializeGraphics( Dali::Graphics::GraphicsInterface& graphics ) = 0;
 
   /**
    * @brief Creates the Surface

@@ -838,7 +838,10 @@ Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::CreateTexture(con
   TraceCallStack::NamedParams namedParams;
   namedParams["textureCreateInfo"] << textureCreateInfo;
   mCallStack.PushCall("CreateTexture", namedParams.str(), namedParams);
-  return Graphics::MakeUnique<TestGraphicsTexture>(textureCreateInfo);
+
+  auto texture = Graphics::MakeUnique<TestGraphicsTexture>(textureCreateInfo);
+  mTextures.push_back(texture.get());
+  return texture;
 }
 
 Graphics::UniquePtr<Graphics::Framebuffer> TestGraphicsController::CreateFramebuffer(

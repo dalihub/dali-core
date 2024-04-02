@@ -2894,8 +2894,9 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   TestApplication app;
   tet_infoline(" UtcDaliActorSetDrawModeOverlayRender");
 
-  Test::GraphicsController& controller = app.GetGraphicsController();
-  controller.mControllerTrace.Enable(true);
+  TestGraphicsController& controller = app.GetGraphicsController();
+  TraceCallStack& controllerTrace = controller.mCallStack;
+  controllerTrace.Enable(true);
 
   auto textureSetA = CreateTexture(16, 16); // Texture must be created and uploaded
   auto textureSetB = CreateTexture(16, 16);
@@ -2915,17 +2916,22 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   app.SendNotification();
   app.Render(1);
 
-  tet_infoline(controller.mControllerTrace.GetTraceString().c_str());
-  controller.mControllerTrace.Reset();
+  tet_infoline(controllerTrace.GetTraceString().c_str());
+  controller.mCallStack.Reset();
 
   // Should be 3 textures changes.
   {
-    auto& renderCmds = controller.GetRenderCommands();
-    auto& createdTextures = controller.GetTextures();
+    std::vector<Graphics::SubmitInfo>& submissions = controller.mSubmitStack;
+    DALI_TEST_CHECK(submissions.size() > 0);
+    TestGraphicsCommandBuffer* cmdBuf = static_cast<TestGraphicsCommandBuffer*>((submissions.back().cmdBuffer[0]));
+    auto texCmds = cmdBuf->GetChildCommandsByType(0|CommandType::BIND_TEXTURES);
+
+    auto& createdTextures = controller.mTextures;
+    std::vector<int> expectedTextures = {1, 2, 0};
     int textureIndex=0;
-    for( auto& renderCmd : renderCmds )
+    for( auto& texCmd : texCmds )
     {
-      const auto& textures = *renderCmd.GetTextureBindings();
+      const auto& textures = texCmd->bindTextures.textureBindings;
       if( textures.size() > 0 )
       {
         DALI_TEST_CHECK(textures[0].texture == createdTextures[textureIndex] );
@@ -2943,18 +2949,20 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
 
   app.SendNotification();
   app.Render(1);
-  tet_infoline(controller.mControllerTrace.GetTraceString().c_str());
+  tet_infoline(controllerTrace.GetTraceString().c_str());
 
   // Should be 3 texture changes.
   {
-    auto& renderCmds = app.GetGraphicsController().GetRenderCommands();
-    auto& createdTextures = app.GetGraphicsController().GetTextures();
-    std::vector<int> expectedTextures = {1, 2, 0};
-    int textureIndex = 0;
+    std::vector<Graphics::SubmitInfo>& submissions = controller.mSubmitStack;
+    DALI_TEST_CHECK(submissions.size() > 0);
+    TestGraphicsCommandBuffer* cmdBuf = static_cast<TestGraphicsCommandBuffer*>((submissions.back().cmdBuffer[0]));
+    auto texCmds = cmdBuf->GetChildCommandsByType(0|CommandType::BIND_TEXTURES);
 
-    for( auto& renderCmd : renderCmds )
+    auto& createdTextures = controller.mTextures;
+    int textureIndex=0;
+    for( auto& texCmd : texCmds )
     {
-      const auto& textures = *renderCmd.GetTextureBindings();
+      const auto& textures = texCmd.bindTextures.textureBindings;
       if( textures.size() > 0 )
       {
         DALI_TEST_CHECK(textures[0].texture == createdTextures[expectedTextures[textureIndex]] );

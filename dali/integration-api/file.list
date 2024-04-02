@@ -41,6 +41,7 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/resource-policies.h
    ${platform_abstraction_src_dir}/resource-types.h
    ${platform_abstraction_src_dir}/gesture-manager.h
+   ${platform_abstraction_src_dir}/graphics-config.h
    ${platform_abstraction_src_dir}/render-controller.h
    ${platform_abstraction_src_dir}/platform-abstraction.h
    ${platform_abstraction_src_dir}/processor-interface.h

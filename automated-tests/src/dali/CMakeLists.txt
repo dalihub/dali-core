@@ -134,7 +134,7 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
      dali-core-vk
 )
 
-ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror )
+ADD_COMPILE_OPTIONS( -O0 -ggdb --coverage -Wall -Werror -Wno-unknown-pragmas)
 ADD_COMPILE_OPTIONS( ${${CAPI_LIB}_CFLAGS_OTHER} )
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
