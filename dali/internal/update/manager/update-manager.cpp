@@ -1159,6 +1159,10 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           }
           else
           {
+            if(uploadOnly)
+            {
+              DALI_LOG_RELEASE_INFO("Scene skip rendering set as true, during 'uploadOnly' was true.\n");
+            }
             scene->scene->SetSkipRendering(true);
           }
 
