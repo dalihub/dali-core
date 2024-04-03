@@ -45,6 +45,8 @@ namespace
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 constexpr uint32_t DEFAULT_MAXIMUM_ALLOWED_TIME = 330u;
 constexpr uint32_t DEFAULT_RECOGNIZER_TIME      = 330u;
+// TODO: Set these according to DPI
+constexpr float DEFAULT_MAXIMUM_MOTION_ALLOWED = 20.0f;
 
 /**
  * Creates a TapGesture and asks the specified detector to emit its detected signal.
@@ -94,7 +96,8 @@ TapGestureProcessor::TapGestureProcessor()
   mCurrentTapEvent(nullptr),
   mPossibleProcessed(false),
   mMaximumAllowedTime(DEFAULT_MAXIMUM_ALLOWED_TIME),
-  mRecognizerTime(DEFAULT_RECOGNIZER_TIME)
+  mRecognizerTime(DEFAULT_RECOGNIZER_TIME),
+  mMaximumMotionAllowedDistance(DEFAULT_MAXIMUM_MOTION_ALLOWED)
 {
 }
 
@@ -142,6 +145,11 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
         {
           hitTestResults.actor = Dali::Actor(GetFeededActor());
           hitTestResults.renderTask = GetFeededRenderTask();
+
+          Vector2 actorCoords;
+          GetFeededActor()->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, tapEvent.point.x, tapEvent.point.y);
+          hitTestResults.actorCoordinates = actorCoords;
+
           // Check that this actor is still the one that was used for the last touch down ?
           if(mCurrentTapActor.GetActor() == &GetImplementation(hitTestResults.actor))
           {
@@ -211,7 +219,7 @@ void TapGestureProcessor::AddGestureDetector(TapGestureDetector* gestureDetector
     request.maxTouches = mMaxTouchesRequired;
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), mMaximumAllowedTime, mRecognizerTime);
+    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), mMaximumAllowedTime, mRecognizerTime, mMaximumMotionAllowedDistance);
   }
   else
   {
@@ -306,6 +314,26 @@ void TapGestureProcessor::SetRecognizerTime(uint32_t time)
       {
         tapRecognizer->SetRecognizerTime(time);
       }
+    }
+  }
+}
+
+void TapGestureProcessor::SetMaximumMotionAllowedDistance(float distance)
+{
+  if(distance < 0.0f)
+  {
+    DALI_LOG_WARNING("distance must be greater than zero.");
+    return;
+  }
+
+  mMaximumMotionAllowedDistance = distance;
+
+  if(mGestureRecognizer)
+  {
+    TapGestureRecognizer* tapRecognizer = dynamic_cast<TapGestureRecognizer*>(mGestureRecognizer.Get());
+    if(tapRecognizer)
+    {
+      tapRecognizer->SetMaximumMotionAllowedDistance(distance);
     }
   }
 }

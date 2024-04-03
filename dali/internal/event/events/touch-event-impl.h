@@ -201,6 +201,13 @@ public:
     mRenderTask = renderTask;
   }
 
+  /**
+   * @brief Set the time (in ms) that the touch event occurred.
+   *
+   * @param[in] time The time (in ms)
+   */
+  void SetTime(uint64_t time);
+
 private:
   /**
    * @brief Virtual Destructor

@@ -160,6 +160,12 @@ void SetTapRecognizerTime(uint32_t time)
   eventProcessor.SetTapRecognizerTime(time);
 }
 
+void SetTapMaximumMotionAllowedDistance(float distance)
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetTapMaximumMotionAllowedDistance(distance);
+}
+
 } // namespace Integration
 
 } // namespace Dali

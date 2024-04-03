@@ -158,6 +158,11 @@ void TouchEvent::AddPoint(const Integration::Point& point)
   mPoints.push_back(point);
 }
 
+void TouchEvent::SetTime(uint64_t time)
+{
+  mTime = time;
+}
+
 } // namespace Internal
 
 } // namespace Dali

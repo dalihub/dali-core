@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -928,6 +928,324 @@ int UtcDaliHitTestAlgorithmBuildPickingRay02(void)
   screenCoords = stageSize * 0.5f - actorSize * 0.5f;
   built        = HitTestAlgorithm::BuildPickingRay(offRenderTask, screenCoords, origin, direction);
   DALI_TEST_EQUALS(built, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm with overlay actors and some different clipping configurations");
+
+  Stage stage     = Stage::GetCurrent();
+  Actor rootLayer = stage.GetRootLayer();
+
+  auto createActor = [&](const Vector3& position) {
+    Actor actor = Handle::New<Actor>(
+      {
+        {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
+        {Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER},
+        {Actor::Property::SIZE, Vector3(200.0f, 200.0f, 0.0f)},
+        {Actor::Property::POSITION, position},
+      });
+    return actor;
+  };
+
+  auto hitTest = [&stage](const Vector2& screenCoordinates) {
+    HitTestAlgorithm::Results results;
+    HitTest(stage, screenCoordinates, results, &DefaultIsActorTouchableFunction);
+    return results.actor;
+  };
+
+  auto red   = createActor(Vector3(-25.0f, -75.0f, 0.0f));
+  auto green = createActor(Vector3(25.0f, 75.0f, 0.0f));
+  auto blue  = createActor(Vector3(100.0f, 100.0f, 0.0f));
+
+  stage.Add(red);
+  stage.Add(green);
+  red.Add(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Points to test
+  Vector2 point1(275.0f, 405.0f);
+  Vector2 point2(338.0f, 336.0f);
+  Vector2 point3(246.0f, 347.0f);
+  Vector2 point4(189.0f, 397.0f);
+  Vector2 point5(187.0f, 295.0f);
+  Vector2 point6(357.0f, 296.0f);
+
+  /* No Clip, No Overlay
+    +----------------+
+    |RED             |
+    |                |
+    |                |
+    |    5           |    6
+    |      +---------+------+
+    |      |   3       2    |
+    |  +---+------------+   |
+    |  | 4       1      |   |
+    +--+                |   |
+       |                | B |
+       |                | L |
+       |                | U |
+       |                | E |
+       |                +---+
+       |GREEN           |
+       +----------------+
+   */
+  DALI_TEST_CHECK(hitTest(point1) == green);
+  DALI_TEST_CHECK(hitTest(point2) == blue);
+  DALI_TEST_CHECK(hitTest(point3) == blue);
+  DALI_TEST_CHECK(hitTest(point4) == green);
+  DALI_TEST_CHECK(hitTest(point5) == red);
+  DALI_TEST_CHECK(hitTest(point6) == rootLayer);
+
+  /* red:CLIP_TO_BOUNDING_BOX, No Overlay
+    +----------------+
+    |RED             |
+    |                |
+    |                |
+    |    5           |    6
+    |      +---------+
+    |      |   3 BLUE| 2
+    |  +---+---------+--+
+    |  | 4       1      |
+    +--+                |
+       |                |
+       |                |
+       |                |
+       |                |
+       |                |
+       |GREEN           |
+       +----------------+
+   */
+  red.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(hitTest(point1) == green);
+  DALI_TEST_CHECK(hitTest(point2) == rootLayer);
+  DALI_TEST_CHECK(hitTest(point3) == blue);
+  DALI_TEST_CHECK(hitTest(point4) == green);
+  DALI_TEST_CHECK(hitTest(point5) == red);
+  DALI_TEST_CHECK(hitTest(point6) == rootLayer);
+
+  /* red:CLIP_TO_BOUNDING_BOX, blue:Overlay
+    +----------------+
+    |RED             |
+    |                |
+    |                |
+    |    5           |    6
+    |      +---------+------+
+    |      |   3       2    |
+    |  +---+                |
+    |  | 4 |     1          |
+    +--+   |                |
+       |   |              B |
+       |   |              L |
+       |   |              U |
+       |   |              E |
+       |   +------------+---+
+       |GREEN           |
+       +----------------+
+   */
+  blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(hitTest(point1) == blue);
+  DALI_TEST_CHECK(hitTest(point2) == blue);
+  DALI_TEST_CHECK(hitTest(point3) == blue);
+  DALI_TEST_CHECK(hitTest(point4) == green);
+  DALI_TEST_CHECK(hitTest(point5) == red);
+  DALI_TEST_CHECK(hitTest(point6) == rootLayer);
+
+  /* No clipping, blue:Overlay
+    +----------------+
+    |RED             |
+    |                |
+    |                |
+    |    5           |    6
+    |      +---------+------+
+    |      |   3       2    |
+    |  +---+                |
+    |  | 4 |     1          |
+    +--+   |                |
+       |   |              B |
+       |   |              L |
+       |   |              U |
+       |   |              E |
+       |   +------------+---+
+       |GREEN           |
+       +----------------+
+   */
+  red.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED);
+  blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(hitTest(point1) == blue);
+  DALI_TEST_CHECK(hitTest(point2) == blue);
+  DALI_TEST_CHECK(hitTest(point3) == blue);
+  DALI_TEST_CHECK(hitTest(point4) == green);
+  DALI_TEST_CHECK(hitTest(point5) == red);
+  DALI_TEST_CHECK(hitTest(point6) == rootLayer);
+
+  /* red:CLIP_CHILDREN, No Overlay
+    +----------------+
+    |RED             |
+    |                |
+    |                |
+    |    5           |    6
+    |      +---------+
+    |      |   3 BLUE| 2
+    |  +---+---------+--+
+    |  | 4       1      |
+    +--+                |
+       |                |
+       |                |
+       |                |
+       |                |
+       |                |
+       |GREEN           |
+       +----------------+
+   */
+  red.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
+  blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::NORMAL);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(hitTest(point1) == green);
+  DALI_TEST_CHECK(hitTest(point2) == rootLayer);
+  DALI_TEST_CHECK(hitTest(point3) == blue);
+  DALI_TEST_CHECK(hitTest(point4) == green);
+  DALI_TEST_CHECK(hitTest(point5) == red);
+  DALI_TEST_CHECK(hitTest(point6) == rootLayer);
+
+  /* red:CLIP_CHILDREN, blue:Overlay
+    +----------------+
+    |RED             |
+    |                |
+    |                |
+    |    5           |    6
+    |      +---------+
+    |      |   3     | 2
+    |  +---+         +--+
+    |  | 4 |     1   |  |
+    +--+   |         |  |
+       |   |BLUE     |  |
+       |   +---------+  |
+       |                |
+       |                |
+       |                |
+       |GREEN           |
+       +----------------+
+   */
+  red.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
+  blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(hitTest(point1) == blue);
+  DALI_TEST_CHECK(hitTest(point2) == rootLayer);
+  DALI_TEST_CHECK(hitTest(point3) == blue);
+  DALI_TEST_CHECK(hitTest(point4) == green);
+  DALI_TEST_CHECK(hitTest(point5) == red);
+  DALI_TEST_CHECK(hitTest(point6) == rootLayer);
+
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm with different overlay actors and clipping configurations throughout a hierarchy");
+
+  Stage stage     = Stage::GetCurrent();
+  Actor rootLayer = stage.GetRootLayer();
+
+  auto createActor = [&](const Vector3& position) {
+    Actor actor = Handle::New<Actor>(
+      {
+        {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
+        {Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER},
+        {Actor::Property::SIZE, Vector3(200.0f, 200.0f, 0.0f)},
+        {Actor::Property::POSITION, position},
+      });
+    return actor;
+  };
+
+  auto hitTest = [&stage](const Vector2& screenCoordinates) {
+    HitTestAlgorithm::Results results;
+    HitTest(stage, screenCoordinates, results, &DefaultIsActorTouchableFunction);
+    return results.actor;
+  };
+
+  auto red    = createActor(Vector3(-25.0f, -75.0f, 0.0f));
+  auto green  = createActor(Vector3(25.0f, 75.0f, 0.0f));
+  auto blue   = createActor(Vector3(100.0f, 100.0f, 0.0f));
+  auto yellow = createActor(Vector3(25.0f, -25.0f, 0.0f));
+  auto purple = createActor(Vector3(25.0f, -25.0f, 0.0f));
+
+  stage.Add(red);
+  stage.Add(green);
+  red.Add(blue);
+  blue.Add(yellow);
+  yellow.Add(purple);
+
+  red.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  yellow.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Points to test
+  Vector2 point1(195.0f, 404.0f);
+  Vector2 point2(224.0f, 351.0f);
+  Vector2 point3(224.0f, 404.0f);
+  Vector2 point4(254.0f, 309.0f);
+  Vector2 point5(254.0f, 404.0f);
+  Vector2 point6(289.0f, 281.0f);
+  Vector2 point7(289.0f, 309.0f);
+  Vector2 point8(289.0f, 404.0f);
+  Vector2 point9(362.0f, 281.0f);
+  Vector2 point10(362.0f, 309.0f);
+  Vector2 point11(457.0f, 309.0f);
+
+  /*
+    +-----------------+
+    |RED              |
+    |                 |
+    |               6 |   9
+    |          +--+---+--------+
+    |          |4 | 7    10    | 11
+    |       +--+  |            |
+    |       |2 |  |            |
+    |   +---+  |  |            |
+    |   | 1 |3 |5 | 8          |
+    +---+   |  |  |            |
+        |   |  |  |      PURPLE|
+        |   |  |  +------------+
+        |   |  |         YELLOW|
+        |   |  +------------+--+
+        |   |          BLUE |
+        |   +------------+--+
+        |                |
+        | GREEN          |
+        +----------------+
+   */
+
+  DALI_TEST_CHECK(hitTest(point1) == green);
+  DALI_TEST_CHECK(hitTest(point2) == blue);
+  DALI_TEST_CHECK(hitTest(point3) == blue);
+  DALI_TEST_CHECK(hitTest(point4) == yellow);
+  DALI_TEST_CHECK(hitTest(point5) == yellow);
+  DALI_TEST_CHECK(hitTest(point6) == red);
+  DALI_TEST_CHECK(hitTest(point7) == purple);
+  DALI_TEST_CHECK(hitTest(point8) == purple);
+  DALI_TEST_CHECK(hitTest(point9) == rootLayer);
+  DALI_TEST_CHECK(hitTest(point10) == purple);
+  DALI_TEST_CHECK(hitTest(point11) == rootLayer);
 
   END_TEST;
 }
