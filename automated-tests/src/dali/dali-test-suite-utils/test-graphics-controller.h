@@ -413,41 +413,6 @@ public:
    */
   bool GetProgramParameter(Graphics::Program& program, uint32_t parameterId, void* outData) override;
 
-public: // ResourceId relative API.
-  /**
-   * @brief Create Graphics::Texture as resourceId.
-   * The ownership of Graphics::Texture will be hold on this controller.
-   * @note If some Graphics::Texture already created before, assert.
-   * @post DiscardTextureFromResourceId() or ReleaseTextureFromResourceId() should be called when we don't use resourceId texture anymore.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture, or nullptr if we fail to create.
-   */
-  Graphics::Texture* CreateTextureByResourceId(uint32_t resourceId, const Graphics::TextureCreateInfo& createInfo) override;
-
-  /**
-   * @brief Discard Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   */
-  void DiscardTextureFromResourceId(uint32_t resourceId) override;
-
-  /**
-   * @brief Get the Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture, or nullptr if there is no valid objects.
-   */
-  Graphics::Texture* GetTextureFromResourceId(uint32_t resourceId) override;
-
-  /**
-   * @brief Get the ownership of Graphics::Texture as resourceId.
-   *
-   * @param[in] resourceId The unique id of resouces.
-   * @return Pointer of Graphics::Texture.
-   */
-  Graphics::UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) override;
-
 public: // Test Functions
   void SetAutoAttrCreation(bool v)
   {

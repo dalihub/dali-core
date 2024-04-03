@@ -121,15 +121,12 @@ public:
    * @param[in] resizingSurface True if the surface is being resized
    * @return True if the operation is successful, False if the operation failed
    */
-  virtual bool PreRender( bool resizingSurface ) = 0;
+  virtual bool PreRender(bool resizingSurface) = 0;
 
   /**
    * @brief Invoked by render thread after Core::Render
-   * @param[in] renderToFbo True if render to FBO.
-   * @param[in] replacingSurface True if the surface is being replaced.
-   * @param[in] resizingSurface True if the surface is being resized.
    */
-  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface ) = 0;
+  virtual void PostRender() = 0;
 
   /**
    * @brief Invoked by render thread when the thread should be stop

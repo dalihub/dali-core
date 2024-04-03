@@ -85,7 +85,7 @@ public:
   /**
    * @copydoc Dali::Integration::RenderSurface::PostRender
    */
-  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface );
+  virtual void PostRender();
 
   /**
    * @copydoc Dali::Integration::RenderSurface::StopRender

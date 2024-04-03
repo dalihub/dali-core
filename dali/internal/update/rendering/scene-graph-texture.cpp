@@ -45,240 +45,6 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TEXTURE");
 #endif
-
-/**
- * @brief Whether specified pixel format is compressed.
- *
- * @param [in] pixelformat Pixel format
- * @return true if format is compressed, false otherwise
- */
-bool IsCompressedFormat(Pixel::Format pixelFormat)
-{
-  switch (pixelFormat)
-  {
-    case Pixel::L8:
-    case Pixel::A8:
-    case Pixel::LA88:
-    case Pixel::RGB565:
-    case Pixel::RGBA4444:
-    case Pixel::RGBA5551:
-    case Pixel::BGR565:
-    case Pixel::BGRA4444:
-    case Pixel::BGRA5551:
-    case Pixel::RGB888:
-    case Pixel::RGB8888:
-    case Pixel::BGR8888:
-    case Pixel::RGBA8888:
-    case Pixel::BGRA8888:
-    case Pixel::RGB16F:
-    case Pixel::RGB32F:
-    case Pixel::DEPTH_FLOAT:
-    case Pixel::DEPTH_UNSIGNED_INT:
-    case Pixel::DEPTH_STENCIL:
-    case Pixel::CHROMINANCE_U:
-    case Pixel::CHROMINANCE_V:
-    case Pixel::R11G11B10F:
-    case Pixel::INVALID:
-    {
-      return false;
-    }
-
-    case Pixel::COMPRESSED_R11_EAC:
-    case Pixel::COMPRESSED_SIGNED_R11_EAC:
-    case Pixel::COMPRESSED_RG11_EAC:
-    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
-    case Pixel::COMPRESSED_RGB8_ETC2:
-    case Pixel::COMPRESSED_SRGB8_ETC2:
-    case Pixel::COMPRESSED_RGB8_ETC1:
-    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
-    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
-    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
-    {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
- * Converts DALi pixel format to Graphics::Format
- * @param format
- * @return
- */
-constexpr Graphics::Format ConvertPixelFormat( Pixel::Format format )
-{
-  switch( format )
-  {
-    case Pixel::INVALID:
-      return Graphics::Format::UNDEFINED;
-    case Pixel::A8:
-      return Graphics::Format::R8_UNORM;
-    case Pixel::L8:
-      return Graphics::Format::L8;
-    case Pixel::LA88:
-      return Graphics::Format::L8A8;
-    case Pixel::RGB565:
-      return Graphics::Format::R5G6B5_UNORM_PACK16;
-    case Pixel::BGR565:
-      return Graphics::Format::B5G6R5_UNORM_PACK16;
-    case Pixel::RGBA4444:
-      return Graphics::Format::R4G4B4A4_UNORM_PACK16;
-    case Pixel::BGRA4444:
-      return Graphics::Format::B4G4R4A4_UNORM_PACK16;
-    case Pixel::RGBA5551:
-      return Graphics::Format::R5G5B5A1_UNORM_PACK16;
-    case Pixel::BGRA5551:
-      return Graphics::Format::B5G5R5A1_UNORM_PACK16;
-    case Pixel::RGB888:
-      return Graphics::Format::R8G8B8_UNORM;
-    case Pixel::RGB8888:
-      return Graphics::Format::R8G8B8A8_UNORM;
-    case Pixel::BGR8888:
-      return Graphics::Format::B8G8R8A8_UNORM;
-    case Pixel::RGBA8888:
-      return Graphics::Format::R8G8B8A8_UNORM;
-    case Pixel::BGRA8888:
-      return Graphics::Format::B8G8R8A8_UNORM;
-
-    // EAC
-    case Pixel::COMPRESSED_R11_EAC:
-      return Graphics::Format::EAC_R11_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SIGNED_R11_EAC:
-      return Graphics::Format::EAC_R11_SNORM_BLOCK;
-    case Pixel::COMPRESSED_RG11_EAC:
-      return Graphics::Format::EAC_R11G11_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SIGNED_RG11_EAC:
-      return Graphics::Format::EAC_R11G11_SNORM_BLOCK;
-
-    // ETC
-    case Pixel::COMPRESSED_RGB8_ETC2:
-      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ETC2:
-      return Graphics::Format::ETC2_R8G8B8_SRGB_BLOCK;
-
-    case Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::Format::ETC2_R8G8B8A1_UNORM_BLOCK; // no 'punchthrough' format
-
-    case Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-      return Graphics::Format::ETC2_R8G8B8A1_SRGB_BLOCK; // no 'punchthrough' format
-
-    case Pixel::COMPRESSED_RGBA8_ETC2_EAC:
-      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to map onto any format
-
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-      return Graphics::Format::ETC2_R8G8B8A8_SRGB_BLOCK; // doesn't seem to map onto any format
-
-    case Pixel::COMPRESSED_RGB8_ETC1:
-      return Graphics::Format::ETC2_R8G8B8_UNORM_BLOCK; // doesn't seem to be supported at all
-
-    case Pixel::COMPRESSED_RGB_PVRTC_4BPPV1:
-      return Graphics::Format::PVRTC1_4BPP_UNORM_BLOCK_IMG; // or SRGB?
-
-    // ASTC
-    case Pixel::COMPRESSED_RGBA_ASTC_4x4_KHR:
-      return Graphics::Format::ASTC_4x4_UNORM_BLOCK; // or SRGB?
-    case Pixel::COMPRESSED_RGBA_ASTC_5x4_KHR:
-      return Graphics::Format::ASTC_5x4_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_5x5_KHR:
-      return Graphics::Format::ASTC_5x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_6x5_KHR:
-      return Graphics::Format::ASTC_6x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_6x6_KHR:
-      return Graphics::Format::ASTC_6x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_8x5_KHR:
-      return Graphics::Format::ASTC_8x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_8x6_KHR:
-      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_8x8_KHR:
-      return Graphics::Format::ASTC_8x8_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x5_KHR:
-      return Graphics::Format::ASTC_10x5_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x6_KHR:
-      return Graphics::Format::ASTC_10x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x8_KHR:
-      return Graphics::Format::ASTC_10x8_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_10x10_KHR:
-      return Graphics::Format::ASTC_10x10_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_12x10_KHR:
-      return Graphics::Format::ASTC_12x10_UNORM_BLOCK;
-    case Pixel::COMPRESSED_RGBA_ASTC_12x12_KHR:
-      return Graphics::Format::ASTC_12x12_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR:
-
-      return Graphics::Format::ASTC_4x4_SRGB_BLOCK; // not type with alpha, but likely to use SRGB
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR:
-      return Graphics::Format::ASTC_5x4_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR:
-      return Graphics::Format::ASTC_5x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR:
-      return Graphics::Format::ASTC_6x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR:
-      return Graphics::Format::ASTC_6x6_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR:
-      return Graphics::Format::ASTC_8x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR:
-      return Graphics::Format::ASTC_8x6_UNORM_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR:
-      return Graphics::Format::ASTC_8x8_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR:
-      return Graphics::Format::ASTC_10x5_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR:
-      return Graphics::Format::ASTC_10x6_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR:
-      return Graphics::Format::ASTC_10x8_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR:
-      return Graphics::Format::ASTC_10x10_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR:
-      return Graphics::Format::ASTC_12x10_SRGB_BLOCK;
-    case Pixel::COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR:
-      return Graphics::Format::ASTC_12x12_SRGB_BLOCK;
-    case Pixel::RGB16F:
-      return Graphics::Format::R16G16B16_SFLOAT;
-    case Pixel::RGB32F:
-      return Graphics::Format::R32G32B32_SFLOAT;
-
-    case Pixel::DEPTH_FLOAT:
-    case Pixel::DEPTH_UNSIGNED_INT:
-    case Pixel::DEPTH_STENCIL:
-    case Pixel::CHROMINANCE_U:
-    case Pixel::CHROMINANCE_V:
-    case Pixel::R11G11B10F:
-      return Graphics::Format::UNDEFINED;
-  }
-  return Graphics::Format::UNDEFINED;
-}
-
 } //Unnamed namespace
 
 
@@ -293,7 +59,7 @@ Texture::Texture( Type type, Pixel::Format format, ImageDimensions size )
   mMaxMipMapLevel( 0 ),
   mType( type ),
   mHasAlpha( HasAlpha( format ) ),
-  mIsCompressed( IsCompressedFormat( format ) )
+  mIsCompressed( Pixel::IsCompressed( format ) )
 {
 }
 
@@ -339,20 +105,39 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
 
   Graphics::TextureUpdateInfo info{};
 
+  const uint32_t srcStride = pixelData->GetWidth();
+  uint32_t       srcOffset = 0u;
+  uint32_t       srcSize   = pixelData->GetBufferSize();
+
+  const bool requiredSubPixelData = (!Pixel::IsCompressed(pixelData->GetPixelFormat())) &&
+                                    ((params.xOffset != 0) ||
+                                     (params.yOffset != 0) ||
+                                     (params.width != pixelData->GetWidth()) ||
+                                     (params.height != pixelData->GetHeight()));
+  if(requiredSubPixelData)
+  {
+    const uint32_t bytePerPixel    = Pixel::GetBytesPerPixel(pixelData->GetPixelFormat());
+    const uint32_t dataStrideByte  = (srcStride ? srcStride : static_cast<uint32_t>(params.width)) * bytePerPixel;
+    const uint32_t dataXOffsetByte = params.xOffset * bytePerPixel;
+    const uint32_t dataWidthByte   = static_cast<uint32_t>(params.width) * bytePerPixel;
+    srcOffset = params.yOffset * dataStrideByte + dataXOffsetByte;
+    srcSize   = static_cast<uint32_t>(params.height) * dataStrideByte - (dataStrideByte - dataWidthByte);
+  }
+
   info.dstTexture   = mGraphicsTexture.get();
   info.dstOffset2D  = {params.xOffset, params.yOffset};
   info.layer        = params.layer;
   info.level        = params.mipmap;
   info.srcReference = 0;
   info.srcExtent2D  = {params.width, params.height};
-  info.srcOffset    = 0u;
-  info.srcSize      = pixelData->GetBufferSize();
-  info.srcStride    = pixelData->GetWidth();
+  info.srcOffset    = srcOffset;
+  info.srcSize      = srcSize;
+  info.srcStride    = srcStride;
   info.srcFormat    = Dali::Graphics::ConvertPixelFormat(pixelData->GetPixelFormat());
 
   Graphics::TextureUpdateSourceInfo updateSourceInfo{};
-  updateSourceInfo.sourceType                = Graphics::TextureUpdateSourceInfo::Type::PIXEL_DATA;
-  updateSourceInfo.pixelDataSource.pixelData = Dali::PixelData(pixelData.Get());
+  updateSourceInfo.sourceType                = Graphics::TextureUpdateSourceInfo::Type::MEMORY;
+  updateSourceInfo.memorySource.memory = pixelData->GetBuffer();
 
   mGraphicsController->UpdateTextures({info}, {updateSourceInfo});
 

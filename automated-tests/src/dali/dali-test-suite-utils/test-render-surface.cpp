@@ -67,7 +67,7 @@ bool TestRenderSurface::PreRender( bool resizingSurface )
   return true;
 }
 
-void TestRenderSurface::PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface )
+void TestRenderSurface::PostRender()
 {
 }
 
