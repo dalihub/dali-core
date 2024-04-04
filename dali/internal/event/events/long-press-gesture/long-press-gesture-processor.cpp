@@ -148,17 +148,18 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
 
     case GestureState::STARTED:
     {
-      Actor* currentGesturedActor = GetCurrentGesturedActor();
-      if(currentGesturedActor)
+      if(GetCurrentGesturedActor())
       {
         HitTestAlgorithm::Results hitTestResults;
-        if(GetFeededActor())
+        Actor* feededActor = GetFeededActor();
+        if(feededActor)
         {
-          hitTestResults.actor = Dali::Actor(GetFeededActor());
+          SetActor(feededActor);
+          hitTestResults.actor = Dali::Actor(feededActor);
           hitTestResults.renderTask = GetFeededRenderTask();
 
           Vector2     actorCoords;
-          currentGesturedActor->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
+          feededActor->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
           hitTestResults.actorCoordinates = actorCoords;
         }
         else
@@ -166,14 +167,14 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
           HitTest(scene, longPressEvent.point, hitTestResults);
         }
 
-        if(hitTestResults.actor && (currentGesturedActor == &GetImplementation(hitTestResults.actor)))
+        if(hitTestResults.actor && (GetCurrentGesturedActor() == &GetImplementation(hitTestResults.actor)))
         {
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
 
           // Set mCurrentLongPressEvent to use inside overridden methods called from ProcessAndEmit()
           mCurrentLongPressEvent = &longPressEvent;
-          if(GetFeededActor())
+          if(feededActor)
           {
             ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
           }
@@ -207,10 +208,7 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
           GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
           mCurrentEmitters.erase(endIter, mCurrentEmitters.end());
-          if(GetFeededGestureDetector())
-          {
-            mCurrentEmitters.push_back(GetFeededGestureDetector());
-          }
+
           if(!mCurrentEmitters.empty())
           {
             Vector2     actorCoords;
