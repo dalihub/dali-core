@@ -276,13 +276,10 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
         {
           GestureDetectorContainer outsideTouchesRangeEmitters;
 
-          if(!(GetFeededActor() && GetFeededGestureDetector()))
-          {
-            // Removes emitters that no longer have the actor attached
-            // Also remove emitters whose touches are outside the range of the current pan event and add them to outsideTouchesRangeEmitters
-            GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(), IsNotAttachedAndOutsideTouchesRangeFunctor(currentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters));
-            mCurrentPanEmitters.erase(endIter, mCurrentPanEmitters.end());
-          }
+          // Removes emitters that no longer have the actor attached
+          // Also remove emitters whose touches are outside the range of the current pan event and add them to outsideTouchesRangeEmitters
+          GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(), IsNotAttachedAndOutsideTouchesRangeFunctor(currentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters));
+          mCurrentPanEmitters.erase(endIter, mCurrentPanEmitters.end());
 
           Vector2 actorCoords;
           if(!outsideTouchesRangeEmitters.empty() || !mCurrentPanEmitters.empty())
