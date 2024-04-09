@@ -445,6 +445,8 @@ UpdateManager::UpdateManager( NotificationManager&             notificationManag
   Integration::DepthBufferAvailable depthNeeded=Integration::DepthBufferAvailable::TRUE;
   Integration::StencilBufferAvailable stencilBufferAvailable = Integration::StencilBufferAvailable::TRUE;
   mImpl->defaultScene->Initialize(graphicsController, depthNeeded, stencilBufferAvailable);
+  auto& uniformBufferManager = mImpl->graphicsAlgorithms.GetUniformBufferManager();
+  uniformBufferManager.RegisterScene(mImpl->defaultScene.Get());
 }
 
 UpdateManager::~UpdateManager()

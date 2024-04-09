@@ -6,3 +6,6 @@
 .ninja_log
 
 /*.dylib
+
+libdali-core.so.2
+libdali-core.so.2.0.0
