@@ -30,9 +30,11 @@ ShaderCache::ShaderCache( Dali::Graphics::Controller& controller )
 }
 
 Dali::Graphics::Program& ShaderCache::GetShader(
+  ShaderData::Type type,
   const std::vector<char>& vertexShaderSource,
   const std::vector<char>& fragmentShaderSource)
 {
+  auto sourceMode = (type==ShaderData::Type::BINARY ? Graphics::ShaderSourceMode::BINARY : Graphics::ShaderSourceMode::TEXT);
   for( auto&& item : mItems )
   {
     if( item.vertexSource == vertexShaderSource && item.fragmentSource == fragmentShaderSource )
@@ -43,14 +45,14 @@ Dali::Graphics::Program& ShaderCache::GetShader(
 
   Graphics::ShaderCreateInfo vertexShaderCreateInfo;
   vertexShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-  vertexShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::BINARY);
+  vertexShaderCreateInfo.SetSourceMode(sourceMode);
   vertexShaderCreateInfo.SetSourceSize(vertexShaderSource.size());
   vertexShaderCreateInfo.SetSourceData(static_cast<const void*>(vertexShaderSource.data()));
   auto vertexShader = mController.CreateShader(vertexShaderCreateInfo, nullptr);
 
   Graphics::ShaderCreateInfo fragmentShaderCreateInfo;
   fragmentShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-  fragmentShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::BINARY);
+  fragmentShaderCreateInfo.SetSourceMode(sourceMode);
   fragmentShaderCreateInfo.SetSourceSize(fragmentShaderSource.size());
   fragmentShaderCreateInfo.SetSourceData(static_cast<const void*>(fragmentShaderSource.data()));
   auto fragmentShader = mController.CreateShader(fragmentShaderCreateInfo, nullptr);

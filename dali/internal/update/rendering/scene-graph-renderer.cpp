@@ -783,8 +783,6 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
   return mRenderingBehavior;
 }
 
-
-
 Renderer::OpacityType Renderer::GetOpacityType( BufferIndex updateBufferIndex, const Node& node ) const
 {
   Renderer::OpacityType opacityType = Renderer::OPAQUE;

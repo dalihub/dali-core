@@ -61,7 +61,8 @@ void Geometry::AddPropertyBuffer( SceneGraph::PropertyBuffer* propertyBuffer )
 void Geometry::SetIndexBuffer( Dali::Vector<unsigned short>& indices )
 {
   // set new index buffer
-  //auto sizeInBytes = uint32_t(indices.Size() * sizeof(indices[0]));
+  auto sizeInBytes = uint32_t(indices.Size() * sizeof(indices[0]));
+  mIndices.resize(sizeInBytes/sizeof(uint16_t));
   std::memcpy(mIndices.data(), indices.begin(), indices.Count()*sizeof(unsigned short));
   mIndicesChanged = true;
 }

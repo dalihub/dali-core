@@ -17,10 +17,13 @@
  * limitations under the License.
  */
 
+#include "dali/internal/common/shader-data.h"
+
+#include <memory>
+
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-shader.h>
 #include <dali/graphics-api/graphics-types.h>
-#include <memory>
 
 namespace Dali
 {
@@ -63,7 +66,8 @@ struct ShaderCache
   /**
    * Get a shader from it's source code
    */
-  Graphics::Program& GetShader( const std::vector<char>& vsh,
+  Graphics::Program& GetShader( ShaderData::Type type,
+                                const std::vector<char>& vsh,
                                 const std::vector<char>& fsh );
 
   /**

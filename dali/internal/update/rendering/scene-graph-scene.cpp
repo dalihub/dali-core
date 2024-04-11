@@ -98,7 +98,7 @@ void Scene::GetAvailableBuffers( Integration::DepthBufferAvailable&   depthBuffe
   stencilBufferAvailable = mStencilBufferAvailable;
 }
 
-const RenderInstructionContainer& Scene::GetRenderInstructions() const
+RenderInstructionContainer& Scene::GetRenderInstructions()
 {
   return mInstructions;
 }

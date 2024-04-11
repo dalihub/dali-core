@@ -7,5 +7,5 @@
 
 /*.dylib
 
-libdali-core.so.2
-libdali-core.so.2.0.0
+libdali-core.so.*
+libdali2-core.so.*

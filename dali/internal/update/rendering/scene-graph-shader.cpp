@@ -106,13 +106,10 @@ void Shader::RemoveConnectionObserver( ConnectionChangePropagator::Observer& obs
 
 void Shader::SetShaderProgram( Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
-  // @todo: we should handle non-binary shaders as well in the future
-  if (shaderData->GetType() == ShaderData::Type::BINARY)
-  {
-    mGraphicsProgram = &mShaderCache->GetShader(
+  mGraphicsProgram = &mShaderCache->GetShader(
+      shaderData->GetType(),
       shaderData->GetShaderForStage(ShaderData::ShaderStage::VERTEX),
       shaderData->GetShaderForStage(ShaderData::ShaderStage::FRAGMENT));
-  }
 
   if( mGraphicsProgram )
   {

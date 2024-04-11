@@ -287,7 +287,7 @@ ClippingBox IntersectAABB( const ClippingBox& aabbA, const ClippingBox& aabbB )
 void ComputeUniformBufferRequirements( const Scene* scene, BufferIndex bufferIndex,
                                        uint32_t& cpuSize, uint32_t& gpuSize)
 {
-  auto& instructions = const_cast<RenderInstructionContainer&>(scene->GetRenderInstructions());
+  auto& instructions = const_cast<Scene*>(scene)->GetRenderInstructions();
   const uint32_t numberOfInstructions = instructions.Count(bufferIndex);
   for( uint32_t i = 0; i < numberOfInstructions; ++i)
   {
@@ -313,9 +313,7 @@ void ComputeUniformBufferRequirements( const Scene* scene, BufferIndex bufferInd
   }
 }
 
-
 } // namespace
-
 
 GraphicsAlgorithms::GraphicsAlgorithms( Graphics::Controller& controller )
 : mGraphicsController(controller)
@@ -1045,7 +1043,7 @@ void GraphicsAlgorithms::RenderScene(
   Integration::StencilBufferAvailable stencilBufferAvailable;
   scene->GetAvailableBuffers(depthBufferAvailable, stencilBufferAvailable);
 
-  const RenderInstructionContainer& renderInstructions = scene->GetRenderInstructions();
+  RenderInstructionContainer& renderInstructions = const_cast<Scene*>(scene)->GetRenderInstructions();
 
   PrepareRendererPipelines( renderInstructions, usesDepth, usesStencil, bufferIndex );
 
@@ -1084,7 +1082,7 @@ void GraphicsAlgorithms::RenderScene(
 
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
-    const RenderInstruction& instruction = scene->GetRenderInstructions().At(bufferIndex, i);
+    RenderInstruction& instruction = renderInstructions.At(bufferIndex, i);
 
     if((renderToFbo && !instruction.mFrameBuffer) || (!renderToFbo && instruction.mFrameBuffer))
     {

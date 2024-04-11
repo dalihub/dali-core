@@ -70,7 +70,7 @@ public:
    * Gets the render instructions for the scene
    * @return the render instructions
    */
-  [[nodiscard]] const RenderInstructionContainer& GetRenderInstructions() const;
+  [[nodiscard]] RenderInstructionContainer& GetRenderInstructions();
 
   /**
    * Set the surface rectangle when surface is resized.

@@ -190,7 +190,6 @@ struct UpdateManager::Impl
     discardQueue( discardQueue ),
     sceneController( nullptr ),
     graphicsAlgorithms( graphicsController ),
-    renderInstructions( ),
     renderTaskProcessor( renderTaskProcessor ),
     graphicsController( graphicsController ),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
@@ -362,7 +361,6 @@ struct UpdateManager::Impl
   DiscardQueue&                        discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
   SceneControllerImpl*                 sceneController;               ///< scene controller
   GraphicsAlgorithms                   graphicsAlgorithms;            ///< Graphics algorithms
-  RenderInstructionContainer           renderInstructions;            ///< List of current instructions per frame
   RenderTaskProcessor&                 renderTaskProcessor;           ///< Handles RenderTasks and RenderInstrucitons
   Graphics::Controller&                graphicsController;            ///< Graphics controller
 
@@ -974,25 +972,30 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         numberOfRenderTasks += mImpl->taskLists[index]->GetTasks().Count();
       }
 
-      mImpl->renderInstructions.ResetAndReserve( bufferIndex,
-                                                 static_cast<uint32_t>( numberOfRenderTasks ) );
+      mImpl->defaultScene->GetRenderInstructions().ResetAndReserve( bufferIndex,
+                                                                    static_cast<uint32_t>( numberOfRenderTasks ) );
 
       for ( VectorBase::SizeType index = 0u; index < taskListCount; index++ )
       {
         if ( NULL != mImpl->roots[index] )
         {
           keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
-                                              *mImpl->taskLists[index],
-                                              *mImpl->roots[index],
-                                              mImpl->sortedLayerLists[index],
-                                              mImpl->renderInstructions,
-                                              renderToFboEnabled,
-                                              isRenderingToFbo );
+                                                                       *mImpl->taskLists[index],
+                                                                       *mImpl->roots[index],
+                                                                       mImpl->sortedLayerLists[index],
+                                                                       mImpl->defaultScene->GetRenderInstructions(),
+                                                                       renderToFboEnabled,
+                                                                       isRenderingToFbo );
         }
       }
 
       // generate graphics objects
       PrepareNodes( bufferIndex );
+      for(auto geom : mImpl->geometryContainer)
+      {
+        geom->Upload(mImpl->graphicsController); // Upload any outstanding buffers
+      }
+
       if( future )
       {
         future->Wait();
@@ -1296,8 +1299,7 @@ void UpdateManager::DestroyGraphicsObjects()
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Destroying graphics objects\n");
 
   // There will be no further Update after this point. Destroy everything!
-
-  mImpl->renderInstructions.Shutdown(); //Prevent further access of dangling renderer ptrs
+  mImpl->defaultScene->GetRenderInstructions().Shutdown(); //Prevent further access of dangling renderer ptrs
 
   for( auto& geometry : mImpl->geometryContainer )
   {
