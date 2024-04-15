@@ -42,8 +42,7 @@ GestureEventProcessor::GestureEventProcessor(SceneGraph::UpdateManager& updateMa
   mRotationGestureProcessor(),
   mRenderController(renderController),
   envOptionMinimumPanDistance(-1),
-  envOptionMinimumPanEvents(-1),
-  mIsProcessingFeedTouch(false)
+  envOptionMinimumPanEvents(-1)
 {
 }
 
@@ -51,52 +50,11 @@ GestureEventProcessor::~GestureEventProcessor() = default;
 
 void GestureEventProcessor::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
 {
-  if(!mIsProcessingFeedTouch)
-  {
-    mLongPressGestureProcessor.ProcessTouch(scene, event);
-    mPanGestureProcessor.ProcessTouch(scene, event);
-    mPinchGestureProcessor.ProcessTouch(scene, event);
-    mTapGestureProcessor.ProcessTouch(scene, event);
-    mRotationGestureProcessor.ProcessTouch(scene, event);
-  }
-  mIsProcessingFeedTouch = false;
-}
-
-void GestureEventProcessor::ProcessTouchEvent(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
-{
-  mIsProcessingFeedTouch = true;
-  switch(gestureDetector->GetType())
-  {
-    case GestureType::LONG_PRESS:
-    {
-      mLongPressGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
-
-    case GestureType::PAN:
-    {
-      mPanGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
-
-    case GestureType::PINCH:
-    {
-      mPinchGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
-
-    case GestureType::TAP:
-    {
-      mTapGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
-
-    case GestureType::ROTATION:
-    {
-      mRotationGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
-  }
+  mLongPressGestureProcessor.ProcessTouch(scene, event);
+  mPanGestureProcessor.ProcessTouch(scene, event);
+  mPinchGestureProcessor.ProcessTouch(scene, event);
+  mTapGestureProcessor.ProcessTouch(scene, event);
+  mRotationGestureProcessor.ProcessTouch(scene, event);
 }
 
 void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector, Scene& scene)

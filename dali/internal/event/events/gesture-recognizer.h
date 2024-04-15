@@ -20,14 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/events/touch-event-integ.h>
-#include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/events/gesture-event.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/events/gesture-detector.h>
 
 namespace Dali
 {
@@ -165,11 +162,11 @@ protected:
   ~GestureRecognizer() override = default;
 
 protected:
-  Vector2                     mScreenSize;
-  GestureType::Value          mType;
-  Scene*                      mScene;
-  GestureSourceType           mSourceType; /// < Gesture input source type.
-  GestureSourceData           mSourceData; /// < Gesture input source data.
+  Vector2            mScreenSize;
+  GestureType::Value mType;
+  Scene*             mScene;
+  GestureSourceType  mSourceType; /// < Gesture input source type.
+  GestureSourceData  mSourceData; /// < Gesture input source data.
 };
 
 using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;

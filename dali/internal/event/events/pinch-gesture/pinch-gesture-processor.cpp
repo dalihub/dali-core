@@ -189,24 +189,7 @@ void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinch
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(GetFeededActor())
-      {
-        hitTestResults.actor = Dali::Actor(GetFeededActor());
-        hitTestResults.renderTask = GetFeededRenderTask();
-
-        // Record the current render-task for Screen->Actor coordinate conversions
-        mCurrentRenderTask = hitTestResults.renderTask;
-
-        Vector2     actorCoords;
-        GetFeededActor()->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
-        hitTestResults.actorCoordinates = actorCoords;
-
-        // Set mCurrentPinchEvent to use inside overridden methods called from ProcessAndEmit()
-        mCurrentPinchEvent = &pinchEvent;
-        ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
-        mCurrentPinchEvent = nullptr;
-      }
-      else if(HitTest(scene, pinchEvent.centerPoint, hitTestResults))
+      if(HitTest(scene, pinchEvent.centerPoint, hitTestResults))
       {
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;
@@ -234,10 +217,6 @@ void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinch
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
           GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
           mCurrentPinchEmitters.erase(endIter, mCurrentPinchEmitters.end());
-          if(GetFeededActor() && GetFeededGestureDetector())
-          {
-            mCurrentPinchEmitters.push_back(GetFeededGestureDetector());
-          }
 
           if(!mCurrentPinchEmitters.empty())
           {
