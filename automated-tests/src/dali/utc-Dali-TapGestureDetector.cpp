@@ -18,7 +18,10 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/internal/event/events/touch-event-impl.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 #include <test-touch-event-utils.h>
@@ -1328,6 +1331,102 @@ int UtcDaliTapGestureDetectorCheck(void)
   // The detector1 must get the tap event. SetMaximumTapsRequired(2u) of detector2 should not affect detector1.
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureSignalReceptionWithGeometryHittest(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start tap within the actor's area
+  TestGenerateTap(application, 20.0f, 20.0f, 100);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(20.0f, 20.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+
+  // repeat the tap within the actor's area - we should still receive the signal
+  data.Reset();
+  TestGenerateTap(application, 50.0f, 50.0f, 700);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTaps(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+
+  // Detach actor
+  detector.DetachAll();
+
+  // Ensure we are no longer signalled
+  data.Reset();
+  TestGenerateTap(application, 20.0f, 20.0f, 1300);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  TestGenerateTap(application, 50.0f, 50.0f, 1900);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliTapGestureHandleEvent(void)
+{
+  TestApplication application;
+  Integration::Scene scene     = application.GetScene();
+  RenderTaskList   taskList  = scene.GetRenderTaskList();
+  Dali::RenderTask task      = taskList.GetTask(0);
+
+  Actor parentActor = Actor::New();
+  parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  Actor childActor = Actor::New();
+  childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  parentActor.Add(childActor);
+  application.GetScene().Add(parentActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             pData;
+  GestureReceivedFunctor pFunctor(pData);
+
+  TapGestureDetector parentDetector = TapGestureDetector::New();
+  parentDetector.DetectedSignal().Connect(&application, pFunctor);
+
+  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1, 100);
+  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+  tp = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 150);
+  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
+  pData.Reset();
 
   END_TEST;
 }

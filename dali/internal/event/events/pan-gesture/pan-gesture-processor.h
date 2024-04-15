@@ -239,6 +239,18 @@ public: // for PanGestureDetector
    */
   const SceneGraph::PanGesture& GetSceneObject() const;
 
+  /**
+   * Gets the minimum distance to start a pan
+   * @return The distance in pixels
+   */
+  int32_t GetMinimumDistance() const;
+
+  /**
+   * Gets the minimum touch events required before a pan can be started
+   * @return The number of touch events
+   */
+  int32_t GetMinimumPanEvents() const;
+
 private:
   // Undefined
   PanGestureProcessor(const PanGestureProcessor&);
@@ -295,6 +307,9 @@ private:
 
   Vector2 mLastVelocity;       ///< The last recorded velocity in local actor coordinates.
   Vector2 mLastScreenVelocity; ///< The last recorded velocity in screen coordinates.
+
+  int32_t mMinimumDistance;
+  int32_t mMinimumPanEvents;
 
   const PanGestureEvent*  mCurrentPanEvent; ///< Pointer to current PanEvent, used when calling ProcessAndEmit()
   SceneGraph::PanGesture* mSceneObject;     ///< Not owned, but we write to it directly

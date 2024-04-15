@@ -78,6 +78,11 @@ public:
   void SendEvent(const Integration::TouchEvent& event) override;
 
   /**
+   * @copydoc Dali::Internal::GestureDetector::CancelEvent()
+   */
+  void CancelEvent() override;
+
+  /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
   void Update(const GestureRequest& request) override;

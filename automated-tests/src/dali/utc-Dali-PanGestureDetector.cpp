@@ -19,9 +19,12 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/events/pan-gesture-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/input-options.h>
 #include <dali/integration-api/profiling.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/internal/event/events/touch-event-impl.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 #include <test-touch-event-utils.h>
@@ -120,6 +123,25 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   Integration::Scene scene;
 };
 
+// Functor that removes the gestured actor from stage
+struct PropagationActorFunctor : public GestureReceivedFunctor
+{
+  PropagationActorFunctor(SignalData& data, bool propagation)
+  : GestureReceivedFunctor(data),
+    propagation(propagation)
+  {
+  }
+
+  void operator()(Actor actor, const PanGesture& pan)
+  {
+    GestureReceivedFunctor::operator()(actor, pan);
+    Dali::DevelActor::SetNeedGesturePropagation(actor, propagation);
+  }
+
+  bool propagation;
+};
+
+
 // Data for constraints
 struct ConstraintData
 {
@@ -199,6 +221,19 @@ PanGesture GeneratePan(unsigned int time,
   return pan;
 }
 
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -3038,6 +3073,284 @@ int UtcDaliPanGestureWhenGesturePropargation(void)
   DALI_TEST_EQUALS(false, cData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
   cData.Reset();
+  pData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureHandleEvent(void)
+{
+  TestApplication application;
+  Integration::Scene scene     = application.GetScene();
+  RenderTaskList   taskList  = scene.GetRenderTaskList();
+  Dali::RenderTask task      = taskList.GetTask(0);
+
+  Actor parentActor = Actor::New();
+  parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  Actor childActor = Actor::New();
+  childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  parentActor.Add(childActor);
+  application.GetScene().Add(parentActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             pData;
+  GestureReceivedFunctor pFunctor(pData);
+
+  PanGestureDetector parentDetector = PanGestureDetector::New();
+  parentDetector.DetectedSignal().Connect(&application, pFunctor);
+
+
+  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
+  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(70.0f, 70.0f), 150);
+  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(90.0f, 90.0f), 200);
+  touchEventImpl = new Internal::TouchEvent(200);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+  tp = GenerateSingleTouch(PointState::UP, Vector2(100.0f, 100.0f), 250);
+  touchEventImpl = new Internal::TouchEvent(250);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
+  pData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureSignalReceptionWithGeometryHittest(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start pan within the actor's area
+  uint32_t time = 100;
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  // Continue the pan within the actor's area - we should still receive the signal
+  data.Reset();
+
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
+  time += TestGetFrameInterval();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  // Gesture ends within actor's area
+  data.Reset();
+
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
+  time += TestGetFrameInterval();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  // Detach actor
+  detector.DetachAll();
+
+  // Ensure we are no longer signalled
+  data.Reset();
+
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
+  time += TestGetFrameInterval();
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPanGestureFeedTouchWhenGesturePropagation(void)
+{
+  TestApplication application;
+  Integration::Scene scene     = application.GetScene();
+  RenderTaskList   taskList  = scene.GetRenderTaskList();
+  Dali::RenderTask task      = taskList.GetTask(0);
+
+  Actor parentActor = Actor::New();
+  parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  Actor childActor = Actor::New();
+  childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  parentActor.Add(childActor);
+  application.GetScene().Add(parentActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             pData;
+  GestureReceivedFunctor pFunctor(pData);
+
+  PanGestureDetector parentDetector = PanGestureDetector::New();
+  parentDetector.DetectedSignal().Connect(&application, pFunctor);
+
+  SignalData             cData;
+  GestureReceivedFunctor cFunctor(cData);
+
+  PanGestureDetector childDetector = PanGestureDetector::New();
+  childDetector.DetectedSignal().Connect(&application, cFunctor);
+
+  // Start gesture within the actor's area, we receive the gesture not parent actor but child actor.
+  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
+  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(60.0f, 60.0f), 150);
+  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(70.0f, 70.0f), 200);
+  touchEventImpl = new Internal::TouchEvent(200);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(80.0f, 80.0f), 250);
+  touchEventImpl = new Internal::TouchEvent(200);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::UP, Vector2(100.0f, 100.0f), 300);
+  touchEventImpl = new Internal::TouchEvent(250);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  DALI_TEST_EQUALS(true, cData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, pData.functorCalled, TEST_LOCATION);
+  cData.Reset();
+  pData.Reset();
+
+
+  // If GesturePropargation is set, a gesture event is to pass over to the parent.
+  SignalData              cPData;
+  PropagationActorFunctor cPFunctor(cPData, true);
+  childDetector.DetectedSignal().Connect(&application, cPFunctor);
+
+  // So now the parent got the gesture event.
+  tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
+  touchEventImpl = new Internal::TouchEvent(100);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(60.0f, 60.0f), 150);
+  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(70.0f, 70.0f), 200);
+  touchEventImpl = new Internal::TouchEvent(200);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::MOTION, Vector2(80.0f, 80.0f), 250);
+  touchEventImpl = new Internal::TouchEvent(250);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  tp = GenerateSingleTouch(PointState::UP, Vector2(100.0f, 100.0f), 300);
+  touchEventImpl = new Internal::TouchEvent(300);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  if(!childDetector.HandleEvent(childActor, touchEventHandle))
+  {
+    parentDetector.HandleEvent(parentActor, touchEventHandle);
+  }
+
+  DALI_TEST_EQUALS(true, cPData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
+  cPData.Reset();
   pData.Reset();
 
   END_TEST;

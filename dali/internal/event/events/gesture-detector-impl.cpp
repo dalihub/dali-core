@@ -27,6 +27,8 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/touch-event-impl.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -36,6 +38,9 @@ GestureDetector::GestureDetector(GestureType::Value type, const SceneGraph::Prop
 : Object(sceneObject),
   mType(type),
   mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor()),
+  mFeededActor(),
+  mRenderTask(nullptr),
+  mGestureRecognizer(),
   mIsDetected(false)
 {
 }
@@ -258,10 +263,63 @@ Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
   return actor;
 }
 
-bool GestureDetector::FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch)
+bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
 {
-  //TODO
-  return false;
+  bool ret = false;
+  Dali::Internal::Actor& actorImpl(GetImplementation(actor));
+  if(touch.GetPointCount() > 0 && actorImpl.OnScene())
+  {
+    const PointState::Type state = touch.GetState(0);
+    if(state == PointState::DOWN)
+    {
+      CancelProcessing();
+      Clear();
+      actorImpl.SetNeedGesturePropagation(false);
+      mGestureEventProcessor.RegisterGestureDetector(this);
+    }
+
+    Integration::TouchEvent touchEvent(touch.GetTime());
+    for(std::size_t i = 0; i< touch.GetPointCount(); i++)
+    {
+      Integration::Point      point;
+      point.SetState(touch.GetState(i));
+      point.SetDeviceId(touch.GetDeviceId(i));
+      point.SetScreenPosition(touch.GetScreenPosition(i));
+      point.SetRadius(touch.GetRadius(i));
+      point.SetPressure(touch.GetPressure(i));
+      point.SetAngle(touch.GetAngle(i));
+      point.SetDeviceClass(touch.GetDeviceClass(i));
+      point.SetDeviceSubclass(touch.GetDeviceSubclass(i));
+      point.SetMouseButton(touch.GetMouseButton(i));
+      point.SetHitActor(touch.GetHitActor(i));
+      point.SetLocalPosition(touch.GetLocalPosition(i));
+      touchEvent.points.push_back(point);
+    }
+
+
+    Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
+    mFeededActor.SetActor(&actorImpl);
+    mRenderTask = &GetImplementation(touchEventImpl.GetRenderTaskPtr());
+
+    if(!actorImpl.NeedGesturePropagation())
+    {
+      ProcessTouchEvent(actorImpl.GetScene(), touchEvent);
+    }
+
+    ret = IsDetected() && !actorImpl.NeedGesturePropagation();
+    actorImpl.SetNeedGesturePropagation(false);
+
+    if(state == PointState::FINISHED || state == PointState::INTERRUPTED)
+    {
+      Clear();
+    }
+  }
+  return ret;
+}
+
+void GestureDetector::CancelAllOtherGestureDetectors()
+{
+  mGestureEventProcessor.CancelAllOtherGestureDetectors(this);
 }
 
 bool GestureDetector::IsDetected() const
@@ -272,6 +330,13 @@ bool GestureDetector::IsDetected() const
 void GestureDetector::SetDetected(bool detected)
 {
   mIsDetected = detected;
+}
+
+void GestureDetector::Clear()
+{
+  mGestureRecognizer = nullptr;
+  mGestureEventProcessor.UnregisterGestureDetector(this);
+  SetDetected(false);
 }
 
 bool GestureDetector::IsAttached(Actor& actor) const

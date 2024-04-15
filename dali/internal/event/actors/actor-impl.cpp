@@ -303,7 +303,21 @@ bool EmitConsumingSignal(Actor& actor, Signal& signal, const Event& event)
     Dali::Actor handle(&actor);
     consumed = signal.Emit(handle, event);
   }
+  return consumed;
+}
 
+/// Helper for emitting a signal
+/// If any one of the multiple callbacks returns true, the entire callback is consumed.
+template<typename Signal, typename Event>
+bool EmitConsumingSignalOr(Actor& actor, Signal& signal, const Event& event)
+{
+  bool consumed = false;
+
+  if(!signal.Empty())
+  {
+    Dali::Actor handle(&actor);
+    consumed = signal.EmitOr(handle, event);
+  }
   return consumed;
 }
 
@@ -995,11 +1009,19 @@ bool Actor::IsGestureRequired(GestureType::Value type) const
 
 bool Actor::EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch)
 {
+  if(mScene && mScene->IsGeometryHittestEnabled())
+  {
+    return EmitConsumingSignalOr(*this, mInterceptTouchedSignal, touch);
+  }
   return EmitConsumingSignal(*this, mInterceptTouchedSignal, touch);
 }
 
 bool Actor::EmitTouchEventSignal(const Dali::TouchEvent& touch)
 {
+  if(mScene && mScene->IsGeometryHittestEnabled())
+  {
+    return EmitConsumingSignalOr(*this, mTouchedSignal, touch);
+  }
   return EmitConsumingSignal(*this, mTouchedSignal, touch);
 }
 

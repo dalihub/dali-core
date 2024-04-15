@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/pan-gesture/pan-gesture-event.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
@@ -44,7 +45,7 @@ class PanGesture;
 /**
  * @copydoc Dali::PanGestureDetector
  */
-class PanGestureDetector : public GestureDetector
+class PanGestureDetector : public GestureDetector, public RecognizerObserver<PanGestureEvent>
 {
 public: // Typedefs
   using AngleThresholdPair = Dali::PanGestureDetector::AngleThresholdPair;
@@ -135,6 +136,18 @@ public:
    */
   bool CheckAngleAllowed(Radian angle) const;
 
+  /**
+   * pan gesture-detector meets the parameters of the current gesture.
+   *
+   * @param[in]  gestureEvent        The gesture event.
+   * @param[in]  actor               The actor that has been gestured.
+   * @param[in]  renderTask          The renderTask.
+   * @param[in]  possiblePanPosition The possiblePanPosition.
+   *
+   * @return true, if the detector meets the parameters, false otherwise.
+   */
+  bool CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask, Vector2 possiblePanPosition);
+
 public:
   /**
    * Called by the PanGestureProcessor when a pan gesture event occurs within the bounds of our
@@ -210,6 +223,48 @@ private:
    */
   void OnActorDestroyed(Object& object) override;
 
+  /**
+   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, const Dali::TouchEvent&)
+   */
+  bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
+   */
+  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
+   */
+  bool CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask) override
+  {
+    // pan gesture use CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask, Vector2 possiblePanPosition) api
+    return true;
+  }
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CancelProcessing()
+   */
+  void CancelProcessing() override;
+
+    /**
+   * This method is called whenever a pan gesture event occurs.
+   * @param[in] scene The scene the pan gesture event occurs in.
+   * @param[in] panEvent The event that has occurred.
+   */
+  void Process(Scene& scene, const PanGestureEvent& panEvent) override;
+
+  /**
+   * Creates a PanGesture and emit its detected signal.
+   * @param[in]  actor             The actor that has been panned.
+   * @param[in]  panEvent          The panEvent received from the adaptor.
+   * @param[in]  localCurrent      Current position relative to the actor attached to the detector.
+   * @param[in]  state             The state of the gesture.
+   * @param[in]  renderTask        The renderTask to use.
+   */
+  void EmitPanSignal(Actor*  actor, const PanGestureEvent& panEvent, Vector2 localCurrent, GestureState state, RenderTaskPtr renderTask);
+
+
   // Default property extensions from Object
 
   /**
@@ -235,11 +290,19 @@ private:
 private:
   Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 
-  uint32_t mMinimumTouches;        ///< The minimum number of fingers required to be touching for pan.
-  uint32_t mMaximumTouches;        ///< The maximum number of fingers required to be touching for pan.
-  uint32_t mMaximumMotionEventAge; ///< The maximum age of motion events as milliseconds.
+  uint32_t                mMinimumTouches;        ///< The minimum number of fingers required to be touching for pan.
+  uint32_t                mMaximumTouches;        ///< The maximum number of fingers required to be touching for pan.
+  uint32_t                mMaximumMotionEventAge; ///< The maximum age of motion events as milliseconds.
 
-  AngleContainer mAngleContainer; ///< A container of all angles allowed for pan to occur.
+  AngleContainer          mAngleContainer;        ///< A container of all angles allowed for pan to occur.
+
+  Vector2                 mPossiblePanPosition;   ///< The Position when possible state.
+  Vector2                 mLastVelocity;          ///< The last recorded velocity in local actor coordinates.
+  Vector2                 mLastScreenVelocity;    ///< The last recorded velocity in screen coordinates.
+  ActorObserver           mCurrentPanActor;       ///< The current actor that has been gestured.
+  SceneGraph::PanGesture* mSceneObject;           ///< Not owned, but we write to it directly
+
+
 };
 
 } // namespace Internal

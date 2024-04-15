@@ -65,6 +65,12 @@ public:
   virtual void SendEvent(const Integration::TouchEvent& event) = 0;
 
   /**
+   * @brief This is canceling the ongoing gesture recognition process.
+   * If the gesture recognition was in progress, it will be stopped immediately after calling this function.
+   */
+  virtual void CancelEvent() = 0;
+
+  /**
    * Called when Core updates the gesture's detection requirements.
    * @param[in]  request  The updated detection requirements.
    */

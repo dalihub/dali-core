@@ -183,6 +183,11 @@ public:
     return mRenderTask;
   }
 
+  Dali::RenderTask& GetRenderTaskPtr()
+  {
+    return mRenderTask;
+  }
+
   // Setters
 
   /**

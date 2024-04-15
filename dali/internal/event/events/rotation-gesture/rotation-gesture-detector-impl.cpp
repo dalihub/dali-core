@@ -24,8 +24,11 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
 
 namespace Dali
 {
@@ -94,11 +97,116 @@ bool RotationGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrac
 void RotationGestureDetector::OnActorAttach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector attach actor(%d)\n", actor.GetId());
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Connect(this, &RotationGestureDetector::OnTouchEvent);
+  }
 }
 
 void RotationGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector detach actor(%d)\n", actor.GetId());
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Disconnect(this, &RotationGestureDetector::OnTouchEvent);
+  }
+}
+
+
+bool RotationGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
+{
+  Dali::TouchEvent touchEvent(touch);
+  return HandleEvent(actor, touchEvent);
+}
+
+void RotationGestureDetector::CancelProcessing()
+{
+  if(mGestureRecognizer)
+  {
+    mGestureRecognizer->CancelEvent();
+  }
+}
+
+void RotationGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+{
+  if(!mGestureRecognizer)
+  {
+    const RotationGestureProcessor& rotationGestureProcessor = mGestureEventProcessor.GetRotationGestureProcessor();
+    uint32_t minimumTouchEvents = rotationGestureProcessor.GetMinimumTouchEvents();
+    uint32_t minimumTouchEventsAfterStart = rotationGestureProcessor.GetMinimumTouchEventsAfterStart();
+
+    mGestureRecognizer = new RotationGestureRecognizer(*this, minimumTouchEvents, minimumTouchEventsAfterStart);
+  }
+  mGestureRecognizer->SendEvent(scene, event);
+}
+
+/**
+ * Creates a RotationGesture and asks the specified detector to emit its detected signal.
+ * @param[in]  actor             The actor that has been rotationed.
+ * @param[in]  gestureDetectors  The gesture detector container that should emit the signal.
+ * @param[in]  rotationEvent        The rotationEvent received from the adaptor.
+ * @param[in]  localCenter       Relative to the actor attached to the detector.
+ */
+void RotationGestureDetector::EmitRotationSignal(
+  Actor*                          actor,
+  const RotationGestureEvent&     rotationEvent,
+  Vector2                         localCenter)
+{
+  SetDetected(true);
+  Internal::RotationGesturePtr rotation(new Internal::RotationGesture(rotationEvent.state));
+  rotation->SetTime(rotationEvent.time);
+  rotation->SetRotation(rotationEvent.rotation);
+  rotation->SetScreenCenterPoint(rotationEvent.centerPoint);
+  rotation->SetLocalCenterPoint(localCenter);
+  rotation->SetSourceType(rotationEvent.sourceType);
+  rotation->SetSourceData(rotationEvent.sourceData);
+
+  Dali::Actor                                    actorHandle(actor);
+  EmitRotationGestureSignal(actorHandle, Dali::RotationGesture(rotation.Get()));
+}
+
+void RotationGestureDetector::Process(Scene& scene, const RotationGestureEvent& rotationEvent)
+{
+  switch(rotationEvent.state)
+  {
+    case GestureState::STARTED:
+    {
+      Actor* feededActor = mFeededActor.GetActor();
+      if(feededActor && CheckGestureDetector(&rotationEvent, feededActor, mRenderTask))
+      {
+        Vector2     actorCoords;
+        RenderTask& renderTaskImpl(*mRenderTask.Get());
+        feededActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
+        EmitRotationSignal(feededActor, rotationEvent, actorCoords);
+      }
+      break;
+    }
+
+    case GestureState::CONTINUING:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
+    {
+      // Only send subsequent rotation gesture signals if we processed the rotation gesture when it started.
+      // Check if actor is still touchable.
+      Actor* feededActor = mFeededActor.GetActor();
+      if(feededActor && feededActor->IsHittable() && mRenderTask)
+      {
+        Vector2     actorCoords;
+        RenderTask& renderTaskImpl(*mRenderTask.Get());
+        feededActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
+
+        EmitRotationSignal(feededActor, rotationEvent, actorCoords);
+      }
+      break;
+    }
+
+    case GestureState::CLEAR:
+    case GestureState::POSSIBLE:
+    {
+      // Nothing to do
+      break;
+    }
+  }
 }
 
 } // namespace Internal
