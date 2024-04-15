@@ -27,8 +27,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
-#include <dali/internal/event/events/touch-event-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -262,52 +260,8 @@ Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
 
 bool GestureDetector::FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch)
 {
-  bool ret = false;
-  if(touch.GetPointCount() > 0)
-  {
-    const PointState::Type state = touch.GetState(0);
-    Dali::Internal::Actor& actorImpl(GetImplementation(actor));
-    if(state == PointState::DOWN)
-    {
-      //TODO We need to find a better way to add detectors to the processor other than detach and attach.
-      Detach(actorImpl);
-      Attach(actorImpl);
-      mIsDetected = false;
-    }
-
-    Integration::TouchEvent touchEvent(touch.GetTime());
-    for(std::size_t i = 0; i< touch.GetPointCount(); i++)
-    {
-      Integration::Point      point;
-      point.SetState(touch.GetState(i));
-      point.SetDeviceId(touch.GetDeviceId(i));
-      point.SetScreenPosition(touch.GetScreenPosition(i));
-      point.SetRadius(touch.GetRadius(i));
-      point.SetPressure(touch.GetPressure(i));
-      point.SetAngle(touch.GetAngle(i));
-      point.SetDeviceClass(touch.GetDeviceClass(i));
-      point.SetDeviceSubclass(touch.GetDeviceSubclass(i));
-      point.SetMouseButton(touch.GetMouseButton(i));
-      point.SetHitActor(touch.GetHitActor(i));
-      point.SetLocalPosition(touch.GetLocalPosition(i));
-      touchEvent.points.push_back(point);
-    }
-
-    Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
-    mGestureEventProcessor.ProcessTouchEvent(this, actorImpl, GetImplementation(touchEventImpl.GetRenderTaskPtr()), actorImpl.GetScene(), touchEvent);
-
-    if(IsDetected())
-    {
-      ret = !actorImpl.NeedGesturePropagation();
-    }
-
-    if(state == PointState::FINISHED || state == PointState::INTERRUPTED || state == PointState::LEAVE)
-    {
-      //TODO We need to find a better way to remove detectors to the processor other than detach.
-      Detach(actorImpl);
-    }
-  }
-  return ret;
+  //TODO
+  return false;
 }
 
 bool GestureDetector::IsDetected() const
