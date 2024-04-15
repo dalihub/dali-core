@@ -108,6 +108,13 @@ public: // To be called by GestureEventProcessor
   void SetRecognizerTime(uint32_t time);
 
   /**
+   * @brief This method gets the recognizer time required to be recognized as a tap gesture (millisecond)
+   *
+   * @return The time value in milliseconds
+   */
+  uint32_t GetRecognizerTime() const;
+
+  /**
    * @brief This method sets the recognizer distance required to be recognized as a tap gesture
    *
    * This distance is from touch down to touch up to recognize the tap gesture.
@@ -115,6 +122,13 @@ public: // To be called by GestureEventProcessor
    * @param[in] distance The distance
    */
   void SetMaximumMotionAllowedDistance(float distance);
+
+  /**
+   * @brief This method gets the recognizer distance required to be recognized as a tap gesture
+   *
+   * @return The distance value
+   */
+  float GetMaximumMotionAllowedDistance() const;
 
 private:
   // Undefined

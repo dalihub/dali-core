@@ -19,8 +19,11 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/events/long-press-gesture-detector-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/input-options.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/internal/event/events/touch-event-impl.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 #include <test-touch-event-utils.h>
@@ -131,6 +134,19 @@ struct TouchEventFunctor
   }
 };
 
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1117,6 +1133,96 @@ int UtcDaliLongPressGestureWhenGesturePropargation(void)
   DALI_TEST_EQUALS(true, cData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
   cData.Reset();
+  pData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureSignalWithGeometryHittest(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Do a long press inside actor's area
+  TestGenerateLongPress(application, 50.0f, 50.0f);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.receivedGesture.GetNumberOfTouches(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.GetLocalPoint(), 0.1, TEST_LOCATION);
+  TestEndLongPress(application, 50.0f, 50.0f);
+
+  // Detach actor
+  detector.DetachAll();
+
+  // Ensure we are no longer signalled
+  data.Reset();
+  TestGenerateLongPress(application, 20.0f, 20.0f);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  TestEndLongPress(application, 50.0f, 50.0f);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureHandleEvent(void)
+{
+  TestApplication application;
+  Integration::Scene scene     = application.GetScene();
+  RenderTaskList   taskList  = scene.GetRenderTaskList();
+  Dali::RenderTask task      = taskList.GetTask(0);
+
+  Actor parentActor = Actor::New();
+  parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  Actor childActor = Actor::New();
+  childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  parentActor.Add(childActor);
+  application.GetScene().Add(parentActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             pData;
+  GestureReceivedFunctor pFunctor(pData);
+
+  LongPressGestureDetector parentDetector = LongPressGestureDetector::New();
+  parentDetector.DetectedSignal().Connect(&application, pFunctor);
+
+  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
+  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+  TestTriggerLongPress(application);
+
+  tp = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 150);
+  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
+
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
   pData.Reset();
 
   END_TEST;

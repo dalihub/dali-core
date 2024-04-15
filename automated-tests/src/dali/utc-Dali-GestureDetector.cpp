@@ -17,6 +17,12 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/touch-integ.h>
+#include <dali/integration-api/render-task-list-integ.h>
+#include <dali/internal/event/events/touch-event-impl.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
 #include <stdlib.h>
 
 #include <algorithm>
@@ -33,6 +39,94 @@ void utc_dali_gesture_detector_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
+
+namespace
+{
+// Stores data that is populated in the callback and will be read by the TET cases
+struct SignalData
+{
+  SignalData()
+  : functorCalled(false),
+    voidFunctorCalled(false),
+    receivedGesture(),
+    pressedActor()
+  {
+  }
+
+  void Reset()
+  {
+    functorCalled     = false;
+    voidFunctorCalled = false;
+
+    receivedGesture.Reset();
+
+    pressedActor.Reset();
+  }
+
+  bool    functorCalled;
+  bool    voidFunctorCalled;
+  Gesture receivedGesture;
+  Actor   pressedActor;
+};
+
+// Functor that sets the data when called
+struct GestureReceivedFunctor
+{
+  GestureReceivedFunctor(SignalData& data)
+  : signalData(data)
+  {
+  }
+
+  void operator()(Actor actor, const Gesture& gesture)
+  {
+    signalData.functorCalled   = true;
+    signalData.receivedGesture = gesture;
+    signalData.pressedActor    = actor;
+  }
+
+  void operator()()
+  {
+    signalData.voidFunctorCalled = true;
+  }
+
+  SignalData& signalData;
+};
+
+Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, int source, uint32_t time)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(state);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  point.SetMouseButton(static_cast<MouseButton::Type>(source));
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
+
+Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(stateA);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(screenPositionA);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  point.SetScreenPosition(screenPositionB);
+  point.SetState(stateB);
+  point.SetDeviceId(7);
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
+
+}
+
 
 int UtcDaliGestureDetectorConstructorN(void)
 {
@@ -498,6 +592,168 @@ int UtcDaliGestureDetectorRegisterProperty(void)
   application.SendNotification();
   application.Render(1000 /* 100% progress */);
   DALI_TEST_EQUALS(detector.GetProperty<int32_t>(index), 99, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliGestureDetectorCancelProcessing(void)
+{
+  TestApplication application;
+  Integration::Scene scene   = application.GetScene();
+  RenderTaskList   taskList  = scene.GetRenderTaskList();
+  Dali::RenderTask task      = taskList.GetTask(0);
+
+  LongPressGestureDetector longDetector     = LongPressGestureDetector::New();
+  TapGestureDetector       tapDetector      = TapGestureDetector::New();
+  PanGestureDetector       panDetector      = PanGestureDetector::New();
+  PinchGestureDetector     pinchDetector    = PinchGestureDetector::New();
+  RotationGestureDetector  rotationDetector = RotationGestureDetector::New();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  SignalData             tData;
+  GestureReceivedFunctor tFunctor(tData);
+
+  SignalData             pData;
+  GestureReceivedFunctor pFunctor(pData);
+
+  longDetector.DetectedSignal().Connect(&application, functor);
+  tapDetector.DetectedSignal().Connect(&application, tFunctor);
+  pinchDetector.DetectedSignal().Connect(&application, pFunctor);
+
+  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1, 100);
+  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+  TestTriggerLongPress(application);
+  longDetector.CancelAllOtherGestureDetectors();
+
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, tData.functorCalled, TEST_LOCATION);
+  data.Reset();
+  tData.Reset();
+
+  tp = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 650);
+  touchEventImpl = new Internal::TouchEvent(650);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, tData.functorCalled, TEST_LOCATION);
+  data.Reset();
+  tData.Reset();
+
+  longDetector.SetTouchesRequired(2, 2);
+
+  tp = GenerateDoubleTouch(PointState::DOWN, Vector2(2.0f, 20.0f), PointState::DOWN, Vector2(38.0f, 20.0f), 100);
+  touchEventImpl = new Internal::TouchEvent(100);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->AddPoint(tp.GetPoint(1));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+  pinchDetector.CancelAllOtherGestureDetectors();
+
+  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 150);
+  touchEventImpl = new Internal::TouchEvent(150);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->AddPoint(tp.GetPoint(1));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+
+  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 200);
+  touchEventImpl = new Internal::TouchEvent(200);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->AddPoint(tp.GetPoint(1));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+
+  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 250);
+  touchEventImpl = new Internal::TouchEvent(250);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->AddPoint(tp.GetPoint(1));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+
+  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 300);
+  touchEventImpl = new Internal::TouchEvent(300);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->AddPoint(tp.GetPoint(1));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+
+  tp = GenerateDoubleTouch(PointState::UP, Vector2(10.0f, 20.0f), PointState::UP, Vector2(30.0f, 20.0f), 350);
+  touchEventImpl = new Internal::TouchEvent(350);
+  touchEventImpl->AddPoint(tp.GetPoint(0));
+  touchEventImpl->AddPoint(tp.GetPoint(1));
+  touchEventImpl->SetRenderTask(task);
+  touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
+  longDetector.HandleEvent(actor, touchEventHandle);
+  tapDetector.HandleEvent(actor, touchEventHandle);
+  panDetector.HandleEvent(actor, touchEventHandle);
+  pinchDetector.HandleEvent(actor, touchEventHandle);
+  rotationDetector.HandleEvent(actor, touchEventHandle);
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, tData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);
+  data.Reset();
+  tData.Reset();
+  pData.Reset();
 
   END_TEST;
 }

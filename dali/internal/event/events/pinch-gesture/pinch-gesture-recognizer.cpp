@@ -214,6 +214,17 @@ void PinchGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   }
 }
 
+void PinchGestureRecognizer::CancelEvent()
+{
+  if(mState != CLEAR && mTouchEvents.size() > 0)
+  {
+    const Integration::TouchEvent& previousEvent(*(mTouchEvents.rbegin()));
+    SendPinch(GestureState::CANCELLED, previousEvent);
+    mState = CLEAR;
+    mTouchEvents.clear();
+  }
+}
+
 void PinchGestureRecognizer::Update(const GestureRequest& request)
 {
   // Nothing to do.

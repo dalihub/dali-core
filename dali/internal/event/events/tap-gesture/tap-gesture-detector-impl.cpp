@@ -26,7 +26,9 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-recognizer.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -77,7 +79,9 @@ TapGestureDetector::TapGestureDetector(uint32_t tapsRequired)
   mWaitTime(DEFAULT_TAP_WAIT_TIME),
   mTappedActor(),
   mTap(),
-  mReceiveAllTapEvents(false)
+  mCurrentTapActor(),
+  mReceiveAllTapEvents(false),
+  mPossibleProcessed(false)
 {
 }
 
@@ -203,6 +207,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
       else
       {
         mTappedActor = tappedActor;
+        mWaitTime    = mGestureEventProcessor.GetTapGestureProcessor().GetMaximumAllowedTime();
         mTimerId     = platformAbstraction.StartTimer(mWaitTime, MakeCallback(this, &TapGestureDetector::TimerCallback));
       }
     }
@@ -241,18 +246,124 @@ bool TapGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerIn
 void TapGestureDetector::OnActorAttach(Actor& actor)
 {
   CheckMinMaxTapsRequired();
-  mWaitTime = mGestureEventProcessor.GetTapGestureProcessor().GetMaximumAllowedTime();
   DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector attach actor(%d)\n", actor.GetId());
+
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Connect(this, &TapGestureDetector::OnTouchEvent);
+  }
 }
 
 void TapGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector detach actor(%d)\n", actor.GetId());
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Disconnect(this, &TapGestureDetector::OnTouchEvent);
+  }
 }
 
 void TapGestureDetector::OnActorDestroyed(Object& object)
 {
   // Do nothing
+}
+
+bool TapGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
+{
+  Dali::TouchEvent touchEvent(touch);
+  return HandleEvent(actor, touchEvent);
+}
+
+bool TapGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask)
+{
+  const TapGestureEvent* tapEvent(static_cast<const TapGestureEvent*>(gestureEvent));
+
+  return (GetMinimumTapsRequired() <= tapEvent->numberOfTaps) && (GetTouchesRequired() == tapEvent->numberOfTouches);
+}
+
+void TapGestureDetector::CancelProcessing()
+{
+  if(mGestureRecognizer)
+  {
+    mGestureRecognizer->CancelEvent();
+  }
+}
+
+// This is an API that is called by FeedTouch and recognizes gestures directly from the Detector without going through the Reconizer.
+void TapGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+{
+  if(!mGestureRecognizer)
+  {
+    TapGestureRequest request;
+    request.minTouches = GetMinimumTapsRequired();
+    request.maxTouches = GetMaximumTapsRequired();
+
+    Size size          = scene.GetSize();
+    const TapGestureProcessor& mTapGestureProcessor = mGestureEventProcessor.GetTapGestureProcessor();
+
+    uint32_t maximumAllowedTime          = mTapGestureProcessor.GetMaximumAllowedTime();
+    uint32_t recognizerTime              = mTapGestureProcessor.GetRecognizerTime();
+    float maximumMotionAllowedDistance   = mTapGestureProcessor.GetMaximumMotionAllowedDistance();
+
+    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), maximumAllowedTime, recognizerTime, maximumMotionAllowedDistance);
+  }
+  mGestureRecognizer->SendEvent(scene, event);
+}
+
+void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)
+{
+  switch(tapEvent.state)
+  {
+    case GestureState::POSSIBLE:
+    {
+      mPossibleProcessed = true;
+      break;
+    }
+    case GestureState::STARTED:
+    {
+      Actor* feededActor = mFeededActor.GetActor();
+      if(feededActor && CheckGestureDetector(&tapEvent, feededActor, mRenderTask) && mPossibleProcessed)
+      {
+        Vector2 actorCoords;
+        feededActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, tapEvent.point.x, tapEvent.point.y);
+
+        SetDetected(true);
+        Internal::TapGesturePtr tap(new Internal::TapGesture(tapEvent.state));
+        tap->SetTime(tapEvent.time);
+        tap->SetNumberOfTaps(tapEvent.numberOfTaps);
+        tap->SetNumberOfTouches(tapEvent.numberOfTouches);
+        tap->SetScreenPoint(tapEvent.point);
+        tap->SetLocalPoint(actorCoords);
+        tap->SetSourceType(tapEvent.sourceType);
+        tap->SetSourceData(tapEvent.sourceData);
+
+        Dali::Actor actorHandle(feededActor);
+        EmitTapGestureSignal(actorHandle, Dali::TapGesture(tap.Get()));
+        mPossibleProcessed = false;
+      }
+      break;
+    }
+    case GestureState::CANCELLED:
+    {
+      mPossibleProcessed = false;
+      break;
+    }
+    case GestureState::CONTINUING:
+    {
+      DALI_ABORT("Incorrect state received from Integration layer: CONTINUING\n");
+      break;
+    }
+    case GestureState::FINISHED:
+    {
+      DALI_ABORT("Incorrect state received from Integration layer: FINISHED\n");
+      break;
+    }
+    case GestureState::CLEAR:
+    {
+      DALI_ABORT("Incorrect state received from Integration layer: CLEAR\n");
+      break;
+    }
+  }
 }
 
 } // namespace Internal

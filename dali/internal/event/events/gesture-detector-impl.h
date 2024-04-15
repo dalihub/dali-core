@@ -20,6 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/events/actor-observer.h>
+#include <dali/internal/event/events/gesture-event.h>
+#include <dali/internal/event/events/gesture-recognizer.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture-detector.h>
@@ -41,6 +45,7 @@ class GestureEventProcessor;
 using GestureDetectorPtr            = IntrusivePtr<GestureDetector>;
 using GestureDetectorContainer      = std::vector<GestureDetector*>;
 using GestureDetectorActorContainer = std::vector<Actor*>;
+using GestureRecognizerPtr          = IntrusivePtr<GestureRecognizer>;
 
 /**
  * This is a type trait that should be used by deriving gesture detectors for their container type.
@@ -54,7 +59,7 @@ struct DerivedGestureDetectorContainer
 /**
  * @copydoc Dali::GestureDetector
  */
-class GestureDetector : public Object, public Object::Observer
+class GestureDetector : public Object, public Object::Observer, public ConnectionTracker
 {
 public:
   /**
@@ -83,9 +88,9 @@ public:
   Dali::Actor GetAttachedActor(size_t index) const;
 
   /**
-   * @copydoc Dali::GestureDetector::FeedTouch()
+   * @copydoc Dali::GestureDetector::HandleEvent()
    */
-  bool FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch);
+  bool HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch);
 
   /**
    * Returns a const reference to the container of attached actor pointers.
@@ -113,6 +118,11 @@ public:
   bool IsAttached(Actor& actor) const;
 
   /**
+   * @brief This method that cancels all other gesture detectors except the current gesture detector
+   */
+  void CancelAllOtherGestureDetectors();
+
+  /**
    * @brief Returns whether the gesture was detected.
    * @return true, if the gesture was detected, false otherwise.
    */
@@ -123,6 +133,22 @@ public:
    * @param detected Whether gesture detected.
    */
   void SetDetected(bool detected);
+
+  /**
+   * gesture-detector meets the parameters of the current gesture.
+   *
+   * @param[in]  gestureEvent The gesture event.
+   * @param[in]  actor        The actor that has been gestured.
+   * @param[in]  renderTask   The renderTask.
+   *
+   * @return true, if the detector meets the parameters, false otherwise.
+   */
+  virtual bool CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask) = 0;
+
+  /**
+   * @brief This is canceling the ongoing gesture recognition process.
+   */
+  virtual void CancelProcessing() = 0;
 
 protected: // Creation & Destruction
   /**
@@ -181,12 +207,37 @@ private:
    */
   virtual void OnActorDestroyed(Object& object) = 0;
 
+  /**
+   * @brief Callback for TouchedSignal signal
+   *
+   * @param actor The actor
+   * @param touch The touch event that has occurred
+   */
+  virtual bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) = 0;
+
+  /**
+   * @brief Delivers touch events to each detector.
+   * This is an API that is called by FeedTouch and recognizes gestures directly from the Detector without going through the Reconizer.
+   *
+   * @param scene The scene
+   * @param event The touch event that has occurred
+   */
+  virtual void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) = 0;
+
+  /**
+   * @brief Clears the detector.
+   */
+  void Clear();
+
 protected:
   GestureType::Value            mType;                  ///< The gesture detector will detect this type of gesture.
   GestureDetectorActorContainer mAttachedActors;        ///< Object::Observer is used to provide weak-pointer behaviour
   GestureDetectorActorContainer mPendingAttachActors;   ///< Object::Observer is used to provide weak-pointer behaviour
   GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.
-  bool mIsDetected : 1;                                 ///< Whether gesture detected.
+  ActorObserver                 mFeededActor;           ///< The Actor that feeds touch events
+  RenderTaskPtr                 mRenderTask;            ///< The render task used to generate this touch event.
+  GestureRecognizerPtr          mGestureRecognizer;     ///< The gesture recognizer
+  bool                          mIsDetected : 1;        ///< Whether gesture detected.
 };
 
 } // namespace Internal

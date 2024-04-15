@@ -486,6 +486,10 @@ struct TouchEventProcessor::Impl
               for(; rIter != processor.mCandidateActorLists.rend(); rIter++)
               {
                 Actor* actorImpl(*rIter);
+                if(actorImpl == interceptedActor)
+                {
+                  break;
+                }
                 EmitTouchSignals(actorImpl, *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
               }
             }
@@ -502,14 +506,32 @@ struct TouchEventProcessor::Impl
             // Let's propagate touch events from the intercepted actor or start propagating touch events from the leaf actor.
             localVars.consumedActor = EmitGeoTouchSignals(interceptedActor ? processor.mInterceptedActorLists : processor.mCandidateActorLists, localVars.touchEventHandle);
 
-            // If consumed, the actors who previously received the touch are interrupted, indicating that the touch has been consumed by another actor.
-            if(localVars.consumedActor && localVars.primaryPointState != PointState::DOWN)
+            if(localVars.consumedActor)
             {
-              std::list<Dali::Internal::Actor*>::reverse_iterator rIter = std::find(processor.mCandidateActorLists.rbegin(), processor.mCandidateActorLists.rend(), localVars.consumedActor);
-              for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
+              // If consumed, the actors who previously received the touch are interrupted, indicating that the touch has been consumed by another actor.
+              // backworkd
+              if(localVars.primaryPointState != PointState::DOWN)
               {
-                Actor* actorImpl(*rIter);
-                EmitTouchSignals(actorImpl, *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+                std::list<Dali::Internal::Actor*>::reverse_iterator rIter = std::find(processor.mCandidateActorLists.rbegin(), processor.mCandidateActorLists.rend(), localVars.consumedActor);
+                if(rIter != processor.mCandidateActorLists.rend())
+                {
+                  for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
+                  {
+                    Actor* actorImpl(*rIter);
+                    EmitTouchSignals(actorImpl, *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+                  }
+                }
+              }
+
+              //forward
+              std::list<Dali::Internal::Actor*>::iterator iter = std::find(processor.mCandidateActorLists.begin(), processor.mCandidateActorLists.end(), localVars.consumedActor);
+              if(iter != processor.mCandidateActorLists.end())
+              {
+                for(++iter; iter != processor.mCandidateActorLists.end(); ++iter)
+                {
+                  Actor* actorImpl(*iter);
+                  EmitTouchSignals(actorImpl, *localVars.currentRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+                }
               }
             }
           }

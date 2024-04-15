@@ -344,11 +344,12 @@ void LongPressGestureProcessor::OnGesturedActorStageDisconnection()
 bool LongPressGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
   DALI_ASSERT_DEBUG(mCurrentLongPressEvent);
-
-  LongPressGestureDetector* longPressDetector(static_cast<LongPressGestureDetector*>(detector));
-
-  return (longPressDetector->GetMinimumTouchesRequired() <= mCurrentLongPressEvent->numberOfTouches) &&
-         (longPressDetector->GetMaximumTouchesRequired() >= mCurrentLongPressEvent->numberOfTouches);
+  bool ret = false;
+  if(detector)
+  {
+    ret = detector->CheckGestureDetector(mCurrentLongPressEvent, actor, mCurrentRenderTask);
+  }
+  return ret;
 }
 
 void LongPressGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)

@@ -190,6 +190,29 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   }
 }
 
+void LongPressGestureRecognizer::CancelEvent()
+{
+  if(mState != CLEAR)
+  {
+    if(mTimerId != 0 && ThreadLocalStorage::Created())
+    {
+      Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
+      platformAbstraction.CancelTimer(mTimerId);
+    }
+    if(mState == FINISHED)
+    {
+      EmitGesture(GestureState::FINISHED);
+    }
+    else
+    {
+      EmitGesture(GestureState::CANCELLED);
+    }
+    mTouchPositions.clear();
+    mTimerId = 0;
+    mState = CLEAR;
+  }
+}
+
 void LongPressGestureRecognizer::Update(const GestureRequest& request)
 {
   const LongPressGestureRequest& longPress = static_cast<const LongPressGestureRequest&>(request);

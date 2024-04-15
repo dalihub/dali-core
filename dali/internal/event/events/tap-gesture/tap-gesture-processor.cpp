@@ -110,6 +110,7 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
   {
     case GestureState::POSSIBLE:
     {
+      ResetActor();
       // Do a hit test and if an actor has been hit then save to see if tap event is still valid on a tap( same actor being hit )
       HitTestAlgorithm::Results hitTestResults;
       if(HitTest(scene, tapEvent.point, hitTestResults))
@@ -119,10 +120,6 @@ void TapGestureProcessor::Process(Scene& scene, const TapGestureEvent& tapEvent)
 
         // Indicate that we've processed a touch down. Bool should be sufficient as a change in actor will result in a cancellation
         mPossibleProcessed = true;
-      }
-      else
-      {
-        ResetActor();
       }
       break;
     }
@@ -289,6 +286,11 @@ void TapGestureProcessor::SetRecognizerTime(uint32_t time)
   }
 }
 
+uint32_t TapGestureProcessor::GetRecognizerTime() const
+{
+  return mRecognizerTime;
+}
+
 void TapGestureProcessor::SetMaximumMotionAllowedDistance(float distance)
 {
   if(distance < 0.0f)
@@ -307,6 +309,11 @@ void TapGestureProcessor::SetMaximumMotionAllowedDistance(float distance)
       tapRecognizer->SetMaximumMotionAllowedDistance(distance);
     }
   }
+}
+
+float TapGestureProcessor::GetMaximumMotionAllowedDistance() const
+{
+  return mMaximumMotionAllowedDistance;
 }
 
 void TapGestureProcessor::UpdateDetection()
@@ -342,17 +349,24 @@ void TapGestureProcessor::UpdateDetection()
 bool TapGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
   DALI_ASSERT_DEBUG(mCurrentTapEvent);
-
-  TapGestureDetector* tapDetector(static_cast<TapGestureDetector*>(detector));
-
-  return (tapDetector->GetMinimumTapsRequired() <= mCurrentTapEvent->numberOfTaps) && (tapDetector->GetTouchesRequired() == mCurrentTapEvent->numberOfTouches);
+  bool ret = false;
+  if(detector)
+  {
+    ret = detector->CheckGestureDetector(mCurrentTapEvent, actor, nullptr);
+  }
+  return ret;
 }
 
 void TapGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)
 {
   DALI_ASSERT_DEBUG(mCurrentTapEvent);
+  ResetActor();
 
   EmitTapSignal(actor, gestureDetectors, *mCurrentTapEvent, actorCoordinates);
+  if(actor->OnScene())
+  {
+    SetActor(actor);
+  }
 }
 
 } // namespace Internal

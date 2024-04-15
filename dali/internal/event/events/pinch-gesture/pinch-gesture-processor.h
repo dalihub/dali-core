@@ -103,6 +103,24 @@ public: // To be called by GestureEventProcessor
    */
   void GestureDetectorUpdated(PinchGestureDetector* gestureDetector);
 
+  /**
+   * @brief Gets the minimum distance to start a pinch
+   * @return The distance in pixels
+   */
+  float GetMinimumPinchDistance() const;
+
+  /**
+   * @brief Gets the minimum touch events required before a pinch can be started
+   * @return The number of touch events
+   */
+  uint32_t GetMinimumTouchEvents() const;
+
+  /**
+   * @brief Gets the minimum touch events required after a pinch started
+   * @return The number of touch events
+   */
+  uint32_t GetMinimumTouchEventsAfterStart() const;
+
 private:
   // Undefined
   PinchGestureProcessor(const PinchGestureProcessor&);

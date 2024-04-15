@@ -480,11 +480,11 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
 
-  //Hit in the intersection red, green. Should pick the green actor since red is outside the scope of its parent.
+  //Hit in the intersection red, green. Should pick the red actor since it is an child of overlay.
   HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, true);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
-  DALI_TEST_CHECK(results.actor == green);
-  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
+  DALI_TEST_CHECK(results.actor == red);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the blue actor since it is an overlay.
   HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, true);

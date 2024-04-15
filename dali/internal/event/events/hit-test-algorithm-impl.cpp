@@ -195,7 +195,7 @@ inline bool IsOnOverlay(Actor* actor, Actor* currentActor)
 /**
  * Hit tests the given actor and updates the in/out variables appropriately
  */
-void HitTestActor(const RenderTask&         renderTask,
+bool HitTestActor(const RenderTask&         renderTask,
                   const Vector4&            rayOrigin,
                   const Vector4&            rayDir,
                   const float&              nearClippingPlane,
@@ -211,7 +211,8 @@ void HitTestActor(const RenderTask&         renderTask,
                   HitActor&                 hit,
                   bool                      isGeometry)
 {
-  if(clippingActor || hitCheck.IsActorHittable(&actor))
+  bool isClippingOrHittable = clippingActor || hitCheck.IsActorHittable(&actor);
+  if(isClippingOrHittable || isGeometry)
   {
     Vector3 size(actor.GetCurrentSize());
 
@@ -233,6 +234,21 @@ void HitTestActor(const RenderTask&         renderTask,
         // Check if cameraDepthDistance is between clipping plane
         if(cameraDepthDistance >= nearClippingPlane && cameraDepthDistance <= farClippingPlane)
         {
+          if(isGeometry && actor.GetParent())
+          {
+            // If the child touches outside the parent's size boundary, it should not be hit.
+            if(!overlayedActor && !clippingActor && !actor.GetParent()->IsLayer())
+            {
+              Vector2 hitPointLocal;
+              float   distance;
+              if(!(rayTest.SphereTest(*actor.GetParent(), rayOrigin, rayDir) &&
+                    rayTest.ActorTest(*actor.GetParent(), rayOrigin, rayDir, hitPointLocal, distance)))
+              {
+                return false;
+              }
+            }
+          }
+
           if(overlayHit && !overlayedActor)
           {
             // If we have already hit an overlay and current actor is not an overlay ignore current actor.
@@ -245,7 +261,7 @@ void HitTestActor(const RenderTask&         renderTask,
             }
 
             // If the hit actor does not want to hit, the hit-test continues.
-            if(hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime, isGeometry))
+            if(isClippingOrHittable && hitCheck.ActorRequiresHitResultCheck(&actor, point, hitPointLocal, eventTime, isGeometry))
             {
               hit.actor       = &actor;
               hit.hitPosition = hitPointLocal;
@@ -272,6 +288,7 @@ void HitTestActor(const RenderTask&         renderTask,
       }
     }
   }
+  return true;
 }
 
 /**
@@ -344,7 +361,10 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
   bool                     overlayedActor = overlayed || actor.IsOverlay();
 
   // If we are a clipping actor or hittable...
-  HitTestActor(renderTask, rayOrigin, rayDir, nearClippingPlane, farClippingPlane, hitCheck, rayTest, point, eventTime, clippingActor, overlayedActor, actor, overlayHit, hit, isGeometry);
+  if(!HitTestActor(renderTask, rayOrigin, rayDir, nearClippingPlane, farClippingPlane, hitCheck, rayTest, point, eventTime, clippingActor, overlayedActor, actor, overlayHit, hit, isGeometry))
+  {
+    return hit;
+  }
 
   // If current actor is clipping, and hit failed, We should not checkup child actors. Fast return
   // Only do this if we're using CLIP_CHILDREN though, as children whose drawing mode is OVERLAY_2D are not clipped when CLIP_TO_BOUNDING_BOX is selected.
@@ -362,18 +382,6 @@ HitActor HitTestWithinLayer(Actor&                                     actor,
   HitActor childHit;
   if(actor.GetChildCount() > 0)
   {
-    // If the child touches outside the parent's size boundary, it should not be hit.
-    if(isGeometry && !actor.IsLayer())
-    {
-      Vector2 hitPointLocal;
-      float   distance;
-      if(!(rayTest.SphereTest(actor, rayOrigin, rayDir) &&
-           rayTest.ActorTest(actor, rayOrigin, rayDir, hitPointLocal, distance)))
-      {
-        return hit;
-      }
-    }
-
     childHit.distance        = std::numeric_limits<float>::max();
     childHit.depth           = std::numeric_limits<int32_t>::min();
     ActorContainer& children = actor.GetChildrenInternal();
