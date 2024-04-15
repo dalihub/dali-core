@@ -301,12 +301,12 @@ public:
     mBakeColorCallSuccess                    = updateProxy.BakeColor(mActorId, vec4);
     mBakeScaleCallSuccess                    = updateProxy.BakeScale(mActorId, vec3);
 
-    mGetOrientationCallSuccess               = updateProxy.GetOrientation(mActorId, quat);
-    mSetOrientationCallSuccess               = updateProxy.SetOrientation(mActorId, quat);
-    mBakeOrientationCallSuccess              = updateProxy.BakeOrientation(mActorId, quat);
-    mGetWorldTransformCallSuccess            = updateProxy.GetWorldTransformAndSize(mActorId, vec3, vec3, quat, vec3);
-    mGetUpdateAreaCallSuccess                = updateProxy.GetUpdateArea(mActorId, vec4);
-    mSetUpdateAreaCallSuccess                = updateProxy.SetUpdateArea(mActorId, vec4);
+    mGetOrientationCallSuccess    = updateProxy.GetOrientation(mActorId, quat);
+    mSetOrientationCallSuccess    = updateProxy.SetOrientation(mActorId, quat);
+    mBakeOrientationCallSuccess   = updateProxy.BakeOrientation(mActorId, quat);
+    mGetWorldTransformCallSuccess = updateProxy.GetWorldTransformAndSize(mActorId, vec3, vec3, quat, vec3);
+    mGetUpdateAreaCallSuccess     = updateProxy.GetUpdateArea(mActorId, vec4);
+    mSetUpdateAreaCallSuccess     = updateProxy.SetUpdateArea(mActorId, vec4);
 
     return false;
   }
@@ -331,13 +331,13 @@ public:
     mBakeColorCallSuccess                    = false;
     mBakeScaleCallSuccess                    = false;
 
-    mSetOrientationCallSuccess               = false;
-    mGetOrientationCallSuccess               = false;
-    mBakeOrientationCallSuccess              = false;
+    mSetOrientationCallSuccess  = false;
+    mGetOrientationCallSuccess  = false;
+    mBakeOrientationCallSuccess = false;
 
-    mGetWorldTransformCallSuccess            = false;
-    mGetUpdateAreaCallSuccess                = false;
-    mSetUpdateAreaCallSuccess                = false;
+    mGetWorldTransformCallSuccess = false;
+    mGetUpdateAreaCallSuccess     = false;
+    mSetUpdateAreaCallSuccess     = false;
   }
 
   const uint32_t mActorId;
@@ -1118,7 +1118,7 @@ int UtcDaliFrameCallbackUpdateStatus(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(application.GetUpdateStatus(), Integration::KeepUpdating::STAGE_KEEP_RENDERING, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetUpdateStatus(), Integration::KeepUpdating::FRAME_UPDATE_CALLBACK, TEST_LOCATION);
 
   END_TEST;
 }

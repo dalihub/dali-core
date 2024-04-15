@@ -1024,9 +1024,8 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     mImpl->frameCallbackProcessor ||                   // ..a frame callback processor is existed OR
     gestureUpdated;                                    // ..a gesture property was updated
 
-  uint32_t keepUpdating          = 0;
-  bool     keepRendererRendering = false;
-  mImpl->renderingRequired       = false;
+  uint32_t keepUpdating    = 0;
+  mImpl->renderingRequired = false;
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
@@ -1075,7 +1074,10 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // Call the frame-callback-processor if set
     if(mImpl->frameCallbackProcessor)
     {
-      keepRendererRendering |= mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
+      if(mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds))
+      {
+        keepUpdating |= KeepUpdating::FRAME_UPDATE_CALLBACK;
+      }
     }
 
     // Update node hierarchy, apply constraints,
@@ -1117,7 +1119,9 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     if(mImpl->renderersAdded)
     {
       // Calculate how many render tasks we have in total
-      std::size_t numberOfRenderTasks = 0;
+      std::size_t numberOfRenderTasks        = 0;
+      std::size_t numberOfRenderInstructions = 0;
+      bool        renderContinuously         = false;
       for(auto&& scene : mImpl->scenes)
       {
         if(scene && scene->taskList)
@@ -1126,8 +1130,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
         }
       }
 
-      std::size_t numberOfRenderInstructions = 0;
-      mImpl->renderInstructionCapacity       = 0u;
+      mImpl->renderInstructionCapacity = 0u;
       for(auto&& scene : mImpl->scenes)
       {
         if(scene && scene->root && scene->taskList && scene->scene)
@@ -1146,13 +1149,13 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           // or keep rendering is requested
           if(!isAnimationRunning || animationActive || mImpl->renderingRequired || (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || sceneKeepUpdating)
           {
-            keepRendererRendering |= mImpl->renderTaskProcessor.Process(bufferIndex,
-                                                                        *scene->taskList,
-                                                                        *scene->root,
-                                                                        scene->sortedLayerList,
-                                                                        scene->scene->GetRenderInstructions(),
-                                                                        renderToFboEnabled,
-                                                                        isRenderingToFbo);
+            renderContinuously |= mImpl->renderTaskProcessor.Process(bufferIndex,
+                                                                     *scene->taskList,
+                                                                     *scene->root,
+                                                                     scene->sortedLayerList,
+                                                                     scene->scene->GetRenderInstructions(),
+                                                                     renderToFboEnabled,
+                                                                     isRenderingToFbo);
 
             mImpl->renderInstructionCapacity += scene->scene->GetRenderInstructions().GetCapacity();
             scene->scene->SetSkipRendering(false);
@@ -1164,6 +1167,11 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
           numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count(bufferIndex);
         }
+      }
+
+      if(renderContinuously)
+      {
+        keepUpdating |= KeepUpdating::RENDERER_CONTINUOUSLY;
       }
 
       DALI_LOG_INFO(gLogFilter, Debug::General, "Update: numberOfRenderTasks(%d), Render Instructions(%d)\n", numberOfRenderTasks, numberOfRenderInstructions);
@@ -1217,12 +1225,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // Check whether further updates are required
   keepUpdating |= KeepUpdatingCheck(elapsedSeconds);
 
-  if(keepRendererRendering)
-  {
-    keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
-  }
-
-  if(keepUpdating & KeepUpdating::STAGE_KEEP_RENDERING)
+  if(keepUpdating & (KeepUpdating::STAGE_KEEP_RENDERING | KeepUpdating::FRAME_UPDATE_CALLBACK | KeepUpdating::RENDERER_CONTINUOUSLY))
   {
     // Set dirty flags for next frame to continue rendering
     mImpl->nodeDirtyFlags |= RenderableUpdateFlags;
