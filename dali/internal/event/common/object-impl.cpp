@@ -64,7 +64,11 @@ void NotifyObservers(Object& object, Object::ObserverContainer& observers, Obser
   object.mObserverNotifying = true;
 
   // Copy observers to prevent changes to vector affecting loop iterator.
-  auto copiedObservers(observers);
+  Object::ObserverContainer copiedObservers;
+  for(auto&& item : observers)
+  {
+    copiedObservers.PushBack(item);
+  }
 
   object.mObserverRemoved = false;
 
@@ -79,7 +83,7 @@ void NotifyObservers(Object& object, Object::ObserverContainer& observers, Obser
     {
       // Notify only if the observer is still in the list.
       // It may be removed during the loop.
-      auto iter = std::find(observers.Begin(), observers.End(), item);
+      auto iter = observers.Find(item);
       if(iter != observers.End())
       {
         (item->*memberFunction)(object);
@@ -103,7 +107,7 @@ void Object::AddObserver(Observer& observer)
 
   // make sure an observer doesn't observe the same object twice
   // otherwise it will get multiple calls to OnSceneObjectAdd(), OnSceneObjectRemove() and ObjectDestroyed()
-  DALI_ASSERT_DEBUG(mObservers.End() == std::find(mObservers.Begin(), mObservers.End(), &observer));
+  DALI_ASSERT_DEBUG(mObservers.End() == mObservers.Find(&observer));
 
   mObservers.PushBack(&observer);
 }
@@ -114,17 +118,12 @@ void Object::RemoveObserver(Observer& observer)
   // TODO : Could we assert during notifying in future?
 
   // Find the observer...
-  const auto endIter = mObservers.End();
-  for(auto iter = mObservers.Begin(); iter != endIter; ++iter)
+  const auto iter = mObservers.Find(&observer);
+  if(iter != mObservers.End())
   {
-    if((*iter) == &observer)
-    {
-      mObserverRemoved = true;
-      mObservers.Erase(iter);
-      break;
-    }
+    mObserverRemoved = true;
+    mObservers.Erase(iter);
   }
-  DALI_ASSERT_DEBUG(endIter != mObservers.End());
 }
 
 bool Object::Supports(Capability capability) const

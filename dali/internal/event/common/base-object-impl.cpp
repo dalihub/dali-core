@@ -61,7 +61,7 @@ void BaseObject::Impl::AddObserver(Observer& observer)
 
   // make sure an observer doesn't observe the same object twice
   // otherwise it will get multiple calls to ObjectDestroyed()
-  DALI_ASSERT_DEBUG(mObservers.End() == std::find(mObservers.Begin(), mObservers.End(), &observer));
+  DALI_ASSERT_DEBUG(mObservers.End() == mObservers.Find(&observer));
 
   mObservers.PushBack(&observer);
 }
@@ -70,17 +70,11 @@ void BaseObject::Impl::RemoveObserver(Observer& observer)
 {
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying BaseObject::Impl::Observers");
 
-  // Find the observer...
-  const auto endIter = mObservers.End();
-  for(auto iter = mObservers.Begin(); iter != endIter; ++iter)
+  const auto iter = mObservers.Find(&observer);
+  if(iter != mObservers.End())
   {
-    if((*iter) == &observer)
-    {
-      mObservers.Erase(iter);
-      break;
-    }
+    mObservers.Erase(iter);
   }
-  DALI_ASSERT_DEBUG(endIter != mObservers.End());
 }
 
 } // namespace Dali

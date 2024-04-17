@@ -21,6 +21,9 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/object/base-object.h>
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/ordered-set.h>
+
 namespace Dali
 {
 /**
@@ -82,8 +85,8 @@ public:
   void RemoveObserver(Observer& observer);
 
 private:
-  BaseObject&             mBaseObject;
-  Dali::Vector<Observer*> mObservers;
+  BaseObject&                                    mBaseObject;
+  Dali::Integration::OrderedSet<Observer, false> mObservers; ///< All observing items (not owned).
 
   bool mObserverNotifying : 1; ///< Whether we are currently notifying observers.
 };

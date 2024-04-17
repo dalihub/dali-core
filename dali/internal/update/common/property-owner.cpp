@@ -47,7 +47,7 @@ void PropertyOwner::AddObserver(Observer& observer)
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying PropertyOwner::Observers");
 
   //Check for duplicates in debug builds
-  DALI_ASSERT_DEBUG(mObservers.End() == std::find(mObservers.Begin(), mObservers.End(), &observer));
+  DALI_ASSERT_DEBUG(mObservers.End() == mObservers.Find(&observer));
 
   mObservers.PushBack(&observer);
 }
@@ -56,15 +56,10 @@ void PropertyOwner::RemoveObserver(Observer& observer)
 {
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying PropertyOwner::Observers");
 
-  // Find the observer...
-  const ConstObserverIter endIter = mObservers.End();
-  for(ObserverIter iter = mObservers.Begin(); iter != endIter; ++iter)
+  const auto iter = mObservers.Find(&observer);
+  if(iter != mObservers.End())
   {
-    if((*iter) == &observer)
-    {
-      mObservers.Erase(iter);
-      break;
-    }
+    mObservers.Erase(iter);
   }
 }
 
