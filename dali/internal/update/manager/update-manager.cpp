@@ -645,7 +645,7 @@ void UpdateManager::RemoveShader( Shader* shader )
 
 void UpdateManager::AddRenderer( OwnerPointer< Renderer >& renderer )
 {
-  renderer->Initialize( mImpl->graphicsController );
+  renderer->Initialize( mImpl->graphicsController,  mImpl->graphicsAlgorithms.GetUniformBufferManager());
   mImpl->renderers.PushBack( renderer.Release() );
   mImpl->renderersAdded = true;
 }
@@ -1135,6 +1135,11 @@ void UpdateManager::SetDefaultSurfaceRect( const Rect<int32_t>& rect )
   mImpl->surfaceRectChanged = true;
 
   DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
+}
+
+void UpdateManager::SetDefaultSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& rtInfo)
+{
+  mImpl->defaultScene->SetSurfaceRenderTargetCreateInfo(rtInfo);
 }
 
 void UpdateManager::KeepRendering( float durationSeconds )

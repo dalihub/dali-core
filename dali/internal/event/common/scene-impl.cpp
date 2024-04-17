@@ -211,6 +211,15 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
 
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
+
+    Graphics::RenderTargetCreateInfo rtInfo{};
+    rtInfo
+      .SetSurface(mSurface)
+      .SetExtent({static_cast<uint32_t>(mSurface->GetPositionSize().width), static_cast<uint32_t>(mSurface->GetPositionSize().height)})
+      .SetPreTransform(0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT);
+
+    SetDefaultSurfaceRenderTargetCreateInfoMessage(updateManager, rtInfo);
+
     SetDefaultSurfaceRectMessage( updateManager, Rect<int32_t>( 0, 0, static_cast<int32_t>( mSurfaceSize.width ), static_cast<int32_t>( mSurfaceSize.height ) ) ); // truncated
 
     RenderTaskPtr defaultRenderTask = mRenderTaskList->GetTask( 0u );
@@ -230,6 +239,7 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
     defaultRenderTask->SetFrameBuffer( mFrameBuffer );
   }
 }
+
 
 Integration::RenderSurface* Scene::GetSurface() const
 {

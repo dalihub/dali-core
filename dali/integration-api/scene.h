@@ -188,7 +188,6 @@ public:
 
   /**
    * @brief Gets the rendering surface bound to the scene
-   *
    * @return The render surface
    */
   Integration::RenderSurface* GetSurface() const;

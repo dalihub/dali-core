@@ -85,7 +85,7 @@ public:
    *
    * @param[in] graphics The Graphics API
    */
-  void Initialize( Graphics::Controller& graphics );
+  void Initialize( Graphics::Controller& graphics, UniformBufferManager& uniformBufferManager);
 
   /**
    * Set the texture set for the renderer

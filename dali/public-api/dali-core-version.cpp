@@ -44,6 +44,7 @@ struct PrintVersion
 };
 PrintVersion CORE_VERSION;
 } // unnamed namespace
+
 #endif
 
 } // namespace Dali

@@ -458,6 +458,8 @@ public:
    */
   void SetDefaultSurfaceRect( const Rect<int>& rect );
 
+  void SetDefaultSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& rtInfo);
+
   /**
    * @copydoc Dali::Stage::KeepRendering()
    */
@@ -881,6 +883,18 @@ inline void SetDefaultSurfaceRectMessage( UpdateManager& manager, const Rect<int
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetDefaultSurfaceRect, rect );
 }
+
+inline void SetDefaultSurfaceRenderTargetCreateInfoMessage( UpdateManager& manager, const Graphics::RenderTargetCreateInfo& rtInfo  )
+{
+  typedef MessageValue1< UpdateManager, Graphics::RenderTargetCreateInfo > LocalType;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::SetDefaultSurfaceRenderTarget, rtInfo );
+}
+
 
 inline void KeepRenderingMessage( UpdateManager& manager, float durationSeconds )
 {

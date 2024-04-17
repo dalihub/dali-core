@@ -160,10 +160,10 @@ void Renderer::operator delete( void* ptr )
   gRendererMemoryPool.FreeThreadSafe( static_cast<Renderer*>( ptr ) );
 }
 
-void Renderer::Initialize( Graphics::Controller& graphicsController )
+void Renderer::Initialize( Graphics::Controller& graphicsController, UniformBufferManager& uniformBufferManager)
 {
   mGraphicsController = &graphicsController;
-
+  mUniformBufferManager = &uniformBufferManager;
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 }
 
