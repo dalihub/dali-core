@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_NOTIFICATION_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include <unordered_map>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/ordered-set.h>
+#include <dali/integration-api/ordered-set.h>
 #include <dali/internal/event/common/property-notifier.h>
 #include <dali/internal/event/common/scene-graph-notifier-interface-mapper.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -82,7 +82,7 @@ private:
   PropertyNotificationManager& operator=(const PropertyNotificationManager& rhs);
 
 private:
-  OrderedSet<PropertyNotification, false> mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
+  Integration::OrderedSet<PropertyNotification, false> mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
 };
 
 } // namespace Internal

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,17 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
-#include <dali/internal/common/ordered-set.h>
+#include <dali/integration-api/ordered-set.h>
 
-using namespace Dali::Internal;
+using namespace Dali;
+using namespace Dali::Integration;
 
-void utc_dali_internal_owner_set_startup(void)
+void utc_dali_internal_ordered_set_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_internal_owner_set_cleanup(void)
+void utc_dali_internal_ordered_set_cleanup(void)
 {
   test_return_value = TET_PASS;
 }

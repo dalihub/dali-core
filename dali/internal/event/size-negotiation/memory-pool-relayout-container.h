@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_RELAYOUT_CONTAINER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
+#include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-#include <dali/internal/common/ordered-set.h>
 
 namespace Dali
 {
@@ -124,7 +124,7 @@ private:
   bool Contains(const Dali::Actor& actor);
 
 private:
-  using RelayoutInfoContainer = Dali::Internal::OrderedSet<RelayoutInfo, false, RelayoutInfo::RelayoutInfoHash, RelayoutInfo::RelayoutInfoCompare>;
+  using RelayoutInfoContainer = Dali::Integration::OrderedSet<RelayoutInfo, false, RelayoutInfo::RelayoutInfoHash, RelayoutInfo::RelayoutInfoCompare>;
 
   RelayoutInfoContainer mRelayoutInfos; ///< The list of relayout infos
 
