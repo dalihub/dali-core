@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_PROPERTY_RESETTER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,12 @@ public:
    */
   ~PropertyResetterBase() override
   {
-    if(mPropertyOwner != nullptr)
+    if(DALI_LIKELY(mInitialized))
     {
-      mPropertyOwner->RemoveObserver(*this);
+      if(mPropertyOwner != nullptr)
+      {
+        mPropertyOwner->RemoveObserver(*this);
+      }
     }
   }
 
@@ -59,6 +62,9 @@ public:
    */
   void Initialize()
   {
+    DALI_ASSERT_ALWAYS(!mInitialized && "Dont call PropertyResetterBase::Initialize() twice");
+
+    mInitialized = true;
     mPropertyOwner->AddObserver(*this);
     mPropertyOwner->SetUpdated(true);
   }
@@ -162,6 +168,7 @@ protected:
     mBaseProperty(baseProperty),
     mRunning(ACTIVE),
     mActive(ACTIVE),
+    mInitialized(false),
     mDisconnected(false)
   {
   }
@@ -170,7 +177,8 @@ protected:
   PropertyBase*  mBaseProperty;  ///< The base property being animated or constrained
   int8_t         mRunning;       ///< Used to determine if we should finish or not, 2 if running, 1 if aging, 0 if stopped
   int8_t         mActive;        ///< 2 if active, 1 if aging, 0 if stopped
-  bool           mDisconnected;  ///< True if the property owner has been disconnected
+  bool           mInitialized : 1;
+  bool           mDisconnected : 1; ///< True if the property owner has been disconnected
 };
 
 class BakerResetter : public PropertyResetterBase
