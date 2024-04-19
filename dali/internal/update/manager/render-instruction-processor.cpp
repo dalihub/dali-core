@@ -194,6 +194,7 @@ inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatri
  * @param viewportSet Whether the viewport is set or not
  * @param viewport The viewport
  * @param cullingEnabled Whether frustum culling is enabled or not
+ * @param stopperNode Marker node that stops rendering(must be rendered)
  */
 inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
                                     uint32_t                  renderPass,
@@ -205,7 +206,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
                                     bool                      isLayer3d,
                                     bool                      viewportSet,
                                     const Viewport&           viewport,
-                                    bool                      cullingEnabled)
+                                    bool                      cullingEnabled,
+                                    Node*                     stopperNode)
 {
   bool    inside(true);
   Node*   node = renderable.mNode;
@@ -223,7 +225,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   bool hasRenderCallback = (rendererExist && renderable.mRenderer->GetRenderCallback());
 
   auto requiredInsideCheck = [&]() {
-    if(cullingEnabled &&
+    if(node != stopperNode &&
+       cullingEnabled &&
        !hasRenderCallback &&
        node->GetClippingMode() == ClippingMode::DISABLED &&
        rendererExist)
@@ -283,7 +286,10 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       const Renderer::OpacityType opacityType = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node)) : Renderer::OPAQUE;
 
       // We can skip render when node is not clipping and transparent
-      skipRender = (opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);
+      // We must not skip when node is a stopper
+      skipRender = (opacityType == Renderer::TRANSPARENT &&
+          node->GetClippingMode() == ClippingMode::DISABLED &&
+          node != stopperNode);
 
       isOpaque = (opacityType == Renderer::OPAQUE);
     }
@@ -371,6 +377,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
  * @param viewportSet Whether the viewport is set or not
  * @param viewport The viewport
  * @param cullingEnabled Whether frustum culling is enabled or not
+ * @param stopperNode Marker node that stops rendering(must be rendered)
  */
 inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex,
                                      uint32_t                  renderPass,
@@ -382,7 +389,8 @@ inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex
                                      bool                      isLayer3d,
                                      bool                      viewportSet,
                                      const Viewport&           viewport,
-                                     bool                      cullingEnabled)
+                                     bool                      cullingEnabled,
+                                     Node*                     stopperNode)
 {
   DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "AddRenderersToRenderList()\n");
 
@@ -398,7 +406,8 @@ inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex
                             isLayer3d,
                             viewportSet,
                             viewport,
-                            cullingEnabled);
+                            cullingEnabled,
+                            stopperNode);
   }
 }
 
@@ -574,6 +583,8 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
   Viewport viewport;
   bool     viewportSet = renderTask.QueryViewport(updateBufferIndex, viewport);
 
+  Node* stopperNode = renderTask.GetStopperNode();
+
   const SortedLayersIter endIter = sortedLayers.end();
   for(SortedLayersIter iter = sortedLayers.begin(); iter != endIter; ++iter)
   {
@@ -605,7 +616,8 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  isLayer3D,
                                  viewportSet,
                                  viewport,
-                                 cull);
+                                 cull,
+                                 stopperNode);
 
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
         SortRenderItems(updateBufferIndex, *renderList, layer, hasClippingNodes, isOrthographicCamera);
@@ -616,6 +628,11 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       }
 
       isRenderListAdded = true;
+
+      if(stopperNode && renderList->RenderUntil(stopperNode))
+      {
+        break;
+      }
     }
 
     if(!layer.overlayRenderables.Empty())
@@ -635,7 +652,8 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  isLayer3D,
                                  viewportSet,
                                  viewport,
-                                 cull);
+                                 cull,
+                                 stopperNode);
 
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.
         SortRenderItems(updateBufferIndex, *renderList, layer, false, isOrthographicCamera);
@@ -646,6 +664,11 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       }
 
       isRenderListAdded = true;
+
+      if(stopperNode && renderList->RenderUntil(stopperNode))
+      {
+        break;
+      }
     }
   }
 

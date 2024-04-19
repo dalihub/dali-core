@@ -256,6 +256,11 @@ public:
    */
   Actor GetSourceActor() const;
 
+  /**
+   * @brief Retrives stopper actor.
+   * @SINCE_2_3.23
+   * @return The actor that marks where to stop rendering.
+   */
   Actor GetStopperActor() const;
 
   /**
@@ -581,7 +586,12 @@ public:
    */
   uint32_t GetRenderTaskId() const;
 
-  void RenderUntil(Actor actor);
+  /**
+   * @brief Stop rendering from given actor. The actor is not included.
+   * @SINCE_2_3.23
+   * @param[in] stopperActor A marker to stop rendering.
+   */
+  void RenderUntil(Actor stopperActor);
 
 public: // Signals
   /**
