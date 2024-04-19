@@ -991,10 +991,6 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
 
       // generate graphics objects
       PrepareNodes( bufferIndex );
-      for(auto geom : mImpl->geometryContainer)
-      {
-        geom->Upload(mImpl->graphicsController); // Upload any outstanding buffers
-      }
 
       if( future )
       {

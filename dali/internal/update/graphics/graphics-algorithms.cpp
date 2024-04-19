@@ -62,6 +62,53 @@ constexpr float CLIP_MATRIX_DATA[] = {
 
 const Matrix CLIP_MATRIX( CLIP_MATRIX_DATA );
 
+// Helper to get the vertex input format
+Dali::Graphics::VertexInputFormat GetPropertyVertexFormat(Property::Type propertyType)
+{
+  Dali::Graphics::VertexInputFormat type{};
+
+  switch(propertyType)
+  {
+    case Property::BOOLEAN:
+    {
+      type = Dali::Graphics::VertexInputFormat::UNDEFINED; // type = GL_BYTE; @todo new type for this?
+      break;
+    }
+    case Property::INTEGER:
+    {
+      type = Dali::Graphics::VertexInputFormat::INTEGER; // (short)
+      break;
+    }
+    case Property::FLOAT:
+    {
+      type = Dali::Graphics::VertexInputFormat::FLOAT;
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR2;
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR3;
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      type = Dali::Graphics::VertexInputFormat::FVECTOR4;
+      break;
+    }
+    default:
+    {
+      type = Dali::Graphics::VertexInputFormat::UNDEFINED;
+    }
+  }
+
+  return type;
+}
+
+
 struct GraphicsDepthCompareOp
 {
   constexpr explicit GraphicsDepthCompareOp( DepthFunction::Type compareOp )
@@ -723,18 +770,18 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
 
   for (auto &&vertexBuffer : geometry->GetVertexBuffers())
   {
+    // update vertex buffer if necessary
+    vertexBuffer->Update(mGraphicsController);
+
     auto gpuBuffer = vertexBuffer->GetGpuBuffer();
     auto graphicsBuffer = gpuBuffer->GetGraphicsObject();
     vertexBuffers.push_back(graphicsBuffer);
     auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
 
-    // update vertex buffer if necessary
-    vertexBuffer->Update(mGraphicsController);
-
+    auto& vertexFormat = *vertexBuffer->GetFormat();
     // store buffer binding
     vi.bufferBindings
-      .emplace_back(vertexBuffer->GetFormat()
-                                ->size, VertexInputRate::PER_VERTEX);
+      .emplace_back(vertexFormat.size, VertexInputRate::PER_VERTEX);
 
     for (auto i = 0u; i < attributeCountInForBuffer; ++i)
     {
@@ -742,9 +789,9 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
       vi.attributes
         .emplace_back(
           reflection.GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
-          bindingIndex, (vertexBuffer->GetFormat()
-                                     ->components[i]).offset,
-          VertexInputFormat::UNDEFINED);
+          bindingIndex,
+          vertexFormat.components[i].offset,
+          GetPropertyVertexFormat(vertexFormat.components[i].type));
 
     }
     bindingIndex++;

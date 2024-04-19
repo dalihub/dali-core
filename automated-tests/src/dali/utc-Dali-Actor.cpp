@@ -2931,7 +2931,7 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
     int textureIndex=0;
     for( auto& texCmd : texCmds )
     {
-      const auto& textures = texCmd->bindTextures.textureBindings;
+      const auto& textures = texCmd->data.bindTextures.textureBindings;
       if( textures.size() > 0 )
       {
         DALI_TEST_CHECK(textures[0].texture == createdTextures[textureIndex] );
@@ -2962,7 +2962,7 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
     int textureIndex=0;
     for( auto& texCmd : texCmds )
     {
-      const auto& textures = texCmd.bindTextures.textureBindings;
+      const auto& textures = texCmd.data.bindTextures.textureBindings;
       if( textures.size() > 0 )
       {
         DALI_TEST_CHECK(textures[0].texture == createdTextures[expectedTextures[textureIndex]] );
