@@ -42,6 +42,7 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/graphics-sync-abstraction.h
    ${platform_abstraction_src_dir}/input-options.h
    ${platform_abstraction_src_dir}/lockless-buffer.h
+   ${platform_abstraction_src_dir}/ordered-set.h
    ${platform_abstraction_src_dir}/pixel-data-integ.h
    ${platform_abstraction_src_dir}/platform-abstraction.h
    ${platform_abstraction_src_dir}/profiling.h

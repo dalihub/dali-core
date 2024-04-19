@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RELAYOUT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 #include <memory> // for unique_ptr
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-#include <dali/internal/common/ordered-set.h>
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
@@ -146,7 +146,7 @@ public: // CALLBACKS
   void OnObjectDestroyed(const Dali::RefObject* object);
 
 private:
-  using RawActorList = Dali::Internal::OrderedSet<Dali::Internal::Actor, false>;
+  using RawActorList = Dali::Integration::OrderedSet<Dali::Internal::Actor, false>;
 
   /**
    * @brief Request for relayout. Relays out whole scene.
