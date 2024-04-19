@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -474,9 +474,10 @@ void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)
   SetActiveStatus();
 }
 
-void RenderTask::PropertyOwnerDisconnected(BufferIndex /*updateBufferIndex*/, PropertyOwner& owner)
+PropertyOwner::Observer::NotifyReturnType RenderTask::PropertyOwnerDisconnected(BufferIndex /*updateBufferIndex*/, PropertyOwner& owner)
 {
   mActive = false; // if either source or camera disconnected, we're no longer active
+  return PropertyOwner::Observer::NotifyReturnType::KEEP_OBSERVING;
 }
 
 void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)

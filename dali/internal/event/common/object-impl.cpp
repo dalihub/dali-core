@@ -55,6 +55,41 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_OBJ
 
 constexpr Property::Index MAX_PER_CLASS_PROPERTY_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX;
 
+/// Helper to notify observers
+using ObserverNotifyMethod = void (Object::Observer::*)(Object&);
+
+void NotifyObservers(Object& object, Object::ObserverContainer& observers, ObserverNotifyMethod memberFunction)
+{
+  // Guard Add/Remove observer during observer notifying.
+  object.mObserverNotifying = true;
+
+  // Copy observers to prevent changes to vector affecting loop iterator.
+  auto copiedObservers(observers);
+
+  object.mObserverRemoved = false;
+
+  // Notification for observers
+  for(auto&& item : copiedObservers)
+  {
+    if(!object.mObserverRemoved)
+    {
+      (item->*memberFunction)(object);
+    }
+    else
+    {
+      // Notify only if the observer is still in the list.
+      // It may be removed during the loop.
+      auto iter = std::find(observers.Begin(), observers.End(), item);
+      if(iter != observers.End())
+      {
+        (item->*memberFunction)(object);
+      }
+    }
+  }
+
+  object.mObserverNotifying = false;
+}
+
 } // unnamed namespace
 
 IntrusivePtr<Object> Object::New()
@@ -64,6 +99,8 @@ IntrusivePtr<Object> Object::New()
 
 void Object::AddObserver(Observer& observer)
 {
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying Object::Observers");
+
   // make sure an observer doesn't observe the same object twice
   // otherwise it will get multiple calls to OnSceneObjectAdd(), OnSceneObjectRemove() and ObjectDestroyed()
   DALI_ASSERT_DEBUG(mObservers.End() == std::find(mObservers.Begin(), mObservers.End(), &observer));
@@ -73,12 +110,16 @@ void Object::AddObserver(Observer& observer)
 
 void Object::RemoveObserver(Observer& observer)
 {
+  // Note : We allow to remove observer during notifying.
+  // TODO : Could we assert during notifying in future?
+
   // Find the observer...
   const auto endIter = mObservers.End();
   for(auto iter = mObservers.Begin(); iter != endIter; ++iter)
   {
     if((*iter) == &observer)
     {
+      mObserverRemoved = true;
       mObservers.Erase(iter);
       break;
     }
@@ -971,17 +1012,23 @@ Object::Object(const SceneGraph::PropertyOwner* sceneObject)
   mUpdateObject(sceneObject),
   mTypeInfo(nullptr),
   mConstraints(nullptr),
-  mPropertyNotifications(nullptr)
+  mPropertyNotifications(nullptr),
+  mObserverNotifying(false),
+  mObserverRemoved(false)
 {
 }
 
 Object::~Object()
 {
-  // Notification for observers
-  for(auto&& item : mObservers)
-  {
-    item->ObjectDestroyed(*this);
-  }
+  NotifyObservers(*this, mObservers, &Object::Observer::ObjectDestroyed);
+
+  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
+  // If someone call AddObserver after this, assert.
+  mObserverNotifying = true;
+
+  // Remove all observers
+  mObserverRemoved = true;
+  mObservers.Clear();
 
   // Disable property notifications in scene graph
   DisablePropertyNotifications();
@@ -1001,11 +1048,9 @@ Object::~Object()
 
 void Object::OnSceneObjectAdd()
 {
-  // Notification for observers
-  for(auto&& item : mObservers)
-  {
-    item->SceneObjectAdded(*this);
-  }
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Should not be call OnSceneObjectAdd while notifying observers");
+
+  NotifyObservers(*this, mObservers, &Object::Observer::SceneObjectAdded);
 
   // enable property notifications in scene graph
   EnablePropertyNotifications();
@@ -1013,11 +1058,9 @@ void Object::OnSceneObjectAdd()
 
 void Object::OnSceneObjectRemove()
 {
-  // Notification for observers
-  for(auto&& item : mObservers)
-  {
-    item->SceneObjectRemoved(*this);
-  }
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Should not be call OnSceneObjectRemove while notifying observers");
+
+  NotifyObservers(*this, mObservers, &Object::Observer::SceneObjectRemoved);
 
   // disable property notifications in scene graph
   DisablePropertyNotifications();

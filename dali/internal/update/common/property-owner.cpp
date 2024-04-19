@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ PropertyOwner::~PropertyOwner()
 
 void PropertyOwner::AddObserver(Observer& observer)
 {
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying PropertyOwner::Observers");
+
   //Check for duplicates in debug builds
   DALI_ASSERT_DEBUG(mObservers.End() == std::find(mObservers.Begin(), mObservers.End(), &observer));
 
@@ -52,13 +54,14 @@ void PropertyOwner::AddObserver(Observer& observer)
 
 void PropertyOwner::RemoveObserver(Observer& observer)
 {
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying PropertyOwner::Observers");
+
   // Find the observer...
   const ConstObserverIter endIter = mObservers.End();
   for(ObserverIter iter = mObservers.Begin(); iter != endIter; ++iter)
   {
     if((*iter) == &observer)
     {
-      // erase it
       mObservers.Erase(iter);
       break;
     }
@@ -72,13 +75,19 @@ bool PropertyOwner::IsObserved()
 
 void PropertyOwner::Destroy()
 {
+  // Guard Add/Remove observer during observer notifying.
+  mObserverNotifying = true;
+
   // Notification for observers
-  const ConstObserverIter endIter = mObservers.End();
-  for(ConstObserverIter iter = mObservers.Begin(); iter != endIter; ++iter)
+  for(auto&& item : mObservers)
   {
-    (*iter)->PropertyOwnerDestroyed(*this);
+    item->PropertyOwnerDestroyed(*this);
   }
 
+  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
+  // If someone call AddObserver / RemoveObserver after this, assert.
+
+  // Remove all observers
   mObservers.Clear();
 
   // Remove all constraints when disconnected from scene-graph
@@ -88,27 +97,47 @@ void PropertyOwner::Destroy()
 
 void PropertyOwner::ConnectToSceneGraph()
 {
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Should not be call ConnectToSceneGraph while notifying PropertyOwner::Observers");
+
   mIsConnectedToSceneGraph = true;
   SetUpdated(true);
 
+  // Guard Add/Remove observer during observer notifying.
+  mObserverNotifying = true;
+
   // Notification for observers
-  const ConstObserverIter endIter = mObservers.End();
-  for(ConstObserverIter iter = mObservers.Begin(); iter != endIter; ++iter)
+  for(auto&& item : mObservers)
   {
-    (*iter)->PropertyOwnerConnected(*this);
+    item->PropertyOwnerConnected(*this);
   }
+
+  mObserverNotifying = false;
 }
 
 void PropertyOwner::DisconnectFromSceneGraph(BufferIndex updateBufferIndex)
 {
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Should not be call DisconnectFromSceneGraph while notifying PropertyOwner::Observers");
+
   mIsConnectedToSceneGraph = false;
 
+  // Guard Add/Remove observer during observer notifying.
+  mObserverNotifying = true;
+
   // Notification for observers
-  const ConstObserverIter endIter = mObservers.End();
-  for(ConstObserverIter iter = mObservers.Begin(); iter != endIter; ++iter)
+  for(auto iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter;)
   {
-    (*iter)->PropertyOwnerDisconnected(updateBufferIndex, *this);
+    auto returnValue = (*iter)->PropertyOwnerDisconnected(updateBufferIndex, *this);
+    if(returnValue == Observer::KEEP_OBSERVING)
+    {
+      ++iter;
+    }
+    else
+    {
+      iter = mObservers.Erase(iter);
+    }
   }
+
+  mObserverNotifying = false;
 
   // Remove all constraints when disconnected from scene-graph
   mConstraints.Clear();
@@ -179,7 +208,8 @@ void PropertyOwner::RemovePostConstraint(ConstraintBase* constraint)
 
 PropertyOwner::PropertyOwner()
 : mUpdated(false),
-  mIsConnectedToSceneGraph(false)
+  mIsConnectedToSceneGraph(false),
+  mObserverNotifying(false)
 {
 }
 

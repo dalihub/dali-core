@@ -85,8 +85,9 @@ private: // From SceneGraph::PropertyOwner::Observer
   /**
    * @copydoc SceneGraph::PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  void PropertyOwnerDisconnected(BufferIndex updateBufferIndex, SceneGraph::PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, SceneGraph::PropertyOwner& owner) override
   { /* Nothing to do */
+    return NotifyReturnType::KEEP_OBSERVING;
   }
 
   /**

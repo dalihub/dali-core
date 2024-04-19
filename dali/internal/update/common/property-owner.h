@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,13 @@ public:
   class Observer
   {
   public:
+    enum NotifyReturnType
+    {
+      STOP_OBSERVING,
+      KEEP_OBSERVING,
+    };
+
+  public:
     /**
      * Called when the observable object is connected to the scene graph.
      * @param[in] owner A reference to the connected PropertyOwner
@@ -60,8 +67,10 @@ public:
      * Called when the observable object is disconnected from the scene graph.
      * @param[in] currentBufferIndex The buffer to reset.
      * @param[in] owner A reference to the disconnected PropertyOwner
+     * @return NotifyReturnType::STOP_OBSERVING if we will not observe this object after this called
+     *         NotifyReturnType::KEEP_OBSERVING if we will observe this object after this called.
      */
-    virtual void PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) = 0;
+    virtual NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) = 0;
 
     /**
      * Called shortly before the observable object is destroyed.
@@ -284,8 +293,10 @@ private:
 
   ObserverContainer mObservers; ///< Container of observer raw-pointers (not owned)
 
-  ConstraintOwnerContainer mConstraints; ///< Container of owned constraints
+  ConstraintOwnerContainer mConstraints;     ///< Container of owned constraints
   ConstraintOwnerContainer mPostConstraints; ///< Container of owned constraints
+
+  bool mObserverNotifying : 1; ///< Whether we are currently notifying observers.
 };
 
 } // namespace SceneGraph
