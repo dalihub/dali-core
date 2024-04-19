@@ -1130,7 +1130,8 @@ void UpdateManager::SetDefaultSurfaceRect( const Rect<int32_t>& rect )
 {
   mImpl->surfaceRectChanged = true;
 
-  DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
+  mImpl->defaultScene->SetSurfaceRect(rect);
+  //DALI_ASSERT_ALWAYS( true && "GRAPHICS: FIXME" );
 }
 
 void UpdateManager::SetDefaultSurfaceRenderTarget(const Graphics::RenderTargetCreateInfo& rtInfo)
