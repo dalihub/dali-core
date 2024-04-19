@@ -117,6 +117,11 @@ Actor* RenderTask::GetSourceActor() const
   return mSourceActor.GetActor();
 }
 
+Actor* RenderTask::GetStopperActor() const
+{
+  return mStopperActor.GetActor();
+}
+
 void RenderTask::SetExclusive(bool exclusive)
 {
   if(mExclusive != exclusive)
@@ -638,6 +643,27 @@ int32_t RenderTask::GetOrderIndex() const
 uint32_t RenderTask::GetRenderTaskId() const
 {
   return mRenderTaskId;
+}
+
+void RenderTask::RenderUntil(Actor* actor)
+{
+  Actor* target = mSourceActor.GetActor();
+  DALI_ASSERT_ALWAYS((target && actor)
+      && "RenderTask::RenderUntil() has empty actors.");
+  DALI_ASSERT_ALWAYS((target->GetHierarchyDepth() < actor->GetHierarchyDepth())
+      && "RenderTask::RenderUntil() has reversed hierarchy.");
+
+  Actor* parent = actor;
+  while(parent != target && !(parent->IsLayer()))
+  {
+    parent = parent->GetParent();
+  }
+
+  if(parent == target && GetRenderTaskSceneObject())
+  {
+    mStopperActor.SetActor(actor);
+    SetStopperNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), &actor->GetNode());
+  }
 }
 
 const SceneGraph::RenderTask* RenderTask::GetRenderTaskSceneObject() const
