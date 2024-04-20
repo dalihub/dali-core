@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,18 +126,16 @@ void ActorParentImpl::Remove(Actor& child, bool notify)
   ActorIter end = mChildren->end();
   for(ActorIter iter = mChildren->begin(); iter != end; ++iter)
   {
-    ActorPtr actor = (*iter);
-
-    if(actor.Get() == &child)
+    if((*iter).Get() == &child)
     {
       // Keep handle for OnChildRemove notification
-      removed = actor;
+      removed = (*iter);
 
       // Do this first, since user callbacks from within SetParent() may need to add the child
       mChildren->erase(iter);
 
-      DALI_ASSERT_DEBUG(actor->GetParent() == &mOwner);
-      actor->SetParent(nullptr, notify);
+      DALI_ASSERT_DEBUG(removed->GetParent() == &mOwner);
+      removed->SetParent(nullptr, notify);
 
       break;
     }
@@ -332,8 +330,10 @@ void ActorParentImpl::RaiseChildToTop(Actor& child)
     auto iter = std::find(mChildren->begin(), mChildren->end(), &child);
     if(iter != mChildren->end())
     {
+      ActorPtr childPtr(&child); // ensure actor remains referenced.
+
       mChildren->erase(iter);
-      mChildren->push_back(ActorPtr(&child));
+      mChildren->push_back(childPtr);
       changed = true;
     }
   }
@@ -348,11 +348,11 @@ void ActorParentImpl::LowerChildToBottom(Actor& child)
   bool changed = false;
   if(mChildren && !mChildren->empty() && mChildren->front() != &child) // If not already at bottom,
   {
-    ActorPtr childPtr(&child); // ensure actor remains referenced.
-
     auto iter = std::find(mChildren->begin(), mChildren->end(), &child);
     if(iter != mChildren->end())
     {
+      ActorPtr childPtr(&child); // ensure actor remains referenced.
+
       mChildren->erase(iter);
       mChildren->insert(mChildren->begin(), childPtr);
       changed = true;
@@ -369,12 +369,12 @@ void ActorParentImpl::RaiseChildAbove(Actor& child, Actor& target)
   bool raised = false;
   if(mChildren && !mChildren->empty() && mChildren->back() != &child && target.GetParent() == child.GetParent()) // If not already at top
   {
-    ActorPtr childPtr(&child); // ensure actor actor remains referenced.
-
     auto targetIter = std::find(mChildren->begin(), mChildren->end(), &target);
     auto childIter  = std::find(mChildren->begin(), mChildren->end(), &child);
     if(childIter < targetIter)
     {
+      ActorPtr childPtr(&child); // ensure actor actor remains referenced.
+
       mChildren->erase(childIter);
       // Erasing early invalidates the targetIter. (Conversely, inserting first may also
       // invalidate actorIter)
@@ -397,13 +397,13 @@ void ActorParentImpl::LowerChildBelow(Actor& child, Actor& target)
   // If not already at bottom
   if(mChildren && !mChildren->empty() && mChildren->front() != &child && target.GetParent() == child.GetParent())
   {
-    ActorPtr childPtr(&child); // ensure actor actor remains referenced.
-
     auto targetIter = std::find(mChildren->begin(), mChildren->end(), &target);
     auto childIter  = std::find(mChildren->begin(), mChildren->end(), &child);
 
     if(childIter > targetIter)
     {
+      ActorPtr childPtr(&child); // ensure actor actor remains referenced.
+
       mChildren->erase(childIter); // actor only invalidates iterators at or after actor point.
       mChildren->insert(targetIter, childPtr);
     }
