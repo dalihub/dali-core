@@ -239,6 +239,13 @@ public:
   void EmitVisibilityChangedSignalRecursively(bool                               visible,
                                               DevelActor::VisibilityChange::Type type);
 
+  /**
+   * @brief Propagates the actor's visibility on the actor tree, and retreives actor list to emit inherited-visibility-changed-signal.
+   *
+   * @param[out] inheritedVisibilityChangedList On return, the list of actors whose inherited visibility is changed.
+   */
+  void InheritVisibilityRecursively(ActorContainer& inheritedVisibilityChangedList);
+
 private:
   /**
    * @brief Emits the ChildAdded signal for this actor

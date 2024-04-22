@@ -548,6 +548,22 @@ void ActorParentImpl::EmitVisibilityChangedSignalRecursively(
   }
 }
 
+void ActorParentImpl::InheritVisibilityRecursively(ActorContainer& inheritedVisibilityChangedList)
+{
+  inheritedVisibilityChangedList.push_back(ActorPtr(&mOwner));
+
+  if(mChildren)
+  {
+    for(const auto& child : *mChildren)
+    {
+      if(child->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>())
+      {
+        child->mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
+      }
+    }
+  }
+}
+
 void ActorParentImpl::EmitChildAddedSignal(Actor& child)
 {
   EmitSignal(child, mChildAddedSignal);

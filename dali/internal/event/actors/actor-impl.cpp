@@ -155,16 +155,17 @@ DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperti
 
 // Signals
 
-static constexpr std::string_view SIGNAL_HOVERED                  = "hovered";
-static constexpr std::string_view SIGNAL_WHEEL_EVENT              = "wheelEvent";
-static constexpr std::string_view SIGNAL_ON_SCENE                 = "onScene";
-static constexpr std::string_view SIGNAL_OFF_SCENE                = "offScene";
-static constexpr std::string_view SIGNAL_ON_RELAYOUT              = "onRelayout";
-static constexpr std::string_view SIGNAL_TOUCHED                  = "touched";
-static constexpr std::string_view SIGNAL_VISIBILITY_CHANGED       = "visibilityChanged";
-static constexpr std::string_view SIGNAL_LAYOUT_DIRECTION_CHANGED = "layoutDirectionChanged";
-static constexpr std::string_view SIGNAL_CHILD_ADDED              = "childAdded";
-static constexpr std::string_view SIGNAL_CHILD_REMOVED            = "childRemoved";
+static constexpr std::string_view SIGNAL_HOVERED                      = "hovered";
+static constexpr std::string_view SIGNAL_WHEEL_EVENT                  = "wheelEvent";
+static constexpr std::string_view SIGNAL_ON_SCENE                     = "onScene";
+static constexpr std::string_view SIGNAL_OFF_SCENE                    = "offScene";
+static constexpr std::string_view SIGNAL_ON_RELAYOUT                  = "onRelayout";
+static constexpr std::string_view SIGNAL_TOUCHED                      = "touched";
+static constexpr std::string_view SIGNAL_VISIBILITY_CHANGED           = "visibilityChanged";
+static constexpr std::string_view SIGNAL_INHERITED_VISIBILITY_CHANGED = "inheritedVisibilityChanged";
+static constexpr std::string_view SIGNAL_LAYOUT_DIRECTION_CHANGED     = "layoutDirectionChanged";
+static constexpr std::string_view SIGNAL_CHILD_ADDED                  = "childAdded";
+static constexpr std::string_view SIGNAL_CHILD_REMOVED                = "childRemoved";
 
 // Actions
 
@@ -222,6 +223,10 @@ static bool DoConnectSignal(BaseObject*                 object,
   else if(name == SIGNAL_VISIBILITY_CHANGED)
   {
     actor->VisibilityChangedSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_INHERITED_VISIBILITY_CHANGED)
+  {
+    actor->InheritedVisibilityChangedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_LAYOUT_DIRECTION_CHANGED)
   {
@@ -285,9 +290,10 @@ SignalConnectorType signalConnector5(mType, std::string(SIGNAL_OFF_SCENE), &DoCo
 SignalConnectorType signalConnector6(mType, std::string(SIGNAL_ON_RELAYOUT), &DoConnectSignal);
 SignalConnectorType signalConnector7(mType, std::string(SIGNAL_TOUCHED), &DoConnectSignal);
 SignalConnectorType signalConnector8(mType, std::string(SIGNAL_VISIBILITY_CHANGED), &DoConnectSignal);
-SignalConnectorType signalConnector9(mType, std::string(SIGNAL_LAYOUT_DIRECTION_CHANGED), &DoConnectSignal);
-SignalConnectorType signalConnector10(mType, std::string(SIGNAL_CHILD_ADDED), &DoConnectSignal);
-SignalConnectorType signalConnector11(mType, std::string(SIGNAL_CHILD_REMOVED), &DoConnectSignal);
+SignalConnectorType signalConnector9(mType, std::string(SIGNAL_INHERITED_VISIBILITY_CHANGED), &DoConnectSignal);
+SignalConnectorType signalConnector10(mType, std::string(SIGNAL_LAYOUT_DIRECTION_CHANGED), &DoConnectSignal);
+SignalConnectorType signalConnector11(mType, std::string(SIGNAL_CHILD_ADDED), &DoConnectSignal);
+SignalConnectorType signalConnector12(mType, std::string(SIGNAL_CHILD_REMOVED), &DoConnectSignal);
 
 TypeAction a1(mType, std::string(ACTION_SHOW), &DoAction);
 TypeAction a2(mType, std::string(ACTION_HIDE), &DoAction);
@@ -1023,6 +1029,11 @@ void Actor::EmitVisibilityChangedSignal(bool visible, DevelActor::VisibilityChan
   EmitSignal(*this, mVisibilityChangedSignal, visible, type);
 }
 
+void Actor::EmitInheritedVisibilityChangedSignal(bool visible)
+{
+  EmitSignal(*this, mInheritedVisibilityChangedSignal, visible);
+}
+
 void Actor::EmitLayoutDirectionChangedSignal(LayoutDirection::Type type)
 {
   EmitSignal(*this, mLayoutDirectionChangedSignal, type);
@@ -1078,6 +1089,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mOffSceneSignal(),
   mOnRelayoutSignal(),
   mVisibilityChangedSignal(),
+  mInheritedVisibilityChangedSignal(),
   mLayoutDirectionChangedSignal(),
   mHitTestResultSignal(),
   mTargetOrientation(Quaternion::IDENTITY),
@@ -1488,6 +1500,8 @@ void Actor::LowerBelow(Internal::Actor& target)
 
 void Actor::SetParent(ActorParent* parent, bool notify)
 {
+  bool emitInheritedVisible = false;
+  bool visiblility = true;
   if(parent)
   {
     DALI_ASSERT_ALWAYS(!mParent && "Actor cannot have 2 parents");
@@ -1501,6 +1515,14 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     {
       // Instruct each actor to create a corresponding node in the scene graph
       ConnectToScene(parentActor->GetHierarchyDepth(), parentActor->GetLayer3DParentCount(), notify);
+
+      Actor* actor         = this;
+      emitInheritedVisible = true;
+      while(emitInheritedVisible && actor)
+      {
+        emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
+        actor = actor->GetParent();
+      }
     }
 
     // Resolve the name and index for the child properties if any
@@ -1509,6 +1531,19 @@ void Actor::SetParent(ActorParent* parent, bool notify)
   else // parent being set to NULL
   {
     DALI_ASSERT_ALWAYS(mParent != nullptr && "Actor should have a parent");
+
+    if(!EventThreadServices::IsShuttingDown() && // Don't emit signals or send messages during Core destruction
+       OnScene())
+    {
+      Actor* actor         = this;
+      emitInheritedVisible = true;
+      while(emitInheritedVisible && actor)
+      {
+        emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
+        actor = actor->GetParent();
+      }
+      visiblility = false;
+    }
 
     mParent = nullptr;
 
@@ -1523,6 +1558,11 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     }
 
     mScene = nullptr;
+  }
+
+  if(emitInheritedVisible)
+  {
+    EmitInheritedVisibilityChangedSignalRecursively(visiblility);
   }
 }
 
@@ -1691,10 +1731,33 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
       RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
     }
 
+    Actor* actor = this->GetParent();
+    bool emitInheritedVisible = OnScene();
+    while(emitInheritedVisible && actor)
+    {
+      emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
+      actor = actor->GetParent();
+    }
+
     mVisible = visible;
 
     // Emit the signal on this actor and all its children
     mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::SELF);
+    if(emitInheritedVisible)
+    {
+      EmitInheritedVisibilityChangedSignalRecursively(visible);
+    }
+  }
+}
+
+void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
+{
+  ActorContainer inheritedVisibilityChangedList;
+  mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
+  // Notify applications about the newly connected actors.
+  for(const auto& actor : inheritedVisibilityChangedList)
+  {
+    actor->EmitInheritedVisibilityChangedSignal(visible);
   }
 }
 

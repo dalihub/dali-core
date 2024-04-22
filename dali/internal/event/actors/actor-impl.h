@@ -1431,6 +1431,12 @@ public:
   void EmitVisibilityChangedSignal(bool visible, DevelActor::VisibilityChange::Type type);
 
   /**
+   * @brief Emits the inherited visibility change signal for this actor.
+   * @param[in] visible Whether the actor has become visible or not considering all parent Actors.
+   */
+  void EmitInheritedVisibilityChangedSignal(bool visible);
+
+  /**
    * @brief Emits the layout direction change signal for this actor and all its children.
    * @param[in] type Whether the actor's layout direction property has changed or a parent's.
    */
@@ -1523,6 +1529,14 @@ public:
   DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal()
   {
     return mVisibilityChangedSignal;
+  }
+
+  /**
+   * @copydoc DevelActor::InheritedVisibilityChangedSignal
+   */
+  Dali::Actor::InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal()
+  {
+    return mInheritedVisibilityChangedSignal;
   }
 
   /**
@@ -1873,6 +1887,13 @@ private:
   void SetVisibleInternal(bool visible, SendMessage::Type sendMessage);
 
   /**
+   * Emits the visibility flag of an actor.
+   * @param[in] visible The new visibility flag.
+   * @param[in] sendMessage Whether to send a message to the update thread or not.
+   */
+  void EmitInheritedVisibilityChangedSignalRecursively(bool visible);
+
+  /**
    * @copydoc ActorParent::SetSiblingOrderOfChild
    */
   void SetSiblingOrderOfChild(Actor& child, uint32_t order) override;
@@ -1944,17 +1965,18 @@ protected:
   ActorGestureData*  mGestureData;  ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
-  Dali::Actor::TouchEventSignalType             mInterceptTouchedSignal;
-  Dali::Actor::TouchEventSignalType             mTouchedSignal;
-  Dali::Actor::HoverSignalType                  mHoveredSignal;
-  Dali::Actor::WheelEventSignalType             mInterceptWheelSignal;
-  Dali::Actor::WheelEventSignalType             mWheelEventSignal;
-  Dali::Actor::OnSceneSignalType                mOnSceneSignal;
-  Dali::Actor::OffSceneSignalType               mOffSceneSignal;
-  Dali::Actor::OnRelayoutSignalType             mOnRelayoutSignal;
-  DevelActor::VisibilityChangedSignalType       mVisibilityChangedSignal;
-  Dali::Actor::LayoutDirectionChangedSignalType mLayoutDirectionChangedSignal;
-  Dali::Actor::TouchEventSignalType             mHitTestResultSignal;
+  Dali::Actor::TouchEventSignalType                 mInterceptTouchedSignal;
+  Dali::Actor::TouchEventSignalType                 mTouchedSignal;
+  Dali::Actor::HoverSignalType                      mHoveredSignal;
+  Dali::Actor::WheelEventSignalType                 mInterceptWheelSignal;
+  Dali::Actor::WheelEventSignalType                 mWheelEventSignal;
+  Dali::Actor::OnSceneSignalType                    mOnSceneSignal;
+  Dali::Actor::OffSceneSignalType                   mOffSceneSignal;
+  Dali::Actor::OnRelayoutSignalType                 mOnRelayoutSignal;
+  DevelActor::VisibilityChangedSignalType           mVisibilityChangedSignal;
+  Dali::Actor::InheritedVisibilityChangedSignalType mInheritedVisibilityChangedSignal;
+  Dali::Actor::LayoutDirectionChangedSignalType     mLayoutDirectionChangedSignal;
+  Dali::Actor::TouchEventSignalType                 mHitTestResultSignal;
 
   Quaternion mTargetOrientation; ///< Event-side storage for orientation
   Vector4    mTargetColor;       ///< Event-side storage for color
