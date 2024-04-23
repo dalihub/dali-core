@@ -696,6 +696,62 @@ int UtcDaliPanGestureRecognizerNewParamsMinNum(void)
   END_TEST;
 }
 
+int UtcDaliPanGestureRecognizerUpdateParamsMinNum(void)
+{
+  TestApplication application;
+
+  Integration::SetPanGestureMinimumPanEvents(8);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  detector.Attach(actor);
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 352));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 90.0f), 756));
+  application.SendNotification();
+  data.Reset();
+
+  Integration::SetPanGestureMinimumPanEvents(10);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 352));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 100.0f), 756));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 110.0f), 857));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
 int UtcDaliPanGestureRecognizerNewParamsMinDistance(void)
 {
   TestApplication application;
@@ -725,6 +781,62 @@ int UtcDaliPanGestureRecognizerNewParamsMinDistance(void)
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureRecognizerUpdateParamsMinDistance(void)
+{
+  TestApplication application;
+
+  Integration::SetPanGestureMinimumDistance(100);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  detector.Attach(actor);
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 352));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(20.0f, 90.0f), 756));
+  application.SendNotification();
+  data.Reset();
+
+  Integration::SetPanGestureMinimumDistance(130);
+
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 60.0f), 352));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 100.0f),756));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 110.0f),857));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 120.0f),858));
 
   application.SendNotification();
 

@@ -63,6 +63,18 @@ public:
 
 public:
   /**
+   * This method sets the minimum distance to start a pan
+   * @param[in] minimumDistance The distance in pixels
+   */
+  void SetMinimumDistance(int32_t minimumDistance);
+
+  /**
+   * Sets the minimum touch events required before a pan can be started
+   * @param[in] minimumPanEvents The number of touch events
+   */
+  void SetMinimumPanEvents(int32_t minimumPanEvents);
+
+  /**
    * @copydoc Dali::Internal::GestureDetector::SendEvent(const Integration::TouchEvent&)
    */
   void SendEvent(const Integration::TouchEvent& event) override;
