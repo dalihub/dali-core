@@ -345,6 +345,27 @@ void PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchE
   }
 }
 
+void PanGestureRecognizer::SetMinimumDistance(int32_t minimumDistance)
+{
+  if(minimumDistance >= 0)
+  {
+    mMinimumDistanceSquared = minimumDistance * minimumDistance;
+
+    // Usually, we do not want to apply the threshold straight away, but phased over the first few pans
+    // Set our distance to threshold adjustments ratio here.
+    float fMinimumDistance     = static_cast<float>(minimumDistance);
+    mThresholdTotalAdjustments = static_cast<unsigned int>(fMinimumDistance * MINIMUM_MOTION_DISTANCE_TO_THRESHOLD_ADJUSTMENTS_RATIO);
+  }
+}
+
+void PanGestureRecognizer::SetMinimumPanEvents(int32_t minimumPanEvents)
+{
+  if(minimumPanEvents >= 1)
+  {
+    mMinimumMotionEvents = minimumPanEvents - 1; // Down is the first event
+  }
+}
+
 } // namespace Internal
 
 } // namespace Dali
