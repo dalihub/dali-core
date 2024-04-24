@@ -214,6 +214,7 @@ void TapGestureRecognizer::EmitSingleTap(uint32_t time, const Integration::Point
      distanceDelta.y > mMaximumMotionAllowedDistance)
   {
     event.state = GestureState::CANCELLED;
+    DALI_LOG_RELEASE_INFO("There is a long distance between touch down and touch up. (%f or %f > %f)\n", distanceDelta.x, distanceDelta.y, mMaximumMotionAllowedDistance);
   }
   EmitTap(time, event);
 }
