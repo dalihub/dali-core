@@ -85,6 +85,8 @@ enum Type
   TRACKBALL,        ///< A trackball style mouse. @SINCE_1_2.60
   REMOCON,          ///< A remote controller. @SINCE_1_2.61
   VIRTUAL_KEYBOARD, ///< A virtual keyboard. @SINCE_1_2.61
+  VIRTUAL_REMOCON,  ///< A virtual remocon. @SINCE_2_3.22
+  VIRTUAL_MOUSE,    ///< A virtual mouse. @SINCE_2_3.22
 };
 
 } // namespace Subclass
