@@ -697,7 +697,8 @@ void GraphicsAlgorithms::RecordRenderItemList(
     //SetupClipping(...);@todo Complete me!
     SetupDepthBuffer(item, secondaryCommandBuffer, autoDepthTestMode, firstDepthBufferUse);
 
-    item.mRenderer->PrepareRender( secondaryCommandBuffer, viewMatrix, vulkanProjectionMatrix, bufferIndex, instruction, item );
+    //item.mRenderer->PrepareRender( secondaryCommandBuffer, viewMatrix, vulkanProjectionMatrix, bufferIndex, instruction, item );
+    item.mRenderer->PrepareRender( secondaryCommandBuffer, viewMatrix, projectionMatrix, bufferIndex, instruction, item );
   }
 }
 
@@ -766,78 +767,30 @@ bool GraphicsAlgorithms::PrepareGraphicsPipeline(
    * Prepare vertex attribute buffer bindings
    */
   uint32_t bindingIndex{0u};
-  std::vector<const Graphics::Buffer*> vertexBuffers{};
 
   for (auto &&vertexBuffer : geometry->GetVertexBuffers())
   {
     // update vertex buffer if necessary
     vertexBuffer->Update(mGraphicsController);
 
-    auto gpuBuffer = vertexBuffer->GetGpuBuffer();
-    auto graphicsBuffer = gpuBuffer->GetGraphicsObject();
-    vertexBuffers.push_back(graphicsBuffer);
     auto attributeCountInForBuffer = vertexBuffer->GetAttributeCount();
 
     auto& vertexFormat = *vertexBuffer->GetFormat();
     // store buffer binding
-    vi.bufferBindings
-      .emplace_back(vertexFormat.size, VertexInputRate::PER_VERTEX);
+    vi.bufferBindings.emplace_back( vertexFormat.size, VertexInputRate::PER_VERTEX );
 
-    for (auto i = 0u; i < attributeCountInForBuffer; ++i)
+    for( auto i = 0u; i < attributeCountInForBuffer; ++i )
     {
       // create attribute description
-      vi.attributes
-        .emplace_back(
-          reflection.GetVertexAttributeLocation(vertexBuffer->GetAttributeName(i)),
-          bindingIndex,
-          vertexFormat.components[i].offset,
-          GetPropertyVertexFormat(vertexFormat.components[i].type));
-
+      vi.attributes.emplace_back( reflection.GetVertexAttributeLocation( vertexBuffer->GetAttributeName( i ) ),
+                                  bindingIndex,
+                                  vertexFormat.components[i].offset,
+                                  GetPropertyVertexFormat( vertexFormat.components[i].type ) );
     }
     bindingIndex++;
   }
 
-  // set optional index buffer
-  auto topology         = PrimitiveTopology::TRIANGLE_STRIP;
-  auto geometryTopology = geometry->GetType();
-  switch (geometryTopology)
-  {
-    case Dali::Geometry::Type::TRIANGLE_STRIP:
-    {
-      topology = PrimitiveTopology::TRIANGLE_STRIP;
-      break;
-    }
-    case Dali::Geometry::Type::LINE_LOOP:
-    case Dali::Geometry::Type::LINE_STRIP:
-    {
-      topology = PrimitiveTopology::LINE_STRIP;
-      break;
-    }
-    case Dali::Geometry::Type::LINES:
-    {
-      topology = PrimitiveTopology::LINE_LIST;
-      break;
-    }
-    case Dali::Geometry::Type::TRIANGLE_FAN:
-    {
-      topology = PrimitiveTopology::TRIANGLE_FAN;
-      break;
-    }
-    case Dali::Geometry::Type::POINTS:
-    {
-      topology = PrimitiveTopology::POINT_LIST;
-      break;
-    }
-    case Dali::Geometry::Type::TRIANGLES:
-    {
-      topology = PrimitiveTopology::TRIANGLE_LIST;
-      break;
-    }
-    default:
-    {
-      topology = PrimitiveTopology::TRIANGLE_LIST;
-    }
-  }
+  auto topology         = geometry->GetTopology();
 
   /**
    * 1. DEPTH MDOE

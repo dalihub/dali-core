@@ -989,8 +989,12 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
         }
       }
 
-      // generate graphics objects
+      // generate graphics objects & upload geometry
       PrepareNodes( bufferIndex );
+      for(auto&& iter : mImpl->geometryContainer)
+      {
+        iter->Upload(mImpl->graphicsController);
+      }
 
       if( future )
       {
@@ -1000,6 +1004,13 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       mImpl->graphicsAlgorithms.ResetCommandBuffer();
       mImpl->graphicsAlgorithms.RenderScene(mImpl->defaultScene.Get(), bufferIndex, true);
       mImpl->graphicsAlgorithms.RenderScene(mImpl->defaultScene.Get(), bufferIndex, false);
+
+      // Post render - clean down update flags
+      for(auto&& iter : mImpl->geometryContainer)
+      {
+        iter->OnRenderFinished();
+      }
+
     }
   }
 

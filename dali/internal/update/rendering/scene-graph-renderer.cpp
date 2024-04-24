@@ -227,7 +227,7 @@ void Renderer::PrepareRender( Graphics::CommandBuffer& commandBuffer,
 
   BindTextures( commandBuffer, reflection );
 
-  uint32_t instanceCount = 1u;
+  uint32_t instanceCount = 0u;
   auto& pipeline = PrepareGraphicsPipeline(program, renderInstruction, item.mNode, !item.mIsOpaque);
 
   commandBuffer.BindPipeline(pipeline);

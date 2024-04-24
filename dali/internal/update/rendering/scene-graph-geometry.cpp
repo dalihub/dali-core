@@ -168,6 +168,7 @@ bool Geometry::Draw(
 {
   uint32_t numIndices(0u);
   intptr_t firstIndexOffset(0u);
+
   if(mIndexBuffer)
   {
     std::size_t sizeOfIndex = sizeof(uint16_t);
