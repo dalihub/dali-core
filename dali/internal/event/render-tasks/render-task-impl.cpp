@@ -495,6 +495,11 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
   if(mFrameBuffer && mappingActor)
   {
     Internal::Actor* inputMappingActor = &GetImplementation(mappingActor);
+    if(!inputMappingActor->OnScene())
+    {
+      return false;
+    }
+
     CameraActor*     localCamera       = GetCameraActor();
     StagePtr         stage             = Stage::GetCurrent();
     if(stage)
@@ -560,6 +565,11 @@ void RenderTask::GetHittableViewport(Viewport& viewPort) const
           viewPort.x = viewPort.y = 0;
           viewPort.width          = static_cast<int32_t>(actorSize.x + 0.5f); // rounded
           viewPort.height         = static_cast<int32_t>(actorSize.y + 0.5f); // rounded
+        }
+        else
+        {
+          // For the case to use ScreenToFrameBufferFunction
+          GetViewport(viewPort);
         }
       }
       else

@@ -109,6 +109,41 @@ bool DefaultIsActorTouchableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::
   return hittable;
 };
 
+bool IsActorTouchableFunctionWithoutLayerHit(Dali::Actor actor, Dali::HitTestAlgorithm::TraverseType type)
+{
+  bool hittable = false;
+
+  switch(type)
+  {
+    case Dali::HitTestAlgorithm::CHECK_ACTOR:
+    {
+      if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) &&
+         actor.GetProperty<bool>(Actor::Property::SENSITIVE) &&
+         actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f &&
+         actor.GetLayer() != actor)
+      {
+        hittable = true;
+      }
+      break;
+    }
+    case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
+    {
+      if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) && // Actor is visible, if not visible then none of its children are visible.
+         actor.GetProperty<bool>(Actor::Property::SENSITIVE))        // Actor is sensitive, if insensitive none of its children should be hittable either.
+      {
+        hittable = true;
+      }
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return hittable;
+};
+
 } // anonymous namespace
 
 // Positive test case for a method
@@ -575,7 +610,7 @@ int UtcDaliHitTestAlgorithmDoesWantedHitTest(void)
   END_TEST;
 }
 
-int UtcDaliHitTestAlgorithmOrder(void)
+int UtcDaliHitTestAlgorithmOrder1(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm between On/Off render task");
@@ -625,6 +660,276 @@ int UtcDaliHitTestAlgorithmOrder(void)
 
   HitTestAlgorithm::Results results;
   HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK(results.actor == green);
+
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmOrder2(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm in for the mapping actor and its child");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                        = Actor::New();
+  blue[Dali::Actor::Property::NAME]                 = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor green                                        = Actor::New();
+  green[Dali::Actor::Property::NAME]                 = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor red                                        = Actor::New();
+  red[Dali::Actor::Property::NAME]                 = "Red";
+  red[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor yellow                                        = Actor::New();
+  yellow[Dali::Actor::Property::NAME]                 = "Yellow";
+  yellow[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  yellow[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  yellow[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  yellow[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  stage.Add(blue);
+  stage.Add(green);
+  stage.Add(yellow);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     offRenderTask  = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  offRenderTask.SetExclusive(true);
+  offRenderTask.SetInputEnabled(true);
+  offRenderTask.SetCameraActor(cameraActor);
+  offRenderTask.SetSourceActor(yellow);
+  offRenderTask.SetScreenToFrameBufferMappingActor(green);
+
+  Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  renderTarget.AttachColorTexture(texture);
+  offRenderTask.SetFrameBuffer(renderTarget);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(10);
+
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK(results.actor == yellow);
+
+  green.Add(red);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(10);
+
+  results = HitTestAlgorithm::Results();
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK(results.actor == red);
+
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmInMultipleLayer(void)
+{
+  TestApplication application;
+  tet_infoline("Testing UtcDaliHitTestAlgorithmInMultipleLayer");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                        = Actor::New();
+  blue[Dali::Actor::Property::NAME]                 = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Layer layer = Layer::New();
+  layer[Dali::Actor::Property::NAME]                 = "Layer";
+  layer[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  layer[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  layer[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  layer[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor green                                        = Actor::New();
+  green[Dali::Actor::Property::NAME]                 = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor red                                        = Actor::New();
+  red[Dali::Actor::Property::NAME]                 = "Red";
+  red[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  stage.Add(blue);
+  stage.Add(layer);
+  layer.Add(green);
+  stage.Add(red);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     offRenderTask  = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  offRenderTask.SetExclusive(true);
+  offRenderTask.SetInputEnabled(true);
+  offRenderTask.SetCameraActor(cameraActor);
+  offRenderTask.SetSourceActor(layer);
+  offRenderTask.SetScreenToFrameBufferMappingActor(red);
+
+  Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  renderTarget.AttachColorTexture(texture);
+  offRenderTask.SetFrameBuffer(renderTarget);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(10);
+
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK(results.actor == green);
+
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmOffSceneMappingActor(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm with OffSceneMappingActor");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                        = Actor::New();
+  blue[Dali::Actor::Property::NAME]                 = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor green                                        = Actor::New();
+  green[Dali::Actor::Property::NAME]                 = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  Actor red                                        = Actor::New();
+  red[Dali::Actor::Property::NAME]                 = "Red";
+  red[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  stage.Add(blue);
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     offRenderTask  = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  offRenderTask.SetExclusive(true);
+  offRenderTask.SetInputEnabled(true);
+  offRenderTask.SetCameraActor(cameraActor);
+  offRenderTask.SetSourceActor(green);
+  offRenderTask.SetScreenToFrameBufferMappingActor(red);
+
+  Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  renderTarget.AttachColorTexture(texture);
+  offRenderTask.SetFrameBuffer(renderTarget);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(10);
+
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK(results.actor == blue);
+
+  stage.Add(red);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(10);
+
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK(results.actor == green);
+
+  END_TEST;
+}
+
+int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::HitTestAlgorithm using ScreenToFrameBufferFunction");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor green                                       = Actor::New();
+  green[Dali::Actor::Property::NAME]                 = "Green";
+  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
+  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+
+  stage.Add(green);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     offRenderTask  = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  offRenderTask.SetExclusive(true);
+  offRenderTask.SetInputEnabled(true);
+  offRenderTask.SetCameraActor(cameraActor);
+  offRenderTask.SetSourceActor(green);
+  offRenderTask.SetScreenToFrameBufferFunction(RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION);
+  offRenderTask.SetViewport(Viewport(Vector4(0, 0, 480, 800)));
+
+  Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  renderTarget.AttachColorTexture(texture);
+  offRenderTask.SetFrameBuffer(renderTarget);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(10);
+
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize / 2.0f, results, &IsActorTouchableFunctionWithoutLayerHit);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
