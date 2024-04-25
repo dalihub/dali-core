@@ -133,8 +133,8 @@ struct Sampler
       case FilterMode::NEAREST_MIPMAP_LINEAR: return Graphics::SamplerMipmapMode::LINEAR;
       case FilterMode::NEAREST_MIPMAP_NEAREST: return Graphics::SamplerMipmapMode::NEAREST;
       case FilterMode::LINEAR_MIPMAP_NEAREST: return Graphics::SamplerMipmapMode::NEAREST;
-      case FilterMode::DEFAULT: return Graphics::SamplerMipmapMode::LINEAR;
-      default: return {};
+      case FilterMode::DEFAULT: return Graphics::SamplerMipmapMode::NONE;
+      default: return Graphics::SamplerMipmapMode::NONE;
     }
     return {};
   }
