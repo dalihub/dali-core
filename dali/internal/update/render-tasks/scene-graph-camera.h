@@ -110,6 +110,15 @@ public:
   void SetInvertYAxis( bool invertYAxis );
 
   /**
+   * Returns whether the Y axis is inverted.
+   * @return True if the Y axis is inverted, false otherwise.
+   */
+  bool IsYAxisInverted() const
+  {
+    return mInvertYAxis;
+  }
+
+  /**
    * @copydoc Dali::Internal::CameraActor::SetProjectionMode
    */
   void SetProjectionMode( Dali::Camera::ProjectionMode projectionMode );

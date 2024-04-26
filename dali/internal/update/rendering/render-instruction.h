@@ -113,6 +113,12 @@ public:
     return &mCamera->GetProjectionMatrix( index );
   }
 
+  // for reflection effect
+  [[nodiscard]] const Camera* GetCamera() const
+  {
+    return mCamera;
+  }
+
   /**
    * Signls that the system is being shutdown
    */

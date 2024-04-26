@@ -65,14 +65,24 @@ public:
 
 private:
 
-  bool SetupScissorClipping( const RenderItem& item );
+  void SetupScissorClipping( const RenderItem& item,
+                             Graphics::CommandBuffer& commandBuffer,
+                             const RenderInstruction& instruction,
+                             int orientation);
 
-  bool SetupStencilClipping( const RenderItem& item, uint32_t& lastClippingDepth, uint32_t& lastClippingId );
+  void SetupStencilClipping( const RenderItem& item, Graphics::CommandBuffer& commandBuffer,
+                             uint32_t& lastClippingDepth, uint32_t& lastClippingId,
+                             const RenderInstruction& instruction,
+                             int orientation);
 
   void SetupClipping( const RenderItem& item,
-                            bool& usedStencilBuffer,
-                            uint32_t& lastClippingDepth,
-                            uint32_t& lastClippingId );
+                      Graphics::CommandBuffer& commandBuffer,
+                      bool& usedStencilBuffer,
+                      uint32_t& lastClippingDepth,
+                      uint32_t& lastClippingId,
+                      bool stencilBufferAvailable,
+                      const RenderInstruction& instruction,
+                      int orientation);
 
 
   bool SetupPipelineViewportState( Graphics::ViewportState& outViewportState );
@@ -82,23 +92,27 @@ private:
                              const Matrix& viewMatrix,
                              const Matrix& projectionMatrix,
                              const RenderInstruction& instruction,
-                             bool depthBufferAvailable);
+                             const Rect<int32_t>& viewport,
+                             const Rect<int>& rootClippingRect,
+                             Uint16Pair sceneSize,
+                             bool depthBufferAvailable,
+                             bool stencilBufferAvailable);
 
   void RecordInstruction( const RenderInstruction& instruction,
                           bool renderToFbo,
                           bool depthBufferAvailable,
+                          bool stencilBufferAvailable,
+                          const Rect<int32_t>& viewport,
+                          const Rect<int>& rootClippingRect,
+                          Uint16Pair sceneSize,
                           BufferIndex bufferIndex);
 
   bool PrepareGraphicsPipeline(const RenderInstruction& instruction,
                                const RenderList* renderList,
                                RenderItem& item,
-                               bool& usesDepth,
-                               bool& usesStencil,
                                BufferIndex bufferIndex );
 
   void PrepareRendererPipelines(const RenderInstructionContainer& renderInstructions,
-                                bool& usesDepth,
-                                bool& usesStencil,
                                 BufferIndex bufferIndex );
 
 private:
@@ -109,6 +123,8 @@ private:
   Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
   std::unique_ptr<UniformBufferManager> mUniformBufferManager;
   ScissorStackType mScissorStack{};        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
+  Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
+  bool              mHasLayerScissor : 1; ///< Marks if the currently process render instruction has a layer-based clipping region
 
   uint32_t mUniformBlockAllocationCount{};
   uint32_t mUniformBlockAllocationBytes{};
