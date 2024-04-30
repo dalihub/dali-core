@@ -1296,19 +1296,26 @@ void GraphicsAlgorithms::RenderScene(
 
 
     Graphics::SyncObject* syncObject{nullptr};
+
+    // @todo Add render tracker back to instruction (and figure out how to sync!)
+    //if(instruction.mRenderTracker && instruction.mFrameBuffer)
+    //{
+    //syncObject                 = instruction.mRenderTracker->CreateSyncObject(mImpl->graphicsController);
+    //instruction.mRenderTracker = nullptr;
+    //}
     mGraphicsCommandBuffer->EndRenderPass(syncObject);
   }
 
   mUniformBufferManager->Flush(nullptr, false);
 
+  // Submit command buffers
   Graphics::SubmitInfo submitInfo;
   submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
   submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
-
   mGraphicsController.SubmitCommandBuffers(submitInfo);
 
+  // Present render targets
   std::sort(targetsToPresent.begin(), targetsToPresent.end());
-
   Graphics::RenderTarget* rt = nullptr;
   for(auto& target : targetsToPresent)
   {

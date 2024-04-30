@@ -1003,6 +1003,8 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       }
       mImpl->graphicsAlgorithms.ResetCommandBuffer();
       mImpl->graphicsAlgorithms.RenderScene(mImpl->defaultScene.Get(), bufferIndex, true);
+
+      mImpl->graphicsAlgorithms.ResetCommandBuffer();
       mImpl->graphicsAlgorithms.RenderScene(mImpl->defaultScene.Get(), bufferIndex, false);
 
       // Post render - clean down update flags
