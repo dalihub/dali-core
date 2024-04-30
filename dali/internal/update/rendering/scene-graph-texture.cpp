@@ -106,7 +106,6 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
   Graphics::TextureUpdateInfo info{};
 
   const uint32_t srcStride = pixelData->GetWidth();
-  uint32_t       srcOffset = 0u;
   uint32_t       srcSize   = pixelData->GetBufferSize();
 
   const bool requiredSubPixelData = (!Pixel::IsCompressed(pixelData->GetPixelFormat())) &&
@@ -118,9 +117,7 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
   {
     const uint32_t bytePerPixel    = Pixel::GetBytesPerPixel(pixelData->GetPixelFormat());
     const uint32_t dataStrideByte  = (srcStride ? srcStride : static_cast<uint32_t>(params.width)) * bytePerPixel;
-    const uint32_t dataXOffsetByte = params.xOffset * bytePerPixel;
     const uint32_t dataWidthByte   = static_cast<uint32_t>(params.width) * bytePerPixel;
-    srcOffset = params.yOffset * dataStrideByte + dataXOffsetByte;
     srcSize   = static_cast<uint32_t>(params.height) * dataStrideByte - (dataStrideByte - dataWidthByte);
   }
 
@@ -130,7 +127,7 @@ void Texture::UploadTexture( PixelDataPtr pixelData, const Internal::Texture::Up
   info.level        = params.mipmap;
   info.srcReference = 0;
   info.srcExtent2D  = {params.width, params.height};
-  info.srcOffset    = srcOffset;
+  info.srcOffset    = 0;
   info.srcSize      = srcSize;
   info.srcStride    = srcStride;
   info.srcFormat    = Dali::Graphics::ConvertPixelFormat(pixelData->GetPixelFormat());
