@@ -1112,7 +1112,8 @@ void GraphicsAlgorithms::RenderScene(
     mUniformBufferManager.reset( new UniformBufferManager( &mGraphicsController ) );
   }
 
-  uint32_t cpuSize, gpuSize;
+  uint32_t cpuSize=0;
+  uint32_t gpuSize=0;
   ComputeUniformBufferRequirements(scene, bufferIndex, cpuSize, gpuSize);
 
   mUniformBufferManager->SetCurrentSceneRenderInfo(scene, true);
