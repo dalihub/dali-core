@@ -94,6 +94,7 @@ void WriteUniform( UniformBufferView& ubo,
                    const Matrix3&               data )
 {
   // Matrix3 has to take stride in account ( 16 )
+#if defined(VULKAN_ENABLED)
   float values[12];
 
   std::memcpy( &values[0], data.AsFloat(), sizeof( float ) * 3 );
@@ -101,6 +102,9 @@ void WriteUniform( UniformBufferView& ubo,
   std::memcpy( &values[8], &data.AsFloat()[6], sizeof( float ) * 3 );
 
   WriteUniform( ubo, uniformInfo, &values, sizeof( float ) * 12 );
+#else
+  WriteUniform( ubo, uniformInfo, data.AsFloat(), sizeof(Matrix3));
+#endif
 }
 
 } // Anonymous namespace
