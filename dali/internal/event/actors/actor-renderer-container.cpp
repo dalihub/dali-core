@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,17 @@ uint32_t RendererContainer::Add(const SceneGraph::Node& node, Renderer& renderer
     renderer.SetBlendEquation(blendEquation);
   }
 
-  uint32_t    index       = static_cast<uint32_t>(mRenderers.size());
+  uint32_t index = 0u;
+
+  // Duplication check
+  auto end = mRenderers.end();
+  for(auto iter = mRenderers.begin(); iter != end; ++iter, ++index)
+  {
+    if((*iter).Get() == &renderer)
+    {
+      return index;
+    }
+  }
   RendererPtr rendererPtr = RendererPtr(&renderer);
   mRenderers.push_back(rendererPtr);
   AttachRendererMessage(mEventThreadServices.GetUpdateManager(), node, renderer.GetRendererSceneObject());

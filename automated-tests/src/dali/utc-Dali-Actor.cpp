@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -304,9 +304,9 @@ struct InheritedVisibilityChangedFunctorData
     DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
   }
 
-  Actor                              actor;
-  bool                               visible;
-  bool                               called;
+  Actor actor;
+  bool  visible;
+  bool  called;
 };
 
 struct InheritedVisibilityChangedFunctor
@@ -4660,6 +4660,50 @@ int UtcDaliActorAddRendererP(void)
   END_TEST;
 }
 
+int UtcDaliActorAddSameRenderer(void)
+{
+  tet_infoline("Testing Actor::AddRenderer");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 0u, TEST_LOCATION);
+
+  Geometry geometry  = CreateQuadGeometry();
+  Shader   shader    = CreateShader();
+  Renderer renderer1 = Renderer::New(geometry, shader);
+  Renderer renderer2 = Renderer::New(geometry, shader);
+  Renderer renderer3 = Renderer::New(geometry, shader);
+
+  DALI_TEST_EQUALS(actor.AddRenderer(renderer1), 0U, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(0), renderer1, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.AddRenderer(renderer2), 1U, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(1), renderer2, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.AddRenderer(renderer1), 0U, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(1), renderer2, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.AddRenderer(renderer3), 2U, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(1), renderer2, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(2), renderer3, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.AddRenderer(renderer2), 1U, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(0), renderer1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(1), renderer2, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetRendererAt(2), renderer3, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliActorAddRendererN01(void)
 {
   tet_infoline("Testing Actor::AddRenderer");
@@ -5407,7 +5451,7 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRenderer(void)
   clippingActorA[Actor::Property::SIZE] = actorSize;
 
   // Add dummy actor, to make application would be rendering.
-  Actor dummyActor = CreateRenderableActor();
+  Actor dummyActor                  = CreateRenderableActor();
   dummyActor[Actor::Property::SIZE] = actorSize;
   clippingActorA.Add(dummyActor);
 
@@ -5471,7 +5515,7 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRendererUnderLayer3D(void)
   clippingActorA[Actor::Property::SIZE] = actorSize;
 
   // Add dummy actor, to make application would be rendering.
-  Actor dummyActor = CreateRenderableActor();
+  Actor dummyActor                  = CreateRenderableActor();
   dummyActor[Actor::Property::SIZE] = actorSize;
   clippingActorA.Add(dummyActor);
 
@@ -6812,7 +6856,6 @@ int UtcDaliActorGeoTouchRaiseAbove(void)
 
   END_TEST;
 }
-
 
 int UtcDaliActorRaiseAbove2(void)
 {
@@ -9867,7 +9910,7 @@ int utcDaliActorInheritedVisibilityChangeSignal1(void)
   tet_infoline("Check that the inherited visibility change signal is called when the visibility changes for the actor itself");
 
   Actor parentActor = Actor::New();
-  Actor actor = Actor::New();
+  Actor actor       = Actor::New();
 
   InheritedVisibilityChangedFunctorData data;
   actor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(data));
@@ -9904,7 +9947,7 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   tet_infoline("Check that the inherited visibility change signal is called when the actor or one of the parent become on scene or off scene");
 
   Actor parentActor = Actor::New();
-  Actor childActor = Actor::New();
+  Actor childActor  = Actor::New();
 
   InheritedVisibilityChangedFunctorData dataP, dataC;
   parentActor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataP));
@@ -9985,7 +10028,7 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   tet_infoline("Check that the inherited visibility change signal is called when the visibility changes for the parent actor");
 
   Actor parentActor = Actor::New();
-  Actor actor = Actor::New();
+  Actor actor       = Actor::New();
   parentActor.Add(actor);
 
   InheritedVisibilityChangedFunctorData data;
@@ -10010,7 +10053,6 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   actor.SetProperty(Actor::Property::VISIBLE, true);
   data.Check(false, TEST_LOCATION);
 
-
   // Prepare Case 2
   // Parent : false
   // actor : false
@@ -10024,7 +10066,6 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, true);
   data.Check(false, TEST_LOCATION);
-
 
   // Prepare Case 3
   // parent : false
@@ -10048,16 +10089,16 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
 
 namespace
 {
-  InheritedVisibilityChangedFunctorData dataPA, dataPB, dataCA, dataCB, dataCC;
-  void ResetInheritedVisibilityChangedFunctorData()
-  {
-    dataPA.Reset();
-    dataPB.Reset();
-    dataCA.Reset();
-    dataCB.Reset();
-    dataCC.Reset();
-  }
+InheritedVisibilityChangedFunctorData dataPA, dataPB, dataCA, dataCB, dataCC;
+void                                  ResetInheritedVisibilityChangedFunctorData()
+{
+  dataPA.Reset();
+  dataPB.Reset();
+  dataCA.Reset();
+  dataCB.Reset();
+  dataCC.Reset();
 }
+} // namespace
 
 int utcDaliActorInheritedVisibilityChangeSignal4(void)
 {
@@ -10074,9 +10115,9 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
 
   Actor parentA = Actor::New();
   Actor parentB = Actor::New();
-  Actor childA = Actor::New();
-  Actor childB = Actor::New();
-  Actor childC = Actor::New();
+  Actor childA  = Actor::New();
+  Actor childB  = Actor::New();
+  Actor childC  = Actor::New();
   parentA.Add(parentB);
   parentB.Add(childA);
   parentB.Add(childB);
@@ -10092,17 +10133,17 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   application.GetScene().Add(parentA);
   dataPA.Check(true, parentA, true, TEST_LOCATION);
   dataPB.Check(true, parentB, true, TEST_LOCATION);
-  dataCA.Check(true, childA,  true, TEST_LOCATION);
-  dataCB.Check(true, childB,  true, TEST_LOCATION);
-  dataCC.Check(true, childC,  true, TEST_LOCATION);
+  dataCA.Check(true, childA, true, TEST_LOCATION);
+  dataCB.Check(true, childB, true, TEST_LOCATION);
+  dataCC.Check(true, childC, true, TEST_LOCATION);
 
   ResetInheritedVisibilityChangedFunctorData();
   parentA.SetProperty(Actor::Property::VISIBLE, false);
   dataPA.Check(true, parentA, false, TEST_LOCATION);
   dataPB.Check(true, parentB, false, TEST_LOCATION);
-  dataCA.Check(true, childA,  false, TEST_LOCATION);
-  dataCB.Check(true, childB,  false, TEST_LOCATION);
-  dataCC.Check(true, childC,  false, TEST_LOCATION);
+  dataCA.Check(true, childA, false, TEST_LOCATION);
+  dataCB.Check(true, childB, false, TEST_LOCATION);
+  dataCC.Check(true, childC, false, TEST_LOCATION);
 
   ResetInheritedVisibilityChangedFunctorData();
   childA.SetProperty(Actor::Property::VISIBLE, false);
@@ -10133,8 +10174,8 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataPA.Check(false, TEST_LOCATION);
   dataPB.Check(true, parentB, true, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
-  dataCB.Check(true, childB,  true, TEST_LOCATION);
-  dataCC.Check(true, childC,  true, TEST_LOCATION);
+  dataCB.Check(true, childB, true, TEST_LOCATION);
+  dataCC.Check(true, childC, true, TEST_LOCATION);
 
   END_TEST;
 }

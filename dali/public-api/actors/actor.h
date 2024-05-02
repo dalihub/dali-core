@@ -1127,6 +1127,7 @@ public:
 public: // Renderer
   /**
    * @brief Adds a renderer to this actor.
+   * @note We don't allow to add duplicated renderers. If we add the same renderer twice, it will just return the index of renderer.
    *
    * @SINCE_1_0.0
    * @param[in] renderer Renderer to add to the actor
