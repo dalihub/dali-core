@@ -538,6 +538,14 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   if(!sceneObject || sceneObject->IsRenderingSkipped())
   {
     // We don't need to calculate dirty rects
+    if(!sceneObject)
+    {
+      DALI_LOG_ERROR("Scene was empty handle. Skip pre-rendering\n");
+    }
+    else
+    {
+      DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
+    }
     return;
   }
 
@@ -782,6 +790,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   SceneGraph::Scene* sceneObject = GetImplementation(scene).GetSceneObject();
   if(!sceneObject)
   {
+    DALI_LOG_ERROR("Scene was empty handle. Skip rendering\n");
     return;
   }
 
@@ -793,7 +802,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 {
   if(mImpl->partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE && !renderToFbo && clippingRect.IsEmpty())
   {
-    // ClippingRect is empty. Skip rendering
+    DALI_LOG_DEBUG_INFO("ClippingRect was empty. Skip rendering\n");
     return;
   }
 
@@ -806,6 +815,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
   if(!sceneObject)
   {
+    DALI_LOG_ERROR("Scene was empty handle. Skip rendering\n");
     return;
   }
 
