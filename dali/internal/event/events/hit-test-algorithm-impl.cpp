@@ -459,7 +459,26 @@ bool IsWithinSourceActors(const Actor& sourceActor, const Actor& actor)
 }
 
 /**
- * Returns true if the layer and all of the layer's parents are visible and sensitive.
+ * Returns true if the actor and all of the actor's parents are hittable.
+ */
+bool IsActorActuallyHittable(Actor* actor, HitTestInterface& hitCheck)
+{
+  Actor* currentActor = actor;
+  // Ensure that we can descend into the layer's (or any of its parent's) hierarchy.
+  while(currentActor)
+  {
+    if(!hitCheck.DescendActorHierarchy(currentActor))
+    {
+      return false;
+    }
+    currentActor = currentActor->GetParent();
+  }
+
+  return true;
+}
+
+/**
+ * Returns true if the layer and all of the layer's parents are hittable.
  */
 inline bool IsActuallyHittable(Layer& layer, const Vector2& screenCoordinates, const Vector2& stageSize, HitTestInterface& hitCheck)
 {
@@ -482,17 +501,7 @@ inline bool IsActuallyHittable(Layer& layer, const Vector2& screenCoordinates, c
   if(hittable)
   {
     Actor* actor(&layer);
-
-    // Ensure that we can descend into the layer's (or any of its parent's) hierarchy.
-    while(actor && hittable)
-    {
-      if(!hitCheck.DescendActorHierarchy(actor))
-      {
-        hittable = false;
-        break;
-      }
-      actor = actor->GetParent();
-    }
+    hittable = IsActorActuallyHittable(actor, hitCheck);
   }
 
   return hittable;
@@ -651,7 +660,9 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
 
     // Determine the layer depth of the source actor
     Actor* sourceActor(renderTask.GetSourceActor());
-    if(sourceActor)
+
+    // Check the source actor is actually hittable or not.
+    if(sourceActor && IsActorActuallyHittable(sourceActor, hitCheck))
     {
       Dali::Layer sourceLayer(sourceActor->GetLayer());
       if(sourceLayer)
@@ -780,6 +791,68 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
 }
 
 /**
+ * Selects Prior Actor that is rendered later between firstActor and secondActor in the layer of rootActor.
+ * if only one of Actor is included in the layer, returns the Actor.
+ * if both of the firstActor and secondActor are not included in the layer, returns empty Actor.
+ */
+Dali::Actor FindPriorActorInLayer(Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
+{
+  Dali::Actor priorActor;
+  Dali::Layer layer = rootActor.GetLayer();
+  bool firstActorIncluded = firstActor.GetLayer() == layer;
+  bool secondActorIncluded = secondActor.GetLayer() == layer;
+
+  if(firstActorIncluded && !secondActorIncluded)
+  {
+    priorActor = firstActor;
+  }
+  else if(!firstActorIncluded && secondActorIncluded)
+  {
+    priorActor = secondActor;
+  }
+  else if(firstActorIncluded && secondActorIncluded)
+  {
+    priorActor = (GetImplementation(firstActor).GetSortingDepth() < GetImplementation(secondActor).GetSortingDepth()) ? secondActor : firstActor;
+  }
+
+  return priorActor;
+}
+
+/**
+ * Selects Prior Actor that is rendered later between firstActor and secondActor from child scene tree of rootActor.
+ */
+Dali::Actor FindPriorActorInLayers(const LayerList& layers, Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
+{
+  Dali::Layer sourceLayer = rootActor.GetLayer();
+  const uint32_t sourceActorDepth(sourceLayer.GetProperty<int>(Dali::Layer::Property::DEPTH));
+
+  Dali::Actor priorActor;
+  uint32_t layerCount = layers.GetLayerCount();
+  if(layerCount > 0)
+  {
+    for(int32_t i = layerCount - 1; i >= 0; --i)
+    {
+      Layer* layer(layers.GetLayer(i));
+      if(sourceActorDepth == static_cast<uint32_t>(i))
+      {
+        priorActor = FindPriorActorInLayer(rootActor, firstActor, secondActor);
+      }
+      else if(IsWithinSourceActors(GetImplementation(rootActor), *layer))
+      {
+        Dali::Actor layerRoot = Dali::Actor(layer);
+        priorActor            = FindPriorActorInLayer(layerRoot, firstActor, secondActor);
+      }
+
+      if(priorActor)
+      {
+        break;
+      }
+    }
+  }
+  return priorActor;
+}
+
+/**
  * Iterate through the RenderTaskList and perform hit testing.
  *
  * @param[in] sceneSize The scene size the tests will be performed in
@@ -821,18 +894,68 @@ bool HitTestRenderTaskList(const Vector2&    sceneSize,
     const auto&                                           exclusives = taskList.GetExclusivesList();
     RayTest                                               rayTest;
 
+    Results                                      storedResults = results;
+    std::vector<std::pair<Dali::Actor, Results>> offScreenHitResults;
     // Hit test order should be reverse of draw order
     for(RenderTaskList::RenderTaskContainer::reverse_iterator iter = tasks.rbegin(); endIter != iter; ++iter)
     {
       RenderTask& renderTask = *iter->Get();
       if(HitTestRenderTask(exclusives, sceneSize, layers, renderTask, screenCoordinates, results, hitCheck, rayTest))
       {
+        if(renderTask.GetFrameBuffer())
+        {
+          Results result = results;
+          offScreenHitResults.push_back(std::make_pair(renderTask.GetScreenToFrameBufferMappingActor(), std::move(result)));
+          continue;
+        }
+
+        if(offScreenHitResults.empty())
+        {
+          return true;
+        }
+
+        Actor* sourceActor(renderTask.GetSourceActor());
+        for(auto&& pair : offScreenHitResults)
+        {
+          Dali::Actor mappingActor = pair.first;
+          if(!mappingActor || !IsWithinSourceActors(*sourceActor, GetImplementation(mappingActor)))
+          {
+            continue;
+          }
+
+          bool mappingActorInsideHitConsumingLayer = false;
+          if(GetImplementation(results.actor).IsLayer())
+          {
+            Dali::Layer resultLayer = Dali::Layer::DownCast(results.actor);
+            // Check the resultLayer is consuming hit even though the layer is not hittable.
+            // And check the resultLayer is the layer of mappingActor too.
+            if(hitCheck.DoesLayerConsumeHit(&GetImplementation(resultLayer)) && !hitCheck.IsActorHittable(&GetImplementation(results.actor)) && results.actor == mappingActor.GetLayer())
+            {
+              mappingActorInsideHitConsumingLayer = true;
+            }
+          }
+          if(mappingActorInsideHitConsumingLayer || mappingActor == FindPriorActorInLayers(layers, Dali::Actor(sourceActor), mappingActor, results.actor))
+          {
+            results = pair.second;
+            break;
+          }
+        }
         // Return true when an actor is hit (or layer in our render-task consumes the hit)
         return true;
       }
     }
-    return false;
+
+    // When no OnScreen Actor is hitted but there are hit results from OffScreen RenderTasks
+    // those use ScreenToFrameBufferFunction, simply returns first hitted result.
+    if(!offScreenHitResults.empty())
+    {
+      results = offScreenHitResults.front().second;
+      return true;
+    }
+
+    results = storedResults;
   }
+  return false;
 }
 
 /**

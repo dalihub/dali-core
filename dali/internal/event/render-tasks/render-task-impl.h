@@ -129,7 +129,7 @@ public:
   void SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor);
 
   /**
-   * @copydoc Dali::RenderTask::GetScreenToFrameBufferMAppingActor
+   * @copydoc Dali::RenderTask::GetScreenToFrameBufferMappingActor
    */
   Dali::Actor GetScreenToFrameBufferMappingActor() const;
 
