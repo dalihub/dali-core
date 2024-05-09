@@ -1,5 +1,5 @@
-#ifndef __DALI_CONNECTION_TRACKER_H__
-#define __DALI_CONNECTION_TRACKER_H__
+#ifndef DALI_CONNECTION_TRACKER_H
+#define DALI_CONNECTION_TRACKER_H
 
 /*
  * Copyright (c) 2018 Samsung Electronics Co., Ltd.
@@ -72,6 +72,7 @@ public:
 
   /**
    * @brief Returns the connection count.
+   *
    * @SINCE_1_0.0
    * @return The connection count
    */
@@ -92,4 +93,4 @@ private:
  */
 } // namespace Dali
 
-#endif // __DALI_CONNECTION_TRACKER_H__
+#endif // DALI_CONNECTION_TRACKER_H

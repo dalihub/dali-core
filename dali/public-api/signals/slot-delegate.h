@@ -108,7 +108,7 @@ public:
   }
 
   /**
-   * @copydoc ConnectionTracker::GetConnectionCount
+   * @copydoc Dali::ConnectionTracker::GetConnectionCount
    */
   std::size_t GetConnectionCount() const
   {
