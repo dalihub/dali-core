@@ -8,5 +8,5 @@ Name: DALi 3D Engine
 Description: Cross platform 3D Engine
 Version: ${apiversion}
 Requires:
-Libs: -L${libdir} -ldali2-core
+Libs: -L${libdir} -ldali-core
 Cflags: -I${includedir}

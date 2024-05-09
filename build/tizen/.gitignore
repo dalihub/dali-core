@@ -4,5 +4,9 @@
 
 .ninja_deps
 .ninja_log
+build.ninja
 
 /*.dylib
+
+libdali-core.so.1
+libdali-core.so.1.0.0
