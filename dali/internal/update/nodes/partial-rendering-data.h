@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PARTIAL_RENDERING_DATA_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,23 @@ struct PartialRenderingData
   Vector3  size{};                /// Size
   uint32_t hash{0u};              /// Last frame's hash
 
-  bool mVisible{true};   /// Visible state (Not hashed)
-  bool mRendered{false}; /// Rendering state (Not hashed)
+  bool mVisible : 1; /// Visible state. It is depends on node's visibility (Not hashed)
+  bool mUpdated : 1; /// IsUpdated return true at this frame. Will be reset at UpdateNodes time. (Not hashed)
+
+  enum Decay
+  {
+    EXPIRED                = 0,
+    UPDATED_PREVIOUS_FRAME = 1,
+    UPDATED_CURRENT_FRAME  = 2
+  };
+  Decay mUpdateDecay : 3; ///< Update decay (aging, Not hashed)
+
+  PartialRenderingData()
+  : mVisible{true},
+    mUpdated{false},
+    mUpdateDecay{Decay::EXPIRED}
+  {
+  }
 
   /**
    * Calculate a hash from the cache data
@@ -52,20 +67,32 @@ struct PartialRenderingData
 
   /**
    * @brief Tests whether cache changed since last frame
-   * @return True if changed
+   * @return True if changed.
    */
   bool IsUpdated(PartialRenderingData& frameCache)
   {
+    if(mUpdateDecay == Decay::UPDATED_CURRENT_FRAME)
+    {
+      return mUpdated;
+    }
+
     frameCache.CalculateHash();
 
-    return hash != frameCache.hash ||
-           matrix != frameCache.matrix ||
-           color != frameCache.color ||
-           updatedPositionSize != frameCache.updatedPositionSize ||
-           size != frameCache.size ||
-           !mRendered; // If everything is the same, check if we didn't render last frame.
+    mUpdated = hash != frameCache.hash ||
+               mUpdateDecay == Decay::EXPIRED || ///< If current value is expired, so cached data is invalid.
+               matrix != frameCache.matrix ||
+               color != frameCache.color ||
+               updatedPositionSize != frameCache.updatedPositionSize ||
+               size != frameCache.size;
+
+    mUpdateDecay = Decay::UPDATED_CURRENT_FRAME;
+
+    return mUpdated;
   }
 
+  /**
+   * @brief Update cached value
+   */
   void Update(const PartialRenderingData& frameCache)
   {
     matrix              = frameCache.matrix;
@@ -74,8 +101,23 @@ struct PartialRenderingData
     size                = frameCache.size;
     hash                = frameCache.hash;
 
-    mRendered = true;
     // Don't change mVisible.
+  }
+
+  /**
+   * @brief Aging down for this data.
+   */
+  void Aging()
+  {
+    mUpdateDecay = static_cast<Decay>(static_cast<int>(mUpdateDecay) >> 1u);
+  }
+
+  /**
+   * @brief Make this data expired.
+   */
+  void MakeExpired()
+  {
+    mUpdateDecay = Decay::EXPIRED;
   }
 
 private:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,6 +180,9 @@ void Node::ConnectChild(Node* childNode)
 
   // Everything should be reinherited when reconnected to scene-graph
   childNode->SetAllDirtyFlags();
+
+  // Make sure the partial rendering data is invalidated.
+  childNode->GetPartialRenderingData().MakeExpired();
 
   // Add the node to the end of the child list.
   mChildren.PushBack(childNode);
