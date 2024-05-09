@@ -39,7 +39,6 @@ my @system_packages = (
     "pkg-config",
     "libtool",
     "ccache",
-    "libelementary-dev",
     "libexif-dev",
     "libgles2-mesa-dev",
     "libdrm-dev",
@@ -57,6 +56,19 @@ my @system_packages = (
     "libgtest-dev",
     "libcairo2-dev",
 );
+
+my $ubuntu_version = (split(/\s+/, `lsb_release -d`))[2];
+if (${ubuntu_version} > 20)
+{
+    # Add unique packages for 20.04 and above
+    push @system_packages, "libefl-all-dev";
+}
+else
+{
+    # Add unique packages for Ubuntu releases before 20.04
+    push @system_packages, "libelementary-dev";
+}
+
 
 # Some packages like require building from source
 # v8 is currently disabled until we can get it working without a http proxy being setup
