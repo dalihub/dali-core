@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H
-#define DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H
+#ifndef DALI_INTERNAL_DUMMY_MEMORY_POOL_H
+#define DALI_INTERNAL_DUMMY_MEMORY_POOL_H
 
 /*
  * Copyright (c) 2024 Samsung Electronics Co., Ltd.
@@ -31,17 +31,11 @@ namespace Dali
 namespace Internal
 {
 /**
- * @brief Memory pool for a given fixed size of memory.
+ * @brief Dummy memory pool for a given fixed size of memory.
  *
- * The pool will allocate and reclaim blocks of memory without concern for what is
- * stored in them. This means it is up to the client to construct/destruct objects
- * and hence determine what data type is stored in the memory block. See FixedSizeObjectAllocator
- * below for an example client for creating objects of a given type. It is also up to the client
- * to ensure that the size of the block takes memory alignment into account for the
- * type of data they wish to store in the block. The TypeSizeWithAlignment<T> template
- * can be useful for determining the size of memory aligned blocks for a given type.
+ * It will be used when memory pool object allocator don't want to use fixed size memory pool.
  */
-class FixedSizeMemoryPool : public MemoryPoolInterface
+class DummyMemoryPool : public MemoryPoolInterface
 {
 public:
   using SizeType = MemoryPoolInterface::SizeType;
@@ -51,19 +45,14 @@ public:
   /**
    * @brief Constructor.
    *
-   * @param fixedSize The fixed size of each memory allocation. Use TypeSizeWithAlignment if aligned memory is required.
-   * @param initialCapacity The initial size of the memory pool. Defaults to a small value (32) after
-   *                        which the capacity will double as needed.
-   * @param maximumBlockCapacity The maximum size that a new block of memory can be allocated. Defaults to
-   *                             a large value (1024 * 1024 = 1048576).
-   * @param[in] maximumBlockCount The maximum number of blocks that can be allocated, or -1 for unlimited
+   * @param[in] fixedSize The fixed size of each memory allocation. Use TypeSizeWithAlignment if aligned memory is required.
    */
-  explicit FixedSizeMemoryPool(SizeType fixedSize, SizeType initialCapacity = 32, SizeType maximumBlockCapacity = 1048576, SizeType maximumBlockCount = 0xffffffff);
+  explicit DummyMemoryPool(SizeType fixedSize);
 
   /**
    * @brief Destructor.
    */
-  ~FixedSizeMemoryPool() override;
+  ~DummyMemoryPool() override;
 
   /**
    * @copydoc Dali::Internal::MemoryPoolInterface::Allocate
@@ -107,10 +96,10 @@ public:
 
 private:
   // Undefined
-  FixedSizeMemoryPool(const FixedSizeMemoryPool& fixedSizeMemoryPool);
+  DummyMemoryPool(const DummyMemoryPool& dummyMemoryPool);
 
   // Undefined
-  FixedSizeMemoryPool& operator=(const FixedSizeMemoryPool& fixedSizeMemoryPool);
+  DummyMemoryPool& operator=(const DummyMemoryPool& dummyMemoryPool);
 
 private:
   struct Impl;

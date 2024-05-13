@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -281,15 +281,15 @@ bool TransformManager::Update()
         // Compute intermediate Local information
         CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
         Vector3 intermediateLocalPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex];
-        Matrix intermediateLocalMatrix;
+        Matrix  intermediateLocalMatrix;
         intermediateLocalMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, intermediateLocalPosition);
 
         // Compute intermediate world information
         Matrix intermediateWorldMatrix;
         MatrixUtils::MultiplyTransformMatrix(intermediateWorldMatrix, intermediateLocalMatrix, mWorld[parentIndex]);
 
-        Vector3       intermediateWorldPosition, intermediateWorldScale;
-        Quaternion    intermediateWorldOrientation;
+        Vector3    intermediateWorldPosition, intermediateWorldScale;
+        Quaternion intermediateWorldOrientation;
         intermediateWorldMatrix.GetTransformComponents(intermediateWorldPosition, intermediateWorldOrientation, intermediateWorldScale);
 
         // Compute final world information
@@ -431,6 +431,48 @@ void TransformManager::ReorderComponents()
       SwapComponents(previousIndex, newIndex);
     }
   }
+
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  // Since Resize() operation will make overhead when we create new Transform::Data, let we check shrink to fit trigger like this.
+  if(DALI_UNLIKELY(static_cast<decltype(mTxComponentAnimatable)::SizeType>(mComponentCount) * Dali::VectorBase::SHRINK_REQUIRED_RATIO < mTxComponentAnimatable.Capacity()))
+  {
+    // Reduce the capacity of vector.
+    // Note that reduce vector capacity will make performance down.
+    // Please do not doing this frequencly.
+
+    // NOTE : We cannot reduce FreeList type for now.
+
+    mTxComponentAnimatable.Resize(mComponentCount);
+    mTxComponentStatic.Resize(mComponentCount);
+    mInheritanceMode.Resize(mComponentCount);
+    mComponentId.Resize(mComponentCount);
+    mSize.Resize(mComponentCount);
+    mParent.Resize(mComponentCount);
+    mWorld.Resize(mComponentCount);
+    mLocal.Resize(mComponentCount);
+    mBoundingSpheres.Resize(mComponentCount);
+    mTxComponentAnimatableBaseValue.Resize(mComponentCount);
+    mSizeBase.Resize(mComponentCount);
+    mComponentDirty.Resize(mComponentCount);
+    mLocalMatrixDirty.Resize(mComponentCount);
+    mOrderedComponents.Resize(mComponentCount);
+
+    mTxComponentAnimatable.ShrinkToFit();
+    mTxComponentStatic.ShrinkToFit();
+    mInheritanceMode.ShrinkToFit();
+    mComponentId.ShrinkToFit();
+    mSize.ShrinkToFit();
+    mParent.ShrinkToFit();
+    mWorld.ShrinkToFit();
+    mLocal.ShrinkToFit();
+    mBoundingSpheres.ShrinkToFit();
+    mTxComponentAnimatableBaseValue.ShrinkToFit();
+    mSizeBase.ShrinkToFit();
+    mComponentDirty.ShrinkToFit();
+    mLocalMatrixDirty.ShrinkToFit();
+    mOrderedComponents.ShrinkToFit();
+  }
+#endif
 }
 
 Vector3& TransformManager::GetVector3PropertyValue(TransformId id, TransformManagerProperty property)

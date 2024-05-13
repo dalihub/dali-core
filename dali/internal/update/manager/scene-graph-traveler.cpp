@@ -100,7 +100,9 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
 void SceneGraphTraveler::Clear()
 {
   mTravledNodeMap.clear();
+#if !defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mTravledNodeMap.rehash(0u); ///< Note : We have to reduce capacity of hash map. Without this line, clear() API will be slow downed.
+#endif
   if(!mInvalidated)
   {
     mTravledNodeMap.insert({mRootNode.GetId(), &mRootNode});

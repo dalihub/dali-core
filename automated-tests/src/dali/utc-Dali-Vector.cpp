@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1385,6 +1385,104 @@ int UtcDaliVectorMoveAssignment(void)
   movedTo = std::move(movedFrom);
   DALI_TEST_EQUALS(movedTo.Size(), 3u, TEST_LOCATION);
   DALI_TEST_EQUALS(movedFrom.Size(), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+int UtcDaliVectorInitializeWithSize(void)
+{
+  tet_infoline("Test vector initialize with size");
+
+  Vector<int> vector(5);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5), vector.Capacity(), TEST_LOCATION);
+
+  for(int i = 0; i < 5; i++)
+  {
+    vector[i] = i;
+  }
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5), vector.Capacity(), TEST_LOCATION);
+  for(int i = 0; i < 5; i++)
+  {
+    DALI_TEST_EQUALS(vector[i], i, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVectorShrinkToFit(void)
+{
+  tet_infoline("Testing Dali::Vector::ShrinkToFit");
+
+  Vector<int> vector;
+
+  // erasing from empty vector
+  Dali::EraseIf(vector, [](const auto& value) { return value == 2; });
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(ZERO, vector.Capacity(), TEST_LOCATION);
+
+  vector.PushBack(1);
+  vector.PushBack(2);
+  vector.PushBack(3);
+  vector.PushBack(4);
+  vector.PushBack(5);
+  vector.PushBack(3);
+
+  // erase multiple value
+  Dali::EraseIf(vector, [](const auto& value) { return value == 3; });
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(4), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(vector[0], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 5, TEST_LOCATION);
+
+  // erase an element present at start
+  Dali::EraseIf(vector, [](const auto& value) { return value == 1; });
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(3), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 5, TEST_LOCATION);
+
+  // erase an element present at end
+  Dali::EraseIf(vector, [](const auto& value) { return value == 5; });
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(2), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 4, TEST_LOCATION);
+
+  // erase an element not present in the vector
+  Dali::EraseIf(vector, [](const auto& value) { return value == 42; });
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(2), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 4, TEST_LOCATION);
+
+  vector.PushBack(3);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(3), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 3, TEST_LOCATION);
+
+  // Call shrink to fit API. It will make capacity fit to vector size.
+  vector.ShrinkToFit();
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), vector.Capacity(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 3, TEST_LOCATION);
+
+  vector.Clear();
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(0), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), vector.Capacity(), TEST_LOCATION);
+
+  // Call shrink to fit at empty vector.
+  vector.ShrinkToFit();
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(0), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(0), vector.Capacity(), TEST_LOCATION);
 
   END_TEST;
 }

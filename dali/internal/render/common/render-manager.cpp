@@ -65,6 +65,25 @@ namespace
 // TODO : Cache clean logic have some problem now. Just block it until bug resolved
 //constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600u; // 60fps * 10sec
 
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+constexpr uint32_t SHRINK_TO_FIT_FRAME_COUNT = (1u << 8); ///< 256 frames. Make this value as power of 2.
+
+/**
+ * Flag whether property has changed, during the Render phase.
+ */
+enum ContainerRemovedFlagBits : uint8_t
+{
+  NOTHING  = 0x00,
+  RENDERER = 0x01,
+  TEXTURE  = 0x02,
+};
+
+/**
+ * @brief ContainerRemovedFlags alters behaviour of implementation
+ */
+using ContainerRemovedFlags = uint8_t;
+#endif
+
 inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorArea, int orientation, const Rect<int32_t>& viewportRect)
 {
   Graphics::Rect2D newScissorArea;
@@ -140,6 +159,9 @@ struct RenderManager::Impl
   : graphicsController(graphicsController),
     renderAlgorithms(graphicsController),
     programController(graphicsController),
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
+#endif
     depthBufferAvailable(depthBufferAvailableParam),
     stencilBufferAvailable(stencilBufferAvailableParam),
     partialUpdateAvailable(partialUpdateAvailableParam)
@@ -193,6 +215,10 @@ struct RenderManager::Impl
 
   std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
   std::unique_ptr<Render::PipelineCache>        pipelineCache;
+
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
+#endif
 
   Integration::DepthBufferAvailable   depthBufferAvailable;   ///< Whether the depth buffer is available
   Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
@@ -255,6 +281,9 @@ void RenderManager::AddRenderer(const Render::RendererKey& renderer)
 void RenderManager::RemoveRenderer(const Render::RendererKey& renderer)
 {
   mImpl->rendererContainer.EraseKey(renderer);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::RENDERER;
+#endif
 }
 
 void RenderManager::AddSampler(OwnerPointer<Render::Sampler>& sampler)
@@ -291,6 +320,10 @@ void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
 
     // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
     mImpl->textureDiscardQueue.PushBack(mImpl->textureContainer.Release(iter));
+
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::TEXTURE;
+#endif
   }
 }
 
@@ -760,8 +793,12 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   }
 
   // Check removed nodes or removed renderers dirty rects
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  for(auto iter = itemsDirtyRects.begin(); iter != itemsDirtyRects.end();)
+#else
   // Note, std::unordered_map end iterator is validate if we call erase.
   for(auto iter = itemsDirtyRects.cbegin(), iterEnd = itemsDirtyRects.cend(); iter != iterEnd;)
+#endif
   {
     if(!iter->second.visited)
     {
@@ -1165,6 +1202,29 @@ void RenderManager::PostRender()
     mImpl->programController.ClearUnusedCache();
   }
   */
+
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  // Shrink relevant containers if required.
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::RENDERER)
+  {
+    mImpl->rendererContainer.ShrinkToFitIfNeeded();
+  }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::TEXTURE)
+  {
+    mImpl->textureContainer.ShrinkToFitIfNeeded();
+  }
+
+  // Both containers always have empty slots, so we can shrink them.
+  // Note that we don't need to release it every frames. So just check every specific frames
+  if((mImpl->frameCount & (SHRINK_TO_FIT_FRAME_COUNT - 1)) == 0)
+  {
+    mImpl->updatedTextures.ShrinkToFit();
+    mImpl->textureDiscardQueue.ShrinkToFit();
+  }
+
+  // Reset flag
+  mImpl->containerRemovedFlags = ContainerRemovedFlagBits::NOTHING;
+#endif
 
   const bool haveInstructions = count > 0u;
 

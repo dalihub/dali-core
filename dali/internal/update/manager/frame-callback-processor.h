@@ -20,7 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <memory>
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+#include <dali/devel-api/common/map-wrapper.h>
+#else
 #include <unordered_map>
+#endif
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
@@ -113,7 +117,11 @@ private:
 
   TransformManager& mTransformManager;
 
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  using TravelerContainer = std::map<const Node*, SceneGraphTravelerPtr>;
+#else
   using TravelerContainer = std::unordered_map<const Node*, SceneGraphTravelerPtr>;
+#endif
   TravelerContainer mRootNodeTravelerMap;
 
   SceneGraphTravelerInterfacePtr mGlobalTraveler;
