@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,18 +182,18 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  void PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
   {
     if(!mDisconnected)
     {
-      // Stop observing property owners
-      StopObservation();
+      // Call PropertyOwnerDestroyed(), for reduce duplicated code.
+      ConstraintBase::PropertyOwnerDestroyed(owner);
 
-      // Notification for derived class
-      OnDisconnect();
-
-      mDisconnected = true;
+      // Let we make owner Stop observing this.
+      return NotifyReturnType::STOP_OBSERVING;
     }
+
+    return NotifyReturnType::KEEP_OBSERVING;
   }
 
   /**

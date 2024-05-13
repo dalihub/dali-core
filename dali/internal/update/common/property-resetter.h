@@ -108,9 +108,10 @@ public:
    * @param[in] bufferIndex the current buffer index
    * @param[in] owner The property owner
    */
-  void PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
   {
     mDisconnected = true;
+    return NotifyReturnType::KEEP_OBSERVING;
   }
 
   /**

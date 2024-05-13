@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,28 @@
 namespace Dali
 {
 BaseObject::Impl::Impl(BaseObject& baseObject)
-: mBaseObject(baseObject)
+: mBaseObject(baseObject),
+  mObservers(),
+  mObserverNotifying(false)
 {
 }
 
 BaseObject::Impl::~Impl()
 {
+  // Guard Add/Remove observer during observer notifying.
+  mObserverNotifying = true;
+
   // Notification for observers
   for(auto&& item : mObservers)
   {
     item->ObjectDestroyed(mBaseObject);
   }
+
+  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
+  // If someone call AddObserver / RemoveObserver after this, assert.
+
+  // Remove all observers
+  mObservers.Clear();
 }
 
 BaseObject::Impl& BaseObject::Impl::Get(BaseObject& baseObject)
@@ -46,6 +57,8 @@ const BaseObject::Impl& BaseObject::Impl::Get(const BaseObject& baseObject)
 
 void BaseObject::Impl::AddObserver(Observer& observer)
 {
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying BaseObject::Impl::Observers");
+
   // make sure an observer doesn't observe the same object twice
   // otherwise it will get multiple calls to ObjectDestroyed()
   DALI_ASSERT_DEBUG(mObservers.End() == std::find(mObservers.Begin(), mObservers.End(), &observer));
@@ -55,6 +68,8 @@ void BaseObject::Impl::AddObserver(Observer& observer)
 
 void BaseObject::Impl::RemoveObserver(Observer& observer)
 {
+  DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying BaseObject::Impl::Observers");
+
   // Find the observer...
   const auto endIter = mObservers.End();
   for(auto iter = mObservers.Begin(); iter != endIter; ++iter)

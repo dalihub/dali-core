@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,9 @@ class Object : public Dali::BaseObject
 {
 public:
   using Capability = Dali::Handle::Capability;
+
+  class Observer;
+  using ObserverContainer = Dali::Vector<Observer*>;
 
   class Observer
   {
@@ -594,7 +597,7 @@ protected:
   mutable const SceneGraph::PropertyOwner* mUpdateObject; ///< Reference to object to hold the scene graph properties
 
 private:
-  Dali::Vector<Observer*>                   mObservers;
+  ObserverContainer                         mObservers;
   mutable OwnerContainer<PropertyMetadata*> mCustomProperties;     ///< Used for accessing custom Node properties
   mutable OwnerContainer<PropertyMetadata*> mAnimatableProperties; ///< Used for accessing animatable Node properties
   mutable const TypeInfo*                   mTypeInfo;             ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
@@ -605,6 +608,10 @@ private:
   PropertyNotificationContainer* mPropertyNotifications; ///< Container of owned property notifications.
 
   Handle::PropertySetSignalType mPropertySetSignal;
+
+public:                        /// To be used at observer container changes only.
+  bool mObserverNotifying : 1; ///< Whether we are currently notifying observers.
+  bool mObserverRemoved : 1;   ///< Whether we have removed an observer during notify.
 };
 
 } // namespace Internal
