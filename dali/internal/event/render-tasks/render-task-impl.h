@@ -71,6 +71,8 @@ public:
    */
   Actor* GetSourceActor() const;
 
+  Actor* GetStopperActor() const;
+
   /**
    * @copydoc Dali::RenderTask::SetExclusive()
    */
@@ -127,7 +129,7 @@ public:
   void SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor);
 
   /**
-   * @copydoc Dali::RenderTask::GetScreenToFrameBufferMAppingActor
+   * @copydoc Dali::RenderTask::GetScreenToFrameBufferMappingActor
    */
   Dali::Actor GetScreenToFrameBufferMappingActor() const;
 
@@ -284,6 +286,8 @@ public:
    */
   uint32_t GetRenderTaskId() const;
 
+  void RenderUntil(Actor* actor);
+
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
    * Retrieve the scene-graph RenderTask object.
@@ -388,6 +392,7 @@ private:
   ActorObserver           mSourceActor;        ///< Source actor
   ActorObserver           mCameraActor;        ///< Camera actor
   ActorObserver           mViewportGuideActor; ///< Actor to matching viewport of this render task to this Actor.
+  ActorObserver           mStopperActor;       ///< A child of mSourceActor. Actor to stop rendering.
   WeakHandle<Dali::Actor> mInputMappingActor;  /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
   RenderTaskList&         mRenderTaskList;     ///< The render task list
 

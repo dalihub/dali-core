@@ -218,14 +218,16 @@ using Padding = Rect<float>; ///< Padding definition @SINCE_1_0.0
  * @nosubgrouping
  *
  * Signals
- * | %Signal Name      | Method                       |
- * |-------------------|------------------------------|
- * | touched           | @ref TouchedSignal()         |
- * | hovered           | @ref HoveredSignal()         |
- * | wheelEvent        | @ref WheelEventSignal()      |
- * | onScene           | @ref OnSceneSignal()         |
- * | offScene          | @ref OffSceneSignal()        |
- * | onRelayout        | @ref OnRelayoutSignal()      |
+ * | %Signal Name               | Method                                  |
+ * |----------------------------|-----------------------------------------|
+ * | touched                    | @ref TouchedSignal()                    |
+ * | hovered                    | @ref HoveredSignal()                    |
+ * | wheelEvent                 | @ref WheelEventSignal()                 |
+ * | onScene                    | @ref OnSceneSignal()                    |
+ * | offScene                   | @ref OffSceneSignal()                   |
+ * | onRelayout                 | @ref OnRelayoutSignal()                 |
+ * | layoutDirectionChanged     | @ref LayoutDirectionChangedSignal()     |
+ * | inheritedVisibilityChanged | @ref InheritedVisibilityChangedSignal() |
  *
  * Actions
  * | %Action Name      | %Actor method called         |
@@ -743,13 +745,14 @@ public:
 
   // Typedefs
 
-  using TouchEventSignalType             = Signal<bool(Actor, const TouchEvent&)>;     ///< Touch signal type @SINCE_1_1.37
-  using HoverSignalType                  = Signal<bool(Actor, const HoverEvent&)>;     ///< Hover signal type @SINCE_1_0.0
-  using WheelEventSignalType             = Signal<bool(Actor, const WheelEvent&)>;     ///< Wheel signal type @SINCE_1_0.0
-  using OnSceneSignalType                = Signal<void(Actor)>;                        ///< Scene connection signal type @SINCE_1_9.24
-  using OffSceneSignalType               = Signal<void(Actor)>;                        ///< Scene disconnection signal type @SINCE_1_9.24
-  using OnRelayoutSignalType             = Signal<void(Actor)>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
-  using LayoutDirectionChangedSignalType = Signal<void(Actor, LayoutDirection::Type)>; ///< Layout direction changes signal type. @SINCE_1_2.60
+  using TouchEventSignalType                 = Signal<bool(Actor, const TouchEvent&)>;     ///< Touch signal type @SINCE_1_1.37
+  using HoverSignalType                      = Signal<bool(Actor, const HoverEvent&)>;     ///< Hover signal type @SINCE_1_0.0
+  using WheelEventSignalType                 = Signal<bool(Actor, const WheelEvent&)>;     ///< Wheel signal type @SINCE_1_0.0
+  using OnSceneSignalType                    = Signal<void(Actor)>;                        ///< Scene connection signal type @SINCE_1_9.24
+  using OffSceneSignalType                   = Signal<void(Actor)>;                        ///< Scene disconnection signal type @SINCE_1_9.24
+  using OnRelayoutSignalType                 = Signal<void(Actor)>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
+  using LayoutDirectionChangedSignalType     = Signal<void(Actor, LayoutDirection::Type)>; ///< Layout direction changes signal type. @SINCE_1_2.60
+  using InheritedVisibilityChangedSignalType = Signal<void(Actor, bool)>;                  ///< Signal type of InheritedVisibilityChangedSignalType. @SINCE_2_3.22
 
   // Creation
 
@@ -1124,6 +1127,7 @@ public:
 public: // Renderer
   /**
    * @brief Adds a renderer to this actor.
+   * @note We don't allow to add duplicated renderers. If we add the same renderer twice, it will just return the index of renderer.
    *
    * @SINCE_1_0.0
    * @param[in] renderer Renderer to add to the actor
@@ -1287,6 +1291,30 @@ public: // Signals
    * @pre The Actor has been initialized.
    */
   LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
+
+  /**
+   * @brief This signal is emitted when the visible property of this actor or any of its parents (right up to the root layer) changes.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Actor actor, bool visible );
+   * @endcode
+   * actor: The actor whose inherited visibility has changed.
+   * visible: This is true if this actor's inherited VISIBLE property is true.
+   * If it is true, it denotes one of the 2 cases.
+   * One is VISIBLE property of this actor or only one of the parent actors were originally false and it becomes true now.
+   * Another is this actor is connected on Scene now with that the VISIBLE property of this actor and all of its parent were true.
+   * If it is false, it also denotes one of the 2 cases.
+   * One is that VISIBLE property of this actor and all of the parent actors were originally true but one of them becomes false now.
+   * Another is VISIBLE property of this actor and all of the parent actors are true and this actor is disconnected from the Scene now.
+   *
+   * @SINCE_2_3.22
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
+   * @note For reference, an actor is only shown if it and it's parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
+   */
+  DALI_CORE_API InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

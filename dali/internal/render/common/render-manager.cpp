@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
-#include <dali/internal/common/ordered-set.h>
+#include <dali/integration-api/ordered-set.h>
 
 #include <dali/internal/event/common/scene-impl.h>
 
@@ -178,14 +178,14 @@ struct RenderManager::Impl
   std::vector<SceneGraph::Scene*> sceneContainer;   ///< List of pointers to the scene graph objects of the scenes
   Render::RenderAlgorithms        renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
-  OrderedSet<Render::Sampler>         samplerContainer;      ///< List of owned samplers
-  OrderedSet<Render::FrameBuffer>     frameBufferContainer;  ///< List of owned framebuffers
-  OrderedSet<Render::VertexBuffer>    vertexBufferContainer; ///< List of owned vertex buffers
-  OrderedSet<Render::Geometry>        geometryContainer;     ///< List of owned Geometries
-  OwnerKeyContainer<Render::Renderer> rendererContainer;     ///< List of owned renderers
-  OwnerKeyContainer<Render::Texture>  textureContainer;      ///< List of owned textures
+  Integration::OrderedSet<Render::Sampler>      samplerContainer;      ///< List of owned samplers
+  Integration::OrderedSet<Render::FrameBuffer>  frameBufferContainer;  ///< List of owned framebuffers
+  Integration::OrderedSet<Render::VertexBuffer> vertexBufferContainer; ///< List of owned vertex buffers
+  Integration::OrderedSet<Render::Geometry>     geometryContainer;     ///< List of owned Geometries
+  OwnerKeyContainer<Render::Renderer>           rendererContainer;     ///< List of owned renderers
+  OwnerKeyContainer<Render::Texture>            textureContainer;      ///< List of owned textures
 
-  OrderedSet<Render::RenderTracker> mRenderTrackers; ///< List of owned render trackers
+  Integration::OrderedSet<Render::RenderTracker> mRenderTrackers; ///< List of owned render trackers
 
   OwnerKeyContainer<Render::Texture> textureDiscardQueue; ///< Discarded textures
 
@@ -538,6 +538,14 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   if(!sceneObject || sceneObject->IsRenderingSkipped())
   {
     // We don't need to calculate dirty rects
+    if(!sceneObject)
+    {
+      DALI_LOG_ERROR("Scene was empty handle. Skip pre-rendering\n");
+    }
+    else
+    {
+      DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
+    }
     return;
   }
 
@@ -782,6 +790,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   SceneGraph::Scene* sceneObject = GetImplementation(scene).GetSceneObject();
   if(!sceneObject)
   {
+    DALI_LOG_ERROR("Scene was empty handle. Skip rendering\n");
     return;
   }
 
@@ -793,7 +802,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 {
   if(mImpl->partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE && !renderToFbo && clippingRect.IsEmpty())
   {
-    // ClippingRect is empty. Skip rendering
+    DALI_LOG_DEBUG_INFO("ClippingRect was empty. Skip rendering\n");
     return;
   }
 
@@ -806,6 +815,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
   if(!sceneObject)
   {
+    DALI_LOG_ERROR("Scene was empty handle. Skip rendering\n");
     return;
   }
 

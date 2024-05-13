@@ -692,6 +692,89 @@ int UtcDaliRenderTaskGetSourceActorN(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskGetStopperActorP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetStopperActor() Create a new render task, Add a new actor to the stage and set RenderTask::RenderUntil(actor). Get its stopper actor and check it is equivalent to what was set.");
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.CreateTask();
+  Actor          actor    = Actor::New();
+  application.GetScene().Add(actor);
+  task.RenderUntil(actor);
+
+  DALI_TEST_EQUALS(actor, task.GetStopperActor(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetStopperActorN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetStopperActor() Try with empty handle");
+
+  RenderTask task;
+
+  try
+  {
+    Actor actor = task.GetStopperActor();
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskRenderUntil(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that rendering stops at the actor.");
+
+  // Make a new render task and compose a tree.
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.GetTask(0u);
+
+  Integration::Scene stage = application.GetScene();
+
+  Actor secondChild;
+  for(int i = 0; i < 5; i++)
+  {
+    Actor parent = CreateRenderableActor();
+    parent.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+    parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    Actor  child = CreateRenderableActor();
+    child.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+    stage.Add(parent);
+    parent.Add(child);
+
+    if (i == 1)
+    {
+      secondChild = child;
+    }
+  }
+  task.RenderUntil(secondChild);
+
+  // Update & Render with the actor on-stage
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut.
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskSetExclusive(void)
 {
   TestApplication application;

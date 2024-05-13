@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3078,13 +3078,121 @@ int UtcDaliSceneGetNativeId(void)
 {
   TestApplication application; // Initializes
 
-  Dali::Integration::Scene scene = application.GetScene();
-  int32_t nativeId = scene.GetNativeId();
+  Dali::Integration::Scene scene    = application.GetScene();
+  int32_t                  nativeId = scene.GetNativeId();
   DALI_TEST_EQUALS(nativeId, 0, TEST_LOCATION);
 
   // Test that setting native id
   scene.SetNativeId(1);
   nativeId = scene.GetNativeId();
   DALI_TEST_EQUALS(nativeId, 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliSceneRemoveSceneObjectAndRender01(void)
+{
+  tet_infoline("Test that removing a scene object and rendering does not crash");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  auto defaultScene = application.GetScene();
+  DALI_TEST_CHECK(defaultScene);
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  defaultScene.Add(actor1);
+
+  // Create a Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(scene);
+
+  application.AddScene(scene);
+
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  scene.Add(actor2);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  scene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
+
+  // Partial Render and notify.
+  application.SendNotification();
+  application.RenderWithPartialUpdate(0, TEST_LOCATION);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  scene.Discard();
+  scene.Reset();
+
+  application.SendNotification();
+  application.Render(0);
+
+  END_TEST;
+}
+
+int UtcDaliSceneRemoveSceneObjectAndRender02(void)
+{
+  tet_infoline("Same UTC with UtcDaliSceneRemoveSceneObjectAndRender01, but let we make application doesn't use PartialUpdate");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    false);
+
+  auto defaultScene = application.GetScene();
+  DALI_TEST_CHECK(defaultScene);
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  defaultScene.Add(actor1);
+
+  // Create a Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(scene);
+
+  application.AddScene(scene);
+
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  scene.Add(actor2);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  scene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
+
+  // Partial Render and notify.
+  application.SendNotification();
+  application.RenderWithPartialUpdate(0, TEST_LOCATION);
+
+  // Render and notify.
+  application.SendNotification();
+  application.Render(0);
+
+  scene.Discard();
+  scene.Reset();
+
+  application.SendNotification();
+  application.Render(0);
+
   END_TEST;
 }

@@ -94,6 +94,16 @@ Node* RenderTask::GetSourceNode() const
   return mSourceNode;
 }
 
+void RenderTask::SetStopperNode(Node* node)
+{
+  mStopperNode = node;
+}
+
+Node* RenderTask::GetStopperNode() const
+{
+  return mStopperNode;
+}
+
 void RenderTask::SetViewportGuideNode(Node* node)
 {
   mViewportGuideNode = node;

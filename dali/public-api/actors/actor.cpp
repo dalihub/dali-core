@@ -259,6 +259,11 @@ Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
   return GetImplementation(*this).LayoutDirectionChangedSignal();
 }
 
+Actor::InheritedVisibilityChangedSignalType& Actor::InheritedVisibilityChangedSignal()
+{
+  return GetImplementation(*this).InheritedVisibilityChangedSignal();
+}
+
 Actor::Actor(Internal::Actor* internal)
 : Handle(internal)
 {

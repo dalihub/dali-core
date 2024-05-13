@@ -256,6 +256,8 @@ public:
    */
   Actor GetSourceActor() const;
 
+  Actor GetStopperActor() const;
+
   /**
    * @brief Sets whether the RenderTask has exclusive access to the source actors; the default is false.
    * @SINCE_1_0.0
@@ -578,6 +580,8 @@ public:
    * @return The unique id of RenderTask, or 0 if invalid.
    */
   uint32_t GetRenderTaskId() const;
+
+  void RenderUntil(Actor actor);
 
 public: // Signals
   /**

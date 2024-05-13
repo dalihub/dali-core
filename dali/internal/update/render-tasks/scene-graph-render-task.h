@@ -87,6 +87,9 @@ public:
    */
   Node* GetSourceNode() const;
 
+  void SetStopperNode(Node* node);
+  Node* GetStopperNode() const;
+
   /**
    * Set the ViewportGuideNode.
    * @param[in] node This node is used to compute viewport of the render task.
@@ -406,6 +409,7 @@ private:
   RenderMessageDispatcher* mRenderMessageDispatcher;
   Render::RenderTracker*   mRenderSyncTracker;
   Node*                    mSourceNode;
+  Node*                    mStopperNode;
   SceneGraph::Camera*      mCameraNode;
   Node*                    mViewportGuideNode;
   Render::FrameBuffer*     mFrameBuffer;

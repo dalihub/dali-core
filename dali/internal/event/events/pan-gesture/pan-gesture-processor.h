@@ -221,6 +221,18 @@ public: // To be called by GestureEventProcessor
    */
   void SetMultitapSmoothingRange(int value);
 
+  /**
+   * This method sets the minimum distance to start a pan
+   * @param[in] value The distance in pixels
+   */
+  void SetMinimumDistance(int32_t value);
+
+  /**
+   * Sets the minimum touch events required before a pan can be started
+   * @param[in] value The number of touch events
+   */
+  void SetMinimumPanEvents(int32_t value);
+
 public: // for PanGestureDetector
   /**
    * @return the pan gesture scene object

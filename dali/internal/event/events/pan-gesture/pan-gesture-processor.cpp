@@ -495,6 +495,31 @@ void PanGestureProcessor::SetMultitapSmoothingRange(int value)
   mSceneObject->SetMultitapSmoothingRange(value);
 }
 
+void PanGestureProcessor::SetMinimumDistance(int32_t value)
+{
+  if(mGestureRecognizer)
+  {
+    PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
+    if(panRecognizer)
+    {
+      panRecognizer->SetMinimumDistance(value);
+    }
+  }
+}
+
+void PanGestureProcessor::SetMinimumPanEvents(int32_t value)
+{
+  if(mGestureRecognizer)
+  {
+    PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
+    if(panRecognizer)
+    {
+      panRecognizer->SetMinimumPanEvents(value);
+    }
+  }
+}
+
+
 const SceneGraph::PanGesture& PanGestureProcessor::GetSceneObject() const
 {
   return *mSceneObject;

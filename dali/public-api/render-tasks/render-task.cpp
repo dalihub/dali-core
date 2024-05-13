@@ -85,6 +85,11 @@ Actor RenderTask::GetSourceActor() const
   return Dali::Actor(GetImplementation(*this).GetSourceActor());
 }
 
+Actor RenderTask::GetStopperActor() const
+{
+  return Dali::Actor(GetImplementation(*this).GetStopperActor());
+}
+
 void RenderTask::SetExclusive(bool exclusive)
 {
   GetImplementation(*this).SetExclusive(exclusive);
@@ -305,6 +310,13 @@ int32_t RenderTask::GetOrderIndex() const
 uint32_t RenderTask::GetRenderTaskId() const
 {
   return GetImplementation(*this).GetRenderTaskId();
+}
+
+void RenderTask::RenderUntil(Actor actor)
+{
+  DALI_ASSERT_ALWAYS(actor && "RenderUntil() actor does not exist.");
+  Internal::Actor* actorImpl(&GetImplementation(actor));
+  return GetImplementation(*this).RenderUntil(actorImpl);
 }
 
 RenderTask::RenderTask(Internal::RenderTask* internal)

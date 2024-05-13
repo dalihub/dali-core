@@ -91,6 +91,20 @@ inline void SetSourceNodeMessage(EventThreadServices& eventThreadServices, const
   new(slot) LocalType(&task, &RenderTask::SetSourceNode, node);
 }
 
+inline void SetStopperNodeMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Node* constNode)
+{
+  // Scene graph thread can destroy this object.
+  Node* node = const_cast<Node*>(constNode);
+
+  using LocalType = MessageValue1<RenderTask, Node*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&task, &RenderTask::SetStopperNode, node);
+}
+
 inline void SetCameraMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Camera* constCamera)
 {
   using LocalType = MessageValue1<RenderTask, Camera*>;

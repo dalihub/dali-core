@@ -1,8 +1,8 @@
-#ifndef DALI_INTERNAL_ORDERED_SET_H
-#define DALI_INTERNAL_ORDERED_SET_H
+#ifndef DALI_INTEGRATION_ORDERED_SET_H
+#define DALI_INTEGRATION_ORDERED_SET_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@
 
 namespace Dali
 {
-namespace Internal
+namespace Integration
 {
 /**
  * @brief Container of data which has strong point to Find & Erase.
  * It will be useful when we need to iterate the order of data insertion.
  * and need to check whether some object is exist or not very fast.
  * @note Since the data's memory is not continuos, iteration is slower than normal vector contianer.
+ * @note Currently, we only support to hold pointer type data.
  *
  * @tparam T The type of class
  * @tparam owned True if data is owned, So we will automatcally release the memory
@@ -316,8 +317,7 @@ private:
   MapContainer  mMap{};  ///< Helper cache map to find item fast.
   ListContainer mList{}; ///< Ordered by PushBack API called. Actual ownership will be stored here.
 };
-} // namespace Internal
-
+} // namespace Integration
 } // namespace Dali
 
-#endif // DALI_INTERNAL_ORDERED_SET_H
+#endif // DALI_INTEGRATION_ORDERED_SET_H
