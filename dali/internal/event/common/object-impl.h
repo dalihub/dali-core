@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -112,7 +113,7 @@ public:
   using Capability = Dali::Handle::Capability;
 
   class Observer;
-  using ObserverContainer = Dali::Vector<Observer*>;
+  using ObserverContainer = Integration::OrderedSet<Observer, false>;
 
   class Observer
   {

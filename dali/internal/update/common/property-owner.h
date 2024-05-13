@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
@@ -287,7 +288,7 @@ protected:
   bool                   mIsConnectedToSceneGraph;
 
 private:
-  using ObserverContainer = Dali::Vector<PropertyOwner::Observer*>;
+  using ObserverContainer = Integration::OrderedSet<PropertyOwner::Observer, false>;
   using ObserverIter      = ObserverContainer::Iterator;
   using ConstObserverIter = ObserverContainer::ConstIterator;
 
