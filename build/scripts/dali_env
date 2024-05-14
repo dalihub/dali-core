@@ -171,7 +171,7 @@ if( $opt_vulkanVersion ne "" )
 else
 {
   # Default Vulkan Version if version not specified, will only be installed if --vulkan is specified
-  $opt_vulkanVersion="1.1.108.0"
+  $opt_vulkanVersion="1.3.280.1"
 }
 
 if( $opt_vulkanInstaller ne "" )

@@ -39,6 +39,12 @@ class Shader;
 class Texture;
 
 /**
+ * Forward declare an opaque Surface type.
+ */
+struct Surface;
+
+
+/**
  * @brief Structure describes 2D offset
  */
 struct Offset2D
@@ -1533,11 +1539,6 @@ struct DefaultDeleter
 
   void (*deleteFunction)(T* object){nullptr}; ///< Custom delete function
 };
-
-/**
- * Surface type is just a void* to any native object.
- */
-using Surface = void;
 
 /**
  * @brief Enum describing preTransform of render target

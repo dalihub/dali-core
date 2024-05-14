@@ -56,7 +56,7 @@ struct RenderTargetCreateInfo
   /**
    * @brief Sets surface associated with the RenderTarget
    *
-   * The surface is a a pointer to any native surface object.
+   * The surface is a pointer to any native surface object.
    *
    * @param[in] value Pointer to the native surface
    * @return reference to this structure
