@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -688,7 +688,7 @@ int UtcDaliVisualRendererAnimatedProperty06(void)
   END_TEST;
 }
 
-int UtcDaliVisualRendererPartialUpdate(void)
+int UtcDaliVisualRendererPartialUpdate01(void)
 {
   TestApplication application(
     TestApplication::DEFAULT_SURFACE_WIDTH,
@@ -911,6 +911,221 @@ int UtcDaliVisualRendererPartialUpdate(void)
 
   // Check finished value bake.
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(0.5f, 2.0f), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVisualRendererPartialUpdate02(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Test that partial update works well when actor has multiple renderer, and we change only actor's transform");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Shader         shader    = Shader::New("VertexSource", "FragmentSource");
+  Geometry       geometry  = CreateQuadGeometry();
+  VisualRenderer renderer1 = VisualRenderer::New(geometry, shader);
+  VisualRenderer renderer2 = VisualRenderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer1);
+  actor.AddRenderer(renderer2);
+  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::POSITION]     = Vector3(64.0f, 64.0f, 0.0f);
+  actor[Actor::Property::SIZE]         = Vector3(64.0f, 64.0f, 0.0f);
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+
+  // Actor added, damaged rect is added size of actor
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Set clippingRect as full surface now. TODO : Set valid rect if we can.
+  Rect<int> clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+
+  // Aligned by 16
+  DirtyRectChecker(damagedRects,
+                   {
+                     Rect<int>(64, 672, 80, 80),
+                     Rect<int>(64, 672, 80, 80),
+                   },
+                   true,
+                   TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  // Change the renderer1 and renderer2 transform property.
+  // To avoid useless float point error, make renderer size as 30x30
+  renderer1.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(0.5f - 2.0f / 64.0f, 0.5f - 2.0f / 64.0f));
+  renderer1.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, Vector2(-0.25f, -0.25f));
+  renderer2.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(0.5f - 2.0f / 64.0f, 0.5f - 2.0f / 64.0f));
+  renderer2.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, Vector2(0.25f, 0.25f));
+
+  // Now current actor show two 30x30 rectangle, one center position is (80, 80) and other is (112, 112).
+  // So, first rectangle's top left position is (65, 65), and seoncd rectangle's bottom right position is (127, 127).
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+  // Aligned by 16
+  // Note, this damagedRect is combine of previous rect and current rect
+  DirtyRectChecker(damagedRects,
+                   {
+                     Rect<int>(64, 672, 80, 80),
+                     Rect<int>(64, 672, 80, 80),
+                   },
+                   true,
+                   TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::BLUE);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Aligned by 16
+  // Note, this damagedRect don't contain previous rect now.
+  // So, first rectangle's top left position is (65, 65), and seoncd rectangle's bottom right position is (127, 127).
+  DirtyRectChecker(damagedRects,
+                   {
+                     Rect<int>(64, 704, 32, 32),
+                     Rect<int>(96, 672, 32, 32),
+                   },
+                   true,
+                   TEST_LOCATION);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // 3 frame spended after change actor property. Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  actor[Actor::Property::POSITION_Y] = 96.0f;
+  // Change the y position of actor.
+  // Now current actor show two 32x32 rectangle, one center position is (80, 96) and other is (112, 128).
+  // So, rectangle's top left position is (64, 80), and bottom right position is (128, 144).
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+  // Aligned by 16
+  // Note, this damagedRect is combine of previous rect and current rect
+  DirtyRectChecker(damagedRects,
+                   {
+                     Rect<int>(64, 672, 32, 64),
+                     Rect<int>(96, 640, 32, 64),
+                   },
+                   true,
+                   TEST_LOCATION);
+
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Update dummy property to damangeRect buffer aging
+  actor.SetProperty(Actor::Property::COLOR, Color::BLUE);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Aligned by 16
+  // Note, this damagedRect don't contain previous rect now.
+  // Current rectangle's top left position is (64, 80), and bottom right position is (128, 144).
+  DirtyRectChecker(damagedRects,
+                   {
+                     Rect<int>(64, 672, 32, 32),
+                     Rect<int>(96, 640, 32, 32),
+                   },
+                   true,
+                   TEST_LOCATION);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  application.SendNotification();
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // 3 frame spended after change actor property. Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   END_TEST;
 }

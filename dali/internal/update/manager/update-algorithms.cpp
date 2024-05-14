@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,9 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
 
   UpdateNodeOpacity(node, nodeDirtyFlags, updateBufferIndex);
 
+  // Age down partial update data
+  node.GetPartialRenderingData().Aging();
+
   // For partial update, mark all children of an animating node as updated.
   if(updated) // Only set to updated if parent was updated.
   {
@@ -174,6 +177,9 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
   UpdateRootNodeOpacity(rootNode, nodeDirtyFlags, updateBufferIndex);
+
+  // Age down partial update data
+  rootNode.GetPartialRenderingData().Aging();
 
   bool updated = rootNode.Updated();
 
