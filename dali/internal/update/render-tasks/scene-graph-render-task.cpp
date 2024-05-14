@@ -511,6 +511,7 @@ RenderTask::RenderTask()
   mRenderMessageDispatcher(nullptr),
   mRenderSyncTracker(nullptr),
   mSourceNode(nullptr),
+  mStopperNode(nullptr),
   mCameraNode(nullptr),
   mViewportGuideNode(nullptr),
   mFrameBuffer(nullptr),
