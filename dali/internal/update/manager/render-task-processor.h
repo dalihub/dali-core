@@ -52,7 +52,6 @@ public:
    * If there is only one default render-task, then no further processing is required.
    * @param[in]  updateBufferIndex  The current update buffer index.
    * @param[in]  renderTasks        The list of render-tasks.
-   * @param[in]  rootNode           The root node of the scene-graph.
    * @param[in]  sortedLayers       The layers containing lists of opaque / transparent renderables.
    * @param[out] instructions       The instructions for rendering the next frame.
    * @param[in]  renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
@@ -61,7 +60,6 @@ public:
    */
   bool Process(BufferIndex                 updateBufferIndex,
                RenderTaskList&             renderTasks,
-               Layer&                      rootNode,
                SortedLayerPointers&        sortedLayers,
                RenderInstructionContainer& instructions,
                bool                        renderToFboEnabled,
