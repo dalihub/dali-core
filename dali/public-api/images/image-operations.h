@@ -67,9 +67,12 @@ enum Type
   FIT_WIDTH,     ///< Image fills whole width. Height is scaled proportionately to
                  ///  maintain aspect ratio.
                  ///  @SINCE_1_0.0
-  FIT_HEIGHT     ///< Image fills whole height. Width is scaled proportionately to
+  FIT_HEIGHT,    ///< Image fills whole height. Width is scaled proportionately to
                  ///  maintain aspect ratio.
                  ///  @SINCE_1_0.0
+  VISUAL_FITTING /// < Image is scaled to fit within the desired dimensions.
+                 ///  maintain aspect ratio.
+                 ///  @SINCE_2_3.24
 };
 const Type DEFAULT = SHRINK_TO_FIT;
 } // namespace FittingMode
