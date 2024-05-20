@@ -18,6 +18,13 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/update-manager.h>
 
+// EXTERNAL INCLUDES
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+#include <dali/devel-api/common/map-wrapper.h>
+#else
+#include <unordered_map>
+#endif
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
 
@@ -85,6 +92,27 @@ namespace SceneGraph
 {
 namespace
 {
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+/**
+ * Flag whether property has changed, during the Update phase.
+ */
+enum ContainerRemovedFlagBits
+{
+  NOTHING               = 0x00,
+  NODE                  = 0x01,
+  RENDERER              = 0x02,
+  SHADER                = 0x04,
+  TEXTURE_SET           = 0x08,
+  ANIMATION             = 0x10,
+  PROPERTY_NOTIFICATION = 0x20,
+  CUSTOM_OBJECT         = 0x40,
+};
+
+/**
+ * @brief ContainerRemovedFlags alters behaviour of implementation
+ */
+using ContainerRemovedFlags = uint8_t;
+#endif
 /**
  * Helper to Erase an object from OwnerContainer using discard queue
  * @param container to remove from
@@ -188,6 +216,9 @@ struct UpdateManager::Impl
     nodeDirtyFlags(NodePropertyFlags::TRANSFORM), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter(0),
     renderingBehavior(DevelStage::Rendering::IF_REQUIRED),
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
+#endif
     animationFinishedDuringUpdate(false),
     previousUpdateScene(false),
     renderTaskWaiting(false),
@@ -276,7 +307,12 @@ struct UpdateManager::Impl
 
   Vector<Node*> nodes; ///< A container of all instantiated nodes
 
-  std::unordered_map<uint32_t, Node*> nodeIdMap; ///< A container of nodes map by id.
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  using NodeIdMap = std::map<uint32_t, Node*>;
+#else
+  using NodeIdMap = std::unordered_map<uint32_t, Node*>;
+#endif
+  NodeIdMap nodeIdMap; ///< A container of nodes map by id.
 
   Vector<Camera*> cameras; ///< A container of cameras. Note : these cameras are owned by Impl::nodes.
 
@@ -312,6 +348,10 @@ struct UpdateManager::Impl
   NodePropertyFlags        nodeDirtyFlags;    ///< cumulative node dirty flags from previous frame
   uint32_t                 frameCounter;      ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
   DevelStage::Rendering    renderingBehavior; ///< Set via DevelStage::SetRenderingBehavior
+
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
+#endif
 
   bool animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
   bool previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
@@ -465,6 +505,9 @@ void UpdateManager::DestroyNode(Node* node)
     if((*iter) == node)
     {
       mImpl->nodes.Erase(iter);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+      mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::NODE;
+#endif
       break;
     }
   }
@@ -515,6 +558,9 @@ void UpdateManager::AddObject(OwnerPointer<PropertyOwner>& object)
 void UpdateManager::RemoveObject(PropertyOwner* object)
 {
   mImpl->customObjects.EraseObject(object);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::CUSTOM_OBJECT;
+#endif
 }
 
 void UpdateManager::AddRenderTaskList(OwnerPointer<RenderTaskList>& taskList)
@@ -659,6 +705,9 @@ void UpdateManager::RemovePropertyNotification(PropertyNotification* propertyNot
   if(iter != mImpl->propertyNotifications.End())
   {
     mImpl->propertyNotifications.Erase(iter);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::PROPERTY_NOTIFICATION;
+#endif
   }
 }
 
@@ -677,6 +726,9 @@ void UpdateManager::RemoveShader(Shader* shader)
 {
   // Find the shader and destroy it
   EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->shaderDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::SHADER;
+#endif
 }
 
 void UpdateManager::SaveBinary(Internal::ShaderDataPtr shaderData)
@@ -715,6 +767,10 @@ void UpdateManager::RemoveRenderer(const RendererKey& rendererKey)
   EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
   // Need to remove the render object as well
   rendererKey->DisconnectFromSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
+
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::RENDERER;
+#endif
 }
 
 void UpdateManager::AttachRenderer(Node* node, Renderer* renderer)
@@ -739,6 +795,9 @@ void UpdateManager::AddTextureSet(OwnerPointer<TextureSet>& textureSet)
 void UpdateManager::RemoveTextureSet(TextureSet* textureSet)
 {
   mImpl->textureSets.EraseObject(textureSet);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::TEXTURE_SET;
+#endif
 }
 
 uint32_t* UpdateManager::ReserveMessageSlot(uint32_t size, bool updateScene)
@@ -853,6 +912,9 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     if(animation->GetState() == Animation::Destroyed)
     {
       iter = mImpl->animations.Erase(iter);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+      mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::ANIMATION;
+#endif
     }
     else
     {
@@ -1218,6 +1280,41 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
   // Macro is undefined in release build.
   SNAPSHOT_NODE_LOGGING;
+
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  // Shrink relevant containers if required.
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::NODE)
+  {
+    mImpl->nodes.ShrinkToFitIfNeeded();
+  }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::RENDERER)
+  {
+    mImpl->renderers.ShrinkToFitIfNeeded();
+  }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::SHADER)
+  {
+    mImpl->shaders.ShrinkToFitIfNeeded();
+  }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::TEXTURE_SET)
+  {
+    mImpl->textureSets.ShrinkToFitIfNeeded();
+  }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::ANIMATION)
+  {
+    mImpl->animations.ShrinkToFitIfNeeded();
+  }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::PROPERTY_NOTIFICATION)
+  {
+    mImpl->propertyNotifications.ShrinkToFitIfNeeded();
+  }
+  if(mImpl->containerRemovedFlags & ContainerRemovedFlagBits::CUSTOM_OBJECT)
+  {
+    mImpl->customObjects.ShrinkToFitIfNeeded();
+  }
+
+  // Reset flag
+  mImpl->containerRemovedFlags = ContainerRemovedFlagBits::NOTHING;
+#endif
 
   // A ResetProperties() may be required in the next frame
   mImpl->previousUpdateScene = updateScene;

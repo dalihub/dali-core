@@ -19,7 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+#include <dali/devel-api/common/map-wrapper.h>
+#else
 #include <unordered_map>
+#endif
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/scene-graph-traveler-interface.h>
@@ -85,8 +89,9 @@ private: // From SceneGraph::PropertyOwner::Observer
   /**
    * @copydoc SceneGraph::PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  void PropertyOwnerDisconnected(BufferIndex updateBufferIndex, SceneGraph::PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, SceneGraph::PropertyOwner& owner) override
   { /* Nothing to do */
+    return NotifyReturnType::KEEP_OBSERVING;
   }
 
   /**
@@ -105,7 +110,12 @@ private:
 private:
   SceneGraph::Node& mRootNode;
 
-  std::unordered_map<uint32_t, SceneGraph::Node*> mTravledNodeMap; ///< Used to store cached pointers to already searched for Nodes.
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  using TraveledNodeMap = std::map<uint32_t, SceneGraph::Node*>;
+#else
+  using TraveledNodeMap = std::unordered_map<uint32_t, SceneGraph::Node*>;
+#endif
+  TraveledNodeMap mTravledNodeMap; ///< Used to store cached pointers to already searched for Nodes.
 
   bool mInvalidated : 1; ///< True if root node was destroyed.
 };

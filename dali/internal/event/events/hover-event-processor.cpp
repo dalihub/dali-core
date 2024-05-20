@@ -405,17 +405,17 @@ struct HoverEventProcessor::Impl
         if(hitActor && processor.mLastPrimaryHitActor.GetActor() != hitActor &&
            localVars.primaryPointState == PointState::MOTION && GetImplementation(hitActor).GetLeaveRequired())
         {
-            // A leave event is sent to the previous actor first.
-            localVars.lastPrimaryHitActor = processor.mLastPrimaryHitActor.GetActor();
-            localVars.lastConsumedActor   = processor.mLastConsumedActor.GetActor();
-            Impl::DeliverLeaveEvent(processor, localVars);
+          // A leave event is sent to the previous actor first.
+          localVars.lastPrimaryHitActor = processor.mLastPrimaryHitActor.GetActor();
+          localVars.lastConsumedActor   = processor.mLastConsumedActor.GetActor();
+          Impl::DeliverLeaveEvent(processor, localVars);
 
-            localVars.hoverEvent->GetPoint(0).SetState(PointState::STARTED);
-            localVars.primaryPointState = PointState::STARTED;
+          localVars.hoverEvent->GetPoint(0).SetState(PointState::STARTED);
+          localVars.primaryPointState = PointState::STARTED;
 
-            // It sends a started event and updates information.
-            localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
-            UpdateMembersWithCurrentHitInformation(processor, localVars);
+          // It sends a started event and updates information.
+          localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
+          UpdateMembersWithCurrentHitInformation(processor, localVars);
         }
         else
         {

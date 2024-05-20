@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ private: // From PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
    */
-  void PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) final
+  NotifyReturnType PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) final
   {
     // If we are active, then bake the value if required
     if(mAnimationPlaying && mDisconnectAction != Dali::Animation::DISCARD)
@@ -140,6 +140,8 @@ private: // From PropertyOwner::Observer
     }
 
     mEnabled = false;
+
+    return NotifyReturnType::KEEP_OBSERVING;
   }
 
   /**

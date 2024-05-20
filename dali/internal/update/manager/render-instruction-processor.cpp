@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,22 +188,24 @@ inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatri
  * @param renderList to add the item to
  * @param renderable Node-Renderer pair
  * @param viewMatrix used to calculate modelview matrix for the item
+ * @param viewMatrixChanged Whether view matrix chagned for this time or not.
  * @param camera The camera used to render
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param viewportSet Whether the viewport is set or not
  * @param viewport The viewport
- * @param cull Whether frustum culling is enabled or not
+ * @param cullingEnabled Whether frustum culling is enabled or not
  */
 inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
                                     uint32_t                  renderPass,
                                     RenderList&               renderList,
                                     Renderable&               renderable,
                                     const Matrix&             viewMatrix,
+                                    bool                      viewMatrixChanged,
                                     const SceneGraph::Camera& camera,
                                     bool                      isLayer3d,
                                     bool                      viewportSet,
                                     const Viewport&           viewport,
-                                    bool                      cull)
+                                    bool                      cullingEnabled)
 {
   bool    inside(true);
   Node*   node = renderable.mNode;
@@ -221,7 +223,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   bool hasRenderCallback = (rendererExist && renderable.mRenderer->GetRenderCallback());
 
   auto requiredInsideCheck = [&]() {
-    if(cull &&
+    if(cullingEnabled &&
        !hasRenderCallback &&
        node->GetClippingMode() == ClippingMode::DISABLED &&
        rendererExist)
@@ -235,7 +237,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   if(requiredInsideCheck())
   {
     const Vector4& boundingSphere = node->GetBoundingSphere();
-    inside                        = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
+
+    inside = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
              (camera.CheckSphereInFrustum(updateBufferIndex, Vector3(boundingSphere), boundingSphere.w));
 
     if(inside && !isLayer3d && viewportSet)
@@ -275,8 +278,9 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
     bool isOpaque = true;
     if(!hasRenderCallback)
     {
-      bool isVisualRenderer = (isLayer3d && !!(renderable.mRenderer && renderable.mRenderer->GetVisualProperties()));
-      Renderer::OpacityType opacityType = rendererExist ? (isVisualRenderer ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node)) : Renderer::OPAQUE;
+      const bool isVisualRendererUnder3D = (isLayer3d && !!(renderable.mRenderer && renderable.mRenderer->GetVisualProperties()));
+
+      const Renderer::OpacityType opacityType = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node)) : Renderer::OPAQUE;
 
       // We can skip render when node is not clipping and transparent
       skipRender = (opacityType == Renderer::TRANSPARENT && node->GetClippingMode() == ClippingMode::DISABLED);
@@ -304,7 +308,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
         item.mRenderer = Render::RendererKey{};
       }
 
-      item.mIsUpdated |= isLayer3d;
+      item.mIsUpdated = (viewMatrixChanged || isLayer3d);
 
       if(!nodeUpdateAreaSet)
       {
@@ -323,32 +327,33 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       }
       item.mModelViewMatrix = nodeModelViewMatrix;
 
-      PartialRenderingData partialRenderingData;
-      partialRenderingData.color               = node->GetWorldColor(updateBufferIndex);
-      partialRenderingData.matrix              = item.mModelViewMatrix;
-      partialRenderingData.updatedPositionSize = item.mUpdateArea;
-      partialRenderingData.size                = item.mSize;
-
       auto& nodePartialRenderingData = node->GetPartialRenderingData();
-      item.mIsUpdated                = nodePartialRenderingData.IsUpdated(partialRenderingData) || item.mIsUpdated;
 
-      nodePartialRenderingData.Update(partialRenderingData);
-    }
-    else
-    {
-      // Mark as not rendered
-      auto& nodePartialRenderingData     = node->GetPartialRenderingData();
-      nodePartialRenderingData.mRendered = false;
+      if(nodePartialRenderingData.mUpdateDecay == PartialRenderingData::Decay::UPDATED_CURRENT_FRAME)
+      {
+        item.mIsUpdated = nodePartialRenderingData.mUpdated;
+      }
+      else
+      {
+        PartialRenderingData partialRenderingData;
+        partialRenderingData.color               = node->GetWorldColor(updateBufferIndex);
+        partialRenderingData.matrix              = item.mModelMatrix;
+        partialRenderingData.updatedPositionSize = item.mUpdateArea;
+        partialRenderingData.size                = item.mSize;
+
+        // Update current node's partial update data as latest.
+        if(nodePartialRenderingData.IsUpdated(partialRenderingData))
+        {
+          item.mIsUpdated = true;
+          nodePartialRenderingData.Update(partialRenderingData);
+        }
+      }
     }
 
     node->SetCulled(updateBufferIndex, false);
   }
   else
   {
-    // Mark as not rendered
-    auto& nodePartialRenderingData     = node->GetPartialRenderingData();
-    nodePartialRenderingData.mRendered = false;
-
     node->SetCulled(updateBufferIndex, true);
   }
 }
@@ -358,23 +363,26 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
  * @param updateBufferIndex to read the model matrix from
  * @param renderPass render pass for this render instruction
  * @param renderList to add the items to
- * @param renderers to render
- * NodeRendererContainer Node-Renderer pairs
+ * @param renderers to render NodeRendererContainer Node-Renderer pairs
  * @param viewMatrix used to calculate modelview matrix for the items
+ * @param viewMatrixChanged Whether view matrix chagned for this time or not.
  * @param camera The camera used to render
  * @param isLayer3d Whether we are processing a 3D layer or not
- * @param cull Whether frustum culling is enabled or not
+ * @param viewportSet Whether the viewport is set or not
+ * @param viewport The viewport
+ * @param cullingEnabled Whether frustum culling is enabled or not
  */
 inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex,
                                      uint32_t                  renderPass,
                                      RenderList&               renderList,
                                      RenderableContainer&      renderers,
                                      const Matrix&             viewMatrix,
+                                     bool                      viewMatrixChanged,
                                      const SceneGraph::Camera& camera,
                                      bool                      isLayer3d,
                                      bool                      viewportSet,
                                      const Viewport&           viewport,
-                                     bool                      cull)
+                                     bool                      cullingEnabled)
 {
   DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "AddRenderersToRenderList()\n");
 
@@ -385,11 +393,12 @@ inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex
                             renderList,
                             renderer,
                             viewMatrix,
+                            viewMatrixChanged,
                             camera,
                             isLayer3d,
                             viewportSet,
                             viewport,
-                            cull);
+                            cullingEnabled);
   }
 }
 
@@ -591,6 +600,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  *renderList,
                                  renderables,
                                  viewMatrix,
+                                 !viewMatrixHasNotChanged,
                                  camera,
                                  isLayer3D,
                                  viewportSet,
@@ -620,6 +630,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  *renderList,
                                  renderables,
                                  viewMatrix,
+                                 !viewMatrixHasNotChanged,
                                  camera,
                                  isLayer3D,
                                  viewportSet,

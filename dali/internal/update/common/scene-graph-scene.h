@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,11 @@
 
 // EXTERNAL INCLUDE
 #include <cstddef>
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+#include <dali/devel-api/common/map-wrapper.h>
+#else
 #include <unordered_map>
+#endif
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
@@ -57,6 +61,15 @@ struct DirtyRectKey
     return node == rhs.node && renderer == rhs.renderer;
   }
 
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  struct DirtyRectKeyCompareLess
+  {
+    bool operator()(const DirtyRectKey& lhs, const DirtyRectKey& rhs) const noexcept
+    {
+      return (lhs.node < rhs.node) || ((lhs.node == rhs.node) && lhs.renderer.Value() < rhs.renderer.Value());
+    }
+  };
+#else
   struct DirtyRectKeyHash
   {
     // Reference by : https://stackoverflow.com/a/21062236
@@ -71,6 +84,7 @@ struct DirtyRectKey
              (key.renderer.Value() >> rendererShift);
     }
   };
+#endif
 
   Node*               node{nullptr};
   Render::RendererKey renderer{};
@@ -93,7 +107,11 @@ struct DirtyRectValue
 class Scene
 {
 public:
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  using ItemsDirtyRectsContainer = std::map<DirtyRectKey, DirtyRectValue, DirtyRectKey::DirtyRectKeyCompareLess>;
+#else
   using ItemsDirtyRectsContainer = std::unordered_map<DirtyRectKey, DirtyRectValue, DirtyRectKey::DirtyRectKeyHash>;
+#endif
 
   /**
    * Constructor

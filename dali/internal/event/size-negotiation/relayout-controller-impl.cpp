@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,7 +108,7 @@ void PrintHierarchy()
 
 RelayoutController::RelayoutController(Integration::RenderController& controller)
 : mRenderController(controller),
-  mRelayoutInfoAllocator(),
+  mRelayoutInfoAllocator(true /* Forcibly use memory pool */),
   mSlotDelegate(this),
   mRelayoutStack(new MemoryPoolRelayoutContainer(mRelayoutInfoAllocator)),
   mRelayoutConnection(false),

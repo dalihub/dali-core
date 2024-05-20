@@ -136,8 +136,9 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  void PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) override
   { /* Nothing to do */
+    return NotifyReturnType::KEEP_OBSERVING;
   }
 
   /**

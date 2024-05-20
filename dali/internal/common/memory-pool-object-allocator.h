@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <memory> ///< for std::unique_ptr
+
 // INTERNAL INCLUDES
+#include <dali/internal/common/dummy-memory-pool.h>
 #include <dali/internal/common/fixed-size-memory-pool.h>
 
 namespace Dali
@@ -46,19 +50,23 @@ public:
   /**
    * @brief Constructor
    */
-  MemoryPoolObjectAllocator()
-  : mPool(nullptr)
+  MemoryPoolObjectAllocator(bool forceUseMemoryPool = false)
+  : mPool(nullptr),
+    mMemoryPoolEnabled(true)
   {
+#if !defined(__LP64__) && defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    if(!forceUseMemoryPool)
+    {
+      mMemoryPoolEnabled = false;
+    }
+#endif
     ResetMemoryPool();
   }
 
   /**
    * @brief Destructor
    */
-  ~MemoryPoolObjectAllocator()
-  {
-    delete mPool;
-  }
+  ~MemoryPoolObjectAllocator() = default;
 
   /**
    * @brief Allocate a block of memory from the memory pool of the appropriate size to
@@ -136,9 +144,21 @@ public:
    */
   void ResetMemoryPool()
   {
-    delete mPool;
-
-    mPool = new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size, 32, 1024 * 1024, POOL_MAX_BLOCK_COUNT);
+    if(DALI_LIKELY(mPool))
+    {
+      mPool->ResetMemoryPool();
+    }
+    else
+    {
+      if(mMemoryPoolEnabled)
+      {
+        mPool.reset(new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size, 32, 1024 * 1024, POOL_MAX_BLOCK_COUNT));
+      }
+      else
+      {
+        mPool.reset(new DummyMemoryPool(TypeSizeWithAlignment<T>::size));
+      }
+    }
   }
 
   /**
@@ -151,7 +171,7 @@ public:
    * @note on 32 bit systems, there is zero overhead, key is a raw ptr,
    * and this method will return it's argument.
    */
-  T* GetPtrFromKey(FixedSizeMemoryPool::KeyType key)
+  T* GetPtrFromKey(MemoryPoolInterface::KeyType key)
   {
     return static_cast<T*>(mPool->GetPtrFromKey(key));
   }
@@ -164,7 +184,7 @@ public:
    * @note on 32 bit systems, there is zero overhead, key is a raw ptr,
    * and this method will return it's argument.
    */
-  FixedSizeMemoryPool::KeyType GetKeyFromPtr(T* ptr)
+  MemoryPoolInterface::KeyType GetKeyFromPtr(T* ptr)
   {
     return mPool->GetKeyFromPtr(ptr);
   }
@@ -185,7 +205,9 @@ private:
   MemoryPoolObjectAllocator& operator=(const MemoryPoolObjectAllocator& memoryPoolObjectAllocator);
 
 private:
-  FixedSizeMemoryPool* mPool; ///< Memory pool from which allocations are made
+  std::unique_ptr<MemoryPoolInterface> mPool; ///< Memory pool from which allocations are made
+
+  bool mMemoryPoolEnabled : 1; ///< True if we can use memory pool feature. False otherwise
 };
 
 } // namespace Internal
