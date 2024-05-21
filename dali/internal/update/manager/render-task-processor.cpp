@@ -213,7 +213,6 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
  * If there is only one default render-task, then no further processing is required.
  * @param[in]  updateBufferIndex          The current update buffer index.
  * @param[in]  taskContainer              The container of render-tasks.
- * @param[in]  rootNode                   The root node of the scene-graph.
  * @param[in]  sortedLayers               The layers containing lists of opaque / transparent renderables.
  * @param[out] instructions               The instructions for rendering the next frame.
  * @param[in]  renderInstructionProcessor An instance of the RenderInstructionProcessor used to sort and handle the renderers for each layer.
@@ -224,7 +223,6 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
  */
 void ProcessTasks(BufferIndex                          updateBufferIndex,
                   RenderTaskList::RenderTaskContainer& taskContainer,
-                  Layer&                               rootNode,
                   SortedLayerPointers&                 sortedLayers,
                   RenderInstructionContainer&          instructions,
                   RenderInstructionProcessor&          renderInstructionProcessor,
@@ -341,7 +339,6 @@ RenderTaskProcessor::~RenderTaskProcessor() = default;
 
 bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
                                   RenderTaskList&             renderTasks,
-                                  Layer&                      rootNode,
                                   SortedLayerPointers&        sortedLayers,
                                   RenderInstructionContainer& instructions,
                                   bool                        renderToFboEnabled,
@@ -368,7 +365,6 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
 
   ProcessTasks(updateBufferIndex,
                taskContainer,
-               rootNode,
                sortedLayers,
                instructions,
                mRenderInstructionProcessor,
@@ -384,7 +380,6 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
 
   ProcessTasks(updateBufferIndex,
                taskContainer,
-               rootNode,
                sortedLayers,
                instructions,
                mRenderInstructionProcessor,

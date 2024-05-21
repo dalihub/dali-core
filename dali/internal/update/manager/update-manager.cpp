@@ -1213,7 +1213,6 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           {
             renderContinuously |= mImpl->renderTaskProcessor.Process(bufferIndex,
                                                                      *scene->taskList,
-                                                                     *scene->root,
                                                                      scene->sortedLayerList,
                                                                      scene->scene->GetRenderInstructions(),
                                                                      renderToFboEnabled,
