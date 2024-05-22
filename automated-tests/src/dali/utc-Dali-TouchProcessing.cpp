@@ -267,6 +267,26 @@ Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector
   return touchEvent;
 }
 
+Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
+{
+  Integration::TouchEvent touchEvent;
+  Integration::Point      point;
+  point.SetState(stateA);
+  point.SetDeviceId(4);
+  point.SetScreenPosition(screenPositionA);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  point.SetScreenPosition(screenPositionB);
+  point.SetState(stateB);
+  point.SetDeviceId(7);
+  point.SetDeviceClass(Device::Class::TOUCH);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  touchEvent.points.push_back(point);
+  touchEvent.time = time;
+  return touchEvent;
+}
+
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2104,6 +2124,46 @@ int UtcDaliTouchEventCapturePropertySet(void)
   application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTouchEventCapturePropertySetWithMultiTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Now set the capture property
+  actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, true);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STARTED, Vector2(10.0f, 10.0f), PointState::STARTED, Vector2(15.0f, 15.0f), 200));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now motion outside of actor, we now SHOULD receive the event
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(110.0f, 110.0f), PointState::MOTION, Vector2(115.0f, 115.0f), 210));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Up event, we should receive it again, but as ended rather than interrupted
+  application.ProcessEvent(GenerateDoubleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f), PointState::FINISHED, Vector2(115.0f, 115.0f), 220));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).state, PointState::FINISHED, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(1).state, PointState::FINISHED, TEST_LOCATION);
 
   END_TEST;
 }
