@@ -53,6 +53,11 @@ public:
   virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical );
 
   /**
+   * @brief InitializeGraphics the platform specific graphics surface interfaces
+   */
+  virtual void InitializeGraphics( Dali::Graphics::GraphicsInterface& graphics );
+
+  /**
    * @copydoc Dali::Integration::RenderSurface::CreateSurface
    */
   virtual void CreateSurface();
@@ -85,7 +90,7 @@ public:
   /**
    * @copydoc Dali::Integration::RenderSurface::PostRender
    */
-  virtual void PostRender();
+  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface );
 
   /**
    * @copydoc Dali::Integration::RenderSurface::StopRender

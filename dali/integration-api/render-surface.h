@@ -28,6 +28,10 @@
 namespace Dali
 {
 class ThreadSynchronizationInterface;
+namespace Graphics
+{
+class GraphicsInterface;
+}
 
 
 /**
@@ -88,6 +92,11 @@ public:
   virtual void GetDpi( unsigned int& dpiHorizontal, unsigned int& dpiVertical ) = 0;
 
   /**
+   * @brief InitializeGraphics the platform specific graphics surface interfaces
+   */
+  virtual void InitializeGraphics( Dali::Graphics::GraphicsInterface& graphics ) = 0;
+
+  /**
    * @brief Creates the Surface
    */
   virtual void CreateSurface() = 0;
@@ -125,8 +134,11 @@ public:
 
   /**
    * @brief Invoked by render thread after Core::Render
+   * @param[in] renderToFbo True if render to FBO.
+   * @param[in] replacingSurface True if the surface is being replaced.
+   * @param[in] resizingSurface True if the surface is being resized.
    */
-  virtual void PostRender() = 0;
+  virtual void PostRender( bool renderToFbo, bool replacingSurface, bool resizingSurface ) = 0;
 
   /**
    * @brief Invoked by render thread when the thread should be stop

@@ -119,7 +119,7 @@ struct RenderTargetCreateInfo
   }
 
   GraphicsStructureType         type{GraphicsStructureType::RENDER_TARGET_CREATE_INFO_STRUCT};
-  Surface*                      surface{nullptr};
+  void*                         surface{nullptr};
   Framebuffer*                  framebuffer{nullptr};
   Extent2D                      extent{};
   RenderTargetTransformFlags    preTransform{0u};

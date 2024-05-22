@@ -38,11 +38,6 @@ class Program;
 class Shader;
 class Texture;
 
-/**
- * Forward declare an opaque Surface type.
- */
-struct Surface;
-
 
 /**
  * @brief Structure describes 2D offset
