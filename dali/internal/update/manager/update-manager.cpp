@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
+#include <dali/integration-api/trace.h>
 
 #include <dali/internal/common/owner-key-container.h>
 
@@ -80,6 +81,12 @@ namespace
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_UPDATE_MANAGER");
 } // unnamed namespace
 #endif
+namespace
+{
+// TODO : The name of trace marker is from VD specific.
+// We might need to change it as DALI_TRACE_UPDATE_PROCESS.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
+} // namespace
 
 using namespace Dali::Integration;
 using Dali::Internal::Update::MessageQueue;
@@ -883,7 +890,16 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
 {
   bool animationActive = false;
 
+  if(mImpl->animations.Empty())
+  {
+    return animationActive;
+  }
+
   auto&& iter = mImpl->animations.Begin();
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss) {
+    oss << "[" << mImpl->animations.Count() << "]";
+  });
 
   while(iter != mImpl->animations.End())
   {
@@ -927,6 +943,10 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   {
     mImpl->notificationManager.QueueNotification(&mImpl->animationPlaylist, std::move(mImpl->notifyRequiredAnimations));
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss) {
+    oss << "[" << mImpl->animations.Count() << "]";
+  });
 
   return animationActive;
 }
@@ -1016,6 +1036,15 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
 
 void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
+  if(mImpl->renderers.Empty())
+  {
+    return;
+  }
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss) {
+    oss << "[" << mImpl->renderers.Count() << "]";
+  });
+
   for(const auto& rendererKey : mImpl->renderers)
   {
     // Apply constraints
@@ -1028,6 +1057,8 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
   }
+
+  DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_RENDERERS");
 }
 
 void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
@@ -1111,6 +1142,15 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if(updateScene || mImpl->previousUpdateScene)
   {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_INTERNAL", [&](std::ostringstream& oss) {
+      oss << "[n:" << mImpl->nodes.Size() << ",";
+      oss << "c:" << mImpl->customObjects.Size() << ",";
+      oss << "a:" << mImpl->animations.Size() << ",";
+      oss << "r:" << mImpl->renderers.Size() << ",";
+      oss << "t:" << mImpl->textureSets.Size() << ",";
+      oss << "s:" << mImpl->shaders.Size() << "]";
+    });
+
     // Animate
     bool animationActive = Animate(bufferIndex, elapsedSeconds);
 
@@ -1237,6 +1277,8 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
       DALI_LOG_INFO(gLogFilter, Debug::General, "Update: numberOfRenderTasks(%d), Render Instructions(%d)\n", numberOfRenderTasks, numberOfRenderInstructions);
     }
+
+    DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_INTERNAL");
   }
 
   if(!uploadOnly)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/internal/render/common/render-algorithms.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/trace.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-list.h>
@@ -390,6 +391,9 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
   }
 }
 
+// TODO : The name of trace marker is from VD specific.
+// We might need to change it as DALI_TRACE_RENDER_PROCESS.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 } // Unnamed namespace
 
 /**
@@ -744,6 +748,10 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize)
 {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) {
+    oss << "[" << instruction.RenderListCount() << "]";
+  });
+
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
   const Matrix* viewMatrix       = instruction.GetViewMatrix(bufferIndex);
@@ -790,6 +798,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
       mGraphicsCommandBuffer->ExecuteCommandBuffers(std::move(buffers));
     }
   }
+  DALI_TRACE_END(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS");
 }
 
 } // namespace Render

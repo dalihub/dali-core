@@ -37,7 +37,9 @@
 
 namespace
 {
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+// TODO : The name of trace marker is from VD specific.
+// We might need to change it as DALI_TRACE_UPDATE_PROCESS.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 
 #ifdef TRACE_ENABLED
 uint64_t GetNanoseconds()
