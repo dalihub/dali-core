@@ -30,22 +30,16 @@ namespace Dali
 {
 namespace Integration
 {
-Core* Core::New(RenderController&      renderController,
-                PlatformAbstraction&   platformAbstraction,
-                Graphics::Controller&  graphicsController,
-                RenderToFrameBuffer    renderToFboEnabled,
-                DepthBufferAvailable   depthBufferAvailable,
-                StencilBufferAvailable stencilBufferAvailable,
-                PartialUpdateAvailable partialUpdateAvailable)
+Core* Core::New(RenderController&     renderController,
+                PlatformAbstraction&  platformAbstraction,
+                Graphics::Controller& graphicsController,
+                CorePolicyFlags       corePolicy)
 {
   Core* instance  = new Core;
   instance->mImpl = new Internal::Core(renderController,
                                        platformAbstraction,
                                        graphicsController,
-                                       renderToFboEnabled,
-                                       depthBufferAvailable,
-                                       stencilBufferAvailable,
-                                       partialUpdateAvailable);
+                                       corePolicy);
 
   return instance;
 }

@@ -75,13 +75,10 @@ using Integration::RenderController;
 using Integration::RenderStatus;
 using Integration::UpdateStatus;
 
-Core::Core(RenderController&                   renderController,
-           PlatformAbstraction&                platform,
-           Graphics::Controller&               graphicsController,
-           Integration::RenderToFrameBuffer    renderToFboEnabled,
-           Integration::DepthBufferAvailable   depthBufferAvailable,
-           Integration::StencilBufferAvailable stencilBufferAvailable,
-           Integration::PartialUpdateAvailable partialUpdateAvailable)
+Core::Core(RenderController&            renderController,
+           PlatformAbstraction&         platform,
+           Graphics::Controller&        graphicsController,
+           Integration::CorePolicyFlags corePolicy)
 : mRenderController(renderController),
   mPlatform(platform),
   mGraphicsController(graphicsController),
@@ -104,7 +101,10 @@ Core::Core(RenderController&                   renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
-  mRenderManager = RenderManager::New(graphicsController, depthBufferAvailable, stencilBufferAvailable, partialUpdateAvailable);
+  mRenderManager = RenderManager::New(graphicsController,
+                                      (corePolicy & Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE) ? Integration::DepthBufferAvailable::TRUE : Integration::DepthBufferAvailable::FALSE,
+                                      (corePolicy & Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE) ? Integration::StencilBufferAvailable::TRUE : Integration::StencilBufferAvailable::FALSE,
+                                      (corePolicy & Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE) ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
 
@@ -132,9 +132,7 @@ Core::Core(RenderController&                   renderController,
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 
-  DALI_LOG_RELEASE_INFO("Node size: %lu\n", sizeof(Dali::Internal::SceneGraph::Node));
-  DALI_LOG_RELEASE_INFO("Renderer size: %lu\n", sizeof(Dali::Internal::SceneGraph::Renderer));
-  DALI_LOG_RELEASE_INFO("RenderItem size: %lu\n", sizeof(Dali::Internal::SceneGraph::RenderItem));
+  DALI_LOG_RELEASE_INFO("Core policy enum : 0x%x\n", static_cast<uint32_t>(corePolicy));
 }
 
 Core::~Core()

@@ -76,13 +76,10 @@ public:
   /**
    * Create and initialise a new Core instance
    */
-  Core(Integration::RenderController&      renderController,
-       Integration::PlatformAbstraction&   platform,
-       Graphics::Controller&               graphicsController,
-       Integration::RenderToFrameBuffer    renderToFboEnabled,
-       Integration::DepthBufferAvailable   depthBufferAvailable,
-       Integration::StencilBufferAvailable stencilBufferAvailable,
-       Integration::PartialUpdateAvailable partialUpdateAvailable);
+  Core(Integration::RenderController&    renderController,
+       Integration::PlatformAbstraction& platform,
+       Graphics::Controller&             graphicsController,
+       Integration::CorePolicyFlags      corePolicy);
 
   /**
    * Destructor

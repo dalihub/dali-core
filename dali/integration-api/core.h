@@ -221,19 +221,13 @@ public:
    * @param[in] renderController The interface to an object which controls rendering.
    * @param[in] platformAbstraction The interface providing platform specific services.
    * @param[in] graphicsController The interface providing graphics services
-   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
-   * @param[in] depthBufferAvailable Whether the depth buffer is available
-   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-   * @param[in] partialUpdateAvailable Whether the partial update is available
+   * @param[in] corePolicy Flag list of update / rendering policies.
    * @return A newly allocated Core.
    */
-  static Core* New(RenderController&      renderController,
-                   PlatformAbstraction&   platformAbstraction,
-                   Graphics::Controller&  graphicsController,
-                   RenderToFrameBuffer    renderToFboEnabled,
-                   DepthBufferAvailable   depthBufferAvailable,
-                   StencilBufferAvailable stencilBufferAvailable,
-                   PartialUpdateAvailable partialUpdateAvailable);
+  static Core* New(RenderController&     renderController,
+                   PlatformAbstraction&  platformAbstraction,
+                   Graphics::Controller& graphicsController,
+                   CorePolicyFlags       corePolicy);
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
