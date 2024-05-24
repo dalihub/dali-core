@@ -67,9 +67,10 @@ void Core::Initialize()
   mImpl->Initialize();
 }
 
-void Core::SurfaceResized( Integration::RenderSurface* surface )
+void Core::SurfaceResized( Integration::RenderSurface* surface,
+                           const Graphics::RenderTargetCreateInfo& rtInfo )
 {
-  mImpl->SurfaceResized(surface);
+  mImpl->SurfaceResized(surface, rtInfo);
 }
 
 void Core::SceneCreated()

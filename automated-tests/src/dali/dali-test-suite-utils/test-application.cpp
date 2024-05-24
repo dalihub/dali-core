@@ -60,11 +60,16 @@ void TestApplication::Initialize()
 
   mRenderSurface = new TestRenderSurface( Dali::PositionSize( 0, 0, mSurfaceWidth, mSurfaceHeight ) );
   mScene = Dali::Integration::Scene::New( Vector2( static_cast<float>( mSurfaceWidth ), static_cast<float>( mSurfaceHeight ) ) );
-  mScene.SetSurface( *mRenderSurface );
+
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
+  rtInfo.SetSurface(reinterpret_cast<Graphics::Surface*>(&mSurfaceWidth)); // Can point to anything, really.
+
+  mScene.SetSurface( *mRenderSurface, rtInfo);
 
   mScene.SetDpi( Vector2( static_cast<float>( mDpi.x ), static_cast<float>( mDpi.y ) ) );
 
-  mCore->SurfaceResized( mRenderSurface );
+  mCore->SurfaceResized( mRenderSurface, rtInfo );
 
   mCore->SceneCreated();
   mCore->Initialize();

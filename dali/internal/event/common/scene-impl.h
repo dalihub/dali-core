@@ -28,6 +28,7 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/events/event-processor.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
+#include <dali/graphics-api/graphics-render-target-create-info.h>
 
 namespace Dali
 {
@@ -117,8 +118,8 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::SetSurface
    */
-  void SetSurface( Integration::RenderSurface& surface );
-
+  void SetSurface( Integration::RenderSurface& surface,
+                   const Graphics::RenderTargetCreateInfo& rtInfo );
   /**
    * Retrieve the render surface the scene is binded to.
    * @return The render surface.

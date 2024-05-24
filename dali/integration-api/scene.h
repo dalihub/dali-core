@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/math/vector2.h>
+#include <dali/graphics-api/graphics-render-target-create-info.h>
 
 namespace Dali
 {
@@ -184,7 +185,8 @@ public:
    *
    * @return The root layer
    */
-  void SetSurface( Integration::RenderSurface& surface );
+  void SetSurface( Integration::RenderSurface& surface,
+                   const Graphics::RenderTargetCreateInfo& rtInfo );
 
   /**
    * @brief Gets the rendering surface bound to the scene

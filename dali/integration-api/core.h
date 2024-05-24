@@ -25,6 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/integration-api/resource-policies.h>
+#include <dali/graphics-api/graphics-render-target-create-info.h>
 
 namespace Dali
 {
@@ -260,7 +261,8 @@ public:
    * Multi-threading note: this method should be called from the main thread
    * @param[in] surface The resized surface
    */
-  void SurfaceResized( Integration::RenderSurface* surface );
+  void SurfaceResized( Integration::RenderSurface* surface,
+                       const Graphics::RenderTargetCreateInfo& rtInfo );
 
   // Core Lifecycle
 

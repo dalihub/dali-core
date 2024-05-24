@@ -193,7 +193,8 @@ Actor& Scene::GetDefaultRootActor()
   return *mRootLayer;
 }
 
-void Scene::SetSurface( Integration::RenderSurface& surface )
+void Scene::SetSurface( Integration::RenderSurface& surface,
+                        const Graphics::RenderTargetCreateInfo& rtInfo )
 {
   mSurface = &surface;
   if ( mSurface )
@@ -211,12 +212,6 @@ void Scene::SetSurface( Integration::RenderSurface& surface )
 
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     SceneGraph::UpdateManager& updateManager = tls->GetUpdateManager();
-
-    Graphics::RenderTargetCreateInfo rtInfo{};
-    rtInfo
-      .SetSurface(mSurface)
-      .SetExtent({static_cast<uint32_t>(mSurface->GetPositionSize().width), static_cast<uint32_t>(mSurface->GetPositionSize().height)})
-      .SetPreTransform(0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT);
 
     SetDefaultSurfaceRenderTargetCreateInfoMessage(updateManager, rtInfo);
 

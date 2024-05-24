@@ -102,7 +102,8 @@ public:
   /**
    * @copydoc Dali::Integration::Core::SurfaceResized(Integration::RenderSurface*)
    */
-  void SurfaceResized( Integration::RenderSurface* surface );
+  void SurfaceResized( Integration::RenderSurface* surface,
+                       const Graphics::RenderTargetCreateInfo& rtInfo );
 
   /**
    * @copydoc Dali::Integration::Core::SetMinimumFrameTimeInterval(uint32_t)

@@ -157,13 +157,14 @@ void Core::Initialize()
   mStage->Initialize( *mScenes[0] );
 }
 
-void Core::SurfaceResized( Integration::RenderSurface* surface )
+void Core::SurfaceResized( Integration::RenderSurface* surface,
+                           const Graphics::RenderTargetCreateInfo& rtInfo)
 {
   for( auto iter = mScenes.begin(); iter != mScenes.end(); ++iter )
   {
     if( (*iter)->GetSurface() == surface )
     {
-      (*iter)->SetSurface( *surface );
+      (*iter)->SetSurface( *surface, rtInfo );
     }
   }
 }
