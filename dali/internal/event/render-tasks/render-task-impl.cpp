@@ -655,15 +655,15 @@ uint32_t RenderTask::GetRenderTaskId() const
   return mRenderTaskId;
 }
 
-void RenderTask::RenderUntil(Actor* actor)
+void RenderTask::RenderUntil(Actor* stopperActor)
 {
   Actor* target = mSourceActor.GetActor();
-  DALI_ASSERT_ALWAYS((target && actor)
+  DALI_ASSERT_ALWAYS((target && stopperActor)
       && "RenderTask::RenderUntil() has empty actors.");
-  DALI_ASSERT_ALWAYS((target->GetHierarchyDepth() < actor->GetHierarchyDepth())
+  DALI_ASSERT_ALWAYS((target->GetHierarchyDepth() < stopperActor->GetHierarchyDepth())
       && "RenderTask::RenderUntil() has reversed hierarchy.");
 
-  Actor* parent = actor;
+  Actor* parent = stopperActor;
   while(parent != target && !(parent->IsLayer()))
   {
     parent = parent->GetParent();
@@ -671,8 +671,8 @@ void RenderTask::RenderUntil(Actor* actor)
 
   if(parent == target && GetRenderTaskSceneObject())
   {
-    mStopperActor.SetActor(actor);
-    SetStopperNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), &actor->GetNode());
+    mStopperActor.SetActor(stopperActor);
+    SetStopperNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), &stopperActor->GetNode());
   }
 }
 

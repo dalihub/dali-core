@@ -87,7 +87,16 @@ public:
    */
   Node* GetSourceNode() const;
 
+  /**
+   * Set the node to stop rendering.
+   * @param[in] node This node will mark where to stop rendering.
+   */
   void SetStopperNode(Node* node);
+
+  /**
+   * Retrieve the stopper node.
+   * @return A marker node to stop rendering.
+   */
   Node* GetStopperNode() const;
 
   /**

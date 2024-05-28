@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
+#include <dali/internal/update/nodes/node.h>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
@@ -234,6 +235,27 @@ public:
     {
       mItems.Resize(mNextFree);
     }
+  }
+
+  /**
+   * Trim the list by stopperNode
+   * @param stopperNode The node to stop rendering. Rendering will not include the node.
+   * @return Whether trimming actually occured.
+   */
+  bool RenderUntil(Node* stopperNode)
+  {
+    RenderItemContainer::Iterator iter = mItems.Begin();
+    for(uint32_t index = 0u; iter != mItems.End(); ++iter, ++index)
+    {
+      RenderItem* item = iter->Get();
+      if(item->mNode == stopperNode)
+      {
+        mNextFree = index;
+        ReleaseUnusedItems();
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

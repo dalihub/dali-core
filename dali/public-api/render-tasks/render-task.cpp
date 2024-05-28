@@ -312,10 +312,10 @@ uint32_t RenderTask::GetRenderTaskId() const
   return GetImplementation(*this).GetRenderTaskId();
 }
 
-void RenderTask::RenderUntil(Actor actor)
+void RenderTask::RenderUntil(Actor stopperActor)
 {
-  DALI_ASSERT_ALWAYS(actor && "RenderUntil() actor does not exist.");
-  Internal::Actor* actorImpl(&GetImplementation(actor));
+  DALI_ASSERT_ALWAYS(stopperActor && "RenderUntil() stopperActor does not exist.");
+  Internal::Actor* actorImpl(&GetImplementation(stopperActor));
   return GetImplementation(*this).RenderUntil(actorImpl);
 }
 
