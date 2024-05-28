@@ -80,7 +80,7 @@ TouchEventCombiner::TouchEventCombiner(uint32_t minMotionTime, Vector2 minMotion
 
 TouchEventCombiner::~TouchEventCombiner() = default;
 
-TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent)
+TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent, bool isMultiTouchEvent)
 {
   TouchEventCombiner::EventDispatchType dispatchEvent(TouchEventCombiner::DISPATCH_NONE);
   const PointState::Type                state    = point.GetState();
@@ -99,7 +99,10 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
       {
         if(iter->point.GetDeviceId() != deviceId)
         {
-          iter->point.SetState(PointState::STATIONARY);
+          if(!isMultiTouchEvent)
+          {
+            iter->point.SetState(PointState::STATIONARY);
+          }
         }
         else
         {
@@ -170,7 +173,10 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
         }
         else
         {
-          iter->point.SetState(PointState::STATIONARY);
+          if(!isMultiTouchEvent)
+          {
+            iter->point.SetState(PointState::STATIONARY);
+          }
           touchEvent.AddPoint(iter->point);
         }
       }
@@ -242,7 +248,10 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
           }
           else
           {
-            iter->point.SetState(PointState::STATIONARY);
+            if(!isMultiTouchEvent)
+            {
+              iter->point.SetState(PointState::STATIONARY);
+            }
             touchEvent.AddPoint(iter->point);
           }
         }
@@ -300,7 +309,10 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
           }
           else
           {
-            iter->point.SetState(PointState::STATIONARY);
+            if(!isMultiTouchEvent)
+            {
+              iter->point.SetState(PointState::STATIONARY);
+            }
             hoverEvent.AddPoint(iter->point);
           }
         }

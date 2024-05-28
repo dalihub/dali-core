@@ -94,14 +94,15 @@ public:
    * @note If the thresholds set have not been passed, then false is returned and the TouchEvent and/or HoverEvent should not be sent
    * to Dali Core.
    *
-   * @param[in]   point         The new Point.
-   * @param[in]   time          The time the event occurred.
-   * @param[out]  touchEvent    This is populated with the correct Point(s) and time information.
-   * @param[out]  hoverEvent    This is populated with the correct Point(s) and time information.
+   * @param[in]   point             The new Point.
+   * @param[in]   time              The time the event occurred.
+   * @param[out]  touchEvent        This is populated with the correct Point(s) and time information.
+   * @param[out]  hoverEvent        This is populated with the correct Point(s) and time information.
+   * @param[in]   isMultiTouchEvent The Flag whether multitouch is being.
    *
    * @return true if the point is beyond the different thresholds set thus, should be sent to core, false otherwise.
    */
-  EventDispatchType GetNextTouchEvent(const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent);
+  EventDispatchType GetNextTouchEvent(const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent, bool isMultiTouchEvent = false);
 
   /**
    * Sets the minimum time (in ms) that should occur between motion events.
