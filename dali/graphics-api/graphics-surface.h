@@ -18,6 +18,8 @@
  *
  */
 
+#include <dali/graphics-api/graphics-types.h>
+
 namespace Dali
 {
 namespace Graphics
@@ -27,7 +29,7 @@ struct SurfaceCreateInfo
 {
   GraphicsStructureType type{GraphicsStructureType::SURFACE_CREATE_INFO_STRUCT};
   ExtensionCreateInfo* nextExtension{nullptr};
-  uint32_t framebufferId;
+  Graphics::FramebufferId framebufferId;
   const AllocationCallbacks* allocationCallbacks{nullptr};
 
   auto& SetAllocationCallbacks(const AllocationCallbacks& value)
@@ -40,7 +42,7 @@ struct SurfaceCreateInfo
     nextExtension = value;
     return *this;
   }
-  auto& SetFramebufferId(uint32_t framebufferId_)
+  auto& SetFramebufferId(Graphics::FramebufferId framebufferId_)
   {
     framebufferId = framebufferId_;
     return *this;
