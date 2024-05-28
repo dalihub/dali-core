@@ -82,6 +82,8 @@ Core::Core(RenderController&            renderController,
 : mRenderController(renderController),
   mPlatform(platform),
   mGraphicsController(graphicsController),
+  mProcessorOnceIndex(0u),
+  mPostProcessorOnceIndex(0u),
   mProcessingEvent(false),
   mProcessorUnregistered(false),
   mPostProcessorUnregistered(false),
@@ -420,16 +422,132 @@ void Core::UnregisterProcessor(Integration::Processor& processor, bool postProce
   }
 }
 
+void Core::RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+{
+  if(postProcessor)
+  {
+    mPostProcessorsOnce[mPostProcessorOnceIndex].PushBack(&processor);
+  }
+  else
+  {
+    mProcessorsOnce[mProcessorOnceIndex].PushBack(&processor);
+  }
+}
+
+void Core::UnregisterProcessorOnce(Integration::Processor& processor, bool postProcessor)
+{
+  if(postProcessor)
+  {
+    for(uint32_t index = 0; index < 2; ++index)
+    {
+      auto iter = std::find(mPostProcessorsOnce[index].Begin(), mPostProcessorsOnce[index].End(), &processor);
+      if(iter != mPostProcessorsOnce[index].End())
+      {
+        mPostProcessorsOnce[index].Erase(iter);
+        if(index != mPostProcessorOnceIndex)
+        {
+          // Check processor unregistered during processing.
+          mPostProcessorUnregistered = true;
+        }
+      }
+    }
+  }
+  else
+  {
+    for(uint32_t index = 0; index < 2; ++index)
+    {
+      auto iter = std::find(mProcessorsOnce[index].Begin(), mProcessorsOnce[index].End(), &processor);
+      if(iter != mProcessorsOnce[index].End())
+      {
+        mProcessorsOnce[index].Erase(iter);
+        if(index != mProcessorOnceIndex)
+        {
+          // Check processor unregistered during processing.
+          mProcessorUnregistered = true;
+        }
+      }
+    }
+  }
+}
+
 void Core::UnregisterProcessors()
 {
   mPostProcessors.Clear();
   mPostProcessorUnregistered = true;
   mProcessors.Clear();
   mProcessorUnregistered = true;
+
+  for(uint32_t index = 0; index < 2; ++index)
+  {
+    mPostProcessorsOnce[index].Clear();
+    mProcessorsOnce[index].Clear();
+  }
 }
 
 void Core::RunProcessors()
 {
+  if(mProcessorsOnce[mProcessorOnceIndex].Count() != 0)
+  {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS_ONCE", [&](std::ostringstream& oss) {
+      oss << "[" << mProcessorOnceIndex << ":" << mProcessorsOnce[mProcessorOnceIndex].Count() << "]";
+    });
+
+    // Swap processor index.
+    uint32_t currentIndex = mProcessorOnceIndex;
+    mProcessorOnceIndex ^= 1;
+
+    // Copy processor pointers to prevent changes to vector affecting loop iterator.
+    Dali::Vector<Integration::Processor*> processors(mProcessorsOnce[currentIndex]);
+
+    // To prevent accessing processor unregistered during the loop
+    mProcessorUnregistered = false;
+
+    for(auto processor : processors)
+    {
+      if(processor)
+      {
+        if(!mProcessorUnregistered)
+        {
+          DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
+          processor->Process(false);
+          DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
+        }
+        else
+        {
+          // Run processor if the processor is still in the list.
+          // It may be removed during the loop.
+          auto iter = std::find(mProcessorsOnce[currentIndex].Begin(), mProcessorsOnce[currentIndex].End(), processor);
+          if(iter != mProcessorsOnce[currentIndex].End())
+          {
+            DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
+            processor->Process(false);
+            DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
+          }
+        }
+      }
+    }
+
+    // Clear once processor.
+    mProcessorsOnce[currentIndex].Clear();
+
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS_ONCE", [&](std::ostringstream& oss) {
+      oss << "[" << currentIndex;
+      if(mProcessorUnregistered)
+      {
+        oss << ", processor changed";
+      }
+      oss << "]";
+    });
+  }
+
   if(mProcessors.Count() != 0)
   {
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSORS", [&](std::ostringstream& oss) {
@@ -487,6 +605,68 @@ void Core::RunProcessors()
 
 void Core::RunPostProcessors()
 {
+  if(mPostProcessorsOnce[mPostProcessorOnceIndex].Count() != 0)
+  {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS_ONCE", [&](std::ostringstream& oss) {
+      oss << "[" << mPostProcessorOnceIndex << ":" << mPostProcessorsOnce[mPostProcessorOnceIndex].Count() << "]";
+    });
+
+    // Swap processor index.
+    uint32_t currentIndex = mPostProcessorOnceIndex;
+    mPostProcessorOnceIndex ^= 1;
+
+    // Copy processor pointers to prevent changes to vector affecting loop iterator.
+    Dali::Vector<Integration::Processor*> processors(mPostProcessorsOnce[currentIndex]);
+
+    // To prevent accessing processor unregistered during the loop
+    mPostProcessorUnregistered = false;
+
+    for(auto processor : processors)
+    {
+      if(processor)
+      {
+        if(!mPostProcessorUnregistered)
+        {
+          DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
+          processor->Process(true);
+          DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+            oss << "[" << processor->GetProcessorName() << "]";
+          });
+        }
+        else
+        {
+          // Run processor if the processor is still in the list.
+          // It may be removed during the loop.
+          auto iter = std::find(mPostProcessorsOnce[currentIndex].Begin(), mPostProcessorsOnce[currentIndex].End(), processor);
+          if(iter != mPostProcessorsOnce[currentIndex].End())
+          {
+            DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
+            processor->Process(true);
+            DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR_ONCE", [&](std::ostringstream& oss) {
+              oss << "[" << processor->GetProcessorName() << "]";
+            });
+          }
+        }
+      }
+    }
+
+    // Clear once processor.
+    mPostProcessorsOnce[currentIndex].Clear();
+
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS_ONCE", [&](std::ostringstream& oss) {
+      oss << "[" << currentIndex;
+      if(mPostProcessorUnregistered)
+      {
+        oss << ", processor changed";
+      }
+      oss << "]";
+    });
+  }
+
   if(mPostProcessors.Count() != 0)
   {
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSORS", [&](std::ostringstream& oss) {

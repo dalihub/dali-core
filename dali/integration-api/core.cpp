@@ -139,6 +139,16 @@ void Core::UnregisterProcessor(Processor& processor, bool postProcessor)
   mImpl->UnregisterProcessor(processor, postProcessor);
 }
 
+void Core::RegisterProcessorOnce(Processor& processor, bool postProcessor)
+{
+  mImpl->RegisterProcessorOnce(processor, postProcessor);
+}
+
+void Core::UnregisterProcessorOnce(Processor& processor, bool postProcessor)
+{
+  mImpl->UnregisterProcessorOnce(processor, postProcessor);
+}
+
 void Core::UnregisterProcessors()
 {
   mImpl->UnregisterProcessors();

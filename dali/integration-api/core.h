@@ -406,7 +406,23 @@ public:
   void UnregisterProcessor(Processor& processor, bool postProcessor = false);
 
   /**
-   * @brief Unregister all processors and post processors what we registered before.
+   * @brief Register a processor for once execute
+   *
+   * Note, Core does not take ownership of this processor.
+   * @param[in] processor The process to register
+   * @param[in] postProcessor set this processor required to be called after size negotiation. Default is false.
+   */
+  void RegisterProcessorOnce(Processor& processor, bool postProcessor = false);
+
+  /**
+   * @brief Unregister a processor for once execute
+   * @param[in] processor The process to unregister
+   * @param[in] postProcessor True if the processor to be unregister is for post processor.
+   */
+  void UnregisterProcessorOnce(Processor& processor, bool postProcessor = false);
+
+  /**
+   * @brief Unregister all processors and post processors (include once) what we registered before.
    */
   void UnregisterProcessors();
 
