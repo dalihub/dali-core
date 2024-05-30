@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include "graphics-render-target.h"
-#include "graphics-surface.h"
 #include "graphics-types.h"
 
 namespace Dali

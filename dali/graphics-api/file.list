@@ -25,7 +25,6 @@ SET( GRAPHICS_API_HEADERS ${GRAPHICS_API_HEADERS}
    ${graphics_src_dir}/graphics-sampler.h
    ${graphics_src_dir}/graphics-shader-create-info.h
    ${graphics_src_dir}/graphics-shader.h
-   ${graphics_src_dir}/graphics-surface.h
    ${graphics_src_dir}/graphics-sync-object-create-info.h
    ${graphics_src_dir}/graphics-sync-object.h
    ${graphics_src_dir}/graphics-texture-create-info.h
