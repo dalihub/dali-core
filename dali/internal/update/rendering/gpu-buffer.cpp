@@ -63,11 +63,14 @@ void GpuBuffer::UpdateDataBuffer(Graphics::Controller& graphicsController, uint3
   info.offset = 0;
   info.size   = size;
 
-  auto  memory = graphicsController.MapBufferRange(info);
-  void* ptr    = memory->LockRegion(0, size);
-  memcpy(ptr, data, size);
-  memory->Unlock(true);
-  graphicsController.UnmapMemory(std::move(memory));
+  auto memory = graphicsController.MapBufferRange(info);
+  if(memory)
+  {
+    void* ptr = memory->LockRegion(0, size);
+    memcpy(ptr, data, size);
+    memory->Unlock(true);
+    graphicsController.UnmapMemory(std::move(memory));
+  }
 }
 
 void GpuBuffer::Destroy()

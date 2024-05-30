@@ -63,7 +63,7 @@ void TestApplication::Initialize()
 
   Graphics::RenderTargetCreateInfo rtInfo{};
   rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
-  rtInfo.SetSurface(reinterpret_cast<Graphics::Surface*>(&mSurfaceWidth)); // Can point to anything, really.
+  rtInfo.SetSurface(mRenderSurface); // Can point to anything, really.
 
   mScene.SetSurface( *mRenderSurface, rtInfo);
 

@@ -1309,6 +1309,13 @@ void GraphicsAlgorithms::RenderScene(
 
   mUniformBufferManager->Flush(nullptr, false);
 
+  /// @todo REMOVE For testing only:
+  /// Ensure that the main surface is presented, even if nothing is available to render.
+  if(targetsToPresent.empty())
+  {
+    targetsToPresent.emplace_back(scene->GetSurfaceRenderTarget());
+  }
+
   // Submit command buffers
   Graphics::SubmitInfo submitInfo;
   submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());

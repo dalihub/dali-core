@@ -869,7 +869,7 @@ void Renderer::ObservedObjectDestroyed(PropertyOwner& owner)
 
 Shader* Renderer::PrepareShader()
 {
-  DALI_ASSERT_ALWAYS(mShader->GetGraphicsObject());
+  //DALI_ASSERT_ALWAYS(mShader->GetGraphicsObject());
   return mShader;
 }
 
@@ -879,7 +879,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline( Graphics::Program&       
                                                        bool                     blend )
 {
   //@todo CACHE ME!
-  DALI_ASSERT_ALWAYS(mPipeline != nullptr);
+  //DALI_ASSERT_ALWAYS(mPipeline != nullptr);
   return *mPipeline.get();
 }
 

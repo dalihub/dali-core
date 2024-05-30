@@ -40,6 +40,11 @@ void Scene::Initialize( Graphics::Controller&               graphicsController,
 {
   mGraphicsController = &graphicsController;
 
+  if(!mRenderTargetCreateInfo.surface)
+  {
+    return;
+  }
+
   // Create the render target for the surface. It should already have been sent via message.
   mRenderTarget = graphicsController.CreateRenderTarget( mRenderTargetCreateInfo, std::move( mRenderTarget ) );
 
@@ -77,7 +82,7 @@ void Scene::Initialize( Graphics::Controller&               graphicsController,
   rpInfo.SetAttachments( attachmentDescriptions );
 
   // Add default render pass (loadOp = clear)
-  mRenderPass = graphicsController.CreateRenderPass( rpInfo, nullptr ); // Warning: Shallow ptr
+  mRenderPass = graphicsController.CreateRenderPass( rpInfo, nullptr );
 
   desc.SetLoadOp( Graphics::AttachmentLoadOp::LOAD );
   attachmentDescriptions[0] = desc;
@@ -88,7 +93,7 @@ void Scene::Initialize( Graphics::Controller&               graphicsController,
     attachmentDescriptions.back() = desc;
   }
 
-  mRenderPassNoClear = graphicsController.CreateRenderPass( rpInfo, nullptr ); // Warning: Shallow ptr
+  mRenderPassNoClear = graphicsController.CreateRenderPass( rpInfo, nullptr );
 }
 
 void Scene::GetAvailableBuffers( Integration::DepthBufferAvailable&   depthBufferAvailable,
@@ -116,6 +121,13 @@ const Rect<int32_t>& Scene::GetSurfaceRect() const
 
 void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
 {
+  if(mRenderTarget == nullptr)
+  {
+    mRenderTargetCreateInfo = renderTargetCreateInfo;
+    Initialize(*mGraphicsController, Integration::DepthBufferAvailable::FALSE, Integration::StencilBufferAvailable::FALSE);
+    return;
+  }
+
   if(mRenderTarget != nullptr &&
      mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface)
   {

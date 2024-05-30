@@ -915,88 +915,88 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
   // changes.
   if( future || updateScene || mImpl->previousUpdateScene )
   {
-    //Animate
-    Animate( bufferIndex, elapsedSeconds );
+    // Animate
+    Animate(bufferIndex, elapsedSeconds);
 
-    //Constraint custom objects
-    ConstrainCustomObjects( bufferIndex );
+    // Constraint custom objects
+    ConstrainCustomObjects(bufferIndex);
 
-    //Clear the lists of renderers from the previous update
-    for( auto sortedLayers : mImpl->sortedLayerLists )
+    // Clear the lists of renderers from the previous update
+    for(auto sortedLayers : mImpl->sortedLayerLists)
     {
-      for( auto&& layer : sortedLayers )
+      for(auto&& layer : sortedLayers)
       {
         layer->ClearRenderables();
       }
     }
 
     // Call the frame-callback-processor if set
-    if( mImpl->frameCallbackProcessor )
+    if(mImpl->frameCallbackProcessor)
     {
-      mImpl->frameCallbackProcessor->Update( bufferIndex, elapsedSeconds );
+      mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds);
     }
 
-    //Update node hierarchy, apply constraints and perform sorting / culling.
-    //This will populate each Layer with a list of renderers which are ready.
-    UpdateNodes( bufferIndex );
+    // Update node hierarchy, apply constraints and perform sorting / culling.
+    // This will populate each Layer with a list of renderers which are ready.
+    UpdateNodes(bufferIndex);
 
-    //Apply constraints to RenderTasks, shaders
-    ConstrainRenderTasks( bufferIndex );
-    ConstrainShaders( bufferIndex );
+    // Apply constraints to RenderTasks, shaders
+    ConstrainRenderTasks(bufferIndex);
+    ConstrainShaders(bufferIndex);
 
-    //Update renderers and apply constraints
-    UpdateRenderers( bufferIndex );
+    // Update renderers and apply constraints
+    UpdateRenderers(bufferIndex);
 
-    //Update the transformations of all the nodes
+    // Update the transformations of all the nodes
     mImpl->transformManager.Update();
 
-    //Process Property Notifications
-    ProcessPropertyNotifications( bufferIndex );
+    // Process Property Notifications
+    ProcessPropertyNotifications(bufferIndex);
 
-    //Update cameras
-    for( auto&& cameraIterator : mImpl->cameras )
+    // Update cameras
+    for(auto&& cameraIterator : mImpl->cameras)
     {
-      cameraIterator->Update( bufferIndex );
+      cameraIterator->Update(bufferIndex);
     }
 
-    //Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
-    //reset the update buffer index and make sure there is enough room in the instruction container
-    if( mImpl->renderersAdded )
+    // Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
+    // reset the update buffer index and make sure there is enough room in the instruction container
+    if(mImpl->renderersAdded)
     {
       // Calculate how many render tasks we have in total
       VectorBase::SizeType numberOfRenderTasks = 0;
 
       const VectorBase::SizeType taskListCount = mImpl->taskLists.Count();
-      for ( VectorBase::SizeType index = 0u; index < taskListCount; index++ )
+      for(VectorBase::SizeType index = 0u; index < taskListCount; index++)
       {
         numberOfRenderTasks += mImpl->taskLists[index]->GetTasks().Count();
       }
 
-      mImpl->defaultScene->GetRenderInstructions().ResetAndReserve( bufferIndex,
-                                                                    static_cast<uint32_t>( numberOfRenderTasks ) );
+      mImpl->defaultScene->GetRenderInstructions().ResetAndReserve(bufferIndex,
+                                                                   static_cast<uint32_t>(numberOfRenderTasks));
 
-      for ( VectorBase::SizeType index = 0u; index < taskListCount; index++ )
+      for(VectorBase::SizeType index = 0u; index < taskListCount; index++)
       {
-        if ( NULL != mImpl->roots[index] )
+        if(NULL != mImpl->roots[index])
         {
-          keepRendererRendering |= mImpl->renderTaskProcessor.Process( bufferIndex,
-                                                                       *mImpl->taskLists[index],
-                                                                       *mImpl->roots[index],
-                                                                       mImpl->sortedLayerLists[index],
-                                                                       mImpl->defaultScene->GetRenderInstructions(),
-                                                                       renderToFboEnabled,
-                                                                       isRenderingToFbo );
+          keepRendererRendering |= mImpl->renderTaskProcessor.Process(bufferIndex,
+                                                                      *mImpl->taskLists[index],
+                                                                      *mImpl->roots[index],
+                                                                      mImpl->sortedLayerLists[index],
+                                                                      mImpl->defaultScene->GetRenderInstructions(),
+                                                                      renderToFboEnabled,
+                                                                      isRenderingToFbo);
         }
       }
 
       // generate graphics objects & upload geometry
-      PrepareNodes( bufferIndex );
+      PrepareNodes(bufferIndex);
       for(auto&& iter : mImpl->geometryContainer)
       {
         iter->Upload(mImpl->graphicsController);
       }
 
-      if( future )
+      if(future)
       {
         future->Wait();
         future.reset();
@@ -1012,7 +1012,11 @@ uint32_t UpdateManager::Update( float elapsedSeconds,
       {
         iter->OnRenderFinished();
       }
-
+    }
+    else
+    {
+      // @todo REMOVE, for testing only
+      mImpl->graphicsAlgorithms.RenderScene(mImpl->defaultScene.Get(), bufferIndex, false);
     }
   }
 
