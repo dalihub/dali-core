@@ -404,7 +404,7 @@ void Animation::Clear()
   mNotificationCount = 0;
 
   // Update the current playlist
-  mPlaylist.OnClear(*this);
+  mPlaylist.OnClear(*this, true);
 }
 
 void Animation::AnimateBy(Property& target, Property::Value relativeValue)

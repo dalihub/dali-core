@@ -51,19 +51,29 @@ void AnimationPlaylist::AnimationDestroyed(Animation& animation)
 
 void AnimationPlaylist::OnPlay(Animation& animation)
 {
-  mPlaylist.push_back(Dali::Animation(&animation));
+  mPlaylist.insert(Dali::Animation(&animation));
 }
 
-void AnimationPlaylist::OnClear(Animation& animation)
+void AnimationPlaylist::OnClear(Animation& animation, bool ignoreRequired)
 {
-  std::vector<Dali::Animation>::iterator iter = std::find(mPlaylist.begin(), mPlaylist.end(), Dali::Animation(&animation));
-  std::vector<Dali::Animation>::iterator last = mPlaylist.end();
-  if(iter != last)
+  // Keep handle for safety.
+  auto handle = Dali::Animation(&animation);
+
+  auto iter = mPlaylist.find(handle);
+  if(iter != mPlaylist.end())
   {
-    --last;                  // move to real last
-    std::swap(*iter, *last); // swap
-    mPlaylist.resize(mPlaylist.size() - 1u);
+    mPlaylist.erase(iter);
   }
+
+  if(ignoreRequired)
+  {
+    mIgnoredAnimations.insert(&animation);
+  }
+}
+
+void AnimationPlaylist::EventLoopFinished()
+{
+  mIgnoredAnimations.clear();
 }
 
 void AnimationPlaylist::NotifyCompleted()
@@ -76,15 +86,15 @@ void AnimationPlaylist::NotifyCompleted()
   {
     Animation* animation = *iter;
 
-    if(animation->HasFinished())
+    if(mIgnoredAnimations.find(animation) == mIgnoredAnimations.end() && animation->HasFinished())
     {
-      finishedAnimations.push_back(Dali::Animation(animation));
+      Dali::Animation handle(animation);
+
+      finishedAnimations.push_back(handle);
 
       // The animation may be present in mPlaylist - remove if necessary
       // Note that the animation "Finish" signal is emitted after Stop() has been called
-      std::vector<Dali::Animation>::iterator iter = std::find(mPlaylist.begin(), mPlaylist.end(), Dali::Animation(animation));
-      DALI_ASSERT_DEBUG(iter != mPlaylist.end());
-      mPlaylist.erase(iter);
+      OnClear(*animation, false);
     }
   }
 

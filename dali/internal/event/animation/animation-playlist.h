@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/public-api/animation/animation.h>
@@ -72,9 +73,17 @@ public:
 
   /**
    * Called when an animation is cleared.
+   * @param[in] animation The animation that is cleared.
+   * @param[in] ignoreRequired Whether to ignore the notify for current event loop, or not.
    * @post The animation will no longer be referenced by AnimationPlaylist.
    */
-  void OnClear(Animation& animation);
+  void OnClear(Animation& animation, bool ignoreRequired);
+
+  /**
+   * Notify from core that current event loop finisehd.
+   * It will clear all ignored animations at OnClear.
+   */
+  void EventLoopFinished();
 
   /**
    * @brief Notify that an animation has reached a progress marker
@@ -117,7 +126,8 @@ private: // from CompleteNotificationInterface
 
 private:
   Dali::Vector<Animation*>     mAnimations; ///< All existing animations (not owned)
-  std::vector<Dali::Animation> mPlaylist;   ///< The currently playing animations (owned through handle)
+  std::set<Dali::Animation> mPlaylist;   ///< The currently playing animations (owned through handle)
+  std::set<Animation*>     mIgnoredAnimations; ///< The currently cleard animations. We should not send notification at NotifyCompleted.
 };
 
 /**

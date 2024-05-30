@@ -309,6 +309,9 @@ void Core::ProcessEvents()
   // Flush any queued messages for the update-thread
   const bool messagesToProcess = mUpdateManager->FlushQueue();
 
+  // Notify to animation play list that event processing has finished.
+  mAnimationPlaylist->EventLoopFinished();
+
   // Check if the touch or gestures require updates.
   const bool gestureNeedsUpdate = mGestureEventProcessor->NeedsUpdate();
 
