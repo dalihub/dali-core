@@ -308,6 +308,9 @@ void Core::ProcessEvents()
 
   RelayoutAndFlush(scenes);
 
+  // Notify to animation play list that event processing has finished.
+  mAnimationPlaylist->EventLoopFinished();
+
   mUpdateManager->EventProcessingFinished();
 
   // Check if the touch or gestures require updates.

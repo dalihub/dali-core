@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/ordered-set.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
@@ -75,9 +75,17 @@ public:
 
   /**
    * Called when an animation is cleared.
+   * @param[in] animation The animation that is cleared.
+   * @param[in] ignoreRequired Whether to ignore the notify for current event loop, or not.
    * @post The animation will no longer be referenced by AnimationPlaylist.
    */
-  void OnClear(Animation& animation);
+  void OnClear(Animation& animation, bool ignoreRequired);
+
+  /**
+   * Notify from core that current event loop finisehd.
+   * It will clear all ignored animations at OnClear.
+   */
+  void EventLoopFinished();
 
   /**
    * @brief Notify that an animation has reached a progress marker
@@ -119,9 +127,9 @@ private: // from CompleteNotificationInterface
   void NotifyCompleted(CompleteNotificationInterface::ParameterList notifierList) override;
 
 private:
-  OrderedSet<Animation, false>        mAnimations; ///< All existing animations (not owned)
-  std::map<Dali::Animation, uint32_t> mPlaylist;   ///< The currently playing animations (owned through handle).
-                                                   ///< Note we can hold same handles multiple, since OnClear can be called after NotifyCompleted.
+  OrderedSet<Animation, false>          mAnimations;        ///< All existing animations (not owned)
+  std::set<Dali::Animation>             mPlaylist;          ///< The currently playing animations (owned through handle).
+  std::set<NotifierInterface::NotifyId> mIgnoredAnimations; ///< The currently cleard animations. We should not send notification at NotifyCompleted.
 };
 
 /**

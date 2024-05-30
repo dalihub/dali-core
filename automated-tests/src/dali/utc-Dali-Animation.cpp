@@ -15967,3 +15967,201 @@ int UtcDaliAnimationGetAnimationId(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationFinishedNotEmittedAfterClear(void)
+{
+  tet_infoline("UtcDaliAnimationFinishedNotEmittedAfterClear");
+
+  TestApplication application;
+
+  auto actor = Actor::New();
+  actor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  auto        animation = Animation::New(1.0f);
+  const float origY     = actor.GetProperty(Actor::Property::POSITION_Y).Get<float>();
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(150.0f, origY, 0.0f), TimePeriod(1.0f));
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+  // Animation finished.
+  application.Render(501);
+
+  uint32_t animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  finishCheck.CheckSignalNotReceived();
+
+  // Send clear.
+  animation.Clear();
+
+  application.SendNotification();
+
+  // Finished signal not emitted.
+  finishCheck.CheckSignalNotReceived();
+
+  END_TEST;
+}
+
+int UtcDaliAnimationReferenceCountCheck01(void)
+{
+  tet_infoline("UtcDaliAnimationReferenceCountCheck01");
+
+  TestApplication application;
+
+  auto actor = Actor::New();
+  actor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  auto        animation = Animation::New(1.0f);
+  const float origY     = actor.GetProperty(Actor::Property::POSITION_Y).Get<float>();
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(150.0f, origY, 0.0f), TimePeriod(1.0f));
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  uint32_t animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  animation.Reset(); // Remove reference count.
+
+  // Still reference count is 1 since it is animated now.
+  finishCheck.CheckSignalNotReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  // Animation finished.
+  application.Render(501);
+
+  // Still reference count is 1 since it is animated now.
+  finishCheck.CheckSignalNotReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  // Send finished signal, and then dereferenced
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationReferenceCountCheck02(void)
+{
+  tet_infoline("UtcDaliAnimationReferenceCountCheck02");
+
+  TestApplication application;
+
+  auto actor = Actor::New();
+  actor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  auto        animation = Animation::New(1.0f);
+  const float origY     = actor.GetProperty(Actor::Property::POSITION_Y).Get<float>();
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(150.0f, origY, 0.0f), TimePeriod(1.0f));
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  uint32_t animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  // Send stop.
+  animation.Stop();
+  animation.Reset(); // Remove reference count.
+
+  // Still reference count is 1 since it is animated now.
+  finishCheck.CheckSignalNotReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  // Animation not finished. But we send Stop(). So finished callback should be emitted.
+  application.SendNotification();
+  application.Render(1);
+
+  // Still reference count is 1 since it is animated now.
+  finishCheck.CheckSignalNotReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  // Send finished signal, and then dereferenced
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationReferenceCountCheck03(void)
+{
+  tet_infoline("UtcDaliAnimationReferenceCountCheck03");
+
+  TestApplication application;
+
+  auto actor = Actor::New();
+  actor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  auto        animation = Animation::New(1.0f);
+  const float origY     = actor.GetProperty(Actor::Property::POSITION_Y).Get<float>();
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(150.0f, origY, 0.0f), TimePeriod(1.0f));
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  uint32_t animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 1, TEST_LOCATION);
+
+  // Send stop and clear.
+  animation.Stop();
+  animation.Clear();
+  animation.Reset(); // Remove reference count.
+
+  // Now reference count is 0 since we dont need to keep it's reference anymore.
+  finishCheck.CheckSignalNotReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 0, TEST_LOCATION);
+
+  // Animation not finished. But we send Clear(). So finished callback should not be emitted.
+  application.SendNotification();
+  application.Render(1);
+
+  // Still reference count is 1 since it is animated now.
+  finishCheck.CheckSignalNotReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 0, TEST_LOCATION);
+
+  // Finished signal not emitted, and then dereferenced
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
