@@ -442,7 +442,7 @@ void Animation::Clear()
   mPlayCalled        = false;
 
   // Update the current playlist
-  mPlaylist.OnClear(*this);
+  mPlaylist.OnClear(*this, true);
 }
 
 void Animation::AnimateBy(Property& target, Property::Value relativeValue)
@@ -835,7 +835,8 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
 
 bool Animation::HasFinished()
 {
-  bool          hasFinished(false);
+  bool hasFinished(false);
+
   const int32_t playedCount(mAnimation->GetPlayedCount());
 
   if(playedCount > mNotificationCount)
