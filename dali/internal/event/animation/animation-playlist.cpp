@@ -132,7 +132,7 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
-    oss << "[n:" << notifierIdList.Count() << ", i:" << mIgnoredAnimations.size() << "]";
+    oss << "[n:" << notifierIdList.Count() << ",i:" << mIgnoredAnimations.size() << "]";
   });
 
   for(const auto& notifierId : notifierIdList)
@@ -161,24 +161,28 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
   // Now it's safe to emit the signals
   for(auto& animation : finishedAnimations)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    // Check whether given animation still available (Since it could be cleared during finished signal emitted).
+    if(DALI_LIKELY(mIgnoredAnimations.find(animation.GetAnimationId()) == mIgnoredAnimations.end()))
     {
-      start = GetNanoseconds();
-    }
-#endif
-    GetImplementation(animation).EmitSignalFinish();
 #ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      end = GetNanoseconds();
-      animationFinishedTimeChecker.emplace_back(end - start, GetImplementation(animation).GetSceneObject()->GetNotifyId());
-    }
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        start = GetNanoseconds();
+      }
 #endif
+      GetImplementation(animation).EmitSignalFinish();
+#ifdef TRACE_ENABLED
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        end = GetNanoseconds();
+        animationFinishedTimeChecker.emplace_back(end - start, GetImplementation(animation).GetSceneObject()->GetNotifyId());
+      }
+#endif
+    }
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
-    oss << "[f:" << finishedAnimations.size();
+    oss << "[f:" << finishedAnimations.size() << ",i:" << mIgnoredAnimations.size();
 
     if(finishedAnimations.size() > 0u)
     {
