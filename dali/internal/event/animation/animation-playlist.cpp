@@ -132,7 +132,7 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
 #endif
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
-    oss << "[n:" << notifierIdList.Count() << ", i:" << mIgnoredAnimations.size() << "]";
+    oss << "[n:" << notifierIdList.Count() << ",i:" << mIgnoredAnimations.size() << "]";
   });
 
   for(const auto& notifierId : notifierIdList)
@@ -161,33 +161,41 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
   // Now it's safe to emit the signals
   for(auto& animation : finishedAnimations)
   {
-#ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+    // Check whether given animation still available (Since it could be cleared during finished signal emitted).
+    if(DALI_LIKELY(mIgnoredAnimations.find(animation.GetAnimationId()) == mIgnoredAnimations.end()))
     {
-      start = GetNanoseconds();
-    }
-#endif
-    GetImplementation(animation).EmitSignalFinish();
 #ifdef TRACE_ENABLED
-    if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-    {
-      end = GetNanoseconds();
-      animationFinishedTimeChecker.emplace_back(end - start, GetImplementation(animation).GetSceneObject()->GetNotifyId());
-    }
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        start = GetNanoseconds();
+      }
 #endif
+      GetImplementation(animation).EmitSignalFinish();
+#ifdef TRACE_ENABLED
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        end = GetNanoseconds();
+        animationFinishedTimeChecker.emplace_back(end - start, GetImplementation(animation).GetSceneObject()->GetNotifyId());
+      }
+#endif
+    }
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
-    oss << "[f:" << finishedAnimations.size() << ",";
+    oss << "[f:" << finishedAnimations.size() << ",i:" << mIgnoredAnimations.size();
 
-    std::sort(animationFinishedTimeChecker.rbegin(), animationFinishedTimeChecker.rend());
-    auto topCount = std::min(5u, static_cast<uint32_t>(animationFinishedTimeChecker.size()));
-
-    oss << "top" << topCount;
-    for(auto i = 0u; i < topCount; ++i)
+    if(finishedAnimations.size() > 0u)
     {
-      oss << "(" << static_cast<float>(animationFinishedTimeChecker[i].first) / 1000000.0f << "ms,";
-      oss << animationFinishedTimeChecker[i].second << ")";
+      oss << ",";
+      std::sort(animationFinishedTimeChecker.rbegin(), animationFinishedTimeChecker.rend());
+      auto topCount = std::min(5u, static_cast<uint32_t>(animationFinishedTimeChecker.size()));
+
+      oss << "top" << topCount;
+      for(auto i = 0u; i < topCount; ++i)
+      {
+        oss << "(" << static_cast<float>(animationFinishedTimeChecker[i].first) / 1000000.0f << "ms,";
+        oss << animationFinishedTimeChecker[i].second << ")";
+      }
     }
     oss << "]";
   });

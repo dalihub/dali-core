@@ -54,6 +54,7 @@ struct AnimationFinishCheck
 
   void operator()(Animation& animation)
   {
+    tet_printf("emitted animation [%u]\n", animation.GetAnimationId());
     mSignalReceived = true;
   }
 
@@ -16028,6 +16029,8 @@ int UtcDaliAnimationReferenceCountCheck01(void)
   animation.FinishedSignal().Connect(&application, finishCheck);
 
   animation.Play();
+  animation.Play();
+  animation.Play();
 
   application.SendNotification();
   application.Render(500);
@@ -16077,6 +16080,8 @@ int UtcDaliAnimationReferenceCountCheck02(void)
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
 
+  animation.Play();
+  animation.Play();
   animation.Play();
 
   application.SendNotification();
@@ -16131,6 +16136,8 @@ int UtcDaliAnimationReferenceCountCheck03(void)
   animation.FinishedSignal().Connect(&application, finishCheck);
 
   animation.Play();
+  animation.Play();
+  animation.Play();
 
   application.SendNotification();
   application.Render(500);
@@ -16162,6 +16169,142 @@ int UtcDaliAnimationReferenceCountCheck03(void)
   finishCheck.CheckSignalNotReceived();
   animationCount = Dali::DevelAnimation::GetAnimationCount();
   DALI_TEST_EQUALS(animationCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+// Functor to test clear another animation during animation finished signal.
+struct AnimationClearCheck
+{
+  AnimationClearCheck(bool& signalReceived)
+  : mSignalReceived(signalReceived),
+    mClearRequiredAnimations()
+  {
+  }
+
+  void AddClearAnimation(Animation animation)
+  {
+    mClearRequiredAnimations.emplace_back(animation);
+    tet_printf("Add clear animation [%u], clear?[%zu]\n", animation.GetAnimationId(), mClearRequiredAnimations.size());
+  }
+
+  void operator()(Animation& animation)
+  {
+    tet_printf("emitted animation [%u], clear?[%zu]\n", animation.GetAnimationId(), mClearRequiredAnimations.size());
+    mSignalReceived = true;
+    for(auto clearRequiredAnimation : mClearRequiredAnimations)
+    {
+      if(clearRequiredAnimation)
+      {
+        tet_printf("clear animation [%u]\n", clearRequiredAnimation.GetAnimationId());
+        clearRequiredAnimation.Clear();
+      }
+    }
+  }
+
+  void Reset()
+  {
+    mSignalReceived = false;
+  }
+
+  void CheckSignalReceived()
+  {
+    if(!mSignalReceived)
+    {
+      tet_printf("Expected Finish signal was not received\n");
+      tet_result(TET_FAIL);
+    }
+    else
+    {
+      tet_result(TET_PASS);
+    }
+  }
+
+  void CheckSignalNotReceived()
+  {
+    if(mSignalReceived)
+    {
+      tet_printf("Unexpected Finish signal was received\n");
+      tet_result(TET_FAIL);
+    }
+    else
+    {
+      tet_result(TET_PASS);
+    }
+  }
+
+  bool& mSignalReceived; // owned by individual tests
+
+  std::vector<Animation> mClearRequiredAnimations;
+};
+
+} // namespace
+int UtcDaliAnimationClearDuringAnimationFinished(void)
+{
+  tet_infoline("UtcDaliAnimationClearDuringAnimationFinished");
+
+  TestApplication application;
+
+  auto actor = Actor::New();
+  actor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  application.GetScene().Add(actor);
+
+  auto animation1 = Animation::New(1.0f);
+  auto animation2 = Animation::New(1.0f);
+  auto animation3 = Animation::New(1.0f);
+  animation1.AnimateTo(Property(actor, Actor::Property::POSITION_X), 150.0f);
+  animation2.AnimateTo(Property(actor, Actor::Property::POSITION_Y), 200.0f);
+  animation3.AnimateTo(Property(actor, Actor::Property::POSITION_Z), 250.0f);
+
+  bool                 signal1Received(false);
+  AnimationFinishCheck finish1Check(signal1Received);
+
+  bool                signal2Received(false);
+  AnimationClearCheck finish2Check(signal2Received);
+
+  bool                 signal3Received(false);
+  AnimationFinishCheck finish3Check(signal3Received);
+
+  // Set clear finish signals.
+  finish2Check.AddClearAnimation(animation1);
+  finish2Check.AddClearAnimation(animation2);
+  finish2Check.AddClearAnimation(animation3);
+
+  animation1.FinishedSignal().Connect(&application, finish1Check);
+  animation2.FinishedSignal().Connect(&application, finish2Check);
+  animation3.FinishedSignal().Connect(&application, finish3Check);
+
+  animation1.Play();
+  animation2.Play();
+  animation3.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  uint32_t animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 3, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(509); // Animation finished
+
+  animationCount = Dali::DevelAnimation::GetAnimationCount();
+  DALI_TEST_EQUALS(animationCount, 3, TEST_LOCATION);
+
+  finish1Check.CheckSignalNotReceived();
+  finish2Check.CheckSignalNotReceived();
+  finish3Check.CheckSignalNotReceived();
+
+  // Notify animation finished signal.
+  application.SendNotification();
+
+  tet_printf("Check animation 1 and 2 receive, and 3 not.\n");
+  tet_printf("Since current Animation finished signal emitted ordered by\n 1. Finished frame.\n 2. Creation time.\n");
+
+  finish1Check.CheckSignalReceived();
+  finish2Check.CheckSignalReceived();
+  finish3Check.CheckSignalNotReceived();
 
   END_TEST;
 }
