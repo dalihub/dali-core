@@ -226,6 +226,7 @@ struct UpdateManager::Impl
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
 #endif
+    discardAnimationFinishedAge(0u),
     animationFinishedDuringUpdate(false),
     previousUpdateScene(false),
     renderTaskWaiting(false),
@@ -360,11 +361,13 @@ struct UpdateManager::Impl
   ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
 #endif
 
-  bool animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
-  bool previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
-  bool renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
-  bool renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
-  bool renderingRequired;             ///< True if required to render the current frame
+  uint8_t discardAnimationFinishedAge : 2; ///< Age of EndAction::Discard animation Stop/Finished. It will make we call ResetToBaseValue at least 2 frames.
+
+  bool animationFinishedDuringUpdate : 1; ///< Flag whether any animations finished during the Update()
+  bool previousUpdateScene : 1;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
+  bool renderTaskWaiting : 1;             ///< A REFRESH_ONCE render task is waiting to be rendered
+  bool renderersAdded : 1;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
+  bool renderingRequired : 1;             ///< True if required to render the current frame
 
 private:
   Impl(const Impl&);            ///< Undefined
@@ -847,6 +850,9 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
+  // Age down discard animations.
+  mImpl->discardAnimationFinishedAge >>= 1;
+
   // Reset node properties
   mImpl->nodeResetters.ResetToBaseValues(bufferIndex);
 
@@ -917,6 +923,12 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     }
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
+
+    // Check whether finished animation is Discard type. If then, we should update scene at least 2 frames.
+    if(finished && animation->GetEndAction() == Animation::EndAction::DISCARD)
+    {
+      mImpl->discardAnimationFinishedAge |= 2u;
+    }
 
     // queue the notification on finished or stopped
     if(finished || stopped)
@@ -1115,6 +1127,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     isAnimationRunning ||                              // ..at least one animation is running OR
     mImpl->messageQueue.IsSceneUpdateRequired() ||     // ..a message that modifies the scene graph node tree is queued OR
     mImpl->frameCallbackProcessor ||                   // ..a frame callback processor is existed OR
+    mImpl->discardAnimationFinishedAge > 0u ||         // ..at least one animation with EndAction::DISCARD finished
     gestureUpdated;                                    // ..a gesture property was updated
 
   uint32_t keepUpdating    = 0;
@@ -1403,7 +1416,7 @@ uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
 
   // If the rendering behavior is set to continuously render, then continue to render.
   // Keep updating until no messages are received and no animations are running.
-  // If an animation has just finished, update at least once more for Discard end-actions.
+  // If an animation has just finished, update at least two frames more for Discard end-actions.
   // No need to check for renderQueue as there is always a render after update and if that
   // render needs another update it will tell the adaptor to call update again
 
@@ -1413,7 +1426,8 @@ uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
   }
 
   if(IsAnimationRunning() ||
-     mImpl->animationFinishedDuringUpdate)
+     mImpl->animationFinishedDuringUpdate ||
+     mImpl->discardAnimationFinishedAge > 0u)
   {
     keepUpdatingRequest |= KeepUpdating::ANIMATIONS_RUNNING;
   }
