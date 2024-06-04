@@ -326,6 +326,12 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
     mResendFlag = 0;
   }
 
+  // Age down visual properties dirty flag
+  if(mVisualProperties)
+  {
+    rendererUpdated |= mVisualProperties->PrepareProperties();
+  }
+
   // Ensure collected map is up to date
   UpdateUniformMap(updateBufferIndex);
 
@@ -829,15 +835,6 @@ void Renderer::ResetToBaseValues(BufferIndex updateBufferIndex)
   }
 }
 
-void Renderer::MarkAsDirty()
-{
-  mOpacity.MarkAsDirty();
-  if(mVisualProperties)
-  {
-    mVisualProperties->MarkAsDirty();
-  }
-}
-
 uint32_t Renderer::GetMemoryPoolCapacity()
 {
   return GetRendererMemoryPool().GetCapacity();
@@ -861,7 +858,12 @@ const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
 
 bool Renderer::IsUpdated() const
 {
-  if(Updated() || (mShader && mShader->Updated()))
+  // We should check Whether
+  // 1. Renderer itself's property changed
+  // 2. Renderer's opacity changed
+  // 3. Shader's propperties are changed
+  // 4. Visual properties are changed
+  if(IsDirty() || (mShader && mShader->Updated()) || (mVisualProperties && mVisualProperties->Updated()))
   {
     return true;
   }
