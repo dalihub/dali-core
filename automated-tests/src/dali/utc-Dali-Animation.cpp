@@ -14354,13 +14354,13 @@ int UtcDaliAnimationClearPropertyValue02(void)
   animation1.Play();
 
   application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 1u /*just less than the animation duration*/);
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 100u /*just less than the animation duration*/);
 
   // The event side property should be set the current value immediately
   DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), targetPosition1, VECTOR3_EPSILON, TEST_LOCATION);
 
   application.SendNotification();
-  application.Render(2u /*just beyond the animation duration*/);
+  application.Render(200u /*just beyond the animation duration*/);
 
   // Build a new animation
   Animation animation2 = Animation::New(durationSeconds);
@@ -14368,7 +14368,7 @@ int UtcDaliAnimationClearPropertyValue02(void)
   animation2.Play();
 
   application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 1u /*just less than the animation duration*/);
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 100u /*just less than the animation duration*/);
 
   // The event side property should be set the current value immediately
   DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), targetPosition2, VECTOR3_EPSILON, TEST_LOCATION);
@@ -14377,7 +14377,7 @@ int UtcDaliAnimationClearPropertyValue02(void)
   animation1.Clear();
 
   application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 1u /*just less than the animation duration*/);
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 100u /*just less than the animation duration*/);
 
   // The property should not be changed.
   DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), targetPosition2, VECTOR3_EPSILON, TEST_LOCATION);
@@ -16241,6 +16241,7 @@ struct AnimationClearCheck
 };
 
 } // namespace
+
 int UtcDaliAnimationClearDuringAnimationFinished(void)
 {
   tet_infoline("UtcDaliAnimationClearDuringAnimationFinished");
@@ -16305,6 +16306,222 @@ int UtcDaliAnimationClearDuringAnimationFinished(void)
   finish1Check.CheckSignalReceived();
   finish2Check.CheckSignalReceived();
   finish3Check.CheckSignalNotReceived();
+
+  END_TEST;
+}
+
+int UtcDaliAnimationPlayAfterStopGetState(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Build the animation
+  float     durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3   initialPosition(0.0f, 0.0f, 0.0f);
+  Vector3   targetPosition(100.0f, 100.0f, 100.0f);
+  actor.SetProperty(Actor::Property::POSITION, initialPosition);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+
+  Vector3 fiftyPercentProgress = (initialPosition + targetPosition) * 0.5f;
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  // Stop and Play.
+  {
+    tet_printf("Play, than Stop and Play immediately. Check the current value and animation state\n");
+    // Start the animation.
+    animation.Play();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    finishCheck.CheckSignalNotReceived();
+    application.SendNotification();
+    application.Render(500);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+
+    // Stop, and Play immediately
+    animation.Stop();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::STOPPED, TEST_LOCATION);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
+    animation.Play();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+
+    finishCheck.CheckSignalNotReceived();
+    application.SendNotification();
+
+    // Re-play the animation. So the position value changed after Render execute.
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+    application.Render(0);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    application.SendNotification();
+
+    // expect finished signal recieved due to Stop API.
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    // Even if finished signal recieved, animation state should be playing for now.
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+
+    application.Render(500);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+
+    finishCheck.CheckSignalNotReceived();
+
+    application.SendNotification();
+    application.Render(550);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
+
+    // Still Playing since animation finished signal not comming yet.
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+
+    // expect finished signal recieved due to Stop API.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+
+    // And now animation state is stopped.
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::STOPPED, TEST_LOCATION);
+
+    // Reset test status
+    finishCheck.Reset();
+    application.SendNotification();
+    application.Render(0);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
+    application.SendNotification();
+    application.Render(0);
+  }
+
+  // Stop and Pause.
+  {
+    tet_printf("Play, than Stop and Pause immediately. Check the current value and animation state\n");
+    // Start the animation.
+    animation.Play();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    finishCheck.CheckSignalNotReceived();
+    application.SendNotification();
+    application.Render(500);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+
+    // Stop, and Pause immediately
+    animation.Stop();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::STOPPED, TEST_LOCATION);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
+    animation.Pause();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PAUSED, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+
+    finishCheck.CheckSignalNotReceived();
+    application.SendNotification();
+
+    // Animation is stopped. So the position value not be changed after Render execute.
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+    application.Render(0);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    application.SendNotification();
+
+    // expect finished signal recieved due to Stop API.
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    // Even if finished signal recieved, animation state should be paused for now.
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PAUSED, TEST_LOCATION);
+
+    application.Render(500);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PAUSED, TEST_LOCATION);
+
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+
+    // Reset test status
+    finishCheck.Reset();
+    application.SendNotification();
+    application.Render(0);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
+    application.SendNotification();
+    application.Render(0);
+  }
+
+  // Stop and Play and Stop.
+  {
+    tet_printf("Play, than Stop / Play / Stop immediately. Check the current value and animation state\n");
+    // Start the animation.
+    animation.Play();
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    finishCheck.CheckSignalNotReceived();
+    application.SendNotification();
+    application.Render(500);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+
+    // Stop, and Play and Stop immediately
+    animation.Stop();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::STOPPED, TEST_LOCATION);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
+    animation.Play();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::PLAYING, TEST_LOCATION);
+    animation.Stop();
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::STOPPED, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+
+    finishCheck.CheckSignalNotReceived();
+    application.SendNotification();
+
+    // Animation is stopped. So the position value not be changed after Render execute.
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), fiftyPercentProgress, TEST_LOCATION);
+    application.Render(0);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    application.SendNotification();
+
+    // expect finished signal recieved due to Stop API.
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    // Animation state should be stopped for now.
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::STOPPED, TEST_LOCATION);
+
+    application.Render(500);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    DALI_TEST_EQUALS(animation.GetState(), Dali::Animation::State::STOPPED, TEST_LOCATION);
+
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+
+    // Reset test status
+    finishCheck.Reset();
+    application.SendNotification();
+    application.Render(0);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
+    application.SendNotification();
+    application.Render(0);
+  }
 
   END_TEST;
 }
