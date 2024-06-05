@@ -1331,8 +1331,6 @@ struct MapTextureInfo
   uint32_t         size;
 };
 
-using FramebufferId = uint32_t;
-
 /**
  * @brief GraphicsStructureType enum is used by all create info structures
  * in order to identify by the implementation which structure it is
