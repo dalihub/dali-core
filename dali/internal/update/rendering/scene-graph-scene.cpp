@@ -80,6 +80,7 @@ void Scene::Initialize( Graphics::Controller&               graphicsController,
 
   Graphics::RenderPassCreateInfo rpInfo{};
   rpInfo.SetAttachments( attachmentDescriptions );
+  rpInfo.SetRenderTarget(mRenderTarget.get());
 
   // Add default render pass (loadOp = clear)
   mRenderPass = graphicsController.CreateRenderPass( rpInfo, nullptr );
@@ -94,6 +95,7 @@ void Scene::Initialize( Graphics::Controller&               graphicsController,
   }
 
   mRenderPassNoClear = graphicsController.CreateRenderPass( rpInfo, nullptr );
+
 }
 
 void Scene::GetAvailableBuffers( Integration::DepthBufferAvailable&   depthBufferAvailable,

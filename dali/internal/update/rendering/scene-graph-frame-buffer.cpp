@@ -153,6 +153,7 @@ void FrameBuffer::PrepareFramebuffer()
 
       Graphics::RenderPassCreateInfo rpInfo{};
       rpInfo.SetAttachments(attachmentDescriptions);
+      rpInfo.SetRenderTarget(mRenderTarget.get());
 
       // Add default render pass (loadOp = clear)
       mRenderPass.emplace_back(mGraphicsController->CreateRenderPass(rpInfo, nullptr));

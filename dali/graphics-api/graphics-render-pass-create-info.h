@@ -25,6 +25,7 @@
 namespace Dali::Graphics
 {
 class RenderTarget;
+
 /**
  * @brief Interface class for RenderPassCreateInfo types in the graphics API.
  *
@@ -65,6 +66,18 @@ struct RenderPassCreateInfo
   }
 
   /**
+   * @brief Set the render target for this render pass
+   *
+   * @param[in] value The render target to use.
+   * @return reference to this structure.
+   */
+  auto& SetRenderTarget(RenderTarget* value)
+  {
+    renderTarget = value;
+    return *this;
+  }
+
+  /**
    * @brief Sets allocation callbacks which will be used when object is created
    * and destroyed.
    *
@@ -80,6 +93,7 @@ struct RenderPassCreateInfo
   GraphicsStructureType                     type{GraphicsStructureType::RENDERPASS_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*                      nextExtension{nullptr};
   const std::vector<AttachmentDescription>* attachments{nullptr};
+  RenderTarget*                             renderTarget{nullptr};
   const AllocationCallbacks*                allocationCallbacks{nullptr};
 };
 
