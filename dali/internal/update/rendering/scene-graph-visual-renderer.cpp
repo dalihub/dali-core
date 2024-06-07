@@ -28,20 +28,20 @@ extern Debug::Filter* gSceneGraphRendererLogFilter; ///< Defined at scene-graph-
 #endif
 namespace VisualRenderer
 {
-void AnimatableVisualProperties::ResetToBaseValues(BufferIndex updateBufferIndex)
+void AnimatableVisualProperties::RequestResetToBaseValues()
 {
-  mTransformOffset.ResetToBaseValue(updateBufferIndex);
-  mTransformSize.ResetToBaseValue(updateBufferIndex);
-  mTransformOrigin.ResetToBaseValue(updateBufferIndex);
-  mTransformAnchorPoint.ResetToBaseValue(updateBufferIndex);
-  mTransformOffsetSizeMode.ResetToBaseValue(updateBufferIndex);
-  mExtraSize.ResetToBaseValue(updateBufferIndex);
-  mMixColor.ResetToBaseValue(updateBufferIndex);
-  mPreMultipliedAlpha.ResetToBaseValue(updateBufferIndex);
+  mTransformOffset.RequestResetToBaseValue();
+  mTransformSize.RequestResetToBaseValue();
+  mTransformOrigin.RequestResetToBaseValue();
+  mTransformAnchorPoint.RequestResetToBaseValue();
+  mTransformOffsetSizeMode.RequestResetToBaseValue();
+  mExtraSize.RequestResetToBaseValue();
+  mMixColor.RequestResetToBaseValue();
+  mPreMultipliedAlpha.RequestResetToBaseValue();
   if(mExtendedProperties)
   {
     auto* decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties);
-    decoratedVisualProperties->ResetToBaseValues(updateBufferIndex);
+    decoratedVisualProperties->RequestResetToBaseValues();
   }
 }
 
@@ -191,14 +191,14 @@ bool AnimatableVisualProperties::PrepareProperties()
   return rendererUpdated;
 }
 
-void AnimatableDecoratedVisualProperties::ResetToBaseValues(BufferIndex updateBufferIndex)
+void AnimatableDecoratedVisualProperties::RequestResetToBaseValues()
 {
-  mCornerRadius.ResetToBaseValue(updateBufferIndex);
-  mCornerRadiusPolicy.ResetToBaseValue(updateBufferIndex);
-  mBorderlineWidth.ResetToBaseValue(updateBufferIndex);
-  mBorderlineColor.ResetToBaseValue(updateBufferIndex);
-  mBorderlineOffset.ResetToBaseValue(updateBufferIndex);
-  mBlurRadius.ResetToBaseValue(updateBufferIndex);
+  mCornerRadius.RequestResetToBaseValue();
+  mCornerRadiusPolicy.RequestResetToBaseValue();
+  mBorderlineWidth.RequestResetToBaseValue();
+  mBorderlineColor.RequestResetToBaseValue();
+  mBorderlineOffset.RequestResetToBaseValue();
+  mBlurRadius.RequestResetToBaseValue();
 }
 
 bool AnimatableDecoratedVisualProperties::Updated() const

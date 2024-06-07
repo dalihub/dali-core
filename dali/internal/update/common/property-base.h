@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_BASE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ namespace Internal
 {
 namespace SceneGraph
 {
+class ResetterManager;
+
 /**
  * Polymorphic base class for scene-graph properties, held by Nodes etc.
  */
@@ -42,12 +44,29 @@ public:
   /**
    * Default constructor.
    */
-  PropertyBase();
+  PropertyBase() = default;
 
   /**
    * Virtual destructor.
    */
-  ~PropertyBase() override;
+  ~PropertyBase() = default;
+
+  /**
+   * @brief Registers a resetter manager for whole property bases.
+   *
+   * @param [in] manager The manager to register.
+   */
+  static void RegisterResetterManager(ResetterManager& manager);
+
+  /**
+   * @brief Unregisters a resetter manager.
+   */
+  static void UnregisterResetterManager();
+
+  /**
+   * @brief Request to reset the property to a base value to registered ResetterManager.
+   */
+  void RequestResetToBaseValue();
 
   /**
    * Reset the property to a base value; only required if the property is animated.

@@ -51,9 +51,9 @@ struct AnimatableVisualProperties
 
 public: // Public API
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::ResetToBaseValues
+   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
    */
-  void ResetToBaseValues(BufferIndex updateBufferIndex);
+  void RequestResetToBaseValues();
 
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::Updated
@@ -143,9 +143,9 @@ public: // Public API
   }
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::ResetToBaseValues
+   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
    */
-  void ResetToBaseValues(BufferIndex updateBufferIndex);
+  void RequestResetToBaseValues();
 
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::Updated

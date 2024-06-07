@@ -70,10 +70,9 @@ public:
   }
 
   /**
-   * Reset the renderer properties to their base values if the renderer is still alive and on stage
-   * @param[in] updateBufferIndex the current buffer index
+   * Request to reset the renderer properties to their base values if the renderer is still alive and on stage
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void RequestResetToBaseValues()
   {
     if(mRenderer != nullptr && mActive)
     {
@@ -82,7 +81,7 @@ public:
       // initialized case.
       --mActive;
 
-      mRenderer->ResetToBaseValues(updateBufferIndex);
+      mRenderer->RequestResetToBaseValues();
     }
   };
 

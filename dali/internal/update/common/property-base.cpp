@@ -18,15 +18,40 @@
 // CLASS HEADER
 #include <dali/internal/update/common/property-base.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/update/common/resetter-manager.h> ///< For RequestPropertyBaseResetToBaseValue
+
 namespace Dali
 {
 namespace Internal
 {
 namespace SceneGraph
 {
-PropertyBase::PropertyBase() = default;
+namespace
+{
+ResetterManager* gResetterManager = nullptr;
+} // unnamed namespace
 
-PropertyBase::~PropertyBase() = default;
+void PropertyBase::RegisterResetterManager(ResetterManager& manager)
+{
+  DALI_ASSERT_ALWAYS(gResetterManager == nullptr && "PropertyBase::RegisterResetterManager called twice!");
+
+  gResetterManager = &manager;
+}
+
+void PropertyBase::UnregisterResetterManager()
+{
+  DALI_ASSERT_ALWAYS(gResetterManager && "PropertyBase::RegisterResetterManager not be called before!");
+
+  gResetterManager = nullptr;
+}
+
+void PropertyBase::RequestResetToBaseValue()
+{
+  DALI_ASSERT_ALWAYS(gResetterManager && "PropertyBase::RequestResetToBaseValue called without RegisterResetterManager!!");
+
+  gResetterManager->RequestPropertyBaseResetToBaseValue(this);
+}
 
 } // namespace SceneGraph
 

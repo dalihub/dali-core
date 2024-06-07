@@ -21,8 +21,10 @@
 // EXTERNAL INCLUDES
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #else
 #include <unordered_map>
+#include <unordered_set>
 #endif
 
 // INTERNAL INCLUDES
@@ -317,8 +319,12 @@ struct UpdateManager::Impl
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   using NodeIdMap = std::map<uint32_t, Node*>;
+
+  using PropertyBaseResetRequestedContainer = std::set<PropertyBase*>;
 #else
   using NodeIdMap = std::unordered_map<uint32_t, Node*>;
+
+  using PropertyBaseResetRequestedContainer = std::unordered_set<PropertyBase*>;
 #endif
   NodeIdMap nodeIdMap; ///< A container of nodes map by id.
 
@@ -329,6 +335,8 @@ struct UpdateManager::Impl
   ResetterContainer<PropertyResetterBase> propertyResetters; ///< A container of property resetters
   ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
   ResetterContainer<RendererResetter>     rendererResetters; ///< A container of renderer resetters
+
+  PropertyBaseResetRequestedContainer resetRequestedPropertyBases; ///< A container of property base to be resets
 
   OwnerContainer<Animation*>            animations;            ///< A container of owned animations
   OwnerContainer<PropertyNotification*> propertyNotifications; ///< A container of owner property notifications.
@@ -383,6 +391,8 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
                              RenderTaskProcessor&           renderTaskProcessor)
 : mImpl(nullptr)
 {
+  PropertyBase::RegisterResetterManager(*this);
+
   mImpl = new Impl(notificationManager,
                    animationFinishedNotifier,
                    propertyNotifier,
@@ -396,6 +406,7 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
 UpdateManager::~UpdateManager()
 {
   delete mImpl;
+  PropertyBase::UnregisterResetterManager();
 }
 
 void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
@@ -704,6 +715,11 @@ void UpdateManager::AddRendererResetter(const Renderer& renderer)
   mImpl->rendererResetters.PushBack(rendererResetter.Release());
 }
 
+void UpdateManager::RequestPropertyBaseResetToBaseValue(PropertyBase* propertyBase)
+{
+  mImpl->resetRequestedPropertyBases.insert(propertyBase);
+}
+
 void UpdateManager::AddPropertyNotification(OwnerPointer<PropertyNotification>& propertyNotification)
 {
   mImpl->propertyNotifications.PushBack(propertyNotification.Release());
@@ -853,14 +869,27 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   // Age down discard animations.
   mImpl->discardAnimationFinishedAge >>= 1;
 
+  // Ensure that their was no request to reset to base values during the previous update
+  // (Since requested property base doesn't consider the lifecycle of PropertyBase,
+  // It might be invalid after the previous update finished)
+  DALI_ASSERT_DEBUG(mImpl->resetRequestedPropertyBases.empty() && "Reset to base values requested during the previous update!");
+  mImpl->resetRequestedPropertyBases.clear();
+
   // Reset node properties
-  mImpl->nodeResetters.ResetToBaseValues(bufferIndex);
+  mImpl->nodeResetters.RequestResetToBaseValues();
 
   // Reset renderer properties
-  mImpl->rendererResetters.ResetToBaseValues(bufferIndex);
+  mImpl->rendererResetters.RequestResetToBaseValues();
 
   // Reset all animating / constrained properties
-  mImpl->propertyResetters.ResetToBaseValues(bufferIndex);
+  mImpl->propertyResetters.RequestResetToBaseValues();
+
+  // Actual reset to base values here
+  for(auto&& propertyBase : mImpl->resetRequestedPropertyBases)
+  {
+    propertyBase->ResetToBaseValue(bufferIndex);
+  }
+  mImpl->resetRequestedPropertyBases.clear();
 
   // Clear all root nodes dirty flags
   for(auto& scene : mImpl->scenes)

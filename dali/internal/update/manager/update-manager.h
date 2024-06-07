@@ -269,6 +269,11 @@ public:
    */
   void AddRendererResetter(const Renderer& renderer) override;
 
+  /**
+   * @copydoc Dali::Internal::SceneGraph::ResetterManager::RequestPropertyBaseResetToBaseValue()
+   */
+  void RequestPropertyBaseResetToBaseValue(PropertyBase* propertyBase) override;
+
   // Property Notification
 
   /**

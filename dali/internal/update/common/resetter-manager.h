@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_RESETTER_MANAGER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,12 @@ public:
    * It will be killed by ResetterManager when the renderer is destroyed
    */
   virtual void AddRendererResetter(const Renderer& renderer) = 0;
+
+  /**
+   * @brief Request to reset base value.
+   * @param[in] propertyBase The property base to reset.
+   */
+  virtual void RequestPropertyBaseResetToBaseValue(PropertyBase* propertyBase) = 0;
 
 protected:
   /**

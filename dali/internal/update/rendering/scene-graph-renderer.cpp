@@ -826,12 +826,12 @@ bool Renderer::IsDirty() const
   return (Updated() || !mOpacity.IsClean());
 }
 
-void Renderer::ResetToBaseValues(BufferIndex updateBufferIndex)
+void Renderer::RequestResetToBaseValues()
 {
-  mOpacity.ResetToBaseValue(updateBufferIndex);
+  mOpacity.RequestResetToBaseValue();
   if(mVisualProperties)
   {
-    mVisualProperties->ResetToBaseValues(updateBufferIndex);
+    mVisualProperties->RequestResetToBaseValues();
   }
 }
 

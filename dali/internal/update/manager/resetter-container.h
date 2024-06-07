@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_RESETTER_CONTAINER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 
 namespace Dali::Internal::SceneGraph
 {
-
 /**
  * Template class to manage node/property resetters
  */
@@ -147,13 +146,12 @@ public:
   }
 
   /**
-   * Iterate over the container, resetting all the referenced
+   * Iterate over the container, request to resetting all the referenced
    * properties. If a resetter has finished (e.g. it's animation /
    * constraint has ended, or it's baked 2 values), then it is removed
    * from the list.
-   * @param[in] bufferIndex The buffer index of the property to be reset
    */
-  void ResetToBaseValues(BufferIndex bufferIndex)
+  void RequestResetToBaseValues()
   {
     if(!mContainer.empty())
     {
@@ -161,7 +159,7 @@ public:
       auto iter = mContainer.begin();
       while(iter != end)
       {
-        (*iter)->ResetToBaseValue(bufferIndex);
+        (*iter)->RequestResetToBaseValues();
         if((*iter)->IsFinished())
         {
           iter = EraseObject(iter);
