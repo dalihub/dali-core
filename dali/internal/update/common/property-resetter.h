@@ -46,9 +46,12 @@ public:
    */
   ~PropertyResetterBase() override
   {
-    if(mPropertyOwner != nullptr)
+    if(DALI_LIKELY(mInitialized))
     {
-      mPropertyOwner->RemoveObserver(*this);
+      if(mPropertyOwner != nullptr)
+      {
+        mPropertyOwner->RemoveObserver(*this);
+      }
     }
   }
 
@@ -59,15 +62,15 @@ public:
    */
   void Initialize()
   {
+    mInitialized = true;
     mPropertyOwner->AddObserver(*this);
     mPropertyOwner->SetUpdated(true);
   }
 
   /**
-   * Reset the property to it's base value if the property owner is still alive and on stage
-   * @param[in] updateBufferIndex the current buffer index
+   * Request to reset the property to it's base value if the property owner is still alive and on stage
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex)
+  virtual void RequestResetToBaseValues()
   {
     if(mPropertyOwner != nullptr && mActive)
     {
@@ -79,7 +82,10 @@ public:
         --mActive;
       }
 
-      mBaseProperty->ResetToBaseValue(updateBufferIndex);
+      if(DALI_LIKELY(mBaseProperty))
+      {
+        mBaseProperty->RequestResetToBaseValue();
+      }
     }
   };
 
@@ -162,15 +168,18 @@ protected:
     mBaseProperty(baseProperty),
     mRunning(ACTIVE),
     mActive(ACTIVE),
+    mInitialized(false),
     mDisconnected(false)
   {
   }
 
   PropertyOwner* mPropertyOwner; ///< The property owner
   PropertyBase*  mBaseProperty;  ///< The base property being animated or constrained
-  int8_t         mRunning;       ///< Used to determine if we should finish or not, 2 if running, 1 if aging, 0 if stopped
-  int8_t         mActive;        ///< 2 if active, 1 if aging, 0 if stopped
-  bool           mDisconnected;  ///< True if the property owner has been disconnected
+
+  int8_t mRunning; ///< Used to determine if we should finish or not, 2 if running, 1 if aging, 0 if stopped
+  int8_t mActive;  ///< 2 if active, 1 if aging, 0 if stopped
+  bool   mInitialized : 1;
+  bool   mDisconnected : 1; ///< True if the property owner has been disconnected
 };
 
 class BakerResetter : public PropertyResetterBase
@@ -218,18 +227,20 @@ public:
   ~BakerResetter() override = default;
 
   /**
-   * @param updateBufferIndex
+   * @copydoc Dali::Internal::SceneGraph::PropertyResetterBase::RequestResetToBaseValues
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void RequestResetToBaseValues() override
   {
     if(mPropertyOwner && mRunning > 0)
     {
-      mRunning--;
-      mBaseProperty->ResetToBaseValue(updateBufferIndex);
-
+      --mRunning;
       if(mRunning > 0)
       {
         mPropertyOwner->SetUpdated(true);
+      }
+      if(DALI_LIKELY(mBaseProperty))
+      {
+        mBaseProperty->RequestResetToBaseValue();
       }
     }
   }

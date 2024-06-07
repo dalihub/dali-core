@@ -70,10 +70,9 @@ public:
   }
 
   /**
-   * Reset the node properties to their base values if the node is still alive and on stage
-   * @param[in] updateBufferIndex the current buffer index
+   * Request to reset the node properties to their base values if the node is still alive and on stage
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex)
+  void RequestResetToBaseValues()
   {
     if(mNode != nullptr && mActive)
     {
@@ -82,8 +81,8 @@ public:
       // property values are set appropriately.
       --mActive;
 
-      mNode->mVisible.ResetToBaseValue(updateBufferIndex);
-      mNode->mColor.ResetToBaseValue(updateBufferIndex);
+      mNode->mVisible.RequestResetToBaseValue();
+      mNode->mColor.RequestResetToBaseValue();
     }
   };
 
@@ -159,9 +158,10 @@ protected:
     mNode->mColor.MarkAsDirty();
   }
 
-  Node*  mNode;         ///< The node that owns the properties
-  int8_t mActive;       ///< 2 if active, 1 if aging, 0 if stopped
-  bool   mDisconnected; ///< True if the node has been disconnected
+  Node* mNode; ///< The node that owns the properties
+
+  uint8_t mActive : 2;       ///< 2 if active, 1 if aging, 0 if stopped
+  bool    mDisconnected : 1; ///< True if the node has been disconnected
 };
 
 } // namespace SceneGraph

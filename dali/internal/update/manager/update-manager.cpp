@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/update-manager.h>
 
+// EXTERNAL INCLUDES
+#include <unordered_set>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/trace.h>
@@ -291,6 +294,9 @@ struct UpdateManager::Impl
   ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
   ResetterContainer<RendererResetter>     rendererResetters; ///< A container of renderer resetters
 
+  using PropertyBaseResetRequestedContainer = std::unordered_set<PropertyBase*>;
+  PropertyBaseResetRequestedContainer resetRequestedPropertyBases; ///< A container of property base to be resets
+
   OwnerContainer<Animation*>            animations;            ///< A container of owned animations
   OwnerContainer<PropertyNotification*> propertyNotifications; ///< A container of owner property notifications.
   OwnerKeyContainer<Renderer>           renderers;             ///< A container of owned renderers
@@ -340,6 +346,8 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
                              RenderTaskProcessor&           renderTaskProcessor)
 : mImpl(nullptr)
 {
+  PropertyBase::RegisterResetterManager(*this);
+
   mImpl = new Impl(notificationManager,
                    animationFinishedNotifier,
                    propertyNotifier,
@@ -353,6 +361,7 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
 UpdateManager::~UpdateManager()
 {
   delete mImpl;
+  PropertyBase::UnregisterResetterManager();
 }
 
 void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
@@ -642,6 +651,11 @@ void UpdateManager::AddRendererResetter(const Renderer& renderer)
   mImpl->rendererResetters.PushBack(rendererResetter.Release());
 }
 
+void UpdateManager::RequestPropertyBaseResetToBaseValue(PropertyBase* propertyBase)
+{
+  mImpl->resetRequestedPropertyBases.insert(propertyBase);
+}
+
 void UpdateManager::AddPropertyNotification(OwnerPointer<PropertyNotification>& propertyNotification)
 {
   mImpl->propertyNotifications.PushBack(propertyNotification.Release());
@@ -778,10 +792,16 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   // Age down discard animations.
   mImpl->discardAnimationFinishedAge >>= 1;
 
+  // Ensure that their was no request to reset to base values during the previous update
+  // (Since requested property base doesn't consider the lifecycle of PropertyBase,
+  // It might be invalid after the previous update finished)
+  DALI_ASSERT_DEBUG(mImpl->resetRequestedPropertyBases.empty() && "Reset to base values requested during the previous update!");
+  mImpl->resetRequestedPropertyBases.clear();
+
   if(mImpl->nodeResetters.Count() > 0u)
   {
     // Reset node properties
-    mImpl->nodeResetters.ResetToBaseValues(bufferIndex);
+    mImpl->nodeResetters.RequestResetToBaseValues();
 #ifdef TRACE_ENABLED
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
@@ -793,7 +813,7 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   if(mImpl->rendererResetters.Count() > 0u)
   {
     // Reset renderer properties
-    mImpl->rendererResetters.ResetToBaseValues(bufferIndex);
+    mImpl->rendererResetters.RequestResetToBaseValues();
 #ifdef TRACE_ENABLED
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
@@ -805,7 +825,7 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   if(mImpl->propertyResetters.Count() > 0u)
   {
     // Reset all animating / constrained properties
-    mImpl->propertyResetters.ResetToBaseValues(bufferIndex);
+    mImpl->propertyResetters.RequestResetToBaseValues();
 #ifdef TRACE_ENABLED
     if(gTraceFilter && gTraceFilter->IsTraceEnabled())
     {
@@ -813,6 +833,14 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
     }
 #endif
   }
+
+  // Actual reset to base values here
+  for(auto&& propertyBase : mImpl->resetRequestedPropertyBases)
+  {
+    propertyBase->ResetToBaseValue(bufferIndex);
+  }
+  mImpl->resetRequestedPropertyBases.clear();
+  mImpl->resetRequestedPropertyBases.rehash(0u);
 
   // Clear all root nodes dirty flags
   for(auto& scene : mImpl->scenes)

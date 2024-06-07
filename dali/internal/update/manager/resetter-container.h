@@ -154,13 +154,12 @@ public:
   }
 
   /**
-   * Iterate over the container, resetting all the referenced
+   * Iterate over the container, request to resetting all the referenced
    * properties. If a resetter has finished (e.g. it's animation /
    * constraint has ended, or it's baked 2 values), then it is removed
    * from the list.
-   * @param[in] bufferIndex The buffer index of the property to be reset
    */
-  void ResetToBaseValues(BufferIndex bufferIndex)
+  void RequestResetToBaseValues()
   {
     if(!mContainer.empty())
     {
@@ -168,7 +167,7 @@ public:
       auto iter = mContainer.begin();
       while(iter != end)
       {
-        (*iter)->ResetToBaseValue(bufferIndex);
+        (*iter)->RequestResetToBaseValues();
         if((*iter)->IsFinished())
         {
           iter = EraseObject(iter);
