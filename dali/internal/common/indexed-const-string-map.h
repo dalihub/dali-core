@@ -54,6 +54,9 @@ public:
   using iterator       = typename IndexedMapBase<ConstString, ConstString, ElementType>::iterator;
   using const_iterator = typename IndexedMapBase<ConstString, ConstString, ElementType>::const_iterator;
 
+private:
+  using SortedIndexList = std::vector<std::pair<const char*, std::uint32_t>>;
+
 public: // override
   /**
    * @brief Constructor.
@@ -87,7 +90,7 @@ public: // Main API
 
     // Find key with binary search.
     // We can do binary search cause mCharPtrIndexList is sorted.
-    const auto& iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
 
     if(iter == mCharPtrIndexList.cend() || iter->first != comparableKey)
     {
@@ -122,7 +125,7 @@ public: // Main API
 
     // Find key with binary search.
     // We can do binary search cause mCharPtrIndexList is sorted.
-    const auto& iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
 
     if(iter == mCharPtrIndexList.cend() || iter->first != comparableKey)
     {
@@ -156,7 +159,7 @@ public: // Main API
 
     // Find key with binary search.
     // We can do binary search cause mCharPtrIndexList is sorted.
-    const auto& iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
 
     if(iter == mCharPtrIndexList.cend() || iter->first != comparableKey)
     {
@@ -182,7 +185,7 @@ public: // Main API
 
     // Find key with binary search.
     // We can do binary search cause mCharPtrIndexList is sorted.
-    const auto& iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mCharPtrIndexList.cbegin(), mCharPtrIndexList.cend(), std::pair<const char*, std::uint32_t>(comparableKey, 0u));
 
     if(iter == mCharPtrIndexList.cend() || iter->first != comparableKey)
     {
@@ -201,7 +204,7 @@ private:
    *
    * @note mCharPtrIndexList's key should be increase order compare as std::size_t.
    */
-  std::vector<std::pair<const char*, std::uint32_t>> mCharPtrIndexList{};
+  SortedIndexList mCharPtrIndexList{};
 
 protected:
   /**

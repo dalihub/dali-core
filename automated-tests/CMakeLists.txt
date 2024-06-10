@@ -9,6 +9,13 @@ INCLUDE_DIRECTORIES(
   src/common
 )
 
+# Ignore some warning options
+INCLUDE(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-result HAVE_NO_UNUSED_RESULT)
+IF (HAVE_NO_UNUSED_RESULT)
+  ADD_COMPILE_OPTIONS( -Wno-unused-result )
+ENDIF()
+
 ADD_SUBDIRECTORY(src)
 
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ")
