@@ -343,33 +343,13 @@ std::string Shader::GetShaderVersionPrefix()
 std::string Shader::GetVertexShaderPrefix()
 {
   Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
-  return GenerateTaggedShaderPrefix(tls.GetVertexShaderPrefix());
+  return tls.GetVertexShaderPrefix();
 }
 
 std::string Shader::GetFragmentShaderPrefix()
 {
   Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
-  return GenerateTaggedShaderPrefix(tls.GetFragmentShaderPrefix());
-}
-
-std::string Shader::GenerateTaggedShaderPrefix(const std::string& shaderPrefix)
-{
-  // The tag is added at the top of vertex/fragment shader and
-  // contains an offset where the source code starts after
-  // the prefix.
-  // This offset is used later by the graphics backend to ignore
-  // the legacy prefix if provided with new versioned shader.
-  // When shader contains tagged prefix, then it starts with:
-  // "//@legacy-prefix-end <offset>" tag.
-  static const std::string TAG           = "//@legacy-prefix-end ";
-  const uint32_t           OFFSET_DIGITS = 5; // offset allocates 5 digits
-
-  auto prefix       = std::string(TAG + "00000\n") + shaderPrefix;
-  auto prefixLength = prefix.length();
-  char tmp          = *(prefix.data() + TAG.length() + OFFSET_DIGITS);
-  std::snprintf(prefix.data() + TAG.size(), OFFSET_DIGITS + 1, "%05d", int(prefixLength));
-  *(prefix.data() + TAG.length() + OFFSET_DIGITS) = tmp;
-  return prefix;
+  return tls.GetFragmentShaderPrefix();
 }
 
 } // namespace Internal

@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_SHADER_CREATE_INFO_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,18 +117,6 @@ struct ShaderCreateInfo
   }
 
   /**
-   * @brief Sets shader code DALi-specific version
-   *
-   * @param[in] value shader version
-   * @return reference to this structure
-   */
-  auto& SetShaderVersion(uint32_t value)
-  {
-    shaderVersion = value;
-    return *this;
-  }
-
-  /**
    * @brief Sets allocation callbacks which will be used when object is created
    * and destroyed.
    *
@@ -160,7 +148,6 @@ struct ShaderCreateInfo
   const void*      sourceData{nullptr};
   uint32_t         sourceSize{0u};
   ShaderSourceMode sourceMode{};
-  uint32_t         shaderVersion{};
 
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };
