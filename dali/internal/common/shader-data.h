@@ -72,6 +72,8 @@ public:
     mRenderPassTag(renderPassTag),
     mName(name)
   {
+    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
+    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
   }
 
   /**
@@ -91,6 +93,8 @@ public:
     mRenderPassTag(renderPassTag),
     mName(name)
   {
+    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
+    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
   }
 
   /**
@@ -110,6 +114,8 @@ public:
     mRenderPassTag(renderPassTag),
     mName(name)
   {
+    UpdateShaderVersion(mVertexShader, mVertexShaderVersion);
+    UpdateShaderVersion(mFragmentShader, mFragmentShaderVersion);
   }
 
   /**
@@ -276,19 +282,66 @@ public: // API
     return mName;
   }
 
+  /**
+   * Returns DALi specific vertex shader version
+   * @return valid version number
+   */
+  uint32_t GetVertexShaderVersion() const
+  {
+    return mVertexShaderVersion;
+  }
+
+  /**
+   * Returns DALi specific fragment shader version
+   * @return valid version number
+   */
+  uint32_t GetFragmentShaderVersion() const
+  {
+    return mFragmentShaderVersion;
+  }
+
 private:                                        // Not implemented
   ShaderData(const ShaderData& other);          ///< no copying of this object
   ShaderData& operator=(const ShaderData& rhs); ///< no copying of this object
 
-private:                                         // Data
-  std::size_t                mShaderHash;        ///< hash key created with vertex and fragment shader code
-  std::vector<char>          mVertexShader;      ///< source code for vertex program
-  std::vector<char>          mFragmentShader;    ///< source code for fragment program
-  Dali::Shader::Hint::Value  mHints;             ///< take a hint
-  Dali::Vector<uint8_t>      mBuffer;            ///< buffer containing compiled binary bytecode
-  Graphics::ShaderSourceMode mSourceMode;        ///< Source mode of shader data ( text or binary )
-  uint32_t                   mRenderPassTag{0u}; ///< Render Pass Tag for this shader
-  std::string                mName{""};          ///< Name for this shader
+private:
+  /**
+   * Updates shader version.
+   */
+  void UpdateShaderVersion(std::vector<char>& code, uint32_t& outVersion)
+  {
+    // The version may be updated only for GLSL language.
+    // If we support direct SPIRV this will be skipped
+    std::string_view strView = code.data();
+
+    // find first occurence of 'version' tag
+    // the tag is expected at the start of line
+    static const std::string VERSION_TAG = "//@version";
+
+    auto pos = strView.find(VERSION_TAG);
+    if(pos != std::string_view::npos && (pos == 0 || strView[pos - 1] == '\n'))
+    {
+      char* end;
+      // Update version
+      outVersion = std::strtoul(strView.data() + pos + VERSION_TAG.length(), &end, 10);
+    }
+    else
+    {
+      outVersion = 0;
+    }
+  }
+
+private:                                             // Data
+  std::size_t                mShaderHash;            ///< hash key created with vertex and fragment shader code
+  std::vector<char>          mVertexShader;          ///< source code for vertex program
+  std::vector<char>          mFragmentShader;        ///< source code for fragment program
+  Dali::Shader::Hint::Value  mHints;                 ///< take a hint
+  Dali::Vector<uint8_t>      mBuffer;                ///< buffer containing compiled binary bytecode
+  Graphics::ShaderSourceMode mSourceMode;            ///< Source mode of shader data ( text or binary )
+  uint32_t                   mRenderPassTag{0u};     ///< Render Pass Tag for this shader
+  std::string                mName{""};              ///< Name for this shader
+  uint32_t                   mVertexShaderVersion;   ///< Vertex shader version
+  uint32_t                   mFragmentShaderVersion; ///< Fragment shader version
 };
 
 } // namespace Internal

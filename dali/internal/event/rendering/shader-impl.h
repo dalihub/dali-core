@@ -141,6 +141,14 @@ public:
    * @copydoc Dali::Shader::GetFragmentShaderPrefix()
    */
   static std::string GetFragmentShaderPrefix();
+
+public:
+  /**
+   * Generates tag 'legacy-prefix-end' with end position of
+   * prefix text to make shader code parsing easier.
+   * Function is public to be testable
+   */
+  static std::string GenerateTaggedShaderPrefix(const std::string& shaderPrefix);
 };
 
 } // namespace Internal
