@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,33 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/public-api/common/vector-wrapper.h>
+
+#ifdef TRACE_ENABLED
+#include <chrono>
+#include <cmath>
+#include <thread>
+#endif
+
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
+#ifdef TRACE_ENABLED
+uint64_t GetNanoseconds()
+{
+  // Get the time of a monotonic clock since its epoch.
+  auto epoch = std::chrono::steady_clock::now().time_since_epoch();
+
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(epoch);
+
+  return static_cast<uint64_t>(duration.count());
+}
+#endif
+} // namespace
 
 namespace Dali
 {
@@ -53,19 +77,10 @@ void AnimationPlaylist::AnimationDestroyed(Animation& animation)
 void AnimationPlaylist::OnPlay(Animation& animation)
 {
   Dali::Animation handle = Dali::Animation(&animation);
-  auto            iter   = mPlaylist.lower_bound(handle);
-  if(iter != mPlaylist.end() && (*iter).first == handle)
-  {
-    // Just increase reference count.
-    ++(iter->second);
-  }
-  else
-  {
-    mPlaylist.insert(iter, {handle, 1u});
-  }
+  mPlaylist.insert(handle);
 }
 
-void AnimationPlaylist::OnClear(Animation& animation)
+void AnimationPlaylist::OnClear(Animation& animation, bool ignoreRequired)
 {
   Dali::Animation handle = Dali::Animation(&animation);
   auto            iter   = mPlaylist.find(handle);
@@ -73,26 +88,35 @@ void AnimationPlaylist::OnClear(Animation& animation)
   // Animation might be removed when NotifyCompleted called.
   if(DALI_LIKELY(iter != mPlaylist.end()))
   {
-    // Just decrease reference count. But if reference count is zero, remove it.
-    if(--(iter->second) == 0u)
-    {
-      mPlaylist.erase(iter);
-    }
+    mPlaylist.erase(iter);
   }
+
+  if(ignoreRequired)
+  {
+    mIgnoredAnimations.insert(animation.GetAnimationId());
+  }
+}
+
+void AnimationPlaylist::EventLoopFinished()
+{
+  mIgnoredAnimations.clear();
 }
 
 void AnimationPlaylist::NotifyProgressReached(NotifierInterface::NotifyId notifyId)
 {
   Dali::Animation handle; // Will own handle until all emits have been done.
 
-  auto* animation = GetEventObject(notifyId);
-  if(DALI_LIKELY(animation))
+  if(DALI_LIKELY(mIgnoredAnimations.find(notifyId) == mIgnoredAnimations.end()))
   {
-    // Check if this animation hold inputed scenegraph animation.
-    DALI_ASSERT_DEBUG(animation->GetSceneObject()->GetNotifyId() == notifyId);
+    auto* animation = GetEventObject(notifyId);
+    if(DALI_LIKELY(animation))
+    {
+      // Check if this animation hold inputed scenegraph animation.
+      DALI_ASSERT_DEBUG(animation->GetSceneObject()->GetNotifyId() == notifyId);
 
-    handle = Dali::Animation(animation);
-    animation->EmitSignalProgressReached();
+      handle = Dali::Animation(animation);
+      animation->EmitSignalProgressReached();
+    }
   }
 }
 
@@ -100,22 +124,36 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
 {
   std::vector<Dali::Animation> finishedAnimations; // Will own handle until all emits have been done.
 
+#ifdef TRACE_ENABLED
+  std::vector<std::pair<uint64_t, uint32_t>> animationFinishedTimeChecker;
+
+  uint64_t start = 0u;
+  uint64_t end   = 0u;
+#endif
+
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
+    oss << "[n:" << notifierIdList.Count() << ",i:" << mIgnoredAnimations.size() << "]";
+  });
+
   for(const auto& notifierId : notifierIdList)
   {
-    auto* animation = GetEventObject(notifierId);
-    if(DALI_LIKELY(animation))
+    if(DALI_LIKELY(mIgnoredAnimations.find(notifierId) == mIgnoredAnimations.end()))
     {
-      // Check if this animation hold inputed scenegraph animation.
-      DALI_ASSERT_DEBUG(animation->GetSceneObject()->GetNotifyId() == notifierId);
-
-      // Update loop count. And check whether animation was finished or not.
-      if(animation->HasFinished())
+      auto* animation = GetEventObject(notifierId);
+      if(DALI_LIKELY(animation))
       {
-        finishedAnimations.push_back(Dali::Animation(animation));
+        // Check if this animation hold inputed scenegraph animation.
+        DALI_ASSERT_DEBUG(animation->GetSceneObject()->GetNotifyId() == notifierId);
 
-        // The animation may be present in mPlaylist - remove if necessary
-        // Note that the animation "Finish" signal is emitted after Stop() has been called
-        OnClear(*animation);
+        // Update loop count. And check whether animation was finished or not.
+        if(animation->HasFinished())
+        {
+          finishedAnimations.push_back(Dali::Animation(animation));
+
+          // The animation may be present in mPlaylist - remove if necessary
+          // Note that the animation "Finish" signal is emitted after Stop() has been called
+          OnClear(*animation, false);
+        }
       }
     }
   }
@@ -123,8 +161,44 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
   // Now it's safe to emit the signals
   for(auto& animation : finishedAnimations)
   {
-    GetImplementation(animation).EmitSignalFinish();
+    // Check whether given animation still available (Since it could be cleared during finished signal emitted).
+    if(DALI_LIKELY(mIgnoredAnimations.find(animation.GetAnimationId()) == mIgnoredAnimations.end()))
+    {
+#ifdef TRACE_ENABLED
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        start = GetNanoseconds();
+      }
+#endif
+      GetImplementation(animation).EmitSignalFinish();
+#ifdef TRACE_ENABLED
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        end = GetNanoseconds();
+        animationFinishedTimeChecker.emplace_back(end - start, GetImplementation(animation).GetSceneObject()->GetNotifyId());
+      }
+#endif
+    }
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
+    oss << "[f:" << finishedAnimations.size() << ",i:" << mIgnoredAnimations.size();
+
+    if(finishedAnimations.size() > 0u)
+    {
+      oss << ",";
+      std::sort(animationFinishedTimeChecker.rbegin(), animationFinishedTimeChecker.rend());
+      auto topCount = std::min(5u, static_cast<uint32_t>(animationFinishedTimeChecker.size()));
+
+      oss << "top" << topCount;
+      for(auto i = 0u; i < topCount; ++i)
+      {
+        oss << "(" << static_cast<float>(animationFinishedTimeChecker[i].first) / 1000000.0f << "ms,";
+        oss << animationFinishedTimeChecker[i].second << ")";
+      }
+    }
+    oss << "]";
+  });
 }
 
 uint32_t AnimationPlaylist::GetAnimationCount()

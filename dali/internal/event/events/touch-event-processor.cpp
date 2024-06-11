@@ -880,7 +880,18 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
     }
     else
     {
-      HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, nullptr, localVars.isGeometry);
+      Actor* capturingTouchActor = mCapturingTouchActor.GetActor();
+      if(capturingTouchActor && mLastRenderTask)
+      {
+        hitTestResults.actor          = Dali::Actor(capturingTouchActor);
+        hitTestResults.renderTask     = mLastRenderTask;
+        const Vector2& screenPosition = currentPoint.GetScreenPosition();
+        capturingTouchActor->ScreenToLocal(*mLastRenderTask, hitTestResults.actorCoordinates.x, hitTestResults.actorCoordinates.y, screenPosition.x, screenPosition.y);
+      }
+      else
+      {
+        HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, nullptr, localVars.isGeometry);
+      }
     }
 
     Integration::Point newPoint(currentPoint);

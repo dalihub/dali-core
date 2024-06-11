@@ -133,6 +133,93 @@ void ValidateParameters(Property::Type propertyType, Property::Type destinationT
   DALI_ASSERT_ALWAYS(period.durationSeconds >= 0 && "Duration must be >=0");
 }
 
+/**
+ * @brief Converts the internal state to the target state.
+ * @param[in, out] currentState The current state of the animation.
+ * @param[in] targetState The target state of the animation.
+ * @return True if the animation state has been changed.
+ */
+bool InternalStateConverter(Internal::Animation::InternalState& currentState, Dali::Animation::State targetState)
+{
+  bool changed = false;
+  switch(targetState)
+  {
+    case Dali::Animation::PLAYING:
+    {
+      switch(currentState)
+      {
+        case Internal::Animation::CLEARED:
+        case Internal::Animation::STOPPED:
+        case Internal::Animation::PAUSED:
+        {
+          currentState = Internal::Animation::InternalState::PLAYING;
+          changed      = true;
+          break;
+        }
+        case Internal::Animation::STOPPING:
+        case Internal::Animation::PAUSED_DURING_STOPPING:
+        {
+          currentState = Internal::Animation::InternalState::PLAYING_DURING_STOPPING;
+          changed      = true;
+          break;
+        }
+        default:
+        {
+          break;
+        }
+      }
+      break;
+    }
+    case Dali::Animation::PAUSED:
+    {
+      switch(currentState)
+      {
+        case Internal::Animation::CLEARED:
+        case Internal::Animation::STOPPED:
+        case Internal::Animation::PLAYING:
+        {
+          currentState = Internal::Animation::InternalState::PAUSED;
+          changed      = true;
+          break;
+        }
+        case Internal::Animation::STOPPING:
+        case Internal::Animation::PLAYING_DURING_STOPPING:
+        {
+          currentState = Internal::Animation::InternalState::PAUSED_DURING_STOPPING;
+          changed      = true;
+          break;
+        }
+        default:
+        {
+          break;
+        }
+      }
+      break;
+    }
+    case Dali::Animation::STOPPED:
+    {
+      switch(currentState)
+      {
+        case Internal::Animation::PLAYING:
+        case Internal::Animation::PLAYING_DURING_STOPPING:
+        case Internal::Animation::PAUSED:
+        case Internal::Animation::PAUSED_DURING_STOPPING:
+        {
+          currentState = Internal::Animation::InternalState::STOPPING;
+          changed      = true;
+          break;
+        }
+        default:
+        {
+          break;
+        }
+      }
+      break;
+    }
+  }
+  return changed;
+}
+
 } // anonymous namespace
 
 AnimationPtr Animation::New(float durationSeconds)
@@ -317,12 +404,10 @@ Dali::Animation::EndAction Animation::GetDisconnectAction() const
 
 void Animation::Play()
 {
-  mPlayCalled = true;
-
   // Update the current playlist
   mPlaylist.OnPlay(*this);
 
-  mState = Dali::Animation::PLAYING;
+  InternalStateConverter(mState, Dali::Animation::PLAYING);
 
   NotifyObjects(Notify::USE_TARGET_VALUE);
 
@@ -336,12 +421,10 @@ void Animation::PlayFrom(float progress)
 {
   if(progress >= mPlayRange.x && progress <= mPlayRange.y)
   {
-    mPlayCalled = true;
-
     // Update the current playlist
     mPlaylist.OnPlay(*this);
 
-    mState = Dali::Animation::PLAYING;
+    InternalStateConverter(mState, Dali::Animation::PLAYING);
 
     NotifyObjects(Notify::USE_TARGET_VALUE);
 
@@ -354,8 +437,6 @@ void Animation::PlayFrom(float progress)
 
 void Animation::PlayAfter(float delaySeconds)
 {
-  mPlayCalled = true;
-
   // The negative delay means play immediately.
   delaySeconds = std::max(0.f, delaySeconds);
 
@@ -364,7 +445,7 @@ void Animation::PlayAfter(float delaySeconds)
   // Update the current playlist
   mPlaylist.OnPlay(*this);
 
-  mState = Dali::Animation::PLAYING;
+  InternalStateConverter(mState, Dali::Animation::PLAYING);
 
   NotifyObjects(Notify::USE_TARGET_VALUE);
 
@@ -376,10 +457,8 @@ void Animation::PlayAfter(float delaySeconds)
 
 void Animation::Pause()
 {
-  if(mState != Dali::Animation::PAUSED)
+  if(InternalStateConverter(mState, Dali::Animation::PAUSED))
   {
-    mState = Dali::Animation::PAUSED;
-
     // mAnimation is being used in a separate thread; queue a Pause message
     PauseAnimationMessage(mEventThreadServices, *mAnimation);
 
@@ -390,15 +469,36 @@ void Animation::Pause()
 
 Dali::Animation::State Animation::GetState() const
 {
-  return mState;
+  Dali::Animation::State state = Dali::Animation::State::STOPPED;
+  switch(mState)
+  {
+    case Dali::Internal::Animation::InternalState::STOPPED:
+    case Dali::Internal::Animation::InternalState::CLEARED:
+    case Dali::Internal::Animation::InternalState::STOPPING:
+    {
+      state = Dali::Animation::State::STOPPED;
+      break;
+    }
+    case Dali::Internal::Animation::InternalState::PLAYING:
+    case Dali::Internal::Animation::InternalState::PLAYING_DURING_STOPPING:
+    {
+      state = Dali::Animation::State::PLAYING;
+      break;
+    }
+    case Dali::Internal::Animation::InternalState::PAUSED:
+    case Dali::Internal::Animation::InternalState::PAUSED_DURING_STOPPING:
+    {
+      state = Dali::Animation::State::PAUSED;
+      break;
+    }
+  }
+  return state;
 }
 
 void Animation::Stop()
 {
-  if(mState != Dali::Animation::STOPPED)
+  if(InternalStateConverter(mState, Dali::Animation::STOPPED))
   {
-    mState = Dali::Animation::STOPPED;
-
     // mAnimation is being used in a separate thread; queue a Stop message
     StopAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
 
@@ -414,14 +514,14 @@ void Animation::Clear()
 {
   DALI_ASSERT_DEBUG(mAnimation);
 
-  if(mConnectors.Empty() && mState == Dali::Animation::STOPPED && !mPlayCalled)
+  if(mConnectors.Empty() && mState == Dali::Internal::Animation::CLEARED)
   {
     // Animation is empty. Fast-out
     return;
   }
 
   // Only notify the objects with the current values if the end action is set to BAKE
-  if(mEndAction == EndAction::BAKE && mState != Dali::Animation::STOPPED)
+  if(mEndAction == EndAction::BAKE && GetState() != Dali::Animation::STOPPED)
   {
     NotifyObjects(Notify::USE_CURRENT_VALUE);
   }
@@ -438,11 +538,10 @@ void Animation::Clear()
 
   // Reset the notification count and relative values, since the new scene-object has never been played
   mNotificationCount = 0;
-  mState             = Dali::Animation::STOPPED;
-  mPlayCalled        = false;
+  mState             = Dali::Internal::Animation::CLEARED;
 
   // Update the current playlist
-  mPlaylist.OnClear(*this);
+  mPlaylist.OnClear(*this, true);
 }
 
 void Animation::AnimateBy(Property& target, Property::Value relativeValue)
@@ -835,7 +934,8 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
 
 bool Animation::HasFinished()
 {
-  bool          hasFinished(false);
+  bool hasFinished(false);
+
   const int32_t playedCount(mAnimation->GetPlayedCount());
 
   if(playedCount > mNotificationCount)
@@ -843,9 +943,32 @@ bool Animation::HasFinished()
     // Note that only one signal is emitted, if the animation has been played repeatedly
     mNotificationCount = playedCount;
 
-    hasFinished = true;
-
-    mState = Dali::Animation::STOPPED;
+    switch(mState)
+    {
+      case Internal::Animation::InternalState::PLAYING:
+      case Internal::Animation::InternalState::STOPPING:
+      {
+        mState      = Dali::Internal::Animation::STOPPED;
+        hasFinished = true;
+        break;
+      }
+      case Internal::Animation::InternalState::PLAYING_DURING_STOPPING:
+      {
+        mState      = Dali::Internal::Animation::PLAYING;
+        hasFinished = true;
+        break;
+      }
+      case Internal::Animation::InternalState::PAUSED_DURING_STOPPING:
+      {
+        mState      = Dali::Internal::Animation::PAUSED;
+        hasFinished = true;
+        break;
+      }
+      default:
+      {
+        break;
+      }
+    }
   }
 
   return hasFinished;

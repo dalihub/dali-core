@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/ordered-set.h>
+#include <dali/integration-api/trace.h>
 
 #include <dali/internal/event/common/scene-impl.h>
 
@@ -145,6 +146,10 @@ inline void AlignDamagedRect(Rect<int32_t>& rect)
   rect.width       = ((right + 16) / 16) * 16 - rect.x;
   rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
 }
+
+// TODO : The name of trace marker is from VD specific.
+// We might need to change it as DALI_TRACE_RENDER_PROCESS.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 } // namespace
 
 /**
@@ -1139,21 +1144,33 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     mainCommandBuffer->EndRenderPass(syncObject);
   }
 
+  if(targetstoPresent.size() > 0u)
+  {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) {
+      oss << "[" << targetstoPresent.size() << "]";
+    });
+  }
+
   // Flush UBOs
   mImpl->uniformBufferManager->Flush(sceneObject, renderToFbo);
   mImpl->renderAlgorithms.SubmitCommandBuffer();
   mImpl->commandBufferSubmitted = true;
 
-  std::sort(targetstoPresent.begin(), targetstoPresent.end());
-
-  Graphics::RenderTarget* rt = nullptr;
-  for(auto& target : targetstoPresent)
+  if(targetstoPresent.size() > 0u)
   {
-    if(target != rt)
+    std::sort(targetstoPresent.begin(), targetstoPresent.end());
+
+    Graphics::RenderTarget* rt = nullptr;
+    for(auto& target : targetstoPresent)
     {
-      mImpl->graphicsController.PresentRenderTarget(target);
-      rt = target;
+      if(target != rt)
+      {
+        mImpl->graphicsController.PresentRenderTarget(target);
+        rt = target;
+      }
     }
+
+    DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
   }
 }
 

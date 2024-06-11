@@ -75,6 +75,29 @@ public:
   Integration::Core&      core;
 };
 
+class NewTestProcessorOnce : public NewTestProcessor
+{
+public:
+  NewTestProcessorOnce(Integration::Core& core)
+  : NewTestProcessor(core)
+  {
+  }
+
+  virtual void Process(bool postProcessor)
+  {
+    processRun = true;
+    if(unregisterProcessor)
+    {
+      core.UnregisterProcessorOnce(*unregisterProcessor, postProcessor);
+    }
+  }
+
+  std::string_view GetProcessorName() const override
+  {
+    return "NewTestProcessorOnce";
+  }
+};
+
 int UtcDaliCoreProcessorP(void)
 {
   TestApplication application;
@@ -98,6 +121,38 @@ int UtcDaliCoreProcessorP(void)
   application.SendNotification();
   tet_infoline("Test that the processor has not been executed again:");
   DALI_TEST_CHECK(testProcessor.processRun == false);
+
+  END_TEST;
+}
+
+int UtcDaliCoreProcessorOnceP(void)
+{
+  TestApplication application;
+
+  TestProcessor      testProcessor;
+  Integration::Core& core = application.GetCore();
+  core.RegisterProcessorOnce(testProcessor);
+
+  tet_infoline("Test that the processor has not been executed yet:");
+  DALI_TEST_CHECK(testProcessor.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processor has been executed:");
+  DALI_TEST_CHECK(testProcessor.processRun);
+
+  // Clear down for next part of test
+  testProcessor.processRun = false;
+
+  application.SendNotification();
+  tet_infoline("Test that the processor has not been executed:");
+  DALI_TEST_CHECK(!testProcessor.processRun);
+
+  core.RegisterProcessorOnce(testProcessor);
+  core.UnregisterProcessorOnce(testProcessor);
+  application.SendNotification();
+  tet_infoline("Test that the processor has not been executed again:");
+  DALI_TEST_CHECK(!testProcessor.processRun);
 
   END_TEST;
 }
@@ -152,6 +207,63 @@ int UtcDaliCoreProcessorMultipleP(void)
   END_TEST;
 }
 
+int UtcDaliCoreProcessorOnceMultipleP(void)
+{
+  TestApplication application;
+
+  TestProcessor testProcessor1;
+  TestProcessor testProcessor2;
+  TestProcessor testProcessor3;
+
+  Integration::Core& core = application.GetCore();
+  core.RegisterProcessorOnce(testProcessor1);
+
+  tet_infoline("Test that the processor has not been executed yet:");
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processor has been executed:");
+  DALI_TEST_CHECK(testProcessor1.processRun);
+
+  // Clear down for next part of test
+  testProcessor1.processRun = false;
+
+  core.RegisterProcessorOnce(testProcessor1);
+  core.RegisterProcessorOnce(testProcessor2);
+  core.RegisterProcessorOnce(testProcessor3);
+
+  tet_infoline("Test that the processors have not been executed yet:");
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processors have been executed:");
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun);
+  DALI_TEST_CHECK(testProcessor3.processRun);
+
+  // Clear down for next part of test
+  testProcessor1.processRun = false;
+  testProcessor2.processRun = false;
+  testProcessor3.processRun = false;
+
+  core.RegisterProcessorOnce(testProcessor1);
+  core.RegisterProcessorOnce(testProcessor2);
+  core.RegisterProcessorOnce(testProcessor3);
+
+  core.UnregisterProcessorOnce(testProcessor2);
+  application.SendNotification();
+  tet_infoline("Test that the unregistered processor has not been executed again but others have");
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun);
+
+  END_TEST;
+}
+
 int UtcDaliCorePostProcessorP(void)
 {
   TestApplication application;
@@ -183,6 +295,38 @@ int UtcDaliCorePostProcessorP(void)
   application.SendNotification();
   tet_infoline("Test that the processor has not been executed again:");
   DALI_TEST_CHECK(testProcessor.processRun == false);
+
+  END_TEST;
+}
+
+int UtcDaliCorePostProcessorOnceP(void)
+{
+  TestApplication application;
+
+  TestProcessor      testProcessor;
+  Integration::Core& core = application.GetCore();
+  core.RegisterProcessorOnce(testProcessor, true);
+
+  tet_infoline("Test that the processor has not been executed yet:");
+  DALI_TEST_CHECK(testProcessor.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processor has been executed:");
+  DALI_TEST_CHECK(testProcessor.processRun);
+
+  // Clear down for next part of test
+  testProcessor.processRun = false;
+
+  application.SendNotification();
+  tet_infoline("Test that the processor has not been executed:");
+  DALI_TEST_CHECK(!testProcessor.processRun);
+
+  core.RegisterProcessorOnce(testProcessor, true);
+  core.UnregisterProcessorOnce(testProcessor, true);
+  application.SendNotification();
+  tet_infoline("Test that the processor has not been executed again:");
+  DALI_TEST_CHECK(!testProcessor.processRun);
 
   END_TEST;
 }
@@ -271,6 +415,112 @@ int UtcDaliCoreProcessorUnregisterDuringCallback02(void)
   END_TEST;
 }
 
+int UtcDaliCoreProcessorOnceUnregisterDuringCallback01(void)
+{
+  // Test post-processor
+  TestApplication    application;
+  Integration::Core& core = application.GetCore();
+
+  NewTestProcessorOnce testProcessor1(core);
+  TestProcessor        testProcessor2;
+  TestProcessor        testProcessor3;
+
+  core.RegisterProcessorOnce(testProcessor1);
+  core.RegisterProcessorOnce(testProcessor2);
+  core.RegisterProcessorOnce(testProcessor3);
+
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processors have been executed:");
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun);
+  DALI_TEST_CHECK(testProcessor3.processRun);
+
+  // Clear down for next part of test
+  testProcessor1.processRun = false;
+  testProcessor2.processRun = false;
+  testProcessor3.processRun = false;
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processors have not been executed:");
+  DALI_TEST_CHECK(!testProcessor1.processRun);
+  DALI_TEST_CHECK(!testProcessor2.processRun);
+  DALI_TEST_CHECK(!testProcessor3.processRun);
+
+  core.RegisterProcessorOnce(testProcessor1);
+  core.RegisterProcessorOnce(testProcessor2);
+  core.RegisterProcessorOnce(testProcessor3);
+
+  testProcessor1.SetProcessorToUnregister(&testProcessor3);
+
+  tet_infoline("Test that the processor unregistered during the callback has not been executed");
+  application.SendNotification();
+
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun);
+  DALI_TEST_CHECK(!testProcessor3.processRun);
+
+  END_TEST;
+}
+
+int UtcDaliCoreProcessorOnceUnregisterDuringCallback02(void)
+{
+  // Test post-processor
+  TestApplication    application;
+  Integration::Core& core = application.GetCore();
+
+  NewTestProcessorOnce testProcessor1(core);
+  TestProcessor        testProcessor2;
+  TestProcessor        testProcessor3;
+
+  core.RegisterProcessorOnce(testProcessor1, true);
+  core.RegisterProcessorOnce(testProcessor2, true);
+  core.RegisterProcessorOnce(testProcessor3, true);
+
+  DALI_TEST_CHECK(testProcessor1.processRun == false);
+  DALI_TEST_CHECK(testProcessor2.processRun == false);
+  DALI_TEST_CHECK(testProcessor3.processRun == false);
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processors have been executed:");
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun);
+  DALI_TEST_CHECK(testProcessor3.processRun);
+
+  // Clear down for next part of test
+  testProcessor1.processRun = false;
+  testProcessor2.processRun = false;
+  testProcessor3.processRun = false;
+
+  application.SendNotification();
+
+  tet_infoline("Test that the processors have not been executed:");
+  DALI_TEST_CHECK(!testProcessor1.processRun);
+  DALI_TEST_CHECK(!testProcessor2.processRun);
+  DALI_TEST_CHECK(!testProcessor3.processRun);
+
+  core.RegisterProcessorOnce(testProcessor1, true);
+  core.RegisterProcessorOnce(testProcessor2, true);
+  core.RegisterProcessorOnce(testProcessor3, true);
+
+  testProcessor1.SetProcessorToUnregister(&testProcessor3);
+
+  tet_infoline("Test that the processor unregistered during the callback has not been executed");
+  application.SendNotification();
+
+  DALI_TEST_CHECK(testProcessor1.processRun);
+  DALI_TEST_CHECK(testProcessor2.processRun);
+  DALI_TEST_CHECK(!testProcessor3.processRun);
+
+  END_TEST;
+}
+
 int UtcDaliCoreProcessorGetProcessorName(void)
 {
   // Test post-processor
@@ -293,6 +543,8 @@ int UtcDaliCoreProcessorUnregisterProcessors(void)
   TestProcessor testProcessor1;
   TestProcessor testProcessor2;
   TestProcessor testProcessor3;
+  TestProcessor testProcessor4;
+  TestProcessor testProcessor5;
 
   Integration::Core& core = application.GetCore();
   core.RegisterProcessor(testProcessor1);
@@ -328,12 +580,17 @@ int UtcDaliCoreProcessorUnregisterProcessors(void)
   testProcessor2.processRun = false;
   testProcessor3.processRun = false;
 
+  core.RegisterProcessorOnce(testProcessor4);
+  core.RegisterProcessorOnce(testProcessor5, true);
+
   core.UnregisterProcessors();
   application.SendNotification();
   tet_infoline("Test that all processors has not been executed again");
   DALI_TEST_CHECK(testProcessor1.processRun == false);
   DALI_TEST_CHECK(testProcessor2.processRun == false);
   DALI_TEST_CHECK(testProcessor3.processRun == false);
+  DALI_TEST_CHECK(testProcessor4.processRun == false);
+  DALI_TEST_CHECK(testProcessor5.processRun == false);
 
   END_TEST;
 

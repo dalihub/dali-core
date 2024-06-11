@@ -25,6 +25,7 @@
 #include <test-native-image.h>
 
 #include <iostream>
+#include "test-application.h"
 
 #define BOOLSTR(x) ((x) ? "T" : "F")
 
@@ -730,12 +731,12 @@ int UtcDaliRenderTaskGetStopperActorN(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskRenderUntil(void)
+int UtcDaliRenderTaskRenderUntil01(void)
 {
   TestApplication application;
-  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that rendering stops at the actor.");
+  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that rendering stops at the renderable actor.");
 
-  // Make a new render task and compose a tree.
+  // Get default rendertask
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
@@ -771,6 +772,116 @@ int UtcDaliRenderTaskRenderUntil(void)
 
   // Check that rendering was cut.
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskRenderUntil02(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that rendering stops at the empty actor.");
+
+  // Get default rendertask
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.GetTask(0u);
+
+  Integration::Scene stage = application.GetScene();
+
+  Actor secondChild;
+  for(int i = 0; i < 5; i++)
+  {
+    Actor parent = CreateRenderableActor();
+    parent.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+    parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    Actor  child = Actor::New(); // Has no renderer
+    child.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+    stage.Add(parent);
+    parent.Add(child);
+
+    if (i == 1)
+    {
+      secondChild = child;
+    }
+  }
+  task.RenderUntil(secondChild);
+
+  // Update & Render with the actor on-stage
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut.
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskRenderUntil03(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that other preceding layers are rendered.");
+
+  // Get default rendertask
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.GetTask(0u);
+
+  Integration::Scene stage = application.GetScene();
+
+  // Compose a tree
+  Actor a0 = CreateRenderableActor();
+  a0.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  a0.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  Layer l0 = Layer::New();
+  l0.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  l0.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  l0.LowerToBottom(); // drawn later
+
+  Actor a1 = CreateRenderableActor();
+  a1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  Actor target = CreateRenderableActor();
+  target.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  Layer l2 = Layer::New(); // same depth index to root, added(drawn) later
+  l2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  l2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  Actor a2 = CreateRenderableActor();
+  a2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+
+  stage.Add(a0);
+  a0.Add(l0);
+  l0.Add(CreateRenderableActor());
+
+  stage.Add(a1);
+  a1.Add(target);
+
+  stage.Add(a2);
+  a2.Add(l2);
+  l2.Add(CreateRenderableActor());
+
+  // draw only a0 and a1 (2 items)
+  // l0 and children is cut(low depth index)
+  // a2 and children are cut(added after target)
+  task.RenderUntil(target);
+
+  // Update & Render with the actor on-stage
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION);
 
   END_TEST;
 }

@@ -29,6 +29,7 @@
 #include <dali/public-api/common/constants.h>
 
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 
 namespace Dali
 {
@@ -77,6 +78,9 @@ inline void CalculateCenterPosition(
   }
 }
 
+// TODO : The name of trace marker is from VD specific.
+// We might need to change it as DALI_TRACE_UPDATE_PROCESS.
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
 } // unnamed namespace
 
 TransformManager::TransformManager()
@@ -235,8 +239,13 @@ bool TransformManager::Update()
 {
   bool componentsChanged = false;
 
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
+    oss << "[" << mComponentCount << "]";
+  });
+
   if(mReorder)
   {
+    DALI_TRACE_SCOPE(gTraceFilter, "DALI_TRANSFORM_REORDER");
     //If some transform component has change its parent or has been removed since last update
     //we need to reorder the vectors
     ReorderComponents();
@@ -356,6 +365,10 @@ bool TransformManager::Update()
     componentsChanged  = componentsChanged || mComponentDirty[i];
     mComponentDirty[i] = false;
   }
+
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
+    oss << "[componentsChanged:" << componentsChanged << "]";
+  });
 
   return componentsChanged;
 }

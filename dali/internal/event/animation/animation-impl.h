@@ -66,6 +66,18 @@ public:
     BETWEEN ///< Animating BETWEEN key-frames
   };
 
+  enum InternalState : uint8_t
+  {
+    STOPPED = Dali::Animation::State::STOPPED, ///< @copydoc Dali::Animation::State::STOPPED
+    PLAYING = Dali::Animation::State::PLAYING, ///< @copydoc Dali::Animation::State::PLAYING
+    PAUSED  = Dali::Animation::State::PAUSED,  ///< @copydoc Dali::Animation::State::PAUSED
+
+    CLEARED,                 ///< Animation is cleared.
+    STOPPING,                ///< Stopping animation. It will be STOPPED when animation finisehd signal called.
+    PLAYING_DURING_STOPPING, ///< Play called during stopping. It will be PLAYING when animation finisehd signal called.
+    PAUSED_DURING_STOPPING,  ///< Pause called during stopping. It will be PAUSED when animation finisehd signal called.
+  };
+
   using EndAction     = Dali::Animation::EndAction;
   using Interpolation = Dali::Animation::Interpolation;
 
@@ -569,21 +581,20 @@ private:
 
   uint32_t mAnimationId{0u};
 
-  AlphaFunction          mDefaultAlpha;
-  Vector2                mPlayRange{0.0f, 1.0f};
-  float                  mBlendPoint{0.0f};
-  float                  mDurationSeconds;
-  float                  mSpeedFactor{1.0f};
-  int32_t                mNotificationCount{0}; ///< Keep track of how many Finished signals have been emitted.
-  int32_t                mLoopCount{1};
-  float                  mProgressReachedMarker{0.0f};
-  float                  mDelaySeconds{0.0f};
-  EndAction              mEndAction;
-  EndAction              mDisconnectAction;
-  Dali::Animation::State mState{Dali::Animation::STOPPED};
-  bool                   mAutoReverseEnabled{false};                ///< Flag to identify that the looping mode is auto reverse.
-  bool                   mConnectorTargetValuesSortRequired{false}; ///< Flag to whether we need to sort mConnectorTargetValues or not
-  bool                   mPlayCalled{false};                        ///< Flag to whether we call Play at least 1 time after create, or clear.
+  AlphaFunction mDefaultAlpha;
+  Vector2       mPlayRange{0.0f, 1.0f};
+  float         mBlendPoint{0.0f};
+  float         mDurationSeconds;
+  float         mSpeedFactor{1.0f};
+  int32_t       mNotificationCount{0}; ///< Keep track of how many Finished signals have been emitted.
+  int32_t       mLoopCount{1};
+  float         mProgressReachedMarker{0.0f};
+  float         mDelaySeconds{0.0f};
+  EndAction     mEndAction;
+  EndAction     mDisconnectAction;
+  InternalState mState{InternalState::CLEARED};
+  bool          mAutoReverseEnabled{false};                ///< Flag to identify that the looping mode is auto reverse.
+  bool          mConnectorTargetValuesSortRequired{false}; ///< Flag to whether we need to sort mConnectorTargetValues or not
 };
 
 } // namespace Internal

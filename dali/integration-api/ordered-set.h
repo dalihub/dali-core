@@ -160,6 +160,16 @@ public:
   }
 
   /**
+   * @brief Predicate to determine if the container is empty
+   *
+   * @return true if the container is empty
+   */
+  bool IsEmpty() const
+  {
+    return mMap.empty();
+  }
+
+  /**
    * @brief Reserves space in the ordered set.
    *
    * @param[in] count Count of elements to reserve
@@ -326,6 +336,18 @@ public:
     mMap.rehash(0);
 #endif
     mList.clear();
+  }
+
+  /**
+   * @brief Reorder cache map. It should be called after the value of mList changed.
+   */
+  void ReorderCacheMap()
+  {
+    mMap.clear();
+    for(auto iter = mList.begin(), iterEnd = mList.end(); iter != iterEnd; ++iter)
+    {
+      mMap.insert({*iter, iter});
+    }
   }
 
 private:

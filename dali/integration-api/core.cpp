@@ -30,22 +30,16 @@ namespace Dali
 {
 namespace Integration
 {
-Core* Core::New(RenderController&      renderController,
-                PlatformAbstraction&   platformAbstraction,
-                Graphics::Controller&  graphicsController,
-                RenderToFrameBuffer    renderToFboEnabled,
-                DepthBufferAvailable   depthBufferAvailable,
-                StencilBufferAvailable stencilBufferAvailable,
-                PartialUpdateAvailable partialUpdateAvailable)
+Core* Core::New(RenderController&     renderController,
+                PlatformAbstraction&  platformAbstraction,
+                Graphics::Controller& graphicsController,
+                CorePolicyFlags       corePolicy)
 {
   Core* instance  = new Core;
   instance->mImpl = new Internal::Core(renderController,
                                        platformAbstraction,
                                        graphicsController,
-                                       renderToFboEnabled,
-                                       depthBufferAvailable,
-                                       stencilBufferAvailable,
-                                       partialUpdateAvailable);
+                                       corePolicy);
 
   return instance;
 }
@@ -143,6 +137,16 @@ void Core::RegisterProcessor(Processor& processor, bool postProcessor)
 void Core::UnregisterProcessor(Processor& processor, bool postProcessor)
 {
   mImpl->UnregisterProcessor(processor, postProcessor);
+}
+
+void Core::RegisterProcessorOnce(Processor& processor, bool postProcessor)
+{
+  mImpl->RegisterProcessorOnce(processor, postProcessor);
+}
+
+void Core::UnregisterProcessorOnce(Processor& processor, bool postProcessor)
+{
+  mImpl->UnregisterProcessorOnce(processor, postProcessor);
 }
 
 void Core::UnregisterProcessors()

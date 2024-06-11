@@ -94,7 +94,6 @@ Layer* FindLayer(Node& node)
  * @param[in]  clippingDepth The current scissor clipping depth
  * @param[out] clippingUsed  Gets set to true if any clipping nodes have been found
  * @param[out] keepRendering Gets set to true if rendering should be kept.
- * @param[out] renderStopped Gets set to true if rendering should be stopped.
  */
 void AddRenderablesForTask(BufferIndex updateBufferIndex,
                            Node&       node,
@@ -106,14 +105,8 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
                            uint32_t    clippingDepth,
                            uint32_t    scissorDepth,
                            bool&       clippingUsed,
-                           bool&       keepRendering,
-                           bool&       renderStopped)
+                           bool&       keepRendering)
 {
-  if(renderStopped)
-  {
-    return;
-  }
-
   // Short-circuit for invisible nodes
   if(!node.IsVisible(updateBufferIndex))
   {
@@ -192,18 +185,19 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
     keepRendering = keepRendering || (rendererKey->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY);
   }
 
+  if(DALI_UNLIKELY(node == renderTask.GetStopperNode() && count == 0u))
+  {
+    // Forcibly add renderables if stopper node don't have renderer.
+    target.PushBack(Renderable(&node, RendererKey{}));
+  }
+
   // Recurse children.
   NodeContainer& children = node.GetChildren();
   const NodeIter endIter  = children.End();
-  for(NodeIter iter = children.Begin(); !renderStopped && iter != endIter; ++iter)
+  for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
   {
     Node& child = **iter;
-    if(child == renderTask.GetStopperNode())
-    {
-      renderStopped = true;
-      break;
-    }
-    AddRenderablesForTask(updateBufferIndex, child, parentVisibilityChanged, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed, keepRendering, renderStopped);
+    AddRenderablesForTask(updateBufferIndex, child, parentVisibilityChanged, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed, keepRendering);
   }
 }
 
@@ -213,7 +207,6 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
  * If there is only one default render-task, then no further processing is required.
  * @param[in]  updateBufferIndex          The current update buffer index.
  * @param[in]  taskContainer              The container of render-tasks.
- * @param[in]  rootNode                   The root node of the scene-graph.
  * @param[in]  sortedLayers               The layers containing lists of opaque / transparent renderables.
  * @param[out] instructions               The instructions for rendering the next frame.
  * @param[in]  renderInstructionProcessor An instance of the RenderInstructionProcessor used to sort and handle the renderers for each layer.
@@ -224,7 +217,6 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
  */
 void ProcessTasks(BufferIndex                          updateBufferIndex,
                   RenderTaskList::RenderTaskContainer& taskContainer,
-                  Layer&                               rootNode,
                   SortedLayerPointers&                 sortedLayers,
                   RenderInstructionContainer&          instructions,
                   RenderInstructionProcessor&          renderInstructionProcessor,
@@ -297,8 +289,6 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
         sortedLayer->ClearRenderables();
       }
 
-      bool stopRendering = false;
-
       AddRenderablesForTask(updateBufferIndex,
                             *sourceNode,
                             false,
@@ -309,8 +299,7 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
                             0u,
                             0u,
                             hasClippingNodes,
-                            keepRendering,
-                            stopRendering);
+                            keepRendering);
 
       renderInstructionProcessor.Prepare(updateBufferIndex,
                                          sortedLayers,
@@ -341,7 +330,6 @@ RenderTaskProcessor::~RenderTaskProcessor() = default;
 
 bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
                                   RenderTaskList&             renderTasks,
-                                  Layer&                      rootNode,
                                   SortedLayerPointers&        sortedLayers,
                                   RenderInstructionContainer& instructions,
                                   bool                        renderToFboEnabled,
@@ -368,7 +356,6 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
 
   ProcessTasks(updateBufferIndex,
                taskContainer,
-               rootNode,
                sortedLayers,
                instructions,
                mRenderInstructionProcessor,
@@ -384,7 +371,6 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
 
   ProcessTasks(updateBufferIndex,
                taskContainer,
-               rootNode,
                sortedLayers,
                instructions,
                mRenderInstructionProcessor,

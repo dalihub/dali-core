@@ -22,6 +22,7 @@
 #include <cmath> // fmod
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/math/math-utils.h>
@@ -229,6 +230,7 @@ void Animation::Pause()
   if(mState == Playing)
   {
     mState = Paused;
+    DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Pause\n", GetNotifyId(), mDurationSeconds * 1000.0f);
   }
 }
 
@@ -251,6 +253,7 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
 
 void Animation::SetAnimatorsActive(bool active)
 {
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms %s\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop");
   for(auto&& item : mAnimators)
   {
     item->SetActive(active);
@@ -269,6 +272,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
     if(mEndAction != Dali::Animation::DISCARD)
     {
       Bake(bufferIndex, mEndAction);
+      DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Stop\n", GetNotifyId(), mDurationSeconds * 1000.0f);
 
       // Animators are automatically set to inactive in Bake
     }
@@ -303,6 +307,8 @@ void Animation::ClearAnimator(BufferIndex bufferIndex)
   mIsStopped   = false; ///< Do not make notify.
   mPlayedCount = 0;
   mCurrentLoop = 0;
+
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Clear\n", GetNotifyId(), mDurationSeconds * 1000.0f);
 }
 
 void Animation::OnDestroy(BufferIndex bufferIndex)
@@ -323,6 +329,8 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
 
   mIsStopped = false; ///< Do not make notify.
   mState     = Destroyed;
+
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Destroy\n", GetNotifyId(), mDurationSeconds * 1000.0f);
 }
 
 void Animation::SetLoopingMode(bool loopingMode)

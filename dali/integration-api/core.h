@@ -221,19 +221,13 @@ public:
    * @param[in] renderController The interface to an object which controls rendering.
    * @param[in] platformAbstraction The interface providing platform specific services.
    * @param[in] graphicsController The interface providing graphics services
-   * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
-   * @param[in] depthBufferAvailable Whether the depth buffer is available
-   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-   * @param[in] partialUpdateAvailable Whether the partial update is available
+   * @param[in] corePolicy Flag list of update / rendering policies.
    * @return A newly allocated Core.
    */
-  static Core* New(RenderController&      renderController,
-                   PlatformAbstraction&   platformAbstraction,
-                   Graphics::Controller&  graphicsController,
-                   RenderToFrameBuffer    renderToFboEnabled,
-                   DepthBufferAvailable   depthBufferAvailable,
-                   StencilBufferAvailable stencilBufferAvailable,
-                   PartialUpdateAvailable partialUpdateAvailable);
+  static Core* New(RenderController&     renderController,
+                   PlatformAbstraction&  platformAbstraction,
+                   Graphics::Controller& graphicsController,
+                   CorePolicyFlags       corePolicy);
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -412,7 +406,23 @@ public:
   void UnregisterProcessor(Processor& processor, bool postProcessor = false);
 
   /**
-   * @brief Unregister all processors and post processors what we registered before.
+   * @brief Register a processor for once execute
+   *
+   * Note, Core does not take ownership of this processor.
+   * @param[in] processor The process to register
+   * @param[in] postProcessor set this processor required to be called after size negotiation. Default is false.
+   */
+  void RegisterProcessorOnce(Processor& processor, bool postProcessor = false);
+
+  /**
+   * @brief Unregister a processor for once execute
+   * @param[in] processor The process to unregister
+   * @param[in] postProcessor True if the processor to be unregister is for post processor.
+   */
+  void UnregisterProcessorOnce(Processor& processor, bool postProcessor = false);
+
+  /**
+   * @brief Unregister all processors and post processors (include once) what we registered before.
    */
   void UnregisterProcessors();
 

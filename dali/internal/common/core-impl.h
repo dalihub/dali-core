@@ -76,13 +76,10 @@ public:
   /**
    * Create and initialise a new Core instance
    */
-  Core(Integration::RenderController&      renderController,
-       Integration::PlatformAbstraction&   platform,
-       Graphics::Controller&               graphicsController,
-       Integration::RenderToFrameBuffer    renderToFboEnabled,
-       Integration::DepthBufferAvailable   depthBufferAvailable,
-       Integration::StencilBufferAvailable stencilBufferAvailable,
-       Integration::PartialUpdateAvailable partialUpdateAvailable);
+  Core(Integration::RenderController&    renderController,
+       Integration::PlatformAbstraction& platform,
+       Graphics::Controller&             graphicsController,
+       Integration::CorePolicyFlags      corePolicy);
 
   /**
    * Destructor
@@ -183,6 +180,16 @@ public:
    * @copydoc Dali::Integration::Core::UnregisterProcessor
    */
   void UnregisterProcessor(Dali::Integration::Processor& processor, bool postProcessor = false);
+
+  /**
+   * @copydoc Dali::Integration::Core::RegisterProcessorOnce
+   */
+  void RegisterProcessorOnce(Integration::Processor& processor, bool postProcessor = false);
+
+  /**
+   * @copydoc Dali::Integration::Core::UnregisterProcessorOnce
+   */
+  void UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor = false);
 
   /**
    * @copydoc Dali::Integration::Core::UnregisterProcessors
@@ -356,6 +363,8 @@ private:
   OwnerPointer<GestureEventProcessor>           mGestureEventProcessor; ///< The gesture event processor
   Dali::Vector<Integration::Processor*>         mProcessors;            ///< Registered processors (not owned)
   Dali::Vector<Integration::Processor*>         mPostProcessors;        ///< Registered post processors those will called after relayout(not owned)
+  Dali::Vector<Integration::Processor*>         mProcessorsOnce[2];     ///< Registered processors for once (not owned)
+  Dali::Vector<Integration::Processor*>         mPostProcessorsOnce[2]; ///< Registered post processors for once. those will called after relayout(not owned)
 
   SceneContainer mScenes; ///< A container of scenes that bound to a surface for rendering, owned by Core
 
@@ -363,6 +372,9 @@ private:
   ObjectRegistryPtr mObjectRegistry;
 
   Graphics::Controller& mGraphicsController;
+
+  uint32_t mProcessorOnceIndex : 1;     ///< Index of the once processor in mProcessorsOnce
+  uint32_t mPostProcessorOnceIndex : 1; ///< Index of the once processor in mProcessorsOnce
 
   bool mProcessingEvent : 1;           ///< True during ProcessEvents()
   bool mProcessorUnregistered : 1;     ///< True if the processor is unregistered during RunProcessors()

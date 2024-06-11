@@ -75,27 +75,28 @@ void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
 
 void RenderTaskList::RemoveTask(RenderTask* task)
 {
-  RenderTaskContainer::ConstIterator end = mRenderTasks.End();
-  for(RenderTaskContainer::Iterator iter = mRenderTasks.Begin(); iter != end; ++iter)
+  auto iter = mRenderTasks.Find(task);
+  if(iter != mRenderTasks.End())
   {
-    if(*iter == task)
-    {
-      // Destroy the task
-      mRenderTasks.Erase(iter);
-
-      break; // we're finished
-    }
+    // Destroy the task
+    mRenderTasks.Erase(iter);
   }
 }
 
 void RenderTaskList::SortTasks(OwnerPointer<std::vector<const SceneGraph::RenderTask*>>& sortedTasks)
 {
-  for(uint32_t i = 0; i < sortedTasks->size(); ++i)
+  DALI_ASSERT_ALWAYS(sortedTasks->size() == mRenderTasks.Count() && "SceneGraph RenderTask list is not matched with Event side RenderTask list!");
+
+  auto iter = mRenderTasks.Begin();
+  for(auto sortedIter = sortedTasks->begin(), sortedIterEnd = sortedTasks->end(); sortedIter != sortedIterEnd; ++sortedIter, ++iter)
   {
-    const SceneGraph::RenderTask* task = (*sortedTasks)[i];
+    const SceneGraph::RenderTask* task = *sortedIter;
     SceneGraph::RenderTask* castedTask = const_cast<SceneGraph::RenderTask*>(task);
-    mRenderTasks[i]                    = castedTask;
+    (*iter)                            = castedTask;
   }
+
+  // We should call Reorder after the order of container changed.
+  mRenderTasks.ReorderCacheMap();
 }
 
 uint32_t RenderTaskList::GetTaskCount()

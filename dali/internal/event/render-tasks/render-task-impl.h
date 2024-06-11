@@ -71,6 +71,9 @@ public:
    */
   Actor* GetSourceActor() const;
 
+  /**
+   * @copydoc Dali::RenderTask::GetStopperActor()
+   */
   Actor* GetStopperActor() const;
 
   /**
@@ -286,7 +289,10 @@ public:
    */
   uint32_t GetRenderTaskId() const;
 
-  void RenderUntil(Actor* actor);
+  /**
+   * @copydoc Dali::RenderTask::RenderUntil
+   */
+  void RenderUntil(Actor* stopperActor);
 
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
