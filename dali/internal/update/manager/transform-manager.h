@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TRANSFORM_MANAGER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -418,10 +418,14 @@ private:
   Vector<Vector4>                      mBoundingSpheres;                ///< Bounding spheres. xyz is the center and w is the radius
   Vector<TransformComponentAnimatable> mTxComponentAnimatableBaseValue; ///< Base values for the animatable part of the components
   Vector<Vector3>                      mSizeBase;                       ///< Base value for the size of the components
-  Vector<bool>                         mComponentDirty;                 ///< 1u if some of the parts of the component has changed in this frame, 0 otherwise
-  Vector<bool>                         mLocalMatrixDirty;               ///< 1u if the local matrix has been updated in this frame, 0 otherwise
-  Vector<SOrderItem>                   mOrderedComponents;              ///< Used to reorder components when hierarchy changes
-  bool                                 mReorder;                        ///< Flag to determine if the components have to reordered in the next Update
+  Vector<uint8_t>                      mComponentDirty;                 ///< Dirty flags for each component. Follow as animatable property's dirty flag.
+                                                                        ///< Or If we change static component changed, flag become non-zero. Age down at Update time.
+                                                                        ///< Note that we don't replace dirty flag as BAKE even if we call Bake operation.
+                                                                        ///< (Since single dirty flag controls multiple animatable properties ; Position, Size, Scale, Orientation.)
+  Vector<bool>       mLocalMatrixDirty;                                 ///< 1u if the local matrix has been updated in this frame, 0 otherwise
+  Vector<SOrderItem> mOrderedComponents;                                ///< Used to reorder components when hierarchy changes
+
+  bool mReorder : 1; ///< Flag to determine if the components have to reordered in the next Update
 };
 
 } //namespace SceneGraph

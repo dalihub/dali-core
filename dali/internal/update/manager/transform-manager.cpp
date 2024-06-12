@@ -26,6 +26,7 @@
 //INTERNAL INCLUDES
 #include <dali/internal/common/math.h>
 #include <dali/internal/common/matrix-utils.h>
+#include <dali/internal/update/common/animatable-property.h> ///< for SET_FLAG and BAKE_FLAG
 #include <dali/public-api/common/constants.h>
 
 #include <dali/integration-api/debug.h>
@@ -44,6 +45,8 @@ static const float gDefaultTransformComponentAnimatableData[] = {1.0f, 1.0f, 1.0
 
 //Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
 static const float gDefaultTransformComponentStaticData[] = {0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f, true};
+
+static const uint32_t STATIC_COMPONENT_FLAG = 0x01; ///< Indicates that the value when we change static transform components, so need to update at least 1 frame.
 
 static_assert(sizeof(gDefaultTransformComponentAnimatableData) == sizeof(TransformComponentAnimatable), "gDefaultTransformComponentAnimatableData should have the same number of floats as specified in TransformComponentAnimatable");
 static_assert(sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformComponentStatic), "gDefaultTransformComponentStaticData should have the same number of floats as specified in TransformComponentStatic");
@@ -110,7 +113,7 @@ TransformId TransformManager::CreateTransform()
     mBoundingSpheres.PushBack(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
     mTxComponentAnimatableBaseValue.PushBack(TransformComponentAnimatable());
     mSizeBase.PushBack(Vector3(0.0f, 0.0f, 0.0f));
-    mComponentDirty.PushBack(false);
+    mComponentDirty.PushBack(CLEAN_FLAG);
     mLocalMatrixDirty.PushBack(false);
   }
   else
@@ -127,7 +130,7 @@ TransformId TransformManager::CreateTransform()
     mWorld[mComponentCount].SetIdentity();
     mBoundingSpheres[mComponentCount]  = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
     mSizeBase[mComponentCount]         = Vector3(0.0f, 0.0f, 0.0f);
-    mComponentDirty[mComponentCount]   = false;
+    mComponentDirty[mComponentCount]   = CLEAN_FLAG;
     mLocalMatrixDirty[mComponentCount] = false;
   }
 
@@ -164,10 +167,12 @@ void TransformManager::RemoveTransform(TransformId id)
 void TransformManager::SetParent(TransformId id, TransformId parentId)
 {
   DALI_ASSERT_ALWAYS(id != parentId);
-  TransformId index      = mIds[id];
-  mParent[index]         = parentId;
-  mComponentDirty[index] = true;
-  mReorder               = true;
+
+  TransformId index = mIds[id];
+  mParent[index]    = parentId;
+  mComponentDirty[index] |= STATIC_COMPONENT_FLAG; ///< Need to calculate local matrix, at least 1 frame.
+
+  mReorder = true;
 }
 
 const Matrix& TransformManager::GetWorldMatrix(TransformId id) const
@@ -192,7 +197,7 @@ void TransformManager::SetInheritPosition(TransformId id, bool inherit)
     mInheritanceMode[index] &= ~INHERIT_POSITION;
   }
 
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
 }
 
 void TransformManager::SetInheritScale(TransformId id, bool inherit)
@@ -207,7 +212,7 @@ void TransformManager::SetInheritScale(TransformId id, bool inherit)
     mInheritanceMode[index] &= ~INHERIT_SCALE;
   }
 
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
 }
 
 void TransformManager::SetInheritOrientation(TransformId id, bool inherit)
@@ -222,7 +227,7 @@ void TransformManager::SetInheritOrientation(TransformId id, bool inherit)
     mInheritanceMode[index] &= ~INHERIT_ORIENTATION;
   }
 
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
 }
 
 void TransformManager::ResetToBaseValue()
@@ -362,8 +367,8 @@ bool TransformManager::Update()
     mBoundingSpheres[i]   = mWorld[i].GetTranslation();
     mBoundingSpheres[i].w = Length(centerToEdgeWorldSpace);
 
-    componentsChanged  = componentsChanged || mComponentDirty[i];
-    mComponentDirty[i] = false;
+    componentsChanged = componentsChanged || mComponentDirty[i];
+    mComponentDirty[i] >>= 1u; ///< age down.
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
@@ -592,33 +597,37 @@ const float& TransformManager::GetVector3PropertyComponentValue(TransformId id, 
 void TransformManager::SetVector3PropertyValue(TransformId id, TransformManagerProperty property, const Vector3& value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
 
   switch(property)
   {
     case TRANSFORM_PROPERTY_POSITION:
     {
+      mComponentDirty[index]                  = SET_FLAG;
       mTxComponentAnimatable[index].mPosition = value;
       break;
     }
     case TRANSFORM_PROPERTY_SCALE:
     {
+      mComponentDirty[index]               = SET_FLAG;
       mTxComponentAnimatable[index].mScale = value;
       break;
     }
     case TRANSFORM_PROPERTY_PARENT_ORIGIN:
     {
+      mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
       mTxComponentStatic[index].mParentOrigin = value;
       break;
     }
     case TRANSFORM_PROPERTY_ANCHOR_POINT:
     {
+      mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
       mTxComponentStatic[index].mAnchorPoint = value;
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
     {
-      mSize[index] = value;
+      mComponentDirty[index] = SET_FLAG;
+      mSize[index]           = value;
       break;
     }
     default:
@@ -631,32 +640,36 @@ void TransformManager::SetVector3PropertyValue(TransformId id, TransformManagerP
 void TransformManager::SetVector3PropertyComponentValue(TransformId id, TransformManagerProperty property, float value, unsigned int component)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
 
   switch(property)
   {
     case TRANSFORM_PROPERTY_POSITION:
     {
+      mComponentDirty[index]                             = SET_FLAG;
       mTxComponentAnimatable[index].mPosition[component] = value;
       break;
     }
     case TRANSFORM_PROPERTY_SCALE:
     {
+      mComponentDirty[index]                          = SET_FLAG;
       mTxComponentAnimatable[index].mScale[component] = value;
       break;
     }
     case TRANSFORM_PROPERTY_PARENT_ORIGIN:
     {
+      mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
       mTxComponentStatic[index].mParentOrigin[component] = value;
       break;
     }
     case TRANSFORM_PROPERTY_ANCHOR_POINT:
     {
+      mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
       mTxComponentStatic[index].mAnchorPoint[component] = value;
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
     {
+      mComponentDirty[index]  = SET_FLAG;
       mSize[index][component] = value;
       break;
     }
@@ -670,7 +683,7 @@ void TransformManager::SetVector3PropertyComponentValue(TransformId id, Transfor
 void TransformManager::BakeVector3PropertyValue(TransformId id, TransformManagerProperty property, const Vector3& value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= BAKED_FLAG;
 
   switch(property)
   {
@@ -709,7 +722,7 @@ void TransformManager::BakeVector3PropertyValue(TransformId id, TransformManager
 void TransformManager::BakeRelativeVector3PropertyValue(TransformId id, TransformManagerProperty property, const Vector3& value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= BAKED_FLAG;
 
   switch(property)
   {
@@ -748,7 +761,7 @@ void TransformManager::BakeRelativeVector3PropertyValue(TransformId id, Transfor
 void TransformManager::BakeMultiplyVector3PropertyValue(TransformId id, TransformManagerProperty property, const Vector3& value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= BAKED_FLAG;
 
   switch(property)
   {
@@ -787,7 +800,7 @@ void TransformManager::BakeMultiplyVector3PropertyValue(TransformId id, Transfor
 void TransformManager::BakeVector3PropertyComponentValue(TransformId id, TransformManagerProperty property, float value, unsigned int component)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= BAKED_FLAG;
 
   switch(property)
   {
@@ -826,7 +839,7 @@ void TransformManager::BakeVector3PropertyComponentValue(TransformId id, Transfo
 void TransformManager::BakeXVector3PropertyValue(TransformId id, TransformManagerProperty property, float value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= BAKED_FLAG;
 
   switch(property)
   {
@@ -865,7 +878,7 @@ void TransformManager::BakeXVector3PropertyValue(TransformId id, TransformManage
 void TransformManager::BakeYVector3PropertyValue(TransformId id, TransformManagerProperty property, float value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= BAKED_FLAG;
 
   switch(property)
   {
@@ -904,7 +917,7 @@ void TransformManager::BakeYVector3PropertyValue(TransformId id, TransformManage
 void TransformManager::BakeZVector3PropertyValue(TransformId id, TransformManagerProperty property, float value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index] = true;
+  mComponentDirty[index] |= BAKED_FLAG;
 
   switch(property)
   {
@@ -954,22 +967,25 @@ const Quaternion& TransformManager::GetQuaternionPropertyValue(TransformId id) c
 void TransformManager::SetQuaternionPropertyValue(TransformId id, const Quaternion& q)
 {
   TransformId index(mIds[id]);
+  mComponentDirty[index] = SET_FLAG;
+
   mTxComponentAnimatable[index].mOrientation = q;
-  mComponentDirty[index]                     = true;
 }
 
 void TransformManager::BakeQuaternionPropertyValue(TransformId id, const Quaternion& q)
 {
   TransformId index(mIds[id]);
+  mComponentDirty[index] |= BAKED_FLAG;
+
   mTxComponentAnimatable[index].mOrientation = mTxComponentAnimatableBaseValue[index].mOrientation = q;
-  mComponentDirty[index]                                                                           = true;
 }
 
 void TransformManager::BakeRelativeQuaternionPropertyValue(TransformId id, const Quaternion& q)
 {
   TransformId index(mIds[id]);
+  mComponentDirty[index] |= BAKED_FLAG;
+
   mTxComponentAnimatable[index].mOrientation = mTxComponentAnimatableBaseValue[index].mOrientation = mTxComponentAnimatable[index].mOrientation * q;
-  mComponentDirty[index]                                                                           = true;
 }
 
 const Vector4& TransformManager::GetBoundingSphere(TransformId id) const
@@ -987,7 +1003,8 @@ void TransformManager::GetWorldMatrixAndSize(TransformId id, Matrix& worldMatrix
 void TransformManager::SetPositionUsesAnchorPoint(TransformId id, bool value)
 {
   TransformId index(mIds[id]);
-  mComponentDirty[index]                             = true;
+  mComponentDirty[index] |= STATIC_COMPONENT_FLAG;
+
   mTxComponentStatic[index].mPositionUsesAnchorPoint = value;
 }
 
