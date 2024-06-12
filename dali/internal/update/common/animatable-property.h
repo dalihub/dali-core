@@ -81,7 +81,7 @@ protected: // for derived classes
    */
   virtual void OnSet()
   {
-    mDirtyFlags |= SET_FLAG;
+    mDirtyFlags = SET_FLAG;
   }
 
   /**
@@ -98,7 +98,7 @@ public:
    */
   void MarkAsDirty()
   {
-    mDirtyFlags |= RESET_FLAG;
+    mDirtyFlags = RESET_FLAG;
   }
 
 public: // From PropertyBase
