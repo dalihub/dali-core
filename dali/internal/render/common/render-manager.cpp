@@ -189,7 +189,6 @@ struct RenderManager::Impl
 
   std::unique_ptr<Dali::ThreadPool> threadPool;            ///< The thread pool
   Vector<Graphics::Texture*>        boundTextures;         ///< The textures bound for rendering
-  Vector<Graphics::Texture*>        textureDependencyList; ///< The dependency list of bound textures
 
   bool commandBufferSubmitted{false};
 };
@@ -889,15 +888,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
     mImpl->programController.ResetProgramMatrices();
-
-    if(instruction.mFrameBuffer)
-    {
-      // For each offscreen buffer, update the dependency list with the new texture id used by this frame buffer.
-      for(unsigned int i0 = 0, i1 = instruction.mFrameBuffer->GetColorAttachmentCount(); i0 < i1; ++i0)
-      {
-        mImpl->textureDependencyList.PushBack(instruction.mFrameBuffer->GetTexture(i0));
-      }
-    }
 
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {
