@@ -83,13 +83,13 @@ const char* TOUCH_POINT_STATE[6] =
 bool ShouldEmitInterceptTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
   PointState::Type state = event.GetState(0);
-  return actorImpl.GetInterceptTouchRequired() && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetInterceptTouchRequired() && actorImpl.IsUserInteractionEnabled() && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
 }
 
 bool ShouldEmitTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
   PointState::Type state = event.GetState(0);
-  return actorImpl.GetTouchRequired() && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetTouchRequired() && actorImpl.IsUserInteractionEnabled() && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
 }
 
 // child -> parent
