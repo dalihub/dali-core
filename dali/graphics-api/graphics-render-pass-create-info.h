@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_RENDERPASS_CREATE_INFO_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,18 @@ struct RenderPassCreateInfo
   }
 
   /**
+   * @brief Set the render target for this render pass
+   *
+   * @param[in] value The render target to use.
+   * @return reference to this structure.
+   */
+  auto& SetRenderTarget(RenderTarget* value)
+  {
+    renderTarget = value;
+    return *this;
+  }
+
+  /**
    * @brief Sets allocation callbacks which will be used when object is created
    * and destroyed.
    *
@@ -80,6 +92,7 @@ struct RenderPassCreateInfo
   GraphicsStructureType                     type{GraphicsStructureType::RENDERPASS_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*                      nextExtension{nullptr};
   const std::vector<AttachmentDescription>* attachments{nullptr};
+  RenderTarget*                             renderTarget{nullptr};
   const AllocationCallbacks*                allocationCallbacks{nullptr};
 };
 

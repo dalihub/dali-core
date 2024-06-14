@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_RENDER_TARGET_CREATE_INFO
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+namespace Integration
+{
+struct RenderSurface;
+}
 namespace Graphics
 {
 /**
@@ -61,7 +65,7 @@ struct RenderTargetCreateInfo
    * @param[in] value Pointer to the native surface
    * @return reference to this structure
    */
-  auto& SetSurface( Surface* value )
+  auto& SetSurface( Integration::RenderSurface* value )
   {
     surface = value;
     return *this;
@@ -119,7 +123,7 @@ struct RenderTargetCreateInfo
   }
 
   GraphicsStructureType         type{GraphicsStructureType::RENDER_TARGET_CREATE_INFO_STRUCT};
-  Surface*                      surface{nullptr};
+  Integration::RenderSurface*   surface{nullptr};
   Framebuffer*                  framebuffer{nullptr};
   Extent2D                      extent{};
   RenderTargetTransformFlags    preTransform{0u};

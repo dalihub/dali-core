@@ -85,8 +85,7 @@ void TestApplication::CreateScene()
   // Create render target for the scene
   Graphics::RenderTargetCreateInfo rtInfo{};
   rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
-  rtInfo.SetSurface(&mSurfaceWidth); // Can point to anything, really.
-
+  rtInfo.SetSurface(reinterpret_cast<Integration::RenderSurface*>(this));
   mScene.SetSurfaceRenderTarget(rtInfo);
 
   mScenes.push_back(mScene);
