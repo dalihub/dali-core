@@ -1816,7 +1816,6 @@ int UtcDaliGeoTouchEventInterruptedDifferentConsumer02(void)
   END_TEST;
 }
 
-
 int UtcDaliGeoTouchEventGetRadius(void)
 {
   TestApplication application;
