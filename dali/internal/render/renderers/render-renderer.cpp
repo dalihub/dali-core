@@ -421,7 +421,6 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     const std::vector<char>& vertexShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
     vertexShaderCreateInfo.SetSourceSize(vertexShaderSrc.size());
     vertexShaderCreateInfo.SetSourceData(static_cast<const void*>(vertexShaderSrc.data()));
-    vertexShaderCreateInfo.SetShaderVersion(shaderData->GetVertexShaderVersion());
     auto vertexShader = mGraphicsController->CreateShader(vertexShaderCreateInfo, nullptr);
 
     Graphics::ShaderCreateInfo fragmentShaderCreateInfo;
@@ -430,7 +429,6 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     const std::vector<char>& fragmentShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
     fragmentShaderCreateInfo.SetSourceSize(fragmentShaderSrc.size());
     fragmentShaderCreateInfo.SetSourceData(static_cast<const void*>(fragmentShaderSrc.data()));
-    fragmentShaderCreateInfo.SetShaderVersion(shaderData->GetFragmentShaderVersion());
     auto fragmentShader = mGraphicsController->CreateShader(fragmentShaderCreateInfo, nullptr);
 
     std::vector<Graphics::ShaderState> shaderStates{
@@ -492,8 +490,9 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     mRenderCallbackInput->usingOwnEglContext = isolatedNotDirect;
     // Set storage for the context to be used
     info.glesNativeInfo.eglSharedContextStoragePointer = &mRenderCallbackInput->eglContext;
-    info.executionMode                                 = isolatedNotDirect ? Graphics::DrawNativeExecutionMode::ISOLATED : Graphics::DrawNativeExecutionMode::DIRECT;
-    info.reserved                                      = nullptr;
+    info.executionMode = isolatedNotDirect ?
+                         Graphics::DrawNativeExecutionMode::ISOLATED : Graphics::DrawNativeExecutionMode::DIRECT;
+    info.reserved = nullptr;
 
     auto& textureResources = mRenderCallback->GetTextureResources();
 
