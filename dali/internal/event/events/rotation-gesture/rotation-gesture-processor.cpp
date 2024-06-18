@@ -277,6 +277,16 @@ void RotationGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
   }
 }
 
+uint32_t RotationGestureProcessor::GetMinimumTouchEvents() const
+{
+  return mMinimumTouchEvents;
+}
+
+uint32_t RotationGestureProcessor::GetMinimumTouchEventsAfterStart() const
+{
+  return mMinimumTouchEventsAfterStart;
+}
+
 void RotationGestureProcessor::OnGesturedActorStageDisconnection()
 {
   mCurrentRotationEmitters.clear();
@@ -284,8 +294,12 @@ void RotationGestureProcessor::OnGesturedActorStageDisconnection()
 
 bool RotationGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
-  // No special case required for rotation.
-  return true;
+  bool ret = false;
+  if(detector)
+  {
+    ret = detector->CheckGestureDetector(mCurrentRotationEvent, actor, mCurrentRenderTask);
+  }
+  return ret;
 }
 
 void RotationGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)

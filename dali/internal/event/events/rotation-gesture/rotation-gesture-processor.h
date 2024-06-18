@@ -95,6 +95,18 @@ public: // To be called by GestureEventProcessor
    */
   void SetMinimumTouchEventsAfterStart(uint32_t value);
 
+  /**
+   * @brief Gets the minimum touch events required before a rotation can be started
+   * @return The number of touch events
+   */
+  uint32_t GetMinimumTouchEvents() const;
+
+  /**
+   * @brief Gets the minimum touch events required after a rotation started
+   * @return The number of touch events
+   */
+  uint32_t GetMinimumTouchEventsAfterStart() const;
+
 private:
   // GestureProcessor overrides
 

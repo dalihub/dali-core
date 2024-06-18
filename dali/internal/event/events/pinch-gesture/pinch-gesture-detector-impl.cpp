@@ -24,8 +24,12 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/gesture-requests.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/public-api/events/pinch-gesture.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-recognizer.h>
 
 namespace Dali
 {
@@ -96,17 +100,121 @@ bool PinchGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTracker
 void PinchGestureDetector::OnActorAttach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector attach actor(%d)\n", actor.GetId());
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Connect(this, &PinchGestureDetector::OnTouchEvent);
+  }
 }
 
 void PinchGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector detach actor(%d)\n", actor.GetId());
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Disconnect(this, &PinchGestureDetector::OnTouchEvent);
+  }
 }
 
 void PinchGestureDetector::OnActorDestroyed(Object& object)
 {
   // Do nothing
 }
+
+bool PinchGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
+{
+  Dali::TouchEvent touchEvent(touch);
+  return HandleEvent(actor, touchEvent);
+}
+
+void PinchGestureDetector::CancelProcessing()
+{
+  if(mGestureRecognizer)
+  {
+    mGestureRecognizer->CancelEvent();
+  }
+}
+
+void PinchGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+{
+  if(!mGestureRecognizer)
+  {
+    const PinchGestureProcessor& mPinchGestureProcessor = mGestureEventProcessor.GetPinchGestureProcessor();
+    float minimumPinchDistance = mPinchGestureProcessor.GetMinimumPinchDistance();
+    uint32_t minimumTouchEvents = mPinchGestureProcessor.GetMinimumTouchEvents();
+    uint32_t minimumTouchEventsAfterStart = mPinchGestureProcessor.GetMinimumTouchEventsAfterStart();
+
+
+    Size size          = scene.GetSize();
+    mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), minimumPinchDistance, minimumTouchEvents, minimumTouchEventsAfterStart);
+  }
+  mGestureRecognizer->SendEvent(scene, event);
+}
+
+void PinchGestureDetector::EmitPinchSignal(Actor* actor, const PinchGestureEvent& pinchEvent, Vector2 localCenter)
+{
+  SetDetected(true);
+  Internal::PinchGesturePtr pinch(new Internal::PinchGesture(pinchEvent.state));
+  pinch->SetTime(pinchEvent.time);
+
+  pinch->SetScale(pinchEvent.scale);
+  pinch->SetSpeed(pinchEvent.speed);
+  pinch->SetScreenCenterPoint(pinchEvent.centerPoint);
+
+  pinch->SetLocalCenterPoint(localCenter);
+  pinch->SetSourceType(pinchEvent.sourceType);
+  pinch->SetSourceData(pinchEvent.sourceData);
+
+
+  Dali::Actor                                    actorHandle(actor);
+  EmitPinchGestureSignal(actorHandle, Dali::PinchGesture(pinch.Get()));
+}
+
+void PinchGestureDetector::Process(Scene& scene, const PinchGestureEvent& pinchEvent)
+{
+  switch(pinchEvent.state)
+  {
+    case GestureState::STARTED:
+    {
+      Actor* feededActor = mFeededActor.GetActor();
+      if(feededActor && CheckGestureDetector(&pinchEvent, feededActor, mRenderTask))
+      {
+        Vector2     actorCoords;
+        RenderTask& renderTaskImpl(*mRenderTask.Get());
+        feededActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
+        EmitPinchSignal(feededActor, pinchEvent, actorCoords);
+      }
+      break;
+    }
+
+    case GestureState::CONTINUING:
+    case GestureState::FINISHED:
+    case GestureState::CANCELLED:
+    {
+      Actor* feededActor = mFeededActor.GetActor();
+      if(feededActor && feededActor->IsHittable() && mRenderTask)
+      {
+        Vector2     actorCoords;
+        RenderTask& renderTaskImpl(*mRenderTask.Get());
+        feededActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
+
+        EmitPinchSignal(feededActor, pinchEvent, actorCoords);
+      }
+      break;
+    }
+
+    case GestureState::CLEAR:
+    {
+      DALI_ABORT("Incorrect state received from Integration layer: CLEAR\n");
+      break;
+    }
+    case GestureState::POSSIBLE:
+    {
+      DALI_ABORT("Incorrect state received from Integration layer: POSSIBLE\n");
+      break;
+    }
+  }
+}
+
 
 } // namespace Internal
 

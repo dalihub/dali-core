@@ -41,6 +41,7 @@ GestureEventProcessor::GestureEventProcessor(SceneGraph::UpdateManager& updateMa
   mTapGestureProcessor(),
   mRotationGestureProcessor(),
   mRenderController(renderController),
+  mGestureDetectors(),
   envOptionMinimumPanDistance(-1),
   envOptionMinimumPanEvents(-1)
 {
@@ -55,6 +56,44 @@ void GestureEventProcessor::ProcessTouchEvent(Scene& scene, const Integration::T
   mPinchGestureProcessor.ProcessTouch(scene, event);
   mTapGestureProcessor.ProcessTouch(scene, event);
   mRotationGestureProcessor.ProcessTouch(scene, event);
+}
+
+bool GestureEventProcessor::IsRegisterGestureDetector(GestureDetector* gestureDetector)
+{
+  return (find(mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector) != mGestureDetectors.end());
+}
+
+void GestureEventProcessor::RegisterGestureDetector(GestureDetector* gestureDetector)
+{
+  if(!IsRegisterGestureDetector(gestureDetector))
+  {
+    mGestureDetectors.push_back(gestureDetector);
+  }
+}
+
+void GestureEventProcessor::CancelAllOtherGestureDetectors(GestureDetector* gestureDetector)
+{
+  for(auto itr = mGestureDetectors.begin(); itr != mGestureDetectors.end(); itr++)
+  {
+    if((*itr) && (*itr) != gestureDetector)
+    {
+      (*itr)->CancelProcessing();
+      (*itr)->SetDetected(false);
+    }
+  }
+  mGestureDetectors.clear();
+  mGestureDetectors.push_back(gestureDetector);
+}
+
+void GestureEventProcessor::UnregisterGestureDetector(GestureDetector* gestureDetector)
+{
+  // Find detector ...
+  GestureDetectorContainer::iterator endIter = std::remove(mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector);
+  if(endIter != mGestureDetectors.end())
+  {
+    // ... and remove it
+    mGestureDetectors.erase(endIter, mGestureDetectors.end());
+  }
 }
 
 void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector, Scene& scene)
@@ -354,6 +393,16 @@ void GestureEventProcessor::SetTapMaximumMotionAllowedDistance(float distance)
 const TapGestureProcessor& GestureEventProcessor::GetTapGestureProcessor()
 {
   return mTapGestureProcessor;
+}
+
+const PinchGestureProcessor& GestureEventProcessor::GetPinchGestureProcessor()
+{
+  return mPinchGestureProcessor;
+}
+
+const RotationGestureProcessor& GestureEventProcessor::GetRotationGestureProcessor()
+{
+  return mRotationGestureProcessor;
 }
 
 } // namespace Internal

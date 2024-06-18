@@ -70,9 +70,14 @@ Actor GestureDetector::GetAttachedActor(size_t index) const
   return GetImplementation(*this).GetAttachedActor(index);
 }
 
-bool GestureDetector::FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch)
+bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
 {
-  return GetImplementation(*this).FeedTouch(actor, touch);
+  return GetImplementation(*this).HandleEvent(actor, touch);
+}
+
+void GestureDetector::CancelAllOtherGestureDetectors()
+{
+  GetImplementation(*this).CancelAllOtherGestureDetectors();
 }
 
 } // namespace Dali

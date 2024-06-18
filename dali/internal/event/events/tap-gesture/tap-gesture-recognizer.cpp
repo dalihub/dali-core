@@ -157,6 +157,11 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   }
 }
 
+void TapGestureRecognizer::CancelEvent()
+{
+  mState = CLEAR;
+}
+
 void TapGestureRecognizer::SetupForTouchDown(const Integration::TouchEvent& event, const Integration::Point& point)
 {
   mTouchPosition = point.GetScreenPosition();
@@ -233,6 +238,7 @@ void TapGestureRecognizer::ProcessEvent(TapGestureEvent& event)
 {
   event.sourceType = mSourceType;
   event.sourceData = mSourceData;
+
   if(mScene)
   {
     // Create another handle so the recognizer cannot be destroyed during process function

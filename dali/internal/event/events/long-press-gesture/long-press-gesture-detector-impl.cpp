@@ -22,8 +22,11 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
-
+#include <dali/internal/event/common/scene-impl.h>
+#include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-recognizer.h>
 #include <dali/public-api/object/type-registry.h>
 
 namespace Dali
@@ -53,7 +56,7 @@ SignalConnectorType signalConnector1(mType, SIGNAL_LONG_PRESS_DETECTED, &LongPre
 
 namespace
 {
-const unsigned int DEFAULT_TOUCHES_REQUIRED = 1;
+const uint32_t DEFAULT_TOUCHES_REQUIRED = 1;
 } // unnamed namespace
 
 LongPressGestureDetectorPtr LongPressGestureDetector::New()
@@ -159,11 +162,19 @@ bool LongPressGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTra
 void LongPressGestureDetector::OnActorAttach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector attach actor(%d)\n", actor.GetId());
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Connect(this, &LongPressGestureDetector::OnTouchEvent);
+  }
 }
 
 void LongPressGestureDetector::OnActorDetach(Actor& actor)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector detach actor(%d)\n", actor.GetId());
+  if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
+  {
+    actor.TouchedSignal().Disconnect(this, &LongPressGestureDetector::OnTouchEvent);
+  }
 }
 
 void LongPressGestureDetector::OnActorDestroyed(Object& object)
@@ -171,10 +182,126 @@ void LongPressGestureDetector::OnActorDestroyed(Object& object)
   // Do nothing
 }
 
+bool LongPressGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
+{
+  Dali::TouchEvent touchEvent(touch);
+  return HandleEvent(actor, touchEvent);
+}
+
 uint32_t LongPressGestureDetector::GetMinimumHoldingTime() const
 {
   return mGestureEventProcessor.GetLongPressMinimumHoldingTime();
 }
+
+bool LongPressGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask)
+{
+  const LongPressGestureEvent* longPressEvent(static_cast<const LongPressGestureEvent*>(gestureEvent));
+
+  return (GetMinimumTouchesRequired() <= longPressEvent->numberOfTouches) &&
+         (GetMaximumTouchesRequired() >= longPressEvent->numberOfTouches);
+}
+
+void LongPressGestureDetector::CancelProcessing()
+{
+  if(mGestureRecognizer)
+  {
+    mGestureRecognizer->CancelEvent();
+  }
+}
+
+void LongPressGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
+{
+  if(!mGestureRecognizer)
+  {
+    LongPressGestureRequest request;
+    request.minTouches = GetMinimumTouchesRequired();
+    request.maxTouches = GetMaximumTouchesRequired();
+
+    Size size = scene.GetSize();
+    uint32_t minimumHoldingTime = GetMinimumHoldingTime();
+    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request), minimumHoldingTime);
+  }
+  mGestureRecognizer->SendEvent(scene, event);
+}
+
+void LongPressGestureDetector::Process(Scene& scene, const LongPressGestureEvent& longPressEvent)
+{
+  switch(longPressEvent.state)
+  {
+    case GestureState::POSSIBLE:
+    {
+      mCurrentLongPressActor.SetActor(mFeededActor.GetActor());
+      break;
+    }
+
+    case GestureState::STARTED:
+    {
+      Actor* currentGesturedActor = mCurrentLongPressActor.GetActor();
+      if(currentGesturedActor && CheckGestureDetector(&longPressEvent, currentGesturedActor, mRenderTask))
+      {
+        Vector2     actorCoords;
+        currentGesturedActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
+        EmitLongPressSignal(currentGesturedActor, longPressEvent, actorCoords);
+      }
+      break;
+    }
+
+    case GestureState::FINISHED:
+    {
+      // The gesture should only be sent to the gesture detector which first received it so that it
+      // can be told when the gesture ends as well.
+
+      // Only send subsequent long press gesture signals if we processed the gesture when it started.
+      // Check if actor is still touchable.
+      Actor* currentGesturedActor = mCurrentLongPressActor.GetActor();
+      if(currentGesturedActor)
+      {
+        if(currentGesturedActor->IsHittable() && mRenderTask)
+        {
+          Vector2     actorCoords;
+          RenderTask& renderTaskImpl = *mRenderTask.Get();
+          currentGesturedActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
+
+          EmitLongPressSignal(currentGesturedActor, longPressEvent, actorCoords);
+        }
+      }
+      break;
+    }
+    case GestureState::CANCELLED:
+    {
+      mCurrentLongPressActor.SetActor(nullptr);
+      break;
+    }
+
+    case GestureState::CONTINUING:
+    {
+      DALI_ABORT("Incorrect state received from Integration layer: CONTINUING\n");
+      break;
+    }
+
+    case GestureState::CLEAR:
+    {
+      DALI_ABORT("Incorrect state received from Integration layer: CLEAR\n");
+      break;
+    }
+  }
+}
+
+void LongPressGestureDetector::EmitLongPressSignal(Actor* actor, const LongPressGestureEvent& longPressEvent, Vector2 localPoint)
+{
+  SetDetected(true);
+  Internal::LongPressGesturePtr longPress(new Internal::LongPressGesture(longPressEvent.state));
+  longPress->SetTime(longPressEvent.time);
+  longPress->SetNumberOfTouches(longPressEvent.numberOfTouches);
+  longPress->SetScreenPoint(longPressEvent.point);
+  longPress->SetLocalPoint(localPoint);
+  longPress->SetSourceType(longPressEvent.sourceType);
+  longPress->SetSourceData(longPressEvent.sourceData);
+
+  Dali::Actor                                    actorHandle(actor);
+  EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));
+}
+
 
 } // namespace Internal
 

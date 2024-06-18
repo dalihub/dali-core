@@ -175,6 +175,21 @@ void PinchGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
   }
 }
 
+float PinchGestureProcessor::GetMinimumPinchDistance() const
+{
+  return mMinimumPinchDistance;
+}
+
+uint32_t PinchGestureProcessor::GetMinimumTouchEvents()  const
+{
+  return mMinimumTouchEvents;
+}
+
+uint32_t PinchGestureProcessor::GetMinimumTouchEventsAfterStart()  const
+{
+  return mMinimumTouchEventsAfterStart;
+}
+
 void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinchEvent)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_PINCH_GESTURE");
@@ -314,8 +329,12 @@ void PinchGestureProcessor::OnGesturedActorStageDisconnection()
 
 bool PinchGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
-  // No special case required for pinch.
-  return true;
+  bool ret = false;
+  if(detector)
+  {
+    ret = detector->CheckGestureDetector(mCurrentPinchEvent, actor, mCurrentRenderTask);
+  }
+  return ret;
 }
 
 void PinchGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)

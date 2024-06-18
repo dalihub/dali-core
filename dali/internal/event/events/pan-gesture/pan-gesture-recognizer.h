@@ -80,6 +80,11 @@ public:
   void SendEvent(const Integration::TouchEvent& event) override;
 
   /**
+   * @copydoc Dali::Internal::GestureDetector::CancelEvent()
+   */
+  void CancelEvent() override;
+
+  /**
    * @copydoc Dali::Internal::GestureDetector::Update(const Integration::GestureRequest&)
    */
   void Update(const GestureRequest& request) override;
@@ -89,8 +94,9 @@ private:
    * Emits the pan gesture event (performs some smoothing operation).
    * @param[in]  state         The state of the pan.
    * @param[in]  currentEvent  The latest touch event.
+   * @return bool true if send a pan event is successful
    */
-  void SendPan(GestureState state, const Integration::TouchEvent& currentEvent);
+  bool SendPan(GestureState state, const Integration::TouchEvent& currentEvent);
 
 private:
   // Reference to the gesture processor for this recognizer
@@ -127,6 +133,8 @@ private:
   uint32_t mMotionEvents;           ///< The motion events received so far (before pan is emitted).
 
   uint32_t mMaximumMotionEventAge; ///< The maximum acceptable motion event age as Milliseconds.
+
+  int mPrimaryDeviceId;
 };
 
 } // namespace Internal

@@ -22,6 +22,7 @@
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 
 namespace Dali
 {
@@ -35,7 +36,7 @@ using PinchGestureDetectorContainer = DerivedGestureDetectorContainer<PinchGestu
 /**
  * @copydoc Dali::PinchGestureDetector
  */
-class PinchGestureDetector : public GestureDetector
+class PinchGestureDetector : public GestureDetector, public RecognizerObserver<PinchGestureEvent>
 {
 public: // Creation
   /**
@@ -104,6 +105,45 @@ private: // GestureDetector overrides
    * @copydoc Dali::Internal::GestureDetector::OnActorDestroyed(Object&)
    */
   void OnActorDestroyed(Object& object) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, const Dali::TouchEvent&)
+   */
+  bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
+   */
+  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
+   */
+  bool CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask) override
+  {
+    // No special case required for pinch.
+    return true;
+  }
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CancelProcessing()
+   */
+  void CancelProcessing() override;
+
+  /**
+   * This method is called whenever a pinch gesture event occurs.
+   * @param[in] scene The scene the tap gesture event occurs in.
+   * @param[in] pinchEvent The event that has occurred.
+   */
+  void Process(Scene& scene, const PinchGestureEvent& pinchEvent) override;
+
+  /**
+   * Creates a PinchGesture and asks the specified detector to emit its detected signal.
+   * @param[in]  actor       The actor that has been pinched.
+   * @param[in]  pinchEvent  The pinchEvent received from the adaptor.
+   * @param[in]  localCenter Relative to the actor attached to the detector.
+   */
+  void EmitPinchSignal(Actor* actor, const PinchGestureEvent& pinchEvent, Vector2 localCenter);
 
 private:
   Dali::PinchGestureDetector::DetectedSignalType mDetectedSignal;

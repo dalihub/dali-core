@@ -22,6 +22,7 @@
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 
 namespace Dali
 {
@@ -35,7 +36,7 @@ using TapGestureDetectorContainer = DerivedGestureDetectorContainer<TapGestureDe
 /**
  * @copydoc Dali::TapGestureDetector
  */
-class TapGestureDetector : public GestureDetector
+class TapGestureDetector : public GestureDetector, public RecognizerObserver<TapGestureEvent>
 {
 public: // Creation
   /**
@@ -161,6 +162,33 @@ private: // GestureDetector overrides
    */
   void OnActorDestroyed(Object& object) override;
 
+  /**
+   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, const Dali::TouchEvent&)
+   */
+  bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
+   */
+  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
+   */
+  bool CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CancelProcessing()
+   */
+  void CancelProcessing() override;
+
+    /**
+   * This method is called whenever a tap gesture event occurs.
+   * @param[in] scene The scene the tap gesture event occurs in.
+   * @param[in] tapEvent The event that has occurred.
+   */
+  void Process(Scene& scene, const TapGestureEvent& tapEvent) override;
+
 private:
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
@@ -171,7 +199,9 @@ private:
   uint32_t         mWaitTime;
   Dali::Actor      mTappedActor;
   Dali::TapGesture mTap;
-  bool             mReceiveAllTapEvents;
+  ActorObserver    mCurrentTapActor;    ///< The current actor that has been gestured.
+  bool             mReceiveAllTapEvents : 1;
+  bool             mPossibleProcessed : 1; ///< Indication of whether we've processed a touch down for this gestuee
 };
 
 } // namespace Internal
