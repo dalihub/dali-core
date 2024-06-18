@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,38 +28,26 @@ extern Debug::Filter* gSceneGraphRendererLogFilter; ///< Defined at scene-graph-
 #endif
 namespace VisualRenderer
 {
-void AnimatableVisualProperties::ResetToBaseValues(BufferIndex updateBufferIndex)
+void AnimatableVisualProperties::RequestResetToBaseValues()
 {
-  mTransformOffset.ResetToBaseValue(updateBufferIndex);
-  mTransformSize.ResetToBaseValue(updateBufferIndex);
-  mTransformOrigin.ResetToBaseValue(updateBufferIndex);
-  mTransformAnchorPoint.ResetToBaseValue(updateBufferIndex);
-  mTransformOffsetSizeMode.ResetToBaseValue(updateBufferIndex);
-  mExtraSize.ResetToBaseValue(updateBufferIndex);
-  mMixColor.ResetToBaseValue(updateBufferIndex);
-  mPreMultipliedAlpha.ResetToBaseValue(updateBufferIndex);
+  mTransformOffset.RequestResetToBaseValue();
+  mTransformSize.RequestResetToBaseValue();
+  mTransformOrigin.RequestResetToBaseValue();
+  mTransformAnchorPoint.RequestResetToBaseValue();
+  mTransformOffsetSizeMode.RequestResetToBaseValue();
+  mExtraSize.RequestResetToBaseValue();
+  mMixColor.RequestResetToBaseValue();
+  mPreMultipliedAlpha.RequestResetToBaseValue();
   if(mExtendedProperties)
   {
     auto* decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties);
-    decoratedVisualProperties->ResetToBaseValues(updateBufferIndex);
+    decoratedVisualProperties->RequestResetToBaseValues();
   }
 }
 
-void AnimatableVisualProperties::MarkAsDirty()
+bool AnimatableVisualProperties::Updated() const
 {
-  mTransformOffset.MarkAsDirty();
-  mTransformSize.MarkAsDirty();
-  mTransformOrigin.MarkAsDirty();
-  mTransformAnchorPoint.MarkAsDirty();
-  mTransformOffsetSizeMode.MarkAsDirty();
-  mExtraSize.MarkAsDirty();
-  mMixColor.MarkAsDirty();
-  mPreMultipliedAlpha.MarkAsDirty();
-  if(mExtendedProperties)
-  {
-    auto* decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties);
-    decoratedVisualProperties->MarkAsDirty();
-  }
+  return mCoefficient.IsUpdated() || (mExtendedProperties && static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties)->Updated());
 }
 
 Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
@@ -67,7 +55,7 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
   auto& coefficient = mCoefficient;
 
   // Recalculate only if coefficient need to be updated.
-  if(coefficient.IsUpdated())
+  if(!coefficient.IsCoefficientCalculated())
   {
     // VisualProperty
     const Vector2 transformOffset         = mTransformOffset.Get(updateBufferIndex);
@@ -119,6 +107,8 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
     coefficient.coefXB = coefficient.coefXA * transformAnchorPoint + transformOffset * Vector2(1.0f - transformOffsetSizeMode.x, 1.0f - transformOffsetSizeMode.y) + transformOrigin;
     coefficient.coefCA = transformSize * Vector2(transformOffsetSizeMode.z, transformOffsetSizeMode.w) + extraSize;
     coefficient.coefCB = coefficient.coefCA * transformAnchorPoint + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
+
+    coefficient.MarkCoefficientCalculated();
   }
 
   float coefD = 0.0f; ///< Default as 0.0f when we don't use decorated renderer.
@@ -130,7 +120,7 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
     auto& decoratedCoefficient = decoratedVisualProperties->mCoefficient;
 
     // Recalculate only if coefficient need to be updated.
-    if(decoratedCoefficient.IsUpdated())
+    if(!decoratedCoefficient.IsCoefficientCalculated())
     {
       // DecoratedVisualProperty
       const float borderlineWidth  = decoratedVisualProperties->mBorderlineWidth.Get(updateBufferIndex);
@@ -147,6 +137,8 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
       // D coefficients be used only decoratedVisual.
       // It can be calculated parallely with visual transform.
       decoratedCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius) + extraPadding;
+
+      decoratedCoefficient.MarkCoefficientCalculated();
     }
 
     // Update coefD so we can use this value out of this scope.
@@ -185,24 +177,40 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
   return resultArea;
 }
 
-void AnimatableDecoratedVisualProperties::ResetToBaseValues(BufferIndex updateBufferIndex)
+bool AnimatableVisualProperties::PrepareProperties()
 {
-  mCornerRadius.ResetToBaseValue(updateBufferIndex);
-  mCornerRadiusPolicy.ResetToBaseValue(updateBufferIndex);
-  mBorderlineWidth.ResetToBaseValue(updateBufferIndex);
-  mBorderlineColor.ResetToBaseValue(updateBufferIndex);
-  mBorderlineOffset.ResetToBaseValue(updateBufferIndex);
-  mBlurRadius.ResetToBaseValue(updateBufferIndex);
+  bool rendererUpdated = mCoefficient.IsUpdated();
+  mCoefficient.ResetFlag();
+
+  if(mExtendedProperties)
+  {
+    auto* decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties);
+    rendererUpdated |= (decoratedVisualProperties->PrepareProperties());
+  }
+
+  return rendererUpdated;
 }
 
-void AnimatableDecoratedVisualProperties::MarkAsDirty()
+void AnimatableDecoratedVisualProperties::RequestResetToBaseValues()
 {
-  mCornerRadius.MarkAsDirty();
-  mCornerRadiusPolicy.MarkAsDirty();
-  mBorderlineWidth.MarkAsDirty();
-  mBorderlineColor.MarkAsDirty();
-  mBorderlineOffset.MarkAsDirty();
-  mBlurRadius.MarkAsDirty();
+  mCornerRadius.RequestResetToBaseValue();
+  mCornerRadiusPolicy.RequestResetToBaseValue();
+  mBorderlineWidth.RequestResetToBaseValue();
+  mBorderlineColor.RequestResetToBaseValue();
+  mBorderlineOffset.RequestResetToBaseValue();
+  mBlurRadius.RequestResetToBaseValue();
+}
+
+bool AnimatableDecoratedVisualProperties::Updated() const
+{
+  return mCoefficient.IsUpdated();
+}
+
+bool AnimatableDecoratedVisualProperties::PrepareProperties()
+{
+  bool rendererUpdated = mCoefficient.IsUpdated();
+  mCoefficient.ResetFlag();
+  return rendererUpdated;
 }
 
 } // namespace VisualRenderer

@@ -21,8 +21,10 @@
 // EXTERNAL INCLUDES
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 #include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #else
 #include <unordered_map>
+#include <unordered_set>
 #endif
 
 // INTERNAL INCLUDES
@@ -226,6 +228,7 @@ struct UpdateManager::Impl
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
 #endif
+    discardAnimationFinishedAge(0u),
     animationFinishedDuringUpdate(false),
     previousUpdateScene(false),
     renderTaskWaiting(false),
@@ -316,8 +319,12 @@ struct UpdateManager::Impl
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   using NodeIdMap = std::map<uint32_t, Node*>;
+
+  using PropertyBaseResetRequestedContainer = std::set<PropertyBase*>;
 #else
   using NodeIdMap = std::unordered_map<uint32_t, Node*>;
+
+  using PropertyBaseResetRequestedContainer = std::unordered_set<PropertyBase*>;
 #endif
   NodeIdMap nodeIdMap; ///< A container of nodes map by id.
 
@@ -328,6 +335,8 @@ struct UpdateManager::Impl
   ResetterContainer<PropertyResetterBase> propertyResetters; ///< A container of property resetters
   ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
   ResetterContainer<RendererResetter>     rendererResetters; ///< A container of renderer resetters
+
+  PropertyBaseResetRequestedContainer resetRequestedPropertyBases; ///< A container of property base to be resets
 
   OwnerContainer<Animation*>            animations;            ///< A container of owned animations
   OwnerContainer<PropertyNotification*> propertyNotifications; ///< A container of owner property notifications.
@@ -360,11 +369,13 @@ struct UpdateManager::Impl
   ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
 #endif
 
-  bool animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
-  bool previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
-  bool renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
-  bool renderersAdded;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
-  bool renderingRequired;             ///< True if required to render the current frame
+  uint8_t discardAnimationFinishedAge : 2; ///< Age of EndAction::Discard animation Stop/Finished. It will make we call ResetToBaseValue at least 2 frames.
+
+  bool animationFinishedDuringUpdate : 1; ///< Flag whether any animations finished during the Update()
+  bool previousUpdateScene : 1;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
+  bool renderTaskWaiting : 1;             ///< A REFRESH_ONCE render task is waiting to be rendered
+  bool renderersAdded : 1;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
+  bool renderingRequired : 1;             ///< True if required to render the current frame
 
 private:
   Impl(const Impl&);            ///< Undefined
@@ -380,6 +391,8 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
                              RenderTaskProcessor&           renderTaskProcessor)
 : mImpl(nullptr)
 {
+  PropertyBase::RegisterResetterManager(*this);
+
   mImpl = new Impl(notificationManager,
                    animationFinishedNotifier,
                    propertyNotifier,
@@ -393,6 +406,7 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
 UpdateManager::~UpdateManager()
 {
   delete mImpl;
+  PropertyBase::UnregisterResetterManager();
 }
 
 void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
@@ -701,6 +715,11 @@ void UpdateManager::AddRendererResetter(const Renderer& renderer)
   mImpl->rendererResetters.PushBack(rendererResetter.Release());
 }
 
+void UpdateManager::RequestPropertyBaseResetToBaseValue(PropertyBase* propertyBase)
+{
+  mImpl->resetRequestedPropertyBases.insert(propertyBase);
+}
+
 void UpdateManager::AddPropertyNotification(OwnerPointer<PropertyNotification>& propertyNotification)
 {
   mImpl->propertyNotifications.PushBack(propertyNotification.Release());
@@ -847,14 +866,30 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
+  // Age down discard animations.
+  mImpl->discardAnimationFinishedAge >>= 1;
+
+  // Ensure that their was no request to reset to base values during the previous update
+  // (Since requested property base doesn't consider the lifecycle of PropertyBase,
+  // It might be invalid after the previous update finished)
+  DALI_ASSERT_DEBUG(mImpl->resetRequestedPropertyBases.empty() && "Reset to base values requested during the previous update!");
+  mImpl->resetRequestedPropertyBases.clear();
+
   // Reset node properties
-  mImpl->nodeResetters.ResetToBaseValues(bufferIndex);
+  mImpl->nodeResetters.RequestResetToBaseValues();
 
   // Reset renderer properties
-  mImpl->rendererResetters.ResetToBaseValues(bufferIndex);
+  mImpl->rendererResetters.RequestResetToBaseValues();
 
   // Reset all animating / constrained properties
-  mImpl->propertyResetters.ResetToBaseValues(bufferIndex);
+  mImpl->propertyResetters.RequestResetToBaseValues();
+
+  // Actual reset to base values here
+  for(auto&& propertyBase : mImpl->resetRequestedPropertyBases)
+  {
+    propertyBase->ResetToBaseValue(bufferIndex);
+  }
+  mImpl->resetRequestedPropertyBases.clear();
 
   // Clear all root nodes dirty flags
   for(auto& scene : mImpl->scenes)
@@ -917,6 +952,12 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     }
 
     mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || finished;
+
+    // Check whether finished animation is Discard type. If then, we should update scene at least 2 frames.
+    if(finished && animation->GetEndAction() == Animation::EndAction::DISCARD)
+    {
+      mImpl->discardAnimationFinishedAge |= 2u;
+    }
 
     // queue the notification on finished or stopped
     if(finished || stopped)
@@ -1115,6 +1156,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     isAnimationRunning ||                              // ..at least one animation is running OR
     mImpl->messageQueue.IsSceneUpdateRequired() ||     // ..a message that modifies the scene graph node tree is queued OR
     mImpl->frameCallbackProcessor ||                   // ..a frame callback processor is existed OR
+    mImpl->discardAnimationFinishedAge > 0u ||         // ..at least one animation with EndAction::DISCARD finished
     gestureUpdated;                                    // ..a gesture property was updated
 
   uint32_t keepUpdating    = 0;
@@ -1403,7 +1445,7 @@ uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
 
   // If the rendering behavior is set to continuously render, then continue to render.
   // Keep updating until no messages are received and no animations are running.
-  // If an animation has just finished, update at least once more for Discard end-actions.
+  // If an animation has just finished, update at least two frames more for Discard end-actions.
   // No need to check for renderQueue as there is always a render after update and if that
   // render needs another update it will tell the adaptor to call update again
 
@@ -1413,7 +1455,8 @@ uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
   }
 
   if(IsAnimationRunning() ||
-     mImpl->animationFinishedDuringUpdate)
+     mImpl->animationFinishedDuringUpdate ||
+     mImpl->discardAnimationFinishedAge > 0u)
   {
     keepUpdatingRequest |= KeepUpdating::ANIMATIONS_RUNNING;
   }

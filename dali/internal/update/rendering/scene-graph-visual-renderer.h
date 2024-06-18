@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,19 +51,27 @@ struct AnimatableVisualProperties
 
 public: // Public API
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::ResetToBaseValues
+   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
    */
-  void ResetToBaseValues(BufferIndex updateBufferIndex);
+  void RequestResetToBaseValues();
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::MarkAsDirty
+   * @copydoc Dali::Internal::SceneGraph::Renderer::Updated
    */
-  void MarkAsDirty();
+  bool Updated() const;
 
   /**
    * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
    */
   Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept;
+
+public:
+  /**
+   * @brief Prepare properties and ready to render sequence
+   *
+   * @return True if we need to render this frame.
+   */
+  bool PrepareProperties();
 
 public:
   /**
@@ -135,14 +143,22 @@ public: // Public API
   }
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::ResetToBaseValues
+   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
    */
-  void ResetToBaseValues(BufferIndex updateBufferIndex);
+  void RequestResetToBaseValues();
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::MarkAsDirty
+   * @copydoc Dali::Internal::SceneGraph::Renderer::Updated
    */
-  void MarkAsDirty();
+  bool Updated() const;
+
+public:
+  /**
+   * @brief Prepare properties and ready to render sequence
+   *
+   * @return True if we need to render this frame.
+   */
+  bool PrepareProperties();
 
 public:
   /**

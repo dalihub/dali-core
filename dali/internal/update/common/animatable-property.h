@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATABLE_PROPERTY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,8 +118,8 @@ public: // From PropertyBase
     return true; // Animatable properties are always valid
   }
 
-protected:              // so that ResetToBaseValue can set it directly
-  uint32_t mDirtyFlags; ///< Flag whether value changed during previous 2 frames
+protected:                 // so that ResetToBaseValue can set it directly
+  uint8_t mDirtyFlags : 2; ///< Flag whether value changed during previous 2 frames
 };
 
 /**

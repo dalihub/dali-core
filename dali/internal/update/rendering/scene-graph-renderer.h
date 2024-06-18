@@ -488,16 +488,9 @@ public:
   bool IsDirty() const;
 
   /**
-   * @brief Reset to base values of all animatable properties.
-   *
-   * @param[in] updateBufferIndex the current buffer index
+   * @brief Request to reset to base values of all animatable properties.
    */
-  void ResetToBaseValues(BufferIndex updateBufferIndex);
-
-  /**
-   * @brief Mark all animatable properties as dirty.
-   */
-  void MarkAsDirty();
+  void RequestResetToBaseValues();
 
   /**
    * Get the capacity of the memory pools

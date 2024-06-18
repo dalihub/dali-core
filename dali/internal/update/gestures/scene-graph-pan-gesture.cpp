@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -266,6 +266,11 @@ bool PanGesture::ReadGestures(FrameGestureInfo& info, unsigned int currentTimest
     if(currentGesture.state == GestureState::STARTED)
     {
       info.justStarted = true;
+
+      // Clear pan data.
+      mPanHistory.clear();
+      mPredictionHistory.clear();
+
       // clear just finished as we have started new pan
       info.justFinished = false;
     }
@@ -301,9 +306,14 @@ bool PanGesture::ReadAndResampleGestures(FrameGestureInfo& info, unsigned int cu
 
     if(lastReadGesture.state == GestureState::STARTED)
     {
+      info.justStarted = true;
+
+      // Clear pan data.
+      mPanHistory.clear();
+      mPredictionHistory.clear();
+
       // Clear just finished as we have started new pan.
       info.justFinished = false;
-      info.justStarted  = true;
     }
     else
     {
