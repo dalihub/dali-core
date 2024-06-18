@@ -79,8 +79,8 @@ struct VisualRendererCoefficientCacheBase
    */
   void ResetFlag()
   {
-    mUpdateCurrentFrame = (mUpdatedFlag != Dali::Internal::SceneGraph::CLEAN_FLAG); ///< Keep the flag whether it was updated or not.
-    mCoefficientCalculated &= (!mUpdateCurrentFrame);                               ///< Re-calculate coefficient only if previous update flag was not clean.
+    mUpdateCurrentFrame    = (mUpdatedFlag != Dali::Internal::SceneGraph::CLEAN_FLAG); ///< Keep the flag whether it was updated or not.
+    mCoefficientCalculated = (!mUpdateCurrentFrame);                                   ///< Re-calculate coefficient only if previous update flag was not clean.
 
     mUpdatedFlag >>= 1;
   }
