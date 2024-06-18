@@ -149,6 +149,7 @@ protected:
   : mRenderer(renderer),
     mActive(AGING) // Since we make this resetter only initialize case now.
   {
+    mRenderer->MarkAsDirty();
   }
 
   Renderer* mRenderer; ///< The renderer that owns the properties

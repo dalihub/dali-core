@@ -495,6 +495,11 @@ public:
   void ResetToBaseValues(BufferIndex updateBufferIndex);
 
   /**
+   * @brief Mark all animatable properties as dirty.
+   */
+  void MarkAsDirty();
+
+  /**
    * Get the capacity of the memory pools
    * @return the capacity of the memory pools
    */

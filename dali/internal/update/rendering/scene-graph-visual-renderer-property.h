@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_VISUAL_RENDERER_PROPERTY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,66 +30,35 @@ namespace Dali::Internal::SceneGraph::VisualRenderer
 struct VisualRendererCoefficientCacheBase
 {
   VisualRendererCoefficientCacheBase()
-  : mUpdatedFlag(Dali::Internal::SceneGraph::BAKED_FLAG),
-    mUpdateCurrentFrame(true),
-    mCoefficientCalculated(false)
+  : mUpdated(true)
   {
   }
 
   virtual ~VisualRendererCoefficientCacheBase() = default;
 
   /**
-   * @brief Check whether this cache is updated or not.
+   * @brief Check whether this cache need to be update.
+   * After call this API, update flag will be reset.
    *
+   * @return True if this coefficient updated. False otherwise.
    */
-  bool IsUpdated() const
+  bool IsUpdated()
   {
-    return mUpdateCurrentFrame;
+    bool ret = mUpdated;
+    mUpdated = false;
+    return ret;
   }
 
   /**
    * @brief Mark update flag as true.
-   * @param[in] bake Whether this coefficient updated by OnBake API, or not.
    */
-  void Update(bool bake)
+  void Update()
   {
-    mUpdateCurrentFrame = true;
-    mUpdatedFlag |= bake ? Dali::Internal::SceneGraph::BAKED_FLAG : Dali::Internal::SceneGraph::SET_FLAG;
-  }
-
-  /**
-   * @brief Get whether we already calculate coefficient at this frame or not.
-   * @return True if we already calculate coefficient at this frame, false otherwise.
-   */
-  bool IsCoefficientCalculated() const
-  {
-    return mCoefficientCalculated;
-  }
-
-  /**
-   * @brief Mark as we calculate coefficient already at this frame.
-   */
-  void MarkCoefficientCalculated()
-  {
-    mCoefficientCalculated = true;
-  }
-
-  /**
-   * @brief Reset update flag.
-   */
-  void ResetFlag()
-  {
-    mUpdateCurrentFrame    = (mUpdatedFlag != Dali::Internal::SceneGraph::CLEAN_FLAG); ///< Keep the flag whether it was updated or not.
-    mCoefficientCalculated = (!mUpdateCurrentFrame);                                   ///< Re-calculate coefficient only if previous update flag was not clean.
-
-    mUpdatedFlag >>= 1;
+    mUpdated = true;
   }
 
 private:
-  uint8_t mUpdatedFlag : 2; ///< Updated flag for this coefficient cache.
-
-  bool mUpdateCurrentFrame : 1;    ///< Whether we need to update this frame or not.
-  bool mCoefficientCalculated : 1; ///< Whether we need to re-calculate coefficient or not.
+  bool mUpdated; ///< Updated flag for this coefficient cache.
 };
 
 /**
@@ -136,7 +105,7 @@ public:
    */
   void OnSet() override
   {
-    GetCacheBaseData()->Update(false);
+    GetCacheBaseData()->Update();
     AnimatablePropertyBase::OnSet();
   }
 
@@ -145,7 +114,7 @@ public:
    */
   void OnBake() override
   {
-    GetCacheBaseData()->Update(true);
+    GetCacheBaseData()->Update();
     AnimatablePropertyBase::OnBake();
   }
 };
