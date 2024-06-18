@@ -19,7 +19,6 @@
 #include <dali/internal/common/const-string.h>
 
 // EXTERNAL INCLUDES
-#include <cstdlib>
 #include <cstddef>
 #include <cstring>
 #include <functional>

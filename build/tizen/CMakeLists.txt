@@ -169,21 +169,6 @@ ELSEIF( UNIX )
     ADD_COMPILE_OPTIONS( -Wno-cast-function-type )
   ENDIF()
 
-  CHECK_CXX_COMPILER_FLAG(-Wno-template-id-cdtor HAVE_NO_TEMPLATE_ID_CDTOR)
-  IF (HAVE_NO_TEMPLATE_ID_CDTOR)
-    ADD_COMPILE_OPTIONS( -Wno-template-id-cdtor )
-  ENDIF()
-
-  CHECK_CXX_COMPILER_FLAG(-Wno-dangling-reference HAVE_NO_DANGLING_REFERENCE)
-  IF (HAVE_NO_DANGLING_REFERENCE)
-    ADD_COMPILE_OPTIONS( -Wno-dangling-reference )
-  ENDIF()
-
-  CHECK_CXX_COMPILER_FLAG(-Wno-unused-result HAVE_NO_UNUSED_RESULT)
-  IF (HAVE_NO_UNUSED_RESULT)
-    ADD_COMPILE_OPTIONS( -Wno-unused-result )
-  ENDIF()
-
   CHECK_CXX_COMPILER_FLAG(-Wno-string-plus-int HAVE_NO_STRING_PLUS_INT)
   IF (HAVE_NO_STRING_PLUS_INT)
     ADD_COMPILE_OPTIONS( -Wno-string-plus-int )
