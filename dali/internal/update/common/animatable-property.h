@@ -379,9 +379,13 @@ public:
    */
   void Set(BufferIndex bufferIndex, int value)
   {
-    mValue[bufferIndex] = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(mValue[bufferIndex] != value)
+    {
+      mValue[bufferIndex] = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -391,9 +395,13 @@ public:
    */
   void SetRelative(BufferIndex bufferIndex, int delta)
   {
-    mValue[bufferIndex] = mValue[bufferIndex] + delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(delta)
+    {
+      mValue[bufferIndex] = mValue[bufferIndex] + delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -439,11 +447,15 @@ public:
    */
   void Bake(BufferIndex bufferIndex, int value)
   {
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = mValue[bufferIndex];
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(mBaseValue != value)
+    {
+      mValue[bufferIndex]     = value;
+      mValue[1 - bufferIndex] = value;
+      mBaseValue              = mValue[bufferIndex];
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -570,9 +582,13 @@ public:
    */
   void Set(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex] = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex], value))
+    {
+      mValue[bufferIndex] = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -582,9 +598,13 @@ public:
    */
   void SetRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex] = mValue[bufferIndex] + delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex] = mValue[bufferIndex] + delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -630,13 +650,17 @@ public:
    */
   void Bake(BufferIndex bufferIndex, float value)
   {
-    // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
-    // has never been atomically safe.
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = mValue[bufferIndex];
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue, value))
+    {
+      // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
+      // has never been atomically safe.
+      mValue[bufferIndex]     = value;
+      mValue[1 - bufferIndex] = value;
+      mBaseValue              = mValue[bufferIndex];
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
