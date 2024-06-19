@@ -402,10 +402,11 @@ IF( ENABLE_LINK_TEST )
     ${DALI_TEST_SUITE_DIR}/test-graphics-texture.cpp
     ${DALI_TEST_SUITE_DIR}/test-platform-abstraction.cpp
     ${DALI_TEST_SUITE_DIR}/test-render-controller.cpp
+    ${DALI_TEST_SUITE_DIR}/test-render-surface.cpp
     ${DALI_TEST_SUITE_DIR}/test-trace-call-stack.cpp
   )
   ADD_EXECUTABLE( ${LINKER_TEST_NAME} ${LINKER_TEST_SOURCES} )
-  TARGET_LINK_LIBRARIES(${LINKER_TEST_NAME} ${name} )
+  TARGET_LINK_LIBRARIES(${LINKER_TEST_NAME} ${name})
   TARGET_INCLUDE_DIRECTORIES( ${LINKER_TEST_NAME} PRIVATE ${DALI_TEST_SUITE_DIR} )
 ENDIF()
 

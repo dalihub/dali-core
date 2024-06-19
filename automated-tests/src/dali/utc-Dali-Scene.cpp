@@ -29,6 +29,7 @@
 #include <iostream>
 
 // Internal headers are allowed here
+#include "test-render-surface.h"
 
 namespace
 {
@@ -2414,23 +2415,24 @@ int UtcDaliSceneEnsureRenderTargetRecreated(void)
 
   graphicsCallStack.Reset();
 
-  int                              fakeSurface1;
+  auto testRenderSurface = new TestRenderSurface(PositionSize(0, 0, 480, 800));
+
   Graphics::RenderTargetCreateInfo createInfo{};
-  createInfo.SetSurface(&fakeSurface1).SetExtent(Graphics::Extent2D{480u, 800u});
+  createInfo.SetSurface(testRenderSurface).SetExtent(Graphics::Extent2D{480u, 800u});
   defaultScene.SetSurfaceRenderTarget(createInfo);
 
   application.SendNotification();
   application.Render();
 
   TraceCallStack::NamedParams query1;
-  query1["surface"] << std::hex << &fakeSurface1;
+  query1["surface"] << std::hex << testRenderSurface;
   const TraceCallStack::NamedParams* matching2 = graphicsCallStack.FindLastMatch("CreateRenderTarget", query1);
   DALI_TEST_CHECK(matching2 != nullptr);
 
   const TraceCallStack::NamedParams* matching3 = graphicsCallStack.FindLastMatch("PresentRenderTarget", empty);
   DALI_TEST_CHECK(matching3 != nullptr);
   DALI_TEST_EQUALS((*matching3)["surface"].str(), query1["surface"].str(), TEST_LOCATION);
-
+  delete testRenderSurface;
   END_TEST;
 }
 
