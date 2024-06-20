@@ -991,9 +991,10 @@ int UtcDaliTouchEventActorBecomesUserInteractionDisabled(void)
   // Change actor to disable user interaction.
   actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
 
-  // Emit a motion signal, shouldn't receive a signal.
+  // Emit a motion signal, signalled with an interrupted
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION);
   data.Reset();
   END_TEST;
 }
