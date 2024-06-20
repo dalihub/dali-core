@@ -28,8 +28,9 @@ namespace Dali::Internal::SceneGraph::VisualRenderer
 {
 struct AnimatableDecoratedVisualProperties
 {
-  AnimatableDecoratedVisualProperties()
-  : mBorderlineWidth(0.0f),
+  AnimatableDecoratedVisualProperties(VisualRendererPropertyObserver& owner)
+  : mCoefficient(owner),
+    mBorderlineWidth(0.0f),
     mBorderlineOffset(0.0f),
     mBlurRadius(0.0f),
     mBorderlineColor(Color::BLACK),
@@ -48,11 +49,6 @@ public: // Public API
    */
   void RequestResetToBaseValues();
 
-  /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::Updated
-   */
-  bool Updated() const;
-
 public:
   /**
    * @brief Prepare properties and ready to render sequence
@@ -70,8 +66,8 @@ public:
    */
   struct DecoratedVisualTransformedUpdateSizeCoefficientCache : public VisualRendererCoefficientCacheBase
   {
-    DecoratedVisualTransformedUpdateSizeCoefficientCache()
-    : VisualRendererCoefficientCacheBase(),
+    DecoratedVisualTransformedUpdateSizeCoefficientCache(VisualRendererPropertyObserver& owner)
+    : VisualRendererCoefficientCacheBase(owner),
       coefD(0.0f)
     {
     }
@@ -98,8 +94,9 @@ public: // Default properties
 
 struct AnimatableVisualProperties
 {
-  AnimatableVisualProperties()
-  : mTransformOffset(Vector2::ZERO),
+  AnimatableVisualProperties(VisualRendererPropertyObserver& owner)
+  : mCoefficient(owner),
+    mTransformOffset(Vector2::ZERO),
     mTransformSize(Vector2::ONE),
     mTransformOrigin(Vector2::ZERO),
     mTransformAnchorPoint(Vector2::ZERO),
@@ -126,11 +123,6 @@ public: // Public API
   void RequestResetToBaseValues();
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::Updated
-   */
-  bool Updated() const;
-
-  /**
    * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
    */
   Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept;
@@ -152,8 +144,8 @@ public:
    */
   struct VisualTransformedUpdateSizeCoefficientCache : public VisualRendererCoefficientCacheBase
   {
-    VisualTransformedUpdateSizeCoefficientCache()
-    : VisualRendererCoefficientCacheBase(),
+    VisualTransformedUpdateSizeCoefficientCache(VisualRendererPropertyObserver& owner)
+    : VisualRendererCoefficientCacheBase(owner),
       coefXA(Vector2::ZERO),
       coefXB(Vector2::ZERO),
       coefCA(Vector2::ZERO),

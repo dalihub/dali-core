@@ -44,11 +44,6 @@ void AnimatableVisualProperties::RequestResetToBaseValues()
   }
 }
 
-bool AnimatableVisualProperties::Updated() const
-{
-  return mCoefficient.IsUpdated() || (mExtendedProperties && mExtendedProperties->Updated());
-}
-
 Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
 {
   auto& coefficient = mCoefficient;
@@ -195,11 +190,6 @@ void AnimatableDecoratedVisualProperties::RequestResetToBaseValues()
   mBorderlineColor.RequestResetToBaseValue();
   mBorderlineOffset.RequestResetToBaseValue();
   mBlurRadius.RequestResetToBaseValue();
-}
-
-bool AnimatableDecoratedVisualProperties::Updated() const
-{
-  return mCoefficient.IsUpdated();
 }
 
 bool AnimatableDecoratedVisualProperties::PrepareProperties()

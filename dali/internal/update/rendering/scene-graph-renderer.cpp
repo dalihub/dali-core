@@ -112,6 +112,7 @@ Renderer::Renderer()
   mDepthTestMode(DepthTestMode::AUTO),
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
   mUpdateDecay(Renderer::Decay::INITIAL),
+  mVisualPropertiesDirtyFlags(CLEAN_FLAG),
   mRegenerateUniformMap(false),
   mPremultipledAlphaEnabled(false),
   mOpacity(1.0f),
@@ -169,7 +170,16 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
     mUpdateDecay = static_cast<Renderer::Decay>(static_cast<int>(mUpdateDecay) - 1);
   }
 
-  if(mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY) // We don't check mUpdateDecay
+  // Age down visual properties dirty flag
+  if(mVisualPropertiesDirtyFlags != CLEAN_FLAG)
+  {
+    DALI_ASSERT_DEBUG(mVisualProperties && "Visual Property not created yet! something wrong (maybe event message flush ordering issue)");
+
+    rendererUpdated |= mVisualProperties->PrepareProperties();
+    mVisualPropertiesDirtyFlags >>= 1;
+  }
+
+  if(mResendFlag || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mVisualPropertiesDirtyFlags != CLEAN_FLAG) // We don't check mUpdateDecay
   {
     SetUpdated(true);
   }
@@ -324,12 +334,6 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       new(slot) DerivedType(rendererPtr, &Render::Renderer::SetRenderCallback, mRenderCallback);
     }
     mResendFlag = 0;
-  }
-
-  // Age down visual properties dirty flag
-  if(mVisualProperties)
-  {
-    rendererUpdated |= mVisualProperties->PrepareProperties();
   }
 
   // Ensure collected map is up to date
@@ -863,7 +867,7 @@ bool Renderer::IsUpdated() const
   // 2. Renderer's opacity changed
   // 3. Shader's propperties are changed
   // 4. Visual properties are changed
-  if(IsDirty() || (mShader && mShader->Updated()) || (mVisualProperties && mVisualProperties->Updated()))
+  if(IsDirty() || (mShader && mShader->Updated()) || (mVisualPropertiesDirtyFlags != CLEAN_FLAG))
   {
     return true;
   }
@@ -877,6 +881,16 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
     return mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, originalUpdateArea);
   }
   return originalUpdateArea;
+}
+
+void Renderer::OnVisualRendererPropertyUpdated(bool bake)
+{
+  mVisualPropertiesDirtyFlags |= bake ? BAKED_FLAG : SET_FLAG;
+}
+
+uint8_t Renderer::GetUpdatedFlag() const
+{
+  return static_cast<uint8_t>(mVisualPropertiesDirtyFlags);
 }
 
 } // namespace SceneGraph

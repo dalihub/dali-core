@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ VisualRendererPtr VisualRenderer::New()
   // create scene object first so it's guaranteed to exist for the event side
   auto sceneObjectKey = SceneGraph::Renderer::NewKey();
 
-  sceneObjectKey->SetVisualProperties(new SceneGraph::VisualRenderer::AnimatableVisualProperties());
+  sceneObjectKey->SetVisualProperties(new SceneGraph::VisualRenderer::AnimatableVisualProperties(*sceneObjectKey.Get()));
 
   // pass the pointer to base for message passing
   VisualRendererPtr rendererPtr(new VisualRenderer(sceneObjectKey.Get()));

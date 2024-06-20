@@ -78,8 +78,8 @@ DecoratedVisualRendererPtr DecoratedVisualRenderer::New()
   // create scene object first so it's guaranteed to exist for the event side
   auto sceneObjectKey = SceneGraph::Renderer::NewKey();
 
-  auto animatableVisualProperties          = new SceneGraph::VisualRenderer::AnimatableVisualProperties();
-  auto animatableDecoratedVisualProperties = new SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties();
+  auto animatableVisualProperties          = new SceneGraph::VisualRenderer::AnimatableVisualProperties(*sceneObjectKey.Get());
+  auto animatableDecoratedVisualProperties = new SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties(*sceneObjectKey.Get());
 
   // Append extended properties as AnimatableDecoratedVisualProperties.
   animatableVisualProperties->mExtendedProperties = animatableDecoratedVisualProperties;
