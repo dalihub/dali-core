@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,7 @@ DecoratedVisualRendererPtr DecoratedVisualRenderer::New()
   auto animatableDecoratedVisualProperties = new SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties();
 
   // Append extended properties as AnimatableDecoratedVisualProperties.
-  animatableVisualProperties->mExtendedProperties               = animatableDecoratedVisualProperties;
-  animatableVisualProperties->mExtendedPropertiesDeleteFunction = SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties::DeleteFunction;
+  animatableVisualProperties->mExtendedProperties = animatableDecoratedVisualProperties;
 
   sceneObjectKey->SetVisualProperties(animatableVisualProperties);
 
@@ -123,7 +122,7 @@ void DecoratedVisualRenderer::SetDefaultProperty(Property::Index        index,
 
     if(visualProperties)
     {
-      auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+      auto decoratedVisualProperties = visualProperties->mExtendedProperties;
 
       if(decoratedVisualProperties)
       {
@@ -243,7 +242,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
         auto visualProperties = sceneObject.GetVisualProperties();
         if(visualProperties)
         {
-          auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+          auto decoratedVisualProperties = visualProperties->mExtendedProperties;
           if(decoratedVisualProperties)
           {
             value = decoratedVisualProperties->mCornerRadius[GetEventThreadServices().GetEventBufferIndex()];
@@ -256,7 +255,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
         auto visualProperties = sceneObject.GetVisualProperties();
         if(visualProperties)
         {
-          auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+          auto decoratedVisualProperties = visualProperties->mExtendedProperties;
           if(decoratedVisualProperties)
           {
             value = decoratedVisualProperties->mCornerRadiusPolicy[GetEventThreadServices().GetEventBufferIndex()];
@@ -269,7 +268,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
         auto visualProperties = sceneObject.GetVisualProperties();
         if(visualProperties)
         {
-          auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+          auto decoratedVisualProperties = visualProperties->mExtendedProperties;
           if(decoratedVisualProperties)
           {
             value = decoratedVisualProperties->mBorderlineWidth[GetEventThreadServices().GetEventBufferIndex()];
@@ -282,7 +281,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
         auto visualProperties = sceneObject.GetVisualProperties();
         if(visualProperties)
         {
-          auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+          auto decoratedVisualProperties = visualProperties->mExtendedProperties;
           if(decoratedVisualProperties)
           {
             value = decoratedVisualProperties->mBorderlineColor[GetEventThreadServices().GetEventBufferIndex()];
@@ -295,7 +294,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
         auto visualProperties = sceneObject.GetVisualProperties();
         if(visualProperties)
         {
-          auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+          auto decoratedVisualProperties = visualProperties->mExtendedProperties;
           if(decoratedVisualProperties)
           {
             value = decoratedVisualProperties->mBorderlineOffset[GetEventThreadServices().GetEventBufferIndex()];
@@ -308,7 +307,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
         auto visualProperties = sceneObject.GetVisualProperties();
         if(visualProperties)
         {
-          auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+          auto decoratedVisualProperties = visualProperties->mExtendedProperties;
           if(decoratedVisualProperties)
           {
             value = decoratedVisualProperties->mBlurRadius[GetEventThreadServices().GetEventBufferIndex()];
@@ -412,7 +411,7 @@ const SceneGraph::PropertyBase* DecoratedVisualRenderer::GetSceneObjectAnimatabl
       auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
       if(visualProperties)
       {
-        auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+        auto decoratedVisualProperties = visualProperties->mExtendedProperties;
         if(decoratedVisualProperties)
         {
           property = &decoratedVisualProperties->mCornerRadius;
@@ -425,7 +424,7 @@ const SceneGraph::PropertyBase* DecoratedVisualRenderer::GetSceneObjectAnimatabl
       auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
       if(visualProperties)
       {
-        auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+        auto decoratedVisualProperties = visualProperties->mExtendedProperties;
         if(decoratedVisualProperties)
         {
           property = &decoratedVisualProperties->mBorderlineWidth;
@@ -438,7 +437,7 @@ const SceneGraph::PropertyBase* DecoratedVisualRenderer::GetSceneObjectAnimatabl
       auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
       if(visualProperties)
       {
-        auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+        auto decoratedVisualProperties = visualProperties->mExtendedProperties;
         if(decoratedVisualProperties)
         {
           property = &decoratedVisualProperties->mBorderlineColor;
@@ -451,7 +450,7 @@ const SceneGraph::PropertyBase* DecoratedVisualRenderer::GetSceneObjectAnimatabl
       auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
       if(visualProperties)
       {
-        auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+        auto decoratedVisualProperties = visualProperties->mExtendedProperties;
         if(decoratedVisualProperties)
         {
           property = &decoratedVisualProperties->mBorderlineOffset;
@@ -464,7 +463,7 @@ const SceneGraph::PropertyBase* DecoratedVisualRenderer::GetSceneObjectAnimatabl
       auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
       if(visualProperties)
       {
-        auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+        auto decoratedVisualProperties = visualProperties->mExtendedProperties;
         if(decoratedVisualProperties)
         {
           property = &decoratedVisualProperties->mBlurRadius;
@@ -496,7 +495,7 @@ const PropertyInputImpl* DecoratedVisualRenderer::GetSceneObjectInputProperty(Pr
       auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
       if(visualProperties)
       {
-        auto decoratedVisualProperties = static_cast<SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties*>(visualProperties->mExtendedProperties);
+        auto decoratedVisualProperties = visualProperties->mExtendedProperties;
         if(decoratedVisualProperties)
         {
           return &decoratedVisualProperties->mCornerRadiusPolicy;

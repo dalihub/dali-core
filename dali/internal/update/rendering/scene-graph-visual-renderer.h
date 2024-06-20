@@ -26,6 +26,76 @@
 
 namespace Dali::Internal::SceneGraph::VisualRenderer
 {
+struct AnimatableDecoratedVisualProperties
+{
+  AnimatableDecoratedVisualProperties()
+  : mBorderlineWidth(0.0f),
+    mBorderlineOffset(0.0f),
+    mBlurRadius(0.0f),
+    mBorderlineColor(Color::BLACK),
+    mCornerRadius(Vector4::ZERO),
+    mCornerRadiusPolicy(1.0f)
+  {
+  }
+
+  ~AnimatableDecoratedVisualProperties()
+  {
+  }
+
+public: // Public API
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
+   */
+  void RequestResetToBaseValues();
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::Updated
+   */
+  bool Updated() const;
+
+public:
+  /**
+   * @brief Prepare properties and ready to render sequence
+   *
+   * @return True if we need to render this frame.
+   */
+  bool PrepareProperties();
+
+public:
+  /**
+   * @brief Cached coefficient value when we calculate visual transformed update size.
+   * It can reduce complexity of calculate the vertex position.
+   *
+   * Vector2 vertexPosition += Vector2(D, D) * aPosition
+   */
+  struct DecoratedVisualTransformedUpdateSizeCoefficientCache : public VisualRendererCoefficientCacheBase
+  {
+    DecoratedVisualTransformedUpdateSizeCoefficientCache()
+    : VisualRendererCoefficientCacheBase(),
+      coefD(0.0f)
+    {
+    }
+
+    ~DecoratedVisualTransformedUpdateSizeCoefficientCache() override = default;
+
+    float coefD;
+  };
+
+public: // Default properties
+  // Define a base offset for the following wrappers. The wrapper macros calculate offsets from the previous
+  // element such that each wrapper type generates a compile time offset to the CoefficientCache data.
+  BASE(DecoratedVisualTransformedUpdateSizeCoefficientCache, mCoefficient); ///< Coefficient value to calculate visual transformed update size by VisualProperties more faster.
+
+  PROPERTY_WRAPPER(mCoefficient, VisualRendererProperty, float, mBorderlineWidth);
+  PROPERTY_WRAPPER(mBorderlineWidth, VisualRendererProperty, float, mBorderlineOffset);
+  PROPERTY_WRAPPER(mBorderlineOffset, VisualRendererProperty, float, mBlurRadius);
+
+  // Properties that don't give any effort to coefficient.
+  AnimatableProperty<Vector4> mBorderlineColor;
+  AnimatableProperty<Vector4> mCornerRadius;
+  AnimatableProperty<float>   mCornerRadiusPolicy;
+};
+
 struct AnimatableVisualProperties
 {
   AnimatableVisualProperties()
@@ -37,15 +107,15 @@ struct AnimatableVisualProperties
     mExtraSize(Vector2::ZERO),
     mMixColor(Vector3::ONE),
     mPreMultipliedAlpha(0.0f),
-    mExtendedPropertiesDeleteFunction(nullptr)
+    mExtendedProperties(nullptr)
   {
   }
 
   ~AnimatableVisualProperties()
   {
-    if(mExtendedProperties && mExtendedPropertiesDeleteFunction)
+    if(mExtendedProperties)
     {
-      mExtendedPropertiesDeleteFunction(mExtendedProperties);
+      delete mExtendedProperties;
     }
   }
 
@@ -115,84 +185,8 @@ public: // Default properties
   AnimatableProperty<Vector3> mMixColor;
   AnimatableProperty<float>   mPreMultipliedAlpha;
 
-public:                                                      // Extended properties
-  void* mExtendedProperties{nullptr};                        // Enable derived class to extend properties further
-  void (*mExtendedPropertiesDeleteFunction)(void*){nullptr}; // Derived class's custom delete functor
-};
-
-struct AnimatableDecoratedVisualProperties
-{
-  AnimatableDecoratedVisualProperties()
-  : mBorderlineWidth(0.0f),
-    mBorderlineOffset(0.0f),
-    mBlurRadius(0.0f),
-    mBorderlineColor(Color::BLACK),
-    mCornerRadius(Vector4::ZERO),
-    mCornerRadiusPolicy(1.0f)
-  {
-  }
-  ~AnimatableDecoratedVisualProperties()
-  {
-  }
-
-public: // Public API
-  // Delete function of AnimatableDecoratedVisualProperties* converted as void*
-  static void DeleteFunction(void* data)
-  {
-    delete static_cast<AnimatableDecoratedVisualProperties*>(data);
-  }
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
-   */
-  void RequestResetToBaseValues();
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::Updated
-   */
-  bool Updated() const;
-
-public:
-  /**
-   * @brief Prepare properties and ready to render sequence
-   *
-   * @return True if we need to render this frame.
-   */
-  bool PrepareProperties();
-
-public:
-  /**
-   * @brief Cached coefficient value when we calculate visual transformed update size.
-   * It can reduce complexity of calculate the vertex position.
-   *
-   * Vector2 vertexPosition += Vector2(D, D) * aPosition
-   */
-  struct DecoratedVisualTransformedUpdateSizeCoefficientCache : public VisualRendererCoefficientCacheBase
-  {
-    DecoratedVisualTransformedUpdateSizeCoefficientCache()
-    : VisualRendererCoefficientCacheBase(),
-      coefD(0.0f)
-    {
-    }
-
-    ~DecoratedVisualTransformedUpdateSizeCoefficientCache() override = default;
-
-    float coefD;
-  };
-
-public: // Default properties
-  // Define a base offset for the following wrappers. The wrapper macros calculate offsets from the previous
-  // element such that each wrapper type generates a compile time offset to the CoefficientCache data.
-  BASE(DecoratedVisualTransformedUpdateSizeCoefficientCache, mCoefficient); ///< Coefficient value to calculate visual transformed update size by VisualProperties more faster.
-
-  PROPERTY_WRAPPER(mCoefficient, VisualRendererProperty, float, mBorderlineWidth);
-  PROPERTY_WRAPPER(mBorderlineWidth, VisualRendererProperty, float, mBorderlineOffset);
-  PROPERTY_WRAPPER(mBorderlineOffset, VisualRendererProperty, float, mBlurRadius);
-
-  // Properties that don't give any effort to coefficient.
-  AnimatableProperty<Vector4> mBorderlineColor;
-  AnimatableProperty<Vector4> mCornerRadius;
-  AnimatableProperty<float>   mCornerRadiusPolicy;
+public: // Extended properties for decorated visual properties
+  AnimatableDecoratedVisualProperties* mExtendedProperties{nullptr};
 };
 } // namespace Dali::Internal::SceneGraph::VisualRenderer
 
