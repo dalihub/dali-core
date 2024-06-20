@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_FRAMEBUFFER_CREATE_INFO_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ namespace Dali
 {
 namespace Graphics
 {
+struct RenderPass;
+
 /**
  * @brief Interface class for FramebufferCreateInfo types in the graphics API.
  */
@@ -109,6 +111,15 @@ struct FramebufferCreateInfo
   }
 
   /**
+   * @brief Set the render passes to be used by this framebuffer
+   */
+  auto& SetRenderPasses(std::vector<Graphics::RenderPass*>&& renderPasses_)
+  {
+    renderPasses = std::move(renderPasses_);
+    return *this;
+  }
+
+  /**
    * @brief Sets allocation callbacks which will be used when object is created
    * and destroyed.
    *
@@ -121,12 +132,13 @@ struct FramebufferCreateInfo
     return *this;
   }
 
-  GraphicsStructureType        type{GraphicsStructureType::FRAMEBUFFER_CREATE_INFO_STRUCT};
-  ExtensionCreateInfo*         nextExtension{nullptr};
-  std::vector<ColorAttachment> colorAttachments{};
-  DepthStencilAttachment       depthStencilAttachment{};
-  Extent2D                     size{};
-  uint8_t                      multiSamplingLevel{0u};
+  GraphicsStructureType              type{GraphicsStructureType::FRAMEBUFFER_CREATE_INFO_STRUCT};
+  ExtensionCreateInfo*               nextExtension{nullptr};
+  std::vector<ColorAttachment>       colorAttachments{};
+  std::vector<Graphics::RenderPass*> renderPasses;
+  DepthStencilAttachment             depthStencilAttachment{};
+  Extent2D                           size{};
+  uint8_t                            multiSamplingLevel{0u};
 
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };

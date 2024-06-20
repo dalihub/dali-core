@@ -64,7 +64,7 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_REN
 namespace
 {
 // TODO : Cache clean logic have some problem now. Just block it until bug resolved
-//constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600u; // 60fps * 10sec
+// constexpr uint32_t CACHE_CLEAN_FRAME_COUNT = 600u; // 60fps * 10sec
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 constexpr uint32_t SHRINK_TO_FIT_FRAME_COUNT = (1u << 8); ///< 256 frames. Make this value as power of 2.
@@ -863,7 +863,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 
-  std::vector<Graphics::RenderTarget*> targetstoPresent;
+  std::vector<Graphics::RenderTarget*> targetsToPresent;
 
   Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
   if(clippingRect == surfaceRect)
@@ -1039,7 +1039,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       currentRenderPass   = sceneObject->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
     }
 
-    targetstoPresent.emplace_back(currentRenderTarget);
+    targetsToPresent.emplace_back(currentRenderTarget);
 
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {
@@ -1144,11 +1144,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     mainCommandBuffer->EndRenderPass(syncObject);
   }
 
-  if(targetstoPresent.size() > 0u)
+  if(targetsToPresent.size() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) {
-      oss << "[" << targetstoPresent.size() << "]";
-    });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss)
+                                            { oss << "[" << targetsToPresent.size() << "]"; });
   }
 
   // Flush UBOs
@@ -1156,12 +1155,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   mImpl->renderAlgorithms.SubmitCommandBuffer();
   mImpl->commandBufferSubmitted = true;
 
-  if(targetstoPresent.size() > 0u)
   {
-    std::sort(targetstoPresent.begin(), targetstoPresent.end());
+    std::sort(targetsToPresent.begin(), targetsToPresent.end());
 
     Graphics::RenderTarget* rt = nullptr;
-    for(auto& target : targetstoPresent)
+    for(auto& target : targetsToPresent)
     {
       if(target != rt)
       {
