@@ -40,14 +40,8 @@ void AnimatableVisualProperties::RequestResetToBaseValues()
   mPreMultipliedAlpha.RequestResetToBaseValue();
   if(mExtendedProperties)
   {
-    auto* decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties);
-    decoratedVisualProperties->RequestResetToBaseValues();
+    mExtendedProperties->RequestResetToBaseValues();
   }
-}
-
-bool AnimatableVisualProperties::Updated() const
-{
-  return mCoefficient.IsUpdated() || (mExtendedProperties && static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties)->Updated());
 }
 
 Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
@@ -115,17 +109,15 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
 
   if(mExtendedProperties)
   {
-    const auto decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties);
-
-    auto& decoratedCoefficient = decoratedVisualProperties->mCoefficient;
+    auto& decoratedCoefficient = mExtendedProperties->mCoefficient;
 
     // Recalculate only if coefficient need to be updated.
     if(!decoratedCoefficient.IsCoefficientCalculated())
     {
       // DecoratedVisualProperty
-      const float borderlineWidth  = decoratedVisualProperties->mBorderlineWidth.Get(updateBufferIndex);
-      const float borderlineOffset = decoratedVisualProperties->mBorderlineOffset.Get(updateBufferIndex);
-      const float blurRadius       = decoratedVisualProperties->mBlurRadius.Get(updateBufferIndex);
+      const float borderlineWidth  = mExtendedProperties->mBorderlineWidth.Get(updateBufferIndex);
+      const float borderlineOffset = mExtendedProperties->mBorderlineOffset.Get(updateBufferIndex);
+      const float blurRadius       = mExtendedProperties->mBlurRadius.Get(updateBufferIndex);
 
       // Extra padding information for anti-alias
       const float extraPadding = 2.0f;
@@ -184,8 +176,7 @@ bool AnimatableVisualProperties::PrepareProperties()
 
   if(mExtendedProperties)
   {
-    auto* decoratedVisualProperties = static_cast<VisualRenderer::AnimatableDecoratedVisualProperties*>(mExtendedProperties);
-    rendererUpdated |= (decoratedVisualProperties->PrepareProperties());
+    rendererUpdated |= mExtendedProperties->PrepareProperties();
   }
 
   return rendererUpdated;
@@ -199,11 +190,6 @@ void AnimatableDecoratedVisualProperties::RequestResetToBaseValues()
   mBorderlineColor.RequestResetToBaseValue();
   mBorderlineOffset.RequestResetToBaseValue();
   mBlurRadius.RequestResetToBaseValue();
-}
-
-bool AnimatableDecoratedVisualProperties::Updated() const
-{
-  return mCoefficient.IsUpdated();
 }
 
 bool AnimatableDecoratedVisualProperties::PrepareProperties()
