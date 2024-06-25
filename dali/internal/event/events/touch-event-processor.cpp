@@ -312,7 +312,7 @@ void ParsePrimaryTouchPoint(
   else
   {
     Actor* ownTouchActor = ownTouchActorObserver.GetActor();
-    HitTestAlgorithm::HitTest(scene.GetSize(), scene.GetRenderTaskList(), scene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, ownTouchActor, scene.IsGeometryHittestEnabled());
+    HitTestAlgorithm::HitTest(scene.GetSize(), scene.GetRenderTaskList(), scene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, ownTouchActor, scene.GetTouchPropagationType());
 
     if(currentPoint.GetState() == PointState::STARTED && hitTestResults.actor)
     {
@@ -912,7 +912,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
       }
       else
       {
-        HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, nullptr, localVars.isGeometry);
+        HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, nullptr, localVars.isGeometry ? Integration::Scene::TouchPropagationType::GEOMETRY : Integration::Scene::TouchPropagationType::PARENT);
       }
     }
 

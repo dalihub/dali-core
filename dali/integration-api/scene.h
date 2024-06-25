@@ -60,7 +60,18 @@ struct Event;
  */
 class DALI_CORE_API Scene : public BaseHandle
 {
+
 public:
+
+  /**
+   * @brief Touch event propagation way
+   */
+  enum TouchPropagationType
+  {
+    PARENT,     ///< events are propagated to parents in the traditional way
+    GEOMETRY    ///< events are propagated based on geometry.
+  };
+
   using EventProcessingFinishedSignalType = Signal<void()>;                        ///< Event Processing finished signal type
   using KeyEventSignalType                = Signal<void(const Dali::KeyEvent&)>;   ///< Key event signal type
   using KeyEventGeneratedSignalType       = Signal<bool(const Dali::KeyEvent&)>;   ///< key event generated signal type
@@ -429,6 +440,13 @@ public:
    * @return True if the scene using geometry event propagation touch and hover events.
    */
   bool IsGeometryHittestEnabled();
+
+  /**
+   * @brief Get the Touch Propagation Type
+   *
+   * @return TouchPropagationType
+   */
+  TouchPropagationType GetTouchPropagationType();
 
   /**
    * @brief Sets the native window id

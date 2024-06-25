@@ -2977,6 +2977,7 @@ int UtcDaliSceneGeoTouchedEnabledDisabled(void)
   TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
   DALI_TEST_EQUALS(scene.IsGeometryHittestEnabled(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(scene.GetTouchPropagationType(), Dali::Integration::Scene::TouchPropagationType::PARENT, TEST_LOCATION);
 
   TouchedSignalData data;
   TouchFunctor      functor(data);
@@ -3050,6 +3051,7 @@ int UtcDaliSceneGeoTouchedEnabledDisabled(void)
 
   scene.SetGeometryHittestEnabled(true);
   DALI_TEST_EQUALS(scene.IsGeometryHittestEnabled(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(scene.GetTouchPropagationType(), Dali::Integration::Scene::TouchPropagationType::GEOMETRY, TEST_LOCATION);
   {
     GenerateTouch(application, PointState::DOWN, Vector2(10.0f, 10.0f));
 
