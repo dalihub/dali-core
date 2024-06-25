@@ -95,11 +95,11 @@ struct HitTestInterface
    * @param[in] point The point of event touched.
    * @param[in] hitPointLocal The hit point in the Actor's local reference system.
    * @param[in] timeStamp The time the event occurred.
-   * @param[in] isGeometry If true, hittest works in a geometry way.
+   * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
    *
    * @return true if the actor should be the hit, false otherwise.
    */
-  virtual bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, bool isGeometry) = 0;
+  virtual bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, const Integration::Scene::TouchPropagationType propagationType) = 0;
 
 protected:
   /**
@@ -117,12 +117,12 @@ protected:
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @param[in] func The function to use in the hit-test algorithm.
- * @param[in] isGeometry If true, hittest works in a geometry way.
+ * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
  * @return true if something was hit
  *
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func, bool isGeometry = false);
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
 
 /**
  * Given screen coordinates, this method returns the hit actor & the local coordinates relative to the actor etc.
@@ -132,7 +132,7 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @param[in] hitTestInterface Used to determine whether the actor is hit or whether we walk down its hierarchy
- * @param[in] isGeometry If true, hittest works in a geometry way.
+ * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
  * @return true if something was hit
  *
  * <h3>Hit Test Algorithm:</h3>
@@ -149,7 +149,7 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
  * @note Currently, we prefer a child hit over a parent (regardless of the distance from the
  *       camera) unless the parent is a RenderableActor but this is subject to change.
  */
-bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface, bool isGeometry = false);
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
 
 /**
  * Default HitTest where we check if a touch is required.
@@ -160,12 +160,12 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @param[in] ownActor The actor from which the touch down was started.
- * @param[in] isGeometry If true, hittest works in a geometry way.
+ * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
  * @return true if something was hit
  *
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, const Actor* ownActor = nullptr, bool isGeometry = false);
+bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, const Actor* ownActor = nullptr, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
 
 } // namespace HitTestAlgorithm
 
