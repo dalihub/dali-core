@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_REFLECTION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ public: // Test methods
     std::vector<uint32_t>  locations{};
     uint32_t               numElements{0u}; // 0 elements means this isn't an array; 1 element means this is an array of size 1
     Property::Type         type;
+    uint32_t               elementStride{0u}; // array element stride, 0 - tightly packed
   };
 
   struct TestUniformBlockInfo

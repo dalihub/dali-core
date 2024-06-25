@@ -85,7 +85,7 @@ struct ProgramCreateInfo
    *
    * The Program will compile and link all given shaders.
    *
-   * param[in] value Valid array of shder states
+   * param[in] value Valid array of shader states
    * @return reference to this structure
    */
   auto& SetShaderState(const std::vector<ShaderState>& value)

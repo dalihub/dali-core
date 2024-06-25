@@ -442,9 +442,85 @@ public: // Test Functions
     mCustomUniforms = customUniforms;
   }
 
+  constexpr std::pair<uint32_t, uint32_t> GetUniformBufferArrayStrideAndTypeSize(TestGraphicsReflection::TestUniformInfo& uniformInfo, uint32_t requestedStride)
+  {
+    uint32_t dataTypeSize  = 0;
+    uint32_t elementStride = 0;
+    switch(uniformInfo.type)
+    {
+      case Property::FLOAT:
+      case Property::INTEGER:
+      case Property::BOOLEAN:
+      {
+        dataTypeSize = sizeof(float);
+        break;
+      }
+      case Property::MATRIX:
+      {
+        dataTypeSize = sizeof(float) * 16;
+        break;
+      }
+      case Property::MATRIX3:
+      {
+        dataTypeSize = sizeof(float) * 9;
+        break;
+      }
+      case Property::VECTOR2:
+      {
+        dataTypeSize = sizeof(float) * 2;
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        dataTypeSize = sizeof(float) * 3;
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        dataTypeSize = sizeof(float) * 4;
+        break;
+      }
+      default:
+      {
+      }
+    }
+    if(uniformInfo.elementStride)
+    {
+      bool roundUp  = (dataTypeSize % uniformInfo.elementStride);
+      elementStride = (dataTypeSize / uniformInfo.elementStride) * uniformInfo.elementStride + (roundUp ? uniformInfo.elementStride : 0);
+    }
+    return std::make_pair(dataTypeSize, elementStride);
+  }
+
+  void AddMemberToUniformBlock(TestGraphicsReflection::TestUniformBlockInfo& blockInfo,
+                               std::string                                   name,
+                               Property::Type                                type,
+                               uint32_t                                      elementCount,
+                               uint32_t                                      elementStrideInBytes)
+  {
+    TestGraphicsReflection::TestUniformInfo info;
+    info.name          = std::move(name);
+    info.type          = type;
+    info.uniformClass  = Graphics::UniformClass::UNIFORM;
+    info.numElements   = elementCount;
+    info.locations     = {0};
+    info.bufferIndex   = 0;                    // this will update when AddCustomUniformBlock called
+
+    auto retval= GetUniformBufferArrayStrideAndTypeSize(info, elementStrideInBytes);
+    info.elementStride = std::max(retval.first, retval.second);
+    info.offsets       = {blockInfo.size};
+    blockInfo.size += (elementCount == 0 ? 1 : elementCount) * std::max(retval.first, retval.second);
+    blockInfo.members.emplace_back(info);
+  }
+
   void AddCustomUniformBlock(const TestGraphicsReflection::TestUniformBlockInfo& blockInfo)
   {
     mCustomUniformBlocks.push_back(blockInfo);
+    auto& info = mCustomUniformBlocks.back();
+    for(auto& member : info.members)
+    {
+      member.bufferIndex = mCustomUniformBlocks.size();
+    }
   }
 
   void ClearSubmitStack()
