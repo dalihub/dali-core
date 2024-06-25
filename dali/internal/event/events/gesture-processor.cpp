@@ -61,7 +61,7 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsTouchConsumed();
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, bool isGeometry) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, const Integration::Scene::TouchPropagationType propagationType) override
   {
     return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
   }

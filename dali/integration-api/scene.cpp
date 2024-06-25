@@ -238,6 +238,11 @@ bool Scene::IsGeometryHittestEnabled()
   return GetImplementation(*this).IsGeometryHittestEnabled();
 }
 
+Scene::TouchPropagationType Scene::GetTouchPropagationType()
+{
+  return GetImplementation(*this).GetTouchPropagationType();
+}
+
 void Scene::SetNativeId(int32_t nativeId)
 {
   return GetImplementation(*this).SetNativeId(nativeId);

@@ -139,10 +139,10 @@ using HitTestFunction = bool (*)(Actor, TraverseType);
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test, only modified if something is hit
  * @param[in] func The function to use in the hit-test algorithm.
- * @param[in] isGeometry If true, hittest works in a geometry way.
+ * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
  * @return true if something was hit
  */
-DALI_CORE_API bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func, bool isGeometry = false);
+DALI_CORE_API bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
 
 /**
  * @brief Given screen coordinates, this method returns the camera origin in world coordinates and the direction of the picking ray in world-space.

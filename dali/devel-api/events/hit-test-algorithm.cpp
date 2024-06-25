@@ -29,10 +29,10 @@ namespace Dali
 {
 namespace HitTestAlgorithm
 {
-bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func, bool isGeometry)
+bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType)
 {
   Internal::Stage& stageImpl = GetImplementation(stage);
-  return Internal::HitTestAlgorithm::HitTest(stageImpl.GetSize(), stageImpl.GetRenderTaskList(), stageImpl.GetLayerList(), screenCoordinates, results, func, isGeometry);
+  return Internal::HitTestAlgorithm::HitTest(stageImpl.GetSize(), stageImpl.GetRenderTaskList(), stageImpl.GetLayerList(), screenCoordinates, results, func, propagationType);
 }
 
 bool BuildPickingRay(RenderTask renderTask, const Vector2& screenCoordinates, Vector3& origin, Vector3& direction)

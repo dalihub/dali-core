@@ -154,7 +154,7 @@ void EventProcessor::ProcessEvents()
       {
         Integration::TouchEvent& touchEvent = static_cast<Integration::TouchEvent&>(*event);
 
-        if(mScene.IsGeometryHittestEnabled())
+        if(mScene.GetTouchPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY)
         {
           DALI_ASSERT_ALWAYS(!touchEvent.points.empty() && "Empty TouchEvent sent from Integration\n");
 
@@ -169,7 +169,7 @@ void EventProcessor::ProcessEvents()
               hitTestResults.point     = touchEvent.GetPoint(i);
               hitTestResults.eventTime = touchEvent.time;
 
-              HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), touchEvent.GetPoint(i).GetScreenPosition(), hitTestResults, nullptr, false);
+              HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), touchEvent.GetPoint(i).GetScreenPosition(), hitTestResults, nullptr, Integration::Scene::TouchPropagationType::GEOMETRY);
 
               if(hitTestResults.actor)
               {
