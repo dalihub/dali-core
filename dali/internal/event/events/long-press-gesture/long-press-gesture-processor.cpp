@@ -135,11 +135,7 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(GetFeededActor())
-      {
-        SetActor(GetFeededActor());
-      }
-      else if(HitTest(scene, longPressEvent.point, hitTestResults))
+      if(HitTest(scene, longPressEvent.point, hitTestResults))
       {
         SetActor(&GetImplementation(hitTestResults.actor));
       }
@@ -148,40 +144,20 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
 
     case GestureState::STARTED:
     {
-      if(GetCurrentGesturedActor())
+      Actor* currentGesturedActor = GetCurrentGesturedActor();
+      if(currentGesturedActor)
       {
         HitTestAlgorithm::Results hitTestResults;
-        Actor* feededActor = GetFeededActor();
-        if(feededActor)
-        {
-          SetActor(feededActor);
-          hitTestResults.actor = Dali::Actor(feededActor);
-          hitTestResults.renderTask = GetFeededRenderTask();
+        HitTest(scene, longPressEvent.point, hitTestResults);
 
-          Vector2     actorCoords;
-          feededActor->ScreenToLocal(*hitTestResults.renderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
-          hitTestResults.actorCoordinates = actorCoords;
-        }
-        else
-        {
-          HitTest(scene, longPressEvent.point, hitTestResults);
-        }
-
-        if(hitTestResults.actor && (GetCurrentGesturedActor() == &GetImplementation(hitTestResults.actor)))
+        if(hitTestResults.actor && (currentGesturedActor == &GetImplementation(hitTestResults.actor)))
         {
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
 
           // Set mCurrentLongPressEvent to use inside overridden methods called from ProcessAndEmit()
           mCurrentLongPressEvent = &longPressEvent;
-          if(feededActor)
-          {
-            ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
-          }
-          else
-          {
-            ProcessAndEmit(hitTestResults);
-          }
+          ProcessAndEmit(hitTestResults);
           mCurrentLongPressEvent = nullptr;
         }
         else
@@ -200,6 +176,7 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
 
       // Only send subsequent long press gesture signals if we processed the gesture when it started.
       // Check if actor is still touchable.
+
       Actor* currentGesturedActor = GetCurrentGesturedActor();
       if(currentGesturedActor)
       {
@@ -367,11 +344,12 @@ void LongPressGestureProcessor::OnGesturedActorStageDisconnection()
 bool LongPressGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
   DALI_ASSERT_DEBUG(mCurrentLongPressEvent);
-
-  LongPressGestureDetector* longPressDetector(static_cast<LongPressGestureDetector*>(detector));
-
-  return (longPressDetector->GetMinimumTouchesRequired() <= mCurrentLongPressEvent->numberOfTouches) &&
-         (longPressDetector->GetMaximumTouchesRequired() >= mCurrentLongPressEvent->numberOfTouches);
+  bool ret = false;
+  if(detector)
+  {
+    ret = detector->CheckGestureDetector(mCurrentLongPressEvent, actor, mCurrentRenderTask);
+  }
+  return ret;
 }
 
 void LongPressGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)

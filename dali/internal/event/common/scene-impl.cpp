@@ -512,6 +512,11 @@ bool Scene::IsGeometryHittestEnabled() const
   return mGeometryHittest;
 }
 
+Dali::Integration::Scene::TouchPropagationType Scene::GetTouchPropagationType() const
+{
+  return mGeometryHittest ? Dali::Integration::Scene::TouchPropagationType::GEOMETRY : Dali::Integration::Scene::TouchPropagationType::PARENT;
+}
+
 void Scene::SetNativeId(int32_t nativeId)
 {
   mNativeId = nativeId;

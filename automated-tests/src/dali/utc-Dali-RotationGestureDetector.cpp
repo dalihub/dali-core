@@ -1191,8 +1191,55 @@ int UtcDaliRotationGestureWhenGesturePropargation(void)
   END_TEST;
 }
 
+int UtcDaliRotationGestureSignalReceptionWithGeometryHittest(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
 
-int UtcDaliRotationGestureFeedTouch(void)
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  RotationGestureDetector detector = RotationGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start rotation within the actor's area
+  TestStartRotation(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 100);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Continue the rotation within the actor's area - we should still receive the signal
+  data.Reset();
+  TestContinueRotation(application, Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), 500);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Gesture ends within actor's area
+  data.Reset();
+  TestEndRotation(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 1000);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::FINISHED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Detach actor
+  detector.DetachAll();
+
+  // Ensure we are no longer signalled
+  data.Reset();
+  TestGenerateRotation(application);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRotationGestureHandleEvent(void)
 {
   TestApplication application;
   Integration::Scene scene     = application.GetScene();
@@ -1226,7 +1273,7 @@ int UtcDaliRotationGestureFeedTouch(void)
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
-  parentDetector.FeedTouch(parentActor, touchEventHandle);
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
 
   tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 150);
   touchEventImpl = new Internal::TouchEvent(150);
@@ -1234,7 +1281,7 @@ int UtcDaliRotationGestureFeedTouch(void)
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
   touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
-  parentDetector.FeedTouch(parentActor, touchEventHandle);
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
 
   tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 200);
   touchEventImpl = new Internal::TouchEvent(200);
@@ -1242,7 +1289,7 @@ int UtcDaliRotationGestureFeedTouch(void)
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
   touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
-  parentDetector.FeedTouch(parentActor, touchEventHandle);
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
 
   tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 250);
   touchEventImpl = new Internal::TouchEvent(250);
@@ -1250,7 +1297,7 @@ int UtcDaliRotationGestureFeedTouch(void)
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
   touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
-  parentDetector.FeedTouch(parentActor, touchEventHandle);
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
 
   tp = GenerateDoubleTouch(PointState::MOTION, Vector2(6.0f, 6.0f), PointState::MOTION, Vector2(18.0f, 18.0f), 300);
   touchEventImpl = new Internal::TouchEvent(300);
@@ -1258,7 +1305,7 @@ int UtcDaliRotationGestureFeedTouch(void)
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
   touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
-  parentDetector.FeedTouch(parentActor, touchEventHandle);
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
 
   tp = GenerateDoubleTouch(PointState::UP, Vector2(10.0f, 8.0f), PointState::UP, Vector2(14.0f, 16.0f), 350);
   touchEventImpl = new Internal::TouchEvent(350);
@@ -1266,7 +1313,7 @@ int UtcDaliRotationGestureFeedTouch(void)
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);
   touchEventHandle = Dali::TouchEvent(touchEventImpl.Get());
-  parentDetector.FeedTouch(parentActor, touchEventHandle);
+  parentDetector.HandleEvent(parentActor, touchEventHandle);
 
 
   DALI_TEST_EQUALS(true, pData.functorCalled, TEST_LOCATION);

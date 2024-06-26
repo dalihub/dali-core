@@ -38,6 +38,9 @@ GestureDetector::GestureDetector(GestureType::Value type, const SceneGraph::Prop
 : Object(sceneObject),
   mType(type),
   mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor()),
+  mFeededActor(),
+  mRenderTask(nullptr),
+  mGestureRecognizer(),
   mIsDetected(false)
 {
 }
@@ -260,19 +263,19 @@ Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
   return actor;
 }
 
-bool GestureDetector::FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch)
+bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
 {
   bool ret = false;
-  if(touch.GetPointCount() > 0)
+  Dali::Internal::Actor& actorImpl(GetImplementation(actor));
+  if(touch.GetPointCount() > 0 && actorImpl.OnScene())
   {
     const PointState::Type state = touch.GetState(0);
-    Dali::Internal::Actor& actorImpl(GetImplementation(actor));
     if(state == PointState::DOWN)
     {
-      //TODO We need to find a better way to add detectors to the processor other than detach and attach.
-      Detach(actorImpl);
-      Attach(actorImpl);
-      mIsDetected = false;
+      CancelProcessing();
+      Clear();
+      actorImpl.SetNeedGesturePropagation(false);
+      mGestureEventProcessor.RegisterGestureDetector(this);
     }
 
     Integration::TouchEvent touchEvent(touch.GetTime());
@@ -293,21 +296,30 @@ bool GestureDetector::FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch)
       touchEvent.points.push_back(point);
     }
 
-    Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
-    mGestureEventProcessor.ProcessTouchEvent(this, actorImpl, GetImplementation(touchEventImpl.GetRenderTaskPtr()), actorImpl.GetScene(), touchEvent);
 
-    if(IsDetected())
+    Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
+    mFeededActor.SetActor(&actorImpl);
+    mRenderTask = &GetImplementation(touchEventImpl.GetRenderTaskPtr());
+
+    if(!actorImpl.NeedGesturePropagation())
     {
-      ret = !actorImpl.NeedGesturePropagation();
+      ProcessTouchEvent(actorImpl.GetScene(), touchEvent);
     }
 
-    if(state == PointState::FINISHED || state == PointState::INTERRUPTED || state == PointState::LEAVE)
+    ret = IsDetected() && !actorImpl.NeedGesturePropagation();
+    actorImpl.SetNeedGesturePropagation(false);
+
+    if(state == PointState::FINISHED || state == PointState::INTERRUPTED)
     {
-      //TODO We need to find a better way to remove detectors to the processor other than detach.
-      Detach(actorImpl);
+      Clear();
     }
   }
   return ret;
+}
+
+void GestureDetector::CancelAllOtherGestureDetectors()
+{
+  mGestureEventProcessor.CancelAllOtherGestureDetectors(this);
 }
 
 bool GestureDetector::IsDetected() const
@@ -318,6 +330,13 @@ bool GestureDetector::IsDetected() const
 void GestureDetector::SetDetected(bool detected)
 {
   mIsDetected = detected;
+}
+
+void GestureDetector::Clear()
+{
+  mGestureRecognizer = nullptr;
+  mGestureEventProcessor.UnregisterGestureDetector(this);
+  SetDetected(false);
 }
 
 bool GestureDetector::IsAttached(Actor& actor) const

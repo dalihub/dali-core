@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 #include <dali/internal/event/events/gesture-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {

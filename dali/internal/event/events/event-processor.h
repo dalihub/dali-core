@@ -18,7 +18,11 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <unordered_map>
+
 // INTERNAL INCLUDES
+#include <dali/integration-api/events/point.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/event/events/hover-event-processor.h>
 #include <dali/internal/event/events/key-event-processor.h>
@@ -38,6 +42,11 @@ class Scene;
 class GestureEventProcessor;
 class NotificationManager;
 
+using TouchPointsContainer          = std::list<Integration::Point>;
+using ActorTouchPointsContainer     = std::unordered_map<uint32_t, TouchPointsContainer>;
+
+using TouchEventProcessorsContainer = std::unordered_map<uint32_t, IntrusivePtr<TouchEventProcessor>>;
+using ActorIdDeviceIdContainer      = std::unordered_map<uint32_t, uint32_t>;
 /**
  * The EventProcessor processes any events that are received by Dali.  Such events include
  * touch events, key events, wheel events, and notification events.
@@ -79,17 +88,21 @@ public:
   void SendInterruptedEvents(Dali::Internal::Actor *actor);
 
 private:
-  Scene&                 mScene;                 ///< The Scene events are processed for.
-  TouchEventProcessor    mTouchEventProcessor;   ///< Processes touch events.
-  HoverEventProcessor    mHoverEventProcessor;   ///< Processes hover events.
-  GestureEventProcessor& mGestureEventProcessor; ///< Processes gesture events.
-  KeyEventProcessor      mKeyEventProcessor;     ///< Processes key events.
-  WheelEventProcessor    mWheelEventProcessor;   ///< Processes wheel events.
+  Scene&                         mScene;                 ///< The Scene events are processed for.
+  TouchEventProcessor            mTouchEventProcessor;   ///< Processes touch events.
+  HoverEventProcessor            mHoverEventProcessor;   ///< Processes hover events.
+  GestureEventProcessor&         mGestureEventProcessor; ///< Processes gesture events.
+  KeyEventProcessor              mKeyEventProcessor;     ///< Processes key events.
+  WheelEventProcessor            mWheelEventProcessor;   ///< Processes wheel events.
 
   // Allow messages to be added safely to one queue, while processing (iterating through) the second queue.
-  MessageBuffer  mEventQueue0;       ///< An event queue.
-  MessageBuffer  mEventQueue1;       ///< Another event queue.
-  MessageBuffer* mCurrentEventQueue; ///< QueueEvent() will queue here.
+  MessageBuffer                  mEventQueue0;       ///< An event queue.
+  MessageBuffer                  mEventQueue1;       ///< Another event queue.
+  MessageBuffer*                 mCurrentEventQueue; ///< QueueEvent() will queue here.
+
+  TouchEventProcessorsContainer  mTouchEventProcessors;  ///< List of touch processors by actor
+  ActorTouchPointsContainer      mActorTouchPoints;      ///< List of touch events by actor
+  ActorIdDeviceIdContainer       mActorIdDeviceId;       ///< List of actor id by touch device id
 };
 
 } // namespace Internal

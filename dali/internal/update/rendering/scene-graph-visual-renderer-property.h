@@ -22,6 +22,30 @@
 namespace Dali::Internal::SceneGraph::VisualRenderer
 {
 /**
+ * @brief Interface to notify updated flags to the owner.
+ * @note  This is a pure virtual class.
+ */
+class VisualRendererPropertyObserver
+{
+protected:
+  /**
+   * Destructor
+   */
+  virtual ~VisualRendererPropertyObserver() = default;
+
+public:
+  /**
+   * @brief Called when some visual properties are changed.
+   */
+  virtual void OnVisualRendererPropertyUpdated(bool bake) = 0;
+
+  /**
+   * @brief Get the current owner's updated flags as visual properties.
+   */
+  virtual uint8_t GetUpdatedFlag() const = 0;
+};
+
+/**
  * @brief Base class for VisualRender properties coefficient.
  * It will mark update flag as dirty if some properties are changed.
  * By that update flag, we can determine that we need to re-calculate
@@ -29,8 +53,8 @@ namespace Dali::Internal::SceneGraph::VisualRenderer
  */
 struct VisualRendererCoefficientCacheBase
 {
-  VisualRendererCoefficientCacheBase()
-  : mUpdatedFlag(Dali::Internal::SceneGraph::BAKED_FLAG),
+  VisualRendererCoefficientCacheBase(VisualRendererPropertyObserver& owner)
+  : mOwner(owner),
     mUpdateCurrentFrame(true),
     mCoefficientCalculated(false)
   {
@@ -54,7 +78,7 @@ struct VisualRendererCoefficientCacheBase
   void Update(bool bake)
   {
     mUpdateCurrentFrame = true;
-    mUpdatedFlag |= bake ? Dali::Internal::SceneGraph::BAKED_FLAG : Dali::Internal::SceneGraph::SET_FLAG;
+    mOwner.OnVisualRendererPropertyUpdated(bake);
   }
 
   /**
@@ -79,14 +103,12 @@ struct VisualRendererCoefficientCacheBase
    */
   void ResetFlag()
   {
-    mUpdateCurrentFrame = (mUpdatedFlag != Dali::Internal::SceneGraph::CLEAN_FLAG); ///< Keep the flag whether it was updated or not.
-    mCoefficientCalculated &= (!mUpdateCurrentFrame);                               ///< Re-calculate coefficient only if previous update flag was not clean.
-
-    mUpdatedFlag >>= 1;
+    mUpdateCurrentFrame = (mOwner.GetUpdatedFlag() != Dali::Internal::SceneGraph::CLEAN_FLAG); ///< Keep the flag whether it was updated or not.
+    mCoefficientCalculated &= (!mUpdateCurrentFrame);                                          ///< Re-calculate coefficient only if previous update flag was not clean.
   }
 
 private:
-  uint8_t mUpdatedFlag : 2; ///< Updated flag for this coefficient cache.
+  VisualRendererPropertyObserver& mOwner; ///< Owner of this cache. It will be used to Update dirty flag for this coefficient cache.
 
   bool mUpdateCurrentFrame : 1;    ///< Whether we need to update this frame or not.
   bool mCoefficientCalculated : 1; ///< Whether we need to re-calculate coefficient or not.

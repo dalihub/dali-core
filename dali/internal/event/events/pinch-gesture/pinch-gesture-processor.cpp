@@ -175,6 +175,21 @@ void PinchGestureProcessor::SetMinimumTouchEventsAfterStart(uint32_t value)
   }
 }
 
+float PinchGestureProcessor::GetMinimumPinchDistance() const
+{
+  return mMinimumPinchDistance;
+}
+
+uint32_t PinchGestureProcessor::GetMinimumTouchEvents()  const
+{
+  return mMinimumTouchEvents;
+}
+
+uint32_t PinchGestureProcessor::GetMinimumTouchEventsAfterStart()  const
+{
+  return mMinimumTouchEventsAfterStart;
+}
+
 void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinchEvent)
 {
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_PINCH_GESTURE");
@@ -189,24 +204,7 @@ void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinch
       ResetActor();
 
       HitTestAlgorithm::Results hitTestResults;
-      if(GetFeededActor())
-      {
-        hitTestResults.actor = Dali::Actor(GetFeededActor());
-        hitTestResults.renderTask = GetFeededRenderTask();
-
-        // Record the current render-task for Screen->Actor coordinate conversions
-        mCurrentRenderTask = hitTestResults.renderTask;
-
-        Vector2     actorCoords;
-        GetFeededActor()->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
-        hitTestResults.actorCoordinates = actorCoords;
-
-        // Set mCurrentPinchEvent to use inside overridden methods called from ProcessAndEmit()
-        mCurrentPinchEvent = &pinchEvent;
-        ProcessAndEmitActor(hitTestResults, GetFeededGestureDetector());
-        mCurrentPinchEvent = nullptr;
-      }
-      else if(HitTest(scene, pinchEvent.centerPoint, hitTestResults))
+      if(HitTest(scene, pinchEvent.centerPoint, hitTestResults))
       {
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;
@@ -234,10 +232,6 @@ void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinch
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
           GestureDetectorContainer::iterator endIter = std::remove_if(mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(currentGesturedActor));
           mCurrentPinchEmitters.erase(endIter, mCurrentPinchEmitters.end());
-          if(GetFeededActor() && GetFeededGestureDetector())
-          {
-            mCurrentPinchEmitters.push_back(GetFeededGestureDetector());
-          }
 
           if(!mCurrentPinchEmitters.empty())
           {
@@ -335,8 +329,12 @@ void PinchGestureProcessor::OnGesturedActorStageDisconnection()
 
 bool PinchGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor* actor)
 {
-  // No special case required for pinch.
-  return true;
+  bool ret = false;
+  if(detector)
+  {
+    ret = detector->CheckGestureDetector(mCurrentPinchEvent, actor, mCurrentRenderTask);
+  }
+  return ret;
 }
 
 void PinchGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)

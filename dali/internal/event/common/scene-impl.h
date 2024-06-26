@@ -253,6 +253,11 @@ public:
   bool IsGeometryHittestEnabled() const;
 
   /**
+   * @copydoc Dali::Integration::Scene::GetTouchPropagationType
+   */
+  Dali::Integration::Scene::TouchPropagationType GetTouchPropagationType() const;
+
+  /**
    * @copydoc Dali::Integration::Scene::SetNativeId
    */
   void SetNativeId(int32_t nativeId);

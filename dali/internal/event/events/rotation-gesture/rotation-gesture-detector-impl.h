@@ -22,6 +22,7 @@
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/rotation-gesture-detector.h>
 #include <dali/public-api/events/rotation-gesture.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 
 namespace Dali
 {
@@ -35,7 +36,7 @@ using RotationGestureDetectorContainer = DerivedGestureDetectorContainer<Rotatio
 /**
  * @copydoc Dali::RotationGestureDetector
  */
-class RotationGestureDetector : public GestureDetector
+class RotationGestureDetector : public GestureDetector, public RecognizerObserver<RotationGestureEvent>
 {
 public: // Creation
   /**
@@ -106,6 +107,45 @@ private: // GestureDetector overrides
   void OnActorDestroyed(Object& object) override
   { /* Nothing to do */
   }
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, const Dali::TouchEvent&)
+   */
+  bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
+   */
+  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
+   */
+  bool CheckGestureDetector(const GestureEvent* longPressEvent, Actor* actor, RenderTaskPtr renderTask) override
+  {
+    // No special case required for rotation.
+    return true;
+  }
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CancelProcessing()
+   */
+  void CancelProcessing() override;
+
+  /**
+   * This method is called whenever a tap gesture event occurs.
+   * @param[in] scene The scene the tap gesture event occurs in.
+   * @param[in] tapEvent The event that has occurred.
+   */
+  void Process(Scene& scene, const RotationGestureEvent& tapEvent) override;
+
+  /**
+   * Creates a RotationGesture emit its detected signal.
+   * @param[in]  actor         The actor that has been rotationed.
+   * @param[in]  rotationEvent The rotationEvent received from the adaptor.
+   * @param[in]  localCenter   Relative to the actor attached to the detector.
+   */
+  void EmitRotationSignal(Actor* actor, const RotationGestureEvent& rotationEvent, Vector2 localCenter);
 
 private:
   Dali::RotationGestureDetector::DetectedSignalType mDetectedSignal;

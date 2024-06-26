@@ -197,6 +197,46 @@ public:
     return returnVal;
   }
 
+  template<typename Ret, typename... Args>
+  Ret EmitReturnOr(Args... args)
+  {
+    Ret returnVal = Ret();
+
+    // Guards against nested Emit() calls
+    EmitGuard guard(mEmittingFlag);
+    if(guard.ErrorOccurred())
+    {
+      return returnVal;
+    }
+
+    // Guards against calling CleanupConnections if the signal is deleted during emission
+    bool signalDeleted{false};
+    mSignalDeleted = &signalDeleted;
+
+    // If more connections are added by callbacks, these are ignore until the next Emit()
+    // Note that count cannot be reduced while iterating
+    auto count = mSignalConnections.size();
+    auto iter  = mSignalConnections.begin();
+    while(count--)
+    {
+      CallbackBase* callback((*iter) ? iter->GetCallback() : nullptr);
+      ++iter;
+      if(callback)
+      {
+        returnVal |= CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
+      }
+    }
+
+    if(!signalDeleted)
+    {
+      // Cleanup NULL values from Connection container
+      CleanupConnections();
+      mSignalDeleted = nullptr;
+    }
+
+    return returnVal;
+  }
+
   /**
    * @brief Emits a signal with  parameter pack.
    *

@@ -172,7 +172,12 @@ public: // Actor related
    * @param touch The thouch event
    * @return If true , the gesture is being recognized.
    */
-  bool FeedTouch(Dali::Actor& actor, Dali::TouchEvent& touch);
+  bool HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch);
+
+  /**
+   * @brief This method that cancels all other gesture detectors except the current gesture detector
+   */
+  void CancelAllOtherGestureDetectors();
 
 protected:
   /// @cond internal

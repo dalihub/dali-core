@@ -41,9 +41,9 @@ GestureEventProcessor::GestureEventProcessor(SceneGraph::UpdateManager& updateMa
   mTapGestureProcessor(),
   mRotationGestureProcessor(),
   mRenderController(renderController),
+  mGestureDetectors(),
   envOptionMinimumPanDistance(-1),
-  envOptionMinimumPanEvents(-1),
-  mIsProcessingFeedTouch(false)
+  envOptionMinimumPanEvents(-1)
 {
 }
 
@@ -51,51 +51,48 @@ GestureEventProcessor::~GestureEventProcessor() = default;
 
 void GestureEventProcessor::ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event)
 {
-  if(!mIsProcessingFeedTouch)
-  {
-    mLongPressGestureProcessor.ProcessTouch(scene, event);
-    mPanGestureProcessor.ProcessTouch(scene, event);
-    mPinchGestureProcessor.ProcessTouch(scene, event);
-    mTapGestureProcessor.ProcessTouch(scene, event);
-    mRotationGestureProcessor.ProcessTouch(scene, event);
-  }
-  mIsProcessingFeedTouch = false;
+  mLongPressGestureProcessor.ProcessTouch(scene, event);
+  mPanGestureProcessor.ProcessTouch(scene, event);
+  mPinchGestureProcessor.ProcessTouch(scene, event);
+  mTapGestureProcessor.ProcessTouch(scene, event);
+  mRotationGestureProcessor.ProcessTouch(scene, event);
 }
 
-void GestureEventProcessor::ProcessTouchEvent(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
+bool GestureEventProcessor::IsRegisterGestureDetector(GestureDetector* gestureDetector)
 {
-  mIsProcessingFeedTouch = true;
-  switch(gestureDetector->GetType())
+  return (find(mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector) != mGestureDetectors.end());
+}
+
+void GestureEventProcessor::RegisterGestureDetector(GestureDetector* gestureDetector)
+{
+  if(!IsRegisterGestureDetector(gestureDetector))
   {
-    case GestureType::LONG_PRESS:
-    {
-      mLongPressGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
+    mGestureDetectors.push_back(gestureDetector);
+  }
+}
 
-    case GestureType::PAN:
+void GestureEventProcessor::CancelAllOtherGestureDetectors(GestureDetector* gestureDetector)
+{
+  for(auto itr = mGestureDetectors.begin(); itr != mGestureDetectors.end(); itr++)
+  {
+    if((*itr) && (*itr) != gestureDetector)
     {
-      mPanGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
+      (*itr)->CancelProcessing();
+      (*itr)->SetDetected(false);
     }
+  }
+  mGestureDetectors.clear();
+  mGestureDetectors.push_back(gestureDetector);
+}
 
-    case GestureType::PINCH:
-    {
-      mPinchGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
-
-    case GestureType::TAP:
-    {
-      mTapGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
-
-    case GestureType::ROTATION:
-    {
-      mRotationGestureProcessor.ProcessTouch(gestureDetector, actor, renderTask, scene, event);
-      break;
-    }
+void GestureEventProcessor::UnregisterGestureDetector(GestureDetector* gestureDetector)
+{
+  // Find detector ...
+  GestureDetectorContainer::iterator endIter = std::remove(mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector);
+  if(endIter != mGestureDetectors.end())
+  {
+    // ... and remove it
+    mGestureDetectors.erase(endIter, mGestureDetectors.end());
   }
 }
 
@@ -396,6 +393,16 @@ void GestureEventProcessor::SetTapMaximumMotionAllowedDistance(float distance)
 const TapGestureProcessor& GestureEventProcessor::GetTapGestureProcessor()
 {
   return mTapGestureProcessor;
+}
+
+const PinchGestureProcessor& GestureEventProcessor::GetPinchGestureProcessor()
+{
+  return mPinchGestureProcessor;
+}
+
+const RotationGestureProcessor& GestureEventProcessor::GetRotationGestureProcessor()
+{
+  return mRotationGestureProcessor;
 }
 
 } // namespace Internal

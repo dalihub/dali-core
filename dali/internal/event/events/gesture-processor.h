@@ -44,16 +44,6 @@ public:
   void ProcessTouch(Scene& scene, const Integration::TouchEvent& event);
 
   /**
-   * Process the touch event in the attached recognizer
-   * @param[in] gestureDetector The gesture detector which gesture want to recognize.
-   * @param[in] actor The actor which gesture want to recognize.
-   * @param[in] renderTask RenderTask.
-   * @param[in] scene Scene.
-   * @param[in] event Touch event to process
-   */
-  void ProcessTouch(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event);
-
-  /**
    * Returns whether any GestureDetector requires a Core::Update
    * @return true if update required
    */
@@ -80,24 +70,6 @@ protected:
   // Methods to be used by deriving classes
 
   /**
-   * @brief Gets the Feeded actor
-   * @return The actor which gesture want to recognize.
-   */
-  Actor* GetFeededActor();
-
-  /**
-   * @brief Gets the Feeded Gesture Detector.
-   * @return The gesture detector which gesture want to recognize.
-   */
-  GestureDetector* GetFeededGestureDetector();
-
-  /**
-   * @brief Get the Feeded Render Task object
-   * @return RenderTaskPtr
-   */
-  RenderTaskPtr GetFeededRenderTask();
-
-  /**
    * Given the hit actor, this walks up the actor tree to determine the actor that is connected to one (or several) gesture detectors.
    *
    * @param[in,out]  actor               The gestured actor. When this function returns, this is the actor that has been hit by the gesture.
@@ -118,17 +90,6 @@ protected:
    * @pre Hit Testing should already be done.
    */
   void ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults);
-
-  /**
-   * Calls the emission method in the deriving class for actor
-   *
-   * @param[in]  hitTestResults      The Hit Test Results.
-   *
-   * @note Uses the CheckGestureDetector() to check if the gesture matches the criteria of the given gesture detector
-   *       and EmitGestureSignal() to emit the signal.
-   * @pre Hit Testing should already be done.
-   */
-  void ProcessAndEmitActor(HitTestAlgorithm::Results& hitTestResults, GestureDetector* gestureDetector);
 
   /**
    * Hit test the screen coordinates, and place the results in hitTestResults.
@@ -228,10 +189,6 @@ private:                                             // Data
   Integration::Point mPoint;                         ///< The point of event touched.
   uint32_t           mEventTime;                     ///< The time the event occurred.
   bool               mGesturedActorDisconnected : 1; ///< Indicates whether the gestured actor has been disconnected from the scene
-  ActorObserver      mFeededActor;                   ///< The actor used to generate this touch event.
-  RenderTaskPtr      mRenderTask;                    ///< The render task used to generate this touch event.
-  GestureDetector*   mGestureDetector;               ///< The gesture detector which gesture want to recognize.
-
 };
 
 } // namespace Internal

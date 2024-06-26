@@ -61,7 +61,7 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsTouchConsumed();
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, bool isGeometry) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, const Integration::Scene::TouchPropagationType propagationType) override
   {
     return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
   }
@@ -78,10 +78,7 @@ GestureProcessor::GestureProcessor(GestureType::Value type)
   mCurrentGesturedActor(nullptr),
   mPoint(),
   mEventTime(0u),
-  mGesturedActorDisconnected(false),
-  mFeededActor(nullptr),
-  mRenderTask(),
-  mGestureDetector(nullptr)
+  mGesturedActorDisconnected(false)
 {
 }
 
@@ -99,41 +96,8 @@ void GestureProcessor::ProcessTouch(Scene& scene, const Integration::TouchEvent&
       mPoint     = event.points[0];
       mEventTime = event.time;
     }
-    mFeededActor = nullptr;
-    mGestureDetector = nullptr;
     mGestureRecognizer->SendEvent(scene, event);
   }
-}
-
-void GestureProcessor::ProcessTouch(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event)
-{
-  if(mGestureRecognizer)
-  {
-    if(!event.points.empty())
-    {
-      mPoint     = event.points[0];
-      mEventTime = event.time;
-    }
-    mGestureDetector = gestureDetector;
-    mFeededActor.SetActor(&actor);
-    mRenderTask = &renderTask;
-    mGestureRecognizer->SendEvent(scene, event);
-  }
-}
-
-Actor* GestureProcessor::GetFeededActor()
-{
-  return mFeededActor.GetActor();
-}
-
-GestureDetector* GestureProcessor::GetFeededGestureDetector()
-{
-  return mGestureDetector;
-}
-
-RenderTaskPtr GestureProcessor::GetFeededRenderTask()
-{
-  return mRenderTask;
 }
 
 void GestureProcessor::GetGesturedActor(Actor*& actor, GestureDetectorContainer& gestureDetectors)
@@ -233,22 +197,6 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
       {
         actor = actor->GetParent();
       }
-    }
-  }
-}
-
-void GestureProcessor::ProcessAndEmitActor(HitTestAlgorithm::Results& hitTestResults, GestureDetector* gestureDetector)
-{
-  if(hitTestResults.actor && gestureDetector)
-  {
-    Actor*  actor(&GetImplementation(hitTestResults.actor));
-    GestureDetectorContainer gestureDetectors;
-    // Check deriving class for whether the current gesture satisfies the gesture detector's parameters.
-    if(actor && actor->IsVisible() && gestureDetector && CheckGestureDetector(gestureDetector, actor))
-    {
-      gestureDetectors.push_back(gestureDetector);
-      gestureDetector->SetDetected(true);
-      EmitGestureSignal(actor, gestureDetectors, hitTestResults.actorCoordinates);
     }
   }
 }

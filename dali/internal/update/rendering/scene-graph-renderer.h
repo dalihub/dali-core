@@ -74,7 +74,8 @@ using RendererConstIter = RendererContainer::ConstIterator;
 
 class Renderer : public PropertyOwner,
                  public UniformMapDataProvider,
-                 public RenderDataProvider
+                 public RenderDataProvider,
+                 public VisualRenderer::VisualRendererPropertyObserver
 {
 public:
   enum OpacityType
@@ -528,6 +529,9 @@ public: // For VisualProperties
   void SetVisualProperties(VisualRenderer::AnimatableVisualProperties* visualProperties)
   {
     mVisualProperties = visualProperties;
+
+    // Initialize visual dirty flags.
+    mVisualPropertiesDirtyFlags = BAKED_FLAG;
   }
 
   /**
@@ -537,6 +541,17 @@ public: // For VisualProperties
   {
     return mVisualProperties.Get();
   }
+
+public: // From VisualRenderer::VisualRendererPropertyObserver
+  /**
+   * @copydoc VisualRenderer::VisualRendererPropertyObserver::OnVisualRendererPropertyUpdated
+   */
+  void OnVisualRendererPropertyUpdated(bool bake) override;
+
+  /**
+   * @copydoc VisualRenderer::VisualRendererPropertyObserver::GetUpdatedFlag
+   */
+  uint8_t GetUpdatedFlag() const override;
 
 private:
   /**
@@ -574,13 +589,14 @@ private:
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
   UniformMap::SizeType mShaderMapChangeCounter{0u};  ///< Value to check if uniform data should be updated
 
-  DepthFunction::Type            mDepthFunction : 4;     ///< Local copy of the depth function
-  FaceCullingMode::Type          mFaceCullingMode : 3;   ///< Local copy of the mode of face culling
-  BlendMode::Type                mBlendMode : 3;         ///< Local copy of the mode of blending
-  DepthWriteMode::Type           mDepthWriteMode : 3;    ///< Local copy of the depth write mode
-  DepthTestMode::Type            mDepthTestMode : 3;     ///< Local copy of the depth test mode
-  DevelRenderer::Rendering::Type mRenderingBehavior : 2; ///< The rendering behavior
-  Decay                          mUpdateDecay : 2;       ///< Update decay (aging)
+  DepthFunction::Type            mDepthFunction : 4;              ///< Local copy of the depth function
+  FaceCullingMode::Type          mFaceCullingMode : 3;            ///< Local copy of the mode of face culling
+  BlendMode::Type                mBlendMode : 3;                  ///< Local copy of the mode of blending
+  DepthWriteMode::Type           mDepthWriteMode : 3;             ///< Local copy of the depth write mode
+  DepthTestMode::Type            mDepthTestMode : 3;              ///< Local copy of the depth test mode
+  DevelRenderer::Rendering::Type mRenderingBehavior : 2;          ///< The rendering behavior
+  Decay                          mUpdateDecay : 2;                ///< Update decay (aging)
+  uint8_t                        mVisualPropertiesDirtyFlags : 2; ///< Update decay for visual properties (aging)
 
   bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
   bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required

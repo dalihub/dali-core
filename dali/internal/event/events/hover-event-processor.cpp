@@ -248,7 +248,7 @@ struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsHoverConsumed();
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, bool isGeometry) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, const Integration::Scene::TouchPropagationType propagationType) override
   {
     // Hover event is always hit.
     return true;
@@ -354,7 +354,7 @@ struct HoverEventProcessor::Impl
       HitTestAlgorithm::Results hitTestResults;
       hitTestResults.eventTime = event.time;
       ActorHoverableCheck actorHoverableCheck;
-      HitTestAlgorithm::HitTest(processor.mScene.GetSize(), processor.mScene.GetRenderTaskList(), processor.mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, actorHoverableCheck, localVars.isGeometry);
+      HitTestAlgorithm::HitTest(processor.mScene.GetSize(), processor.mScene.GetRenderTaskList(), processor.mScene.GetLayerList(), currentPoint.GetScreenPosition(), hitTestResults, actorHoverableCheck, localVars.isGeometry ? Integration::Scene::TouchPropagationType::GEOMETRY : Integration::Scene::TouchPropagationType::PARENT);
 
       Integration::Point newPoint(currentPoint);
       newPoint.SetHitActor(hitTestResults.actor);
@@ -645,7 +645,7 @@ void HoverEventProcessor::SendInterruptedHoverEvent(Dali::Internal::Actor* actor
     Integration::Point point;
     point.SetState(PointState::INTERRUPTED);
     point.SetHitActor(Dali::Actor(actor));
-    if(mScene.IsGeometryHittestEnabled())
+    if(mScene.GetTouchPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY)
     {
       std::list<Dali::Internal::Actor*> actorLists;
       actorLists.push_back(actor);

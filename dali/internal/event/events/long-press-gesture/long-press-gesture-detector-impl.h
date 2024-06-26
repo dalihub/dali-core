@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
+#include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
 
 namespace Dali
 {
@@ -34,7 +35,7 @@ using LongPressGestureDetectorContainer = DerivedGestureDetectorContainer<LongPr
 /**
  * @copydoc Dali::LongPressGestureDetector
  */
-class LongPressGestureDetector : public GestureDetector
+class LongPressGestureDetector : public GestureDetector, public RecognizerObserver<LongPressGestureEvent>
 {
 public: // Creation
   /**
@@ -136,6 +137,15 @@ private:
   LongPressGestureDetector(const LongPressGestureDetector&);
   LongPressGestureDetector& operator=(const LongPressGestureDetector& rhs);
 
+  /**
+   * Creates a LongPressGesture and asks the specified detector to emit its detected signal.
+   * @param[in]  actor             The actor on which the long press gesture has occurred.
+   * @param[in]  gestureDetectors  A reference to gesture detectors that should emit the signal.
+   * @param[in]  longPressEvent    The longPressEvent received from the adaptor.
+   * @param[in]  localPoint        Relative to the actor attached to the detector.
+   */
+  void EmitLongPressSignal(Actor* actor, const LongPressGestureEvent& longPressEvent, Vector2 localPoint);
+
 private: // GestureDetector overrides
   /**
    * @copydoc Dali::Internal::GestureDetector::OnActorAttach(Actor&)
@@ -152,11 +162,40 @@ private: // GestureDetector overrides
    */
   void OnActorDestroyed(Object& object) override;
 
+  /**
+   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, const Dali::TouchEvent&)
+   */
+  bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)
+   */
+  void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CheckGestureDetector(const GestureEvent*, Actor*, RenderTaskPtr)
+   */
+  bool CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask) override;
+
+  /**
+   * @copydoc Dali::Internal::GestureDetector::CancelProcessing()
+   */
+  void CancelProcessing() override;
+
+  /**
+   * This method is called whenever a long press gesture event occurs.
+   * @param[in] scene The scene the long press gesture event occurs in.
+   * @param[in] longPressEvent The event that has occurred.
+   */
+  void Process(Scene& scene, const LongPressGestureEvent& longPressEvent) override;
+
 private:
   Dali::LongPressGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mMinimumTouchesRequired;
   unsigned int mMaximumTouchesRequired;
+
+  ActorObserver          mCurrentLongPressActor;  ///< Current actor for which the long press gesture has been recognized.
 };
 
 } // namespace Internal

@@ -45,6 +45,8 @@ namespace Internal
 class Stage;
 class Scene;
 
+using GestureDetectorContainer = std::vector<GestureDetector*>;
+
 /**
  * Gesture Event Processing:
  *
@@ -74,16 +76,6 @@ public: // To be called by EventProcessor
    */
   void ProcessTouchEvent(Scene& scene, const Integration::TouchEvent& event);
 
-  /**
-   * This function is called by gesture detector whenever a touch event occurs
-   * @param[in] gestureDetector The gesture detector
-   * @param[in] actor The actor
-   * @param[in] renderTask The renderTask
-   * @param[in] scene The scene
-   * @param[in] event The event that has occurred
-   */
-  void ProcessTouchEvent(GestureDetector* gestureDetector, Actor& actor, Dali::Internal::RenderTask& renderTask, Scene& scene, const Integration::TouchEvent& event);
-
 public: // To be called by gesture detectors
   /**
    * This method adds the specified gesture detector to the relevant gesture processor.
@@ -109,6 +101,32 @@ public: // To be called by gesture detectors
    * @note If we are in the middle of processing the gesture being set, then this call is ignored.
    */
   void SetGestureProperties(const Dali::Gesture& gesture);
+
+  /**
+   * @brief This method checks whether GestureDetector is in the list of detectors currently processing gestures.
+   *
+   * @param gestureDetector
+   * @return true
+   */
+  bool IsRegisterGestureDetector(GestureDetector* gestureDetector);
+
+  /**
+   * @brief This method adds a GestureDetector to the list of detectors currently processing gestures.
+   * @param gestureDetector The gesture detector to add
+   */
+  void RegisterGestureDetector(GestureDetector* gestureDetector);
+
+  /**
+   * @brief This method that cancels all other gesture detectors except the current gesture detector
+   * @param gestureDetector The current gesture detector
+   */
+  void CancelAllOtherGestureDetectors(GestureDetector* gestureDetector);
+
+  /**
+   * @brief This method clears all processing desture detectors
+   * @param gestureDetector The gesture detector to remove
+   */
+  void UnregisterGestureDetector(GestureDetector* gestureDetector);
 
 public: // Called by Core
   /**
@@ -330,6 +348,16 @@ public: // needed for PanGesture
    */
   const TapGestureProcessor& GetTapGestureProcessor();
 
+  /**
+   * @return the pinch gesture processor
+   */
+  const PinchGestureProcessor& GetPinchGestureProcessor();
+
+  /**
+   * @return the rotation gesture processor
+   */
+  const RotationGestureProcessor& GetRotationGestureProcessor();
+
 private:
   // Undefined
   GestureEventProcessor(const GestureEventProcessor&);
@@ -342,10 +370,10 @@ private:
   TapGestureProcessor            mTapGestureProcessor;
   RotationGestureProcessor       mRotationGestureProcessor;
   Integration::RenderController& mRenderController;
+  GestureDetectorContainer       mGestureDetectors;
 
   int32_t envOptionMinimumPanDistance;
   int32_t envOptionMinimumPanEvents;
-  bool mIsProcessingFeedTouch;  // Whether the gesture is being recognized via FeedTouch in gestureDetector
 };
 
 } // namespace Internal

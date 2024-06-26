@@ -183,6 +183,17 @@ void RotationGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   }
 }
 
+void RotationGestureRecognizer::CancelEvent()
+{
+  if(mState != CLEAR && mTouchEvents.size() > 0)
+  {
+    const Integration::TouchEvent& previousEvent(*(mTouchEvents.rbegin()));
+    SendRotation(GestureState::CANCELLED, previousEvent);
+    mState = CLEAR;
+    mTouchEvents.clear();
+  }
+}
+
 void RotationGestureRecognizer::SetMinimumTouchEvents(uint32_t value)
 {
   mMinimumTouchEvents = value;

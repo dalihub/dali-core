@@ -55,7 +55,10 @@ EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEvent
   mWheelEventProcessor(scene),
   mEventQueue0(INITIAL_BUFFER_SIZE),
   mEventQueue1(INITIAL_BUFFER_SIZE),
-  mCurrentEventQueue(&mEventQueue0)
+  mCurrentEventQueue(&mEventQueue0),
+  mTouchEventProcessors(),
+  mActorTouchPoints(),
+  mActorIdDeviceId()
 {
 }
 
@@ -150,9 +153,73 @@ void EventProcessor::ProcessEvents()
       case Event::Touch:
       {
         Integration::TouchEvent& touchEvent = static_cast<Integration::TouchEvent&>(*event);
-        mTouchEventProcessor.ProcessTouchEvent(touchEvent);
 
-        mGestureEventProcessor.ProcessTouchEvent(mScene, touchEvent);
+        if(mScene.GetTouchPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY)
+        {
+          DALI_ASSERT_ALWAYS(!touchEvent.points.empty() && "Empty TouchEvent sent from Integration\n");
+
+          mActorTouchPoints.clear();
+          for(uint i = 0; i < touchEvent.GetPointCount(); i++)
+          {
+            // Perform hittest only for downloads and save points. This is to remember the actor that was first hit for each point.
+            // So, even if you leave the actor or move and climb on top of another actor, you can only proceed with the touch event process for the actor that was first down.
+            if(touchEvent.GetPoint(i).GetState() == PointState::DOWN)
+            {
+              HitTestAlgorithm::Results hitTestResults;
+              hitTestResults.point     = touchEvent.GetPoint(i);
+              hitTestResults.eventTime = touchEvent.time;
+
+              HitTestAlgorithm::HitTest(mScene.GetSize(), mScene.GetRenderTaskList(), mScene.GetLayerList(), touchEvent.GetPoint(i).GetScreenPosition(), hitTestResults, nullptr, Integration::Scene::TouchPropagationType::GEOMETRY);
+
+              if(hitTestResults.actor)
+              {
+                // Stores which actor the touch event hit.
+                mActorIdDeviceId[touchEvent.GetPoint(i).GetDeviceId()] = (&GetImplementation(hitTestResults.actor))->GetId();
+              }
+            }
+            // You can see which actor the touch event hit.
+            auto actorId = mActorIdDeviceId.find(touchEvent.GetPoint(i).GetDeviceId());
+            if(actorId != mActorIdDeviceId.end())
+            {
+              // Store the touch point in the actor to which the touch event should be delivered.
+              mActorTouchPoints[actorId->second].push_back(touchEvent.GetPoint(i));
+            }
+          }
+
+          // For each actor, the stored touch points are collected and the TouchEventProcessor is executed for each actor
+          for(ActorTouchPointsContainer::iterator aItr = mActorTouchPoints.begin(); aItr != mActorTouchPoints.end(); aItr++)
+          {
+            uint32_t actorId = aItr->first;
+            TouchPointsContainer& touchPoints = aItr->second;
+            Integration::TouchEvent touchEventInternal(touchEvent.time);
+
+            for(TouchPointsContainer::iterator tItr = touchPoints.begin(); tItr != touchPoints.end(); tItr++)
+            {
+              touchEventInternal.AddPoint(*tItr);
+            }
+
+            auto processor = mTouchEventProcessors.find(actorId);
+            if(processor == mTouchEventProcessors.end())
+            {
+              mTouchEventProcessors[actorId] = new TouchEventProcessor(mScene);
+            }
+
+            mTouchEventProcessors[actorId]->ProcessTouchEvent(touchEventInternal);
+          }
+
+          // All touch events have been processed, it should be cleared.
+          if(touchEvent.GetPointCount() == 1 && (touchEvent.GetPoint(0).GetState() == PointState::UP || touchEvent.GetPoint(0).GetState() == PointState::INTERRUPTED))
+          {
+            mActorIdDeviceId.clear();
+            mTouchEventProcessors.clear();
+          }
+        }
+        else
+        {
+          mTouchEventProcessor.ProcessTouchEvent(touchEvent);
+          mGestureEventProcessor.ProcessTouchEvent(mScene, touchEvent);
+        }
+
         break;
       }
 

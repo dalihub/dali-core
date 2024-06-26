@@ -66,6 +66,7 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
   unsigned int                            pointCount(event.GetPointCount());
   Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
   GestureRecognizerPtr                    ptr(this); // To keep us from being destroyed during the life-time of this method
+
   switch(mState)
   {
     // CLEAR: Wait till one point touches the screen before starting timer.
@@ -186,6 +187,29 @@ void LongPressGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
       }
       break;
     }
+  }
+}
+
+void LongPressGestureRecognizer::CancelEvent()
+{
+  if(mState != CLEAR)
+  {
+    if(mTimerId != 0 && ThreadLocalStorage::Created())
+    {
+      Dali::Integration::PlatformAbstraction& platformAbstraction = ThreadLocalStorage::Get().GetPlatformAbstraction();
+      platformAbstraction.CancelTimer(mTimerId);
+    }
+    if(mState == FINISHED)
+    {
+      EmitGesture(GestureState::FINISHED);
+    }
+    else
+    {
+      EmitGesture(GestureState::CANCELLED);
+    }
+    mTouchPositions.clear();
+    mTimerId = 0;
+    mState = CLEAR;
   }
 }
 
