@@ -19,15 +19,13 @@
 
 namespace Dali
 {
-namespace Integration
-{
-RenderSurfaceInterface::RenderSurfaceInterface()  = default;
-RenderSurfaceInterface::~RenderSurfaceInterface() = default;
-} // namespace Integration
-
 TestRenderSurface::TestRenderSurface(Dali::PositionSize positionSize)
 : mPositionSize(positionSize),
   mBackgroundColor()
+{
+}
+
+TestRenderSurface::~TestRenderSurface()
 {
 }
 
