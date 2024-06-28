@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -637,6 +637,7 @@ private:
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
     int32_t                  arrayIndex{-1}; ///< The array index
+    uint32_t                 arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
 
     int16_t  uniformLocation{0u};
     uint16_t uniformOffset{0u};
