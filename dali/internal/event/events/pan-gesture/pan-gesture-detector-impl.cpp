@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -286,7 +286,7 @@ void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const Dali::Pan
     Dali::PanGestureDetector handle(this);
 
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Emitting Signal (%p)\n", this);
-    if(pan.GetState() !=  GestureState::CONTINUING)
+    if(pan.GetState() != GestureState::CONTINUING)
     {
       DALI_LOG_DEBUG_INFO("emitting pan gesture actor id(%d) state(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID), pan.GetState());
     }
@@ -318,12 +318,12 @@ void PanGestureDetector::SetPanGestureProperties(const Dali::PanGesture& pan)
 }
 
 PanGestureDetector::PanGestureDetector(const SceneGraph::PanGesture& sceneObject)
-: GestureDetector(GestureType::PAN, &sceneObject),
+: GestureDetector(GestureType::PAN),
   mMinimumTouches(1),
   mMaximumTouches(1),
   mMaximumMotionEventAge(std::numeric_limits<uint32_t>::max()),
   mPossiblePanPosition(0.f, 0.f),
-  mSceneObject(SceneGraph::PanGesture::New())
+  mSceneObject(const_cast<SceneGraph::PanGesture*>(&sceneObject))
 {
 }
 
@@ -331,7 +331,7 @@ PanGestureDetector::~PanGestureDetector() = default;
 
 const SceneGraph::PanGesture& PanGestureDetector::GetPanGestureSceneObject() const
 {
-  return static_cast<const SceneGraph::PanGesture&>(GetSceneObject());
+  return static_cast<const SceneGraph::PanGesture&>(*mSceneObject);
 }
 
 void PanGestureDetector::OnActorAttach(Actor& actor)
@@ -362,7 +362,6 @@ bool PanGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent&
   Dali::TouchEvent touchEvent(touch);
   return HandleEvent(actor, touchEvent);
 }
-
 
 void PanGestureDetector::SetDefaultProperty(Property::Index index, const Property::Value& property)
 {
@@ -497,8 +496,8 @@ void PanGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
   if(!mGestureRecognizer)
   {
     const PanGestureProcessor& panGestureProcessor = mGestureEventProcessor.GetPanGestureProcessor();
-    int32_t minDistance = panGestureProcessor.GetMinimumDistance();
-    int32_t minPanEvents = panGestureProcessor.GetMinimumPanEvents();
+    int32_t                    minDistance         = panGestureProcessor.GetMinimumDistance();
+    int32_t                    minPanEvents        = panGestureProcessor.GetMinimumPanEvents();
 
     PanGestureRequest request;
     request.minTouches        = GetMinimumTouchesRequired();
@@ -548,7 +547,7 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
     case GestureState::CONTINUING:
     {
       Actor* currentGesturedActor = mCurrentPanActor.GetActor();
-      Actor* feededActor = mFeededActor.GetActor();
+      Actor* feededActor          = mFeededActor.GetActor();
       if(currentGesturedActor && currentGesturedActor->NeedGesturePropagation() && feededActor && feededActor != currentGesturedActor)
       {
         if(feededActor->IsHittable() && CheckGestureDetector(&panEvent, feededActor, mRenderTask, mPossiblePanPosition))
@@ -598,7 +597,7 @@ bool PanGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, 
   CheckGestureDetector(gestureEvent, actor, renderTask);
   const PanGestureEvent* panEvent(static_cast<const PanGestureEvent*>(gestureEvent));
 
-  bool                retVal(false);
+  bool retVal(false);
 
   if((panEvent->numberOfTouches >= GetMinimumTouchesRequired()) &&
      (panEvent->numberOfTouches <= GetMaximumTouchesRequired()))
@@ -671,12 +670,11 @@ void PanGestureDetector::CancelProcessing()
   }
 }
 
-
-void PanGestureDetector::EmitPanSignal(Actor*                          actor,
-                                        const PanGestureEvent&          panEvent,
-                                        Vector2                         localCurrent,
-                                        GestureState                    state,
-                                        RenderTaskPtr                   renderTask)
+void PanGestureDetector::EmitPanSignal(Actor*                 actor,
+                                       const PanGestureEvent& panEvent,
+                                       Vector2                localCurrent,
+                                       GestureState           state,
+                                       RenderTaskPtr          renderTask)
 {
   SetDetected(true);
   Internal::PanGesturePtr pan(new Internal::PanGesture(panEvent.state));
@@ -720,7 +718,7 @@ void PanGestureDetector::EmitPanSignal(Actor*                          actor,
   // When the gesture ends, we may incorrectly get a ZERO velocity (as we have lifted our finger without any movement)
   // so we should use the last recorded velocity instead in this scenario.
   if((panEvent.state == GestureState::FINISHED) && (pan->GetScreenVelocity() == Vector2::ZERO) &&
-    (panEvent.timeDelta < MAXIMUM_TIME_WITH_VALID_LAST_VELOCITY))
+     (panEvent.timeDelta < MAXIMUM_TIME_WITH_VALID_LAST_VELOCITY))
   {
     pan->SetVelocity(mLastVelocity);
     pan->SetScreenVelocity(mLastScreenVelocity);
@@ -732,7 +730,8 @@ void PanGestureDetector::EmitPanSignal(Actor*                          actor,
     mLastScreenVelocity = pan->GetScreenVelocity();
   }
 
-  if(mSceneObject)
+  // We should not use scene object if Core is shutting down.
+  if(DALI_LIKELY(Dali::Stage::IsInstalled() && mSceneObject))
   {
     // We update the scene object directly rather than sending a message.
     // Sending a message could cause unnecessary delays, the scene object ensure thread safe behaviour.
