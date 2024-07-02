@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,7 +247,7 @@ private:
    */
   void CancelProcessing() override;
 
-    /**
+  /**
    * This method is called whenever a pan gesture event occurs.
    * @param[in] scene The scene the pan gesture event occurs in.
    * @param[in] panEvent The event that has occurred.
@@ -262,8 +262,7 @@ private:
    * @param[in]  state             The state of the gesture.
    * @param[in]  renderTask        The renderTask to use.
    */
-  void EmitPanSignal(Actor*  actor, const PanGestureEvent& panEvent, Vector2 localCurrent, GestureState state, RenderTaskPtr renderTask);
-
+  void EmitPanSignal(Actor* actor, const PanGestureEvent& panEvent, Vector2 localCurrent, GestureState state, RenderTaskPtr renderTask);
 
   // Default property extensions from Object
 
@@ -290,19 +289,17 @@ private:
 private:
   Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 
-  uint32_t                mMinimumTouches;        ///< The minimum number of fingers required to be touching for pan.
-  uint32_t                mMaximumTouches;        ///< The maximum number of fingers required to be touching for pan.
-  uint32_t                mMaximumMotionEventAge; ///< The maximum age of motion events as milliseconds.
+  uint32_t mMinimumTouches;        ///< The minimum number of fingers required to be touching for pan.
+  uint32_t mMaximumTouches;        ///< The maximum number of fingers required to be touching for pan.
+  uint32_t mMaximumMotionEventAge; ///< The maximum age of motion events as milliseconds.
 
-  AngleContainer          mAngleContainer;        ///< A container of all angles allowed for pan to occur.
+  AngleContainer mAngleContainer; ///< A container of all angles allowed for pan to occur.
 
-  Vector2                 mPossiblePanPosition;   ///< The Position when possible state.
-  Vector2                 mLastVelocity;          ///< The last recorded velocity in local actor coordinates.
-  Vector2                 mLastScreenVelocity;    ///< The last recorded velocity in screen coordinates.
-  ActorObserver           mCurrentPanActor;       ///< The current actor that has been gestured.
-  SceneGraph::PanGesture* mSceneObject;           ///< Not owned, but we write to it directly
-
-
+  Vector2                 mPossiblePanPosition; ///< The Position when possible state.
+  Vector2                 mLastVelocity;        ///< The last recorded velocity in local actor coordinates.
+  Vector2                 mLastScreenVelocity;  ///< The last recorded velocity in screen coordinates.
+  ActorObserver           mCurrentPanActor;     ///< The current actor that has been gestured.
+  SceneGraph::PanGesture* mSceneObject;         ///< Not owned, but we write to it directly (Owned by UpdateManager)
 };
 
 } // namespace Internal

@@ -4795,7 +4795,10 @@ int UtcDaliRendererUniformBlocks01(void)
   const int MAX_BONE_COUNT{300};
   const int skinningBlockSize = MAX_BONE_COUNT * sizeof(Matrix);
 
-  graphics.AddCustomUniformBlock(TestGraphicsReflection::TestUniformBlockInfo{"Skinning Block", 0, 0, skinningBlockSize, {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
+  graphics.AddCustomUniformBlock(TestGraphicsReflection::TestUniformBlockInfo{
+    "Skinning Block", 0, 0,
+    skinningBlockSize,
+    {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
 
   const int MAX_MORPH_COUNT{128};
   const int morphBlockSize = MAX_MORPH_COUNT * sizeof(float) + sizeof(float);
@@ -4911,6 +4914,108 @@ int UtcDaliRendererUniformBlocks02(void)
     float* wPtr1 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 1);
     float* wPtr2 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 56);
     float* wPtr3 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + sizeof(float) * 128);
+
+    tet_printf("Test that uBlendShapeWeight[0] is written correctly as %4.2f\n", w1);
+    tet_printf("Test that uBlendShapeWeight[55] is written correctly as %4.2f\n", w2);
+    tet_printf("Test that uBlendShapeWeight[127] is written correctly as %4.2f\n", w3);
+
+    DALI_TEST_EQUALS(*wPtr1, w1, 0.0001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(*wPtr2, w2, 0.0001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(*wPtr3, w3, 0.0001f, TEST_LOCATION);
+
+    n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(i * 0.3f), Vector3::YAXIS), Vector3(200.0f + i * 10.0f, -i, 20.0f));
+    renderer["uBone[299]"] = n;
+
+    w1 += 0.005f;
+    w2 += 0.005f;
+    w3 -= 0.01f;
+    renderer["uBlendShapeWeight[0]"]   = w1;
+    renderer["uBlendShapeWeight[55]"]  = w2;
+    renderer["uBlendShapeWeight[127]"] = w3;
+
+    application.SendNotification();
+    application.Render();
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererUniformBlocksWithStride(void)
+{
+  setenv("LOG_UNIFORM_BUFFER", "5f", 1); // Turns on buffer logging
+  TestApplication application;
+
+  tet_infoline("Test that repeated update/render cycles write into alternative buffers");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  const int MAX_BONE_COUNT{300};
+  TestGraphicsReflection::TestUniformBlockInfo skinningBlock;
+  skinningBlock.name          = "SkinningBlock";
+  skinningBlock.binding       = 0;
+  skinningBlock.descriptorSet = 0;
+  graphics.AddMemberToUniformBlock( skinningBlock, "uBone", Property::Type::MATRIX, MAX_BONE_COUNT, 16 );
+  graphics.AddCustomUniformBlock(skinningBlock);
+  const int skinningBlockSize = int(skinningBlock.size);
+
+  const int MAX_MORPH_COUNT{128};
+  TestGraphicsReflection::TestUniformBlockInfo morphBlock;
+  morphBlock.name          = "MorphBlock";
+  morphBlock.binding       = 1;
+  morphBlock.descriptorSet = 0;
+  graphics.AddMemberToUniformBlock( morphBlock, "uNumberOfBlendShapes", Property::Type::FLOAT, 0, 0 );
+  graphics.AddMemberToUniformBlock( morphBlock, "uBlendShapeWeight", Property::Type::FLOAT, MAX_MORPH_COUNT, 16 );
+  graphics.AddCustomUniformBlock(morphBlock);
+
+  Actor    actor    = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
+  Shader   shader   = CreateShader(); // Don't care about src content
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = CreateRenderer(actor, geometry, shader, 0);
+  Matrix   m, n;
+  m.SetIdentity();
+  n.SetIdentity();
+  n.SetTransformComponents(Vector3(2.f, 2.f, 2.f), Quaternion(Radian(0.3f), Vector3::YAXIS), Vector3(200.0f, 1.0f, 20.0f));
+
+  CreateRendererProperties(renderer, m, n);
+  float w1                           = 0.01f;
+  float w2                           = 0.5f;
+  float w3                           = 0.79f;
+  renderer["uBlendShapeWeight[0]"]   = w1;
+  renderer["uBlendShapeWeight[55]"]  = w2;
+  renderer["uBlendShapeWeight[127]"] = w3;
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  // We expect 1 vertex buffer, 1 index buffer and 1 uniform buffer (representing 2 blocks)
+  DALI_TEST_EQUALS(cmdTrace.CountMethod("BindUniformBuffers"), 1, TEST_LOCATION);
+
+  const uint32_t MORPH_BLOCK_OFFSET = (skinningBlockSize % UNIFORM_BLOCK_ALIGNMENT == 0) ? skinningBlockSize : ((skinningBlockSize / UNIFORM_BLOCK_ALIGNMENT) + 1) * UNIFORM_BLOCK_ALIGNMENT;
+
+  for(int i = 0; i < 50; ++i)
+  {
+    tet_infoline("\nTest that uBone[299] is written correctly");
+    TestGraphicsBuffer* bufferPtr = FindUniformBuffer(i % 2, graphics);
+    DALI_TEST_CHECK(graphics.mAllocatedBuffers.size() == (i == 0 ? 4 : 5));
+    DALI_TEST_CHECK(bufferPtr != nullptr);
+    auto offset0 = sizeof(Dali::Matrix) * 299;
+    Matrix* mPtr = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + offset0);
+    DALI_TEST_EQUALS(*mPtr, n, 0.0001, TEST_LOCATION);
+
+    const auto size = morphBlock.members[1].elementStride;
+    const auto memberOffset = morphBlock.members[1].offsets[0];
+    float* wPtr1 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 0);
+    float* wPtr2 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 55);
+    float* wPtr3 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 127);
 
     tet_printf("Test that uBlendShapeWeight[0] is written correctly as %4.2f\n", w1);
     tet_printf("Test that uBlendShapeWeight[55] is written correctly as %4.2f\n", w2);

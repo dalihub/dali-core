@@ -862,14 +862,16 @@ void Renderer::FillUniformBuffer(Program&                                       
         continue;
       }
 
-      uniform.uniformOffset     = uniformInfo.offset;
-      uniform.uniformLocation   = uniformInfo.location;
-      uniform.uniformBlockIndex = uniformInfo.bufferIndex;
-      uniform.initialized       = true;
+      uniform.uniformOffset      = uniformInfo.offset;
+      uniform.uniformLocation    = int16_t(uniformInfo.location);
+      uniform.uniformBlockIndex  = uniformInfo.bufferIndex;
+      uniform.initialized        = true;
 
       auto       dst      = ubo->GetOffset() + uniformInfo.offset;
       const auto typeSize = iter.propertyValue->GetValueSize();
-      const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+      uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+
+      const auto dest     = dst + uniform.arrayElementStride * arrayIndex;
 
       ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
                  typeSize,
@@ -881,7 +883,7 @@ void Renderer::FillUniformBuffer(Program&                                       
 
       auto       dst      = ubo->GetOffset() + uniform.uniformOffset;
       const auto typeSize = iter.propertyValue->GetValueSize();
-      const auto dest     = dst + static_cast<uint32_t>(typeSize) * arrayIndex;
+      const auto dest     = dst + uniform.arrayElementStride * arrayIndex;
 
       ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
                  typeSize,

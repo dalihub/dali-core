@@ -325,13 +325,14 @@ bool TestGraphicsReflection::GetUniformBlock(uint32_t index, Dali::Graphics::Uni
   out.size = block.size;
   for(auto i = 0u; i < out.members.size(); ++i)
   {
-    const auto& memberUniform   = block.members[i];
-    out.members[i].name         = memberUniform.name;
-    out.members[i].binding      = block.binding;
-    out.members[i].uniformClass = Graphics::UniformClass::UNIFORM;
-    out.members[i].offset       = memberUniform.offsets[0];
-    out.members[i].location     = memberUniform.locations[0];
-    out.members[i].elementCount = memberUniform.numElements;
+    const auto& memberUniform    = block.members[i];
+    out.members[i].name          = memberUniform.name;
+    out.members[i].binding       = block.binding;
+    out.members[i].uniformClass  = Graphics::UniformClass::UNIFORM;
+    out.members[i].offset        = memberUniform.offsets[0];
+    out.members[i].location      = memberUniform.locations[0];
+    out.members[i].elementCount  = memberUniform.numElements;
+    out.members[i].elementStride = memberUniform.elementStride;
   }
 
   return true;

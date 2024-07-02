@@ -212,7 +212,7 @@ bool HitTestActor(const RenderTask&                              renderTask,
                   const Integration::Scene::TouchPropagationType propagationType)
 {
   bool isClippingOrHittable = clippingActor || hitCheck.IsActorHittable(&actor);
-  bool isGeometry = propagationType == Integration::Scene::TouchPropagationType::GEOMETRY;
+  bool isGeometry           = propagationType == Integration::Scene::TouchPropagationType::GEOMETRY;
   if(isClippingOrHittable || isGeometry)
   {
     Vector3 size(actor.GetCurrentSize());
@@ -243,7 +243,7 @@ bool HitTestActor(const RenderTask&                              renderTask,
               Vector2 hitPointLocal;
               float   distance;
               if(!(rayTest.SphereTest(*actor.GetParent(), rayOrigin, rayDir) &&
-                    rayTest.ActorTest(*actor.GetParent(), rayOrigin, rayDir, hitPointLocal, distance)))
+                   rayTest.ActorTest(*actor.GetParent(), rayOrigin, rayDir, hitPointLocal, distance)))
               {
                 return false;
               }
@@ -330,22 +330,22 @@ void UpdateChildHitData(const HitActor& hit, const HitActor& currentHit, const b
  * - When comparing against renderable parents, if Actor is the same distance
  * or closer than it's renderable parent, then it takes priority.
  */
-HitActor HitTestWithinLayer(Actor&                                           actor,
-                            const RenderTask&                                renderTask,
-                            const RenderTaskList::ExclusivesContainer&       exclusives,
-                            const Vector4&                                   rayOrigin,
-                            const Vector4&                                   rayDir,
-                            const float&                                     nearClippingPlane,
-                            const float&                                     farClippingPlane,
-                            HitTestInterface&                                hitCheck,
-                            const bool&                                      overlayed,
-                            bool&                                            overlayHit,
-                            bool                                             layerIs3d,
-                            const RayTest&                                   rayTest,
-                            const Integration::Point&                        point,
-                            const uint32_t                                   eventTime,
-                            std::list<Dali::Internal::Actor*>&               actorLists,
-                            const Integration::Scene::TouchPropagationType   propagationType)
+HitActor HitTestWithinLayer(Actor&                                         actor,
+                            const RenderTask&                              renderTask,
+                            const RenderTaskList::ExclusivesContainer&     exclusives,
+                            const Vector4&                                 rayOrigin,
+                            const Vector4&                                 rayDir,
+                            const float&                                   nearClippingPlane,
+                            const float&                                   farClippingPlane,
+                            HitTestInterface&                              hitCheck,
+                            const bool&                                    overlayed,
+                            bool&                                          overlayHit,
+                            bool                                           layerIs3d,
+                            const RayTest&                                 rayTest,
+                            const Integration::Point&                      point,
+                            const uint32_t                                 eventTime,
+                            std::list<Dali::Internal::Actor*>&             actorLists,
+                            const Integration::Scene::TouchPropagationType propagationType)
 {
   HitActor hit;
 
@@ -807,9 +807,9 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
 Dali::Actor FindPriorActorInLayer(Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
 {
   Dali::Actor priorActor;
-  Dali::Layer layer = rootActor.GetLayer();
-  bool firstActorIncluded = firstActor.GetLayer() == layer;
-  bool secondActorIncluded = secondActor.GetLayer() == layer;
+  Dali::Layer layer               = rootActor.GetLayer();
+  bool        firstActorIncluded  = firstActor.GetLayer() == layer;
+  bool        secondActorIncluded = secondActor.GetLayer() == layer;
 
   if(firstActorIncluded && !secondActorIncluded)
   {
@@ -832,11 +832,11 @@ Dali::Actor FindPriorActorInLayer(Dali::Actor rootActor, Dali::Actor firstActor,
  */
 Dali::Actor FindPriorActorInLayers(const LayerList& layers, Dali::Actor rootActor, Dali::Actor firstActor, Dali::Actor secondActor)
 {
-  Dali::Layer sourceLayer = rootActor.GetLayer();
+  Dali::Layer    sourceLayer = rootActor.GetLayer();
   const uint32_t sourceActorDepth(sourceLayer.GetProperty<int>(Dali::Layer::Property::DEPTH));
 
   Dali::Actor priorActor;
-  uint32_t layerCount = layers.GetLayerCount();
+  uint32_t    layerCount = layers.GetLayerCount();
   if(layerCount > 0)
   {
     for(int32_t i = layerCount - 1; i >= 0; --i)
@@ -872,13 +872,13 @@ Dali::Actor FindPriorActorInLayers(const LayerList& layers, Dali::Actor rootActo
  * @param[in] propagationType Whether the scene using geometry event propagation touch and hover events.
  * @return True if we have a hit, false otherwise
  */
-bool HitTestRenderTaskList(const Vector2&                                  sceneSize,
-                           LayerList&                                      layers,
-                           RenderTaskList&                                 taskList,
-                           const Vector2&                                  screenCoordinates,
-                           Results&                                        results,
-                           HitTestInterface&                               hitCheck,
-                           const Integration::Scene::TouchPropagationType  propagationType)
+bool HitTestRenderTaskList(const Vector2&                                 sceneSize,
+                           LayerList&                                     layers,
+                           RenderTaskList&                                taskList,
+                           const Vector2&                                 screenCoordinates,
+                           Results&                                       results,
+                           HitTestInterface&                              hitCheck,
+                           const Integration::Scene::TouchPropagationType propagationType)
 {
   if(propagationType == Integration::Scene::TouchPropagationType::GEOMETRY)
   {
@@ -1005,7 +1005,9 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& taskList, LayerList& laye
 {
   bool wasHit(false);
   // Hit-test the regular on-scene actors
-  Results                hitTestResults;
+  Results hitTestResults;
+  hitTestResults.eventTime = 0u; ///< Unused
+
   HitTestFunctionWrapper hitTestFunctionWrapper(func);
   if(HitTestForEachRenderTask(sceneSize, layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper, propagationType))
   {
