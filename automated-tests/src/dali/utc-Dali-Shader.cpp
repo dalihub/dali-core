@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <stdlib.h>
@@ -728,6 +729,45 @@ int UtcDaliShaderWrongData(void)
   const Property::Array* outArray   = value.GetArray();
   uint32_t               arrayCount = outArray->Size();
   DALI_TEST_CHECK(arrayCount == 0u);
+
+  END_TEST;
+}
+
+int UtcDaliShaderDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliShaderDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mShader.Reset();
+      }
+
+      Dali::Shader mShader;
+    };
+    TestThread thread;
+
+    Dali::Shader shader = Dali::Shader::New("", "");
+    thread.mShader      = std::move(shader);
+    shader.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }

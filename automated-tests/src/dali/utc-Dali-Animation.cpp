@@ -19,6 +19,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/devel-api/animation/key-frames-devel.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -16670,6 +16671,45 @@ int UtcDaliAnimationPlayAfterStopGetState(void)
     application.SendNotification();
     application.Render(0);
   }
+
+  END_TEST;
+}
+
+int UtcDaliAnimationDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimationDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mAnimation.Reset();
+      }
+
+      Dali::Animation mAnimation;
+    };
+    TestThread thread;
+
+    Dali::Animation animation = Dali::Animation::New(0);
+    thread.mAnimation         = std::move(animation);
+    animation.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }

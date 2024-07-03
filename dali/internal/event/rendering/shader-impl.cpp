@@ -318,7 +318,12 @@ void Shader::SetShaderProperty(const Dali::Property::Value& shaderMap)
 
 Shader::~Shader()
 {
-  if(EventThreadServices::IsCoreRunning())
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~Shader[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     EventThreadServices&       eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();

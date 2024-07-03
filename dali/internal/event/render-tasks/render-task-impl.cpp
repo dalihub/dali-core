@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -500,8 +500,8 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
       return false;
     }
 
-    CameraActor*     localCamera       = GetCameraActor();
-    StagePtr         stage             = Stage::GetCurrent();
+    CameraActor* localCamera = GetCameraActor();
+    StagePtr     stage       = Stage::GetCurrent();
     if(stage)
     {
       Vector2      size(stage->GetSize());
@@ -658,10 +658,8 @@ uint32_t RenderTask::GetRenderTaskId() const
 void RenderTask::RenderUntil(Actor* stopperActor)
 {
   Actor* target = mSourceActor.GetActor();
-  DALI_ASSERT_ALWAYS((target && stopperActor)
-      && "RenderTask::RenderUntil() has empty actors.");
-  DALI_ASSERT_ALWAYS((target->GetHierarchyDepth() < stopperActor->GetHierarchyDepth())
-      && "RenderTask::RenderUntil() has reversed hierarchy.");
+  DALI_ASSERT_ALWAYS((target && stopperActor) && "RenderTask::RenderUntil() has empty actors.");
+  DALI_ASSERT_ALWAYS((target->GetHierarchyDepth() < stopperActor->GetHierarchyDepth()) && "RenderTask::RenderUntil() has reversed hierarchy.");
 
   Actor* parent = stopperActor;
   while(parent != target && !(parent->IsLayer()))
@@ -998,6 +996,11 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
 
 RenderTask::~RenderTask()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~RenderTask[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::~RenderTask(this:%p)\n", this);
   // scene object deletion is handled by our parent
   // scene object handles observation of source and camera

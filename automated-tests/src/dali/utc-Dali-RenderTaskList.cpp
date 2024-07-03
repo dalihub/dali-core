@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -291,5 +292,51 @@ int UtcDaliRenderTaskListGetTaskNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliRenderTaskListDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mRenderTaskList.Reset();
+      }
+
+      Dali::RenderTaskList mRenderTaskList;
+    };
+    TestThread thread;
+
+    Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+
+    RenderTaskList renderTaskList = scene.GetRenderTaskList();
+
+    thread.mRenderTaskList = std::move(renderTaskList);
+    renderTaskList.Reset();
+
+    scene.RemoveSceneObject();
+    scene.Discard();
+    scene.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
   END_TEST;
 }

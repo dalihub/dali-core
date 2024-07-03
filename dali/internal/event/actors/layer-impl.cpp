@@ -145,7 +145,7 @@ Layer::~Layer()
   if(mIsRoot)
   {
     // Guard to allow handle destruction after Core has been destroyed
-    if(EventThreadServices::IsCoreRunning())
+    if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
     {
       UninstallRootMessage(GetEventThreadServices().GetUpdateManager(), &GetSceneGraphLayer());
 
