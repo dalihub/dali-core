@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ Texture::Texture(TextureType::Type type, uint32_t resourceId)
 
 void Texture::Initialize()
 {
-  if(EventThreadServices::IsCoreRunning())
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     if(mNativeImage)
     {
@@ -117,7 +117,12 @@ void Texture::Initialize()
 
 Texture::~Texture()
 {
-  if(EventThreadServices::IsCoreRunning() && mTextureKey)
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~Texture[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
     RemoveTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
   }
@@ -170,7 +175,7 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
                      "Parameter value out of range");
 
   bool result(false);
-  if(EventThreadServices::IsCoreRunning() && mTextureKey)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
     if(mNativeImage)
     {
@@ -246,15 +251,23 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
       }
     }
   }
+  else
+  {
+    DALI_LOG_ERROR("Texture[%p] called Upload API from non-UI thread!\n", this);
+  }
 
   return result;
 }
 
 void Texture::GenerateMipmaps()
 {
-  if(EventThreadServices::IsCoreRunning() && mTextureKey)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
     GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
+  }
+  else
+  {
+    DALI_LOG_ERROR("Texture[%p] called GenerateMipmaps API from non-UI thread!\n", this);
   }
 }
 
@@ -286,7 +299,7 @@ Dali::TextureType::Type Texture::GetTextureType() const
 void Texture::SetSize(const ImageDimensions& size)
 {
   mSize = size;
-  if(EventThreadServices::IsCoreRunning() && mTextureKey)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
     SetTextureSizeMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, mSize);
   }
@@ -295,7 +308,7 @@ void Texture::SetSize(const ImageDimensions& size)
 void Texture::SetPixelFormat(Pixel::Format format)
 {
   mFormat = format;
-  if(EventThreadServices::IsCoreRunning() && mTextureKey)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
     SetTextureFormatMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, mFormat);
   }

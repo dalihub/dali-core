@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -176,11 +176,10 @@ void RenderTaskList::SortTasks()
     return;
   }
 
-  std::stable_sort(mTasks.begin(), mTasks.end(), [](RenderTaskPtr first, RenderTaskPtr second) -> bool
-                   { return first->GetOrderIndex() < second->GetOrderIndex(); });
+  std::stable_sort(mTasks.begin(), mTasks.end(), [](RenderTaskPtr first, RenderTaskPtr second) -> bool { return first->GetOrderIndex() < second->GetOrderIndex(); });
 
   OwnerPointer<std::vector<const SceneGraph::RenderTask*>> sortedTasks(new std::vector<const SceneGraph::RenderTask*>());
-  for(auto && task : mTasks)
+  for(auto&& task : mTasks)
   {
     sortedTasks->push_back(task->GetRenderTaskSceneObject());
   }
@@ -197,7 +196,12 @@ RenderTaskList::RenderTaskList()
 
 RenderTaskList::~RenderTaskList()
 {
-  if(EventThreadServices::IsCoreRunning() && mSceneObject)
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~RenderTaskList[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
   {
     // Remove the render task list using a message to the update manager
     RemoveRenderTaskListMessage(mEventThreadServices.GetUpdateManager(), *mSceneObject);

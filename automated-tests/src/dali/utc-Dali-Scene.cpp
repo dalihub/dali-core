@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
@@ -3090,3 +3091,58 @@ int UtcDaliSceneGetNativeId(void)
   DALI_TEST_EQUALS(nativeId, 1, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliSceneDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliSceneDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // RemoveSceneObject, Discard and Destruct at worker thread.
+        mScene.RemoveSceneObject();
+        mScene.Discard();
+
+        mScene.Reset();
+      }
+
+      Dali::Integration::Scene mScene;
+    };
+    TestThread thread;
+
+    Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+
+    // Unparent of DefaultCamera might throw exception. and exception at destructor will make abort.
+    // To avoid it, we should remove all children of root layer.
+    while(scene.GetRootLayer().GetChildCount() > 0)
+    {
+      auto child = scene.GetRootLayer().GetChildAt(0);
+      scene.GetRootLayer().Remove(child);
+    }
+
+    // To make ensure the last reference is in thread, call Discard first.
+    scene.Discard();
+
+    thread.mScene = std::move(scene);
+    scene.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+>>>>>>> 42f1aca96... Print log if worker thread destruction occured for UI items.

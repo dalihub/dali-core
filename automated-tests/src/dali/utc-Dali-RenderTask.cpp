@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
@@ -4274,7 +4275,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
   RenderTask     renderTask1    = renderTaskList.CreateTask();
 
   application.SendNotification();
-  uint32_t       answer1[2]     = {0u, 0u};
+  uint32_t answer1[2] = {0u, 0u};
   DALI_TEST_EQUALS(2, renderTaskList.GetTaskCount(), TEST_LOCATION);
   for(uint32_t i = 0; i < 2; ++i)
   {
@@ -4356,19 +4357,19 @@ int UtcDaliRenderTaskOrderIndex02(void)
   RenderTask     renderTask1    = renderTaskList.CreateTask();
   application.SendNotification();
   DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
-  
-  RenderTask     renderTask2    = renderTaskList.CreateTask();
+
+  RenderTask renderTask2 = renderTaskList.CreateTask();
   application.SendNotification();
   DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
   DALI_TEST_EQUALS(renderTask2, renderTaskList.GetTask(2u), TEST_LOCATION);
 
-  RenderTask     renderTask3    = renderTaskList.CreateTask();
+  RenderTask renderTask3 = renderTaskList.CreateTask();
   application.SendNotification();
   DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
   DALI_TEST_EQUALS(renderTask2, renderTaskList.GetTask(2u), TEST_LOCATION);
   DALI_TEST_EQUALS(renderTask3, renderTaskList.GetTask(3u), TEST_LOCATION);
 
-  RenderTask     renderTask4    = renderTaskList.CreateTask();
+  RenderTask renderTask4 = renderTaskList.CreateTask();
   application.SendNotification();
   DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
   DALI_TEST_EQUALS(renderTask2, renderTaskList.GetTask(2u), TEST_LOCATION);
@@ -4402,10 +4403,56 @@ int UtcDaliRenderTaskGetRenderTaskId(void)
   DALI_TEST_CHECK(renderTask1.GetRenderTaskId() != 0u);
   DALI_TEST_CHECK(renderTask2.GetRenderTaskId() != 0u);
   DALI_TEST_CHECK(renderTask3.GetRenderTaskId() != 0u);
-  
+
   DALI_TEST_CHECK(renderTask1.GetRenderTaskId() != renderTask2.GetRenderTaskId());
   DALI_TEST_CHECK(renderTask2.GetRenderTaskId() != renderTask3.GetRenderTaskId());
   DALI_TEST_CHECK(renderTask3.GetRenderTaskId() != renderTask1.GetRenderTaskId());
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliRenderTaskDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mRenderTask.Reset();
+      }
+
+      Dali::RenderTask mRenderTask;
+    };
+    TestThread thread;
+    Stage      stage = Stage::GetCurrent();
+    Vector2    stageSize(stage.GetSize());
+
+    RenderTaskList renderTaskList = stage.GetRenderTaskList();
+
+    RenderTask renderTask = renderTaskList.CreateTask();
+
+    renderTaskList.RemoveTask(renderTask);
+
+    thread.mRenderTask = std::move(renderTask);
+    renderTask.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }

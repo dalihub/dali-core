@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1152,12 +1152,17 @@ void Actor::Initialize()
 
 Actor::~Actor()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~Actor[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
   // Remove mParent pointers from children even if we're destroying core,
   // to guard against GetParent() & Unparent() calls from CustomActor destructors.
   UnparentChildren();
 
   // Guard to allow handle destruction after Core has been destroyed
-  if(EventThreadServices::IsCoreRunning())
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     if(mRenderers)
     {
@@ -1346,7 +1351,7 @@ void Actor::NotifyStageDisconnection(bool notify)
   // Actors can be added (in a callback), before the off-stage state is reported.
   // Also if the actor was added & removed before mOnSceneSignalled was set, then we don't notify here.
   // only do this step if there is a stage, i.e. Core is not being shut down
-  if(EventThreadServices::IsCoreRunning() && !OnScene() && mOnSceneSignalled)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()) && !OnScene() && mOnSceneSignalled)
   {
     if(notify)
     {

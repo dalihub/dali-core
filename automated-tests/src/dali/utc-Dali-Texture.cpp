@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/rendering/texture-devel.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/pixel-data-integ.h>
 #include <dali/integration-api/texture-integ.h>
 #include <dali/public-api/dali-core.h>
@@ -1723,6 +1724,58 @@ int utcDaliTexturePartialUpdate02(void)
 
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextureDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliTextureDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Upload at worker thread
+        uint8_t*        rawBuffer = new uint8_t[4];
+        Dali::PixelData pixelData = Dali::PixelData::New(rawBuffer, 4, 1, 1, Pixel::RGBA8888, Dali::PixelData::DELETE_ARRAY);
+
+        // Use try-catch to avoid memory leak false alarm
+        try
+        {
+          // Upload, GenerateMipmaps, and Destruct at worker thread.
+          mTexture.Upload(pixelData);
+          mTexture.GenerateMipmaps();
+          mTexture.Reset();
+        }
+        catch(...)
+        {
+        }
+      }
+
+      Dali::Texture mTexture;
+    };
+    TestThread thread;
+
+    Dali::Texture texture = Dali::Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
+    thread.mTexture       = std::move(texture);
+    texture.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }

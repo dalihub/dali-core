@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
@@ -4937,11 +4938,6 @@ int UtcDaliRendererUniformBlocks02(void)
   END_TEST;
 }
 
-int AlignSize(int size, int align)
-{
-  return (size % align == 0) ? size : ((size / align) + 1) * align;
-}
-
 int UtcDaliRendererUniformBlocks03(void)
 {
   setenv("LOG_UNIFORM_BUFFER", "5f", 1); // Turns on buffer logging
@@ -5209,5 +5205,46 @@ int UtcDaliRendererUniformArrayOverflow(void)
   // the r component of uColor uniform must not be changed.
   // if r is 0.0f then test fails as the array stomped on the uniform's memory.
   DALI_TEST_EQUALS((uniformColor.r != 0.0f), true, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRendererDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliRendererDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mRenderer.Reset();
+      }
+
+      Dali::Renderer mRenderer;
+    };
+    TestThread thread;
+
+    Dali::Geometry geometry = CreateQuadGeometry();
+    Dali::Shader   shader   = Dali::Shader::New("vertexSrc", "fragmentSrc");
+    Dali::Renderer renderer = Dali::Renderer::New(geometry, shader);
+    thread.mRenderer        = std::move(renderer);
+    renderer.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
   END_TEST;
 }

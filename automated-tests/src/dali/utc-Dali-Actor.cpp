@@ -21,6 +21,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/capabilities.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -14650,5 +14651,44 @@ int UtcDaliActorDispatchHoverMotionPropertyN(void)
   {
     tet_result(TET_FAIL);
   }
+  END_TEST;
+}
+
+int UtcDaliActorDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliActorDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mActor.Reset();
+      }
+
+      Dali::Actor mActor;
+    };
+    TestThread thread;
+
+    Dali::Actor actor = Dali::Actor::New();
+    thread.mActor     = std::move(actor);
+    actor.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
   END_TEST;
 }

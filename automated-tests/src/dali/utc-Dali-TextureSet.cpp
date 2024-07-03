@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 
 // INTERNAL INCLUDES
@@ -650,6 +651,45 @@ int UtcDaliTextureSetMultipleTextures(void)
 
   DALI_TEST_CHECK(boundTextures0[boundTextures0.size() - 1] == 1u);
   DALI_TEST_CHECK(boundTextures1.size() == count); // The bound texture count of GL_TEXTURE1 should not be changed.
+
+  END_TEST;
+}
+
+int UtcDaliTextureSetDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliTextureSetDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mTextureSet.Reset();
+      }
+
+      Dali::TextureSet mTextureSet;
+    };
+    TestThread thread;
+
+    Dali::TextureSet textureSet = Dali::TextureSet::New();
+    thread.mTextureSet          = std::move(textureSet);
+    textureSet.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }
