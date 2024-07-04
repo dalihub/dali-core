@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,39 @@ namespace Integration
 {
 namespace Log
 {
+namespace
+{
+void FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_list args)
+{
+  if(format != nullptr)
+  {
+    char* buffer       = nullptr;
+    int   bufferLength = vasprintf(&buffer, format, args); // Development note : bufferLength doesn't include null-terminated character.
+
+    if(bufferLength >= 0) // No error
+    {
+      // TODO : We need to consider thread-safety way to print something.
+      switch(priority)
+      {
+        case DebugPriority::DEBUG:
+        case DebugPriority::INFO:
+        {
+          fprintf(stdout, "%.*s", bufferLength, buffer);
+          break;
+        }
+        case DebugPriority::WARNING:
+        case DebugPriority::ERROR:
+        default:
+        {
+          fprintf(stderr, "%.*s", bufferLength, buffer);
+          break;
+        }
+      }
+      free(buffer);
+    }
+  }
+}
+} // namespace
 thread_local LogFunction gthreadLocalLogFunction = nullptr;
 
 /* Forward declarations */
@@ -45,17 +78,22 @@ std::string ArgListToString(const char* format, va_list args);
 
 void LogMessage(DebugPriority priority, const char* format, ...)
 {
-  if(!gthreadLocalLogFunction)
+  if(DALI_UNLIKELY(!gthreadLocalLogFunction))
   {
-    return;
+    va_list arg;
+    va_start(arg, format);
+    FormatPrintToStandardOutput(priority, format, arg);
+    va_end(arg);
   }
+  else
+  {
+    va_list arg;
+    va_start(arg, format);
+    std::string message = ArgListToString(format, arg);
+    va_end(arg);
 
-  va_list arg;
-  va_start(arg, format);
-  std::string message = ArgListToString(format, arg);
-  va_end(arg);
-
-  gthreadLocalLogFunction(priority, message);
+    gthreadLocalLogFunction(priority, message);
+  }
 }
 
 void InstallLogFunction(const LogFunction& logFunction)
