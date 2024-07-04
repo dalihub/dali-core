@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 #include <string.h>
 #include <unistd.h>
@@ -556,5 +557,44 @@ int UtcDaliSamplerSetFilterModeNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliSamplerDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliSamplerDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mSampler.Reset();
+      }
+
+      Dali::Sampler mSampler;
+    };
+    TestThread thread;
+
+    Dali::Sampler sampler = Dali::Sampler::New();
+    thread.mSampler       = std::move(sampler);
+    sampler.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
   END_TEST;
 }

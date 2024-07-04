@@ -1019,6 +1019,14 @@ Object::Object(const SceneGraph::PropertyOwner* sceneObject)
 
 Object::~Object()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    if(nullptr != mUpdateObject)
+    {
+      DALI_LOG_ERROR("~Object[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+    }
+  }
+
   NotifyObservers(*this, mObservers, &Object::Observer::ObjectDestroyed);
 
   // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.

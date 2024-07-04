@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 #include <chrono>
 using namespace std::chrono_literals;
@@ -720,6 +721,47 @@ int UtcDaliSetAndRemoveVertexBufferUpdateCallback(void)
   value = callback->GetValueWithTimeout();
   // Test whether callback ran
   DALI_TEST_EQUALS(value.success, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVertexBufferDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimationDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mVertexBuffer.Reset();
+      }
+
+      Dali::VertexBuffer mVertexBuffer;
+    };
+    TestThread thread;
+
+    Dali::VertexBuffer vertexBuffer = VertexBuffer::New(Property::Map() = {
+                                                          {"aPosition", Property::Type::VECTOR2},
+                                                          {"aTexCoord", Property::Type::VECTOR2}});
+    thread.mVertexBuffer            = std::move(vertexBuffer);
+    vertexBuffer.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }

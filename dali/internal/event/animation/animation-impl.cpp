@@ -261,6 +261,11 @@ void Animation::Initialize()
 
 Animation::~Animation()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~Animation[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
   // Guard to allow handle destruction after Core has been destroyed
   if(Stage::IsInstalled())
   {

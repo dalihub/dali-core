@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,6 +81,11 @@ ConstraintBase* ConstraintBase::Clone(Object& object)
 
 ConstraintBase::~ConstraintBase()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~ConstraintBase[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
   StopObservation();
 
   RemoveInternal();
@@ -108,7 +113,7 @@ void ConstraintBase::Apply(bool isPreConstraint)
 {
   if(mTargetObject && !mApplied && !mSourceDestroyed)
   {
-    mApplied = true;
+    mApplied         = true;
     mIsPreConstraint = isPreConstraint;
     ConnectConstraint(mIsPreConstraint);
 

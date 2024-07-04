@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 using namespace Dali;
 
@@ -33,6 +34,8 @@ void framebuffer_set_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+namespace
+{
 RenderTask CreateRenderTask(TestApplication& application,
                             FrameBuffer      framebuffer)
 {
@@ -61,6 +64,7 @@ RenderTask CreateRenderTask(TestApplication& application,
 
   return newTask;
 }
+} // namespace
 
 int UtcDaliFrameBufferNew01(void)
 {
@@ -766,5 +770,44 @@ int UtcDaliFrameBufferAttachColorTextureNegative02(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int UtcDaliFrameBufferDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliFrameBufferDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mFrameBuffer.Reset();
+      }
+
+      Dali::FrameBuffer mFrameBuffer;
+    };
+    TestThread thread;
+
+    Dali::FrameBuffer frameBuffer = Dali::FrameBuffer::New(100, 100);
+    thread.mFrameBuffer           = std::move(frameBuffer);
+    frameBuffer.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
   END_TEST;
 }

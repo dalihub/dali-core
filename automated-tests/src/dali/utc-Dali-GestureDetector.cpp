@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/public-api/dali-core.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
-#include <dali/internal/event/events/tap-gesture/tap-gesture-detector-impl.h>
+#include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
 #include <algorithm>
@@ -125,8 +126,7 @@ Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vecto
   return touchEvent;
 }
 
-}
-
+} // namespace
 
 int UtcDaliGestureDetectorConstructorN(void)
 {
@@ -598,10 +598,10 @@ int UtcDaliGestureDetectorRegisterProperty(void)
 
 int UtcDaliGestureDetectorCancelProcessing(void)
 {
-  TestApplication application;
-  Integration::Scene scene   = application.GetScene();
-  RenderTaskList   taskList  = scene.GetRenderTaskList();
-  Dali::RenderTask task      = taskList.GetTask(0);
+  TestApplication    application;
+  Integration::Scene scene    = application.GetScene();
+  RenderTaskList     taskList = scene.GetRenderTaskList();
+  Dali::RenderTask   task     = taskList.GetTask(0);
 
   LongPressGestureDetector longDetector     = LongPressGestureDetector::New();
   TapGestureDetector       tapDetector      = TapGestureDetector::New();
@@ -646,13 +646,12 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   TestTriggerLongPress(application);
   longDetector.CancelAllOtherGestureDetectors();
 
-
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, tData.functorCalled, TEST_LOCATION);
   data.Reset();
   tData.Reset();
 
-  tp = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 650);
+  tp             = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 650);
   touchEventImpl = new Internal::TouchEvent(650);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
@@ -670,7 +669,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
 
   longDetector.SetTouchesRequired(2, 2);
 
-  tp = GenerateDoubleTouch(PointState::DOWN, Vector2(2.0f, 20.0f), PointState::DOWN, Vector2(38.0f, 20.0f), 100);
+  tp             = GenerateDoubleTouch(PointState::DOWN, Vector2(2.0f, 20.0f), PointState::DOWN, Vector2(38.0f, 20.0f), 100);
   touchEventImpl = new Internal::TouchEvent(100);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
@@ -684,7 +683,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
 
   pinchDetector.CancelAllOtherGestureDetectors();
 
-  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 150);
+  tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 150);
   touchEventImpl = new Internal::TouchEvent(150);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
@@ -696,8 +695,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   pinchDetector.HandleEvent(actor, touchEventHandle);
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
-
-  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 200);
+  tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 200);
   touchEventImpl = new Internal::TouchEvent(200);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
@@ -709,8 +707,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   pinchDetector.HandleEvent(actor, touchEventHandle);
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
-
-  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 250);
+  tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 250);
   touchEventImpl = new Internal::TouchEvent(250);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
@@ -722,8 +719,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   pinchDetector.HandleEvent(actor, touchEventHandle);
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
-
-  tp = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 300);
+  tp             = GenerateDoubleTouch(PointState::MOTION, Vector2(10.0f, 20.0f), PointState::MOTION, Vector2(30.0f, 20.0f), 300);
   touchEventImpl = new Internal::TouchEvent(300);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
@@ -735,8 +731,7 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   pinchDetector.HandleEvent(actor, touchEventHandle);
   rotationDetector.HandleEvent(actor, touchEventHandle);
 
-
-  tp = GenerateDoubleTouch(PointState::UP, Vector2(10.0f, 20.0f), PointState::UP, Vector2(30.0f, 20.0f), 350);
+  tp             = GenerateDoubleTouch(PointState::UP, Vector2(10.0f, 20.0f), PointState::UP, Vector2(30.0f, 20.0f), 350);
   touchEventImpl = new Internal::TouchEvent(350);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
@@ -754,6 +749,45 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   data.Reset();
   tData.Reset();
   pData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliGestureDetectorDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliGestureDetectorDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mGestureDetector.Reset();
+      }
+
+      Dali::GestureDetector mGestureDetector;
+    };
+    TestThread thread;
+
+    GestureDetector detector = PanGestureDetector::New();
+    thread.mGestureDetector  = std::move(detector);
+    detector.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
 
   END_TEST;
 }
