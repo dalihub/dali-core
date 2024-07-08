@@ -22,19 +22,9 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/events/gesture.h>
-#include <dali/public-api/math/viewport.h>
-#include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
-
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
-
 #include <dali/integration-api/events/touch-event-integ.h>
-
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
@@ -46,6 +36,14 @@
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/update/nodes/node-declarations.h>
+#include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/events/gesture.h>
+#include <dali/public-api/math/viewport.h>
+#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 
 namespace Dali
 {
@@ -1577,6 +1575,46 @@ public:
   {
   }
 
+public:
+  // For Internal RenderTask Ordering
+
+  /**
+   * @brief Retrieves the off-screen RenderTasks associated with the Actor.
+   * This method returns the internal RenderTasks held by the Actor. This tasks are
+   * used for off-screen rendering, and the system will assign order index to each
+   * tasks based on the render order.
+   *
+   * Actor with a non-NONE OffScreenRenderableType should override this method to
+   * provide their render tasks.
+   *
+   * @param[out] tasks A list of RenderTasks to be populated with the Actor's forward
+   * or backward off-screen RenderTask.
+   * @param[in] isForward Indicates whether to retrieve forward (true) or backward (false)
+   * RenderTasks.
+   */
+  virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward);
+
+  /**
+   * @brief Sets OffScreenRenderableType of this Actor.
+   * This method is called by child class to set type itself.
+   *
+   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
+   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
+   */
+  void SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
+
+  /**
+   * @brief Retrieves OffScreenRenderableType of this Actor.
+   *
+   * @return OffScreenRenderableType for this Actor.
+   */
+  OffScreenRenderable::Type GetOffScreenRenderableType() const;
+
+  /**
+   * @brief Requests RenderTask reordering when the offscreen properties of this Actor are changed.
+   */
+  void RequestRenderTaskReorder();
+
 protected:
   enum DerivedType
   {
@@ -2026,6 +2064,9 @@ protected:
 
 private:
   static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
+
+  // OffScreenRenderable
+  OffScreenRenderable::Type mOffScreenRenderableType;
 
   struct PropertyHandler;
   struct SiblingHandler;

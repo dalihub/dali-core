@@ -128,6 +128,11 @@ private:
     mImpl->OnSizeAnimation(animationHandle, targetSize);
   }
 
+  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+  {
+    mImpl->GetOffScreenRenderTasks(tasks, isForward);
+  }
+
   /**
    * @copydoc Internal::Actor::OnRelayout
    */
