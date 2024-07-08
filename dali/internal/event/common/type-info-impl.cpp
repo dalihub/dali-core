@@ -133,7 +133,7 @@ inline bool GetBaseType(Internal::TypeInfo*& baseType, TypeRegistry& typeRegistr
   // if greater than unresolved means we have a base type, null means no base
   bool baseExists = (baseType > UNRESOLVED);
   // base only needs to be resolved once
-  if(UNRESOLVED == baseType)
+  if(DALI_UNLIKELY(UNRESOLVED == baseType))
   {
     TypeRegistry::TypeInfoPointer base = typeRegistry.GetTypeInfo(baseTypeName);
     if(base)
@@ -438,13 +438,13 @@ std::string_view TypeInfo::GetPropertyName(Property::Index index) const
 
 void TypeInfo::AddActionFunction(std::string actionName, Dali::TypeInfo::ActionFunction function)
 {
-  if(nullptr == function)
+  if(DALI_UNLIKELY(nullptr == function))
   {
     DALI_LOG_WARNING("Action function is empty\n");
   }
   else
   {
-    if(!mActions.Register(ConstString(actionName), function))
+    if(DALI_UNLIKELY(!mActions.Register(ConstString(actionName), function)))
     {
       DALI_LOG_WARNING("Action already exists in TypeRegistry Type\n", actionName.c_str());
     }
@@ -453,13 +453,13 @@ void TypeInfo::AddActionFunction(std::string actionName, Dali::TypeInfo::ActionF
 
 void TypeInfo::AddConnectorFunction(std::string signalName, Dali::TypeInfo::SignalConnectorFunction function)
 {
-  if(nullptr == function)
+  if(DALI_UNLIKELY(nullptr == function))
   {
     DALI_LOG_WARNING("Connector function is empty\n");
   }
   else
   {
-    if(!mSignalConnectors.Register(ConstString(signalName), function))
+    if(DALI_UNLIKELY(!mSignalConnectors.Register(ConstString(signalName), function)))
     {
       DALI_LOG_WARNING("Signal name already exists in TypeRegistry Type for signal connector function\n", signalName.c_str());
     }
@@ -470,14 +470,16 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
 {
   // The setter can be empty as a property can be read-only.
 
-  if(nullptr == getFunc)
+  if(DALI_UNLIKELY(nullptr == getFunc))
   {
+    DALI_LOG_ERROR("GetProperty Function is empty! name:%s, index:%d, type:%d\n", name.c_str(), index, static_cast<int32_t>(type));
     DALI_ASSERT_ALWAYS(!"GetProperty Function is empty");
   }
   else
   {
-    if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
+    if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
     {
+      DALI_LOG_ERROR("Property index already added to Type! name:%s, index:%d, type:%d\n", name.c_str(), index, static_cast<int32_t>(type));
       DALI_ASSERT_ALWAYS(!"Property index already added to Type");
     }
   }
@@ -487,14 +489,16 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
 {
   // The setter can be empty as a property can be read-only.
 
-  if(nullptr == getFunc)
+  if(DALI_UNLIKELY(nullptr == getFunc))
   {
+    DALI_LOG_ERROR("GetProperty Function is empty! name:%s, index:%d, type:%d\n", name.c_str(), index, static_cast<int32_t>(type));
     DALI_ASSERT_ALWAYS(!"GetProperty Function is empty");
   }
   else
   {
-    if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
+    if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
     {
+      DALI_LOG_ERROR("Property index already added to Type! name:%s, index:%d, type:%d\n", name.c_str(), index, static_cast<int32_t>(type));
       DALI_ASSERT_ALWAYS(!"Property index already added to Type");
     }
   }
@@ -502,16 +506,18 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
 
 void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Type type)
 {
-  if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
+  if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
   {
+    DALI_LOG_ERROR("Property index already added to Type! name:%s, index:%d, type:%d\n", name.c_str(), index, static_cast<int32_t>(type));
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
   }
 }
 
 void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue)
 {
-  if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(defaultValue.GetType(), ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
+  if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(defaultValue.GetType(), ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
   {
+    DALI_LOG_ERROR("Property index already added to Type! name:%s, index:%d\n", name.c_str(), index);
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
   }
   else
@@ -523,28 +529,37 @@ void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Pr
 void TypeInfo::AddAnimatablePropertyComponent(std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex)
 {
   Property::Type type = GetPropertyType(baseIndex);
-  DALI_ASSERT_ALWAYS((type == Property::VECTOR2 || type == Property::VECTOR3 || type == Property::VECTOR4) && "Base property does not support component");
+  if(DALI_UNLIKELY(!(type == Property::VECTOR2 || type == Property::VECTOR3 || type == Property::VECTOR4)))
+  {
+    DALI_LOG_ERROR("Base property does not support component! name:%s, index:%d, baseIndex:%d, component:%d, type:%d\n", name.c_str(), index, baseIndex, static_cast<int32_t>(componentIndex), static_cast<int32_t>(type));
+    DALI_ASSERT_ALWAYS(!"Base property does not support component");
+  }
 
   bool success = false;
 
-  if(mRegisteredProperties.Get(static_cast<std::uint32_t>(index)) == mRegisteredProperties.end())
+  if(DALI_LIKELY(mRegisteredProperties.Get(static_cast<std::uint32_t>(index)) == mRegisteredProperties.end()))
   {
     const auto& iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyComponentFinder<RegisteredPropertyPair>(baseIndex, componentIndex));
 
-    if(iter == mRegisteredProperties.end())
+    if(DALI_LIKELY(iter == mRegisteredProperties.end()))
     {
       mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), baseIndex, componentIndex));
       success = true;
     }
   }
 
-  DALI_ASSERT_ALWAYS(success && "Property component already registered");
+  if(DALI_UNLIKELY(!success))
+  {
+    DALI_LOG_ERROR("Property component already registered! name:%s, index:%d, baseIndex:%d, component:%d\n", name.c_str(), index, baseIndex, static_cast<int32_t>(componentIndex));
+    DALI_ASSERT_ALWAYS(!"Property component already registered");
+  }
 }
 
 void TypeInfo::AddChildProperty(std::string name, Property::Index index, Property::Type type)
 {
-  if(!mRegisteredChildProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
+  if(DALI_UNLIKELY(!mRegisteredChildProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
   {
+    DALI_LOG_ERROR("Property index already added to Type! name:%s, index:%d, type:%d\n", name.c_str(), index, static_cast<int32_t>(type));
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
   }
 }
@@ -882,19 +897,26 @@ void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
   if(iter != mRegisteredProperties.end())
   {
-    if(iter->second.setFunc)
+    if(mCSharpType)
     {
-      if(mCSharpType)
+      if(DALI_UNLIKELY(nullptr == iter->second.cSharpSetFunc))
       {
-        // CSharp wants a property name not an index
-        auto name = (iter->second).name;
+        DALI_LOG_ERROR("Trying to write to a read-only property! name:%s, index:%d, object:%p\n", (iter->second).name.GetCString(), static_cast<int32_t>(index), object);
+        return;
+      }
+      // CSharp wants a property name not an index
+      auto name = (iter->second).name;
 
-        iter->second.cSharpSetFunc(object, name.GetCString(), const_cast<Property::Value*>(&value));
-      }
-      else
+      iter->second.cSharpSetFunc(object, name.GetCString(), const_cast<Property::Value*>(&value));
+    }
+    else
+    {
+      if(DALI_UNLIKELY(nullptr == iter->second.setFunc))
       {
-        iter->second.setFunc(object, index, value);
+        DALI_LOG_ERROR("Trying to write to a read-only property! name:%s, index:%d, object:%p\n", (iter->second).name.GetCString(), static_cast<int32_t>(index), object);
+        return;
       }
+      iter->second.setFunc(object, index, value);
     }
   }
   else if(GetBaseType(mBaseType, mTypeRegistry, mBaseTypeName))
@@ -914,15 +936,23 @@ void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property
   RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(ConstString(name)));
   if(iter != mRegisteredProperties.end())
   {
-    DALI_ASSERT_ALWAYS(iter->second.setFunc && "Trying to write to a read-only property");
-
     if(mCSharpType)
     {
+      if(DALI_UNLIKELY(nullptr == iter->second.cSharpSetFunc))
+      {
+        DALI_LOG_ERROR("Trying to write to a read-only property! name:%s, index:%d, object:%p\n", name.c_str(), static_cast<int32_t>(iter->first), object);
+        return;
+      }
       // CSharp wants a property name not an index
       iter->second.cSharpSetFunc(object, name.c_str(), const_cast<Property::Value*>(&value));
     }
     else
     {
+      if(DALI_UNLIKELY(nullptr == iter->second.setFunc))
+      {
+        DALI_LOG_ERROR("Trying to write to a read-only property! name:%s, index:%d, object:%p\n", name.c_str(), static_cast<int32_t>(iter->first), object);
+        return;
+      }
       iter->second.setFunc(object, iter->first, value);
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1162,7 +1162,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   END_TEST;
 }
 
-int UtcDaliTypeRegistryAnimatablePropertyRegistrationN(void)
+int UtcDaliTypeRegistryAnimatablePropertyRegistrationN01(void)
 {
   TestApplication application;
   TypeRegistry    typeRegistry = TypeRegistry::Get();
@@ -1187,6 +1187,27 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationN(void)
   catch(DaliException& e)
   {
     DALI_TEST_ASSERT(e, "(index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX)", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyRegistrationN02(void)
+{
+  TestApplication application;
+  TypeRegistry    typeRegistry = TypeRegistry::Get();
+
+  AnimatablePropertyRegistration property1(customType1, "animPropName", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1, Property::BOOLEAN);
+
+  // Attempt to register an animatable property with the same index
+  try
+  {
+    AnimatablePropertyRegistration property1(customType1, "animPropName2", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1, Property::BOOLEAN);
+    tet_result(TET_FAIL);
+  }
+  catch(DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "!\"Property index already added to Type\"", TEST_LOCATION);
   }
 
   END_TEST;
@@ -1268,7 +1289,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   END_TEST;
 }
 
-int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultN(void)
+int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultN01(void)
 {
   TestApplication application;
   TypeRegistry    typeRegistry = TypeRegistry::Get();
@@ -1293,6 +1314,27 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultN(void)
   catch(DaliException& e)
   {
     DALI_TEST_ASSERT(e, "(index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX)", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultN02(void)
+{
+  TestApplication application;
+  TypeRegistry    typeRegistry = TypeRegistry::Get();
+
+  AnimatablePropertyRegistration property1(customType1, "animPropName", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1, false);
+
+  // Attempt to register an animatable property with the same index
+  try
+  {
+    AnimatablePropertyRegistration property1(customType1, "animPropName2", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1, false);
+    tet_result(TET_FAIL);
+  }
+  catch(DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "!\"Property index already added to Type\"", TEST_LOCATION);
   }
 
   END_TEST;
@@ -1936,7 +1978,7 @@ int UtcDaliPropertyRegistrationFunctions(void)
   // Attempt to register a property without a setter
   try
   {
-    PropertyRegistration property1(customType1, "propName", propertyIndex++, Property::BOOLEAN, NULL, &GetProperty);
+    PropertyRegistration property1(customType1, "propName1", propertyIndex++, Property::BOOLEAN, NULL, &GetProperty);
     tet_result(TET_PASS);
   }
   catch(DaliException& e)
@@ -1947,7 +1989,7 @@ int UtcDaliPropertyRegistrationFunctions(void)
   // Attempt to register a property without a getter
   try
   {
-    PropertyRegistration property1(customType1, "propName", propertyIndex++, Property::BOOLEAN, NULL, NULL);
+    PropertyRegistration property1(customType1, "propName2", propertyIndex++, Property::BOOLEAN, NULL, NULL);
     tet_result(TET_FAIL);
   }
   catch(DaliException& e)
@@ -2018,11 +2060,42 @@ int UtcDaliPropertyRegistrationPropertyWritableP(void)
   Internal::TypeInfo& typeInfoImpl = GetImplementation(typeInfo);
 
   DALI_TEST_EQUALS(typeInfoImpl.IsPropertyWritable(propertyIndex1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(typeInfoImpl.IsPropertyWritable(propertyIndex2), false, TEST_LOCATION);
 
   END_TEST;
 }
 
-int UtcDaliPropertyRegistrationPropertyWritableN(void)
+int UtcDaliPropertyRegistrationPropertyWritableN01(void)
+{
+  TestApplication application;
+  int             propertyIndex1 = PROPERTY_REGISTRATION_START_INDEX + 200;
+  int             propertyIndex2 = PROPERTY_REGISTRATION_START_INDEX + 201;
+
+  // Add two properties, one with SetProperty, one without
+  PropertyRegistration property1(customType1, "propNameReadwrite", propertyIndex1, Property::BOOLEAN, &SetProperty, &GetProperty);
+  PropertyRegistration property2(customType1, "propNameReadonly", propertyIndex2, Property::BOOLEAN, NULL, &GetProperty);
+
+  // Create custom-actor
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo(typeid(MyTestCustomActor));
+  DALI_TEST_CHECK(typeInfo);
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK(handle);
+  Actor customActor = Actor::DownCast(handle);
+  DALI_TEST_CHECK(customActor);
+
+  // Check SetProperty and GetProperty works well for Readwrite
+  setPropertyCalled = false;
+  customActor.SetProperty(propertyIndex1, true);
+  DALI_TEST_EQUALS(setPropertyCalled, true, TEST_LOCATION);
+
+  setPropertyCalled = false;
+  customActor.SetProperty(propertyIndex2, true);
+  DALI_TEST_EQUALS(setPropertyCalled, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyRegistrationPropertyWritableN02(void)
 {
   TypeInfo            typeInfo     = TypeRegistry::Get().GetTypeInfo(typeid(MyTestCustomActor));
   Internal::TypeInfo& typeInfoImpl = GetImplementation(typeInfo);
