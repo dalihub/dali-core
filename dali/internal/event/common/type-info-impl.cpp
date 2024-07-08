@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -215,11 +215,7 @@ bool TypeInfo::DoActionTo(BaseObject* object, const std::string& actionName, con
 {
   bool done = false;
 
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   auto iter = mActions.Get(ConstString(actionName));
-#else
-  ActionContainer::iterator    iter = find_if(mActions.begin(), mActions.end(), PairFinder<std::string, ActionPair>(actionName));
-#endif
   if(iter != mActions.end())
   {
     done = (iter->second)(object, actionName, properties);
@@ -241,11 +237,7 @@ bool TypeInfo::ConnectSignal(BaseObject* object, ConnectionTrackerInterface* con
 {
   bool connected(false);
 
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   auto iter = mSignalConnectors.Get(ConstString(signalName));
-#else
-  ConnectorContainer::iterator iter = find_if(mSignalConnectors.begin(), mSignalConnectors.end(), PairFinder<std::string, ConnectionPair>(signalName));
-#endif
   if(iter != mSignalConnectors.end())
   {
     connected = (iter->second)(object, connectionTracker, signalName, functor);
@@ -298,11 +290,7 @@ std::string TypeInfo::GetActionName(uint32_t index) const
 
   if(index < count)
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     name = std::string(mActions.GetKeyByIndex(index).GetStringView());
-#else
-    name = mActions[index].first;
-#endif
   }
   else
   {
@@ -336,11 +324,7 @@ std::string TypeInfo::GetSignalName(uint32_t index) const
 
   if(index < count)
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     name = std::string(mSignalConnectors.GetKeyByIndex(index).GetStringView());
-#else
-    name = mSignalConnectors[index].first;
-#endif
   }
   else
   {
@@ -405,11 +389,7 @@ void TypeInfo::AppendProperties(Dali::Property::IndexContainer&              ind
 
 std::string_view TypeInfo::GetRegisteredPropertyName(Property::Index index) const
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
   if(iter != mRegisteredProperties.end())
   {
     return iter->second.name.GetStringView();
@@ -437,11 +417,7 @@ std::string_view TypeInfo::GetPropertyName(Property::Index index) const
   }
   else
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-    RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
     if(iter != mRegisteredProperties.end())
     {
       return iter->second.name.GetStringView();
@@ -468,23 +444,10 @@ void TypeInfo::AddActionFunction(std::string actionName, Dali::TypeInfo::ActionF
   }
   else
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     if(!mActions.Register(ConstString(actionName), function))
     {
       DALI_LOG_WARNING("Action already exists in TypeRegistry Type\n", actionName.c_str());
     }
-#else
-    ActionContainer::iterator                   iter = std::find_if(mActions.begin(), mActions.end(), PairFinder<std::string, ActionPair>(actionName));
-
-    if(iter == mActions.end())
-    {
-      mActions.push_back(ActionPair(std::move(actionName), function));
-    }
-    else
-    {
-      DALI_LOG_WARNING("Action already exists in TypeRegistry Type\n", actionName.c_str());
-    }
-#endif
   }
 }
 
@@ -496,23 +459,10 @@ void TypeInfo::AddConnectorFunction(std::string signalName, Dali::TypeInfo::Sign
   }
   else
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     if(!mSignalConnectors.Register(ConstString(signalName), function))
     {
       DALI_LOG_WARNING("Signal name already exists in TypeRegistry Type for signal connector function\n", signalName.c_str());
     }
-#else
-    ConnectorContainer::iterator iter = find_if(mSignalConnectors.begin(), mSignalConnectors.end(), PairFinder<std::string, ConnectionPair>(signalName));
-
-    if(iter == mSignalConnectors.end())
-    {
-      mSignalConnectors.push_back(ConnectionPair(std::move(signalName), function));
-    }
-    else
-    {
-      DALI_LOG_WARNING("Signal name already exists in TypeRegistry Type for signal connector function\n", signalName.c_str());
-    }
-#endif
   }
 }
 
@@ -526,22 +476,10 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
   }
   else
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
     {
       DALI_ASSERT_ALWAYS(!"Property index already added to Type");
     }
-#else
-    RegisteredPropertyContainer::iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-    if(iter == mRegisteredProperties.end())
-    {
-      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(!"Property index already added to Type");
-    }
-#endif
   }
 }
 
@@ -555,48 +493,23 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
   }
   else
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
     {
       DALI_ASSERT_ALWAYS(!"Property index already added to Type");
     }
-#else
-    RegisteredPropertyContainer::iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-    if(iter == mRegisteredProperties.end())
-    {
-      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
-    }
-    else
-    {
-      DALI_ASSERT_ALWAYS(!"Property index already added to Type");
-    }
-#endif
   }
 }
 
 void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Type type)
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
   {
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
   }
-#else
-  RegisteredPropertyContainer::iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-  if(iter == mRegisteredProperties.end())
-  {
-    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
-  }
-  else
-  {
-    DALI_ASSERT_ALWAYS(!"Property index already added to Type");
-  }
-#endif
 }
 
 void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue)
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   if(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(defaultValue.GetType(), ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
   {
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
@@ -605,18 +518,6 @@ void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Pr
   {
     mPropertyDefaultValues.Register(static_cast<std::uint32_t>(index), std::move(defaultValue));
   }
-#else
-  RegisteredPropertyContainer::iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-  if(iter == mRegisteredProperties.end())
-  {
-    mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(defaultValue.GetType(), ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
-    mPropertyDefaultValues.push_back(PropertyDefaultValuePair(index, std::move(defaultValue)));
-  }
-  else
-  {
-    DALI_ASSERT_ALWAYS(!"Property index already added to Type");
-  }
-#endif
 }
 
 void TypeInfo::AddAnimatablePropertyComponent(std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex)
@@ -626,7 +527,6 @@ void TypeInfo::AddAnimatablePropertyComponent(std::string name, Property::Index 
 
   bool success = false;
 
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   if(mRegisteredProperties.Get(static_cast<std::uint32_t>(index)) == mRegisteredProperties.end())
   {
     const auto& iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyComponentFinder<RegisteredPropertyPair>(baseIndex, componentIndex));
@@ -637,35 +537,13 @@ void TypeInfo::AddAnimatablePropertyComponent(std::string name, Property::Index 
       success = true;
     }
   }
-#else
-  RegisteredPropertyContainer::iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-  if(iter == mRegisteredProperties.end())
-  {
-    iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyComponentFinder<RegisteredPropertyPair>(baseIndex, componentIndex));
-
-    if(iter == mRegisteredProperties.end())
-    {
-      mRegisteredProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, ConstString(name), baseIndex, componentIndex)));
-      success = true;
-    }
-  }
-#endif
 
   DALI_ASSERT_ALWAYS(success && "Property component already registered");
 }
 
 void TypeInfo::AddChildProperty(std::string name, Property::Index index, Property::Type type)
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   if(!mRegisteredChildProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)))
-#else
-  RegisteredPropertyContainer::iterator iter = find_if(mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-  if(iter == mRegisteredChildProperties.end())
-  {
-    mRegisteredChildProperties.push_back(RegisteredPropertyPair(index, RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX)));
-  }
-  else
-#endif
   {
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
   }
@@ -725,11 +603,7 @@ Property::Index TypeInfo::GetBasePropertyIndex(Property::Index index) const
 {
   Property::Index basePropertyIndex = Property::INVALID_INDEX;
 
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
   if(iter != mRegisteredProperties.end())
   {
     basePropertyIndex = iter->second.basePropertyIndex;
@@ -747,11 +621,7 @@ int32_t TypeInfo::GetComponentIndex(Property::Index index) const
 {
   int componentIndex = Property::INVALID_COMPONENT_INDEX;
 
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
   if(iter != mRegisteredProperties.end())
   {
     componentIndex = iter->second.componentIndex;
@@ -787,11 +657,7 @@ Property::Index TypeInfo::GetChildPropertyIndex(ConstString name) const
 
 std::string_view TypeInfo::GetChildPropertyName(Property::Index index) const
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mRegisteredChildProperties.Get(static_cast<std::uint32_t>(index));
-#else
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
   if(iter != mRegisteredChildProperties.end())
   {
     return iter->second.name.GetStringView();
@@ -812,11 +678,7 @@ Property::Type TypeInfo::GetChildPropertyType(Property::Index index) const
 {
   Property::Type type(Property::NONE);
 
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mRegisteredChildProperties.Get(static_cast<std::uint32_t>(index));
-#else
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
   if(iter != mRegisteredChildProperties.end())
   {
     type = iter->second.type;
@@ -851,11 +713,7 @@ bool TypeInfo::IsPropertyWritable(Property::Index index) const
   }
   else
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-    RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
     if(iter != mRegisteredProperties.end())
     {
       writable = iter->second.setFunc ? true : false;
@@ -970,11 +828,7 @@ Property::Type TypeInfo::GetPropertyType(Property::Index index) const
   }
   else
   {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
     const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-    RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
     if(iter != mRegisteredProperties.end())
     {
       if(iter->second.componentIndex == Property::INVALID_COMPONENT_INDEX)
@@ -1009,11 +863,7 @@ Property::Type TypeInfo::GetPropertyType(Property::Index index) const
 
 Property::Value TypeInfo::GetPropertyDefaultValue(Property::Index index) const
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mPropertyDefaultValues.Get(static_cast<std::uint32_t>(index));
-#else
-  PropertyDefaultValueContainer::const_iterator iter = find_if(mPropertyDefaultValues.begin(), mPropertyDefaultValues.end(), PairFinder<Property::Index, PropertyDefaultValuePair>(index));
-#endif
   if(iter != mPropertyDefaultValues.end())
   {
     return iter->second;
@@ -1029,11 +879,7 @@ Property::Value TypeInfo::GetPropertyDefaultValue(Property::Index index) const
 
 void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::Value value) const
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-  RegisteredPropertyContainer::const_iterator   iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
   if(iter != mRegisteredProperties.end())
   {
     if(iter->second.setFunc)
@@ -1093,11 +939,7 @@ void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property
 
 Property::Value TypeInfo::GetProperty(const BaseObject* object, Property::Index index) const
 {
-#ifdef USE_INDEXED_MAP_CONTAINER_AT_TYPE_INFO
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-#else
-  RegisteredPropertyContainer::const_iterator   iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PairFinder<Property::Index, RegisteredPropertyPair>(index));
-#endif
   if(iter != mRegisteredProperties.end())
   {
     if(mCSharpType) // using csharp property get which returns a pointer to a Property::Value
