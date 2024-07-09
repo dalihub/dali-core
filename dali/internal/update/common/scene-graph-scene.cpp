@@ -84,17 +84,10 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
     mClearValues.back().depthStencil.stencil = 0;
   }
 
-  // @todo Currently, AttachmentDescription does not contain the attachment.
-  // VK can get the color attachment from the frame buffer or the surface's framebuffer
-  // But, the surface framebuffer is "per frame", i.e. it depends on the buffer index which
-  // attachment is relevant.
-  // So,
-  // do we need a compatible render pass per buffer? i.e. should we have 4, not 2?!
-  // And, should we manage that here, or could VulkanRenderPass manage 2 separate vkHandles instead?
-
-  // @todo These render passes should be used by the backend (somehow) to generate the vk render passes
-  // for each back-buffer's image, stored with the framebuffer. (not impl?)
-
+  /* Defines 2 render passes, one to clear, the other not.
+   * These are matched up to actual render pass objects in the backend.
+   * (Expect that swapchains are created with matching load/store ops)
+   */
   Graphics::RenderPassCreateInfo rpInfo{};
   rpInfo.SetAttachments(attachmentDescriptions);
 
@@ -110,7 +103,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
     attachmentDescriptions.back() = desc;
   }
 
-  mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr); // Warning: Shallow ptr
+  mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr);
 }
 
 RenderInstructionContainer& Scene::GetRenderInstructions()
