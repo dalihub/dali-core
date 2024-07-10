@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
@@ -4796,9 +4797,7 @@ int UtcDaliRendererUniformBlocks01(void)
   const int skinningBlockSize = MAX_BONE_COUNT * sizeof(Matrix);
 
   graphics.AddCustomUniformBlock(TestGraphicsReflection::TestUniformBlockInfo{
-    "Skinning Block", 0, 0,
-    skinningBlockSize,
-    {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
+    "Skinning Block", 0, 0, skinningBlockSize, {{"uBone", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MAX_BONE_COUNT, Property::Type::MATRIX}}});
 
   const int MAX_MORPH_COUNT{128};
   const int morphBlockSize = MAX_MORPH_COUNT * sizeof(float) + sizeof(float);
@@ -4953,22 +4952,22 @@ int UtcDaliRendererUniformBlocksWithStride(void)
   const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
   gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
 
-  const int MAX_BONE_COUNT{300};
+  const int                                    MAX_BONE_COUNT{300};
   TestGraphicsReflection::TestUniformBlockInfo skinningBlock;
   skinningBlock.name          = "SkinningBlock";
   skinningBlock.binding       = 0;
   skinningBlock.descriptorSet = 0;
-  graphics.AddMemberToUniformBlock( skinningBlock, "uBone", Property::Type::MATRIX, MAX_BONE_COUNT, 16 );
+  graphics.AddMemberToUniformBlock(skinningBlock, "uBone", Property::Type::MATRIX, MAX_BONE_COUNT, 16);
   graphics.AddCustomUniformBlock(skinningBlock);
   const int skinningBlockSize = int(skinningBlock.size);
 
-  const int MAX_MORPH_COUNT{128};
+  const int                                    MAX_MORPH_COUNT{128};
   TestGraphicsReflection::TestUniformBlockInfo morphBlock;
   morphBlock.name          = "MorphBlock";
   morphBlock.binding       = 1;
   morphBlock.descriptorSet = 0;
-  graphics.AddMemberToUniformBlock( morphBlock, "uNumberOfBlendShapes", Property::Type::FLOAT, 0, 0 );
-  graphics.AddMemberToUniformBlock( morphBlock, "uBlendShapeWeight", Property::Type::FLOAT, MAX_MORPH_COUNT, 16 );
+  graphics.AddMemberToUniformBlock(morphBlock, "uNumberOfBlendShapes", Property::Type::FLOAT, 0, 0);
+  graphics.AddMemberToUniformBlock(morphBlock, "uBlendShapeWeight", Property::Type::FLOAT, MAX_MORPH_COUNT, 16);
   graphics.AddCustomUniformBlock(morphBlock);
 
   Actor    actor    = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
@@ -5007,15 +5006,15 @@ int UtcDaliRendererUniformBlocksWithStride(void)
     TestGraphicsBuffer* bufferPtr = FindUniformBuffer(i % 2, graphics);
     DALI_TEST_CHECK(graphics.mAllocatedBuffers.size() == (i == 0 ? 4 : 5));
     DALI_TEST_CHECK(bufferPtr != nullptr);
-    auto offset0 = sizeof(Dali::Matrix) * 299;
-    Matrix* mPtr = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + offset0);
+    auto    offset0 = sizeof(Dali::Matrix) * 299;
+    Matrix* mPtr    = reinterpret_cast<Dali::Matrix*>(&bufferPtr->memory[0] + offset0);
     DALI_TEST_EQUALS(*mPtr, n, 0.0001, TEST_LOCATION);
 
-    const auto size = morphBlock.members[1].elementStride;
+    const auto size         = morphBlock.members[1].elementStride;
     const auto memberOffset = morphBlock.members[1].offsets[0];
-    float* wPtr1 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 0);
-    float* wPtr2 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 55);
-    float* wPtr3 = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 127);
+    float*     wPtr1        = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 0);
+    float*     wPtr2        = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 55);
+    float*     wPtr3        = reinterpret_cast<float*>(&bufferPtr->memory[MORPH_BLOCK_OFFSET] + memberOffset + size * 127);
 
     tet_printf("Test that uBlendShapeWeight[0] is written correctly as %4.2f\n", w1);
     tet_printf("Test that uBlendShapeWeight[55] is written correctly as %4.2f\n", w2);
@@ -5314,5 +5313,46 @@ int UtcDaliRendererUniformArrayOverflow(void)
   // the r component of uColor uniform must not be changed.
   // if r is 0.0f then test fails as the array stomped on the uniform's memory.
   DALI_TEST_EQUALS((uniformColor.r != 0.0f), true, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRendererDestructWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliRendererDestructWorkerThreadN Test, for line coverage");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        // Destruct at worker thread.
+        mRenderer.Reset();
+      }
+
+      Dali::Renderer mRenderer;
+    };
+    TestThread thread;
+
+    Dali::Geometry geometry = CreateQuadGeometry();
+    Dali::Shader   shader   = Dali::Shader::New("vertexSrc", "fragmentSrc");
+    Dali::Renderer renderer = Dali::Renderer::New(geometry, shader);
+    thread.mRenderer        = std::move(renderer);
+    renderer.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
   END_TEST;
 }

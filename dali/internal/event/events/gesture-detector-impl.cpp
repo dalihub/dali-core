@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,11 @@ GestureDetector::GestureDetector(GestureType::Value type, const SceneGraph::Prop
 
 GestureDetector::~GestureDetector()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~GestureDetector[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
   if(!mPendingAttachActors.empty())
   {
     for(GestureDetectorActorContainer::iterator iter = mPendingAttachActors.begin(), endIter = mPendingAttachActors.end(); iter != endIter; ++iter)
@@ -265,7 +270,7 @@ Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
 
 bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
 {
-  bool ret = false;
+  bool                   ret = false;
   Dali::Internal::Actor& actorImpl(GetImplementation(actor));
   if(touch.GetPointCount() > 0 && actorImpl.OnScene())
   {
@@ -279,9 +284,9 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
     }
 
     Integration::TouchEvent touchEvent(touch.GetTime());
-    for(std::size_t i = 0; i< touch.GetPointCount(); i++)
+    for(std::size_t i = 0; i < touch.GetPointCount(); i++)
     {
-      Integration::Point      point;
+      Integration::Point point;
       point.SetState(touch.GetState(i));
       point.SetDeviceId(touch.GetDeviceId(i));
       point.SetScreenPosition(touch.GetScreenPosition(i));
@@ -295,7 +300,6 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
       point.SetLocalPosition(touch.GetLocalPosition(i));
       touchEvent.points.push_back(point);
     }
-
 
     Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
     mFeededActor.SetActor(&actorImpl);

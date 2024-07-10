@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,11 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("~Scene[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
+  }
+
   if(mDefaultCamera)
   {
     // its enough to release the handle so the object is released
@@ -240,20 +245,28 @@ void Scene::SurfaceReplaced()
 
 void Scene::RemoveSceneObject()
 {
-  if(EventThreadServices::IsCoreRunning() && mSceneObject)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
   {
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     RemoveSceneMessage(tls->GetUpdateManager(), *mSceneObject);
     mSceneObject = nullptr;
   }
+  else if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("Scene[%p] called RemoveSceneObject API from non-UI thread!\n", this);
+  }
 }
 
 void Scene::Discard()
 {
-  if(EventThreadServices::IsCoreRunning())
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     tls->RemoveScene(this);
+  }
+  else if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  {
+    DALI_LOG_ERROR("Scene[%p] called Discard API from non-UI thread!\n", this);
   }
 }
 

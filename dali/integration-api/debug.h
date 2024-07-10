@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_DEBUG_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,6 +124,7 @@ using LogFunction = void (*)(DebugPriority, std::string&);
  * A log function has to be installed for every thread that wants to use logging.
  * This should be done by the adaptor.
  * The log function can be different for each thread.
+ * If a log function is not installed, the log message will be print at stderr.
  * @param logFunction the log function to install
  * @param logOpts the log options to save in thread
  */
