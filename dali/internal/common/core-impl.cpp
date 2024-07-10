@@ -142,6 +142,7 @@ Core::~Core()
   /*
    * The order of destructing these singletons is important!!!
    */
+  DALI_LOG_RELEASE_INFO("Dali::Core is terminated.\n");
 
   // clear the thread local storage first
   // allows core to be created / deleted many times in the same thread (how TET cases work).
