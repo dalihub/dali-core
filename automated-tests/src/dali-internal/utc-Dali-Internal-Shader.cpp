@@ -97,7 +97,7 @@ int UtcDaliShaderWithPrefixTestVersion(void)
   END_TEST;
 }
 
-int UtcDaliInternalShaderSaveAndLoad(void)
+int UtcDaliInternalShaderSaveAndLoad01(void)
 {
   TestApplication application;
 
@@ -200,5 +200,139 @@ int UtcDaliInternalShaderSaveAndLoad(void)
   DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), false, TEST_LOCATION);
   DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), true, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliInternalShaderSaveAndLoad02(void)
+{
+  TestApplication application;
+
+  std::string vertexShader1   = "some vertex code\n";
+  std::string fragmentShader1 = "some fragment code\n";
+
+  std::string vertexShader2   = "some another vertex code\n";
+  std::string fragmentShader2 = "some another fragment code\n";
+
+  Dali::Vector<uint8_t> dummyBuffer(5);
+  for(size_t i = 0; i < 5; i++)
+  {
+    dummyBuffer[i] = static_cast<uint8_t>(i + 21);
+  }
+
+  // Make save and load failed successful
+  auto& platformAbstraction = application.GetPlatform();
+  platformAbstraction.SetLoadFileResult(false, dummyBuffer);
+
+  // Test version number in the shader data
+  Dali::Internal::ThreadLocalStorage& tls           = Dali::Internal::ThreadLocalStorage::Get();
+  Dali::Internal::ShaderFactory&      shaderFactory = tls.GetShaderFactory();
+
+  tet_printf("Load shader1. It should be cached at string container\n");
+  size_t                  shaderHash1 = 0u;
+  Internal::ShaderDataPtr shaderData1 = shaderFactory.Load(vertexShader1, fragmentShader1, Shader::Hint::NONE, 0u, "", shaderHash1);
+  DALI_TEST_CHECK(shaderHash1 != 0u);
+
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), true, TEST_LOCATION);
+
+  // Reset trace callstack
+  platformAbstraction.GetTrace().Reset();
+
+  tet_printf("Load shader2. It also should be cached at string container\n");
+  size_t                  shaderHash2 = 0u;
+  Internal::ShaderDataPtr shaderData2 = shaderFactory.Load(vertexShader2, fragmentShader2, Shader::Hint::NONE, 0u, "", shaderHash2);
+  DALI_TEST_CHECK(shaderHash2 != 0u);
+
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), true, TEST_LOCATION);
+
+  // Reset trace callstack
+  platformAbstraction.GetTrace().Reset();
+
+  tet_printf("Both shader 1 and 2 don't have binary now.\n");
+  DALI_TEST_EQUALS(shaderData1.Get()->HasBinary(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(shaderData2.Get()->HasBinary(), false, TEST_LOCATION);
+
+  // Copy the memory of dummy
+  shaderData1.Get()->AllocateBuffer(5);
+  for(size_t i = 0; i < 5; i++)
+  {
+    shaderData1.Get()->GetBuffer()[i] = static_cast<uint8_t>(i + 1);
+  }
+
+  DALI_TEST_EQUALS(shaderData1.Get()->HasBinary(), true, TEST_LOCATION);
+
+  tet_printf("Save shaderData1 as binary, but failed.\n");
+  shaderFactory.SaveBinary(shaderData1);
+
+  tet_printf("Check shader saved\n");
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), false, TEST_LOCATION);
+
+  // Reset trace callstack
+  platformAbstraction.GetTrace().Reset();
+
+  tet_printf("Save shaderData1 as binary, and success now.\n");
+  platformAbstraction.SetSaveFileResult(true);
+  shaderFactory.SaveBinary(shaderData1);
+
+  tet_printf("Check shader saved\n");
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), false, TEST_LOCATION);
+
+  // Reset trace callstack
+  platformAbstraction.GetTrace().Reset();
+
+  tet_printf("Load shader with same code as shaderData1\n");
+  size_t                  shaderHash3 = 0u;
+  Internal::ShaderDataPtr shaderData3 = shaderFactory.Load(vertexShader1, fragmentShader1, Shader::Hint::NONE, 0u, "", shaderHash3);
+
+  tet_printf("Check shaderData1 cached\n");
+  DALI_TEST_EQUALS(shaderHash3, shaderHash1, TEST_LOCATION);
+  DALI_TEST_EQUALS(shaderData3.Get()->HasBinary(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(shaderData3.Get(), shaderData1.Get(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), false, TEST_LOCATION);
+
+  // Reset trace callstack
+  platformAbstraction.GetTrace().Reset();
+
+  tet_printf("Load shader with same code as shaderData2\n");
+  size_t                  shaderHash4 = 0u;
+  Internal::ShaderDataPtr shaderData4 = shaderFactory.Load(vertexShader2, fragmentShader2, Shader::Hint::NONE, 0u, "", shaderHash4);
+
+  tet_printf("Check shaderData2 cached\n");
+  DALI_TEST_EQUALS(shaderHash4, shaderHash2, TEST_LOCATION);
+  DALI_TEST_EQUALS(shaderData4.Get(), shaderData2.Get(), TEST_LOCATION);
+  DALI_TEST_EQUALS(shaderData4.Get()->HasBinary(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), false, TEST_LOCATION);
+
+  // Reset trace callstack
+  platformAbstraction.GetTrace().Reset();
+
+  tet_printf("Allow to load shader binary\n");
+  platformAbstraction.SetLoadFileResult(true, dummyBuffer);
+
+  tet_printf("Load shader same as shaderData1, but difference render pass tag\n");
+  size_t                  shaderHash5 = 0u;
+  Internal::ShaderDataPtr shaderData5 = shaderFactory.Load(vertexShader1, fragmentShader1, Shader::Hint::NONE, 1u, "", shaderHash5);
+
+  tet_printf("Check shaderData1 and shaderData5 have same hash, but deferent buffer\n");
+  DALI_TEST_EQUALS(shaderHash5, shaderHash1, TEST_LOCATION);
+  DALI_TEST_CHECK(shaderData5.Get() != shaderData1.Get());
+  DALI_TEST_EQUALS(shaderData5.Get()->HasBinary(), true, TEST_LOCATION);
+
+  tet_printf("Check shaderData5 binary same as dummy buffer\n");
+  DALI_TEST_EQUALS(shaderData5.Get()->GetBufferSize(), dummyBuffer.Count(), TEST_LOCATION);
+  for(size_t i = 0; i < 5; ++i)
+  {
+    DALI_TEST_EQUALS(shaderData5.Get()->GetBuffer()[i], dummyBuffer[i], TEST_LOCATION);
+  }
+
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), true, TEST_LOCATION);
   END_TEST;
 }
