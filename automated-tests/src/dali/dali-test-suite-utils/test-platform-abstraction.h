@@ -2,7 +2,7 @@
 #define DALI_TEST_PLATFORM_ABSTRACTION_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,10 +85,7 @@ public:
   /**
    * @copydoc PlatformAbstraction::SaveShaderBinaryFile()
    */
-  virtual bool SaveShaderBinaryFile(const std::string& filename, const unsigned char* buffer, unsigned int numBytes) const override
-  {
-    return true;
-  }
+  bool SaveShaderBinaryFile(const std::string& filename, const unsigned char* buffer, unsigned int numBytes) const override;
 
   /**
    * @copydoc PlatformAbstraction::StartTimer()
