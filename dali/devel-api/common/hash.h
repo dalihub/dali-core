@@ -2,7 +2,7 @@
 #define DALI_HASH
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <string_view>
 #include <vector>
 
 //INTERNAL INCLUDES
@@ -56,6 +57,30 @@ DALI_CORE_API std::size_t CalculateHash(const std::string& string1, const std::s
  * @return hash code
  */
 DALI_CORE_API std::size_t CalculateHash(const std::string& toHash, char terminator);
+
+/**
+ * @brief Create a hash code for a string_view
+ * @param toHash string_view to hash
+ * @return hash code
+ */
+DALI_CORE_API std::size_t CalculateHash(const std::string_view& toHash);
+
+/**
+ * @brief Create a hash code for 2 string_views combined.
+ * Allows a hash to be calculated without concatenating the string_views and allocating any memory.
+ * @param string1 first string_view
+ * @param string2 second string_view
+ * @return hash code
+ */
+DALI_CORE_API std::size_t CalculateHash(const std::string_view& string1, const std::string_view& string2);
+
+/**
+ * @brief Create a hash code for a string_view
+ * @param toHash string_view to hash
+ * @param terminator character terminating the hashing
+ * @return hash code
+ */
+DALI_CORE_API std::size_t CalculateHash(const std::string_view& toHash, char terminator);
 
 /**
  * @brief Create a hash code for a std::vector<std::uint8_t>

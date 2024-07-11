@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,26 @@ inline void HashString(const char* string, std::size_t& hash, char terminator)
   while((c = *string++) && c != terminator)
   {
     hash = hash * 33 + c;
+  }
+}
+
+inline void HashStringView(const std::string_view& string, std::size_t& hash)
+{
+  for(auto c : string)
+  {
+    hash = hash * 33 + c;
+  }
+}
+
+inline void HashStringView(const std::string_view& string, std::size_t& hash, char terminator)
+{
+  for(auto c : string)
+  {
+    if(c == terminator)
+    {
+      break;
+    }
+    hash = hash * 33 + static_cast<std::size_t>(c);
   }
 }
 
@@ -85,6 +105,34 @@ std::size_t CalculateHash(const std::string& string1, const std::string& string2
 
   HashString(string1.c_str(), hash);
   HashString(string2.c_str(), hash);
+
+  return hash;
+}
+
+std::size_t CalculateHash(const std::string_view& toHash)
+{
+  std::size_t hash(INITIAL_HASH_VALUE);
+
+  HashStringView(toHash, hash);
+
+  return hash;
+}
+
+std::size_t CalculateHash(const std::string_view& toHash, char terminator)
+{
+  std::size_t hash(INITIAL_HASH_VALUE);
+
+  HashStringView(toHash, hash, terminator);
+
+  return hash;
+}
+
+std::size_t CalculateHash(const std::string_view& string1, const std::string_view& string2)
+{
+  std::size_t hash(INITIAL_HASH_VALUE);
+
+  HashStringView(string1, hash);
+  HashStringView(string2, hash);
 
   return hash;
 }

@@ -50,16 +50,16 @@ const unsigned int NUMBER_OF_DEFAULT_UNIFORMS = static_cast<unsigned int>(Progra
  */
 size_t DEFAULT_UNIFORM_HASHTABLE[NUMBER_OF_DEFAULT_UNIFORMS] =
   {
-    CalculateHash(std::string("uModelMatrix")),
-    CalculateHash(std::string("uMvpMatrix")),
-    CalculateHash(std::string("uViewMatrix")),
-    CalculateHash(std::string("uModelView")),
-    CalculateHash(std::string("uNormalMatrix")),
-    CalculateHash(std::string("uProjection")),
-    CalculateHash(std::string("uScale")),
-    CalculateHash(std::string("uSize")),
-    CalculateHash(std::string("uColor")),
-    CalculateHash(std::string("uActorColor"))};
+    CalculateHash(std::string_view("uModelMatrix")),
+    CalculateHash(std::string_view("uMvpMatrix")),
+    CalculateHash(std::string_view("uViewMatrix")),
+    CalculateHash(std::string_view("uModelView")),
+    CalculateHash(std::string_view("uNormalMatrix")),
+    CalculateHash(std::string_view("uProjection")),
+    CalculateHash(std::string_view("uScale")),
+    CalculateHash(std::string_view("uSize")),
+    CalculateHash(std::string_view("uColor")),
+    CalculateHash(std::string_view("uActorColor"))};
 
 /**
  * Helper function to calculate the correct alignment of data for uniform buffers
