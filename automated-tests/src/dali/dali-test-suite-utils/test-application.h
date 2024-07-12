@@ -28,6 +28,7 @@
 
 #include "test-graphics-controller.h"
 #include "test-render-controller.h"
+#include "test-render-surface.h"
 
 namespace Dali
 {
@@ -102,6 +103,7 @@ protected:
   TestPlatformAbstraction mPlatformAbstraction;
   TestRenderController    mRenderController;
   TestGraphicsController  mGraphicsController;
+  TestRenderSurface*      mRenderSurface;
 
   Integration::UpdateStatus mStatus;
   Integration::RenderStatus mRenderStatus;

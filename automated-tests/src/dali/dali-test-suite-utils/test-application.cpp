@@ -83,10 +83,10 @@ void TestApplication::CreateScene()
   mScene.SetDpi(Vector2(static_cast<float>(mDpi.x), static_cast<float>(mDpi.y)));
 
   // Create render target for the scene
+  mRenderSurface = new TestRenderSurface(Dali::PositionSize(0, 0, mSurfaceWidth, mSurfaceHeight));
   Graphics::RenderTargetCreateInfo rtInfo{};
   rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
-  rtInfo.SetSurface(&mSurfaceWidth); // Can point to anything, really.
-
+  rtInfo.SetSurface(mRenderSurface);
   mScene.SetSurfaceRenderTarget(rtInfo);
 
   mScenes.push_back(mScene);

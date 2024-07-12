@@ -1536,11 +1536,6 @@ struct DefaultDeleter
 };
 
 /**
- * Surface type is just a void* to any native object.
- */
-using Surface = void;
-
-/**
  * @brief Enum describing preTransform of render target
  */
 enum class RenderTargetTransformFlagBits

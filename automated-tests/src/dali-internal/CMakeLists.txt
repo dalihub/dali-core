@@ -58,8 +58,10 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/test-native-image.cpp
         ../dali/dali-test-suite-utils/test-platform-abstraction.cpp
         ../dali/dali-test-suite-utils/test-render-controller.cpp
+        ../dali/dali-test-suite-utils/test-render-surface.cpp
         ../dali/dali-test-suite-utils/test-trace-call-stack.cpp
         ../dali/dali-test-suite-utils/test-addon-manager.cpp
+  ../dali/dali-test-suite-utils/test-render-surface-if.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
