@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ struct TestGraphicsDeleter
   }
 };
 
-} //namespace
+} // namespace
 
 std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo)
 {
@@ -635,14 +635,38 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
   bool                     scissorEnabled = false;
   TestGraphicsFramebuffer* currentFramebuffer{nullptr};
   TestGraphicsPipeline*    currentPipeline{nullptr};
+  bool                     recording = false;
+  bool                     recorded  = false;
 
   for(auto& cmd : commandBuffer.GetCommands())
   {
     // process command
     switch(cmd.type)
     {
+      case CommandType::BEGIN:
+      {
+        if(recording)
+        {
+          fprintf(stderr, "ERROR: Should only call Begin once per cmd buffer\n");
+        }
+        recording = true;
+        break;
+      }
+      case CommandType::END:
+      {
+        if(!recording)
+        {
+          fprintf(stderr, "ERROR: Should only call End following a Begin");
+        }
+        recorded  = true;
+        recording = false;
+        break;
+      }
       case CommandType::FLUSH:
       {
+        if(recording)
+        {
+        }
         // Nothing to do here
         break;
       }
@@ -1008,6 +1032,11 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         break;
       }
     }
+  }
+
+  if(!recorded)
+  {
+    fprintf(stderr, "ERROR: No command buffer was recorded");
   }
 }
 

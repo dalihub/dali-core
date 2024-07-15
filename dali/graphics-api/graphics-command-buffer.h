@@ -58,17 +58,17 @@ struct TextureBinding
   const Texture* texture; // texture to be bound
   const Sampler* sampler; // sampler to be bound
   uint32_t       binding; // binding index
-  auto& SetTexture( const Texture* _texture )
+  auto&          SetTexture(const Texture* _texture)
   {
     texture = _texture;
     return *this;
   }
-  auto& SetBinding( uint32_t _binding )
+  auto& SetBinding(uint32_t _binding)
   {
     binding = _binding;
     return *this;
   }
-  auto& SetSampler( const Sampler* _sampler )
+  auto& SetSampler(const Sampler* _sampler)
   {
     sampler = _sampler;
     return *this;
@@ -117,7 +117,7 @@ enum class DrawNativeAPI
 enum class DrawNativeExecutionMode
 {
   ISOLATED, ///< Commands execute isolated from the main pipeline (not altering state)
-  DIRECT ///< Commands inherit and alter current state of the main pipeline (unsafe!)
+  DIRECT    ///< Commands inherit and alter current state of the main pipeline (unsafe!)
 };
 
 struct DrawNativeInfo
@@ -169,8 +169,22 @@ public:
   virtual ~CommandBuffer() = default;
 
   // not copyable
-  CommandBuffer(const CommandBuffer&) = delete;
+  CommandBuffer(const CommandBuffer&)            = delete;
   CommandBuffer& operator=(const CommandBuffer&) = delete;
+
+  /**
+   * @brief Begin recording the command buffer.
+   *
+   * @param[in] info The command buffer usage flags and any other data.
+   */
+  virtual void Begin(const CommandBufferBeginInfo& info) = 0;
+
+  /**
+   * @brief Finish recording the command buffer and put it into execution mode.
+   *
+   * All render passes should be ended prior to calling this.
+   */
+  virtual void End() = 0;
 
   /**
    * @brief Binds vertex buffers
@@ -466,7 +480,7 @@ public:
   virtual void SetDepthWriteEnable(bool depthWriteEnable) = 0;
 
 protected:
-  CommandBuffer(CommandBuffer&&) = default;
+  CommandBuffer(CommandBuffer&&)            = default;
   CommandBuffer& operator=(CommandBuffer&&) = default;
 };
 } // namespace Dali::Graphics

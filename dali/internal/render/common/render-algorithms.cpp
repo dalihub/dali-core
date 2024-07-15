@@ -614,6 +614,12 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   auto* mutableRenderList      = const_cast<RenderList*>(&renderList);
   auto& secondaryCommandBuffer = mutableRenderList->GetCommandBuffer(mGraphicsController);
   secondaryCommandBuffer.Reset();
+
+  // We are always "inside" a render pass here.
+  Graphics::CommandBufferBeginInfo info;
+  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::RENDER_PASS_CONTINUE;
+  secondaryCommandBuffer.Begin(info);
+
   secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
   mHasLayerScissor = false;
 
@@ -705,6 +711,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
       }
     }
   }
+  secondaryCommandBuffer.End();
 }
 
 RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
@@ -728,11 +735,17 @@ void RenderAlgorithms::ResetCommandBuffer()
   {
     mGraphicsCommandBuffer->Reset();
   }
+
+  Graphics::CommandBufferBeginInfo info;
+  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
+  mGraphicsCommandBuffer->Begin(info);
 }
 
 void RenderAlgorithms::SubmitCommandBuffer()
 {
   // Submit main command buffer
+  mGraphicsCommandBuffer->End();
+
   Graphics::SubmitInfo submitInfo;
   submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
   submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
@@ -748,9 +761,8 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) {
-    oss << "[" << instruction.RenderListCount() << "]";
-  });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
+                                          { oss << "[" << instruction.RenderListCount() << "]"; });
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
@@ -779,7 +791,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           *projectionMatrix,
                           depthBufferAvailable,
                           stencilBufferAvailable,
-                          instruction, //added for reflection effect
+                          instruction, // added for reflection effect
                           viewport,
                           rootClippingRect,
                           orientation,
