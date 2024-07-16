@@ -133,8 +133,10 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-native-image.cpp
         dali-test-suite-utils/test-platform-abstraction.cpp
         dali-test-suite-utils/test-render-controller.cpp
+        dali-test-suite-utils/test-render-surface.cpp
         dali-test-suite-utils/test-trace-call-stack.cpp
         dali-test-suite-utils/test-addon-manager.cpp
+        dali-test-suite-utils/test-render-surface-if.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
@@ -150,9 +152,10 @@ FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
-    ../../../
-    ${${CAPI_LIB}_INCLUDE_DIRS}
-    dali-test-suite-utils
+  ../../../
+  .
+  ${${CAPI_LIB}_INCLUDE_DIRS}
+  dali-test-suite-utils
 )
 
 ADD_DEFINITIONS( -DADDON_LIBS_PATH=\"${CMAKE_CURRENT_BINARY_DIR}\" )

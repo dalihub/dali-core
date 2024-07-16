@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_RENDER_TARGET_CREATE_INFO
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@
 
 namespace Dali
 {
+namespace Integration
+{
+struct RenderSurfaceInterface;
+}
 namespace Graphics
 {
 /**
@@ -61,7 +65,7 @@ struct RenderTargetCreateInfo
    * @param[in] value Pointer to the native surface
    * @return reference to this structure
    */
-  auto& SetSurface( Surface* value )
+  auto& SetSurface(Integration::RenderSurfaceInterface* value)
   {
     surface = value;
     return *this;
@@ -75,7 +79,7 @@ struct RenderTargetCreateInfo
    * @param[in] value Pointer to the Framebuffer object
    * @return reference to this structure
    */
-  auto& SetFramebuffer( Framebuffer* value )
+  auto& SetFramebuffer(Framebuffer* value)
   {
     framebuffer = value;
     return *this;
@@ -87,7 +91,7 @@ struct RenderTargetCreateInfo
    * @param[in] value Size of render target
    * @return reference to this structure
    */
-  auto& SetExtent( Extent2D value )
+  auto& SetExtent(Extent2D value)
   {
     extent = value;
     return *this;
@@ -99,7 +103,7 @@ struct RenderTargetCreateInfo
    * @param[in] value transform flags
    * @return reference to this structure
    */
-  auto& SetPreTransform( RenderTargetTransformFlags value )
+  auto& SetPreTransform(RenderTargetTransformFlags value)
   {
     preTransform = value;
     return *this;
@@ -118,16 +122,16 @@ struct RenderTargetCreateInfo
     return *this;
   }
 
-  GraphicsStructureType         type{GraphicsStructureType::RENDER_TARGET_CREATE_INFO_STRUCT};
-  Surface*                      surface{nullptr};
-  Framebuffer*                  framebuffer{nullptr};
-  Extent2D                      extent{};
-  RenderTargetTransformFlags    preTransform{0u};
-  ExtensionCreateInfo*          nextExtension{nullptr};
+  GraphicsStructureType                type{GraphicsStructureType::RENDER_TARGET_CREATE_INFO_STRUCT};
+  Integration::RenderSurfaceInterface* surface{nullptr};
+  Framebuffer*                         framebuffer{nullptr};
+  Extent2D                             extent{};
+  RenderTargetTransformFlags           preTransform{0u};
+  ExtensionCreateInfo*                 nextExtension{nullptr};
 
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };
 
 } // namespace Graphics
 } // namespace Dali
-#endif //DALI_GRAPHICS_RENDER_TARGET_CREATE_INFO
+#endif // DALI_GRAPHICS_RENDER_TARGET_CREATE_INFO

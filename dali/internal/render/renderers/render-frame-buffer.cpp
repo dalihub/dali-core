@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,16 +122,6 @@ bool FrameBuffer::CreateGraphicsObjects()
     }
     else
     {
-      mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, std::move(mGraphicsObject));
-
-      // Create render target
-      Graphics::RenderTargetCreateInfo rtInfo{};
-      rtInfo
-        .SetFramebuffer(mGraphicsObject.get())
-        .SetExtent({mWidth, mHeight})
-        .SetPreTransform(0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT);
-      mRenderTarget = mGraphicsController->CreateRenderTarget(rtInfo, std::move(mRenderTarget));
-
       std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
       // Default behaviour for color attachments is to CLEAR and STORE
@@ -174,7 +164,22 @@ bool FrameBuffer::CreateGraphicsObjects()
       attachmentDescriptions[0].SetLoadOp(Graphics::AttachmentLoadOp::DONT_CARE);
       mRenderPass.emplace_back(mGraphicsController->CreateRenderPass(rpInfo, nullptr));
 
-      created = true;
+      std::vector<Graphics::RenderPass*> renderPasses;
+      renderPasses.push_back(mRenderPass[0].get());
+      renderPasses.push_back(mRenderPass[1].get());
+      mCreateInfo.SetRenderPasses(std::move(renderPasses));
+
+      mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, std::move(mGraphicsObject));
+
+      // Create render target
+      Graphics::RenderTargetCreateInfo rtInfo{};
+      rtInfo
+        .SetFramebuffer(mGraphicsObject.get())
+        .SetExtent({mWidth, mHeight})
+        .SetPreTransform(0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT);
+
+      mRenderTarget = mGraphicsController->CreateRenderTarget(rtInfo, std::move(mRenderTarget));
+      created       = true;
     }
   }
   return created;

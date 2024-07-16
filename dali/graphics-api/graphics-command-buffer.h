@@ -58,6 +58,21 @@ struct TextureBinding
   const Texture* texture; // texture to be bound
   const Sampler* sampler; // sampler to be bound
   uint32_t       binding; // binding index
+  auto& SetTexture( const Texture* _texture )
+  {
+    texture = _texture;
+    return *this;
+  }
+  auto& SetBinding( uint32_t _binding )
+  {
+    binding = _binding;
+    return *this;
+  }
+  auto& SetSampler( const Sampler* _sampler )
+  {
+    sampler = _sampler;
+    return *this;
+  }
 };
 
 /**

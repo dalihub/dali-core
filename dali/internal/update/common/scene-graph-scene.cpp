@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,10 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
     mClearValues.back().depthStencil.stencil = 0;
   }
 
+  /* Defines 2 render passes, one to clear, the other not.
+   * These are matched up to actual render pass objects in the backend.
+   * (Expect that swapchains are created with matching load/store ops)
+   */
   Graphics::RenderPassCreateInfo rpInfo{};
   rpInfo.SetAttachments(attachmentDescriptions);
 
@@ -99,7 +103,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
     attachmentDescriptions.back() = desc;
   }
 
-  mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr); // Warning: Shallow ptr
+  mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr);
 }
 
 RenderInstructionContainer& Scene::GetRenderInstructions()
