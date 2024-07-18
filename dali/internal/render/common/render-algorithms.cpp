@@ -617,7 +617,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // We are always "inside" a render pass here.
   Graphics::CommandBufferBeginInfo info;
-  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::RENDER_PASS_CONTINUE;
+  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
   secondaryCommandBuffer.Begin(info);
 
   secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
