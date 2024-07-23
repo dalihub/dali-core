@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,13 +181,43 @@ int UtcDaliRegisterCSharpPropertyN(void)
   END_TEST;
 }
 
+int UtcDaliCSharpPropertyRegistrationFunctions(void)
+{
+  TestApplication application;
+  int             propertyIndex = PROPERTY_REGISTRATION_START_INDEX + 10;
+
+  CSharpTypeRegistry::RegisterType("DateControl", typeid(Dali::Actor), &CreateCustomNamedInit);
+
+  // Attempt to register a property without a setter
+  try
+  {
+    CSharpTypeRegistry::RegisterProperty("DateControl", "propName1", propertyIndex++, Property::BOOLEAN, NULL, GetProperty);
+    tet_result(TET_PASS);
+  }
+  catch(DaliException& e)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  // Attempt to register a property without a getter
+  try
+  {
+    CSharpTypeRegistry::RegisterProperty("DateControl", "propName2", propertyIndex++, Property::BOOLEAN, NULL, NULL);
+    tet_result(TET_FAIL);
+  }
+  catch(DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "!\"GetProperty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
 int UtcDaliRegisterCSharpPropertySetP(void)
 {
   TestApplication application;
 
   // register the same property twice
   CSharpTypeRegistry::RegisterType("DateControl", typeid(Dali::Actor), &CreateCustomNamedInit);
-  ;
 
   Property::Index index(100001);
 
@@ -218,6 +248,40 @@ int UtcDaliRegisterCSharpPropertySetP(void)
   DALI_TEST_EQUALS(50, intPropertyValue, TEST_LOCATION);
 
   DALI_TEST_EQUALS(setPropertyCalled, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRegisterCSharpPropertySetN(void)
+{
+  TestApplication application;
+
+  // register the same property twice
+  CSharpTypeRegistry::RegisterType("DateControl", typeid(Dali::Actor), &CreateCustomNamedInit);
+
+  Property::Index index(100001);
+
+  CSharpTypeRegistry::RegisterProperty("DateControl",
+                                       "readonly",
+                                       index,
+                                       Property::INTEGER,
+                                       nullptr,
+                                       GetProperty);
+
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo("DateControl");
+
+  // Check the property is writable in the type registry
+  Internal::TypeInfo& typeInfoImpl = GetImplementation(typeInfo);
+
+  Property::Value value(50);
+
+  typeInfoImpl.SetProperty(NULL, index, value);
+  DALI_TEST_EQUALS(setPropertyCalled, false, TEST_LOCATION);
+
+  typeInfoImpl.SetProperty(NULL, "readonly", value);
+  DALI_TEST_EQUALS(setPropertyCalled, false, TEST_LOCATION);
 
   END_TEST;
 }

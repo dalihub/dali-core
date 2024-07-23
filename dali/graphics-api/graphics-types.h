@@ -1279,6 +1279,26 @@ enum class CommandBufferLevel
   SECONDARY ///< Secondary buffer must be executed within scope of Primary buffer
 };
 
+using CommandBufferUsageFlags = uint32_t;
+enum class CommandBufferUsageFlagBits : uint32_t
+{
+  ONE_TIME_SUBMIT      = 1 << 0,
+  RENDER_PASS_CONTINUE = 1 << 1,
+  SIMULTANEOUS_USE     = 1 << 2,
+};
+
+template<typename T>
+inline CommandBufferUsageFlags operator|(T flags, CommandBufferUsageFlagBits bit)
+{
+  return static_cast<CommandBufferUsageFlags>(flags) | static_cast<CommandBufferUsageFlags>(bit);
+}
+
+struct CommandBufferBeginInfo
+{
+  CommandBufferUsageFlags usage;
+  // Don't care about inheritance yet. Can extend as required.
+};
+
 /**
  * @brief Enum indicating whether shader source
  * is text-based or binary.
@@ -1497,7 +1517,8 @@ struct DefaultDeleter
   template<class P, template<typename> typename U>
   DefaultDeleter(const U<P>& deleter)
   {
-    deleteFunction = [](T* object) { U<P>()(static_cast<P*>(object)); };
+    deleteFunction = [](T* object)
+    { U<P>()(static_cast<P*>(object)); };
   }
 
   /**
@@ -1579,4 +1600,4 @@ MakeUnique(Args&&... args)
 } // namespace Graphics
 } // namespace Dali
 
-#endif //DALI_GRAPHICS_API_TYPES_H
+#endif // DALI_GRAPHICS_API_TYPES_H

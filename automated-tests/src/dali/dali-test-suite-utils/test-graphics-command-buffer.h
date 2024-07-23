@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,8 @@ enum class CommandType
   SET_DEPTH_TEST_ENABLE   = 1 << 25,
   SET_DEPTH_WRITE_ENABLE  = 1 << 26,
   DRAW_NATIVE             = 1 << 27,
+  BEGIN                   = 1 << 28,
+  END                     = 1 << 29
 };
 
 std::ostream& operator<<(std::ostream& os, Graphics::StencilOp op);
@@ -109,7 +111,7 @@ struct UniformBufferBindingDescriptor
   const TestGraphicsBuffer* buffer{nullptr};
   uint32_t                  binding{0u};
   uint32_t                  offset{0u};
-  bool                      emulated; ///<true if UBO is emulated for old gfx API
+  bool                      emulated; ///< true if UBO is emulated for old gfx API
 };
 
 /**
@@ -226,6 +228,11 @@ struct Command
   {
     switch(rhs.type)
     {
+      case CommandType::BEGIN:
+      {
+        data.begin = rhs.data.begin;
+        break;
+      }
       case CommandType::BEGIN_RENDER_PASS:
       {
         new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor(rhs.data.beginRenderPass);
@@ -374,6 +381,10 @@ struct Command
         data.depth.writeEnabled = rhs.data.depth.writeEnabled;
         break;
       }
+      default:
+      {
+        break;
+      }
     }
     type = rhs.type;
   }
@@ -386,6 +397,11 @@ struct Command
   {
     switch(rhs.type)
     {
+      case CommandType::BEGIN:
+      {
+        data.begin = rhs.data.begin;
+        break;
+      }
       case CommandType::BEGIN_RENDER_PASS:
       {
         new(&data.beginRenderPass) CommandData::BeginRenderPassDescriptor(std::move(rhs.data.beginRenderPass));
@@ -533,6 +549,10 @@ struct Command
         data.depth.writeEnabled = rhs.data.depth.writeEnabled;
         break;
       }
+      default:
+      {
+        break;
+      }
     }
     type = rhs.type;
   }
@@ -548,6 +568,11 @@ struct Command
     ~CommandData()
     {
     } // do nothing
+
+    struct
+    {
+      Graphics::CommandBufferBeginInfo info;
+    } begin;
 
     struct
     {
@@ -664,6 +689,22 @@ public:
   TestGraphicsCommandBuffer(TraceCallStack& callstack, TestGlAbstraction& glAbstraction);
   ~TestGraphicsCommandBuffer()
   {
+  }
+
+  void Begin(const Graphics::CommandBufferBeginInfo& info) override
+  {
+    mCommands.emplace_back();
+    mCommands.back().type            = CommandType::BEGIN;
+    mCommands.back().data.begin.info = info;
+
+    TraceCallStack::NamedParams namedParams;
+    namedParams["usage"] << std::hex << info.usage;
+    mCallStack.PushCall("Begin", namedParams.str(), namedParams);
+  }
+  void End() override
+  {
+    mCommands.emplace_back(CommandType::END);
+    mCallStack.PushCall("End", "");
   }
 
   void BindVertexBuffers(uint32_t                                    firstBinding,
@@ -1094,4 +1135,4 @@ private:
 
 } // namespace Dali
 
-#endif //DALI_TEST_GRAPHICS_COMMAND_BUFFER_H
+#endif // DALI_TEST_GRAPHICS_COMMAND_BUFFER_H
