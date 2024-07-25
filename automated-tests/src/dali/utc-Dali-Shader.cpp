@@ -23,6 +23,8 @@
 
 #include <iostream>
 
+#include <test-platform-abstraction.h>
+
 using namespace Dali;
 
 void utc_dali_shader_startup(void)
