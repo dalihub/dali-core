@@ -4420,7 +4420,7 @@ int UtcDaliRenderTaskRenderPassTag(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskWithWrongShaderData(void)
+int UtcDaliRenderTaskWithWrongShaderData01(void)
 {
   TestApplication application;
   tet_infoline("Testing RenderTask with wrong shader data");
@@ -4447,6 +4447,54 @@ int UtcDaliRenderTaskWithWrongShaderData(void)
 
   RenderTaskList renderTaskList = stage.GetRenderTaskList();
   DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(!gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskWithWrongShaderData02(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with wrong shader data. This UTC is for line coverage");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+
+  Shader   validShader = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer    = Renderer::New(geometry, validShader);
+  blue.AddRenderer(renderer);
+
+  stage.Add(blue);
+
+  auto& gfx = application.GetGraphicsController();
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK(gfx.mCallStack.FindMethod("CreatePipeline"));
+  gfx.mCallStack.Reset();
+  DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
+
+  // Change the shader as invalid.
+  Shader invalidShader = Shader::New(Property::Value(10.0f));
+  renderer.SetShader(invalidShader);
+
   // Render and notify
   application.SendNotification();
   application.Render(16);

@@ -95,13 +95,26 @@ Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shader
 
 Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller)
 : mCache(cache),
-  mGfxProgram(nullptr),
+  mLifecycleObservers(),
   mGfxController(controller),
-  mProgramData(std::move(shaderData))
+  mProgramData(std::move(shaderData)),
+  mObserverNotifying(false)
 {
 }
 
-Program::~Program() = default;
+Program::~Program()
+{
+  mObserverNotifying = true;
+  for(auto&& iter : mLifecycleObservers)
+  {
+    auto* observer = iter.first;
+    observer->ProgramDestroyed(this);
+  }
+  mLifecycleObservers.clear();
+
+  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
+  // If someone call AddObserver / RemoveObserver after this, assert.
+}
 
 void Program::BuildReflection(const Graphics::Reflection& graphicsReflection, Render::UniformBufferManager& uniformBufferManager)
 {
