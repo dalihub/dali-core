@@ -756,6 +756,14 @@ public:
   }
 
   /**
+   * @copydoc Dali::Internal::SceneGraph::AnimatablePropertyBase::OnBake()
+   */
+  void OnBake() override
+  {
+    mDirtyFlags |= BAKED_FLAG; ///< Dev note : We should not override dirtyflags as BAKED_FLAG since we can give flags component by component.
+  }
+
+  /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
   const Vector2& GetVector2(BufferIndex bufferIndex) const override
@@ -1035,6 +1043,14 @@ public:
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
+  }
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::AnimatablePropertyBase::OnBake()
+   */
+  void OnBake() override
+  {
+    mDirtyFlags |= BAKED_FLAG; ///< Dev note : We should not override dirtyflags as BAKED_FLAG since we can give flags component by component.
   }
 
   /**
@@ -1371,6 +1387,14 @@ public:
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
+  }
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::AnimatablePropertyBase::OnBake()
+   */
+  void OnBake() override
+  {
+    mDirtyFlags |= BAKED_FLAG; ///< Dev note : We should not override dirtyflags as BAKED_FLAG since we can give flags component by component.
   }
 
   /**
