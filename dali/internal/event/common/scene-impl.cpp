@@ -59,6 +59,7 @@ Scene::Scene()
   mDepthTreeDirty(false),
   mPartialUpdateEnabled(true),
   mGeometryHittest(false),
+  mIsVisible(true),
   mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
   mSurfaceOrientation(0),
   mScreenOrientation(0),
@@ -154,6 +155,29 @@ void Scene::Add(Actor& actor)
 void Scene::Remove(Actor& actor)
 {
   mRootLayer->Remove(actor);
+}
+
+void Scene::Show()
+{
+  if(!mIsVisible)
+  {
+    mIsVisible = true;
+    mRootLayer->EmitInheritedVisibilityChangedSignalRecursively(true);
+  }
+}
+
+void Scene::Hide()
+{
+  if(mIsVisible)
+  {
+    mIsVisible = false;
+    mRootLayer->EmitInheritedVisibilityChangedSignalRecursively(false);
+  }
+}
+
+bool Scene::IsVisible() const
+{
+  return mIsVisible;
 }
 
 Size Scene::GetSize() const

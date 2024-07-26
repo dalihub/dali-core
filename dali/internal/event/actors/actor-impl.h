@@ -1649,6 +1649,13 @@ public:
    */
   void RebuildDepthTree();
 
+  /**
+   * Emits the visibility flag of an actor.
+   * @param[in] visible The new visibility flag.
+   * @param[in] sendMessage Whether to send a message to the update thread or not.
+   */
+  void EmitInheritedVisibilityChangedSignalRecursively(bool visible);
+
 public:
   // Default property extensions from Object
 
@@ -1885,13 +1892,6 @@ private:
    * @param[in] sendMessage Whether to send a message to the update thread or not.
    */
   void SetVisibleInternal(bool visible, SendMessage::Type sendMessage);
-
-  /**
-   * Emits the visibility flag of an actor.
-   * @param[in] visible The new visibility flag.
-   * @param[in] sendMessage Whether to send a message to the update thread or not.
-   */
-  void EmitInheritedVisibilityChangedSignalRecursively(bool visible);
 
   /**
    * @copydoc ActorParent::SetSiblingOrderOfChild
