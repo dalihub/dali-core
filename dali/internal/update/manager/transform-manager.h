@@ -425,9 +425,9 @@ private:
   Vector<bool>       mWorldMatrixDirty;                                 ///< 1u if the world matrix has been updated in this frame, 0 otherwise
   Vector<SOrderItem> mOrderedComponents;                                ///< Used to reorder components when hierarchy changes
 
-  uint8_t mDirtyFlags : 2; ///< Dirty flags for all transform components. Age down at Update time.
-  bool    mReorder : 1;    ///< Flag to determine if the components have to reordered in the next Update
-  bool    mUpdated : 1;    ///< Flag whether we have updated the transform components previous frame.
+  uint8_t mDirtyFlags;  ///< Dirty flags for all transform components. Age down at Update time.
+  bool    mReorder : 1; ///< Flag to determine if the components have to reordered in the next Update
+  bool    mUpdated : 1; ///< Flag whether we have updated the transform components previous frame.
 };
 
 } //namespace SceneGraph
