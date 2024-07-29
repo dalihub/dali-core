@@ -47,16 +47,16 @@ int UtcTransformManagerPropertyGetFloatComponentN(void)
   // For coverage
   DALI_LOG_TRACE_METHOD(gLogFilter);
 
-  struct S
+  struct TestNode
   {
     Dali::Internal::SceneGraph::TransformManagerData                                  txMgrData;
     Dali::Internal::SceneGraph::TransformManagerPropertyQuaternion<sizeof(txMgrData)> property;
-  } s;
+  } testNode;
 
   try
   {
     // There is no float component getter in derived class, only in base class.
-    s.property.GetFloatComponent(0u);
+    testNode.property.GetFloatComponent(0u);
   }
   catch(Dali::DaliException& e)
   {
@@ -73,19 +73,19 @@ int UtcTransformManagerPropertyUninitializedMgrData(void)
 {
   TestApplication application;
 
-  struct S
+  struct TestNode
   {
     const Vector3 input{1.0f, 2.0f, 3.0f};
 
     Dali::Internal::SceneGraph::TransformManagerData                            txMgrData;
     Dali::Internal::SceneGraph::TransformManagerVector3Input<sizeof(txMgrData)> property{Dali::Internal::SceneGraph::TRANSFORM_PROPERTY_POSITION, input};
-  } s;
+  } testNode;
 
-  Vector3 output = s.property.GetVector3(0);
+  Vector3 output = testNode.property.GetVector3(0);
 
   tet_infoline("Test that if input property's transform manager data is not initialized, that getting a value returns the initial value of the property.");
 
-  DALI_TEST_EQUALS(s.input, output, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(testNode.input, output, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -93,19 +93,19 @@ int UtcTransformManagerPropertyUninitializedMgrData(void)
 using namespace Dali::Internal::SceneGraph;
 int UtcDaliInternalTransformPropertyGetValueSize(void)
 {
-  struct S
+  struct PropertyValueSizeTestCase
   {
     Dali::Internal::PropertyInputImpl* property;
     Property::Value                    value;
     size_t                             size;
-    S(Dali::Internal::PropertyInputImpl* p, Property::Value v, size_t s)
+    PropertyValueSizeTestCase(Dali::Internal::PropertyInputImpl* p, Property::Value v, size_t s)
     : property(p),
       value(v),
       size(s)
     {
     }
   };
-  std::vector<S> properties;
+  std::vector<PropertyValueSizeTestCase> properties;
 
   properties.emplace_back(new TransformManagerPropertyVector3<TransformManagerProperty::TRANSFORM_PROPERTY_SCALE, 0>(), Vector3(2.3f, 4.5f, 1.9f), sizeof(Vector3));
 
@@ -117,9 +117,9 @@ int UtcDaliInternalTransformPropertyGetValueSize(void)
 
   properties.emplace_back(new TransformManagerMatrixInput<0>(), Matrix::IDENTITY, sizeof(Matrix));
 
-  for(auto& s : properties)
+  for(auto& valueSizeTestCase : properties)
   {
-    DALI_TEST_EQUALS(s.property->GetValueSize(), s.size, TEST_LOCATION);
+    DALI_TEST_EQUALS(valueSizeTestCase.property->GetValueSize(), valueSizeTestCase.size, TEST_LOCATION);
   }
 
   END_TEST;
@@ -127,16 +127,18 @@ int UtcDaliInternalTransformPropertyGetValueSize(void)
 
 int UtcDaliInternalTransformPropertyGetValueAddress(void)
 {
-  struct N
+  struct TestNode
   {
     BASE(TransformManagerData, mTransformManagerData);
     PROPERTY_WRAPPER(mTransformManagerData, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SCALE, mScale);
-    TEMPLATE_WRAPPER(mScale, TransformManagerPropertyQuaternion, mOrientation);
+    PROPERTY_WRAPPER(mScale, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_ANCHOR_POINT, mAnchorPoint);
+    PROPERTY_WRAPPER(mAnchorPoint, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_PARENT_ORIGIN, mParentOrigin);
+    TEMPLATE_WRAPPER(mParentOrigin, TransformManagerPropertyQuaternion, mOrientation);
     TEMPLATE_WRAPPER(mOrientation, TransformManagerVector3Input, mWorldPosition);
     TEMPLATE_WRAPPER(mWorldPosition, TransformManagerQuaternionInput, mWorldOrientation);
     TEMPLATE_WRAPPER(mWorldOrientation, TransformManagerMatrixInput, mWorldMatrix);
 
-    N()
+    TestNode()
     : mTransformManagerData(),
       mWorldPosition(TRANSFORM_PROPERTY_WORLD_POSITION, Vector3(1.0f, 1.0f, 1.0f)),
       mWorldOrientation(),
@@ -146,7 +148,7 @@ int UtcDaliInternalTransformPropertyGetValueAddress(void)
   };
 
   TransformManager testManager;
-  N                node;
+  TestNode         node;
   node.mTransformManagerData.mManager = &testManager;
   node.mTransformManagerData.mId      = testManager.CreateTransform();
 
@@ -155,12 +157,52 @@ int UtcDaliInternalTransformPropertyGetValueAddress(void)
 
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(1.2f, 1.2f, 1.2f), TEST_LOCATION);
 
+  // Test anchor point, for coverage.
+  addr = node.mAnchorPoint.GetValueAddress(0);
+  node.mAnchorPoint.Set(0, Vector3(0.5f, 0.1f, 0.0f));
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.1f, 0.0f), TEST_LOCATION);
+
+  node.mAnchorPoint.SetFloatComponent(0.9f, 1);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.0f), TEST_LOCATION);
+
+  node.mAnchorPoint.BakeFloatComponent(0.4f, 2);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.4f), TEST_LOCATION);
+
+  node.mAnchorPoint.BakeX(0, 0.0f);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.9f, 0.4f), TEST_LOCATION);
+
+  node.mAnchorPoint.BakeY(0, 0.1f);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.4f), TEST_LOCATION);
+
+  node.mAnchorPoint.BakeZ(0, 0.2f);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.2f), TEST_LOCATION);
+
+  // Test parent origin, for coverage.
+  addr = node.mParentOrigin.GetValueAddress(0);
+  node.mParentOrigin.Set(0, Vector3(0.5f, 0.1f, 0.0f));
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.1f, 0.0f), TEST_LOCATION);
+
+  node.mParentOrigin.SetFloatComponent(0.9f, 1);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.0f), TEST_LOCATION);
+
+  node.mParentOrigin.BakeFloatComponent(0.4f, 2);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.4f), TEST_LOCATION);
+
+  node.mParentOrigin.BakeX(0, 0.0f);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.9f, 0.4f), TEST_LOCATION);
+
+  node.mParentOrigin.BakeY(0, 0.1f);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.4f), TEST_LOCATION);
+
+  node.mParentOrigin.BakeZ(0, 0.2f);
+  DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.2f), TEST_LOCATION);
+
   node.mOrientation.Set(0, Quaternion(Radian(1.619f), Vector3::ZAXIS));
   addr = node.mOrientation.GetValueAddress(0);
   DALI_TEST_EQUALS(*reinterpret_cast<const Quaternion*>(addr), Quaternion(Radian(1.619f), Vector3::ZAXIS), TEST_LOCATION);
 
-  Matrix& m = node.mWorldMatrix.Get(0);
-  m         = Matrix::IDENTITY;
+  Matrix& worldMatrix = node.mWorldMatrix.Get(0);
+  worldMatrix         = Matrix::IDENTITY;
 
   addr = node.mWorldPosition.GetValueAddress(0);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.f, 0.f, 0.f), TEST_LOCATION);
