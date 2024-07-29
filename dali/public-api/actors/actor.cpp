@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ Actor Actor::GetChildAt(uint32_t index) const
 
 Actor Actor::FindChildByName(std::string_view actorName)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(Internal::ConstString(actorName));
+  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(actorName);
   return Actor(child.Get());
 }
 
