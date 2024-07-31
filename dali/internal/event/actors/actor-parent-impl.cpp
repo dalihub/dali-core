@@ -170,10 +170,10 @@ ActorPtr ActorParentImpl::GetChildAt(uint32_t index) const
   return ((mChildren) ? (*mChildren)[index] : ActorPtr());
 }
 
-ActorPtr ActorParentImpl::FindChildByName(ConstString actorName)
+ActorPtr ActorParentImpl::FindChildByName(const std::string_view& actorName)
 {
   ActorPtr child = nullptr;
-  if(actorName.GetStringView() == mOwner.GetName())
+  if(actorName == mOwner.GetName())
   {
     child = &mOwner;
   }

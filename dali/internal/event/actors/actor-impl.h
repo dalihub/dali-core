@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ public:
    */
   std::string_view GetName() const
   {
-    return mName.GetStringView();
+    return mName;
   }
 
   /**
@@ -194,7 +194,7 @@ public:
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildByName
    */
-  ActorPtr FindChildByName(ConstString actorName) override;
+  ActorPtr FindChildByName(const std::string_view& actorName) override;
 
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildById
@@ -1984,7 +1984,7 @@ protected:
   Vector3    mTargetScale;       ///< Event-side storage for scale
   Rect<int>  mTouchAreaOffset;   ///< touch area offset (left, right, bottom, top)
 
-  ConstString mName;        ///< Name of the actor
+  std::string mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
 

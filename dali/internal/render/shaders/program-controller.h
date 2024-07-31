@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_CONTROLLER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public:
     ProgramPair(Program* program, size_t shaderHash)
     : mProgram(program),
       mShaderHash(shaderHash),
-      mRefCount{1u}
+      mUsed{true} ///< Initialize as be used at construct time.
     {
     }
 
@@ -81,19 +81,19 @@ public:
       return mShaderHash;
     }
 
-    [[nodiscard]] inline uint16_t GetReferenceCount() const
+    [[nodiscard]] inline bool IsUsed() const
     {
-      return mRefCount;
+      return mUsed;
     }
 
-    void Reference()
+    void MarkAsUsed()
     {
-      ++mRefCount;
+      mUsed = true;
     }
 
-    void ClearReferenceCount()
+    void ClearUsedFlag()
     {
-      mRefCount = 0u;
+      mUsed = false;
     }
 
     ProgramPair(const ProgramPair&) = delete;
@@ -102,7 +102,7 @@ public:
   private: // Data
     Program* mProgram;
     size_t   mShaderHash;
-    uint16_t mRefCount;
+    bool     mUsed : 1;
   };
 
   /**
@@ -121,14 +121,28 @@ public:
 
 public: // API
   /**
-   * @brief Reset all program reference count as 0.
+   * @brief Reset all program used flags.
+   * @note The used flag of program will be marked when we call GetProgram() or AddProgram().
    */
-  void ResetReferenceCount();
+  void ResetUsedFlag();
 
   /**
-   * @brief Clear program who the reference count is 0.
+   * @brief Clear program incrementally who are not be used.
+   *
+   * @param[in] fullCollect True if we want to clear whole items.
+   * @return True if we need to iterate more item to check used count. False if we clear cache completely.
    */
-  void ClearUnusedCache();
+  bool ClearUnusedCacheIncrementally(bool fullCollect);
+
+  /**
+   * @brief Get the number of cached program
+   *
+   * @return The number of cached program.
+   */
+  uint32_t GetCachedProgramCount() const
+  {
+    return static_cast<uint32_t>(mProgramCache.Count());
+  }
 
 private: // From ProgramCache
   /**
@@ -147,6 +161,9 @@ private: // Data
   using ProgramContainer = OwnerContainer<ProgramPair*>;
   using ProgramIterator  = ProgramContainer::Iterator;
   ProgramContainer mProgramCache;
+
+  ProgramIterator mClearCacheIterator;
+  bool            mProgramCacheAdded : 1;
 };
 
 } // namespace Internal

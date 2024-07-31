@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <cstdint> // int32_t, uint32_t
 #include <string>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/const-string.h>
@@ -46,7 +47,7 @@ class ProgramCache;
 namespace Render
 {
 class UniformBufferManager;
-}
+} // namespace Render
 
 /**
  * A program contains a vertex & fragment shader.
@@ -56,6 +57,24 @@ class Program
 {
 public:
   using Hash = std::size_t;
+
+  /**
+   * Observer to determine when the program is no longer present
+   */
+  class LifecycleObserver
+  {
+  public:
+    /**
+     * Called shortly before the program is destroyed.
+     */
+    virtual void ProgramDestroyed(const Program* program) = 0;
+
+  protected:
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~LifecycleObserver() = default;
+  };
 
   /**
    * Indices of default uniforms
@@ -128,6 +147,45 @@ public:
    */
   [[nodiscard]] const Graphics::UniformInfo* GetDefaultUniform(DefaultUniformIndex defaultUniformIndex) const;
 
+  /**
+   * Allows Program to track the life-cycle of this object.
+   * Note that we allow to observe lifecycle multiple times.
+   * But ProgramDestroyed callback will be called only one time.
+   * @param[in] observer The observer to add.
+   */
+  void AddLifecycleObserver(LifecycleObserver& observer)
+  {
+    DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying Program::LifecycleObservers");
+
+    auto iter = mLifecycleObservers.find(&observer);
+    if(iter != mLifecycleObservers.end())
+    {
+      // Increase the number of observer count
+      ++(iter->second);
+    }
+    else
+    {
+      mLifecycleObservers.insert({&observer, 1u});
+    }
+  }
+
+  /**
+   * The Program no longer needs to track the life-cycle of this object.
+   * @param[in] observer The observer that to remove.
+   */
+  void RemoveLifecycleObserver(LifecycleObserver& observer)
+  {
+    DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying Program::LifecycleObservers");
+
+    auto iter = mLifecycleObservers.find(&observer);
+    DALI_ASSERT_ALWAYS(iter != mLifecycleObservers.end());
+
+    if(--(iter->second) == 0u)
+    {
+      mLifecycleObservers.erase(iter);
+    }
+  }
+
 private: // Implementation
   /**
    * Constructor, private so no direct instantiation
@@ -190,10 +248,15 @@ public:
     return mUniformBlockMemoryRequirements;
   }
 
-private:                                                 // Data
-  ProgramCache&                          mCache;         ///< The program cache
+private:                // Data
+  ProgramCache& mCache; ///< The program cache
+
+  using LifecycleObserverContainer = std::unordered_map<LifecycleObserver*, uint32_t>; ///< Lifecycle observers container. We allow to add same observer multiple times.
+                                                                                       ///< Key is a pointer to observer, value is the number of observer added.
+  LifecycleObserverContainer mLifecycleObservers;
+
   Graphics::UniquePtr<Graphics::Program> mGfxProgram;    ///< Gfx program
-  Graphics::Controller&                  mGfxController; /// < Gfx controller
+  Graphics::Controller&                  mGfxController; ///< Gfx controller
   Internal::ShaderDataPtr                mProgramData;   ///< Shader program source and binary (when compiled & linked or loaded)
 
   // uniform value caching
@@ -205,6 +268,8 @@ private:                                                 // Data
   UniformReflectionContainer mReflectionDefaultUniforms{}; ///< Contains default uniforms
 
   UniformBlockMemoryRequirements mUniformBlockMemoryRequirements; ///< Memory requirements per each block, block 0 = standalone/emulated
+
+  bool mObserverNotifying : 1; ///< Safety guard flag to ensure that the LifecycleObserver not be added or deleted while observing.
 };
 
 } // namespace Internal

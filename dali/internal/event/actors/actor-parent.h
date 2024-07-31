@@ -1,7 +1,7 @@
 #ifndef DALI_INTERNAL_ACTOR_PARENT_H
 #define DALI_INTERNAL_ACTOR_PARENT_H
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use actor file except in compliance with the License.
@@ -75,7 +75,7 @@ public:
   /**
    * @copydoc Dali::Actor::FindChildByName
    */
-  virtual ActorPtr FindChildByName(ConstString actorName) = 0;
+  virtual ActorPtr FindChildByName(const std::string_view& actorName) = 0;
 
   /**
    * @copydoc Dali::Actor::FindChildById
