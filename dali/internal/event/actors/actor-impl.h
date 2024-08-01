@@ -555,6 +555,10 @@ public:
   Matrix GetCurrentWorldMatrix() const;
 
   // Visibility
+  /**
+   * @copydoc DevelActor::GetVisiblityChangedActor()
+   */
+  static ActorPtr GetVisiblityChangedActor();
 
   /**
    * Sets the visibility flag of an actor.

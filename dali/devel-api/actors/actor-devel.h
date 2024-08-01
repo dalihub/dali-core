@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -239,6 +239,39 @@ using VisibilityChangedSignalType = Signal<void(Actor, bool, VisibilityChange::T
  * @note For reference, an actor is only shown if it and it's parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
  */
 DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor);
+
+/**
+ * @brief Get the actor who trigger the VisibilityChangedSignal or InheritedVisibilityChangedSignal signal.
+ * @note The return value is "INVALID" if this API called outside of the VisibilityChangedSignal or InheritedVisibilityChangedSignal signal.
+ * "INVALID" don't mean the empty handle. It might return the valid handle. But it doesn't mean the visibility changed actor.
+ * if this API called outside of VisibilityChangedSignal or InheritedVisibilityChangedSignal signal.
+ *
+ * For example, Let we assume some Actor tree looks like (root)A - B - C - D - E.
+ * If we change C's visibility as false + Change A's visibility inside of D's VisibilityChangedSignal callback,
+ * The result of this API will like this.
+ *
+ * (Some codes here)                                                 --> GetVisiblityChangedActor() is INVALID
+ * C.SetProperty(Actor::Property::VISIBLE, false)
+ *   VisibilityChangedSignal(C, false, VisibilityChange::SELF)       --> GetVisiblityChangedActor() is Actor C
+ *   VisibilityChangedSignal(D, false, VisibilityChange::PARENT)     --> GetVisiblityChangedActor() is Actor C
+ *     A.SetProperty(Actor::Property::VISIBLE, false)
+ *       VisibilityChangedSignal(A, false, VisibilityChange::SELF)   --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(B, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(C, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(D, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(E, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       InheritedVisibilityChangedSignal(A, false)                  --> GetVisiblityChangedActor() is Actor A
+ *       InheritedVisibilityChangedSignal(B, false)                  --> GetVisiblityChangedActor() is Actor A
+ *     (Some codes here)                                             --> GetVisiblityChangedActor() is Actor C
+ *   VisibilityChangedSignal(E, false, VisibilityChange::PARENT)     --> GetVisiblityChangedActor() is Actor C
+ *   InheritedVisibilityChangedSignal(C, false)                      --> GetVisiblityChangedActor() is Actor C
+ *   InheritedVisibilityChangedSignal(D, false)                      --> GetVisiblityChangedActor() is Actor C
+ *   InheritedVisibilityChangedSignal(E, false)                      --> GetVisiblityChangedActor() is Actor C
+ * (Some codes here)                                                 --> GetVisiblityChangedActor() is INVALID
+ *
+ * @return The actor who trigger the visibility changed signal.
+ */
+DALI_CORE_API Actor GetVisiblityChangedActor();
 
 /**
  * Calculates screen position.
