@@ -21,6 +21,7 @@
 #include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
+#include <mesh-builder.h>
 #include <stdlib.h>
 
 #include <algorithm>
@@ -1296,6 +1297,179 @@ int UtcDaliAnimationSetEndActionP03(void)
   DALI_TEST_EQUALS(initialValue.x, actor.GetCurrentProperty<Vector3>(customPropertyIndex).x, TEST_LOCATION);
   DALI_TEST_EQUALS(customPropertyYValue, actor.GetCurrentProperty<Vector3>(customPropertyIndex).y, TEST_LOCATION);
   DALI_TEST_EQUALS(initialValue.z, actor.GetCurrentProperty<Vector3>(customPropertyIndex).z, TEST_LOCATION);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  END_TEST;
+}
+
+int UtcDaliAnimationSetEndActionP04(void)
+{
+  tet_infoline("Test Animation::EndAction with VisualRenderer property\n");
+  TestApplication application;
+
+  Actor          actor          = Actor::New();
+  Shader         shader         = Shader::New("VertexSource", "FragmentSource");
+  Geometry       geometry       = CreateQuadGeometry();
+  VisualRenderer visualRenderer = VisualRenderer::New(geometry, shader);
+  actor.AddRenderer(visualRenderer);
+
+  application.GetScene().Add(actor);
+
+  // Initialize transform size value
+  Vector2 initialValue(0.0f, 2.0f);
+  visualRenderer.SetProperty(Dali::VisualRenderer::Property::TRANSFORM_SIZE, initialValue);
+  DALI_TEST_EQUALS(visualRenderer.GetProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), initialValue, TEST_LOCATION);
+
+  // Build the animation
+  float     durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE);
+
+  Vector2 targetValue(1.0f, 1.0f);
+  animation.AnimateTo(Property(visualRenderer, Dali::VisualRenderer::Property::TRANSFORM_SIZE), targetValue, AlphaFunction::LINEAR);
+
+  // Start the animation
+  animation.Play();
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS(targetValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+
+  // Go back to the start
+  visualRenderer.SetProperty(Dali::VisualRenderer::Property::TRANSFORM_SIZE, initialValue);
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+
+  tet_printf("Set EndAction::BAKE_FINAL\n");
+  // Test BakeFinal, animate again, for half the duration
+  finishCheck.Reset();
+  animation.SetEndAction(Animation::BAKE_FINAL);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE_FINAL);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f * 0.5f) /*half of the animation duration*/);
+
+  // Stop the animation early
+  animation.Stop();
+
+  tet_printf("EndAction::BAKE_FINAL Animation stopped\n");
+  // We did NOT expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS((initialValue + targetValue) * 0.5f, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), VECTOR3_EPSILON, TEST_LOCATION);
+
+  // The position should be same with target position in the next frame
+  tet_printf("Check current value return well\n");
+  application.Render(0);
+  DALI_TEST_EQUALS(targetValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+
+  // Go back to the start
+  visualRenderer.SetProperty(Dali::VisualRenderer::Property::TRANSFORM_SIZE, initialValue);
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+
+  tet_printf("Set EndAction::Discard\n");
+  // Test EndAction::Discard, animate again, but don't bake this time
+  finishCheck.Reset();
+  animation.SetEndAction(Animation::DISCARD);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::DISCARD);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
+
+  // Check whether we need to keep update at least 2 frames after discard-animation finished.
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+
+  tet_printf("EndAction::Discard Animation finished\n");
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS(targetValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+
+  // The position should be discarded in the next frame
+  // And also, check whether we need to keep update next frames after discard-animation finished.
+  tet_printf("Check current value return well\n");
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue /*discarded*/, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+
+  // Check that nothing has changed after a couple of buffer swaps
+  // After 2 frames rendered, UpdateStatus will not mark as animation runing.
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+
+  tet_printf("Set EndAction::Discard and play another animation with EndAction::Bake\n");
+  // Test EndAction::Discard, animate again, but don't bake this time
+  finishCheck.Reset();
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::DISCARD);
+
+  float     customPropertyYValue = 5.0f;
+  Animation animation2           = Animation::New(durationSeconds);
+  DALI_TEST_CHECK(animation2.GetEndAction() == Animation::BAKE);
+  animation2.AnimateTo(Property(visualRenderer, Dali::VisualRenderer::Property::TRANSFORM_SIZE, 1), customPropertyYValue, AlphaFunction::LINEAR);
+  animation.Play();
+  animation2.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f));
+  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
+
+  // Check whether we need to keep update at least 2 frames after discard-animation finished.
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+
+  tet_printf("EndAction::Discard Animation finished\n");
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS(targetValue.x, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
+  DALI_TEST_EQUALS(customPropertyYValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
+
+  // The position should be discarded in the next frame
+  // And also, check whether we need to keep update next frames after discard-animation finished.
+  tet_printf("Check current value return well\n");
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue.x /*discarded*/, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
+  DALI_TEST_EQUALS(customPropertyYValue /*baked*/, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+
+  // Check that nothing has changed after a couple of buffer swaps
+  // After 2 frames rendered, UpdateStatus will not mark as animation runing.
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue.x, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
+  DALI_TEST_EQUALS(customPropertyYValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+
+  application.Render(0);
+  DALI_TEST_EQUALS(initialValue.x, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
+  DALI_TEST_EQUALS(customPropertyYValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
   DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
   END_TEST;
 }
