@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -629,6 +629,81 @@ int UtcDaliIntrusivePtrOperatorEqualWithNullptr(void)
   DALI_TEST_CHECK(nullptr == counted1);
   DALI_TEST_CHECK(!(counted1 != nullptr));
   DALI_TEST_CHECK(!(nullptr != counted1));
+
+  END_TEST;
+}
+
+/** Comparision of two different types*/
+int UtcDaliIntrusivePtrOperatorLessTU(void)
+{
+  tet_infoline("Test for Dali::IntrusivePtr::operator <(T, U)");
+
+  IntrusivePtr<Counted>         counted1(new Counted);
+  IntrusivePtr<CountedSubclass> countedSubclass1(new CountedSubclass);
+  IntrusivePtr<CountedSubclass> countedSubclass2(new CountedSubclass);
+  IntrusivePtr<Counted>         counted2(countedSubclass2);
+
+  const bool expectResult = counted1.Get() < countedSubclass1.Get();
+
+  DALI_TEST_EQUALS(operator<(counted1, countedSubclass1), expectResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(countedSubclass1, counted1), !expectResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(counted2, countedSubclass2), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(countedSubclass2, counted2), false, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliIntrusivePtrOperatorLessRightPointerTU(void)
+{
+  tet_infoline("Test for Dali::IntrusivePtr::operator <(T, U*)");
+
+  IntrusivePtr<Counted>         counted1(new Counted);
+  IntrusivePtr<CountedSubclass> countedSubclass1(new CountedSubclass);
+  IntrusivePtr<CountedSubclass> countedSubclass2(new CountedSubclass);
+  IntrusivePtr<Counted>         counted2(countedSubclass2);
+
+  const bool expectResult = counted1.Get() < countedSubclass1.Get();
+
+  DALI_TEST_EQUALS(operator<(counted1, countedSubclass1.Get()), expectResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(countedSubclass1, counted1.Get()), !expectResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(counted2, countedSubclass2.Get()), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(countedSubclass2, counted2.Get()), false, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliIntrusivePtrOperatorLessLeftPointerTU(void)
+{
+  tet_infoline("Test for Dali::IntrusivePtr::operator <(T*, U)");
+
+  IntrusivePtr<Counted>         counted1(new Counted);
+  IntrusivePtr<CountedSubclass> countedSubclass1(new CountedSubclass);
+  IntrusivePtr<CountedSubclass> countedSubclass2(new CountedSubclass);
+  IntrusivePtr<Counted>         counted2(countedSubclass2);
+
+  const bool expectResult = counted1.Get() < countedSubclass1.Get();
+
+  DALI_TEST_EQUALS(operator<(counted1.Get(), countedSubclass1), expectResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(countedSubclass1.Get(), counted1), !expectResult, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(counted2.Get(), countedSubclass2), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(operator<(countedSubclass2.Get(), counted2), false, TEST_LOCATION);
+  END_TEST;
+}
+
+/** Comparision with nullptr */
+int UtcDaliIntrusivePtrOperatorLessWithNullptr(void)
+{
+  tet_infoline("Test for Dali::IntrusivePtr::operator < nullptr");
+
+  IntrusivePtr<Counted> counted1(new Counted);
+
+  // counted1 is not nullptr.
+  DALI_TEST_CHECK(!(counted1 < nullptr));
+  DALI_TEST_CHECK(nullptr < counted1);
+
+  counted1 = nullptr;
+
+  // counted1 is nullptr.
+  DALI_TEST_CHECK(!(counted1 < nullptr));
+  DALI_TEST_CHECK(!(nullptr < counted1));
 
   END_TEST;
 }
