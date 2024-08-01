@@ -25,6 +25,7 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-render-target-create-info.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/handle.h>
@@ -461,6 +462,13 @@ public:
    * @return The native window id
    */
   int32_t GetNativeId() const;
+
+  /**
+   * @brief Gets the last pan gesture state
+   *
+   * @return Dali::GestureState
+   */
+  Dali::GestureState GetLastPanGestureState();
 
   /**
    * @brief This signal is emitted just after the event processing is finished.

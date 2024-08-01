@@ -253,6 +253,11 @@ int32_t Scene::GetNativeId() const
   return GetImplementation(*this).GetNativeId();
 }
 
+Dali::GestureState Scene::GetLastPanGestureState()
+{
+  return GetImplementation(*this).GetLastPanGestureState();
+}
+
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();

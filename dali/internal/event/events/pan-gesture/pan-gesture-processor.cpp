@@ -134,6 +134,7 @@ PanGestureProcessor::PanGestureProcessor(SceneGraph::UpdateManager& updateManage
   mMinimumDistance(-1),
   mMinimumPanEvents(-1),
   mCurrentPanEvent(nullptr),
+  mCurrentScene(nullptr),
   mSceneObject(SceneGraph::PanGesture::New()) // Create scene object to store pan information.
 {
   // Pass ownership to scene-graph; scene object lives for the lifecycle of UpdateManager
@@ -157,6 +158,7 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
 
   DALI_TRACE_SCOPE(gTraceFilter, "DALI_PROCESS_PAN_GESTURE");
 
+  mCurrentScene = &scene;
   switch(panEvent.state)
   {
     case GestureState::POSSIBLE:
@@ -242,8 +244,8 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
             currentGesturedActor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
 
             // EmitPanSignal checks whether we have a valid actor and whether the container we are passing in has emitters before it emits the pan.
-            EmitPanSignal(currentGesturedActor, outsideTouchesRangeEmitters, panEvent, actorCoords, GestureState::FINISHED, mCurrentRenderTask);
-            EmitPanSignal(currentGesturedActor, mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask);
+            EmitPanSignal(currentGesturedActor, outsideTouchesRangeEmitters, panEvent, actorCoords, GestureState::FINISHED, mCurrentRenderTask, mCurrentScene);
+            EmitPanSignal(currentGesturedActor, mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask, mCurrentScene);
           }
 
           if(mCurrentPanEmitters.empty())
@@ -274,6 +276,7 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
       break;
     }
   }
+  mCurrentScene = nullptr;
 }
 
 void PanGestureProcessor::AddGestureDetector(PanGestureDetector* gestureDetector, Scene& scene, int32_t minDistance, int32_t minPanEvents)
@@ -546,7 +549,8 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
                                         const PanGestureEvent&          panEvent,
                                         Vector2                         localCurrent,
                                         GestureState                    state,
-                                        RenderTaskPtr                   renderTask)
+                                        RenderTaskPtr                   renderTask,
+                                        Scene*                          scene)
 {
   if(actor && !gestureDetectors.empty())
   {
@@ -610,6 +614,12 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
       mSceneObject->AddGesture(*pan.Get());
     }
 
+    // store the state;
+    if(scene)
+    {
+      scene->SetLastPanGestureState(state);
+    }
+
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
       oss << "[" << gestureDetectors.size() << "]";
     });
@@ -621,6 +631,7 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
     {
       static_cast<PanGestureDetector*>(*iter)->EmitPanGestureSignal(actorHandle, Dali::PanGesture(pan.Get()));
     }
+
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
       oss << "[" << gestureDetectors.size() << "]";
@@ -654,7 +665,7 @@ void PanGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorC
 
   actor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoordinates.x, actorCoordinates.y, mCurrentPanEvent->currentPosition.x, mCurrentPanEvent->currentPosition.y);
 
-  EmitPanSignal(actor, gestureDetectors, *mCurrentPanEvent, actorCoordinates, mCurrentPanEvent->state, mCurrentRenderTask);
+  EmitPanSignal(actor, gestureDetectors, *mCurrentPanEvent, actorCoordinates, mCurrentPanEvent->state, mCurrentRenderTask, mCurrentScene);
 
   if(actor->OnScene())
   {

@@ -268,6 +268,17 @@ public:
   int32_t GetNativeId() const;
 
   /**
+   * Sets the last pan gesture state.
+   * @param[in] state The pan gesture state.
+   */
+  void SetLastPanGestureState(Dali::GestureState state);
+
+  /**
+   * @copydoc Dali::Integration::Scene::GetLastPanGestureState
+   */
+  Dali::GestureState GetLastPanGestureState();
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -460,6 +471,9 @@ private:
 
   // The native window id
   int32_t mNativeId;
+
+  // The pan gesture state
+  Dali::GestureState mPanGestureState;
 
   // The key event signal
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;

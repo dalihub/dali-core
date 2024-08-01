@@ -261,8 +261,9 @@ private:
    * @param[in]  localCurrent      Current position relative to the actor attached to the detector.
    * @param[in]  state             The state of the gesture.
    * @param[in]  renderTask        The renderTask to use.
+   * @param[in]  scene             The scene the pan gesture event occurs in.
    */
-  void EmitPanSignal(Actor* actor, const PanGestureEvent& panEvent, Vector2 localCurrent, GestureState state, RenderTaskPtr renderTask);
+  void EmitPanSignal(Actor* actor, const PanGestureEvent& panEvent, Vector2 localCurrent, GestureState state, RenderTaskPtr renderTask, Scene& scene);
 
   // Default property extensions from Object
 

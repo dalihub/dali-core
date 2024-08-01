@@ -62,7 +62,8 @@ Scene::Scene()
   mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
   mSurfaceOrientation(0),
   mScreenOrientation(0),
-  mNativeId(0)
+  mNativeId(0),
+  mPanGestureState(GestureState::CLEAR)
 {
 }
 
@@ -538,6 +539,16 @@ void Scene::SetNativeId(int32_t nativeId)
 int32_t Scene::GetNativeId() const
 {
   return mNativeId;
+}
+
+void Scene::SetLastPanGestureState(Dali::GestureState state)
+{
+  mPanGestureState = state;
+}
+
+Dali::GestureState Scene::GetLastPanGestureState()
+{
+  return mPanGestureState;
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()
