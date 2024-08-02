@@ -159,7 +159,7 @@ public:
   void OnSet() override
   {
     GetCacheBaseData()->Update(false);
-    AnimatablePropertyBase::OnSet();
+    AnimatableProperty<T>::OnSet();
   }
 
   /**
@@ -168,7 +168,7 @@ public:
   void OnBake() override
   {
     GetCacheBaseData()->Update(true);
-    AnimatablePropertyBase::OnBake();
+    AnimatableProperty<T>::OnBake();
   }
 };
 
