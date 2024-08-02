@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -551,7 +551,7 @@ const PropertyBase* Camera::GetProjectionDirection() const
 void Camera::Update(BufferIndex updateBufferIndex)
 {
   // if this has changes in world position we need to update camera for next 2 frames
-  if(IsLocalMatrixDirty())
+  if(IsWorldMatrixDirty())
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }
@@ -875,7 +875,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
         {
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Orthographic(projectionMatrix,
-                      static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
+                       static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
                        mOrthographicSize[updateBufferIndex],
                        mAspectRatio[updateBufferIndex],
                        mNearClippingPlane[updateBufferIndex],

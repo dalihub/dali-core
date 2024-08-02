@@ -207,7 +207,7 @@ inline void UpdateLayers(Node&             node,
 {
   // Some dirty flags are inherited from parent
   NodePropertyFlags nodeDirtyFlags = node.GetDirtyFlags() | node.GetInheritedDirtyFlags(parentFlags);
-  nodeDirtyFlags |= (node.IsLocalMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
+  nodeDirtyFlags |= (node.IsWorldMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
 
   Layer* nodeIsLayer(node.GetLayer());
   Layer* layer = nodeIsLayer ? nodeIsLayer : &currentLayer;
@@ -255,7 +255,7 @@ void UpdateLayerTree(Layer&      layer,
                      BufferIndex updateBufferIndex)
 {
   NodePropertyFlags nodeDirtyFlags = layer.GetDirtyFlags();
-  nodeDirtyFlags |= (layer.IsLocalMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
+  nodeDirtyFlags |= (layer.IsWorldMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
 
   layer.SetReuseRenderers(updateBufferIndex, nodeDirtyFlags == NodePropertyFlags::NOTHING);
 
