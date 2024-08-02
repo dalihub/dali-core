@@ -15015,6 +15015,149 @@ int UtcDaliActorCalculateWorldTransform08(void)
   END_TEST;
 }
 
+int UtcDaliActorCalculateWorldTransform09(void)
+{
+  TestApplication application;
+
+  tet_infoline("Check the current position value if leaf actor doesn't inherit scale. (Real world usecase error)");
+
+  Actor rootActor = Actor::New();
+  Actor middleActor = Actor::New();
+  Actor leafActor = Actor::New();
+
+  Vector3 rootActorPosition = Vector3(0.0f, 50.0f, 100.0f);
+
+  rootActor[Actor::Property::POSITION]      = rootActorPosition;
+  rootActor[Actor::Property::SCALE]         = Vector3::ONE;
+  rootActor[Actor::Property::SIZE]          = Vector2(200, 400);
+  rootActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+
+  Vector3 middleActorPosition = Vector3(100.0f, 0.0f, 0.0f);
+  Vector3 middleActorSize     = Vector3(200.0f, 400.0f, 0.0f);
+  middleActor[Actor::Property::POSITION]      = middleActorPosition;
+  middleActor[Actor::Property::SCALE]         = Vector3::ONE;
+  middleActor[Actor::Property::SIZE]          = middleActorSize;
+  middleActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  middleActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+
+  Vector3 leafActorPosition = Vector3(0.0f, 100.0f, 0.0f);
+  leafActor[Actor::Property::POSITION]      = leafActorPosition;
+  leafActor[Actor::Property::SCALE]         = Vector3::ONE;
+  leafActor[Actor::Property::SIZE]          = Vector2(200, 400);
+  leafActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  leafActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT; ///< To test parent's size changeness applied
+
+  middleActor[Actor::Property::INHERIT_SCALE] = true;
+
+  application.GetScene().Add(rootActor);
+  rootActor.Add(middleActor);
+  middleActor.Add(leafActor);
+
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  application.Render(0);
+
+  Matrix actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  Vector3 worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  Vector3 actualWorldPosition = rootActorPosition + middleActorPosition - middleActorSize * 0.5 /*ParentOrigin::TOP_LEFT*/ + leafActorPosition;
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  // Make middleActor's inherit scale is false.
+  // Since all actor's scale is Vector3::ONE, their is nothing changed.
+  // Test at least 2 frames.
+  middleActor[Actor::Property::INHERIT_SCALE] = false;
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  // Change rootActor's position.
+  // Test at least 2 frames.
+  rootActorPosition = Vector3(-200.0f, -100.0f, 300.0f);
+  rootActor[Actor::Property::POSITION] = rootActorPosition;
+
+  // Actual world position changed
+  actualWorldPosition = rootActorPosition + middleActorPosition - middleActorSize * 0.5 /*ParentOrigin::TOP_LEFT*/ + leafActorPosition;
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  // Change middleActor's size.
+  // Test at least 2 frames.
+  middleActorSize = Vector3(400.0f, 300.0f, 0.0f);
+  middleActor[Actor::Property::SIZE] = middleActorSize;
+
+  // Actual world position changed
+  actualWorldPosition = rootActorPosition + middleActorPosition - middleActorSize * 0.5 /*ParentOrigin::TOP_LEFT*/ + leafActorPosition;
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  // Make middleActor's inherit scale true again.
+  // Test at least 2 frames.
+  middleActor[Actor::Property::INHERIT_SCALE] = true;
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  worldPosition = Vector3(actualMatrix.GetTranslation());
+
+  DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliActorCalculateWorldColor01(void)
 {
   TestApplication application;
