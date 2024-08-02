@@ -2,7 +2,7 @@
 #define DALI_INTRUSIVE_PTR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -434,6 +434,76 @@ template<typename T>
 inline bool operator!=(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
 {
   return nullptr != rhs.Get();
+}
+
+/**
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
+ *
+ * @SINCE_2_3.35
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the pointers point of rhs is bigger than lhs
+ */
+template<typename T, typename U>
+inline bool operator<(IntrusivePtr<T> const& lhs, IntrusivePtr<U> const& rhs)
+{
+  return lhs.Get() < rhs.Get();
+}
+
+/**
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
+ *
+ * @SINCE_2_3.35
+ * @param[in] lhs Object to compare with
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the pointers point of rhs is bigger than lhs
+ */
+template<typename T, typename U>
+inline bool operator<(T* lhs, IntrusivePtr<U> const& rhs)
+{
+  return lhs < rhs.Get();
+}
+
+/**
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
+ *
+ * @SINCE_2_3.35
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs Object to compare against
+ * @return True if the pointers point of rhs is bigger than lhs
+ */
+template<typename T, typename U>
+inline bool operator<(IntrusivePtr<T> const& lhs, U* rhs)
+{
+  return lhs.Get() < rhs;
+}
+
+/**
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
+ *
+ * @SINCE_2_3.35
+ * @param[in] lhs nullptr
+ * @param[in] rhs Intrusive pointer to compare against
+ * @return True if the pointers point of rhs is bigger than lhs
+ */
+template<typename T>
+inline bool operator<(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
+{
+  return nullptr < rhs.Get();
+}
+
+/**
+ * @brief Comparison overrides of objects wrapped by intrusive pointers.
+ *
+ * @SINCE_2_3.35
+ * @param[in] lhs Intrusive pointer to compare with
+ * @param[in] rhs nullptr
+ * @return True if the pointers point of rhs is bigger than lhs
+ */
+template<typename T>
+inline bool operator<(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
+{
+  return lhs.Get() < nullptr;
 }
 
 /**
