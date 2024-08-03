@@ -489,7 +489,8 @@ inline bool operator<(IntrusivePtr<T> const& lhs, U* rhs)
 template<typename T>
 inline bool operator<(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
 {
-  return nullptr < rhs.Get();
+  // Do not use less operator with nullptr. It will make compile error over gcc-14.
+  return nullptr != rhs.Get();
 }
 
 /**
@@ -503,7 +504,8 @@ inline bool operator<(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
 template<typename T>
 inline bool operator<(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
 {
-  return lhs.Get() < nullptr;
+  // Do not use less operator with nullptr. It will make compile error over gcc-14.
+  return false;
 }
 
 /**
