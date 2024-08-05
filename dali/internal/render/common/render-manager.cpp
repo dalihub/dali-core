@@ -154,9 +154,7 @@ inline void AlignDamagedRect(Rect<int32_t>& rect)
   rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
 }
 
-// TODO : The name of trace marker is from VD specific.
-// We might need to change it as DALI_TRACE_RENDER_PROCESS.
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
 } // namespace
 
 /**

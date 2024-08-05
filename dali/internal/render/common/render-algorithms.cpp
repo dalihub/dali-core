@@ -391,9 +391,7 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
   }
 }
 
-// TODO : The name of trace marker is from VD specific.
-// We might need to change it as DALI_TRACE_RENDER_PROCESS.
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
 } // Unnamed namespace
 
 /**
@@ -761,8 +759,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
-                                          { oss << "[" << instruction.RenderListCount() << "]"; });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) { oss << "[" << instruction.RenderListCount() << "]"; });
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
