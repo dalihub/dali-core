@@ -10503,11 +10503,11 @@ int utcDaliActorInheritedVisibilityChangeSignal5(void)
 
   data.Reset();
   application.GetScene().Show();
-  data.Check(true, actor, true, TEST_LOCATION);
+  data.Check(true, Dali::Actor(), actor, true, TEST_LOCATION);
 
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
-  data.Check(true, actor, false, TEST_LOCATION);
+  data.Check(true, Dali::Actor(), actor, false, TEST_LOCATION);
 
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
@@ -10515,7 +10515,7 @@ int utcDaliActorInheritedVisibilityChangeSignal5(void)
 
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  data.Check(true, actor, true, TEST_LOCATION);
+  data.Check(true, Dali::Actor(), actor, true, TEST_LOCATION);
 
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
@@ -10523,7 +10523,7 @@ int utcDaliActorInheritedVisibilityChangeSignal5(void)
 
   data.Reset();
   application.GetScene().Hide();
-  data.Check(true, actor, false, TEST_LOCATION);
+  data.Check(true, Dali::Actor(), actor, false, TEST_LOCATION);
 
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
@@ -10535,7 +10535,7 @@ int utcDaliActorInheritedVisibilityChangeSignal5(void)
 
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  data.Check(true, actor, true, TEST_LOCATION);
+  data.Check(true, Dali::Actor(), actor, true, TEST_LOCATION);
 
   END_TEST;
 }
