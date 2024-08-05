@@ -68,6 +68,21 @@ void Scene::Remove(Actor actor)
   GetImplementation(*this).Remove(GetImplementation(actor));
 }
 
+void Scene::Show()
+{
+  GetImplementation(*this).Show();
+}
+
+void Scene::Hide()
+{
+  GetImplementation(*this).Hide();
+}
+
+bool Scene::IsVisible() const
+{
+  return GetImplementation(*this).IsVisible();
+}
+
 Size Scene::GetSize() const
 {
   return GetImplementation(*this).GetSize();

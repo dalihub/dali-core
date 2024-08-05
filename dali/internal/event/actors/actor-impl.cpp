@@ -1411,6 +1411,17 @@ void Actor::RebuildDepthTree()
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
+void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
+{
+  ActorContainer inheritedVisibilityChangedList;
+  mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
+  // Notify applications about the newly connected actors.
+  for(const auto& actor : inheritedVisibilityChangedList)
+  {
+    actor->EmitInheritedVisibilityChangedSignal(visible);
+  }
+}
+
 void Actor::SetDefaultProperty(Property::Index index, const Property::Value& property)
 {
   PropertyHandler::SetDefaultProperty(*this, index, property);
@@ -1544,7 +1555,8 @@ void Actor::SetParent(ActorParent* parent, bool notify)
       ConnectToScene(parentActor->GetHierarchyDepth(), parentActor->GetLayer3DParentCount(), notify);
 
       Actor* actor         = this;
-      emitInheritedVisible = true;
+      // OnScene should be checked, this actor can be removed during OnSceneConnection.
+      emitInheritedVisible = OnScene() && mScene->IsVisible();
       while(emitInheritedVisible && actor)
       {
         emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
@@ -1563,7 +1575,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
        OnScene())
     {
       Actor* actor         = this;
-      emitInheritedVisible = true;
+      emitInheritedVisible = mScene->IsVisible();
       while(emitInheritedVisible && actor)
       {
         emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
@@ -1759,7 +1771,7 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     }
 
     Actor* actor                = this->GetParent();
-    bool   emitInheritedVisible = OnScene();
+    bool   emitInheritedVisible = OnScene() && mScene->IsVisible();
     while(emitInheritedVisible && actor)
     {
       emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
@@ -1774,17 +1786,6 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     {
       EmitInheritedVisibilityChangedSignalRecursively(visible);
     }
-  }
-}
-
-void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
-{
-  ActorContainer inheritedVisibilityChangedList;
-  mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
-  // Notify applications about the newly connected actors.
-  for(const auto& actor : inheritedVisibilityChangedList)
-  {
-    actor->EmitInheritedVisibilityChangedSignal(visible);
   }
 }
 

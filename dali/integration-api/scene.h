@@ -168,6 +168,25 @@ public:
   void Remove(Actor actor);
 
   /**
+   * @brief Shows the scene if it is hidden.
+   * @SINCE_2_3.35
+   */
+  void Show();
+
+  /**
+   * @brief Hides the scene if it is showing.
+   * @SINCE_2_3.35
+   */
+  void Hide();
+
+  /**
+   * @brief Returns whether the window is visible or not.
+   * @SINCE_2_3.35
+   * @return True if the window is visible, false otherwise.
+   */
+  bool IsVisible() const;
+
+  /**
    * @brief Returns the size of the Scene in pixels as a Vector.
    *
    * The x component will be the width of the Scene in pixels.

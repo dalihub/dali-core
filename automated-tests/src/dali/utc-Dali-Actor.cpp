@@ -10181,6 +10181,65 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   END_TEST;
 }
 
+int utcDaliActorInheritedVisibilityChangeSignal5(void)
+{
+  TestApplication application;
+  tet_infoline("Check that the inherited visibility change signal is called when the scene visibility is changed");
+
+  Actor parentActor = Actor::New();
+  Actor actor       = Actor::New();
+
+  InheritedVisibilityChangedFunctorData data;
+  actor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(data));
+
+  application.GetScene().Hide();
+
+  parentActor.Add(actor);
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  application.GetScene().Add(parentActor);
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  application.GetScene().Show();
+  data.Check(true, actor, true, TEST_LOCATION);
+
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  data.Check(true, actor, false, TEST_LOCATION);
+
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, true);
+  data.Check(true, actor, true, TEST_LOCATION);
+
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, true);
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  application.GetScene().Hide();
+  data.Check(true, actor, false, TEST_LOCATION);
+
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  application.GetScene().Show();
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, true);
+  data.Check(true, actor, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
 static void LayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
 {
   gLayoutDirectionType = type;
