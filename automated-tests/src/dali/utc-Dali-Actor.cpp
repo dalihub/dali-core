@@ -211,6 +211,7 @@ struct VisibilityChangedFunctorData
 {
   VisibilityChangedFunctorData()
   : actor(),
+    changedActor(),
     visible(false),
     type(DevelActor::VisibilityChange::SELF),
     called(false)
@@ -220,14 +221,20 @@ struct VisibilityChangedFunctorData
   void Reset()
   {
     actor.Reset();
+    changedActor.Reset();
     visible = false;
     type    = DevelActor::VisibilityChange::SELF;
     called  = false;
   }
 
-  void Check(bool compareCalled, Actor compareActor, bool compareVisible, DevelActor::VisibilityChange::Type compareType, const char* location)
+  void Check(bool compareCalled, Actor compareChangedActor, Actor compareActor, bool compareVisible, DevelActor::VisibilityChange::Type compareType, const char* location)
   {
     DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
+    if(compareChangedActor)
+    {
+      // Do not check changed actor if compareChangedActor is empty.
+      DALI_TEST_EQUALS(changedActor, compareChangedActor, TEST_INNER_LOCATION(location));
+    }
     DALI_TEST_EQUALS(actor, compareActor, TEST_INNER_LOCATION(location));
     DALI_TEST_EQUALS(visible, compareVisible, TEST_INNER_LOCATION(location));
     DALI_TEST_EQUALS((int)type, (int)compareType, TEST_INNER_LOCATION(location));
@@ -239,6 +246,7 @@ struct VisibilityChangedFunctorData
   }
 
   Actor                              actor;
+  Actor                              changedActor;
   bool                               visible;
   DevelActor::VisibilityChange::Type type;
   bool                               called;
@@ -253,13 +261,29 @@ struct VisibilityChangedFunctor
 
   void operator()(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
   {
-    data.actor   = actor;
-    data.visible = visible;
-    data.type    = type;
-    data.called  = true;
+    data.actor        = actor;
+    data.changedActor = DevelActor::GetVisiblityChangedActor();
+    data.visible      = visible;
+    data.type         = type;
+    data.called       = true;
   }
 
   VisibilityChangedFunctorData& data;
+};
+
+struct VisibilityChangedLambdaFunctor
+{
+  VisibilityChangedLambdaFunctor(std::function<void(Actor, bool, DevelActor::VisibilityChange::Type)> functor)
+  : functor(functor)
+  {
+  }
+
+  void operator()(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  {
+    functor(actor, visible, type);
+  }
+
+  std::function<void(Actor, bool, DevelActor::VisibilityChange::Type)> functor;
 };
 
 struct VisibilityChangedVoidFunctor
@@ -281,6 +305,7 @@ struct InheritedVisibilityChangedFunctorData
 {
   InheritedVisibilityChangedFunctorData()
   : actor(),
+    changedActor(),
     visible(false),
     called(false)
   {
@@ -289,13 +314,19 @@ struct InheritedVisibilityChangedFunctorData
   void Reset()
   {
     actor.Reset();
+    changedActor.Reset();
     visible = false;
     called  = false;
   }
 
-  void Check(bool compareCalled, Actor compareActor, bool compareVisible, const char* location)
+  void Check(bool compareCalled, Actor compareChangedActor, Actor compareActor, bool compareVisible, const char* location)
   {
     DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
+    if(compareChangedActor)
+    {
+      // Do not check changed actor if compareChangedActor is empty.
+      DALI_TEST_EQUALS(changedActor, compareChangedActor, TEST_INNER_LOCATION(location));
+    }
     DALI_TEST_EQUALS(actor, compareActor, TEST_INNER_LOCATION(location));
     DALI_TEST_EQUALS(visible, compareVisible, TEST_INNER_LOCATION(location));
   }
@@ -306,6 +337,7 @@ struct InheritedVisibilityChangedFunctorData
   }
 
   Actor actor;
+  Actor changedActor;
   bool  visible;
   bool  called;
 };
@@ -319,9 +351,10 @@ struct InheritedVisibilityChangedFunctor
 
   void operator()(Actor actor, bool visible)
   {
-    data.actor   = actor;
-    data.visible = visible;
-    data.called  = true;
+    data.actor        = actor;
+    data.changedActor = DevelActor::GetVisiblityChangedActor();
+    data.visible      = visible;
+    data.called       = true;
   }
 
   InheritedVisibilityChangedFunctorData& data;
@@ -9763,7 +9796,7 @@ int utcDaliActorVisibilityChangeSignalSelf(void)
 
   actor.SetProperty(Actor::Property::VISIBLE, false);
 
-  data.Check(true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true /* called */, actor, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
 
   tet_infoline("Ensure functor is not called if we attempt to change the visibility to what it already is at");
   data.Reset();
@@ -9775,7 +9808,7 @@ int utcDaliActorVisibilityChangeSignalSelf(void)
   data.Reset();
 
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  data.Check(true /* called */, actor, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true /* called */, actor, actor, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
 
   tet_infoline("Set the visibility to current using properties, ensure not called");
   data.Reset();
@@ -9808,8 +9841,8 @@ int utcDaliActorVisibilityChangeSignalChildren(void)
 
   parent.SetProperty(Actor::Property::VISIBLE, false);
   parentData.Check(false /* not called */, TEST_LOCATION);
-  childData.Check(true /* called */, child, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  grandChildData.Check(true /* called */, grandChild, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  childData.Check(true /* called */, parent, child, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  grandChildData.Check(true /* called */, parent, grandChild, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
 
   tet_infoline("Connect to the parent's signal as well and ensure all three are called");
   parentData.Reset();
@@ -9819,9 +9852,9 @@ int utcDaliActorVisibilityChangeSignalChildren(void)
   DevelActor::VisibilityChangedSignal(parent).Connect(&application, VisibilityChangedFunctor(parentData));
 
   parent.SetProperty(Actor::Property::VISIBLE, true);
-  parentData.Check(true /* called */, parent, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
-  childData.Check(true /* called */, child, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  grandChildData.Check(true /* called */, grandChild, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  parentData.Check(true /* called */, parent, parent, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  childData.Check(true /* called */, parent, child, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  grandChildData.Check(true /* called */, parent, grandChild, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
 
   tet_infoline("Ensure none of the functors are called if we attempt to change the visibility to what it already is at");
   parentData.Reset();
@@ -9860,7 +9893,7 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
   tet_infoline("Play the animation and check the property value");
   animation.Play();
 
-  data.Check(true /* called */, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true /* called */, actor, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::VISIBLE), false, TEST_LOCATION);
 
   tet_infoline("Animation not currently finished, so the current visibility should still be true");
@@ -9913,30 +9946,43 @@ int utcDaliActorInheritedVisibilityChangeSignal1(void)
   Actor parentActor = Actor::New();
   Actor actor       = Actor::New();
 
+  VisibilityChangedFunctorData          visibilityData;
   InheritedVisibilityChangedFunctorData data;
+  DevelActor::VisibilityChangedSignal(actor).Connect(&application, VisibilityChangedFunctor(visibilityData));
   actor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(data));
 
   parentActor.Add(actor);
+  visibilityData.Check(false, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   application.GetScene().Add(parentActor);
-  data.Check(true, actor, true, TEST_LOCATION);
+  visibilityData.Check(false, TEST_LOCATION); ///< SceneOn doesn't emit VisibilityChangedSignal.
+  data.Check(true, parentActor /* Since parent actor added on scene */, actor, true, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
-  data.Check(true, actor, false, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true, actor, actor, false, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
+  visibilityData.Check(false, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  data.Check(true, actor, true, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true, actor, actor, true, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
+  visibilityData.Check(false, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   END_TEST;
@@ -9950,75 +9996,122 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   Actor parentActor = Actor::New();
   Actor childActor  = Actor::New();
 
+  VisibilityChangedFunctorData          visibilityDataP, visibilityDataC;
   InheritedVisibilityChangedFunctorData dataP, dataC;
+  DevelActor::VisibilityChangedSignal(parentActor).Connect(&application, VisibilityChangedFunctor(visibilityDataP));
+  DevelActor::VisibilityChangedSignal(childActor).Connect(&application, VisibilityChangedFunctor(visibilityDataC));
   parentActor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataP));
   childActor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataC));
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   parentActor.Add(childActor);
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
   dataC.Check(false, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   application.GetScene().Add(parentActor);
-  dataP.Check(true, parentActor, true, TEST_LOCATION);
-  dataC.Check(true, childActor, true, TEST_LOCATION);
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION);
+  dataP.Check(true, parentActor, parentActor, true, TEST_LOCATION);
+  dataC.Check(true, parentActor, childActor, true, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   childActor.Unparent();
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
-  dataC.Check(true, childActor, false, TEST_LOCATION);
+  dataC.Check(true, childActor, childActor, false, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   childActor.SetProperty(Actor::Property::VISIBLE, false);
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(true, childActor, childActor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
   dataC.Check(false, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   parentActor.Add(childActor);
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
   dataC.Check(false, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   childActor.SetProperty(Actor::Property::VISIBLE, true);
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(true, childActor, childActor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
-  dataC.Check(true, childActor, true, TEST_LOCATION);
+  dataC.Check(true, childActor, childActor, true, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, false);
-  dataP.Check(true, parentActor, false, TEST_LOCATION);
-  dataC.Check(true, childActor, false, TEST_LOCATION);
+  visibilityDataP.Check(true, parentActor, parentActor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityDataC.Check(true, parentActor, childActor, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataP.Check(true, parentActor, parentActor, false, TEST_LOCATION);
+  dataC.Check(true, parentActor, childActor, false, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   childActor.Unparent();
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
   dataC.Check(false, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, true);
-  dataP.Check(true, parentActor, true, TEST_LOCATION);
+  visibilityDataP.Check(true, parentActor, parentActor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION); ///< childActor is not a child of parentActor now.
+  dataP.Check(true, parentActor, parentActor, true, TEST_LOCATION);
   dataC.Check(false, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   parentActor.Add(childActor);
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
-  dataC.Check(true, childActor, true, TEST_LOCATION);
+  dataC.Check(true, childActor, childActor, true, TEST_LOCATION);
 
+  visibilityDataP.Reset();
+  visibilityDataC.Reset();
   dataP.Reset();
   dataC.Reset();
   parentActor.Remove(childActor);
+  visibilityDataP.Check(false, TEST_LOCATION);
+  visibilityDataC.Check(false, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
-  dataC.Check(true, childActor, false, TEST_LOCATION);
+  dataC.Check(true, childActor, childActor, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -10032,67 +10125,94 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   Actor actor       = Actor::New();
   parentActor.Add(actor);
 
+  VisibilityChangedFunctorData          visibilityData;
   InheritedVisibilityChangedFunctorData data;
+  DevelActor::VisibilityChangedSignal(actor).Connect(&application, VisibilityChangedFunctor(visibilityData));
   actor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(data));
 
   application.GetScene().Add(parentActor);
-  data.Check(true, actor, true, TEST_LOCATION);
+  data.Check(true, parentActor, actor, true, TEST_LOCATION);
 
   // Case 1
   // Parent true -> false : called
   // actor true -> false  : not called
   // actor false -> true  : not called
+  visibilityData.Reset();
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, false);
-  data.Check(true, actor, false, TEST_LOCATION);
+  visibilityData.Check(true, parentActor, actor, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  data.Check(true, parentActor, actor, false, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
+  visibilityData.Check(true, actor, actor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
+  visibilityData.Check(true, actor, actor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Prepare Case 2
   // Parent : false
   // actor : false
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
+  visibilityData.Check(true, actor, actor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Case 2
   // actor : false
   // parent false -> true : not called
+  visibilityData.Reset();
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, true);
+  visibilityData.Check(true, parentActor, actor, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Prepare Case 3
   // parent : false
   // actor : true
+  visibilityData.Reset();
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, false);
+  visibilityData.Check(true, parentActor, actor, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
+  visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
+  visibilityData.Check(true, actor, actor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Case 3
   // actor : true
   // parent false -> true : called
+  visibilityData.Reset();
+  data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, true);
-  data.Check(true, actor, true, TEST_LOCATION);
+  visibilityData.Check(true, parentActor, actor, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  data.Check(true, parentActor, actor, true, TEST_LOCATION);
 
   END_TEST;
 }
 
 namespace
 {
+VisibilityChangedFunctorData          dataVPA, dataVPB, dataVCA, dataVCB, dataVCC;
 InheritedVisibilityChangedFunctorData dataPA, dataPB, dataCA, dataCB, dataCC;
-void                                  ResetInheritedVisibilityChangedFunctorData()
+
+void ResetInheritedVisibilityChangedFunctorData()
 {
+  dataVPA.Reset();
+  dataVPB.Reset();
+  dataVCA.Reset();
+  dataVCB.Reset();
+  dataVCC.Reset();
+
   dataPA.Reset();
   dataPB.Reset();
   dataCA.Reset();
@@ -10124,6 +10244,12 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   parentB.Add(childB);
   parentB.Add(childC);
 
+  DevelActor::VisibilityChangedSignal(parentA).Connect(&application, VisibilityChangedFunctor(dataVPA));
+  DevelActor::VisibilityChangedSignal(parentB).Connect(&application, VisibilityChangedFunctor(dataVPB));
+  DevelActor::VisibilityChangedSignal(childA).Connect(&application, VisibilityChangedFunctor(dataVCA));
+  DevelActor::VisibilityChangedSignal(childB).Connect(&application, VisibilityChangedFunctor(dataVCB));
+  DevelActor::VisibilityChangedSignal(childC).Connect(&application, VisibilityChangedFunctor(dataVCC));
+
   parentA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
   parentB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
   childA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCA));
@@ -10132,22 +10258,37 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
 
   ResetInheritedVisibilityChangedFunctorData();
   application.GetScene().Add(parentA);
-  dataPA.Check(true, parentA, true, TEST_LOCATION);
-  dataPB.Check(true, parentB, true, TEST_LOCATION);
-  dataCA.Check(true, childA, true, TEST_LOCATION);
-  dataCB.Check(true, childB, true, TEST_LOCATION);
-  dataCC.Check(true, childC, true, TEST_LOCATION);
+  dataVPA.Check(false, TEST_LOCATION);
+  dataVPB.Check(false, TEST_LOCATION);
+  dataVCA.Check(false, TEST_LOCATION);
+  dataVCB.Check(false, TEST_LOCATION);
+  dataVCC.Check(false, TEST_LOCATION);
+  dataPA.Check(true, parentA, parentA, true, TEST_LOCATION);
+  dataPB.Check(true, parentA, parentB, true, TEST_LOCATION);
+  dataCA.Check(true, parentA, childA, true, TEST_LOCATION);
+  dataCB.Check(true, parentA, childB, true, TEST_LOCATION);
+  dataCC.Check(true, parentA, childC, true, TEST_LOCATION);
 
   ResetInheritedVisibilityChangedFunctorData();
   parentA.SetProperty(Actor::Property::VISIBLE, false);
-  dataPA.Check(true, parentA, false, TEST_LOCATION);
-  dataPB.Check(true, parentB, false, TEST_LOCATION);
-  dataCA.Check(true, childA, false, TEST_LOCATION);
-  dataCB.Check(true, childB, false, TEST_LOCATION);
-  dataCC.Check(true, childC, false, TEST_LOCATION);
+  dataVPA.Check(true, parentA, parentA, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  dataVPB.Check(true, parentA, parentB, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCA.Check(true, parentA, childA, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentA, childB, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentA, childC, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataPA.Check(true, parentA, parentA, false, TEST_LOCATION);
+  dataPB.Check(true, parentA, parentB, false, TEST_LOCATION);
+  dataCA.Check(true, parentA, childA, false, TEST_LOCATION);
+  dataCB.Check(true, parentA, childB, false, TEST_LOCATION);
+  dataCC.Check(true, parentA, childC, false, TEST_LOCATION);
 
   ResetInheritedVisibilityChangedFunctorData();
   childA.SetProperty(Actor::Property::VISIBLE, false);
+  dataVPA.Check(false, TEST_LOCATION);
+  dataVPB.Check(false, TEST_LOCATION);
+  dataVCA.Check(true, childA, childA, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  dataVCB.Check(false, TEST_LOCATION);
+  dataVCC.Check(false, TEST_LOCATION);
   dataPA.Check(false, TEST_LOCATION);
   dataPB.Check(false, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
@@ -10156,6 +10297,11 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
 
   ResetInheritedVisibilityChangedFunctorData();
   parentB.SetProperty(Actor::Property::VISIBLE, false);
+  dataVPA.Check(false, TEST_LOCATION);
+  dataVPB.Check(true, parentB, parentB, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  dataVCA.Check(true, parentB, childA, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentB, childB, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentB, childC, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
   dataPA.Check(false, TEST_LOCATION);
   dataPB.Check(false, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
@@ -10164,7 +10310,12 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
 
   ResetInheritedVisibilityChangedFunctorData();
   parentA.SetProperty(Actor::Property::VISIBLE, true);
-  dataPA.Check(true, parentA, true, TEST_LOCATION);
+  dataVPA.Check(true, parentA, parentA, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  dataVPB.Check(true, parentA, parentB, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCA.Check(true, parentA, childA, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentA, childB, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentA, childC, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataPA.Check(true, parentA, parentA, true, TEST_LOCATION);
   dataPB.Check(false, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
   dataCB.Check(false, TEST_LOCATION);
@@ -10172,11 +10323,160 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
 
   ResetInheritedVisibilityChangedFunctorData();
   parentB.SetProperty(Actor::Property::VISIBLE, true);
+  dataVPA.Check(false, TEST_LOCATION);
+  dataVPB.Check(true, parentB, parentB, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  dataVCA.Check(true, parentB, childA, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentB, childB, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentB, childC, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
   dataPA.Check(false, TEST_LOCATION);
-  dataPB.Check(true, parentB, true, TEST_LOCATION);
+  dataPB.Check(true, parentB, parentB, true, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
-  dataCB.Check(true, childB, true, TEST_LOCATION);
-  dataCC.Check(true, childC, true, TEST_LOCATION);
+  dataCB.Check(true, parentB, childB, true, TEST_LOCATION);
+  dataCC.Check(true, parentB, childC, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
+{
+  TestApplication application;
+  tet_infoline("Check the GetVisiblityChangedActor() return value during visiblity changed signal called");
+  tet_infoline("Note that this is same situation with actor-devel comments");
+
+  // TODO : It might be failed if the order of signal emit is changed.
+  // Don't be afraid if it's failed. You can remove this UTC if it is failed but you think your change is right way.
+
+  // place 5 actor as linear A-B-C-D-E
+  // First, change C as invisible
+  // During visibility changed signal of D, change A as invisible.
+  // Check A,B,C,D,E got visiblity changed callback. and those got GetVisiblityChangedActor() as A.
+  // After finish visibility changed signal of D, Check GetVisiblityChangedActor() return C for now.
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+  Actor actorD = Actor::New();
+  Actor actorE = Actor::New();
+
+  application.GetScene().Add(actorA);
+  actorA.Add(actorB);
+  actorB.Add(actorC);
+  actorC.Add(actorD);
+  actorD.Add(actorE);
+
+  // Let we reuse dataVPA~dataVCC, to reduce code line.
+  ResetInheritedVisibilityChangedFunctorData();
+
+  // Write expcet result at dataVCA and dataVCB
+  dataVCA.changedActor = actorC;
+  dataVCA.actor        = actorC;
+  dataVCA.visible      = false;
+  dataVCA.type         = DevelActor::VisibilityChange::SELF;
+
+  dataVCB.changedActor = actorC;
+  dataVCB.actor        = actorD;
+  dataVCB.visible      = false;
+  dataVCB.type         = DevelActor::VisibilityChange::PARENT;
+
+  dataVCC.changedActor = actorC;
+  dataVCC.actor        = actorE;
+  dataVCC.visible      = false;
+  dataVCC.type         = DevelActor::VisibilityChange::PARENT;
+
+  bool actorDSignalCalled  = false;
+  auto actorDSignalFunctor = [&]() {
+    // Ensure that below codes run only 1 times.
+    if(!actorDSignalCalled)
+    {
+      actorDSignalCalled = true;
+      // Change the expect result.
+      dataVPA.changedActor = actorA;
+      dataVPA.actor        = actorA;
+      dataVPA.visible      = false;
+      dataVPA.type         = DevelActor::VisibilityChange::SELF;
+
+      dataVPB.changedActor = actorA;
+      dataVPB.actor        = actorB;
+      dataVPB.visible      = false;
+      dataVPB.type         = DevelActor::VisibilityChange::PARENT;
+
+      dataVCA.changedActor = actorA;
+      dataVCA.actor        = actorC;
+      dataVCA.visible      = false;
+      dataVCA.type         = DevelActor::VisibilityChange::PARENT;
+
+      dataVCB.changedActor = actorA;
+      dataVCB.actor        = actorD;
+      dataVCB.visible      = false;
+      dataVCB.type         = DevelActor::VisibilityChange::PARENT;
+
+      dataVCC.changedActor = actorA;
+      dataVCC.actor        = actorE;
+      dataVCC.visible      = false;
+      dataVCC.type         = DevelActor::VisibilityChange::PARENT;
+
+      // Make actorA invisible.
+      actorA.SetProperty(Actor::Property::VISIBLE, false);
+
+      // Check InheritedVisibilityChanged callback
+      dataPA.Check(true, actorA, actorA, false, TEST_LOCATION);
+      dataPB.Check(true, actorA, actorB, false, TEST_LOCATION);
+      dataCA.Check(false, TEST_LOCATION);
+      dataCB.Check(false, TEST_LOCATION);
+      dataCC.Check(false, TEST_LOCATION);
+
+      // Change the expect result again
+      ResetInheritedVisibilityChangedFunctorData();
+
+      dataVCA.changedActor = actorC;
+      dataVCA.actor        = actorC;
+      dataVCA.visible      = false;
+      dataVCA.type         = DevelActor::VisibilityChange::SELF;
+
+      dataVCB.changedActor = actorC;
+      dataVCB.actor        = actorD;
+      dataVCB.visible      = false;
+      dataVCB.type         = DevelActor::VisibilityChange::PARENT;
+
+      dataVCC.changedActor = actorC;
+      dataVCC.actor        = actorE;
+      dataVCC.visible      = false;
+      dataVCC.type         = DevelActor::VisibilityChange::PARENT;
+    }
+  };
+
+  DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
+    dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
+  }));
+  DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
+    dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
+  }));
+  DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
+    dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
+  }));
+  DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
+    dataVCB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
+    actorDSignalFunctor();
+  }));
+  DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
+    dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
+  }));
+
+  actorA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
+  actorB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
+  actorC.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCA));
+  actorD.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCB));
+  actorE.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCC));
+
+  // Change C as invisible
+  actorC.SetProperty(Actor::Property::VISIBLE, false);
+
+  // Check InheritedVisibilityChanged callback
+  dataPA.Check(false, TEST_LOCATION);
+  dataPB.Check(false, TEST_LOCATION);
+  dataCA.Check(true, actorC, actorC, false, TEST_LOCATION);
+  dataCB.Check(true, actorC, actorD, false, TEST_LOCATION);
+  dataCC.Check(true, actorC, actorE, false, TEST_LOCATION);
 
   END_TEST;
 }
