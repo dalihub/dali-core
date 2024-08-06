@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,14 @@ public:
    * Construct a new TextureSet.
    */
   static TextureSet* New();
+
+  /**
+   * Clear memory pool of texture set.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::TextureSet classes are invalid.
+   */
+  static void ResetMemoryPool();
 
   /**
    * Destructor. Not virtual as not a base class and not inheriting anything

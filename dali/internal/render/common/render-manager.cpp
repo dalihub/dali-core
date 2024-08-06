@@ -325,6 +325,10 @@ RenderManager::RenderManager()
 RenderManager::~RenderManager()
 {
   delete mImpl;
+
+  // Ensure to release memory pool
+  Render::Renderer::ResetMemoryPool();
+  Render::Texture::ResetMemoryPool();
 }
 
 void RenderManager::ContextDestroyed()

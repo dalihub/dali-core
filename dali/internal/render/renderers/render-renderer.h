@@ -148,6 +148,14 @@ public:
                             StencilParameters&              stencilParameters);
 
   /**
+   * Clear memory pool of renderer.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all Render::Renderer classes are invalid.
+   */
+  static void ResetMemoryPool();
+
+  /**
    * Constructor.
    * @param[in] dataProviders The data providers for the renderer
    * @param[in] geometry The geometry for the renderer

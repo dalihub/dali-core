@@ -91,6 +91,14 @@ public:
   static RendererKey NewKey();
 
   /**
+   * Clear memory pool of renderers.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::Renderer classes are invalid.
+   */
+  static void ResetMemoryPool();
+
+  /**
    * Destructor
    */
   ~Renderer() override;

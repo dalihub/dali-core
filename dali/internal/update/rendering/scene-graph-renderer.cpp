@@ -50,9 +50,9 @@ Debug::Filter* gSceneGraphRendererLogFilter = Debug::Filter::New(Debug::NoLoggin
 namespace // unnamed namespace
 {
 // Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
-MemoryPoolObjectAllocator<Renderer>& GetRendererMemoryPool()
+Dali::Internal::MemoryPoolObjectAllocator<Renderer>& GetRendererMemoryPool()
 {
-  static MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
+  static Dali::Internal::MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
   return gRendererMemoryPool;
 }
 
@@ -91,6 +91,11 @@ RendererKey Renderer::NewKey()
   auto  key = GetRendererMemoryPool().GetKeyFromPtr(static_cast<Renderer*>(ptr));
   new(ptr) Renderer();
   return RendererKey(key);
+}
+
+void Renderer::ResetMemoryPool()
+{
+  GetRendererMemoryPool().ResetMemoryPool();
 }
 
 Renderer::Renderer()

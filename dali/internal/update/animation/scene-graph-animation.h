@@ -64,6 +64,14 @@ public:
   static Animation* New(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction);
 
   /**
+   * Clear memory pool of animation.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::Animation classes are invalid.
+   */
+  static void ResetMemoryPool();
+
+  /**
    * Virtual destructor
    */
   virtual ~Animation();

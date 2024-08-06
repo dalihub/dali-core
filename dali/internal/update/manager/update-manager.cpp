@@ -405,6 +405,15 @@ UpdateManager::~UpdateManager()
 {
   delete mImpl;
   PropertyBase::UnregisterResetterManager();
+
+  // Ensure to release memory pool
+  Animation::ResetMemoryPool();
+  Camera::ResetMemoryPool();
+  Node::ResetMemoryPool();
+  Renderer::ResetMemoryPool();
+  RenderItem::ResetMemoryPool();
+  RenderTaskList::ResetMemoryPool();
+  TextureSet::ResetMemoryPool();
 }
 
 void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)

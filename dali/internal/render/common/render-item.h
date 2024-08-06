@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,14 @@ struct RenderItem
    * @return A key to a new RenderItem
    */
   static RenderItemKey NewKey();
+
+  /**
+   * Clear memory pool of render item.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::RenderItem classes are invalid.
+   */
+  static void ResetMemoryPool();
 
   /**
    * Non-virtual destructor; RenderItem is not suitable as a base class.

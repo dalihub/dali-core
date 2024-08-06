@@ -67,6 +67,11 @@ Animation* Animation::New(float durationSeconds, float speedFactor, const Vector
   return new(GetAnimationMemoryPool().AllocateRawThreadSafe()) Animation(durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction);
 }
 
+void Animation::ResetMemoryPool()
+{
+  GetAnimationMemoryPool().ResetMemoryPool();
+}
+
 Animation::Animation(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction)
 : mPlayRange(playRange),
   mDurationSeconds(durationSeconds),

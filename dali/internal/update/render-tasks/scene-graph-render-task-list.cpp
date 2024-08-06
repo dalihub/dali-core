@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,11 @@ namespace SceneGraph
 RenderTaskList* RenderTaskList::New()
 {
   return new(GetRenderTaskListMemoryPool().AllocateRawThreadSafe()) RenderTaskList();
+}
+
+void RenderTaskList::ResetMemoryPool()
+{
+  GetRenderTaskListMemoryPool().ResetMemoryPool();
 }
 
 RenderTaskList::RenderTaskList()
@@ -90,9 +95,9 @@ void RenderTaskList::SortTasks(OwnerPointer<std::vector<const SceneGraph::Render
   auto iter = mRenderTasks.Begin();
   for(auto sortedIter = sortedTasks->begin(), sortedIterEnd = sortedTasks->end(); sortedIter != sortedIterEnd; ++sortedIter, ++iter)
   {
-    const SceneGraph::RenderTask* task = *sortedIter;
-    SceneGraph::RenderTask* castedTask = const_cast<SceneGraph::RenderTask*>(task);
-    (*iter)                            = castedTask;
+    const SceneGraph::RenderTask* task       = *sortedIter;
+    SceneGraph::RenderTask*       castedTask = const_cast<SceneGraph::RenderTask*>(task);
+    (*iter)                                  = castedTask;
   }
 
   // We should call Reorder after the order of container changed.

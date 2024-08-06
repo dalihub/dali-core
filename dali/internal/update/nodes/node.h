@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,14 @@ public:
    * Deletes a Node.
    */
   static void Delete(Node* node);
+
+  /**
+   * Clear memory pool of node.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::Node classes are invalid.
+   */
+  static void ResetMemoryPool();
 
   /**
    * Called during UpdateManager::DestroyNode shortly before Node is destroyed.

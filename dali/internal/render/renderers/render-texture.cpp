@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::Concise, false, "LOG_T
 #endif
 
 // Memory pool used to allocate new textures. Memory used by this pool will be released when shutting down DALi
-MemoryPoolObjectAllocator<Texture>& GetTextureMemoryPool()
+Dali::Internal::MemoryPoolObjectAllocator<Texture>& GetTextureMemoryPool()
 {
-  static MemoryPoolObjectAllocator<Texture> gTextureMemoryPool;
+  static Dali::Internal::MemoryPoolObjectAllocator<Texture> gTextureMemoryPool;
   return gTextureMemoryPool;
 }
 
@@ -71,6 +71,11 @@ TextureKey Texture::NewKey(Type type, uint32_t resourceId)
   new(ptr) Texture(type, resourceId);
 
   return TextureKey(key);
+}
+
+void Texture::ResetMemoryPool()
+{
+  GetTextureMemoryPool().ResetMemoryPool();
 }
 
 Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)

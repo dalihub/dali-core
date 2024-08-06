@@ -52,6 +52,11 @@ RenderItemKey RenderItem::NewKey()
   return RenderItemKey(key);
 }
 
+void RenderItem::ResetMemoryPool()
+{
+  GetRenderItemPool().ResetMemoryPool();
+}
+
 RenderItem::RenderItem()
 : mModelMatrix(false),
   mModelViewMatrix(false),

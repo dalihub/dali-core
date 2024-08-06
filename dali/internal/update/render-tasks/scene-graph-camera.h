@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CAMERA_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,6 +99,14 @@ public:
    * @return a new camera.
    */
   static Camera* New();
+
+  /**
+   * Clear memory pool of camera.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::Camera classes are invalid.
+   */
+  static void ResetMemoryPool();
 
   /**
    * Virtual destructor
@@ -457,17 +465,17 @@ private:
   uint32_t mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
   int      mProjectionRotation;   ///< The rotaion angle of the projection
 
-public:                           // PROPERTIES
+public:                                                                                 // PROPERTIES
   Dali::Camera::Type                                              mType;                // Non-animatable
   AnimatableProperty<Dali::Camera::ProjectionMode>                mProjectionMode;      // Non-animatable, constraint_input
   AnimatableProperty<Dali::DevelCameraActor::ProjectionDirection> mProjectionDirection; // Non-animatable, constraint_input
   AnimatableProperty<bool>                                        mInvertYAxis;         // Non-animatable, constraint_input
 
-  AnimatableProperty<float> mFieldOfView;                                               // Animatable
-  AnimatableProperty<float> mOrthographicSize;                                          // Animatable
-  AnimatableProperty<float> mAspectRatio;                                               // Animatable
-  AnimatableProperty<float> mNearClippingPlane;                                         // Animatable
-  AnimatableProperty<float> mFarClippingPlane;                                          // Animatable
+  AnimatableProperty<float> mFieldOfView;       // Animatable
+  AnimatableProperty<float> mOrthographicSize;  // Animatable
+  AnimatableProperty<float> mAspectRatio;       // Animatable
+  AnimatableProperty<float> mNearClippingPlane; // Animatable
+  AnimatableProperty<float> mFarClippingPlane;  // Animatable
 
   Vector3 mTargetPosition;
 
