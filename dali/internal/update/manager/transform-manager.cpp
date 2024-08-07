@@ -116,7 +116,7 @@ TransformId TransformManager::CreateTransform()
     mTxComponentAnimatableBaseValue.PushBack(TransformComponentAnimatable());
     mSizeBase.PushBack(Vector3(0.0f, 0.0f, 0.0f));
     mComponentDirty.PushBack(CLEAN_FLAG);
-    mWorldMatrixDirty.PushBack(false);
+    mLocalMatrixDirty.PushBack(false);
   }
   else
   {
@@ -133,7 +133,7 @@ TransformId TransformManager::CreateTransform()
     mBoundingSpheres[mComponentCount]  = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
     mSizeBase[mComponentCount]         = Vector3(0.0f, 0.0f, 0.0f);
     mComponentDirty[mComponentCount]   = CLEAN_FLAG;
-    mWorldMatrixDirty[mComponentCount] = false;
+    mLocalMatrixDirty[mComponentCount] = false;
   }
 
   mComponentCount++;
@@ -155,7 +155,7 @@ void TransformManager::RemoveTransform(TransformId id)
   mTxComponentAnimatableBaseValue[index] = mTxComponentAnimatableBaseValue[mComponentCount];
   mSizeBase[index]                       = mSizeBase[mComponentCount];
   mComponentDirty[index]                 = mComponentDirty[mComponentCount];
-  mWorldMatrixDirty[index]               = mWorldMatrixDirty[mComponentCount];
+  mLocalMatrixDirty[index]               = mLocalMatrixDirty[mComponentCount];
   mBoundingSpheres[index]                = mBoundingSpheres[mComponentCount];
 
   TransformId lastItemId = mComponentId[mComponentCount];
@@ -252,7 +252,7 @@ void TransformManager::ResetToBaseValue()
 
     if(mUpdated)
     {
-      memset(&mWorldMatrixDirty[0], false, sizeof(bool) * mComponentCount);
+      memset(&mLocalMatrixDirty[0], false, sizeof(bool) * mComponentCount);
     }
   }
 }
@@ -292,10 +292,9 @@ bool TransformManager::Update()
       const TransformId& parentIndex = mIds[mParent[i]];
       if(DALI_LIKELY(mInheritanceMode[i] == INHERIT_ALL))
       {
-        if(mComponentDirty[i] || mWorldMatrixDirty[parentIndex])
+        if(mComponentDirty[i] || mLocalMatrixDirty[parentIndex])
         {
-          // TODO : Skip world matrix comparision. Is it improve performance?
-          mWorldMatrixDirty[i] = true;
+          mLocalMatrixDirty[i] = true;
 
           //Full transform inherited
           CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
@@ -308,8 +307,8 @@ bool TransformManager::Update()
       }
       else
       {
-        // Keep previous worldMatrix for comparison.
-        Matrix previousWorldMatrix = mWorld[i];
+        // Keep previous localMatrix for comparison.
+        Matrix previousLocalMatrix = mLocal[i];
 
         // Get Parent information.
         Vector3       parentPosition, parentScale;
@@ -371,18 +370,14 @@ bool TransformManager::Update()
         inverseParentMatrix.SetInverseTransformComponents(parentScale, parentOrientation, parentPosition);
         mLocal[i] = inverseParentMatrix * mWorld[i];
 
-        // TODO : We need to check mComponentDirty since we have to check the size changeness.
-        //        Could we check size changeness only?
-        mWorldMatrixDirty[i] = mComponentDirty[i] || (previousWorldMatrix != mWorld[i]);
+        mLocalMatrixDirty[i] = mComponentDirty[i] || (previousLocalMatrix != mLocal[i]);
       }
     }
     else //Component has no parent or doesn't inherit transform
     {
       if(mComponentDirty[i])
       {
-        // TODO : We need to check mComponentDirty since we have to check the size changeness.
-        //        Could we check size changeness only?
-        mWorldMatrixDirty[i] = true;
+        mLocalMatrixDirty[i] = true;
 
         CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
         localPosition = mTxComponentAnimatable[i].mPosition + centerPosition;
@@ -399,7 +394,7 @@ bool TransformManager::Update()
     mBoundingSpheres[i]   = mWorld[i].GetTranslation();
     mBoundingSpheres[i].w = Length(centerToEdgeWorldSpace);
 
-    mUpdated = mUpdated || mWorldMatrixDirty[i];
+    mUpdated = mUpdated || mLocalMatrixDirty[i];
 
     mComponentDirty[i] >>= 1u; ///< age down.
   }
@@ -507,7 +502,7 @@ void TransformManager::ReorderComponents()
     mTxComponentAnimatableBaseValue.Resize(mComponentCount);
     mSizeBase.Resize(mComponentCount);
     mComponentDirty.Resize(mComponentCount);
-    mWorldMatrixDirty.Resize(mComponentCount);
+    mLocalMatrixDirty.Resize(mComponentCount);
     mOrderedComponents.Resize(mComponentCount);
 
     mTxComponentAnimatable.ShrinkToFit();
@@ -522,7 +517,7 @@ void TransformManager::ReorderComponents()
     mTxComponentAnimatableBaseValue.ShrinkToFit();
     mSizeBase.ShrinkToFit();
     mComponentDirty.ShrinkToFit();
-    mWorldMatrixDirty.ShrinkToFit();
+    mLocalMatrixDirty.ShrinkToFit();
     mOrderedComponents.ShrinkToFit();
   }
 #endif

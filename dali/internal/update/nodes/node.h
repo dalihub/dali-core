@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -740,10 +740,10 @@ public:
    * Checks if local matrix has changed since last update
    * @return true if local matrix has changed, false otherwise
    */
-  bool IsWorldMatrixDirty() const
+  bool IsLocalMatrixDirty() const
   {
     return (mTransformManagerData.Id() != INVALID_TRANSFORM_ID) &&
-           (mTransformManagerData.Manager()->IsWorldMatrixDirty(mTransformManagerData.Id()));
+           (mTransformManagerData.Manager()->IsLocalMatrixDirty(mTransformManagerData.Id()));
   }
 
   /**
