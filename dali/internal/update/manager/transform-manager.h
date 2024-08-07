@@ -179,13 +179,13 @@ public:
   Matrix& GetWorldMatrix(TransformId id);
 
   /**
-   * Checks if the local transform was updated in the last Update
+   * Checks if the world transform was updated in the last Update
    * @param[in] id Id of the transform
-   * @return true if local matrix changed in the last update, false otherwise
+   * @return true if world matrix changed in the last update, false otherwise
    */
-  bool IsLocalMatrixDirty(TransformId id) const
+  bool IsWorldMatrixDirty(TransformId id) const
   {
-    return mLocalMatrixDirty[mIds[id]];
+    return mWorldMatrixDirty[mIds[id]];
   }
 
   /**
@@ -422,7 +422,7 @@ private:
                                                                         ///< Or If we change static component changed, flag become non-zero. Age down at Update time.
                                                                         ///< Note that we don't replace dirty flag as BAKE even if we call Bake operation.
                                                                         ///< (Since single dirty flag controls multiple animatable properties ; Position, Size, Scale, Orientation.)
-  Vector<bool>       mLocalMatrixDirty;                                 ///< 1u if the local matrix has been updated in this frame, 0 otherwise
+  Vector<bool>       mWorldMatrixDirty;                                 ///< 1u if the local matrix has been updated in this frame, 0 otherwise
   Vector<SOrderItem> mOrderedComponents;                                ///< Used to reorder components when hierarchy changes
 
   uint8_t mDirtyFlags : 2; ///< Dirty flags for all transform components. Age down at Update time.
