@@ -80,6 +80,21 @@ public:
   void Remove(Actor& actor);
 
   /**
+   * @copydoc Dali::Integration::Scene::Show
+   */
+  void Show();
+
+  /**
+   * @copydoc Dali::Integration::Scene::Hide
+   */
+  void Hide();
+
+  /**
+   * @copydoc Dali::Integration::Scene::IsVisible
+   */
+  bool IsVisible() const;
+
+  /**
    * @copydoc Dali::Integration::Scene::GetSize
    */
   Size GetSize() const;
@@ -268,6 +283,17 @@ public:
   int32_t GetNativeId() const;
 
   /**
+   * Sets the last pan gesture state.
+   * @param[in] state The pan gesture state.
+   */
+  void SetLastPanGestureState(Dali::GestureState state);
+
+  /**
+   * @copydoc Dali::Integration::Scene::GetLastPanGestureState
+   */
+  Dali::GestureState GetLastPanGestureState();
+
+  /**
    * Used by the EventProcessor to emit key event signals.
    * @param[in] event The key event.
    */
@@ -449,6 +475,7 @@ private:
   bool mDepthTreeDirty : 1;       ///< True if the depth tree needs recalculating
   bool mPartialUpdateEnabled : 1; ///< True if the partial update is enabled
   bool mGeometryHittest : 1;      ///< True if the geometry hittest is enabled
+  bool mIsVisible : 1;            ///< True if this Scene is visible
 
   EventProcessor mEventProcessor;
 
@@ -460,6 +487,9 @@ private:
 
   // The native window id
   int32_t mNativeId;
+
+  // The pan gesture state
+  Dali::GestureState mPanGestureState;
 
   // The key event signal
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;

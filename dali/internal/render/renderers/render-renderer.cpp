@@ -79,9 +79,9 @@ namespace Render
 {
 namespace
 {
-MemoryPoolObjectAllocator<Renderer>& GetRenderRendererMemoryPool()
+Dali::Internal::MemoryPoolObjectAllocator<Renderer>& GetRenderRendererMemoryPool()
 {
-  static MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
+  static Dali::Internal::MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
   return gRenderRendererMemoryPool;
 }
 } // namespace
@@ -111,6 +111,11 @@ RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider,
   // Use placement new to construct renderer.
   new(ptr) Renderer(dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction, stencilParameters);
   return RendererKey(key);
+}
+
+void Renderer::ResetMemoryPool()
+{
+  GetRenderRendererMemoryPool().ResetMemoryPool();
 }
 
 Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,

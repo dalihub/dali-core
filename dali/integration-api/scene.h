@@ -25,6 +25,7 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-render-target-create-info.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/handle.h>
@@ -165,6 +166,25 @@ public:
    * @pre The actor has been added to the stage.
    */
   void Remove(Actor actor);
+
+  /**
+   * @brief Shows the scene if it is hidden.
+   * @SINCE_2_3.35
+   */
+  void Show();
+
+  /**
+   * @brief Hides the scene if it is showing.
+   * @SINCE_2_3.35
+   */
+  void Hide();
+
+  /**
+   * @brief Returns whether the window is visible or not.
+   * @SINCE_2_3.35
+   * @return True if the window is visible, false otherwise.
+   */
+  bool IsVisible() const;
 
   /**
    * @brief Returns the size of the Scene in pixels as a Vector.
@@ -461,6 +481,13 @@ public:
    * @return The native window id
    */
   int32_t GetNativeId() const;
+
+  /**
+   * @brief Gets the last pan gesture state
+   *
+   * @return Dali::GestureState
+   */
+  Dali::GestureState GetLastPanGestureState();
 
   /**
    * @brief This signal is emitted just after the event processing is finished.

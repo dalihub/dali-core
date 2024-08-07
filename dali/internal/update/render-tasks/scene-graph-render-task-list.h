@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,14 @@ public:
    * @return A new RenderTaskList
    */
   static RenderTaskList* New();
+
+  /**
+   * Clear memory pool of render task list.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::RenderTaskList classes are invalid.
+   */
+  static void ResetMemoryPool();
 
   /**
    * Destructor
@@ -144,7 +152,7 @@ private:
 inline void AddTaskMessage(EventThreadServices& eventThreadServices, const RenderTaskList& list, OwnerPointer<RenderTask>& task)
 {
   // Message has ownership of the RenderTask while in transit from event -> update
-  using LocalType = MessageValue1<RenderTaskList, OwnerPointer<RenderTask> >;
+  using LocalType = MessageValue1<RenderTaskList, OwnerPointer<RenderTask>>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));

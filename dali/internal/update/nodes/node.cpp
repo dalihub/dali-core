@@ -81,6 +81,11 @@ void Node::Delete(Node* node)
   }
 }
 
+void Node::ResetMemoryPool()
+{
+  GetNodeMemoryPool().ResetMemoryPool();
+}
+
 Node::Node()
 : mTransformManagerData(),                                                      // Initialized to use invalid id by default
   mOrientation(),                                                               // Initialized to identity by default

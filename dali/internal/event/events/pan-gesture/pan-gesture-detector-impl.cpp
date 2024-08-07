@@ -532,13 +532,13 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
         feededActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
         if(mCurrentPanActor.GetActor() == feededActor)
         {
-          EmitPanSignal(feededActor, panEvent, actorCoords, panEvent.state, mRenderTask);
+          EmitPanSignal(feededActor, panEvent, actorCoords, panEvent.state, mRenderTask, scene);
         }
         else
         {
           mPossiblePanPosition = panEvent.previousPosition;
           mCurrentPanActor.SetActor(feededActor);
-          EmitPanSignal(feededActor, panEvent, actorCoords, panEvent.state, mRenderTask);
+          EmitPanSignal(feededActor, panEvent, actorCoords, panEvent.state, mRenderTask, scene);
         }
       }
       break;
@@ -557,7 +557,7 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
 
           mPossiblePanPosition = panEvent.currentPosition;
           mCurrentPanActor.SetActor(feededActor);
-          EmitPanSignal(feededActor, panEvent, actorCoords, GestureState::STARTED, mRenderTask);
+          EmitPanSignal(feededActor, panEvent, actorCoords, GestureState::STARTED, mRenderTask, scene);
         }
         break;
       }
@@ -574,7 +574,7 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
       {
         Vector2 actorCoords;
         currentGesturedActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
-        EmitPanSignal(currentGesturedActor, panEvent, actorCoords, panEvent.state, mRenderTask);
+        EmitPanSignal(currentGesturedActor, panEvent, actorCoords, panEvent.state, mRenderTask, scene);
       }
 
       if((panEvent.state == GestureState::FINISHED) || (panEvent.state == GestureState::CANCELLED))
@@ -674,7 +674,8 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
                                        const PanGestureEvent& panEvent,
                                        Vector2                localCurrent,
                                        GestureState           state,
-                                       RenderTaskPtr          renderTask)
+                                       RenderTaskPtr          renderTask,
+                                       Scene&                 scene)
 {
   SetDetected(true);
   Internal::PanGesturePtr pan(new Internal::PanGesture(panEvent.state));
@@ -737,6 +738,9 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
     // Sending a message could cause unnecessary delays, the scene object ensure thread safe behaviour.
     mSceneObject->AddGesture(*pan.Get());
   }
+
+  // store the state;
+  scene.SetLastPanGestureState(state);
 
   Dali::Actor actorHandle(actor);
 

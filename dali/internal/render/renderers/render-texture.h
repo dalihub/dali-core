@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,14 @@ public:
    * Factory method to return a new texture accessed by key.
    */
   static TextureKey NewKey(Type type, uint32_t resourceId);
+
+  /**
+   * Clear memory pool of texture.
+   * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all Render::Texture classes are invalid.
+   */
+  static void ResetMemoryPool();
 
   /**
    * Constructor

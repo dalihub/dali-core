@@ -3347,3 +3347,60 @@ int UtcDaliPanGestureFeedTouchWhenGesturePropagation(void)
 
   END_TEST;
 }
+
+int UtcDaliPanGestureSignalGetLastGestureState(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  Integration::Scene scene = application.GetScene();
+  scene.Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start pan within the actor's area
+  uint32_t time = 100;
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, scene.GetLastPanGestureState(), TEST_LOCATION);
+
+  // Continue the pan within the actor's area - we should still receive the signal
+  data.Reset();
+
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
+  time += TestGetFrameInterval();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, data.receivedGesture.GetState(), TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, scene.GetLastPanGestureState(), TEST_LOCATION);
+
+  // Gesture ends within actor's area - we would receive a finished state
+  data.Reset();
+
+  // Remove the actor from stage and reset the data
+  application.GetScene().Remove(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  TestEndPan(application, Vector2(10.0f, 4.0f), time);
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, scene.GetLastPanGestureState(), TEST_LOCATION);
+  END_TEST;
+}

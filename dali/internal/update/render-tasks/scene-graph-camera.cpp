@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,9 +51,9 @@ namespace SceneGraph
 namespace
 {
 //Memory pool used to allocate new camera. Memory used by this pool will be released when shutting down DALi
-MemoryPoolObjectAllocator<Camera>& GetCameraMemoryPool()
+Dali::Internal::MemoryPoolObjectAllocator<Camera>& GetCameraMemoryPool()
 {
-  static MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
+  static Dali::Internal::MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
   return gCameraMemoryPool;
 }
 
@@ -361,6 +361,11 @@ Camera::Camera()
 Camera* Camera::New()
 {
   return new(GetCameraMemoryPool().AllocateRawThreadSafe()) Camera();
+}
+
+void Camera::ResetMemoryPool()
+{
+  GetCameraMemoryPool().ResetMemoryPool();
 }
 
 Camera::~Camera() = default;
@@ -875,7 +880,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
         {
           Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
           Orthographic(projectionMatrix,
-                      static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
+                       static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
                        mOrthographicSize[updateBufferIndex],
                        mAspectRatio[updateBufferIndex],
                        mNearClippingPlane[updateBufferIndex],

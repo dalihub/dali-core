@@ -270,13 +270,15 @@ private:
    * @param[in]  localCurrent      Current position relative to the actor attached to the detector.
    * @param[in]  state             The state of the gesture.
    * @param[in]  renderTask        The renderTask to use.
+   * @param[in]  scene             The scene the pan gesture event occurs in.
    */
   void EmitPanSignal(Actor*                          actor,
                      const GestureDetectorContainer& gestureDetectors,
                      const PanGestureEvent&          panEvent,
                      Vector2                         localCurrent,
                      GestureState                    state,
-                     RenderTaskPtr                   renderTask);
+                     RenderTaskPtr                   renderTask,
+                     Scene*                          scene);
 
   // GestureProcessor overrides
 
@@ -312,6 +314,7 @@ private:
   int32_t mMinimumPanEvents;
 
   const PanGestureEvent*  mCurrentPanEvent; ///< Pointer to current PanEvent, used when calling ProcessAndEmit()
+  Dali::Internal::Scene*  mCurrentScene;    ///< The scene where the gesture event occurred
   SceneGraph::PanGesture* mSceneObject;     ///< Not owned, but we write to it directly
 };
 

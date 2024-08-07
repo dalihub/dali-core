@@ -68,6 +68,21 @@ void Scene::Remove(Actor actor)
   GetImplementation(*this).Remove(GetImplementation(actor));
 }
 
+void Scene::Show()
+{
+  GetImplementation(*this).Show();
+}
+
+void Scene::Hide()
+{
+  GetImplementation(*this).Hide();
+}
+
+bool Scene::IsVisible() const
+{
+  return GetImplementation(*this).IsVisible();
+}
+
 Size Scene::GetSize() const
 {
   return GetImplementation(*this).GetSize();
@@ -251,6 +266,11 @@ void Scene::SetNativeId(int32_t nativeId)
 int32_t Scene::GetNativeId() const
 {
   return GetImplementation(*this).GetNativeId();
+}
+
+Dali::GestureState Scene::GetLastPanGestureState()
+{
+  return GetImplementation(*this).GetLastPanGestureState();
 }
 
 Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()

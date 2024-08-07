@@ -367,6 +367,16 @@ void CheckParentAndCall(ActorParent* parent, Actor& actor, Actor& target, ActorP
   }
 }
 
+/**
+ * @brief Get the stack of visibility changed actors.
+ * @return The global visibility changed actors stack.
+ */
+ActorContainer& GetVisibilityChagnedActorStack()
+{
+  static ActorContainer gVisibilityChangedActorStack; ///< Stack of visibility changed actors. Latest actor is the latest visibility changed actor.
+  return gVisibilityChangedActorStack;
+}
+
 } // unnamed namespace
 
 ActorPtr Actor::New()
@@ -700,6 +710,15 @@ void Actor::SetInheritScale(bool inherit)
 Matrix Actor::GetCurrentWorldMatrix() const
 {
   return GetNode().GetWorldMatrix(0);
+}
+
+ActorPtr Actor::GetVisiblityChangedActor()
+{
+  if(!GetVisibilityChagnedActorStack().empty())
+  {
+    return GetVisibilityChagnedActorStack().back();
+  }
+  return ActorPtr();
 }
 
 void Actor::SetVisible(bool visible)
@@ -1411,6 +1430,17 @@ void Actor::RebuildDepthTree()
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
+void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
+{
+  ActorContainer inheritedVisibilityChangedList;
+  mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
+  // Notify applications about the newly connected actors.
+  for(const auto& actor : inheritedVisibilityChangedList)
+  {
+    actor->EmitInheritedVisibilityChangedSignal(visible);
+  }
+}
+
 void Actor::SetDefaultProperty(Property::Index index, const Property::Value& property)
 {
   PropertyHandler::SetDefaultProperty(*this, index, property);
@@ -1544,7 +1574,8 @@ void Actor::SetParent(ActorParent* parent, bool notify)
       ConnectToScene(parentActor->GetHierarchyDepth(), parentActor->GetLayer3DParentCount(), notify);
 
       Actor* actor         = this;
-      emitInheritedVisible = true;
+      // OnScene should be checked, this actor can be removed during OnSceneConnection.
+      emitInheritedVisible = OnScene() && mScene->IsVisible();
       while(emitInheritedVisible && actor)
       {
         emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
@@ -1563,7 +1594,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
        OnScene())
     {
       Actor* actor         = this;
-      emitInheritedVisible = true;
+      emitInheritedVisible = mScene->IsVisible();
       while(emitInheritedVisible && actor)
       {
         emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
@@ -1589,7 +1620,15 @@ void Actor::SetParent(ActorParent* parent, bool notify)
 
   if(emitInheritedVisible)
   {
+    // Push the actor at the stack.
+    // Note that another actor's visibility could be changed during visibility change callback.
+    // So we need to stack those actors, and then use it.
+    GetVisibilityChagnedActorStack().emplace_back(this);
+
     EmitInheritedVisibilityChangedSignalRecursively(visiblility);
+
+    // Pop the actor from the stack now
+    GetVisibilityChagnedActorStack().pop_back();
   }
 }
 
@@ -1759,7 +1798,7 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     }
 
     Actor* actor                = this->GetParent();
-    bool   emitInheritedVisible = OnScene();
+    bool   emitInheritedVisible = OnScene() && mScene->IsVisible();
     while(emitInheritedVisible && actor)
     {
       emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
@@ -1768,23 +1807,21 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
 
     mVisible = visible;
 
+    // Push the actor at the stack.
+    // Note that another actor's visibility could be changed during visibility change callback.
+    // So we need to stack those actors, and then use it.
+    GetVisibilityChagnedActorStack().emplace_back(this);
+
     // Emit the signal on this actor and all its children
     mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::SELF);
+
     if(emitInheritedVisible)
     {
       EmitInheritedVisibilityChangedSignalRecursively(visible);
     }
-  }
-}
 
-void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
-{
-  ActorContainer inheritedVisibilityChangedList;
-  mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
-  // Notify applications about the newly connected actors.
-  for(const auto& actor : inheritedVisibilityChangedList)
-  {
-    actor->EmitInheritedVisibilityChangedSignal(visible);
+    // Pop the actor from the stack now
+    GetVisibilityChagnedActorStack().pop_back();
   }
 }
 

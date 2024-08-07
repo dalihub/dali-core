@@ -67,6 +67,11 @@ Animation* Animation::New(float durationSeconds, float speedFactor, const Vector
   return new(GetAnimationMemoryPool().AllocateRawThreadSafe()) Animation(durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction);
 }
 
+void Animation::ResetMemoryPool()
+{
+  GetAnimationMemoryPool().ResetMemoryPool();
+}
+
 Animation::Animation(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction)
 : mPlayRange(playRange),
   mDurationSeconds(durationSeconds),
@@ -175,7 +180,6 @@ void Animation::Play()
     mCurrentLoop  = 0;
     mDelaySeconds = 0.0f;
   }
-  mState = Playing;
 
   if(mSpeedFactor < 0.0f && mElapsedSeconds <= mPlayRange.x * mDurationSeconds)
   {
@@ -183,6 +187,9 @@ void Animation::Play()
   }
 
   SetAnimatorsActive(true);
+
+  // Set state after activte animators
+  mState = Playing;
 }
 
 void Animation::PlayFrom(float progress)
@@ -198,9 +205,11 @@ void Animation::PlayFrom(float progress)
       mCurrentLoop  = 0;
       mDelaySeconds = 0.0f;
     }
-    mState = Playing;
 
     SetAnimatorsActive(true);
+
+    // Set state after activte animators
+    mState = Playing;
   }
 }
 
@@ -214,7 +223,6 @@ void Animation::PlayAfter(float delaySeconds)
     {
       mCurrentLoop = 0;
     }
-    mState = Playing;
 
     if(mSpeedFactor < 0.0f && mElapsedSeconds <= mPlayRange.x * mDurationSeconds)
     {
@@ -222,6 +230,9 @@ void Animation::PlayAfter(float delaySeconds)
     }
 
     SetAnimatorsActive(true);
+
+    // Set state after activte animators
+    mState = Playing;
   }
 }
 
@@ -229,8 +240,8 @@ void Animation::Pause()
 {
   if(mState == Playing)
   {
+    DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Pause (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
     mState = Paused;
-    DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Pause\n", GetNotifyId(), mDurationSeconds * 1000.0f);
   }
 }
 
@@ -253,7 +264,7 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
 
 void Animation::SetAnimatorsActive(bool active)
 {
-  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms %s\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop");
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms %s (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop", "SRPD"[mState]);
   for(auto&& item : mAnimators)
   {
     item->SetActive(active);
@@ -272,7 +283,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
     if(mEndAction != Dali::Animation::DISCARD)
     {
       Bake(bufferIndex, mEndAction);
-      DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Stop\n", GetNotifyId(), mDurationSeconds * 1000.0f);
+      DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Stop (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
       // Animators are automatically set to inactive in Bake
     }
@@ -308,7 +319,7 @@ void Animation::ClearAnimator(BufferIndex bufferIndex)
   mPlayedCount = 0;
   mCurrentLoop = 0;
 
-  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Clear\n", GetNotifyId(), mDurationSeconds * 1000.0f);
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Clear (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 }
 
 void Animation::OnDestroy(BufferIndex bufferIndex)
@@ -327,10 +338,10 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
     }
   }
 
+  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Destroy (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+
   mIsStopped = false; ///< Do not make notify.
   mState     = Destroyed;
-
-  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Destroy\n", GetNotifyId(), mDurationSeconds * 1000.0f);
 }
 
 void Animation::SetLoopingMode(bool loopingMode)
@@ -438,6 +449,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stop
         {
           DALI_ASSERT_DEBUG(mCurrentLoop == mLoopCount);
           finished = true;
+          DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Finished (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
           // The animation has now been played to completion
           ++mPlayedCount;

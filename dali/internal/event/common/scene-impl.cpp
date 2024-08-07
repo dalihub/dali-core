@@ -59,10 +59,12 @@ Scene::Scene()
   mDepthTreeDirty(false),
   mPartialUpdateEnabled(true),
   mGeometryHittest(false),
+  mIsVisible(true),
   mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
   mSurfaceOrientation(0),
   mScreenOrientation(0),
-  mNativeId(0)
+  mNativeId(0),
+  mPanGestureState(GestureState::CLEAR)
 {
 }
 
@@ -154,6 +156,29 @@ void Scene::Add(Actor& actor)
 void Scene::Remove(Actor& actor)
 {
   mRootLayer->Remove(actor);
+}
+
+void Scene::Show()
+{
+  if(!mIsVisible)
+  {
+    mIsVisible = true;
+    mRootLayer->EmitInheritedVisibilityChangedSignalRecursively(true);
+  }
+}
+
+void Scene::Hide()
+{
+  if(mIsVisible)
+  {
+    mIsVisible = false;
+    mRootLayer->EmitInheritedVisibilityChangedSignalRecursively(false);
+  }
+}
+
+bool Scene::IsVisible() const
+{
+  return mIsVisible;
 }
 
 Size Scene::GetSize() const
@@ -538,6 +563,16 @@ void Scene::SetNativeId(int32_t nativeId)
 int32_t Scene::GetNativeId() const
 {
   return mNativeId;
+}
+
+void Scene::SetLastPanGestureState(Dali::GestureState state)
+{
+  mPanGestureState = state;
+}
+
+Dali::GestureState Scene::GetLastPanGestureState()
+{
+  return mPanGestureState;
 }
 
 Integration::Scene::KeyEventSignalType& Scene::KeyEventSignal()

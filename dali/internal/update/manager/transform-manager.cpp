@@ -81,9 +81,7 @@ inline void CalculateCenterPosition(
   }
 }
 
-// TODO : The name of trace marker is from VD specific.
-// We might need to change it as DALI_TRACE_UPDATE_PROCESS.
-DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_COMBINED, false);
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_UPDATE_PROCESS, false);
 } // unnamed namespace
 
 TransformManager::TransformManager()
