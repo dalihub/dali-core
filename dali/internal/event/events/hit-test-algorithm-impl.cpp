@@ -559,7 +559,7 @@ void GeoHitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
       Dali::Layer sourceLayer(sourceActor->GetLayer());
       if(sourceLayer)
       {
-        const uint32_t sourceActorDepth(sourceLayer.GetProperty<bool>(Dali::Layer::Property::DEPTH));
+        const uint32_t sourceActorDepth(sourceLayer.GetProperty<int32_t>(Dali::Layer::Property::DEPTH));
         CameraActor*   cameraActor     = renderTask.GetCameraActor();
         bool           pickingPossible = cameraActor->BuildPickingRay(screenCoordinates,
                                                             viewport,
@@ -676,7 +676,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
       Dali::Layer sourceLayer(sourceActor->GetLayer());
       if(sourceLayer)
       {
-        const uint32_t sourceActorDepth(sourceLayer.GetProperty<bool>(Dali::Layer::Property::DEPTH));
+        const uint32_t sourceActorDepth(sourceLayer.GetProperty<int32_t>(Dali::Layer::Property::DEPTH));
 
         CameraActor* cameraActor     = renderTask.GetCameraActor();
         bool         pickingPossible = cameraActor->BuildPickingRay(
