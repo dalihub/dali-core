@@ -745,13 +745,13 @@ public:
   }
 
   /**
-   * Checks if local matrix has changed since last update
-   * @return true if local matrix has changed, false otherwise
+   * Checks if world matrix has changed since last update
+   * @return true if world matrix has changed, false otherwise
    */
-  bool IsLocalMatrixDirty() const
+  bool IsWorldMatrixDirty() const
   {
     return (mTransformManagerData.Id() != INVALID_TRANSFORM_ID) &&
-           (mTransformManagerData.Manager()->IsLocalMatrixDirty(mTransformManagerData.Id()));
+           (mTransformManagerData.Manager()->IsWorldMatrixDirty(mTransformManagerData.Id()));
   }
 
   /**
