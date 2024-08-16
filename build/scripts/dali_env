@@ -238,7 +238,7 @@ sub check_system_package
             if(system("apt-cache show $package > /dev/null 2>&1") == 0)
             {
                 print "Attempting to install $package\n";
-                system("sudo apt-get -y --force-yes install $package");
+                system("sudo apt-get -y --allow-change-held-packages --allow-downgrades install $package");
             }
         }
     }
