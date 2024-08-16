@@ -32,6 +32,7 @@
 
 #include <cfloat> // For FLT_MAX
 #include <string>
+#include <functional> // for std::function
 
 #include "assert.h"
 

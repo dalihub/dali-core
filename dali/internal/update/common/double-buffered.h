@@ -66,10 +66,10 @@ public:
 
 private:
   // Undefined
-  DoubleBuffered<T>(const DoubleBuffered<T>&);
+  DoubleBuffered(const DoubleBuffered&);
 
   // Undefined
-  DoubleBuffered<T>& operator=(const DoubleBuffered<T>& rhs);
+  DoubleBuffered& operator=(const DoubleBuffered& rhs);
 
 private:
   T mValue1;

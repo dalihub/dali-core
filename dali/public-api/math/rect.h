@@ -90,7 +90,7 @@ struct Rect
    * @SINCE_1_9.27
    * @param[in] rhs The original object
    */
-  Rect(const Rect<T>& rhs) = default;
+  Rect(const Rect& rhs) = default;
 
   /**
    * @brief Default copy assignment operator.
@@ -107,7 +107,7 @@ struct Rect
    * @SINCE_1_9.27
    * @param[in] rhs The original object
    */
-  Rect<T>(Rect<T>&& rhs) noexcept = default;
+  Rect(Rect&& rhs) noexcept = default;
 
   /**
    * @brief Default move assignment operator.
