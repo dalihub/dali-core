@@ -556,7 +556,7 @@ const PropertyBase* Camera::GetProjectionDirection() const
 void Camera::Update(BufferIndex updateBufferIndex)
 {
   // if this has changes in world position we need to update camera for next 2 frames
-  if(IsWorldMatrixDirty())
+  if(IsLocalMatrixDirty())
   {
     mUpdateViewFlag = UPDATE_COUNT;
   }

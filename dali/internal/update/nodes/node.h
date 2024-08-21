@@ -748,10 +748,10 @@ public:
    * Checks if local matrix has changed since last update
    * @return true if local matrix has changed, false otherwise
    */
-  bool IsWorldMatrixDirty() const
+  bool IsLocalMatrixDirty() const
   {
     return (mTransformManagerData.Id() != INVALID_TRANSFORM_ID) &&
-           (mTransformManagerData.Manager()->IsWorldMatrixDirty(mTransformManagerData.Id()));
+           (mTransformManagerData.Manager()->IsLocalMatrixDirty(mTransformManagerData.Id()));
   }
 
   /**
