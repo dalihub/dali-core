@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_TRANSFORM_MANAGER_PROPERTY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,6 +220,16 @@ struct TransformManagerPropertyVector3 final : public TransformManagerPropertyHa
   void Set(BufferIndex bufferIndex, const Vector3& value) override
   {
     GetTxManagerData()->Manager()->SetVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
+  }
+
+  void SetComponent(BufferIndex bufferIndex, float value, uint32_t component)
+  {
+    GetTxManagerData()->Manager()->SetVector3PropertyComponentValue(GetTxManagerData()->Id(), PropertyT, value, component);
+  }
+
+  void BakeComponent(BufferIndex bufferIndex, float value, uint32_t component)
+  {
+    GetTxManagerData()->Manager()->BakeVector3PropertyComponentValue(GetTxManagerData()->Id(), PropertyT, value, component);
   }
 
   void Bake(BufferIndex bufferIndex, const Vector3& value) override
