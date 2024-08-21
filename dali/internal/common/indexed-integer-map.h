@@ -50,6 +50,9 @@ public:
   using iterator       = typename IndexedMapBase<std::uint32_t, std::uint32_t, ElementType>::iterator;
   using const_iterator = typename IndexedMapBase<std::uint32_t, std::uint32_t, ElementType>::const_iterator;
 
+private:
+  using SortedIndexList = std::vector<std::pair<std::uint32_t, std::uint32_t>>;
+
 public: // override
   /**
    * @brief Constructor.
@@ -80,7 +83,7 @@ public: // Main API
   {
     // Find key with binary search.
     // We can do binary search cause mKeyIndexList is sorted.
-    const auto& iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
 
     if(iter == mKeyIndexList.cend() || iter->first != key)
     {
@@ -112,7 +115,7 @@ public: // Main API
   {
     // Find key with binary search.
     // We can do binary search cause mKeyIndexList is sorted.
-    const auto& iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
 
     if(iter == mKeyIndexList.cend() || iter->first != key)
     {
@@ -143,7 +146,7 @@ public: // Main API
   {
     // Find key with binary search.
     // We can do binary search cause mKeyIndexList is sorted.
-    const auto& iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
 
     if(iter == mKeyIndexList.cend() || iter->first != key)
     {
@@ -166,7 +169,7 @@ public: // Main API
   {
     // Find key with binary search.
     // We can do binary search cause mKeyIndexList is sorted.
-    const auto& iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
+    SortedIndexList::const_iterator iter = std::lower_bound(mKeyIndexList.cbegin(), mKeyIndexList.cend(), std::pair<std::uint32_t, std::uint32_t>(key, 0u));
 
     if(iter == mKeyIndexList.cend() || iter->first != key)
     {
@@ -185,7 +188,7 @@ private:
    *
    * @note mKeyIndexList's key should be increase order.
    */
-  std::vector<std::pair<std::uint32_t, std::uint32_t>> mKeyIndexList{};
+  SortedIndexList mKeyIndexList{};
 
 protected:
   /**

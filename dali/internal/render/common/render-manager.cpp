@@ -1218,6 +1218,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   mImpl->renderAlgorithms.SubmitCommandBuffer();
   mImpl->commandBufferSubmitted = true;
 
+  if(targetsToPresent.size() > 0u)
   {
     std::sort(targetsToPresent.begin(), targetsToPresent.end());
 
