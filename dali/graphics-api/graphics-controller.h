@@ -359,7 +359,7 @@ public:
   /**
    * @brief Tests whether two Pipelines are the same.
    *
-   * On the higher level, this function may help wit creating pipeline cache.
+   * On the higher level, this function may help with creating pipeline cache.
    *
    * @return true if pipeline objects match
    */
