@@ -288,8 +288,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       // We can skip render when node is not clipping and transparent
       // We must not skip when node is a stopper
       skipRender = (opacityType == Renderer::TRANSPARENT &&
-          node->GetClippingMode() == ClippingMode::DISABLED &&
-          node != stopperNode);
+                    node->GetClippingMode() == ClippingMode::DISABLED &&
+                    node != stopperNode);
 
       isOpaque = (opacityType == Renderer::OPAQUE);
     }

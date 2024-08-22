@@ -708,6 +708,11 @@ int UtcDaliRenderTaskGetStopperActorP(void)
 
   DALI_TEST_EQUALS(actor, task.GetStopperActor(), TEST_LOCATION);
 
+  // Cancel render until, by set empty handle
+  task.RenderUntil(Dali::Actor());
+
+  DALI_TEST_EQUALS(Dali::Actor(), task.GetStopperActor(), TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -833,42 +838,62 @@ int UtcDaliRenderTaskRenderUntil03(void)
 
   Integration::Scene stage = application.GetScene();
 
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
+    Actor actor = CreateRenderableActor();
+    actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(Actor::Property::NAME, name);
+
+    return actor;
+  };
+
   // Compose a tree
-  Actor a0 = CreateRenderableActor();
-  a0.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  a0.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  //     |- l0 (depth = 1)
+  //         |- (renderable)
+  //         |- (renderable)
+  // |- a1 (renderable)
+  //     |- target (stopper node)
+  // |- a2 (renderable)
+  //     |- l2  (depth = 2)
+  //         |- (renderable)
+  //         |- (renderable)
+  //         |- (renderable)
+  Actor a0 = CreateRenderableActorWithName("a0");
 
   Layer l0 = Layer::New();
   l0.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   l0.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  l0.LowerToBottom(); // drawn later
 
-  Actor a1 = CreateRenderableActor();
-  a1.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  Actor a1 = CreateRenderableActorWithName("a1");
 
-  Actor target = CreateRenderableActor();
-  target.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  Actor target = CreateRenderableActorWithName("target");
 
-  Layer l2 = Layer::New(); // same depth index to root, added(drawn) later
+  Layer l2 = Layer::New();
   l2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   l2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  Actor a2 = CreateRenderableActor();
-  a2.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
+  Actor a2 = CreateRenderableActorWithName("a2");
 
   stage.Add(a0);
   a0.Add(l0);
-  l0.Add(CreateRenderableActor());
+  l0.Add(CreateRenderableActorWithName("l0-c0"));
+  l0.Add(CreateRenderableActorWithName("l0-c1"));
 
   stage.Add(a1);
   a1.Add(target);
 
   stage.Add(a2);
   a2.Add(l2);
-  l2.Add(CreateRenderableActor());
+  l2.Add(CreateRenderableActorWithName("l2-c0"));
+  l2.Add(CreateRenderableActorWithName("l2-c1"));
+  l2.Add(CreateRenderableActorWithName("l2-c2"));
 
   // draw only a0 and a1 (2 items)
-  // l0 and children is cut(low depth index)
+  // l0, l2 and children is cut(high depth index than stage)
   // a2 and children are cut(added after target)
   task.RenderUntil(target);
 
@@ -883,6 +908,380 @@ int UtcDaliRenderTaskRenderUntil03(void)
 
   // Check that rendering was cut
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Move l2 lower than stage.
+  //
+  // stage (depth = 1)
+  // |- a0 (renderable)
+  //     |- l0 (depth = 2)
+  //         |- (renderable)
+  //         |- (renderable)
+  // |- a1 (renderable)
+  //     |- target (stopper node)
+  // |- a2 (renderable)
+  //     |- l2  (depth = 0)
+  //         |- (renderable)
+  //         |- (renderable)
+  //         |- (renderable)
+  l2.LowerToBottom();
+
+  // After now, draw a0, a1, and child of l2 (2 + 3 items)
+  // l0 and children is cut(high depth index than stage)
+  // a2 and children are cut(added after target)
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskRenderUntil04(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that other preceding layers are rendered, for more complex cases");
+
+  // Get default rendertask
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.GetTask(0u);
+
+  Integration::Scene stage = application.GetScene();
+
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
+    Actor actor = CreateRenderableActor();
+    actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(Actor::Property::NAME, name);
+
+    return actor;
+  };
+
+  // Compose a tree
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  //     |- l0 (depth = 1)
+  //         |- (renderable)
+  //         |- (renderable)
+  // |- a1 (renderable)
+  //     |- l1 (depth = 2)
+  //         |- b0 (renderable)
+  //         |- target (stopper node)
+  //         |- b1 (renderable)
+  // |- a2 (renderable)
+  //     |- l2  (depth = 3)
+  //         |- (renderable)
+  //         |- (renderable)
+  //         |- (renderable)
+  Actor a0 = CreateRenderableActorWithName("a0");
+
+  Layer l0 = Layer::New();
+  l0.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  l0.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  Actor a1 = CreateRenderableActorWithName("a1");
+
+  Layer l1 = Layer::New();
+  l1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  l1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  Actor b0 = CreateRenderableActorWithName("b0");
+
+  Actor target = CreateRenderableActorWithName("target");
+
+  Actor b1 = CreateRenderableActorWithName("b1");
+
+  Layer l2 = Layer::New();
+  l2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  l2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+
+  Actor a2 = CreateRenderableActorWithName("a2");
+
+  stage.Add(a0);
+  a0.Add(l0);
+  l0.Add(CreateRenderableActorWithName("l0-c0"));
+  l0.Add(CreateRenderableActorWithName("l0-c1"));
+
+  stage.Add(a1);
+  a1.Add(l1);
+  l1.Add(b0);
+  l1.Add(target);
+  l1.Add(b1);
+
+  stage.Add(a2);
+  a2.Add(l2);
+  l2.Add(CreateRenderableActorWithName("l2-c0"));
+  l2.Add(CreateRenderableActorWithName("l2-c1"));
+  l2.Add(CreateRenderableActorWithName("l2-c2"));
+
+  // draw a0, a1, a2, and l0, and b0 (3 + 2 + 1 items)
+  // l2 and children is cut(high depth index than l1)
+  // b1 is cut out (added after target)
+  task.RenderUntil(target);
+
+  // Update & Render with the actor on-stage
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 6, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Move l1 lower than stage.
+  //
+  // stage (depth = 1)
+  // |- a0 (renderable)
+  //     |- l0 (depth = 2)
+  //         |- (renderable)
+  //         |- (renderable)
+  // |- a1 (renderable)
+  //     |- l1 (depth = 0)
+  //         |- b0 (renderable)
+  //         |- target (stopper node)
+  //         |- b1 (renderable)
+  // |- a2 (renderable)
+  //     |- l2  (depth = 3)
+  //         |- (renderable)
+  //         |- (renderable)
+  //         |- (renderable)
+  l1.LowerToBottom();
+
+  // After now, draw b0 only.
+  // root layer, l1, l2 and children is cut(high depth index than l1, what target hold)
+  // b1 is cut out (added after target)
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Move l2 lower than stage.
+  //
+  // stage (depth = 2)
+  // |- a0 (renderable)
+  //     |- l0 (depth = 3)
+  //         |- (renderable)
+  //         |- (renderable)
+  // |- a1 (renderable)
+  //     |- l1 (depth = 1)
+  //         |- b0 (renderable)
+  //         |- target (stopper node)
+  //         |- b1 (renderable)
+  // |- a2 (renderable)
+  //     |- l2  (depth = 0)
+  //         |- (renderable)
+  //         |- (renderable)
+  //         |- (renderable)
+  l2.LowerToBottom();
+
+  // After now, draw b0 and l2 (1 + 3 items).
+  // root layer, l1 and children is cut(high depth index than l1, what target hold)
+  // b1 is cut out (added after target)
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 4, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Make b0 and a2 draw mode as overlay
+  //
+  // stage (depth = 2)
+  // |- a0 (renderable)
+  //     |- l0 (depth = 3)
+  //         |- (renderable)
+  //         |- (renderable)
+  // |- a1 (renderable)
+  //     |- l1 (depth = 1)
+  //         |- b0 (renderable) (overlay)
+  //         |- target (stopper node)
+  //         |- b1 (renderable)
+  // |- a2 (renderable) (overlay)
+  //     |- l2  (depth = 0)
+  //         |- (renderable) (overlay)
+  //         |- (renderable)
+  //         |- (renderable)
+  b0.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+  a2.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+  l2.GetChildAt(0).SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+
+  // After now, draw l2 (3 items).
+  // root layer, l1 and children is cut(high depth index than l1, what target hold)
+  // b1 is cut out (added after target)
+  // b0 is cut out (overlay mode)
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Make target draw mode as overlay
+  //
+  // stage (depth = 2)
+  // |- a0 (renderable)
+  //     |- l0 (depth = 3)
+  //         |- (renderable)
+  //         |- (renderable)
+  // |- a1 (renderable)
+  //     |- l1 (depth = 1)
+  //         |- b0 (renderable) (overlay)
+  //         |- target (stopper node) (overlay)
+  //         |- b1 (renderable)
+  // |- a2 (renderable) (overlay)
+  //     |- l2  (depth = 0)
+  //         |- (renderable) (overlay)
+  //         |- (renderable)
+  //         |- (renderable)
+  target.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+
+  // After now, draw b0, b1, and l2 (2 + 3 items).
+  // root layer, l1 and children is cut(high depth index than l1, what target hold)
+  // b1 is not be cut out due to target is overlay mode
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 5, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskRenderUntil05(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that stopper actor scene off and scene on again");
+
+  // Get default rendertask
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.GetTask(0u);
+
+  Integration::Scene stage = application.GetScene();
+
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
+    Actor actor = CreateRenderableActor();
+    actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(Actor::Property::NAME, name);
+
+    return actor;
+  };
+
+  // Compose a tree
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  // |- a1 (renderable)
+  //     |- target (stopper node)
+  // |- a2 (renderable)
+  Actor a0     = CreateRenderableActorWithName("a0");
+  Actor a1     = CreateRenderableActorWithName("a1");
+  Actor a2     = CreateRenderableActorWithName("a2");
+  Actor target = CreateRenderableActorWithName("target");
+
+  stage.Add(a0);
+  stage.Add(a1);
+  stage.Add(a2);
+  a1.Add(target);
+
+  // draw a0, a1 (2 items)
+  task.RenderUntil(target);
+
+  // Update & Render with the actor on-stage
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Unparent target
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  // |- a1 (renderable)
+  // |- a2 (renderable)
+  target.Unparent();
+
+  // After now, draw all actors, a0, a1, and a2.
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Add target under a0.
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  //     |- target (stopper node)
+  // |- a1 (renderable)
+  // |- a2 (renderable)
+  a0.Add(target);
+
+  // After now, draw a0 only.
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Cancel RenderUntil.
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  //     |- target (renderable)
+  // |- a1 (renderable)
+  // |- a2 (renderable)
+  task.RenderUntil(Dali::Actor());
+
+  // After now, draw all actors (4 items).
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 4, TEST_LOCATION);
 
   END_TEST;
 }
