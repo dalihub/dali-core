@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -314,8 +314,12 @@ uint32_t RenderTask::GetRenderTaskId() const
 
 void RenderTask::RenderUntil(Actor stopperActor)
 {
-  DALI_ASSERT_ALWAYS(stopperActor && "RenderUntil() stopperActor does not exist.");
-  Internal::Actor* actorImpl(&GetImplementation(stopperActor));
+  // NULL handle is allowed
+  Internal::Actor* actorImpl(nullptr);
+  if(stopperActor)
+  {
+    actorImpl = &GetImplementation(stopperActor);
+  }
   return GetImplementation(*this).RenderUntil(actorImpl);
 }
 
