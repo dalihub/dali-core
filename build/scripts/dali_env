@@ -157,18 +157,30 @@ my $sbs_path         = "$root_path/target";
 my $install_path     = "$root_path/opt";
 
 my $opt_create=0;
+my $opt_force;
+my $opt_envfile="setenv";
 my $opt_setenv=0;
 my $opt_help=0;
 my $opt_man=0;
+my $opt_vk_version="1.3.280.1";
+my $opt_vulkan;
+my $VULKAN_ENV="";
 
 GetOptions("create"     => \$opt_create,
+           "envfile=s"  => \$opt_envfile,
+           "force"      => \$opt_force,
            "setenv"     => \$opt_setenv,
            "help"       => \$opt_help,
+           "vulkan:s"   => \$opt_vulkan,
            "man"        => \$opt_man) or pod2usage(2);
 
 pod2usage(1) if $opt_help;
 pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
 
+if($opt_vulkan ne "")
+{
+    $opt_vk_version=$opt_vulkan;
+}
 
 ################################################################################
 
@@ -198,6 +210,14 @@ sub in_dali_env
 
 sub create_setenv
 {
+    my $oldfh;
+    my $fh;
+    if($opt_envfile)
+    {
+        print "Writing environment script to $opt_envfile\n";
+        open($fh, ">", $opt_envfile)|| die "Can't open $opt_envfile for writing:$!\n";
+        $oldfh = select($fh);
+    }
     print <<"EOF";
 #
 # To use the desktop libraries, please add the following lines to your .bashrc or
@@ -212,6 +232,7 @@ sub create_setenv
 # _OR_
 # \$ CXXFLAGS="-g -O0" cmake -DCMAKE_INSTALL_PREFIX=\$DESKTOP_PREFIX
 
+${VULKAN_ENV}
 export DESKTOP_PREFIX=$install_path
 export PATH=$install_path/bin:\$PATH
 export LD_LIBRARY_PATH=$install_path/lib:\$LD_LIBRARY_PATH
@@ -223,9 +244,95 @@ export DALI_WINDOW_WIDTH=480
 export DALI_WINDOW_HEIGHT=800
 
 EOF
+    if($opt_envfile)
+    {
+        close($fh);
+        select($oldfh);
+    }
 }
 
 ################################################################################
+
+sub install_vulkan
+{
+    if($opt_vulkan)
+    {
+        my $archive="vulkansdk-linux-x86_64-${opt_vk_version}.tar.xz";
+        my $url="https://sdk.lunarg.com/sdk/download/${opt_vk_version}/linux/$archive";
+
+        # Avoid excessive downloading of the same file
+        if(! -e "/tmp/$archive")
+        {
+            print "Downloading Vulkan SDK version ${opt_vk_version}\nfrom: $url\n";
+            system('wget','-P','/tmp',$url);
+            die "Can't download archive" if(! -e "/tmp/$archive");
+        }
+
+        my $vulkan_install_path="$root_path/vulkan";
+        print "Unpacking archive\n";
+        mkpath($vulkan_install_path);
+        chdir($vulkan_install_path);
+        system('tar','-xf',"/tmp/$archive", '--checkpoint=5000', '--checkpoint-action=ttyout=.');
+        print("\n");
+        chdir("$root_path/..");
+
+        my $fh;
+        open($fh, ">", "$install_path/lib/pkgconfig/vulkan.pc") || die "Can't open vulkan.pc for writing: $!\n";
+
+        $vulkan_install_path .= "/${opt_vk_version}";
+        print $fh <<"EOF";
+prefix=${vulkan_install_path}/x86_64
+exec_prefix=${vulkan_install_path}/x86_64
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: Vulkan-Loader
+Description: Vulkan Loader
+Version: ${opt_vk_version}
+Libs: -L\${libdir} -lvulkan
+Libs.private:  -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc
+Cflags: -I\${includedir}
+EOF
+        close($fh);
+
+        open($fh, ">", "$install_path/lib/pkgconfig/glslang.pc") || die "Can't open glslang.pc for writing: $!\n";
+        print $fh <<"EOF";
+prefix=${vulkan_install_path}/x86_64
+exec_prefix=${vulkan_install_path}/x86_64
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: glslang
+Description: OpenGL and OpenGL ES shader front end and validator
+Version: ${opt_vk_version}
+Libs: -L\${libdir} -lglslang -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lshaderc -lshaderc_combined
+Cflags: -I\${includedir}
+EOF
+        close($fh);
+
+        open($fh, ">", "$install_path/lib/pkgconfig/SPIRV-Tools.pc") || die "Can't open SPIRV-Tools.pc for writing: $!\n";
+        print $fh <<"EOF";
+prefix=${vulkan_install_path}/x86_64
+exec_prefix=${vulkan_install_path}/x86_64
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: SPIRV-Tools
+Description: Tools for SPIR-V
+Version: ${opt_vk_version}
+Libs: -L\${libdir} -lSPIRV-Tools -lSPIRV-Tools-link -lSPIRV-Tools-opt
+Cflags: -I\${includedir}
+EOF
+        close($fh);
+
+        $VULKAN_ENV=<<"EOF";
+export VULKAN_VERSION=${opt_vk_version}
+export VULKAN_ROOT=${root_path}/vulkan/\${VULKAN_VERSION}
+. \${VULKAN_ROOT}/setup-env.sh
+EOF
+        print "Written pkg-config files to $install_path/lib/pkg-config\n";
+    }
+}
 
 sub check_system_package
 {
@@ -585,24 +692,29 @@ if($opt_create)
         die "Already in a dali-env directory\n";
         # Could query if user wants to re-create?
     }
-    elsif(-e $root_path)
+    elsif(-e $root_path && !$opt_force)
     {
         die "$root_path already exists\n";
     }
-    elsif(-e $new_root)
+    elsif(-e $new_root && !$opt_force)
     {
         die "A dali-env directory already exists here\n";
     }
+    if($opt_force)
+    {
+        system('rm','-rf',"$root_path");
+    }
 
-    check_system_packages();
+    #check_system_packages();
 
     create_link();
 
     create_env();
 
     # do this after source directory structure created in create_env
-    check_source_packages();
+    #check_source_packages();
 
+    install_vulkan();
     create_setenv();
 }
 elsif($opt_setenv)
@@ -640,9 +752,23 @@ dali_env [-c] [-s] [-h|-m]
 
 Create a DALi environment directory in the current directory.
 
+=item B<-f|--force>
+
+Removes any existing dali-env directory before creating a new one.
+
 =item B<-s|--setenv>
 
 Display environment variables to setup.
+
+=item B<-e|--envfile> environment-file
+
+Write the environment settings to the given file
+
+=item B<-v|--vulkan> [vulkan-option]
+
+Install the Vulkan SDK (By default, uses 1.3.280.1) with the optional version
+number. Adds several .pc files into dali-env/opt/lib/pkg-config directory,
+and requires a new environment file to be written.
 
 =item B<-h|--help>
 
@@ -658,6 +784,6 @@ Display the manual page
 
 B<dali_env>
 
-Gets the required dependencies for DALi and them to a local directory. Can also create a setenv script to point to the installation.
+Gets the required dependencies for DALi and installs them to a local directory. Can also create a setenv script to point to the installation.
 
 =cut
