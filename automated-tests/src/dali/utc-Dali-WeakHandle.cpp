@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -473,3 +473,83 @@ int UtcDaliWeakHandleMoveAssignment(void)
 
   END_TEST;
 }
+
+namespace
+{
+class SelfDestructObject;
+class SelfDestructHandle : public Dali::BaseHandle
+{
+public:
+  static SelfDestructHandle New();
+
+  SelfDestructHandle() = default;
+  ~SelfDestructHandle() = default;
+private:
+  explicit SelfDestructHandle(SelfDestructObject* object);
+};
+
+class SelfDestructObject : public Dali::BaseObject
+{
+public:
+  SelfDestructObject()
+  : BaseObject()
+  {
+  }
+
+  ~SelfDestructObject()
+  {
+    // Guard unlimited destruction, for safety.
+    if(gDestructorCalledTime++ < 10)
+    {
+      auto handle = mWeakHandle.GetBaseHandle();
+    }
+  }
+
+public:
+  WeakHandle<SelfDestructHandle> mWeakHandle;
+
+  static uint32_t gDestructorCalledTime;
+};
+
+SelfDestructHandle::SelfDestructHandle(SelfDestructObject* object)
+: BaseHandle(object)
+{
+}
+
+SelfDestructHandle SelfDestructHandle::New()
+{
+  IntrusivePtr<SelfDestructObject> object = new SelfDestructObject();
+  auto handle = SelfDestructHandle(object.Get());
+  object->mWeakHandle = handle;
+  return handle;
+}
+
+uint32_t SelfDestructObject::gDestructorCalledTime = 0U;
+
+} // namespace
+
+int UtcDaliWeakHandleInvalidDuringSelfDestruction(void)
+{
+  TestApplication application;
+
+  SelfDestructObject::gDestructorCalledTime = 0u;
+
+  SelfDestructHandle handle = SelfDestructHandle::New();
+  DALI_TEST_EQUALS(1, handle.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the object is not increased
+
+  try
+  {
+    handle.Reset();
+
+    // Check this UTC completed without any exception
+    DALI_TEST_EQUALS(SelfDestructObject::gDestructorCalledTime, 1u, TEST_LOCATION);
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
