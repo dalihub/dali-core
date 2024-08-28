@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,14 @@ BaseObject::BaseObject()
 }
 
 BaseObject::~BaseObject() = default;
+
+void BaseObject::OnDestroy()
+{
+  DALI_ASSERT_ALWAYS(mImpl && "~BaseObject OnDestroy should not be called twice!");
+
+  // Notify BaseObject::Impl::Observer destroyed first.
+  mImpl.reset();
+}
 
 void BaseObject::RegisterObject()
 {

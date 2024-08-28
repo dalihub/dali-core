@@ -1027,16 +1027,6 @@ Object::~Object()
     }
   }
 
-  NotifyObservers(*this, mObservers, &Object::Observer::ObjectDestroyed);
-
-  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
-  // If someone call AddObserver after this, assert.
-  mObserverNotifying = true;
-
-  // Remove all observers
-  mObserverRemoved = true;
-  mObservers.Clear();
-
   // Disable property notifications in scene graph
   DisablePropertyNotifications();
 
@@ -1051,6 +1041,23 @@ Object::~Object()
       RemoveObjectMessage(GetEventThreadServices().GetUpdateManager(), mUpdateObject);
     }
   }
+}
+
+void Object::OnDestroy()
+{
+  // Notify object destroyed first.
+  NotifyObservers(*this, mObservers, &Object::Observer::ObjectDestroyed);
+
+  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
+  // If someone call AddObserver after this, assert.
+  mObserverNotifying = true;
+
+  // Remove all observers
+  mObserverRemoved = true;
+  mObservers.Clear();
+
+  // Note : You MUST call base class OnDestroy if you are deriving this method.
+  BaseObject::OnDestroy();
 }
 
 void Object::OnSceneObjectAdd()
