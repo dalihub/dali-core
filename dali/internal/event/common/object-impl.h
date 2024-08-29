@@ -416,6 +416,13 @@ protected:
   ~Object() override;
 
   /**
+   * @copydoc Dali::BaseObject::OnDestroy()
+   *
+   * @note If Derived class override this function, derived class MUST call base class function.
+   */
+  void OnDestroy() override;
+
+  /**
    * Called immediately by derived classes, after the scene-object has been created & passed to the scene-graph.
    */
   void OnSceneObjectAdd();
