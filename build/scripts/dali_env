@@ -58,6 +58,7 @@ my @system_packages = (
     "gettext",
     "libwebp-dev",
     "libmagick++-dev",
+    "libxml-parser-perl",
 );
 
 my $ubuntu_version = (split(/\s+/, `lsb_release -d`))[2];
@@ -163,7 +164,7 @@ my $opt_setenv=0;
 my $opt_help=0;
 my $opt_man=0;
 my $opt_vk_version="1.3.280.1";
-my $opt_vulkan;
+my $opt_vulkan=undef;
 my $VULKAN_ENV="";
 
 GetOptions("create"     => \$opt_create,
@@ -180,6 +181,35 @@ pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
 if($opt_vulkan ne "")
 {
     $opt_vk_version=$opt_vulkan;
+}
+
+################################################################################
+
+# Taken from IO::Interactive (to avoid yet more perl dependencies!)
+sub is_interactive {
+    my ($out_handle) = (@_, select);    # Default to default output handle
+
+    # Not interactive if output is not to terminal...
+    return 0 if not -t $out_handle;
+
+    # If *ARGV is opened, we're interactive if...
+    if ( tied(*ARGV) or defined(fileno(ARGV)) ) { # this is what 'Scalar::Util::openhandle *ARGV' boils down to
+
+        # ...it's currently opened to the magic '-' file
+        return -t *STDIN if defined $ARGV && $ARGV eq '-';
+
+        # ...it's at end-of-file and the next file is the magic '-' file
+        return @ARGV>0 && $ARGV[0] eq '-' && -t *STDIN if eof *ARGV;
+
+        # ...it's directly attached to the terminal
+        return -t *ARGV;
+    }
+
+    # If *ARGV isn't opened, it will be interactive if *STDIN is attached
+    # to a terminal.
+    else {
+        return -t *STDIN;
+    }
 }
 
 ################################################################################
@@ -210,19 +240,30 @@ sub in_dali_env
 
 sub create_setenv
 {
+    # Setup vulkan environment if necessary
+    my $vulkan_env="";
+    if(defined($opt_vulkan))
+    {
+        $vulkan_env=<<"EOF";
+export VULKAN_VERSION=${opt_vk_version}
+export VULKAN_ROOT=${root_path}/vulkan/\${VULKAN_VERSION}
+. \${VULKAN_ROOT}/setup-env.sh
+EOF
+    }
+
     my $oldfh;
     my $fh;
-    if($opt_envfile)
+    if($opt_envfile && is_interactive())
     {
         print "Writing environment script to $opt_envfile\n";
         open($fh, ">", $opt_envfile)|| die "Can't open $opt_envfile for writing:$!\n";
         $oldfh = select($fh);
     }
+
     print <<"EOF";
-#
 # To use the desktop libraries, please add the following lines to your .bashrc or
 # create a setenv script from them, e.g. by running this command as follows
-# \$ $install_path/bin/dali_env -s > setenv
+# \$ $install_path/bin/dali_env -s
 #
 # You can then source this script by using
 # \$ . setenv
@@ -232,7 +273,7 @@ sub create_setenv
 # _OR_
 # \$ CXXFLAGS="-g -O0" cmake -DCMAKE_INSTALL_PREFIX=\$DESKTOP_PREFIX
 
-${VULKAN_ENV}
+${vulkan_env}
 export DESKTOP_PREFIX=$install_path
 export PATH=$install_path/bin:\$PATH
 export LD_LIBRARY_PATH=$install_path/lib:\$LD_LIBRARY_PATH
@@ -244,7 +285,7 @@ export DALI_WINDOW_WIDTH=480
 export DALI_WINDOW_HEIGHT=800
 
 EOF
-    if($opt_envfile)
+    if($fh)
     {
         close($fh);
         select($oldfh);
@@ -252,10 +293,13 @@ EOF
 }
 
 ################################################################################
+sub vulkan_env
+{
+}
 
 sub install_vulkan
 {
-    if($opt_vulkan)
+    if(defined($opt_vulkan))
     {
         my $archive="vulkansdk-linux-x86_64-${opt_vk_version}.tar.xz";
         my $url="https://sdk.lunarg.com/sdk/download/${opt_vk_version}/linux/$archive";
@@ -325,14 +369,10 @@ Cflags: -I\${includedir}
 EOF
         close($fh);
 
-        $VULKAN_ENV=<<"EOF";
-export VULKAN_VERSION=${opt_vk_version}
-export VULKAN_ROOT=${root_path}/vulkan/\${VULKAN_VERSION}
-. \${VULKAN_ROOT}/setup-env.sh
-EOF
         print "Written pkg-config files to $install_path/lib/pkg-config\n";
     }
 }
+
 
 sub check_system_package
 {
@@ -705,14 +745,14 @@ if($opt_create)
         system('rm','-rf',"$root_path");
     }
 
-    #check_system_packages();
+    check_system_packages();
 
     create_link();
 
     create_env();
 
     # do this after source directory structure created in create_env
-    #check_source_packages();
+    check_source_packages();
 
     install_vulkan();
     create_setenv();
@@ -758,11 +798,12 @@ Removes any existing dali-env directory before creating a new one.
 
 =item B<-s|--setenv>
 
-Display environment variables to setup.
+If run interactively, then writes environment variables to environment file.
+If non-interactive, then outputs environment to STDOUT.
 
 =item B<-e|--envfile> environment-file
 
-Write the environment settings to the given file
+Set the filename for the environment settings, defaults to "setenv"
 
 =item B<-v|--vulkan> [vulkan-option]
 
