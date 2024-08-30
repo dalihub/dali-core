@@ -981,6 +981,14 @@ public:
     OnBake();
   }
 
+  /**
+   * @brief Reset to base value without dirty flag check.
+   */
+  void ResetToBaseValueInternal(BufferIndex updateBufferIndex)
+  {
+    mValue[updateBufferIndex] = mBaseValue;
+  }
+
 private:
   // Undefined
   AnimatableProperty(const AnimatableProperty& property);

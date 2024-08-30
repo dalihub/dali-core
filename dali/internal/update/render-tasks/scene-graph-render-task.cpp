@@ -51,9 +51,17 @@ RenderTask::~RenderTask()
       mSourceNode->RemoveExclusiveRenderTask(this);
     }
   }
+  if(mStopperNode)
+  {
+    mStopperNode->RemoveObserver(*this);
+  }
   if(mCameraNode)
   {
     mCameraNode->RemoveObserver(*this);
+  }
+  if(mViewportGuideNode)
+  {
+    mViewportGuideNode->RemoveObserver(*this);
   }
   if(mRenderSyncTracker)
   {
@@ -99,7 +107,17 @@ Node* RenderTask::GetSourceNode() const
 
 void RenderTask::SetStopperNode(Node* node)
 {
+  if(mStopperNode)
+  {
+    mStopperNode->RemoveObserver(*this);
+  }
+
   mStopperNode = node;
+
+  if(mStopperNode)
+  {
+    mStopperNode->AddObserver(*this);
+  }
 }
 
 Node* RenderTask::GetStopperNode() const
@@ -109,7 +127,17 @@ Node* RenderTask::GetStopperNode() const
 
 void RenderTask::SetViewportGuideNode(Node* node)
 {
+  if(mViewportGuideNode)
+  {
+    mViewportGuideNode->RemoveObserver(*this);
+  }
+
   mViewportGuideNode = node;
+
+  if(mViewportGuideNode)
+  {
+    mViewportGuideNode->AddObserver(*this);
+  }
 }
 
 Node* RenderTask::GetViewportGuideNode() const
@@ -432,8 +460,11 @@ void RenderTask::UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize
     Vector2 screenPosition(halfSceneSize.width + worldPosition.x - halfNodeSize.x,
                            halfSceneSize.height + worldPosition.y - halfNodeSize.y);
 
-    /* This is an implicit constraint - the properties will be dirty until the node
+    /**
+     * This is an implicit constraint - the properties will be dirty until the node
      * is removed. (RenderTask::Impl manages this)
+     *
+     * TODO : Need to make Resseter for these properties.
      */
     mViewportPosition.Set(updateBufferIndex, screenPosition);
     mViewportSize.Set(updateBufferIndex, Vector2(nodeSize));
@@ -487,13 +518,19 @@ void RenderTask::ContextDestroyed()
 
 void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)
 {
-  // check if we've gone from inactive to active
-  SetActiveStatus();
+  if(&owner == static_cast<PropertyOwner*>(mSourceNode) || &owner == static_cast<PropertyOwner*>(mCameraNode))
+  {
+    // check if we've gone from inactive to active
+    SetActiveStatus();
+  }
 }
 
 PropertyOwner::Observer::NotifyReturnType RenderTask::PropertyOwnerDisconnected(BufferIndex /*updateBufferIndex*/, PropertyOwner& owner)
 {
-  mActive = false; // if either source or camera disconnected, we're no longer active
+  if(&owner == static_cast<PropertyOwner*>(mSourceNode) || &owner == static_cast<PropertyOwner*>(mCameraNode))
+  {
+    mActive = false; // if either source or camera disconnected, we're no longer active
+  }
   return PropertyOwner::Observer::NotifyReturnType::KEEP_OBSERVING;
 }
 
@@ -502,13 +539,32 @@ void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)
   if(static_cast<PropertyOwner*>(mSourceNode) == &owner)
   {
     mSourceNode = nullptr;
+
+    mActive = false; // if either source or camera destroyed, we're no longer active
   }
-  else if(static_cast<PropertyOwner*>(mCameraNode) == &owner)
+  if(static_cast<PropertyOwner*>(mCameraNode) == &owner)
   {
     mCameraNode = nullptr;
-  }
 
-  mActive = false; // if either source or camera destroyed, we're no longer active
+    mActive = false; // if either source or camera destroyed, we're no longer active
+  }
+  if(static_cast<PropertyOwner*>(mStopperNode) == &owner)
+  {
+    mStopperNode = nullptr;
+  }
+  if(static_cast<PropertyOwner*>(mViewportGuideNode) == &owner)
+  {
+    mViewportGuideNode = nullptr;
+
+    if(DALI_LIKELY(!Dali::Stage::IsShuttingDown()))
+    {
+      // TODO : Until SG::RenderTask Resseter preopared, just call this internal API without dirty flag down.
+      mViewportPosition.ResetToBaseValueInternal(0);
+      mViewportPosition.ResetToBaseValueInternal(1);
+      mViewportSize.ResetToBaseValueInternal(0);
+      mViewportSize.ResetToBaseValueInternal(1);
+    }
+  }
 }
 
 void RenderTask::AddInitializeResetter(ResetterManager& manager) const

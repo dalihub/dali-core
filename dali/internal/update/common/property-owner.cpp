@@ -46,26 +46,30 @@ void PropertyOwner::AddObserver(Observer& observer)
 {
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying PropertyOwner::Observers");
 
-  //Check for duplicates in debug builds
-  DALI_ASSERT_DEBUG(mObservers.End() == mObservers.Find(&observer));
-
-  mObservers.PushBack(&observer);
+  auto [iter, inserted] = mObservers.emplace(&observer, 1u);
+  if(!inserted)
+  {
+    // Increase the number of observer count
+    ++(iter->second);
+  }
 }
 
 void PropertyOwner::RemoveObserver(Observer& observer)
 {
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying PropertyOwner::Observers");
 
-  const auto iter = mObservers.Find(&observer);
-  if(iter != mObservers.End())
+  auto iter = mObservers.find(&observer);
+  DALI_ASSERT_ALWAYS(iter != mObservers.end());
+
+  if(--(iter->second) == 0u)
   {
-    mObservers.Erase(iter);
+    mObservers.erase(iter);
   }
 }
 
 bool PropertyOwner::IsObserved()
 {
-  return mObservers.Count() != 0u;
+  return mObservers.size() != 0u;
 }
 
 void PropertyOwner::Destroy()
@@ -76,14 +80,14 @@ void PropertyOwner::Destroy()
   // Notification for observers
   for(auto&& item : mObservers)
   {
-    item->PropertyOwnerDestroyed(*this);
+    item.first->PropertyOwnerDestroyed(*this);
   }
 
   // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
   // If someone call AddObserver / RemoveObserver after this, assert.
 
   // Remove all observers
-  mObservers.Clear();
+  mObservers.clear();
 
   // Remove all constraints when disconnected from scene-graph
   mConstraints.Clear();
@@ -103,7 +107,7 @@ void PropertyOwner::ConnectToSceneGraph()
   // Notification for observers
   for(auto&& item : mObservers)
   {
-    item->PropertyOwnerConnected(*this);
+    item.first->PropertyOwnerConnected(*this);
   }
 
   mObserverNotifying = false;
@@ -119,16 +123,16 @@ void PropertyOwner::DisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   mObserverNotifying = true;
 
   // Notification for observers
-  for(auto iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter;)
+  for(auto iter = mObservers.begin(); iter != mObservers.end();)
   {
-    auto returnValue = (*iter)->PropertyOwnerDisconnected(updateBufferIndex, *this);
+    auto returnValue = (*iter).first->PropertyOwnerDisconnected(updateBufferIndex, *this);
     if(returnValue == Observer::KEEP_OBSERVING)
     {
       ++iter;
     }
     else
     {
-      iter = mObservers.Erase(iter);
+      iter = mObservers.erase(iter);
     }
   }
 
