@@ -62,7 +62,11 @@ DALI_PROPERTY("stencilMask", INTEGER, true, false, false, Dali::Renderer::Proper
 DALI_PROPERTY("stencilOperationOnFail", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL)
 DALI_PROPERTY("stencilOperationOnZFail", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL)
 DALI_PROPERTY("stencilOperationOnZPass", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS)
-DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::DevelRenderer::Property::OPACITY)
+DALI_PROPERTY("rendererMixColor", VECTOR4, true, true, true, Dali::Renderer::Property::MIX_COLOR)
+DALI_PROPERTY("rendererMixColorRed", FLOAT, true, true, true, Dali::Renderer::Property::MIX_COLOR_RED)
+DALI_PROPERTY("rendererMixColorGreen", FLOAT, true, true, true, Dali::Renderer::Property::MIX_COLOR_GREEN)
+DALI_PROPERTY("rendererMixColorBlue", FLOAT, true, true, true, Dali::Renderer::Property::MIX_COLOR_BLUE)
+DALI_PROPERTY("rendererOpacity", FLOAT, true, true, true, Dali::Renderer::Property::OPACITY)
 DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
 DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
 DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
@@ -658,16 +662,35 @@ void Renderer::SetDefaultProperty(Property::Index        index,
       }
       break;
     }
-    case Dali::DevelRenderer::Property::OPACITY:
+    case Dali::Renderer::Property::MIX_COLOR:
     {
-      float opacity;
-      if(propertyValue.Get(opacity))
+      Vector4 mixColor;
+      if(propertyValue.Get(mixColor))
       {
-        if(!Equals(mOpacity, opacity))
+        if(mMixColor != mixColor)
         {
-          mOpacity         = opacity;
+          mMixColor        = mixColor;
           auto sceneObject = const_cast<SceneGraph::Renderer*>(&GetRendererSceneObject());
-          SceneGraph::BakeOpacityMessage(GetEventThreadServices(), *sceneObject, mOpacity);
+          SceneGraph::BakeMixColorMessage(GetEventThreadServices(), *sceneObject, mMixColor);
+        }
+      }
+      break;
+    }
+    case Dali::Renderer::Property::MIX_COLOR_RED:
+    case Dali::Renderer::Property::MIX_COLOR_GREEN:
+    case Dali::Renderer::Property::MIX_COLOR_BLUE:
+    case Dali::Renderer::Property::OPACITY:
+    {
+      const uint8_t componentIndex = static_cast<uint8_t>(static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED));
+
+      float mixColorComponentValue;
+      if(propertyValue.Get(mixColorComponentValue))
+      {
+        if(!Equals(mMixColor[componentIndex], mixColorComponentValue))
+        {
+          mMixColor[componentIndex] = mixColorComponentValue;
+          auto sceneObject          = const_cast<SceneGraph::Renderer*>(&GetRendererSceneObject());
+          SceneGraph::BakeMixColorComponentMessage(GetEventThreadServices(), *sceneObject, mixColorComponentValue, componentIndex);
         }
       }
       break;
@@ -733,9 +756,18 @@ void Renderer::OnNotifyDefaultPropertyAnimation(Animation& animation, Property::
     {
       switch(index)
       {
-        case Dali::DevelRenderer::Property::OPACITY:
+        case Dali::Renderer::Property::MIX_COLOR:
         {
-          value.Get(mOpacity);
+          value.Get(mMixColor);
+          break;
+        }
+        case Dali::Renderer::Property::MIX_COLOR_RED:
+        case Dali::Renderer::Property::MIX_COLOR_GREEN:
+        case Dali::Renderer::Property::MIX_COLOR_BLUE:
+        case Dali::Renderer::Property::OPACITY:
+        {
+          const uint8_t componentIndex = static_cast<uint8_t>(static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED));
+          value.Get(mMixColor[componentIndex]);
           break;
         }
       }
@@ -746,9 +778,18 @@ void Renderer::OnNotifyDefaultPropertyAnimation(Animation& animation, Property::
     {
       switch(index)
       {
-        case Dali::DevelRenderer::Property::OPACITY:
+        case Dali::Renderer::Property::MIX_COLOR:
         {
-          AdjustValue<float>(mOpacity, value);
+          AdjustValue<Vector4>(mMixColor, value);
+          break;
+        }
+        case Dali::Renderer::Property::MIX_COLOR_RED:
+        case Dali::Renderer::Property::MIX_COLOR_GREEN:
+        case Dali::Renderer::Property::MIX_COLOR_BLUE:
+        case Dali::Renderer::Property::OPACITY:
+        {
+          const uint8_t componentIndex = static_cast<uint8_t>(static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED));
+          AdjustValue<float>(mMixColor[componentIndex], value);
           break;
         }
       }
@@ -761,10 +802,19 @@ const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty(Prope
 {
   const SceneGraph::PropertyBase* property = nullptr;
 
-  if(index == DevelRenderer::Property::OPACITY)
+  switch(index)
   {
-    property = &GetRendererSceneObject().mOpacity;
+    case Dali::Renderer::Property::MIX_COLOR:
+    case Dali::Renderer::Property::MIX_COLOR_RED:
+    case Dali::Renderer::Property::MIX_COLOR_GREEN:
+    case Dali::Renderer::Property::MIX_COLOR_BLUE:
+    case Dali::Renderer::Property::OPACITY:
+    {
+      property = &GetRendererSceneObject().mMixColor;
+      break;
+    }
   }
+
   if(!property)
   {
     // not our property, ask base
@@ -778,6 +828,37 @@ const PropertyInputImpl* Renderer::GetSceneObjectInputProperty(Property::Index i
 {
   // reuse animatable property getter, Object::GetSceneObjectInputProperty does the same so no need to call that0
   return GetSceneObjectAnimatableProperty(index);
+}
+
+int32_t Renderer::GetPropertyComponentIndex(Property::Index index) const
+{
+  int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
+
+  switch(index)
+  {
+    case Dali::Renderer::Property::MIX_COLOR_RED:
+    case Dali::Renderer::Property::MIX_COLOR_GREEN:
+    case Dali::Renderer::Property::MIX_COLOR_BLUE:
+    case Dali::Renderer::Property::OPACITY:
+    {
+      componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED);
+      break;
+    }
+
+    default:
+    {
+      // Do nothing
+      break;
+    }
+  }
+
+  if(Property::INVALID_COMPONENT_INDEX == componentIndex)
+  {
+    // ask base
+    componentIndex = Object::GetPropertyComponentIndex(index);
+  }
+
+  return componentIndex;
 }
 
 void Renderer::AddDrawCommand(const Dali::DevelRenderer::DrawCommand& command)
@@ -799,12 +880,12 @@ void Renderer::AddDrawCommand(const Dali::DevelRenderer::DrawCommand& command)
 
 Renderer::Renderer(const SceneGraph::Renderer* sceneObject)
 : Object(sceneObject),
+  mMixColor(Color::WHITE),
   mDepthIndex(0),
   mIndexedDrawFirstElement(0),
   mIndexedDrawElementCount(0),
   mStencilParameters(RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP),
   mBlendingOptions(),
-  mOpacity(1.0f),
   mDepthFunction(DepthFunction::LESS),
   mFaceCullingMode(FaceCullingMode::NONE),
   mBlendMode(BlendMode::AUTO),
@@ -983,9 +1064,17 @@ bool Renderer::GetCachedPropertyValue(Property::Index index, Property::Value& va
       value = mStencilParameters.stencilOperationOnZPass;
       break;
     }
-    case Dali::DevelRenderer::Property::OPACITY:
+    case Dali::Renderer::Property::MIX_COLOR:
     {
-      value = mOpacity;
+      value = mMixColor;
+      break;
+    }
+    case Dali::Renderer::Property::MIX_COLOR_RED:
+    case Dali::Renderer::Property::MIX_COLOR_GREEN:
+    case Dali::Renderer::Property::MIX_COLOR_BLUE:
+    case Dali::Renderer::Property::OPACITY:
+    {
+      value = mMixColor[static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED)];
       break;
     }
     case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:
@@ -1170,9 +1259,17 @@ bool Renderer::GetCurrentPropertyValue(Property::Index index, Property::Value& v
       value                                                 = stencilParameters.stencilOperationOnZPass;
       break;
     }
-    case Dali::DevelRenderer::Property::OPACITY:
+    case Dali::Renderer::Property::MIX_COLOR:
     {
-      value = sceneObject.GetOpacity(GetEventThreadServices().GetEventBufferIndex());
+      value = sceneObject.GetMixColor(GetEventThreadServices().GetEventBufferIndex());
+      break;
+    }
+    case Dali::Renderer::Property::MIX_COLOR_RED:
+    case Dali::Renderer::Property::MIX_COLOR_GREEN:
+    case Dali::Renderer::Property::MIX_COLOR_BLUE:
+    case Dali::Renderer::Property::OPACITY:
+    {
+      value = sceneObject.GetMixColor(GetEventThreadServices().GetEventBufferIndex())[static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED)];
       break;
     }
     case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:

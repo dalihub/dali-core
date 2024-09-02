@@ -102,7 +102,6 @@ struct AnimatableVisualProperties
     mTransformAnchorPoint(Vector2::ZERO),
     mTransformOffsetSizeMode(Vector4::ZERO),
     mExtraSize(Vector2::ZERO),
-    mMixColor(Vector3::ONE),
     mPreMultipliedAlpha(0.0f),
     mExtendedProperties(nullptr)
   {
@@ -174,8 +173,7 @@ public: // Default properties
   PROPERTY_WRAPPER(mTransformOffsetSizeMode, VisualRendererProperty, Vector2, mExtraSize);
 
   // Properties that don't give any effort to coefficient.
-  AnimatableProperty<Vector3> mMixColor;
-  AnimatableProperty<float>   mPreMultipliedAlpha;
+  AnimatableProperty<float> mPreMultipliedAlpha;
 
 public: // Extended properties for decorated visual properties
   AnimatableDecoratedVisualProperties* mExtendedProperties{nullptr};

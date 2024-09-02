@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -253,18 +253,34 @@ inline void SetStencilOperationOnZPassMessage(EventThreadServices& eventThreadSe
   new(slot) LocalType(&renderer, &Renderer::SetStencilOperationOnZPass, stencilOperation);
 }
 
-inline void BakeOpacityMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, float opacity)
+inline void BakeMixColorMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, Vector4 mixColor)
 {
-  using LocalType = MessageDoubleBuffered1<Renderer, float>;
+  using LocalType = MessageDoubleBuffered1<Renderer, Vector4>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
-  new(slot) LocalType(&renderer, &Renderer::BakeOpacity, opacity);
+  new(slot) LocalType(&renderer, &Renderer::BakeMixColor, mixColor);
 
   OwnerPointer<SceneGraph::PropertyResetterBase> resetter(
     new SceneGraph::BakerResetter(const_cast<Renderer*>(&renderer),
-                                  const_cast<AnimatableProperty<float>*>(&renderer.mOpacity),
+                                  const_cast<AnimatableProperty<Vector4>*>(&renderer.mMixColor),
+                                  SceneGraph::BakerResetter::Lifetime::BAKE));
+  SceneGraph::AddResetterMessage(eventThreadServices.GetUpdateManager(), resetter);
+}
+
+inline void BakeMixColorComponentMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, float componentValue, uint8_t componentIndex)
+{
+  using LocalType = MessageDoubleBuffered2<Renderer, float, uint8_t>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  new(slot) LocalType(&renderer, &Renderer::BakeMixColorComponent, componentValue, componentIndex);
+
+  OwnerPointer<SceneGraph::PropertyResetterBase> resetter(
+    new SceneGraph::BakerResetter(const_cast<Renderer*>(&renderer),
+                                  const_cast<AnimatableProperty<Vector4>*>(&renderer.mMixColor),
                                   SceneGraph::BakerResetter::Lifetime::BAKE));
   SceneGraph::AddResetterMessage(eventThreadServices.GetUpdateManager(), resetter);
 }

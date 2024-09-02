@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,6 +204,11 @@ public: // Default property extensions from Object
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
   /**
+   * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
+   */
+  int32_t GetPropertyComponentIndex(Property::Index index) const override;
+
+  /**
    * @brief Adds a draw command to the Renderer.
    * DrawCommands override Renderer's default behaviour.
    *
@@ -266,6 +271,8 @@ protected:
   TextureSetPtr mTextureSet; ///< Intrusive pointer to the texture set used by this renderer
   ShaderPtr     mShader;     ///< Intrusive pointer to the shader used by this renderer
 
+  Vector4 mMixColor; ///< Local copy of the mix color
+
   int32_t mDepthIndex;
 
   uint32_t mIndexedDrawFirstElement; ///< Offset of first element to draw from bound index buffer
@@ -275,7 +282,6 @@ protected:
   Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;   ///< Local copy of blending options bitmask
 
-  float                          mOpacity;                      ///< Local copy of the opacity
   DepthFunction::Type            mDepthFunction : 4;            ///< Local copy of the depth function
   FaceCullingMode::Type          mFaceCullingMode : 3;          ///< Local copy of the mode of face culling
   BlendMode::Type                mBlendMode : 3;                ///< Local copy of the mode of blending

@@ -30,9 +30,9 @@
 #include <test-actor-utils.h>
 #include <test-native-image.h>
 
-#include <cfloat> // For FLT_MAX
-#include <string>
+#include <cfloat>     // For FLT_MAX
 #include <functional> // for std::function
+#include <string>
 
 #include "assert.h"
 
@@ -5428,7 +5428,7 @@ int UtcDaliActorPropertyScissorClippingActor02(void)
   DALI_TEST_CHECK(renderer);
 
   // Make Renderer opacity 0.
-  renderer[DevelRenderer::Property::OPACITY] = 0.0f;
+  renderer[Dali::Renderer::Property::OPACITY] = 0.0f;
 
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
@@ -12322,7 +12322,7 @@ int utcDaliActorPartialUpdateAnimation02(void)
   // Make an animation
   Renderer  renderer  = actor.GetRendererAt(0);
   Animation animation = Animation::New(1.0f);
-  animation.AnimateTo(Property(renderer, DevelRenderer::Property::OPACITY), 0.5f, TimePeriod(0.5f, 0.5f));
+  animation.AnimateTo(Property(renderer, Dali::Renderer::Property::OPACITY), 0.5f, TimePeriod(0.5f, 0.5f));
   animation.SetLoopCount(3);
   animation.Play();
 
@@ -12810,8 +12810,8 @@ int utcDaliActorPartialUpdateChangeTransparency(void)
 
   // Make the actor transparent by changing opacity of the Renderer
   // It changes a uniform value
-  Renderer renderer                          = actor.GetRendererAt(0);
-  renderer[DevelRenderer::Property::OPACITY] = 0.0f;
+  Renderer renderer                           = actor.GetRendererAt(0);
+  renderer[Dali::Renderer::Property::OPACITY] = 0.0f;
 
   application.SendNotification();
 
@@ -12830,7 +12830,7 @@ int utcDaliActorPartialUpdateChangeTransparency(void)
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   // Make the actor opaque again
-  renderer[DevelRenderer::Property::OPACITY] = 1.0f;
+  renderer[Dali::Renderer::Property::OPACITY] = 1.0f;
 
   application.SendNotification();
 
@@ -12849,7 +12849,7 @@ int utcDaliActorPartialUpdateChangeTransparency(void)
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   // Make the actor translucent
-  renderer[DevelRenderer::Property::OPACITY] = 0.5f;
+  renderer[Dali::Renderer::Property::OPACITY] = 0.5f;
 
   application.SendNotification();
 
@@ -12868,7 +12868,7 @@ int utcDaliActorPartialUpdateChangeTransparency(void)
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   // Change Renderer opacity - also translucent
-  renderer[DevelRenderer::Property::OPACITY] = 0.2f;
+  renderer[Dali::Renderer::Property::OPACITY] = 0.2f;
 
   application.SendNotification();
 
@@ -13278,7 +13278,7 @@ int utcDaliActorPartialUpdateOneActorMultipleRenderers(void)
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   // Make renderer2 dirty
-  renderer2[DevelRenderer::Property::OPACITY] = 0.5f;
+  renderer2[Dali::Renderer::Property::OPACITY] = 0.5f;
 
   application.SendNotification();
 
@@ -13381,7 +13381,7 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
   // Make renderer dirty
-  renderer[DevelRenderer::Property::OPACITY] = 0.5f;
+  renderer[Dali::Renderer::Property::OPACITY] = 0.5f;
 
   application.SendNotification();
 
@@ -15022,9 +15022,9 @@ int UtcDaliActorCalculateWorldTransform09(void)
 
   tet_infoline("Check the current position value if leaf actor doesn't inherit scale. (Real world usecase error)");
 
-  Actor rootActor = Actor::New();
+  Actor rootActor   = Actor::New();
   Actor middleActor = Actor::New();
-  Actor leafActor = Actor::New();
+  Actor leafActor   = Actor::New();
 
   Vector3 rootActorPosition = Vector3(0.0f, 50.0f, 100.0f);
 
@@ -15034,15 +15034,15 @@ int UtcDaliActorCalculateWorldTransform09(void)
   rootActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
   rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
 
-  Vector3 middleActorPosition = Vector3(100.0f, 0.0f, 0.0f);
-  Vector3 middleActorSize     = Vector3(200.0f, 400.0f, 0.0f);
+  Vector3 middleActorPosition                 = Vector3(100.0f, 0.0f, 0.0f);
+  Vector3 middleActorSize                     = Vector3(200.0f, 400.0f, 0.0f);
   middleActor[Actor::Property::POSITION]      = middleActorPosition;
   middleActor[Actor::Property::SCALE]         = Vector3::ONE;
   middleActor[Actor::Property::SIZE]          = middleActorSize;
   middleActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
   middleActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
 
-  Vector3 leafActorPosition = Vector3(0.0f, 100.0f, 0.0f);
+  Vector3 leafActorPosition                 = Vector3(0.0f, 100.0f, 0.0f);
   leafActor[Actor::Property::POSITION]      = leafActorPosition;
   leafActor[Actor::Property::SCALE]         = Vector3::ONE;
   leafActor[Actor::Property::SIZE]          = Vector2(200, 400);
@@ -15060,7 +15060,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  Matrix actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  Matrix  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   Vector3 worldPosition = Vector3(actualMatrix.GetTranslation());
 
   Vector3 actualWorldPosition = rootActorPosition + middleActorPosition - middleActorSize * 0.5 /*ParentOrigin::TOP_LEFT*/ + leafActorPosition;
@@ -15075,7 +15075,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
@@ -15083,14 +15083,14 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
 
   // Change rootActor's position.
   // Test at least 2 frames.
-  rootActorPosition = Vector3(-200.0f, -100.0f, 300.0f);
+  rootActorPosition                    = Vector3(-200.0f, -100.0f, 300.0f);
   rootActor[Actor::Property::POSITION] = rootActorPosition;
 
   // Actual world position changed
@@ -15099,7 +15099,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
@@ -15107,14 +15107,14 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
 
   // Change middleActor's size.
   // Test at least 2 frames.
-  middleActorSize = Vector3(400.0f, 300.0f, 0.0f);
+  middleActorSize                    = Vector3(400.0f, 300.0f, 0.0f);
   middleActor[Actor::Property::SIZE] = middleActorSize;
 
   // Actual world position changed
@@ -15123,7 +15123,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
@@ -15131,7 +15131,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
@@ -15143,7 +15143,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);
@@ -15151,7 +15151,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   application.SendNotification();
   application.Render(0);
 
-  actualMatrix = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
+  actualMatrix  = leafActor.GetCurrentProperty<Matrix>(Actor::Property::WORLD_MATRIX);
   worldPosition = Vector3(actualMatrix.GetTranslation());
 
   DALI_TEST_EQUALS(actualWorldPosition, worldPosition, 0.001f, TEST_LOCATION);

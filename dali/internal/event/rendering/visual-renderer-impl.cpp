@@ -44,8 +44,8 @@ DALI_PROPERTY("transformOrigin", VECTOR2, true, false, false, Dali::VisualRender
 DALI_PROPERTY("transformAnchorPoint", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT)
 DALI_PROPERTY("transformOffsetSizeMode", VECTOR4, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE)
 DALI_PROPERTY("extraSize", VECTOR2, true, true, true, Dali::VisualRenderer::Property::EXTRA_SIZE)
-DALI_PROPERTY("visualMixColor", VECTOR3, true, true, true, Dali::VisualRenderer::Property::VISUAL_MIX_COLOR)
-DALI_PROPERTY("preMultipliedAlpha", FLOAT, true, false, false, Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA)
+DALI_PROPERTY("visualMixColor", VECTOR3, true, false, true, Dali::VisualRenderer::Property::VISUAL_MIX_COLOR)
+DALI_PROPERTY("visualPreMultipliedAlpha", FLOAT, true, false, false, Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA)
 DALI_PROPERTY_TABLE_END(Dali::VisualRenderer::Property::DEFAULT_VISUAL_RENDERER_PROPERTY_START_INDEX, VisualRendererDefaultProperties)
 
 // Property string to enumeration tables:
@@ -193,32 +193,20 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
       }
       case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
       {
-        if(propertyValue.Get(mPropertyCache.mMixColor))
+        Vector3 mixColorVec3;
+        if(propertyValue.Get(mixColorVec3))
         {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-          if(visualProperties)
-          {
-            BakeMessage<Vector3>(GetEventThreadServices(), *mUpdateObject, visualProperties->mMixColor, mPropertyCache.mMixColor);
-          }
+          float opacity = Renderer::GetDefaultProperty(Dali::Renderer::Property::OPACITY).Get<float>();
+          Renderer::SetDefaultProperty(Dali::Renderer::Property::MIX_COLOR, Vector4(mixColorVec3.r, mixColorVec3.g, mixColorVec3.b, opacity));
         }
         break;
       }
       case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
       {
-        float preMultipliedAlpha;
+        float preMultipliedAlpha = 0.0f;
         if(propertyValue.Get(preMultipliedAlpha))
         {
-          if(!Equals(mPropertyCache.mPreMultipliedAlpha, preMultipliedAlpha))
-          {
-            const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-            auto                        visualProperties = sceneObject.GetVisualProperties();
-            if(visualProperties)
-            {
-              mPropertyCache.mPreMultipliedAlpha = preMultipliedAlpha;
-              BakeMessage<float>(GetEventThreadServices(), *mUpdateObject, visualProperties->mPreMultipliedAlpha, preMultipliedAlpha);
-            }
-          }
+          Renderer::SetDefaultProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, !Dali::EqualsZero(preMultipliedAlpha));
         }
         break;
       }
@@ -270,12 +258,15 @@ Property::Value VisualRenderer::GetDefaultProperty(Property::Index index) const
       }
       case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
       {
-        value = mPropertyCache.mMixColor;
+        Vector4 mixColor     = Renderer::GetDefaultProperty(Dali::Renderer::Property::MIX_COLOR).Get<Vector4>();
+        Vector3 mixColorVec3 = Vector3(mixColor.r, mixColor.g, mixColor.b);
+        value                = mixColorVec3;
         break;
       }
       case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
       {
-        value = mPropertyCache.mPreMultipliedAlpha;
+        bool blendPreMultipliedAlpha = Renderer::GetDefaultProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA).Get<bool>();
+        value                        = blendPreMultipliedAlpha ? 1.0f : 0.0f;
         break;
       }
       default:
@@ -358,20 +349,15 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
       }
       case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
-        {
-          value = visualProperties->mMixColor[GetEventThreadServices().GetEventBufferIndex()];
-        }
+        Vector4 mixColor     = Renderer::GetDefaultPropertyCurrentValue(Dali::Renderer::Property::MIX_COLOR).Get<Vector4>();
+        Vector3 mixColorVec3 = Vector3(mixColor.r, mixColor.g, mixColor.b);
+        value                = mixColorVec3;
         break;
       }
       case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
-        {
-          value = visualProperties->mPreMultipliedAlpha[GetEventThreadServices().GetEventBufferIndex()];
-        }
+        bool blendPreMultipliedAlpha = Renderer::GetDefaultPropertyCurrentValue(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA).Get<bool>();
+        value                        = blendPreMultipliedAlpha ? 1.0f : 0.0f;
         break;
       }
     }
@@ -409,11 +395,6 @@ void VisualRenderer::OnNotifyDefaultPropertyAnimation(Animation& animation, Prop
             value.Get(mPropertyCache.mExtraSize);
             break;
           }
-          case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
-          {
-            value.Get(mPropertyCache.mMixColor);
-            break;
-          }
         }
         break;
       }
@@ -435,11 +416,6 @@ void VisualRenderer::OnNotifyDefaultPropertyAnimation(Animation& animation, Prop
           case Dali::VisualRenderer::Property::EXTRA_SIZE:
           {
             AdjustValue<Vector2>(mPropertyCache.mExtraSize, value);
-            break;
-          }
-          case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
-          {
-            AdjustValue<Vector3>(mPropertyCache.mMixColor, value);
             break;
           }
         }
@@ -484,11 +460,8 @@ const SceneGraph::PropertyBase* VisualRenderer::GetSceneObjectAnimatableProperty
     }
     case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
-      {
-        property = &visualProperties->mMixColor;
-      }
+      // We should use Dali::Renderer::Property::MIX_COLOR, instead of it.
+      property = Renderer::GetSceneObjectAnimatableProperty(Dali::Renderer::Property::MIX_COLOR);
       break;
     }
   }
@@ -533,14 +506,10 @@ const PropertyInputImpl* VisualRenderer::GetSceneObjectInputProperty(Property::I
       }
       break;
     }
-    case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
+    case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
-      {
-        return &visualProperties->mPreMultipliedAlpha;
-      }
-      break;
+      // We should use Dali::Renderer::Property::MIX_COLOR, instead of it.
+      return Renderer::GetSceneObjectInputProperty(Dali::Renderer::Property::MIX_COLOR);
     }
     default:
     {
@@ -558,8 +527,6 @@ void VisualRenderer::AddUniformMappings()
   AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ORIGIN, ConstString("origin"));
   AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT, ConstString("anchorPoint"));
   AddUniformMapping(Dali::VisualRenderer::Property::EXTRA_SIZE, ConstString("extraSize"));
-  AddUniformMapping(Dali::VisualRenderer::Property::VISUAL_MIX_COLOR, ConstString("mixColor"));
-  AddUniformMapping(Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, ConstString("preMultipliedAlpha"));
 }
 
 } // namespace Internal

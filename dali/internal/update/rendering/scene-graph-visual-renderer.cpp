@@ -36,7 +36,6 @@ void AnimatableVisualProperties::RequestResetToBaseValues()
   mTransformAnchorPoint.RequestResetToBaseValue();
   mTransformOffsetSizeMode.RequestResetToBaseValue();
   mExtraSize.RequestResetToBaseValue();
-  mMixColor.RequestResetToBaseValue();
   mPreMultipliedAlpha.RequestResetToBaseValue();
   if(mExtendedProperties)
   {

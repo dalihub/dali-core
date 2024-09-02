@@ -120,7 +120,7 @@ Renderer::Renderer()
   mVisualPropertiesDirtyFlags(CLEAN_FLAG),
   mRegenerateUniformMap(false),
   mPremultipledAlphaEnabled(false),
-  mOpacity(1.0f),
+  mMixColor(Color::WHITE),
   mDepthIndex(0)
 {
 }
@@ -633,16 +633,50 @@ const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() cons
   return mStencilParameters;
 }
 
-void Renderer::BakeOpacity(BufferIndex updateBufferIndex, float opacity)
+void Renderer::BakeMixColor(BufferIndex updateBufferIndex, const Vector4& mixColor)
 {
-  mOpacity.Bake(updateBufferIndex, opacity);
+  mMixColor.Bake(updateBufferIndex, mixColor);
 
   SetUpdated(true);
 }
 
-float Renderer::GetOpacity(BufferIndex updateBufferIndex) const
+void Renderer::BakeMixColorComponent(BufferIndex updateBufferIndex, float componentValue, uint8_t componentIndex)
 {
-  return mOpacity[updateBufferIndex];
+  switch(componentIndex)
+  {
+    case 0:
+    {
+      mMixColor.BakeX(updateBufferIndex, componentValue);
+      break;
+    }
+    case 1:
+    {
+      mMixColor.BakeY(updateBufferIndex, componentValue);
+      break;
+    }
+    case 2:
+    {
+      mMixColor.BakeZ(updateBufferIndex, componentValue);
+      break;
+    }
+    case 3:
+    {
+      mMixColor.BakeW(updateBufferIndex, componentValue);
+      break;
+    }
+    default:
+    {
+      DALI_ASSERT_ALWAYS(0 && "Invalid mix color component comes!");
+      break;
+    }
+  }
+
+  SetUpdated(true);
+}
+
+Vector4 Renderer::GetMixColor(BufferIndex updateBufferIndex) const
+{
+  return mMixColor[updateBufferIndex];
 }
 
 void Renderer::SetRenderingBehavior(DevelRenderer::Rendering::Type renderingBehavior)
@@ -720,7 +754,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
     }
     case BlendMode::ON: // If the renderer should always be use blending
     {
-      float alpha = node.GetWorldColor(updateBufferIndex).a * mOpacity[updateBufferIndex];
+      float alpha = node.GetWorldColor(updateBufferIndex).a * mMixColor[updateBufferIndex].a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;
@@ -753,7 +787,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
       }
 
       // renderer should determine opacity using the actor color
-      float alpha = node.GetWorldColor(updateBufferIndex).a * mOpacity[updateBufferIndex];
+      float alpha = node.GetWorldColor(updateBufferIndex).a * mMixColor[updateBufferIndex].a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;
@@ -832,12 +866,12 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
 bool Renderer::IsDirty() const
 {
   // Check whether the opacity property has changed
-  return (Updated() || !mOpacity.IsClean());
+  return (Updated() || !mMixColor.IsClean());
 }
 
 void Renderer::RequestResetToBaseValues()
 {
-  mOpacity.RequestResetToBaseValue();
+  mMixColor.RequestResetToBaseValue();
   if(mVisualProperties)
   {
     mVisualProperties->RequestResetToBaseValues();
