@@ -31,6 +31,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/images/pixel-data-devel.cpp
   ${devel_api_src_dir}/object/handle-devel.cpp
   ${devel_api_src_dir}/object/csharp-type-registry.cpp
+  ${devel_api_src_dir}/object/base-object-observer.cpp
   ${devel_api_src_dir}/rendering/frame-buffer-devel.cpp
   ${devel_api_src_dir}/rendering/renderer-devel.cpp
   ${devel_api_src_dir}/rendering/texture-devel.cpp
@@ -104,6 +105,7 @@ SET( devel_api_core_images_header_files
 
 
 SET( devel_api_core_object_header_files
+  ${devel_api_src_dir}/object/base-object-observer.h
   ${devel_api_src_dir}/object/csharp-type-info.h
   ${devel_api_src_dir}/object/csharp-type-registry.h
   ${devel_api_src_dir}/object/handle-devel.h
