@@ -349,7 +349,7 @@ includedir=\${prefix}/include
 Name: glslang
 Description: OpenGL and OpenGL ES shader front end and validator
 Version: ${opt_vk_version}
-Libs: -L\${libdir} -lglslang -lOSDependent -lHLSL -lOGLCompiler -lSPVRemapper -lshaderc -lshaderc_combined
+Libs: -L\${libdir} -lglslang -lOSDependent -lSPVRemapper -lshaderc -lshaderc_combined
 Cflags: -I\${includedir}
 EOF
         close($fh);
