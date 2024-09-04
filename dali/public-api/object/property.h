@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,8 +123,9 @@ struct DALI_CORE_API Property
    * @brief Creates a Property instance.
    *
    * @SINCE_1_0.0
-   * @param[in] object A valid handle to the target object.
-   * @param[in] propertyIndex The index of a property.
+   * @DEPRECATED_2_4.42
+   * @param[in] object A valid handle to the target object
+   * @param[in] propertyIndex The index of a property
    * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
    */
   Property(Handle& object, Property::Index propertyIndex, int32_t componentIndex);
@@ -144,6 +145,7 @@ struct DALI_CORE_API Property
    * @brief Creates a Property instance.
    *
    * @SINCE_1_0.0
+   * @DEPRECATED_2_4.42
    * @param[in] object A valid handle to the target object
    * @param[in] propertyName The property name
    * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
@@ -162,7 +164,7 @@ struct DALI_CORE_API Property
 
   Index propertyIndex; ///< The index of a property provided by object.
 
-  int32_t componentIndex; ///< Index of a property sub component, for use with Vector2, Vector3 and Vector4, -1 if using main property
+  int32_t componentIndex; ///< @DEPRECATED_2_4.42 Index of a property sub component, for use with Vector2, Vector3 and Vector4, -1 if using main property
 };
 
 /**
