@@ -412,6 +412,8 @@ public:
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
+   * @param[in] renderTarget render target associated with instruction
+   * @param[in] queueIndex Index of the render queue
    *
    * @return True if commands have been added to the command buffer
    */
@@ -426,6 +428,7 @@ public:
               const Vector3&                                       size,
               bool                                                 blend,
               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+              Graphics::RenderTarget*                              renderTarget,
               uint32_t                                             queueIndex);
 
   /**
@@ -583,6 +586,7 @@ private:
   Graphics::Pipeline& PrepareGraphicsPipeline(
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+    Graphics::RenderTarget*                              renderTarget,
     const SceneGraph::NodeDataProvider&                  node,
     bool                                                 blend);
 

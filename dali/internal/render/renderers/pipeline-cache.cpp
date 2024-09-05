@@ -543,7 +543,8 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
       .SetVertexInputState(&level0->inputState)
       .SetRasterizationState(&level1->rs)
       .SetColorBlendState(&level2->colorBlendState)
-      .SetProgramState(&programState);
+      .SetProgramState(&programState)
+      .SetRenderTarget(queryInfo.renderTarget);
 
     // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
     // and re-drawn in multiple instructions).
