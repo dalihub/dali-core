@@ -1194,7 +1194,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       viewportRect,
       clippingRect,
       surfaceOrientation,
-      Uint16Pair(surfaceRect.width, surfaceRect.height));
+      Uint16Pair(surfaceRect.width, surfaceRect.height),
+      currentRenderTarget);
 
     Graphics::SyncObject* syncObject{nullptr};
     // If the render instruction has an associated render tracker (owned separately)

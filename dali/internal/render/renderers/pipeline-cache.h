@@ -102,6 +102,8 @@ struct PipelineCacheQueryInfo
   Program*  program;
   Geometry* geometry;
 
+  Graphics::RenderTarget* renderTarget;
+
   bool cameraUsingReflection;
 
   // Blending

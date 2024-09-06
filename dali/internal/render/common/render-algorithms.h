@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_ALGORITHMS_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ public:
    * @param[in] rootClippingRect       The clipping rectangle
    * @param[in] orientation            The Scene's surface orientation.
    * @param[in] sceneSize              The Scene's surface size.
+   * @param[in] renderTarget           The RenderTarget associated with instruction
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
                                 BufferIndex                          bufferIndex,
@@ -69,7 +70,8 @@ public:
                                 const Rect<int32_t>&                 viewport,
                                 const Rect<int>&                     rootClippingRect,
                                 int                                  orientation,
-                                const Uint16Pair&                    sceneSize);
+                                const Uint16Pair&                    sceneSize,
+                                Graphics::RenderTarget*              renderTarget);
 
   /**
    * Resets main command buffer (per scene)
@@ -95,15 +97,6 @@ public:
   }
 
 private:
-  /**
-   * @brief Calculate a 2D AABB (axis aligned bounding box) in screen space.
-   * The RenderItems dimensions are translated and a Z value of 0 is assumed for this purpose.
-   * No projection is performed, but rotation on Z is supported.
-   * @param[in] item The RenderItem to generate an AABB for
-   * @return         The generated AABB in screen space
-   */
-  inline Dali::ClippingBox CalculateScreenSpaceAABB(const Dali::Internal::SceneGraph::RenderItem& item);
-
   /**
    * @brief Perform any scissor clipping related operations based on the current RenderItem.
    * This includes:
@@ -155,6 +148,7 @@ private:
    * @param[in] rootClippingRect       The root clipping rectangle
    * @param[in] orientation            The Scene's surface orientation
    * @param[in] sceneSize              The Scene's surface size.
+   * @param[in] renderTarget           The render target associated with render instruction
    */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
                                 BufferIndex                                          bufferIndex,
@@ -166,7 +160,8 @@ private:
                                 const Rect<int32_t>&                                 viewport,
                                 const Rect<int>&                                     rootClippingRect,
                                 int                                                  orientation,
-                                const Uint16Pair&                                    sceneSize);
+                                const Uint16Pair&                                    sceneSize,
+                                Graphics::RenderTarget*                              renderTarget);
 
   // Member variables:
 
