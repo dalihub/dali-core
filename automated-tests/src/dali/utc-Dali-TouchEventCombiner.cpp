@@ -1034,3 +1034,67 @@ int UtcDaliTouchEventCombinerHoverDownAfterTouchUp(void)
 
   END_TEST;
 }
+
+
+int UtcDaliTouchEventCombinerMultipleMouseButton(void)
+{
+  TouchEventCombiner combiner;
+  unsigned long      time(0u);
+
+  // Primary down
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::DOWN, 100.0f, 100.0f);
+    point.SetMouseButton(MouseButton::PRIMARY);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent(point, time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(touchEvent.GetPointCount(), 1, TEST_LOCATION);
+  }
+
+  // secondary down
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::DOWN, 100.0f, 100.0f);
+    point.SetMouseButton(MouseButton::SECONDARY);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent(point, ++time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(touchEvent.GetPointCount(), 2, TEST_LOCATION);
+  }
+
+  // move
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::MOTION, 150.0f, 150.0f);
+    point.SetMouseButton(MouseButton::PRIMARY);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent(point, ++time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(touchEvent.GetPointCount(), 2, TEST_LOCATION);
+  }
+
+  // up event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::UP, 150.0f, 150.0f);
+    point.SetMouseButton(MouseButton::PRIMARY);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent(point, ++time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(touchEvent.GetPointCount(), 2, TEST_LOCATION);
+  }
+
+    // up event
+  {
+    Integration::TouchEvent touchEvent;
+    Integration::HoverEvent hoverEvent;
+    Integration::Point      point = GeneratePoint(1, PointState::UP, 150.0f, 150.0f);
+    point.SetMouseButton(MouseButton::SECONDARY);
+
+    DALI_TEST_EQUALS(Integration::TouchEventCombiner::DISPATCH_TOUCH, combiner.GetNextTouchEvent(point, ++time, touchEvent, hoverEvent), TEST_LOCATION);
+    DALI_TEST_EQUALS(touchEvent.GetPointCount(), 1, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
