@@ -39,6 +39,7 @@ class Shader;
 class Texture;
 class RenderTarget;
 class RenderPass;
+class Sampler;
 
 /**
  * @brief Structure describes 2D offset
@@ -1295,12 +1296,45 @@ inline CommandBufferUsageFlags operator|(T flags, CommandBufferUsageFlagBits bit
   return static_cast<CommandBufferUsageFlags>(flags) | static_cast<CommandBufferUsageFlags>(bit);
 }
 
+enum class ResourceType
+{
+  PROGRAM,
+  BUFFER,
+  SAMPLER,
+  TEXTURE
+};
+
+struct ProgramResourceBindingInfo
+{
+  Graphics::Program* program;
+  uint32_t           count;
+};
+
+struct BufferResourceBindingInfo;
+struct TextureResourceBindingInfo;
+struct SamplerResourceBindingInfo;
+
+struct CommandBufferResourceBinding
+{
+  ResourceType type; ///< Type of resource
+
+  union
+  {
+    ProgramResourceBindingInfo* programBinding{nullptr};
+    BufferResourceBindingInfo*  bufferBinding;
+    TextureResourceBindingInfo* textureBinding;
+    SamplerResourceBindingInfo* samplerBinding;
+  };
+};
+
 struct CommandBufferBeginInfo
 {
   CommandBufferUsageFlags usage;
-  const RenderPass*       renderPass{nullptr};
-  const RenderTarget*     renderTarget{nullptr};
-  auto&                   SetUsage(CommandBufferUsageFlags flags)
+
+  std::vector<CommandBufferResourceBinding>* resourceBindings{nullptr}; ///< Sets resource binding hints
+  const RenderPass*                          renderPass{nullptr};
+  const RenderTarget*                        renderTarget{nullptr};
+  auto&                                      SetUsage(CommandBufferUsageFlags flags)
   {
     usage = flags;
     return *this;

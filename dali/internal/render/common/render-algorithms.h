@@ -76,8 +76,10 @@ public:
 
   /**
    * Resets main command buffer (per scene)
+   *
+   * @param[in] bindings list of resource bindings (optional, can be null)
    */
-  void ResetCommandBuffer();
+  void ResetCommandBuffer(std::vector<Graphics::CommandBufferResourceBinding>* bindings);
 
   /**
    * Submits main command buffer (per scene)
