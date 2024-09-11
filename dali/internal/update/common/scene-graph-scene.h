@@ -76,7 +76,12 @@ struct DirtyRectKey
     std::size_t operator()(DirtyRectKey const& key) const noexcept
     {
       constexpr std::size_t nodeShift     = Dali::Log<1 + sizeof(Node)>::value;
+
+#if defined(__LP64__)
+      constexpr std::size_t rendererShift = 0;
+#else
       constexpr std::size_t rendererShift = Dali::Log<1 + sizeof(Render::Renderer)>::value;
+#endif
 
       constexpr std::size_t zitterShift = sizeof(std::size_t) * 4; // zitter shift to avoid hash collision
 

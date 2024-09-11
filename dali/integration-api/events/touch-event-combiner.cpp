@@ -35,6 +35,13 @@ namespace
 {
 const unsigned long DEFAULT_MINIMUM_MOTION_TIME(1u);
 const Vector2       DEFAULT_MINIMUM_MOTION_DISTANCE(1.0f, 1.0f);
+
+inline bool CheckEqualInputSource(const Point& lhs, const int deviceId, const MouseButton::Type mouseButton)
+{
+  return (lhs.GetDeviceId() == deviceId) &&        /// Check device id is equal and
+         ((mouseButton == MouseButton::INVALID) || /// ...Check whether input point is not from mouse
+          (mouseButton == lhs.GetMouseButton()));  /// ...or from same mouse button
+}
 } // unnamed namespace
 
 struct TouchEventCombiner::PointInfo
@@ -86,6 +93,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
   const PointState::Type                state    = point.GetState();
   const int                             deviceId = point.GetDeviceId();
   const Device::Class::Type             deviceType = point.GetDeviceClass();
+  const MouseButton::Type               mouseButton = point.GetMouseButton();
 
   switch(state)
   {
@@ -97,7 +105,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
       // Iterate through already stored touch points and add to TouchEvent
       for(PointInfoContainer::iterator iter = mPressedPoints.begin(), endIter = mPressedPoints.end(); iter != endIter; ++iter)
       {
-        if(iter->point.GetDeviceId() != deviceId)
+        if(!CheckEqualInputSource(iter->point, deviceId, mouseButton))
         {
           if(!isMultiTouchEvent)
           {
@@ -164,7 +172,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
       PointInfoContainer::iterator match(mPressedPoints.end());
       for(PointInfoContainer::iterator iter = mPressedPoints.begin(), endIter = mPressedPoints.end(); iter != endIter; ++iter)
       {
-        if(deviceId == iter->point.GetDeviceId())
+        if(CheckEqualInputSource(iter->point, deviceId, mouseButton))
         {
           match = iter;
 
@@ -259,6 +267,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(cons
         if(match != mPressedPoints.end())
         {
           PointInfo matchedPoint(point, time);
+          matchedPoint.point.SetMouseButton(match->point.GetMouseButton());
           std::swap(*match, matchedPoint);
 
           dispatchEvent = TouchEventCombiner::DISPATCH_TOUCH; // Dispatch touch event

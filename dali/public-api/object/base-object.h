@@ -2,7 +2,7 @@
 #define DALI_BASE_OBJECT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,13 @@ protected:
   ~BaseObject() override;
 
   /**
+   * @copydoc Dali::RefObject::OnDestroy()
+   *
+   * @note If Derived class override this function, derived class MUST call base class function.
+   */
+  void OnDestroy() override;
+
+  /**
    * @brief Registers the object as created with the Object registry.
    * @SINCE_1_0.0
    */
@@ -111,6 +118,7 @@ protected:
    */
   void UnregisterObject();
 
+private:
   // Not copyable or movable
 
   BaseObject(const BaseObject& rhs) = delete;            ///< Deleted copy constructor

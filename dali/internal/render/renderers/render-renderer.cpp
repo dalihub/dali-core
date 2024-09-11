@@ -492,6 +492,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Vector3&                                       size,
                       bool                                                 blend,
                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+                      Graphics::RenderTarget*                              renderTarget,
                       uint32_t                                             queueIndex)
 {
   // Before doing anything test if the call happens in the right queue
@@ -591,7 +592,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   if(program)
   {
     // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
-    auto& pipeline = PrepareGraphicsPipeline(*program, instruction, node, blend);
+    auto& pipeline = PrepareGraphicsPipeline(*program, instruction, renderTarget, node, blend);
 
     commandBuffer.BindPipeline(pipeline);
 
@@ -1062,6 +1063,7 @@ Vector4 Renderer::GetTextureUpdateArea() const noexcept
 Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,
+  Graphics::RenderTarget*                              renderTarget,
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
@@ -1074,6 +1076,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   queryInfo.blendingOptions       = &mBlendingOptions;
   queryInfo.alphaPremultiplied    = mPremultipliedAlphaEnabled;
   queryInfo.cameraUsingReflection = instruction.GetCamera()->GetReflectionUsed();
+  queryInfo.renderTarget          = renderTarget;
 
   queryInfo.GenerateHash();
 

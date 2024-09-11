@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public:
    */
   ~WorkerThread();
 
-  WorkerThread(const WorkerThread& other) = delete;
+  WorkerThread(const WorkerThread& other)            = delete;
   WorkerThread& operator=(const WorkerThread& other) = delete;
 
   /**
@@ -89,9 +89,8 @@ void WorkerThread::WaitAndExecute()
     {
       std::unique_lock<std::mutex> lock{mTaskQueueMutex};
 
-      mConditionVariable.wait(lock, [this]() -> bool {
-        return !mTaskQueue.empty() || mTerminating;
-      });
+      mConditionVariable.wait(lock, [this]() -> bool
+                              { return !mTaskQueue.empty() || mTerminating; });
 
       if(mTerminating)
       {
@@ -153,9 +152,8 @@ void WorkerThread::Notify()
 void WorkerThread::Wait()
 {
   std::unique_lock<std::mutex> lock{mTaskQueueMutex};
-  mConditionVariable.wait(lock, [this]() -> bool {
-    return mTaskQueue.empty();
-  });
+  mConditionVariable.wait(lock, [this]() -> bool
+                          { return mTaskQueue.empty(); });
 }
 
 // ThreadPool -----------------------------------------------------------------------------------------------
@@ -194,10 +192,10 @@ bool ThreadPool::Initialize(uint32_t threadCount)
   for(auto i = 0u; i < thread_count - 1; i++)
   {
     /**
-    * The workers will execute an infinite loop function
-    * and will wait for a job to enter the job queue. Once a job is in the the queue
-    * the threads will wake up to acquire and execute it.
-    */
+     * The workers will execute an infinite loop function
+     * and will wait for a job to enter the job queue. Once a job is in the the queue
+     * the threads will wake up to acquire and execute it.
+     */
     mImpl->mWorkers.push_back(make_unique<WorkerThread>(i));
   }
 
@@ -215,11 +213,11 @@ void ThreadPool::Wait()
 SharedFuture ThreadPool::SubmitTask(uint32_t workerIndex, const Task& task)
 {
   auto future = std::shared_ptr<Future<void>>(new Future<void>);
-  mImpl->mWorkers[workerIndex]->AddTask([task, future](uint32_t index) {
+  mImpl->mWorkers[workerIndex]->AddTask([task, future](uint32_t index)
+                                        {
     task(index);
 
-    future->mPromise.set_value();
-  });
+    future->mPromise.set_value(); });
 
   return future;
 }
@@ -229,7 +227,8 @@ SharedFuture ThreadPool::SubmitTasks(const std::vector<Task>& tasks)
   auto future = std::shared_ptr<Future<void>>(new Future<void>);
 
   mImpl->mWorkers[mImpl->mWorkerIndex++ % static_cast<uint32_t>(mImpl->mWorkers.size())]->AddTask(
-    [future, tasks](uint32_t index) {
+    [future, tasks](uint32_t index)
+    {
       for(auto& task : tasks)
       {
         task(index);
@@ -253,14 +252,15 @@ UniqueFutureGroup ThreadPool::SubmitTasks(const std::vector<Task>& tasks, uint32
 
   if(threadMask != 0)
   {
-    threads = threadMask;
+    threads = std::min(threadMask, threads);
   }
 
   if(threads > mImpl->mWorkers.size())
   {
     threads = uint32_t(mImpl->mWorkers.size());
   }
-  else if(!threads)
+
+  if(!threads)
   {
     threads = 1;
   }
@@ -276,7 +276,8 @@ UniqueFutureGroup ThreadPool::SubmitTasks(const std::vector<Task>& tasks, uint32
     auto future = std::shared_ptr<Future<void>>(new Future<void>);
     retval->mFutures.emplace_back(future);
     mImpl->mWorkers[mImpl->mWorkerIndex++ % static_cast<uint32_t>(mImpl->mWorkers.size())]->AddTask(
-      [future, tasks, taskIndex, taskSize](uint32_t index) {
+      [future, tasks, taskIndex, taskSize](uint32_t index)
+      {
         auto begin = tasks.begin() + int(taskIndex);
         auto end   = begin + int(taskSize);
         for(auto it = begin; it < end; ++it)
@@ -298,4 +299,4 @@ size_t ThreadPool::GetWorkerCount() const
   return mImpl->mWorkers.size();
 }
 
-} //namespace Dali
+} // namespace Dali

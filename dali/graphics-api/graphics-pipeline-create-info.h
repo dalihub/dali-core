@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_PIPELINE_CREATE_INFO_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ namespace Dali
 {
 namespace Graphics
 {
+class RenderTarget;
 /**
  * @brief Interface class for generating Pipeline types in the graphics API.
  *
@@ -190,6 +191,25 @@ struct PipelineCreateInfo
     return *this;
   }
 
+  /**
+   * @brief Sets render target that pipeline will be used with
+   *
+   * The pipeline must know which render target (this or compatible)
+   * it will be used with.
+   *
+   * It is valid not to set render target but only if device supports
+   * 'dynamic rendering'. Our current implementation doesn't support it
+   * but it may in the future.
+   *
+   * @param[in] value Pointer to valid RenderTarget objet
+   * @return reference to this structure
+   */
+  auto& SetRenderTarget(RenderTarget* value)
+  {
+    renderTarget = value;
+    return *this;
+  }
+
   GraphicsStructureType type{GraphicsStructureType::PIPELINE_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*  nextExtension{nullptr};
 
@@ -202,6 +222,8 @@ struct PipelineCreateInfo
   VertexInputState*        vertexInputState{nullptr};
   InputAssemblyState*      inputAssemblyState{nullptr};
   PipelineDynamicStateMask dynamicStateMask{0u};
+
+  RenderTarget* renderTarget{nullptr};
 
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };
