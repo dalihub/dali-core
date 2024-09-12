@@ -71,6 +71,7 @@ public:
                                 const Rect<int>&                     rootClippingRect,
                                 int                                  orientation,
                                 const Uint16Pair&                    sceneSize,
+                                Graphics::RenderPass*                renderPass,
                                 Graphics::RenderTarget*              renderTarget);
 
   /**
@@ -166,6 +167,7 @@ private:
                                 const Rect<int>&                                     rootClippingRect,
                                 int                                                  orientation,
                                 const Uint16Pair&                                    sceneSize,
+                                Graphics::RenderPass*                                renderPass,
                                 Graphics::RenderTarget*                              renderTarget);
 
   // Member variables:

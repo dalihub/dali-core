@@ -1243,6 +1243,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clippingRect,
       surfaceOrientation,
       Uint16Pair(surfaceRect.width, surfaceRect.height),
+      currentRenderPass,
       currentRenderTarget);
 
     Graphics::SyncObject* syncObject{nullptr};
@@ -1259,7 +1260,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   if(targetsToPresent.size() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) { oss << "[" << targetsToPresent.size() << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss)
+                                            { oss << "[" << targetsToPresent.size() << "]"; });
   }
 
   // Flush UBOs
