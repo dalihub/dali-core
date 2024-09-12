@@ -84,6 +84,11 @@ public:
   void SubmitCommandBuffer();
 
   /**
+   * @brief Destroy main command buffer (called only one time, at terminate case)
+   */
+  void DestroyCommandBuffer();
+
+  /**
    * Returns main command buffer
    *
    * 'Main' command buffer exists per each scene and it is used

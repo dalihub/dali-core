@@ -138,6 +138,11 @@ public:
   void Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable);
 
   /**
+   * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
+   */
+  void ContextDestroyed();
+
+  /**
    * Gets the render instructions for the scene
    * @return the render instructions
    */

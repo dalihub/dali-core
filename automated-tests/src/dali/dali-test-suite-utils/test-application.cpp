@@ -101,6 +101,10 @@ void TestApplication::InitializeCore()
 
 TestApplication::~TestApplication()
 {
+  if(DALI_LIKELY(mCore))
+  {
+    mCore->ContextDestroyed();
+  }
   Dali::Integration::Log::UninstallLogFunction();
   delete mCore;
 }

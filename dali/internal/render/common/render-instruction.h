@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,9 +57,10 @@ public:
    */
   ~RenderInstruction();
 
-  RenderInstruction(const RenderInstruction&) = delete;
-
-  RenderInstruction& operator=(const RenderInstruction& rhs) = delete;
+  /**
+   * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
+   */
+  void ContextDestroyed();
 
   /**
    * Get the next free Renderlist
@@ -134,14 +135,18 @@ public:
    */
   std::size_t GetCapacity();
 
+private:
+  RenderInstruction(const RenderInstruction&) = delete;
+  RenderInstruction& operator=(const RenderInstruction& rhs) = delete;
+
 public:                                  // Data
   Render::RenderTracker* mRenderTracker; ///< Pointer to an optional tracker object (not owned)
 
-  Viewport mViewport;                    ///< Optional viewport
-  Vector4  mClearColor;                  ///< Optional color to clear with
-  bool     mIsViewportSet : 1;           ///< Flag to determine whether the viewport is set
-  bool     mIsClearColorSet : 1;         ///< Flag to determine whether the clearColor is set
-  bool     mIgnoreRenderToFbo : 1;       ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
+  Viewport mViewport;              ///< Optional viewport
+  Vector4  mClearColor;            ///< Optional color to clear with
+  bool     mIsViewportSet : 1;     ///< Flag to determine whether the viewport is set
+  bool     mIsClearColorSet : 1;   ///< Flag to determine whether the clearColor is set
+  bool     mIgnoreRenderToFbo : 1; ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)
 
   Render::FrameBuffer* mFrameBuffer;
   uint32_t             mRenderPassTag{0u};

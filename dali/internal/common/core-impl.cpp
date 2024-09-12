@@ -185,6 +185,7 @@ void Core::ContextCreated()
 
 void Core::ContextDestroyed()
 {
+  mUpdateManager->ContextDestroyed();
   mRenderManager->ContextDestroyed();
 }
 

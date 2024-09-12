@@ -295,6 +295,34 @@ struct UpdateManager::Impl
     return *frameCallbackProcessor;
   }
 
+  /**
+   * @brief Remove all owned render context at scene.
+   *
+   * @note Should be called at ContextDestroyed case.
+   */
+  void ContextDestroyed()
+  {
+    // Disconnect render tasks from nodes, before destroying the nodes
+    for(auto&& scene : scenes)
+    {
+      if(scene)
+      {
+        if(scene->scene)
+        {
+          scene->scene->ContextDestroyed();
+        }
+        if(scene->taskList)
+        {
+          RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
+          for(auto&& task : tasks)
+          {
+            task->ContextDestroyed();
+          }
+        }
+      }
+    }
+  }
+
   SceneGraphBuffers              sceneGraphBuffers;       ///< Used to keep track of which buffers are being written or read
   RenderMessageDispatcher        renderMessageDispatcher; ///< Used for passing messages to the render-thread
   NotificationManager&           notificationManager;     ///< Queues notification messages for the event-thread.
@@ -414,6 +442,12 @@ UpdateManager::~UpdateManager()
   RenderItem::ResetMemoryPool();
   RenderTaskList::ResetMemoryPool();
   TextureSet::ResetMemoryPool();
+}
+
+void UpdateManager::ContextDestroyed()
+{
+  // Remove owned update context
+  mImpl->ContextDestroyed();
 }
 
 void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)

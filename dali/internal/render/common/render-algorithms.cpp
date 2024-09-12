@@ -751,6 +751,11 @@ void RenderAlgorithms::SubmitCommandBuffer()
   mGraphicsController.SubmitCommandBuffers(submitInfo);
 }
 
+void RenderAlgorithms::DestroyCommandBuffer()
+{
+  mGraphicsCommandBuffer.reset();
+}
+
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&            instruction,
                                                 BufferIndex                         bufferIndex,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,

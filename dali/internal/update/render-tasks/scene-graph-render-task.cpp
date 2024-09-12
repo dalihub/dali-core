@@ -57,7 +57,10 @@ RenderTask::~RenderTask()
   }
   if(mRenderSyncTracker)
   {
-    mRenderMessageDispatcher->RemoveRenderTracker(*mRenderSyncTracker);
+    if(DALI_LIKELY(mRenderMessageDispatcher))
+    {
+      mRenderMessageDispatcher->RemoveRenderTracker(*mRenderSyncTracker);
+    }
   }
 }
 
@@ -389,6 +392,8 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
     // create tracker if one doesn't yet exist.
     if(!mRenderSyncTracker)
     {
+      DALI_ASSERT_ALWAYS(mRenderMessageDispatcher && "We don't allow to call PrepareRenderInstruction after Graphics context destroyed!");
+
       mRenderSyncTracker = new Render::RenderTracker();
       mRenderMessageDispatcher->AddRenderTracker(*mRenderSyncTracker);
     }
@@ -466,6 +471,18 @@ void RenderTask::SetSyncRequired(bool requiresSync)
 void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
 {
   mRenderPassTag = renderPassTag;
+}
+
+void RenderTask::ContextDestroyed()
+{
+  // Note : We don't need to call RemoveRenderTracker in this case.
+  // (Since RenderManager::ContextDestroyed will delete it.)
+  mRenderSyncTracker = nullptr;
+
+  mRenderMessageDispatcher = nullptr;
+
+  mRenderInstruction[0].ContextDestroyed();
+  mRenderInstruction[1].ContextDestroyed();
 }
 
 void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)
