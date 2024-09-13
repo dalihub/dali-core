@@ -2,7 +2,7 @@
 #define DALI_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,15 +133,17 @@ public:
 
       /**
        * @brief Mix color is a generic color for any visual.
-       * @details Name "visualMixColor", type Property::VECTOR3, animatable
+       * @details Name "visualMixColor", type Property::VECTOR3
        * @SINCE_2_1.13
+       * @DEPRECATED_2_3.41 Use Renderer::Property::MIX_COLOR instead.
        */
       VISUAL_MIX_COLOR,
 
       /**
        * @brief PremultipliedAlpha is a float representing a bool, and is either 0.0f, or 1.0f
-       * @details Name "preMultipliedAlpha", type Property::FLOAT
+       * @details Name "visualPreMultipliedAlpha", type Property::FLOAT
        * @SINCE_2_1.13
+       * @DEPRECATED_2_3.41 Not be added as uniform anymore. Use Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA instead.
        */
       VISUAL_PRE_MULTIPLIED_ALPHA,
     };

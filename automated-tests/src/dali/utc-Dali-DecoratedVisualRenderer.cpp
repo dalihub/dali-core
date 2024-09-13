@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -202,9 +202,9 @@ int UtcDaliDecoratedVisualRendererDefaultProperties(void)
   VisualRenderer          baseVisualRenderer = VisualRenderer::New(geometry, shader);
   Renderer                baseRenderer       = Renderer::New(geometry, shader);
 
-  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 28, TEST_LOCATION);
-  DALI_TEST_EQUALS(baseVisualRenderer.GetPropertyCount(), 28 + 8, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 28 + 8 + 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 32, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseVisualRenderer.GetPropertyCount(), 32 + 8, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32 + 8 + 6, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "cornerRadius", Property::VECTOR4, true, true, true, DecoratedVisualRenderer::Property::CORNER_RADIUS, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "cornerRadiusPolicy", Property::FLOAT, true, false, true, DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, TEST_LOCATION);
@@ -331,6 +331,8 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   END_TEST;
 }
 
+namespace
+{
 struct DecoratedVisualProperties
 {
   DecoratedVisualProperties() = default;
@@ -375,13 +377,13 @@ struct DecoratedVisualProperties
     progress.mTransformOffset  = start.mTransformOffset + (end.mTransformOffset - start.mTransformOffset) * alpha;
     progress.mTransformSize    = start.mTransformSize + (end.mTransformSize - start.mTransformSize) * alpha;
     progress.mExtraSize        = start.mExtraSize + (end.mExtraSize - start.mExtraSize) * alpha;
-    progress.mMixColor         = start.mMixColor + (end.mMixColor - start.mMixColor) * alpha;
     progress.mCornerRadius     = start.mCornerRadius + (end.mCornerRadius - start.mCornerRadius) * alpha;
     progress.mBorderlineWidth  = start.mBorderlineWidth + (end.mBorderlineWidth - start.mBorderlineWidth) * alpha;
     progress.mBorderlineColor  = start.mBorderlineColor + (end.mBorderlineColor - start.mBorderlineColor) * alpha;
     progress.mBorderlineOffset = start.mBorderlineOffset + (end.mBorderlineOffset - start.mBorderlineOffset) * alpha;
     progress.mBlurRadius       = start.mBlurRadius + (end.mBlurRadius - start.mBlurRadius) * alpha;
 
+    progress.mMixColor                = end.mMixColor; ///< mMixColor is not animatable anymore.
     progress.mTransformOffsetSizeMode = end.mTransformOffsetSizeMode;
     progress.mTransformOrigin         = end.mTransformOrigin;
     progress.mTransformAnchorPoint    = end.mTransformAnchorPoint;
@@ -539,6 +541,7 @@ void CheckSceneGraphDecoratedVisualProperties(DecoratedVisualRenderer renderer, 
   actualProps.mTransformOffsetSizeMode = renderer.GetCurrentProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   actualProps.mExtraSize               = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   actualProps.mMixColor                = renderer.GetCurrentProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
+  actualProps.mPreMultipliedAlpha      = renderer.GetCurrentProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA);
 
   actualProps.mCornerRadius       = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
   actualProps.mCornerRadiusPolicy = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY);
@@ -571,51 +574,59 @@ void CheckUniforms(DecoratedVisualRenderer renderer, DecoratedVisualProperties p
   tet_infoline("CheckUniforms\n");
 
   TraceCallStack::NamedParams params;
+  uint32_t                    uniformIndex = 0;
 
   tet_printf("Callback trace: \n%s\n", callStack.GetTraceString().c_str());
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[0].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[0].name.c_str(), props.mTransformOffset));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformOffset));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[1].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[1].name.c_str(), props.mTransformSize));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformSize));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[2].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[2].name.c_str(), props.mTransformOrigin));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformOrigin));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[3].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[3].name.c_str(), props.mTransformAnchorPoint));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformAnchorPoint));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[4].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[4].name.c_str(), props.mTransformOffsetSizeMode));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[uniformIndex].name.c_str(), props.mTransformOffsetSizeMode));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[5].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[5].name.c_str(), props.mExtraSize));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mExtraSize));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[6].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>(uniforms[6].name.c_str(), props.mMixColor));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[uniformIndex].name.c_str(), props.mCornerRadius));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[7].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[7].name.c_str(), props.mPreMultipliedAlpha));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[uniformIndex].name.c_str(), props.mCornerRadiusPolicy));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[8].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[8].name.c_str(), props.mCornerRadius));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[uniformIndex].name.c_str(), props.mBorderlineWidth));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[9].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[9].name.c_str(), props.mCornerRadiusPolicy));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[uniformIndex].name.c_str(), props.mBorderlineColor));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[10].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[10].name.c_str(), props.mBorderlineWidth));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[uniformIndex].name.c_str(), props.mBorderlineOffset));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[11].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[11].name.c_str(), props.mBorderlineColor));
-
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[12].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[12].name.c_str(), props.mBorderlineOffset));
-
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[13].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[13].name.c_str(), props.mBlurRadius));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[uniformIndex].name.c_str(), props.mBlurRadius));
+  ++uniformIndex;
 }
+} // namespace
 
 int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
 {
@@ -632,8 +643,6 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
                                           {"anchorPoint", Property::VECTOR2},
                                           {"offsetSizeMode", Property::VECTOR4},
                                           {"extraSize", Property::VECTOR2},
-                                          {"mixColor", Property::VECTOR3},
-                                          {"preMultipliedAlpha", Property::FLOAT},
                                           {"cornerRadius", Property::VECTOR4},
                                           {"cornerRadiusPolicy", Property::FLOAT},
                                           {"borderlineWidth", Property::FLOAT},
@@ -673,7 +682,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
   animation.AnimateTo(Property(renderer, VisualRenderer::Property::TRANSFORM_OFFSET), targetProps.mTransformOffset);
   animation.AnimateTo(Property(renderer, VisualRenderer::Property::TRANSFORM_SIZE), targetProps.mTransformSize);
   animation.AnimateTo(Property(renderer, VisualRenderer::Property::EXTRA_SIZE), targetProps.mExtraSize);
-  animation.AnimateTo(Property(renderer, VisualRenderer::Property::VISUAL_MIX_COLOR), targetProps.mMixColor);
+  renderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, targetProps.mMixColor); ///< visual mix color is not animatable.
 
   animation.AnimateTo(Property(renderer, DecoratedVisualRenderer::Property::CORNER_RADIUS), targetProps.mCornerRadius);
   animation.AnimateTo(Property(renderer, DecoratedVisualRenderer::Property::BORDERLINE_WIDTH), targetProps.mBorderlineWidth);

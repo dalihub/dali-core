@@ -2,7 +2,7 @@
 #define DALI_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,11 +62,11 @@ namespace BlendMode
  */
 enum Type
 {
-  OFF,               ///< Blending is disabled.                                                    @SINCE_1_1.43
-  AUTO,              ///< Blending is enabled if there is alpha channel. This is the default mode. @SINCE_1_1.43
-  ON,                ///< Blending is enabled.                                                     @SINCE_1_1.43
-  ON_WITHOUT_CULL,   ///< Blending is enabled, and don't cull the renderer                         @SINCE_2_0.43
-  USE_ACTOR_OPACITY  ///< Blending is enabled when the actor is not opaque                         @SINCE_2_2.7
+  OFF,              ///< Blending is disabled.                                                    @SINCE_1_1.43
+  AUTO,             ///< Blending is enabled if there is alpha channel. This is the default mode. @SINCE_1_1.43
+  ON,               ///< Blending is enabled.                                                     @SINCE_1_1.43
+  ON_WITHOUT_CULL,  ///< Blending is enabled, and don't cull the renderer                         @SINCE_2_0.43
+  USE_ACTOR_OPACITY ///< Blending is enabled when the actor is not opaque                         @SINCE_2_2.7
 };
 
 } // namespace BlendMode
@@ -415,6 +415,42 @@ public:
        * @note The default value is StencilOperation::KEEP.
        */
       STENCIL_OPERATION_ON_Z_PASS,
+
+      /**
+       * @brief The mix color of the renderer, include opacity.
+       * The final color of this renderer will be multiplied by this value.
+       * @SINCE_2_3.41
+       * @details name "rendererMixColor", type VECTOR4
+       */
+      MIX_COLOR,
+
+      /**
+       * @brief The red component of mix color of the renderer.
+       * @SINCE_2_3.41
+       * @details name "rendererMixColorRed", type FLOAT
+       */
+      MIX_COLOR_RED,
+
+      /**
+       * @brief The green component of mix color of the renderer.
+       * @SINCE_2_3.41
+       * @details name "rendererMixColorGreen", type FLOAT
+       */
+      MIX_COLOR_GREEN,
+
+      /**
+       * @brief The blue component of mix color of the renderer.
+       * @SINCE_2_3.41
+       * @details name "rendererMixColorBlue", type FLOAT
+       */
+      MIX_COLOR_BLUE,
+
+      /**
+       * @brief The opacity of the renderer. It is alpha component of the mix color property.
+       * @SINCE_2_3.41
+       * @details Name "rendererOpacity", type FLOAT.
+       */
+      OPACITY,
     };
   };
 

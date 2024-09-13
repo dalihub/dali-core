@@ -261,39 +261,44 @@ int UtcDaliRendererDefaultProperties(void)
 {
   TestApplication application;
   /* from renderer-impl.cpp
-  DALI_PROPERTY( "depthIndex",                      INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_INDEX )
-  DALI_PROPERTY( "faceCullingMode",                 INTEGER,   true, false,  false, Dali::Renderer::Property::FACE_CULLING_MODE )
-  DALI_PROPERTY( "blendMode",                       INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_MODE )
-  DALI_PROPERTY( "blendEquationRgb",                INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_EQUATION_RGB )
-  DALI_PROPERTY( "blendEquationAlpha",              INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_EQUATION_ALPHA )
-  DALI_PROPERTY( "blendFactorSrcRgb",               INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB )
-  DALI_PROPERTY( "blendFactorDestRgb",              INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB )
-  DALI_PROPERTY( "blendFactorSrcAlpha",             INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA )
-  DALI_PROPERTY( "blendFactorDestAlpha",            INTEGER,   true, false,  false, Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA )
-  DALI_PROPERTY( "blendColor",                      VECTOR4,   true, false,  false, Dali::Renderer::Property::BLEND_COLOR )
-  DALI_PROPERTY( "blendPreMultipliedAlpha",         BOOLEAN,   true, false,  false, Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA )
-  DALI_PROPERTY( "indexRangeFirst",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_FIRST )
-  DALI_PROPERTY( "indexRangeCount",                 INTEGER,   true, false,  false, Dali::Renderer::Property::INDEX_RANGE_COUNT )
-  DALI_PROPERTY( "depthWriteMode",                  INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_WRITE_MODE )
-  DALI_PROPERTY( "depthFunction",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_FUNCTION )
-  DALI_PROPERTY( "depthTestMode",                   INTEGER,   true, false,  false, Dali::Renderer::Property::DEPTH_TEST_MODE )
-  DALI_PROPERTY( "renderMode",                      INTEGER,   true, false,  false, Dali::Renderer::Property::RENDER_MODE )
-  DALI_PROPERTY( "stencilFunction",                 INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION )
-  DALI_PROPERTY( "stencilFunctionMask",             INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_MASK )
-  DALI_PROPERTY( "stencilFunctionReference",        INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE )
-  DALI_PROPERTY( "stencilMask",                     INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_MASK )
-  DALI_PROPERTY( "stencilOperationOnFail",          INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL )
-  DALI_PROPERTY( "stencilOperationOnZFail",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL )
-  DALI_PROPERTY( "stencilOperationOnZPass",         INTEGER,   true, false,  false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS )
-  DALI_PROPERTY( "opacity",                         FLOAT,     true, true,   true,  Dali::DevelRenderer::Property::OPACITY )
-  DALI_PROPERTY( "renderingBehavior",               INTEGER,   true, false,  false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR )
-  DALI_PROPERTY( "blendEquation",                   INTEGER,   true, false,  false, Dali::DevelRenderer::Property::BLEND_EQUATION )
+  DALI_PROPERTY("depthIndex", INTEGER, true, false, false, Dali::Renderer::Property::DEPTH_INDEX)
+  DALI_PROPERTY("faceCullingMode", INTEGER, true, false, false, Dali::Renderer::Property::FACE_CULLING_MODE)
+  DALI_PROPERTY("blendMode", INTEGER, true, false, false, Dali::Renderer::Property::BLEND_MODE)
+  DALI_PROPERTY("blendEquationRgb", INTEGER, true, false, false, Dali::Renderer::Property::BLEND_EQUATION_RGB)
+  DALI_PROPERTY("blendEquationAlpha", INTEGER, true, false, false, Dali::Renderer::Property::BLEND_EQUATION_ALPHA)
+  DALI_PROPERTY("blendFactorSrcRgb", INTEGER, true, false, false, Dali::Renderer::Property::BLEND_FACTOR_SRC_RGB)
+  DALI_PROPERTY("blendFactorDestRgb", INTEGER, true, false, false, Dali::Renderer::Property::BLEND_FACTOR_DEST_RGB)
+  DALI_PROPERTY("blendFactorSrcAlpha", INTEGER, true, false, false, Dali::Renderer::Property::BLEND_FACTOR_SRC_ALPHA)
+  DALI_PROPERTY("blendFactorDestAlpha", INTEGER, true, false, false, Dali::Renderer::Property::BLEND_FACTOR_DEST_ALPHA)
+  DALI_PROPERTY("blendColor", VECTOR4, true, false, false, Dali::Renderer::Property::BLEND_COLOR)
+  DALI_PROPERTY("blendPreMultipliedAlpha", BOOLEAN, true, false, false, Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA)
+  DALI_PROPERTY("indexRangeFirst", INTEGER, true, false, false, Dali::Renderer::Property::INDEX_RANGE_FIRST)
+  DALI_PROPERTY("indexRangeCount", INTEGER, true, false, false, Dali::Renderer::Property::INDEX_RANGE_COUNT)
+  DALI_PROPERTY("depthWriteMode", INTEGER, true, false, false, Dali::Renderer::Property::DEPTH_WRITE_MODE)
+  DALI_PROPERTY("depthFunction", INTEGER, true, false, false, Dali::Renderer::Property::DEPTH_FUNCTION)
+  DALI_PROPERTY("depthTestMode", INTEGER, true, false, false, Dali::Renderer::Property::DEPTH_TEST_MODE)
+  DALI_PROPERTY("renderMode", INTEGER, true, false, false, Dali::Renderer::Property::RENDER_MODE)
+  DALI_PROPERTY("stencilFunction", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_FUNCTION)
+  DALI_PROPERTY("stencilFunctionMask", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_FUNCTION_MASK)
+  DALI_PROPERTY("stencilFunctionReference", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_FUNCTION_REFERENCE)
+  DALI_PROPERTY("stencilMask", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_MASK)
+  DALI_PROPERTY("stencilOperationOnFail", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_OPERATION_ON_FAIL)
+  DALI_PROPERTY("stencilOperationOnZFail", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL)
+  DALI_PROPERTY("stencilOperationOnZPass", INTEGER, true, false, false, Dali::Renderer::Property::STENCIL_OPERATION_ON_Z_PASS)
+  DALI_PROPERTY("rendererMixColor", VECTOR4, true, true, true, Dali::Renderer::Property::MIX_COLOR)
+  DALI_PROPERTY("rendererMixColorRed", FLOAT, true, true, true, Dali::Renderer::Property::MIX_COLOR_RED)
+  DALI_PROPERTY("rendererMixColorGreen", FLOAT, true, true, true, Dali::Renderer::Property::MIX_COLOR_GREEN)
+  DALI_PROPERTY("rendererMixColorBlue", FLOAT, true, true, true, Dali::Renderer::Property::MIX_COLOR_BLUE)
+  DALI_PROPERTY("rendererOpacity", FLOAT, true, true, true, Dali::Renderer::Property::OPACITY)
+  DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
+  DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
+  DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
 */
 
   Geometry geometry = CreateQuadGeometry();
   Shader   shader   = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 28, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "depthIndex", Property::INTEGER, true, false, false, Renderer::Property::DEPTH_INDEX, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "faceCullingMode", Property::INTEGER, true, false, false, Renderer::Property::FACE_CULLING_MODE, TEST_LOCATION);
@@ -319,10 +324,14 @@ int UtcDaliRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "stencilOperationOnFail", Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_FAIL, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "stencilOperationOnZFail", Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "stencilOperationOnZPass", Property::INTEGER, true, false, false, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, TEST_LOCATION);
-  TEST_RENDERER_PROPERTY(renderer, "opacity", Property::FLOAT, true, true, true, DevelRenderer::Property::OPACITY, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "rendererMixColor", Property::VECTOR4, true, true, true, Renderer::Property::MIX_COLOR, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "rendererMixColorRed", Property::FLOAT, true, true, true, Renderer::Property::MIX_COLOR_RED, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "rendererMixColorGreen", Property::FLOAT, true, true, true, Renderer::Property::MIX_COLOR_GREEN, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "rendererMixColorBlue", Property::FLOAT, true, true, true, Renderer::Property::MIX_COLOR_BLUE, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "rendererOpacity", Property::FLOAT, true, true, true, Renderer::Property::OPACITY, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "renderingBehavior", Property::INTEGER, true, false, false, DevelRenderer::Property::RENDERING_BEHAVIOR, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "blendEquation", Property::INTEGER, true, false, false, DevelRenderer::Property::BLEND_EQUATION, TEST_LOCATION);
-  TEST_RENDERER_PROPERTY(renderer, "instanceCount", Property::INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "instanceCount", Property::INTEGER, true, false, false, DevelRenderer::Property::INSTANCE_COUNT, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3394,7 +3403,7 @@ int UtcDaliRendererOpacity(void)
   actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
-  Property::Value value = renderer.GetProperty(DevelRenderer::Property::OPACITY);
+  Property::Value value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
   float           opacity;
   DALI_TEST_CHECK(value.Get(opacity));
   DALI_TEST_EQUALS(opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
@@ -3410,16 +3419,16 @@ int UtcDaliRendererOpacity(void)
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
   DALI_TEST_EQUALS(actualActorColor.a, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
-  renderer.SetProperty(DevelRenderer::Property::OPACITY, 0.5f);
+  renderer.SetProperty(Dali::Renderer::Property::OPACITY, 0.5f);
 
   application.SendNotification();
   application.Render();
 
-  value = renderer.GetProperty(DevelRenderer::Property::OPACITY);
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
   DALI_TEST_CHECK(value.Get(opacity));
   DALI_TEST_EQUALS(opacity, 0.5f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
-  value = renderer.GetCurrentProperty(DevelRenderer::Property::OPACITY);
+  value = renderer.GetCurrentProperty(Dali::Renderer::Property::OPACITY);
   DALI_TEST_CHECK(value.Get(opacity));
   DALI_TEST_EQUALS(opacity, 0.5f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
@@ -3452,36 +3461,341 @@ int UtcDaliRendererOpacityAnimation(void)
   application.SendNotification();
   application.Render(0);
 
-  Property::Value value = renderer.GetProperty(DevelRenderer::Property::OPACITY);
+  Property::Value value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
   float           opacity;
   DALI_TEST_CHECK(value.Get(opacity));
   DALI_TEST_EQUALS(opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
   Animation animation = Animation::New(1.0f);
-  animation.AnimateTo(Property(renderer, DevelRenderer::Property::OPACITY), 0.0f);
+  animation.AnimateTo(Property(renderer, Dali::Renderer::Property::OPACITY), 0.0f);
   animation.Play();
 
   application.SendNotification();
   application.Render(1000);
 
-  value = renderer.GetProperty(DevelRenderer::Property::OPACITY);
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
   DALI_TEST_CHECK(value.Get(opacity));
   DALI_TEST_EQUALS(opacity, 0.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
   // Need to clear the animation before setting the property as the animation value is baked and will override any previous setters
   animation.Clear();
-  renderer.SetProperty(DevelRenderer::Property::OPACITY, 0.1f);
+  renderer.SetProperty(Dali::Renderer::Property::OPACITY, 0.1f);
 
-  animation.AnimateBy(Property(renderer, DevelRenderer::Property::OPACITY), 0.5f);
+  animation.AnimateBy(Property(renderer, Dali::Renderer::Property::OPACITY), 0.5f);
   animation.Play();
 
   application.SendNotification();
   application.Render(1000);
 
-  value = renderer.GetProperty(DevelRenderer::Property::OPACITY);
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
   DALI_TEST_CHECK(value.Get(opacity));
   DALI_TEST_EQUALS(opacity, 0.6f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
-  DALI_TEST_EQUALS(opacity, renderer.GetCurrentProperty(DevelRenderer::Property::OPACITY).Get<float>(), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, renderer.GetCurrentProperty(Dali::Renderer::Property::OPACITY).Get<float>(), Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererMixColor(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test MIX_COLOR property");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Vector4 actorColor(0.8f, 0.5f, 0.7f, 1.0f);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  actor.SetProperty(Actor::Property::COLOR, actorColor);
+  application.GetScene().Add(actor);
+
+  Property::Value value;
+  Vector4         mixColor;
+  float           mixColorRed;
+  float           mixColorGreen;
+  float           mixColorBlue;
+  float           opacity;
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, Vector4::ONE, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  Vector4            actualValue;
+  Vector4            actualActorColor;
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualValue));
+  DALI_TEST_EQUALS(actualValue, Vector4::ONE * actorColor, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
+  DALI_TEST_EQUALS(actualActorColor, Vector4::ONE * actorColor, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  Vector4 targetValue(0.2, 0.3f, 0.4f, 0.5f);
+  renderer.SetProperty(Dali::Renderer::Property::MIX_COLOR, targetValue);
+
+  application.SendNotification();
+  application.Render();
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, targetValue, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, targetValue.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, targetValue.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, targetValue.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, targetValue.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uColor", actualValue));
+  DALI_TEST_EQUALS(actualValue, targetValue * actorColor, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualValue.r, targetValue.r * actorColor.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualValue.g, targetValue.g * actorColor.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualValue.b, targetValue.b * actorColor.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualValue.a, targetValue.a * actorColor.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  // Note : Renderer opacity doesn't apply to uActorColor.
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uActorColor", actualActorColor));
+  DALI_TEST_EQUALS(actualActorColor, Vector4::ONE * actorColor, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererMixColorAnimation01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test MIX_COLOR property animation");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Vector4 actorColor(0.8f, 0.5f, 0.7f, 1.0f);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  actor.SetProperty(Actor::Property::COLOR, actorColor);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+
+  Property::Value value;
+  Vector4         mixColor;
+  float           mixColorRed;
+  float           mixColorGreen;
+  float           mixColorBlue;
+  float           opacity;
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, Vector4::ONE, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  Vector4   targetValue(0.2, 0.3f, 0.4f, 0.5f);
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(renderer, Dali::Renderer::Property::MIX_COLOR), targetValue);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(1000);
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, targetValue, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, targetValue.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, targetValue.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, targetValue.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, targetValue.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  // Need to clear the animation before setting the property as the animation value is baked and will override any previous setters
+  animation.Clear();
+  Vector4 originValue(0.1f, 0.1f, 0.1f, 0.1f);
+  renderer.SetProperty(Dali::Renderer::Property::MIX_COLOR, originValue);
+
+  animation.AnimateBy(Property(renderer, Dali::Renderer::Property::MIX_COLOR), targetValue - originValue);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(1000);
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, targetValue, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, targetValue.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, targetValue.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, targetValue.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, targetValue.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR).Get<Vector4>(), targetValue, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR_RED).Get<float>(), targetValue.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR_GREEN).Get<float>(), targetValue.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR_BLUE).Get<float>(), targetValue.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::OPACITY).Get<float>(), targetValue.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererMixColorAnimation02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test MIX_COLOR_RED, MIX_COLOR_GREEN, MIX_COLOR_BLUE, OPACITY property animation");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Vector4 actorColor(0.8f, 0.5f, 0.7f, 1.0f);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  actor.SetProperty(Actor::Property::COLOR, actorColor);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+
+  Property::Value value;
+  Vector4         mixColor;
+  float           mixColorRed;
+  float           mixColorGreen;
+  float           mixColorBlue;
+  float           opacity;
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, Vector4::ONE, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, 1.0f, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  Vector4   targetValue(0.2, 0.3f, 0.4f, 0.5f);
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(renderer, Dali::Renderer::Property::MIX_COLOR_RED), targetValue.r);
+  animation.AnimateTo(Property(renderer, Dali::Renderer::Property::MIX_COLOR_GREEN), targetValue.g);
+  animation.AnimateTo(Property(renderer, Dali::Renderer::Property::MIX_COLOR_BLUE), targetValue.b);
+  animation.AnimateTo(Property(renderer, Dali::Renderer::Property::OPACITY), targetValue.a);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(1000);
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, targetValue, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, targetValue.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, targetValue.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, targetValue.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, targetValue.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  // Need to clear the animation before setting the property as the animation value is baked and will override any previous setters
+  animation.Clear();
+  Vector4 originValue(0.1f, 0.1f, 0.1f, 0.1f);
+  renderer.SetProperty(Dali::Renderer::Property::MIX_COLOR_RED, originValue.r);
+  renderer.SetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN, originValue.g);
+  renderer.SetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE, originValue.b);
+  renderer.SetProperty(Dali::Renderer::Property::OPACITY, originValue.a);
+
+  animation.AnimateBy(Property(renderer, Dali::Renderer::Property::MIX_COLOR_RED), targetValue.r - originValue.r);
+  animation.AnimateBy(Property(renderer, Dali::Renderer::Property::MIX_COLOR_GREEN), targetValue.g - originValue.g);
+  animation.AnimateBy(Property(renderer, Dali::Renderer::Property::MIX_COLOR_BLUE), targetValue.b - originValue.b);
+  animation.AnimateBy(Property(renderer, Dali::Renderer::Property::OPACITY), targetValue.a - originValue.a);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(1000);
+
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR);
+  DALI_TEST_CHECK(value.Get(mixColor));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_RED);
+  DALI_TEST_CHECK(value.Get(mixColorRed));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_GREEN);
+  DALI_TEST_CHECK(value.Get(mixColorGreen));
+  value = renderer.GetProperty(Dali::Renderer::Property::MIX_COLOR_BLUE);
+  DALI_TEST_CHECK(value.Get(mixColorBlue));
+  value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
+  DALI_TEST_CHECK(value.Get(opacity));
+  DALI_TEST_EQUALS(mixColor, targetValue, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorRed, targetValue.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorGreen, targetValue.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(mixColorBlue, targetValue.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(opacity, targetValue.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR).Get<Vector4>(), targetValue, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR_RED).Get<float>(), targetValue.r, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR_GREEN).Get<float>(), targetValue.g, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::MIX_COLOR_BLUE).Get<float>(), targetValue.b, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty(Dali::Renderer::Property::OPACITY).Get<float>(), targetValue.a, Dali::Math::MACHINE_EPSILON_1, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3581,7 +3895,7 @@ int UtcDaliRendererRenderingBehavior(void)
   {
     // Render again and check the update status
     Animation animation = Animation::New(1.0f);
-    animation.AnimateTo(Property(renderer, DevelRenderer::Property::OPACITY), 0.0f, TimePeriod(0.5f, 0.5f));
+    animation.AnimateTo(Property(renderer, Dali::Renderer::Property::OPACITY), 0.0f, TimePeriod(0.5f, 0.5f));
     animation.Play();
 
     drawTrace.Reset();
@@ -4359,7 +4673,7 @@ int utcDaliRendererPartialUpdateAddRemoveRenderer(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // 3. Change a property value of the Renderer
-  renderer.SetProperty(DevelRenderer::Property::OPACITY, 0.5f);
+  renderer.SetProperty(Dali::Renderer::Property::MIX_COLOR, Vector4(0.5f, 0.5f, 0.5f, 0.5f));
   application.SendNotification();
 
   damagedRects.clear();
