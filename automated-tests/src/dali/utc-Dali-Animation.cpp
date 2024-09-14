@@ -24,8 +24,11 @@
 #include <mesh-builder.h>
 #include <stdlib.h>
 
+#include <dali/public-api/common/vector-wrapper.h>
+
 #include <algorithm>
 #include <iostream>
+#include <utility>
 
 using std::max;
 using namespace Dali;
@@ -14564,14 +14567,14 @@ int UtcDaliAnimationAnimateByInvalidParameters(void)
       // not mathing properties (VECTOR3, FLOAT)
       animation.AnimateBy(Property(actor, Actor::Property::POSITION), Property::Value(10.f));
     },
-    "Property and target types don't match");
+    "Target types could not be convert to Property type");
 
   DALI_TEST_ASSERTION(
     {
       // not mathing properties (VECTOR3.A, VECTOR2)
       animation.AnimateBy(Property(actor, Actor::Property::COLOR_ALPHA), Property::Value(Property::VECTOR2));
     },
-    "Property and target types don't match");
+    "Target types could not be convert to Property type");
 
   DALI_TEST_ASSERTION(
     {
@@ -14625,17 +14628,10 @@ int UtcDaliAnimationAnimateToInvalidParameters(void)
 
   DALI_TEST_ASSERTION(
     {
-      // not mathing properties (FLOAT, INT)
-      animation.AnimateTo(Property(actor, Actor::Property::SCALE_Y), Property::Value(10));
-    },
-    "Property and target types don't match");
-
-  DALI_TEST_ASSERTION(
-    {
       // not mathing properties (VECTOR3, VECTOR2)
       animation.AnimateTo(Property(actor, Actor::Property::COLOR), Property::Value(Property::VECTOR2));
     },
-    "Property and target types don't match");
+    "Target types could not be convert to Property type");
 
   DALI_TEST_ASSERTION(
     {
@@ -14702,7 +14698,7 @@ int UtcDaliAnimationAnimateBetweenInvalidParameters(void)
       keyframes.Add(0.5f, Property::Value(Vector4(1, 2, 3, 4)));
       animation.AnimateBetween(Property(actor, Actor::Property::MAXIMUM_SIZE), keyframes);
     },
-    "Property and target types don't match");
+    "Target types could not be convert to Property type");
 
   DALI_TEST_ASSERTION(
     {
@@ -14712,6 +14708,130 @@ int UtcDaliAnimationAnimateBetweenInvalidParameters(void)
       animation.AnimateBetween(Property(actor, Actor::Property::POSITION), keyframes, TimePeriod(-1));
     },
     "Duration must be >=0");
+
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateConvertPropertyValueParameters(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Create the animation
+  Animation animation = Animation::New(1.0f);
+
+  Property::Index indexBoolean = actor.RegisterProperty("animationBoolean", Property::Value(false), Property::ANIMATABLE);
+  Property::Index indexFloat   = actor.RegisterProperty("animationFloat", Property::Value(0.0f), Property::ANIMATABLE);
+  Property::Index indexInteger = actor.RegisterProperty("animationInteger", Property::Value(0), Property::ANIMATABLE);
+
+  // clang-format off
+  const std::vector<std::pair<Property::Index, Property::Value>> indexValueList =
+  {
+    {indexBoolean, actor.GetProperty(indexBoolean)},
+    {indexFloat, actor.GetProperty(indexFloat)},
+    {indexInteger, actor.GetProperty(indexInteger)},
+  };
+
+  // Piar of relative value - {except value as relative value per each type of properties}
+  const std::vector<std::pair<Property::Value, std::vector<Property::Value>>> testExceptValueList =
+  {
+    {
+      Property::Value(true),
+      {
+        Property::Value(true), Property::Value(1.0f), Property::Value(1),
+      }
+    },
+    {
+      Property::Value(2.0f),
+      {
+        Property::Value(true), Property::Value(2.0f), Property::Value(2),
+      }
+    },
+    {
+      Property::Value(3),
+      {
+        Property::Value(true), Property::Value(3.0f), Property::Value(3),
+      }
+    },
+  };
+  // clang-format on
+
+  // Let we test both AnimateBy and AnimateTo and AnimateBetween as one UTC.
+  for(auto animateType = 0; animateType < 3; ++animateType)
+  {
+    tet_printf("Animation type test : %s\n", std::vector<std::string>({"AnimateBy", "AnimateTo", "AnimateBetween"})[animateType].c_str());
+    for(const auto& valueExceptPair : testExceptValueList)
+    {
+      {
+        std::ostringstream oss;
+        oss << valueExceptPair.first;
+        tet_printf("Animate required value : %s\n", oss.str().c_str());
+      }
+      for(const auto& indexValuePair : indexValueList)
+      {
+        if(animateType == 0u)
+        {
+          animation.AnimateBy(Property(actor, indexValuePair.first), valueExceptPair.first);
+        }
+        else if(animateType == 1u)
+        {
+          animation.AnimateTo(Property(actor, indexValuePair.first), valueExceptPair.first);
+        }
+        else if(animateType == 2u)
+        {
+          Dali::KeyFrames keyFrames = Dali::KeyFrames::New();
+
+          // Convert original value type as excepted type.
+          auto originalValue = indexValuePair.second;
+          originalValue.ConvertType(valueExceptPair.first.GetType());
+
+          keyFrames.Add(0.0f, originalValue);
+          keyFrames.Add(1.0f, valueExceptPair.first);
+          animation.AnimateBetween(Property(actor, indexValuePair.first), keyFrames);
+        }
+      }
+      animation.Play();
+
+      const auto& exceptValueList = valueExceptPair.second;
+
+      // Test except value list size is same as index value list size. (All property should have except value)
+      DALI_TEST_EQUALS(exceptValueList.size(), indexValueList.size(), TEST_LOCATION);
+
+      // Check cached event thread values are expect.
+      for(auto i = 0u; i < indexValueList.size(); ++i)
+      {
+        DALI_TEST_EQUALS(actor.GetProperty(indexValueList[i].first), exceptValueList[i], TEST_LOCATION);
+      }
+
+      // Check current vaules are not animated yet.
+      for(auto i = 0u; i < indexValueList.size(); ++i)
+      {
+        DALI_TEST_EQUALS(actor.GetCurrentProperty(indexValueList[i].first), indexValueList[i].second, TEST_LOCATION);
+      }
+
+      application.SendNotification();
+      application.Render(500);
+      application.SendNotification();
+      application.Render(500 + 10); ///< Note, we don't allow 1 frame animation finished. To fair test, render 2 frames.
+
+      // Check current vaules are except.
+      for(auto i = 0u; i < indexValueList.size(); ++i)
+      {
+        DALI_TEST_EQUALS(actor.GetCurrentProperty(indexValueList[i].first), exceptValueList[i], TEST_LOCATION);
+      }
+
+      animation.Clear();
+      // Reset to base value, for fair test.
+      for(const auto& indexValuePair : indexValueList)
+      {
+        actor.SetProperty(indexValuePair.first, indexValuePair.second);
+      }
+      application.SendNotification();
+      application.Render();
+    }
+  }
 
   END_TEST;
 }
