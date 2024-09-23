@@ -2,7 +2,7 @@
 #define DALI_IMAGE_OPERATIONS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,9 +92,9 @@ const Type DEFAULT = SHRINK_TO_FIT;
 namespace SamplingMode
 {
 /**
-   * @brief Enumeration for SamplingMode type.
-   * @SINCE_1_0.0
-   */
+ * @brief Enumeration for SamplingMode type.
+ * @SINCE_1_0.0
+ */
 enum Type
 {
   BOX,              ///< Iteratively box filter to generate an image of 1/2, 1/4,
@@ -119,9 +119,15 @@ enum Type
                     ///  is enabled, the borders of the image may be trimmed to
                     ///  match the aspect ratio of the desired dimensions.
                     ///  @SINCE_1_0.0
-  DONT_CARE         ///< For caching algorithms where a client strongly prefers a
+  DONT_CARE,        ///< For caching algorithms where a client strongly prefers a
                     ///  cache-hit to reuse a cached image.
                     ///  @SINCE_1_0.0
+  LANCZOS,          ///< Use filter with Lanczos resample algorithm.
+                    ///  @SINCE_2_3.43
+  BOX_THEN_LANCZOS, ///< Iteratively box filter to generate an image of 1/2, 1/4,
+                    ///  1/8 etc width and height and approximately the desired
+                    ///  size, then apply Lanczos resample algorithm.
+                    ///  @SINCE_2_3.43
 };
 const Type DEFAULT = BOX;
 } // namespace SamplingMode
