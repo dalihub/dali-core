@@ -175,18 +175,12 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
       mUpdated = true;
 
       mObserverNotifying = true;
-      for(auto iter = mLifecycleObservers.begin(); iter != mLifecycleObservers.end();)
+      for(auto&& iter : mLifecycleObservers)
       {
-        auto returnValue = (*iter).first->GeometryBufferChanged(this);
-        if(returnValue == LifecycleObserver::KEEP_OBSERVING)
-        {
-          ++iter;
-        }
-        else
-        {
-          iter = mLifecycleObservers.erase(iter);
-        }
+        auto* observer = iter.first;
+        observer->GeometryBufferChanged(this);
       }
+      mLifecycleObservers.clear();
       mObserverNotifying = false;
     }
   }

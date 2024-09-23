@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,6 +61,7 @@ namespace Render
 // Store internal PipelineCache as singleton
 
 PipelineCache::PipelineCache(Dali::Graphics::Controller& controller)
+: mPipelineUseRenderTarget(controller.HasClipMatrix()) ///< TODO : Need to implement more clever way to determine whether render target is used or not.
 {
   gPipelineCache = this;
   InvokeNext(this, &controller);
@@ -82,7 +83,7 @@ int UtcDaliCorePipelineCacheTest(void)
   DALI_TEST_EQUALS(gPipelineCache != 0, true, TEST_LOCATION);
 
   // Test size of level0 nodes (should be 0, nothing added yet)
-  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 0), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 0, TEST_LOCATION);
 
   // Create something to render
   Geometry   geometry   = CreateQuadGeometry();
@@ -104,7 +105,7 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // 1 pipeline should be added
-  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
 
   // Add another actor, new pipeline will be created
   Shader   shader1   = Shader::New("newVertexSrc", "newFragmentSrc");
@@ -118,7 +119,7 @@ int UtcDaliCorePipelineCacheTest(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 2, TEST_LOCATION);
 
   // Now add 3rd actor reusing first pipeline
   {
@@ -133,7 +134,7 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // Number of pipelines shouldn't change
-  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 2, TEST_LOCATION);
 
   // Test final 'noBlend' path on first pipeline
   {
@@ -148,14 +149,47 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // Test whether noBlend pipeline is set in cache
-  DALI_TEST_EQUALS((gPipelineCache->level0nodes.size() == 2), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 2, TEST_LOCATION);
   DALI_TEST_CHECK(!gPipelineCache->level0nodes.front().level1nodes.front().noBlends.empty());
   DALI_TEST_EQUALS(gPipelineCache->level0nodes.front().level1nodes.front().noBlends.front().pipeline != nullptr, true, TEST_LOCATION);
+
+  // Test another actor with seperated scene.
+
+  // Create a new Scene with render target
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(newScene);
+  application.AddScene(newScene);
+  {
+    Actor    actor4    = Actor::New();
+    Renderer renderer4 = Renderer::New(geometry, shader);
+    actor4.AddRenderer(renderer4);
+    actor4.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+    newScene.Add(actor4);
+  }
+  application.SendNotification();
+  application.Render();
+
+  // Test whether new render target pipeline is set in cache
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 3, TEST_LOCATION);
 
   // Remove renderer to test whether old pipeline is removed
   application.GetScene().Remove(actor1);
   actor1.RemoveRenderer(renderer1);
   renderer1.Reset();
+
+  // Make the frame count of the pipeline cache large to clean cache
+  gPipelineCache->mFrameCount = 1000;
+
+  application.SendNotification();
+  application.Render();
+
+  // Test whether both newScene and actor exist.
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 2, TEST_LOCATION);
+
+  // Remove scene
+  application.RemoveScene(newScene);
+  newScene.Discard();
+  newScene.Reset();
 
   // Make the frame count of the pipeline cache large to clean cache
   gPipelineCache->mFrameCount = 1000;

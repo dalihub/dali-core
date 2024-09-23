@@ -196,11 +196,10 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
 }
 } // namespace
 
-PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::Geometry* geometry)
+PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::Geometry* geometry, SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects)
 {
-  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry](PipelineCacheL0& item) {
-    return ((item.program == program && item.geometry == geometry));
-  });
+  auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry, renderTargetGraphicsObjects](PipelineCacheL0& item)
+                         { return ((item.program == program && item.geometry == geometry && item.renderTargetGraphicsObjects == renderTargetGraphicsObjects)); });
 
   // Add new node to cache
   if(it == level0nodes.end())
@@ -251,13 +250,18 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
       ++bindingIndex;
     }
     PipelineCacheL0 level0;
-    level0.program    = program;
-    level0.geometry   = geometry;
-    level0.inputState = vertexInputState;
+    level0.program                     = program;
+    level0.geometry                    = geometry;
+    level0.renderTargetGraphicsObjects = renderTargetGraphicsObjects;
+    level0.inputState                  = vertexInputState;
 
-    // Observer program and geometry lifecycle
+    // Observer program and geometry (and render target holder if required) lifecycle
     program->AddLifecycleObserver(*this);
     geometry->AddLifecycleObserver(*this);
+    if(renderTargetGraphicsObjects)
+    {
+      renderTargetGraphicsObjects->AddLifecycleObserver(*this);
+    }
 
     it = level0nodes.insert(level0nodes.end(), std::move(level0));
 
@@ -319,7 +323,8 @@ PipelineCacheL1Ptr PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* rendere
   hash = (topo & 0xffu) | ((cull << 8u) & 0xff00u) | ((uint32_t(poly) << 16u) & 0xff0000u);
 
   // If L1 not found by hash, create rasterization state describing pipeline and store it
-  auto it = std::find_if(level1nodes.begin(), level1nodes.end(), [hash](PipelineCacheL1& item) { return item.hashCode == hash; });
+  auto it = std::find_if(level1nodes.begin(), level1nodes.end(), [hash](PipelineCacheL1& item)
+                         { return item.hashCode == hash; });
 
   if(it == level1nodes.end())
   {
@@ -375,7 +380,8 @@ PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, 
   auto bitmask = uint32_t(blendingOptions.GetBitmask());
 
   // Find by bitmask (L2 entries must be sorted by bitmask)
-  auto it = std::find_if(level2nodes.begin(), level2nodes.end(), [bitmask](PipelineCacheL2& item) { return item.hash == bitmask; });
+  auto it = std::find_if(level2nodes.begin(), level2nodes.end(), [bitmask](PipelineCacheL2& item)
+                         { return item.hash == bitmask; });
 
   // TODO: find better way of blend constants lookup
   PipelineCacheL2Ptr retval = level2nodes.end();
@@ -432,7 +438,8 @@ PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, 
 
     l2.hash = blendingOptions.GetBitmask();
 
-    auto upperBound = std::upper_bound(level2nodes.begin(), level2nodes.end(), l2, [](const PipelineCacheL2& lhs, const PipelineCacheL2& rhs) { return lhs.hash < rhs.hash; });
+    auto upperBound = std::upper_bound(level2nodes.begin(), level2nodes.end(), l2, [](const PipelineCacheL2& lhs, const PipelineCacheL2& rhs)
+                                       { return lhs.hash < rhs.hash; });
 
     level2nodes.insert(upperBound, std::move(l2));
 
@@ -468,6 +475,7 @@ bool PipelineCacheL1::ClearUnusedCache()
 void PipelineCacheQueryInfo::GenerateHash()
 {
   // Lightweight hash value generation.
+  // DevNote : We should not hash renderTargetGraphicsObjects, Since some PipelineCache class might not use render target.
   hash = (reinterpret_cast<std::size_t>(program) >> Dali::Log<sizeof(decltype(*program))>::value) ^
          (reinterpret_cast<std::size_t>(geometry) >> Dali::Log<sizeof(decltype(*geometry))>::value) ^
          ((blendingEnabled ? 1u : 0u) << 0u) ^
@@ -478,12 +486,13 @@ void PipelineCacheQueryInfo::GenerateHash()
          (blendingEnabled ? static_cast<std::size_t>(blendingOptions->GetBitmask()) : 0xDA11u);
 }
 
-bool PipelineCacheQueryInfo::Equal(const PipelineCacheQueryInfo& lhs, const PipelineCacheQueryInfo& rhs) noexcept
+bool PipelineCacheQueryInfo::Equal(const PipelineCacheQueryInfo& lhs, const PipelineCacheQueryInfo& rhs, const bool compareRenderTarget) noexcept
 {
   // Naive equal check.
   const bool ret = (lhs.hash == rhs.hash) && // Check hash value first
                    (lhs.program == rhs.program) &&
                    (lhs.geometry == rhs.geometry) &&
+                   (!compareRenderTarget || lhs.renderTargetGraphicsObjects == rhs.renderTargetGraphicsObjects) &&
                    (lhs.blendingEnabled == rhs.blendingEnabled) &&
                    (lhs.alphaPremultiplied == rhs.alphaPremultiplied) &&
                    (lhs.geometry->GetTopology() == rhs.geometry->GetTopology()) &&
@@ -500,7 +509,8 @@ bool PipelineCacheQueryInfo::Equal(const PipelineCacheQueryInfo& lhs, const Pipe
 }
 
 PipelineCache::PipelineCache(Graphics::Controller& controller)
-: graphicsController(&controller)
+: graphicsController(&controller),
+  mPipelineUseRenderTarget(controller.HasClipMatrix()) ///< TODO : Need to implement more clever way to determine whether render target is used or not.
 {
   // Clean up cache first
   CleanLatestUsedCache();
@@ -513,6 +523,8 @@ PipelineCache::~PipelineCache()
   {
     level0node.program->RemoveLifecycleObserver(*this);
     level0node.geometry->RemoveLifecycleObserver(*this);
+    level0node.renderTargetGraphicsObjects->RemoveLifecycleObserver(*this);
+    level0node.NotifyPipelineCacheDestroyed(PipelineCacheL0::LifecycleObserver::NotificationType::NONE);
   }
   level0nodes.clear();
 }
@@ -529,7 +541,7 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
     return mLatestResult[latestUsedCacheIndex];
   }
 
-  auto level0 = GetPipelineCacheL0(queryInfo.program, queryInfo.geometry);
+  auto level0 = GetPipelineCacheL0(queryInfo.program, queryInfo.geometry, mPipelineUseRenderTarget ? queryInfo.renderTargetGraphicsObjects : nullptr);
   auto level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
 
   PipelineCachePtr level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
@@ -547,7 +559,7 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
       .SetRasterizationState(&level1->rs)
       .SetColorBlendState(&level2->colorBlendState)
       .SetProgramState(&programState)
-      .SetRenderTarget(queryInfo.renderTarget);
+      .SetRenderTarget(level0->renderTargetGraphicsObjects ? level0->renderTargetGraphicsObjects->GetGraphicsRenderTarget() : nullptr);
 
     // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
     // and re-drawn in multiple instructions).
@@ -557,6 +569,7 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
   PipelineResult result{};
 
   result.pipeline = level2->pipeline.get();
+  result.level0   = level0;
   result.level2   = level2;
 
   level2->referenceCount++;
@@ -570,18 +583,23 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
 
 bool PipelineCache::ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const
 {
-  return mLatestResult[latestUsedCacheIndex].pipeline != nullptr && PipelineCacheQueryInfo::Equal(queryInfo, mLatestQuery[latestUsedCacheIndex]);
+  return mLatestResult[latestUsedCacheIndex].pipeline != nullptr && PipelineCacheQueryInfo::Equal(queryInfo, mLatestQuery[latestUsedCacheIndex], mPipelineUseRenderTarget);
 }
 
 void PipelineCache::PreRender()
 {
-  CleanLatestUsedCache();
-
   // We don't need to check this every frame
   if(++mFrameCount >= CACHE_CLEAN_FRAME_COUNT)
   {
+    CleanLatestUsedCache();
+
     mFrameCount = 0u;
     ClearUnusedCache();
+  }
+  else
+  {
+    // Clear only blending case
+    mLatestResult[0].pipeline = nullptr;
   }
 }
 
@@ -596,6 +614,11 @@ void PipelineCache::ClearUnusedCache()
       // Stop observer lifecycle
       iter->program->RemoveLifecycleObserver(*this);
       iter->geometry->RemoveLifecycleObserver(*this);
+      if(mPipelineUseRenderTarget && iter->renderTargetGraphicsObjects)
+      {
+        iter->renderTargetGraphicsObjects->RemoveLifecycleObserver(*this);
+      }
+      iter->NotifyPipelineCacheDestroyed(PipelineCacheL0::LifecycleObserver::NotificationType::NONE);
       iter = level0nodes.erase(iter);
     }
     else
@@ -622,6 +645,11 @@ void PipelineCache::ProgramDestroyed(const Program* program)
     if(iter->program == program)
     {
       iter->geometry->RemoveLifecycleObserver(*this);
+      if(mPipelineUseRenderTarget && iter->renderTargetGraphicsObjects)
+      {
+        iter->renderTargetGraphicsObjects->RemoveLifecycleObserver(*this);
+      }
+      iter->NotifyPipelineCacheDestroyed(PipelineCacheL0::LifecycleObserver::NotificationType::PROGRAM_DESTROYED);
       iter = level0nodes.erase(iter);
     }
     else
@@ -631,12 +659,29 @@ void PipelineCache::ProgramDestroyed(const Program* program)
   }
 }
 
-Geometry::LifecycleObserver::NotifyReturnType PipelineCache::GeometryBufferChanged(const Geometry* geometry)
+void PipelineCache::GeometryBufferChanged(const Geometry* geometry)
 {
-  // Let just run the same logic with geometry destroyed cases.
-  GeometryDestroyed(geometry);
+  // Remove latest used pipeline cache infomation.
+  CleanLatestUsedCache();
 
-  return Geometry::LifecycleObserver::NotifyReturnType::STOP_OBSERVING;
+  // Remove cached items what cache hold now.
+  for(auto iter = level0nodes.begin(); iter != level0nodes.end();)
+  {
+    if(iter->geometry == geometry)
+    {
+      iter->program->RemoveLifecycleObserver(*this);
+      if(mPipelineUseRenderTarget && iter->renderTargetGraphicsObjects)
+      {
+        iter->renderTargetGraphicsObjects->RemoveLifecycleObserver(*this);
+      }
+      iter->NotifyPipelineCacheDestroyed(PipelineCacheL0::LifecycleObserver::NotificationType::GEOMETRY_BUFFER_CHANGED);
+      iter = level0nodes.erase(iter);
+    }
+    else
+    {
+      iter++;
+    }
+  }
 }
 
 void PipelineCache::GeometryDestroyed(const Geometry* geometry)
@@ -650,11 +695,41 @@ void PipelineCache::GeometryDestroyed(const Geometry* geometry)
     if(iter->geometry == geometry)
     {
       iter->program->RemoveLifecycleObserver(*this);
+      if(mPipelineUseRenderTarget && iter->renderTargetGraphicsObjects)
+      {
+        iter->renderTargetGraphicsObjects->RemoveLifecycleObserver(*this);
+      }
+      iter->NotifyPipelineCacheDestroyed(PipelineCacheL0::LifecycleObserver::NotificationType::GEOMETRY_DESTROYED);
       iter = level0nodes.erase(iter);
     }
     else
     {
       iter++;
+    }
+  }
+}
+
+void PipelineCache::RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects)
+{
+  if(DALI_LIKELY(mPipelineUseRenderTarget))
+  {
+    // Remove latest used pipeline cache infomation.
+    CleanLatestUsedCache();
+
+    // Remove cached items what cache hold now.
+    for(auto iter = level0nodes.begin(); iter != level0nodes.end();)
+    {
+      if(iter->renderTargetGraphicsObjects == renderTargetGraphicsObjects)
+      {
+        iter->program->RemoveLifecycleObserver(*this);
+        iter->geometry->RemoveLifecycleObserver(*this);
+        iter->NotifyPipelineCacheDestroyed(PipelineCacheL0::LifecycleObserver::NotificationType::RENDER_TARGET_GRAPHICS_OBJECTS_DESTROYED);
+        iter = level0nodes.erase(iter);
+      }
+      else
+      {
+        iter++;
+      }
     }
   }
 }

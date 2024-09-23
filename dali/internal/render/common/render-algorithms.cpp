@@ -597,19 +597,19 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
   }
 }
 
-inline void RenderAlgorithms::ProcessRenderList(const RenderList&                   renderList,
-                                                BufferIndex                         bufferIndex,
-                                                const Matrix&                       viewMatrix,
-                                                const Matrix&                       projectionMatrix,
-                                                Integration::DepthBufferAvailable   depthBufferAvailable,
-                                                Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                const RenderInstruction&            instruction,
-                                                const Rect<int32_t>&                viewport,
-                                                const Rect<int>&                    rootClippingRect,
-                                                int                                 orientation,
-                                                const Uint16Pair&                   sceneSize,
-                                                Graphics::RenderPass*               renderPass,
-                                                Graphics::RenderTarget*             renderTarget)
+inline void RenderAlgorithms::ProcessRenderList(const RenderList&                        renderList,
+                                                BufferIndex                              bufferIndex,
+                                                const Matrix&                            viewMatrix,
+                                                const Matrix&                            projectionMatrix,
+                                                Integration::DepthBufferAvailable        depthBufferAvailable,
+                                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                                const RenderInstruction&                 instruction,
+                                                const Rect<int32_t>&                     viewport,
+                                                const Rect<int>&                         rootClippingRect,
+                                                int                                      orientation,
+                                                const Uint16Pair&                        sceneSize,
+                                                Graphics::RenderPass&                    renderPass,
+                                                SceneGraph::RenderTargetGraphicsObjects& renderTargetGraphicsObjects)
 {
   DALI_PRINT_RENDER_LIST(renderList);
 
@@ -633,8 +633,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   // We are always "inside" a render pass here.
   Graphics::CommandBufferBeginInfo info;
   info.SetUsage(0 | Graphics::CommandBufferUsageFlagBits::RENDER_PASS_CONTINUE)
-    .SetRenderPass(*renderPass)
-    .SetRenderTarget(*renderTarget);
+    .SetRenderPass(renderPass)
+    .SetRenderTarget(*renderTargetGraphicsObjects.GetGraphicsRenderTarget());
   secondaryCommandBuffer.Begin(info);
 
   secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
@@ -742,14 +742,14 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
         // Ignore an item's world color when rendering offscreen cache
         // to ensure we avoid repetitive calculations from different instructions.
-        bool           drawOffscreenRenderingCache = (item.mNode->GetCacheRendererCount() > 0u) && (instruction.mFrameBuffer != nullptr);
+        const bool     drawOffscreenRenderingCache = (item.mNode->GetCacheRendererCount() > 0u) && (instruction.mFrameBuffer != nullptr);
         const Vector4& worldColor                  = drawOffscreenRenderingCache ? Vector4::ONE : nodeInfo.worldColor;
 
         auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTarget, queue);
+          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTargetGraphicsObjects, queue);
         }
       }
     }
@@ -767,19 +767,20 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 {
 }
 
-void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&            instruction,
-                                                BufferIndex                         bufferIndex,
-                                                Integration::DepthBufferAvailable   depthBufferAvailable,
-                                                Integration::StencilBufferAvailable stencilBufferAvailable,
-                                                const Rect<int32_t>&                viewport,
-                                                const Rect<int>&                    rootClippingRect,
-                                                int                                 orientation,
-                                                const Uint16Pair&                   sceneSize,
-                                                Graphics::RenderPass*               renderPass,
-                                                Graphics::RenderTarget*             renderTarget,
-                                                Graphics::CommandBuffer*            commandBuffer)
+void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&                 instruction,
+                                                BufferIndex                              bufferIndex,
+                                                Integration::DepthBufferAvailable        depthBufferAvailable,
+                                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                                const Rect<int32_t>&                     viewport,
+                                                const Rect<int>&                         rootClippingRect,
+                                                int                                      orientation,
+                                                const Uint16Pair&                        sceneSize,
+                                                Graphics::RenderPass&                    renderPass,
+                                                SceneGraph::RenderTargetGraphicsObjects& renderTargetGraphicsObjects,
+                                                Graphics::CommandBuffer*                 commandBuffer)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) { oss << "[" << instruction.RenderListCount() << "]"; });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
+                                          { oss << "[" << instruction.RenderListCount() << "]"; });
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
@@ -814,7 +815,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           orientation,
                           sceneSize,
                           renderPass,
-                          renderTarget);
+                          renderTargetGraphicsObjects);
 
         // Execute command buffer
         auto* secondaryCommandBuffer = renderList->GetCommandBuffer();
