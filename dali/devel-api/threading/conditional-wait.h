@@ -2,7 +2,7 @@
 #define DALI_CONDITIONAL_WAIT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <chrono> ///< for std::chrono::time_point
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -64,6 +67,8 @@ public:
     ScopedLock(const ScopedLock&);
     const ScopedLock& operator=(const ScopedLock&);
   };
+
+  using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
 
   /**
    * @brief Constructor, creates the internal synchronization objects
@@ -113,6 +118,19 @@ public:
    * @pre scope must have been passed this ConditionalWait during its construction.
    */
   void Wait(const ScopedLock& scope);
+
+  /**
+   * @brief Wait until specific time point or another thread to notify us when the condition is true and we can continue
+   *
+   * Will always block current thread until Notify is called.
+   * Assumes that the ScopedLock object passed in has already locked the internal state of
+   * this object. Releases the lock while waiting and re-acquires it when returning
+   * from the wait.
+   * @param[in] scope A pre-existing lock on the internal state of this object.
+   * @param[in] timePoint Maximum time point to wait.
+   * @pre scope must have been passed this ConditionalWait during its construction.
+   */
+  void WaitUntil(const ScopedLock& scope, TimePoint timePoint);
 
   /**
    * @brief Return the count of threads waiting for this conditional

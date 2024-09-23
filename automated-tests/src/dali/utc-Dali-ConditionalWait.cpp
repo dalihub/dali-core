@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,29 @@ class WorkerThreadWaitN : public Thread
   {
     gConditionalWait->Wait();
   }
+};
+
+class WorkerThreadWaitUntilN : public Thread
+{
+public:
+  WorkerThreadWaitUntilN()
+  : Thread()
+  {
+    auto now          = std::chrono::steady_clock::now();
+    auto waitDuration = std::chrono::milliseconds(100); // 0.1 second
+
+    mWaitUntilTimePoint = std::chrono::time_point_cast<ConditionalWait::TimePoint::duration>(now + waitDuration);
+  }
+
+  virtual void Run()
+  {
+    ConditionalWait::ScopedLock lock(*gConditionalWait);
+
+    gConditionalWait->WaitUntil(lock, mWaitUntilTimePoint);
+  }
+
+private:
+  ConditionalWait::TimePoint mWaitUntilTimePoint;
 };
 
 } // namespace
@@ -238,6 +261,77 @@ int UtcConditionalWait6P(void)
   }
 
   // notify once but with a scoped lock, it will resume all threads
+  {
+    ConditionalWait::ScopedLock lock(*gConditionalWait);
+    gConditionalWait->Notify(lock);
+  }
+
+  thread1.Join();
+  thread2.Join();
+  thread3.Join();
+  thread4.Join();
+
+  DALI_TEST_EQUALS(0u, gConditionalWait->GetWaitCount(), TEST_LOCATION);
+
+  delete gConditionalWait;
+  END_TEST;
+}
+
+int UtcConditionalWaitUntilP1(void)
+{
+  tet_infoline("Testing ConditionalWait - scenario:  waituntil now + 100 ms - with 4 threads. No notify");
+
+  auto utcStartTime = std::chrono::steady_clock::now();
+
+  // initialize values
+  gConditionalWait = new ConditionalWait();
+
+  WorkerThreadWaitUntilN thread1;
+  thread1.Start();
+  WorkerThreadWaitUntilN thread2;
+  thread2.Start();
+  WorkerThreadWaitUntilN thread3;
+  thread3.Start();
+  WorkerThreadWaitUntilN thread4;
+  thread4.Start();
+
+  // Let we check thread join well without any notification
+
+  thread1.Join();
+  thread2.Join();
+  thread3.Join();
+  thread4.Join();
+
+  DALI_TEST_EQUALS(0u, gConditionalWait->GetWaitCount(), TEST_LOCATION);
+
+  auto utcFinishedTime = std::chrono::steady_clock::now();
+
+  // Check thread join spened at least 100ms
+  auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(utcFinishedTime - utcStartTime).count();
+
+  DALI_TEST_GREATER(elapsedTime, static_cast<int64_t>(100 - 1), TEST_LOCATION); // 100ms is the minimum time for the threads to wait
+
+  delete gConditionalWait;
+  END_TEST;
+}
+
+int UtcConditionalWaitUntilP2(void)
+{
+  tet_infoline("Testing ConditionalWait - scenario:  waituntil now + 100 ms - notify with 4 threads");
+
+  // initialize values
+  gConditionalWait = new ConditionalWait();
+
+  WorkerThreadWaitUntilN thread1;
+  thread1.Start();
+  WorkerThreadWaitUntilN thread2;
+  thread2.Start();
+  WorkerThreadWaitUntilN thread3;
+  thread3.Start();
+  WorkerThreadWaitUntilN thread4;
+  thread4.Start();
+
+  // Notify with scoped lock
   {
     ConditionalWait::ScopedLock lock(*gConditionalWait);
     gConditionalWait->Notify(lock);
