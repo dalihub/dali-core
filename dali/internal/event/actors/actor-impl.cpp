@@ -1111,6 +1111,28 @@ DevelActor::ChildOrderChangedSignalType& Actor::ChildOrderChangedSignal()
   return mParentImpl.ChildOrderChangedSignal();
 }
 
+void Actor::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+{
+}
+
+void Actor::SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
+{
+  mOffScreenRenderableType = offScreenRenderableType;
+}
+
+OffScreenRenderable::Type Actor::GetOffScreenRenderableType() const
+{
+  return mOffScreenRenderableType;
+}
+
+void Actor::RequestRenderTaskReorder()
+{
+  if(mScene && GetOffScreenRenderableType() != OffScreenRenderable::Type::NONE)
+  {
+    mScene->GetRenderTaskList().RequestReorder();
+  }
+}
+
 Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
 : Object(&node),
   mParentImpl(*this),
@@ -1170,7 +1192,8 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mColorMode(Node::DEFAULT_COLOR_MODE),
   mClippingMode(ClippingMode::DISABLED),
   mHoverState(PointState::FINISHED),
-  mBlendEquation(DevelBlendEquation::ADD)
+  mBlendEquation(DevelBlendEquation::ADD),
+  mOffScreenRenderableType(OffScreenRenderable::Type::NONE)
 {
 }
 
