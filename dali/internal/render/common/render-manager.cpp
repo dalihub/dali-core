@@ -1040,6 +1040,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     {
       iter->type           = Graphics::ResourceType::PROGRAM;
       iter->programBinding = &item.second;
+      ++iter;
     }
   }
 
