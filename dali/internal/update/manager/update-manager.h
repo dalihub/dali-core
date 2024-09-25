@@ -127,6 +127,11 @@ public:
    */
   ~UpdateManager() override;
 
+  /**
+   * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
+   */
+  void ContextDestroyed();
+
   // Node connection methods
 
   /**

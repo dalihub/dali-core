@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ protected:
   ~VisualRenderer() override;
 
 private:
-  VisualRenderer(const VisualRenderer&)            = delete;
+  VisualRenderer(const VisualRenderer&) = delete;
   VisualRenderer& operator=(const VisualRenderer&) = delete;
 
 public:
@@ -124,7 +124,6 @@ public:
     Vector2 mTransformAnchorPoint{Vector2::ZERO};
     Vector4 mTransformOffsetSizeMode{Vector2::ZERO};
     Vector2 mExtraSize{Vector2::ZERO};
-    Vector3 mMixColor{Vector3::ONE};
     float   mPreMultipliedAlpha{0.0f};
   };
 

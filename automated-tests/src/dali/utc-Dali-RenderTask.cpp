@@ -1286,6 +1286,114 @@ int UtcDaliRenderTaskRenderUntil05(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskRenderUntil06(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::RenderUntil(actor) Check that stopper actor scene off and destroyed");
+
+  // Get default rendertask
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.GetTask(0u);
+
+  Integration::Scene stage = application.GetScene();
+
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
+    Actor actor = CreateRenderableActor();
+    actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(Actor::Property::NAME, name);
+
+    return actor;
+  };
+
+  // Compose a tree
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  // |- a1 (renderable)
+  //     |- target (stopper node)
+  // |- a2 (renderable)
+  Actor a0     = CreateRenderableActorWithName("a0");
+  Actor a1     = CreateRenderableActorWithName("a1");
+  Actor a2     = CreateRenderableActorWithName("a2");
+  Actor target = CreateRenderableActorWithName("target");
+
+  stage.Add(a0);
+  stage.Add(a1);
+  stage.Add(a2);
+  a1.Add(target);
+
+  // draw a0, a1 (2 items)
+  task.RenderUntil(target);
+
+  // Update & Render with the actor on-stage
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 2, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Destroy target
+  //
+  // stage (depth = 0)
+  // |- a0 (renderable)
+  // |- a1 (renderable)
+  // |- a2 (renderable)
+  target.Unparent();
+  target.Reset();
+
+  DALI_TEST_EQUALS(task.GetStopperActor(), Actor(), TEST_LOCATION);
+
+  // After now, draw all actors, a0, a1, and a2.
+
+  // Update & Render
+  application.SendNotification();
+  application.Render();
+
+  // Check that rendering was cut
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 3, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // To make ensure the destroyed target has same pointer with new one, try this test multiple times
+  for(int tryCount = 0; tryCount < 50; tryCount++)
+  {
+    // Create new target, which might have same pointer with previous one.
+    target = CreateRenderableActorWithName("target");
+
+    // Add target under a0.
+    //
+    // stage (depth = 0)
+    // |- a0 (renderable)
+    //     |- target (renderable)
+    // |- a1 (renderable)
+    // |- a2 (renderable)
+    a0.Add(target);
+
+    // After now, draw all actors (4 items).
+
+    // Update & Render
+    application.SendNotification();
+    application.Render();
+
+    // Check that rendering was cut
+    DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 4, TEST_LOCATION);
+
+    drawTrace.Reset();
+    target.Unparent();
+  }
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskSetExclusive(void)
 {
   TestApplication application;
@@ -4609,6 +4717,120 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask with ViewportGuideActor, and check viewport if guide actor destroyed");
+
+  Stage   stage = Stage::GetCurrent();
+  Vector2 stageSize(stage.GetSize());
+
+  Actor blue                                 = Actor::New();
+  blue[Dali::Actor::Property::NAME]          = "Blue";
+  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Actor red                                 = Actor::New();
+  red[Dali::Actor::Property::NAME]          = "Red";
+  red[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  red[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
+  red[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
+
+  Geometry geometry = Geometry::New();
+  Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
+  Renderer renderer = Renderer::New(geometry, shader);
+  red.AddRenderer(renderer);
+
+  stage.Add(blue);
+  stage.Add(red);
+
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     renderTask     = renderTaskList.CreateTask();
+
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(cameraActor);
+
+  renderTask.SetExclusive(true);
+  renderTask.SetInputEnabled(true);
+  renderTask.SetCameraActor(cameraActor);
+  renderTask.SetSourceActor(red);
+  application.SendNotification();
+  application.Render(16);
+
+  Vector2 viewportPosition = renderTask.GetCurrentViewportPosition();
+  Vector2 viewportSize     = renderTask.GetCurrentViewportSize();
+
+  // Check viewport return 0 without guide actor
+  DALI_TEST_EQUALS(viewportSize, Vector2(0, 0), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportPosition, Vector2(0, 0), TEST_LOCATION);
+
+  // Set ViewportGuideActor
+  renderTask.SetViewportGuideActor(blue);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  viewportPosition = renderTask.GetCurrentViewportPosition();
+  viewportSize     = renderTask.GetCurrentViewportSize();
+
+  DALI_TEST_EQUALS(viewportSize, Vector2(300, 300), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportPosition, Vector2(90, 250), TEST_LOCATION);
+
+  // Render several frames.
+  application.SendNotification();
+  application.Render(16);
+  application.SendNotification();
+  application.Render(16);
+  application.SendNotification();
+  application.Render(16);
+
+  viewportPosition = renderTask.GetCurrentViewportPosition();
+  viewportSize     = renderTask.GetCurrentViewportSize();
+
+  DALI_TEST_EQUALS(viewportSize, Vector2(300, 300), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportPosition, Vector2(90, 250), TEST_LOCATION);
+
+  tet_printf("Destroy blue. RenderTask don't hold actor's reference, so ViewportGuideActor invalide now\n");
+
+  blue.Unparent();
+  blue.Reset();
+
+  DALI_TEST_EQUALS(renderTask.GetViewportGuideActor(), Actor(), TEST_LOCATION);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render(16);
+
+  viewportPosition = renderTask.GetCurrentViewportPosition();
+  viewportSize     = renderTask.GetCurrentViewportSize();
+
+  // Check view port revert as origin well.
+  DALI_TEST_EQUALS(viewportSize, Vector2(0, 0), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportPosition, Vector2(0, 0), TEST_LOCATION);
+
+  // Render several frames.
+  application.SendNotification();
+  application.Render(16);
+  application.SendNotification();
+  application.Render(16);
+  application.SendNotification();
+  application.Render(16);
+
+  viewportPosition = renderTask.GetCurrentViewportPosition();
+  viewportSize     = renderTask.GetCurrentViewportSize();
+
+  DALI_TEST_EQUALS(viewportSize, Vector2(0, 0), TEST_LOCATION);
+  DALI_TEST_EQUALS(viewportPosition, Vector2(0, 0), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskSetPartialUpdate(void)
 {
   TestApplication application(
@@ -4916,7 +5138,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
   RenderTask     renderTask1    = renderTaskList.CreateTask();
 
   application.SendNotification();
-  uint32_t answer1[2] = {0u, 0u};
+  int32_t answer1[2] = {INT32_MIN, 0};
   DALI_TEST_EQUALS(2, renderTaskList.GetTaskCount(), TEST_LOCATION);
   for(uint32_t i = 0; i < 2; ++i)
   {
@@ -4925,7 +5147,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   RenderTask renderTask2 = renderTaskList.CreateTask();
   application.SendNotification();
-  int32_t answer2[3] = {0u, 0u, 0u};
+  int32_t answer2[3] = {INT32_MIN, 0, 0};
   DALI_TEST_EQUALS(3, renderTaskList.GetTaskCount(), TEST_LOCATION);
   for(uint32_t i = 0; i < 3; ++i)
   {
@@ -4934,7 +5156,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   RenderTask renderTask3 = renderTaskList.CreateTask();
   application.SendNotification();
-  int32_t answer3[4] = {0u, 0u, 0u, 0u};
+  int32_t answer3[4] = {INT32_MIN, 0, 0, 0};
   DALI_TEST_EQUALS(4, renderTaskList.GetTaskCount(), TEST_LOCATION);
   for(uint32_t i = 0; i < 4; ++i)
   {
@@ -4943,7 +5165,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask1.SetOrderIndex(3);
   application.SendNotification();
-  int32_t answer4[4] = {0u, 0u, 0u, 3u};
+  int32_t answer4[4] = {INT32_MIN, 0, 0, 3};
   for(uint32_t i = 0; i < 4; ++i)
   {
     DALI_TEST_EQUALS(answer4[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -4951,7 +5173,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask2.SetOrderIndex(7);
   application.SendNotification();
-  int32_t answer5[4] = {0u, 0u, 3u, 7u};
+  int32_t answer5[4] = {INT32_MIN, 0, 3, 7};
   for(uint32_t i = 0; i < 4; ++i)
   {
     DALI_TEST_EQUALS(answer5[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -4961,7 +5183,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
   scene.GetOverlayLayer();
   application.SendNotification();
   DALI_TEST_EQUALS(5, renderTaskList.GetTaskCount(), TEST_LOCATION);
-  int32_t answer6[5] = {0u, 0u, 3u, 7u, INT32_MAX};
+  int32_t answer6[5] = {INT32_MIN, 0, 3, 7, INT32_MAX};
   for(uint32_t i = 0; i < 5; ++i)
   {
     DALI_TEST_EQUALS(answer6[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -4969,7 +5191,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask3.SetOrderIndex(4);
   application.SendNotification();
-  int32_t answer7[5] = {0u, 3u, 4u, 7u, INT32_MAX};
+  int32_t answer7[5] = {INT32_MIN, 3, 4, 7, INT32_MAX};
   for(uint32_t i = 0; i < 5; ++i)
   {
     DALI_TEST_EQUALS(answer7[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -4977,7 +5199,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask2.SetOrderIndex(2);
   application.SendNotification();
-  int32_t answer8[5] = {0u, 2u, 3u, 4u, INT32_MAX};
+  int32_t answer8[5] = {INT32_MIN, 2, 3, 4, INT32_MAX};
   for(uint32_t i = 0; i < 5; ++i)
   {
     DALI_TEST_EQUALS(answer8[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);

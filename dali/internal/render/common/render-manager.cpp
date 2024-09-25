@@ -259,6 +259,37 @@ struct RenderManager::Impl
     }
   }
 
+  /**
+   * @brief Remove all owned render context.
+   *
+   * @note Should be called at ContextDestroyed case.
+   */
+  void ContextDestroyed()
+  {
+    sceneContainer.clear();
+    renderAlgorithms.DestroyCommandBuffer();
+
+    samplerContainer.Clear();
+    frameBufferContainer.Clear();
+    vertexBufferContainer.Clear();
+    geometryContainer.Clear();
+    rendererContainer.Clear();
+    textureContainer.Clear();
+
+    mRenderTrackers.Clear();
+
+    updatedTextures.Clear();
+    textureDiscardQueue.Clear();
+
+    pipelineCache.reset(); // clear now before the program contoller is deleted
+
+    if(DALI_LIKELY(uniformBufferManager))
+    {
+      uniformBufferManager->ContextDestroyed();
+    }
+    uniformBufferManager.reset();
+  }
+
   // the order is important for destruction,
   Graphics::Controller&           graphicsController;
   RenderQueue                     renderQueue;      ///< A message queue for receiving messages from the update-thread.
@@ -333,7 +364,24 @@ RenderManager::~RenderManager()
 
 void RenderManager::ContextDestroyed()
 {
-  mImpl->uniformBufferManager->ContextDestroyed();
+  // Call Destroy for some items.
+  for(auto&& item : mImpl->frameBufferContainer)
+  {
+    if(DALI_LIKELY(item))
+    {
+      item->Destroy();
+    }
+  }
+  for(auto&& item : mImpl->textureContainer)
+  {
+    if(DALI_LIKELY(item))
+    {
+      item->Destroy();
+    }
+  }
+
+  // Remove owned render context
+  mImpl->ContextDestroyed();
 }
 
 RenderQueue& RenderManager::GetRenderQueue()
@@ -912,11 +960,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     return;
   }
 
-  // Reset main algorithms command buffer
-  mImpl->renderAlgorithms.ResetCommandBuffer();
-
-  auto mainCommandBuffer = mImpl->renderAlgorithms.GetMainCommandBuffer();
-
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
   if(!sceneObject)
@@ -943,6 +986,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   auto totalSizeCPU = 0u;
   auto totalSizeGPU = 0u;
 
+  std::unordered_map<Graphics::Program*, Graphics::ProgramResourceBindingInfo> programUsageCount;
+
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -964,6 +1009,18 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
             {
               const auto& memoryRequirements = program->GetUniformBlocksMemoryRequirements();
 
+              // collect how many programs we use in this frame
+              auto key = &program->GetGraphicsProgram();
+              auto it  = programUsageCount.find(key);
+              if(it == programUsageCount.end())
+              {
+                programUsageCount[key] = Graphics::ProgramResourceBindingInfo{.program = key, .count = 1};
+              }
+              else
+              {
+                (*it).second.count++;
+              }
+
               totalSizeCPU += memoryRequirements.totalCpuSizeRequired;
               totalSizeGPU += memoryRequirements.totalGpuSizeRequired;
             }
@@ -972,6 +1029,24 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
   }
+
+  // Fill resource binding for the command buffer
+  std::vector<Graphics::CommandBufferResourceBinding> commandBufferResourceBindings;
+  if(!programUsageCount.empty())
+  {
+    commandBufferResourceBindings.resize(programUsageCount.size());
+    auto iter = commandBufferResourceBindings.begin();
+    for(auto& item : programUsageCount)
+    {
+      iter->type           = Graphics::ResourceType::PROGRAM;
+      iter->programBinding = &item.second;
+    }
+  }
+
+  // Reset main algorithms command buffer
+  mImpl->renderAlgorithms.ResetCommandBuffer(commandBufferResourceBindings.empty() ? nullptr : &commandBufferResourceBindings);
+
+  auto mainCommandBuffer = mImpl->renderAlgorithms.GetMainCommandBuffer();
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Render scene (%s), CPU:%d GPU:%d\n", renderToFbo ? "Offscreen" : "Onscreen", totalSizeCPU, totalSizeGPU);
 
@@ -1195,6 +1270,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clippingRect,
       surfaceOrientation,
       Uint16Pair(surfaceRect.width, surfaceRect.height),
+      currentRenderPass,
       currentRenderTarget);
 
     Graphics::SyncObject* syncObject{nullptr};

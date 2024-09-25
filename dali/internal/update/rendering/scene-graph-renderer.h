@@ -365,16 +365,24 @@ public:
   const Render::Renderer::StencilParameters& GetStencilParameters() const;
 
   /**
-   * Bakes the opacity
+   * Bakes the mixColor
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] opacity The opacity
+   * @param[in] mixColor The mix color
    */
-  void BakeOpacity(BufferIndex updateBufferIndex, float opacity);
+  void BakeMixColor(BufferIndex updateBufferIndex, const Vector4& mixColor);
 
   /**
-   * @copydoc RenderDataProvider::GetOpacity()
+   * Bakes the component of mixColor
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] componentValue The value of mix colorcomponent.
+   * @param[in] componentIndex The index of mix color component.
    */
-  float GetOpacity(BufferIndex updateBufferIndex) const override;
+  void BakeMixColorComponent(BufferIndex updateBufferIndex, float componentValue, uint8_t componentIndex);
+
+  /**
+   * @copydoc RenderDataProvider::GetMixColor()
+   */
+  Vector4 GetMixColor(BufferIndex updateBufferIndex) const override;
 
   /**
    * Sets the rendering behavior
@@ -613,8 +621,8 @@ private:
   Dali::RenderCallback*                         mRenderCallback{nullptr};
 
 public:
-  AnimatableProperty<float> mOpacity;    ///< The opacity value
-  int32_t                   mDepthIndex; ///< Used only in PrepareRenderInstructions
+  AnimatableProperty<Vector4> mMixColor;   ///< The mix color value
+  int32_t                     mDepthIndex; ///< Used only in PrepareRenderInstructions
 };
 
 } // namespace SceneGraph

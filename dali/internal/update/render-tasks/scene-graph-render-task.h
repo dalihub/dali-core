@@ -374,6 +374,11 @@ public:
    */
   void SetRenderPassTag(uint32_t renderPassTag);
 
+  /**
+   * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
+   */
+  void ContextDestroyed();
+
 private: // from PropertyOwner::Observer
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerConnected( PropertyOwner& owner )

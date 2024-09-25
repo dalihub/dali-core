@@ -451,6 +451,8 @@ void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, ui
   mOwner.mLayer3DParentsCount = static_cast<uint16_t>(layer3DParentsCount); // overflow ignored, not expected in practice
   mOwner.ConnectToSceneGraph();
 
+  mOwner.RequestRenderTaskReorder();
+
   // Notification for internal derived classes
   mOwner.OnSceneConnectionInternal();
 

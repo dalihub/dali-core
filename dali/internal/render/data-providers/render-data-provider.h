@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,11 +79,11 @@ public:
   virtual const Dali::Vector<Render::TextureKey>* GetTextures() const = 0;
 
   /**
-   * Get the opacity
+   * Get the mix color
    * @param[in] bufferIndex The current buffer index.
-   * @return The opacity
+   * @return The mix color
    */
-  virtual float GetOpacity(BufferIndex bufferIndex) const = 0;
+  virtual Vector4 GetMixColor(BufferIndex bufferIndex) const = 0;
 
   /**
    * @brief Retrieve if the render data is updated

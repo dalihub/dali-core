@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_VALUE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,6 +298,16 @@ public:
    * @return The type ID
    */
   Type GetType() const;
+
+  /**
+   * @brief Convert value to another type.
+   * @note It will be works only if both input and output are scalar type. - Property::BOOLEAN, Property::FLOAT, Property::INTEGER.
+   *
+   * @SINCE_2_3.41
+   * @param[in] targetType Target type of the conversion.
+   * @return True if convert is successful, false otherwise. If the conversion fails, the original value is not modified.
+   */
+  bool ConvertType(const Property::Type targetType);
 
   /**
    * @brief Retrieves a specific value.

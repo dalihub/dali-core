@@ -189,8 +189,8 @@ int UtcDaliVisualRendererDefaultProperties(void)
   VisualRenderer  renderer     = VisualRenderer::New(geometry, shader);
   Renderer        baseRenderer = Renderer::New(geometry, shader);
 
-  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 28, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 28 + 8, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 32, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32 + 8, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "transformOffset", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_OFFSET, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "transformSize", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_SIZE, TEST_LOCATION);
@@ -198,9 +198,8 @@ int UtcDaliVisualRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "transformAnchorPoint", Property::VECTOR2, true, false, false, VisualRenderer::Property::TRANSFORM_ANCHOR_POINT, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "transformOffsetSizeMode", Property::VECTOR4, true, false, false, VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "extraSize", Property::VECTOR2, true, true, true, VisualRenderer::Property::EXTRA_SIZE, TEST_LOCATION);
-
-  TEST_RENDERER_PROPERTY(renderer, "visualMixColor", Property::VECTOR3, true, true, true, VisualRenderer::Property::VISUAL_MIX_COLOR, TEST_LOCATION);
-  TEST_RENDERER_PROPERTY(renderer, "preMultipliedAlpha", Property::FLOAT, true, false, false, VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "visualMixColor", Property::VECTOR3, true, false, true, VisualRenderer::Property::VISUAL_MIX_COLOR, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "visualPreMultipliedAlpha", Property::FLOAT, true, false, false, VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, TEST_LOCATION);
 
   END_TEST;
 }
@@ -209,7 +208,7 @@ int UtcDaliVisualRendererAnimatedProperty01(void)
 {
   TestApplication application;
 
-  tet_infoline("Test that a visual renderer property can be animated");
+  tet_infoline("Test that a visual renderer property cannot be animated anymore");
 
   Shader         shader   = Shader::New("VertexSource", "FragmentSource");
   Geometry       geometry = CreateQuadGeometry();
@@ -231,20 +230,16 @@ int UtcDaliVisualRendererAnimatedProperty01(void)
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, Vector3(1.0f, 0.0f, 1.0f));
   keyFrames.Add(1.0f, Vector3(0.0f, 0.0f, 0.0f));
-  animation.AnimateBetween(Property(renderer, colorIndex), keyFrames);
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(500);
-
-  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector3>(colorIndex), Vector3(0.5f, 0.f, 0.5f), TEST_LOCATION);
-
-  application.Render(400);
-  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector3>(colorIndex), Vector3(0.1f, 0.f, 0.1f), TEST_LOCATION);
-
-  application.Render(100);
-  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector3>(colorIndex), Vector3(0.f, 0.f, 0.f), TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(colorIndex), Vector3(0.f, 0.f, 0.f), TEST_LOCATION);
+  try
+  {
+    animation.AnimateBetween(Property(renderer, colorIndex), keyFrames);
+    animation.Play();
+    tet_result(TET_FAIL);
+  }
+  catch(...)
+  {
+    tet_result(TET_PASS);
+  }
 
   // Can we test to see if the actor has stopped being drawn?
   END_TEST;
@@ -296,6 +291,8 @@ int UtcDaliVisualRendererAnimatedProperty02(void)
   END_TEST;
 }
 
+namespace
+{
 struct VisualProperties
 {
   VisualProperties() = default;
@@ -324,10 +321,12 @@ struct VisualProperties
   static VisualProperties GetPropsAt(float alpha, const VisualProperties& start, const VisualProperties& end)
   {
     VisualProperties progress;
-    progress.mTransformOffset         = start.mTransformOffset + (end.mTransformOffset - start.mTransformOffset) * alpha;
-    progress.mTransformSize           = start.mTransformSize + (end.mTransformSize - start.mTransformSize) * alpha;
-    progress.mExtraSize               = start.mExtraSize + (end.mExtraSize - start.mExtraSize) * alpha;
-    progress.mMixColor                = start.mMixColor + (end.mMixColor - start.mMixColor) * alpha;
+
+    progress.mTransformOffset = start.mTransformOffset + (end.mTransformOffset - start.mTransformOffset) * alpha;
+    progress.mTransformSize   = start.mTransformSize + (end.mTransformSize - start.mTransformSize) * alpha;
+    progress.mExtraSize       = start.mExtraSize + (end.mExtraSize - start.mExtraSize) * alpha;
+
+    progress.mMixColor                = end.mMixColor; ///< mMixColor is not animatable anymore.
     progress.mTransformOffsetSizeMode = end.mTransformOffsetSizeMode;
     progress.mTransformOrigin         = end.mTransformOrigin;
     progress.mTransformAnchorPoint    = end.mTransformAnchorPoint;
@@ -433,7 +432,7 @@ void CheckSceneGraphVisualProperties(VisualRenderer renderer, VisualProperties e
   actualProps.mTransformOffsetSizeMode = renderer.GetCurrentProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   actualProps.mExtraSize               = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   actualProps.mMixColor                = renderer.GetCurrentProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
-  actualProps.mPreMultipliedAlpha      = renderer.GetProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA);
+  actualProps.mPreMultipliedAlpha      = renderer.GetCurrentProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA);
 
   PrintVisualProperties(actualProps, "Actual update props");
 
@@ -452,33 +451,36 @@ void CheckUniforms(VisualRenderer renderer, VisualProperties props, std::vector<
   tet_infoline("CheckUniforms\n");
 
   TraceCallStack::NamedParams params;
+  uint32_t                    uniformIndex = 0;
 
   tet_printf("Callback trace: \n%s\n", callStack.GetTraceString().c_str());
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[0].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[0].name.c_str(), props.mTransformOffset));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformOffset));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[1].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[1].name.c_str(), props.mTransformSize));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformSize));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[2].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[2].name.c_str(), props.mTransformOrigin));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformOrigin));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[3].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[3].name.c_str(), props.mTransformAnchorPoint));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformAnchorPoint));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[4].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[4].name.c_str(), props.mTransformOffsetSizeMode));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[uniformIndex].name.c_str(), props.mTransformOffsetSizeMode));
+  ++uniformIndex;
 
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[5].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[5].name.c_str(), props.mExtraSize));
-
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[6].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector3>(uniforms[6].name.c_str(), props.mMixColor));
-
-  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[7].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[7].name.c_str(), props.mPreMultipliedAlpha));
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mExtraSize));
+  ++uniformIndex;
 }
+
+} // namespace
 
 int UtcDaliVisualRendererAnimatedProperty03(void)
 {
@@ -494,9 +496,7 @@ int UtcDaliVisualRendererAnimatedProperty03(void)
                                           {"origin", Property::VECTOR2},
                                           {"anchorPoint", Property::VECTOR2},
                                           {"offsetSizeMode", Property::VECTOR4},
-                                          {"extraSize", Property::VECTOR2},
-                                          {"mixColor", Property::VECTOR3},
-                                          {"preMultipliedAlpha", Property::FLOAT}};
+                                          {"extraSize", Property::VECTOR2}};
 
   application.GetGraphicsController().AddCustomUniforms(customUniforms);
 
@@ -525,7 +525,7 @@ int UtcDaliVisualRendererAnimatedProperty03(void)
   animation.AnimateTo(Property(renderer, VisualRenderer::Property::TRANSFORM_OFFSET), targetProps.mTransformOffset);
   animation.AnimateTo(Property(renderer, VisualRenderer::Property::TRANSFORM_SIZE), targetProps.mTransformSize);
   animation.AnimateTo(Property(renderer, VisualRenderer::Property::EXTRA_SIZE), targetProps.mExtraSize);
-  animation.AnimateTo(Property(renderer, VisualRenderer::Property::VISUAL_MIX_COLOR), targetProps.mMixColor);
+  renderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, targetProps.mMixColor); ///< visual mix color is not animatable.
   animation.Play();
 
   CheckEventVisualProperties(renderer, targetProps);
@@ -651,13 +651,13 @@ int UtcDaliVisualRendererAnimatedProperty06(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
   application.GetScene().Add(actor);
 
-  Property::Index index = DevelRenderer::Property::OPACITY;
+  Property::Index index = Dali::Renderer::Property::OPACITY;
   renderer.SetProperty(index, 1.0f);
 
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(index), 1.0f, 0.001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DevelRenderer::Property::OPACITY), 1.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(Dali::Renderer::Property::OPACITY), 1.0f, 0.0001f, TEST_LOCATION);
 
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
@@ -669,22 +669,22 @@ int UtcDaliVisualRendererAnimatedProperty06(void)
   application.SendNotification();
 
   // Test that the event side properties are set to target value of 0
-  DALI_TEST_EQUALS(renderer.GetProperty<float>(DevelRenderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(Dali::Renderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
 
   application.Render(500);
 
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(index), 0.25f, 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DevelRenderer::Property::OPACITY), 0.25f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(Dali::Renderer::Property::OPACITY), 0.25f, 0.0001f, TEST_LOCATION);
 
   // Test that the event side properties are set to target value 0f 0
-  DALI_TEST_EQUALS(renderer.GetProperty<float>(DevelRenderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(Dali::Renderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
 
   // Complete the animation
   application.Render(500);
 
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(index), 0.0f, 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DevelRenderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetProperty<float>(DevelRenderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(Dali::Renderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(Dali::Renderer::Property::OPACITY), 0.0f, 0.0001f, TEST_LOCATION);
   END_TEST;
 }
 

@@ -106,6 +106,14 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
   mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr);
 }
 
+void Scene::ContextDestroyed()
+{
+  mRenderPass.reset();
+  mRenderPassNoClear.reset();
+
+  mRenderTarget.reset();
+}
+
 RenderInstructionContainer& Scene::GetRenderInstructions()
 {
   return mInstructions;

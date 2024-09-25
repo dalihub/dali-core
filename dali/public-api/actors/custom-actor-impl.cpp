@@ -33,6 +33,21 @@ void CustomActorImpl::OnPropertySet(Property::Index index, const Property::Value
 {
 }
 
+void CustomActorImpl::SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
+{
+  mOwner->SetOffScreenRenderableType(offScreenRenderableType);
+}
+
+OffScreenRenderable::Type CustomActorImpl::GetOffScreenRenderableType()
+{
+  return mOwner->GetOffScreenRenderableType();
+}
+
+void CustomActorImpl::RequestRenderTaskReorder()
+{
+  mOwner->RequestRenderTaskReorder();
+}
+
 CustomActorImpl::CustomActorImpl(ActorFlags flags)
 : mOwner(nullptr),
   mFlags(flags)

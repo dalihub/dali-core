@@ -806,16 +806,15 @@ void Renderer::WriteUniformBuffer(
 
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
 
-    Vector4        finalColor;                               ///< Applied renderer's opacity color
-    const Vector4& color = node.GetRenderColor(bufferIndex); ///< Actor's original color
+    const Vector4& color      = node.GetRenderColor(bufferIndex);              ///< Actor's original color
+    const Vector4& mixColor   = mRenderDataProvider->GetMixColor(bufferIndex); ///< Renderer's mix color
+    Vector4        finalColor = color * mixColor;                              ///< Applied renderer's mix color
     if(mPremultipliedAlphaEnabled)
     {
-      const float& alpha = color.a * mRenderDataProvider->GetOpacity(bufferIndex);
-      finalColor         = Vector4(color.r * alpha, color.g * alpha, color.b * alpha, alpha);
-    }
-    else
-    {
-      finalColor = Vector4(color.r, color.g, color.b, color.a * mRenderDataProvider->GetOpacity(bufferIndex));
+      const float alpha = finalColor.a;
+      finalColor.r *= alpha;
+      finalColor.g *= alpha;
+      finalColor.b *= alpha;
     }
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), uboViews, finalColor);
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, color);
