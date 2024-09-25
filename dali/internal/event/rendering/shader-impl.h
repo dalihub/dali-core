@@ -146,7 +146,7 @@ public:
   /**
    * Generates tag 'legacy-prefix-end' with end position of
    * prefix text to make shader code parsing easier.
-   * Function is public to be testable
+   * Function is public to be testable and integration api.
    */
   static std::string GenerateTaggedShaderPrefix(const std::string& shaderPrefix);
 };
