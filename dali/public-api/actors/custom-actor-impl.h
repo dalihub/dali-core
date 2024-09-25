@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
