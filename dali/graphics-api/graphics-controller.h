@@ -412,6 +412,20 @@ public: // ResourceId relative API.
    */
   virtual UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) = 0;
 
+  /**
+   * @brief Determine if the backend needs to multiply the projection matrix by a clip matrix
+   *
+   * @return TRUE if the graphics backend requires an alternative clip matrix
+   */
+  virtual bool HasClipMatrix() const = 0;
+
+  /**
+   * @brief Get the alternative clipping matrix.
+   *
+   * @return the clipping matrix
+   */
+  virtual const Matrix& GetClipMatrix() const = 0;
+
 protected:
   /**
    * Creates controller
