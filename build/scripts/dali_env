@@ -520,7 +520,7 @@ sub check_source_packages
             {
                 print "Attempting to build $pkg\n";
                 # from https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
-                run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp *.a /usr/lib; cd -;");
+                run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp lib/*.a /usr/lib; cd -;");
             }
         }
     }
