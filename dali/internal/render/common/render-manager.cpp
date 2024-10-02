@@ -269,17 +269,17 @@ struct RenderManager::Impl
     sceneContainer.clear();
     renderAlgorithms.DestroyCommandBuffer();
 
-    samplerContainer.Clear();
-    frameBufferContainer.Clear();
+    //samplerContainer.Clear();
+    //frameBufferContainer.Clear();
     vertexBufferContainer.Clear();
     geometryContainer.Clear();
     rendererContainer.Clear();
-    textureContainer.Clear();
+    //textureContainer.Clear();
 
     mRenderTrackers.Clear();
 
-    updatedTextures.Clear();
-    textureDiscardQueue.Clear();
+    //updatedTextures.Clear();
+    //textureDiscardQueue.Clear();
 
     pipelineCache.reset(); // clear now before the program contoller is deleted
 
@@ -364,22 +364,6 @@ RenderManager::~RenderManager()
 
 void RenderManager::ContextDestroyed()
 {
-  // Call Destroy for some items.
-  for(auto&& item : mImpl->frameBufferContainer)
-  {
-    if(DALI_LIKELY(item))
-    {
-      item->Destroy();
-    }
-  }
-  for(auto&& item : mImpl->textureContainer)
-  {
-    if(DALI_LIKELY(item))
-    {
-      item->Destroy();
-    }
-  }
-
   // Remove owned render context
   mImpl->ContextDestroyed();
 }
