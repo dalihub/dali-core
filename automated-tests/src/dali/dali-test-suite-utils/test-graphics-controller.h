@@ -151,6 +151,8 @@ public:
    */
   void Destroy() override;
 
+  uint32_t GetDeviceLimitation(Graphics::DeviceCapability capability) override;
+
   /**
    * @brief Executes batch update of textures
    *
