@@ -1505,4 +1505,22 @@ Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::ReleaseTextureFro
   return texture;
 }
 
+bool TestGraphicsController::HasClipMatrix() const
+{
+  return true;
+}
+
+const Matrix& TestGraphicsController::GetClipMatrix() const
+{
+  // This matrix transforms from GL -> Vulkan clip space
+  constexpr float VULKAN_CLIP_MATRIX_DATA[] = {
+    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f, 0.0f, 0.5f, 1.0f};
+  static const Matrix VULKAN_CLIP_MATRIX(VULKAN_CLIP_MATRIX_DATA);
+  static const Matrix IDENTITY = Matrix::IDENTITY;
+
+  // For now, return IDENTITY to stay in GL clip space.
+  // @todo Add test toggle
+  return IDENTITY;
+}
+
 } // namespace Dali
