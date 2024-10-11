@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,12 @@
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
+#include <dali/public-api/common/vector-wrapper.h>
+
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <utility>
 
 using namespace Dali;
 
@@ -238,7 +242,7 @@ int UtcDaliPropertyValueConstructorsRectP(void)
   Property::Value value(v);
 
   DALI_TEST_EQUALS(value.GetType(), Property::RECTANGLE, TEST_LOCATION);
-  DALI_TEST_CHECK(value.Get<Rect<int> >() == v);
+  DALI_TEST_CHECK(value.Get<Rect<int>>() == v);
 
   END_TEST;
 }
@@ -248,7 +252,7 @@ int UtcDaliPropertyValueConstructorsRectTypeP(void)
   Property::Value value(Property::RECTANGLE);
 
   DALI_TEST_CHECK(value.GetType() == Property::RECTANGLE);
-  DALI_TEST_CHECK(value.Get<Rect<int> >() == Rect<int>(0, 0, 0, 0));
+  DALI_TEST_CHECK(value.Get<Rect<int>>() == Rect<int>(0, 0, 0, 0));
 
   END_TEST;
 }
@@ -456,7 +460,7 @@ int UtcDaliPropertyValueCopyConstructorMatrixP(void)
 
 int UtcDaliPropertyValueCopyConstructorRectP(void)
 {
-  CheckCopyCtorP<Rect<int> > check(Rect<int>(1.0, 1.0, 1.0, 1.0));
+  CheckCopyCtorP<Rect<int>> check(Rect<int>(1.0, 1.0, 1.0, 1.0));
   END_TEST;
 }
 
@@ -813,7 +817,7 @@ int UtcDaliPropertyValueMoveAssignmentOperator(void)
   DALI_TEST_EQUALS(valueFloat, 1.0f, TEST_LOCATION);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
-#if (__GNUC__ >= 13)
+#if(__GNUC__ >= 13)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wself-move"
 #endif
@@ -821,7 +825,7 @@ int UtcDaliPropertyValueMoveAssignmentOperator(void)
   value2 = std::move(value2);
   DALI_TEST_EQUALS(true, value2.Get(valueFloat), TEST_LOCATION);
   DALI_TEST_EQUALS(valueFloat, 1.0f, TEST_LOCATION);
-#if (__GNUC__ >= 13)
+#if(__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
 
@@ -918,7 +922,7 @@ int UtcDaliPropertyValueGetRectP(void)
 {
   Property::Value value(Rect<int>(1, 2, 3, 4));
   Rect<int>       result(4, 3, 2, 1);
-  DALI_TEST_EQUALS(Rect<int>(1, 2, 3, 4), value.Get<Rect<int> >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Rect<int>(1, 2, 3, 4), value.Get<Rect<int>>(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, value.Get(result), TEST_LOCATION);
   DALI_TEST_EQUALS(Rect<int>(1, 2, 3, 4), result, TEST_LOCATION);
   END_TEST;
@@ -928,7 +932,7 @@ int UtcDaliPropertyValueGetRectN(void)
 {
   Property::Value value;
   Rect<int>       result(4, 3, 2, 1);
-  DALI_TEST_EQUALS(Rect<int>(0, 0, 0, 0), value.Get<Rect<int> >(), TEST_LOCATION);
+  DALI_TEST_EQUALS(Rect<int>(0, 0, 0, 0), value.Get<Rect<int>>(), TEST_LOCATION);
   DALI_TEST_EQUALS(false, value.Get(result), TEST_LOCATION);
   DALI_TEST_EQUALS(Rect<int>(4, 3, 2, 1), result, TEST_LOCATION);
   Property::Value value2("");
@@ -1480,6 +1484,122 @@ int UtcDaliPropertyValueEqualMapType(void)
   // DALI_TEST_EQUALS(value1, value2, TEST_LOCATION);
   DALI_TEST_NOT_EQUALS(value1, value2, Math::MACHINE_EPSILON_100, TEST_LOCATION);
 
+  END_TEST;
+}
+
+int UtcDaliPropertyValueConvertScalarType(void)
+{
+  tet_infoline("Check Property::Value type conversion.");
+
+  // Piar of input value - {except value as relative value per each type of properties}
+  // clang-format off
+  const std::vector<Property::Type> testConvertTypeList =
+  {
+    Property::BOOLEAN, Property::FLOAT, Property::INTEGER,
+  };
+  const std::vector<std::pair<Property::Value, std::vector<Property::Value>>> testExceptValueList =
+  {
+    {
+      Property::Value(true),
+      {
+        Property::Value(true), Property::Value(1.0f), Property::Value(1),
+      }
+    },
+    {
+      Property::Value(2.0f),
+      {
+        Property::Value(true), Property::Value(2.0f), Property::Value(2),
+      }
+    },
+    {
+      Property::Value(3),
+      {
+        Property::Value(true), Property::Value(3.0f), Property::Value(3),
+      }
+    },
+  };
+  // clang-format on
+
+  for(auto& valueExceptPair : testExceptValueList)
+  {
+    const auto& exceptValueList = valueExceptPair.second;
+
+    // Test except value list size is same as conversion type list size. (All property should have except value)
+    DALI_TEST_EQUALS(exceptValueList.size(), testConvertTypeList.size(), TEST_LOCATION);
+
+    // Check cached event thread values are expect.
+    for(auto i = 0u; i < testConvertTypeList.size(); ++i)
+    {
+      // Check expect type is valid.
+      const Property::Type convertType = testConvertTypeList[i];
+      DALI_TEST_EQUALS(convertType, exceptValueList[i].GetType(), TEST_LOCATION);
+
+      Property::Value convertedValue = valueExceptPair.first;
+
+      tet_printf("Test convert from %d to %d\n", static_cast<int>(convertedValue.GetType()), static_cast<int>(convertType));
+
+      DALI_TEST_CHECK(convertedValue.ConvertType(convertType));
+      DALI_TEST_EQUALS(convertedValue, exceptValueList[i], TEST_LOCATION);
+    }
+  }
+  END_TEST;
+}
+
+int UtcDaliPropertyValueConvertFailed(void)
+{
+  tet_infoline("Check Property::Value type conversion failed.");
+
+  float           a[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
+  Property::Array array;
+  Property::Map   map;
+
+  // clang-format off
+  const std::vector<Property::Value> scalarValueList =
+  {
+    Property::Value(false), Property::Value(1.0f), Property::Value(2)
+  };
+  const std::vector<Property::Value> conversionInvalidValueList =
+  {
+    Property::Value(),
+    Property::Value(Vector2()), Property::Value(Vector3()), Property::Value(Vector4()),
+
+    Property::Value(Matrix(a)),
+    Property::Value(Matrix3(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f)),
+
+    Property::Value(Rect<int32_t>(2, 3, 4, 5)),
+    Property::Value(AngleAxis(Radian(20.0f), Vector3(0.0f, 1.0f, 0.0f))),
+    Property::Value(std::string("Hell, o, World!")),
+    Property::Value(Extents(4, 8, 5, 2)),
+
+    Property::Value(array),
+    Property::Value(map),
+  };
+  // clang-format on
+
+  for(int i = Property::Type::NONE; i <= Property::Type::EXTENTS; ++i)
+  {
+    Property::Type type(static_cast<Property::Type>(i));
+
+    // Test convert for scalar value type
+    for(auto& value : scalarValueList)
+    {
+      // Copy value
+      Property::Value convertedValue      = value;
+      bool            expectConvertResult = (type == Property::BOOLEAN || type == Property::FLOAT || type == Property::INTEGER);
+
+      DALI_TEST_EQUALS(convertedValue.ConvertType(type), expectConvertResult, TEST_LOCATION);
+    }
+
+    // Test convert invalid for conversion invalid types
+    for(auto& value : conversionInvalidValueList)
+    {
+      // Copy value
+      Property::Value convertedValue      = value;
+      bool            expectConvertResult = (type == convertedValue.GetType());
+
+      DALI_TEST_EQUALS(convertedValue.ConvertType(type), expectConvertResult, TEST_LOCATION);
+    }
+  }
   END_TEST;
 }
 
