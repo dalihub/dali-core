@@ -138,7 +138,6 @@ void Scene::Initialize(Size size, int32_t windowOrientation, int32_t screenOrien
 
   // Create the default render-task and ensure clear is enabled on it to show the background color
   RenderTaskPtr renderTask = mRenderTaskList->CreateTask(mRootLayer.Get(), mDefaultCamera.Get());
-  renderTask->SetOrderIndex(INT32_MIN);
   renderTask->SetClearEnabled(true);
 
   // Create scene graph object

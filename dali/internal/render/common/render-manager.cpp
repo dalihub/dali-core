@@ -960,6 +960,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     return;
   }
 
+  // Reset main algorithms command buffer
+  mImpl->renderAlgorithms.ResetCommandBuffer();
+
+  auto mainCommandBuffer = mImpl->renderAlgorithms.GetMainCommandBuffer();
+
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
   if(!sceneObject)
@@ -986,8 +991,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   auto totalSizeCPU = 0u;
   auto totalSizeGPU = 0u;
 
-  std::unordered_map<Graphics::Program*, Graphics::ProgramResourceBindingInfo> programUsageCount;
-
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -1009,18 +1012,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
             {
               const auto& memoryRequirements = program->GetUniformBlocksMemoryRequirements();
 
-              // collect how many programs we use in this frame
-              auto key = &program->GetGraphicsProgram();
-              auto it  = programUsageCount.find(key);
-              if(it == programUsageCount.end())
-              {
-                programUsageCount[key] = Graphics::ProgramResourceBindingInfo{.program = key, .count = 1};
-              }
-              else
-              {
-                (*it).second.count++;
-              }
-
               totalSizeCPU += memoryRequirements.totalCpuSizeRequired;
               totalSizeGPU += memoryRequirements.totalGpuSizeRequired;
             }
@@ -1029,25 +1020,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
   }
-
-  // Fill resource binding for the command buffer
-  std::vector<Graphics::CommandBufferResourceBinding> commandBufferResourceBindings;
-  if(!programUsageCount.empty())
-  {
-    commandBufferResourceBindings.resize(programUsageCount.size());
-    auto iter = commandBufferResourceBindings.begin();
-    for(auto& item : programUsageCount)
-    {
-      iter->type           = Graphics::ResourceType::PROGRAM;
-      iter->programBinding = &item.second;
-      ++iter;
-    }
-  }
-
-  // Reset main algorithms command buffer
-  mImpl->renderAlgorithms.ResetCommandBuffer(commandBufferResourceBindings.empty() ? nullptr : &commandBufferResourceBindings);
-
-  auto mainCommandBuffer = mImpl->renderAlgorithms.GetMainCommandBuffer();
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Render scene (%s), CPU:%d GPU:%d\n", renderToFbo ? "Offscreen" : "Onscreen", totalSizeCPU, totalSizeGPU);
 
@@ -1257,7 +1229,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       scissorArea,
       currentClearValues);
 
-    // Note, don't set the viewport/scissor on the primary command buffer.
+    mainCommandBuffer->SetViewport({float(viewportRect.x),
+                                    float(viewportRect.y),
+                                    float(viewportRect.width),
+                                    float(viewportRect.height)});
 
     mImpl->renderAlgorithms.ProcessRenderInstruction(
       instruction,
@@ -1268,7 +1243,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       clippingRect,
       surfaceOrientation,
       Uint16Pair(surfaceRect.width, surfaceRect.height),
-      currentRenderPass,
       currentRenderTarget);
 
     Graphics::SyncObject* syncObject{nullptr};
@@ -1285,8 +1259,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   if(targetsToPresent.size() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss)
-                                            { oss << "[" << targetsToPresent.size() << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) { oss << "[" << targetsToPresent.size() << "]"; });
   }
 
   // Flush UBOs

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2022 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -500,106 +500,6 @@ struct Property::Value::Impl
     mData.mType.type = typeValue;
   }
 
-  bool ConvertType(const Property::Type targetType)
-  {
-    bool                 converted = false;
-    const Property::Type inputType = mData.mType.type;
-
-    if(inputType == targetType)
-    {
-      // We don't need conversion for same type.
-      return true;
-    }
-
-    switch(inputType)
-    {
-      // Try to convert only for scalar types
-      case Property::BOOLEAN:
-      {
-        bool value = mData.mBool.member;
-        switch(targetType)
-        {
-          case Property::FLOAT:
-          {
-            SetType(targetType);
-            mData.mFloat.member = static_cast<float>(value);
-            converted           = true;
-            break;
-          }
-          case Property::INTEGER:
-          {
-            SetType(targetType);
-            mData.mInt.member = static_cast<int32_t>(value);
-            converted         = true;
-            break;
-          }
-          default:
-          {
-            break;
-          }
-        }
-        break;
-      }
-      case Property::FLOAT:
-      {
-        float value = mData.mFloat.member;
-        switch(targetType)
-        {
-          case Property::BOOLEAN:
-          {
-            SetType(targetType);
-            mData.mBool.member = static_cast<bool>(!Dali::EqualsZero(value));
-            converted          = true;
-            break;
-          }
-          case Property::INTEGER:
-          {
-            SetType(targetType);
-            mData.mInt.member = static_cast<int32_t>(value);
-            converted         = true;
-            break;
-          }
-          default:
-          {
-            break;
-          }
-        }
-        break;
-      }
-      case Property::INTEGER:
-      {
-        int32_t value = mData.mInt.member;
-        switch(targetType)
-        {
-          case Property::BOOLEAN:
-          {
-            SetType(targetType);
-            mData.mBool.member = static_cast<bool>(value);
-            converted          = true;
-            break;
-          }
-          case Property::FLOAT:
-          {
-            SetType(targetType);
-            mData.mFloat.member = static_cast<float>(value);
-            converted           = true;
-            break;
-          }
-          default:
-          {
-            break;
-          }
-        }
-        break;
-      }
-      default:
-      {
-        break;
-      }
-    }
-    return converted;
-  }
-
 private:
   /**
    * This helper function takes a typed(Tp) memory location( member)
@@ -1015,11 +915,6 @@ Property::Value::~Value()
 Property::Type Property::Value::GetType() const
 {
   return Read().GetType();
-}
-
-bool Property::Value::ConvertType(const Property::Type targetType)
-{
-  return Write().ConvertType(targetType);
 }
 
 bool Property::Value::Get(bool& booleanValue) const

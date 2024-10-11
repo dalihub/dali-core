@@ -169,10 +169,6 @@ public:
   float TestCalculateChildSizeBase(const Dali::Actor& child, Dali::Dimension::Type dimension);
   bool  TestRelayoutDependentOnChildrenBase(Dali::Dimension::Type dimension);
 
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
-  {
-  }
-
 public:
   Dali::Property::Index    mDaliProperty;
   std::vector<std::string> mMethodsCalled;
@@ -518,10 +514,6 @@ public:
   bool RelayoutDependentOnChildren(Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS) override
   {
     return false;
-  }
-
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
-  {
   }
 };
 

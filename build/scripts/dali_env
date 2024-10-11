@@ -165,7 +165,7 @@ my $opt_help=0;
 my $opt_man=0;
 my $opt_vk_version="1.3.280.1";
 my $opt_vulkan=undef;
-my $opt_usd=0;
+my $VULKAN_ENV="";
 
 GetOptions("create"     => \$opt_create,
            "envfile=s"  => \$opt_envfile,
@@ -173,7 +173,6 @@ GetOptions("create"     => \$opt_create,
            "setenv"     => \$opt_setenv,
            "help"       => \$opt_help,
            "vulkan:s"   => \$opt_vulkan,
-           "usd"        => \$opt_usd,
            "man"        => \$opt_man) or pod2usage(2);
 
 pod2usage(1) if $opt_help;
@@ -294,23 +293,8 @@ EOF
 }
 
 ################################################################################
-sub download_archive
+sub vulkan_env
 {
-    my ($archive, $url, $download_info) = @_;
-
-    # Avoid excessive downloading of the same file
-    if(! -e "/tmp/$archive")
-    {
-        print "Downloading $download_info\nfrom: $url\n";
-        system('wget','-P','/tmp',$url);
-        die "Can't download archive" if(! -e "/tmp/$archive");
-    }
-}
-
-sub untar_archive
-{
-    my $archive=shift;
-    system('tar','-xf',"/tmp/$archive", '--checkpoint=5000', '--checkpoint-action=ttyout=.');
 }
 
 sub install_vulkan
@@ -319,13 +303,20 @@ sub install_vulkan
     {
         my $archive="vulkansdk-linux-x86_64-${opt_vk_version}.tar.xz";
         my $url="https://sdk.lunarg.com/sdk/download/${opt_vk_version}/linux/$archive";
-        download_archive($archive, $url, "Vulkan SDK version ${opt_vk_version}");
+
+        # Avoid excessive downloading of the same file
+        if(! -e "/tmp/$archive")
+        {
+            print "Downloading Vulkan SDK version ${opt_vk_version}\nfrom: $url\n";
+            system('wget','-P','/tmp',$url);
+            die "Can't download archive" if(! -e "/tmp/$archive");
+        }
 
         my $vulkan_install_path="$root_path/vulkan";
-        print "Unpacking vulkan archive\n";
+        print "Unpacking archive\n";
         mkpath($vulkan_install_path);
         chdir($vulkan_install_path);
-        untar_archive($archive);
+        system('tar','-xf',"/tmp/$archive", '--checkpoint=5000', '--checkpoint-action=ttyout=.');
         print("\n");
         chdir("$root_path/..");
 
@@ -382,84 +373,6 @@ EOF
     }
 }
 
-sub install_usd
-{
-    if($opt_usd)
-    {
-        my $boost_archive="boost-1.84.0.tar.gz";
-        my $boost_url="https://github.com/boostorg/boost/releases/download/boost-1.84.0/$boost_archive";
-        download_archive($boost_archive, $boost_url, "Boost");
-
-        my $tbb_archive="2019_U9.tar.gz";
-        my $tbb_url="https://github.com/oneapi-src/oneTBB/archive/refs/tags/$tbb_archive";
-        download_archive($tbb_archive, $tbb_url, "LibTBB");
-
-        my $openusd_archive="32-bit-arm-and-tizen-support.tar.gz";
-        my $openusd_url="https://github.com/dalihub/OpenUSD/archive/refs/tags/$openusd_archive";
-        download_archive($openusd_archive, $openusd_url, "OpenUSD");
-
-        my $usd_install_path=$install_path;
-        my $usd_source_path="$src_path/usd";
-
-        print "Unpacking Boost, TBB & OpenUSD archives\n";
-        mkpath($usd_source_path);
-        chdir($usd_source_path);
-        untar_archive($boost_archive);
-        untar_archive($tbb_archive);
-        untar_archive($openusd_archive);
-
-        mkpath("$usd_install_path/lib");
-        mkpath("$usd_install_path/include");
-
-        my $boost_source_path="$usd_source_path/boost-1.84.0";
-        print "Building Boost\n";
-        chdir("$boost_source_path");
-        system('cmake',"-DCMAKE_INSTALL_PREFIX=$usd_install_path", '.');
-        system('make','-j8','install');
-
-        my $tbb_source_path="$usd_source_path/oneTBB-2019_U9";
-        print "Building TBB\n";
-        chdir("$tbb_source_path");
-        system('make','-j8');
-        my $tbbBuildFolder=`make info | grep tbb_build_prefix | cut -d= -f 2`;
-        chomp($tbbBuildFolder);
-        $tbbBuildFolder=$tbbBuildFolder . "_release";
-        print "$tbbBuildFolder Hello";
-        system("install -m 644 ./build/$tbbBuildFolder/*.so* $usd_install_path/lib/");
-        system('cp','-rf','include/tbb',"$usd_install_path/include/");
-
-        my $openusd_source_path="$usd_source_path/OpenUSD-32-bit-arm-and-tizen-support";
-        print "Building USD\n";
-        chdir("$openusd_source_path");
-        system('cmake',
-               '-DPXR_ENABLE_PYTHON_SUPPORT=OFF',
-               '-DPXR_ENABLE_PTEX_SUPPORT=OFF',
-               '-DPXR_ENABLE_OPENVDB_SUPPORT=OFF',
-               '-DPXR_ENABLE_HDF5_SUPPORT=OFF',
-               '-DPXR_ENABLE_MATERIALX_SUPPORT=OFF',
-               '-DPXR_BUILD_IMAGING=OFF',
-               '-DPXR_BUILD_USD_IMAGING=OFF',
-               '-DPXR_BUILD_USDVIEW=OFF',
-               '-DPXR_BUILD_DOCUMENTATION=OFF',
-               '-DPXR_BUILD_HTML_DOCUMENTATION=OFF',
-               '-DPXR_BUILD_PYTHON_DOCUMENTATION=OFF',
-               '-DPXR_BUILD_TESTS=OFF',
-               '-DPXR_BUILD_EXAMPLES=OFF',
-               '-DPXR_BUILD_TUTORIALS=OFF',
-               '-DPXR_BUILD_USD_TOOLS=OFF',
-               '-DPXR_BUILD_MAYAPY_TESTS=OFF',
-               '-DPXR_BUILD_ANIMX_TESTS=OFF',
-               "-DTBB_ROOT_DIR=$usd_install_path",
-               "-DBOOST_ROOT=$usd_install_path",
-               "-DCMAKE_INSTALL_PREFIX=$usd_install_path",
-               '.'
-              );
-        system('make','-j8','install');
-
-        print("\n");
-        chdir("$root_path/..");
-    }
-}
 
 sub check_system_package
 {
@@ -520,7 +433,7 @@ sub check_source_packages
             {
                 print "Attempting to build $pkg\n";
                 # from https://www.eriksmistad.no/getting-started-with-google-test-on-ubuntu/
-                run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp lib/*.a /usr/lib; cd -;");
+                run_command("cd /usr/src/gtest; sudo cmake CMakeLists.txt; sudo make; sudo cp *.a /usr/lib; cd -;");
             }
         }
     }
@@ -842,7 +755,6 @@ if($opt_create)
     check_source_packages();
 
     install_vulkan();
-    install_usd();
     create_setenv();
 }
 elsif($opt_setenv)
@@ -898,10 +810,6 @@ Set the filename for the environment settings, defaults to "setenv"
 Install the Vulkan SDK (By default, uses 1.3.280.1) with the optional version
 number. Adds several .pc files into dali-env/opt/lib/pkg-config directory,
 and requires a new environment file to be written.
-
-=item B<-u|--usd>
-
-Installs the OpenUSD library and its dependencies.
 
 =item B<-h|--help>
 

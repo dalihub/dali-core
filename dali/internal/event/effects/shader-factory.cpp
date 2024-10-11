@@ -33,8 +33,6 @@ namespace
 {
 const char* VERSION_SEPARATOR = "-";
 const char* SHADER_SUFFIX     = ".dali-bin";
-
-constexpr uint32_t MAXIMUM_STRING_SHADER_DATA_CACHE_CLEAN_THRESHOLD = 128u;
 } // namespace
 
 namespace Dali
@@ -190,11 +188,6 @@ void ShaderFactory::MemoryCacheInsert(ShaderData& shaderData, const bool isBinar
   }
   else
   {
-    if(DALI_UNLIKELY(mTotalStringCachedShadersCount >= MAXIMUM_STRING_SHADER_DATA_CACHE_CLEAN_THRESHOLD))
-    {
-      // Reset string cache, to avoid memory leak problem.
-      ResetStringShaderData();
-    }
     auto& cacheList = mShaderStringCache[shaderHash]; ///< Get or create a new cache list.
 
     // Ignore shaderdata with string if it already exists:
@@ -209,8 +202,6 @@ void ShaderFactory::MemoryCacheInsert(ShaderData& shaderData, const bool isBinar
     }
     shaderData.Reference();
     cacheList.PushBack(&shaderData);
-
-    ++mTotalStringCachedShadersCount;
     DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "CACHED NON-BINARY SHADER FOR HASH: %u, HINT: %d, TAG: %u\n", shaderHash, static_cast<int>(shaderData.GetHints()), shaderData.GetRenderPassTag());
   }
 }
@@ -231,8 +222,6 @@ void ShaderFactory::RemoveStringShaderData(ShaderData& shaderData)
         // Reduce reference before erase
         (*iter)->Unreference();
         cacheList.Erase(iter);
-
-        --mTotalStringCachedShadersCount;
         break;
       }
     }
@@ -241,25 +230,6 @@ void ShaderFactory::RemoveStringShaderData(ShaderData& shaderData)
       mShaderStringCache.erase(shaderHash);
     }
   }
-}
-
-void ShaderFactory::ResetStringShaderData()
-{
-  DALI_LOG_RELEASE_INFO("Trigger StringShaderData GC. shader : [%u]\n", mTotalStringCachedShadersCount);
-  for(auto&& iter : mShaderStringCache)
-  {
-    auto& cacheList = iter.second;
-    for(auto&& shaderData : cacheList)
-    {
-      shaderData->Unreference();
-    }
-  }
-
-  // Reset cache after unreference.
-  mShaderStringCache.clear();
-
-  mTotalStringCachedShadersCount = 0u;
-  DALI_LOG_RELEASE_INFO("StringShaderData GC done\n");
 }
 
 } // namespace Internal

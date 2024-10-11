@@ -71,15 +71,12 @@ public:
                                 const Rect<int>&                     rootClippingRect,
                                 int                                  orientation,
                                 const Uint16Pair&                    sceneSize,
-                                Graphics::RenderPass*                renderPass,
                                 Graphics::RenderTarget*              renderTarget);
 
   /**
    * Resets main command buffer (per scene)
-   *
-   * @param[in] bindings list of resource bindings (optional, can be null)
    */
-  void ResetCommandBuffer(std::vector<Graphics::CommandBufferResourceBinding>* bindings);
+  void ResetCommandBuffer();
 
   /**
    * Submits main command buffer (per scene)
@@ -169,7 +166,6 @@ private:
                                 const Rect<int>&                                     rootClippingRect,
                                 int                                                  orientation,
                                 const Uint16Pair&                                    sceneSize,
-                                Graphics::RenderPass*                                renderPass,
                                 Graphics::RenderTarget*                              renderTarget);
 
   // Member variables:

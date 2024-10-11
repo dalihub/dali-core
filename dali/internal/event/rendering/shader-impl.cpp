@@ -348,13 +348,13 @@ std::string Shader::GetShaderVersionPrefix()
 std::string Shader::GetVertexShaderPrefix()
 {
   Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
-  return GenerateTaggedShaderPrefix(tls.GetVertexShaderPrefix());
+  return tls.GetVertexShaderPrefix();
 }
 
 std::string Shader::GetFragmentShaderPrefix()
 {
   Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
-  return GenerateTaggedShaderPrefix(tls.GetFragmentShaderPrefix());
+  return tls.GetFragmentShaderPrefix();
 }
 
 std::string Shader::GenerateTaggedShaderPrefix(const std::string& shaderPrefix)
