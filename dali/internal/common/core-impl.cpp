@@ -158,6 +158,9 @@ Core::~Core()
     tls->Unreference();
   }
 
+  // Call SceneDestroyed() if we never be called it ever before.
+  SceneDestroyed();
+
   mObjectRegistry.Reset();
 
   // Stop relayout requests being raised on stage destruction
@@ -285,6 +288,16 @@ void Core::SceneCreated()
     Dali::Actor sceneRootLayer = scene->GetRootLayer();
     mRelayoutController->RequestRelayoutTree(sceneRootLayer);
   }
+}
+
+void Core::SceneDestroyed()
+{
+  // Be careful that Core::SceneDestroyed() could be called multiple times.
+
+  // Remove all registered processors.
+  UnregisterProcessors();
+
+  mRelayoutController->SetEnabled(false);
 }
 
 void Core::QueueEvent(const Integration::Event& event)
