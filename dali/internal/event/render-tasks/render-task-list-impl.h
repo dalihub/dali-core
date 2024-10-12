@@ -23,6 +23,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
+#include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/internal/event/common/scene-graph-notifier-interface-mapper.h>
 #include <dali/internal/event/events/actor-observer.h>
@@ -163,6 +164,21 @@ public:
   void SortTasks();
 
   /**
+   * @brief Requests to reorder the RenderTasks of this RenderTaskList.
+   */
+  void RequestReorder()
+  {
+    mIsRequestedToReorderTask = true;
+  }
+
+  /**
+   * @brief Reorder RenderTasks along the priority of OffScreenRenderableType of each Actor.
+   *
+   * @param[in] layerList layerList that used for tasks reordering.
+   */
+  void ReorderTasks(Dali::Internal::LayerList& layerList);
+
+  /**
    * Provide notification signals for a "Finished" render task.
    * This method should be called in the event-thread
    * Queue NotifyFinishedMessage() from update-thread
@@ -215,6 +231,7 @@ private:
   RenderTaskPtr       mOverlayRenderTask{nullptr};
 
   bool mIsRequestedToSortTask{false};
+  bool mIsRequestedToReorderTask{false};
 };
 
 } // namespace Internal

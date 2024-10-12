@@ -422,6 +422,9 @@ public: // ResourceId relative API.
    */
   Graphics::UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) override;
 
+  bool          HasClipMatrix() const override;
+  const Matrix& GetClipMatrix() const override;
+
 public: // Test Functions
   void SetAutoAttrCreation(bool v)
   {
@@ -499,14 +502,14 @@ public: // Test Functions
                                uint32_t                                      elementStrideInBytes)
   {
     TestGraphicsReflection::TestUniformInfo info;
-    info.name          = std::move(name);
-    info.type          = type;
-    info.uniformClass  = Graphics::UniformClass::UNIFORM;
-    info.numElements   = elementCount;
-    info.locations     = {0};
-    info.bufferIndex   = 0;                    // this will update when AddCustomUniformBlock called
+    info.name         = std::move(name);
+    info.type         = type;
+    info.uniformClass = Graphics::UniformClass::UNIFORM;
+    info.numElements  = elementCount;
+    info.locations    = {0};
+    info.bufferIndex  = 0; // this will update when AddCustomUniformBlock called
 
-    auto retval= GetUniformBufferArrayStrideAndTypeSize(info, elementStrideInBytes);
+    auto retval        = GetUniformBufferArrayStrideAndTypeSize(info, elementStrideInBytes);
     info.elementStride = std::max(retval.first, retval.second);
     info.offsets       = {blockInfo.size};
     blockInfo.size += (elementCount == 0 ? 1 : elementCount) * std::max(retval.first, retval.second);
@@ -567,4 +570,4 @@ public:
 
 } // namespace Dali
 
-#endif //TEST_GRAPHICS_CONTROLLER_H
+#endif // TEST_GRAPHICS_CONTROLLER_H
