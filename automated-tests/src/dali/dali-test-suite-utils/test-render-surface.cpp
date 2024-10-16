@@ -71,6 +71,12 @@ void TestRenderSurface::MoveResize(Dali::PositionSize positionSize)
   mPositionSize = positionSize;
 }
 
+void TestRenderSurface::Resize(Dali::Uint16Pair size)
+{
+  mPositionSize.width  = size.GetWidth();
+  mPositionSize.height = size.GetHeight();
+}
+
 void TestRenderSurface::StartRender()
 {
 }

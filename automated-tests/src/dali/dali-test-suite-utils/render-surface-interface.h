@@ -20,6 +20,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/math/uint-16-pair.h>
 
 namespace Dali
 {
@@ -48,6 +49,7 @@ public:
   virtual void                                      DestroySurface()                                                                                    = 0;
   virtual bool                                      ReplaceGraphicsSurface()                                                                            = 0;
   virtual void                                      MoveResize(Dali::PositionSize positionSize)                                                         = 0;
+  virtual void                                      Resize(Dali::Uint16Pair size)                                                                       = 0;
   virtual void                                      StartRender()                                                                                       = 0;
   virtual bool                                      PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect) = 0;
   virtual void                                      PostRender()                                                                                        = 0;

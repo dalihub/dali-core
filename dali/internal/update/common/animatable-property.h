@@ -808,9 +808,13 @@ public:
    */
   void SetX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].x, value))
+    {
+      mValue[bufferIndex].x = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -821,9 +825,13 @@ public:
    */
   void SetY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].y, value))
+    {
+      mValue[bufferIndex].y = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -845,9 +853,13 @@ public:
    */
   void SetXRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].x += delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].x += delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -857,9 +869,13 @@ public:
    */
   void SetYRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].y += delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].y += delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -921,11 +937,15 @@ public:
    */
   void BakeX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x     = value;
-    mValue[1 - bufferIndex].x = value;
-    mBaseValue.x              = value;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.x, value))
+    {
+      mValue[bufferIndex].x     = value;
+      mValue[1 - bufferIndex].x = value;
+      mBaseValue.x              = value;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -935,11 +955,15 @@ public:
    */
   void BakeY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y     = value;
-    mValue[1 - bufferIndex].y = value;
-    mBaseValue.y              = value;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.y, value))
+    {
+      mValue[bufferIndex].y     = value;
+      mValue[1 - bufferIndex].y = value;
+      mBaseValue.y              = value;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -1106,9 +1130,13 @@ public:
    */
   void SetX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].x, value))
+    {
+      mValue[bufferIndex].x = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1119,9 +1147,13 @@ public:
    */
   void SetY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].y, value))
+    {
+      mValue[bufferIndex].y = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1132,9 +1164,13 @@ public:
    */
   void SetZ(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].z = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].z, value))
+    {
+      mValue[bufferIndex].z = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1156,9 +1192,13 @@ public:
    */
   void SetXRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].x += delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].x += delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1168,9 +1208,13 @@ public:
    */
   void SetYRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].y += delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].y += delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1180,9 +1224,13 @@ public:
    */
   void SetZRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].z += delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].z += delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1242,11 +1290,15 @@ public:
    */
   void BakeX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x     = value;
-    mValue[1 - bufferIndex].x = value;
-    mBaseValue.x              = value;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.x, value))
+    {
+      mValue[bufferIndex].x     = value;
+      mValue[1 - bufferIndex].x = value;
+      mBaseValue.x              = value;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -1256,11 +1308,15 @@ public:
    */
   void BakeY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y     = value;
-    mValue[1 - bufferIndex].y = value;
-    mBaseValue.y              = value;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.y, value))
+    {
+      mValue[bufferIndex].y     = value;
+      mValue[1 - bufferIndex].y = value;
+      mBaseValue.y              = value;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -1270,11 +1326,15 @@ public:
    */
   void BakeZ(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].z     = value;
-    mValue[1 - bufferIndex].z = value;
-    mBaseValue.z              = value;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.z, value))
+    {
+      mValue[bufferIndex].z     = value;
+      mValue[1 - bufferIndex].z = value;
+      mBaseValue.z              = value;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -1450,9 +1510,13 @@ public:
    */
   void SetX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].x, value))
+    {
+      mValue[bufferIndex].x = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1463,9 +1527,13 @@ public:
    */
   void SetY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].y, value))
+    {
+      mValue[bufferIndex].y = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1476,9 +1544,13 @@ public:
    */
   void SetZ(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].z = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].z, value))
+    {
+      mValue[bufferIndex].z = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1489,9 +1561,13 @@ public:
    */
   void SetW(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].w = value;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::Equals(mValue[bufferIndex].w, value))
+    {
+      mValue[bufferIndex].w = value;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1513,9 +1589,13 @@ public:
    */
   void SetXRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].x = mValue[bufferIndex].x + delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].x = mValue[bufferIndex].x + delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1525,9 +1605,13 @@ public:
    */
   void SetYRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].y = mValue[bufferIndex].y + delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].y = mValue[bufferIndex].y + delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1537,9 +1621,13 @@ public:
    */
   void SetZRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].z = mValue[bufferIndex].z + delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].z = mValue[bufferIndex].z + delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1549,9 +1637,13 @@ public:
    */
   void SetWRelative(BufferIndex bufferIndex, float delta)
   {
-    mValue[bufferIndex].w = mValue[bufferIndex].w + delta;
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if(!Dali::EqualsZero(delta))
+    {
+      mValue[bufferIndex].w = mValue[bufferIndex].w + delta;
 
-    OnSet();
+      OnSet();
+    }
   }
 
   /**
@@ -1611,11 +1703,15 @@ public:
    */
   void BakeX(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].x     = value;
-    mValue[1 - bufferIndex].x = value;
-    mBaseValue.x              = mValue[bufferIndex].x;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.x, value))
+    {
+      mValue[bufferIndex].x     = value;
+      mValue[1 - bufferIndex].x = value;
+      mBaseValue.x              = mValue[bufferIndex].x;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -1625,11 +1721,15 @@ public:
    */
   void BakeY(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].y     = value;
-    mValue[1 - bufferIndex].y = value;
-    mBaseValue.y              = mValue[bufferIndex].y;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.y, value))
+    {
+      mValue[bufferIndex].y     = value;
+      mValue[1 - bufferIndex].y = value;
+      mBaseValue.y              = mValue[bufferIndex].y;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -1639,11 +1739,15 @@ public:
    */
   void BakeZ(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].z     = value;
-    mValue[1 - bufferIndex].z = value;
-    mBaseValue.z              = mValue[bufferIndex].z;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.z, value))
+    {
+      mValue[bufferIndex].z     = value;
+      mValue[1 - bufferIndex].z = value;
+      mBaseValue.z              = mValue[bufferIndex].z;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**
@@ -1653,11 +1757,15 @@ public:
    */
   void BakeW(BufferIndex bufferIndex, float value)
   {
-    mValue[bufferIndex].w     = value;
-    mValue[1 - bufferIndex].w = value;
-    mBaseValue.w              = mValue[bufferIndex].w;
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if(!Dali::Equals(mBaseValue.w, value))
+    {
+      mValue[bufferIndex].w     = value;
+      mValue[1 - bufferIndex].w = value;
+      mBaseValue.w              = mValue[bufferIndex].w;
 
-    OnBake();
+      OnBake();
+    }
   }
 
   /**

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_DECLARATIONS_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ using NodeConstIter = NodeContainer::ConstIterator;
  * Flag whether property has changed, during the Update phase.
  */
 enum class NodePropertyFlags : uint8_t
-// 8 bits is enough for 6 flags (compiler will check it)
+// 8 bits is enough for 7 flags (compiler will check it)
 {
   NOTHING                      = 0x000,
   TRANSFORM                    = 0x001,
@@ -50,7 +50,8 @@ enum class NodePropertyFlags : uint8_t
   CHILD_DELETED                = 0x008,
   CHILDREN_REORDER             = 0x010,
   DESCENDENT_HIERARCHY_CHANGED = 0x020,
-  ALL                          = (DESCENDENT_HIERARCHY_CHANGED << 1) - 1 // all the flags
+  CLIPPING_MODE                = 0x040,
+  ALL                          = (CLIPPING_MODE << 1) - 1 // all the flags
 };
 
 struct NodeDepthPair
