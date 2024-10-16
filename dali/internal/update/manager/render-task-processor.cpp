@@ -83,7 +83,7 @@ Layer* FindLayer(Node& node)
  *
  * @param[in]  updateBufferIndex The current update buffer index.
  * @param[in]  node The current node of the scene-graph.
- * @param[in]  parentVisibilityChanged The parent node's visibility was changed at current frame.
+ * @param[in]  parentVisibilityChanged The parent node's visibility might be changed at current frame. (Due to visibility property, or ancient's clipping mode change)
  * @param[in]  currentLayer The current layer containing lists of opaque/transparent renderables.
  * @param[in]  renderTask The current render-task.
  * @param[in]  inheritedDrawMode The draw mode of the parent
@@ -119,6 +119,12 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
   {
     node.GetPartialRenderingData().mVisible = true;
     parentVisibilityChanged                 = true;
+  }
+
+  // If the node's clipping mode is changed, we need to mark all descendent nodes as updated
+  if(node.IsClippingModeChanged())
+  {
+    parentVisibilityChanged = true;
   }
 
   if(parentVisibilityChanged)

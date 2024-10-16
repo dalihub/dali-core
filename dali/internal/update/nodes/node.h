@@ -62,7 +62,7 @@ class ResetterManager;
 class Node;
 
 // Flags which require the scene renderable lists to be updated
-static NodePropertyFlags RenderableUpdateFlags = NodePropertyFlags::TRANSFORM | NodePropertyFlags::CHILD_DELETED;
+static NodePropertyFlags RenderableUpdateFlags = NodePropertyFlags::TRANSFORM | NodePropertyFlags::CHILD_DELETED | NodePropertyFlags::CLIPPING_MODE;
 
 /**
  * Node is the base class for all nodes in the Scene Graph.
@@ -222,8 +222,11 @@ public:
    */
   void SetClippingMode(const ClippingMode::Type clippingMode)
   {
-    mClippingMode = clippingMode;
-    SetDirtyFlag(NodePropertyFlags::TRANSFORM);
+    if(mClippingMode != clippingMode)
+    {
+      mClippingMode = clippingMode;
+      SetDirtyFlag(NodePropertyFlags::CLIPPING_MODE);
+    }
   }
 
   /**
@@ -911,6 +914,16 @@ public:
   bool IsDescendentHierarchyChanged() const
   {
     return mDirtyFlags & NodePropertyFlags::DESCENDENT_HIERARCHY_CHANGED;
+  }
+
+  /**
+   * @brief Get whether clipping mode was changed.
+   * @note It will be reset when mDirtyFlag reseted.
+   * @return True if current node's clipping mode was changed.
+   */
+  bool IsClippingModeChanged() const
+  {
+    return mDirtyFlags & NodePropertyFlags::CLIPPING_MODE;
   }
 
   /**
