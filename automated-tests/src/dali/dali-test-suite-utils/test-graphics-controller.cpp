@@ -866,24 +866,19 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         break;
       }
 
-      case CommandType::SET_STENCIL_FUNC:
-      {
-        mGl.StencilFunc(GLCompareOp(cmd.data.stencilFunc.compareOp).op,
-                        cmd.data.stencilFunc.reference,
-                        cmd.data.stencilFunc.compareMask);
-        break;
-      }
-
       case CommandType::SET_STENCIL_WRITE_MASK:
       {
         mGl.StencilMask(cmd.data.stencilWriteMask.mask);
         break;
       }
-      case CommandType::SET_STENCIL_OP:
+      case CommandType::SET_STENCIL_STATE:
       {
-        mGl.StencilOp(GLStencilOp(cmd.data.stencilOp.failOp).op,
-                      GLStencilOp(cmd.data.stencilOp.depthFailOp).op,
-                      GLStencilOp(cmd.data.stencilOp.passOp).op);
+        mGl.StencilFunc(GLCompareOp(cmd.data.stencilState.compareOp).op,
+                        cmd.data.stencilState.reference,
+                        cmd.data.stencilState.compareMask);
+        mGl.StencilOp(GLStencilOp(cmd.data.stencilState.failOp).op,
+                      GLStencilOp(cmd.data.stencilState.depthFailOp).op,
+                      GLStencilOp(cmd.data.stencilState.passOp).op);
         break;
       }
 
@@ -1190,13 +1185,15 @@ void TestGraphicsController::GenerateTextureMipmaps(const Graphics::Texture& tex
   mGl.GenerateMipmap(gfxTexture->GetTarget());
 }
 
-bool TestGraphicsController::EnableDepthStencilBuffer(bool enableDepth, bool enableStencil)
+bool TestGraphicsController::EnableDepthStencilBuffer(const Graphics::RenderTarget& renderTarget,
+                                                      bool                          enableDepth,
+                                                      bool                          enableStencil)
 {
   TraceCallStack::NamedParams namedParams;
   namedParams["enableDepth"] << (enableDepth ? "T" : "F");
   namedParams["enableStencil"] << (enableStencil ? "T" : "F");
-  mCallStack.PushCall("EnableDepthStencilBuffer", "", namedParams);
-  return false;
+  mCallStack.PushCall("EnableDepthStencilBuffer", namedParams.str(), namedParams);
+  return true;
 }
 
 void TestGraphicsController::RunGarbageCollector(size_t numberOfDiscardedRenderers)

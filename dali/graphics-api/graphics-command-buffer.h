@@ -169,7 +169,7 @@ public:
   virtual ~CommandBuffer() = default;
 
   // not copyable
-  CommandBuffer(const CommandBuffer&)            = delete;
+  CommandBuffer(const CommandBuffer&) = delete;
   CommandBuffer& operator=(const CommandBuffer&) = delete;
 
   /**
@@ -438,25 +438,21 @@ public:
   virtual void SetStencilWriteMask(uint32_t writeMask) = 0;
 
   /**
-   * @brief Setup the stencil function
+   * @brief Setup the dynamic stencil state
    *
    * @param[in] compareOp How the stencil buffer, reference and compareMask are combined to determine whether to draw a pixel or not.
    * @param[in] reference A reference value that is ANDed with the mask in the compare op.
    * @param[in] compareMask The bitplanes from the stencil buffer that are active.
-   */
-  virtual void SetStencilFunc(Graphics::CompareOp compareOp,
-                              uint32_t            reference,
-                              uint32_t            compareMask) = 0;
-
-  /**
-   * @brief Set how subsequent draws will affect the stencil buffer.
    * @param[in] failOp What happens to stencil buffer if drawing a pixel fails the stencil test
    * @param[in] passOp What happens to stencil buffer if drawing a pixel passes stencil & depth test
    * @param[in] depthFailOp What happens to stencil buffer if drawing a pixel passes stencil but fails depth test.
    */
-  virtual void SetStencilOp(Graphics::StencilOp failOp,
-                            Graphics::StencilOp passOp,
-                            Graphics::StencilOp depthFailOp) = 0;
+  virtual void SetStencilState(Graphics::CompareOp compareOp,
+                               uint32_t            reference,
+                               uint32_t            compareMask,
+                               Graphics::StencilOp failOp,
+                               Graphics::StencilOp passOp,
+                               Graphics::StencilOp depthFailOp) = 0;
 
   /**
    * @brief Defines the comparison operator for passing the depth test.
@@ -480,7 +476,7 @@ public:
   virtual void SetDepthWriteEnable(bool depthWriteEnable) = 0;
 
 protected:
-  CommandBuffer(CommandBuffer&&)            = default;
+  CommandBuffer(CommandBuffer&&) = default;
   CommandBuffer& operator=(CommandBuffer&&) = default;
 };
 } // namespace Dali::Graphics

@@ -139,13 +139,14 @@ public:
   virtual void GenerateTextureMipmaps(const Texture& texture) = 0;
 
   /**
-   * @brief Enables depth/stencil buffer
+   * @brief Enables depth/stencil buffer for the given render target
    *
+   * @param[in] renderTarget The current surface. Applications should manage offscreen depth buffer through Framebuffer interface.
    * @param[in] enableDepth True to enable depth
    * @param[in] enableStencil True to enable stencil
    * @return True on success
    */
-  virtual bool EnableDepthStencilBuffer(bool enableDepth, bool enableStencil) = 0;
+  virtual bool EnableDepthStencilBuffer(const Graphics::RenderTarget& renderTarget, bool enableDepth, bool enableStencil) = 0;
 
   /**
    * @brief Runs garbage collector (if supported)

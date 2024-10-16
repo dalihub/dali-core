@@ -120,6 +120,19 @@ struct RenderItem
   static ClippingBox CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight);
 
   /**
+   * @brief Returns true if this node/renderer uses the depth buffer (read or write)
+   * @param[in] depthTestEnabled True if depth testing is currently on
+   * @return true if this node/renderer pair uses the depth buffer
+   */
+  bool UsesDepthBuffer(bool depthTestEnabled);
+
+  /**
+   * @brief Returns true if this node/renderer uses the stencil buffer (read or write)
+   * @return true if this node/renderer pair uses the stencil buffer
+   */
+  bool UsesStencilBuffer();
+
+  /**
    * Overriden delete operator.
    * Deletes the RenderItem from its global memory pool
    * @param[in] A pointer to the RenderItem to delete.
@@ -143,6 +156,11 @@ struct RenderItem
    */
   static uint32_t GetMemoryPoolCapacity();
 
+  /**
+   * @return true if this render item uses the depth buffer (reads or writes to it)
+   */
+  bool UsesDepthBuffer();
+
 private:
   /**
    * Private constructor. See RenderItem::New
@@ -150,7 +168,7 @@ private:
   RenderItem();
 
   // RenderItems should not be copied as they are heavy
-  RenderItem(const RenderItem& item) = delete;
+  RenderItem(const RenderItem& item)            = delete;
   RenderItem& operator=(const RenderItem& item) = delete;
 };
 

@@ -173,10 +173,7 @@ public:
    */
   void GenerateTextureMipmaps(const Graphics::Texture& texture) override;
 
-  /**
-   * TBD: do we need those functions in the new implementation?
-   */
-  bool EnableDepthStencilBuffer(bool enableDepth, bool enableStencil) override;
+  bool EnableDepthStencilBuffer(const Graphics::RenderTarget& surface, bool enableDepth, bool enableStencil) override;
 
   void RunGarbageCollector(size_t numberOfDiscardedRenderers) override;
 
