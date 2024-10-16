@@ -90,6 +90,11 @@ private:
    */
   void RemoveStringShaderData(Internal::ShaderData& shaderData);
 
+  /**
+   * @brief Remove all the string shader data from the cache.
+   */
+  void ResetStringShaderData();
+
   // Undefined
   ShaderFactory(const ShaderFactory&) = delete;
 
@@ -101,6 +106,8 @@ private:
 
   ShaderCacheContainer mShaderBinaryCache; ///< Cache of pre-compiled shaders.
   ShaderCacheContainer mShaderStringCache; ///< Cache of non-pre-compiled shaders. (TODO : Could we clean up this cache by user management?)
+
+  uint32_t mTotalStringCachedShadersCount{0u}; ///< Total number of cached shaders that are not pre-compiled.
 
 }; // class ShaderFactory
 

@@ -16,6 +16,7 @@
 */
 
 #include <dali-test-suite-utils.h>
+#include <dali/integration-api/shader-integ.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
@@ -74,6 +75,49 @@ int UtcDaliShaderWithPrefixTestVersion(void)
 
   auto vertexPrefix   = Dali::Shader::GetVertexShaderPrefix();
   auto fragmentPrefix = Dali::Shader::GetFragmentShaderPrefix();
+
+  Dali::Shader shader = Dali::Shader::New(
+    vertexPrefix + vertexShader,
+    fragmentPrefix + fragmentShader);
+
+  DALI_TEST_EQUALS(vertexPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
+  DALI_TEST_EQUALS(fragmentPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
+
+  // Test version number in the shader data
+  Dali::Internal::ThreadLocalStorage& tls           = Dali::Internal::ThreadLocalStorage::Get();
+  Dali::Internal::ShaderFactory&      shaderFactory = tls.GetShaderFactory();
+  size_t                              shaderHash;
+  Internal::ShaderDataPtr             shaderData = shaderFactory.Load(vertexShader, fragmentShader, {}, {}, "", shaderHash);
+
+  bool dataValid = (shaderData != nullptr);
+  DALI_TEST_EQUALS(dataValid, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(shaderData->GetVertexShaderVersion(), 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(shaderData->GetFragmentShaderVersion(), 101, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliShaderWithPrefixTestVersion2(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test same case of UtcDaliShaderWithPrefixTestVersion with integration api");
+
+  std::string vertexShader =
+    "//@version 100\n"
+    "some code\n";
+  std::string fragmentShader =
+    "//@version 101\n"
+    "some code\n";
+
+  // Get prefix from graphics config.
+  auto vertexPrefix   = application.GetGlAbstraction().GetVertexShaderPrefix();
+  auto fragmentPrefix = application.GetGlAbstraction().GetFragmentShaderPrefix();
+
+  // And use GenerateTaggedShaderPrefix from integration-api.
+  vertexPrefix   = Dali::Integration::GenerateTaggedShaderPrefix(vertexPrefix);
+  fragmentPrefix = Dali::Integration::GenerateTaggedShaderPrefix(fragmentPrefix);
 
   Dali::Shader shader = Dali::Shader::New(
     vertexPrefix + vertexShader,

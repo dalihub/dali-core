@@ -40,6 +40,7 @@ namespace Render
 {
 namespace
 {
+
 struct GraphicsDepthCompareOp
 {
   constexpr explicit GraphicsDepthCompareOp(DepthFunction::Type compareOp)
@@ -147,7 +148,7 @@ struct GraphicsStencilOp
 
 inline Graphics::Viewport ViewportFromClippingBox(const Uint16Pair& sceneSize, ClippingBox clippingBox, int orientation)
 {
-  Graphics::Viewport viewport{static_cast<float>(clippingBox.x), static_cast<float>(clippingBox.y), static_cast<float>(clippingBox.width), static_cast<float>(clippingBox.height), 0.0f, 0.0f};
+  Graphics::Viewport viewport{static_cast<float>(clippingBox.x), static_cast<float>(clippingBox.y), static_cast<float>(clippingBox.width), static_cast<float>(clippingBox.height), 0.0f, 1.0f};
 
   if(orientation == 90 || orientation == 270)
   {
@@ -169,6 +170,8 @@ inline Graphics::Viewport ViewportFromClippingBox(const Uint16Pair& sceneSize, C
     viewport.x = sceneSize.GetX() - (clippingBox.x + clippingBox.width);
     viewport.y = sceneSize.GetY() - (clippingBox.y + clippingBox.height);
   }
+  viewport.minDepth = 0;
+  viewport.maxDepth = 1;
   return viewport;
 }
 
@@ -593,6 +596,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 const Rect<int>&                    rootClippingRect,
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize,
+                                                Graphics::RenderPass*               renderPass,
                                                 Graphics::RenderTarget*             renderTarget)
 {
   DALI_PRINT_RENDER_LIST(renderList);
@@ -616,7 +620,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // We are always "inside" a render pass here.
   Graphics::CommandBufferBeginInfo info;
-  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
+  info.SetUsage(0 | Graphics::CommandBufferUsageFlagBits::RENDER_PASS_CONTINUE)
+    .SetRenderPass(*renderPass)
+    .SetRenderTarget(*renderTarget);
   secondaryCommandBuffer.Begin(info);
 
   secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
@@ -627,9 +633,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // Add root clipping rect (set manually for Render function by partial update for example)
   // on the bottom of the stack
+  Graphics::Viewport graphicsViewport = ViewportFromClippingBox(sceneSize, mViewportRectangle, 0);
   if(!rootClippingRect.IsEmpty())
   {
-    Graphics::Viewport graphicsViewport = ViewportFromClippingBox(sceneSize, mViewportRectangle, 0);
     secondaryCommandBuffer.SetScissorTestEnable(true);
     secondaryCommandBuffer.SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
     mScissorStack.push_back(rootClippingRect);
@@ -638,12 +644,13 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   else if(!renderList.IsClipping())
   {
     secondaryCommandBuffer.SetScissorTestEnable(false);
+    //@todo Vk requires a scissor to be set, as we have turned on dynamic state scissor in the pipelines.
+    secondaryCommandBuffer.SetScissor(Rect2DFromClippingBox(mViewportRectangle, orientation, graphicsViewport));
     mScissorStack.push_back(mViewportRectangle);
   }
 
   if(renderList.IsClipping())
   {
-    Graphics::Viewport graphicsViewport = ViewportFromClippingBox(sceneSize, mViewportRectangle, 0);
     secondaryCommandBuffer.SetScissorTestEnable(true);
     const ClippingBox& layerScissorBox = renderList.GetClippingBox();
     secondaryCommandBuffer.SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
@@ -653,6 +660,13 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // Prepare Render::Renderer Render for this secondary command buffer.
   Renderer::PrepareCommandBuffer();
+
+  // Modify by the clip matrix if necessary (transforms from GL clip space to alternative clip space)
+  Matrix clippedProjectionMatrix(projectionMatrix);
+  if(mGraphicsController.HasClipMatrix())
+  {
+    Matrix::Multiply(clippedProjectionMatrix, projectionMatrix, mGraphicsController.GetClipMatrix());
+  }
 
   // Loop through all RenderItems in the RenderList, set up any prerequisites to render them, then perform the render.
   for(uint32_t index = 0u; index < count; ++index)
@@ -705,7 +719,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, projectionMatrix, item.mScale, item.mSize, !item.mIsOpaque, instruction, renderTarget, queue);
+          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, item.mScale, item.mSize, !item.mIsOpaque, instruction, renderTarget, queue);
         }
       }
     }
@@ -720,7 +734,7 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 {
 }
 
-void RenderAlgorithms::ResetCommandBuffer()
+void RenderAlgorithms::ResetCommandBuffer(std::vector<Graphics::CommandBufferResourceBinding>* resourceBindings)
 {
   // Reset main command buffer
   if(!mGraphicsCommandBuffer)
@@ -736,7 +750,8 @@ void RenderAlgorithms::ResetCommandBuffer()
   }
 
   Graphics::CommandBufferBeginInfo info;
-  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
+  info.resourceBindings = resourceBindings; // set resource bindings, currently only programs
+  info.usage            = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
   mGraphicsCommandBuffer->Begin(info);
 }
 
@@ -764,6 +779,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 const Rect<int>&                    rootClippingRect,
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize,
+                                                Graphics::RenderPass*               renderPass,
                                                 Graphics::RenderTarget*             renderTarget)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) { oss << "[" << instruction.RenderListCount() << "]"; });
@@ -800,6 +816,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           rootClippingRect,
                           orientation,
                           sceneSize,
+                          renderPass,
                           renderTarget);
 
         // Execute command buffer

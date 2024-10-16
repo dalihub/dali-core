@@ -189,6 +189,21 @@ enum Type
 } // namespace LayoutDirection
 
 /**
+ * @brief Enumeration for the OffScreenRenderable of the Actor
+ * @SINCE_2_3.43
+ */
+namespace OffScreenRenderable
+{
+enum Type
+{
+  NONE     = 0,                  // The Actor has no OffScreenRenderables. @SINCE_2_3.43
+  FORWARD  = 1,                  // The Actor has RenderTasks those need reorder. And the Tasks will draw Actors those placed in front of the Actor. @SINCE_2_3.43
+  BACKWARD = 2,                  // The Actor has RenderTasks those need reorder, And the Tasks will draw Actors those placed behinde of the Actor. @SINCE_2_3.43
+  BOTH     = FORWARD | BACKWARD, // The Actor has RenderTasks for the both of FORWARD and BACKWARD. @SINCE_2_3.43
+};
+} // namespace OffScreenRenderables
+
+/**
  * @}
  */
 } // namespace Dali

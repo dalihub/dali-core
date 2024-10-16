@@ -37,6 +37,9 @@ class Framebuffer;
 class Program;
 class Shader;
 class Texture;
+class RenderTarget;
+class RenderPass;
+class Sampler;
 
 /**
  * @brief Structure describes 2D offset
@@ -77,7 +80,7 @@ struct Viewport
   float width    = 0.0f;
   float height   = 0.0f;
   float minDepth = 0.0f;
-  float maxDepth = 0.0f;
+  float maxDepth = 1.0f;
 };
 
 /**
@@ -575,7 +578,7 @@ struct RasterizationState
 struct InputAssemblyState
 {
   PrimitiveTopology topology{};
-  bool              primitiveRestartEnable{true};
+  bool              primitiveRestartEnable{false};
 
   auto& SetTopology(PrimitiveTopology value)
   {
@@ -585,7 +588,7 @@ struct InputAssemblyState
 
   auto& SetPrimitiveRestartEnable(bool value)
   {
-    primitiveRestartEnable = true;
+    primitiveRestartEnable = value;
     return *this;
   }
 };
@@ -1293,10 +1296,59 @@ inline CommandBufferUsageFlags operator|(T flags, CommandBufferUsageFlagBits bit
   return static_cast<CommandBufferUsageFlags>(flags) | static_cast<CommandBufferUsageFlags>(bit);
 }
 
+enum class ResourceType
+{
+  PROGRAM,
+  BUFFER,
+  SAMPLER,
+  TEXTURE
+};
+
+struct ProgramResourceBindingInfo
+{
+  Graphics::Program* program;
+  uint32_t           count;
+};
+
+struct BufferResourceBindingInfo;
+struct TextureResourceBindingInfo;
+struct SamplerResourceBindingInfo;
+
+struct CommandBufferResourceBinding
+{
+  ResourceType type; ///< Type of resource
+
+  union
+  {
+    ProgramResourceBindingInfo* programBinding{nullptr};
+    BufferResourceBindingInfo*  bufferBinding;
+    TextureResourceBindingInfo* textureBinding;
+    SamplerResourceBindingInfo* samplerBinding;
+  };
+};
+
 struct CommandBufferBeginInfo
 {
   CommandBufferUsageFlags usage;
-  // Don't care about inheritance yet. Can extend as required.
+
+  std::vector<CommandBufferResourceBinding>* resourceBindings{nullptr}; ///< Sets resource binding hints
+  const RenderPass*                          renderPass{nullptr};
+  const RenderTarget*                        renderTarget{nullptr};
+  auto&                                      SetUsage(CommandBufferUsageFlags flags)
+  {
+    usage = flags;
+    return *this;
+  }
+  auto& SetRenderPass(const RenderPass& value)
+  {
+    renderPass = &value;
+    return *this;
+  }
+  auto& SetRenderTarget(const RenderTarget& value)
+  {
+    renderTarget = &value;
+    return *this;
+  }
 };
 
 /**
@@ -1517,8 +1569,7 @@ struct DefaultDeleter
   template<class P, template<typename> typename U>
   DefaultDeleter(const U<P>& deleter)
   {
-    deleteFunction = [](T* object)
-    { U<P>()(static_cast<P*>(object)); };
+    deleteFunction = [](T* object) { U<P>()(static_cast<P*>(object)); };
   }
 
   /**

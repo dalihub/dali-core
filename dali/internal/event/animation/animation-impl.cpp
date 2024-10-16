@@ -118,19 +118,20 @@ inline bool IsAnimatable(Property::Type type)
 }
 
 /**
- * Helper to validate animation input values
+ * Helper to validate and convert animation input values
  *
- * @param propertyType type of the property that is being animated
- * @param destinationType type of the target
- * @param period time period of the animation
+ * @param[in] propertyType type of the property that is being animated
+ * @param[in] period time period of the animation
+ * @param[in, out] convertedValue if the value needs conversion, this will contain the converted value.
  */
-void ValidateParameters(Property::Type propertyType, Property::Type destinationType, const TimePeriod& period)
+void ValidateAndConvertParameters(Property::Type propertyType, const TimePeriod& period, Property::Value& convertedValue)
 {
   // destination value has to be animatable
   DALI_ASSERT_ALWAYS(IsAnimatable(propertyType) && "Property type is not animatable");
-  DALI_ASSERT_ALWAYS(IsAnimatable(destinationType) && "Target value is not animatable");
-  DALI_ASSERT_ALWAYS(propertyType == destinationType && "Property and target types don't match");
+  DALI_ASSERT_ALWAYS(IsAnimatable(convertedValue.GetType()) && "Target value is not animatable");
   DALI_ASSERT_ALWAYS(period.durationSeconds >= 0 && "Duration must be >=0");
+
+  DALI_ASSERT_ALWAYS(convertedValue.ConvertType(propertyType) && "Target types could not be convert to Property type");
 }
 
 /**
@@ -566,22 +567,18 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, TimeP
 
 void Animation::AnimateBy(Property& target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object&              object          = GetImplementation(target.object);
-  const Property::Type propertyType    = object.GetPropertyType(target.propertyIndex);
-  const Property::Type destinationType = relativeValue.GetType();
+  Object&              object       = GetImplementation(target.object);
+  const Property::Type propertyType = (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? object.GetPropertyType(target.propertyIndex) : Property::FLOAT;
 
-  // validate animation parameters, if component index is set then use float as checked type
-  ValidateParameters((target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
-                     destinationType,
-                     period);
+  // validate and convert animation parameters, if component index is set then use float as checked type
+  ValidateAndConvertParameters(propertyType, period, relativeValue);
 
   ExtendDuration(period);
 
   // keep the current count.
   auto connectorIndex = mConnectors.Count();
 
-  // using destination type so component animation gets correct type
-  switch(destinationType)
+  switch(propertyType)
   {
     case Property::BOOLEAN:
     {
@@ -688,22 +685,18 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Ti
 
 void Animation::AnimateTo(Property& target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period)
 {
-  Object&              object          = GetImplementation(target.object);
-  const Property::Type propertyType    = object.GetPropertyType(target.propertyIndex);
-  const Property::Type destinationType = destinationValue.GetType();
+  Object&              object       = GetImplementation(target.object);
+  const Property::Type propertyType = (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? object.GetPropertyType(target.propertyIndex) : Property::FLOAT;
 
-  // validate animation parameters, if component index is set then use float as checked type
-  ValidateParameters((target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
-                     destinationType,
-                     period);
+  // validate and convert animation parameters, if component index is set then use float as checked type
+  ValidateAndConvertParameters(propertyType, period, destinationValue);
 
   ExtendDuration(period);
 
   // keep the current count.
   auto connectorIndex = mConnectors.Count();
 
-  // using destination type so component animation gets correct type
-  switch(destinationType)
+  switch(propertyType)
   {
     case Property::BOOLEAN:
     {
@@ -831,20 +824,36 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
   Object&          object        = GetImplementation(target.object);
   const KeyFrames& keyFramesImpl = GetImplementation(keyFrames);
 
-  const Property::Type propertyType    = object.GetPropertyType(target.propertyIndex);
-  const Property::Type destinationType = keyFramesImpl.GetType();
+  const Property::Type propertyType = (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? object.GetPropertyType(target.propertyIndex) : Property::FLOAT;
 
-  // validate animation parameters, if component index is set then use float as checked type
-  ValidateParameters((target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? propertyType : Property::FLOAT,
-                     destinationType,
-                     period);
+  auto lastKeyFrameValue = keyFramesImpl.GetLastKeyFrameValue();
+  ValidateAndConvertParameters(propertyType, period, lastKeyFrameValue);
+
+  if(DALI_UNLIKELY(propertyType != keyFramesImpl.GetType()))
+  {
+    // Test for conversion valid, and convert keyframe values to matched property type.
+    Dali::KeyFrames convertedKeyFrames = Dali::KeyFrames::New();
+    auto            keyFrameCount      = keyFramesImpl.GetKeyFrameCount();
+    for(auto frameIndex = 0u; frameIndex < keyFrameCount; ++frameIndex)
+    {
+      float           progress;
+      Property::Value value;
+      keyFramesImpl.GetKeyFrame(frameIndex, progress, value);
+      DALI_ASSERT_ALWAYS(value.ConvertType(propertyType) && "Target types could not be convert to Property type");
+
+      convertedKeyFrames.Add(progress, value);
+    }
+
+    // Retry to animation as the converted keyframes.
+    AnimateBetween(target, convertedKeyFrames, alpha, period, interpolation);
+    return;
+  }
 
   ExtendDuration(period);
 
-  AppendConnectorTargetValues({keyFramesImpl.GetLastKeyFrameValue(), period, mConnectors.Count(), BETWEEN});
+  AppendConnectorTargetValues({lastKeyFrameValue, period, mConnectors.Count(), BETWEEN});
 
-  // using destination type so component animation gets correct type
-  switch(destinationType)
+  switch(propertyType)
   {
     case Dali::Property::BOOLEAN:
     {
