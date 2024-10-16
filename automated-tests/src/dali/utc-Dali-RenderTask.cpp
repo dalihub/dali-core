@@ -5138,7 +5138,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
   RenderTask     renderTask1    = renderTaskList.CreateTask();
 
   application.SendNotification();
-  int32_t answer1[2] = {INT32_MIN, 0};
+  uint32_t answer1[2] = {0u, 0u};
   DALI_TEST_EQUALS(2, renderTaskList.GetTaskCount(), TEST_LOCATION);
   for(uint32_t i = 0; i < 2; ++i)
   {
@@ -5147,7 +5147,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   RenderTask renderTask2 = renderTaskList.CreateTask();
   application.SendNotification();
-  int32_t answer2[3] = {INT32_MIN, 0, 0};
+  int32_t answer2[3] = {0u, 0u, 0u};
   DALI_TEST_EQUALS(3, renderTaskList.GetTaskCount(), TEST_LOCATION);
   for(uint32_t i = 0; i < 3; ++i)
   {
@@ -5156,7 +5156,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   RenderTask renderTask3 = renderTaskList.CreateTask();
   application.SendNotification();
-  int32_t answer3[4] = {INT32_MIN, 0, 0, 0};
+  int32_t answer3[4] = {0u, 0u, 0u, 0u};
   DALI_TEST_EQUALS(4, renderTaskList.GetTaskCount(), TEST_LOCATION);
   for(uint32_t i = 0; i < 4; ++i)
   {
@@ -5165,7 +5165,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask1.SetOrderIndex(3);
   application.SendNotification();
-  int32_t answer4[4] = {INT32_MIN, 0, 0, 3};
+  int32_t answer4[4] = {0u, 0u, 0u, 3u};
   for(uint32_t i = 0; i < 4; ++i)
   {
     DALI_TEST_EQUALS(answer4[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -5173,7 +5173,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask2.SetOrderIndex(7);
   application.SendNotification();
-  int32_t answer5[4] = {INT32_MIN, 0, 3, 7};
+  int32_t answer5[4] = {0u, 0u, 3u, 7u};
   for(uint32_t i = 0; i < 4; ++i)
   {
     DALI_TEST_EQUALS(answer5[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -5183,7 +5183,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
   scene.GetOverlayLayer();
   application.SendNotification();
   DALI_TEST_EQUALS(5, renderTaskList.GetTaskCount(), TEST_LOCATION);
-  int32_t answer6[5] = {INT32_MIN, 0, 3, 7, INT32_MAX};
+  int32_t answer6[5] = {0u, 0u, 3u, 7u, INT32_MAX};
   for(uint32_t i = 0; i < 5; ++i)
   {
     DALI_TEST_EQUALS(answer6[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -5191,7 +5191,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask3.SetOrderIndex(4);
   application.SendNotification();
-  int32_t answer7[5] = {INT32_MIN, 3, 4, 7, INT32_MAX};
+  int32_t answer7[5] = {0u, 3u, 4u, 7u, INT32_MAX};
   for(uint32_t i = 0; i < 5; ++i)
   {
     DALI_TEST_EQUALS(answer7[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
@@ -5199,7 +5199,7 @@ int UtcDaliRenderTaskOrderIndex01(void)
 
   renderTask2.SetOrderIndex(2);
   application.SendNotification();
-  int32_t answer8[5] = {INT32_MIN, 2, 3, 4, INT32_MAX};
+  int32_t answer8[5] = {0u, 2u, 3u, 4u, INT32_MAX};
   for(uint32_t i = 0; i < 5; ++i)
   {
     DALI_TEST_EQUALS(answer8[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);

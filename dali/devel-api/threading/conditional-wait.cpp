@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2020 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ void ConditionalWait::Notify()
 void ConditionalWait::Notify(const ScopedLock& scope)
 {
   // Scope must be locked:
-  DALI_ASSERT_ALWAYS(&scope.GetLockedWait() == this);
+  DALI_ASSERT_DEBUG(&scope.GetLockedWait() == this);
 
   volatile unsigned int previousCount = mImpl->count;
 
@@ -127,7 +127,7 @@ void ConditionalWait::Wait()
 void ConditionalWait::Wait(const ScopedLock& scope)
 {
   // Scope must be locked:
-  DALI_ASSERT_ALWAYS(&scope.GetLockedWait() == this);
+  DALI_ASSERT_DEBUG(&scope.GetLockedWait() == this);
 
   ++(mImpl->count);
 
@@ -136,32 +136,6 @@ void ConditionalWait::Wait(const ScopedLock& scope)
   {
     // wait while condition changes
     mImpl->condition.wait(scope.mImpl->lock); // need to pass in the std::unique_lock
-  } while(0 != mImpl->count);
-
-  // We return with our mutex locked safe in the knowledge that the ScopedLock
-  // passed in will unlock it in the caller.
-}
-
-void ConditionalWait::WaitUntil(const ScopedLock& scope, ConditionalWait::TimePoint timePoint)
-{
-  // Scope must be locked:
-  DALI_ASSERT_ALWAYS(&scope.GetLockedWait() == this);
-
-  ++(mImpl->count);
-
-  // conditional wait may wake up without anyone calling Notify
-  do
-  {
-    // wait while condition changes
-    if(mImpl->condition.wait_until(scope.mImpl->lock, timePoint) == std::cv_status::timeout)
-    {
-      // Pass-through for this wait request.
-      // Note that we should not wake-up other wait requests.
-      if(mImpl->count > 0u)
-      {
-        --mImpl->count;
-      }
-    }
   } while(0 != mImpl->count);
 
   // We return with our mutex locked safe in the knowledge that the ScopedLock

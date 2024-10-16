@@ -1040,7 +1040,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     {
       iter->type           = Graphics::ResourceType::PROGRAM;
       iter->programBinding = &item.second;
-      ++iter;
     }
   }
 
@@ -1257,7 +1256,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       scissorArea,
       currentClearValues);
 
-    // Note, don't set the viewport/scissor on the primary command buffer.
+    mainCommandBuffer->SetViewport({float(viewportRect.x),
+                                    float(viewportRect.y),
+                                    float(viewportRect.width),
+                                    float(viewportRect.height)});
 
     mImpl->renderAlgorithms.ProcessRenderInstruction(
       instruction,
@@ -1285,8 +1287,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   if(targetsToPresent.size() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss)
-                                            { oss << "[" << targetsToPresent.size() << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) { oss << "[" << targetsToPresent.size() << "]"; });
   }
 
   // Flush UBOs

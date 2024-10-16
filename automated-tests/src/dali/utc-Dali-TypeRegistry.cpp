@@ -204,10 +204,6 @@ struct MyTestCustomActor : public CustomActorImpl
     return false;
   }
 
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
-  {
-  }
-
 public:
   SignalType mSignal;
 };

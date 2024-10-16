@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,8 +57,8 @@ struct ImageAttributes::ImageAttributesImpl
 
   uint16_t    width;                      ///< image width in pixels
   uint16_t    height;                     ///< image height in pixels
-  ScalingMode scaling : 4;                ///< scaling option, ShrinkToFit is default
-  FilterMode  filtering : 5;              ///< filtering option. Box is the default
+  ScalingMode scaling : 3;                ///< scaling option, ShrinkToFit is default
+  FilterMode  filtering : 4;              ///< filtering option. Box is the default
   bool        mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
 };
 

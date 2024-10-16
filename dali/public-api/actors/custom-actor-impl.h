@@ -23,12 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/actors/actor.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/render-tasks/render-task.h>
 
 namespace Dali
 {
@@ -42,6 +39,7 @@ namespace Internal DALI_INTERNAL
 class CustomActor;
 }
 
+class Actor;
 class Animation;
 class CustomActor;
 class CustomActorImpl;
@@ -173,47 +171,6 @@ public:
    * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize
    */
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
-
-  /**
-   * @brief Retrieves the off-screen RenderTasks associated with the Actor.
-   * This method returns the internal RenderTasks held by the Actor. This tasks are
-   * used for off-screen rendering, and the system will assign order index to each
-   * tasks based on the render order.
-   *
-   * Actor with a non-NONE OffScreenRenderableType should override this method to
-   * provide their render tasks.
-   *
-   * @SINCE_2_3.43
-   * @param[out] tasks A list of RenderTasks to be populated with the Actor's forward
-   * or backward off-screen RenderTask.
-   * @param[in] isForward Indicates whether to retrieve forward (true) or backward (false)
-   * RenderTasks.
-   */
-  virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) = 0;
-
-  /**
-   * @brief Sets OffScreenRenderableType of this Actor.
-   * This method is called by child class to set type itself.
-   *
-   * @SINCE_2_3.43
-   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
-   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
-   */
-  void SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
-
-  /**
-   * @brief Retrieves OffScreenRenderableType of this Actor.
-   *
-   * @SINCE_2_3.43
-   * @return OffScreenRenderableType for this Actor.
-   */
-  OffScreenRenderable::Type GetOffScreenRenderableType();
-
-  /**
-   * @brief Requests RenderTask reordering when the offscreen properties of this Actor are changed.
-   * @SINCE_2_3.43
-   */
-  void RequestRenderTaskReorder();
 
   /**
    * @brief Called after the size negotiation has been finished for this control.
