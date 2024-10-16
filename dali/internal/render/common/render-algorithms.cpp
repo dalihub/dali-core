@@ -593,7 +593,6 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 const Rect<int>&                    rootClippingRect,
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize,
-                                                Graphics::RenderPass*               renderPass,
                                                 Graphics::RenderTarget*             renderTarget)
 {
   DALI_PRINT_RENDER_LIST(renderList);
@@ -617,9 +616,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // We are always "inside" a render pass here.
   Graphics::CommandBufferBeginInfo info;
-  info.SetUsage(0 | Graphics::CommandBufferUsageFlagBits::RENDER_PASS_CONTINUE)
-    .SetRenderPass(*renderPass)
-    .SetRenderTarget(*renderTarget);
+  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
   secondaryCommandBuffer.Begin(info);
 
   secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
@@ -723,7 +720,7 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 {
 }
 
-void RenderAlgorithms::ResetCommandBuffer(std::vector<Graphics::CommandBufferResourceBinding>* resourceBindings)
+void RenderAlgorithms::ResetCommandBuffer()
 {
   // Reset main command buffer
   if(!mGraphicsCommandBuffer)
@@ -739,8 +736,7 @@ void RenderAlgorithms::ResetCommandBuffer(std::vector<Graphics::CommandBufferRes
   }
 
   Graphics::CommandBufferBeginInfo info;
-  info.resourceBindings = resourceBindings; // set resource bindings, currently only programs
-  info.usage            = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
+  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
   mGraphicsCommandBuffer->Begin(info);
 }
 
@@ -768,7 +764,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 const Rect<int>&                    rootClippingRect,
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize,
-                                                Graphics::RenderPass*               renderPass,
                                                 Graphics::RenderTarget*             renderTarget)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) { oss << "[" << instruction.RenderListCount() << "]"; });
@@ -805,7 +800,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           rootClippingRect,
                           orientation,
                           sceneSize,
-                          renderPass,
                           renderTarget);
 
         // Execute command buffer
