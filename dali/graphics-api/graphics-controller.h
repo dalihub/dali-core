@@ -427,6 +427,13 @@ public: // ResourceId relative API.
    */
   virtual const Matrix& GetClipMatrix() const = 0;
 
+  /**
+   * @brief Returns device limitation for specified capability
+   * @param[in] capability Valid capability
+   * @return Limitation of that capability
+   */
+  virtual uint32_t GetDeviceLimitation(Graphics::DeviceCapability capability) = 0;
+
 protected:
   /**
    * Creates controller

@@ -5518,7 +5518,7 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   application.Render();
 
   TraceCallStack::NamedParams namedParams;
-  namedParams["id"] << 6;
+  namedParams["id"] << 5;
   DALI_TEST_CHECK(gl.mBufferTrace.FindMethodAndParams("DeleteBuffers", namedParams));
 
   END_TEST;

@@ -1520,4 +1520,16 @@ const Matrix& TestGraphicsController::GetClipMatrix() const
   return IDENTITY;
 }
 
+uint32_t TestGraphicsController::GetDeviceLimitation(Graphics::DeviceCapability capability)
+{
+  if(capability == Graphics::DeviceCapability::MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT)
+  {
+    auto& gl           = *const_cast<TestGlAbstraction*>(&mGl);
+    GLint uniformAlign = 0;
+    gl.GetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformAlign);
+    return uniformAlign; // Default for testing
+  }
+  return 0;
+}
+
 } // namespace Dali

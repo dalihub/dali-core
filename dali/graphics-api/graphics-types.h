@@ -1630,6 +1630,11 @@ inline RenderTargetTransformFlags operator|(T flags, RenderTargetTransformFlagBi
   return static_cast<RenderTargetTransformFlags>(flags) | static_cast<RenderTargetTransformFlags>(bit);
 }
 
+enum class DeviceCapability
+{
+  MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT
+};
+
 /**
  * unique_ptr defined in the Graphics scope
  */

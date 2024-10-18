@@ -770,7 +770,7 @@ void Renderer::WriteUniformBuffer(
       auto uniformBufferView             = mUniformBufferManager->CreateUniformBufferView(programRequirements.blockSize[i], standaloneUniforms);
       mUniformBufferBindings[i].buffer   = uniformBufferView->GetBuffer();
       mUniformBufferBindings[i].offset   = uniformBufferView->GetOffset();
-      mUniformBufferBindings[i].binding  = standaloneUniforms ? 0 : i - 1;
+      mUniformBufferBindings[i].binding  = standaloneUniforms ? 0 : reflection.GetUniformBlockBinding(i);
       mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
       uboViews[i].reset(uniformBufferView.release());
     }
