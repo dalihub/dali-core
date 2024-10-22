@@ -2,7 +2,7 @@
 #define TEST_ADDON_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,8 @@ public:
   bool GetAddOnInfo(const std::string& name, AddOnInfo& info) override;
 
   std::vector<AddOnLibrary> LoadAddOns(const std::vector<std::string>& addonNames) override;
+
+  AddOnLibrary LoadAddOn(const std::string& addonName, const std::string& libraryName) override;
 
   void* GetGlobalProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName) override;
 

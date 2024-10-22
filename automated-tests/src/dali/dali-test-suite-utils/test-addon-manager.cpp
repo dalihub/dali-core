@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,23 @@ std::vector<std::string> AddOnManager::EnumerateAddOns()
   std::vector<std::string> addons{};
   auto*                    fin     = fopen(listFileName.c_str(), "r");
   char*                    lineBuf = new char[256];
-  size_t                   n       = 256;
+  memset(lineBuf, 0, 256);
+  size_t n = 256;
   while(getline(&lineBuf, &n, fin) > 0)
   {
+    char* c = lineBuf;
+    while(*c)
+    {
+      if(*c == '\n' || *c == '\r')
+      {
+        *c = 0;
+        break;
+      }
+      ++c;
+    }
     tet_printf("Adding %s\n", lineBuf);
     addons.emplace_back(lineBuf);
+    memset(lineBuf, 0, 256);
   }
   fclose(fin);
   delete[] lineBuf;
@@ -144,6 +156,43 @@ std::vector<AddOnLibrary> AddOnManager::LoadAddOns(const std::vector<std::string
   }
 
   return retval;
+}
+
+AddOnLibrary AddOnManager::LoadAddOn(const std::string& addonName, const std::string& libraryName)
+{
+  AddOnLibrary addOnLibrary = nullptr;
+  size_t       index        = 0;
+  auto         iter         = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&addonName, &index](AddOnCacheEntry& entry) {
+    index++;
+    return (entry.name == addonName);
+  });
+
+  if(iter != mAddOnCache.end())
+  {
+    addOnLibrary = reinterpret_cast<void*>(index);
+  }
+  else
+  {
+    mAddOnCache.emplace_back();
+    mAddOnCache.back().handle = dlopen(libraryName.c_str(), RTLD_DEEPBIND | RTLD_LAZY);
+    if(!mAddOnCache.back().handle)
+    {
+      mAddOnCache.back().valid = false;
+      tet_printf("Can't open addon lib: %s\n", libraryName.c_str());
+    }
+    // Here addon must self register
+    if(!mAddOnCache.back().valid)
+    {
+      puts("Addon invalid!");
+    }
+    else
+    {
+      tet_printf("Valid AddOn: %s\n", mAddOnCache.back().name.c_str());
+      addOnLibrary = reinterpret_cast<void*>(mAddOnCache.size());
+    }
+  }
+
+  return addOnLibrary;
 }
 
 void* AddOnManager::GetGlobalProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName)
