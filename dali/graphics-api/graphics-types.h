@@ -1212,6 +1212,7 @@ struct UniformInfo
   uint32_t     location{0u};
   uint32_t     elementCount{0u};
   uint32_t     elementStride{0u};
+  uint32_t     matrixStride{0u}; ///< Number of bytes for matrix row
 
   bool operator==(const UniformInfo& rhs)
   {
@@ -1626,7 +1627,8 @@ struct DefaultDeleter
   template<class P, template<typename> typename U>
   DefaultDeleter(const U<P>& deleter)
   {
-    deleteFunction = [](T* object) { U<P>()(static_cast<P*>(object)); };
+    deleteFunction = [](T* object)
+    { U<P>()(static_cast<P*>(object)); };
   }
 
   /**

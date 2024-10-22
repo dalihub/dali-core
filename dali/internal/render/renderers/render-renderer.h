@@ -632,6 +632,19 @@ private:
                          BufferIndex                                                    updateBufferIndex,
                          std::size_t                                                    nodeIndex);
 
+  /**
+   * @brief Write dynamic (i.e. not default) uniform into the buffer
+   *
+   * @param[in] propertyValue The property value to write
+   * @param[in] uniform The map describing the uniform
+   * @param[in] uboViews Target uniform buffer object
+   * @param[in] updateBufferIndex update buffer index
+   */
+  void WriteDynUniform(const PropertyInputImpl*                                       propertyValue,
+                       UniformIndexMap&                                               uniform,
+                       const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
+                       BufferIndex                                                    updateBufferIndex);
+
 private:
   Graphics::Controller*           mGraphicsController;
   SceneGraph::RenderDataProvider* mRenderDataProvider;
@@ -656,6 +669,7 @@ private:
     Hash                     uniformNameHashNoArray{0u};
     int32_t                  arrayIndex{-1};         ///< The array index
     uint32_t                 arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
+    uint32_t                 matrixStride{0u};       ///< The stride for a matrix row
 
     int16_t  uniformLocation{0u};
     uint16_t uniformOffset{0u};

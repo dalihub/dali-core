@@ -565,6 +565,7 @@ public:
 
   std::vector<UniformData>                                  mCustomUniforms;
   std::vector<TestGraphicsReflection::TestUniformBlockInfo> mCustomUniformBlocks;
+  UniformBufferBindingDescriptor                            mLastUniformBinding;
 };
 
 } // namespace Dali
