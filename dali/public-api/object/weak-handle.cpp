@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,44 +84,38 @@ WeakHandleBase::WeakHandleBase(BaseHandle& handle)
 
 WeakHandleBase::~WeakHandleBase()
 {
-  delete mImpl;
-  mImpl = nullptr;
 }
 
 WeakHandleBase::WeakHandleBase(const WeakHandleBase& handle)
 : mImpl(nullptr)
 {
   BaseHandle object = handle.GetBaseHandle();
-  mImpl             = new Impl(object);
+  mImpl             = std::make_unique<Impl>(object);
 }
 
 WeakHandleBase& WeakHandleBase::operator=(const WeakHandleBase& rhs)
 {
   if(this != &rhs)
   {
-    delete mImpl;
+    mImpl.reset();
 
     BaseHandle handle = rhs.GetBaseHandle();
-    mImpl             = new Impl(handle);
+    mImpl             = std::make_unique<Impl>(handle);
   }
 
   return *this;
 }
 
 WeakHandleBase::WeakHandleBase(WeakHandleBase&& rhs)
-: mImpl(rhs.mImpl)
+: mImpl(std::move(rhs.mImpl))
 {
-  rhs.mImpl = nullptr;
 }
 
 WeakHandleBase& WeakHandleBase::operator=(WeakHandleBase&& rhs)
 {
   if(this != &rhs)
   {
-    delete mImpl;
-
-    mImpl     = rhs.mImpl;
-    rhs.mImpl = nullptr;
+    mImpl = std::move(rhs.mImpl);
   }
 
   return *this;
@@ -129,7 +123,25 @@ WeakHandleBase& WeakHandleBase::operator=(WeakHandleBase&& rhs)
 
 bool WeakHandleBase::operator==(const WeakHandleBase& rhs) const
 {
-  return this->mImpl->mObject == rhs.mImpl->mObject;
+  if(DALI_LIKELY(this->mImpl))
+  {
+    if(DALI_LIKELY(rhs.mImpl))
+    {
+      return this->mImpl->mObject == rhs.mImpl->mObject;
+    }
+    else
+    {
+      return this->mImpl->mObject == nullptr;
+    }
+  }
+  else
+  {
+    if(DALI_LIKELY(rhs.mImpl))
+    {
+      return rhs.mImpl->mObject == nullptr;
+    }
+  }
+  return true; /// Both are empty handle.
 }
 
 bool WeakHandleBase::operator!=(const WeakHandleBase& rhs) const
@@ -144,7 +156,10 @@ BaseHandle WeakHandleBase::GetBaseHandle() const
 
 void WeakHandleBase::Reset()
 {
-  mImpl->Reset();
+  if(DALI_LIKELY(mImpl))
+  {
+    mImpl->Reset();
+  }
 }
 
 } // namespace Dali

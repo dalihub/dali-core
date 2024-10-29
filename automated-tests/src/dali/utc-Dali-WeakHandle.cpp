@@ -264,6 +264,8 @@ int UtcDaliWeakHandleBaseMoveConstructor(void)
   DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
   DALI_TEST_CHECK(!object.GetBaseHandle());                                   // object moved
 
+  object.Reset(); /// No effect to moved object
+
   END_TEST;
 }
 
@@ -283,6 +285,8 @@ int UtcDaliWeakHandleBaseMoveAssignment(void)
   DALI_TEST_CHECK(move.GetBaseHandle() == actor);
   DALI_TEST_EQUALS(1, actor.GetBaseObject().ReferenceCount(), TEST_LOCATION); // reference count of the actor is not increased
   DALI_TEST_CHECK(!object.GetBaseHandle());                                   // object moved
+
+  object.Reset(); /// No effect to moved object
 
   END_TEST;
 }
@@ -359,6 +363,58 @@ int UtcDaliWeakHandleBaseInequalityOperatorN(void)
   END_TEST;
 }
 
+int UtcDaliWeakHandleBaseEqualityOperatorVariousCases(void)
+{
+  TestApplication application;
+  tet_infoline("Positive Test Dali::WeakHandleBase::operator== with various cases");
+
+  WeakHandleBase object;
+  WeakHandleBase theSameObject;
+  DALI_TEST_CHECK(object == theSameObject);
+
+  Actor actor = Actor::New();
+
+  object = WeakHandleBase(actor);
+  DALI_TEST_CHECK(object.GetBaseHandle() == actor);
+
+  theSameObject = WeakHandleBase(actor);
+  DALI_TEST_CHECK(theSameObject.GetBaseHandle() == actor);
+  DALI_TEST_CHECK(object == theSameObject);
+
+  // Compare with empty object
+  tet_printf("Compare with empty object\n");
+  WeakHandleBase emptyObject;
+  DALI_TEST_CHECK(object != emptyObject);
+
+  tet_printf("Compare with moved object\n");
+  WeakHandleBase movedObject = std::move(theSameObject);
+
+  DALI_TEST_CHECK(movedObject.GetBaseHandle() == actor);
+  DALI_TEST_CHECK(object == movedObject);
+
+  DALI_TEST_CHECK(!theSameObject.GetBaseHandle());
+  DALI_TEST_CHECK(emptyObject == theSameObject);
+
+  tet_printf("Compare after Reset called\n");
+
+  object.Reset();
+
+  DALI_TEST_CHECK(emptyObject == object);
+  DALI_TEST_CHECK(theSameObject == object);
+  DALI_TEST_CHECK(object != movedObject);
+
+  tet_printf("Compare between moved objects\n");
+
+  movedObject = std::move(object);
+  DALI_TEST_CHECK(emptyObject == object);
+  DALI_TEST_CHECK(theSameObject == object);
+  DALI_TEST_CHECK(object == movedObject);
+  DALI_TEST_CHECK(emptyObject == movedObject);
+  DALI_TEST_CHECK(theSameObject == movedObject);
+
+  END_TEST;
+}
+
 int UtcDaliWeakHandleBaseGetBaseHandle(void)
 {
   TestApplication application;
@@ -402,6 +458,12 @@ int UtcDaliWeakHandleBaseReset(void)
   WeakHandleBase object(actor);
   DALI_TEST_CHECK(object.GetBaseHandle() == actor);
 
+  object.Reset();
+
+  DALI_TEST_CHECK(object == WeakHandleBase());
+  DALI_TEST_CHECK(object.GetBaseHandle() == Handle());
+
+  // Call Reset one more time.
   object.Reset();
 
   DALI_TEST_CHECK(object == WeakHandleBase());

@@ -2,7 +2,7 @@
 #define DALI_WEAK_HANDLE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  * limitations under the License.
  *
  */
+// EXTERNAL_INCLUDES
+#include <memory> ///< for std::unique_ptr
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/custom-actor.h>
@@ -130,7 +132,7 @@ public:
 protected:
   /// @cond internal
   struct Impl;
-  Impl* mImpl;
+  std::unique_ptr<Impl> mImpl;
   /// @endcond
 };
 
