@@ -28,8 +28,8 @@
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
 #include <mesh-builder.h>
+#include <test-graphics-command-buffer.h>
 #include <test-trace-call-stack.h>
-#include "test-graphics-command-buffer.h"
 
 using namespace Dali;
 
@@ -181,6 +181,8 @@ int UtcDaliDecoratedVisualRendererDownCast02(void)
   END_TEST;
 }
 
+namespace
+{
 // using a template to auto deduce the parameter types
 template<typename P1, typename P2, typename P3, typename P4, typename P5, typename P6, typename P7, typename P8>
 void TEST_RENDERER_PROPERTY(P1 renderer, P2 stringName, P3 type, P4 isWriteable, P5 isAnimateable, P6 isConstraintInput, P7 enumName, P8 LOCATION)
@@ -192,6 +194,7 @@ void TEST_RENDERER_PROPERTY(P1 renderer, P2 stringName, P3 type, P4 isWriteable,
   DALI_TEST_EQUALS(renderer.IsPropertyAnimatable(enumName), isAnimateable, LOCATION);
   DALI_TEST_EQUALS(renderer.IsPropertyAConstraintInput(enumName), isConstraintInput, LOCATION);
 }
+} // namespace
 
 int UtcDaliDecoratedVisualRendererDefaultProperties(void)
 {
@@ -204,7 +207,7 @@ int UtcDaliDecoratedVisualRendererDefaultProperties(void)
 
   DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 32, TEST_LOCATION);
   DALI_TEST_EQUALS(baseVisualRenderer.GetPropertyCount(), 32 + 8, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32 + 8 + 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32 + 8 + 7, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "cornerRadius", Property::VECTOR4, true, true, true, DecoratedVisualRenderer::Property::CORNER_RADIUS, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "cornerRadiusPolicy", Property::FLOAT, true, false, true, DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, TEST_LOCATION);
@@ -212,6 +215,7 @@ int UtcDaliDecoratedVisualRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "borderlineColor", Property::VECTOR4, true, true, true, DecoratedVisualRenderer::Property::BORDERLINE_COLOR, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "borderlineOffset", Property::FLOAT, true, true, true, DecoratedVisualRenderer::Property::BORDERLINE_OFFSET, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "blurRadius", Property::FLOAT, true, true, true, DecoratedVisualRenderer::Property::BLUR_RADIUS, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "cornerSquareness", Property::VECTOR4, true, true, true, DecoratedVisualRenderer::Property::CORNER_SQUARENESS, TEST_LOCATION);
 
   END_TEST;
 }
@@ -280,6 +284,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   renderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_COLOR, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
   renderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET, -1.0f);
   renderer.SetProperty(DecoratedVisualRenderer::Property::BLUR_RADIUS, 0.0f);
+  renderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 
   application.SendNotification();
   application.Render(0);
@@ -290,6 +295,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Vector4(1.0f, 0.0f, 0.0f, 1.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), -1.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 0.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateBy(Property(renderer, DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4(10.0f, 100.0f, 100.0f, 10.0f));
@@ -297,6 +303,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   animation.AnimateBy(Property(renderer, DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Vector4(-1.0f, 1.0f, 1.0f, 0.0f));
   animation.AnimateBy(Property(renderer, DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), 2.0f);
   animation.AnimateBy(Property(renderer, DecoratedVisualRenderer::Property::BLUR_RADIUS), 20.0f);
+  animation.AnimateBy(Property(renderer, DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(1.0f, 1.0f, -1.0f, -0.5f));
   animation.Play();
 
   application.SendNotification();
@@ -307,6 +314,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Vector4(0.5f, 0.5f, 0.5f, 1.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), 0.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(0.5f, 0.5f, 0.5f, 0.75f), 0.001f, TEST_LOCATION);
 
   application.Render(400);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4(10.0f, 91.0f, 90.0f, 9.0f), 0.001f, TEST_LOCATION);
@@ -314,6 +322,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Vector4(0.1f, 0.9f, 0.9f, 1.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), 0.8f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 18.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(0.9f, 0.9f, 0.1f, 0.55f), 0.001f, TEST_LOCATION);
 
   application.Render(100);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4(11.0f, 101.0f, 100.0f, 10.0f), 0.001f, TEST_LOCATION);
@@ -321,12 +330,14 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Vector4(0.0f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), 1.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(1.0f, 1.0f, 0.0f, 0.5f), 0.001f, TEST_LOCATION);
 
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4(11.0f, 101.0f, 100.0f, 10.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH), 11.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Vector4(0.0f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), 1.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(1.0f, 1.0f, 0.0f, 0.5f), 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -337,7 +348,7 @@ struct DecoratedVisualProperties
 {
   DecoratedVisualProperties() = default;
 
-  DecoratedVisualProperties(Vector2 offset, Vector2 size, Vector2 origin, Vector2 pivot, Vector4 modes, Vector2 extraSize, Vector3 mixColor, float preMultipliedAlpha, Vector4 cornerRadius, float cornerRadiusPolicy, float borderlineWidth, Vector4 borderlineColor, float borderlineOffset, float blurRadius)
+  DecoratedVisualProperties(Vector2 offset, Vector2 size, Vector2 origin, Vector2 pivot, Vector4 modes, Vector2 extraSize, Vector3 mixColor, float preMultipliedAlpha, Vector4 cornerRadius, Vector4 cornerSquareness, float cornerRadiusPolicy, float borderlineWidth, Vector4 borderlineColor, float borderlineOffset, float blurRadius)
   : mTransformOffset(offset),
     mTransformSize(size),
     mTransformOrigin(origin),
@@ -347,6 +358,7 @@ struct DecoratedVisualProperties
     mMixColor(mixColor),
     mPreMultipliedAlpha(preMultipliedAlpha),
     mCornerRadius(cornerRadius),
+    mCornerSquareness(cornerSquareness),
     mCornerRadiusPolicy(cornerRadiusPolicy),
     mBorderlineWidth(borderlineWidth),
     mBorderlineColor(borderlineColor),
@@ -365,6 +377,7 @@ struct DecoratedVisualProperties
   float   mPreMultipliedAlpha{0.0f};
 
   Vector4 mCornerRadius{Vector4::ZERO};
+  Vector4 mCornerSquareness{Vector4::ZERO};
   float   mCornerRadiusPolicy{1.0f};
   float   mBorderlineWidth{0.0f};
   Vector4 mBorderlineColor{Vector4::ZERO};
@@ -378,6 +391,7 @@ struct DecoratedVisualProperties
     progress.mTransformSize    = start.mTransformSize + (end.mTransformSize - start.mTransformSize) * alpha;
     progress.mExtraSize        = start.mExtraSize + (end.mExtraSize - start.mExtraSize) * alpha;
     progress.mCornerRadius     = start.mCornerRadius + (end.mCornerRadius - start.mCornerRadius) * alpha;
+    progress.mCornerSquareness = start.mCornerSquareness + (end.mCornerSquareness - start.mCornerSquareness) * alpha;
     progress.mBorderlineWidth  = start.mBorderlineWidth + (end.mBorderlineWidth - start.mBorderlineWidth) * alpha;
     progress.mBorderlineColor  = start.mBorderlineColor + (end.mBorderlineColor - start.mBorderlineColor) * alpha;
     progress.mBorderlineOffset = start.mBorderlineOffset + (end.mBorderlineOffset - start.mBorderlineOffset) * alpha;
@@ -405,6 +419,7 @@ void PrintDecoratedVisualProperties(const DecoratedVisualProperties& props, cons
     "%*c mixColor:(%5.3f, %5.3f, %5.3f)\n"
     "%*c preMultipliedAlpha:(%5.3f)\n"
     "%*c cornerRadius:(%5.3f, %5.3f, %5.3f, %5.3f)\n"
+    "%*c cornerSquareness:(%5.3f, %5.3f, %5.3f, %5.3f)\n"
     "%*c cornerRadiusPolicy:(%5.3f)\n"
     "%*c borderlineWidth:(%5.3f)\n"
     "%*c borderlineColor:(%5.3f, %5.3f, %5.3f, %5.3f)\n"
@@ -451,6 +466,12 @@ void PrintDecoratedVisualProperties(const DecoratedVisualProperties& props, cons
     props.mCornerRadius.w,
     prefix.length() + 1,
     ' ',
+    props.mCornerSquareness.x,
+    props.mCornerSquareness.y,
+    props.mCornerSquareness.z,
+    props.mCornerSquareness.w,
+    prefix.length() + 1,
+    ' ',
     props.mCornerRadiusPolicy,
     prefix.length() + 1,
     ' ',
@@ -481,6 +502,7 @@ void SetDecoratedVisualProperties(DecoratedVisualRenderer renderer, DecoratedVis
   renderer.SetProperty(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, props.mPreMultipliedAlpha);
 
   renderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS, props.mCornerRadius);
+  renderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_SQUARENESS, props.mCornerSquareness);
   renderer.SetProperty(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, props.mCornerRadiusPolicy);
   renderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH, props.mBorderlineWidth);
   renderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_COLOR, props.mBorderlineColor);
@@ -503,6 +525,7 @@ void CheckEventDecoratedVisualProperties(DecoratedVisualRenderer renderer, Decor
   actualProps.mPreMultipliedAlpha      = renderer.GetProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA);
 
   actualProps.mCornerRadius       = renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
+  actualProps.mCornerSquareness   = renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS);
   actualProps.mCornerRadiusPolicy = renderer.GetProperty<float>(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY);
   actualProps.mBorderlineWidth    = renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
   actualProps.mBorderlineColor    = renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
@@ -521,6 +544,7 @@ void CheckEventDecoratedVisualProperties(DecoratedVisualRenderer renderer, Decor
   DALI_TEST_EQUALS(actualProps.mPreMultipliedAlpha, expectedProps.mPreMultipliedAlpha, TEST_LOCATION);
 
   DALI_TEST_EQUALS(actualProps.mCornerRadius, expectedProps.mCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualProps.mCornerSquareness, expectedProps.mCornerSquareness, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mCornerRadiusPolicy, expectedProps.mCornerRadiusPolicy, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mBorderlineWidth, expectedProps.mBorderlineWidth, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mBorderlineColor, expectedProps.mBorderlineColor, TEST_LOCATION);
@@ -544,6 +568,7 @@ void CheckSceneGraphDecoratedVisualProperties(DecoratedVisualRenderer renderer, 
   actualProps.mPreMultipliedAlpha      = renderer.GetCurrentProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA);
 
   actualProps.mCornerRadius       = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS);
+  actualProps.mCornerSquareness   = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS);
   actualProps.mCornerRadiusPolicy = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY);
   actualProps.mBorderlineWidth    = renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH);
   actualProps.mBorderlineColor    = renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR);
@@ -562,6 +587,7 @@ void CheckSceneGraphDecoratedVisualProperties(DecoratedVisualRenderer renderer, 
   DALI_TEST_EQUALS(actualProps.mPreMultipliedAlpha, expectedProps.mPreMultipliedAlpha, TEST_LOCATION);
 
   DALI_TEST_EQUALS(actualProps.mCornerRadius, expectedProps.mCornerRadius, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualProps.mCornerSquareness, expectedProps.mCornerSquareness, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mCornerRadiusPolicy, expectedProps.mCornerRadiusPolicy, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mBorderlineWidth, expectedProps.mBorderlineWidth, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mBorderlineColor, expectedProps.mBorderlineColor, TEST_LOCATION);
@@ -607,6 +633,10 @@ void CheckUniforms(DecoratedVisualRenderer renderer, DecoratedVisualProperties p
   ++uniformIndex;
 
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>(uniforms[uniformIndex].name.c_str(), props.mCornerSquareness));
+  ++uniformIndex;
+
+  DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
   DALI_TEST_CHECK(gl.GetUniformValue<float>(uniforms[uniformIndex].name.c_str(), props.mCornerRadiusPolicy));
   ++uniformIndex;
 
@@ -644,6 +674,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
                                           {"offsetSizeMode", Property::VECTOR4},
                                           {"extraSize", Property::VECTOR2},
                                           {"cornerRadius", Property::VECTOR4},
+                                          {"cornerSquareness", Property::VECTOR4},
                                           {"cornerRadiusPolicy", Property::FLOAT},
                                           {"borderlineWidth", Property::FLOAT},
                                           {"borderlineColor", Property::VECTOR4},
@@ -658,6 +689,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
 
   // Add all uniform mappings
   renderer.RegisterCornerRadiusUniform();
+  renderer.RegisterCornerSquarenessUniform();
   renderer.RegisterBorderlineUniform();
   renderer.RegisterBlurRadiusUniform();
 
@@ -666,8 +698,8 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
   application.GetScene().Add(actor);
 
-  DecoratedVisualProperties props{Vector2(10.f, 10.f), Vector2(200.f, 100.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(0.0f, 0.0f), Vector3(Color::SEA_GREEN), 0.0f, Vector4(100.0f, 10.0f, 1.0f, 0.1f), 1.0f, 20.0f, Vector4(1.0f, 0.0f, 1.0f, 0.5f), 1.0f, 10.0f};
-  DecoratedVisualProperties targetProps{Vector2(40.f, 40.f), Vector2(100.f, 200.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(25.0f, 25.0f), Vector3(Color::MEDIUM_PURPLE), 0.0f, Vector4(0.2f, 2.0f, 20.0f, 200.0f), 1.0f, 40.0f, Vector4(0.0f, 0.2f, 0.0f, 1.0f), -1.0f, 2.0f};
+  DecoratedVisualProperties props{Vector2(10.f, 10.f), Vector2(200.f, 100.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(0.0f, 0.0f), Vector3(Color::SEA_GREEN), 0.0f, Vector4(100.0f, 10.0f, 1.0f, 0.1f), Vector4(0.0f, 1.0f, 0.0f, 1.0f), 1.0f, 20.0f, Vector4(1.0f, 0.0f, 1.0f, 0.5f), 1.0f, 10.0f};
+  DecoratedVisualProperties targetProps{Vector2(40.f, 40.f), Vector2(100.f, 200.f), Vector2(0.5f, 0.5f), Vector2(0.5f, 0.5f), Vector4::ZERO, Vector2(25.0f, 25.0f), Vector3(Color::MEDIUM_PURPLE), 0.0f, Vector4(0.2f, 2.0f, 20.0f, 200.0f), Vector4(1.0f, 0.0f, 1.0f, 0.0f), 1.0f, 40.0f, Vector4(0.0f, 0.2f, 0.0f, 1.0f), -1.0f, 2.0f};
 
   SetDecoratedVisualProperties(renderer, props);
   CheckEventDecoratedVisualProperties(renderer, props);
@@ -685,6 +717,7 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
   renderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, targetProps.mMixColor); ///< visual mix color is not animatable.
 
   animation.AnimateTo(Property(renderer, DecoratedVisualRenderer::Property::CORNER_RADIUS), targetProps.mCornerRadius);
+  animation.AnimateTo(Property(renderer, DecoratedVisualRenderer::Property::CORNER_SQUARENESS), targetProps.mCornerSquareness);
   animation.AnimateTo(Property(renderer, DecoratedVisualRenderer::Property::BORDERLINE_WIDTH), targetProps.mBorderlineWidth);
   animation.AnimateTo(Property(renderer, DecoratedVisualRenderer::Property::BORDERLINE_COLOR), targetProps.mBorderlineColor);
   animation.AnimateTo(Property(renderer, DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), targetProps.mBorderlineOffset);
