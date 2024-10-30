@@ -15,6 +15,7 @@ SET(TC_SOURCES
   utc-Dali-Internal-FixedSizeMemoryPool.cpp
   utc-Dali-Internal-FrustumCulling.cpp
   utc-Dali-Internal-Gesture.cpp
+  utc-Dali-Internal-GraphicsAPI.cpp
   utc-Dali-Internal-GpuBuffer.cpp
   utc-Dali-Internal-Handles.cpp
   utc-Dali-Internal-IndexedConstStringMap.cpp

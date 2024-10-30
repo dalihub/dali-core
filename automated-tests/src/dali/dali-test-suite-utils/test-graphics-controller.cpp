@@ -718,10 +718,26 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         if(currentPipeline)
         {
           auto& bindings = cmd.data.bindUniformBuffers;
-          auto  buffer   = bindings.standaloneUniformsBufferBinding;
 
+          auto buffer = bindings.standaloneUniformsBufferBinding;
           // based on reflection, issue gl calls
           buffer.buffer->BindAsUniformBuffer(static_cast<const TestGraphicsProgram*>(currentPipeline->programState.program), bindings.standaloneUniformsBufferBinding);
+
+          // Store off uniform bindings for test retrieval:
+          if(!bindings.uniformBufferBindings.empty())
+          {
+            mLastUniformBinding.buffer   = bindings.uniformBufferBindings.back().buffer;
+            mLastUniformBinding.binding  = bindings.uniformBufferBindings.back().binding;
+            mLastUniformBinding.offset   = bindings.uniformBufferBindings.back().offset;
+            mLastUniformBinding.emulated = bindings.uniformBufferBindings.back().emulated;
+          }
+          else
+          {
+            mLastUniformBinding.buffer   = bindings.standaloneUniformsBufferBinding.buffer;
+            mLastUniformBinding.binding  = bindings.standaloneUniformsBufferBinding.binding;
+            mLastUniformBinding.offset   = bindings.standaloneUniformsBufferBinding.offset;
+            mLastUniformBinding.emulated = true;
+          }
         }
         break;
       }

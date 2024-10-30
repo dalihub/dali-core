@@ -857,6 +857,23 @@ void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::Unif
   WriteUniform(ubo, uniformInfo, &data, sizeof(T));
 }
 
+template<>
+void Renderer::WriteUniform<Matrix3>(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const Matrix3& matrix)
+{
+  auto     dst       = ubo.GetOffset() + uniformInfo.offset;
+  uint32_t rowStride = 3 * sizeof(float); // Gles2 standalone buffer is tightly packed
+  if(uniformInfo.bufferIndex > 0)
+  {
+    rowStride = uniformInfo.matrixStride; // Gles3/Vulkan uniform block, mat3 row is padded to vec4
+  }
+  for(int i = 0; i < 3; ++i)
+  {
+    ubo.Write(&matrix.AsFloat()[i * 3],
+              sizeof(float) * 3,
+              dst + (i * rowStride));
+  }
+}
+
 void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
 {
   ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
@@ -870,8 +887,8 @@ void Renderer::FillUniformBuffer(Program&                                       
 {
   for(auto& iter : mUniformIndexMaps[nodeIndex])
   {
-    auto& uniform    = iter;
-    int   arrayIndex = uniform.arrayIndex;
+    auto& uniform = iter;
+
     if(!uniform.initialized)
     {
       auto uniformInfo  = Graphics::UniformInfo{};
@@ -879,13 +896,7 @@ void Renderer::FillUniformBuffer(Program&                                       
                                              uniform.uniformNameHash,
                                              uniform.uniformNameHashNoArray,
                                              uniformInfo);
-
-      UniformBufferView* ubo = nullptr;
-      if(uniformFound)
-      {
-        ubo = uboViews[uniformInfo.bufferIndex].get();
-      }
-      else
+      if(!uniformFound)
       {
         continue;
       }
@@ -895,28 +906,47 @@ void Renderer::FillUniformBuffer(Program&                                       
       uniform.uniformBlockIndex = uniformInfo.bufferIndex;
       uniform.initialized       = true;
 
-      auto       dst             = ubo->GetOffset() + uniformInfo.offset;
       const auto typeSize        = iter.propertyValue->GetValueSize();
       uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+      uniform.matrixStride       = uniformInfo.matrixStride;
 
-      const auto dest = dst + uniform.arrayElementStride * arrayIndex;
-
-      ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
-                 typeSize,
-                 dest);
+      WriteDynUniform(iter.propertyValue, uniform, uboViews, updateBufferIndex);
     }
     else
     {
-      UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
-
-      auto       dst      = ubo->GetOffset() + uniform.uniformOffset;
-      const auto typeSize = iter.propertyValue->GetValueSize();
-      const auto dest     = dst + uniform.arrayElementStride * arrayIndex;
-
-      ubo->Write(iter.propertyValue->GetValueAddress(updateBufferIndex),
-                 typeSize,
-                 dest);
+      WriteDynUniform(iter.propertyValue, uniform, uboViews, updateBufferIndex);
     }
+  }
+}
+
+void Renderer::WriteDynUniform(
+  const PropertyInputImpl*                                       propertyValue,
+  UniformIndexMap&                                               uniform,
+  const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
+  BufferIndex                                                    updateBufferIndex)
+{
+  const auto         typeSize   = propertyValue->GetValueSize();
+  UniformBufferView* ubo        = uboViews[uniform.uniformBlockIndex].get();
+  int                arrayIndex = uniform.arrayIndex;
+  auto               dst        = ubo->GetOffset() + uniform.uniformOffset;
+  const auto         dest       = dst + uniform.arrayElementStride * arrayIndex;
+
+  const auto valueAddress = propertyValue->GetValueAddress(updateBufferIndex);
+
+  if(propertyValue->GetType() == Property::MATRIX3 &&
+     uniform.matrixStride > 0 &&
+     uniform.matrixStride != uint32_t(-1))
+  {
+    for(int i = 0; i < 3; ++i)
+    {
+      ubo->Write(reinterpret_cast<const float*>(valueAddress) + i * 3,
+                 sizeof(float) * 3,
+                 dest + (i * uniform.matrixStride));
+    }
+  }
+  else
+  {
+    ubo->Write(valueAddress, typeSize, dest);
   }
 }
 

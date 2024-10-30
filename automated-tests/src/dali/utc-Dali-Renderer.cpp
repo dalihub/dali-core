@@ -5463,6 +5463,133 @@ int UtcDaliRendererUniformBlocks03(void)
   END_TEST;
 }
 
+int UtcDaliRendererUniformBlocks04Mat3Stride(void)
+{
+  setenv("LOG_UNIFORM_BUFFER", "5f", 1); // Turns on buffer logging
+  TestApplication application;
+
+  tet_infoline("Test array of Matrix3 has row stride of 16 inside a uniform block");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  const int MATRIX_ARRAY_COUNT{20};
+  const int matrixBlockSize = MATRIX_ARRAY_COUNT * (3 * sizeof(Vector4)); // Mat3s are padded in std140
+
+  TestGraphicsReflection::TestUniformBlockInfo block{"TestBlock", 0, 0, matrixBlockSize, {{"uAlign", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MATRIX_ARRAY_COUNT, Property::Type::MATRIX3, 48, 16}}};
+  block.members[0].offsets.resize(MATRIX_ARRAY_COUNT);
+  for(int i = 0; i < MATRIX_ARRAY_COUNT; ++i)
+  {
+    block.members[0].offsets[i] = i * 48;
+  }
+  graphics.AddCustomUniformBlock(block);
+
+  Actor    actor    = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
+  Shader   shader   = CreateShader(); // Don't care about src content
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = CreateRenderer(actor, geometry, shader, 0);
+
+  for(int i = 0; i < MATRIX_ARRAY_COUNT; ++i)
+  {
+    Matrix3 align = Matrix3::IDENTITY;
+    for(int e = 0; e < 9; ++e)
+    {
+      align.AsFloat()[e] = (i + e) * 1.0f;
+    }
+    std::ostringstream property;
+    property << "uAlign[" << i << "]";
+    renderer.RegisterProperty(property.str(), align);
+  }
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(cmdTrace.CountMethod("BindUniformBuffers"), 1, TEST_LOCATION);
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
+
+  auto data = graphics.mLastUniformBinding.buffer->memory.data();
+  data += graphics.mLastUniformBinding.offset;
+  const float* fdata = reinterpret_cast<const float*>(data);
+
+  // Aligned mat3s should have been written to this memory block
+  for(int i = 0; i < MATRIX_ARRAY_COUNT; ++i)
+  {
+    for(int t = 0; t < 12; ++t)
+    {
+      tet_printf("%3.2f ", fdata[i * 12 + t]);
+    }
+    tet_printf("\n");
+    for(int row = 0; row < 3; ++row)
+    {
+      for(int col = 0; col < 3; ++col)
+      {
+        DALI_TEST_EQUALS(fdata[i * 12 + row * 4 + col], (i + row * 3 + col) * 1.0f, TEST_LOCATION);
+      }
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererUniformMat3StandaloneStride(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that mat3 has stride of 12 in standalone uniform block");
+  tet_infoline("Or rather, that it's written contiguously into memory");
+
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+
+  Shader     shader     = Shader::New("VertexSource", "FragmentSource");
+  TextureSet textureSet = CreateTextureSet(image);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(0);
+
+  Property::Value value(Matrix3::IDENTITY);
+  Property::Index index = shader.RegisterProperty("uANormalMatrix", value);
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that each of the object's uniforms are set
+  Matrix3 uniformValue;
+  DALI_TEST_CHECK(gl.GetUniformValue<Matrix3>("uANormalMatrix", uniformValue));
+  DALI_TEST_EQUALS(uniformValue, value.Get<Matrix3>(), TEST_LOCATION);
+
+  float* els = value.Get<Matrix3>().AsFloat();
+  for(int i = 0; i < 9; ++i)
+  {
+    *els++ = i * 1.0f;
+  }
+  shader.SetProperty(index, value);
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK(gl.GetUniformValue<Matrix3>("uANormalMatrix", uniformValue));
+  DALI_TEST_EQUALS(uniformValue, value.Get<Matrix3>(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRendererUniformBlocksUnregisterScene01(void)
 {
   TestApplication application;
