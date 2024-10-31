@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <dali/public-api/images/pixel-data.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/signals/callback.h>
 
 namespace Dali
@@ -71,6 +72,33 @@ struct Rect2D
 };
 
 /**
+ * @brief Equality operator.
+ *
+ * @param[in] lhs The first rectangle
+ * @param[in] rhs The second rectangle
+ * @return True if rectangles are not identical
+ */
+inline bool operator==(const Rect2D& lhs, const Rect2D& rhs)
+{
+  return (lhs.x == rhs.x) &&
+         (lhs.y == rhs.y) &&
+         (lhs.width == rhs.width) &&
+         (lhs.height == rhs.height);
+}
+
+/**
+ * @brief Inequality operator.
+ *
+ * @param[in] lhs The first rectangle
+ * @param[in] rhs The second rectangle
+ * @return True if rectangles are not identical
+ */
+inline bool operator!=(const Rect2D& lhs, const Rect2D& rhs)
+{
+  return !(lhs == rhs);
+}
+
+/**
  * @brief Structure represents area of viewport
  */
 struct Viewport
@@ -82,6 +110,35 @@ struct Viewport
   float minDepth = 0.0f;
   float maxDepth = 1.0f;
 };
+
+/**
+ * @brief Equality operator.
+ *
+ * @param[in] lhs The first rectangle
+ * @param[in] rhs The second rectangle
+ * @return True if rectangles are not identical
+ */
+inline bool operator==(const Viewport& lhs, const Viewport& rhs)
+{
+  return Equals(lhs.x, rhs.x) &&
+         Equals(lhs.y, rhs.y) &&
+         Equals(lhs.width, rhs.width) &&
+         Equals(lhs.height, rhs.height) &&
+         Equals(lhs.minDepth, rhs.minDepth) &&
+         Equals(lhs.maxDepth, rhs.maxDepth);
+}
+
+/**
+ * @brief Inequality operator.
+ *
+ * @param[in] lhs The first rectangle
+ * @param[in] rhs The second rectangle
+ * @return True if rectangles are not identical
+ */
+inline bool operator!=(const Viewport& lhs, const Viewport& rhs)
+{
+  return !(lhs == rhs);
+}
 
 /**
  * @brief Describes vertex attribute input rate
@@ -1155,6 +1212,7 @@ struct UniformInfo
   uint32_t     location{0u};
   uint32_t     elementCount{0u};
   uint32_t     elementStride{0u};
+  uint32_t     matrixStride{0u}; ///< Number of bytes for matrix row
 
   bool operator==(const UniformInfo& rhs)
   {
@@ -1569,7 +1627,8 @@ struct DefaultDeleter
   template<class P, template<typename> typename U>
   DefaultDeleter(const U<P>& deleter)
   {
-    deleteFunction = [](T* object) { U<P>()(static_cast<P*>(object)); };
+    deleteFunction = [](T* object)
+    { U<P>()(static_cast<P*>(object)); };
   }
 
   /**
@@ -1629,6 +1688,11 @@ inline RenderTargetTransformFlags operator|(T flags, RenderTargetTransformFlagBi
 {
   return static_cast<RenderTargetTransformFlags>(flags) | static_cast<RenderTargetTransformFlags>(bit);
 }
+
+enum class DeviceCapability
+{
+  MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT
+};
 
 /**
  * unique_ptr defined in the Graphics scope

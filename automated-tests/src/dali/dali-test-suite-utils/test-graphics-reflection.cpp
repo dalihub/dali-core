@@ -333,6 +333,7 @@ bool TestGraphicsReflection::GetUniformBlock(uint32_t index, Dali::Graphics::Uni
     out.members[i].location      = memberUniform.locations[0];
     out.members[i].elementCount  = memberUniform.numElements;
     out.members[i].elementStride = memberUniform.elementStride;
+    out.members[i].matrixStride  = memberUniform.matrixStride;
   }
 
   return true;

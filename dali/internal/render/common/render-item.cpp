@@ -25,7 +25,7 @@
 
 namespace
 {
-//Memory pool used to allocate new RenderItems. Memory used by this pool will be released when shutting down DALi
+// Memory pool used to allocate new RenderItems. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem>& GetRenderItemPool()
 {
   static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem> gRenderItemPool(true /* Forcibly use memory pool */);
@@ -194,6 +194,55 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
   int w = static_cast<int>(roundf(aabbInScreen.w));
 
   return ClippingBox(x, y, z - x, w - y);
+}
+
+bool RenderItem::UsesDepthBuffer(bool depthTestEnabled)
+{
+  const DepthWriteMode::Type depthWriteMode = mRenderer->GetDepthWriteMode();
+  const DepthTestMode::Type  depthTestMode  = mRenderer->GetDepthTestMode();
+
+  const bool enableDepthWrite = ((depthWriteMode == DepthWriteMode::AUTO) && depthTestEnabled && mIsOpaque) ||
+                                (depthWriteMode == DepthWriteMode::ON);
+  const bool enableDepthTest = ((depthTestMode == DepthTestMode::AUTO) && depthTestEnabled) ||
+                               (depthTestMode == DepthTestMode::ON);
+  return enableDepthTest || enableDepthWrite;
+}
+
+bool RenderItem::UsesStencilBuffer()
+{
+  RenderMode::Type renderMode  = RenderMode::AUTO;
+  bool             usesStencil = false;
+  if(mRenderer)
+  {
+    renderMode = mRenderer->GetRenderMode();
+  }
+
+  switch(renderMode)
+  {
+    case RenderMode::AUTO:
+    {
+      if(mNode->GetClippingId() != 0u) // If there is a clipping node, then we are either reading/writing the stencil buffer.
+      {
+        usesStencil = true;
+      }
+      break;
+    }
+
+    case RenderMode::NONE:
+    case RenderMode::COLOR:
+    {
+      usesStencil = false;
+      break;
+    }
+
+    case RenderMode::STENCIL:
+    case RenderMode::COLOR_STENCIL:
+    {
+      usesStencil = true;
+      break;
+    }
+  }
+  return usesStencil;
 }
 
 void RenderItem::operator delete(void* ptr)

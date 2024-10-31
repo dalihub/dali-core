@@ -151,6 +151,8 @@ public:
    */
   void Destroy() override;
 
+  uint32_t GetDeviceLimitation(Graphics::DeviceCapability capability) override;
+
   /**
    * @brief Executes batch update of textures
    *
@@ -173,10 +175,7 @@ public:
    */
   void GenerateTextureMipmaps(const Graphics::Texture& texture) override;
 
-  /**
-   * TBD: do we need those functions in the new implementation?
-   */
-  bool EnableDepthStencilBuffer(bool enableDepth, bool enableStencil) override;
+  bool EnableDepthStencilBuffer(const Graphics::RenderTarget& surface, bool enableDepth, bool enableStencil) override;
 
   void RunGarbageCollector(size_t numberOfDiscardedRenderers) override;
 
@@ -566,6 +565,7 @@ public:
 
   std::vector<UniformData>                                  mCustomUniforms;
   std::vector<TestGraphicsReflection::TestUniformBlockInfo> mCustomUniformBlocks;
+  UniformBufferBindingDescriptor                            mLastUniformBinding;
 };
 
 } // namespace Dali

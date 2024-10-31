@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_ADDON_MANAGER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,14 @@ public:
    * @return vector of initialised extension handles
    */
   virtual std::vector<AddOnLibrary> LoadAddOns(const std::vector<std::string>& addonNames) = 0;
+
+  /**
+   * @brief Loads the specified addon from the specified library if it's not already cached
+   * @param addonName Name of the AddOn to acquire
+   * @param libraryName Name of the library to load the AddOn from
+   * @return Returns a valid handle or nullptr
+   */
+  virtual AddOnLibrary LoadAddOn(const std::string& addonName, const std::string& libraryName) = 0;
 
   /**
    * @brief Loads AddOn with specified name

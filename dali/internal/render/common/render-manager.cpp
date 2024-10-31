@@ -968,6 +968,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     return;
   }
 
+  // @todo These should be members of scene
+  const Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
+  const Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
+
   uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 
   std::vector<Graphics::RenderTarget*> targetsToPresent;
@@ -988,6 +992,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   std::unordered_map<Graphics::Program*, Graphics::ProgramResourceBindingInfo> programUsageCount;
 
+  bool sceneNeedsDepthBuffer   = false;
+  bool sceneNeedsStencilBuffer = false;
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -998,11 +1004,19 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       for(auto j = 0u; j < instruction.RenderListCount(); ++j)
       {
         const auto& renderList = instruction.GetRenderList(j);
+        bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
+                               !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
+                               renderList->HasColorRenderItems());
+        bool        usesDepthBuffer   = false;
+        bool        usesStencilBuffer = false;
         for(auto k = 0u; k < renderList->Count(); ++k)
         {
           auto& item = renderList->GetItem(k);
+          usesStencilBuffer |= item.UsesStencilBuffer();
           if(item.mRenderer && item.mRenderer->NeedsProgram())
           {
+            usesDepthBuffer |= item.UsesDepthBuffer(autoDepthTestMode);
+
             // Prepare and store used programs for further processing
             auto program = item.mRenderer->PrepareProgram(instruction);
             if(program)
@@ -1026,10 +1040,18 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
             }
           }
         }
+        if(!instruction.mFrameBuffer)
+        {
+          sceneNeedsDepthBuffer |= usesDepthBuffer;
+          sceneNeedsStencilBuffer |= usesStencilBuffer;
+        }
       }
     }
   }
-
+  if(!renderToFbo)
+  {
+    mImpl->graphicsController.EnableDepthStencilBuffer(*sceneObject->GetSurfaceRenderTarget(), sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
+  }
   // Fill resource binding for the command buffer
   std::vector<Graphics::CommandBufferResourceBinding> commandBufferResourceBindings;
   if(!programUsageCount.empty())
@@ -1104,10 +1126,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       surfaceOrientation -= 360;
     }
 
-    // @todo Should these be part of scene?
-    Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
-    Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
-
     Graphics::RenderTarget*           currentRenderTarget = nullptr;
     Graphics::RenderPass*             currentRenderPass   = nullptr;
     std::vector<Graphics::ClearValue> currentClearValues{};
@@ -1169,7 +1187,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
          (currentClearValues.size() <= 1))
       {
         currentClearValues.emplace_back();
-        currentClearValues.back().depthStencil.depth   = 0;
+        currentClearValues.back().depthStencil.depth   = 1.0f;
         currentClearValues.back().depthStencil.stencil = 0;
       }
 

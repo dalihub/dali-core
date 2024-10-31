@@ -80,7 +80,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
     attachmentDescriptions.push_back(desc);
 
     mClearValues.emplace_back();
-    mClearValues.back().depthStencil.depth   = 0;
+    mClearValues.back().depthStencil.depth   = 1.0f;
     mClearValues.back().depthStencil.stencil = 0;
   }
 
