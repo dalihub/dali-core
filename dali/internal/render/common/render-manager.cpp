@@ -1303,8 +1303,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   if(targetsToPresent.size() > 0u)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss)
-                                            { oss << "[" << targetsToPresent.size() << "]"; });
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) { oss << "[" << targetsToPresent.size() << "]"; });
   }
 
   // Flush UBOs
@@ -1350,11 +1349,16 @@ void RenderManager::PostRender()
   }
 
   // Notify updated RenderTexture that rendering has finished
-  for(auto&& iter : mImpl->updatedTextures)
+  // Note : updatedTextures could be added during OnRenderFinished
+  while(!mImpl->updatedTextures.Empty())
   {
-    iter->OnRenderFinished();
+    auto updatedTextures = std::move(mImpl->updatedTextures);
+    mImpl->updatedTextures.Clear();
+    for(auto&& iter : updatedTextures)
+    {
+      iter->OnRenderFinished();
+    }
   }
-  mImpl->updatedTextures.Clear();
 
   // Remove discarded textures after OnRenderFinished called
   mImpl->textureDiscardQueue.Clear();
