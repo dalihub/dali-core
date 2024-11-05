@@ -38,7 +38,7 @@ void Sampler::SetFilterMode(Dali::FilterMode::Type minFilter, Dali::FilterMode::
 {
   if(nullptr != mRenderObject)
   {
-    SetFilterModeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(minFilter), static_cast<unsigned int>(magFilter));
+    SetFilterModeMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(minFilter), static_cast<unsigned int>(magFilter));
   }
 }
 
@@ -46,7 +46,7 @@ void Sampler::SetWrapMode(Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap
 {
   if(nullptr != mRenderObject)
   {
-    SetWrapModeMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(rWrap), static_cast<unsigned int>(sWrap), static_cast<unsigned int>(tWrap));
+    SetWrapModeMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(rWrap), static_cast<unsigned int>(sWrap), static_cast<unsigned int>(tWrap));
   }
 }
 
@@ -56,14 +56,14 @@ Render::Sampler* Sampler::GetSamplerRenderObject()
 }
 
 Sampler::Sampler()
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mRenderObject(nullptr)
 {
 }
 
 void Sampler::Initialize()
 {
-  SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
+  SceneGraph::UpdateManager& updateManager = GetEventThreadServices().GetUpdateManager();
 
   mRenderObject = new Render::Sampler();
   OwnerPointer<Render::Sampler> transferOwnership(mRenderObject);
@@ -79,7 +79,7 @@ Sampler::~Sampler()
 
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
   {
-    SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
+    SceneGraph::UpdateManager& updateManager = GetEventThreadServices().GetUpdateManager();
     RemoveSamplerMessage(updateManager, *mRenderObject);
   }
 }

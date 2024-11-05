@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
@@ -41,7 +42,7 @@ class FrameBuffer;
 class FrameBuffer;
 using FrameBufferPtr = IntrusivePtr<FrameBuffer>;
 
-class FrameBuffer : public BaseObject
+class FrameBuffer : public BaseObject, public EventThreadServicesHolder
 {
 public:
   using Mask = Dali::FrameBuffer::Attachment::Mask;
@@ -124,15 +125,13 @@ private: // implementation
    */
   void Initialize();
 
-protected:
 private: // unimplemented methods
   FrameBuffer()                   = delete;
   FrameBuffer(const FrameBuffer&) = delete;
   FrameBuffer& operator=(const FrameBuffer&) = delete;
 
-private:                                               // data
-  Internal::EventThreadServices& mEventThreadServices; ///< Used to send messages to the render thread via update thread
-  Internal::Render::FrameBuffer* mRenderObject;        ///< The Render::Texture associated to this texture
+private:                                        // data
+  Internal::Render::FrameBuffer* mRenderObject; ///< The Render::Texture associated to this texture
 
   TexturePtr mColor[Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS];
   TexturePtr mDepth;

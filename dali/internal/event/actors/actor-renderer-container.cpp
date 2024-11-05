@@ -20,7 +20,7 @@
 namespace Dali::Internal
 {
 RendererContainer::RendererContainer(EventThreadServices& eventThreadServices)
-: mEventThreadServices(eventThreadServices)
+: EventThreadServicesHolder(eventThreadServices)
 {
 }
 
@@ -44,7 +44,7 @@ uint32_t RendererContainer::Add(const SceneGraph::Node& node, Renderer& renderer
   }
   RendererPtr rendererPtr = RendererPtr(&renderer);
   mRenderers.push_back(rendererPtr);
-  AttachRendererMessage(mEventThreadServices.GetUpdateManager(), node, renderer.GetRendererSceneObject());
+  AttachRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
   return index;
 }
 
@@ -56,7 +56,7 @@ void RendererContainer::Remove(const SceneGraph::Node& node, Renderer& renderer)
     if((*iter).Get() == &renderer)
     {
       mRenderers.erase(iter);
-      DetachRendererMessage(mEventThreadServices, node, renderer.GetRendererSceneObject());
+      DetachRendererMessage(GetEventThreadServices(), node, renderer.GetRendererSceneObject());
       break;
     }
   }
@@ -67,7 +67,7 @@ void RendererContainer::Remove(const SceneGraph::Node& node, uint32_t index)
   if(index < mRenderers.size())
   {
     RendererPtr renderer = mRenderers[index];
-    DetachRendererMessage(mEventThreadServices, node, renderer->GetRendererSceneObject());
+    DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
     mRenderers.erase(mRenderers.begin() + index);
   }
 }
@@ -76,7 +76,7 @@ void RendererContainer::RemoveAll(const SceneGraph::Node& node)
 {
   for(auto&& renderer : mRenderers)
   {
-    DetachRendererMessage(mEventThreadServices, node, renderer->GetRendererSceneObject());
+    DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
   }
   mRenderers.clear();
 }

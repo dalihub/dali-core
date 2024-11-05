@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTORS_ACTOR_RENDERER_CONTAINER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
  */
 
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -35,7 +36,7 @@ class Node;
  * Class to contain an actor's renderers.
  * Enables actor to set the blending for all renderers at once.
  */
-class RendererContainer
+class RendererContainer : public EventThreadServicesHolder
 {
 public:
   /**
@@ -101,8 +102,7 @@ public:
   void SetBlending(DevelBlendEquation::Type blendEquation);
 
 private:
-  EventThreadServices&     mEventThreadServices; ///< The event thread services (for sending messages)
-  std::vector<RendererPtr> mRenderers;           ///< The contained renderers
+  std::vector<RendererPtr> mRenderers; ///< The contained renderers
 };
 
 } // namespace Dali::Internal

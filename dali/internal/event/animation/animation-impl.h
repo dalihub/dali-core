@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/key-frames.h>
@@ -56,7 +57,7 @@ using AnimationConstIter = AnimationContainer::const_iterator;
  * The UpdateManager owns the Animation object, but the lifetime of the animation is
  * indirectly controlled by the Animation.
  */
-class Animation : public BaseObject
+class Animation : public BaseObject, public EventThreadServicesHolder
 {
 public:
   enum Type : uint8_t
@@ -438,9 +439,9 @@ public: // For connecting animators to animations
    * Retrieve the event thread services object
    * @return The interface for sending messages to the scene graph
    */
-  EventThreadServices& GetEventThreadServices()
+  EventThreadServices& GetAnimationEventThreadServices()
   {
-    return mEventThreadServices;
+    return GetEventThreadServices();
   }
 
 protected:
@@ -570,8 +571,7 @@ private:
 
   const SceneGraph::Animation* mAnimation{nullptr};
 
-  EventThreadServices& mEventThreadServices;
-  AnimationPlaylist&   mPlaylist;
+  AnimationPlaylist& mPlaylist;
 
   Dali::Animation::AnimationSignalType mFinishedSignal{};
   Dali::Animation::AnimationSignalType mProgressReachedSignal{};
