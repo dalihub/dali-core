@@ -84,7 +84,7 @@ LDFLAGS="${LDFLAGS:-%optflags}" ;
 
 %if "%{vd_asan}" == "1" || "%{asan}" == "1"
 CFLAGS+=" -fsanitize=address"
-CXXFLAGS+=" -fsanitize=address"
+CXXFLAGS+=" -fsanitize=address -Wno-maybe-uninitialized"
 LDFLAGS+=" -fsanitize=address"
 %endif
 export CFLAGS;
