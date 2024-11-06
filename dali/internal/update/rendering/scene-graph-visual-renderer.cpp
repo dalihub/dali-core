@@ -184,6 +184,7 @@ bool AnimatableVisualProperties::PrepareProperties()
 void AnimatableDecoratedVisualProperties::RequestResetToBaseValues()
 {
   mCornerRadius.RequestResetToBaseValue();
+  mCornerSquareness.RequestResetToBaseValue();
   mCornerRadiusPolicy.RequestResetToBaseValue();
   mBorderlineWidth.RequestResetToBaseValue();
   mBorderlineColor.RequestResetToBaseValue();

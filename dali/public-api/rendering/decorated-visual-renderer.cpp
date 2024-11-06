@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,11 @@ DecoratedVisualRenderer& DecoratedVisualRenderer::operator=(DecoratedVisualRende
 void DecoratedVisualRenderer::RegisterCornerRadiusUniform()
 {
   GetImplementation(*this).RegisterCornerRadiusUniform();
+}
+
+void DecoratedVisualRenderer::RegisterCornerSquarenessUniform()
+{
+  GetImplementation(*this).RegisterCornerSquarenessUniform();
 }
 
 void DecoratedVisualRenderer::RegisterBorderlineUniform()

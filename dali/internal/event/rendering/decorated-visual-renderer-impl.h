@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_DECORATED_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,11 @@ public:
   void RegisterCornerRadiusUniform();
 
   /**
+   * @copydoc Dali::DecoratedVisualRenderer::RegisterCornerSquarenessUniform()
+   */
+  void RegisterCornerSquarenessUniform();
+
+  /**
    * @copydoc Dali::DecoratedVisualRenderer::RegisterBorderlineUniform()
    */
   void RegisterBorderlineUniform();
@@ -130,14 +135,16 @@ private:
 public:
   enum DecoratedVisualRendererUseType
   {
-    DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS = 1,
-    DECORATED_VISUAL_RENDERER_USE_BORDERLINE    = 2,
-    DECORATED_VISUAL_RENDERER_USE_BLUR_RADIUS   = 4,
+    DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS     = 1 << 0,
+    DECORATED_VISUAL_RENDERER_USE_CORNER_SQUARENESS = 1 << 1,
+    DECORATED_VISUAL_RENDERER_USE_BORDERLINE        = 1 << 2,
+    DECORATED_VISUAL_RENDERER_USE_BLUR_RADIUS       = 1 << 3,
   };
 
   struct DecoratedVisualPropertyCache
   {
     Vector4 mCornerRadius{Vector4::ZERO};
+    Vector4 mCornerSquareness{Vector4::ZERO};
     float   mCornerRadiusPolicy{1.0f};
     float   mBorderlineWidth{0.0f};
     Vector4 mBorderlineColor{Color::BLACK};
@@ -148,7 +155,7 @@ public:
 private:
   DecoratedVisualPropertyCache mDecoratedPropertyCache;
 
-  uint8_t mAddUniformFlag : 4;
+  uint8_t mAddUniformFlag : 5;
 };
 
 } // namespace Internal
