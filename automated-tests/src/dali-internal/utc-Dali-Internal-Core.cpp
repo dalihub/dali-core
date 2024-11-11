@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ public:
     RelayoutSignalHandler::RelayoutCallback(actor);
   }
 };
+constexpr size_t FORCIBLE_WAIT_FLUSHED_BUFFER_COUNT_THRESHOLD = 1024;
 
 } // anonymous namespace
 
@@ -105,6 +106,50 @@ int UtcDaliCoreProcessEvents(void)
 
   DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::SIZE).Get<Vector3>(), size, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), position, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliCoreProcessEventsStressTest(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::ProcessEvents more than 1k times before render");
+
+  Vector3 size(100.0f, 100.0f, 0.0f);
+  Vector3 position(100.0f, 100.0f, 0.0f);
+
+  Actor actor = Actor::New();
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor.SetProperty(Actor::Property::SIZE, size);
+  actor.SetProperty(Actor::Property::POSITION, position);
+  application.GetScene().Add(actor);
+
+  RelayoutSignalHandler relayoutSignal(application);
+  actor.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
+
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(relayoutSignal.mSignalCalled, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::SIZE).Get<Vector3>(), size, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::POSITION).Get<Vector3>(), position, TEST_LOCATION);
+
+  relayoutSignal.mSignalCalled = false;
+
+  for(size_t i = 0; i < FORCIBLE_WAIT_FLUSHED_BUFFER_COUNT_THRESHOLD; ++i)
+  {
+    Vector3 newSize = size + Vector3(i + 1, i + 1, 0);
+    actor.SetProperty(Actor::Property::SIZE, newSize);
+    application.SendNotification();
+    DALI_TEST_EQUALS(relayoutSignal.mSignalCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::SIZE).Get<Vector3>(), newSize, TEST_LOCATION);
+
+    relayoutSignal.mSignalCalled = false;
+  }
+
+  application.Render();
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
