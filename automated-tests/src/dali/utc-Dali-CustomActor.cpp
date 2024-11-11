@@ -1722,7 +1722,6 @@ class OffScreenCustomActor : public UnregisteredCustomActor
 public:
   void OnSceneConnection(int depth) override
   {
-    tet_printf("tyty : %d\n", GetOffScreenRenderableType());
     Dali::Integration::Scene scene = Dali::Integration::Scene::Get(Self());
     if(scene)
     {
@@ -1891,6 +1890,86 @@ int UtcDaliCustomActorReordering(void)
   DALI_TEST_CHECK(E_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex() < J_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
   DALI_TEST_CHECK(J_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
   DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < E_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorReordering2(void)
+{
+  TestApplication application; // Need the type registry
+
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
+
+  /**
+   *          Al
+   *       /     \
+   *      Bb      Cb
+   * 
+   * A is Layer. 
+   * B and C are BACKWARD OffScreenRenderable
+   *
+   * At the initial status, the OrderIndex of each RenderTask is
+   * B(Backward) - C(Backward)
+   *
+   * if we change sibling order to call RaiseToTop of B, the OrderIndex of each RenderTask becomes
+   * C(Backward) - B(Backward)
+   */
+
+  Layer A_layer = Layer::New();
+  OffScreenCustomActor B_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
+  OffScreenCustomActor C_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
+
+  application.GetScene().Add(A_layer);
+
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
+  tet_printf("task cnt before : %d\n", application.GetScene().GetRenderTaskList().GetTaskCount());
+
+  A_layer.Add(B_offScreenCustomActor);
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 3, TEST_LOCATION);
+
+  A_layer.Add(C_offScreenCustomActor);
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 5, TEST_LOCATION);
+
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.RaiseToTop();
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() > C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.LowerToBottom();
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.RaiseAbove(C_offScreenCustomActor);
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() > C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.LowerBelow(C_offScreenCustomActor);
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.Raise();
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() > C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.Lower();
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
 
   END_TEST;
 }

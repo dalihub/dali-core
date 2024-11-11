@@ -22,6 +22,7 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -294,6 +295,7 @@ void ActorParentImpl::RaiseChild(Actor& child)
   }
   if(changed)
   {
+    RequestRenderTaskReorderRecursively();
     EmitOrderChangedAndRebuild(child);
   }
 }
@@ -318,6 +320,7 @@ void ActorParentImpl::LowerChild(Actor& child)
   }
   if(changed)
   {
+    RequestRenderTaskReorderRecursively();
     EmitOrderChangedAndRebuild(child);
   }
 }
@@ -339,6 +342,7 @@ void ActorParentImpl::RaiseChildToTop(Actor& child)
   }
   if(changed)
   {
+    RequestRenderTaskReorderRecursively();
     EmitOrderChangedAndRebuild(child);
   }
 }
@@ -360,6 +364,7 @@ void ActorParentImpl::LowerChildToBottom(Actor& child)
   }
   if(changed)
   {
+    RequestRenderTaskReorderRecursively();
     EmitOrderChangedAndRebuild(child);
   }
 }
@@ -386,6 +391,7 @@ void ActorParentImpl::RaiseChildAbove(Actor& child, Actor& target)
   }
   if(raised)
   {
+    RequestRenderTaskReorderRecursively();
     EmitOrderChangedAndRebuild(child);
   }
 }
@@ -411,6 +417,7 @@ void ActorParentImpl::LowerChildBelow(Actor& child, Actor& target)
   }
   if(lowered)
   {
+    RequestRenderTaskReorderRecursively();
     EmitOrderChangedAndRebuild(child);
   }
 }
@@ -565,6 +572,25 @@ void ActorParentImpl::InheritVisibilityRecursively(ActorContainer& inheritedVisi
     }
   }
 }
+
+void ActorParentImpl::RequestRenderTaskReorderRecursively()
+{
+  if(mOwner.OnScene() && mOwner.GetScene().GetRenderTaskList().IsReorderRequested())
+  {
+    return;
+  }
+
+  mOwner.RequestRenderTaskReorder();
+
+  if(mChildren)
+  {
+    for(const auto& child : *mChildren)
+    {
+      child->mParentImpl.RequestRenderTaskReorderRecursively();
+    }
+  }
+}
+
 
 void ActorParentImpl::EmitChildAddedSignal(Actor& child)
 {
