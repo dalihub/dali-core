@@ -39,7 +39,7 @@ Render::FrameBuffer* FrameBuffer::GetRenderObject() const
 }
 
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mRenderObject(nullptr),
   mColor{nullptr},
   mDepth(nullptr),
@@ -56,7 +56,7 @@ void FrameBuffer::Initialize()
   mRenderObject = new Render::FrameBuffer(mWidth, mHeight, mAttachments);
 
   OwnerPointer<Render::FrameBuffer> transferOwnership(mRenderObject);
-  AddFrameBuffer(mEventThreadServices.GetUpdateManager(), transferOwnership);
+  AddFrameBuffer(GetEventThreadServices().GetUpdateManager(), transferOwnership);
 }
 
 void FrameBuffer::AttachColorTexture(TexturePtr texture, uint32_t mipmapLevel, uint32_t layer)
@@ -75,7 +75,7 @@ void FrameBuffer::AttachColorTexture(TexturePtr texture, uint32_t mipmapLevel, u
     mColor[mColorAttachmentCount] = texture;
     ++mColorAttachmentCount;
 
-    AttachColorTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel, layer);
+    AttachColorTextureToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel, layer);
   }
 }
 
@@ -89,7 +89,7 @@ void FrameBuffer::AttachDepthTexture(TexturePtr texture, uint32_t mipmapLevel)
   else
   {
     mDepth = texture;
-    AttachDepthTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
+    AttachDepthTextureToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
   }
 }
 
@@ -103,13 +103,13 @@ void FrameBuffer::AttachDepthStencilTexture(TexturePtr texture, unsigned int mip
   else
   {
     mStencil = texture;
-    AttachDepthStencilTextureToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
+    AttachDepthStencilTextureToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
   }
 }
 
 void FrameBuffer::SetMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
-  SetMultiSamplingLevelToFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject, multiSamplingLevel);
+  SetMultiSamplingLevelToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, multiSamplingLevel);
 }
 
 Texture* FrameBuffer::GetColorTexture(uint8_t index) const
@@ -142,7 +142,7 @@ FrameBuffer::~FrameBuffer()
 
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
   {
-    RemoveFrameBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject);
+    RemoveFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
   }
 }
 

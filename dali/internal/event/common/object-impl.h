@@ -27,6 +27,7 @@
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/animation/animation-impl.h>
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/common/property-metadata.h>
@@ -107,7 +108,7 @@ public:
  *   a) Create their own scene-graph object and pass it to Object constructor.
  *   b) pass nullptr to Object constructor, in this case Object will create default scene object for property handling
  */
-class Object : public Dali::BaseObject
+class Object : public Dali::BaseObject, public EventThreadServicesHolder
 {
 public:
   using Capability = Dali::Handle::Capability;
@@ -567,36 +568,6 @@ private:
    * @param [in] value The new value of the property.
    */
   virtual void SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value);
-
-protected:
-  /**
-   * Get the event thread services object - used for sending messages to the scene graph
-   * Assert if called from the wrong thread.
-   * This is intentionally inline for performance reasons.
-   *
-   * @return The event thread services object
-   */
-  inline EventThreadServices& GetEventThreadServices()
-  {
-    DALI_ASSERT_ALWAYS(EventThreadServices::IsCoreRunning());
-    return mEventThreadServices;
-  }
-
-  /**
-   * Get the event thread services object - used for sending messages to the scene graph
-   * Assert if called from the wrong thread
-   * This is intentionally inline for performance reasons.
-   *
-   * @return The event thread services object
-   */
-  inline const EventThreadServices& GetEventThreadServices() const
-  {
-    DALI_ASSERT_ALWAYS(EventThreadServices::IsCoreRunning());
-    return mEventThreadServices;
-  }
-
-private:
-  EventThreadServices& mEventThreadServices;
 
 protected:
   // mutable because it's lazy initialised and GetSceneObject has to be const so it can be called from const methods

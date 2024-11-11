@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATOR_CONNECTOR_BASE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,13 +104,13 @@ public:
     // Add the new SceneGraph::Animator to its correspondent SceneGraph::Animation via message
     const SceneGraph::Animation* animation = mParent->GetSceneObject();
     DALI_ASSERT_DEBUG(nullptr != animation);
-    AddAnimatorMessage(mParent->GetEventThreadServices(), *animation, *mAnimator);
+    AddAnimatorMessage(mParent->GetAnimationEventThreadServices(), *animation, *mAnimator);
 
     // Add the new SceneGraph::PropertyResetter to the update manager via message
     if(resetterRequired)
     {
       OwnerPointer<SceneGraph::PropertyResetterBase> resetter = SceneGraph::AnimatorResetter::New(propertyOwner, *baseProperty, *mAnimator);
-      AddResetterMessage(mParent->GetEventThreadServices().GetUpdateManager(), resetter);
+      AddResetterMessage(mParent->GetAnimationEventThreadServices().GetUpdateManager(), resetter);
     }
   }
 

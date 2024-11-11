@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RAY_TEST_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,9 +71,6 @@ public:
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
    */
   bool ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance) const;
-
-private:
-  const EventThreadServices& mEventThreadServices;
 };
 
 } // namespace Internal
