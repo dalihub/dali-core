@@ -246,6 +246,12 @@ public:
    */
   void InheritVisibilityRecursively(ActorContainer& inheritedVisibilityChangedList);
 
+  /**
+   * @brief Propagates request of RenderTask reordering to its' children.
+   * Once the reorder is requested to the RenderTaskList, the traversal is finished.
+   */
+  void RequestRenderTaskReorderRecursively();
+
 private:
   /**
    * @brief Emits the ChildAdded signal for this actor
