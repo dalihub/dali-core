@@ -22,6 +22,7 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
@@ -593,6 +594,30 @@ public:
    * If actor is an empty handle, or stopperActor is not a child of sourceActor, then full scene will be rendered
    */
   void RenderUntil(Actor stopperActor);
+
+  /**
+   * @brief Requests to Keep rendering result of this frame.
+   * @SINCE_2_3.51
+   * @note This mothod is only available when the refresh rate is REFRESH_ONCE.
+   * @note The result can be used after the FinishedSignal is emitted.
+   */
+  void KeepRenderResult();
+
+  /**
+   * @brief Requests to Clear the rendered result.
+   * @SINCE_2_3.51
+   * @note Since the rendered result is kept in the render thread resource, this method asynchronously clears the result.
+   */
+  void ClearRenderResult();
+
+  /**
+   * @brief Retrieves the rendered result as PixelData.
+   * @SINCE_2_3.51
+   * @return Dali::PixelData that contains rendered result.
+   * @note This method is only available after the FinishedSignal is emitted.
+   * If this method is called before the Finishedsignal is emitted, empty handle is returned.
+   */
+  Dali::PixelData GetRenderResult();
 
 public: // Signals
   /**

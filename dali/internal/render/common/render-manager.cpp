@@ -25,6 +25,7 @@
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/integration-api/trace.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/internal/event/common/scene-impl.h>
 
@@ -269,6 +270,7 @@ struct RenderManager::Impl
     sceneContainer.clear();
     renderAlgorithms.DestroyCommandBuffer();
 
+    renderedFrameBufferContainer.clear();
     samplerContainer.Clear();
     frameBufferContainer.Clear();
     vertexBufferContainer.Clear();
@@ -296,12 +298,13 @@ struct RenderManager::Impl
   std::vector<SceneGraph::Scene*> sceneContainer;   ///< List of pointers to the scene graph objects of the scenes
   Render::RenderAlgorithms        renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
-  Integration::OrderedSet<Render::Sampler>      samplerContainer;      ///< List of owned samplers
-  Integration::OrderedSet<Render::FrameBuffer>  frameBufferContainer;  ///< List of owned framebuffers
-  Integration::OrderedSet<Render::VertexBuffer> vertexBufferContainer; ///< List of owned vertex buffers
-  Integration::OrderedSet<Render::Geometry>     geometryContainer;     ///< List of owned Geometries
-  OwnerKeyContainer<Render::Renderer>           rendererContainer;     ///< List of owned renderers
-  OwnerKeyContainer<Render::Texture>            textureContainer;      ///< List of owned textures
+  std::vector<Render::FrameBuffer*>             renderedFrameBufferContainer; ///< List of rendered frame buffer
+  Integration::OrderedSet<Render::Sampler>      samplerContainer;             ///< List of owned samplers
+  Integration::OrderedSet<Render::FrameBuffer>  frameBufferContainer;         ///< List of owned framebuffers
+  Integration::OrderedSet<Render::VertexBuffer> vertexBufferContainer;        ///< List of owned vertex buffers
+  Integration::OrderedSet<Render::Geometry>     geometryContainer;            ///< List of owned Geometries
+  OwnerKeyContainer<Render::Renderer>           rendererContainer;            ///< List of owned renderers
+  OwnerKeyContainer<Render::Texture>            textureContainer;             ///< List of owned textures
 
   Integration::OrderedSet<Render::RenderTracker> mRenderTrackers; ///< List of owned render trackers
 
@@ -1299,6 +1302,12 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       instruction.mRenderTracker = nullptr;
     }
     mainCommandBuffer->EndRenderPass(syncObject);
+
+    if(instruction.mFrameBuffer && instruction.mFrameBuffer->IsKeepingRenderResultRequested())
+    {
+      mainCommandBuffer->ReadPixels(instruction.mFrameBuffer->GetRenderResultBuffer());
+      mImpl->renderedFrameBufferContainer.push_back(instruction.mFrameBuffer);
+    }
   }
 
   if(targetsToPresent.size() > 0u)
@@ -1372,6 +1381,12 @@ void RenderManager::PostRender()
   }
 
   mImpl->ClearUnusedProgramCacheIfNeed();
+
+  for(auto& framebuffer : mImpl->renderedFrameBufferContainer)
+  {
+    framebuffer->SetRenderResultDrawn();
+  }
+  mImpl->renderedFrameBufferContainer.clear();
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   // Shrink relevant containers if required.

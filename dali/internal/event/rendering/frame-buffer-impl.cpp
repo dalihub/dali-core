@@ -133,6 +133,24 @@ void FrameBuffer::SetSize(uint32_t width, uint32_t height)
   mHeight = height;
 }
 
+void FrameBuffer::KeepRenderResult()
+{
+  KeepRenderResultToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
+}
+
+void FrameBuffer::ClearRenderResult()
+{
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
+  {
+    ClearRenderResultToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
+  }
+}
+
+Dali::PixelData FrameBuffer::GetRenderResult()
+{
+  return mRenderObject->GetRenderResult();
+}
+
 FrameBuffer::~FrameBuffer()
 {
   if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))

@@ -291,6 +291,12 @@ public:
   virtual void EndRenderPass(Graphics::SyncObject* syncObject) = 0;
 
   /**
+   * @brief Request to read pixels
+   * @param[out] buffer to load pixel data.
+   */
+  virtual void ReadPixels(uint8_t* buffer) = 0;
+
+  /**
    * @brief Executes a list of secondary command buffers
    *
    * The secondary command buffers will be executed as a part of a primary
