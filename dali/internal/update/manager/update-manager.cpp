@@ -1602,6 +1602,16 @@ void UpdateManager::NotifyFrameCallback(FrameCallbackInterface* frameCallback, D
   mImpl->GetFrameCallbackProcessor(*this).NotifyFrameCallback(frameCallback, syncPoint);
 }
 
+void UpdateManager::KeepRenderResultToFrameBuffer(Render::FrameBuffer* frameBuffer)
+{
+  frameBuffer->KeepRenderResult();
+}
+
+void UpdateManager::ClearRenderResultToFrameBuffer(Render::FrameBuffer* frameBuffer)
+{
+  frameBuffer->ClearRenderResult();
+}
+
 void UpdateManager::AddSampler(OwnerPointer<Render::Sampler>& sampler)
 {
   // Message has ownership of Sampler while in transit from update to render

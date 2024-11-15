@@ -740,6 +740,18 @@ public:
   void NotifyFrameCallback(FrameCallbackInterface* frameCallback, Dali::UpdateProxy::NotifySyncPoint syncPoint);
 
   /**
+   * Requests to keep render result of the framebuffer.
+   * @param[in] frameBuffer The FrameBuffer
+   */
+  void KeepRenderResultToFrameBuffer(Render::FrameBuffer* frameBuffer);
+
+  /**
+   * Requests to clear kept render result of the framebuffer.
+   * @param[in] frameBuffer The FrameBuffer
+   */
+  void ClearRenderResultToFrameBuffer(Render::FrameBuffer* frameBuffer);
+
+  /**
    * Get the update message queue capacity (mutex locked)
    */
   std::size_t GetUpdateMessageQueueCapacity() const;
@@ -1611,6 +1623,28 @@ inline void SetMultiSamplingLevelToFrameBuffer(UpdateManager& manager, Render::F
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::SetMultiSamplingLevelToFrameBuffer, &frameBuffer, multiSamplingLevel);
+}
+
+inline void KeepRenderResultToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer)
+{
+  using LocalType = MessageValue1<UpdateManager, Render::FrameBuffer*>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::KeepRenderResultToFrameBuffer, &frameBuffer);
+}
+
+inline void ClearRenderResultToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer)
+{
+  using LocalType = MessageValue1<UpdateManager, Render::FrameBuffer*>;
+
+  // Reserve some memory inside the render queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::ClearRenderResultToFrameBuffer, &frameBuffer);
 }
 
 inline void SetDepthIndicesMessage(UpdateManager& manager, OwnerPointer<NodeDepths>& nodeDepths)

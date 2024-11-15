@@ -28,7 +28,8 @@ namespace Internal
 namespace Render
 {
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
-: mWidth(width),
+: mRenderResult(nullptr),
+  mWidth(width),
   mHeight(height),
   mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
   mStencilBuffer(attachments & Dali::FrameBuffer::Attachment::STENCIL)
@@ -45,7 +46,10 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
   }
 }
 
-FrameBuffer::~FrameBuffer() = default;
+FrameBuffer::~FrameBuffer()
+{
+  ClearRenderResult();
+}
 
 void FrameBuffer::Destroy()
 {
@@ -67,7 +71,7 @@ void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLe
     }
 
     uint32_t                  attachmentId = mCreateInfo.colorAttachments.size();
-    Graphics::ColorAttachment colorAttachment{attachmentId, texture->GetGraphicsObject(), layer, mipmapLevel};
+    Graphics::ColorAttachment colorAttachment{attachmentId, texture->GetGraphicsObject(), layer, mipmapLevel, texture->GetPixelFormat()};
     mCreateInfo.colorAttachments.push_back(colorAttachment);
   }
 }
@@ -104,6 +108,66 @@ void FrameBuffer::AttachDepthStencilTexture(Render::Texture* texture, uint32_t m
 void FrameBuffer::SetMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
   mCreateInfo.multiSamplingLevel = multiSamplingLevel;
+}
+
+void FrameBuffer::KeepRenderResult()
+{
+  mIsKeepingRenderResultRequested = true;
+}
+
+void FrameBuffer::ClearRenderResult()
+{
+  if(mIsKeepingRenderResultRequested)
+  {
+    mIsKeepingRenderResultRequested = false;
+    delete[] mRenderResult;
+  }
+
+  Dali::Mutex::ScopedLock lock(mPixelDataMutex);
+  if(mRenderedPixelData)
+  {
+    mRenderedPixelData.Reset();
+  }
+}
+
+bool FrameBuffer::IsKeepingRenderResultRequested() const
+{
+  return mIsKeepingRenderResultRequested;
+}
+
+uint8_t* FrameBuffer::GetRenderResultBuffer()
+{
+  uint8_t* buffer = nullptr;
+  if(mIsKeepingRenderResultRequested)
+  {
+    if(mRenderResult)
+    {
+      delete[] mRenderResult;
+    }
+    mRenderResult = new uint8_t[mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888)];
+    buffer = mRenderResult;
+  }
+  return buffer;
+}
+
+void FrameBuffer::SetRenderResultDrawn()
+{
+  Dali::Mutex::ScopedLock lock(mPixelDataMutex);
+  mRenderedPixelData              = Dali::PixelData::New(mRenderResult, mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888), mWidth, mHeight, Pixel::Format::RGBA8888, Dali::PixelData::DELETE_ARRAY);
+  mRenderResult                   = nullptr;
+  mIsKeepingRenderResultRequested = false;
+}
+
+// Called from Main thread.
+Dali::PixelData FrameBuffer::GetRenderResult()
+{
+  Dali::Mutex::ScopedLock lock(mPixelDataMutex);
+  Dali::PixelData pixelData;
+  if(!mIsKeepingRenderResultRequested && mRenderedPixelData)
+  {
+    pixelData = mRenderedPixelData;
+  }
+  return pixelData;
 }
 
 bool FrameBuffer::CreateGraphicsObjects()

@@ -111,6 +111,24 @@ public:
    */
   void SetSize(uint32_t width, uint32_t height);
 
+  /**
+   * @brief Requests to Keep rendering result.
+   */
+  void KeepRenderResult();
+
+  /**
+   * @brief Requests to Clear the rendered result.
+   * @note Since the rendered result is kept in the render thread resource, this method asynchronously clears the result.
+   */
+  void ClearRenderResult();
+
+  /**
+   * @brief Retrieves the rendered result as PixelData.
+   * @return Dali::PixelData that contains rendered result.
+   * If the frame is not yet rendered, empty handle is returned.
+   */
+  Dali::PixelData GetRenderResult();
+
 private: // implementation
   /**
    * Constructor

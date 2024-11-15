@@ -21,6 +21,9 @@
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/public-api/rendering/frame-buffer.h>
+#include <dali/devel-api/threading/mutex.h>
+
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -111,6 +114,41 @@ public:
   void SetMultiSamplingLevel(uint8_t multiSamplingLevel);
 
   /**
+   * @brief Requests to Keep rendering result.
+   */
+  void KeepRenderResult();
+
+  /**
+   * @brief Requests to Clear the rendered result.
+   * @note Since the rendered result is kept in the render thread resource, this method asynchronously clears the result.
+   */
+  void ClearRenderResult();
+
+  /**
+   * @brief Retrieves the rendered result as PixelData.
+   * @return Dali::PixelData that contains rendered result.
+   * If the frame is not yet rendered, empty handle is returned.
+   */
+  Dali::PixelData GetRenderResult();
+
+  /**
+   * @brief Retrieves whether keeping render result is requested or not.
+   * @return True if keeping render result is requested.
+   */
+  bool IsKeepingRenderResultRequested() const;
+
+  /**
+   * @brief Retrieves buffer pointer that the render result is stored.
+   * @return Buffer pointer of the render result buffer.
+   */
+  uint8_t* GetRenderResultBuffer();
+
+  /**
+   * @brief Notifies the drawing call of the frame is finished.
+   */
+  void SetRenderResultDrawn();
+
+  /**
    * @brief Get the number of textures bound to this frame buffer as color attachments.
    * @return The number of color attachments.
    */
@@ -171,6 +209,12 @@ private:
 
   // clear colors
   std::vector<Graphics::ClearValue> mClearValues{};
+
+  bool            mIsKeepingRenderResultRequested{false};
+  bool            mIsRenderResultDrawn{false};
+  uint8_t*        mRenderResult;
+  Dali::PixelData mRenderedPixelData;
+  Dali::Mutex     mPixelDataMutex;
 
   uint32_t mWidth;
   uint32_t mHeight;
