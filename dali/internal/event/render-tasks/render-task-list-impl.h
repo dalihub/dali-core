@@ -173,6 +173,14 @@ public:
   }
 
   /**
+   * @brief Retrieve whether Reordering is required or not.
+   */
+  bool IsReorderRequested() const
+  {
+    return mIsRequestedToReorderTask;
+  }
+
+  /**
    * @brief Reorder RenderTasks along the priority of OffScreenRenderableType of each Actor.
    *
    * @param[in] layerList layerList that used for tasks reordering.

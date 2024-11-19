@@ -244,6 +244,8 @@ private:
   using SingletonConstIter = SingletonContainer::const_iterator;
 
   SingletonContainer mSingletonContainer; ///< The container to look up singleton by its type name
+
+  bool mSingletoneContainerChanging : 1; ///< Flag if singleton container is changing now.
 };
 
 } // namespace Internal
