@@ -51,7 +51,7 @@ void TextureSet::SetTexture(uint32_t index, TexturePtr texture)
     renderTexture = texture->GetRenderTextureKey();
   }
 
-  SceneGraph::SetTextureMessage(mEventThreadServices, *mSceneObject, index, renderTexture);
+  SceneGraph::SetTextureMessage(GetEventThreadServices(), *mSceneObject, index, renderTexture);
 
   if(!texture)
   {
@@ -91,7 +91,7 @@ void TextureSet::SetSampler(uint32_t index, SamplerPtr sampler)
     renderSampler = sampler->GetSamplerRenderObject();
   }
 
-  SceneGraph::SetSamplerMessage(mEventThreadServices, *mSceneObject, index, renderSampler);
+  SceneGraph::SetSamplerMessage(GetEventThreadServices(), *mSceneObject, index, renderSampler);
 
   if(!sampler)
   {
@@ -171,14 +171,14 @@ void TextureSet::TrimContainers()
 }
 
 TextureSet::TextureSet()
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mSceneObject(nullptr)
 {
 }
 
 void TextureSet::Initialize()
 {
-  SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
+  SceneGraph::UpdateManager& updateManager = GetEventThreadServices().GetUpdateManager();
 
   mSceneObject = SceneGraph::TextureSet::New();
   OwnerPointer<SceneGraph::TextureSet> transferOwnership(mSceneObject);
@@ -194,7 +194,7 @@ TextureSet::~TextureSet()
 
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
-    SceneGraph::UpdateManager& updateManager = mEventThreadServices.GetUpdateManager();
+    SceneGraph::UpdateManager& updateManager = GetEventThreadServices().GetUpdateManager();
     RemoveTextureSetMessage(updateManager, *mSceneObject);
   }
 }

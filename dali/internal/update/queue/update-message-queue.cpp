@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@
 // CLASS HEADER
 #include <dali/internal/update/queue/update-message-queue.h>
 
+// EXTERNAL INCLUDES
+#include <future> ///< for std::future and std::promise
+#include <chrono> ///< for std::chrono::milliseconds
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/common/message.h>
@@ -42,6 +47,11 @@ namespace // unnamed namespace
 static const std::size_t INITIAL_BUFFER_SIZE   = 32768;
 static const std::size_t MAX_BUFFER_CAPACITY   = 73728; // Avoid keeping buffers which exceed this
 static const std::size_t MAX_FREE_BUFFER_COUNT = 3;     // Allow this number of buffers to be recycled
+
+// Threshold of flushed buffers count to keep in the message queue.
+// If the buffer exceeded orver the max allowed count, main thread will be sleep to avoid too much message flushing.
+constexpr std::size_t MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE            = 1024;
+constexpr uint32_t    TIME_TO_WAIT_FOR_MESSAGE_PROCESSING_MILLISECONDS = 10; // milliseconds
 
 // A queue of message buffers
 typedef vector<MessageBuffer*> MessageBufferQueue;
@@ -127,6 +137,9 @@ struct MessageQueue::Impl
   MessageQueueMutex  queueMutex;   ///< queueMutex must be locked whilst accessing processQueue or recycleQueue
   MessageBufferQueue processQueue; ///< to process in the next update
   MessageBufferQueue recycleQueue; ///< to recycle MessageBuffers after the messages have been processed
+
+  std::promise<void> messagePromise; ///< promise for message queue processing. Should be created and set value under mutex.
+  std::future<void>  messageFuture;  ///< future for message queue processing done. Should be created under mutex. Will be wait rarely.
 
   MessageBuffer*     currentMessageBuffer; ///< can be used without locking
   MessageBufferQueue freeQueue;            ///< buffers from the recycleQueue; can be used without locking
@@ -214,6 +227,19 @@ bool MessageQueue::FlushQueue()
     mImpl->processQueue.push_back(mImpl->currentMessageBuffer);
     mImpl->currentMessageBuffer = nullptr;
 
+    // Reset message promise and future.
+    mImpl->messagePromise = std::promise<void>();
+    mImpl->messageFuture  = mImpl->messagePromise.get_future();
+    if(DALI_UNLIKELY(mImpl->processQueue.size() >= MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE))
+    {
+      DALI_LOG_ERROR("MessageQueue count exceeded [%zu >= %zu] Wait maximum %u ms\n", mImpl->processQueue.size(), MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE, TIME_TO_WAIT_FOR_MESSAGE_PROCESSING_MILLISECONDS);
+    }
+    else
+    {
+      // Promise value immediatly.
+      mImpl->messagePromise.set_value();
+    }
+
     // Grab any recycled MessageBuffers
     while(!mImpl->recycleQueue.empty())
     {
@@ -239,6 +265,15 @@ bool MessageQueue::FlushQueue()
     }
   }
 
+  // Block if too much message queued without processing.
+  // It will be unlocked whenever ProcessMessages called, or time expired.
+  auto futureState = mImpl->messageFuture.wait_for(std::chrono::milliseconds(TIME_TO_WAIT_FOR_MESSAGE_PROCESSING_MILLISECONDS));
+
+  if(DALI_UNLIKELY(futureState != std::future_status::ready))
+  {
+    DALI_LOG_ERROR("MessageQueue not processed for overhead cases.\n");
+  }
+
   return messagesToProcess;
 }
 
@@ -258,6 +293,11 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
     mImpl->queueWasEmpty = mImpl->processQueue.empty(); // Flag whether we processed anything
 
     copiedProcessQueue = std::move(mImpl->processQueue); // Move message queue
+
+    if(DALI_UNLIKELY(copiedProcessQueue.size() >= MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE))
+    {
+      mImpl->messagePromise.set_value();
+    }
   }
 
   for(auto&& buffer : copiedProcessQueue)

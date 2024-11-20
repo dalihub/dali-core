@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/object/property-map.h>     // Dali::Property::Map
 #include <dali/public-api/rendering/vertex-buffer.h> // Dali::VertexBuffer
 
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 
@@ -40,7 +41,7 @@ using VertexBufferPtr = IntrusivePtr<VertexBuffer>;
  * VertexBuffer is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class VertexBuffer : public BaseObject
+class VertexBuffer : public BaseObject, public EventThreadServicesHolder
 {
 public:
   /**
@@ -108,7 +109,6 @@ private: // unimplemented methods
   VertexBuffer& operator=(const VertexBuffer&);
 
 private:                                                            // data
-  EventThreadServices&        mEventThreadServices;                 ///<Used to send messages to the render thread via update thread
   Render::VertexBuffer*       mRenderObject{nullptr};               ///<Render side object
   VertexBufferUpdateCallback* mVertexBufferUpdateCallback{nullptr}; ///<Vertex buffer update callback pointer
   uint32_t                    mBufferFormatSize{0};

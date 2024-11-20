@@ -40,7 +40,6 @@ namespace Render
 {
 namespace
 {
-
 struct GraphicsDepthCompareOp
 {
   constexpr explicit GraphicsDepthCompareOp(DepthFunction::Type compareOp)
@@ -320,19 +319,18 @@ inline void SetupStencilClipping(const RenderItem& item, Graphics::CommandBuffer
     // As the mask is made up of contiguous "1" values, we can do this quickly with a bit-shift.
     const uint32_t testMask = currentDepthMask >> 1u;
 
-    // Test against existing stencil bit-planes. All must match up to (but not including) this depth.
-    commandBuffer.SetStencilFunc(Graphics::CompareOp::EQUAL, currentDepthMask, testMask);
     // Write to the new stencil bit-plane (the other previous bit-planes are also written to).
     commandBuffer.SetStencilWriteMask(currentDepthMask);
-    commandBuffer.SetStencilOp(Graphics::StencilOp::KEEP, Graphics::StencilOp::REPLACE, Graphics::StencilOp::REPLACE);
+
+    // Test against existing stencil bit-planes. All must match up to (but not including) this depth.
+    commandBuffer.SetStencilState(Graphics::CompareOp::EQUAL, currentDepthMask, testMask, Graphics::StencilOp::KEEP, Graphics::StencilOp::REPLACE, Graphics::StencilOp::REPLACE);
   }
   else
   {
     // We are reading from the stencil buffer. Set up the stencil accordingly
     // This calculation sets all the bits up to the current depth bit.
     // This has the effect of testing that the pixel being written to exists in every bit-plane up to the current depth.
-    commandBuffer.SetStencilFunc(Graphics::CompareOp::EQUAL, currentDepthMask, currentDepthMask);
-    commandBuffer.SetStencilOp(Graphics::StencilOp::KEEP, Graphics::StencilOp::KEEP, Graphics::StencilOp::KEEP);
+    commandBuffer.SetStencilState(Graphics::CompareOp::EQUAL, currentDepthMask, currentDepthMask, Graphics::StencilOp::KEEP, Graphics::StencilOp::KEEP, Graphics::StencilOp::KEEP);
   }
 }
 
@@ -350,6 +348,7 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
 {
   // Set up whether or not to write to the depth buffer.
   const DepthWriteMode::Type depthWriteMode = item.mRenderer->GetDepthWriteMode();
+
   // Most common mode (AUTO) is tested first.
   const bool enableDepthWrite = ((depthWriteMode == DepthWriteMode::AUTO) && depthTestEnabled && item.mIsOpaque) ||
                                 (depthWriteMode == DepthWriteMode::ON);
@@ -374,6 +373,8 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
     // Note: We could do this at the beginning of the RenderTask and rely on the
     // graphics implementation to ignore the clear if not required, but, we would
     // have to enable the depth buffer to do so, which could be a redundant enable.
+
+    //@todo Why are we clearing here? Shouldn't this be part of BeginRenderPass nowadays?!
     if(DALI_UNLIKELY(firstDepthBufferUse))
     {
       // This is the first time the depth buffer is being written to or read.
@@ -382,10 +383,16 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
       // Note: The buffer will only be cleared if written to since a previous clear.
       commandBuffer.SetDepthWriteEnable(true);
       commandBuffer.ClearDepthBuffer();
+      if(!enableDepthWrite)
+      {
+        commandBuffer.SetDepthWriteEnable(enableDepthWrite); // Disable again if necessary.
+      }
     }
-
-    // Set up the depth mask based on our depth write setting.
-    commandBuffer.SetDepthWriteEnable(enableDepthWrite);
+    else
+    {
+      // Set up the depth mask based on our depth write setting.
+      commandBuffer.SetDepthWriteEnable(enableDepthWrite);
+    }
   }
   else
   {
@@ -572,12 +579,12 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
         }
 
         // Setup the stencil buffer based on the renderer's properties.
-        commandBuffer.SetStencilOp(GraphicsStencilOp(renderer->GetStencilOperationOnFail()).op,
-                                   GraphicsStencilOp(renderer->GetStencilOperationOnZPass()).op,
-                                   GraphicsStencilOp(renderer->GetStencilOperationOnZFail()).op);
-        commandBuffer.SetStencilFunc(GraphicsStencilCompareOp(renderer->GetStencilFunction()).op,
-                                     renderer->GetStencilFunctionReference(),
-                                     renderer->GetStencilFunctionMask());
+        commandBuffer.SetStencilState(GraphicsStencilCompareOp(renderer->GetStencilFunction()).op,
+                                      renderer->GetStencilFunctionReference(),
+                                      renderer->GetStencilFunctionMask(),
+                                      GraphicsStencilOp(renderer->GetStencilOperationOnFail()).op,
+                                      GraphicsStencilOp(renderer->GetStencilOperationOnZPass()).op,
+                                      GraphicsStencilOp(renderer->GetStencilOperationOnZFail()).op);
         commandBuffer.SetStencilWriteMask(renderer->GetStencilMask());
       }
       break;

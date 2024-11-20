@@ -53,7 +53,7 @@ inline void AddUnique(SceneGraph::PropertyOwnerContainer& propertyOwners, SceneG
 } // unnamed namespace
 
 ConstraintBase::ConstraintBase(Object& object, Property::Index targetPropertyIndex, SourceContainer& sources)
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mTargetObject(&object),
   mSceneGraphConstraint(nullptr),
   mSources(sources),

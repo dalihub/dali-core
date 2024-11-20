@@ -2,7 +2,7 @@
 #define DALI_DECOREATED_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,16 @@ public:
        * @note The default value is 0.0f.
        */
       BLUR_RADIUS,
+
+      /**
+       * @brief The squareness for the rounded corners of the visual. (recommend [0.0f to 1.0f]).
+       * @details Name "cornerSquareness", type Property::Vector4, animatable.
+       *
+       * @see Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS
+       * @SINCE_2_3.48
+       * @note The default value is (0, 0, 0, 0).
+       */
+      CORNER_SQUARENESS,
     };
   };
 
@@ -180,6 +190,13 @@ public:
    * @SINCE_2_1.21
    */
   void RegisterCornerRadiusUniform();
+
+  /**
+   * @brief Register relate with corner squareness uniforms so we can use it as uniform properties.
+   *
+   * @SINCE_2_3.48
+   */
+  void RegisterCornerSquarenessUniform();
 
   /**
    * @brief Register relate with borderline uniforms so we can use it as uniform properties.

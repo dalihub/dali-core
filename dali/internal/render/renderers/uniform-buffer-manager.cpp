@@ -169,31 +169,7 @@ uint32_t UniformBufferManager::GetUniformBlockAlignment(bool emulated)
 
   if(mCachedUniformBlockAlignment == 0)
   {
-    /* Getting the block alignment. This is a little complicated for the following reasons:
-     *
-     * On GL, this is as simple as calling glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT).
-     *
-     * On Vulkan, this needs a test buffer to be allocated with the right usage flags,
-     * and GetBufferMemoryRequirements will return alignment that would then be common
-     * to all similar buffers.
-     *
-     * We have generally copied the Vulkan api into our GraphicsAPI, with some changes.
-     * So, we have to use Graphics::GetBufferMemoryRequirements() which we call on a test buffer.
-     *
-     * Note, this doesn't change during the graphics context lifetime, so can be cached.
-     */
-
-    Graphics::BufferPropertiesFlags flags = 0u;
-
-    const uint32_t TEST_BUFFER_ALLOCATION{256};
-    auto           createInfo = Graphics::BufferCreateInfo()
-                        .SetSize(TEST_BUFFER_ALLOCATION)
-                        .SetBufferPropertiesFlags(flags)
-                        .SetUsage(0u | Graphics::BufferUsage::UNIFORM_BUFFER);
-
-    Graphics::UniquePtr<Graphics::Buffer> graphicsBuffer = mController->CreateBuffer(createInfo, nullptr);
-    Graphics::MemoryRequirements          requirements   = mController->GetBufferMemoryRequirements(*graphicsBuffer.get());
-    mCachedUniformBlockAlignment                         = requirements.alignment;
+    mCachedUniformBlockAlignment = mController->GetDeviceLimitation(Graphics::DeviceCapability::MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT);
   }
 
   return mCachedUniformBlockAlignment;

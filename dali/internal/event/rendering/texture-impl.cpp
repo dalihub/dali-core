@@ -56,7 +56,7 @@ Render::TextureKey Texture::GetRenderTextureKey() const
 }
 
 Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions size)
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mTextureKey{},
   mNativeImage(),
   mSize(size),
@@ -68,7 +68,7 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
 }
 
 Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mTextureKey{},
   mNativeImage(nativeImageInterface),
   mSize(nativeImageInterface->GetWidth(), nativeImageInterface->GetHeight()),
@@ -80,7 +80,7 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
 }
 
 Texture::Texture(TextureType::Type type, uint32_t resourceId)
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mTextureKey{},
   mNativeImage(),
   mSize(),
@@ -111,7 +111,7 @@ void Texture::Initialize()
       }
     }
 
-    AddTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
+    AddTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
   }
 }
 
@@ -124,7 +124,7 @@ Texture::~Texture()
 
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
-    RemoveTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
+    RemoveTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
   }
 }
 
@@ -239,7 +239,7 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
                                              static_cast<uint16_t>(yOffset),
                                              static_cast<uint16_t>(width),
                                              static_cast<uint16_t>(height)};
-            UploadTextureMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, pixelData, params);
+            UploadTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey, pixelData, params);
 
             result = true;
           }
@@ -263,7 +263,7 @@ void Texture::GenerateMipmaps()
 {
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
-    GenerateMipmapsMessage(mEventThreadServices.GetUpdateManager(), mTextureKey);
+    GenerateMipmapsMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
   }
   else
   {
@@ -301,7 +301,7 @@ void Texture::SetSize(const ImageDimensions& size)
   mSize = size;
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
-    SetTextureSizeMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, mSize);
+    SetTextureSizeMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey, mSize);
   }
 }
 
@@ -310,7 +310,7 @@ void Texture::SetPixelFormat(Pixel::Format format)
   mFormat = format;
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
-    SetTextureFormatMessage(mEventThreadServices.GetUpdateManager(), mTextureKey, mFormat);
+    SetTextureFormatMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey, mFormat);
   }
 }
 

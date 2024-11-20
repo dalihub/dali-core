@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTIVE_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/animation/constraint-source-impl.h>
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
@@ -46,7 +47,7 @@ class AnimatableProperty;
 /**
  * An abstract base class for active constraints.
  */
-class ConstraintBase : public BaseObject, public Object::Observer
+class ConstraintBase : public BaseObject, public Object::Observer, public EventThreadServicesHolder
 {
 public:
   using RemoveAction = Dali::Constraint::RemoveAction;
@@ -189,34 +190,7 @@ protected:
    */
   PropertyInputImpl* AddInputProperty(Source& source, SceneGraph::PropertyOwnerContainer& propertyOwners, int32_t& componentIndex);
 
-  /**
-   * Get the event thread services object - used for sending messages to the scene graph
-   * Assert if called from the wrong thread.
-   * This is intentionally inline for performance reasons.
-   *
-   * @return The event thread services object
-   */
-  inline EventThreadServices& GetEventThreadServices()
-  {
-    DALI_ASSERT_DEBUG(EventThreadServices::IsCoreRunning());
-    return mEventThreadServices;
-  }
-
-  /**
-   * Get the event thread services object - used for sending messages to the scene graph
-   * Assert if called from the wrong thread
-   * This is intentionally inline for performance reasons.
-   *
-   * @return The event thread services object
-   */
-  inline const EventThreadServices& GetEventThreadServices() const
-  {
-    DALI_ASSERT_DEBUG(EventThreadServices::IsCoreRunning());
-    return mEventThreadServices;
-  }
-
 protected:
-  EventThreadServices&              mEventThreadServices;
   Object*                           mTargetObject; ///< The object owns the constraint.
   const SceneGraph::ConstraintBase* mSceneGraphConstraint;
   SourceContainer                   mSources;

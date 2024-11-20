@@ -241,7 +241,7 @@ AnimationPtr Animation::New(float durationSeconds)
 }
 
 Animation::Animation(EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha)
-: mEventThreadServices(eventThreadServices),
+: EventThreadServicesHolder(eventThreadServices),
   mPlaylist(playlist),
   mDefaultAlpha(defaultAlpha),
   mDurationSeconds(durationSeconds),
@@ -290,7 +290,7 @@ void Animation::CreateSceneObject()
   mAnimationId = mAnimation->GetNotifyId();
 
   OwnerPointer<SceneGraph::Animation> transferOwnership(const_cast<SceneGraph::Animation*>(mAnimation));
-  AddAnimationMessage(mEventThreadServices.GetUpdateManager(), transferOwnership);
+  AddAnimationMessage(GetEventThreadServices().GetUpdateManager(), transferOwnership);
 
   // Setup mapping infomations between scenegraph animation
   mPlaylist.MapNotifier(mAnimation, *this);
@@ -304,7 +304,7 @@ void Animation::DestroySceneObject()
     mPlaylist.UnmapNotifier(mAnimation);
 
     // Remove animation using a message to the update manager
-    RemoveAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
+    RemoveAnimationMessage(GetEventThreadServices().GetUpdateManager(), *mAnimation);
     mAnimation = nullptr;
 
     // Reset id
@@ -323,7 +323,7 @@ void Animation::SetDuration(float seconds)
   mDurationSeconds = seconds;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetDurationMessage(mEventThreadServices, *mAnimation, seconds);
+  SetDurationMessage(GetEventThreadServices(), *mAnimation, seconds);
 }
 
 void Animation::SetProgressNotification(float progress)
@@ -354,7 +354,7 @@ void Animation::SetLoopCount(int32_t count)
   mLoopCount = count;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetLoopingMessage(mEventThreadServices, *mAnimation, mLoopCount);
+  SetLoopingMessage(GetEventThreadServices(), *mAnimation, mLoopCount);
 }
 
 int32_t Animation::GetLoopCount()
@@ -384,7 +384,7 @@ void Animation::SetEndAction(EndAction action)
   mEndAction = action;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetEndActionMessage(mEventThreadServices, *mAnimation, action);
+  SetEndActionMessage(GetEventThreadServices(), *mAnimation, action);
 }
 
 Dali::Animation::EndAction Animation::GetEndAction() const
@@ -399,7 +399,7 @@ void Animation::SetDisconnectAction(EndAction action)
   mDisconnectAction = action;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetDisconnectActionMessage(mEventThreadServices, *mAnimation, action);
+  SetDisconnectActionMessage(GetEventThreadServices(), *mAnimation, action);
 }
 
 Dali::Animation::EndAction Animation::GetDisconnectAction() const
@@ -420,7 +420,7 @@ void Animation::Play()
   SendFinalProgressNotificationMessage();
 
   // mAnimation is being used in a separate thread; queue a Play message
-  PlayAnimationMessage(mEventThreadServices, *mAnimation);
+  PlayAnimationMessage(GetEventThreadServices(), *mAnimation);
 }
 
 void Animation::PlayFrom(float progress)
@@ -437,7 +437,7 @@ void Animation::PlayFrom(float progress)
     SendFinalProgressNotificationMessage();
 
     // mAnimation is being used in a separate thread; queue a Play message
-    PlayAnimationFromMessage(mEventThreadServices, *mAnimation, progress);
+    PlayAnimationFromMessage(GetEventThreadServices(), *mAnimation, progress);
   }
 }
 
@@ -458,7 +458,7 @@ void Animation::PlayAfter(float delaySeconds)
   SendFinalProgressNotificationMessage();
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  PlayAfterMessage(mEventThreadServices, *mAnimation, delaySeconds);
+  PlayAfterMessage(GetEventThreadServices(), *mAnimation, delaySeconds);
 }
 
 void Animation::Pause()
@@ -466,7 +466,7 @@ void Animation::Pause()
   if(InternalStateConverter(mState, Dali::Animation::PAUSED))
   {
     // mAnimation is being used in a separate thread; queue a Pause message
-    PauseAnimationMessage(mEventThreadServices, *mAnimation);
+    PauseAnimationMessage(GetEventThreadServices(), *mAnimation);
 
     // Notify the objects with the _paused_, i.e. current values
     NotifyObjects(Notify::FORCE_CURRENT_VALUE);
@@ -506,7 +506,7 @@ void Animation::Stop()
   if(InternalStateConverter(mState, Dali::Animation::STOPPED))
   {
     // mAnimation is being used in a separate thread; queue a Stop message
-    StopAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
+    StopAnimationMessage(GetEventThreadServices().GetUpdateManager(), *mAnimation);
 
     // Only notify the objects with the _stopped_, i.e. current values if the end action is set to BAKE
     if(mEndAction == EndAction::BAKE)
@@ -540,7 +540,7 @@ void Animation::Clear()
   mConnectorTargetValuesSortRequired = false;
 
   // mAnimation is being used in a separate thread; queue a Clear message
-  ClearAnimationMessage(mEventThreadServices.GetUpdateManager(), *mAnimation);
+  ClearAnimationMessage(GetEventThreadServices().GetUpdateManager(), *mAnimation);
 
   // Reset the notification count and relative values, since the new scene-object has never been played
   mNotificationCount = 0;
@@ -1144,7 +1144,7 @@ void Animation::SetCurrentProgress(float progress)
   if(mAnimation && progress >= mPlayRange.x && progress <= mPlayRange.y)
   {
     // mAnimation is being used in a separate thread; queue a message to set the current progress
-    SetCurrentProgressMessage(mEventThreadServices, *mAnimation, progress);
+    SetCurrentProgressMessage(GetEventThreadServices(), *mAnimation, progress);
   }
 }
 
@@ -1174,7 +1174,7 @@ void Animation::SetSpeedFactor(float factor)
   if(mAnimation)
   {
     mSpeedFactor = factor;
-    SetSpeedFactorMessage(mEventThreadServices, *mAnimation, factor);
+    SetSpeedFactorMessage(GetEventThreadServices(), *mAnimation, factor);
   }
 }
 
@@ -1199,7 +1199,7 @@ void Animation::SetPlayRange(const Vector2& range)
     mPlayRange = orderedRange;
 
     // mAnimation is being used in a separate thread; queue a message to set play range
-    SetPlayRangeMessage(mEventThreadServices, *mAnimation, orderedRange);
+    SetPlayRangeMessage(GetEventThreadServices(), *mAnimation, orderedRange);
   }
 }
 
@@ -1213,7 +1213,7 @@ void Animation::SetBlendPoint(float blendPoint)
   if(blendPoint >= 0.0f && blendPoint <= 1.0f)
   {
     mBlendPoint = blendPoint;
-    SetBlendPointMessage(mEventThreadServices, *mAnimation, mBlendPoint);
+    SetBlendPointMessage(GetEventThreadServices(), *mAnimation, mBlendPoint);
   }
   else
   {
@@ -1231,7 +1231,7 @@ void Animation::SetLoopingMode(Dali::Animation::LoopingMode loopingMode)
   mAutoReverseEnabled = (loopingMode == Dali::Animation::LoopingMode::AUTO_REVERSE);
 
   // mAnimation is being used in a separate thread; queue a message to set play range
-  SetLoopingModeMessage(mEventThreadServices, *mAnimation, mAutoReverseEnabled);
+  SetLoopingModeMessage(GetEventThreadServices(), *mAnimation, mAutoReverseEnabled);
 }
 
 Dali::Animation::LoopingMode Animation::GetLoopingMode() const
@@ -1290,7 +1290,7 @@ void Animation::SendFinalProgressNotificationMessage()
   if(mProgressReachedMarker > 0.0f)
   {
     float progressMarkerSeconds = mDurationSeconds * mProgressReachedMarker;
-    SetProgressNotificationMessage(mEventThreadServices, *mAnimation, progressMarkerSeconds);
+    SetProgressNotificationMessage(GetEventThreadServices(), *mAnimation, progressMarkerSeconds);
   }
 }
 

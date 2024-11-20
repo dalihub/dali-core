@@ -1007,7 +1007,7 @@ Handle::PropertySetSignalType& Object::PropertySetSignal()
 }
 
 Object::Object(const SceneGraph::PropertyOwner* sceneObject)
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mUpdateObject(sceneObject),
   mTypeInfo(nullptr),
   mConstraints(nullptr),

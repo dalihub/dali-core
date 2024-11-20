@@ -440,7 +440,7 @@ void CheckColorMask(TestGlAbstraction& glAbstraction, bool maskValue)
   DALI_TEST_EQUALS<bool>(colorMaskParams.blue, maskValue, TEST_LOCATION);
 
   // @todo only test alpha if the framebuffer has an alpha channel
-  //DALI_TEST_EQUALS<bool>(colorMaskParams.alpha, maskValue, TEST_LOCATION);
+  // DALI_TEST_EQUALS<bool>(colorMaskParams.alpha, maskValue, TEST_LOCATION);
 }
 
 } // anonymous namespace
@@ -2161,7 +2161,7 @@ int UtcDaliActorSetInheritPosition(void)
   DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), parentPosition, TEST_LOCATION);
   DALI_TEST_EQUALS(child.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), parentPosition + childPosition, TEST_LOCATION);
 
-  //Change child position
+  // Change child position
   Vector3 childOffset(-1.0f, 1.0f, 0.0f);
   child.SetProperty(Actor::Property::POSITION, childOffset);
 
@@ -2175,7 +2175,7 @@ int UtcDaliActorSetInheritPosition(void)
   DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), parentPosition, TEST_LOCATION);
   DALI_TEST_EQUALS(child.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), childOffset, TEST_LOCATION);
 
-  //Change back to inherit position from parent
+  // Change back to inherit position from parent
   child.SetProperty(Actor::Property::INHERIT_POSITION, true);
   DALI_TEST_EQUALS(child.GetProperty<bool>(Actor::Property::INHERIT_POSITION), true, TEST_LOCATION);
   application.SendNotification();
@@ -3671,7 +3671,7 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   application.SendNotification();
   application.Render(1);
 
-  //Textures are bound when first created. Clear bound textures vector
+  // Textures are bound when first created. Clear bound textures vector
   application.GetGlAbstraction().ClearBoundTextures();
 
   // Render a,b,c as regular non-overlays. so order will be:
@@ -3745,7 +3745,7 @@ int UtcDaliActorSetDrawModeOverlayWithClipping(void)
   application.SendNotification();
   application.Render();
 
-  //Textures are bound when first created. Clear bound textures vector
+  // Textures are bound when first created. Clear bound textures vector
   application.GetGlAbstraction().ClearBoundTextures();
 
   b[Actor::Property::PARENT_ORIGIN] = ParentOrigin::BOTTOM_LEFT;
@@ -3846,7 +3846,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Matrix childMatrix(false);
   childMatrix.SetTransformComponents(childScale, childRotation, childPosition);
 
-  //Child matrix should be the composition of child and parent
+  // Child matrix should be the composition of child and parent
   Matrix childWorldMatrix(false);
   Matrix::Multiply(childWorldMatrix, childMatrix, parentMatrix);
 
@@ -4468,10 +4468,10 @@ int UtcDaliActorGetHierachyDepth(void)
   Actor actorE = Actor::New();
   Actor actorF = Actor::New();
 
-  //Test that root actor has depth equal 0
+  // Test that root actor has depth equal 0
   DALI_TEST_EQUALS(0, stage.GetRootLayer().GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
 
-  //Test actors return depth -1 when not connected to the tree
+  // Test actors return depth -1 when not connected to the tree
   DALI_TEST_EQUALS(-1, actorA.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, actorB.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, actorC.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
@@ -4479,7 +4479,7 @@ int UtcDaliActorGetHierachyDepth(void)
   DALI_TEST_EQUALS(-1, actorE.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, actorF.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
 
-  //Create the hierarchy
+  // Create the hierarchy
   stage.Add(actorA);
   actorA.Add(actorB);
   actorA.Add(actorC);
@@ -4487,7 +4487,7 @@ int UtcDaliActorGetHierachyDepth(void)
   actorB.Add(actorE);
   actorC.Add(actorF);
 
-  //Test actors return correct depth
+  // Test actors return correct depth
   DALI_TEST_EQUALS(1, actorA.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(2, actorB.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(2, actorC.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
@@ -4495,14 +4495,14 @@ int UtcDaliActorGetHierachyDepth(void)
   DALI_TEST_EQUALS(3, actorE.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(3, actorF.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
 
-  //Removing actorB from the hierarchy. actorB, actorD and actorE should now have depth equal -1
+  // Removing actorB from the hierarchy. actorB, actorD and actorE should now have depth equal -1
   actorA.Remove(actorB);
 
   DALI_TEST_EQUALS(-1, actorB.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, actorD.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
   DALI_TEST_EQUALS(-1, actorE.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
 
-  //Removing actorA from the stage. All actors should have depth equal -1
+  // Removing actorA from the stage. All actors should have depth equal -1
   stage.Remove(actorA);
 
   DALI_TEST_EQUALS(-1, actorA.GetProperty<int>(Actor::Property::HIERARCHY_DEPTH), TEST_LOCATION);
@@ -5094,6 +5094,7 @@ int UtcDaliActorPropertyClippingActor(void)
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    stencilTrace        = glAbstraction.GetStencilFunctionTrace();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+  TraceCallStack&    gfxTrace            = application.GetGraphicsController().mCallStack;
   size_t             startIndex          = 0u;
 
   // Create a clipping actor.
@@ -5102,6 +5103,8 @@ int UtcDaliActorPropertyClippingActor(void)
   application.GetScene().Add(actorDepth1Clip);
 
   // Gather the call trace.
+  gfxTrace.Enable(true);
+  stencilTrace.EnableLogging(true);
   GenerateTrace(application, enabledDisableTrace, stencilTrace);
 
   // Check we are writing to the color buffer.
@@ -5112,13 +5115,21 @@ int UtcDaliActorPropertyClippingActor(void)
   oss << std::hex << GL_STENCIL_TEST;
   DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", oss.str()));
 
+  TraceCallStack::NamedParams namedParams;
+  namedParams["enableDepth"] << "F";
+  namedParams["enableStencil"] << "T";
+  DALI_TEST_CHECK(gfxTrace.FindMethodAndParams("EnableDepthStencilBuffer", namedParams));
+
   // Check the stencil buffer was cleared.
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("ClearStencil", "0", startIndex));
+  const size_t clearIndex = startIndex;
 
   // Check the correct setup was done to write to the first bit-plane (only) of the stencil buffer.
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 0", startIndex)); // 514 is GL_EQUAL, But testing no bit-planes for the first clipping node.
-  DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "1", startIndex));
+  startIndex = clearIndex;
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7681, 7681", startIndex)); // GL_KEEP, GL_REPLACE, GL_REPLACE
+  startIndex = clearIndex;
+  DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "1", startIndex));
 
   END_TEST;
 }
@@ -5129,10 +5140,13 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor enable and then disable");
   TestApplication application;
 
+  size_t startIndex = 0u;
+
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    stencilTrace        = glAbstraction.GetStencilFunctionTrace();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
-  size_t             startIndex          = 0u;
+  TraceCallStack&    gfxTrace            = application.GetGraphicsController().mCallStack;
+  gfxTrace.Enable(true);
 
   // Create a clipping actor.
   Actor actorDepth1Clip = CreateActorWithContent16x16();
@@ -5140,7 +5154,12 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   application.GetScene().Add(actorDepth1Clip);
 
   // Gather the call trace.
+  stencilTrace.EnableLogging(true);
   GenerateTrace(application, enabledDisableTrace, stencilTrace);
+  TraceCallStack::NamedParams namedParams;
+  namedParams["enableDepth"] << "F";
+  namedParams["enableStencil"] << "T";
+  DALI_TEST_CHECK(gfxTrace.FindMethodAndParams("EnableDepthStencilBuffer", namedParams));
 
   // Check we are writing to the color buffer.
   CheckColorMask(glAbstraction, true);
@@ -5152,19 +5171,29 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
 
   // Check the stencil buffer was cleared.
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("ClearStencil", "0", startIndex));
+  const size_t clearIndex = startIndex;
 
   // Check the correct setup was done to write to the first bit-plane (only) of the stencil buffer.
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 0", startIndex)); // 514 is GL_EQUAL, But testing no bit-planes for the first clipping node.
-  DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "1", startIndex));
+  startIndex = clearIndex;
   DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7681, 7681", startIndex)); // GL_KEEP, GL_REPLACE, GL_REPLACE
+  startIndex = clearIndex;
+  DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "1", startIndex));
 
   // Now disable the clipping
   actorDepth1Clip.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED);
 
   // Gather the call trace.
+  gfxTrace.Reset();
+  stencilTrace.EnableLogging(true);
   GenerateTrace(application, enabledDisableTrace, stencilTrace);
 
   // Check the stencil buffer was disabled.
+  namedParams["enableStencil"].str("");
+  namedParams["enableStencil"].clear();
+  namedParams["enableStencil"] << "F";
+  DALI_TEST_CHECK(gfxTrace.FindMethodAndParams("EnableDepthStencilBuffer", namedParams));
+
   std::ostringstream stencil;
   stencil << std::hex << GL_STENCIL_TEST;
   DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Disable", stencil.str()));
@@ -5208,6 +5237,7 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   childDepth3.Add(childDepth4);
 
   // Gather the call trace.
+  stencilTrace.EnableLogging(true);
   GenerateTrace(application, enabledDisableTrace, stencilTrace);
 
   // Check we are writing to the color buffer.
@@ -5225,20 +5255,29 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
 
     // Check the stencil buffer was cleared.
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("ClearStencil", "0", startIndex));
+    const size_t clearIndex = startIndex;
 
     // Check the correct setup was done to write to the first bit-plane (only) of the stencil buffer.
-    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 0", startIndex));      // 514 is GL_EQUAL, But testing no bit-planes for the first clipping node.
-    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "1", startIndex));              // Write to the first bit-plane
+    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 0", startIndex)); // 514 is GL_EQUAL, But testing no bit-planes for the first clipping node.
+    startIndex = clearIndex;
+
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7681, 7681", startIndex)); // GL_KEEP, GL_REPLACE, GL_REPLACE
+    startIndex = clearIndex;
+    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "1", startIndex)); // Write to the first bit-plane
+    startIndex = clearIndex + 2;
 
     // Check the correct setup was done to test against first bit-plane (only) of the stencil buffer.
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 1, 1", startIndex));      // 514 is GL_EQUAL
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7680, 7680", startIndex)); // GL_KEEP, GL_KEEP, GL_KEEP
 
+    const size_t secondBitplaneIndex = startIndex;
     // Check we are set up to write to the second bitplane of the stencil buffer (only).
-    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 3, 1", startIndex));      // 514 is GL_EQUAL, Test both bit-planes 1 & 2
-    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "3", startIndex));              // Write to second (and previous) bit-planes
+    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilFunc", "514, 3, 1", startIndex)); // 514 is GL_EQUAL, Test both bit-planes 1 & 2
+    startIndex = secondBitplaneIndex;
     DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilOp", "7680, 7681, 7681", startIndex)); // GL_KEEP, GL_REPLACE, GL_REPLACE
+    startIndex = secondBitplaneIndex;
+    DALI_TEST_CHECK(stencilTrace.FindMethodAndParamsFromStartIndex("StencilMask", "3", startIndex)); // Write to second (and previous) bit-planes
+    startIndex = secondBitplaneIndex + 2;
 
     // Check we are set up to test against both the first and second bit-planes of the stencil buffer.
     // (Both must be set to pass the check).
@@ -10446,22 +10485,13 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
     }
   };
 
-  DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
-    dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
-  }));
-  DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
-    dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
-  }));
-  DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
-    dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
-  }));
+  DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
     dataVCB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
-    actorDSignalFunctor();
-  }));
-  DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
-    dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
-  }));
+    actorDSignalFunctor(); }));
+  DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
   actorA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
   actorB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));

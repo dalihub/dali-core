@@ -61,6 +61,7 @@ public: // Test methods
     uint32_t               numElements{0u}; // 0 elements means this isn't an array; 1 element means this is an array of size 1
     Property::Type         type;
     uint32_t               elementStride{0u}; // array element stride, 0 - tightly packed
+    uint32_t               matrixStride{0u};  // Matrix row stride in bytes, 0 - tightly packed
   };
 
   struct TestUniformBlockInfo
@@ -98,4 +99,4 @@ public: // Test methods
 
 } // namespace Dali
 
-#endif //DALI_TEST_GRAPHICS_REFLECTION_H
+#endif // DALI_TEST_GRAPHICS_REFLECTION_H

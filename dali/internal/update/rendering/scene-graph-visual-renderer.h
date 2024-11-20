@@ -35,6 +35,7 @@ struct AnimatableDecoratedVisualProperties
     mBlurRadius(0.0f),
     mBorderlineColor(Color::BLACK),
     mCornerRadius(Vector4::ZERO),
+    mCornerSquareness(Vector4::ZERO),
     mCornerRadiusPolicy(1.0f)
   {
   }
@@ -89,6 +90,7 @@ public: // Default properties
   // Properties that don't give any effort to coefficient.
   AnimatableProperty<Vector4> mBorderlineColor;
   AnimatableProperty<Vector4> mCornerRadius;
+  AnimatableProperty<Vector4> mCornerSquareness;
   AnimatableProperty<float>   mCornerRadiusPolicy;
 };
 

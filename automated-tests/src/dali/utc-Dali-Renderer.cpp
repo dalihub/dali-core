@@ -2040,13 +2040,13 @@ int UtcDaliRendererRenderOrder2DLayer(void)
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
-  //Check that actor1 has been rendered after actor2
+  // Check that actor1 has been rendered after actor2
   DALI_TEST_GREATER(textureBindIndex[1], textureBindIndex[2], TEST_LOCATION);
 
-  //Check that actor0 has been rendered after actor1
+  // Check that actor0 has been rendered after actor1
   DALI_TEST_GREATER(textureBindIndex[0], textureBindIndex[1], TEST_LOCATION);
 
-  //Check that actor3 has been rendered after actor0
+  // Check that actor3 has been rendered after actor0
   DALI_TEST_GREATER(textureBindIndex[3], textureBindIndex[0], TEST_LOCATION);
 
   END_TEST;
@@ -2108,19 +2108,19 @@ int UtcDaliRendererRenderOrder2DLayerMultipleRenderers(void)
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
-  //Check that renderer3 has been rendered after renderer4
+  // Check that renderer3 has been rendered after renderer4
   DALI_TEST_GREATER(textureBindIndex[3], textureBindIndex[4], TEST_LOCATION);
 
-  //Check that renderer0 has been rendered after renderer2
+  // Check that renderer0 has been rendered after renderer2
   DALI_TEST_GREATER(textureBindIndex[4], textureBindIndex[5], TEST_LOCATION);
 
-  //Check that renderer5 has been rendered after renderer2
+  // Check that renderer5 has been rendered after renderer2
   DALI_TEST_GREATER(textureBindIndex[5], textureBindIndex[0], TEST_LOCATION);
 
-  //Check that renderer0 has been rendered after renderer2
+  // Check that renderer0 has been rendered after renderer2
   DALI_TEST_GREATER(textureBindIndex[0], textureBindIndex[2], TEST_LOCATION);
 
-  //Check that renderer2 has been rendered after renderer1
+  // Check that renderer2 has been rendered after renderer1
   DALI_TEST_GREATER(textureBindIndex[2], textureBindIndex[1], TEST_LOCATION);
 
   END_TEST;
@@ -2299,16 +2299,16 @@ int UtcDaliRendererRenderOrder2DLayerOverlay(void)
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
-  //Check that actor4 has been rendered after actor2
+  // Check that actor4 has been rendered after actor2
   DALI_TEST_GREATER(textureBindIndex[4], textureBindIndex[2], TEST_LOCATION);
 
-  //Check that actor1 has been rendered after actor4
+  // Check that actor1 has been rendered after actor4
   DALI_TEST_GREATER(textureBindIndex[1], textureBindIndex[4], TEST_LOCATION);
 
-  //Check that actor0 has been rendered after actor1
+  // Check that actor0 has been rendered after actor1
   DALI_TEST_GREATER(textureBindIndex[0], textureBindIndex[1], TEST_LOCATION);
 
-  //Check that actor3 has been rendered after actor0
+  // Check that actor3 has been rendered after actor0
   DALI_TEST_GREATER(textureBindIndex[3], textureBindIndex[0], TEST_LOCATION);
 
   END_TEST;
@@ -2383,13 +2383,13 @@ int UtcDaliRendererRenderOrder3DLayer(void)
     textureBindIndex[i] = gl.GetTextureTrace().FindIndexFromMethodAndParams("BindTexture", params.str());
   }
 
-  //Check that actor3 has been rendered after actor0
+  // Check that actor3 has been rendered after actor0
   DALI_TEST_GREATER(textureBindIndex[3], textureBindIndex[0], TEST_LOCATION);
 
-  //Check that actor2 has been rendered after actor3
+  // Check that actor2 has been rendered after actor3
   DALI_TEST_GREATER(textureBindIndex[2], textureBindIndex[3], TEST_LOCATION);
 
-  //Check that actor1 has been rendered after actor2
+  // Check that actor1 has been rendered after actor2
   DALI_TEST_GREATER(textureBindIndex[1], textureBindIndex[2], TEST_LOCATION);
 
   END_TEST;
@@ -2585,7 +2585,7 @@ int UtcDaliRendererSetDepthFunction(void)
   std::ostringstream depthTestStr;
   depthTestStr << std::hex << GL_DEPTH_TEST;
 
-  //GL_NEVER
+  // GL_NEVER
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::NEVER);
 
@@ -2600,7 +2600,7 @@ int UtcDaliRendererSetDepthFunction(void)
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
-  //GL_ALWAYS
+  // GL_ALWAYS
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::ALWAYS);
 
@@ -2613,7 +2613,7 @@ int UtcDaliRendererSetDepthFunction(void)
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
-  //GL_LESS
+  // GL_LESS
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS);
 
@@ -2626,7 +2626,7 @@ int UtcDaliRendererSetDepthFunction(void)
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
-  //GL_GREATER
+  // GL_GREATER
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::GREATER);
 
@@ -2639,7 +2639,7 @@ int UtcDaliRendererSetDepthFunction(void)
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
-  //GL_EQUAL
+  // GL_EQUAL
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::EQUAL);
 
@@ -2652,7 +2652,7 @@ int UtcDaliRendererSetDepthFunction(void)
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
-  //GL_NOTEQUAL
+  // GL_NOTEQUAL
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::NOT_EQUAL);
 
@@ -2665,7 +2665,7 @@ int UtcDaliRendererSetDepthFunction(void)
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
-  //GL_LEQUAL
+  // GL_LEQUAL
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::LESS_EQUAL);
 
@@ -2678,7 +2678,7 @@ int UtcDaliRendererSetDepthFunction(void)
     DALI_TEST_CHECK(glDepthFunctionStack.FindMethodAndParams("DepthFunc", depthFunctionStr.str().c_str()));
   }
 
-  //GL_GEQUAL
+  // GL_GEQUAL
   {
     renderer.SetProperty(Renderer::Property::DEPTH_FUNCTION, DepthFunction::GREATER_EQUAL);
 
@@ -2812,31 +2812,49 @@ int UtcDaliRendererSetDepthTestMode(void)
   TraceCallStack&    glEnableDisableStack = glAbstraction.GetEnableDisableTrace();
   glEnableDisableStack.Enable(true);
   glEnableDisableStack.EnableLogging(true);
+  TraceCallStack& gfxTrace = application.GetGraphicsController().mCallStack;
+  gfxTrace.Enable(true);
 
   glEnableDisableStack.Reset();
+  gfxTrace.Reset();
   application.SendNotification();
   application.Render();
 
   // Check depth-test is enabled by default.
   DALI_TEST_CHECK(glEnableDisableStack.FindMethodAndParams("Enable", GetDepthTestString()));
   DALI_TEST_CHECK(!glEnableDisableStack.FindMethodAndParams("Disable", GetDepthTestString()));
+  {
+    TraceCallStack::NamedParams namedParams;
+    namedParams["enableDepth"] << "T";
+    namedParams["enableStencil"] << "F";
+    DALI_TEST_CHECK(gfxTrace.FindMethodAndParams("EnableDepthStencilBuffer", namedParams));
+  }
 
   // Turn off depth-testing. We want to check if the depth buffer has been disabled, so we need to turn off depth-write as well for this case.
   renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF);
   renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
 
   glEnableDisableStack.Reset();
+  gfxTrace.Reset();
   application.SendNotification();
   application.Render();
 
   // Check the depth buffer was disabled.
   DALI_TEST_CHECK(glEnableDisableStack.FindMethodAndParams("Disable", GetDepthTestString()));
 
+  {
+    TraceCallStack::NamedParams namedParams;
+    namedParams["enableDepth"] << "F";
+    namedParams["enableStencil"] << "F";
+    DALI_TEST_CHECK(gfxTrace.FindMethodAndParams("EnableDepthStencilBuffer", namedParams));
+  }
+
   // Turn on automatic mode depth-testing.
   // Layer behavior is currently set to LAYER_3D so AUTO should enable depth-testing.
   renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::AUTO);
 
   glEnableDisableStack.Reset();
+  gfxTrace.Reset();
   application.SendNotification();
   application.Render();
 
@@ -2844,21 +2862,37 @@ int UtcDaliRendererSetDepthTestMode(void)
   DALI_TEST_CHECK(glEnableDisableStack.FindMethodAndParams("Enable", GetDepthTestString()));
   DALI_TEST_CHECK(!glEnableDisableStack.FindMethodAndParams("Disable", GetDepthTestString()));
 
+  {
+    TraceCallStack::NamedParams namedParams;
+    namedParams["enableDepth"] << "T";
+    namedParams["enableStencil"] << "F";
+    DALI_TEST_CHECK(gfxTrace.FindMethodAndParams("EnableDepthStencilBuffer", namedParams));
+  }
+
   // Change the layer behavior to LAYER_UI.
   // Note this will also disable depth testing for the layer by default, we test this first.
   application.GetScene().GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_UI);
 
   glEnableDisableStack.Reset();
+  gfxTrace.Reset();
   application.SendNotification();
   application.Render();
 
   // Check depth-test is disabled.
   DALI_TEST_CHECK(glEnableDisableStack.FindMethodAndParams("Disable", GetDepthTestString()));
 
+  {
+    TraceCallStack::NamedParams namedParams;
+    namedParams["enableDepth"] << "F";
+    namedParams["enableStencil"] << "F";
+    DALI_TEST_CHECK(gfxTrace.FindMethodAndParams("EnableDepthStencilBuffer", namedParams));
+  }
+
   // Turn the layer depth-test flag back on, and confirm that depth testing is now on.
   application.GetScene().GetRootLayer().SetProperty(Layer::Property::DEPTH_TEST, true);
 
   glEnableDisableStack.Reset();
+  gfxTrace.Reset();
   application.SendNotification();
   application.Render();
 
@@ -3072,7 +3106,7 @@ void CheckRenderModeColorMask(TestApplication& application, Renderer& renderer, 
   DALI_TEST_EQUALS<bool>(colorMaskParams.green, expectedValue, TEST_LOCATION);
   DALI_TEST_EQUALS<bool>(colorMaskParams.blue, expectedValue, TEST_LOCATION);
   // @todo Only check alpha if framebuffer supports it.
-  //DALI_TEST_EQUALS<bool>(colorMaskParams.alpha, expectedValue, TEST_LOCATION);
+  // DALI_TEST_EQUALS<bool>(colorMaskParams.alpha, expectedValue, TEST_LOCATION);
 }
 
 int UtcDaliRendererSetRenderModeToUseColorBuffer(void)
@@ -3341,7 +3375,7 @@ int UtcDaliRendererWrongNumberOfTextures(void)
   TestApplication application;
   tet_infoline("Test renderer does render even if number of textures is different than active samplers in the shader");
 
-  //Create a TextureSet with 4 textures (One more texture in the texture set than active samplers)
+  // Create a TextureSet with 4 textures (One more texture in the texture set than active samplers)
   //@note Shaders in the test suit have 3 active samplers. See TestGlAbstraction::GetActiveUniform()
   Texture    texture    = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64u, 64u);
   TextureSet textureSet = CreateTextureSet();
@@ -3369,10 +3403,10 @@ int UtcDaliRendererWrongNumberOfTextures(void)
   application.SendNotification();
   application.Render(0);
 
-  //Test we do the drawcall when TextureSet has more textures than there are active samplers in the shader
+  // Test we do the drawcall when TextureSet has more textures than there are active samplers in the shader
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
 
-  //Create a TextureSet with 1 texture (two more active samplers than texture in the texture set)
+  // Create a TextureSet with 1 texture (two more active samplers than texture in the texture set)
   //@note Shaders in the test suit have 3 active samplers. See TestGlAbstraction::GetActiveUniform()
   textureSet = CreateTextureSet();
   renderer.SetTextures(textureSet);
@@ -3381,7 +3415,7 @@ int UtcDaliRendererWrongNumberOfTextures(void)
   application.SendNotification();
   application.Render(0);
 
-  //Test we do the drawcall when TextureSet has less textures than there are active samplers in the shader.
+  // Test we do the drawcall when TextureSet has less textures than there are active samplers in the shader.
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
 
   END_TEST;
@@ -5429,6 +5463,133 @@ int UtcDaliRendererUniformBlocks03(void)
   END_TEST;
 }
 
+int UtcDaliRendererUniformBlocks04Mat3Stride(void)
+{
+  setenv("LOG_UNIFORM_BUFFER", "5f", 1); // Turns on buffer logging
+  TestApplication application;
+
+  tet_infoline("Test array of Matrix3 has row stride of 16 inside a uniform block");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  const int MATRIX_ARRAY_COUNT{20};
+  const int matrixBlockSize = MATRIX_ARRAY_COUNT * (3 * sizeof(Vector4)); // Mat3s are padded in std140
+
+  TestGraphicsReflection::TestUniformBlockInfo block{"TestBlock", 0, 0, matrixBlockSize, {{"uAlign", Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, MATRIX_ARRAY_COUNT, Property::Type::MATRIX3, 48, 16}}};
+  block.members[0].offsets.resize(MATRIX_ARRAY_COUNT);
+  for(int i = 0; i < MATRIX_ARRAY_COUNT; ++i)
+  {
+    block.members[0].offsets[i] = i * 48;
+  }
+  graphics.AddCustomUniformBlock(block);
+
+  Actor    actor    = CreateActor(application.GetScene().GetRootLayer(), 0, TEST_LOCATION);
+  Shader   shader   = CreateShader(); // Don't care about src content
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = CreateRenderer(actor, geometry, shader, 0);
+
+  for(int i = 0; i < MATRIX_ARRAY_COUNT; ++i)
+  {
+    Matrix3 align = Matrix3::IDENTITY;
+    for(int e = 0; e < 9; ++e)
+    {
+      align.AsFloat()[e] = (i + e) * 1.0f;
+    }
+    std::ostringstream property;
+    property << "uAlign[" << i << "]";
+    renderer.RegisterProperty(property.str(), align);
+  }
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(cmdTrace.CountMethod("BindUniformBuffers"), 1, TEST_LOCATION);
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
+
+  auto data = graphics.mLastUniformBinding.buffer->memory.data();
+  data += graphics.mLastUniformBinding.offset;
+  const float* fdata = reinterpret_cast<const float*>(data);
+
+  // Aligned mat3s should have been written to this memory block
+  for(int i = 0; i < MATRIX_ARRAY_COUNT; ++i)
+  {
+    for(int t = 0; t < 12; ++t)
+    {
+      tet_printf("%3.2f ", fdata[i * 12 + t]);
+    }
+    tet_printf("\n");
+    for(int row = 0; row < 3; ++row)
+    {
+      for(int col = 0; col < 3; ++col)
+      {
+        DALI_TEST_EQUALS(fdata[i * 12 + row * 4 + col], (i + row * 3 + col) * 1.0f, TEST_LOCATION);
+      }
+    }
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRendererUniformMat3StandaloneStride(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that mat3 has stride of 12 in standalone uniform block");
+  tet_infoline("Or rather, that it's written contiguously into memory");
+
+  Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 64, 64);
+
+  Shader     shader     = Shader::New("VertexSource", "FragmentSource");
+  TextureSet textureSet = CreateTextureSet(image);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+  renderer.SetTextures(textureSet);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(0);
+
+  Property::Value value(Matrix3::IDENTITY);
+  Property::Index index = shader.RegisterProperty("uANormalMatrix", value);
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that each of the object's uniforms are set
+  Matrix3 uniformValue;
+  DALI_TEST_CHECK(gl.GetUniformValue<Matrix3>("uANormalMatrix", uniformValue));
+  DALI_TEST_EQUALS(uniformValue, value.Get<Matrix3>(), TEST_LOCATION);
+
+  float* els = value.Get<Matrix3>().AsFloat();
+  for(int i = 0; i < 9; ++i)
+  {
+    *els++ = i * 1.0f;
+  }
+  shader.SetProperty(index, value);
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK(gl.GetUniformValue<Matrix3>("uANormalMatrix", uniformValue));
+  DALI_TEST_EQUALS(uniformValue, value.Get<Matrix3>(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRendererUniformBlocksUnregisterScene01(void)
 {
   TestApplication application;
@@ -5484,7 +5645,7 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   application.Render();
 
   TraceCallStack::NamedParams namedParams;
-  namedParams["id"] << 6;
+  namedParams["id"] << 5;
   DALI_TEST_CHECK(gl.mBufferTrace.FindMethodAndParams("DeleteBuffers", namedParams));
 
   END_TEST;

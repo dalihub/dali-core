@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SAMPLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/connectable.h>      // Dali::Internal::Connectable
+#include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h>      // Dali::Internal::Object
 #include <dali/public-api/actors/sampling.h>
@@ -43,7 +44,7 @@ using SamplerPtr = IntrusivePtr<Sampler>;
  * Sampler is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class Sampler : public BaseObject
+class Sampler : public BaseObject, public EventThreadServicesHolder
 {
 public:
   /**
@@ -83,9 +84,8 @@ protected:
    */
   ~Sampler() override;
 
-private:                                     // data
-  EventThreadServices& mEventThreadServices; ///<Used to send messages to the render thread via the update thread
-  Render::Sampler*     mRenderObject;        ///<Render thread sampler for this sampler
+private:                          // data
+  Render::Sampler* mRenderObject; ///<Render thread sampler for this sampler
 };
 
 } // namespace Internal

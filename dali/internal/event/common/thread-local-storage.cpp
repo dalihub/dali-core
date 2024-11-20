@@ -55,7 +55,8 @@ thread_local bool                isShuttingDown = false;
 } // namespace
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
-: mCore(core)
+: mCore(core),
+  mSingletoneContainerChanging(false)
 {
   DALI_ASSERT_ALWAYS(threadLocal == nullptr && "Cannot create more than one ThreadLocalStorage object");
 
@@ -63,7 +64,15 @@ ThreadLocalStorage::ThreadLocalStorage(Core* core)
   isShuttingDown = false;
 }
 
-ThreadLocalStorage::~ThreadLocalStorage() = default;
+ThreadLocalStorage::~ThreadLocalStorage()
+{
+  if(DALI_LIKELY(!mSingletoneContainerChanging))
+  {
+    // Turn on this flag as true, and don't return to false agian.
+    mSingletoneContainerChanging = true;
+    mSingletonContainer.clear();
+  }
+}
 
 void ThreadLocalStorage::Remove()
 {
@@ -198,27 +207,38 @@ void ThreadLocalStorage::Register(const std::type_info& info, BaseHandle singlet
 {
   if(singleton)
   {
-    DALI_LOG_SINGLETON_SERVICE(Debug::General, "Singleton Added: %s\n", info.name());
-    mSingletonContainer.push_back(SingletonPair(info.name(), singleton));
+    if(DALI_LIKELY(!mSingletoneContainerChanging))
+    {
+      DALI_LOG_SINGLETON_SERVICE(Debug::General, "Singleton Added: %s\n", info.name());
+      mSingletonContainer.push_back(SingletonPair(info.name(), singleton));
+    }
   }
 }
 
 void ThreadLocalStorage::UnregisterAll()
 {
-  mSingletonContainer.clear();
+  if(DALI_LIKELY(!mSingletoneContainerChanging))
+  {
+    mSingletoneContainerChanging = true;
+    mSingletonContainer.clear();
+    mSingletoneContainerChanging = false;
+  }
 }
 
 BaseHandle ThreadLocalStorage::GetSingleton(const std::type_info& info) const
 {
   BaseHandle object;
 
-  const SingletonContainer::const_iterator end = mSingletonContainer.end();
-  for(SingletonContainer::const_iterator iter = mSingletonContainer.begin(); iter != end; ++iter)
+  if(DALI_LIKELY(!mSingletoneContainerChanging))
   {
-    // comparing the addresses as these are allocated statically per library
-    if((*iter).first == info.name())
+    const SingletonContainer::const_iterator end = mSingletonContainer.end();
+    for(SingletonContainer::const_iterator iter = mSingletonContainer.begin(); iter != end; ++iter)
     {
-      object = (*iter).second;
+      // comparing the addresses as these are allocated statically per library
+      if((*iter).first == info.name())
+      {
+        object = (*iter).second;
+      }
     }
   }
 

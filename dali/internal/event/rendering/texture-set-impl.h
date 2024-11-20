@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h> // std::vector
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/object-impl.h>     // Dali::Internal::Object
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 #include <dali/internal/event/rendering/shader-impl.h>  // Dali::Internal::Shader
@@ -45,7 +46,7 @@ using TextureSetPtr = IntrusivePtr<TextureSet>;
 /**
  * TextureSet is an object that holds all the textures used by a renderer
  */
-class TextureSet : public BaseObject
+class TextureSet : public BaseObject, public EventThreadServicesHolder
 {
 public:
   /**
@@ -122,8 +123,7 @@ private: // unimplemented methods
   TextureSet(const TextureSet&);
   TextureSet& operator=(const TextureSet&);
 
-private:                                        // Data
-  EventThreadServices&    mEventThreadServices; ///<Used to send messages to the update thread
+private: // Data
   SceneGraph::TextureSet* mSceneObject;
   std::vector<SamplerPtr> mSamplers;
   std::vector<TexturePtr> mTextures;

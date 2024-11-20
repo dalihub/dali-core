@@ -2,7 +2,7 @@
 #define DALI_ADDON_BINDER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,25 @@ public:
     if(mAddOnManager)
     {
       mAddOnHandle = mAddOnManager->GetAddOn(addonName);
+      if(mAddOnHandle)
+      {
+        mAddOnManager->GetAddOnInfo(addonName, mAddOnInfo);
+      }
+    }
+  }
+
+  /**
+   * @brief Constructor. Opens an AddOn and creates interface
+   * @param[in] addonName Name of AddOn
+   * @param[in] libraryName Name of the library to load addon from.
+   * @param[in] version Version of AddOn
+   */
+  explicit AddOnBinder(const char* addonName, const char* libraryName, uint32_t version = 0u)
+  {
+    mAddOnManager = Dali::Integration::AddOnManager::Get();
+    if(mAddOnManager)
+    {
+      mAddOnHandle = mAddOnManager->LoadAddOn(addonName, libraryName);
       if(mAddOnHandle)
       {
         mAddOnManager->GetAddOnInfo(addonName, mAddOnInfo);

@@ -163,7 +163,7 @@ void VertexBuffer::SetData(const void* data, uint32_t size)
   std::copy(source, source + bufferSize, destination);
 
   // Ownership of the bufferCopy is passed to the message ( uses an owner pointer )
-  SceneGraph::SetVertexBufferData(mEventThreadServices.GetUpdateManager(), *mRenderObject, bufferCopy, mSize);
+  SceneGraph::SetVertexBufferData(GetEventThreadServices().GetUpdateManager(), *mRenderObject, bufferCopy, mSize);
 }
 
 uint32_t VertexBuffer::GetSize() const
@@ -173,7 +173,7 @@ uint32_t VertexBuffer::GetSize() const
 
 void VertexBuffer::SetDivisor(uint32_t divisor)
 {
-  SceneGraph::SetVertexBufferDivisorMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, divisor);
+  SceneGraph::SetVertexBufferDivisorMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, divisor);
   mDivisor = divisor;
 }
 
@@ -189,7 +189,7 @@ void VertexBuffer::SetVertexBufferUpdateCallback(VertexBufferUpdateCallback& cal
     ClearVertexBufferUpdateCallback();
   }
   mVertexBufferUpdateCallback = &callback;
-  SceneGraph::SetVertexBufferUpdateCallbackMessage(mEventThreadServices.GetUpdateManager(), *mRenderObject, &callback);
+  SceneGraph::SetVertexBufferUpdateCallbackMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, &callback);
 }
 
 void VertexBuffer::ClearVertexBufferUpdateCallback()
@@ -222,12 +222,12 @@ VertexBuffer::~VertexBuffer()
 
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
   {
-    SceneGraph::RemoveVertexBuffer(mEventThreadServices.GetUpdateManager(), *mRenderObject);
+    SceneGraph::RemoveVertexBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
   }
 }
 
 VertexBuffer::VertexBuffer()
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mRenderObject(nullptr),
   mBufferFormatSize(0),
   mSize(0)
@@ -238,7 +238,7 @@ void VertexBuffer::Initialize(Dali::Property::Map& formatMap)
 {
   mRenderObject = new Render::VertexBuffer();
   OwnerPointer<Render::VertexBuffer> transferOwnership(mRenderObject);
-  SceneGraph::AddVertexBuffer(mEventThreadServices.GetUpdateManager(), transferOwnership);
+  SceneGraph::AddVertexBuffer(GetEventThreadServices().GetUpdateManager(), transferOwnership);
 
   uint32_t numComponents = static_cast<uint32_t>(formatMap.Count());
 
@@ -321,7 +321,7 @@ void VertexBuffer::Initialize(Dali::Property::Map& formatMap)
 
   mBufferFormatSize = format->size;
 
-  SceneGraph::SetVertexBufferFormat(mEventThreadServices.GetUpdateManager(), *mRenderObject, format);
+  SceneGraph::SetVertexBufferFormat(GetEventThreadServices().GetUpdateManager(), *mRenderObject, format);
 }
 
 uint32_t GetPropertyImplementationSize(Property::Type& propertyType)

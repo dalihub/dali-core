@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GEOMETRY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/geometry.h> // Dali::Geometry
 
+#include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/rendering/vertex-buffer-impl.h> // Dali::Internal::VertexBuffer
 #include <dali/internal/render/renderers/render-geometry.h>
 
@@ -46,7 +47,7 @@ using GeometryPtr = IntrusivePtr<Geometry>;
  * Geometry is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class Geometry : public BaseObject
+class Geometry : public BaseObject, public EventThreadServicesHolder
 {
 public:
   /**
@@ -118,9 +119,8 @@ private: // unimplemented methods
   Geometry(const Geometry&);
   Geometry& operator=(const Geometry&);
 
-private:                                     // data
-  EventThreadServices& mEventThreadServices; ///<Used to send messages to the render thread via update thread
-  Render::Geometry*    mRenderObject;
+private: // data
+  Render::Geometry* mRenderObject;
 
   std::vector<VertexBufferPtr> mVertexBuffers; ///< Vector of intrusive pointers to vertex buffers
   Dali::Geometry::Type         mType;          ///< Geometry type (cached)

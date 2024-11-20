@@ -60,14 +60,13 @@ enum class CommandType
   CLEAR_DEPTH_BUFFER      = 1 << 19,
   SET_STENCIL_TEST_ENABLE = 1 << 20,
   SET_STENCIL_WRITE_MASK  = 1 << 21,
-  SET_STENCIL_OP          = 1 << 22,
-  SET_STENCIL_FUNC        = 1 << 23,
-  SET_DEPTH_COMPARE_OP    = 1 << 24,
-  SET_DEPTH_TEST_ENABLE   = 1 << 25,
-  SET_DEPTH_WRITE_ENABLE  = 1 << 26,
-  DRAW_NATIVE             = 1 << 27,
-  BEGIN                   = 1 << 28,
-  END                     = 1 << 29
+  SET_STENCIL_STATE       = 1 << 22,
+  SET_DEPTH_COMPARE_OP    = 1 << 23,
+  SET_DEPTH_TEST_ENABLE   = 1 << 24,
+  SET_DEPTH_WRITE_ENABLE  = 1 << 25,
+  DRAW_NATIVE             = 1 << 26,
+  BEGIN                   = 1 << 27,
+  END                     = 1 << 28
 };
 
 std::ostream& operator<<(std::ostream& os, Graphics::StencilOp op);
@@ -346,23 +345,19 @@ struct Command
         data.stencilTest.enabled = rhs.data.stencilTest.enabled;
         break;
       }
-      case CommandType::SET_STENCIL_FUNC:
-      {
-        data.stencilFunc.compareMask = rhs.data.stencilFunc.compareMask;
-        data.stencilFunc.compareOp   = rhs.data.stencilFunc.compareOp;
-        data.stencilFunc.reference   = rhs.data.stencilFunc.reference;
-        break;
-      }
       case CommandType::SET_STENCIL_WRITE_MASK:
       {
         data.stencilWriteMask.mask = rhs.data.stencilWriteMask.mask;
         break;
       }
-      case CommandType::SET_STENCIL_OP:
+      case CommandType::SET_STENCIL_STATE:
       {
-        data.stencilOp.failOp      = rhs.data.stencilOp.failOp;
-        data.stencilOp.depthFailOp = rhs.data.stencilOp.depthFailOp;
-        data.stencilOp.passOp      = rhs.data.stencilOp.passOp;
+        data.stencilState.compareMask = rhs.data.stencilState.compareMask;
+        data.stencilState.compareOp   = rhs.data.stencilState.compareOp;
+        data.stencilState.reference   = rhs.data.stencilState.reference;
+        data.stencilState.failOp      = rhs.data.stencilState.failOp;
+        data.stencilState.depthFailOp = rhs.data.stencilState.depthFailOp;
+        data.stencilState.passOp      = rhs.data.stencilState.passOp;
         break;
       }
 
@@ -520,18 +515,14 @@ struct Command
         data.stencilWriteMask.mask = rhs.data.stencilWriteMask.mask;
         break;
       }
-      case CommandType::SET_STENCIL_OP:
+      case CommandType::SET_STENCIL_STATE:
       {
-        data.stencilOp.failOp      = rhs.data.stencilOp.failOp;
-        data.stencilOp.depthFailOp = rhs.data.stencilOp.depthFailOp;
-        data.stencilOp.passOp      = rhs.data.stencilOp.passOp;
-        break;
-      }
-      case CommandType::SET_STENCIL_FUNC:
-      {
-        data.stencilFunc.compareMask = rhs.data.stencilFunc.compareMask;
-        data.stencilFunc.compareOp   = rhs.data.stencilFunc.compareOp;
-        data.stencilFunc.reference   = rhs.data.stencilFunc.reference;
+        data.stencilState.failOp      = rhs.data.stencilState.failOp;
+        data.stencilState.depthFailOp = rhs.data.stencilState.depthFailOp;
+        data.stencilState.passOp      = rhs.data.stencilState.passOp;
+        data.stencilState.compareMask = rhs.data.stencilState.compareMask;
+        data.stencilState.compareOp   = rhs.data.stencilState.compareOp;
+        data.stencilState.reference   = rhs.data.stencilState.reference;
         break;
       }
       case CommandType::SET_DEPTH_COMPARE_OP:
@@ -657,19 +648,15 @@ struct Command
       Graphics::StencilOp failOp;
       Graphics::StencilOp passOp;
       Graphics::StencilOp depthFailOp;
-    } stencilOp;
+      uint32_t            compareMask;
+      Graphics::CompareOp compareOp;
+      uint32_t            reference;
+    } stencilState;
 
     struct
     {
       uint32_t mask;
     } stencilWriteMask;
-
-    struct
-    {
-      uint32_t            compareMask;
-      Graphics::CompareOp compareOp;
-      uint32_t            reference;
-    } stencilFunc;
 
     struct
     {
@@ -1033,38 +1020,29 @@ public:
     mCommands.back().data.stencilWriteMask.mask = writeMask;
   }
 
-  void SetStencilOp(Graphics::StencilOp failOp,
-                    Graphics::StencilOp passOp,
-                    Graphics::StencilOp depthFailOp) override
+  void SetStencilState(Graphics::CompareOp compareOp,
+                       uint32_t            reference,
+                       uint32_t            compareMask,
+                       Graphics::StencilOp failOp,
+                       Graphics::StencilOp passOp,
+                       Graphics::StencilOp depthFailOp) override
   {
     TraceCallStack::NamedParams params;
     params["failOp"] << failOp;
     params["passOp"] << passOp;
     params["depthFailOp"] << depthFailOp;
-    mCallStack.PushCall("SetStencilOp", params.str(), params);
-    mCommands.emplace_back();
-    mCommands.back().type                       = CommandType::SET_STENCIL_OP;
-    mCommands.back().data.stencilOp.failOp      = failOp;
-    mCommands.back().data.stencilOp.passOp      = passOp;
-    mCommands.back().data.stencilOp.depthFailOp = depthFailOp;
-  }
-
-  void SetStencilFunc(Graphics::CompareOp compareOp,
-                      uint32_t            reference,
-                      uint32_t            compareMask) override
-  {
-    TraceCallStack::NamedParams params;
     params["compareOp"] << compareOp;
     params["compareMask"] << std::hex << compareMask;
     params["reference"] << std::hex << reference;
-    mCallStack.PushCall("SetStencilFunc", params.str(), params);
-
+    mCallStack.PushCall("SetStencilState", params.str(), params);
     mCommands.emplace_back();
-    mCommands.back().type = CommandType::SET_STENCIL_FUNC;
-
-    mCommands.back().data.stencilFunc.compareOp   = compareOp;
-    mCommands.back().data.stencilFunc.compareMask = compareMask;
-    mCommands.back().data.stencilFunc.reference   = reference;
+    mCommands.back().type                          = CommandType::SET_STENCIL_STATE;
+    mCommands.back().data.stencilState.failOp      = failOp;
+    mCommands.back().data.stencilState.passOp      = passOp;
+    mCommands.back().data.stencilState.depthFailOp = depthFailOp;
+    mCommands.back().data.stencilState.compareOp   = compareOp;
+    mCommands.back().data.stencilState.compareMask = compareMask;
+    mCommands.back().data.stencilState.reference   = reference;
   }
 
   void SetDepthCompareOp(Graphics::CompareOp compareOp) override

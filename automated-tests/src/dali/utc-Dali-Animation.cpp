@@ -17179,3 +17179,56 @@ int UtcDaliAnimationDestructWorkerThreadN(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationPlayWorkerThreadN(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimationPlayWorkerThreadN Test");
+
+  try
+  {
+    class TestThread : public Thread
+    {
+    public:
+      virtual void Run()
+      {
+        tet_printf("Run TestThread\n");
+        for(auto& functor : {&Animation::Play, &Animation::Pause, &Animation::Stop, &Animation::Clear})
+        {
+          try
+          {
+            // API call at worker thread.
+            (mAnimation.*functor)();
+          }
+          catch(Dali::DaliException& e)
+          {
+            DALI_TEST_PRINT_ASSERT(e);
+            DALI_TEST_ASSERT(e, "Core is not running! Might call this API from worker thread.", TEST_LOCATION);
+          }
+        }
+      }
+
+      Dali::Animation mAnimation;
+    };
+    TestThread thread;
+
+    Dali::Animation animation = Dali::Animation::New(0);
+    Dali::Actor     actor     = Actor::New();
+    application.GetScene().Add(actor);
+    animation.AnimateTo(Property(actor, Actor::Property::POSITION), Vector3(100.0f, 10.0f, 1.0f), AlphaFunction::LINEAR);
+    thread.mAnimation = std::move(animation);
+    animation.Reset();
+
+    thread.Start();
+
+    thread.Join();
+  }
+  catch(...)
+  {
+  }
+
+  // Always success
+  DALI_TEST_CHECK(true);
+
+  END_TEST;
+}

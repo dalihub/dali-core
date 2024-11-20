@@ -42,7 +42,6 @@ namespace Dali
 {
 namespace Internal
 {
-
 typedef std::vector<Actor*>                             OffScreenRenderableContainer;
 typedef std::pair<Actor*, OffScreenRenderableContainer> ForwardOffScreenRenderableSubTree;
 typedef std::vector<ForwardOffScreenRenderableSubTree>  OffScreenRenderableData;
@@ -188,13 +187,13 @@ void RenderTaskList::SortTasks()
   {
     sortedTasks->push_back(task->GetRenderTaskSceneObject());
   }
-  SortTasksMessage(mEventThreadServices, *mSceneObject, sortedTasks);
+  SortTasksMessage(GetEventThreadServices(), *mSceneObject, sortedTasks);
   mIsRequestedToSortTask = false;
 }
 
 bool IsWithinSourceActors(const Actor& sourceActor, Actor& actor)
 {
-  bool isInside = false;
+  bool   isInside     = false;
   Actor* currentActor = &actor;
   while(currentActor)
   {
@@ -218,7 +217,6 @@ void FindOffScreenRenderableWithinSubTree(Actor& rootActor, Actor& actor, uint32
 {
   if(&actor != renderableData[subTreeIndex].first)
   {
-
     // New BACKWARD OffScreen Renderable
     if(actor.GetOffScreenRenderableType() & OffScreenRenderable::Type::BACKWARD)
     {
@@ -359,7 +357,7 @@ void RenderTaskList::ReorderTasks(Dali::Internal::LayerList& layerList)
 }
 
 RenderTaskList::RenderTaskList()
-: mEventThreadServices(EventThreadServices::Get()),
+: EventThreadServicesHolder(EventThreadServices::Get()),
   mDefaults(*Stage::GetCurrent()),
   mSceneObject(nullptr)
 {
@@ -375,7 +373,7 @@ RenderTaskList::~RenderTaskList()
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
   {
     // Remove the render task list using a message to the update manager
-    RemoveRenderTaskListMessage(mEventThreadServices.GetUpdateManager(), *mSceneObject);
+    RemoveRenderTaskListMessage(GetEventThreadServices().GetUpdateManager(), *mSceneObject);
   }
 }
 
@@ -385,7 +383,7 @@ void RenderTaskList::Initialize()
   mSceneObject = SceneGraph::RenderTaskList::New();
 
   OwnerPointer<SceneGraph::RenderTaskList> transferOwnership(const_cast<SceneGraph::RenderTaskList*>(mSceneObject));
-  AddRenderTaskListMessage(mEventThreadServices.GetUpdateManager(), transferOwnership);
+  AddRenderTaskListMessage(GetEventThreadServices().GetUpdateManager(), transferOwnership);
 
   // set the callback to call us back when tasks are completed
   mSceneObject->SetCompleteNotificationInterface(this);
