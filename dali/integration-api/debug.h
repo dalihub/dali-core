@@ -22,10 +22,11 @@
 #include <stdint.h>
 #include <cstring>
 #include <iostream>
-#include <list>
+#include <memory>
 #include <sstream>
 #include <string>
 
+#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property-map.h>
 
@@ -504,7 +505,7 @@ public:                                    \
   *
   * @note The maximum value timeInNanoseconds can hold is 0xFFFFFFFFFFFFFFFF which is 1.844674407e+19. Therefore, this can overflow after approximately 584 years.
   */
-void GetNanoseconds(uint64_t& timeInNanoseconds);
+DALI_CORE_API void GetNanoseconds(uint64_t& timeInNanoseconds);
 
 #define DALI_LOG_TIMER_START(timeVariable) \
   uint64_t timeVariable##1;                \
@@ -523,6 +524,174 @@ void GetNanoseconds(uint64_t& timeInNanoseconds);
 #endif
 
 } // namespace Log
+
+namespace TimeChecker
+{
+/**
+ * @brief Print as release info if elapsed time greater or equal than threshold. (milliseconds)
+ * You can also set threshold by environment value.
+ *
+ * threshold = -1 (==std::numeric_limits<uint32_t>::max()) means always not print.
+ * threshold = 0 mean always print.
+ *
+ * To check duration, call BeginTimeCheck() and EndTimeCheck() pairwise.
+ * The filter print duration at EndTimeCheck() by DALI_LOG_RELEASE_INFO.
+ * We can call it recursively.
+ *
+ * @code
+ * auto* filter = ThresholdFilter::New(20u, "specific_environment_value");
+ *
+ * filter->BeginTimeCheck();
+ * for(;;)
+ * {
+ *   filter->BeginTimeCheck();
+ *   // Some codes
+ *   filter->EndTimeCheck("Phase 1");
+ *   filter->BeginTimeCheck();
+ *   // Some codes
+ *   filter->EndTimeCheck("Phase 2");
+ * }
+ * filter->EndTimeCheck("Total");
+ * @endcode
+ */
+class DALI_CORE_API ThresholdFilter
+{
+public:
+  using Milliseconds = uint32_t;
+
+  /**
+   * @brief Create new filter object.
+   * The ownership of memory hold in global static list.
+   * It will be released when thread joined.
+   * @return New allocated filter with threshold and environment.
+   */
+  static ThresholdFilter* New(ThresholdFilter::Milliseconds thresholdMilliSeconds, const char* environmentVariableName);
+
+  /**
+   * @brief Check whether this filter is enabled or not.
+   * @return True if threshold is valid value. False if threshold is -1 (==std::numeric_limits<uint32_t>::max())
+   */
+  inline bool IsEnabled()
+  {
+    return mThresholdMilliSeconds != std::numeric_limits<Milliseconds>::max();
+  }
+
+  /**
+   * @brief Begin time checker.
+   * @post EndTimeCheck() should be called after.
+   */
+  void BeginTimeCheck();
+
+  /**
+   * @brief End time checker.
+   * Print log if duration is greater of equal than threshold.
+   * @param[in] messagePrefix Prefix of message.
+   * @param[in] module The name of module who call this checker
+   * @param[in] fuction The name of function who call this checker
+   * @param[in] line The line number of function who call this checker.
+   * @pre BeginTimeCheck() should be called before.
+   */
+  void EndTimeCheck(const char* messagePrefix, const char* module, const char* function, const int line);
+
+private:
+  ThresholdFilter(Milliseconds thresholdMilliSeconds);
+
+private:
+  Milliseconds mThresholdMilliSeconds;
+
+  struct Impl;
+  std::unique_ptr<Impl> mImpl;
+};
+
+/**
+ * @brief The ScopeTracer object is used by the DALI_TIME_CHECKER_SCOPE macros.
+ */
+class DALI_CORE_API ScopeTracer final
+{
+public:
+  ScopeTracer(ThresholdFilter* filter, const char* messagePrefix, const char* module, const char* function, const int line);
+  ~ScopeTracer();
+
+public:
+  const char* mMessagePrefix;
+  const char* mModule;
+  const char* mFunction;
+  const int   mLine;
+
+  ThresholdFilter* mFilter;
+};
+
+/**
+ * @brief Initialization of time checker filter
+ * Note that filter must be thread_local scoped
+ * @ref ThresholdFilter::New
+ */
+#define DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(name, environmentVariableName, threshold)                                                            \
+  namespace                                                                                                                                                       \
+  {                                                                                                                                                               \
+  thread_local Dali::Integration::TimeChecker::ThresholdFilter* name = Dali::Integration::TimeChecker::ThresholdFilter::New(threshold, #environmentVariableName); \
+  }
+
+/**
+ * @brief Shorten filter macro without default threshold value.
+ * It will make filter disabled as default.
+ * @ref ThresholdFilter::New
+ */
+#define DALI_INIT_TIME_CHECKER_FILTER(name, environmentVariableName) \
+  DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(name, environmentVariableName, std::numeric_limits<Dali::Integration::TimeChecker::ThresholdFilter::Milliseconds>::max())
+
+/**
+ * @brief Begin of time checker
+ * @ref ThresholdFilter::BeginTimeCheck
+ */
+#define DALI_TIME_CHECKER_BEGIN(filter) \
+  if(filter && filter->IsEnabled())     \
+  {                                     \
+    filter->BeginTimeCheck();           \
+  }
+
+/**
+ * @brief End of time checker without any prefix message
+ * @ref ThresholdFilter::EndTimeCheck
+ */
+#define DALI_TIME_CHECKER_END(filter)                  \
+  if(filter && filter->IsEnabled())                    \
+  {                                                    \
+    filter->EndTimeCheck("",                           \
+                         DALI_LOG_FORMAT_PREFIX_ARGS); \
+  }
+
+/**
+ * @brief End of time checker with simple prefix message
+ * @ref ThresholdFilter::EndTimeCheck
+ */
+#define DALI_TIME_CHECKER_END_WITH_MESSAGE(filter, message) \
+  if(filter && filter->IsEnabled())                         \
+  {                                                         \
+    filter->EndTimeCheck(message,                           \
+                         DALI_LOG_FORMAT_PREFIX_ARGS);      \
+  }
+
+/**
+ * @brief End of time checker with prefix message generator
+ * @ref ThresholdFilter::EndTimeCheck
+ */
+#define DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(filter, messageGenerator) \
+  if(filter && filter->IsEnabled())                                            \
+  {                                                                            \
+    std::ostringstream oss;                                                    \
+    messageGenerator(oss);                                                     \
+    filter->EndTimeCheck(oss.str().c_str(),                                    \
+                         DALI_LOG_FORMAT_PREFIX_ARGS);                         \
+  }
+
+/**
+ * @brief Used for scope time check. It check time around a scope.
+ */
+#define DALI_TIME_CHECKER_SCOPE(filter, message) \
+  Dali::Integration::TimeChecker::ScopeTracer timeCheckerScopeTracer(filter, message, DALI_LOG_FORMAT_PREFIX_ARGS);
+
+} // namespace TimeChecker
 } // namespace Integration
 } // namespace Dali
 

@@ -11,6 +11,7 @@ SET(TC_SOURCES
   utc-Dali-Internal-ActorRelayout.cpp
   utc-Dali-Internal-ConstString.cpp
   utc-Dali-Internal-Core.cpp
+  utc-Dali-Internal-Debug.cpp
   utc-Dali-Internal-DummyMemoryPool.cpp
   utc-Dali-Internal-FixedSizeMemoryPool.cpp
   utc-Dali-Internal-FrustumCulling.cpp
