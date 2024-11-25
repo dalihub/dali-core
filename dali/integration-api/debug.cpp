@@ -23,6 +23,10 @@
 #include <cstdarg>
 #include <memory>
 
+// INTERNAL INCLUDES
+#include <dali/public-api/common/list-wrapper.h>
+#include <dali/public-api/common/vector-wrapper.h>
+
 namespace Dali
 {
 #ifdef DEBUG_ENABLED
@@ -278,8 +282,6 @@ std::string FormatToString(const char* format, ...)
   return s;
 }
 
-#ifdef DEBUG_ENABLED
-
 void GetNanoseconds(uint64_t& timeInNanoseconds)
 {
   // Get the time of a monotonic clock since its epoch.
@@ -290,9 +292,104 @@ void GetNanoseconds(uint64_t& timeInNanoseconds)
   timeInNanoseconds = static_cast<uint64_t>(duration.count());
 }
 
-#endif // DEBUG_ENABLED
-
 } // namespace Log
+
+namespace TimeChecker
+{
+typedef std::list<std::unique_ptr<ThresholdFilter>> FilterList;
+
+namespace
+{
+constexpr uint64_t MILLISECONDS_TO_NANOSECONDS = 1'000'000;
+
+static FilterList& GetActiveFilters()
+{
+  thread_local static FilterList activeFilters;
+  return activeFilters;
+}
+} // namespace
+
+struct ThresholdFilter::Impl
+{
+  std::vector<uint64_t> mTimeStamps;
+};
+
+ThresholdFilter* ThresholdFilter::New(ThresholdFilter::Milliseconds thresholdMilliSeconds, const char* environmentVariableName)
+{
+  try
+  {
+    char* environmentVariableValue = getenv(environmentVariableName);
+    if(environmentVariableValue)
+    {
+      thresholdMilliSeconds = static_cast<Milliseconds>(std::atoi(environmentVariableValue));
+    }
+  }
+  catch(...)
+  {
+    // Do nothing, just use default value.
+  }
+
+  ThresholdFilter* thresholdFilter = new ThresholdFilter(thresholdMilliSeconds);
+
+  GetActiveFilters().push_back(std::unique_ptr<ThresholdFilter>(thresholdFilter));
+  return thresholdFilter;
+}
+
+void ThresholdFilter::BeginTimeCheck()
+{
+  if(DALI_LIKELY(IsEnabled()))
+  {
+    uint64_t currentTime;
+    Log::GetNanoseconds(currentTime);
+    mImpl->mTimeStamps.push_back(currentTime);
+  }
+}
+
+void ThresholdFilter::EndTimeCheck(const char* messagePrefix, const char* module, const char* function, const int line)
+{
+  if(DALI_LIKELY(IsEnabled() && !mImpl->mTimeStamps.empty()))
+  {
+    uint64_t currentTime;
+    Log::GetNanoseconds(currentTime);
+
+    uint64_t duration = currentTime - mImpl->mTimeStamps.back();
+    mImpl->mTimeStamps.pop_back();
+
+    if(duration >= static_cast<uint64_t>(mThresholdMilliSeconds) * MILLISECONDS_TO_NANOSECONDS)
+    {
+      // Use LogMessage function directly, to print correct module / function and line.
+      Dali::Integration::Log::LogMessage(Dali::Integration::Log::INFO, DALI_LOG_FORMAT_PREFIX "%s takes [%.6lf ms]\n", module, function, line, messagePrefix ? messagePrefix : "", static_cast<double>(duration) / static_cast<double>(MILLISECONDS_TO_NANOSECONDS));
+    }
+  }
+}
+
+ThresholdFilter::ThresholdFilter(ThresholdFilter::Milliseconds thresholdMilliSeconds)
+: mThresholdMilliSeconds(thresholdMilliSeconds),
+  mImpl(new Impl())
+{
+}
+
+ScopeTracer::ScopeTracer(ThresholdFilter* filter, const char* messagePrefix, const char* module, const char* function, const int line)
+: mMessagePrefix(messagePrefix),
+  mModule(module),
+  mFunction(function),
+  mLine(line),
+  mFilter(filter)
+{
+  if(mFilter && mFilter->IsEnabled())
+  {
+    mFilter->BeginTimeCheck();
+  }
+}
+
+ScopeTracer::~ScopeTracer()
+{
+  if(mFilter && mFilter->IsEnabled())
+  {
+    mFilter->EndTimeCheck(mMessagePrefix, mModule, mFunction, mLine);
+  }
+}
+} // namespace TimeChecker
 
 } // namespace Integration
 
