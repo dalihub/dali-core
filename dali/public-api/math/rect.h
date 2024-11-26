@@ -2,7 +2,7 @@
 #define DALI_RECT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,13 +252,13 @@ struct Rect
    */
   bool Intersect(const Rect<T>& rect)
   {
-    const int left   = std::max(rect.x, x);
-    const int top    = std::max(rect.y, y);
-    const int right  = std::min(rect.x + rect.width, x + width);
-    const int bottom = std::min(rect.y + rect.height, y + height);
+    const T left   = std::max(rect.x, x);
+    const T top    = std::max(rect.y, y);
+    const T right  = std::min(rect.x + rect.width, x + width);
+    const T bottom = std::min(rect.y + rect.height, y + height);
 
-    const int width  = right - left;
-    const int height = bottom - top;
+    const T width  = right - left;
+    const T height = bottom - top;
     if(!(width < 0 || height < 0))
     {
       x            = left;
@@ -280,14 +280,14 @@ struct Rect
    */
   void Merge(const Rect<T>& rect)
   {
-    const int left   = std::min(rect.x, x);
-    const int top    = std::min(rect.y, y);
-    const int right  = std::max(rect.x + rect.width, x + width);
-    const int bottom = std::max(rect.y + rect.height, y + height);
-    x                = left;
-    y                = top;
-    width            = right - left;
-    height           = bottom - top;
+    const T left   = std::min(rect.x, x);
+    const T top    = std::min(rect.y, y);
+    const T right  = std::max(rect.x + rect.width, x + width);
+    const T bottom = std::max(rect.y + rect.height, y + height);
+    x              = left;
+    y              = top;
+    width          = right - left;
+    height         = bottom - top;
   }
 
   /**
@@ -298,14 +298,14 @@ struct Rect
    */
   void Inset(T dx, T dy)
   {
-    const int left   = x - dx;
-    const int top    = y - dy;
-    const int right  = x + width + dx;
-    const int bottom = y + height + dy;
-    x                = left;
-    y                = top;
-    width            = right - left;
-    height           = bottom - top;
+    const T left   = x - dx;
+    const T top    = y - dy;
+    const T right  = x + width + dx;
+    const T bottom = y + height + dy;
+    x              = left;
+    y              = top;
+    width          = right - left;
+    height         = bottom - top;
   }
 
   /**
