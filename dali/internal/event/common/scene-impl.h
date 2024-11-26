@@ -340,6 +340,12 @@ public:
   bool EmitWheelEventGeneratedSignal(const Dali::WheelEvent& event);
 
   /**
+   * Used by the EventProcessor to emit key event monitor signals.
+   * @param[in] event The key event.
+   */
+  void EmitKeyEventMonitorSignal(const Dali::KeyEvent& event);
+
+  /**
    * @copydoc Dali::Integration::Scene::AddFrameRenderedCallback
    */
   void AddFrameRenderedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId);
@@ -388,6 +394,11 @@ public:
    * @copydoc Integration::Scene::InterceptKeyEventSignal()
    */
   Integration::Scene::KeyEventGeneratedSignalType& InterceptKeyEventSignal();
+
+  /**
+   * @copydoc Integration::Scene::KeyEventSignal()
+   */
+  Integration::Scene::KeyEventSignalType& KeyEventMonitorSignal();
 
   /**
    * @copydoc Integration::Scene::SignalEventProcessingFinished()
@@ -495,6 +506,7 @@ private:
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;
   Integration::Scene::KeyEventGeneratedSignalType mKeyEventGeneratedSignal;
   Integration::Scene::KeyEventGeneratedSignalType mInterceptKeyEventSignal;
+  Integration::Scene::KeyEventSignalType          mKeyEventMonitorSignal;
 
   // The event processing finished signal
   Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;
@@ -505,6 +517,7 @@ private:
   // The wheel event signal
   Integration::Scene::WheelEventSignalType          mWheelEventSignal;
   Integration::Scene::WheelEventGeneratedSignalType mWheelEventGeneratedSignal;
+
 };
 
 } // namespace Internal

@@ -147,6 +147,12 @@ struct DALI_CORE_API KeyEvent : public Event
    * Window id where key event occurred.
    */
   uint32_t windowId;
+
+  /**
+   * The time (in ms)  when key event was received.
+   */
+  uint32_t receiveTime;
+
 };
 
 } // namespace Integration
