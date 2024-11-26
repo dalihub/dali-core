@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -363,5 +363,146 @@ int UtcDaliRectOStreamOperatorP(void)
   std::string expectedOutput = "[1, 2, 10, 10]";
 
   DALI_TEST_EQUALS(oss.str(), expectedOutput, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRectIntersectP(void)
+{
+  TestApplication application;
+
+  // Test for float
+  {
+    Rect<float> baseRect(100.0f, 200.0f, 200.0f, 300.0f);
+
+    Rect<float> rf1 = baseRect;
+
+    tet_printf("Check rf1 changed if intersect successed\n");
+    Rect<float> rf2(50.0f, 250.3f, 200.0f, 300.0f);
+    DALI_TEST_CHECK(rf1.Intersect(rf2));
+    DALI_TEST_EQUALS(rf1, Rect<float>(100.0f, 250.3f, 150.0f, 249.7f), TEST_LOCATION);
+
+    tet_printf("Check rf1 didnt changed if not intersect\n");
+    Rect<float> rf3(254.5f, 0.0f, 30.6f, 234.56f);
+    DALI_TEST_CHECK(!rf1.Intersect(rf3));
+    DALI_TEST_EQUALS(rf1, Rect<float>(100.0f, 250.3f, 150.0f, 249.7f), TEST_LOCATION);
+
+    tet_printf("Check baseRect was intersect with rf3\n");
+    rf1 = baseRect;
+    DALI_TEST_CHECK(rf1.Intersect(rf3));
+    DALI_TEST_EQUALS(rf1, Rect<float>(254.5f, 200.0f, 30.6f, 34.56f), TEST_LOCATION);
+  }
+
+  // Test for int
+  {
+    Rect<int> baseRect(100, 200, 200, 300);
+
+    Rect<int> rf1 = baseRect;
+
+    tet_printf("Check rf1 changed if intersect successed\n");
+    Rect<int> rf2(50, 150, 200, 300);
+    DALI_TEST_CHECK(rf1.Intersect(rf2));
+    DALI_TEST_EQUALS(rf1, Rect<int>(100, 200, 150, 250), TEST_LOCATION);
+
+    tet_printf("Check rf1 didnt changed if not intersect\n");
+    Rect<int> rf3(254, 0, 10, 234);
+    DALI_TEST_CHECK(!rf1.Intersect(rf3));
+    DALI_TEST_EQUALS(rf1, Rect<int>(100, 200, 150, 250), TEST_LOCATION);
+
+    tet_printf("Check baseRect was intersect with rf3\n");
+    rf1 = baseRect;
+    DALI_TEST_CHECK(rf1.Intersect(rf3));
+    DALI_TEST_EQUALS(rf1, Rect<int>(254, 200, 10, 34), TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRectMergeP(void)
+{
+  TestApplication application;
+
+  // Test for float
+  {
+    Rect<float> baseRect(100.0f, 200.0f, 200.0f, 300.0f);
+
+    Rect<float> rf1 = baseRect;
+
+    tet_printf("Check rf1 changed after merge\n");
+    Rect<float> rf2(50.0f, 250.3f, 200.0f, 300.0f);
+    rf1.Merge(rf2);
+    DALI_TEST_EQUALS(rf1, Rect<float>(50.0f, 200.0f, 250.0f, 350.3f), TEST_LOCATION);
+
+    tet_printf("Check rf1 changed after merge\n");
+    Rect<float> rf3(354.5f, 0.0f, 30.6f, 234.56f);
+    rf1.Merge(rf3);
+    DALI_TEST_EQUALS(rf1, Rect<float>(50.0f, 0.0f, 335.1f, 550.3f), TEST_LOCATION);
+
+    tet_printf("Check baseRect merge with rf3\n");
+    rf1 = baseRect;
+    rf1.Merge(rf3);
+    DALI_TEST_EQUALS(rf1, Rect<float>(100.0f, 0.0f, 285.1f, 500.0f), TEST_LOCATION);
+  }
+
+  // Test for int
+  {
+    Rect<int> baseRect(100, 200, 200, 300);
+
+    Rect<int> rf1 = baseRect;
+
+    tet_printf("Check rf1 changed after merge\n");
+    Rect<int> rf2(50, 150, 200, 300);
+    rf1.Merge(rf2);
+    DALI_TEST_EQUALS(rf1, Rect<int>(50, 150, 250, 350), TEST_LOCATION);
+
+    tet_printf("Check rf1 changed after merge\n");
+    Rect<int> rf3(354, 0, 10, 234);
+    rf1.Merge(rf3);
+    DALI_TEST_EQUALS(rf1, Rect<int>(50, 0, 314, 500), TEST_LOCATION);
+
+    tet_printf("Check baseRect merge with rf3\n");
+    rf1 = baseRect;
+    rf1.Merge(rf3);
+    DALI_TEST_EQUALS(rf1, Rect<int>(100, 0, 264, 500), TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRectInsetP(void)
+{
+  TestApplication application;
+
+  // Test for float
+  {
+    Rect<float> rf1(100.0f, 200.0f, 200.0f, 300.0f);
+
+    tet_printf("Check rf1 changed after inset\n");
+    rf1.Inset(-50.0f, 50.0f);
+    DALI_TEST_EQUALS(rf1, Rect<float>(150.0f, 150.0f, 100.0f, 400.0f), TEST_LOCATION);
+
+    rf1.Inset(100.0f, -100.0f);
+    DALI_TEST_EQUALS(rf1, Rect<float>(50.0f, 250.0f, 300.0f, 200.0f), TEST_LOCATION);
+
+    tet_printf("Check rf1 invalid after large inset\n");
+    rf1.Inset(-150.0f, -150.0f);
+    DALI_TEST_CHECK(!rf1.IsValid());
+  }
+
+  // Test for int
+  {
+    Rect<int> rf1(100, 200, 200, 300);
+
+    tet_printf("Check rf1 changed after inset\n");
+    rf1.Inset(-50, 50);
+    DALI_TEST_EQUALS(rf1, Rect<int>(150, 150, 100, 400), TEST_LOCATION);
+
+    rf1.Inset(100, -100);
+    DALI_TEST_EQUALS(rf1, Rect<int>(50, 250, 300, 200), TEST_LOCATION);
+
+    tet_printf("Check rf1 invalid after large inset\n");
+    rf1.Inset(-100, -101);
+    DALI_TEST_CHECK(!rf1.IsValid());
+  }
+
   END_TEST;
 }

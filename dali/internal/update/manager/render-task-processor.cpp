@@ -42,24 +42,6 @@ namespace SceneGraph
 {
 namespace // Unnamed namespace
 {
-// Return false if the node or it's parents are exclusive to another render-task.
-bool CheckExclusivity(const Node& node, const RenderTask& task)
-{
-  if(node.IsExclusiveRenderTask(&task))
-  {
-    return true;
-  }
-
-  const Node* parent = node.GetParent();
-  if(parent)
-  {
-    return CheckExclusivity(*parent, task);
-  }
-
-  // No exclusive flags set.
-  return true;
-}
-
 Layer* FindLayer(Node& node)
 {
   Node*  currentNode(&node);
@@ -270,12 +252,6 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
 
     Node* sourceNode = renderTask.GetSourceNode();
     DALI_ASSERT_DEBUG(NULL != sourceNode); // Otherwise Prepare() should return false
-
-    // Check that the source node is not exclusive to another task.
-    if(!CheckExclusivity(*sourceNode, renderTask))
-    {
-      continue;
-    }
 
     Layer* layer = FindLayer(*sourceNode);
     if(!layer)
