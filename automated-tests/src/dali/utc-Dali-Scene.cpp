@@ -2649,6 +2649,62 @@ int UtcDaliSceneSignalInterceptKeyEventN(void)
   END_TEST;
 }
 
+int UtcDaliSceneSignalKeyEventMonitorP(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyEventSignalData      data;
+  KeyEventReceivedFunctor functor(data);
+  scene.KeyEventSignal().Connect(&application, functor);
+
+  KeyEventSignalData      monitorData;
+  KeyEventReceivedFunctor monitorFunctor(monitorData);
+  scene.KeyEventMonitorSignal().Connect(&application, monitorFunctor);
+
+  Integration::KeyEvent event("i", "", "i", 0, 0, 0, Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event);
+
+  DALI_TEST_EQUALS(false, monitorData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  data.Reset();
+  monitorData.Reset();
+
+  Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  event3.receiveTime = 330;
+  application.ProcessEvent(event3);
+
+  DALI_TEST_EQUALS(true, monitorData.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event3.keyModifier == monitorData.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event3.keyName == monitorData.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event3.keyString == monitorData.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event3.receiveTime == monitorData.receivedKeyEvent.GetReceiveTime());
+  DALI_TEST_CHECK(event3.state == static_cast<Integration::KeyEvent::State>(monitorData.receivedKeyEvent.GetState()));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+
+  data.Reset();
+  monitorData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliSceneSignalKeyEventMonitorN(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyEventSignalData      data;
+  KeyEventReceivedFunctor functor(data);
+  scene.KeyEventMonitorSignal().Connect(&application, functor);
+
+  // Check that a non-pressed key events data is not modified.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+
 int UtcDaliSceneGetOverlayLayer(void)
 {
   TestApplication application;

@@ -47,7 +47,8 @@ KeyEvent::KeyEvent()
   mDeviceClass(Device::Class::NONE),
   mDeviceSubclass(Device::Subclass::NONE),
   mIsRepeat(false),
-  mWindowId(0)
+  mWindowId(0),
+  mReceiveTime(0)
 {
 }
 
@@ -74,7 +75,8 @@ KeyEvent::KeyEvent(const std::string&           keyName,
   mDeviceClass(deviceClass),
   mDeviceSubclass(deviceSubclass),
   mIsRepeat(false),
-  mWindowId(0)
+  mWindowId(0),
+  mReceiveTime(0)
 {
 }
 
@@ -185,6 +187,11 @@ uint32_t KeyEvent::GetWindowId() const
   return mWindowId;
 }
 
+uint32_t KeyEvent::GetReceiveTime() const
+{
+  return mReceiveTime;
+}
+
 void KeyEvent::SetKeyName(const std::string& keyName)
 {
   mKeyName = keyName;
@@ -235,6 +242,11 @@ void KeyEvent::SetRepeat(const bool repeat)
 void KeyEvent::SetWindowId(uint32_t windowId)
 {
   mWindowId = windowId;
+}
+
+void KeyEvent::SetReceiveTime(uint32_t time)
+{
+  mReceiveTime = time;
 }
 
 } // namespace Internal

@@ -36,6 +36,8 @@ namespace Internal
 {
 namespace
 {
+const uint32_t DEFAULT_MONITOR_KEY_EVENT_TIME = 330u;
+
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
 #ifdef TRACE_ENABLED
@@ -59,11 +61,19 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
   KeyEventPtr    keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
   keyEvent->SetRepeat(event.isRepeat);
   keyEvent->SetWindowId(event.windowId);
+  keyEvent->SetReceiveTime(event.receiveTime);
+
   Dali::KeyEvent keyEventHandle(keyEvent.Get());
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROCESS_KEY_EVENT", [&](std::ostringstream& oss) {
-    oss << "[name:" << event.keyName << ", code:" << event.keyCode << ", state:" << KEY_EVENT_STATES[event.state] << ", time:" << event.time << "]";
+    oss << "[name:" << event.keyName << ", code:" << event.keyCode << ", state:" << KEY_EVENT_STATES[event.state] << ", time:" << event.time << ", recieveTime:" << event.receiveTime << "]";
   });
+
+  if(event.receiveTime > 0 && (event.receiveTime >= event.time + DEFAULT_MONITOR_KEY_EVENT_TIME))
+  {
+    DALI_LOG_RELEASE_INFO("KeyEvent is delayed : occurred time %d ms, received time %d ms \n", event.time, event.receiveTime);
+    mScene.EmitKeyEventMonitorSignal(keyEventHandle);
+  }
 
   // Emit the key event signal from the scene.
   bool consumed = false;

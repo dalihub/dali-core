@@ -187,6 +187,11 @@ public:
   uint32_t GetWindowId() const;
 
   /**
+   * @copydoc Dali::KeyEvent::GetReceiveTime()
+   */
+  uint32_t GetReceiveTime() const;
+
+  /**
    * @brief Set the name given to the key pressed
    *
    * @param[in] keyName The name given to the key pressed.
@@ -249,6 +254,12 @@ public:
    */
   void SetWindowId(uint32_t windowId);
 
+  /**
+   * @brief Sets the time when the key event was received.
+   *
+   * @param[in] receiveTime The time when the key event was received.
+   */
+  void SetReceiveTime(uint32_t receiveTime);
 
 private:
   /**
@@ -279,6 +290,7 @@ private:
   Device::Subclass::Type mDeviceSubclass; ///< The subclass of device the key event originated from
   bool                   mIsRepeat;       ///< Whether the key referenced by the event is a repeating key.
   uint32_t               mWindowId;       ///< The window id where key event occurred.
+  uint32_t               mReceiveTime;    ///< The time when the key event was received.
 };
 
 } // namespace Internal

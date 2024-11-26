@@ -494,6 +494,15 @@ bool Scene::EmitWheelEventGeneratedSignal(const Dali::WheelEvent& event)
   return mWheelEventGeneratedSignal.Emit(event);
 }
 
+void Scene::EmitKeyEventMonitorSignal(const Dali::KeyEvent& event)
+{
+  if(!mKeyEventMonitorSignal.Empty())
+  {
+    Dali::Integration::Scene handle(this);
+    mKeyEventMonitorSignal.Emit(event);
+  }
+}
+
 void Scene::AddFrameRenderedCallback(std::unique_ptr<CallbackBase> callback, int32_t frameId)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
@@ -589,6 +598,11 @@ Integration::Scene::KeyEventGeneratedSignalType& Scene::KeyEventGeneratedSignal(
 Integration::Scene::KeyEventGeneratedSignalType& Scene::InterceptKeyEventSignal()
 {
   return mInterceptKeyEventSignal;
+}
+
+Integration::Scene::KeyEventSignalType& Scene::KeyEventMonitorSignal()
+{
+  return mKeyEventMonitorSignal;
 }
 
 Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()

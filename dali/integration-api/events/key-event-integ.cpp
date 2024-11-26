@@ -39,7 +39,8 @@ KeyEvent::KeyEvent()
   deviceClass(Device::Class::NONE),
   deviceSubclass(Device::Subclass::NONE),
   isRepeat(false),
-  windowId(0)
+  windowId(0),
+  receiveTime(0)
 {
 }
 
@@ -67,7 +68,8 @@ KeyEvent::KeyEvent(const std::string&           keyName,
   deviceClass(deviceClass),
   deviceSubclass(deviceSubclass),
   isRepeat(false),
-  windowId(0)
+  windowId(0),
+  receiveTime(0)
 {
 }
 

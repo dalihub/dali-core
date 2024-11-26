@@ -263,6 +263,12 @@ public:
    */
   uint32_t GetWindowId() const;
 
+  /**
+   * @brief Gets the time when the key event was received.
+   * @SINCE_2_3.52
+   */
+  uint32_t GetReceiveTime() const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**
