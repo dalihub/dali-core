@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_INPUT_IMPL_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/common/hash-utils.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
@@ -30,14 +31,6 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-input.h>
-
-#if defined(ANDROID) || defined(WIN32) || defined(__APPLE__)
-namespace std
-{
-uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed);
-
-}
-#endif
 
 namespace Dali
 {
@@ -322,53 +315,53 @@ public:
     return false;
   }
 
-  std::uint64_t Hash(BufferIndex bufferIndex, uint64_t seed) const
+  std::size_t Hash(BufferIndex bufferIndex, std::size_t seed) const
   {
     switch(GetType())
     {
       case Property::BOOLEAN:
       {
-        return std::_Hash_bytes(&GetBoolean(bufferIndex), sizeof(bool), seed);
+        return Dali::Internal::HashUtils::HashRawValue(GetBoolean(bufferIndex), seed);
       }
 
       case Property::INTEGER:
       {
-        return std::_Hash_bytes(&GetInteger(bufferIndex), sizeof(int), seed);
+        return Dali::Internal::HashUtils::HashRawValue(GetInteger(bufferIndex), seed);
       }
 
       case Property::FLOAT:
       {
-        return std::_Hash_bytes(&GetFloat(bufferIndex), sizeof(float), seed);
+        return Dali::Internal::HashUtils::HashRawValue(GetFloat(bufferIndex), seed);
       }
 
       case Property::VECTOR2:
       {
-        return std::_Hash_bytes(&GetVector2(bufferIndex), sizeof(Vector2), seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector2(bufferIndex).AsFloat(), 2, seed);
       }
 
       case Property::VECTOR3:
       {
-        return std::_Hash_bytes(&GetVector3(bufferIndex), sizeof(Vector3), seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector3(bufferIndex).AsFloat(), 3, seed);
       }
 
       case Property::VECTOR4:
       {
-        return std::_Hash_bytes(&GetVector4(bufferIndex), sizeof(Vector4), seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector4(bufferIndex).AsFloat(), 4, seed);
       }
 
       case Property::ROTATION:
       {
-        return std::_Hash_bytes(&GetQuaternion(bufferIndex), sizeof(Quaternion), seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetQuaternion(bufferIndex).AsVector().AsFloat(), 4, seed);
       }
 
       case Property::MATRIX:
       {
-        return std::_Hash_bytes(&GetMatrix(bufferIndex), sizeof(Matrix), seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetMatrix(bufferIndex).AsFloat(), 16, seed);
       }
 
       case Property::MATRIX3:
       {
-        return std::_Hash_bytes(&GetMatrix3(bufferIndex), sizeof(Matrix3), seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetMatrix3(bufferIndex).AsFloat(), 9, seed);
       }
 
       default:

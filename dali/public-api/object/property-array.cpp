@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,51 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-array.h>
 
+// EXTERNAL INCLUDES
+#include <limits>
+
 // INTERNAL INCLUDES
+#include <dali/internal/common/hash-utils.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
 namespace
 {
-}; // unnamed namespace
+constexpr std::size_t NOT_HASHED    = 0u;
+constexpr std::size_t ALWAYS_REHASH = std::numeric_limits<std::size_t>::max();
+} // namespace
 
 struct Property::Array::Impl
 {
   typedef std::vector<Value> Array;
 
+public:
+  std::size_t GetHash() const
+  {
+    std::size_t hash = mHash;
+    if(hash == ALWAYS_REHASH || hash == NOT_HASHED)
+    {
+      hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
+
+      for(const auto& iter : mArray)
+      {
+        // Use ordered hash operation.
+        Dali::Internal::HashUtils::HashRawValue(iter.GetHash(), hash);
+      }
+
+      if(mHash != ALWAYS_REHASH)
+      {
+        mHash = hash;
+      }
+    }
+    return hash;
+  }
+
+public:
   Array mArray;
+
+  mutable std::size_t mHash{NOT_HASHED};
 };
 
 Property::Array::Array()
@@ -51,7 +82,11 @@ Property::Array::Array(const std::initializer_list<Property::Value>& values)
 Property::Array::Array(const Property::Array& other)
 : mImpl(new Impl)
 {
-  mImpl->mArray = other.mImpl->mArray;
+  if(DALI_LIKELY(other.mImpl))
+  {
+    mImpl->mArray = other.mImpl->mArray;
+    // Keep mHash as NOT_HASHED.
+  }
 }
 
 Property::Array::Array(Property::Array&& other) noexcept
@@ -67,43 +102,70 @@ Property::Array::~Array()
 
 Property::Array::SizeType Property::Array::Count() const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  return mImpl->mArray.size();
+  return DALI_LIKELY(mImpl) ? mImpl->mArray.size() : 0;
 }
 
 void Property::Array::PushBack(const Value& value)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
+
+  if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+  {
+    // Use ordered hash operation.
+    Dali::Internal::HashUtils::HashRawValue(value.GetHash(), mImpl->mHash);
+  }
   mImpl->mArray.push_back(value);
 }
 
 void Property::Array::Clear()
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  mImpl->mArray.clear();
+  if(DALI_LIKELY(mImpl))
+  {
+    mImpl->mArray.clear();
+    mImpl->mHash = NOT_HASHED;
+  }
 }
 
 void Property::Array::Reserve(SizeType size)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
+
   mImpl->mArray.reserve(size);
 }
 
 void Property::Array::Resize(SizeType size)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  mImpl->mArray.resize(size);
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
+
+  if(mImpl->mArray.size() != size)
+  {
+    mImpl->mArray.resize(size);
+
+    // Just reset hash as zero.
+    if(mImpl->mHash != ALWAYS_REHASH)
+    {
+      mImpl->mHash = NOT_HASHED;
+    }
+  }
 }
 
 Property::Array::SizeType Property::Array::Capacity()
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  return mImpl->mArray.capacity();
+  return DALI_LIKELY(mImpl) ? mImpl->mArray.capacity() : 0;
 }
 
 const Property::Value& Property::Array::operator[](SizeType index) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
   // Note says no bounds checking is performed so we don't need to verify mImpl as Count() will return 0 anyway
   return mImpl->mArray[index];
@@ -111,7 +173,13 @@ const Property::Value& Property::Array::operator[](SizeType index) const
 
 Property::Value& Property::Array::operator[](SizeType index)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
+
+  // Mark as we should rehash always. (Since new value might be changed by application side anytime.)
+  if(mImpl->mHash != ALWAYS_REHASH)
+  {
+    mImpl->mHash = ALWAYS_REHASH;
+  }
 
   // Note says no bounds checking is performed so we don't need to verify mImpl as Count() will return 0 anyway
   return mImpl->mArray[index];
@@ -119,11 +187,21 @@ Property::Value& Property::Array::operator[](SizeType index)
 
 Property::Array& Property::Array::operator=(const Property::Array& other)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
   if(this != &other)
   {
-    mImpl->mArray = other.mImpl->mArray;
+    if(DALI_UNLIKELY(other.mImpl == nullptr))
+    {
+      Clear();
+    }
+    else
+    {
+      if(DALI_UNLIKELY(!mImpl))
+      {
+        mImpl = new Impl();
+      }
+      mImpl->mArray = other.mImpl->mArray;
+      mImpl->mHash  = other.mImpl->mHash;
+    }
   }
   return *this;
 }
@@ -139,17 +217,38 @@ Property::Array& Property::Array::operator=(Property::Array&& other) noexcept
   return *this;
 }
 
+bool Property::Array::operator==(const Property::Array& rhs) const
+{
+  // TODO : Need to check epsilon for float comparison in future. For now, just compare hash value and count.
+  return Count() == rhs.Count() && GetHash() == rhs.GetHash();
+}
+
+std::size_t Property::Array::GetHash() const
+{
+  return DALI_LIKELY(mImpl) ? mImpl->GetHash() : Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
+}
+
 std::ostream& operator<<(std::ostream& stream, const Property::Array& array)
 {
   stream << "Array(" << array.Count() << ") = [";
-  for(Property::Array::SizeType i = 0; i < array.Count(); ++i)
+
+  if(DALI_LIKELY(array.mImpl))
   {
-    if(i > 0)
+    for(Property::Array::SizeType i = 0; i < array.Count(); ++i)
     {
-      stream << ", ";
+      if(i > 0)
+      {
+        stream << ", ";
+      }
+      stream << array.GetElementAt(i);
     }
-    stream << array.GetElementAt(i);
+
+    if(array.mImpl->mHash != NOT_HASHED)
+    {
+      stream << "(hash=" << array.mImpl->mHash << ")";
+    }
   }
+
   stream << "]";
 
   return stream;

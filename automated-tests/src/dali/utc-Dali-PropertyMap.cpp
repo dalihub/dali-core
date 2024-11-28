@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,31 +92,15 @@ int UtcDaliPropertyMapMoveConstructor(void)
   Property::Map map2(std::move(map1));
   DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
 
-  // Calling any methods on map1 will debug assert
+  // Calling some methods on map1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
-  DALI_TEST_ASSERTION(map1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Empty(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert((const char*)"key", Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(std::string("key"), Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(0, Property::Value()), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find((const char*)"key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(std::string("key")), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, "key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find("key", Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Clear(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Merge(Property::Map()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1["key"], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
-  DALI_TEST_ASSERTION(map1[0], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
-  DALI_TEST_ASSERTION(Property::Map temp; map1 = temp, exceptionMessage);
 
   END_TEST;
 }
@@ -136,43 +120,158 @@ int UtcDaliPropertyMapMoveAssignmentOperator(void)
   map2 = std::move(map1);
   DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
 
-  // Calling any methods on map1 will debug assert
+  // Calling some methods on map1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
-  DALI_TEST_ASSERTION(map1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Empty(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert((const char*)"key", Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(std::string("key"), Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(0, Property::Value()), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find((const char*)"key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(std::string("key")), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, "key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find("key", Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Clear(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Merge(Property::Map()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1["key"], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
-  DALI_TEST_ASSERTION(map1[0], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
-  DALI_TEST_ASSERTION(Property::Map temp; map1 = temp, exceptionMessage);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
-#if (__GNUC__ >= 13)
+#if(__GNUC__ >= 13)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wself-move"
 #endif
   // Self assignment
   map2 = std::move(map2);
   DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION); // No debug assert as nothing should happen
-#if (__GNUC__ >= 13)
+#if(__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapMovedMapP1(void)
+{
+  Property::Map map1;
+  map1["hello"] = 1;
+  map1["world"] = 2;
+  map1[10]      = "DALi";
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  Property::Map map2;
+  map2[10] = "DALi again";
+  DALI_TEST_EQUALS(1u, map2.Count(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
+
+  // Calling some methods on map1 will debug assert
+  const char* exceptionMessage = "Cannot use an object previously used as an r-value";
+  DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
+  DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
+  DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
+
+  // Call some API to moved map
+  Property::Map emptyMap;
+  DALI_TEST_EQUALS(emptyMap.GetHash(), map1.GetHash(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, map1.Empty(), TEST_LOCATION);
+  map1.Clear();
+
+  DALI_TEST_EQUALS(false, map1.Remove(10), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, map1.Remove("hello"), TEST_LOCATION);
+
+  Property::Value* nullValuePtr = nullptr;
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find(10), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find("hello"), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find(10, "hello"), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find(10, Property::Type::FLOAT), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find("hello", Property::Type::FLOAT), TEST_LOCATION);
+
+  // Test Insert
+  map1["hello"] = 1;
+  map1.Insert("world", 2);
+  map1[10] = "DALi";
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Insert 2 (Index key first)
+  map1[10]      = "DALi";
+  map1["hello"] = 1;
+  map1.Insert("world", 2);
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Insert 3 (Insert key first)
+  map1.Insert(4, 2);
+  map1[10]      = "DALi";
+  map1["hello"] = 1;
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Insert 4 (Insert string first)
+  map1.Insert("world", 2);
+  map1[10]      = "DALi";
+  map1["hello"] = 1;
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Merge
+  map1.Merge(map2);
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test copy operator
+  DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
+
+  map1 = map2;
+
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test copy moved map
+  Property::Map map3 = map1;
+  DALI_TEST_EQUALS(0u, map3.Count(), TEST_LOCATION);
+
+  Property::Map map4;
+  map4 = map1;
+  DALI_TEST_EQUALS(0u, map4.Count(), TEST_LOCATION);
+
+  // Test move operator
+  DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
+
+  map1 = std::move(map2);
+
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  // Test move moved map
+  DALI_TEST_EQUALS(0u, map2.Count(), TEST_LOCATION);
+  Property::Map map5 = std::move(map2);
+
+  DALI_TEST_EQUALS(0u, map5.Count(), TEST_LOCATION);
+
+  map3 = std::move(map2);
+
+  DALI_TEST_EQUALS(0u, map3.Count(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -724,6 +823,21 @@ int UtcDaliPropertyMapOstream02(void)
   END_TEST;
 }
 
+int UtcDaliPropertyMapOstream03(void)
+{
+  std::ostringstream oss;
+
+  Property::Map map;
+  map.Insert(100, 9);
+
+  Property::Map map2(std::move(map));
+
+  oss << map;
+  DALI_TEST_EQUALS(oss.str().compare("Map(0) = {}"), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliPropertyKeyConstructorP(void)
 {
   Property::Key key1("aKey");
@@ -858,6 +972,198 @@ int UtcDaliPropertyMapNestedInitializerListConstructor(void)
     // check the value
     DALI_TEST_EQUALS(3, map3[3].Get<int>(), TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapGetHashP01(void)
+{
+  tet_infoline("Check Property::Map::GetHash()");
+
+  Property::Map map;
+
+  tet_printf("Check empty map is not zero.\n");
+  auto emptyMapHash = map.GetHash();
+
+  DALI_TEST_NOT_EQUALS(emptyMapHash, static_cast<decltype(emptyMapHash)>(0u), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  map.Insert(1, 1);
+  map.Insert(2, Vector2(2.0f, 3.0f));
+  map.Insert("3", 4);
+
+  DALI_TEST_NOT_EQUALS(emptyMapHash, map.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  Property::Value* lValuePtr = map.Find(2);
+
+  auto originalHash = map.GetHash();
+
+  tet_printf("Check if l-value of some element changeness applied.\n");
+
+  DALI_TEST_EQUALS(originalHash, map.GetHash(), TEST_LOCATION);
+
+  (*lValuePtr) = Property::Value(Vector3(2.0f, 3.0f, 0.0f));
+  auto newHash = map.GetHash();
+
+  DALI_TEST_NOT_EQUALS(originalHash, newHash, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Find(2)->Get<Vector3>(), Vector3(2.0f, 3.0f, 0.0f), TEST_LOCATION);
+
+  tet_printf("Revert l-value as original value, and check it applied.\n");
+  (*lValuePtr) = Property::Value(Vector2(2.0f, 3.0f));
+  newHash      = map.GetHash();
+
+  DALI_TEST_EQUALS(originalHash, newHash, TEST_LOCATION);
+
+  Property::Map otherMap;
+
+  otherMap.Insert(1, 1);
+  otherMap.Insert(2, Vector2(2.0f, 3.0f));
+  otherMap.Insert("3", 4);
+
+  tet_printf("Check same map return same hash.\n");
+  DALI_TEST_EQUALS(originalHash, otherMap.GetHash(), TEST_LOCATION);
+
+  Property::Value value = otherMap[44]; ///< Dummy action to create empty element.
+
+  tet_printf("Check map with difference size return difference hash.\n");
+  DALI_TEST_NOT_EQUALS(originalHash, otherMap.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  otherMap[44] = Property::Value("44");
+  DALI_TEST_NOT_EQUALS(originalHash, otherMap.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  otherMap.Remove(44);
+
+  tet_printf("Check removed map return same hash.\n");
+  DALI_TEST_EQUALS(originalHash, otherMap.GetHash(), TEST_LOCATION);
+
+  Property::Map otherMap2;
+
+  otherMap2.Insert(2, Vector2(2.0f, 3.0f));
+  otherMap2.Insert(1, 1);
+  otherMap2.Insert("3", 4);
+
+  tet_printf("Check map with difference order return same hash.\n");
+  DALI_TEST_EQUALS(originalHash, otherMap2.GetHash(), TEST_LOCATION);
+
+  map.Clear();
+  tet_printf("Check cleared map has same value with empty map.\n");
+  DALI_TEST_EQUALS(emptyMapHash, map.GetHash(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapGetHashP02(void)
+{
+  tet_infoline("Check Property::Map::GetHash() if value is Map or Array.");
+
+  Property::Map   map;
+  Property::Array subArray;
+  Property::Map   subMap;
+
+  subArray.PushBack(2);
+  subArray.PushBack(3);
+
+  subMap.Insert(0, "0");
+  subMap.Insert("1", 1);
+
+  map.Insert(1, 1);
+  map.Insert(2, Vector2(2.0f, 3.0f));
+  map.Insert(3, subArray);
+  map.Insert("4", subMap);
+  map.Insert("5", 4);
+
+  auto originalHash = map.GetHash();
+
+  Property::Array* subArrayPtr = map.Find(3)->GetArray();
+  Property::Map*   subMapPtr   = map.Find("4")->GetMap();
+
+  DALI_TEST_CHECK(subArrayPtr);
+  DALI_TEST_CHECK(subMapPtr);
+
+  tet_printf("Check if l-value of some element changeness applied.\n");
+
+  subArrayPtr->PushBack(-2);
+  DALI_TEST_NOT_EQUALS(originalHash, map.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  subArrayPtr->Resize(2);
+  DALI_TEST_EQUALS(originalHash, map.GetHash(), TEST_LOCATION);
+
+  subMapPtr->Insert(2, 2);
+  subMapPtr->Insert("3", "3");
+  auto newHash = map.GetHash();
+  DALI_TEST_NOT_EQUALS(originalHash, newHash, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  subMapPtr->Remove(2);
+  DALI_TEST_NOT_EQUALS(originalHash, map.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(newHash, map.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  subMapPtr->Remove("3");
+  DALI_TEST_EQUALS(originalHash, map.GetHash(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapEqualNonFloatType(void)
+{
+  tet_infoline("Check Property::Map equality if all values don't need to consider epsilon");
+
+  Property::Map   map1;
+  Property::Array subArray1;
+  Property::Map   subMap1;
+
+  subArray1.PushBack(2);
+  subArray1.PushBack(3);
+
+  subMap1.Insert(0, "0");
+  subMap1.Insert("1", 1);
+
+  map1.Insert(1, 1);
+  map1.Insert(2, false);
+  map1.Insert(3, subArray1);
+  map1.Insert("4", subMap1);
+  map1.Insert("5", 4);
+
+  tet_printf("Check self-equality return true\n");
+  DALI_TEST_CHECK(map1 == map1);
+  DALI_TEST_EQUALS(map1, map1, TEST_LOCATION);
+
+  tet_printf("Generate exactly same Property::Map with map1\n");
+
+  Property::Map   map2;
+  Property::Array subArray2;
+  Property::Map   subMap2;
+
+  subArray2.PushBack(2);
+  subArray2.PushBack(3);
+
+  subMap2.Insert("1", 1);
+  subMap2.Insert(0, "0");
+
+  map2.Insert(3, subArray1);
+  map2.Insert(2, false);
+  map2.Insert(1, 1);
+  map2.Insert("5", 4);
+  map2.Insert("4", subMap1);
+
+  DALI_TEST_CHECK(map1 == map2);
+  DALI_TEST_EQUALS(map1, map2, TEST_LOCATION);
+
+  tet_printf("Change map2\n");
+
+  map2.Insert(999, "999");
+  DALI_TEST_CHECK(map1 != map2);
+
+  tet_printf("Change map2 again\n");
+
+  map2.Remove(999);
+  DALI_TEST_CHECK(map1 == map2);
+
+  tet_printf("Change map2\n");
+
+  Property::Value* valuePtr = map2.Find(2);
+  *valuePtr                 = true;
+  DALI_TEST_CHECK(map1 != map2);
+
+  tet_printf("Change map2 again\n");
+
+  *valuePtr = false;
+  DALI_TEST_CHECK(map1 == map2);
 
   END_TEST;
 }
