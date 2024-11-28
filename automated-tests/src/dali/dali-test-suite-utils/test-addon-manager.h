@@ -23,13 +23,16 @@
 
 #include <string>
 
-namespace Dali
-{
 namespace Test
 {
 class AddOnManager : public Dali::Integration::AddOnManager
 {
 public:
+  /**
+   * Initializes the test addon manager so that it can be used by DALi.
+   */
+  static void Initialize();
+
   /**
    * @brief Constructor, initialised by the Adaptor
    */
@@ -42,17 +45,17 @@ public:
 
   std::vector<std::string> EnumerateAddOns() override;
 
-  bool GetAddOnInfo(const std::string& name, AddOnInfo& info) override;
+  bool GetAddOnInfo(const std::string& name, Dali::AddOnInfo& info) override;
 
-  std::vector<AddOnLibrary> LoadAddOns(const std::vector<std::string>& addonNames) override;
+  std::vector<Dali::AddOnLibrary> LoadAddOns(const std::vector<std::string>& addonNames) override;
 
-  AddOnLibrary LoadAddOn(const std::string& addonName, const std::string& libraryName) override;
+  Dali::AddOnLibrary LoadAddOn(const std::string& addonName, const std::string& libraryName) override;
 
   void* GetGlobalProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName) override;
 
   void* GetInstanceProc(const Dali::AddOnLibrary& addOnLibrary, const char* procName) override;
 
-  void RegisterAddOnDispatchTable(const AddOnDispatchTable* dispatchTable) override;
+  void RegisterAddOnDispatchTable(const Dali::AddOnDispatchTable* dispatchTable) override;
 
   void Start() override;
 
@@ -64,16 +67,16 @@ public:
 
   struct AddOnCacheEntry
   {
-    std::string name{};
-    AddOnInfo   info{};
+    std::string     name{};
+    Dali::AddOnInfo info{};
 
     // library handle
     void* handle{nullptr};
 
     // main function pointers
-    void (*GetAddOnInfo)(AddOnInfo&)      = nullptr; ///< Returns AddOnInfo structure
-    void* (*GetInstanceProc)(const char*) = nullptr; ///< Returns pointer of instance function (member funtion)
-    void* (*GetGlobalProc)(const char*)   = nullptr; ///< Returns pointer of global function (non-member function)
+    void (*GetAddOnInfo)(Dali::AddOnInfo&) = nullptr; ///< Returns AddOnInfo structure
+    void* (*GetInstanceProc)(const char*)  = nullptr; ///< Returns pointer of instance function (member funtion)
+    void* (*GetGlobalProc)(const char*)    = nullptr; ///< Returns pointer of global function (non-member function)
 
     void (*OnStart)()  = nullptr;
     void (*OnResume)() = nullptr;
@@ -86,6 +89,5 @@ public:
   std::vector<AddOnCacheEntry> mAddOnCache;
 };
 } // Namespace Test
-} // namespace Dali
 
 #endif // TEST_ADDON_MANAGER_H
