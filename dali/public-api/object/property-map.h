@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_MAP_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,6 +369,51 @@ public:
    * @note The other array is an r-value so becomes invalid and is no longer usable.
    */
   Map& operator=(Map&& other) noexcept;
+
+  /**
+   * @brief Equality operator.
+   *
+   * @SINCE_2_3.54
+   * @param[in] rhs A reference for comparison
+   * @return True if equal type and equal value.
+   */
+  bool operator==(const Map& rhs) const;
+
+  /**
+   * @brief Inequality operator.
+   *
+   * @SINCE_2_3.54
+   * @param[in] rhs A reference for comparison
+   * @return True if not equal
+   */
+  bool operator!=(const Map& rhs) const
+  {
+    return !(*this == rhs);
+  }
+
+  /**
+   * @brief Get hash value of the map.
+   *
+   * @note The order of key/value pairs is not considered.
+   * For example, Map({{"key", 1}, {"key2", 2}}) and Map({{"key2", 2}, {"key", 1}}) will have same hash value.
+   * But the type of Property::Value is considered.
+   * For example, Map({{"key", 1}}) and Map({{"key", 1.0f}}) might not have same hash value.
+   *
+   * @warning Hash might spend O(N) per each call.
+   * @warning Hash don't consider floating point precision. So even if two values equality return true,
+   * they can have different hash value.
+   * @code
+   * Property::Map v1({{1, 1.0f}});
+   * Property::Map v2({{1, 1.0000001192092896f}}); // 1.0f + FLT_EPSILON
+   * assert(v1 == v2); // true
+   * assert(v1.GetHash() == v2.GetHash()); // false, because of floating point precision issue.
+   * @endcode
+   *
+   * @SINCE_2_3.54
+   *
+   * @return Get the hashed value.
+   */
+  std::size_t GetHash() const;
 
   /**
    * @brief Output to stream.

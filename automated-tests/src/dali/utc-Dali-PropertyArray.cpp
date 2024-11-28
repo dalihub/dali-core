@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,14 +369,14 @@ int UtcDaliPropertyArrayMoveAssignmentOperator(void)
   DALI_TEST_ASSERTION(Property::Array temp; array1 = temp, exceptionMessage);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
-#if (__GNUC__ >= 13)
+#if(__GNUC__ >= 13)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wself-move"
 #endif
   // Self assignemnt
   array2 = std::move(array2);
   DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION); // still works, no debug assert
-#if (__GNUC__ >= 13)
+#if(__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
 
@@ -390,6 +390,199 @@ int UtcDaliPropertyArrayInitializerListConstructor(void)
   DALI_TEST_EQUALS(Property::INTEGER, array.GetElementAt(0).GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(Property::INTEGER, array.GetElementAt(1).GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(Property::STRING, array.GetElementAt(2).GetType(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayGetHashP01(void)
+{
+  tet_infoline("Check Property::Array::GetHash()");
+
+  Property::Array array;
+
+  tet_printf("Check empty array is not zero.\n");
+  auto emptyArrayHash = array.GetHash();
+
+  DALI_TEST_NOT_EQUALS(emptyArrayHash, static_cast<decltype(emptyArrayHash)>(0u), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  array.PushBack(1);
+  array.PushBack(Vector2(2.0f, 3.0f));
+  array.PushBack(4);
+
+  DALI_TEST_NOT_EQUALS(emptyArrayHash, array.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  Property::Value& lValue = array.GetElementAt(1);
+
+  auto originalHash = array.GetHash();
+
+  tet_printf("Check if l-value of some element changeness applied.\n");
+
+  DALI_TEST_EQUALS(originalHash, array.GetHash(), TEST_LOCATION);
+
+  lValue       = Property::Value(Vector3(2.0f, 3.0f, 0.0f));
+  auto newHash = array.GetHash();
+
+  DALI_TEST_NOT_EQUALS(originalHash, newHash, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_EQUALS(array.GetElementAt(1).Get<Vector3>(), Vector3(2.0f, 3.0f, 0.0f), TEST_LOCATION);
+
+  tet_printf("Revert l-value as original value, and check it applied.\n");
+  lValue  = Property::Value(Vector2(2.0f, 3.0f));
+  newHash = array.GetHash();
+
+  DALI_TEST_EQUALS(originalHash, newHash, TEST_LOCATION);
+
+  Property::Array otherArray;
+
+  otherArray.PushBack(1);
+  otherArray.PushBack(Vector2(2.0f, 3.0f));
+  otherArray.PushBack(4);
+
+  tet_printf("Check same array return same hash.\n");
+  DALI_TEST_EQUALS(originalHash, otherArray.GetHash(), TEST_LOCATION);
+
+  otherArray.Resize(4);
+
+  tet_printf("Check array with difference size return difference hash.\n");
+  DALI_TEST_NOT_EQUALS(originalHash, otherArray.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  otherArray[3] = Property::Value("5");
+  DALI_TEST_NOT_EQUALS(originalHash, otherArray.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  otherArray.Resize(3);
+
+  tet_printf("Check resized array return same hash.\n");
+  DALI_TEST_EQUALS(originalHash, otherArray.GetHash(), TEST_LOCATION);
+
+  Property::Array otherArray2;
+
+  otherArray2.PushBack(4);
+  otherArray2.PushBack(Vector2(2.0f, 3.0f));
+  otherArray2.PushBack(1);
+
+  tet_printf("Check array with difference order return difference hash.\n");
+  DALI_TEST_NOT_EQUALS(originalHash, otherArray2.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  array.Clear();
+  tet_printf("Check cleared arrayy has same value with empty array.\n");
+  DALI_TEST_EQUALS(emptyArrayHash, array.GetHash(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayGetHashP02(void)
+{
+  tet_infoline("Check Property::Array::GetHash() if value is Map or Array.");
+
+  Property::Array array;
+  Property::Array subArray;
+  Property::Map   subMap;
+
+  subArray.PushBack(2);
+  subArray.PushBack(3);
+
+  subMap.Insert(0, "0");
+  subMap.Insert("1", 1);
+
+  array.PushBack(1);
+  array.PushBack(Vector2(2.0f, 3.0f));
+  array.PushBack(subArray);
+  array.PushBack(subMap);
+  array.PushBack(4);
+
+  auto originalHash = array.GetHash();
+
+  Property::Array* subArrayPtr = array.GetElementAt(2).GetArray();
+  Property::Map*   subMapPtr   = array.GetElementAt(3).GetMap();
+
+  DALI_TEST_CHECK(subArrayPtr);
+  DALI_TEST_CHECK(subMapPtr);
+
+  tet_printf("Check if l-value of some element changeness applied.\n");
+
+  subArrayPtr->PushBack(-2);
+  DALI_TEST_NOT_EQUALS(originalHash, array.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  subArrayPtr->Resize(2);
+  DALI_TEST_EQUALS(originalHash, array.GetHash(), TEST_LOCATION);
+
+  subMapPtr->Insert(2, 2);
+  subMapPtr->Insert("3", "3");
+  auto newHash = array.GetHash();
+  DALI_TEST_NOT_EQUALS(originalHash, newHash, Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  subMapPtr->Remove(2);
+  DALI_TEST_NOT_EQUALS(originalHash, array.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(newHash, array.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+  subMapPtr->Remove("3");
+  DALI_TEST_EQUALS(originalHash, array.GetHash(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayEqualNonFloatType(void)
+{
+  tet_infoline("Check Property::Array equality if all values don't need to consider epsilon");
+
+  Property::Array array1;
+  Property::Array subArray1;
+  Property::Map   subMap1;
+
+  subArray1.PushBack(2);
+  subArray1.PushBack(3);
+
+  subMap1.Insert(0, "0");
+  subMap1.Insert("1", 1);
+
+  array1.PushBack(1);
+  array1.PushBack(false);
+  array1.PushBack(subArray1);
+  array1.PushBack(subMap1);
+  array1.PushBack(4);
+
+  tet_printf("Check self-equality return true\n");
+  DALI_TEST_CHECK(array1 == array1);
+  DALI_TEST_EQUALS(array1, array1, TEST_LOCATION);
+
+  tet_printf("Generate exactly same Property::Array with array1\n");
+
+  Property::Array array2;
+  Property::Array subArray2;
+  Property::Map   subMap2;
+
+  subArray2.PushBack(2);
+  subArray2.PushBack(3);
+
+  subMap2.Insert(0, "0");
+  subMap2.Insert("1", 1);
+
+  array2.PushBack(1);
+  array2.PushBack(false);
+  array2.PushBack(subArray1);
+  array2.PushBack(subMap1);
+  array2.PushBack(4);
+
+  DALI_TEST_CHECK(array1 == array2);
+  DALI_TEST_EQUALS(array1, array2, TEST_LOCATION);
+
+  tet_printf("Change array2\n");
+
+  auto oldCount = array2.Count();
+  array2.PushBack(2);
+  DALI_TEST_CHECK(array1 != array2);
+
+  tet_printf("Change array2 again\n");
+
+  array2.Resize(oldCount);
+  DALI_TEST_CHECK(array1 == array2);
+
+  tet_printf("Change array2\n");
+
+  Property::Value& value = array2.GetElementAt(1);
+  value                  = true;
+  DALI_TEST_CHECK(array1 != array2);
+
+  tet_printf("Change array2 again\n");
+
+  value = false;
+  DALI_TEST_CHECK(array1 == array2);
 
   END_TEST;
 }

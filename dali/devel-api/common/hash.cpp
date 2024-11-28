@@ -18,139 +18,81 @@
 // CLASS HEADER
 #include <dali/devel-api/common/hash.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/common/hash-utils.h>
+
 namespace Dali
 {
-namespace //unnamed namespace
-{
-/*
- * djb2 (http://www.cse.yorku.ca/~oz/hash.html)
- */
-
-inline void HashString(const char* string, std::size_t& hash)
-{
-  while(int c = *string++)
-  {
-    hash = hash * 33 + c;
-  }
-}
-
-inline void HashString(const char* string, std::size_t& hash, char terminator)
-{
-  char c;
-  while((c = *string++) && c != terminator)
-  {
-    hash = hash * 33 + c;
-  }
-}
-
-inline void HashStringView(const std::string_view& string, std::size_t& hash)
-{
-  for(auto c : string)
-  {
-    hash = hash * 33 + c;
-  }
-}
-
-inline void HashStringView(const std::string_view& string, std::size_t& hash, char terminator)
-{
-  for(auto c : string)
-  {
-    if(c == terminator)
-    {
-      break;
-    }
-    hash = hash * 33 + static_cast<std::size_t>(c);
-  }
-}
-
-inline void HashBuffer(const std::vector<std::uint8_t>& buffer, std::size_t& hash)
-{
-  for(const auto& c : buffer)
-  {
-    hash = hash * 33 + c;
-  }
-}
-
-inline void HashBuffer(const Dali::Vector<std::uint8_t>& buffer, std::size_t& hash)
-{
-  for(const auto& c : buffer)
-  {
-    hash = hash * 33 + c;
-  }
-}
-
-} // unnamed namespace
-
 std::size_t CalculateHash(const std::string& toHash)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashString(toHash.c_str(), hash);
+  Dali::Internal::HashUtils::HashString(toHash.c_str(), hash);
 
   return hash;
 }
 
 std::size_t CalculateHash(const std::string& toHash, char terminator)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashString(toHash.c_str(), hash, terminator);
+  Dali::Internal::HashUtils::HashString(toHash.c_str(), hash, terminator);
 
   return hash;
 }
 
 std::size_t CalculateHash(const std::string& string1, const std::string& string2)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashString(string1.c_str(), hash);
-  HashString(string2.c_str(), hash);
+  Dali::Internal::HashUtils::HashString(string1.c_str(), hash);
+  Dali::Internal::HashUtils::HashString(string2.c_str(), hash);
 
   return hash;
 }
 
 std::size_t CalculateHash(const std::string_view& toHash)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashStringView(toHash, hash);
+  Dali::Internal::HashUtils::HashStringView(toHash, hash);
 
   return hash;
 }
 
 std::size_t CalculateHash(const std::string_view& toHash, char terminator)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashStringView(toHash, hash, terminator);
+  Dali::Internal::HashUtils::HashStringView(toHash, hash, terminator);
 
   return hash;
 }
 
 std::size_t CalculateHash(const std::string_view& string1, const std::string_view& string2)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashStringView(string1, hash);
-  HashStringView(string2, hash);
+  Dali::Internal::HashUtils::HashStringView(string1, hash);
+  Dali::Internal::HashUtils::HashStringView(string2, hash);
 
   return hash;
 }
 
 std::size_t CalculateHash(const std::vector<std::uint8_t>& toHash)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashBuffer(toHash, hash);
+  Dali::Internal::HashUtils::HashBuffer(toHash, hash);
 
   return hash;
 }
 
 std::size_t CalculateHash(const Dali::Vector<std::uint8_t>& toHash)
 {
-  std::size_t hash(INITIAL_HASH_VALUE);
+  std::size_t hash(Dali::Internal::HashUtils::INITIAL_HASH_VALUE);
 
-  HashBuffer(toHash, hash);
+  Dali::Internal::HashUtils::HashBuffer(toHash, hash);
 
   return hash;
 }

@@ -22,21 +22,6 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
 
-#if defined(ANDROID) || defined(WIN32) || defined(__APPLE__)
-namespace std
-{
-uint64_t _Hash_bytes(const void* bytes, uint64_t size, uint64_t seed)
-{
-  for(uint64_t i = 0; i < size; i++)
-  {
-    seed = seed * 31 + reinterpret_cast<const unsigned char*>(bytes)[i];
-  }
-
-  return seed;
-}
-} // namespace std
-#endif
-
 namespace Dali
 {
 namespace Internal

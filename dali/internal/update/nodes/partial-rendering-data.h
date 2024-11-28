@@ -29,11 +29,11 @@ namespace Dali::Internal::SceneGraph
  */
 struct PartialRenderingData
 {
-  Matrix   matrix{};              /// Model-view matrix
-  Vector4  color{};               /// Color
-  Vector4  updatedPositionSize{}; /// Updated position/size (x, y, width, height)
-  Vector3  size{};                /// Size
-  uint32_t hash{0u};              /// Last frame's hash
+  Matrix      matrix{};              /// Model-view matrix
+  Vector4     color{};               /// Color
+  Vector4     updatedPositionSize{}; /// Updated position/size (x, y, width, height)
+  Vector3     size{};                /// Size
+  std::size_t hash{0u};              /// Last frame's hash
 
   bool mVisible : 1; /// Visible state. It is depends on node's visibility (Not hashed)
   bool mUpdated : 1; /// IsUpdated return true at this frame. Will be reset at UpdateNodes time. (Not hashed)
@@ -58,11 +58,11 @@ struct PartialRenderingData
    */
   void CalculateHash()
   {
-    hash = Dali::INITIAL_HASH_VALUE;
-    AddToHash(hash, &matrix, sizeof(decltype(matrix)));
-    AddToHash(hash, &color, sizeof(decltype(color)));
-    AddToHash(hash, &updatedPositionSize, sizeof(decltype(updatedPositionSize)));
-    AddToHash(hash, &size, sizeof(decltype(size)));
+    hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
+    Dali::Internal::HashUtils::HashRawBuffer<float>(matrix.AsFloat(), 16, hash);
+    Dali::Internal::HashUtils::HashRawBuffer<float>(color.AsFloat(), 4, hash);
+    Dali::Internal::HashUtils::HashRawBuffer<float>(updatedPositionSize.AsFloat(), 4, hash);
+    Dali::Internal::HashUtils::HashRawBuffer<float>(size.AsFloat(), 3, hash);
   }
 
   /**
@@ -118,16 +118,6 @@ struct PartialRenderingData
   void MakeExpired()
   {
     mUpdateDecay = Decay::EXPIRED;
-  }
-
-private:
-  void AddToHash(uint32_t& aHash, void* el, size_t numBytes)
-  {
-    uint8_t* elBytes = static_cast<uint8_t*>(el);
-    for(size_t i = 0; i < numBytes; ++i)
-    {
-      aHash = aHash * 33 + *elBytes++;
-    }
   }
 };
 

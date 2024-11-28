@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <limits>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/hash-utils.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
@@ -33,12 +35,47 @@ typedef std::vector<StringValuePair> StringValueContainer;
 using IndexValuePair      = std::pair<Property::Index, Property::Value>;
 using IndexValueContainer = std::vector<IndexValuePair>;
 
+constexpr std::size_t NOT_HASHED    = 0u;
+constexpr std::size_t ALWAYS_REHASH = std::numeric_limits<std::size_t>::max();
+
 }; // unnamed namespace
 
 struct Property::Map::Impl
 {
+public:
+  std::size_t GetHash() const
+  {
+    std::size_t hash = mHash;
+    if(hash == ALWAYS_REHASH || hash == NOT_HASHED)
+    {
+      hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
+
+      for(const auto& iter : mStringValueContainer)
+      {
+        // Use unordered hash operation.
+        auto valueHash = iter.second.GetHash();
+        hash += Dali::Internal::HashUtils::HashStringView(std::string_view(iter.first), valueHash);
+      }
+      for(const auto& iter : mIndexValueContainer)
+      {
+        // Use unordered hash operation.
+        auto valueHash = iter.second.GetHash();
+        hash += Dali::Internal::HashUtils::HashRawValue(iter.first, valueHash);
+      }
+
+      if(mHash != ALWAYS_REHASH)
+      {
+        mHash = hash;
+      }
+    }
+    return hash;
+  }
+
+public:
   StringValueContainer mStringValueContainer;
   IndexValueContainer  mIndexValueContainer;
+
+  mutable std::size_t mHash{NOT_HASHED};
 };
 
 Property::Map::Map()
@@ -101,12 +138,24 @@ bool Property::Map::Empty() const
 void Property::Map::Insert(std::string key, Value value)
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+  {
+    // Use unordered hash operation.
+    auto valueHash = value.GetHash();
+    mImpl->mHash += Dali::Internal::HashUtils::HashStringView(std::string_view(key), valueHash);
+  }
   mImpl->mStringValueContainer.push_back(std::make_pair(std::move(key), std::move(value)));
 }
 
 void Property::Map::Insert(Property::Index key, Value value)
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+  {
+    // Use unordered hash operation.
+    auto valueHash = value.GetHash();
+    mImpl->mHash += Dali::Internal::HashUtils::HashRawValue(key, valueHash);
+  }
   mImpl->mIndexValueContainer.push_back(std::make_pair(key, std::move(value)));
 }
 
@@ -200,6 +249,12 @@ Property::Value* Property::Map::Find(std::string_view key) const
   {
     if(key == iter.first)
     {
+      if(mImpl->mHash != ALWAYS_REHASH)
+      {
+        // Mark as we cannot assume that hash is valid anymore.
+        // Recalculate hash always after now.
+        mImpl->mHash = ALWAYS_REHASH;
+      }
       return &iter.second;
     }
   }
@@ -214,6 +269,12 @@ Property::Value* Property::Map::Find(Property::Index key) const
   {
     if(iter.first == key)
     {
+      if(mImpl->mHash != ALWAYS_REHASH)
+      {
+        // Mark as we cannot assume that hash is valid anymore.
+        // Recalculate hash always after now.
+        mImpl->mHash = ALWAYS_REHASH;
+      }
       return &iter.second;
     }
   }
@@ -238,6 +299,12 @@ Property::Value* Property::Map::Find(std::string_view key, Property::Type type) 
   {
     if((iter.second.GetType() == type) && (key == iter.first))
     {
+      if(mImpl->mHash != ALWAYS_REHASH)
+      {
+        // Mark as we cannot assume that hash is valid anymore.
+        // Recalculate hash always after now.
+        mImpl->mHash = ALWAYS_REHASH;
+      }
       return &iter.second;
     }
   }
@@ -252,6 +319,12 @@ Property::Value* Property::Map::Find(Property::Index key, Property::Type type) c
   {
     if((iter.second.GetType() == type) && (iter.first == key))
     {
+      if(mImpl->mHash != ALWAYS_REHASH)
+      {
+        // Mark as we cannot assume that hash is valid anymore.
+        // Recalculate hash always after now.
+        mImpl->mHash = ALWAYS_REHASH;
+      }
       return &iter.second;
     }
   }
@@ -264,6 +337,7 @@ void Property::Map::Clear()
 
   mImpl->mStringValueContainer.clear();
   mImpl->mIndexValueContainer.clear();
+  mImpl->mHash = NOT_HASHED;
 }
 
 bool Property::Map::Remove(Property::Index key)
@@ -273,6 +347,12 @@ bool Property::Map::Remove(Property::Index key)
   auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element) { return element.first == key; });
   if(iter != mImpl->mIndexValueContainer.end())
   {
+    if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+    {
+      // Use unordered hash operation.
+      auto valueHash = iter->second.GetHash();
+      mImpl->mHash -= Dali::Internal::HashUtils::HashRawValue(key, valueHash);
+    }
     mImpl->mIndexValueContainer.erase(iter);
     return true;
   }
@@ -286,6 +366,12 @@ bool Property::Map::Remove(std::string_view key)
   auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element) { return element.first == key; });
   if(iter != mImpl->mStringValueContainer.end())
   {
+    if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+    {
+      // Use unordered hash operation.
+      auto valueHash = iter->second.GetHash();
+      mImpl->mHash -= Dali::Internal::HashUtils::HashStringView(key, valueHash);
+    }
     mImpl->mStringValueContainer.erase(iter);
     return true;
   }
@@ -301,6 +387,12 @@ void Property::Map::Merge(const Property::Map& from)
   {
     if(Count())
     {
+      // Just reset hash as zero. (Since incremental merge is complex.)
+      if(mImpl->mHash != ALWAYS_REHASH)
+      {
+        mImpl->mHash = NOT_HASHED;
+      }
+
       for(auto&& iter : from.mImpl->mStringValueContainer)
       {
         (*this)[iter.first] = iter.second;
@@ -338,6 +430,13 @@ Property::Value& Property::Map::operator[](std::string_view key)
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
 
+  if(mImpl->mHash != ALWAYS_REHASH)
+  {
+    // Mark as we cannot assume that hash is valid anymore.
+    // Recalculate hash always after now.
+    mImpl->mHash = ALWAYS_REHASH;
+  }
+
   for(auto&& iter : mImpl->mStringValueContainer)
   {
     if(iter.first == key)
@@ -370,6 +469,13 @@ Property::Value& Property::Map::operator[](Property::Index key)
 {
   DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
 
+  if(mImpl->mHash != ALWAYS_REHASH)
+  {
+    // Mark as we cannot assume that hash is valid anymore.
+    // Recalculate hash always after now.
+    mImpl->mHash = ALWAYS_REHASH;
+  }
+
   for(auto&& iter : mImpl->mIndexValueContainer)
   {
     if(iter.first == key)
@@ -391,6 +497,7 @@ Property::Map& Property::Map::operator=(const Property::Map& other)
   {
     mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
     mImpl->mIndexValueContainer  = other.mImpl->mIndexValueContainer;
+    mImpl->mHash                 = other.mImpl->mHash;
   }
   return *this;
 }
@@ -404,6 +511,20 @@ Property::Map& Property::Map::operator=(Property::Map&& other) noexcept
     other.mImpl = nullptr;
   }
   return *this;
+}
+
+bool Property::Map::operator==(const Property::Map& rhs) const
+{
+  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+
+  // TODO : Need to check epsilon for float comparison in future. For now, just compare hash value and count.
+  return Count() == rhs.Count() && GetHash() == rhs.GetHash();
+}
+
+std::size_t Property::Map::GetHash() const
+{
+  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  return mImpl->GetHash();
 }
 
 std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
@@ -435,6 +556,11 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
   }
 
   stream << "}";
+
+  if(map.mImpl->mHash != NOT_HASHED)
+  {
+    stream << "(hash=" << map.mImpl->mHash << ")";
+  }
 
   return stream;
 }
