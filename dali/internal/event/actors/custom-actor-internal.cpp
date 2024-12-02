@@ -17,6 +17,8 @@
 
 // CLASS HEADER
 #include <dali/internal/event/actors/custom-actor-internal.h>
+
+// INTERNAL INCLUDES
 #include <dali/public-api/object/type-info.h>
 
 namespace Dali

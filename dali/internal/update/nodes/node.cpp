@@ -262,6 +262,26 @@ void Node::RemoveRenderer(const RendererKey& renderer)
   }
 }
 
+void Node::SetCacheRenderer(const RendererKey& renderer)
+{
+  if(DALI_UNLIKELY(mCacheRenderer))
+  {
+    mCacheRenderer->DetachFromNodeDataProvider(*this);
+  }
+  SetUpdated(true);
+  mCacheRenderer = renderer;
+}
+
+void Node::RemoveCacheRenderer()
+{
+  if(DALI_LIKELY(mCacheRenderer))
+  {
+    mCacheRenderer->DetachFromNodeDataProvider(*this);
+    SetUpdated(true);
+    mCacheRenderer = RendererKey{};
+  }
+}
+
 NodePropertyFlags Node::GetDirtyFlags() const
 {
   // get initial dirty flags, they are reset ResetDefaultProperties, but setters may have made the node dirty already

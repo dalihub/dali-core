@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 #include "test-custom-actor.h"
+
+#include <mesh-builder.h>
 
 using namespace Dali;
 
@@ -1716,7 +1718,6 @@ int UtcDaliCustomActorComponentPropertyConstraintsP(void)
 
 namespace Impl
 {
-
 class OffScreenCustomActor : public UnregisteredCustomActor
 {
 public:
@@ -1725,11 +1726,11 @@ public:
     Dali::Integration::Scene scene = Dali::Integration::Scene::Get(Self());
     if(scene)
     {
-      mScene                  = scene;
-      RenderTaskList taskList = scene.GetRenderTaskList();
-      mForwardRenderTask      = taskList.CreateTask();
-      mBackwardRenderTask     = taskList.CreateTask();
-      FrameBuffer forwardFrameBuffer = FrameBuffer::New(1, 1);
+      mScene                          = scene;
+      RenderTaskList taskList         = scene.GetRenderTaskList();
+      mForwardRenderTask              = taskList.CreateTask();
+      mBackwardRenderTask             = taskList.CreateTask();
+      FrameBuffer forwardFrameBuffer  = FrameBuffer::New(1, 1);
       FrameBuffer backwardFrameBuffer = FrameBuffer::New(1, 1);
 
       mForwardRenderTask.SetFrameBuffer(forwardFrameBuffer);
@@ -1839,15 +1840,15 @@ int UtcDaliCustomActorReordering(void)
    * G(Forward) - F(Backward) - E(Forward) - J(BACKWARD) - B(BACKWARD) - E(BACKWARD)
    */
 
-  Layer A_layer = Layer::New();
+  Layer                A_layer                = Layer::New();
   OffScreenCustomActor B_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
-  Layer C_layer = Layer::New();
-  Actor D_actor = Actor::New();
+  Layer                C_layer                = Layer::New();
+  Actor                D_actor                = Actor::New();
   OffScreenCustomActor E_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BOTH);
   OffScreenCustomActor F_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
   OffScreenCustomActor G_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::FORWARD);
-  Actor H_actor = Actor::New();
-  Actor I_actor = Actor::New();
+  Actor                H_actor                = Actor::New();
+  Actor                I_actor                = Actor::New();
   OffScreenCustomActor J_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
 
   A_layer.Add(B_offScreenCustomActor);
@@ -1915,7 +1916,7 @@ int UtcDaliCustomActorReordering2(void)
    * C(Backward) - B(Backward)
    */
 
-  Layer A_layer = Layer::New();
+  Layer                A_layer                = Layer::New();
   OffScreenCustomActor B_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
   OffScreenCustomActor C_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
 
@@ -1971,5 +1972,40 @@ int UtcDaliCustomActorReordering2(void)
   tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
   DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
 
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplSetRemoveCacheRenderer(void)
+{
+  TestApplication application;
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
+
+  DerivedCustomActor customActor = DerivedCustomActor::New();
+
+  Geometry geometry  = CreateQuadGeometry();
+  Shader   shader    = CreateShader();
+  Renderer renderer  = Renderer::New(geometry, shader);
+  Renderer renderer2 = Renderer::New(geometry, shader);
+
+  customActor.AddRenderer(renderer);
+  customActor.GetImplementation().SetCacheRenderer(renderer);
+  customActor.GetImplementation().SetCacheRenderer(renderer2);
+  customActor.GetImplementation().SetCacheRenderer(renderer2);
+  DALI_TEST_EQUALS(customActor.GetRendererCount(), 1, TEST_LOCATION); // cache renderer is not counted.
+
+  customActor.RemoveRenderer(0u);
+  customActor.GetImplementation().SetCacheRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  customActor.GetImplementation().RemoveCacheRenderer();
+  customActor.GetImplementation().RemoveCacheRenderer();
+  application.SendNotification();
+  application.Render();
+
+  customActor.GetImplementation().SetCacheRenderer(renderer2);
+
+  tet_result(TET_PASS);
   END_TEST;
 }

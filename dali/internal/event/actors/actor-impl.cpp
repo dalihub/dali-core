@@ -1133,6 +1133,37 @@ void Actor::RequestRenderTaskReorder()
   }
 }
 
+void Actor::SetCacheRenderer(Renderer& renderer)
+{
+  const SceneGraph::Node& node = GetNode();
+
+  if(mCacheRenderer)
+  {
+    if(mCacheRenderer == RendererPtr(&renderer))
+    {
+      return;
+    }
+    RemoveCacheRenderer();
+  }
+
+  if(mIsBlendEquationSet)
+  {
+    renderer.SetBlendEquation(mBlendEquation);
+  }
+  mCacheRenderer = RendererPtr(&renderer);
+  AttachCacheRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
+}
+
+void Actor::RemoveCacheRenderer()
+{
+  if(DALI_LIKELY(mCacheRenderer))
+  {
+    const SceneGraph::Node& node = GetNode();
+    DetachCacheRendererMessage(GetEventThreadServices(), node, mCacheRenderer->GetRendererSceneObject());
+    mCacheRenderer.Reset();
+  }
+}
+
 Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
 : Object(&node),
   mParentImpl(*this),
@@ -1222,6 +1253,10 @@ Actor::~Actor()
     {
       // Detach all renderers before delete container.
       mRenderers->RemoveAll(GetNode());
+    }
+    if(mCacheRenderer)
+    {
+      RemoveCacheRenderer();
     }
 
     // Root layer will destroy its node in its own destructor
@@ -1596,7 +1631,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
       // Instruct each actor to create a corresponding node in the scene graph
       ConnectToScene(parentActor->GetHierarchyDepth(), parentActor->GetLayer3DParentCount(), notify);
 
-      Actor* actor         = this;
+      Actor* actor = this;
       // OnScene should be checked, this actor can be removed during OnSceneConnection.
       emitInheritedVisible = OnScene() && mScene->IsVisible();
       while(emitInheritedVisible && actor)

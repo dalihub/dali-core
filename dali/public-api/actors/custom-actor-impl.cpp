@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/custom-actor-internal.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -46,6 +47,16 @@ OffScreenRenderable::Type CustomActorImpl::GetOffScreenRenderableType()
 void CustomActorImpl::RequestRenderTaskReorder()
 {
   mOwner->RequestRenderTaskReorder();
+}
+
+void CustomActorImpl::SetCacheRenderer(Renderer& renderer)
+{
+  mOwner->SetCacheRenderer(GetImplementation(renderer));
+}
+
+void CustomActorImpl::RemoveCacheRenderer()
+{
+  mOwner->RemoveCacheRenderer();
 }
 
 CustomActorImpl::CustomActorImpl(ActorFlags flags)

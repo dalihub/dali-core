@@ -2,7 +2,7 @@
 #define DALI_CUSTOM_ACTOR_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,6 +214,20 @@ public:
    * @SINCE_2_3.43
    */
   void RequestRenderTaskReorder();
+
+  /**
+   * @brief Set renderer drawing cached output to this Actor.
+   * @SINCE_2_3.54
+   * @param[in] renderer Renderer to set to the Actor
+   * @pre The renderer must be initialized.
+   */
+  void SetCacheRenderer(Renderer& renderer);
+
+  /**
+   * @brief Removes cache renderer from the Actor.
+   * @SINCE_2_3.54
+   */
+  void RemoveCacheRenderer();
 
   /**
    * @brief Called after the size negotiation has been finished for this control.
