@@ -5319,3 +5319,59 @@ int UtcDaliRenderTaskDestructWorkerThreadN(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskKeepRenderResult(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SignalFinished()");
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+
+  application.GetScene().Add(offscreenCameraActor);
+
+  Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
+  Actor   rootActor = CreateRenderableActor(image);
+  rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  application.GetScene().Add(rootActor);
+
+  RenderTaskList          taskList           = application.GetScene().GetRenderTaskList();
+  Texture                 frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 10, 10);
+  FrameBuffer             frameBuffer        = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetCameraActor(offscreenCameraActor);
+  newTask.SetSourceActor(rootActor);
+  newTask.SetInputEnabled(false);
+  newTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  newTask.SetClearEnabled(true);
+  newTask.SetExclusive(true);
+  newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+  newTask.SetFrameBuffer(frameBuffer);
+  newTask.KeepRenderResult();
+
+  bool               finished = false;
+  RenderTaskFinished renderTaskFinished(finished);
+  newTask.FinishedSignal().Connect(&application, renderTaskFinished);
+
+  DALI_TEST_CHECK(!newTask.GetRenderResult());
+
+  // Flush the queue and render.
+  application.SendNotification();
+  application.Render();
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK(finished);
+  DALI_TEST_CHECK(newTask.GetRenderResult());
+
+  newTask.ClearRenderResult();
+
+  DALI_TEST_CHECK(newTask.GetRenderResult());
+
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK(!newTask.GetRenderResult());
+
+  END_TEST;
+}

@@ -184,11 +184,21 @@ CameraActor* RenderTask::GetCameraActor() const
 
 void RenderTask::SetFrameBuffer(FrameBufferPtr frameBuffer)
 {
+  if(mFrameBuffer)
+  {
+    mFrameBuffer->ClearRenderResult();
+  }
+
   mFrameBuffer = frameBuffer;
   Render::FrameBuffer* renderFrameBufferPtr(nullptr);
   if(frameBuffer)
   {
-    renderFrameBufferPtr = mFrameBuffer->GetRenderObject();
+    renderFrameBufferPtr = frameBuffer->GetRenderObject();
+  }
+
+  if(frameBuffer && mIsRequestedToKeepRenderResult)
+  {
+    frameBuffer->KeepRenderResult();
   }
 
   if(GetRenderTaskSceneObject())
@@ -443,6 +453,10 @@ void RenderTask::SetRefreshRate(uint32_t refreshRate)
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::SetRefreshRate(this:%p, %d)\n", this, refreshRate);
 
   mRefreshRate = refreshRate; // cached for GetRefreshRate()
+  if(mRefreshRate == Dali::RenderTask::REFRESH_ONCE)
+  {
+    ClearRenderResult();
+  }
 
   // Note - even when refreshRate is the same as mRefreshRate, a message should be sent
 
@@ -670,6 +684,40 @@ void RenderTask::RenderUntil(Actor* stopperActor)
       SetStopperNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
     }
   }
+}
+
+void RenderTask::KeepRenderResult()
+{
+  if(mRefreshRate == Dali::RenderTask::REFRESH_ONCE)
+  {
+    if(!mIsRequestedToKeepRenderResult)
+    {
+      mIsRequestedToKeepRenderResult = true;
+      if(mFrameBuffer)
+      {
+        mFrameBuffer->KeepRenderResult();
+      }
+    }
+  }
+}
+
+void RenderTask::ClearRenderResult()
+{
+  mIsRequestedToKeepRenderResult = false;
+  if(mFrameBuffer)
+  {
+    mFrameBuffer->ClearRenderResult();
+  }
+}
+
+Dali::PixelData RenderTask::GetRenderResult()
+{
+  Dali::PixelData pixelData;
+  if(mFrameBuffer)
+  {
+    pixelData = mFrameBuffer->GetRenderResult();
+  }
+  return pixelData;
 }
 
 const SceneGraph::RenderTask* RenderTask::GetRenderTaskSceneObject() const
@@ -936,6 +984,7 @@ void RenderTask::EmitSignalFinish()
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::EmitSignalFinish(this:%p)\n", this);
 
+  mIsRequestedToKeepRenderResult = false;
   if(!mSignalFinished.Empty())
   {
     Dali::RenderTask handle(this);
@@ -979,6 +1028,7 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
   mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),
   mRefreshOnceCounter(0u),
   mScreenToFrameBufferFunction(Dali::RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION),
+  mIsRequestedToKeepRenderResult(false),
   mExclusive(Dali::RenderTask::DEFAULT_EXCLUSIVE),
   mInputEnabled(Dali::RenderTask::DEFAULT_INPUT_ENABLED),
   mClearEnabled(Dali::RenderTask::DEFAULT_CLEAR_ENABLED),
@@ -1002,6 +1052,8 @@ RenderTask::~RenderTask()
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::~RenderTask(this:%p)\n", this);
   // scene object deletion is handled by our parent
   // scene object handles observation of source and camera
+
+  ClearRenderResult();
 }
 
 } // namespace Internal

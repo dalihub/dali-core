@@ -1081,10 +1081,11 @@ enum class TextureTiling
  */
 struct ColorAttachment
 {
-  uint32_t attachmentId;
-  Texture* texture;
-  uint32_t layerId;
-  uint32_t levelId;
+  uint32_t            attachmentId;
+  Texture*            texture;
+  uint32_t            layerId;
+  uint32_t            levelId;
+  Dali::Pixel::Format pixelFormat;
 };
 
 /**

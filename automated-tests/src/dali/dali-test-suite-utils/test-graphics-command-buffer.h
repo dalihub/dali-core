@@ -834,6 +834,10 @@ public:
     mCallStack.PushCall("EndRenderPass", namedParams.str(), namedParams);
   }
 
+  void ReadPixels(uint8_t* buffer) override
+  {
+  }
+
   void ExecuteCommandBuffers(std::vector<const CommandBuffer*>&& commandBuffers) override
   {
     mCommands.emplace_back();

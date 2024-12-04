@@ -19,6 +19,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dlfcn.h>
+#include <memory>
 
 #include <cstring>
 
@@ -26,10 +27,20 @@
 #define ADDON_LIBS_PATH ""
 #endif
 
-namespace Dali
-{
 namespace Test
 {
+using namespace Dali;
+
+void AddOnManager::Initialize()
+{
+  // Only create an instance if we haven't created one already
+  if(!AddOnManager::Get())
+  {
+    static std::unique_ptr<AddOnManager> sAddonManager(new AddOnManager);
+    // Memory will be freed upon test completion
+  }
+}
+
 std::vector<std::string> AddOnManager::EnumerateAddOns()
 {
   std::string listFileName(ADDON_LIBS_PATH);
@@ -174,7 +185,7 @@ AddOnLibrary AddOnManager::LoadAddOn(const std::string& addonName, const std::st
   else
   {
     mAddOnCache.emplace_back();
-    mAddOnCache.back().handle = dlopen(libraryName.c_str(), RTLD_DEEPBIND | RTLD_LAZY);
+    mAddOnCache.back().handle = dlopen(libraryName.c_str(), RTLD_LAZY); // We want to override some called methods in test code so don't do a deepbind
     if(!mAddOnCache.back().handle)
     {
       mAddOnCache.back().valid = false;
@@ -252,4 +263,3 @@ void AddOnManager::Pause()
 }
 
 } // namespace Test
-} // namespace Dali

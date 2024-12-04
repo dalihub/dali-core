@@ -323,6 +323,21 @@ void RenderTask::RenderUntil(Actor stopperActor)
   return GetImplementation(*this).RenderUntil(actorImpl);
 }
 
+void RenderTask::KeepRenderResult()
+{
+  GetImplementation(*this).KeepRenderResult();
+}
+
+void RenderTask::ClearRenderResult()
+{
+  GetImplementation(*this).ClearRenderResult();
+}
+
+PixelData RenderTask::GetRenderResult()
+{
+  return GetImplementation(*this).GetRenderResult();
+}
+
 RenderTask::RenderTask(Internal::RenderTask* internal)
 : Handle(internal)
 {

@@ -22,6 +22,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/images/pixel-data.h>
 
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/events/actor-observer.h>
@@ -294,6 +295,21 @@ public:
    */
   void RenderUntil(Actor* stopperActor);
 
+  /**
+   * @copydoc Dali::RenderTask::KeepRenderResult
+   */
+  void KeepRenderResult();
+
+  /**
+   * @copydoc Dali::RenderTask::ClearRenderResult
+   */
+  void ClearRenderResult();
+
+  /**
+   * @copydoc Dali::RenderTask::GetRenderResult
+   */
+  Dali::PixelData GetRenderResult();
+
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
    * Retrieve the scene-graph RenderTask object.
@@ -420,6 +436,7 @@ private:
 
   uint32_t mRenderTaskId{0u};
 
+  bool mIsRequestedToKeepRenderResult : 1;
   bool mExclusive : 1;    ///< True if the render-task has exclusive access to the source Nodes.
   bool mInputEnabled : 1; ///< True if the render-task should be considered for input handling.
   bool mClearEnabled : 1; ///< True if the render-task should be clear the color buffer.

@@ -123,6 +123,11 @@ uint32_t KeyEvent::GetWindowId() const
   return GetImplementation(*this).GetWindowId();
 }
 
+uint32_t KeyEvent::GetReceiveTime() const
+{
+  return GetImplementation(*this).GetReceiveTime();
+}
+
 KeyEvent::KeyEvent(Internal::KeyEvent* internal)
 : BaseHandle(internal)
 {

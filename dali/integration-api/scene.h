@@ -539,6 +539,20 @@ public:
   KeyEventGeneratedSignalType& InterceptKeyEventSignal();
 
   /**
+   * @brief The user would connect to this signal to monitor a KeyEvent at window.
+   * This signal is emitted when KeyEvent is generated.
+   *
+   * A Callback of the following type may be connected:
+   * @code
+   *  bool YourCallbackName(const KeyEvent& event);
+   * @endcode
+   *
+   * @return The signal to connect to
+   */
+  KeyEventSignalType& KeyEventMonitorSignal();
+
+
+  /**
    * @brief This signal is emitted when the screen is touched and when the touch ends
    * (i.e. the down & up touch events only).
    *
