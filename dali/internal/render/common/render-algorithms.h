@@ -75,14 +75,12 @@ public:
                                 Graphics::RenderTarget*              renderTarget);
 
   /**
-   * Resets main command buffer (per scene)
-   *
-   * @param[in] bindings list of resource bindings (optional, can be null)
+   * Resets main command buffer
    */
-  void ResetCommandBuffer(std::vector<Graphics::CommandBufferResourceBinding>* bindings);
+  void ResetCommandBuffer();
 
   /**
-   * Submits main command buffer (per scene)
+   * Submits main command buffer
    */
   void SubmitCommandBuffer();
 

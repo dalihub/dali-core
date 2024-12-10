@@ -118,6 +118,8 @@ public:
     return mGraphicsSyncImpl;
   }
 
+  void SetResourceBindingHints(const std::vector<Graphics::SceneResourceBinding>& resourceBindings) override;
+
   void SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo) override;
 
   /**
