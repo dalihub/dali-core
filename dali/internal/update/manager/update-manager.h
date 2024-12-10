@@ -358,6 +358,13 @@ public:
    */
   void AttachRenderer(Node* node, Renderer* renderer);
 
+  /**
+   * Attach cache renderer to node
+   * @param[in] node target
+   * @param[in] renderer to attach
+   */
+  void AttachCacheRenderer(Node* node, Renderer* renderer);
+
   // Gestures
 
   /**
@@ -1242,6 +1249,16 @@ inline void AttachRendererMessage(UpdateManager& manager, const Node& node, cons
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::AttachRenderer, const_cast<Node*>(&node), const_cast<Renderer*>(&renderer));
+}
+
+inline void AttachCacheRendererMessage(UpdateManager& manager, const Node& node, const Renderer& renderer)
+{
+  using LocalType = MessageValue2<UpdateManager, Node*, Renderer*>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::AttachCacheRenderer, const_cast<Node*>(&node), const_cast<Renderer*>(&renderer));
 }
 
 // The render thread can safely change the Shader

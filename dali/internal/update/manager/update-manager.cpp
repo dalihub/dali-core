@@ -846,6 +846,12 @@ void UpdateManager::AttachRenderer(Node* node, Renderer* renderer)
   mImpl->renderersAdded = true;
 }
 
+void UpdateManager::AttachCacheRenderer(Node* node, Renderer* renderer)
+{
+  node->SetCacheRenderer(Renderer::GetKey(renderer));
+  mImpl->renderersAdded = true;
+}
+
 void UpdateManager::SetPanGestureProcessor(PanGesture* panGestureProcessor)
 {
   DALI_ASSERT_DEBUG(NULL != panGestureProcessor);

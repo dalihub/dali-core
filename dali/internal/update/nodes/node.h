@@ -267,6 +267,25 @@ public:
     return static_cast<uint32_t>(mRenderers.Size());
   }
 
+  /**
+   * Set cache renderer which draws output of offscreen rendering
+   * Draws only when mOffScreenRendering is true
+   */
+  void SetCacheRenderer(const RendererKey& renderer);
+
+  /**
+   * Remove cache renderer
+   */
+  void RemoveCacheRenderer();
+
+  /**
+   * Get cache renderer
+   */
+  RendererKey GetCacheRenderer() const
+  {
+    return mCacheRenderer;
+  }
+
   // Containment methods
 
   /**
@@ -1105,7 +1124,8 @@ protected:
   Node*               mParent;               ///< Pointer to parent node (a child is owned by its parent)
   RenderTaskContainer mExclusiveRenderTasks; ///< Nodes can be marked as exclusive to multiple RenderTasks
 
-  RendererContainer mRenderers; ///< Container of renderers; not owned
+  RendererContainer mRenderers;     ///< Container of renderers; not owned
+  RendererKey       mCacheRenderer; ///< Result of offscreen rendering
 
   NodeContainer mChildren; ///< Container of children; not owned
 
@@ -1229,6 +1249,17 @@ inline void DetachRendererMessage(EventThreadServices& eventThreadServices, cons
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&node, &Node::RemoveRenderer, Renderer::GetKey(renderer));
+}
+
+inline void DetachCacheRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
+{
+  using LocalType = Message<Node>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&node, &Node::RemoveCacheRenderer);
 }
 
 inline void SetDepthIndexMessage(EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex)

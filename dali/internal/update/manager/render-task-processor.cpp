@@ -114,8 +114,12 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
     node.SetUpdated(true);
   }
 
+  RendererKey cacheRenderer                      = node.GetCacheRenderer();
+  const bool  isNodeExclusiveAtAnotherRenderTask = node.GetExclusiveRenderTaskCount() && !node.IsExclusiveRenderTask(&renderTask);
+
   // Check whether node is exclusive to a different render-task
-  if(node.GetExclusiveRenderTaskCount() && !node.IsExclusiveRenderTask(&renderTask))
+  // Check if node has pre-drawn cache to draw
+  if(isNodeExclusiveAtAnotherRenderTask && !cacheRenderer)
   {
     return;
   }
@@ -165,6 +169,13 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
   node.SetClippingInformation(currentClippingId, clippingDepth, scissorDepth);
 
   RenderableContainer& target = DALI_LIKELY(inheritedDrawMode == DrawMode::NORMAL) ? layer->colorRenderables : layer->overlayRenderables;
+
+  if(isNodeExclusiveAtAnotherRenderTask && cacheRenderer)
+  {
+    target.PushBack(Renderable(&node, cacheRenderer));
+    return;
+  }
+
   for(uint32_t i = 0; i < count; ++i)
   {
     SceneGraph::RendererKey rendererKey = node.GetRendererAt(i);
