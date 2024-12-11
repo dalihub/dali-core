@@ -1618,7 +1618,6 @@ public:
   // For offscreen rendering
   /**
    * @brief Set renderer drawing cached output to this Actor.
-   * @SINCE_2_3.54
    * @param[in] renderer Renderer to set to the Actor
    * @pre The renderer must be initialized.
    */
@@ -1626,7 +1625,6 @@ public:
 
   /**
    * @brief Removes cache renderer from the Actor.
-   * @SINCE_2_3.54
    */
   void RemoveCacheRenderer();
 
