@@ -560,7 +560,7 @@ int UtcDaliPropertyValueMoveConstructorArray(void)
   DALI_TEST_EQUALS(3u, array.Size(), TEST_LOCATION);
 
   Property::Value value(std::move(array));
-  DALI_TEST_ASSERTION(array.Size(), "Cannot use an object previously used as an r-value"); // Our local variable should become invalid
+  DALI_TEST_EQUALS(0u, array.Size(), TEST_LOCATION);
 
   Property::Array* arrayPtr = value.GetArray();
   DALI_TEST_CHECK(arrayPtr);
@@ -578,7 +578,7 @@ int UtcDaliPropertyValueMoveConstructorMap(void)
   DALI_TEST_EQUALS(3u, map.Count(), TEST_LOCATION);
 
   Property::Value value(std::move(map));
-  DALI_TEST_ASSERTION(map.Count(), "Cannot use an object previously used as an r-value"); // Our local variable should become invalid
+  DALI_TEST_EQUALS(0u, map.Count(), TEST_LOCATION);
 
   Property::Map* mapPtr = value.GetMap();
   DALI_TEST_CHECK(mapPtr);

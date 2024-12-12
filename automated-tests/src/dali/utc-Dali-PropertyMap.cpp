@@ -92,31 +92,15 @@ int UtcDaliPropertyMapMoveConstructor(void)
   Property::Map map2(std::move(map1));
   DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
 
-  // Calling any methods on map1 will debug assert
+  // Calling some methods on map1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
-  DALI_TEST_ASSERTION(map1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Empty(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert((const char*)"key", Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(std::string("key"), Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(0, Property::Value()), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find((const char*)"key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(std::string("key")), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, "key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find("key", Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Clear(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Merge(Property::Map()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1["key"], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
-  DALI_TEST_ASSERTION(map1[0], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
-  DALI_TEST_ASSERTION(Property::Map temp; map1 = temp, exceptionMessage);
 
   END_TEST;
 }
@@ -136,31 +120,15 @@ int UtcDaliPropertyMapMoveAssignmentOperator(void)
   map2 = std::move(map1);
   DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
 
-  // Calling any methods on map1 will debug assert
+  // Calling some methods on map1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
-  DALI_TEST_ASSERTION(map1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Empty(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert((const char*)"key", Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(std::string("key"), Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Insert(0, Property::Value()), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find((const char*)"key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(std::string("key")), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, "key"), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find("key", Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Find(0, Property::INTEGER), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Clear(), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.Merge(Property::Map()), exceptionMessage);
-  DALI_TEST_ASSERTION(map1["key"], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
-  DALI_TEST_ASSERTION(map1[0], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
-  DALI_TEST_ASSERTION(Property::Map temp; map1 = temp, exceptionMessage);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
 #if(__GNUC__ >= 13)
@@ -173,6 +141,137 @@ int UtcDaliPropertyMapMoveAssignmentOperator(void)
 #if(__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapMovedMapP1(void)
+{
+  Property::Map map1;
+  map1["hello"] = 1;
+  map1["world"] = 2;
+  map1[10]      = "DALi";
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  Property::Map map2;
+  map2[10] = "DALi again";
+  DALI_TEST_EQUALS(1u, map2.Count(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
+
+  // Calling some methods on map1 will debug assert
+  const char* exceptionMessage = "Cannot use an object previously used as an r-value";
+  DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
+  DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
+  DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
+  DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
+
+  // Call some API to moved map
+  Property::Map emptyMap;
+  DALI_TEST_EQUALS(emptyMap.GetHash(), map1.GetHash(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, map1.Empty(), TEST_LOCATION);
+  map1.Clear();
+
+  DALI_TEST_EQUALS(false, map1.Remove(10), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, map1.Remove("hello"), TEST_LOCATION);
+
+  Property::Value* nullValuePtr = nullptr;
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find(10), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find("hello"), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find(10, "hello"), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find(10, Property::Type::FLOAT), TEST_LOCATION);
+  DALI_TEST_EQUALS(nullValuePtr, map1.Find("hello", Property::Type::FLOAT), TEST_LOCATION);
+
+  // Test Insert
+  map1["hello"] = 1;
+  map1.Insert("world", 2);
+  map1[10] = "DALi";
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Insert 2 (Index key first)
+  map1[10]      = "DALi";
+  map1["hello"] = 1;
+  map1.Insert("world", 2);
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Insert 3 (Insert key first)
+  map1.Insert(4, 2);
+  map1[10]      = "DALi";
+  map1["hello"] = 1;
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Insert 4 (Insert string first)
+  map1.Insert("world", 2);
+  map1[10]      = "DALi";
+  map1["hello"] = 1;
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test Merge
+  map1.Merge(map2);
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test copy operator
+  DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
+
+  map1 = map2;
+
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  map2 = std::move(map1);
+  DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
+
+  // Test copy moved map
+  Property::Map map3 = map1;
+  DALI_TEST_EQUALS(0u, map3.Count(), TEST_LOCATION);
+
+  Property::Map map4;
+  map4 = map1;
+  DALI_TEST_EQUALS(0u, map4.Count(), TEST_LOCATION);
+
+  // Test move operator
+  DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION);
+
+  map1 = std::move(map2);
+
+  DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
+
+  // Test move moved map
+  DALI_TEST_EQUALS(0u, map2.Count(), TEST_LOCATION);
+  Property::Map map5 = std::move(map2);
+
+  DALI_TEST_EQUALS(0u, map5.Count(), TEST_LOCATION);
+
+  map3 = std::move(map2);
+
+  DALI_TEST_EQUALS(0u, map3.Count(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -720,6 +819,21 @@ int UtcDaliPropertyMapOstream02(void)
 
   // string-value pairs first, then index-value pairs
   DALI_TEST_EQUALS(oss.str().compare("Map(3) = {timePeriod:Map(3) = {duration:5, delay:1, 10:DALi}, value:100, 100:9}"), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapOstream03(void)
+{
+  std::ostringstream oss;
+
+  Property::Map map;
+  map.Insert(100, 9);
+
+  Property::Map map2(std::move(map));
+
+  oss << map;
+  DALI_TEST_EQUALS(oss.str().compare("Map(0) = {}"), 0, TEST_LOCATION);
 
   END_TEST;
 }
