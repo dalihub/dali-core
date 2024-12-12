@@ -76,6 +76,13 @@ public:
   virtual ~Controller() = default;
 
   /**
+   * @brief Sets resource binding hints for the scene
+   *
+   * Backend may choose to allocate memory for the resources.
+   */
+  virtual void SetResourceBindingHints(const std::vector<SceneResourceBinding>& resourceBindings) = 0;
+
+  /**
    * @brief Submits array of command buffers
    *
    * Submits command buffers to the graphics pipeline. Submitted commands

@@ -741,7 +741,7 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 {
 }
 
-void RenderAlgorithms::ResetCommandBuffer(std::vector<Graphics::CommandBufferResourceBinding>* resourceBindings)
+void RenderAlgorithms::ResetCommandBuffer()
 {
   // Reset main command buffer
   if(!mGraphicsCommandBuffer)
@@ -757,8 +757,7 @@ void RenderAlgorithms::ResetCommandBuffer(std::vector<Graphics::CommandBufferRes
   }
 
   Graphics::CommandBufferBeginInfo info;
-  info.resourceBindings = resourceBindings; // set resource bindings, currently only programs
-  info.usage            = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
+  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
   mGraphicsCommandBuffer->Begin(info);
 }
 
