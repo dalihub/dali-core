@@ -266,7 +266,6 @@ public:
    * @SINCE_2_1.31
    * @param[in] rhs A reference for comparison
    * @return True if equal type and equal value.
-   * @note Property::ARRAY and Property::MAP don't support equality operator now. Always return false.
    */
   bool operator==(const Value& rhs) const;
 
@@ -276,7 +275,6 @@ public:
    * @SINCE_2_1.31
    * @param[in] rhs A reference for comparison
    * @return True if not equal
-   * @note Property::ARRAY and Property::MAP don't support equality operator now. Always return true.
    */
   bool operator!=(const Value& rhs) const
   {
@@ -543,6 +541,24 @@ public:
    * @pre GetType() is a type convertible to Extents.
    */
   bool Get(Extents& extentsValue) const;
+
+  /**
+   * @brief Get hash value of the value.
+   *
+   * @warning Hash don't consider floating point precision. So even if two values equality return true,
+   * they can have different hash value.
+   * @code
+   * Property::Value v1(1.0f);
+   * Property::Value v2(1.0000001192092896f); // 1.0f + FLT_EPSILON
+   * assert(v1 == v2); // true
+   * assert(v1.GetHash() == v2.GetHash()); // false, because of floating point precision issue.
+   * @endcode
+   *
+   * @SINCE_2_3.54
+   *
+   * @return Get the hashed value.
+   */
+  std::size_t GetHash() const;
 
   /**
    * @brief Output to stream.

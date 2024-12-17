@@ -39,6 +39,8 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-types.h>
 
+#include <dali/internal/common/hash-utils.h>
+
 /**
  * As the Implementation is bit complex because of Small Buffer Optimization (SBO)
  * In the Property::Value class and Tagged Union implementation in the Impl class.
@@ -85,6 +87,8 @@ struct Property::Value::Impl
 
   Impl()
   {
+    // DevNote - This feature should be keeped to be opitmized.
+    // See patch with name : Added small buffer optimization to Property::Value.
     static_assert(sizeof(Impl) == 16);
     static_assert(alignof(Impl) == alignof(Impl*));
 
@@ -177,7 +181,7 @@ struct Property::Value::Impl
 
   Type GetType() const
   {
-    return mData.mType.type;
+    return mData.mMetadata.type;
   }
 
   bool GetBool() const
@@ -486,10 +490,12 @@ struct Property::Value::Impl
         return mData.mExtents.member == other.mData.mExtents.member;
       }
       case Property::ARRAY:
+      {
+        return mData.mArray.member == other.mData.mArray.member;
+      }
       case Property::MAP:
       {
-        // TODO : Need to support this case
-        return false;
+        return mData.mMap.member == other.mData.mMap.member;
       }
     }
     return false;
@@ -497,13 +503,14 @@ struct Property::Value::Impl
 
   void SetType(Type typeValue)
   {
-    mData.mType.type = typeValue;
+    mData.mMetadata.type = typeValue;
+    mData.mMetadata.hash = 0u; ///< Reset hash value when changing type.
   }
 
   bool ConvertType(const Property::Type targetType)
   {
     bool                 converted = false;
-    const Property::Type inputType = mData.mType.type;
+    const Property::Type inputType = mData.mMetadata.type;
 
     if(inputType == targetType)
     {
@@ -600,6 +607,110 @@ struct Property::Value::Impl
     return converted;
   }
 
+  std::size_t GetHash() const
+  {
+    std::size_t hash = mData.mMetadata.hash;
+    if(hash == 0u)
+    {
+      hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
+
+      switch(GetType())
+      {
+        case Property::NONE:
+        {
+          break;
+        }
+        case Property::BOOLEAN:
+        {
+          Dali::Internal::HashUtils::HashRawValue(mData.mBool.member, hash);
+          break;
+        }
+        case Property::FLOAT:
+        {
+          Dali::Internal::HashUtils::HashRawValue(mData.mFloat.member, hash);
+          break;
+        }
+        case Property::INTEGER:
+        {
+          Dali::Internal::HashUtils::HashRawValue(mData.mInt.member, hash);
+          break;
+        }
+        case Property::VECTOR2:
+        {
+          Dali::Internal::HashUtils::HashRawBuffer<float>(mData.mVector2.member.AsFloat(), 2, hash);
+          break;
+        }
+        case Property::VECTOR3:
+        {
+          Dali::Internal::HashUtils::HashRawBuffer<float>(mData.mVector3.member.AsFloat(), 3, hash);
+          break;
+        }
+        case Property::VECTOR4:
+        {
+          Dali::Internal::HashUtils::HashRawBuffer<float>(mData.mVector4.member->AsFloat(), 4, hash);
+          break;
+        }
+        case Property::MATRIX3:
+        {
+          Dali::Internal::HashUtils::HashRawBuffer<float>(mData.mMatrix3.member->AsFloat(), 9, hash);
+          break;
+        }
+        case Property::MATRIX:
+        {
+          Dali::Internal::HashUtils::HashRawBuffer<float>(mData.mMatrix.member->AsFloat(), 16, hash);
+          break;
+        }
+        case Property::RECTANGLE:
+        {
+          Dali::Internal::HashUtils::HashRawValue(mData.mRect.member->x, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mRect.member->y, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mRect.member->width, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mRect.member->height, hash);
+          break;
+        }
+        case Property::ROTATION:
+        {
+          Dali::Internal::HashUtils::HashRawValue(mData.mAngleAxis.member->angle.radian, hash);
+          Dali::Internal::HashUtils::HashRawBuffer<float>(mData.mAngleAxis.member->axis.AsFloat(), 3, hash);
+          break;
+        }
+        case Property::STRING:
+        {
+          Dali::Internal::HashUtils::HashStringView(std::string_view(*mData.mString.member), hash);
+          break;
+        }
+        case Property::EXTENTS:
+        {
+          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.start, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.end, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.top, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.bottom, hash);
+          break;
+        }
+        case Property::ARRAY:
+        {
+          hash ^= mData.mArray.member.GetHash();
+          break;
+        }
+        case Property::MAP:
+        {
+          hash ^= mData.mMap.member.GetHash();
+          break;
+        }
+      }
+
+      // Don't store hash result for array and map type. (Since their value might be changed later)
+      if(!(mData.mMetadata.type == Property::ARRAY || mData.mMetadata.type == Property::MAP))
+      {
+        mData.mMetadata.hash = hash;
+      }
+    }
+
+    // For here, we can store only 24 bit hash value as maximum.
+    // So need to append the type info after hash calculate.
+    return ((static_cast<std::size_t>(mData.mMetadata.type) << 24) | (static_cast<std::size_t>(hash) & 0x00ffffff));
+  }
+
 private:
   /**
    * This helper function takes a typed(Tp) memory location( member)
@@ -689,6 +800,15 @@ private:
     }
   }
 
+  /**
+   * Data for property type and hash value.
+   */
+  struct Metadata
+  {
+    Type             type : 8;
+    mutable uint32_t hash : 24;
+  }; // TODO : Tell the compiler it is okay to use a single 32 bit load. For example : __attribute__((packed, aligned(4))) for gcc
+
   /*
    * This wrapper struct is used for
    * storing Type in every union member
@@ -700,8 +820,8 @@ private:
   template<typename T>
   struct UnionMember
   {
-    Type type;
-    T    member;
+    Metadata metadata;
+    T        member;
   };
 
   /**
@@ -742,10 +862,8 @@ private:
     UnionMember<AngleAxis*>      mAngleAxis;
     UnionMember<std::string*>    mString;
     UnionMember<Rect<int32_t>*>  mRect;
-    struct
-    {
-      Type type;
-    } mType;
+
+    Metadata mMetadata;
   };
 
   Data mData;
@@ -1346,6 +1464,11 @@ bool Property::Value::Get(Extents& extentsValue) const
   }
 
   return converted;
+}
+
+std::size_t Property::Value::GetHash() const
+{
+  return Read().GetHash();
 }
 
 std::ostream& operator<<(std::ostream& stream, const Property::Value& value)

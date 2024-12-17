@@ -1055,12 +1055,12 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   {
     mImpl->graphicsController.EnableDepthStencilBuffer(*sceneObject->GetSurfaceRenderTarget(), sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
   }
-  // Fill resource binding for the command buffer
-  std::vector<Graphics::CommandBufferResourceBinding> commandBufferResourceBindings;
+  // Fill resource binding for the scene
+  std::vector<Graphics::SceneResourceBinding> sceneResourceBindings;
   if(!programUsageCount.empty())
   {
-    commandBufferResourceBindings.resize(programUsageCount.size());
-    auto iter = commandBufferResourceBindings.begin();
+    sceneResourceBindings.resize(programUsageCount.size());
+    auto iter = sceneResourceBindings.begin();
     for(auto& item : programUsageCount)
     {
       iter->type           = Graphics::ResourceType::PROGRAM;
@@ -1068,9 +1068,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       ++iter;
     }
   }
+  mImpl->graphicsController.SetResourceBindingHints(sceneResourceBindings);
 
   // Reset main algorithms command buffer
-  mImpl->renderAlgorithms.ResetCommandBuffer(commandBufferResourceBindings.empty() ? nullptr : &commandBufferResourceBindings);
+  mImpl->renderAlgorithms.ResetCommandBuffer();
 
   auto mainCommandBuffer = mImpl->renderAlgorithms.GetMainCommandBuffer();
 

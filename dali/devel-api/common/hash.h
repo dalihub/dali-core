@@ -21,19 +21,14 @@
 // EXTERNAL INCLUDES
 #include <string>
 #include <string_view>
-#include <vector>
 
 //INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
-enum
-{
-  INITIAL_HASH_VALUE = 5381
-};
-
 /**
  * @brief Create a hash code for a string
  * @param toHash string to hash

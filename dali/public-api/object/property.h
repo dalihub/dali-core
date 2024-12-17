@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ struct DALI_CORE_API Property
    * @brief Enumeration for the property types supported.
    * @SINCE_1_0.0
    */
-  enum Type
+  enum Type : uint8_t
   {
     NONE, ///< No type @SINCE_1_0.0
 

@@ -1373,7 +1373,7 @@ struct BufferResourceBindingInfo;
 struct TextureResourceBindingInfo;
 struct SamplerResourceBindingInfo;
 
-struct CommandBufferResourceBinding
+struct SceneResourceBinding
 {
   ResourceType type; ///< Type of resource
 
@@ -1390,10 +1390,9 @@ struct CommandBufferBeginInfo
 {
   CommandBufferUsageFlags usage;
 
-  std::vector<CommandBufferResourceBinding>* resourceBindings{nullptr}; ///< Sets resource binding hints
-  const RenderPass*                          renderPass{nullptr};
-  const RenderTarget*                        renderTarget{nullptr};
-  auto&                                      SetUsage(CommandBufferUsageFlags flags)
+  const RenderPass*   renderPass{nullptr};
+  const RenderTarget* renderTarget{nullptr};
+  auto&               SetUsage(CommandBufferUsageFlags flags)
   {
     usage = flags;
     return *this;
@@ -1628,8 +1627,7 @@ struct DefaultDeleter
   template<class P, template<typename> typename U>
   DefaultDeleter(const U<P>& deleter)
   {
-    deleteFunction = [](T* object)
-    { U<P>()(static_cast<P*>(object)); };
+    deleteFunction = [](T* object) { U<P>()(static_cast<P*>(object)); };
   }
 
   /**

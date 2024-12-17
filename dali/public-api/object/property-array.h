@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_ARRAY_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,6 +225,51 @@ public:
    * @note After the @a other array is used, it becomes invalid and is no longer usable.
    */
   Array& operator=(Array&& other) noexcept;
+
+  /**
+   * @brief Equality operator.
+   *
+   * @SINCE_2_3.54
+   * @param[in] rhs A reference for comparison
+   * @return True if equal type and equal value.
+   */
+  bool operator==(const Array& rhs) const;
+
+  /**
+   * @brief Inequality operator.
+   *
+   * @SINCE_2_3.54
+   * @param[in] rhs A reference for comparison
+   * @return True if not equal
+   */
+  bool operator!=(const Array& rhs) const
+  {
+    return !(*this == rhs);
+  }
+
+  /**
+   * @brief Get hash value of the array.
+   *
+   * @note The order of key/value pairs is considered.
+   * For example, Array({1, 2}) and Array({2, 1}) might not have same hash value.
+   * And the type of Property::Value is considered.
+   * For example, Array({1}) and Array({1.0f}) might not have same hash value.
+   *
+   * @warning Hash might spend O(N) per each call.
+   * @warning Hash don't consider floating point precision. So even if two values equality return true,
+   * they can have different hash value.
+   * @code
+   * Property::Array v1({1.0f}});
+   * Property::Array v2({1.0000001192092896f}); // 1.0f + FLT_EPSILON
+   * assert(v1 == v2); // true
+   * assert(v1.GetHash() == v2.GetHash()); // false, because of floating point precision issue.
+   * @endcode
+   *
+   * @SINCE_2_3.54
+   *
+   * @return Get the hashed value.
+   */
+  std::size_t GetHash() const;
 
   /**
    * @brief Output to stream.

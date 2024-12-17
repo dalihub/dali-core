@@ -613,6 +613,11 @@ TestGraphicsController::TestGraphicsController()
   trace.EnableLogging(false);
 }
 
+void TestGraphicsController::SetResourceBindingHints(const std::vector<Graphics::SceneResourceBinding>& resourceBindings)
+{
+  mCallStack.PushCall("SetResourceBindingHints", "");
+}
+
 void TestGraphicsController::SubmitCommandBuffers(const Graphics::SubmitInfo& submitInfo)
 {
   TraceCallStack::NamedParams namedParams;
