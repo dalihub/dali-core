@@ -157,10 +157,13 @@ void VertexBuffer::SetData(const void* data, uint32_t size)
   OwnerPointer<Vector<uint8_t> > bufferCopy = new Dali::Vector<uint8_t>();
   bufferCopy->ResizeUninitialized(bufferSize);
 
-  // copy the data
-  const uint8_t* source      = static_cast<const uint8_t*>(data);
-  uint8_t*       destination = &((*bufferCopy)[0]);
-  std::copy(source, source + bufferSize, destination);
+  if(DALI_LIKELY(bufferSize > 0u))
+  {
+    // copy the data
+    const uint8_t* source      = static_cast<const uint8_t*>(data);
+    uint8_t*       destination = &((*bufferCopy)[0]);
+    std::copy(source, source + bufferSize, destination);
+  }
 
   // Ownership of the bufferCopy is passed to the message ( uses an owner pointer )
   SceneGraph::SetVertexBufferData(GetEventThreadServices().GetUpdateManager(), *mRenderObject, bufferCopy, mSize);
