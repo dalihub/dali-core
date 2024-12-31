@@ -79,6 +79,8 @@ namespace Render
 {
 namespace
 {
+constexpr uint32_t DEFAULT_RENDER_PASS_TAG = 0u;
+
 Dali::Internal::MemoryPoolObjectAllocator<Renderer>& GetRenderRendererMemoryPool()
 {
   static Dali::Internal::MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
@@ -198,7 +200,7 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
   mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
 }
 
-bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
+bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer, uint32_t renderPassTag)
 {
   uint32_t textureUnit = 0;
 
@@ -216,6 +218,11 @@ bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
     {
       if((*textures)[i] && (*textures)[i]->GetGraphicsObject())
       {
+        // NOTE : Due to DDK bug, we should not render NativeTexture on shadowmap. Should be fixed in future! 2024-12-31. eunkiki.hong
+        if(renderPassTag != DEFAULT_RENDER_PASS_TAG && (*textures)[i]->IsNativeImage())
+        {
+          return false;
+        }
         Graphics::Texture* graphicsTexture = (*textures)[i]->GetGraphicsObject();
         // if the sampler exists,
         //   if it's default, delete the graphics object
@@ -582,7 +589,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   bool drawn = false;
 
   // Check all textures are prepared first.
-  if(!BindTextures(commandBuffer))
+  if(!BindTextures(commandBuffer, instruction.mRenderPassTag))
   {
     return drawn;
   }
