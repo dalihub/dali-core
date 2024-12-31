@@ -53,7 +53,12 @@ void VertexBuffer::SetData(Dali::Vector<uint8_t>* data, uint32_t size)
 
 bool VertexBuffer::Update(Graphics::Controller& graphicsController)
 {
-  if(!mData || !mFormat || !mSize)
+  if(!mFormat || !mSize)
+  {
+    return false;
+  }
+
+  if(!mData || mData->Empty())
   {
     return false;
   }
@@ -66,7 +71,7 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
     }
 
     // Update the GpuBuffer
-    if(mGpuBuffer)
+    if(mGpuBuffer && mData && !mData->Empty())
     {
       DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
       mGpuBuffer->UpdateDataBuffer(graphicsController, GetDataSize(), &((*mData)[0]));
