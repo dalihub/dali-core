@@ -411,7 +411,7 @@ int UtcDaliVertexBufferInvalidTypeN02(void)
   END_TEST;
 }
 
-int UtcDaliVertexBufferSetDataNegative(void)
+int UtcDaliVertexBufferSetDataNegative01(void)
 {
   TestApplication    application;
   Dali::VertexBuffer instance;
@@ -425,6 +425,88 @@ int UtcDaliVertexBufferSetDataNegative(void)
   catch(...)
   {
     DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliVertexBufferSetDataNegative02(void)
+{
+  TestApplication    application;
+
+  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
+                                                         {"aTexCoord", Property::VECTOR2},
+                                                         {"aColor", Property::VECTOR4}};
+
+  try
+  {
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+
+    void*    data(nullptr);
+    uint32_t dataSize(1u);
+
+    vertexBuffer.SetData(data, dataSize);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "VertexBuffer::SetData() data was nullptr but size is not zero!", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliVertexBufferSetDataWithZeroLength(void)
+{
+  TestApplication    application;
+
+  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
+                                                         {"aTexCoord", Property::VECTOR2},
+                                                         {"aColor", Property::VECTOR4}};
+
+  try
+  {
+    VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
+
+    void*    data(nullptr);
+    uint32_t dataSize(0u);
+
+    vertexBuffer.SetData(data, dataSize);
+
+    Geometry geometry = Geometry::New();
+    geometry.AddVertexBuffer(vertexBuffer);
+
+    Shader   shader   = CreateShader();
+    Renderer renderer = Renderer::New(geometry, shader);
+    Actor    actor    = Actor::New();
+    actor.SetProperty(Actor::Property::SIZE, Vector3::ONE * 100.f);
+    actor.AddRenderer(renderer);
+    application.GetScene().Add(actor);
+
+    application.SendNotification();
+    application.Render();
+
+    const float halfQuadSize = .5f;
+    struct TexturedQuadVertex
+    {
+      Vector2 position;
+      Vector2 textureCoordinates;
+    };
+    TexturedQuadVertex texturedQuadVertexData[4] = {
+      {Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f)},
+      {Vector2(halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f)},
+      {Vector2(-halfQuadSize, halfQuadSize), Vector2(0.f, 1.f)},
+      {Vector2(halfQuadSize, halfQuadSize), Vector2(1.f, 1.f)}};
+
+    // Re-upload the data on the vertexBuffer with zero length
+    vertexBuffer.SetData(texturedQuadVertexData, 0u);
+
+    application.SendNotification();
+    application.Render(0);
+
+    DALI_TEST_CHECK(true); // Should get here without exception
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_CHECK(false); // Should not get here
   }
   END_TEST;
 }
