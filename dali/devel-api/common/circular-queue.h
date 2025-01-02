@@ -2,7 +2,7 @@
 #define DALI_CIRCULAR_QUEUE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,9 @@ namespace Dali
 {
 /**
  * Class to provide a circular growable queue on top of Dali::Vector
- * It is designed to occupy a fixed block of memory. It does not allow
- * addition of elements past the start; i.e. it doesn't overwrite.
+ * It is designed to occupy a fixed block of memory. But we can call Resize
+ * to change that fixed block of memory. Instead, Resize API will copy whole elements.
+ * It does not allow addition of elements past the start; i.e. it doesn't overwrite.
  */
 template<typename ElementType>
 class CircularQueue
@@ -35,13 +36,56 @@ public:
    * Constructor
    * @param[in] maximumSize The maximum number of elements that the queue can contain
    */
-  CircularQueue(int maximumSize)
-  : mMaximumSize(maximumSize),
-    mStartMarker(0),
-    mEndMarker(0),
-    mNumberOfElements(0)
+  CircularQueue(uint32_t maximumSize)
+  : mMaximumSize(maximumSize)
   {
     mQueue.Reserve(maximumSize);
+  }
+
+  /**
+   * @brief Resize capacity. The elements will be auto clamped by the new maximum size.
+   * @note Performance note : We will copy whole data during capacity change.
+   * @param[in] maximumSize The maximum number of elements that the queue can contain
+   */
+  void Resize(uint32_t maximumSize)
+  {
+    if(mMaximumSize != maximumSize)
+    {
+      Queue newQueue;
+      newQueue.Reserve(maximumSize);
+
+      auto newNumberOfElements = std::min(mNumberOfElements, maximumSize);
+      newQueue.Resize(newNumberOfElements);
+      for(uint32_t newIndex = 0u, oldIndex = mStartMarker; newIndex < newNumberOfElements; ++newIndex)
+      {
+        // Pop front
+        newQueue[newIndex] = mQueue[oldIndex++];
+        if(oldIndex == mMaximumSize)
+        {
+          oldIndex = 0u;
+        }
+      }
+
+      mMaximumSize      = maximumSize;
+      mNumberOfElements = newNumberOfElements;
+      mStartMarker      = 0u;
+      mEndMarker        = mNumberOfElements;
+      if(mEndMarker == mMaximumSize)
+      {
+        mEndMarker = 0u;
+      }
+
+      mQueue.Swap(newQueue);
+    }
+  }
+
+  /**
+   * @brief Clear the queue.
+   */
+  void Clear()
+  {
+    mQueue.Clear();
+    mStartMarker = mEndMarker = mNumberOfElements = 0u;
   }
 
   /**
@@ -52,17 +96,21 @@ public:
    * @warning This method asserts if the user attempts to read outside the
    * range of elements.
    */
-  ElementType& operator[](unsigned int index)
+  ElementType& operator[](uint32_t index)
   {
-    unsigned int actualIndex = (mStartMarker + index) % mMaximumSize;
-    DALI_ASSERT_ALWAYS(actualIndex < mQueue.Count() && "Reading outside queue boundary");
+    DALI_ASSERT_ALWAYS(mMaximumSize != 0u && "Max capacity is zero!");
+
+    uint32_t actualIndex = (mStartMarker + index) % mMaximumSize;
+    DALI_ASSERT_ALWAYS(actualIndex < static_cast<uint32_t>(mQueue.Count()) && "Reading outside queue boundary");
     return mQueue[actualIndex];
   }
 
-  const ElementType& operator[](unsigned int index) const
+  const ElementType& operator[](uint32_t index) const
   {
-    unsigned int actualIndex = (mStartMarker + index) % mMaximumSize;
-    DALI_ASSERT_ALWAYS(actualIndex < mQueue.Count() && "Reading outside queue boundary");
+    DALI_ASSERT_ALWAYS(mMaximumSize != 0u && "Max capacity is zero!");
+
+    uint32_t actualIndex = (mStartMarker + index) % mMaximumSize;
+    DALI_ASSERT_ALWAYS(actualIndex < static_cast<uint32_t>(mQueue.Count()) && "Reading outside queue boundary");
     return mQueue[actualIndex];
   }
 
@@ -78,29 +126,22 @@ public:
     DALI_ASSERT_ALWAYS(!IsFull() && "Adding to full queue");
 
     // Push back if we need to increase the vector count
-    if(mQueue.Count() == 0 || (mQueue.Count() < mMaximumSize && !IsEmpty()))
+    if(static_cast<uint32_t>(mQueue.Count()) < mMaximumSize)
     {
       mQueue.PushBack(element);
-      if(!IsEmpty())
-      {
-        ++mEndMarker;
-      }
-      ++mNumberOfElements;
-    }
-    else if(IsEmpty())
-    {
-      // Don't advance the end marker or increase the vector count
-      mQueue[mEndMarker] = element;
-      ++mNumberOfElements;
+      ++mEndMarker;
     }
     else if(!IsFull())
     {
       // vector is at max and there is space: advance end marker
-      ++mEndMarker;
-      mEndMarker %= mMaximumSize;
-      mQueue[mEndMarker] = element;
-      ++mNumberOfElements;
+      mQueue[mEndMarker++] = element;
     }
+
+    if(mEndMarker == mMaximumSize)
+    {
+      mEndMarker = 0u;
+    }
+    ++mNumberOfElements;
   }
 
   /**
@@ -114,16 +155,13 @@ public:
     DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
     ElementType element;
 
-    if(mNumberOfElements == 1)
+    if(mNumberOfElements > 0)
     {
-      element           = mQueue[mStartMarker];
-      mNumberOfElements = 0;
-    }
-    else if(mNumberOfElements > 1)
-    {
-      element = mQueue[mStartMarker];
-      ++mStartMarker;
-      mStartMarker %= mMaximumSize;
+      element = mQueue[mStartMarker++];
+      if(mStartMarker == mMaximumSize)
+      {
+        mStartMarker = 0u;
+      }
       --mNumberOfElements;
     }
 
@@ -145,13 +183,13 @@ public:
   ElementType& Back()
   {
     DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
-    return mQueue[mEndMarker];
+    return mQueue[GetBackIndex()];
   }
 
   const ElementType& Back() const
   {
     DALI_ASSERT_ALWAYS(!IsEmpty() && "Reading from empty queue");
-    return mQueue[mEndMarker];
+    return mQueue[GetBackIndex()];
   }
 
   /**
@@ -171,9 +209,7 @@ public:
    */
   bool IsFull() const
   {
-    return (mQueue.Count() == mMaximumSize &&
-            mNumberOfElements > 0 &&
-            (mEndMarker + 1) % mMaximumSize == mStartMarker);
+    return mNumberOfElements == mMaximumSize;
   }
 
   /**
@@ -181,17 +217,25 @@ public:
    *
    * @return the number of elements in the queue.
    */
-  std::size_t Count() const
+  uint32_t Count() const
   {
     return mNumberOfElements;
   }
 
 private:
-  Queue       mQueue;            ///< The queue of elements
-  std::size_t mMaximumSize;      ///< maximum size of queue
-  std::size_t mStartMarker;      ///< Index of the first element in the queue
-  std::size_t mEndMarker;        ///< Index of the last element in the queue
-  int         mNumberOfElements; ///< Number of valid elements in the queue
+  uint32_t GetBackIndex() const
+  {
+    DALI_ASSERT_ALWAYS(mMaximumSize != 0u && "Max capacity is zero!");
+
+    return (mEndMarker == 0u ? mMaximumSize : mEndMarker) - 1u;
+  }
+
+private:
+  Queue    mQueue{};              ///< The queue of elements
+  uint32_t mMaximumSize{0u};      ///< maximum size of queue
+  uint32_t mStartMarker{0u};      ///< Index of the first element in the queue
+  uint32_t mEndMarker{0u};        ///< Index of the push back available element in the queue
+  uint32_t mNumberOfElements{0u}; ///< Number of valid elements in the queue
 };
 
 } // namespace Dali
