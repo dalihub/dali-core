@@ -66,7 +66,7 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
     return false;
   }
 
-  if(!mVertexBufferUpdateCallback && !mData)
+  if(!mVertexBufferUpdateCallback && (!mData || mData->Empty()))
   {
     return false;
   }
@@ -79,7 +79,7 @@ bool VertexBuffer::Update(Graphics::Controller& graphicsController)
     }
 
     // Update the GpuBuffer
-    if(mGpuBuffer && mData)
+    if(mGpuBuffer && mData && !mData->Empty())
     {
       DALI_ASSERT_DEBUG(mSize && "No data in the property buffer!");
       mGpuBuffer->UpdateDataBuffer(graphicsController, GetDataSize(), &((*mData)[0]));
