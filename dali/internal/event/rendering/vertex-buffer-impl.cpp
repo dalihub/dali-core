@@ -148,6 +148,8 @@ VertexBufferPtr VertexBuffer::New(Dali::Property::Map& format)
 
 void VertexBuffer::SetData(const void* data, uint32_t size)
 {
+  DALI_ASSERT_ALWAYS((data || (size == 0u)) && "VertexBuffer::SetData() data was nullptr but size is not zero!");
+
   mSize = size; // size is the number of elements
 
   uint32_t bufferSize = mBufferFormatSize * mSize;
