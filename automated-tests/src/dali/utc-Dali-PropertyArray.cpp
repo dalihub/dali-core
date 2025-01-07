@@ -279,6 +279,21 @@ int UtcDaliPropertyArrayOstream02(void)
   END_TEST;
 }
 
+int UtcDaliPropertyArrayOstream03(void)
+{
+  std::ostringstream oss;
+
+  Property::Array array1;
+  array1.PushBack(0);
+
+  Property::Array array2(std::move(array1));
+
+  oss << array1;
+  DALI_TEST_EQUALS(oss.str().compare("Array(0) = []"), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliPropertyArrayCopyConstructor(void)
 {
   Property::Array array1;
@@ -324,19 +339,10 @@ int UtcDaliPropertyArrayMoveConstructor(void)
   Property::Array array2(std::move(array1));
   DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION);
 
-  // Calling any methods on array1 will debug assert
+  // Calling some methods on array1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
-  DALI_TEST_ASSERTION(array1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.PushBack(Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Clear(), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Reserve(1), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Resize(1), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Capacity(), exceptionMessage);
   DALI_TEST_ASSERTION(array1[0], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Array&>(array1)[0], exceptionMessage);
-  DALI_TEST_ASSERTION(Property::Array temp; array1 = temp, exceptionMessage);
-
   END_TEST;
 }
 
@@ -355,18 +361,10 @@ int UtcDaliPropertyArrayMoveAssignmentOperator(void)
   array2 = std::move(array1);
   DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION);
 
-  // Calling any methods on array1 will debug assert
+  // Calling some methods on array1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
-  DALI_TEST_ASSERTION(array1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.PushBack(Property::Value()), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Count(), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Clear(), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Reserve(1), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Resize(1), exceptionMessage);
-  DALI_TEST_ASSERTION(array1.Capacity(), exceptionMessage);
   DALI_TEST_ASSERTION(array1[0], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Array&>(array1)[0], exceptionMessage);
-  DALI_TEST_ASSERTION(Property::Array temp; array1 = temp, exceptionMessage);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
 #if(__GNUC__ >= 13)
@@ -379,6 +377,107 @@ int UtcDaliPropertyArrayMoveAssignmentOperator(void)
 #if(__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayMovedArrayP1(void)
+{
+  Property::Array array1;
+  array1.PushBack(0);
+  array1.PushBack(1);
+  array1.PushBack(2);
+  DALI_TEST_EQUALS(3u, array1.Size(), TEST_LOCATION);
+
+  Property::Array array2(std::move(array1));
+  DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION);
+
+  // Calling some methods on array1 will debug assert
+  const char* exceptionMessage = "Cannot use an object previously used as an r-value";
+  DALI_TEST_ASSERTION(array1[0], exceptionMessage);
+  DALI_TEST_ASSERTION(const_cast<const Property::Array&>(array1)[0], exceptionMessage);
+
+  // Call some API to moved array
+  Property::Array emptyArray;
+  DALI_TEST_EQUALS(emptyArray.GetHash(), array1.GetHash(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array1.Capacity(), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, array1.Empty(), TEST_LOCATION);
+  array1.Clear();
+
+  // Test reserve
+  array1.Reserve(4u);
+  DALI_TEST_EQUALS(0u, array1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(4u, array1.Capacity(), TEST_LOCATION);
+
+  array2 = std::move(array1);
+  DALI_TEST_EQUALS(0u, array1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array1.Capacity(), TEST_LOCATION);
+
+  // Test resize
+  array1.Resize(2u);
+  DALI_TEST_EQUALS(2u, array1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, array1.Capacity(), TEST_LOCATION);
+
+  array2 = std::move(array1);
+  DALI_TEST_EQUALS(0u, array1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array1.Capacity(), TEST_LOCATION);
+
+  // Test PushBack
+  array1.PushBack(0);
+  array1.PushBack(1);
+  array1.PushBack(2);
+  DALI_TEST_EQUALS(3u, array1.Size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, array1[2].Get<int32_t>(), TEST_LOCATION);
+
+  array2 = std::move(array1);
+  DALI_TEST_EQUALS(0u, array1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array1.Capacity(), TEST_LOCATION);
+
+  // Test copy operator
+  DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, array2[2].Get<int32_t>(), TEST_LOCATION);
+
+  array1 = array2;
+
+  DALI_TEST_EQUALS(3u, array1.Size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, array1[2].Get<int32_t>(), TEST_LOCATION);
+
+  array2 = std::move(array1);
+  DALI_TEST_EQUALS(0u, array1.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array1.Capacity(), TEST_LOCATION);
+
+  // Test copy moved array
+  Property::Array array3 = array1;
+  DALI_TEST_EQUALS(0u, array3.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array3.Capacity(), TEST_LOCATION);
+
+  Property::Array array4;
+  array4 = array1;
+  DALI_TEST_EQUALS(0u, array4.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array4.Capacity(), TEST_LOCATION);
+
+  // Test move operator
+  DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, array2[2].Get<int32_t>(), TEST_LOCATION);
+
+  array1 = std::move(array2);
+
+  DALI_TEST_EQUALS(3u, array1.Size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, array1[2].Get<int32_t>(), TEST_LOCATION);
+
+  // Test move moved array
+  DALI_TEST_EQUALS(0u, array2.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array2.Capacity(), TEST_LOCATION);
+
+  Property::Array array5 = std::move(array2);
+  DALI_TEST_EQUALS(0u, array5.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array5.Capacity(), TEST_LOCATION);
+
+  array3 = std::move(array2);
+
+  DALI_TEST_EQUALS(0u, array3.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, array3.Capacity(), TEST_LOCATION);
 
   END_TEST;
 }

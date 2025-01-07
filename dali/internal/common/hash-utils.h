@@ -29,10 +29,7 @@
 
 namespace Dali::Internal::HashUtils
 {
-enum
-{
-  INITIAL_HASH_VALUE = 5381
-};
+constexpr std::size_t INITIAL_HASH_VALUE = 5381;
 
 /*
  * djb2 (http://www.cse.yorku.ca/~oz/hash.html)

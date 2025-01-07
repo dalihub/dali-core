@@ -108,8 +108,12 @@ Property::Map::Map(const std::initializer_list<KeyValuePair>& values)
 Property::Map::Map(const Property::Map& other)
 : mImpl(new Impl)
 {
-  mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
-  mImpl->mIndexValueContainer  = other.mImpl->mIndexValueContainer;
+  if(DALI_LIKELY(other.mImpl))
+  {
+    mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
+    mImpl->mIndexValueContainer  = other.mImpl->mIndexValueContainer;
+    // Keep mHash as NOT_HASHED.
+  }
 }
 
 Property::Map::Map(Property::Map&& other) noexcept
@@ -125,19 +129,29 @@ Property::Map::~Map()
 
 Property::Map::SizeType Property::Map::Count() const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  return mImpl->mStringValueContainer.size() + mImpl->mIndexValueContainer.size();
+  if(DALI_LIKELY(mImpl))
+  {
+    return mImpl->mStringValueContainer.size() + mImpl->mIndexValueContainer.size();
+  }
+  return 0;
 }
 
 bool Property::Map::Empty() const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  return mImpl->mStringValueContainer.empty() && mImpl->mIndexValueContainer.empty();
+  if(DALI_LIKELY(mImpl))
+  {
+    return mImpl->mStringValueContainer.empty() && mImpl->mIndexValueContainer.empty();
+  }
+  return true;
 }
 
 void Property::Map::Insert(std::string key, Value value)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
+
   if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
   {
     // Use unordered hash operation.
@@ -149,7 +163,11 @@ void Property::Map::Insert(std::string key, Value value)
 
 void Property::Map::Insert(Property::Index key, Value value)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
+
   if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
   {
     // Use unordered hash operation.
@@ -161,7 +179,8 @@ void Property::Map::Insert(Property::Index key, Value value)
 
 Property::Value& Property::Map::GetValue(SizeType position) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
+
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
   DALI_ASSERT_ALWAYS(position < (numStringKeys + numIndexKeys) && "position out-of-bounds");
@@ -180,7 +199,8 @@ const std::string& Property::Map::GetKey(SizeType position) const
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetKey() is deprecated and will be removed from next release.\n");
 
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
+
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   DALI_ASSERT_ALWAYS(position < numStringKeys && "position out-of-bounds");
 
@@ -189,7 +209,7 @@ const std::string& Property::Map::GetKey(SizeType position) const
 
 Property::Key Property::Map::GetKeyAt(SizeType position) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
@@ -211,7 +231,7 @@ StringValuePair& Property::Map::GetPair(SizeType position) const
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPair() is deprecated and will be removed from next release.\n");
 
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
 
@@ -222,11 +242,10 @@ StringValuePair& Property::Map::GetPair(SizeType position) const
 
 KeyValuePair Property::Map::GetKeyValue(SizeType position) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
-
   DALI_ASSERT_ALWAYS(position < (numStringKeys + numIndexKeys) && "position out-of-bounds");
 
   if(position < numStringKeys)
@@ -243,19 +262,20 @@ KeyValuePair Property::Map::GetKeyValue(SizeType position) const
 
 Property::Value* Property::Map::Find(std::string_view key) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
-  for(auto&& iter : mImpl->mStringValueContainer)
+  if(DALI_LIKELY(mImpl))
   {
-    if(key == iter.first)
+    for(auto&& iter : mImpl->mStringValueContainer)
     {
-      if(mImpl->mHash != ALWAYS_REHASH)
+      if(key == iter.first)
       {
-        // Mark as we cannot assume that hash is valid anymore.
-        // Recalculate hash always after now.
-        mImpl->mHash = ALWAYS_REHASH;
+        if(mImpl->mHash != ALWAYS_REHASH)
+        {
+          // Mark as we cannot assume that hash is valid anymore.
+          // Recalculate hash always after now.
+          mImpl->mHash = ALWAYS_REHASH;
+        }
+        return &iter.second;
       }
-      return &iter.second;
     }
   }
   return nullptr; // Not found
@@ -263,19 +283,20 @@ Property::Value* Property::Map::Find(std::string_view key) const
 
 Property::Value* Property::Map::Find(Property::Index key) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
-  for(auto&& iter : mImpl->mIndexValueContainer)
+  if(DALI_LIKELY(mImpl))
   {
-    if(iter.first == key)
+    for(auto&& iter : mImpl->mIndexValueContainer)
     {
-      if(mImpl->mHash != ALWAYS_REHASH)
+      if(iter.first == key)
       {
-        // Mark as we cannot assume that hash is valid anymore.
-        // Recalculate hash always after now.
-        mImpl->mHash = ALWAYS_REHASH;
+        if(mImpl->mHash != ALWAYS_REHASH)
+        {
+          // Mark as we cannot assume that hash is valid anymore.
+          // Recalculate hash always after now.
+          mImpl->mHash = ALWAYS_REHASH;
+        }
+        return &iter.second;
       }
-      return &iter.second;
     }
   }
   return nullptr; // Not found
@@ -293,19 +314,20 @@ Property::Value* Property::Map::Find(Property::Index indexKey, std::string_view 
 
 Property::Value* Property::Map::Find(std::string_view key, Property::Type type) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
-  for(auto&& iter : mImpl->mStringValueContainer)
+  if(DALI_LIKELY(mImpl))
   {
-    if((iter.second.GetType() == type) && (key == iter.first))
+    for(auto&& iter : mImpl->mStringValueContainer)
     {
-      if(mImpl->mHash != ALWAYS_REHASH)
+      if((iter.second.GetType() == type) && (key == iter.first))
       {
-        // Mark as we cannot assume that hash is valid anymore.
-        // Recalculate hash always after now.
-        mImpl->mHash = ALWAYS_REHASH;
+        if(mImpl->mHash != ALWAYS_REHASH)
+        {
+          // Mark as we cannot assume that hash is valid anymore.
+          // Recalculate hash always after now.
+          mImpl->mHash = ALWAYS_REHASH;
+        }
+        return &iter.second;
       }
-      return &iter.second;
     }
   }
   return nullptr; // Not found
@@ -313,19 +335,20 @@ Property::Value* Property::Map::Find(std::string_view key, Property::Type type) 
 
 Property::Value* Property::Map::Find(Property::Index key, Property::Type type) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
-  for(auto&& iter : mImpl->mIndexValueContainer)
+  if(DALI_LIKELY(mImpl))
   {
-    if((iter.second.GetType() == type) && (iter.first == key))
+    for(auto&& iter : mImpl->mIndexValueContainer)
     {
-      if(mImpl->mHash != ALWAYS_REHASH)
+      if((iter.second.GetType() == type) && (iter.first == key))
       {
-        // Mark as we cannot assume that hash is valid anymore.
-        // Recalculate hash always after now.
-        mImpl->mHash = ALWAYS_REHASH;
+        if(mImpl->mHash != ALWAYS_REHASH)
+        {
+          // Mark as we cannot assume that hash is valid anymore.
+          // Recalculate hash always after now.
+          mImpl->mHash = ALWAYS_REHASH;
+        }
+        return &iter.second;
       }
-      return &iter.second;
     }
   }
   return nullptr; // Not found
@@ -333,54 +356,60 @@ Property::Value* Property::Map::Find(Property::Index key, Property::Type type) c
 
 void Property::Map::Clear()
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
-  mImpl->mStringValueContainer.clear();
-  mImpl->mIndexValueContainer.clear();
-  mImpl->mHash = NOT_HASHED;
+  if(DALI_LIKELY(mImpl))
+  {
+    mImpl->mStringValueContainer.clear();
+    mImpl->mIndexValueContainer.clear();
+    mImpl->mHash = NOT_HASHED;
+  }
 }
 
 bool Property::Map::Remove(Property::Index key)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
-  auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element) { return element.first == key; });
-  if(iter != mImpl->mIndexValueContainer.end())
+  if(DALI_LIKELY(mImpl))
   {
-    if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+    auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element) { return element.first == key; });
+    if(iter != mImpl->mIndexValueContainer.end())
     {
-      // Use unordered hash operation.
-      auto valueHash = iter->second.GetHash();
-      mImpl->mHash -= Dali::Internal::HashUtils::HashRawValue(key, valueHash);
+      if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+      {
+        // Use unordered hash operation.
+        auto valueHash = iter->second.GetHash();
+        mImpl->mHash -= Dali::Internal::HashUtils::HashRawValue(key, valueHash);
+      }
+      mImpl->mIndexValueContainer.erase(iter);
+      return true;
     }
-    mImpl->mIndexValueContainer.erase(iter);
-    return true;
   }
   return false;
 }
 
 bool Property::Map::Remove(std::string_view key)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
-  auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element) { return element.first == key; });
-  if(iter != mImpl->mStringValueContainer.end())
+  if(DALI_LIKELY(mImpl))
   {
-    if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+    auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element) { return element.first == key; });
+    if(iter != mImpl->mStringValueContainer.end())
     {
-      // Use unordered hash operation.
-      auto valueHash = iter->second.GetHash();
-      mImpl->mHash -= Dali::Internal::HashUtils::HashStringView(key, valueHash);
+      if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
+      {
+        // Use unordered hash operation.
+        auto valueHash = iter->second.GetHash();
+        mImpl->mHash -= Dali::Internal::HashUtils::HashStringView(key, valueHash);
+      }
+      mImpl->mStringValueContainer.erase(iter);
+      return true;
     }
-    mImpl->mStringValueContainer.erase(iter);
-    return true;
   }
   return false;
 }
 
 void Property::Map::Merge(const Property::Map& from)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
 
   // Ensure we're not attempting to merge with ourself
   if(this != &from)
@@ -413,7 +442,7 @@ void Property::Map::Merge(const Property::Map& from)
 
 const Property::Value& Property::Map::operator[](std::string_view key) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
   for(auto&& iter : mImpl->mStringValueContainer)
   {
@@ -428,7 +457,10 @@ const Property::Value& Property::Map::operator[](std::string_view key) const
 
 Property::Value& Property::Map::operator[](std::string_view key)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
 
   if(mImpl->mHash != ALWAYS_REHASH)
   {
@@ -452,7 +484,7 @@ Property::Value& Property::Map::operator[](std::string_view key)
 
 const Property::Value& Property::Map::operator[](Property::Index key) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
   for(auto&& iter : mImpl->mIndexValueContainer)
   {
@@ -467,7 +499,10 @@ const Property::Value& Property::Map::operator[](Property::Index key) const
 
 Property::Value& Property::Map::operator[](Property::Index key)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
+  if(DALI_UNLIKELY(!mImpl))
+  {
+    mImpl = new Impl();
+  }
 
   if(mImpl->mHash != ALWAYS_REHASH)
   {
@@ -491,13 +526,22 @@ Property::Value& Property::Map::operator[](Property::Index key)
 
 Property::Map& Property::Map::operator=(const Property::Map& other)
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
   if(this != &other)
   {
-    mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
-    mImpl->mIndexValueContainer  = other.mImpl->mIndexValueContainer;
-    mImpl->mHash                 = other.mImpl->mHash;
+    if(DALI_UNLIKELY(other.mImpl == nullptr))
+    {
+      Clear();
+    }
+    else
+    {
+      if(DALI_UNLIKELY(!mImpl))
+      {
+        mImpl = new Impl();
+      }
+      mImpl->mStringValueContainer = other.mImpl->mStringValueContainer;
+      mImpl->mIndexValueContainer  = other.mImpl->mIndexValueContainer;
+      mImpl->mHash                 = other.mImpl->mHash;
+    }
   }
   return *this;
 }
@@ -515,23 +559,20 @@ Property::Map& Property::Map::operator=(Property::Map&& other) noexcept
 
 bool Property::Map::operator==(const Property::Map& rhs) const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-
   // TODO : Need to check epsilon for float comparison in future. For now, just compare hash value and count.
   return Count() == rhs.Count() && GetHash() == rhs.GetHash();
 }
 
 std::size_t Property::Map::GetHash() const
 {
-  DALI_ASSERT_DEBUG(mImpl && "Cannot use an object previously used as an r-value");
-  return mImpl->GetHash();
+  return DALI_LIKELY(mImpl) ? mImpl->GetHash() : Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
 }
 
 std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
 {
   stream << "Map(" << map.Count() << ") = {";
 
-  if(map.mImpl)
+  if(DALI_LIKELY(map.mImpl))
   {
     int32_t count = 0;
     // Output the String-Value pairs
@@ -553,14 +594,14 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
       }
       stream << iter.first << ":" << iter.second;
     }
+
+    if(map.mImpl->mHash != NOT_HASHED)
+    {
+      stream << "(hash=" << map.mImpl->mHash << ")";
+    }
   }
 
   stream << "}";
-
-  if(map.mImpl->mHash != NOT_HASHED)
-  {
-    stream << "(hash=" << map.mImpl->mHash << ")";
-  }
 
   return stream;
 }

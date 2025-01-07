@@ -59,6 +59,7 @@ my @system_packages = (
     "libwebp-dev",
     "libmagick++-dev",
     "libxml-parser-perl",
+    "libuv1-dev",
 );
 
 my $ubuntu_version = (split(/\s+/, `lsb_release -d`))[2];
