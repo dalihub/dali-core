@@ -349,6 +349,9 @@ public:
    * @SINCE_1_0.0
    * @param[in] mappingActor The actor used for conversion
    * @note The mapping actor needs to be rendered by the default render task to make the mapping work properly.
+   * @note An Actor can be MappingActor for only one RenderTask.
+   * @note If input mappingActor is null, then this RenderTask become to do not use mapping Actor.
+   * @note The mapping actor cannot be used as a Source Actor of any RenderTask.
    */
   void SetScreenToFrameBufferMappingActor(Actor mappingActor);
 

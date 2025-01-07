@@ -37,15 +37,8 @@ class EventThreadServices;
  * Stores a reference to the EventThreadServices so limit the number of times this is created
  * to avoid repeated calls to EventThreadServices::Get().
  */
-class RayTest
+namespace RayTest
 {
-public:
-  /// Constructor
-  RayTest();
-
-  /// Default Destructor
-  ~RayTest() = default;
-
   /**
    * Performs a ray-sphere test with the given pick-ray and the given actor's bounding sphere.
    *
@@ -56,7 +49,7 @@ public:
    *
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
    */
-  bool SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir) const;
+  bool SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir);
 
   /**
    * Performs a ray-actor test with the given pick-ray and the given actor's geometry.
@@ -70,7 +63,21 @@ public:
    *
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
    */
-  bool ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance) const;
+  bool ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance);
+
+  /**
+   * Performs a ray-actor test with the given pick-ray and the given actor's Bounding Box.
+   *
+   * @param[in] actor The actor to perform the ray-sphere test on
+   * @param[in] rayOrigin The ray origin in the world's reference system.
+   * @param[in] rayDir The ray director vector in the world's reference system.
+   * @param[out] hitPointLocal The hit point in the Actor's local reference system.
+   * @param[out] distance The distance from the hit point to the camera.
+   * @return True if the ray intersects the actor's Bounding Box.
+   *
+   * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
+   */
+  bool ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector3& hitPointLocal, float& distance);
 };
 
 } // namespace Internal

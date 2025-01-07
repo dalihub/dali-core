@@ -483,8 +483,8 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   //Hit in the intersection red, green. Should pick the red actor since it is an child of overlay.
   HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
-  DALI_TEST_CHECK(results.actor == red);
-  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
+  DALI_TEST_CHECK(results.actor == green);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the blue actor since it is an overlay.
   HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
@@ -565,7 +565,7 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
   offRenderTask.SetInputEnabled(true);
   offRenderTask.SetCameraActor(cameraActor);
   offRenderTask.SetSourceActor(green);
-  offRenderTask.SetScreenToFrameBufferMappingActor(green);
+  offRenderTask.SetScreenToFrameBufferMappingActor(blue);
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
@@ -576,6 +576,7 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
   application.SendNotification();
   application.Render(10);
 
+  // Because the offRenderTask is set to exclusive, the green will not be rendered and it cannot be touched as a MappingActor.
   HitTestAlgorithm::Results results;
   HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
@@ -623,7 +624,7 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
   offRenderTask.SetInputEnabled(true);
   offRenderTask.SetCameraActor(cameraActor);
   offRenderTask.SetSourceActor(green);
-  offRenderTask.SetScreenToFrameBufferMappingActor(green);
+  offRenderTask.SetScreenToFrameBufferMappingActor(blue);
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
@@ -634,7 +635,7 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
   offRenderTask2.SetInputEnabled(true);
   offRenderTask2.SetCameraActor(cameraActor);
   offRenderTask2.SetSourceActor(green);
-  offRenderTask2.SetScreenToFrameBufferMappingActor(green);
+  offRenderTask2.SetScreenToFrameBufferMappingActor(blue);
   offRenderTask2.SetFrameBuffer(renderTarget);
 
   // Render and notify
