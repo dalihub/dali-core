@@ -221,9 +221,7 @@ bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
         //   if it's default, delete the graphics object
         //   otherwise re-initialize it if dirty
 
-        const Graphics::Sampler* graphicsSampler = samplers ? ((i < (*samplers).Size() && (*samplers)[i]) ? (*samplers)[i]->GetGraphicsObject()
-                                                                                                          : nullptr)
-                                                            : nullptr;
+        const Graphics::Sampler* graphicsSampler = samplers ? ((i < (*samplers).Size() && (*samplers)[i]) ? (*samplers)[i]->GetGraphicsObject() : nullptr) : nullptr;
 
         const Graphics::TextureBinding textureBinding{graphicsTexture, graphicsSampler, textureUnit};
         textureBindings.push_back(textureBinding);
@@ -651,7 +649,8 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
   const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
   const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
 
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element) { return (element.node == nodePtr && element.program == programPtr); });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element)
+                           { return (element.node == nodePtr && element.program == programPtr); });
 
   std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
@@ -1000,7 +999,8 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
   }
 
   // Remove mNodeIndexMap and mUniformIndexMaps.
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element)
+                           { return element.node == &node; });
   while(iter != mNodeIndexMap.end())
   {
     // Swap between end of mUniformIndexMaps and removed.
@@ -1027,7 +1027,8 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
     // Remove uniform index maps.
     mUniformIndexMaps.pop_back();
 
-    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
+    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element)
+                        { return element.node == &node; });
   }
 }
 
