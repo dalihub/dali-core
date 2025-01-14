@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
 
       // D coefficients be used only decoratedVisual.
       // It can be calculated parallely with visual transform.
-      decoratedCoefficient.coefD = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius) + extraPadding;
+      decoratedCoefficient.coefD = (1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth + (2.0f * blurRadius) + extraPadding;
 
       decoratedCoefficient.MarkCoefficientCalculated();
     }

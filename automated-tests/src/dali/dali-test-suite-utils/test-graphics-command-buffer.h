@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -763,14 +763,14 @@ public:
   {
     mCommands.emplace_back();
     mCommands.back().type                              = CommandType::BIND_TEXTURES;
-    mCommands.back().data.bindTextures.textureBindings = std::move(textureBindings);
+    mCommands.back().data.bindTextures.textureBindings = textureBindings;
     mCallStack.PushCall("BindTextures", "");
   }
 
   void BindSamplers(const std::vector<Graphics::SamplerBinding>& samplerBindings) override
   {
     mCommands.emplace_back();
-    mCommands.back().data.bindSamplers.samplerBindings = std::move(samplerBindings);
+    mCommands.back().data.bindSamplers.samplerBindings = samplerBindings;
     mCallStack.PushCall("BindSamplers", "");
   }
 
