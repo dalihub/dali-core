@@ -573,7 +573,7 @@ private:
    *
    * @return True if all textures are bounded successfully. False otherwise.
    */
-  bool BindTextures(Graphics::CommandBuffer& commandBuffer, uint32_t renderPassTag);
+  bool BindTextures(Graphics::CommandBuffer& commandBuffer);
 
   /**
    * Prepare a pipeline for this renderer.
