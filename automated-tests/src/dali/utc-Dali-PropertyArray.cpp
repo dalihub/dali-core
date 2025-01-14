@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -403,6 +403,10 @@ int UtcDaliPropertyArrayMovedArrayP1(void)
   DALI_TEST_EQUALS(0u, array1.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(0u, array1.Capacity(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, array1.Empty(), TEST_LOCATION);
+
+  // DALI_TEST_EQUALS copy the array. We should use DALI_TEST_CHECK
+  DALI_TEST_CHECK(emptyArray == array1);
+  DALI_TEST_CHECK(array1 == emptyArray);
   array1.Clear();
 
   // Test reserve
@@ -654,8 +658,8 @@ int UtcDaliPropertyArrayEqualNonFloatType(void)
 
   array2.PushBack(1);
   array2.PushBack(false);
-  array2.PushBack(subArray1);
-  array2.PushBack(subMap1);
+  array2.PushBack(subArray2);
+  array2.PushBack(subMap2);
   array2.PushBack(4);
 
   DALI_TEST_CHECK(array1 == array2);
@@ -682,6 +686,74 @@ int UtcDaliPropertyArrayEqualNonFloatType(void)
 
   value = false;
   DALI_TEST_CHECK(array1 == array2);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyArrayEqualFloatType(void)
+{
+  tet_infoline("Check Property::Array equality even if some values need to consider epsilon");
+
+  Property::Array array1;
+  Property::Array subArray1;
+  Property::Map   subMap1;
+
+  subArray1.PushBack(2.0f);
+  subArray1.PushBack(3);
+
+  subMap1.Insert(0, "0");
+  subMap1.Insert("1", 1.0f);
+
+  array1.PushBack(1.0f);
+  array1.PushBack(false);
+  array1.PushBack(subArray1);
+  array1.PushBack(subMap1);
+  array1.PushBack(4);
+
+  tet_printf("Check self-equality return true\n");
+  DALI_TEST_CHECK(array1 == array1);
+  DALI_TEST_EQUALS(array1, array1, TEST_LOCATION);
+
+  tet_printf("Generate exactly same Property::Array with array1\n");
+
+  Property::Array array2;
+  Property::Array subArray2;
+  Property::Map   subMap2;
+
+  subArray2.PushBack(2.0f + Math::MACHINE_EPSILON_1);
+  subArray2.PushBack(3);
+
+  subMap2.Insert(0, "0");
+  subMap2.Insert("1", 1.0f - Math::MACHINE_EPSILON_1);
+
+  array2.PushBack(1.0f + Math::MACHINE_EPSILON_1);
+  DALI_TEST_CHECK(array1 != array2);
+
+  array2.PushBack(false);
+  DALI_TEST_CHECK(array1 != array2);
+
+  array2.PushBack(subArray2);
+  DALI_TEST_CHECK(array1 != array2);
+
+  array2.PushBack(subMap2);
+  DALI_TEST_CHECK(array1 != array2);
+
+  array2.PushBack(4);
+
+  DALI_TEST_CHECK(array1 == array2);
+  DALI_TEST_EQUALS(array1, array2, TEST_LOCATION);
+
+  // Hash value may not be equal!
+  DALI_TEST_NOT_EQUALS(array1.GetHash(), array2.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  array2.PushBack(5);
+
+  DALI_TEST_CHECK(array1 != array2);
+
+  array2.Resize(5);
+
+  DALI_TEST_CHECK(array1 == array2);
+  DALI_TEST_EQUALS(array1, array2, TEST_LOCATION);
 
   END_TEST;
 }
