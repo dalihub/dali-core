@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_SHADER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ public:
    * Get the shader data for this shader.
    * @return The shader data.
    */
-  [[nodiscard]] ShaderDataPtr GetShaderData(uint32_t renderPassTag) const;
+  [[nodiscard]] const ShaderDataPtr& GetShaderData(uint32_t renderPassTag) const;
 
 private: // Data
   ShaderDataPtr              mDefaultShaderData{nullptr};

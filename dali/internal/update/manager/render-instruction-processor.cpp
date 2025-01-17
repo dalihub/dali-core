@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -322,16 +322,16 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
         nodeScale = nodeWorldMatrix.GetScale();
       }
 
-      item.mScale       = nodeScale;
-      item.mSize        = nodeSize;
-      item.mUpdateArea  = nodeUpdateArea;
-      item.mModelMatrix = nodeWorldMatrix;
-
       if(!nodeModelViewMatrixSet)
       {
         MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
       }
-      item.mModelViewMatrix = nodeModelViewMatrix;
+
+      item.mScale           = nodeScale;
+      item.mSize            = nodeSize;
+      item.mUpdateArea      = nodeUpdateArea;
+      item.mModelMatrix     = std::move(nodeWorldMatrix);
+      item.mModelViewMatrix = std::move(nodeModelViewMatrix);
 
       auto& nodePartialRenderingData = node->GetPartialRenderingData();
 
@@ -341,17 +341,10 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       }
       else
       {
-        PartialRenderingData partialRenderingData;
-        partialRenderingData.color               = node->GetWorldColor(updateBufferIndex);
-        partialRenderingData.matrix              = item.mModelMatrix;
-        partialRenderingData.updatedPositionSize = item.mUpdateArea;
-        partialRenderingData.size                = item.mSize;
-
         // Update current node's partial update data as latest.
-        if(nodePartialRenderingData.IsUpdated(partialRenderingData))
+        if(nodePartialRenderingData.UpdateNodeInfomations(item.mModelMatrix, node->GetWorldColor(updateBufferIndex), item.mUpdateArea, item.mSize))
         {
           item.mIsUpdated = true;
-          nodePartialRenderingData.Update(partialRenderingData);
         }
       }
     }
