@@ -457,7 +457,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
       // This is a clipping node. We generate the AABB for this node and intersect it with the previous intersection further up the tree.
 
       // Get the AABB bounding box for the current render item.
-      const ClippingBox scissorBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
+      const ClippingBox scissorBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height));
 
       // Get the AABB for the parent item that we must intersect with.
       const ClippingBox& parentBox(mScissorStack.back());
@@ -499,7 +499,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
     {
       // store clipping box inside the render callback input structure
       auto& input       = item.mRenderer->GetRenderCallbackInput();
-      input.clippingBox = ClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.mSize, mViewportRectangle.width, mViewportRectangle.height));
+      input.clippingBox = ClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height));
     }
   }
 }
@@ -668,6 +668,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   // Prepare Render::Renderer Render for this secondary command buffer.
   Renderer::PrepareCommandBuffer();
 
+  const SceneGraph::Node* lastRenderedNode = nullptr;
+  Vector3                 nodeScale        = Vector3::ONE;
+
   // Modify by the clip matrix if necessary (transforms from GL clip space to alternative clip space)
   Matrix clippedProjectionMatrix(projectionMatrix);
   if(mGraphicsController.HasClipMatrix())
@@ -680,11 +683,14 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   {
     const RenderItem& item = renderList.GetItem(index);
 
+    // Get NodeInformation as const l-value, to reduce memory access operations.
+    const SceneGraph::PartialRenderingData::NodeInfomations& nodeInfo = item.GetPartialRenderingDataNodeInfomations();
+
     // Discard renderers outside the root clipping rect
     bool skip = true;
     if(!rootClippingRect.IsEmpty())
     {
-      Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(bufferIndex, item.mUpdateArea) : item.mUpdateArea;
+      Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(bufferIndex, nodeInfo.updatedPositionSize) : nodeInfo.updatedPositionSize;
       auto    rect       = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), mViewportRectangle.width, mViewportRectangle.height);
 
       if(rect.Intersect(rootClippingRect))
@@ -722,11 +728,18 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
       // It is similar to the multi-pass rendering.
       if(!skip)
       {
+        if(lastRenderedNode != item.mNode)
+        {
+          lastRenderedNode = item.mNode;
+
+          nodeScale = nodeInfo.modelMatrix.GetScale();
+        }
+
         auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, item.mModelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, item.mScale, item.mSize, !item.mIsOpaque, instruction, renderTarget, queue);
+          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, nodeInfo.worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTarget, queue);
         }
       }
     }
@@ -753,8 +766,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 Graphics::RenderTarget*             renderTarget,
                                                 Graphics::CommandBuffer*            commandBuffer)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
-                                          { oss << "[" << instruction.RenderListCount() << "]"; });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) { oss << "[" << instruction.RenderListCount() << "]"; });
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 

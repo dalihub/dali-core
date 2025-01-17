@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,6 +115,7 @@ Node::Node()
   mPositionUsesAnchorPoint(true),
   mTransparent(false),
   mUpdateAreaChanged(false),
+  mUpdateAreaUseSize(true),
   mUseTextureUpdateArea(false)
 {
 #ifdef DEBUG_ENABLED
@@ -362,6 +363,57 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
 uint32_t Node::GetMemoryPoolCapacity()
 {
   return GetNodeMemoryPool().GetCapacity();
+}
+
+void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLayer3d)
+{
+  if(mPartialRenderingData.mUpdateDecay == PartialRenderingData::Decay::UPDATED_CURRENT_FRAME)
+  {
+    // Fast-out if we're already updated this frame
+    return;
+  }
+
+  if(Updated())
+  {
+    // If the node was updated, then mark the partial rendering data as expired
+    // So we can skip data comparision.
+    mPartialRenderingData.MakeExpired();
+  }
+
+  const Vector4& worldColor = GetWorldColor(updateBufferIndex);
+
+  // TODO : Can't we get modelMatrix and size as const l-value at onces?
+  const auto&    transformId = mTransformManagerData.Id();
+  const Matrix&  modelMatrix = transformId == INVALID_TRANSFORM_ID ? Matrix::IDENTITY : mWorldMatrix.Get(0);
+  const Vector3& size        = transformId == INVALID_TRANSFORM_ID ? Vector3::ZERO : mSize.Get(0);
+
+  const Vector4& updatedPositionSize = CalculateNodeUpdateArea(isLayer3d, modelMatrix, size);
+
+  mPartialRenderingData.UpdateNodeInfomations(modelMatrix, worldColor, updatedPositionSize, size);
+}
+
+Vector4 Node::CalculateNodeUpdateArea(bool isLayer3d, const Matrix& nodeWorldMatrix, const Vector3& nodeSize) const
+{
+  if(DALI_LIKELY(mUpdateAreaUseSize))
+  {
+    if(isLayer3d)
+    {
+      return Vector4::ZERO;
+    }
+    // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
+    // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be too slow
+    // Instead, use [8] and [9] of world matrix, which are z-axis's x and z-axis's y value.
+    if(EqualsZero(nodeWorldMatrix.AsFloat()[8]) && EqualsZero(nodeWorldMatrix.AsFloat()[9]))
+    {
+      return Vector4(0.0f, 0.0f, nodeSize.width, nodeSize.height);
+    }
+    // Keep nodeUpdateArea as Vector4::ZERO.
+    return Vector4::ZERO;
+  }
+  else
+  {
+    return GetUpdateAreaHint();
+  }
 }
 
 } // namespace SceneGraph

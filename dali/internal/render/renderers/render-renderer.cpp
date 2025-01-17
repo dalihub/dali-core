@@ -486,6 +486,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Matrix&                                        modelViewMatrix,
                       const Matrix&                                        viewMatrix,
                       const Matrix&                                        projectionMatrix,
+                      const Vector4&                                       worldColor,
                       const Vector3&                                       scale,
                       const Vector3&                                       size,
                       bool                                                 blend,
@@ -597,7 +598,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     if(queueIndex == 0)
     {
       std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, *program);
-      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, node, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, scale, size, nodeIndex);
+      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColor, scale, size, nodeIndex);
     }
     // @todo We should detect this case much earlier to prevent unnecessary work
     // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
@@ -738,11 +739,11 @@ void Renderer::WriteUniformBuffer(
   Graphics::CommandBuffer&             commandBuffer,
   Program*                             program,
   const SceneGraph::RenderInstruction& instruction,
-  const SceneGraph::NodeDataProvider&  node,
   const Matrix&                        modelMatrix,
   const Matrix&                        modelViewMatrix,
   const Matrix&                        viewMatrix,
   const Matrix&                        projectionMatrix,
+  const Vector4&                       worldColor,
   const Vector3&                       scale,
   const Vector3&                       size,
   std::size_t                          nodeIndex)
@@ -805,9 +806,8 @@ void Renderer::WriteUniformBuffer(
 
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
 
-    const Vector4& color      = node.GetRenderColor(bufferIndex);              ///< Actor's original color
     const Vector4& mixColor   = mRenderDataProvider->GetMixColor(bufferIndex); ///< Renderer's mix color
-    Vector4        finalColor = color * mixColor;                              ///< Applied renderer's mix color
+    Vector4        finalColor = worldColor * mixColor;                         ///< Applied Actor's original color to renderer's mix color
     if(mPremultipliedAlphaEnabled)
     {
       const float alpha = finalColor.a;
@@ -816,7 +816,7 @@ void Renderer::WriteUniformBuffer(
       finalColor.b *= alpha;
     }
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), uboViews, finalColor);
-    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, color);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, worldColor);
 
     // Write uniforms from the uniform map
     FillUniformBuffer(*program, instruction, uboViews, bufferIndex, nodeIndex);

@@ -128,7 +128,7 @@ inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorAr
   return newScissorArea;
 }
 
-inline Rect<int32_t> CalculateUpdateArea(RenderItem& item, BufferIndex renderBufferIndex, const Rect<int32_t>& viewportRect)
+inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& updatedPositionSize, BufferIndex renderBufferIndex, const Rect<int32_t>& viewportRect)
 {
   Vector4 updateArea;
   if(item.mNode && item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
@@ -137,7 +137,7 @@ inline Rect<int32_t> CalculateUpdateArea(RenderItem& item, BufferIndex renderBuf
   }
   else
   {
-    updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(renderBufferIndex, item.mUpdateArea) : item.mUpdateArea;
+    updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(renderBufferIndex, updatedPositionSize) : updatedPositionSize;
   }
 
   return RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height);
@@ -841,8 +841,12 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
             for(uint32_t listIndex = 0u; listIndex < listCount; ++listIndex)
             {
               RenderItem& item = renderList->GetItem(listIndex);
+
+              // Get NodeInformation as const l-value, to reduce memory access operations.
+              const SceneGraph::PartialRenderingData::NodeInfomations& nodeInfo = item.GetPartialRenderingDataNodeInfomations();
+
               // If the item does 3D transformation, make full update
-              if(item.mUpdateArea == Vector4::ZERO)
+              if(nodeInfo.updatedPositionSize == Vector4::ZERO)
               {
                 cleanDamagedRect = true;
 
@@ -870,9 +874,9 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                  (item.mNode &&
                   (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated()))))
               {
-                item.mIsUpdated = false;
+                item.mIsUpdated = false; /// DevNote : Reset flag here, since RenderItem could be reused by renderList.ReuseCachedItems().
 
-                rect = CalculateUpdateArea(item, mImpl->renderBufferIndex, viewportRect);
+                rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, mImpl->renderBufferIndex, viewportRect);
                 if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                 {
                   AlignDamagedRect(rect);
@@ -911,7 +915,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 else
                 {
                   // The item is not in the list for some reason. Add the current rect!
-                  rect = CalculateUpdateArea(item, mImpl->renderBufferIndex, viewportRect);
+                  rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, mImpl->renderBufferIndex, viewportRect);
                   if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                   {
                     AlignDamagedRect(rect);
@@ -1029,11 +1033,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         bool        usesStencilBuffer = false;
         for(auto k = 0u; k < renderList->Count(); ++k)
         {
-          auto& item = renderList->GetItem(k);
-          usesStencilBuffer |= item.UsesStencilBuffer();
+          auto& item        = renderList->GetItem(k);
+          usesStencilBuffer = usesStencilBuffer || item.UsesStencilBuffer();
           if(item.mRenderer && item.mRenderer->NeedsProgram())
           {
-            usesDepthBuffer |= item.UsesDepthBuffer(autoDepthTestMode);
+            usesDepthBuffer = usesDepthBuffer || item.UsesDepthBuffer(autoDepthTestMode);
 
             // Prepare and store used programs for further processing
             auto program = item.mRenderer->PrepareProgram(instruction);

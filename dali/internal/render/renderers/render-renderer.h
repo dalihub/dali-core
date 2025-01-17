@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -408,6 +408,7 @@ public:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
+   * @param[in] worldColor The world color of the node.
    * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
@@ -424,6 +425,7 @@ public:
               const Matrix&                                        modelViewMatrix,
               const Matrix&                                        viewMatrix,
               const Matrix&                                        projectionMatrix,
+              const Vector4&                                       worldColor,
               const Vector3&                                       scale,
               const Vector3&                                       size,
               bool                                                 blend,
@@ -599,6 +601,7 @@ private:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
+   * @param[in] worldColor The world color of the node.
    * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
@@ -609,11 +612,11 @@ private:
                           Graphics::CommandBuffer&             commandBuffer,
                           Program*                             program,
                           const SceneGraph::RenderInstruction& instruction,
-                          const SceneGraph::NodeDataProvider&  node,
                           const Matrix&                        modelMatrix,
                           const Matrix&                        modelViewMatrix,
                           const Matrix&                        viewMatrix,
                           const Matrix&                        projectionMatrix,
+                          const Vector4&                       worldColor,
                           const Vector3&                       scale,
                           const Vector3&                       size,
                           std::size_t                          nodeIndex);
