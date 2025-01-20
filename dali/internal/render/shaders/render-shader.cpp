@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,11 +60,11 @@ void Shader::UpdateShaderData(ShaderDataPtr shaderData)
   }
 }
 
-ShaderDataPtr Shader::GetShaderData(uint32_t renderPassTag) const
+const ShaderDataPtr& Shader::GetShaderData(uint32_t renderPassTag) const
 {
   if(renderPassTag != DEFAULT_RENDER_PASS_TAG)
   {
-    for(auto&& shaderData : mShaderDataList)
+    for(const auto& shaderData : mShaderDataList)
     {
       if(shaderData->GetRenderPassTag() == renderPassTag)
       {
