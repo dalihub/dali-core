@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,8 +219,34 @@ Property::Array& Property::Array::operator=(Property::Array&& other) noexcept
 
 bool Property::Array::operator==(const Property::Array& rhs) const
 {
-  // TODO : Need to check epsilon for float comparison in future. For now, just compare hash value and count.
-  return Count() == rhs.Count() && GetHash() == rhs.GetHash();
+  if(DALI_UNLIKELY(this == &rhs))
+  {
+    // Fast out for self comparision
+    return true;
+  }
+
+  const auto lhsCount = Count();
+  if(lhsCount != rhs.Count())
+  {
+    return false;
+  }
+  if(DALI_UNLIKELY(mImpl == nullptr))
+  {
+    return rhs.Empty();
+  }
+  if(DALI_UNLIKELY(rhs.mImpl == nullptr))
+  {
+    return Empty();
+  }
+
+  for(SizeType i = 0u; i < lhsCount; ++i)
+  {
+    if(mImpl->mArray[i] != rhs.mImpl->mArray[i])
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 std::size_t Property::Array::GetHash() const

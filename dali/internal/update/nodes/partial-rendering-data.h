@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PARTIAL_RENDERING_DATA_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,6 @@ namespace Dali::Internal::SceneGraph
  */
 struct PartialRenderingData
 {
-  Matrix      matrix{};              /// Model-view matrix
-  Vector4     color{};               /// Color
-  Vector4     updatedPositionSize{}; /// Updated position/size (x, y, width, height)
-  Vector3     size{};                /// Size
-  std::size_t hash{0u};              /// Last frame's hash
-
   bool mVisible : 1; /// Visible state. It is depends on node's visibility (Not hashed)
   bool mUpdated : 1; /// IsUpdated return true at this frame. Will be reset at UpdateNodes time. (Not hashed)
 
@@ -54,54 +48,52 @@ struct PartialRenderingData
   }
 
   /**
-   * Calculate a hash from the cache data
-   */
-  void CalculateHash()
-  {
-    hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
-    Dali::Internal::HashUtils::HashRawBuffer<float>(matrix.AsFloat(), 16, hash);
-    Dali::Internal::HashUtils::HashRawBuffer<float>(color.AsFloat(), 4, hash);
-    Dali::Internal::HashUtils::HashRawBuffer<float>(updatedPositionSize.AsFloat(), 4, hash);
-    Dali::Internal::HashUtils::HashRawBuffer<float>(size.AsFloat(), 3, hash);
-  }
-
-  /**
-   * @brief Tests whether cache changed since last frame
+   * @brief Tests whether cache changed since last frame, and update node infomations
    * @return True if changed.
    */
-  bool IsUpdated(PartialRenderingData& frameCache)
+  bool UpdateNodeInfomations(const Matrix& modelMatrix, const Vector4& worldColor, const Vector4& updatedPositionSize, const Vector3& size)
   {
     if(mUpdateDecay == Decay::UPDATED_CURRENT_FRAME)
     {
       return mUpdated;
     }
 
-    frameCache.CalculateHash();
+    if(mUpdateDecay == Decay::EXPIRED)
+    {
+      mUpdated = true;
 
-    mUpdated = hash != frameCache.hash ||
-               mUpdateDecay == Decay::EXPIRED || ///< If current value is expired, so cached data is invalid.
-               matrix != frameCache.matrix ||
-               color != frameCache.color ||
-               updatedPositionSize != frameCache.updatedPositionSize ||
-               size != frameCache.size;
+      mNodeInfomations = {modelMatrix, worldColor, updatedPositionSize, size, 0u, 0u};
+    }
+    else
+    {
+      mUpdated = true;
+
+      size_t hash1 = NodeInfomations::CalculateHash1(worldColor, updatedPositionSize, size);
+      size_t hash2 = 0u;
+      if(mNodeInfomations.GetHash1() == hash1)
+      {
+        hash2 = NodeInfomations::CalculateHash2(modelMatrix); // Hash2 is expensive, so we calculate it only when necessary
+        if(mNodeInfomations.GetHash2() == hash2)
+        {
+          // Full comparision one more time.
+          mUpdated = !(mNodeInfomations.matrix == modelMatrix &&
+                       mNodeInfomations.color == worldColor &&
+                       mNodeInfomations.updatedPositionSize == updatedPositionSize &&
+                       mNodeInfomations.size == size);
+        }
+      }
+
+      if(mUpdated)
+      {
+        mNodeInfomations = {modelMatrix, worldColor, updatedPositionSize, size, hash1, hash2};
+
+        // Don't change mVisible.
+      }
+    }
 
     mUpdateDecay = Decay::UPDATED_CURRENT_FRAME;
 
     return mUpdated;
-  }
-
-  /**
-   * @brief Update cached value
-   */
-  void Update(const PartialRenderingData& frameCache)
-  {
-    matrix              = frameCache.matrix;
-    color               = frameCache.color;
-    updatedPositionSize = frameCache.updatedPositionSize;
-    size                = frameCache.size;
-    hash                = frameCache.hash;
-
-    // Don't change mVisible.
   }
 
   /**
@@ -119,6 +111,51 @@ struct PartialRenderingData
   {
     mUpdateDecay = Decay::EXPIRED;
   }
+
+private:
+  struct NodeInfomations
+  {
+    Matrix  matrix{};              /// Model matrix
+    Vector4 color{};               /// Color
+    Vector4 updatedPositionSize{}; /// Updated position/size (x, y, width, height)
+    Vector3 size{};                /// Size
+
+    mutable size_t hash1{0u}; /// Last frame's hash for non-matrix
+    mutable size_t hash2{0u}; /// Last frame's hash for matrix
+
+    static size_t CalculateHash1(const Vector4& color, const Vector4& updatedPositionSize, const Vector3& size)
+    {
+      size_t hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
+      Dali::Internal::HashUtils::HashRawBuffer<float>(color.AsFloat(), 4, hash);
+      Dali::Internal::HashUtils::HashRawBuffer<float>(updatedPositionSize.AsFloat(), 4, hash);
+      Dali::Internal::HashUtils::HashRawBuffer<float>(size.AsFloat(), 3, hash);
+      return hash;
+    }
+
+    static size_t CalculateHash2(const Matrix& matrix)
+    {
+      size_t hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
+      Dali::Internal::HashUtils::HashRawBuffer<float>(matrix.AsFloat(), 16, hash);
+      return hash;
+    }
+
+    size_t GetHash1() const
+    {
+      if(hash1 == 0u)
+      {
+        hash1 = CalculateHash1(color, updatedPositionSize, size);
+      }
+      return hash1;
+    }
+    size_t GetHash2() const
+    {
+      if(hash2 == 0u)
+      {
+        hash2 = CalculateHash2(matrix);
+      }
+      return hash2;
+    }
+  } mNodeInfomations;
 };
 
 } // namespace Dali::Internal::SceneGraph

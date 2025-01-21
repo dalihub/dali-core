@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,6 +175,10 @@ int UtcDaliPropertyMapMovedMapP1(void)
   DALI_TEST_EQUALS(emptyMap.GetHash(), map1.GetHash(), TEST_LOCATION);
   DALI_TEST_EQUALS(0u, map1.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, map1.Empty(), TEST_LOCATION);
+
+  // DALI_TEST_EQUALS copy the map. We should use DALI_TEST_CHECK
+  DALI_TEST_CHECK(emptyMap == map1);
+  DALI_TEST_CHECK(map1 == emptyMap);
   map1.Clear();
 
   DALI_TEST_EQUALS(false, map1.Remove(10), TEST_LOCATION);
@@ -1135,11 +1139,11 @@ int UtcDaliPropertyMapEqualNonFloatType(void)
   subMap2.Insert("1", 1);
   subMap2.Insert(0, "0");
 
-  map2.Insert(3, subArray1);
+  map2.Insert(3, subArray2);
   map2.Insert(2, false);
   map2.Insert(1, 1);
   map2.Insert("5", 4);
-  map2.Insert("4", subMap1);
+  map2.Insert("4", subMap2);
 
   DALI_TEST_CHECK(map1 == map2);
   DALI_TEST_EQUALS(map1, map2, TEST_LOCATION);
@@ -1163,6 +1167,77 @@ int UtcDaliPropertyMapEqualNonFloatType(void)
   tet_printf("Change map2 again\n");
 
   *valuePtr = false;
+  DALI_TEST_CHECK(map1 == map2);
+
+  END_TEST;
+}
+
+int UtcDaliPropertyMapEqualFloatType(void)
+{
+  tet_infoline("Check Property::Map equality even if some values need to consider epsilon");
+
+  Property::Map   map1;
+  Property::Array subArray1;
+  Property::Map   subMap1;
+
+  subArray1.PushBack(2.0f);
+  subArray1.PushBack(3);
+
+  subMap1.Insert(0, "0");
+  subMap1.Insert("1", 1.0f);
+
+  map1.Insert(1, 1.0f);
+  map1.Insert(2, false);
+  map1.Insert(3, subArray1);
+  map1.Insert("4", subMap1);
+  map1.Insert("5", 4);
+
+  tet_printf("Check self-equality return true\n");
+  DALI_TEST_CHECK(map1 == map1);
+  DALI_TEST_EQUALS(map1, map1, TEST_LOCATION);
+
+  tet_printf("Generate exactly same Property::Map with map1\n");
+
+  Property::Map   map2;
+  Property::Array subArray2;
+  Property::Map   subMap2;
+
+  subArray2.PushBack(2.0f + Math::MACHINE_EPSILON_1);
+  subArray2.PushBack(3);
+
+  subMap2.Insert("1", 1.0f - Math::MACHINE_EPSILON_1);
+  subMap2.Insert(0, "0");
+
+  map2.Insert(3, subArray2);
+  DALI_TEST_CHECK(map1 != map2);
+
+  map2.Insert(2, false);
+  DALI_TEST_CHECK(map1 != map2);
+
+  map2.Insert(1, 1.0f + Math::MACHINE_EPSILON_1);
+  DALI_TEST_CHECK(map1 != map2);
+
+  map2.Insert("5", 4);
+  DALI_TEST_CHECK(map1 != map2);
+
+  map2.Insert("4", subMap2);
+
+  DALI_TEST_CHECK(map1 == map2);
+  DALI_TEST_EQUALS(map1, map2, TEST_LOCATION);
+
+  // Hash value may not be equal!
+  DALI_TEST_NOT_EQUALS(map1.GetHash(), map2.GetHash(), Math::MACHINE_EPSILON_100, TEST_LOCATION);
+
+  map2.Insert("6", 8);
+  DALI_TEST_CHECK(map1 != map2);
+
+  map2.Remove(2);
+  DALI_TEST_CHECK(map1 != map2);
+
+  map2.Insert(2, false);
+  DALI_TEST_CHECK(map1 != map2);
+
+  map2.Remove("6");
   DALI_TEST_CHECK(map1 == map2);
 
   END_TEST;

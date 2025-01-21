@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <limits>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/hash-utils.h>
@@ -559,8 +560,76 @@ Property::Map& Property::Map::operator=(Property::Map&& other) noexcept
 
 bool Property::Map::operator==(const Property::Map& rhs) const
 {
-  // TODO : Need to check epsilon for float comparison in future. For now, just compare hash value and count.
-  return Count() == rhs.Count() && GetHash() == rhs.GetHash();
+  if(DALI_UNLIKELY(this == &rhs))
+  {
+    // Fast out for self comparision
+    return true;
+  }
+
+  if(Count() != rhs.Count())
+  {
+    return false;
+  }
+  if(DALI_UNLIKELY(mImpl == nullptr))
+  {
+    return rhs.Empty();
+  }
+  if(DALI_UNLIKELY(rhs.mImpl == nullptr))
+  {
+    return Empty();
+  }
+
+  // TODO : Should we support duplication key comparision?
+  {
+    std::unordered_map<std::string_view, const Property::Value*> stringValueMap;
+    for(auto&& iter : mImpl->mStringValueContainer)
+    {
+      stringValueMap[std::string_view(iter.first)] = &iter.second;
+    }
+    for(auto&& iter : rhs.mImpl->mStringValueContainer)
+    {
+      auto mapIter = stringValueMap.find(std::string_view(iter.first));
+      if(mapIter == stringValueMap.end())
+      {
+        return false;
+      }
+      if(*(mapIter->second) != iter.second)
+      {
+        return false;
+      }
+      stringValueMap.erase(mapIter);
+    }
+    if(!stringValueMap.empty())
+    {
+      return false;
+    }
+  }
+  {
+    std::unordered_map<Property::Index, const Property::Value*> indexValueMap;
+    for(auto&& iter : mImpl->mIndexValueContainer)
+    {
+      indexValueMap[iter.first] = &iter.second;
+    }
+    for(auto&& iter : rhs.mImpl->mIndexValueContainer)
+    {
+      auto mapIter = indexValueMap.find(iter.first);
+      if(mapIter == indexValueMap.end())
+      {
+        return false;
+      }
+      if(*(mapIter->second) != iter.second)
+      {
+        return false;
+      }
+      indexValueMap.erase(mapIter);
+    }
+    if(!indexValueMap.empty())
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 std::size_t Property::Map::GetHash() const
