@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -933,14 +933,16 @@ void Renderer::WriteDynUniform(
 
   const auto valueAddress = propertyValue->GetValueAddress(updateBufferIndex);
 
-  if(propertyValue->GetType() == Property::MATRIX3 &&
-     uniform.matrixStride > 0 &&
-     uniform.matrixStride != uint32_t(-1))
+  if((propertyValue->GetType() == Property::MATRIX3 || propertyValue->GetType() == Property::VECTOR4) &&
+     uniform.matrixStride != uint32_t(-1) &&
+     uniform.matrixStride > 0)
   {
-    for(int i = 0; i < 3; ++i)
+    // If the property is Vector4 type and matrixStride is valid integer, then we should treat it as mat2 type uniforms.
+    const uint32_t matrixRow = (propertyValue->GetType() == Property::MATRIX3) ? 3 : 2;
+    for(uint32_t i = 0; i < matrixRow; ++i)
     {
-      ubo->Write(reinterpret_cast<const float*>(valueAddress) + i * 3,
-                 sizeof(float) * 3,
+      ubo->Write(reinterpret_cast<const float*>(valueAddress) + i * matrixRow,
+                 sizeof(float) * matrixRow,
                  dest + (i * uniform.matrixStride));
     }
   }
