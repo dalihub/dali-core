@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ PixelData::PixelData(uint8_t*                         buffer,
                      uint32_t                         bufferSize,
                      uint32_t                         width,
                      uint32_t                         height,
-                     uint32_t                         stride,
+                     uint32_t                         strideBytes,
                      Pixel::Format                    pixelFormat,
                      Dali::PixelData::ReleaseFunction releaseFunction,
                      bool                             releaseAfterUpload)
@@ -45,7 +45,7 @@ PixelData::PixelData(uint8_t*                         buffer,
   mBufferSize(bufferSize),
   mWidth(width),
   mHeight(height),
-  mStride(stride),
+  mStrideBytes(strideBytes),
   mPixelFormat(pixelFormat),
   mReleaseFunction(releaseFunction),
   mReleaseAfterUpload(releaseAfterUpload)
@@ -65,12 +65,12 @@ PixelDataPtr PixelData::New(uint8_t*                         buffer,
                             uint32_t                         bufferSize,
                             uint32_t                         width,
                             uint32_t                         height,
-                            uint32_t                         stride,
+                            uint32_t                         strideBytes,
                             Pixel::Format                    pixelFormat,
                             Dali::PixelData::ReleaseFunction releaseFunction,
                             bool                             releaseAfterUpload)
 {
-  return new PixelData(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction, releaseAfterUpload);
+  return new PixelData(buffer, bufferSize, width, height, strideBytes, pixelFormat, releaseFunction, releaseAfterUpload);
 }
 
 uint32_t PixelData::GetWidth() const
@@ -119,13 +119,28 @@ void PixelData::ReleasePixelDataBuffer()
 
 Dali::Integration::PixelDataBuffer PixelData::GetPixelDataBuffer() const
 {
-  Dali::Integration::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mWidth, mHeight, mStride);
+  Dali::Integration::PixelDataBuffer pixelDataBuffer(mBuffer, mBufferSize, mWidth, mHeight, mStrideBytes);
   return pixelDataBuffer;
 }
 
 uint32_t PixelData::GetStride() const
 {
-  return mStride;
+  DALI_LOG_ERROR("GetStride() API deprecated! Use GetStrideBytes() instead\n");
+  const uint32_t bytesPerPixel = Dali::Pixel::GetBytesPerPixel(mPixelFormat);
+  if(DALI_UNLIKELY(bytesPerPixel == 0u))
+  {
+    return 0u;
+  }
+  if(DALI_UNLIKELY(mStrideBytes % bytesPerPixel != 0u))
+  {
+    DALI_LOG_WARNING("StrideByte value [%u] cannot divide by bpp [%u]!\n", mStrideBytes, bytesPerPixel);
+  }
+  return mStrideBytes / bytesPerPixel;
+}
+
+uint32_t PixelData::GetStrideBytes() const
+{
+  return mStrideBytes;
 }
 
 } // namespace Internal
