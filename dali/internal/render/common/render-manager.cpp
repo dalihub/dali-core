@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,7 +268,6 @@ struct RenderManager::Impl
   void ContextDestroyed()
   {
     sceneContainer.clear();
-    renderAlgorithms.DestroyCommandBuffer();
 
     renderedFrameBufferContainer.clear();
     samplerContainer.Clear();
@@ -977,8 +976,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
 
-  std::vector<Graphics::RenderTarget*> targetsToPresent;
-
   Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
   if(clippingRect == surfaceRect)
   {
@@ -1051,9 +1048,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
   }
+
+  auto sceneRenderTarget = sceneObject->GetSurfaceRenderTarget();
   if(!renderToFbo)
   {
-    mImpl->graphicsController.EnableDepthStencilBuffer(*sceneObject->GetSurfaceRenderTarget(), sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
+    mImpl->graphicsController.EnableDepthStencilBuffer(*sceneRenderTarget, sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
   }
   // Fill resource binding for the scene
   std::vector<Graphics::SceneResourceBinding> sceneResourceBindings;
@@ -1069,11 +1068,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
   }
   mImpl->graphicsController.SetResourceBindingHints(sceneResourceBindings);
-
-  // Reset main algorithms command buffer
-  mImpl->renderAlgorithms.ResetCommandBuffer();
-
-  auto mainCommandBuffer = mImpl->renderAlgorithms.GetMainCommandBuffer();
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Render scene (%s), CPU:%d GPU:%d\n", renderToFbo ? "Offscreen" : "Onscreen", totalSizeCPU, totalSizeGPU);
 
@@ -1110,6 +1104,30 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
 #endif
 
+  if(renderToFbo)
+  {
+    for(uint32_t i = 0; i < instructionCount; ++i)
+    {
+      RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
+      if(instruction.mFrameBuffer)
+      {
+        // Ensure graphics framebuffer is created, bind attachments and create render passes/commandbuffers
+        // Only happens once per framebuffer. If the creation fails, e.g. no attachments yet,
+        // then don't render to this framebuffer.
+        if(!instruction.mFrameBuffer->GetGraphicsObject())
+        {
+          const bool created = instruction.mFrameBuffer->CreateGraphicsObjects();
+          if(!created)
+          {
+            continue;
+          }
+        }
+      }
+    }
+  }
+
+  std::vector<Graphics::CommandBuffer*> commandBuffers;
+
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -1130,22 +1148,16 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       surfaceOrientation -= 360;
     }
 
-    Graphics::RenderTarget*           currentRenderTarget = nullptr;
-    Graphics::RenderPass*             currentRenderPass   = nullptr;
+    Graphics::RenderTarget*           currentRenderTarget  = nullptr;
+    Graphics::RenderPass*             currentRenderPass    = nullptr;
+    Graphics::CommandBuffer*          currentCommandBuffer = nullptr;
     std::vector<Graphics::ClearValue> currentClearValues{};
 
     if(instruction.mFrameBuffer)
     {
-      // Ensure graphics framebuffer is created, bind attachments and create render passes
-      // Only happens once per framebuffer. If the create fails, e.g. no attachments yet,
-      // then don't render to this framebuffer.
       if(!instruction.mFrameBuffer->GetGraphicsObject())
       {
-        const bool created = instruction.mFrameBuffer->CreateGraphicsObjects();
-        if(!created)
-        {
-          continue;
-        }
+        continue;
       }
 
       auto& clearValues = instruction.mFrameBuffer->GetGraphicsRenderPassClearValues();
@@ -1201,7 +1213,15 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       currentRenderPass   = sceneObject->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
     }
 
-    targetsToPresent.emplace_back(currentRenderTarget);
+    // Setup command buffer for this instruction.
+    currentCommandBuffer = instruction.GetCommandBuffer(mImpl->graphicsController);
+    commandBuffers.emplace_back(currentCommandBuffer);
+
+    currentCommandBuffer->Reset();
+    Graphics::CommandBufferBeginInfo info;
+    info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
+    info.SetRenderTarget(*currentRenderTarget);
+    currentCommandBuffer->Begin(info);
 
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {
@@ -1271,70 +1291,72 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // When the surface is rotated, the input values already were set with the rotated angle.
     // So, re-calculation is needed.
     scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, surfaceRect);
-
-    // Begin render pass
-    mainCommandBuffer->BeginRenderPass(
-      currentRenderPass,
-      currentRenderTarget,
-      scissorArea,
-      currentClearValues);
-
-    // Note, don't set the viewport/scissor on the primary command buffer.
-
-    mImpl->renderAlgorithms.ProcessRenderInstruction(
-      instruction,
-      mImpl->renderBufferIndex,
-      depthBufferAvailable,
-      stencilBufferAvailable,
-      viewportRect,
-      clippingRect,
-      surfaceOrientation,
-      Uint16Pair(surfaceRect.width, surfaceRect.height),
-      currentRenderPass,
-      currentRenderTarget);
-
-    Graphics::SyncObject* syncObject{nullptr};
-    // If the render instruction has an associated render tracker (owned separately)
-    // and framebuffer, create a one shot sync object, and use it to determine when
-    // the render pass has finished executing on GPU.
-    if(instruction.mRenderTracker && instruction.mFrameBuffer)
+    if(scissorArea.width > 0 && scissorArea.height > 0)
     {
-      syncObject                 = instruction.mRenderTracker->CreateSyncObject(mImpl->graphicsController);
-      instruction.mRenderTracker = nullptr;
-    }
-    mainCommandBuffer->EndRenderPass(syncObject);
+      // Begin render pass
+      currentCommandBuffer->BeginRenderPass(currentRenderPass,
+                                            currentRenderTarget,
+                                            scissorArea,
+                                            currentClearValues);
 
-    if(instruction.mFrameBuffer && instruction.mFrameBuffer->IsKeepingRenderResultRequested())
-    {
-      mainCommandBuffer->ReadPixels(instruction.mFrameBuffer->GetRenderResultBuffer());
-      mImpl->renderedFrameBufferContainer.push_back(instruction.mFrameBuffer);
-    }
-  }
+      // Note, don't set the viewport/scissor on primary command buffer.
+      mImpl->renderAlgorithms.ProcessRenderInstruction(instruction,
+                                                       mImpl->renderBufferIndex,
+                                                       depthBufferAvailable,
+                                                       stencilBufferAvailable,
+                                                       viewportRect,
+                                                       clippingRect,
+                                                       surfaceOrientation,
+                                                       Uint16Pair(surfaceRect.width, surfaceRect.height),
+                                                       currentRenderPass,
+                                                       currentRenderTarget,
+                                                       currentCommandBuffer);
 
-  if(targetsToPresent.size() > 0u)
-  {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_FINISHED", [&](std::ostringstream& oss) { oss << "[" << targetsToPresent.size() << "]"; });
+      Graphics::SyncObject* syncObject{nullptr};
+
+      // If the render instruction has an associated render tracker (owned separately)
+      // and framebuffer, create a one shot sync object, and use it to determine when
+      // the render pass has finished executing on GPU.
+      if(instruction.mRenderTracker && instruction.mFrameBuffer)
+      {
+        syncObject                 = instruction.mRenderTracker->CreateSyncObject(mImpl->graphicsController);
+        instruction.mRenderTracker = nullptr;
+      }
+      currentCommandBuffer->EndRenderPass(syncObject);
+
+      if(instruction.mFrameBuffer && instruction.mFrameBuffer->IsKeepingRenderResultRequested())
+      {
+        currentCommandBuffer->ReadPixels(instruction.mFrameBuffer->GetRenderResultBuffer());
+        mImpl->renderedFrameBufferContainer.push_back(instruction.mFrameBuffer);
+      }
+    }
   }
 
   // Flush UBOs
   mImpl->uniformBufferManager->Flush(sceneObject, renderToFbo);
-  mImpl->renderAlgorithms.SubmitCommandBuffer();
-  mImpl->commandBufferSubmitted = true;
 
-  if(targetsToPresent.size() > 0u)
+  // Submit command buffers
+  Graphics::SubmitInfo submitInfo;
+  submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+
+  for(auto commandBuffer : commandBuffers)
   {
-    std::sort(targetsToPresent.begin(), targetsToPresent.end());
+    commandBuffer->End();
+    submitInfo.cmdBuffer.push_back(commandBuffer);
+  }
 
-    Graphics::RenderTarget* rt = nullptr;
-    for(auto& target : targetsToPresent)
-    {
-      if(target != rt)
-      {
-        mImpl->graphicsController.PresentRenderTarget(target);
-        rt = target;
-      }
-    }
+  if(!submitInfo.cmdBuffer.empty())
+  {
+    mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
+    mImpl->commandBufferSubmitted = true;
+  }
 
+  // present render target (if main scene)
+  if(!renderToFbo)
+  {
+    DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
+    auto renderTarget = sceneObject->GetSurfaceRenderTarget();
+    mImpl->graphicsController.PresentRenderTarget(renderTarget);
     DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
   }
 }

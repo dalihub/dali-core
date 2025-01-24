@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
-#include <dali/internal/render/renderers/render-sampler.h>
-#include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/internal/render/renderers/render-sampler.h>
 
-#include <dali/integration-api/debug.h>
+#include <unordered_map>
 
 namespace Dali
 {
@@ -31,6 +30,11 @@ using Mask = Dali::FrameBuffer::Attachment::Mask;
 
 namespace Internal
 {
+namespace SceneGraph
+{
+class RenderInstruction;
+}
+
 namespace Render
 {
 class Texture;
@@ -172,7 +176,7 @@ public:
 
   /**
    * The function returns initialized array of clear values
-   * which then can be modified and assed to BeginRenderPass()
+   * which then can be modified and passed to BeginRenderPass()
    * command.
    */
   [[nodiscard]] auto& GetGraphicsRenderPassClearValues()
@@ -180,7 +184,6 @@ public:
     return mClearValues;
   }
 
-private:
   /**
    * @brief Undefined copy constructor. FrameBuffer cannot be copied
    */
@@ -197,15 +200,14 @@ private:
 
   Graphics::FramebufferCreateInfo mCreateInfo;
 
-  // Render pass and render target
+  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};
 
   /**
    * Render passes are created on fly depending on Load and Store operations
    * The default render pass (most likely to be used) is the load = CLEAR
-   * amd store = STORE for color attachment.
+   * and store = STORE for color attachment.
    */
   std::vector<Graphics::UniquePtr<Graphics::RenderPass>> mRenderPass{};
-  Graphics::UniquePtr<Graphics::RenderTarget>            mRenderTarget{nullptr};
 
   // clear colors
   std::vector<Graphics::ClearValue> mClearValues{};

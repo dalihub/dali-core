@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,12 @@ public:
    * Destructor
    */
   ~RenderInstruction();
+
+  // Deleted copy constructor
+  RenderInstruction(const RenderInstruction&) = delete;
+
+  // Deleted assignment operator
+  RenderInstruction& operator=(const RenderInstruction& rhs) = delete;
 
   /**
    * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
@@ -130,16 +136,21 @@ public:
     return mCamera;
   }
 
+  [[nodiscard]] Graphics::CommandBuffer* GetCommandBuffer(Graphics::Controller& graphicsController)
+  {
+    if(!mCommandBuffer)
+    {
+      mCommandBuffer = graphicsController.CreateCommandBuffer(Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::PRIMARY), nullptr);
+    }
+    return mCommandBuffer.get();
+  }
+
   /**
    * Get the total memory usage of the render instruction
    */
   std::size_t GetCapacity();
 
-private:
-  RenderInstruction(const RenderInstruction&) = delete;
-  RenderInstruction& operator=(const RenderInstruction& rhs) = delete;
-
-public:                                  // Data
+public:
   Render::RenderTracker* mRenderTracker; ///< Pointer to an optional tracker object (not owned)
 
   Viewport mViewport;              ///< Optional viewport
@@ -151,7 +162,9 @@ public:                                  // Data
   Render::FrameBuffer* mFrameBuffer;
   uint32_t             mRenderPassTag{0u};
 
-private:                                             // Data
+private:
+  Graphics::UniquePtr<Graphics::CommandBuffer> mCommandBuffer{nullptr}; ///< Output of render lists
+
   Camera*                       mCamera;             ///< camera that is used
   RenderListContainer           mRenderLists;        ///< container of all render lists
   RenderListContainer::SizeType mNextFreeRenderList; ///< index for the next free render list
