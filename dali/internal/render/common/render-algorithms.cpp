@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -741,42 +741,6 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 {
 }
 
-void RenderAlgorithms::ResetCommandBuffer()
-{
-  // Reset main command buffer
-  if(!mGraphicsCommandBuffer)
-  {
-    mGraphicsCommandBuffer = mGraphicsController.CreateCommandBuffer(
-      Graphics::CommandBufferCreateInfo()
-        .SetLevel(Graphics::CommandBufferLevel::PRIMARY),
-      nullptr);
-  }
-  else
-  {
-    mGraphicsCommandBuffer->Reset();
-  }
-
-  Graphics::CommandBufferBeginInfo info;
-  info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
-  mGraphicsCommandBuffer->Begin(info);
-}
-
-void RenderAlgorithms::SubmitCommandBuffer()
-{
-  // Submit main command buffer
-  mGraphicsCommandBuffer->End();
-
-  Graphics::SubmitInfo submitInfo;
-  submitInfo.cmdBuffer.push_back(mGraphicsCommandBuffer.get());
-  submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
-  mGraphicsController.SubmitCommandBuffers(submitInfo);
-}
-
-void RenderAlgorithms::DestroyCommandBuffer()
-{
-  mGraphicsCommandBuffer.reset();
-}
-
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&            instruction,
                                                 BufferIndex                         bufferIndex,
                                                 Integration::DepthBufferAvailable   depthBufferAvailable,
@@ -786,9 +750,11 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 int                                 orientation,
                                                 const Uint16Pair&                   sceneSize,
                                                 Graphics::RenderPass*               renderPass,
-                                                Graphics::RenderTarget*             renderTarget)
+                                                Graphics::RenderTarget*             renderTarget,
+                                                Graphics::CommandBuffer*            commandBuffer)
 {
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss) { oss << "[" << instruction.RenderListCount() << "]"; });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
+                                          { oss << "[" << instruction.RenderListCount() << "]"; });
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
@@ -826,16 +792,16 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           renderTarget);
 
         // Execute command buffer
-        auto* commandBuffer = renderList->GetCommandBuffer();
-        if(commandBuffer)
+        auto* secondaryCommandBuffer = renderList->GetCommandBuffer();
+        if(secondaryCommandBuffer)
         {
-          buffers.push_back(commandBuffer);
+          buffers.push_back(secondaryCommandBuffer);
         }
       }
     }
     if(!buffers.empty())
     {
-      mGraphicsCommandBuffer->ExecuteCommandBuffers(std::move(buffers));
+      commandBuffer->ExecuteCommandBuffers(std::move(buffers));
     }
   }
   DALI_TRACE_END(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS");

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -404,18 +404,19 @@ private:
   bool mNeedFullUpdate;                   ///< A flag to update full area
   bool mPartialUpdateEnabled;             ///< True if the partial update is enabled
 
-  // Render pass and render target
+  // Render target, command buffer and render passes
 
   Graphics::RenderTargetCreateInfo mRenderTargetCreateInfo; // Passed in by message before 2nd stage Initialization happens.
+
+  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr}; ///< This is created in Update/Render thread when surface is created/resized/replaced
 
   /**
    * Render pass is created on fly depending on Load and Store operations
    * The default render pass (most likely to be used) is the load = CLEAR
    * and store = STORE for color attachment.
    */
-  Graphics::UniquePtr<Graphics::RenderPass>   mRenderPass{nullptr};        ///< The render pass created to render the surface
-  Graphics::UniquePtr<Graphics::RenderPass>   mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
-  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};      ///< This is created in Update/Render thread when surface is created/resized/replaced
+  Graphics::UniquePtr<Graphics::RenderPass> mRenderPass{nullptr};        ///< The render pass created to render the surface
+  Graphics::UniquePtr<Graphics::RenderPass> mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
 
   SceneGraph::Layer* mRoot{nullptr}; ///< Root node
 

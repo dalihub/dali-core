@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -145,7 +145,7 @@ uint8_t* FrameBuffer::GetRenderResultBuffer()
       delete[] mRenderResult;
     }
     mRenderResult = new uint8_t[mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888)];
-    buffer = mRenderResult;
+    buffer        = mRenderResult;
   }
   return buffer;
 }
@@ -162,7 +162,7 @@ void FrameBuffer::SetRenderResultDrawn()
 Dali::PixelData FrameBuffer::GetRenderResult()
 {
   Dali::Mutex::ScopedLock lock(mPixelDataMutex);
-  Dali::PixelData pixelData;
+  Dali::PixelData         pixelData;
   if(!mIsKeepingRenderResultRequested && mRenderedPixelData)
   {
     pixelData = mRenderedPixelData;
@@ -243,7 +243,8 @@ bool FrameBuffer::CreateGraphicsObjects()
         .SetPreTransform(0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT);
 
       mRenderTarget = mGraphicsController->CreateRenderTarget(rtInfo, std::move(mRenderTarget));
-      created       = true;
+
+      created = true;
     }
   }
   return created;

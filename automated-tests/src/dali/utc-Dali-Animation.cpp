@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -476,6 +476,8 @@ int UtcDaliAnimationSetLoopCountP(void)
 
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render(0);
 
   // Build the animation
   float     durationSeconds(1.0f);
@@ -687,6 +689,7 @@ int UtcDaliAnimationSetLoopCountP3(void)
   animation.SetLooping(true);
   DALI_TEST_CHECK(animation.IsLooping());
 
+  application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * intervalSeconds * 1000.0f));
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
@@ -797,6 +800,7 @@ int UtcDaliAnimationGetLoopCountP(void)
 
   animation.Play();
 
+  application.SendNotification();
   application.Render(0);
   application.SendNotification();
 
@@ -12698,8 +12702,8 @@ int UtcDaliAnimationAnimateBetweenIntegerP(void)
   const Property::Index index = actor.RegisterProperty("customProperty", startValue);
   application.GetScene().Add(actor);
 
-  application.Render();
   application.SendNotification();
+  application.Render();
 
   DALI_TEST_EQUALS(actor.GetProperty<int>(index), startValue, TEST_LOCATION);
 

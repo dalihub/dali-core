@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_ALGORITHMS_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,9 @@ public:
    * @param[in] rootClippingRect       The clipping rectangle
    * @param[in] orientation            The Scene's surface orientation.
    * @param[in] sceneSize              The Scene's surface size.
+   * @param[in] renderPass             The RenderPass associated with the renderTarget
    * @param[in] renderTarget           The RenderTarget associated with instruction
+   * @param[in] commandBuffer          The CommandBuffer associated with the renderTarget
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
                                 BufferIndex                          bufferIndex,
@@ -72,35 +74,8 @@ public:
                                 int                                  orientation,
                                 const Uint16Pair&                    sceneSize,
                                 Graphics::RenderPass*                renderPass,
-                                Graphics::RenderTarget*              renderTarget);
-
-  /**
-   * Resets main command buffer
-   */
-  void ResetCommandBuffer();
-
-  /**
-   * Submits main command buffer
-   */
-  void SubmitCommandBuffer();
-
-  /**
-   * @brief Destroy main command buffer (called only one time, at terminate case)
-   */
-  void DestroyCommandBuffer();
-
-  /**
-   * Returns main command buffer
-   *
-   * 'Main' command buffer exists per each scene and it is used
-   * to bake all render instructions for the scene.
-   *
-   * @return main command buffer
-   */
-  [[nodiscard]] Graphics::CommandBuffer* GetMainCommandBuffer() const
-  {
-    return mGraphicsCommandBuffer.get();
-  }
+                                Graphics::RenderTarget*              renderTarget,
+                                Graphics::CommandBuffer*             commandBuffer);
 
 private:
   /**
@@ -174,8 +149,7 @@ private:
 
   using ScissorStackType = std::vector<Dali::ClippingBox>; ///< The container type used to maintain the applied scissor hierarchy
 
-  Graphics::Controller&                        mGraphicsController;
-  Graphics::UniquePtr<Graphics::CommandBuffer> mGraphicsCommandBuffer{};
+  Graphics::Controller& mGraphicsController;
 
   std::vector<Graphics::CommandBuffer*> mGraphicsRenderItemCommandBuffers{}; ///< Collection of command buffers issuing single draw call
 

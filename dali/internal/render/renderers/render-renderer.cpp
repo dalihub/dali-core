@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -221,9 +221,7 @@ bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
         //   if it's default, delete the graphics object
         //   otherwise re-initialize it if dirty
 
-        const Graphics::Sampler* graphicsSampler = samplers ? ((i < (*samplers).Size() && (*samplers)[i]) ? (*samplers)[i]->GetGraphicsObject()
-                                                                                                          : nullptr)
-                                                            : nullptr;
+        const Graphics::Sampler* graphicsSampler = samplers ? ((i < (*samplers).Size() && (*samplers)[i]) ? (*samplers)[i]->GetGraphicsObject() : nullptr) : nullptr;
 
         const Graphics::TextureBinding textureBinding{graphicsTexture, graphicsSampler, textureUnit};
         textureBindings.push_back(textureBinding);
@@ -651,7 +649,8 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
   const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
   const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
 
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element) { return (element.node == nodePtr && element.program == programPtr); });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element)
+                           { return (element.node == nodePtr && element.program == programPtr); });
 
   std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
@@ -933,14 +932,16 @@ void Renderer::WriteDynUniform(
 
   const auto valueAddress = propertyValue->GetValueAddress(updateBufferIndex);
 
-  if(propertyValue->GetType() == Property::MATRIX3 &&
-     uniform.matrixStride > 0 &&
-     uniform.matrixStride != uint32_t(-1))
+  if((propertyValue->GetType() == Property::MATRIX3 || propertyValue->GetType() == Property::VECTOR4) &&
+     uniform.matrixStride != uint32_t(-1) &&
+     uniform.matrixStride > 0)
   {
-    for(int i = 0; i < 3; ++i)
+    // If the property is Vector4 type and matrixStride is valid integer, then we should treat it as mat2 type uniforms.
+    const uint32_t matrixRow = (propertyValue->GetType() == Property::MATRIX3) ? 3 : 2;
+    for(uint32_t i = 0; i < matrixRow; ++i)
     {
-      ubo->Write(reinterpret_cast<const float*>(valueAddress) + i * 3,
-                 sizeof(float) * 3,
+      ubo->Write(reinterpret_cast<const float*>(valueAddress) + i * matrixRow,
+                 sizeof(float) * matrixRow,
                  dest + (i * uniform.matrixStride));
     }
   }
@@ -998,7 +999,8 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
   }
 
   // Remove mNodeIndexMap and mUniformIndexMaps.
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element)
+                           { return element.node == &node; });
   while(iter != mNodeIndexMap.end())
   {
     // Swap between end of mUniformIndexMaps and removed.
@@ -1025,7 +1027,8 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
     // Remove uniform index maps.
     mUniformIndexMaps.pop_back();
 
-    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
+    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element)
+                        { return element.node == &node; });
   }
 }
 
