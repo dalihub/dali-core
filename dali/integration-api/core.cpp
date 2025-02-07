@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,9 +109,9 @@ void Core::PreRender(RenderStatus& status, bool forceClear)
   mImpl->PreRender(status, forceClear);
 }
 
-void Core::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+bool Core::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  mImpl->PreRender(scene, damagedRects);
+  return mImpl->PreRender(scene, damagedRects);
 }
 
 void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo)

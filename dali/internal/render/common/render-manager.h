@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -383,8 +383,9 @@ public:
    * @pre The graphics implementation must be initialized
    * @param[in] scene The scene to be rendered.
    * @param[out] damagedRects The list of damaged rects for the current render pass.
+   * @return True if this scene will present, false otherwise.
    */
-  void PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  bool PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
 
   // This method should be called from Core::RenderScene()
 

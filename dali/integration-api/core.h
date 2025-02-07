@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -212,6 +212,7 @@ private:
  * This is the recommended option, so that input processing will not affect the smoothness of animations.
  * Note that the rendering thread must be halted, before destroying the GL context.
  */
+
 class DALI_CORE_API Core
 {
 public:
@@ -353,8 +354,9 @@ public:
    * @pre The GL context must have been created, and made current.
    * @param[in] scene The scene to be rendered.
    * @param[out] damagedRects containing damaged render items rects for this pass.
+   * @return true if the scene has something to render, false if there is nothing to render
    */
-  void PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  bool PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
 
   /**
    * Render a scene in the next frame. This method should be preceded by a call up PreRender.

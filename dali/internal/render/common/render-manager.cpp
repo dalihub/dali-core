@@ -677,15 +677,33 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   mImpl->commandBufferSubmitted = false;
 }
 
-void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
+  bool             somethingToRender = false;
+  Internal::Scene& sceneInternal     = GetImplementation(scene);
+  Scene*           sceneObject       = sceneInternal.GetSceneObject();
+
+  if(!sceneObject)
   {
-    return;
+    // May not be a scene object if the window is being removed.
+    return somethingToRender;
   }
 
-  Internal::Scene&   sceneInternal = GetImplementation(scene);
-  SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
+  const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+  for(uint32_t i = instructionCount; i > 0; --i)
+  {
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i - 1);
+    if(instruction.RenderListCount() > 0)
+    {
+      somethingToRender = true;
+      break;
+    }
+  }
+
+  if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
+  {
+    return somethingToRender;
+  }
 
   if(!sceneObject || sceneObject->IsRenderingSkipped())
   {
@@ -698,7 +716,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     {
       DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
     }
-    return;
+    return somethingToRender;
   }
 
   class DamagedRectsCleaner
@@ -744,7 +762,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     // Clear all dirty rects
     // The rects will be added when partial updated is enabled again
     itemsDirtyRects.clear();
-    return;
+    return somethingToRender;
   }
 
   // Mark previous dirty rects in the std::unordered_map.
@@ -753,7 +771,6 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     dirtyRectPair.second.visited = false;
   }
 
-  uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -939,6 +956,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   {
     damagedRectCleaner.SetCleanOnReturn(false);
   }
+  return somethingToRender;
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
@@ -1111,16 +1129,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
       if(instruction.mFrameBuffer)
       {
-        // Ensure graphics framebuffer is created, bind attachments and create render passes/commandbuffers
-        // Only happens once per framebuffer. If the creation fails, e.g. no attachments yet,
-        // then don't render to this framebuffer.
+        // If ready, ensure framebuffer graphics objects are created, bind attachments and
+        // create render passes/commandbuffers
         if(!instruction.mFrameBuffer->GetGraphicsObject())
         {
-          const bool created = instruction.mFrameBuffer->CreateGraphicsObjects();
-          if(!created)
-          {
-            continue;
-          }
+          instruction.mFrameBuffer->CreateGraphicsObjects();
         }
       }
     }
@@ -1157,6 +1170,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     {
       if(!instruction.mFrameBuffer->GetGraphicsObject())
       {
+        // If not yet ready, ignore.
         continue;
       }
 
