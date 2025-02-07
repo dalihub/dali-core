@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,12 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/transform-manager.h>
 
-//EXTERNAL INCLUDES
+// EXTERNAL INCLUDES
 #include <algorithm>
 #include <cstring>
 #include <type_traits>
 
-//INTERNAL INCLUDES
+// INTERNAL INCLUDES
 #include <dali/internal/common/math.h>
 #include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/update/common/animatable-property.h> ///< for SET_FLAG and BAKE_FLAG
@@ -40,10 +40,10 @@ namespace SceneGraph
 {
 namespace
 {
-//Default values for scale (1.0,1.0,1.0), orientation (Identity) and position (0.0,0.0,0.0)
+// Default values for scale (1.0,1.0,1.0), orientation (Identity) and position (0.0,0.0,0.0)
 static const float gDefaultTransformComponentAnimatableData[] = {1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
 
-//Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
+// Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
 static const float gDefaultTransformComponentStaticData[] = {0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f, true};
 
 static const uint32_t STATIC_COMPONENT_FLAG = 0x01; ///< Indicates that the value when we change static transform components, so need to update at least 1 frame.
@@ -80,6 +80,10 @@ inline void CalculateCenterPosition(
     centerPosition -= (topLeft - transformComponentStatic.mAnchorPoint) * size;
   }
 }
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_TRANSFORM_MANAGER");
+#endif
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_UPDATE_PROCESS, false);
 
@@ -231,12 +235,12 @@ TransformManager::~TransformManager() = default;
 
 TransformId TransformManager::CreateTransform()
 {
-  //Get id for the new component
+  // Get id for the new component
   TransformId id = mIds.Add(mComponentCount);
 
   if(mTxComponentAnimatable.Size() <= mComponentCount)
   {
-    //Make room for another component
+    // Make room for another component
     mTxComponentAnimatable.PushBack(TransformComponentAnimatable());
     mTxComponentStatic.PushBack(TransformComponentStatic());
     mInheritanceMode.PushBack(INHERIT_ALL);
@@ -253,7 +257,7 @@ TransformId TransformManager::CreateTransform()
   }
   else
   {
-    //Set default values
+    // Set default values
     memcpy(&mTxComponentAnimatable[mComponentCount], &gDefaultTransformComponentAnimatableData, sizeof(TransformComponentAnimatable));
     memcpy(&mTxComponentStatic[mComponentCount], &gDefaultTransformComponentStaticData, sizeof(TransformComponentStatic));
     memcpy(&mTxComponentAnimatableBaseValue[mComponentCount], &gDefaultTransformComponentAnimatableData, sizeof(TransformComponentAnimatable));
@@ -275,7 +279,7 @@ TransformId TransformManager::CreateTransform()
 
 void TransformManager::RemoveTransform(TransformId id)
 {
-  //Move the last element to the gap
+  // Move the last element to the gap
   mComponentCount--;
   TransformId index                      = mIds[id];
   mTxComponentAnimatable[index]          = mTxComponentAnimatable[mComponentCount];
@@ -365,24 +369,23 @@ bool TransformManager::Update()
 
   if(mDirtyFlags == CLEAN_FLAG)
   {
-    DALI_LOG_DEBUG_INFO("Transform value is not changed. Skip transform update.\n");
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Transform value is not changed. Skip transform update.\n");
     return false;
   }
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
-    oss << "[" << mComponentCount << "]";
-  });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
+                                          { oss << "[" << mComponentCount << "]"; });
 
   if(mReorder)
   {
     DALI_TRACE_SCOPE(gTraceFilter, "DALI_TRANSFORM_REORDER");
-    //If some transform component has change its parent or has been removed since last update
-    //we need to reorder the vectors
+    // If some transform component has change its parent or has been removed since last update
+    // we need to reorder the vectors
     ReorderComponents();
     mReorder = false;
   }
 
-  //Iterate through all components to compute its world matrix
+  // Iterate through all components to compute its world matrix
   Vector3       centerPosition;
   Vector3       localPosition;
   const Vector3 half(0.5f, 0.5f, 0.5f);
@@ -399,12 +402,12 @@ bool TransformManager::Update()
           // TODO : Skip world matrix comparision. Is it improve performance?
           mWorldMatrixDirty[i] = true;
 
-          //Full transform inherited
+          // Full transform inherited
           CalculateCenterPosition(centerPosition, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i], half, topLeft);
           localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - half) * mSize[parentIndex];
           mLocal[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
 
-          //Update the world matrix
+          // Update the world matrix
           MatrixUtils::MultiplyTransformMatrix(mWorld[i], mLocal[i], mWorld[parentIndex]);
         }
       }
@@ -478,7 +481,7 @@ bool TransformManager::Update()
         mWorldMatrixDirty[i] = mComponentDirty[i] || (previousWorldMatrix != mWorld[i]);
       }
     }
-    else //Component has no parent or doesn't inherit transform
+    else // Component has no parent or doesn't inherit transform
     {
       if(mComponentDirty[i])
       {
@@ -493,7 +496,7 @@ bool TransformManager::Update()
       }
     }
 
-    //Update the bounding sphere
+    // Update the bounding sphere
     Vec3 centerToEdge = {mSize[i].Length() * 0.5f, 0.0f, 0.0f};
     Vec3 centerToEdgeWorldSpace;
     TransformVector3(centerToEdgeWorldSpace, mWorld[i].AsFloat(), centerToEdge);
@@ -508,9 +511,8 @@ bool TransformManager::Update()
 
   mDirtyFlags >>= 1u; ///< age down.
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss) {
-    oss << "[componentsChanged:" << mUpdated << "]";
-  });
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
+                                        { oss << "[componentsChanged:" << mUpdated << "]"; });
 
   return mUpdated;
 }
@@ -1119,6 +1121,6 @@ void TransformManager::SetPositionUsesAnchorPoint(TransformId id, bool value)
   SetTransfromPropertyIfChanged(mTxComponentStatic[index].mPositionUsesAnchorPoint, mComponentDirty[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
 }
 
-} //namespace SceneGraph
-} //namespace Internal
-} //namespace Dali
+} // namespace SceneGraph
+} // namespace Internal
+} // namespace Dali
