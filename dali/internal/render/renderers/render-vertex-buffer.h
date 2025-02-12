@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,7 @@ public:
   /**
    * Perform the upload of the buffer only when required
    * @param[in] graphicsController The controller
+   * @return True if all data are valid so update success. False if some data are invalid.
    */
   bool Update(Graphics::Controller& graphicsController);
 
@@ -206,6 +207,11 @@ public:
     return mGpuBuffer.Get();
   }
 
+  [[nodiscard]] inline bool IsDataChanged() const
+  {
+    return mDataChanged;
+  }
+
 private:
   OwnerPointer<VertexBuffer::Format>   mFormat;    ///< Format of the buffer
   OwnerPointer<Dali::Vector<uint8_t> > mData;      ///< Data
@@ -232,7 +238,7 @@ private:
 
   StateLock<VertexBufferSyncState> mVertexBufferStateLock{VertexBufferSyncState::UNLOCKED};
 
-  bool mDataChanged; ///< Flag to know if data has changed in a frame
+  bool mDataChanged : 1; ///< Flag to know if data has changed in a frame. Reset as false after Update successed.
 };
 
 } // namespace Render

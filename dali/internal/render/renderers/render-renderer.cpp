@@ -963,7 +963,7 @@ void Renderer::SetShaderChanged(bool value)
 
 bool Renderer::Updated()
 {
-  if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged() || mRenderDataProvider->IsUpdated())
+  if(mRenderCallback || mShaderChanged || mGeometry->Updated() || mRenderDataProvider->IsUpdated())
   {
     return true;
   }
