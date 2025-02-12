@@ -649,8 +649,7 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
   const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
   const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
 
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element)
-                           { return (element.node == nodePtr && element.program == programPtr); });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element) { return (element.node == nodePtr && element.program == programPtr); });
 
   std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
@@ -964,7 +963,7 @@ void Renderer::SetShaderChanged(bool value)
 
 bool Renderer::Updated()
 {
-  if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged() || mRenderDataProvider->IsUpdated())
+  if(mRenderCallback || mShaderChanged || mGeometry->Updated() || mRenderDataProvider->IsUpdated())
   {
     return true;
   }
@@ -999,8 +998,7 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
   }
 
   // Remove mNodeIndexMap and mUniformIndexMaps.
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element)
-                           { return element.node == &node; });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
   while(iter != mNodeIndexMap.end())
   {
     // Swap between end of mUniformIndexMaps and removed.
@@ -1027,8 +1025,7 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
     // Remove uniform index maps.
     mUniformIndexMaps.pop_back();
 
-    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element)
-                        { return element.node == &node; });
+    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
   }
 }
 
