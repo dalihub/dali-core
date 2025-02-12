@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,8 @@ Geometry::Geometry()
   mIndexType(Dali::Graphics::Format::R16_UINT),
   mGeometryType(Dali::Geometry::TRIANGLES),
   mIndicesChanged(false),
-  mHasBeenUpdated(false),
-  mAttributesChanged(true)
+  mHasBeenUploaded(false),
+  mUpdated(true)
 {
 }
 
@@ -66,7 +66,7 @@ Geometry::~Geometry() = default;
 void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
 {
   mVertexBuffers.PushBack(vertexBuffer);
-  mAttributesChanged = true;
+  mUpdated = true;
 }
 
 const Vector<Render::VertexBuffer*>& Geometry::GetVertexBuffers() const
@@ -78,6 +78,7 @@ void Geometry::SetIndexBuffer(Uint16ContainerType& indices)
 {
   mIndices.Swap(indices);
   mIndicesChanged = true;
+  mUpdated        = true;
   mIndexType      = Graphics::Format::R16_UINT;
 }
 
@@ -87,6 +88,7 @@ void Geometry::SetIndexBuffer(Uint32ContainerType& indices)
   mIndices.ResizeUninitialized(indices.Count() * 2);
   memcpy(mIndices.Begin(), indices.Begin(), indices.Count() * sizeof(uint32_t));
   mIndicesChanged = true;
+  mUpdated        = true;
   mIndexType      = Graphics::Format::R32_UINT;
 }
 
@@ -99,7 +101,7 @@ void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
     {
       //This will delete the gpu buffer associated to the RenderVertexBuffer if there is one
       mVertexBuffers.Remove(iter);
-      mAttributesChanged = true;
+      mUpdated = true;
       break;
     }
   }
@@ -107,13 +109,13 @@ void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
 
 void Geometry::OnRenderFinished()
 {
-  mHasBeenUpdated    = false;
-  mAttributesChanged = false;
+  mHasBeenUploaded = false;
+  mUpdated         = false;
 }
 
 void Geometry::Upload(Graphics::Controller& graphicsController)
 {
-  if(!mHasBeenUpdated)
+  if(!mHasBeenUploaded)
   {
     // Update buffers
     if(mIndicesChanged)
@@ -138,6 +140,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
 
     for(auto&& buffer : mVertexBuffers)
     {
+      mUpdated = mUpdated || buffer->IsDataChanged();
       if(!buffer->Update(graphicsController))
       {
         //Vertex buffer is not ready ( Size, data or format has not been specified yet )
@@ -145,7 +148,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
       }
     }
 
-    mHasBeenUpdated = true;
+    mHasBeenUploaded = true;
   }
 }
 

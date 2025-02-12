@@ -901,7 +901,7 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
     return true;
   }
 
-  if(mRenderCallback || mShaderChanged || mGeometry->AttributesChanged())
+  if(mRenderCallback || mShaderChanged || mGeometry->Updated())
   {
     return true;
   }
@@ -949,7 +949,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
-  if(mGeometry->AttributesChanged())
+  if(mGeometry->Updated())
   {
     mUpdated = true;
   }

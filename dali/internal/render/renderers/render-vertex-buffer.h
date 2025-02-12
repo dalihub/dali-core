@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,7 @@ public:
   /**
    * Perform the upload of the buffer only when required
    * @param[in] graphicsController The controller
+   * @return True if all data are valid so update success. False if some data are invalid.
    */
   bool Update(Graphics::Controller& graphicsController);
 
@@ -144,6 +145,11 @@ public:
   [[nodiscard]] inline const GpuBuffer* GetGpuBuffer() const
   {
     return mGpuBuffer.Get();
+  }
+
+  [[nodiscard]] inline bool IsDataChanged() const
+  {
+    return mDataChanged;
   }
 
 private:
