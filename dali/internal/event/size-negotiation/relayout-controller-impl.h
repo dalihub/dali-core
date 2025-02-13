@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RELAYOUT_CONTROLLER_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,8 @@ public: // CALLBACKS
   void OnObjectDestroyed(const Dali::RefObject* object);
 
 private:
-  using RawActorList = Dali::Integration::OrderedSet<Dali::Internal::Actor, false>;
+  using RawActorOrderedSet = Dali::Integration::OrderedSet<Dali::Internal::Actor, false>; ///< Specialised container to find duplication list, and order
+  using RawActorList       = std::vector<Dali::Internal::Actor*>;
 
   /**
    * @brief Request for relayout. Relays out whole scene.
@@ -156,16 +157,16 @@ private:
   /**
    * @brief Add actor to request list
    *
-   * @param[in] actor The root of the sub tree to add
+   * @param[in] actorImpl The root of the sub tree to add
    */
-  void AddRequest(Dali::Actor& actor);
+  void AddRequest(Dali::Internal::Actor& actorImpl);
 
   /**
    * @brief Remove actor from request list
    *
-   * @param[in] actor The root of the sub tree to remove
+   * @param[in] actorImpl The root of the sub tree to remove
    */
-  void RemoveRequest(Dali::Actor& actor);
+  void RemoveRequest(const Dali::Internal::Actor& actorImpl);
 
   /**
    * @brief Disconnect the Relayout() method from the Stage::EventProcessingFinishedSignal().
@@ -176,12 +177,12 @@ private:
    * @brief Propagate dirty layout flags to actor and all sub-actors. This will stop propagating when a dirty actor
    * is found.
    *
-   * @param[in] actor The actor to propagate on
+   * @param[in] actorImpl The actor to propagate on
    * @param[in] dimension The dimension to propagate on
    * @param[in] topOfSubTreeStack The top of the sub tree that this actor is in
    * @param[in] potentialRedundantSubRoots Actors collected as potentially already being included in relayout
    */
-  void PropagateAll(Dali::Actor& actor, Dimension::Type dimension, std::vector<Dali::Actor>& topOfSubTreeStack, std::vector<Dali::Actor>& potentialRedundantSubRoots);
+  void PropagateAll(Dali::Internal::Actor& actorImpl, Dimension::Type dimension, RawActorList& topOfSubTreeStack, RawActorList& potentialRedundantSubRoots);
 
   /**
    * Queue an actor on the relayout container
@@ -190,7 +191,14 @@ private:
    * @param[in] actors The container to add the actor to
    * @param[in] size The size that this actor should be
    */
-  void QueueActor(Internal::Actor* actor, RelayoutContainer& actors, Vector2 size);
+  void QueueActor(Internal::Actor& actor, RelayoutContainer& actors, Vector2 size);
+
+  /**
+   * Internal recursive logic for relayout tree
+   *
+   * @param[in] actorImpl The root of the sub tree to request relayout
+   */
+  void RequestRelayoutRecursively(Internal::Actor& actorImpl);
 
   // Undefined
   RelayoutController(const RelayoutController&) = delete;
@@ -202,12 +210,12 @@ private:
 
   SlotDelegate<RelayoutController> mSlotDelegate;
 
-  RawActorList mDirtyLayoutSubTrees; ///< List of roots of sub trees that are dirty
+  RawActorOrderedSet mDirtyLayoutSubTrees; ///< List of roots of sub trees that are dirty
 
   std::unique_ptr<MemoryPoolRelayoutContainer> mRelayoutStack; ///< Stack for relayouting
 
-  std::vector<Dali::Actor> mPotentialRedundantSubRoots; ///< Stack of Actor when RequestLayout comes. Keep it as member to avoid vector size reserving.
-  std::vector<Dali::Actor> mTopOfSubTreeStack;
+  RawActorList mPotentialRedundantSubRoots; ///< Stack of Actor when RequestLayout comes. Keep it as member to avoid vector size reserving.
+  RawActorList mTopOfSubTreeStack;
 
   bool mRelayoutConnection : 1;   ///< Whether EventProcessingFinishedSignal signal is connected.
   bool mRelayoutFlag : 1;         ///< Relayout flag to avoid unnecessary calls

@@ -30,56 +30,45 @@ MemoryPoolRelayoutContainer::MemoryPoolRelayoutContainer(MemoryPoolObjectAllocat
 
 MemoryPoolRelayoutContainer::~MemoryPoolRelayoutContainer() = default;
 
-bool MemoryPoolRelayoutContainer::Contains(const Dali::Actor& actor)
+void MemoryPoolRelayoutContainer::Add(const Dali::Actor& actor, const Vector2& size)
 {
   // Store actor into dummy info.
   // It will be used for check comparision.
+  // TODO : Can't we remove this handle copying, to avoid useless IntrusivePtr ref count?
   mDummyRelayoutInfo->actor = actor;
 
-  bool ret = (mRelayoutInfos.Find(mDummyRelayoutInfo.get()) != mRelayoutInfos.End());
-
-  // Reset empty handle for deference.
-  mDummyRelayoutInfo->actor = Dali::Actor();
-  return ret;
-}
-
-void MemoryPoolRelayoutContainer::Add(const Dali::Actor& actor, const Vector2& size)
-{
-  if(!Contains(actor))
+  if(mRelayoutInfos.Find(mDummyRelayoutInfo.get()) == mRelayoutInfos.End())
   {
     void*         ptr  = mAllocator.AllocateRaw();
     RelayoutInfo* info = new(ptr) RelayoutInfo();
-    info->actor        = actor;
-    info->size         = size;
+
+    info->actor = std::move(mDummyRelayoutInfo->actor);
+    info->size  = size;
 
     mRelayoutInfos.PushBack(info);
   }
-}
-
-void MemoryPoolRelayoutContainer::PopBack()
-{
-  if(mRelayoutInfos.Count() > 0)
+  else
   {
-    RelayoutInfoContainer::Iterator back = mRelayoutInfos.End();
-    back--;
-    RelayoutInfo* info = *back;
-    mRelayoutInfos.Erase(back);
-
-    // Need to be destroyed after mRelayoutInfos erased.
-    mAllocator.Destroy(info);
+    // Reset empty handle for deference.
+    mDummyRelayoutInfo->actor = Dali::Actor();
   }
 }
 
-void MemoryPoolRelayoutContainer::GetBack(Dali::Actor& actorOut, Vector2& sizeOut) const
+void MemoryPoolRelayoutContainer::PopBack(Dali::Actor& actorOut, Vector2& sizeOut)
 {
-  if(mRelayoutInfos.Count() > 0)
-  {
-    RelayoutInfoContainer::ConstIterator back = mRelayoutInfos.End();
-    back--;
-    RelayoutInfo* info = *back;
-    actorOut           = info->actor;
-    sizeOut            = info->size;
-  }
+  DALI_ASSERT_ALWAYS(mRelayoutInfos.Count() > 0 && "Try to pop from empty relayout container!");
+
+  RelayoutInfoContainer::ConstIterator back = mRelayoutInfos.End();
+  back--;
+  RelayoutInfo* info = *back;
+
+  mRelayoutInfos.Erase(back);
+
+  actorOut = std::move(info->actor);
+  sizeOut  = std::move(info->size);
+
+  // Need to be destroyed after mRelayoutInfos erased.
+  mAllocator.Destroy(info);
 }
 
 size_t MemoryPoolRelayoutContainer::Size() const
