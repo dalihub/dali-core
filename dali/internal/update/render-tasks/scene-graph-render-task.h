@@ -373,10 +373,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @return The render instruction
    */
-  RenderInstruction& GetRenderInstruction(BufferIndex updateBufferIndex)
-  {
-    return mRenderInstruction[updateBufferIndex];
-  }
+  RenderInstruction& GetRenderInstruction(BufferIndex updateBufferIndex);
 
   /**
    * Sets Render Pass key for this RenderTask.
@@ -446,7 +443,7 @@ private:
   Node*                    mViewportGuideNode;
   Render::FrameBuffer*     mFrameBuffer;
 
-  RenderInstruction mRenderInstruction[2]; ///< Owned double buffered render instruction. (Double buffered because this owns render commands for the currently drawn frame)
+  RenderInstruction mRenderInstruction; ///< Owned render instruction. (Was double buffered, but no longer needed)
 
   uint32_t mRefreshRate;         ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
   uint32_t mFrameCounter;        ///< counter for rendering every N frames
