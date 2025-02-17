@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,16 @@ struct RenderItem
    * @brief Returns true if this node/renderer uses the stencil buffer (read or write)
    * @return true if this node/renderer pair uses the stencil buffer
    */
-  bool UsesStencilBuffer();
+  bool UsesStencilBuffer() const;
+
+  /**
+   * @brief Get PartialRenderingData::NodeInfomations from node
+   * @return Node infomations from node's partial rendering data.
+   */
+  const PartialRenderingData::NodeInfomations& GetPartialRenderingDataNodeInfomations() const
+  {
+    return mNode->GetPartialRenderingData().mNodeInfomations;
+  }
 
   /**
    * Overriden delete operator.
@@ -139,17 +148,14 @@ struct RenderItem
    */
   void operator delete(void* ptr);
 
-  Matrix              mModelMatrix;
   Matrix              mModelViewMatrix;
-  Vector3             mScale;
-  Vector3             mSize;
-  Vector4             mUpdateArea; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
   Render::RendererKey mRenderer;
-  Node*               mNode;
+  const Node*         mNode;
   const void*         mTextureSet; ///< Used for sorting only
   int                 mDepthIndex;
-  bool                mIsOpaque : 1;
-  bool                mIsUpdated : 1;
+
+  bool mIsOpaque : 1;
+  bool mIsUpdated : 1;
 
   /**
    * Get the capacity of the global pool.
@@ -168,7 +174,7 @@ private:
   RenderItem();
 
   // RenderItems should not be copied as they are heavy
-  RenderItem(const RenderItem& item)            = delete;
+  RenderItem(const RenderItem& item) = delete;
   RenderItem& operator=(const RenderItem& item) = delete;
 };
 

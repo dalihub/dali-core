@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -717,6 +717,8 @@ public:
       mUpdateAreaHint    = updateAreaHint;
       mUpdateAreaChanged = true;
     }
+
+    mUpdateAreaUseSize = (mUpdateAreaHint == Vector4::ZERO);
     mDirtyFlags |= NodePropertyFlags::TRANSFORM;
   }
 
@@ -998,10 +1000,24 @@ public:
   static uint32_t GetMemoryPoolCapacity();
 
   /**
+   * @brief Update partial rendering data from the latest node infomations.
+   */
+  void UpdatePartialRenderingData(BufferIndex bufferIndex, bool isLayer3d);
+
+  /**
    * @brief Returns partial rendering data associated with the node.
    * @return The partial rendering data
    */
   PartialRenderingData& GetPartialRenderingData()
+  {
+    return mPartialRenderingData;
+  }
+
+  /**
+   * @brief Returns partial rendering data associated with the node.
+   * @return The partial rendering data
+   */
+  const PartialRenderingData& GetPartialRenderingData() const
   {
     return mPartialRenderingData;
   }
@@ -1080,6 +1096,17 @@ private:
    */
   void RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex);
 
+  /**
+   * @brief Calculates the update area of the node. Or Vector4::ZERO if partial update area is not 2D scale.
+   * @param[in] isLayer3d Whether we are processing a 3D layer or not
+   * @param[in] nodeWorldMatrix The world matrix of the node
+   * @param[in] nodeSize The size of the node
+   *
+   * @return It's own UpdateAreaHint, or if we use nodeUpdateArea equal with Vector4(0, 0, nodeSize.width, nodeSize.height),
+   *         or Vector4::ZERO if z transform occured.
+   */
+  Vector4 CalculateNodeUpdateArea(bool isLayer3d, const Matrix& nodeWorldMatrix, const Vector3& nodeSize) const;
+
 public: // Default properties
   // Define a base offset for the following wrappers. The wrapper macros calculate offsets from the previous
   // element such that each wrapper type generates a compile time offset to the transform manager data.
@@ -1144,6 +1171,7 @@ protected:
   bool               mPositionUsesAnchorPoint : 1; ///< True if the node should use the anchor-point when calculating the position
   bool               mTransparent : 1;             ///< True if this node is transparent. This value do not affect children.
   bool               mUpdateAreaChanged : 1;       ///< True if the update area of the node is changed.
+  bool               mUpdateAreaUseSize : 1;       ///< True if the update area of the node is same as node size.
   bool               mUseTextureUpdateArea : 1;    ///< Whether the actor uses the update area of the texture instead of its own.
 
   // Changes scope, should be at end of class

@@ -74,7 +74,7 @@ Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex u
     // const float decoratedBorderlineWidth = std::max((1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth, 2.0f * blurRadius);
     // const Vector2 decoratedVisualSize    = visualSize + Vector2(decoratedBorderlineWidth, decoratedBorderlineWidth);
 
-    // Note : vertexPositoin.xy = aPosition * decoratedVisualSize
+    // Note : vertexPosition.xy = aPosition * decoratedVisualSize
     //                          + anchorPoint * visualSize
     //                          + origin * uSize.xy
     //                          + visualOffset;
