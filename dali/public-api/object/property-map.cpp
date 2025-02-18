@@ -55,12 +55,14 @@ public:
       {
         // Use unordered hash operation.
         auto valueHash = iter.second.GetHash();
+        valueHash *= valueHash;
         hash += Dali::Internal::HashUtils::HashStringView(std::string_view(iter.first), valueHash);
       }
       for(const auto& iter : mIndexValueContainer)
       {
         // Use unordered hash operation.
         auto valueHash = iter.second.GetHash();
+        valueHash *= valueHash;
         hash += Dali::Internal::HashUtils::HashRawValue(iter.first, valueHash);
       }
 
@@ -157,6 +159,7 @@ void Property::Map::Insert(std::string key, Value value)
   {
     // Use unordered hash operation.
     auto valueHash = value.GetHash();
+    valueHash *= valueHash;
     mImpl->mHash += Dali::Internal::HashUtils::HashStringView(std::string_view(key), valueHash);
   }
   mImpl->mStringValueContainer.push_back(std::make_pair(std::move(key), std::move(value)));
@@ -173,6 +176,7 @@ void Property::Map::Insert(Property::Index key, Value value)
   {
     // Use unordered hash operation.
     auto valueHash = value.GetHash();
+    valueHash *= valueHash;
     mImpl->mHash += Dali::Internal::HashUtils::HashRawValue(key, valueHash);
   }
   mImpl->mIndexValueContainer.push_back(std::make_pair(key, std::move(value)));
@@ -376,6 +380,7 @@ bool Property::Map::Remove(Property::Index key)
       {
         // Use unordered hash operation.
         auto valueHash = iter->second.GetHash();
+        valueHash *= valueHash;
         mImpl->mHash -= Dali::Internal::HashUtils::HashRawValue(key, valueHash);
       }
       mImpl->mIndexValueContainer.erase(iter);
@@ -396,6 +401,7 @@ bool Property::Map::Remove(std::string_view key)
       {
         // Use unordered hash operation.
         auto valueHash = iter->second.GetHash();
+        valueHash *= valueHash;
         mImpl->mHash -= Dali::Internal::HashUtils::HashStringView(key, valueHash);
       }
       mImpl->mStringValueContainer.erase(iter);

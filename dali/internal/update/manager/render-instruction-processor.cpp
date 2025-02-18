@@ -144,44 +144,6 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
 }
 
 /**
- * Set the update area of the node
- * @param[in] node The node of the renderer
- * @param[in] isLayer3d Whether we are processing a 3D layer or not
- * @param[in,out] nodeWorldMatrix The world matrix of the node
- * @param[in,out] nodeSize The size of the node
- * @param[in,out] nodeUpdateArea The update area of the node
- *
- * @return True if node use it's own UpdateAreaHint, or z transform occured. False if we use nodeUpdateArea equal with Vector4(0, 0, nodeSize.width, nodeSize.height).
- */
-inline bool SetNodeUpdateArea(Node* node, bool isLayer3d, Matrix& nodeWorldMatrix, Vector3& nodeSize, Vector4& nodeUpdateArea)
-{
-  node->GetWorldMatrixAndSize(nodeWorldMatrix, nodeSize);
-
-  if(node->GetUpdateAreaHint() == Vector4::ZERO)
-  {
-    if(isLayer3d)
-    {
-      return true;
-    }
-    // RenderItem::CalculateViewportSpaceAABB cannot cope with z transform
-    // I don't use item.mModelMatrix.GetTransformComponents() for z transform, would be too slow
-    Vector3 zaxis = nodeWorldMatrix.GetZAxis();
-    if(EqualsZero(zaxis.x) && EqualsZero(zaxis.y))
-    {
-      nodeUpdateArea = Vector4(0.0f, 0.0f, nodeSize.width, nodeSize.height);
-      return false;
-    }
-    // Keep nodeUpdateArea as Vector4::ZERO, and return true.
-    return true;
-  }
-  else
-  {
-    nodeUpdateArea = node->GetUpdateAreaHint();
-    return true;
-  }
-}
-
-/**
  * Add a renderer to the list
  * @param updateBufferIndex to read the model matrix from
  * @param renderPass render pass for this render instruction
@@ -209,15 +171,15 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
                                     bool                      cullingEnabled,
                                     Node*                     stopperNode)
 {
-  bool    inside(true);
-  Node*   node = renderable.mNode;
-  Matrix  nodeWorldMatrix(false);
-  Vector3 nodeScale;
-  Vector3 nodeSize;
-  Vector4 nodeUpdateArea;
-  bool    nodeUpdateAreaSet(false);
-  Matrix  nodeModelViewMatrix(false);
-  bool    nodeModelViewMatrixSet(false);
+  bool  inside(true);
+  Node* node = renderable.mNode;
+
+  bool nodePartialRenderingDataUpdateChecked(false);
+
+  Matrix nodeModelViewMatrix(false);
+  bool   nodeModelViewMatrixSet(false);
+
+  auto& nodePartialRenderingData = node->GetPartialRenderingData();
 
   const bool rendererExist(renderable.mRenderer);
 
@@ -246,16 +208,18 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
     if(inside && !isLayer3d && viewportSet)
     {
-      SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
-      nodeUpdateAreaSet = true;
+      node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d);
 
-      nodeScale = nodeWorldMatrix.GetScale();
+      const Vector4& nodeUpdateArea = nodePartialRenderingData.mNodeInfomations.updatedPositionSize;
+      const Vector3& nodeScale      = nodePartialRenderingData.mNodeInfomations.modelMatrix.GetScale();
+
+      nodePartialRenderingDataUpdateChecked = true;
 
       const Vector3& size = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f) * nodeScale;
 
       if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
-        MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodePartialRenderingData.mNodeInfomations.modelMatrix, viewMatrix);
         nodeModelViewMatrixSet = true;
 
         // Assume actors are at z=0, compute AABB in view space & test rect intersection
@@ -267,7 +231,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
         //  - If then, It must use math calculate like tan(fov) internally. So, we might need calculate it only one times, and cache.
         ClippingBox boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, Vector3(nodeUpdateArea.x, nodeUpdateArea.y, 0.0f), Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f));
         ClippingBox clippingBox = camera.GetOrthographicClippingBox(updateBufferIndex);
-        inside                  = clippingBox.Intersects(boundingBox);
+
+        inside = clippingBox.Intersects(boundingBox);
       }
     }
     /*
@@ -299,7 +264,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       // Get the next free RenderItem.
       RenderItem& item = renderList.GetNextFreeItem();
 
-      item.mNode       = node;
+      item.mNode       = static_cast<const Node*>(node);
       item.mIsOpaque   = isOpaque;
       item.mDepthIndex = isLayer3d ? 0 : node->GetDepthIndex();
 
@@ -316,37 +281,19 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       item.mIsUpdated = (viewMatrixChanged || isLayer3d);
 
-      if(!nodeUpdateAreaSet)
+      if(!nodePartialRenderingDataUpdateChecked)
       {
-        SetNodeUpdateArea(node, isLayer3d, nodeWorldMatrix, nodeSize, nodeUpdateArea);
-        nodeScale = nodeWorldMatrix.GetScale();
+        node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d);
       }
 
       if(!nodeModelViewMatrixSet)
       {
-        MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodeWorldMatrix, viewMatrix);
+        MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodePartialRenderingData.mNodeInfomations.modelMatrix, viewMatrix);
       }
 
-      item.mScale           = nodeScale;
-      item.mSize            = nodeSize;
-      item.mUpdateArea      = nodeUpdateArea;
-      item.mModelMatrix     = std::move(nodeWorldMatrix);
       item.mModelViewMatrix = std::move(nodeModelViewMatrix);
 
-      auto& nodePartialRenderingData = node->GetPartialRenderingData();
-
-      if(nodePartialRenderingData.mUpdateDecay == PartialRenderingData::Decay::UPDATED_CURRENT_FRAME)
-      {
-        item.mIsUpdated = nodePartialRenderingData.mUpdated;
-      }
-      else
-      {
-        // Update current node's partial update data as latest.
-        if(nodePartialRenderingData.UpdateNodeInfomations(item.mModelMatrix, node->GetWorldColor(updateBufferIndex), item.mUpdateArea, item.mSize))
-        {
-          item.mIsUpdated = true;
-        }
-      }
+      item.mIsUpdated = item.mIsUpdated || nodePartialRenderingData.mUpdated;
     }
 
     node->SetCulled(updateBufferIndex, false);

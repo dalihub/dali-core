@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,10 +58,7 @@ void RenderItem::ResetMemoryPool()
 }
 
 RenderItem::RenderItem()
-: mModelMatrix(false),
-  mModelViewMatrix(false),
-  mScale(),
-  mSize(),
+: mModelViewMatrix(false),
   mRenderer{},
   mNode(nullptr),
   mTextureSet(nullptr),
@@ -208,7 +205,7 @@ bool RenderItem::UsesDepthBuffer(bool depthTestEnabled)
   return enableDepthTest || enableDepthWrite;
 }
 
-bool RenderItem::UsesStencilBuffer()
+bool RenderItem::UsesStencilBuffer() const
 {
   RenderMode::Type renderMode  = RenderMode::AUTO;
   bool             usesStencil = false;

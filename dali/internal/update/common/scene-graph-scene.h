@@ -48,7 +48,7 @@ class Node;
 
 struct DirtyRectKey
 {
-  DirtyRectKey(Node* node, Render::RendererKey renderer)
+  DirtyRectKey(const Node* node, Render::RendererKey renderer)
   : node(node),
     renderer(renderer)
   {
@@ -91,7 +91,7 @@ struct DirtyRectKey
   };
 #endif
 
-  Node*               node{nullptr};
+  const Node*         node{nullptr};
   Render::RendererKey renderer{};
 };
 

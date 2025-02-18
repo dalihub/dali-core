@@ -128,7 +128,7 @@ inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorAr
   return newScissorArea;
 }
 
-inline Rect<int32_t> CalculateUpdateArea(RenderItem& item, BufferIndex renderBufferIndex, const Rect<int32_t>& viewportRect)
+inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& updatedPositionSize, BufferIndex renderBufferIndex, const Rect<int32_t>& viewportRect)
 {
   Vector4 updateArea;
   if(item.mNode && item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
@@ -137,7 +137,7 @@ inline Rect<int32_t> CalculateUpdateArea(RenderItem& item, BufferIndex renderBuf
   }
   else
   {
-    updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(renderBufferIndex, item.mUpdateArea) : item.mUpdateArea;
+    updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(renderBufferIndex, updatedPositionSize) : updatedPositionSize;
   }
 
   return RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height);
@@ -677,15 +677,33 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   mImpl->commandBufferSubmitted = false;
 }
 
-void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
+  bool             somethingToRender = false;
+  Internal::Scene& sceneInternal     = GetImplementation(scene);
+  Scene*           sceneObject       = sceneInternal.GetSceneObject();
+
+  if(!sceneObject)
   {
-    return;
+    // May not be a scene object if the window is being removed.
+    return somethingToRender;
   }
 
-  Internal::Scene&   sceneInternal = GetImplementation(scene);
-  SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
+  const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+  for(uint32_t i = instructionCount; i > 0; --i)
+  {
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i - 1);
+    if(instruction.RenderListCount() > 0)
+    {
+      somethingToRender = true;
+      break;
+    }
+  }
+
+  if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
+  {
+    return somethingToRender;
+  }
 
   if(!sceneObject || sceneObject->IsRenderingSkipped())
   {
@@ -698,7 +716,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     {
       DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
     }
-    return;
+    return somethingToRender;
   }
 
   class DamagedRectsCleaner
@@ -744,7 +762,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     // Clear all dirty rects
     // The rects will be added when partial updated is enabled again
     itemsDirtyRects.clear();
-    return;
+    return somethingToRender;
   }
 
   // Mark previous dirty rects in the std::unordered_map.
@@ -753,7 +771,6 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     dirtyRectPair.second.visited = false;
   }
 
-  uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -824,8 +841,12 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
             for(uint32_t listIndex = 0u; listIndex < listCount; ++listIndex)
             {
               RenderItem& item = renderList->GetItem(listIndex);
+
+              // Get NodeInformation as const l-value, to reduce memory access operations.
+              const SceneGraph::PartialRenderingData::NodeInfomations& nodeInfo = item.GetPartialRenderingDataNodeInfomations();
+
               // If the item does 3D transformation, make full update
-              if(item.mUpdateArea == Vector4::ZERO)
+              if(nodeInfo.updatedPositionSize == Vector4::ZERO)
               {
                 cleanDamagedRect = true;
 
@@ -853,9 +874,9 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                  (item.mNode &&
                   (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated()))))
               {
-                item.mIsUpdated = false;
+                item.mIsUpdated = false; /// DevNote : Reset flag here, since RenderItem could be reused by renderList.ReuseCachedItems().
 
-                rect = CalculateUpdateArea(item, mImpl->renderBufferIndex, viewportRect);
+                rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, mImpl->renderBufferIndex, viewportRect);
                 if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                 {
                   AlignDamagedRect(rect);
@@ -894,7 +915,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
                 else
                 {
                   // The item is not in the list for some reason. Add the current rect!
-                  rect = CalculateUpdateArea(item, mImpl->renderBufferIndex, viewportRect);
+                  rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, mImpl->renderBufferIndex, viewportRect);
                   if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                   {
                     AlignDamagedRect(rect);
@@ -939,6 +960,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   {
     damagedRectCleaner.SetCleanOnReturn(false);
   }
+  return somethingToRender;
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
@@ -1011,11 +1033,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         bool        usesStencilBuffer = false;
         for(auto k = 0u; k < renderList->Count(); ++k)
         {
-          auto& item = renderList->GetItem(k);
-          usesStencilBuffer |= item.UsesStencilBuffer();
+          auto& item        = renderList->GetItem(k);
+          usesStencilBuffer = usesStencilBuffer || item.UsesStencilBuffer();
           if(item.mRenderer && item.mRenderer->NeedsProgram())
           {
-            usesDepthBuffer |= item.UsesDepthBuffer(autoDepthTestMode);
+            usesDepthBuffer = usesDepthBuffer || item.UsesDepthBuffer(autoDepthTestMode);
 
             // Prepare and store used programs for further processing
             auto program = item.mRenderer->PrepareProgram(instruction);
@@ -1111,16 +1133,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
       if(instruction.mFrameBuffer)
       {
-        // Ensure graphics framebuffer is created, bind attachments and create render passes/commandbuffers
-        // Only happens once per framebuffer. If the creation fails, e.g. no attachments yet,
-        // then don't render to this framebuffer.
+        // If ready, ensure framebuffer graphics objects are created, bind attachments and
+        // create render passes/commandbuffers
         if(!instruction.mFrameBuffer->GetGraphicsObject())
         {
-          const bool created = instruction.mFrameBuffer->CreateGraphicsObjects();
-          if(!created)
-          {
-            continue;
-          }
+          instruction.mFrameBuffer->CreateGraphicsObjects();
         }
       }
     }
@@ -1157,6 +1174,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     {
       if(!instruction.mFrameBuffer->GetGraphicsObject())
       {
+        // If not yet ready, ignore.
         continue;
       }
 

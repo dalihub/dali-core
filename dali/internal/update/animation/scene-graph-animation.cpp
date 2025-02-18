@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,10 @@
 
 namespace // Unnamed namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gAnimFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_ANIMATION");
+#endif
+
 // Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation>& GetAnimationMemoryPool()
 {
@@ -240,7 +244,7 @@ void Animation::Pause()
 {
   if(mState == Playing)
   {
-    DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Pause (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+    DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Pause (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
     mState = Paused;
   }
 }
@@ -264,7 +268,7 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
 
 void Animation::SetAnimatorsActive(bool active)
 {
-  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms %s (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop", "SRPD"[mState]);
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms %s (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop", "SRPD"[mState]);
   for(auto&& item : mAnimators)
   {
     item->SetActive(active);
@@ -283,7 +287,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
     if(mEndAction != Dali::Animation::DISCARD)
     {
       Bake(bufferIndex, mEndAction);
-      DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Stop (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+      DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Stop (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
       // Animators are automatically set to inactive in Bake
     }
@@ -319,7 +323,7 @@ void Animation::ClearAnimator(BufferIndex bufferIndex)
   mPlayedCount = 0;
   mCurrentLoop = 0;
 
-  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Clear (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Clear (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 }
 
 void Animation::OnDestroy(BufferIndex bufferIndex)
@@ -338,7 +342,7 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
     }
   }
 
-  DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Destroy (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Destroy (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
   mIsStopped = false; ///< Do not make notify.
   mState     = Destroyed;
@@ -449,7 +453,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stop
         {
           DALI_ASSERT_DEBUG(mCurrentLoop == mLoopCount);
           finished = true;
-          DALI_LOG_DEBUG_INFO("Animation[%u] with duration %f ms Finished (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+          DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Finished (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
           // The animation has now been played to completion
           ++mPlayedCount;
