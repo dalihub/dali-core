@@ -954,9 +954,6 @@ bool Animation::HasFinished()
 
   if(playedCount > mNotificationCount)
   {
-    // Note that only one signal is emitted, if the animation has been played repeatedly
-    mNotificationCount = playedCount;
-
     switch(mState)
     {
       case Internal::Animation::InternalState::PLAYING:
@@ -982,6 +979,12 @@ bool Animation::HasFinished()
       {
         break;
       }
+    }
+
+    if(hasFinished)
+    {
+      // Note that only one signal is emitted, if the animation has been played repeatedly
+      mNotificationCount = playedCount;
     }
   }
 
