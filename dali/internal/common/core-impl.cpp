@@ -270,7 +270,9 @@ void Core::ForceRelayout()
   // Copy the Scene container locally to avoid possibly invalid iterator
   SceneContainer scenes = mScenes;
 
+  DALI_LOG_DEBUG_INFO("ForceRelayout()\n");
   RelayoutAndFlush(scenes);
+  DALI_LOG_DEBUG_INFO("ForceRelayout() done\n");
 }
 
 void Core::ProcessEvents()
@@ -347,6 +349,8 @@ void Core::RelayoutAndFlush(SceneContainer& scenes)
 
     // Signal that any messages received will be flushed soon
     mUpdateManager->EventProcessingStarted();
+
+    mNotificationManager->ProcessMessages();
   }
 
   mRelayoutFlush = true;
@@ -386,6 +390,9 @@ void Core::RelayoutAndFlush(SceneContainer& scenes)
 
   if(!isProcessEvents)
   {
+    // Notify to animation play list that event processing has finished.
+    mAnimationPlaylist->EventLoopFinished();
+
     // Revert fake informations
     mProcessingEvent = false;
     mRelayoutController->SetProcessingCoreEvents(false);

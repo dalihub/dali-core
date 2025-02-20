@@ -3989,6 +3989,53 @@ int UtcDaliAnimationClearIgnoreFinishedSignal(void)
     application.SendNotification();
     application.Render(0);
   }
+  {
+    tet_printf("Check whether clear and render-well case don't send signal\n");
+    // Play the animation, and clear when animation finished naturally, and play again.
+    animation.Play();
+
+    application.SendNotification();
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f));
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    // Call Clear now.
+    animation.Clear();
+
+    // Finish animation naturally. (Note that dali don't call finished callback even if one render frame spend more than duration.)
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f) + 10u);
+    application.SendNotification();
+
+    // expect finished signal not be recieved due to Animation cleared.
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    // Play again
+    animation.Play();
+    application.SendNotification();
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f));
+    finishCheck.CheckSignalNotReceived();
+    finishCheck.Reset();
+
+    application.Render(static_cast<uint32_t>(durationSeconds * 500.0f) + 10u);
+    application.SendNotification();
+
+    // expect finished signal recieved due to Animation finished.
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+    finishCheck.Reset();
+
+    application.SendNotification();
+    application.Render(0);
+  }
 
   END_TEST;
 }
