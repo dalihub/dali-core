@@ -17283,3 +17283,56 @@ int UtcDaliAnimationPlayWorkerThreadN(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationStressTest(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimationStressTest Test, for line coverage");
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Build the animation
+  float     durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  DALI_TEST_EQUALS(animation.GetDuration(), durationSeconds, TEST_LOCATION);
+
+  // Start the animation with a lots of animations
+  Vector3  targetPosition(10.0f, 10.0f, 10.0f);
+  uint32_t animateToCount = 100;
+  for(auto i = 0u; i < animateToCount; ++i)
+  {
+    float timeRate = static_cast<float>(i) / static_cast<float>(animateToCount);
+    animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition + Vector3::XAXIS, TimePeriod(timeRate * durationSeconds * 0.9f, timeRate * durationSeconds * 0.1f));
+  }
+
+  DALI_TEST_EQUALS(Vector3::ZERO, actor.GetProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
+  animation.Play();
+
+  // Check property changed as latest value of animation.
+  DALI_TEST_EQUALS(targetPosition, actor.GetProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
+
+  bool                 signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) - 1u /*just less than the animation duration*/);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  application.Render(2u /*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS(targetPosition, actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
+
+  // Restart the animation, with a different duration
+  finishCheck.Reset();
+
+  END_TEST;
+}
