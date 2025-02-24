@@ -24,6 +24,7 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/public-api/common/list-wrapper.h>
 #include <dali/internal/render/renderers/render-geometry.h> ///< For Geometry::LifecycleObserver
+#include <dali/internal/render/shaders/program.h>           ///< For Program::LifecycleObserver
 
 namespace Dali::Internal
 {
@@ -159,6 +160,11 @@ public:
   void ResetPipeline(PipelineCachePtr pipelineCache);
 
 public: // From Geometry::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryBufferChanged()
+   */
+  Geometry::LifecycleObserver::NotifyReturnType GeometryBufferChanged(const Geometry* geometry);
+
   /**
    * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
    */

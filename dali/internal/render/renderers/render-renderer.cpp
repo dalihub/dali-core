@@ -205,6 +205,12 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
   mShaderCache          = &shaderCache;
   mUniformBufferManager = &uniformBufferManager;
   mPipelineCache        = &pipelineCache;
+
+  // Add Observer now
+  if(mGeometry)
+  {
+    mGeometry->AddLifecycleObserver(*this);
+  }
 }
 
 Renderer::~Renderer()
@@ -215,18 +221,38 @@ Renderer::~Renderer()
     mPipelineCache->ResetPipeline(mPipeline);
     mPipelineCached = false;
   }
+
+  // Stop observing
+  if(mGeometry)
+  {
+    mGeometry->RemoveLifecycleObserver(*this);
+    mGeometry = nullptr;
+  }
 }
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  mGeometry = geometry;
-  mUpdated  = true;
-
-  // Reset old pipeline
-  if(DALI_LIKELY(mPipelineCached))
+  if(mGeometry != geometry)
   {
-    mPipelineCache->ResetPipeline(mPipeline);
-    mPipelineCached = false;
+    if(mGeometry)
+    {
+      mGeometry->RemoveLifecycleObserver(*this);
+    }
+
+    mGeometry = geometry;
+
+    if(mGeometry)
+    {
+      mGeometry->AddLifecycleObserver(*this);
+    }
+
+    // Reset old pipeline
+    if(DALI_LIKELY(mPipelineCached))
+    {
+      mPipelineCache->ResetPipeline(mPipeline);
+      mPipelineCached = false;
+    }
+    mUpdated  = true;
   }
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
@@ -948,6 +974,27 @@ bool Renderer::Updated(BufferIndex bufferIndex, const SceneGraph::NodeDataProvid
   }
 
   return false;
+}
+
+Geometry::LifecycleObserver::NotifyReturnType Renderer::GeometryBufferChanged(const Geometry* geometry)
+{
+  DALI_ASSERT_ALWAYS(mGeometry == geometry && "Something wrong happend when Render::Renderer observed by geometry!");
+
+  // Reset old pipeline
+  if(DALI_LIKELY(mPipelineCached))
+  {
+    mPipelineCache->ResetPipeline(mPipeline);
+    mPipelineCached = false;
+  }
+
+  return Geometry::LifecycleObserver::NotifyReturnType::KEEP_OBSERVING;
+}
+
+void Renderer::GeometryDestroyed(const Geometry* geometry)
+{
+  // Let just run the same logic with geometry buffer changed cases.
+  [[maybe_unused]] auto ret = GeometryBufferChanged(geometry);
+  mGeometry                 = nullptr;
 }
 
 Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
