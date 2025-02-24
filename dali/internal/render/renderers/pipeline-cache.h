@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PIPELINE_CACHE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/public-api/common/list-wrapper.h>
+#include <dali/internal/render/renderers/render-geometry.h> ///< For Geometry::LifecycleObserver
 
 namespace Dali::Internal
 {
@@ -30,7 +31,6 @@ class Program;
 namespace Render
 {
 class Renderer;
-class Geometry;
 
 struct PipelineCacheL2;
 struct PipelineCacheL1;
@@ -130,7 +130,7 @@ struct PipelineResult
 /**
  * Pipeline cache
  */
-class PipelineCache
+class PipelineCache : public Geometry::LifecycleObserver
 {
 public:
   /**
@@ -138,6 +138,11 @@ public:
    * @param[in] controller Graphics controller
    */
   explicit PipelineCache(Graphics::Controller& controller);
+
+  /**
+   * Destructor
+   */
+  ~PipelineCache();
 
   /**
    * Retrieves next cache level
@@ -172,6 +177,12 @@ public:
    * @param pipelineCache The pipeline cache to decrease the reference count
    */
   void ResetPipeline(PipelineCachePtr pipelineCache);
+
+public: // From Geometry::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
+   */
+  void GeometryDestroyed(const Geometry* geometry);
 
 private:
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -255,6 +255,9 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
     level0.geometry   = geometry;
     level0.inputState = vertexInputState;
 
+    // Observer geometry lifecycle
+    geometry->AddLifecycleObserver(*this);
+
     it = level0nodes.insert(level0nodes.end(), std::move(level0));
 
     if(attrNotFound)
@@ -502,6 +505,15 @@ PipelineCache::PipelineCache(Graphics::Controller& controller)
   CleanLatestUsedCache();
 }
 
+PipelineCache::~PipelineCache()
+{
+  // Stop observer lifecycle
+  for(auto&& level0node : level0nodes)
+  {
+    level0node.geometry->RemoveLifecycleObserver(*this);
+  }
+}
+
 PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound)
 {
   // Seperate branch whether query use blending or not.
@@ -577,6 +589,8 @@ void PipelineCache::ClearUnusedCache()
 
     if(iter->level1nodes.empty())
     {
+      // Stop observer lifecycle
+      iter->geometry->RemoveLifecycleObserver(*this);
       iter = level0nodes.erase(iter);
     }
     else
@@ -590,6 +604,22 @@ void PipelineCache::ResetPipeline(PipelineCachePtr pipelineCache)
 {
   // TODO : Can we always assume that pipelineCache input is valid iterator?
   pipelineCache->referenceCount--;
+}
+
+void PipelineCache::GeometryDestroyed(const Geometry* geometry)
+{
+  // Remove cached items what cache hold now.
+  for(auto iter = level0nodes.begin(); iter != level0nodes.end();)
+  {
+    if(iter->geometry == geometry)
+    {
+      iter = level0nodes.erase(iter);
+    }
+    else
+    {
+      iter++;
+    }
+  }
 }
 
 } // namespace Dali::Internal::Render
