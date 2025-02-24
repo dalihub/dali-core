@@ -51,17 +51,31 @@ inline constexpr size_t GetSizeOfIndexFromIndexType(Dali::Graphics::Format graph
 }
 } // unnamed namespace
 Geometry::Geometry()
-: mIndices(),
+: mLifecycleObservers(),
+  mIndices(),
   mIndexBuffer(nullptr),
   mIndexType(Dali::Graphics::Format::R16_UINT),
   mGeometryType(Dali::Geometry::TRIANGLES),
   mIndicesChanged(false),
   mHasBeenUploaded(false),
-  mUpdated(true)
+  mUpdated(true),
+  mObserverNotifying(false)
 {
 }
 
-Geometry::~Geometry() = default;
+Geometry::~Geometry()
+{
+  mObserverNotifying = true;
+  for(auto&& iter : mLifecycleObservers)
+  {
+    auto* observer = iter.first;
+    observer->GeometryDestroyed(this);
+  }
+  mLifecycleObservers.clear();
+
+  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
+  // If someone call AddObserver / RemoveObserver after this, assert.
+}
 
 void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
 {
@@ -151,6 +165,25 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
     }
 
     mHasBeenUploaded = true;
+
+    // Notify to observers that geometry informations are changed
+    if(mUpdated)
+    {
+      mObserverNotifying = true;
+      for(auto iter = mLifecycleObservers.begin(); iter != mLifecycleObservers.end();)
+      {
+        auto returnValue = (*iter).first->GeometryBufferChanged(this);
+        if(returnValue == LifecycleObserver::KEEP_OBSERVING)
+        {
+          ++iter;
+        }
+        else
+        {
+          iter = mLifecycleObservers.erase(iter);
+        }
+      }
+      mObserverNotifying = false;
+    }
   }
 }
 

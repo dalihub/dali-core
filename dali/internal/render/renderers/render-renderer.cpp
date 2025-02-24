@@ -158,6 +158,12 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
   mProgramCache         = &programCache;
   mUniformBufferManager = &uniformBufferManager;
   mPipelineCache        = &pipelineCache;
+
+  // Add Observer now
+  if(mGeometry)
+  {
+    mGeometry->AddLifecycleObserver(*this);
+  }
 }
 
 Renderer::~Renderer()
@@ -175,6 +181,11 @@ Renderer::~Renderer()
     mCurrentProgram->RemoveLifecycleObserver(*this);
     mCurrentProgram = nullptr;
   }
+  if(mGeometry)
+  {
+    mGeometry->RemoveLifecycleObserver(*this);
+    mGeometry = nullptr;
+  }
 }
 
 void Renderer::operator delete(void* ptr)
@@ -189,7 +200,27 @@ Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  mGeometry = geometry;
+  if(mGeometry != geometry)
+  {
+    if(mGeometry)
+    {
+      mGeometry->RemoveLifecycleObserver(*this);
+    }
+
+    mGeometry = geometry;
+
+    if(mGeometry)
+    {
+      mGeometry->AddLifecycleObserver(*this);
+    }
+
+    // Reset old pipeline
+    if(DALI_LIKELY(mPipelineCached))
+    {
+      mPipelineCache->ResetPipeline(mPipeline);
+      mPipelineCached = false;
+    }
+  }
 }
 
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
@@ -1049,6 +1080,27 @@ void Renderer::ProgramDestroyed(const Program* program)
   mNodeIndexMap.shrink_to_fit();
   mUniformIndexMaps.shrink_to_fit();
 #endif
+}
+
+Geometry::LifecycleObserver::NotifyReturnType Renderer::GeometryBufferChanged(const Geometry* geometry)
+{
+  DALI_ASSERT_ALWAYS(mGeometry == geometry && "Something wrong happend when Render::Renderer observed by geometry!");
+
+  // Reset old pipeline
+  if(DALI_LIKELY(mPipelineCached))
+  {
+    mPipelineCache->ResetPipeline(mPipeline);
+    mPipelineCached = false;
+  }
+
+  return Geometry::LifecycleObserver::NotifyReturnType::KEEP_OBSERVING;
+}
+
+void Renderer::GeometryDestroyed(const Geometry* geometry)
+{
+  // Let just run the same logic with geometry buffer changed cases.
+  [[maybe_unused]] auto ret = GeometryBufferChanged(geometry);
+  mGeometry                 = nullptr;
 }
 
 Vector4 Renderer::GetTextureUpdateArea() const noexcept

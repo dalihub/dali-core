@@ -183,6 +183,7 @@ struct RenderManager::Impl
 
   ~Impl()
   {
+    geometryContainer.Clear(); // clear now before the pipeline cache is deleted
     rendererContainer.Clear(); // clear now before the program contoller and the pipeline cache are deleted
     pipelineCache.reset();     // clear now before the program contoller is deleted
   }
@@ -273,7 +274,7 @@ struct RenderManager::Impl
     samplerContainer.Clear();
     frameBufferContainer.Clear();
     vertexBufferContainer.Clear();
-    geometryContainer.Clear();
+    geometryContainer.Clear(); // clear now before the pipeline cache is deleted
     rendererContainer.Clear();
     textureContainer.Clear();
 
