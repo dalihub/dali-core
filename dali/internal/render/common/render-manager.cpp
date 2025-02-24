@@ -133,7 +133,9 @@ struct RenderManager::Impl
   ~Impl()
   {
     threadPool.reset(nullptr); // reset now to maintain correct destruction order
-    rendererContainer.Clear(); // clear now before the pipeline cache is deleted
+    geometryContainer.Clear(); // clear now before the pipeline cache is deleted
+    rendererContainer.Clear(); // clear now before the program contoller and the pipeline cache are deleted
+    pipelineCache.reset();     // clear now before the program contoller is deleted
   }
 
   void AddRenderTracker(Render::RenderTracker* renderTracker)

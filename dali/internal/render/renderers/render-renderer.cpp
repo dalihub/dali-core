@@ -221,6 +221,13 @@ void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   mGeometry = geometry;
   mUpdated  = true;
+
+  // Reset old pipeline
+  if(DALI_LIKELY(mPipelineCached))
+  {
+    mPipelineCache->ResetPipeline(mPipeline);
+    mPipelineCached = false;
+  }
 }
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
