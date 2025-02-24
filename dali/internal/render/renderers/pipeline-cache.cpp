@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -514,6 +514,7 @@ PipelineCache::~PipelineCache()
     level0node.program->RemoveLifecycleObserver(*this);
     level0node.geometry->RemoveLifecycleObserver(*this);
   }
+  level0nodes.clear();
 }
 
 PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound)
@@ -628,6 +629,14 @@ void PipelineCache::ProgramDestroyed(const Program* program)
       iter++;
     }
   }
+}
+
+Geometry::LifecycleObserver::NotifyReturnType PipelineCache::GeometryBufferChanged(const Geometry* geometry)
+{
+  // Let just run the same logic with geometry destroyed cases.
+  GeometryDestroyed(geometry);
+
+  return Geometry::LifecycleObserver::NotifyReturnType::STOP_OBSERVING;
 }
 
 void PipelineCache::GeometryDestroyed(const Geometry* geometry)

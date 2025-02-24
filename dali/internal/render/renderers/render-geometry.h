@@ -60,10 +60,24 @@ public:
   class LifecycleObserver
   {
   public:
+    enum NotifyReturnType
+    {
+      STOP_OBSERVING,
+      KEEP_OBSERVING,
+    };
+
+  public:
     /**
-     * Called shortly before the program is destroyed.
+     * Called shortly if the geometry indices or vertex buffers are changed.
+     * @return NotifyReturnType::STOP_OBSERVING if we will not observe this object after this called
+     *         NotifyReturnType::KEEP_OBSERVING if we will observe this object after this called.
      */
-    virtual void GeometryDestroyed(const Geometry* program) = 0;
+    virtual NotifyReturnType GeometryBufferChanged(const Geometry* geometry) = 0;
+
+    /**
+     * Called shortly before the geometry is destroyed.
+     */
+    virtual void GeometryDestroyed(const Geometry* geometry) = 0;
 
   protected:
     /**

@@ -88,7 +88,7 @@ namespace Render
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer : public Program::LifecycleObserver
+class Renderer : public Program::LifecycleObserver, public Geometry::LifecycleObserver
 {
 public:
   /**
@@ -547,6 +547,17 @@ public: // From Program::LifecycleObserver
    * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
    */
   void ProgramDestroyed(const Program* program);
+
+public: // From Geometry::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryBufferChanged()
+   */
+  Geometry::LifecycleObserver::NotifyReturnType GeometryBufferChanged(const Geometry* geometry);
+
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
+   */
+  void GeometryDestroyed(const Geometry* geometry);
 
 private:
   struct UniformIndexMap;
