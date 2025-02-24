@@ -512,6 +512,7 @@ PipelineCache::~PipelineCache()
   {
     level0node.geometry->RemoveLifecycleObserver(*this);
   }
+  level0nodes.clear();
 }
 
 PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound)
@@ -604,6 +605,14 @@ void PipelineCache::ResetPipeline(PipelineCachePtr pipelineCache)
 {
   // TODO : Can we always assume that pipelineCache input is valid iterator?
   pipelineCache->referenceCount--;
+}
+
+Geometry::LifecycleObserver::NotifyReturnType PipelineCache::GeometryBufferChanged(const Geometry* geometry)
+{
+  // Let just run the same logic with geometry destroyed cases.
+  GeometryDestroyed(geometry);
+
+  return Geometry::LifecycleObserver::NotifyReturnType::STOP_OBSERVING;
 }
 
 void PipelineCache::GeometryDestroyed(const Geometry* geometry)

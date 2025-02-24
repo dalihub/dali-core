@@ -88,7 +88,7 @@ namespace Render
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer
+class Renderer : public Geometry::LifecycleObserver
 {
 public:
   /**
@@ -530,6 +530,17 @@ public:
    * @return The updated area of textures
    */
   Vector4 GetTextureUpdateArea() const noexcept;
+
+public: // From Geometry::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryBufferChanged()
+   */
+  Geometry::LifecycleObserver::NotifyReturnType GeometryBufferChanged(const Geometry* geometry);
+
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
+   */
+  void GeometryDestroyed(const Geometry* geometry);
 
 private:
   struct UniformIndexMap;

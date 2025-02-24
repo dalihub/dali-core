@@ -165,6 +165,25 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
     }
 
     mHasBeenUploaded = true;
+
+    // Notify to observers that geometry informations are changed
+    if(mUpdated)
+    {
+      mObserverNotifying = true;
+      for(auto iter = mLifecycleObservers.begin(); iter != mLifecycleObservers.end();)
+      {
+        auto returnValue = (*iter).first->GeometryBufferChanged(this);
+        if(returnValue == LifecycleObserver::KEEP_OBSERVING)
+        {
+          ++iter;
+        }
+        else
+        {
+          iter = mLifecycleObservers.erase(iter);
+        }
+      }
+      mObserverNotifying = false;
+    }
   }
 }
 
