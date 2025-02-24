@@ -25,13 +25,13 @@
 
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/render/shaders/program.h> ///< For Program::LifecycleObserver
+#include <dali/internal/render/renderers/render-geometry.h> ///< For Geometry::LifecycleObserver
 
 namespace Dali::Internal
 {
 namespace Render
 {
 class Renderer;
-class Geometry;
 
 struct PipelineCacheL2;
 struct PipelineCacheL1;
@@ -133,7 +133,7 @@ struct PipelineResult
 /**
  * Pipeline cache
  */
-class PipelineCache : public Program::LifecycleObserver
+class PipelineCache : public Program::LifecycleObserver, public Geometry::LifecycleObserver
 {
 public:
   /**
@@ -186,6 +186,12 @@ public: // From Program::LifecycleObserver
    * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
    */
   void ProgramDestroyed(const Program* program);
+
+public: // From Geometry::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
+   */
+  void GeometryDestroyed(const Geometry* geometry);
 
 private:
   /**

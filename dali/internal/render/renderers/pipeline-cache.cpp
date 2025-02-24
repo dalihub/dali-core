@@ -255,8 +255,9 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
     level0.geometry   = geometry;
     level0.inputState = vertexInputState;
 
-    // Observer program lifecycle
+    // Observer program and geometry lifecycle
     program->AddLifecycleObserver(*this);
+    geometry->AddLifecycleObserver(*this);
 
     it = level0nodes.insert(level0nodes.end(), std::move(level0));
 
@@ -507,10 +508,11 @@ PipelineCache::PipelineCache(Graphics::Controller& controller)
 
 PipelineCache::~PipelineCache()
 {
-  // Stop observer program lifecycle
+  // Stop observer lifecycle
   for(auto&& level0node : level0nodes)
   {
     level0node.program->RemoveLifecycleObserver(*this);
+    level0node.geometry->RemoveLifecycleObserver(*this);
   }
 }
 
@@ -590,8 +592,9 @@ void PipelineCache::ClearUnusedCache()
 
     if(iter->level1nodes.empty())
     {
-      // Stop observer program lifecycle
+      // Stop observer lifecycle
       iter->program->RemoveLifecycleObserver(*this);
+      iter->geometry->RemoveLifecycleObserver(*this);
       iter = level0nodes.erase(iter);
     }
     else
@@ -617,6 +620,27 @@ void PipelineCache::ProgramDestroyed(const Program* program)
   {
     if(iter->program == program)
     {
+      iter->geometry->RemoveLifecycleObserver(*this);
+      iter = level0nodes.erase(iter);
+    }
+    else
+    {
+      iter++;
+    }
+  }
+}
+
+void PipelineCache::GeometryDestroyed(const Geometry* geometry)
+{
+  // Remove latest used pipeline cache infomation.
+  CleanLatestUsedCache();
+
+  // Remove cached items what cache hold now.
+  for(auto iter = level0nodes.begin(); iter != level0nodes.end();)
+  {
+    if(iter->geometry == geometry)
+    {
+      iter->program->RemoveLifecycleObserver(*this);
       iter = level0nodes.erase(iter);
     }
     else
