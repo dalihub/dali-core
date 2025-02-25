@@ -56,7 +56,7 @@ namespace
 Debug::Filter* gAnimFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_ANIMATION");
 #endif
 
-static constexpr size_t WARNING_PRINT_THRESHOLD = 100u;
+static constexpr size_t WARNING_PRINT_THRESHOLD = 10000u;
 
 // Signals
 
