@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,11 @@ Dali::PixelData NewPixelDataWithReleaseAfterUpload(uint8_t*                   bu
                                                    uint32_t                   bufferSize,
                                                    uint32_t                   width,
                                                    uint32_t                   height,
-                                                   uint32_t                   stride,
+                                                   uint32_t                   strideBytes,
                                                    Pixel::Format              pixelFormat,
                                                    PixelData::ReleaseFunction releaseFunction)
 {
-  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, stride, pixelFormat, releaseFunction, true);
+  IntrusivePtr<Internal::PixelData> internal = Internal::PixelData::New(buffer, bufferSize, width, height, strideBytes, pixelFormat, releaseFunction, true);
   return PixelData(internal.Get());
 }
 

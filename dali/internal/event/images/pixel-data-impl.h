@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,11 @@ public:
   uint32_t GetStride() const;
 
   /**
+   * @copydoc PixelData::GetStrideBytes()
+   */
+  uint32_t GetStrideBytes() const;
+
+  /**
    * Class method to get the total currently allocated size of pixel buffers
    */
   static uint32_t GetTotalAllocatedSize()
@@ -169,7 +174,7 @@ private:
   uint32_t                         mBufferSize;      ///< Buffer size in bytes
   uint32_t                         mWidth;           ///< Buffer width in pixels
   uint32_t                         mHeight;          ///< Buffer height in pixels
-  uint32_t                         mStride;          ///< Buffer stride in pixels, 0 means the buffer is tightly packed
+  uint32_t                         mStrideBytes;     ///< Buffer stride in bytes, 0 means the buffer is tightly packed
   Pixel::Format                    mPixelFormat;     ///< Pixel format
   Dali::PixelData::ReleaseFunction mReleaseFunction; ///< Function for releasing memory
 
