@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,12 @@ static bool HIDE_VALUE = false;
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gAnimFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_ANIMATION");
+#endif
+
+static constexpr size_t WARNING_PRINT_THRESHOLD = 100u;
+
 // Signals
 
 static constexpr std::string_view SIGNAL_FINISHED = "finished";
@@ -289,6 +295,8 @@ void Animation::CreateSceneObject()
   // Set id of scene graph animation
   mAnimationId = mAnimation->GetNotifyId();
 
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Created\n", mAnimationId);
+
   OwnerPointer<SceneGraph::Animation> transferOwnership(const_cast<SceneGraph::Animation*>(mAnimation));
   AddAnimationMessage(GetEventThreadServices().GetUpdateManager(), transferOwnership);
 
@@ -302,6 +310,8 @@ void Animation::DestroySceneObject()
   {
     // Remove mapping infomations
     mPlaylist.UnmapNotifier(mAnimation);
+
+    DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Destroyed\n", mAnimationId);
 
     // Remove animation using a message to the update manager
     RemoveAnimationMessage(GetEventThreadServices().GetUpdateManager(), *mAnimation);
@@ -350,6 +360,8 @@ void Animation::SetLooping(bool on)
 
 void Animation::SetLoopCount(int32_t count)
 {
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] SetLoopCount[%d]\n", mAnimationId, count);
+
   // Cache for public getters
   mLoopCount = count;
 
@@ -380,6 +392,8 @@ bool Animation::IsLooping() const
 
 void Animation::SetEndAction(EndAction action)
 {
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] SetEndAction[%d]\n", mAnimationId, static_cast<int>(action));
+
   // Cache for public getters
   mEndAction = action;
 
@@ -410,6 +424,8 @@ Dali::Animation::EndAction Animation::GetDisconnectAction() const
 
 void Animation::Play()
 {
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Play() connectors : %zu, internal state : %d\n", mAnimationId, mConnectors.Count(), static_cast<int>(mState));
+
   // Update the current playlist
   mPlaylist.OnPlay(*this);
 
@@ -427,6 +443,8 @@ void Animation::PlayFrom(float progress)
 {
   if(progress >= mPlayRange.x && progress <= mPlayRange.y)
   {
+    DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] PlayFrom(%f) connectors : %zu, internal state : %d\n", mAnimationId, progress, mConnectors.Count(), static_cast<int>(mState));
+
     // Update the current playlist
     mPlaylist.OnPlay(*this);
 
@@ -448,6 +466,8 @@ void Animation::PlayAfter(float delaySeconds)
 
   mDelaySeconds = delaySeconds;
 
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] PlayAfter(%f) connectors : %zu, internal state : %d\n", mAnimationId, mDelaySeconds, mConnectors.Count(), static_cast<int>(mState));
+
   // Update the current playlist
   mPlaylist.OnPlay(*this);
 
@@ -463,6 +483,7 @@ void Animation::PlayAfter(float delaySeconds)
 
 void Animation::Pause()
 {
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Pause() internal state : %d\n", mAnimationId, static_cast<int>(mState));
   if(InternalStateConverter(mState, Dali::Animation::PAUSED))
   {
     // mAnimation is being used in a separate thread; queue a Pause message
@@ -503,6 +524,7 @@ Dali::Animation::State Animation::GetState() const
 
 void Animation::Stop()
 {
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Stop() internal state : %d\n", mAnimationId, static_cast<int>(mState));
   if(InternalStateConverter(mState, Dali::Animation::STOPPED))
   {
     // mAnimation is being used in a separate thread; queue a Stop message
@@ -519,6 +541,8 @@ void Animation::Stop()
 void Animation::Clear()
 {
   DALI_ASSERT_DEBUG(mAnimation);
+
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Clear() connectors : %zu, internal state : %d\n", mAnimationId, mConnectors.Count(), static_cast<int>(mState));
 
   if(mConnectors.Empty() && mState == Dali::Internal::Animation::CLEARED)
   {
@@ -952,11 +976,10 @@ bool Animation::HasFinished()
 
   const int32_t playedCount(mAnimation->GetPlayedCount());
 
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] HasFinished() count : %d -> %d, internal state : %d\n", mAnimationId, mNotificationCount, playedCount, static_cast<int>(mState));
+
   if(playedCount > mNotificationCount)
   {
-    // Note that only one signal is emitted, if the animation has been played repeatedly
-    mNotificationCount = playedCount;
-
     switch(mState)
     {
       case Internal::Animation::InternalState::PLAYING:
@@ -983,6 +1006,12 @@ bool Animation::HasFinished()
         break;
       }
     }
+
+    if(hasFinished)
+    {
+      // Note that only one signal is emitted, if the animation has been played repeatedly
+      mNotificationCount = playedCount;
+    }
   }
 
   return hasFinished;
@@ -1003,6 +1032,7 @@ void Animation::EmitSignalFinish()
   if(!mFinishedSignal.Empty())
   {
     Dali::Animation handle(this);
+    DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] EmitSignalFinish(), internal state : %d\n", mAnimationId, static_cast<int>(mState));
     mFinishedSignal.Emit(handle);
   }
 }
@@ -1308,6 +1338,11 @@ void Animation::AppendConnectorTargetValues(ConnectorTargetValues&& connectorTar
 
   // Store data to later notify the object that its property is being animated
   mConnectorTargetValues.push_back(std::move(connectorTargetValues));
+
+  if(DALI_UNLIKELY(mConnectorTargetValues.size() % WARNING_PRINT_THRESHOLD == 0))
+  {
+    DALI_LOG_WARNING("Animation[%u] Connect %zu Animators! Please check you might append too much items.\n", mAnimationId, mConnectorTargetValues.size());
+  }
 }
 
 } // namespace Internal

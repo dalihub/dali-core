@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,12 +138,11 @@ RelayoutController* RelayoutController::Get()
   return nullptr;
 }
 
-void RelayoutController::QueueActor(Internal::Actor* actor, RelayoutContainer& actors, Vector2 size)
+void RelayoutController::QueueActor(Internal::Actor& actorImpl, RelayoutContainer& actors, Vector2 size)
 {
-  if(actor && actor->RelayoutRequired())
+  if(actorImpl.RelayoutRequired())
   {
-    Dali::Actor actorHandle = Dali::Actor(actor);
-    actors.Add(actorHandle, size);
+    actors.Add(Dali::Actor(&actorImpl), size);
   }
 }
 
@@ -154,49 +153,53 @@ void RelayoutController::RequestRelayout(Dali::Actor& actor, Dimension::Type dim
     return;
   }
 
-  std::vector<Dali::Actor>& potentialRedundantSubRoots = mPotentialRedundantSubRoots;
-  std::vector<Dali::Actor>& topOfSubTreeStack          = mTopOfSubTreeStack;
+  RawActorList& potentialRedundantSubRoots = mPotentialRedundantSubRoots;
+  RawActorList& topOfSubTreeStack          = mTopOfSubTreeStack;
 
   DALI_ASSERT_ALWAYS(potentialRedundantSubRoots.empty() && "potentialRedundantSubRoots must be empty before RequestRelayout!");
   DALI_ASSERT_ALWAYS(topOfSubTreeStack.empty() && "topOfSubTreeStack must be empty before RequestRelayout!");
 
-  topOfSubTreeStack.push_back(actor);
-
-  // Propagate on all dimensions
-  for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    if(dimension & (1 << i))
+    Dali::Internal::Actor& actorImpl = GetImplementation(actor);
+
+    topOfSubTreeStack.push_back(&actorImpl);
+
+    // Propagate on all dimensions
+    for(uint32_t i = 0; i < Dimension::DIMENSION_COUNT; ++i)
     {
-      // Do the propagation
-      PropagateAll(actor, static_cast<Dimension::Type>(1 << i), topOfSubTreeStack, potentialRedundantSubRoots);
+      if(dimension & (1 << i))
+      {
+        // Do the propagation
+        PropagateAll(actorImpl, static_cast<Dimension::Type>(1 << i), topOfSubTreeStack, potentialRedundantSubRoots);
+      }
     }
   }
 
   while(!topOfSubTreeStack.empty())
   {
     // Request this actor as head of sub-tree if it is not dependent on a parent that is dirty
-    Dali::Actor subTreeActor = topOfSubTreeStack.back();
+    Dali::Internal::Actor& subTreeActorImpl = *topOfSubTreeStack.back();
     topOfSubTreeStack.pop_back();
 
-    Dali::Actor parent = subTreeActor.GetParent();
-    if(!parent || !(GetImplementation(subTreeActor).RelayoutDependentOnParent() && GetImplementation(parent).RelayoutRequired()))
+    Dali::Internal::Actor* parentImplPtr = subTreeActorImpl.GetParent();
+    if(!parentImplPtr || !(subTreeActorImpl.RelayoutDependentOnParent() && (*parentImplPtr).RelayoutRequired()))
     {
       // Add sub tree root to relayout list
-      AddRequest(subTreeActor);
+      AddRequest(subTreeActorImpl);
 
       // Flag request for end of frame
       Request();
     }
     else
     {
-      potentialRedundantSubRoots.push_back(subTreeActor);
+      potentialRedundantSubRoots.push_back(&subTreeActorImpl);
     }
   }
 
   // Remove any redundant sub-tree heads
-  for(auto& subRoot : potentialRedundantSubRoots)
+  for(const auto& subRoot : potentialRedundantSubRoots)
   {
-    RemoveRequest(subRoot);
+    RemoveRequest(*subRoot);
   }
 
   potentialRedundantSubRoots.clear();
@@ -218,22 +221,16 @@ void RelayoutController::OnApplicationSceneCreated()
   Request();
 }
 
-void RelayoutController::RequestRelayoutTree(Dali::Actor& actor)
+void RelayoutController::RequestRelayoutRecursively(Dali::Internal::Actor& actorImpl)
 {
-  if(!mEnabled)
-  {
-    return;
-  }
-
   // Only set dirty flag if doing relayout and not already marked as dirty
-  Actor& actorImpl = GetImplementation(actor);
   if(actorImpl.RelayoutPossible())
   {
     // If parent is not in relayout we are at the top of a new sub-tree
-    Dali::Actor parent = actor.GetParent();
-    if(!parent || !GetImplementation(parent).IsRelayoutEnabled())
+    Dali::Internal::Actor* parentImplPtr = actorImpl.GetParent();
+    if(!parentImplPtr || !(*parentImplPtr).IsRelayoutEnabled())
     {
-      AddRequest(actor);
+      AddRequest(actorImpl);
     }
 
     // Set dirty flag on actors that are enabled
@@ -242,18 +239,20 @@ void RelayoutController::RequestRelayoutTree(Dali::Actor& actor)
   }
 
   // Propagate down to children
-  for(uint32_t i = 0; i < actor.GetChildCount(); ++i)
+  if(actorImpl.GetChildCount())
   {
-    Dali::Actor child = actor.GetChildAt(i);
-
-    RequestRelayoutTree(child);
+    // Get reference of children container, to avoid useless reference count changing
+    auto& children = actorImpl.GetChildrenInternal();
+    for(auto& childImplPtr : children)
+    {
+      RequestRelayoutRecursively(*childImplPtr);
+    }
   }
 }
 
-void RelayoutController::PropagateAll(Dali::Actor& actor, Dimension::Type dimension, std::vector<Dali::Actor>& topOfSubTreeStack, std::vector<Dali::Actor>& potentialRedundantSubRoots)
+void RelayoutController::PropagateAll(Dali::Internal::Actor& actorImpl, Dimension::Type dimension, RawActorList& topOfSubTreeStack, RawActorList& potentialRedundantSubRoots)
 {
   // Only set dirty flag if doing relayout and not already marked as dirty
-  Actor& actorImpl = GetImplementation(actor);
   if(actorImpl.RelayoutPossible(dimension))
   {
     // Set dirty and negotiated flags
@@ -269,58 +268,74 @@ void RelayoutController::PropagateAll(Dali::Actor& actor, Dimension::Type dimens
       if(actorImpl.RelayoutDependentOnDimension(dimension, dimensionToCheck) &&
          !actorImpl.IsLayoutDirty(dimensionToCheck))
       {
-        PropagateAll(actor, dimensionToCheck, topOfSubTreeStack, potentialRedundantSubRoots);
+        PropagateAll(actorImpl, dimensionToCheck, topOfSubTreeStack, potentialRedundantSubRoots);
       }
     }
 
     // Propagate up to parent
-    Dali::Actor parent = actor.GetParent();
-    if(parent)
     {
-      Actor& parentImpl = GetImplementation(parent);
-      if(parentImpl.RelayoutDependentOnChildren(dimension) && !parentImpl.IsLayoutDirty(dimension))
+      Dali::Internal::Actor* parentImplPtr = actorImpl.GetParent();
+      if(parentImplPtr)
       {
-        // Store the highest parent reached
-        bool found = false;
-        for(auto&& element : topOfSubTreeStack)
+        Actor& parentImpl = *parentImplPtr;
+        if(parentImpl.RelayoutDependentOnChildren(dimension) && !parentImpl.IsLayoutDirty(dimension))
         {
-          if(element == parent)
+          // Store the highest parent reached
+          bool found = false;
+          for(auto&& element : topOfSubTreeStack)
           {
-            found = true;
-            break;
+            if(element == &parentImpl)
+            {
+              found = true;
+              break;
+            }
           }
-        }
 
-        if(!found)
-        {
-          topOfSubTreeStack.push_back(parent);
-        }
+          if(!found)
+          {
+            topOfSubTreeStack.push_back(&parentImpl);
+          }
 
-        // Propagate up
-        PropagateAll(parent, dimension, topOfSubTreeStack, potentialRedundantSubRoots);
+          // Propagate up
+          PropagateAll(parentImpl, dimension, topOfSubTreeStack, potentialRedundantSubRoots);
+        }
       }
     }
 
     // Propagate down to children
-    for(unsigned int i = 0, childCount = actor.GetChildCount(); i < childCount; ++i)
+    if(actorImpl.GetChildCount())
     {
-      Dali::Actor child     = actor.GetChildAt(i);
-      Actor&      childImpl = GetImplementation(child);
-
-      if(childImpl.IsRelayoutEnabled() && childImpl.RelayoutDependentOnParent(dimension))
+      // Get reference of children container, to avoid useless reference count changing
+      auto& children = actorImpl.GetChildrenInternal();
+      for(auto& childImplPtr : children)
       {
-        if(childImpl.IsLayoutDirty(dimension))
+        Internal::Actor& childImpl = *childImplPtr;
+
+        if(childImpl.IsRelayoutEnabled() && childImpl.RelayoutDependentOnParent(dimension))
         {
-          // We have found a child that could potentially have already been collected for relayout
-          potentialRedundantSubRoots.push_back(child);
-        }
-        else
-        {
-          PropagateAll(child, dimension, topOfSubTreeStack, potentialRedundantSubRoots);
+          if(childImpl.IsLayoutDirty(dimension))
+          {
+            // We have found a child that could potentially have already been collected for relayout
+            potentialRedundantSubRoots.push_back(&childImpl);
+          }
+          else
+          {
+            PropagateAll(childImpl, dimension, topOfSubTreeStack, potentialRedundantSubRoots);
+          }
         }
       }
     }
   }
+}
+
+void RelayoutController::RequestRelayoutTree(Dali::Actor& actor)
+{
+  if(!mEnabled)
+  {
+    return;
+  }
+
+  RequestRelayoutRecursively(GetImplementation(actor));
 }
 
 void RelayoutController::PropagateFlags(Dali::Actor& actor, Dimension::Type dimension)
@@ -371,23 +386,20 @@ void RelayoutController::PropagateFlags(Dali::Actor& actor, Dimension::Type dime
   }
 }
 
-void RelayoutController::AddRequest(Dali::Actor& actor)
+void RelayoutController::AddRequest(Internal::Actor& actorImpl)
 {
-  Internal::Actor* actorPtr = &GetImplementation(actor);
-
   // Only add the rootActor if it is not already recorded
-  auto iter = mDirtyLayoutSubTrees.Find(actorPtr);
+  auto iter = mDirtyLayoutSubTrees.Find(&actorImpl);
 
   if(iter == mDirtyLayoutSubTrees.End())
   {
-    mDirtyLayoutSubTrees.PushBack(actorPtr);
+    mDirtyLayoutSubTrees.PushBack(&actorImpl);
   }
 }
 
-void RelayoutController::RemoveRequest(Dali::Actor& actor)
+void RelayoutController::RemoveRequest(const Internal::Actor& actorImpl)
 {
-  Internal::Actor* actorPtr = &GetImplementation(actor);
-  mDirtyLayoutSubTrees.EraseObject(actorPtr);
+  mDirtyLayoutSubTrees.EraseObject(&actorImpl);
 }
 
 void RelayoutController::Request()
@@ -419,21 +431,22 @@ void RelayoutController::Relayout()
 
     // 1. Finds all top-level controls from the dirty list and allocate them the size of the scene
     //    These controls are paired with the parent/scene size and added to the stack.
-    for(auto& dirtyActor : mDirtyLayoutSubTrees)
+    for(auto iter = mDirtyLayoutSubTrees.Begin(); iter != mDirtyLayoutSubTrees.End();)
     {
+      Internal::Actor* dirtyActorImplPtr = *iter;
       // Need to test if actor is valid (could have been deleted and had the pointer cleared)
-      if(dirtyActor)
+      if(dirtyActorImplPtr)
       {
+        auto& dirtyActorImpl = *dirtyActorImplPtr;
         // Only negotiate actors that are on the scene
-        if(dirtyActor->OnScene())
+        if(dirtyActorImpl.OnScene())
         {
-          Internal::Actor* parent = dirtyActor->GetParent();
-          QueueActor(dirtyActor, *mRelayoutStack, (parent) ? Vector2(parent->GetTargetSize()) : dirtyActor->GetScene().GetSize());
+          Internal::Actor* parent = dirtyActorImpl.GetParent();
+          QueueActor(dirtyActorImpl, *mRelayoutStack, (parent) ? Vector2(parent->GetTargetSize()) : dirtyActorImpl.GetScene().GetSize());
         }
       }
+      iter = mDirtyLayoutSubTrees.Erase(iter);
     }
-
-    mDirtyLayoutSubTrees.Clear();
 
     // 2. Iterate through the stack until it's empty.
     if(mRelayoutStack->Size() > 0)
@@ -447,23 +460,22 @@ void RelayoutController::Relayout()
 
       while(mRelayoutStack->Size() > 0)
       {
-        Dali::Actor actor;
-        Vector2     size;
-
 #ifdef TRACE_ENABLED
         ++relayoutActorCount;
 #endif
+        Dali::Actor actor;
+        Vector2     size;
 
-        mRelayoutStack->GetBack(actor, size);
-        Actor& actorImpl = GetImplementation(actor);
-        mRelayoutStack->PopBack();
+        mRelayoutStack->PopBack(actor, size);
+
+        Internal::Actor& actorImpl = GetImplementation(actor);
 
         if(actorImpl.RelayoutRequired() && actorImpl.OnScene())
         {
 #ifdef TRACE_ENABLED
           ++negotiatedActorCount;
 #endif
-          DALI_LOG_INFO(gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actor.GetTypeName().c_str(), actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str(), size.width, size.height);
+          DALI_LOG_INFO(gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actorImpl.GetTypeName().c_str(), std::string(actorImpl.GetName()).c_str(), size.width, size.height);
 
           // 3. Negotiate the size with the current actor. Pass it an empty container which the actor
           //    has to fill with all the actors it has not done any size negotiation for.

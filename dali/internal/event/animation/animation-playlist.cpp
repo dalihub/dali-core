@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,10 @@
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gAnimFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_ANIMATION");
+#endif
 
 #ifdef TRACE_ENABLED
 uint64_t GetNanoseconds()
@@ -91,6 +95,8 @@ void AnimationPlaylist::OnClear(Animation& animation, bool ignoreRequired)
     mPlaylist.erase(iter);
   }
 
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "OnClear(%d) Animation[%u]\n", ignoreRequired, animation.GetAnimationId());
+
   if(ignoreRequired)
   {
     mIgnoredAnimations.insert(animation.GetAnimationId());
@@ -99,7 +105,11 @@ void AnimationPlaylist::OnClear(Animation& animation, bool ignoreRequired)
 
 void AnimationPlaylist::EventLoopFinished()
 {
-  mIgnoredAnimations.clear();
+  if(mIgnoredAnimations.size() > 0u)
+  {
+    DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Ignored animations count[%zu]\n", mIgnoredAnimations.size());
+    mIgnoredAnimations.clear();
+  }
 }
 
 void AnimationPlaylist::NotifyProgressReached(NotifierInterface::NotifyId notifyId)
@@ -154,7 +164,19 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
           // Note that the animation "Finish" signal is emitted after Stop() has been called
           OnClear(*animation, false);
         }
+        else
+        {
+          DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] not finished actually...\n", notifierId);
+        }
       }
+      else
+      {
+        DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] destroyed!!\n", notifierId);
+      }
+    }
+    else
+    {
+      DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Ignored (Clear() called)\n", notifierId);
     }
   }
 
@@ -178,6 +200,10 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
         animationFinishedTimeChecker.emplace_back(end - start, GetImplementation(animation).GetSceneObject()->GetNotifyId());
       }
 #endif
+    }
+    else
+    {
+      DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Ignored (Clear() called)\n", animation.GetAnimationId());
     }
   }
 

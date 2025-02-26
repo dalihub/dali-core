@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_RELAYOUT_CONTAINER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public:
    */
   struct RelayoutInfo
   {
-    Dali::Actor actor; ///< The actor to relayout
+    Dali::Actor actor; ///< The actor to relayout (Keep reference, to guard destruct case during Relayout)
     Vector2     size;  ///< The desired size of the actor
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     struct RelayoutInfoCompareLess
@@ -95,17 +95,12 @@ public:
   void Add(const Dali::Actor& actor, const Vector2& size) override;
 
   /**
-   * @brief Remove information from the container
-   */
-  void PopBack();
-
-  /**
-   * @brief Retrieve relayout information for the latest added
+   * @brief Retrieve relayout information for the latest added, and remove from the container
    *
    * @param[out] actorOut Latest added actor
    * @param[out] sizeOt Latest added size
    */
-  void GetBack(Dali::Actor& actorOut, Vector2& sizeOut) const;
+  void PopBack(Dali::Actor& actorOut, Vector2& sizeOut);
 
   /**
    * @brief The count of information in the container
@@ -123,15 +118,6 @@ public:
    * @brief Reset the container, freeing all memory
    */
   void Clear();
-
-private:
-  /**
-   * @brief Returns if the container contains the actor or not
-   *
-   * @param actor The actor to search for
-   * @return Return if the actor was found or not
-   */
-  bool Contains(const Dali::Actor& actor);
 
 private:
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
