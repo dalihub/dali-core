@@ -2,7 +2,7 @@
 #define DALI_PIXEL_DATA_INTEG_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,18 +40,18 @@ struct PixelDataBuffer
   uint32_t bufferSize;
   uint32_t width;
   uint32_t height;
-  uint32_t stride;
+  uint32_t strideBytes;
 
   PixelDataBuffer(uint8_t* buffer,
                   uint32_t bufferSize,
                   uint32_t width,
                   uint32_t height,
-                  uint32_t stride = 0)
+                  uint32_t strideBytes = 0)
   : buffer(buffer),
     bufferSize(bufferSize),
     width(width),
     height(height),
-    stride(stride)
+    strideBytes(strideBytes)
   {
   }
 };
@@ -77,7 +77,7 @@ DALI_CORE_API Dali::PixelData NewPixelDataWithReleaseAfterUpload(uint8_t*       
                                                                  uint32_t                   bufferSize,
                                                                  uint32_t                   width,
                                                                  uint32_t                   height,
-                                                                 uint32_t                   stride,
+                                                                 uint32_t                   strideBytes,
                                                                  Pixel::Format              pixelFormat,
                                                                  PixelData::ReleaseFunction releaseFunction);
 

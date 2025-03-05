@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,8 @@ int UtcDaliPixelData02(void)
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == 0);
+  DALI_TEST_CHECK(pixelData.GetStride() == 0); ///< Legacy code. Can we remove it?
+  DALI_TEST_CHECK(pixelData.GetStrideBytes() == 0);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
 
   END_TEST;
@@ -70,18 +71,19 @@ int UtcDaliPixelData03(void)
 {
   TestApplication application;
 
-  uint32_t width      = 10u;
-  uint32_t height     = 10u;
-  uint32_t stride     = 12u;
-  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::RGB888);
+  uint32_t width       = 10u;
+  uint32_t height      = 10u;
+  uint32_t strideBytes = (width * Pixel::GetBytesPerPixel(Pixel::RGB888) + 7) / 8 * 8; /// = 32;
+  uint32_t bufferSize  = strideBytes * height;
 
   uint8_t*  buffer    = reinterpret_cast<uint8_t*>(malloc(bufferSize));
-  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::RGB888, PixelData::FREE);
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, strideBytes, Pixel::RGB888, PixelData::FREE);
 
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetStride() == width); ///< Legacy code. Can we remove it?
+  DALI_TEST_CHECK(pixelData.GetStrideBytes() == strideBytes);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::RGB888);
 
   END_TEST;
@@ -91,19 +93,19 @@ int UtcDaliPixelData04(void)
 {
   TestApplication application;
 
-  uint32_t width      = 10u;
-  uint32_t height     = 10u;
-  uint32_t stride     = 12u;
-  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::L8);
-  uint8_t* buffer     = new uint8_t[bufferSize];
-  buffer[0]           = 'a';
+  uint32_t width       = 10u;
+  uint32_t height      = 10u;
+  uint32_t strideBytes = (width * Pixel::GetBytesPerPixel(Pixel::L8) + 7) / 8 * 8; /// = 16;
+  uint32_t bufferSize  = strideBytes * height;
+  uint8_t* buffer      = new uint8_t[bufferSize];
+  buffer[0]            = 'a';
 
-  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::L8, PixelData::DELETE_ARRAY);
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, strideBytes, Pixel::L8, PixelData::DELETE_ARRAY);
 
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetStrideBytes() == strideBytes);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
 
   END_TEST;
@@ -243,19 +245,19 @@ int UtcDaliPixelDataGetPixelDataBuffer(void)
 {
   TestApplication application;
 
-  uint32_t width      = 10u;
-  uint32_t height     = 10u;
-  uint32_t stride     = 12u;
-  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::L8);
-  uint8_t* buffer     = new uint8_t[bufferSize];
-  buffer[0]           = 'a';
+  uint32_t width       = 10u;
+  uint32_t height      = 10u;
+  uint32_t strideBytes = (width * Pixel::GetBytesPerPixel(Pixel::L8) + 7) / 8 * 8; /// = 16;
+  uint32_t bufferSize  = strideBytes * height;
+  uint8_t* buffer      = new uint8_t[bufferSize];
+  buffer[0]            = 'a';
 
-  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::L8, PixelData::DELETE_ARRAY);
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, strideBytes, Pixel::L8, PixelData::DELETE_ARRAY);
 
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetStrideBytes() == strideBytes);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
 
   Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
@@ -272,19 +274,19 @@ int UtcDaliPixelDataReleasePixelDataBuffer(void)
 {
   TestApplication application;
 
-  uint32_t width      = 10u;
-  uint32_t height     = 10u;
-  uint32_t stride     = 12u;
-  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::L8);
-  uint8_t* buffer     = new uint8_t[bufferSize];
-  buffer[0]           = 'a';
+  uint32_t width       = 10u;
+  uint32_t height      = 10u;
+  uint32_t strideBytes = (width * Pixel::GetBytesPerPixel(Pixel::L8) + 7) / 8 * 8; /// = 16;
+  uint32_t bufferSize  = strideBytes * height;
+  uint8_t* buffer      = new uint8_t[bufferSize];
+  buffer[0]            = 'a';
 
-  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, stride, Pixel::L8, PixelData::DELETE_ARRAY);
+  PixelData pixelData = PixelData::New(buffer, bufferSize, width, height, strideBytes, Pixel::L8, PixelData::DELETE_ARRAY);
 
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetStrideBytes() == strideBytes);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
 
   Dali::Integration::ReleasePixelDataBuffer(pixelData);
@@ -300,19 +302,19 @@ int UtcDaliPixelDataNewPixelDataWithReleaseAfterUpload(void)
 {
   TestApplication application;
 
-  uint32_t width      = 10u;
-  uint32_t height     = 10u;
-  uint32_t stride     = 12u;
-  uint32_t bufferSize = stride * height * Pixel::GetBytesPerPixel(Pixel::L8);
-  uint8_t* buffer     = new uint8_t[bufferSize];
-  buffer[0]           = 'a';
+  uint32_t width       = 10u;
+  uint32_t height      = 10u;
+  uint32_t strideBytes = (width * Pixel::GetBytesPerPixel(Pixel::L8) + 7) / 8 * 8; /// = 16;
+  uint32_t bufferSize  = strideBytes * height;
+  uint8_t* buffer      = new uint8_t[bufferSize];
+  buffer[0]            = 'a';
 
-  PixelData pixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, width, height, stride, Pixel::L8, PixelData::DELETE_ARRAY);
+  PixelData pixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, width, height, strideBytes, Pixel::L8, PixelData::DELETE_ARRAY);
 
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == stride);
+  DALI_TEST_CHECK(pixelData.GetStrideBytes() == strideBytes);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
   DALI_TEST_EQUALS(Dali::Integration::IsPixelDataReleaseAfterUpload(pixelData), true, TEST_LOCATION);
 

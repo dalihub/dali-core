@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,9 +237,9 @@ void Texture::Upload(PixelDataPtr pixelData, const Graphics::UploadParams& param
   DALI_ASSERT_ALWAYS(!mNativeImage);
   DALI_ASSERT_ALWAYS(mResourceId == 0u);
 
-  const uint32_t srcStride = pixelData->GetStride();
-  uint32_t       srcOffset = 0u;
-  uint32_t       srcSize   = pixelData->GetBufferSize();
+  const uint32_t srcStrideBytes = pixelData->GetStrideBytes();
+  uint32_t       srcOffset      = 0u;
+  uint32_t       srcSize        = pixelData->GetBufferSize();
 
   // Cache uploaded data
   const auto uploadedDataWidth   = params.dataWidth;
@@ -251,6 +251,8 @@ void Texture::Upload(PixelDataPtr pixelData, const Graphics::UploadParams& param
                                      (params.dataYOffset != 0) ||
                                      (uploadedDataWidth != pixelData->GetWidth()) ||
                                      (uploadedDataHeight != pixelData->GetHeight()));
+
+  const uint32_t bytePerPixel = Pixel::GetBytesPerPixel(uploadedPixelFormat);
 
   if(requiredSubPixelData)
   {
@@ -275,8 +277,7 @@ void Texture::Upload(PixelDataPtr pixelData, const Graphics::UploadParams& param
      * srcOffset = A).offsetByte;
      * srcSize = ( C).offsetByte - A).offsetByte );
      */
-    const uint32_t bytePerPixel    = Pixel::GetBytesPerPixel(uploadedPixelFormat);
-    const uint32_t dataStrideByte  = (srcStride ? srcStride : pixelData->GetWidth()) * bytePerPixel;
+    const uint32_t dataStrideByte  = srcStrideBytes ? srcStrideBytes : (pixelData->GetWidth() * bytePerPixel);
     const uint32_t dataXOffsetByte = params.dataXOffset * bytePerPixel;
     const uint32_t dataWidthByte   = static_cast<uint32_t>(uploadedDataWidth) * bytePerPixel;
 
@@ -311,7 +312,7 @@ void Texture::Upload(PixelDataPtr pixelData, const Graphics::UploadParams& param
   info.srcExtent2D  = {uploadedDataWidth, uploadedDataHeight};
   info.srcOffset    = srcOffset;
   info.srcSize      = srcSize;
-  info.srcStride    = srcStride;
+  info.srcStride    = bytePerPixel ? srcStrideBytes / bytePerPixel : 0u; ///< Note : Graphics stride use pixel scale!
   info.srcFormat    = Dali::Graphics::ConvertPixelFormat(uploadedPixelFormat);
 
   mUpdatedArea = Rect<uint16_t>(params.xOffset, params.yOffset, params.width, params.height);

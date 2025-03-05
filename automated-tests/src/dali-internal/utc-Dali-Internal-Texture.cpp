@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ int UtcDaliTextureUploadByResourceId(void)
       info.srcExtent2D  = {pixelData.GetWidth(), pixelData.GetHeight()};
       info.srcOffset    = 0;
       info.srcSize      = Dali::Integration::GetPixelDataBuffer(pixelData).bufferSize;
-      info.srcStride    = pixelData.GetStride();
+      info.srcStride    = pixelData.GetStrideBytes() ? pixelData.GetStrideBytes() / Dali::Pixel::GetBytesPerPixel(pixelData.GetPixelFormat()) : 0u;
       info.srcFormat    = Dali::Graphics::ConvertPixelFormat(pixelData.GetPixelFormat());
 
       Graphics::TextureUpdateSourceInfo updateSourceInfo{};
