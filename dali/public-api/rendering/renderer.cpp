@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,12 @@ Renderer Renderer::New(RenderCallback& renderCallback)
 {
   Internal::RendererPtr renderer = Internal::Renderer::New();
   renderer->SetRenderCallback(&renderCallback);
+  return Renderer(renderer.Get());
+}
+
+Renderer Renderer::New()
+{
+  Internal::RendererPtr renderer = Internal::Renderer::New();
   return Renderer(renderer.Get());
 }
 

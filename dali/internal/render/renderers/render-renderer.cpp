@@ -415,11 +415,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
   return mStencilParameters.stencilOperationOnZPass;
 }
 
-void Renderer::Upload()
-{
-  mGeometry->Upload(*mGraphicsController);
-}
-
 bool Renderer::NeedsProgram() const
 {
   // Our access to shader is currently through the RenderDataProvider, which
@@ -585,6 +580,12 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     // submit draw
     commandBuffer.DrawNative(&info);
     return true;
+  }
+
+  if(DALI_UNLIKELY(!mGeometry))
+  {
+    // Geometry not set. Ignore below logics.
+    return false;
   }
 
   // Prepare commands
@@ -983,8 +984,16 @@ void Renderer::WriteDynUniform(
 
 void Renderer::SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const
 {
-  sortAttributes.shader   = &mRenderDataProvider->GetShader();
-  sortAttributes.geometry = mGeometry;
+  if(!mRenderCallback)
+  {
+    sortAttributes.shader   = &mRenderDataProvider->GetShader();
+    sortAttributes.geometry = mGeometry;
+  }
+  else
+  {
+    sortAttributes.shader   = nullptr;
+    sortAttributes.geometry = nullptr;
+  }
 }
 
 void Renderer::SetShaderChanged(bool value)
@@ -994,7 +1003,7 @@ void Renderer::SetShaderChanged(bool value)
 
 bool Renderer::Updated()
 {
-  if(mRenderCallback || mShaderChanged || mGeometry->Updated() || mRenderDataProvider->IsUpdated())
+  if(mRenderCallback || mShaderChanged || (DALI_LIKELY(mGeometry) && mGeometry->Updated()) || mRenderDataProvider->IsUpdated())
   {
     return true;
   }
@@ -1148,6 +1157,8 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
+  DALI_ASSERT_DEBUG(mGeometry && "Geometry should not be nullptr! something wrong!\n");
+
   // Prepare query info
   PipelineCacheQueryInfo queryInfo{};
   queryInfo.program               = &program;

@@ -396,11 +396,6 @@ public:
   [[nodiscard]] StencilOperation::Type GetStencilOperationOnZPass() const;
 
   /**
-   * Called to upload during RenderManager::Render().
-   */
-  void Upload();
-
-  /**
    * Called to render during RenderManager::Render().
    * @param[in,out] commandBuffer The command buffer to write into
    * @param[in] bufferIndex The index of the previous update buffer.

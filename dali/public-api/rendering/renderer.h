@@ -2,7 +2,7 @@
 #define DALI_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -472,6 +472,15 @@ public:
    * @return A handle to the Renderer
    */
   static Renderer New(RenderCallback& renderCallback);
+
+  /**
+   * @brief Creates a new Renderer object without geometry and shader.
+   * @post We should set Geometry and Shader before attach to actor. If not, exception throwed.
+   *
+   * @SINCE_2_4.9
+   * @return A handle to the Renderer
+   */
+  static Renderer New();
 
   /**
    * @brief Default constructor, creates an empty handle

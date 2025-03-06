@@ -495,7 +495,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
   {
     // If there is render callback on the Renderer we need to calculate the scissor box and provide it to the
     // callback so it may be clipped
-    if(item.mRenderer->GetRenderCallback())
+    if(DALI_LIKELY(item.mRenderer) && item.mRenderer->GetRenderCallback())
     {
       // store clipping box inside the render callback input structure
       auto& input       = item.mRenderer->GetRenderCallbackInput();
