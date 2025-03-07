@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_INFO_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -173,8 +173,10 @@ public:
    * @param[in] name The name of the property.
    * @param[in] index The index of the property
    * @param[in] type The Property::Type.
+   * @param[in] setFunc An additional function to call to set the property (Can be nullptr).
+   * @param[in] getFunc An additional function to call to retrieve the value of the property (Can be nullptr).
    */
-  void AddAnimatableProperty(std::string name, Property::Index index, Property::Type type);
+  void AddAnimatableProperty(std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Adds an animatable property with the given default value.
@@ -303,6 +305,14 @@ public:
   Property::Value GetPropertyDefaultValue(Property::Index index) const;
 
   /**
+   * Sets the value of an animatable property at the index specified for the given object.
+   * @param[in] object The object whose property is to be set.
+   * @param[in] index The property index.
+   * @param[in] value The value to set.
+   */
+  void SetAnimatableProperty(BaseObject* object, Property::Index index, Property::Value value) const;
+
+  /**
    * Sets the value of a property at the index specified for the given object.
    * @param[in] object The object whose property is to be set.
    * @param[in] index The property index.
@@ -317,6 +327,14 @@ public:
    * @param[in] value The value to set.
    */
   void SetProperty(BaseObject* object, const std::string& name, Property::Value value) const;
+
+  /**
+   * Retrieves the value of an animatable property at the index specified for the given object.
+   * @param[in] object The object whose property is to be queried.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  Property::Value GetAnimatableProperty(const BaseObject* object, Property::Index index) const;
 
   /**
    * Retrieves the value of a property at the index specified for the given object.

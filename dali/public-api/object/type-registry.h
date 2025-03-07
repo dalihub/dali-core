@@ -2,7 +2,7 @@
 #define DALI_TYPE_REGISTRY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -358,9 +358,16 @@ public:
    * @param[in] name The name of the property
    * @param[in] index The property index. Must be a value between ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX and ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX inclusive
    * @param[in] type The property value type
+   * @param[in] setFunc An additional function to call when setting the property (Can be nullptr).
+   * @param[in] getFunc An additional function to call to retrieve the current value of the property (Can be nullptr).
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type);
+  explicit AnimatablePropertyRegistration(TypeRegistration&             registered,
+                                          std::string                   name,
+                                          Property::Index               index,
+                                          Property::Type                type,
+                                          TypeInfo::SetPropertyFunction setFunc = nullptr,
+                                          TypeInfo::GetPropertyFunction getFunc = nullptr);
 
   /**
    * @brief This constructor registers the animatable property with the registered default value.
@@ -376,7 +383,7 @@ public:
    * @param[in] value The property default value
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value);
+  explicit AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value);
 };
 
 /**

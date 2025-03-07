@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_REGISTRY_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,9 +156,11 @@ public:
    * @param [in] name Property name
    * @param [in] index Property index
    * @param [in] type Property type
+   * @param [in] setFunc An additional function to set the property (Can be nullptr).
+   * @param [in] getFunc An additional function to get the value of a property (Can be nullptr).
    * @return true if registered
    */
-  bool RegisterAnimatableProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type);
+  bool RegisterAnimatableProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Register a scene graph only property with a default value
