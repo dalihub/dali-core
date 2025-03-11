@@ -979,8 +979,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
 {
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Rendering to %s\n", renderToFbo ? "Framebuffer" : "Surface");
+
   if(mImpl->partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE && !renderToFbo && clippingRect.IsEmpty())
   {
+    DALI_LOG_INFO(gLogFilter, Debug::General, "PartialUpdate and no clip\n");
     DALI_LOG_DEBUG_INFO("ClippingRect was empty. Skip rendering\n");
     return;
   }
@@ -992,6 +995,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     DALI_LOG_ERROR("Scene was empty handle. Skip rendering\n");
     return;
   }
+  DALI_LOG_INFO(gLogFilter, Debug::General, "No early out\n");
 
   // @todo These should be members of scene
   const Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
@@ -1017,6 +1021,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   bool sceneNeedsDepthBuffer   = false;
   bool sceneNeedsStencilBuffer = false;
+
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Instruction count: %d\n", instructionCount);
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -1272,10 +1278,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
 
-    // Set surface orientation
-    // @todo Inform graphics impl by another route.
-    // was: mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
-
     /*** Clear region of framebuffer or surface before drawing ***/
     bool clearFullFrameRect = (surfaceRect == viewportRect);
     if(instruction.mFrameBuffer != nullptr)
@@ -1364,6 +1366,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     submitInfo.cmdBuffer.push_back(commandBuffer);
   }
 
+  DALI_LOG_INFO(gLogFilter, Debug::General, "CmdBuffer count: %u\n", submitInfo.cmdBuffer.size());
+
   if(!submitInfo.cmdBuffer.empty())
   {
     mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
@@ -1373,6 +1377,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   // present render target (if main scene)
   if(!renderToFbo)
   {
+    DALI_LOG_INFO(gLogFilter, Debug::General, "Present\n");
+
     DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
     auto renderTarget = sceneObject->GetSurfaceRenderTarget();
     mImpl->graphicsController.PresentRenderTarget(renderTarget);

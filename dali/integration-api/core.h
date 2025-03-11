@@ -371,7 +371,7 @@ public:
   void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo);
 
   /**
-   * Render a scene in the next frame. This method should be preceded by a call up PreRender.
+   * Render a scene in the next frame. This method should be preceded by a call to PreRender.
    * This method should be called twice. The first pass to render off-screen frame buffers if any,
    * and the second pass to render the surface.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
@@ -385,7 +385,7 @@ public:
 
   /**
    * This is called after rendering all the scenes in the next frame. This method should be
-   * followed by a call up RenderScene.
+   * followed by a call to RenderScene.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
    */
