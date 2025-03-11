@@ -402,7 +402,7 @@ public:
   void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo);
 
   /**
-   * Render a scene in the next frame. This method should be preceded by a call up PreRender.
+   * Render a scene in the next frame. This method should be preceded by a call to PreRender.
    * This method should be called twice. The first pass to render off-screen frame buffers if any,
    * and the second pass to render the surface.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
@@ -413,6 +413,16 @@ public:
    * @param[in] clippingRect The clipping rect for the rendered scene.
    */
   void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
+
+  /**
+   * Clear the scene's surface.
+   *
+   * Note, this does not need to be called if there is something to render.
+   *
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @param[in] scene The scene to be rendered.
+   */
+  void ClearScene(Integration::Scene scene);
 
   // This method should be called from Core::PostRender()
 

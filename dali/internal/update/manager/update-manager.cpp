@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,11 +182,11 @@ struct UpdateManager::Impl
     {
     }
 
-    ~SceneInfo()               = default;                ///< Default non-virtual destructor
-    SceneInfo(SceneInfo&& rhs) = default;                ///< Move constructor
-    SceneInfo& operator=(SceneInfo&& rhs) = default;     ///< Move assignment operator
-    SceneInfo& operator=(const SceneInfo& rhs) = delete; ///< Assignment operator
-    SceneInfo(const SceneInfo& rhs)            = delete; ///< Copy constructor
+    ~SceneInfo()                               = default; ///< Default non-virtual destructor
+    SceneInfo(SceneInfo&& rhs)                 = default; ///< Move constructor
+    SceneInfo& operator=(SceneInfo&& rhs)      = default; ///< Move assignment operator
+    SceneInfo& operator=(const SceneInfo& rhs) = delete;  ///< Assignment operator
+    SceneInfo(const SceneInfo& rhs)            = delete;  ///< Copy constructor
 
     Layer*                       root{nullptr};   ///< Root node (root is a layer). The layer is not stored in the node memory pool.
     OwnerPointer<RenderTaskList> taskList;        ///< Scene graph render task list
@@ -457,7 +457,8 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
 
   Layer* rootLayer = layer.Release();
 
-  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene) { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
+  DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
+                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
@@ -652,6 +653,7 @@ void UpdateManager::AddScene(OwnerPointer<Scene>& scene)
 
   // Set root to the Scene
   sceneInfo->scene->SetRoot(sceneInfo->root);
+  sceneInfo->scene->SetRenderMessageDispatcher(&mImpl->renderMessageDispatcher);
 
   // Initialize the context from render manager
   typedef MessageValue1<RenderManager, SceneGraph::Scene*> DerivedType;
@@ -979,9 +981,8 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
 
   auto&& iter = mImpl->animations.Begin();
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss) {
-    oss << "[" << mImpl->animations.Count() << "]";
-  });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
+                                          { oss << "[" << mImpl->animations.Count() << "]"; });
 
   while(iter != mImpl->animations.End())
   {
@@ -1032,9 +1033,8 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     mImpl->notificationManager.QueueNotification(&mImpl->animationPlaylist, std::move(mImpl->notifyRequiredAnimations));
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss) {
-    oss << "[" << mImpl->animations.Count() << "]";
-  });
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
+                                        { oss << "[" << mImpl->animations.Count() << "]"; });
 
   return animationActive;
 }
@@ -1129,9 +1129,8 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
     return;
   }
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss) {
-    oss << "[" << mImpl->renderers.Count() << "]";
-  });
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss)
+                                          { oss << "[" << mImpl->renderers.Count() << "]"; });
 
   for(const auto& rendererKey : mImpl->renderers)
   {
@@ -1231,14 +1230,14 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if(updateScene || mImpl->previousUpdateScene)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_INTERNAL", [&](std::ostringstream& oss) {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_INTERNAL", [&](std::ostringstream& oss)
+                                            {
       oss << "[n:" << mImpl->nodes.Size() << ",";
       oss << "c:" << mImpl->customObjects.Size() << ",";
       oss << "a:" << mImpl->animations.Size() << ",";
       oss << "r:" << mImpl->renderers.Size() << ",";
       oss << "t:" << mImpl->textureSets.Size() << ",";
-      oss << "s:" << mImpl->shaders.Size() << "]";
-    });
+      oss << "s:" << mImpl->shaders.Size() << "]"; });
 
     // Animate
     bool animationActive = Animate(bufferIndex, elapsedSeconds);
@@ -1588,7 +1587,8 @@ void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
     {
       // Reorder children container only if sibiling order changed.
       NodeContainer& container = node->GetChildren();
-      std::sort(container.Begin(), container.End(), [](Node* a, Node* b) { return a->GetDepthIndex() < b->GetDepthIndex(); });
+      std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
+                { return a->GetDepthIndex() < b->GetDepthIndex(); });
     }
   }
 }

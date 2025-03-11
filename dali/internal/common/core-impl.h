@@ -142,6 +142,11 @@ public:
   void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
   /**
+   * @copydoc Dali::Integration::Core::ClearScene()
+   */
+  void ClearScene(Integration::Scene scene);
+
+  /**
    * @copydoc Dali::Integration::Core::Render()
    */
   void PostRender();

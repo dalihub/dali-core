@@ -43,6 +43,7 @@ namespace Internal
 {
 namespace SceneGraph
 {
+class RenderMessageDispatcher;
 class RenderInstructionContainer;
 class Node;
 
@@ -109,6 +110,15 @@ struct DirtyRectValue
   bool          visited{true};
 };
 
+/**
+ * SceneGraph::Scene is a core object representing the window and it's scene-graph. It's used in both
+ * UpdateManager and RenderManager, so has to live in both worlds, and has to know how to send
+ * messages to itself to be run in RenderManager's Queue.
+ *
+ * Initialization is tricky - the Scene's render target has to be setup in RenderManager, so needs
+ * mRenderTargetCreateInfo to be defined before Initialize is called in RenderManage's Queue.
+ * Also, a scene's background color may also get set before Initialize is called.
+ */
 class Scene
 {
 public:
@@ -120,7 +130,6 @@ public:
 
   /**
    * Constructor
-   * @param[in] surface The render surface
    */
   Scene();
 
@@ -130,7 +139,25 @@ public:
   virtual ~Scene();
 
   /**
-   * Creates a scene object in the GPU.
+   * Set the render message dispatcher.
+   * Called from UpdateManagerQueue, before Initialize.
+   */
+  void SetRenderMessageDispatcher(RenderMessageDispatcher* dispatcher);
+
+  /**
+   * Set the render target of the surface
+   * Called from UpdateManager Queue, before Initialize
+   *
+   * @param[in] renderTarget The render target.
+   */
+  void SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
+
+  /**
+   * Creates a scene object
+   * Note, this is run inside RenderManager Queue, not UpdateManagerQueue.
+   * So, other APIs must also run inside RenderManager Queue if they need
+   * to run afterwards.
+   *
    * @param[in] graphicsController The graphics controller
    * @param[in] depthBufferAvailable True if there is a depth buffer
    * @param[in] stencilBufferAvailable True if there is a stencil buffer
@@ -262,11 +289,23 @@ public:
   bool IsRotationCompletedAcknowledgementSet();
 
   /**
-   * Set the render target of the surface
+   * @brief Set the clear color for the scene's render passes
    *
-   * @param[in] renderTarget The render target.
+   * @note Normally, the render instruction's clear color is used (from the render task).
+   *
+   * @param[in] color The color to clear for the render passes
    */
-  void SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
+  void SetClearColor(const Vector4& color);
+
+  /**
+   * @brief Set the clear color for the scene's ClearOp render pass
+   *
+   * @note Needs to run after 2nd stage Initialize in RenderManagerQ, so
+   * has to re-send.
+   *
+   * @param[in] color The color to clear for the render pass
+   */
+  void SetClearColorInRenderQ(const Vector4& color);
 
   /**
    * @brief Keep rendering for at least the given amount of time.
@@ -386,7 +425,8 @@ private:
 
   RenderInstructionContainer mInstructions; ///< Render instructions for the scene
 
-  Graphics::Controller* mGraphicsController{nullptr}; ///< Graphics controller
+  RenderMessageDispatcher* mRenderMessageDispatcher{nullptr}; ///< RenderManager message dispatcher
+  Graphics::Controller*    mGraphicsController{nullptr};      ///< Graphics controller
 
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks; ///< Frame presented callbacks
@@ -511,6 +551,17 @@ inline void SetPartialUpdateEnabledMessage(EventThreadServices& eventThreadServi
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&scene, &Scene::SetPartialUpdateEnabled, enabled);
+}
+
+inline void SetClearColorMessage(EventThreadServices& eventThreadServices, const Scene& scene, const Vector4& color)
+{
+  using LocalType = MessageValue1<Scene, Vector4>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&scene, &Scene::SetClearColorInRenderQ, color);
 }
 
 } // namespace SceneGraph
