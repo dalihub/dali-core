@@ -17,6 +17,9 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
+#include <unordered_map>
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/graphics-api/graphics-controller.h>
@@ -50,6 +53,38 @@ public:
 
   using Uint16ContainerType = Dali::Vector<uint16_t>;
   using Uint32ContainerType = Dali::Vector<uint32_t>;
+
+  /**
+   * Observer to determine when the geometry is no longer present
+   */
+  class LifecycleObserver
+  {
+  public:
+    enum NotifyReturnType
+    {
+      STOP_OBSERVING,
+      KEEP_OBSERVING,
+    };
+
+  public:
+    /**
+     * Called shortly if the geometry indices or vertex buffers are changed.
+     * @return NotifyReturnType::STOP_OBSERVING if we will not observe this object after this called
+     *         NotifyReturnType::KEEP_OBSERVING if we will observe this object after this called.
+     */
+    virtual NotifyReturnType GeometryBufferChanged(const Geometry* geometry) = 0;
+
+    /**
+     * Called shortly before the geometry is destroyed.
+     */
+    virtual void GeometryDestroyed(const Geometry* geometry) = 0;
+
+  protected:
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~LifecycleObserver() = default;
+  };
 
   Geometry();
 
@@ -147,7 +182,50 @@ public:
    */
   bool BindVertexAttributes(Graphics::CommandBuffer& commandBuffer);
 
+  /**
+   * Allows Geometry to track the life-cycle of this object.
+   * Note that we allow to observe lifecycle multiple times.
+   * But GeometryDestroyed callback will be called only one time.
+   * @param[in] observer The observer to add.
+   */
+  void AddLifecycleObserver(LifecycleObserver& observer)
+  {
+    DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying Geometry::LifecycleObservers");
+
+    auto iter = mLifecycleObservers.find(&observer);
+    if(iter != mLifecycleObservers.end())
+    {
+      // Increase the number of observer count
+      ++(iter->second);
+    }
+    else
+    {
+      mLifecycleObservers.insert({&observer, 1u});
+    }
+  }
+
+  /**
+   * The Geometry no longer needs to track the life-cycle of this object.
+   * @param[in] observer The observer that to remove.
+   */
+  void RemoveLifecycleObserver(LifecycleObserver& observer)
+  {
+    DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying Geometry::LifecycleObservers");
+
+    auto iter = mLifecycleObservers.find(&observer);
+    DALI_ASSERT_ALWAYS(iter != mLifecycleObservers.end());
+
+    if(--(iter->second) == 0u)
+    {
+      mLifecycleObservers.erase(iter);
+    }
+  }
+
 private:
+  using LifecycleObserverContainer = std::unordered_map<LifecycleObserver*, uint32_t>; ///< Lifecycle observers container. We allow to add same observer multiple times.
+                                                                                       ///< Key is a pointer to observer, value is the number of observer added.
+  LifecycleObserverContainer mLifecycleObservers;
+
   // VertexBuffers
   Vector<Render::VertexBuffer*> mVertexBuffers;
 
@@ -160,6 +238,8 @@ private:
   bool mIndicesChanged : 1;
   bool mHasBeenUploaded : 1;
   bool mUpdated : 1; ///< Flag to know if data has changed in a frame. Value fixed after Upload() call, and reset as false after OnRenderFinished
+
+  bool mObserverNotifying : 1; ///< Safety guard flag to ensure that the LifecycleObserver not be added or deleted while observing.
 };
 
 } // namespace Render

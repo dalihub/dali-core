@@ -88,7 +88,7 @@ namespace Render
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer : public Program::LifecycleObserver
+class Renderer : public Program::LifecycleObserver, public Geometry::LifecycleObserver
 {
 public:
   /**
@@ -396,11 +396,6 @@ public:
   [[nodiscard]] StencilOperation::Type GetStencilOperationOnZPass() const;
 
   /**
-   * Called to upload during RenderManager::Render().
-   */
-  void Upload();
-
-  /**
    * Called to render during RenderManager::Render().
    * @param[in,out] commandBuffer The command buffer to write into
    * @param[in] bufferIndex The index of the previous update buffer.
@@ -549,6 +544,17 @@ public: // From Program::LifecycleObserver
    * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
    */
   void ProgramDestroyed(const Program* program);
+
+public: // From Geometry::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryBufferChanged()
+   */
+  Geometry::LifecycleObserver::NotifyReturnType GeometryBufferChanged(const Geometry* geometry);
+
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
+   */
+  void GeometryDestroyed(const Geometry* geometry);
 
 private:
   struct UniformIndexMap;

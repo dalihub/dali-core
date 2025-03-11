@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,6 +137,19 @@ int UtcDaliRendererNew02(void)
   TestApplication application;
   Renderer        renderer;
   DALI_TEST_EQUALS((bool)renderer, false, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRendererNew03(void)
+{
+  TestApplication application;
+
+  Renderer renderer = Renderer::New();
+  DALI_TEST_EQUALS((bool)renderer, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(!!renderer.GetGeometry(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -408,6 +421,147 @@ int UtcDaliRendererSetGetShader(void)
   DALI_TEST_EQUALS(actualValue, Color::GREEN, TEST_LOCATION);
 
   DALI_TEST_EQUALS(renderer.GetShader(), shader2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetGetGeometryAndShader01(void)
+{
+  TestApplication application;
+  tet_infoline("Test SetGeometry, GetGeometry, SetShader, GetShader without new creation.");
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  Shader shader1 = CreateShader();
+  shader1.RegisterProperty("uFadeColor", Color::RED);
+
+  Shader shader2 = CreateShader();
+  shader2.RegisterProperty("uFadeColor", Color::GREEN);
+
+  Geometry geometry = CreateQuadGeometry();
+
+  Renderer renderer = Renderer::New();
+  Actor    actor    = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+
+  DALI_TEST_EQUALS(!!renderer.GetGeometry(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Nothing rendered!
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Set geometry after rendering.
+  renderer.SetGeometry(geometry);
+  DALI_TEST_EQUALS(renderer.GetGeometry(), geometry, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Also rendering skipped.
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Set shader after rendering.
+  renderer.SetShader(shader1);
+  DALI_TEST_EQUALS(renderer.GetGeometry(), geometry, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetShader(), shader1, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that the first shaders's fade color property is accessed
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawElements"));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uFadeColor", actualValue));
+  DALI_TEST_EQUALS(actualValue, Color::RED, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetShader(), shader1, TEST_LOCATION);
+
+  // set the second shader to the renderer
+  renderer.SetShader(shader2);
+  DALI_TEST_EQUALS(renderer.GetGeometry(), geometry, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetShader(), shader2, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that the second shader's fade color property is accessed
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uFadeColor", actualValue));
+  DALI_TEST_EQUALS(actualValue, Color::GREEN, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetShader(), shader2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetGetGeometryAndShader02(void)
+{
+  TestApplication application;
+  tet_infoline("Test SetGeometry, GetGeometry, SetShader, GetShader without new creation.");
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  Shader   shader   = CreateShader();
+  Geometry geometry = CreateQuadGeometry();
+
+  Renderer renderer = Renderer::New();
+  Actor    actor    = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+
+  DALI_TEST_EQUALS(!!renderer.GetGeometry(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Nothing rendered!
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Set shader after rendering.
+  renderer.SetShader(shader);
+  DALI_TEST_EQUALS(!!renderer.GetGeometry(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetShader(), shader, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Also rendering skipped.
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Set geometry after rendering.
+  renderer.SetGeometry(geometry);
+  DALI_TEST_EQUALS(renderer.GetGeometry(), geometry, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetShader(), shader, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawElements"));
 
   END_TEST;
 }

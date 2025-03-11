@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -508,6 +508,14 @@ public:
    * @brief Request to reset to base values of all animatable properties.
    */
   void RequestResetToBaseValues();
+
+  /**
+   * @brief True if this renderer could be renderable. False otherwise.
+   */
+  bool IsRenderable() const
+  {
+    return (mGeometry && mShader) || mRenderCallback;
+  }
 
   /**
    * Get the capacity of the memory pools

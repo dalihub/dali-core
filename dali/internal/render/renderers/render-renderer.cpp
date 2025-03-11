@@ -158,6 +158,12 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
   mProgramCache         = &programCache;
   mUniformBufferManager = &uniformBufferManager;
   mPipelineCache        = &pipelineCache;
+
+  // Add Observer now
+  if(mGeometry)
+  {
+    mGeometry->AddLifecycleObserver(*this);
+  }
 }
 
 Renderer::~Renderer()
@@ -175,6 +181,11 @@ Renderer::~Renderer()
     mCurrentProgram->RemoveLifecycleObserver(*this);
     mCurrentProgram = nullptr;
   }
+  if(mGeometry)
+  {
+    mGeometry->RemoveLifecycleObserver(*this);
+    mGeometry = nullptr;
+  }
 }
 
 void Renderer::operator delete(void* ptr)
@@ -189,7 +200,27 @@ Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  mGeometry = geometry;
+  if(mGeometry != geometry)
+  {
+    if(mGeometry)
+    {
+      mGeometry->RemoveLifecycleObserver(*this);
+    }
+
+    mGeometry = geometry;
+
+    if(mGeometry)
+    {
+      mGeometry->AddLifecycleObserver(*this);
+    }
+
+    // Reset old pipeline
+    if(DALI_LIKELY(mPipelineCached))
+    {
+      mPipelineCache->ResetPipeline(mPipeline);
+      mPipelineCached = false;
+    }
+  }
 }
 
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
@@ -384,11 +415,6 @@ StencilOperation::Type Renderer::GetStencilOperationOnZPass() const
   return mStencilParameters.stencilOperationOnZPass;
 }
 
-void Renderer::Upload()
-{
-  mGeometry->Upload(*mGraphicsController);
-}
-
 bool Renderer::NeedsProgram() const
 {
   // Our access to shader is currently through the RenderDataProvider, which
@@ -554,6 +580,12 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     // submit draw
     commandBuffer.DrawNative(&info);
     return true;
+  }
+
+  if(DALI_UNLIKELY(!mGeometry))
+  {
+    // Geometry not set. Ignore below logics.
+    return false;
   }
 
   // Prepare commands
@@ -952,8 +984,16 @@ void Renderer::WriteDynUniform(
 
 void Renderer::SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const
 {
-  sortAttributes.shader   = &mRenderDataProvider->GetShader();
-  sortAttributes.geometry = mGeometry;
+  if(!mRenderCallback)
+  {
+    sortAttributes.shader   = &mRenderDataProvider->GetShader();
+    sortAttributes.geometry = mGeometry;
+  }
+  else
+  {
+    sortAttributes.shader   = nullptr;
+    sortAttributes.geometry = nullptr;
+  }
 }
 
 void Renderer::SetShaderChanged(bool value)
@@ -963,7 +1003,7 @@ void Renderer::SetShaderChanged(bool value)
 
 bool Renderer::Updated()
 {
-  if(mRenderCallback || mShaderChanged || mGeometry->Updated() || mRenderDataProvider->IsUpdated())
+  if(mRenderCallback || mShaderChanged || (DALI_LIKELY(mGeometry) && mGeometry->Updated()) || mRenderDataProvider->IsUpdated())
   {
     return true;
   }
@@ -1051,6 +1091,27 @@ void Renderer::ProgramDestroyed(const Program* program)
 #endif
 }
 
+Geometry::LifecycleObserver::NotifyReturnType Renderer::GeometryBufferChanged(const Geometry* geometry)
+{
+  DALI_ASSERT_ALWAYS(mGeometry == geometry && "Something wrong happend when Render::Renderer observed by geometry!");
+
+  // Reset old pipeline
+  if(DALI_LIKELY(mPipelineCached))
+  {
+    mPipelineCache->ResetPipeline(mPipeline);
+    mPipelineCached = false;
+  }
+
+  return Geometry::LifecycleObserver::NotifyReturnType::KEEP_OBSERVING;
+}
+
+void Renderer::GeometryDestroyed(const Geometry* geometry)
+{
+  // Let just run the same logic with geometry buffer changed cases.
+  [[maybe_unused]] auto ret = GeometryBufferChanged(geometry);
+  mGeometry                 = nullptr;
+}
+
 Vector4 Renderer::GetTextureUpdateArea() const noexcept
 {
   Vector4 result = Vector4::ZERO;
@@ -1096,6 +1157,8 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
+  DALI_ASSERT_DEBUG(mGeometry && "Geometry should not be nullptr! something wrong!\n");
+
   // Prepare query info
   PipelineCacheQueryInfo queryInfo{};
   queryInfo.program               = &program;

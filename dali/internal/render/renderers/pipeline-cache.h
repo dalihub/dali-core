@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PIPELINE_CACHE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,14 @@
 #include <dali/public-api/common/list-wrapper.h>
 
 #include <dali/internal/common/blending-options.h>
-#include <dali/internal/render/shaders/program.h> ///< For Program::LifecycleObserver
+#include <dali/internal/render/renderers/render-geometry.h> ///< For Geometry::LifecycleObserver
+#include <dali/internal/render/shaders/program.h>           ///< For Program::LifecycleObserver
 
 namespace Dali::Internal
 {
 namespace Render
 {
 class Renderer;
-class Geometry;
 
 struct PipelineCacheL2;
 struct PipelineCacheL1;
@@ -133,7 +133,7 @@ struct PipelineResult
 /**
  * Pipeline cache
  */
-class PipelineCache : public Program::LifecycleObserver
+class PipelineCache : public Program::LifecycleObserver, public Geometry::LifecycleObserver
 {
 public:
   /**
@@ -186,6 +186,17 @@ public: // From Program::LifecycleObserver
    * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
    */
   void ProgramDestroyed(const Program* program);
+
+public: // From Geometry::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryBufferChanged()
+   */
+  Geometry::LifecycleObserver::NotifyReturnType GeometryBufferChanged(const Geometry* geometry);
+
+  /**
+   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
+   */
+  void GeometryDestroyed(const Geometry* geometry);
 
 private:
   /**

@@ -181,7 +181,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
   auto& nodePartialRenderingData = node->GetPartialRenderingData();
 
-  const bool rendererExist(renderable.mRenderer);
+  const bool rendererExist(renderable.mRenderer && DALI_LIKELY(renderable.mRenderer->IsRenderable()));
 
   // Don't cull items which have render callback
   bool hasRenderCallback = (rendererExist && renderable.mRenderer->GetRenderCallback());

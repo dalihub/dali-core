@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,10 @@ int UtcDaliRendererSetRenderCallbackP(void)
   // Check the size (whether callback has been called)
   auto size(drawable.size);
   DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
