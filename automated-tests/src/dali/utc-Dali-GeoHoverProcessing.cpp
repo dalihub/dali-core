@@ -665,6 +665,87 @@ int UtcDaliGeoHoverLeaveParentConsumer(void)
   END_TEST;
 }
 
+
+int UtcDaliGeoHoverLeaveWithDispatchMotion(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor rootActor(application.GetScene().GetRootLayer());
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's hovered signal
+  SignalData        data;
+  HoverEventFunctor functor(data, false);
+  actor.HoveredSignal().Connect(&application, functor);
+
+  // Connect to root actor's hovered signal
+  SignalData        rootData;
+  HoverEventFunctor rootFunctor(rootData); // Consumes signal
+  rootActor.HoveredSignal().Connect(&application, rootFunctor);
+
+  // Set actor to require leave events
+  actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+  rootActor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+
+  // Sets the dispatch hover motion property to false. This means that hover motion events are not recived
+  actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, false);
+  rootActor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, false);
+
+  // Emit a started signal
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, rootData.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
+  DALI_TEST_CHECK(actor == rootData.hoverEvent.GetHitActor(0));
+  data.Reset();
+  rootData.Reset();
+
+  // Emit a motion signal outside of actor, should be signalled with a Leave
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  // The event is not received because DISPATCH_HOVER_MOTION is false.
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::LEAVE, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
+  data.Reset();
+  rootData.Reset();
+
+  // Another motion outside of actor, only rootActor signalled
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(201.0f, 201.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+  data.Reset();
+  rootData.Reset();
+
+  // Another motion event inside actor, signalled with start. This is because a new hover event was started on that actor.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(50.0f, 50.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
+  data.Reset();
+  rootData.Reset();
+
+  // Another motion event inside actor, Since DispatchHoverMotion is false, no signal is received.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+  data.Reset();
+  rootData.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliGeoHoverActorBecomesInsensitive(void)
 {
   TestApplication application;
