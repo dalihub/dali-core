@@ -420,6 +420,11 @@ struct HoverEventProcessor::Impl
         else
         {
           localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
+          // If IsDispatchHoverMotion is false, the move event was not dispatched. So consumedActor should keep the previous LastConsumedActor value.
+          if(!localVars.consumedActor && localVars.primaryPointState == PointState::MOTION && !GetImplementation(hitActor).IsDispatchHoverMotion())
+          {
+            localVars.consumedActor = Dali::Actor(processor.mLastConsumedActor.GetActor());
+          }
         }
       }
 
