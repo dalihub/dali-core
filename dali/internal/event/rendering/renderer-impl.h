@@ -279,6 +279,8 @@ protected:
   uint32_t mIndexedDrawElementCount; ///< Number of elements to draw
   uint32_t mInstanceCount{0};        ///< Number of instances to draw
 
+  Dali::Extents mUpdateAreaExtents;
+
   Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;   ///< Local copy of blending options bitmask
 

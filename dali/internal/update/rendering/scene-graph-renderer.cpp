@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,19 @@ enum Flags
   RESEND_SET_RENDER_CALLBACK         = 1 << 21
 };
 
+inline Vector4 AdjustExtents(const Vector4& updateArea, const Dali::Extents& updateAreaExtents)
+{
+  if(DALI_LIKELY(updateAreaExtents == Dali::Extents()))
+  {
+    return updateArea;
+  }
+  const float left   = updateArea.x - updateArea.z * 0.5f - static_cast<float>(updateAreaExtents.start);
+  const float right  = updateArea.x + updateArea.z * 0.5f + static_cast<float>(updateAreaExtents.end);
+  const float top    = updateArea.y - updateArea.w * 0.5f - static_cast<float>(updateAreaExtents.top);
+  const float bottom = updateArea.y + updateArea.w * 0.5f + static_cast<float>(updateAreaExtents.bottom);
+  return Vector4((left + right) * 0.5f, (top + bottom) * 0.5f, (right - left), (bottom - top));
+}
+
 } // Anonymous namespace
 
 RendererKey Renderer::NewKey()
@@ -110,6 +123,7 @@ Renderer::Renderer()
   mIndexedDrawElementsCount(0u),
   mBlendBitmask(0u),
   mResendFlag(0u),
+  mUpdateAreaExtents(),
   mDepthFunction(DepthFunction::LESS),
   mFaceCullingMode(FaceCullingMode::NONE),
   mBlendMode(BlendMode::AUTO),
@@ -617,6 +631,15 @@ void Renderer::SetStencilOperationOnZPass(StencilOperation::Type stencilOperatio
   mResendFlag |= RESEND_STENCIL_OPERATION_ON_Z_PASS;
 }
 
+void Renderer::SetUpdateAreaExtents(const Dali::Extents& updateAreaExtents)
+{
+  if(mUpdateAreaExtents != updateAreaExtents)
+  {
+    mUpdateAreaExtents = updateAreaExtents;
+    SetUpdated(true);
+  }
+}
+
 void Renderer::SetRenderCallback(RenderCallback* callback)
 {
   if(mRenderCallback != callback)
@@ -917,9 +940,9 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
 {
   if(mVisualProperties)
   {
-    return mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, originalUpdateArea);
+    return AdjustExtents(mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, originalUpdateArea), mUpdateAreaExtents);
   }
-  return originalUpdateArea;
+  return AdjustExtents(originalUpdateArea, mUpdateAreaExtents);
 }
 
 void Renderer::OnVisualRendererPropertyUpdated(bool bake)

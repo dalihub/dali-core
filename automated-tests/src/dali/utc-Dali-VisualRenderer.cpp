@@ -189,8 +189,8 @@ int UtcDaliVisualRendererDefaultProperties(void)
   VisualRenderer  renderer     = VisualRenderer::New(geometry, shader);
   Renderer        baseRenderer = Renderer::New(geometry, shader);
 
-  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 32, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32 + 8, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 33, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 33 + 8, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "transformOffset", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_OFFSET, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "transformSize", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_SIZE, TEST_LOCATION);

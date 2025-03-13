@@ -205,9 +205,9 @@ int UtcDaliDecoratedVisualRendererDefaultProperties(void)
   VisualRenderer          baseVisualRenderer = VisualRenderer::New(geometry, shader);
   Renderer                baseRenderer       = Renderer::New(geometry, shader);
 
-  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 32, TEST_LOCATION);
-  DALI_TEST_EQUALS(baseVisualRenderer.GetPropertyCount(), 32 + 8, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32 + 8 + 7, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseRenderer.GetPropertyCount(), 33, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseVisualRenderer.GetPropertyCount(), 33 + 8, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 33 + 8 + 7, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "cornerRadius", Property::VECTOR4, true, true, true, DecoratedVisualRenderer::Property::CORNER_RADIUS, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "cornerRadiusPolicy", Property::FLOAT, true, false, true, DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY, TEST_LOCATION);

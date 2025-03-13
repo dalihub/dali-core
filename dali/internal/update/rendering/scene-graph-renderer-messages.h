@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/public-api/common/extents.h>
 
 namespace Dali::Internal::SceneGraph
 {
@@ -320,6 +321,13 @@ inline void SetInstanceCountMessage(EventThreadServices& eventThreadServices, co
   using LocalType = MessageValue1<SceneGraph::Renderer, uint32_t>;
   uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
   new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetInstanceCount, instanceCount);
+}
+
+inline void SetUpdateAreaExtentsMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Extents& updateAreaExtents)
+{
+  using LocalType = MessageValue1<SceneGraph::Renderer, Extents>;
+  uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetUpdateAreaExtents, updateAreaExtents);
 }
 
 } // namespace Dali::Internal::SceneGraph

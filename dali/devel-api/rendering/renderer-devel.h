@@ -2,7 +2,7 @@
 #define DALI_RENDERER_DEVEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,6 +163,16 @@ enum Type
    * @details name "instanceCount", type INTEGER
    */
   INSTANCE_COUNT = OPACITY + 3,
+
+  /**
+   * @brief Increase the range of update area by pixel value.
+   * @note Extents the area - the position and the size - used for the attached actor's damaged area calculation.
+   * This value be appended after calculate all update area, like visual offset.
+   * @see Dali::Actor::Property::UPDATE_AREA_HINT
+   * @details name "updateAreaExtents", type EXTENTS
+   * @SINCE_2_4.11
+   */
+  UPDATE_AREA_EXTENTS = OPACITY + 4,
 };
 } // namespace Property
 
