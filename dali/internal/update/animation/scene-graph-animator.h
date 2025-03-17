@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,14 +81,12 @@ public:
     mPropertyOwner(propertyOwner),
     mDurationSeconds(timePeriod.durationSeconds),
     mIntervalDelaySeconds(timePeriod.delaySeconds),
-    mSpeedFactor(1.0f),
     mCurrentProgress(0.f),
     mAlphaFunction(alphaFunction),
     mDisconnectAction(Dali::Animation::BAKE_FINAL),
     mAnimationPlaying(false),
     mEnabled(true),
     mConnectedToSceneGraph(false),
-    mAutoReverseEnabled(false),
     mDelayed(false)
   {
   }
@@ -184,40 +182,6 @@ public:
   float GetDuration() const
   {
     return mDurationSeconds;
-  }
-
-  void SetSpeedFactor(float factor)
-  {
-    mSpeedFactor = factor;
-  }
-
-  void SetLoopCount(int32_t loopCount)
-  {
-    mLoopCount = loopCount;
-  }
-
-  float SetProgress(float progress)
-  {
-    float value = 0.0f;
-
-    if(mAutoReverseEnabled)
-    {
-      if(mSpeedFactor > 0.0f)
-      {
-        value = 1.0f - 2.0f * std::abs(progress - 0.5f);
-      }
-      // Reverse mode
-      else if(mSpeedFactor < 0.0f)
-      {
-        value = 2.0f * std::abs(progress - 0.5f);
-      }
-    }
-    else
-    {
-      value = progress;
-    }
-
-    return value;
   }
 
   /**
@@ -443,15 +407,6 @@ public:
   }
 
   /**
-   * @brief Sets the looping mode.
-   * @param[in] loopingMode True when the looping mode is AUTO_REVERSE
-   */
-  void SetLoopingMode(bool loopingMode)
-  {
-    mAutoReverseEnabled = loopingMode;
-  }
-
-  /**
    * Returns wheter the target object of the animator is still valid
    * or has been destroyed.
    * @return True if animator is orphan, false otherwise   *
@@ -471,12 +426,6 @@ public:
    */
   void Update(BufferIndex bufferIndex, float progress, float blendPoint, bool bake)
   {
-    if(mLoopCount >= 0)
-    {
-      // Update the progress value
-      progress = SetProgress(progress);
-    }
-
     if(mPropertyOwner)
     {
       mPropertyOwner->SetUpdated(true);
@@ -519,18 +468,15 @@ protected:
 
   float mDurationSeconds;
   float mIntervalDelaySeconds;
-  float mSpeedFactor;
   float mCurrentProgress;
 
   AlphaFunction mAlphaFunction;
 
-  int32_t                    mLoopCount{1};
   Dali::Animation::EndAction mDisconnectAction;          ///< EndAction to apply when target object gets disconnected from the stage.
   bool                       mAnimationPlaying : 1;      ///< whether disconnect has been applied while it's running.
   bool                       mEnabled : 1;               ///< Animator is "enabled" while its target object is valid and on the stage.
   bool                       mConnectedToSceneGraph : 1; ///< True if ConnectToSceneGraph() has been called in update-thread.
-  bool                       mAutoReverseEnabled : 1;
-  bool                       mDelayed : 1; ///< True if the animator is in delayed state
+  bool                       mDelayed : 1;               ///< True if the animator is in delayed state
 };
 
 /**
