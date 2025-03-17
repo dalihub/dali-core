@@ -414,6 +414,16 @@ public:
    */
   void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
+  /**
+   * Clear the scene's surface.
+   *
+   * Note, this does not need to be called if there is something to render.
+   *
+   * Multi-threading note: this method should be called from a dedicated rendering thread.
+   * @param[in] scene The scene to be rendered.
+   */
+  void ClearScene(Integration::Scene scene);
+
   // This method should be called from Core::PostRender()
 
   /**

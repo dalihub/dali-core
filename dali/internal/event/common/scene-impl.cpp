@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -332,8 +332,15 @@ void Scene::SetBackgroundColor(const Vector4& color)
 {
   mBackgroundColor = color;
 
+  // Normally, clear color is taken from render instruction, so set the
+  // background color to the render task (which generates render instructions).
   mRenderTaskList->GetTask(0u)->SetClearColor(color);
   mRenderTaskList->GetTask(0u)->SetClearEnabled(true);
+
+  // But, if nothing is drawn, and a clear is required, then there are no
+  // render instructions, so we need to get it from the scene object instead.
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  SetClearColorMessage(tls->GetEventThreadServices(), *mSceneObject, color);
 }
 
 Vector4 Scene::GetBackgroundColor() const

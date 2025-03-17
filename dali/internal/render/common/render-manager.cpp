@@ -1386,6 +1386,47 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
 }
 
+void RenderManager::ClearScene(Integration::Scene scene)
+{
+  Internal::Scene&   sceneInternal = GetImplementation(scene);
+  SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
+  if(!sceneObject)
+  {
+    return;
+  }
+
+  auto& currentClearValues = sceneObject->GetGraphicsRenderPassClearValues();
+  DALI_ASSERT_DEBUG(!currentClearValues.empty());
+
+  Graphics::RenderTarget* currentRenderTarget = sceneObject->GetSurfaceRenderTarget();
+  Graphics::RenderPass*   currentRenderPass   = sceneObject->GetGraphicsRenderPass(
+    Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE);
+
+  Rect<int32_t>    surfaceRect = sceneObject->GetSurfaceRect();
+  Graphics::Rect2D scissorArea{0, 0, uint32_t(surfaceRect.width), uint32_t(surfaceRect.height)};
+  int32_t          surfaceOrientation = sceneObject->GetSurfaceOrientation() + sceneObject->GetScreenOrientation();
+  if(surfaceOrientation >= 360)
+  {
+    surfaceOrientation -= 360;
+  }
+  scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, surfaceRect);
+
+  auto commandBuffer = mImpl->graphicsController.CreateCommandBuffer(Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::PRIMARY), nullptr);
+  commandBuffer->Begin(Graphics::CommandBufferBeginInfo()
+                         .SetUsage(0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT)
+                         .SetRenderTarget(*currentRenderTarget));
+
+  commandBuffer->BeginRenderPass(currentRenderPass, currentRenderTarget, scissorArea, currentClearValues);
+  commandBuffer->EndRenderPass(nullptr);
+  commandBuffer->End();
+
+  Graphics::SubmitInfo submitInfo;
+  submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+  submitInfo.cmdBuffer.push_back(commandBuffer.get());
+  mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
+  mImpl->graphicsController.PresentRenderTarget(currentRenderTarget);
+}
+
 void RenderManager::PostRender()
 {
   if(!mImpl->commandBufferSubmitted)

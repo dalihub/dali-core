@@ -384,6 +384,14 @@ public:
   void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
   /**
+   * Clear the scene's surface if there is nothing else to draw.
+   *
+   * Don't need to call this if there is something to draw;
+   * @param[in] scene The scene to be cleared.
+   */
+  void ClearScene(Integration::Scene scene);
+
+  /**
    * This is called after rendering all the scenes in the next frame. This method should be
    * followed by a call to RenderScene.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
