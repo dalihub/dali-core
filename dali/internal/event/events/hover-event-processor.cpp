@@ -141,7 +141,7 @@ Dali::Actor EmitGeoHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, c
   {
     Actor* actorImpl(*rIter);
     // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
-    if(ShouldEmitHoverEvent(*actorImpl, hoverEvent))
+    if(actorImpl->GetHoverRequired())
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_HOVER_EVENT_SIGNAL");
       PointState::Type currentState = actorImpl->GetHoverState();
@@ -160,11 +160,14 @@ Dali::Actor EmitGeoHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, c
           break;
         }
       }
-      else if(actorImpl->EmitHoverEventSignal(hoverEvent))
+      else if(hoverEvent.GetState(0) != PointState::MOTION || actorImpl->IsDispatchHoverMotion())
       {
-        // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
-        consumedActor = Dali::Actor(actorImpl);
-        break;
+        if(actorImpl->EmitHoverEventSignal(hoverEvent))
+        {
+          // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
+          consumedActor = Dali::Actor(actorImpl);
+          break;
+        }
       }
     }
   }
@@ -420,6 +423,11 @@ struct HoverEventProcessor::Impl
         else
         {
           localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
+          // If IsDispatchHoverMotion is false, the move event was not dispatched. So consumedActor should keep the previous LastConsumedActor value.
+          if(!localVars.consumedActor && localVars.primaryPointState == PointState::MOTION && !GetImplementation(hitActor).IsDispatchHoverMotion())
+          {
+            localVars.consumedActor = Dali::Actor(processor.mLastConsumedActor.GetActor());
+          }
         }
       }
 
