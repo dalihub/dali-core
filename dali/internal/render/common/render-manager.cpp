@@ -680,30 +680,30 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
 bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  bool             somethingToRender = false;
-  Internal::Scene& sceneInternal     = GetImplementation(scene);
-  Scene*           sceneObject       = sceneInternal.GetSceneObject();
+  bool             renderToScene = false;
+  Internal::Scene& sceneInternal = GetImplementation(scene);
+  Scene*           sceneObject   = sceneInternal.GetSceneObject();
 
   if(!sceneObject)
   {
     // May not be a scene object if the window is being removed.
-    return somethingToRender;
+    return renderToScene;
   }
 
   const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   for(uint32_t i = instructionCount; i > 0; --i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i - 1);
-    if(instruction.RenderListCount() > 0)
+    if(instruction.RenderListCount() > 0 && instruction.mFrameBuffer == nullptr)
     {
-      somethingToRender = true;
+      renderToScene = true;
       break;
     }
   }
 
   if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
   {
-    return somethingToRender;
+    return renderToScene;
   }
 
   if(!sceneObject || sceneObject->IsRenderingSkipped())
@@ -717,7 +717,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     {
       DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
     }
-    return somethingToRender;
+    return renderToScene;
   }
 
   class DamagedRectsCleaner
@@ -763,7 +763,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     // Clear all dirty rects
     // The rects will be added when partial updated is enabled again
     itemsDirtyRects.clear();
-    return somethingToRender;
+    return renderToScene;
   }
 
   // Mark previous dirty rects in the std::unordered_map.
@@ -961,7 +961,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   {
     damagedRectCleaner.SetCleanOnReturn(false);
   }
-  return somethingToRender;
+  return renderToScene;
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
@@ -985,6 +985,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   {
     DALI_LOG_INFO(gLogFilter, Debug::General, "PartialUpdate and no clip\n");
     DALI_LOG_DEBUG_INFO("ClippingRect was empty. Skip rendering\n");
+    // Should not get here anymore - copied this check to caller.
     return;
   }
 
