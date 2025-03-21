@@ -497,9 +497,14 @@ inline void RenderAlgorithms::SetupScissorClipping(
     // callback so it may be clipped
     if(DALI_LIKELY(item.mRenderer) && item.mRenderer->GetRenderCallback())
     {
+      ClippingBox useClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height));
+
+      Graphics::Viewport graphicsViewport   = ViewportFromClippingBox(Uint16Pair{0, 0}, mViewportRectangle, 0);
+      Graphics::Rect2D   graphicsScissorBox = Rect2DFromClippingBox(useClippingBox, orientation, graphicsViewport);
+
       // store clipping box inside the render callback input structure
       auto& input       = item.mRenderer->GetRenderCallbackInput();
-      input.clippingBox = ClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height));
+      input.clippingBox = ClippingBox(graphicsScissorBox.x, graphicsScissorBox.y, graphicsScissorBox.width, graphicsScissorBox.height);
     }
   }
 }
