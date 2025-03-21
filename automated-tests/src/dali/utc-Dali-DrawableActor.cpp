@@ -22,16 +22,18 @@ struct DrawableObject
 {
   bool Render(const RenderCallbackInput& inputData)
   {
-    // Store the size of rendered area
-    size = inputData.size;
+    // Store the size and clipping box of rendered area
+    size        = inputData.size;
+    clippingBox = inputData.clippingBox;
 
     return false;
   }
 
   bool RenderWithTextures(const RenderCallbackInput& inputData)
   {
-    // Store the size of rendered area
-    size = inputData.size;
+    // Store the size and clipping box of rendered area
+    size        = inputData.size;
+    clippingBox = inputData.clippingBox;
 
     auto count = inputData.textureBindings.size();
 
@@ -41,7 +43,8 @@ struct DrawableObject
     return false;
   }
 
-  Size size{};
+  Size        size{};
+  ClippingBox clippingBox{};
 };
 
 int UtcDaliRendererSetRenderCallbackP(void)
@@ -126,6 +129,101 @@ int UtcRenderCallbackTextureBindingP(void)
 
   // Check the size (whether callback has been called)
   DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliDrawableActor2P(void)
+{
+  tet_infoline("Testing Renderer:LSetRenderCallback() and check clipping box");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor       = Actor::New();
+  Actor parentActor = Actor::New();
+  application.GetScene().Add(parentActor);
+  parentActor.Add(actor);
+
+  parentActor.SetProperty(Actor::Property::POSITION, Vector2(20, 50));
+  parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 200));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(50, 70));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  auto renderer = Renderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.size, Size(100, 200), TEST_LOCATION);
+
+  // Check clippingBox. Note that clippingBox coordinate is in screen coordinates
+  DALI_TEST_EQUALS(drawable.clippingBox, Rect<int32_t>(20 + 50, 800 - (50 + 70 + 200), 100, 200), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliDrawableActorSceneRotated(void)
+{
+  tet_infoline("Testing Renderer:LSetRenderCallback()");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor       = Actor::New();
+  Actor parentActor = Actor::New();
+  application.GetScene().Add(parentActor);
+  parentActor.Add(actor);
+
+  parentActor.SetProperty(Actor::Property::POSITION, Vector2(20, 50));
+  parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 200));
+  actor.SetProperty(Actor::Property::POSITION, Vector2(50, 70));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  auto renderer = Renderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.size, Size(100, 200), TEST_LOCATION);
+
+  // Check clippingBox. Note that clippingBox coordinate is in screen coordinates
+  DALI_TEST_EQUALS(drawable.clippingBox, Rect<int32_t>(20 + 50, TestApplication::DEFAULT_SURFACE_HEIGHT - (50 + 70 + 200), 100, 200), TEST_LOCATION);
+
+  // Reset size (to check callback comes)
+  drawable.size = Size();
+
+  application.GetScene().SurfaceRotated(TestApplication::DEFAULT_SURFACE_WIDTH,
+                                        TestApplication::DEFAULT_SURFACE_HEIGHT,
+                                        90,
+                                        0);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check the size (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.size, Size(100, 200), TEST_LOCATION);
+
+  // Check clippingBox. Note that clippingBox coordinate is in screen coordinates
+  DALI_TEST_EQUALS(drawable.clippingBox, Rect<int32_t>(50 + 70, 20 + 50, 200, 100), TEST_LOCATION);
 
   END_TEST;
 }
