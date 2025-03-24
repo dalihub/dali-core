@@ -184,6 +184,16 @@ public:
   bool BuildPickingRay(const Vector2& screenCoordinates, const Viewport& viewport, Vector4& rayOrigin, Vector4& rayDirection);
 
   /**
+   * Build a picking ray with this camera and given screen coordinates (Not considers viewport.)
+   * @param [in] screenCoordinates the ray passed through
+   * @param [in] screenSize screen Size.
+   * @param [out] rayOrigin for the picking ray
+   * @param [out] rayDirection for the picking ray
+   * @return true if the building was successful, false if its not possible (camera is not valid for hit testing)
+   */
+  bool BuildPickingRay(const Vector2& screenCoordinates, const Vector2& screenSize, Vector4& rayOrigin, Vector4& rayDirection);
+
+  /**
    * Retrieve the view-matrix; This will only be valid when the actor is on-stage.
    * @return The view-matrix.
    */

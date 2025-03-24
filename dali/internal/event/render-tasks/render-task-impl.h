@@ -235,6 +235,12 @@ public:
   uint32_t GetRefreshRate() const;
 
   /**
+   * Retrieves whether the RenderTask is input available or not
+   * @return True if the RenderTask is input available.
+   */
+  bool IsInputAvailable() const;
+
+  /**
    * Check if the render-task is hittable. If render task is offscreen, the screen coordinates may be translated.
    * @param[in,out] screenCoords The screen coordinate, which may be converted (for hit-testing actors which are rendered off-screen).
    * @return True the render-task can be used for input-handling; otherwise the output parameters are not valid.
