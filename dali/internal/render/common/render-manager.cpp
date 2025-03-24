@@ -680,30 +680,30 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
 bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
 {
-  bool             somethingToRender = false;
-  Internal::Scene& sceneInternal     = GetImplementation(scene);
-  Scene*           sceneObject       = sceneInternal.GetSceneObject();
+  bool             renderToScene = false;
+  Internal::Scene& sceneInternal = GetImplementation(scene);
+  Scene*           sceneObject   = sceneInternal.GetSceneObject();
 
   if(!sceneObject)
   {
     // May not be a scene object if the window is being removed.
-    return somethingToRender;
+    return renderToScene;
   }
 
   const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   for(uint32_t i = instructionCount; i > 0; --i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i - 1);
-    if(instruction.RenderListCount() > 0)
+    if(instruction.RenderListCount() > 0 && instruction.mFrameBuffer == nullptr)
     {
-      somethingToRender = true;
+      renderToScene = true;
       break;
     }
   }
 
   if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
   {
-    return somethingToRender;
+    return renderToScene;
   }
 
   if(!sceneObject || sceneObject->IsRenderingSkipped())
@@ -717,7 +717,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     {
       DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
     }
-    return somethingToRender;
+    return renderToScene;
   }
 
   class DamagedRectsCleaner
@@ -763,7 +763,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     // Clear all dirty rects
     // The rects will be added when partial updated is enabled again
     itemsDirtyRects.clear();
-    return somethingToRender;
+    return renderToScene;
   }
 
   // Mark previous dirty rects in the std::unordered_map.
@@ -961,7 +961,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   {
     damagedRectCleaner.SetCleanOnReturn(false);
   }
-  return somethingToRender;
+  return renderToScene;
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)
@@ -979,9 +979,13 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
 {
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Rendering to %s\n", renderToFbo ? "Framebuffer" : "Surface");
+
   if(mImpl->partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE && !renderToFbo && clippingRect.IsEmpty())
   {
+    DALI_LOG_INFO(gLogFilter, Debug::General, "PartialUpdate and no clip\n");
     DALI_LOG_DEBUG_INFO("ClippingRect was empty. Skip rendering\n");
+    // Should not get here anymore - copied this check to caller.
     return;
   }
 
@@ -992,6 +996,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     DALI_LOG_ERROR("Scene was empty handle. Skip rendering\n");
     return;
   }
+  DALI_LOG_INFO(gLogFilter, Debug::General, "No early out\n");
 
   // @todo These should be members of scene
   const Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
@@ -1017,6 +1022,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   bool sceneNeedsDepthBuffer   = false;
   bool sceneNeedsStencilBuffer = false;
+
+  DALI_LOG_INFO(gLogFilter, Debug::General, "Instruction count: %d\n", instructionCount);
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
@@ -1272,10 +1279,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
 
-    // Set surface orientation
-    // @todo Inform graphics impl by another route.
-    // was: mImpl->currentContext->SetSurfaceOrientation(surfaceOrientation);
-
     /*** Clear region of framebuffer or surface before drawing ***/
     bool clearFullFrameRect = (surfaceRect == viewportRect);
     if(instruction.mFrameBuffer != nullptr)
@@ -1364,6 +1367,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     submitInfo.cmdBuffer.push_back(commandBuffer);
   }
 
+  DALI_LOG_INFO(gLogFilter, Debug::General, "CmdBuffer count: %u\n", submitInfo.cmdBuffer.size());
+
   if(!submitInfo.cmdBuffer.empty())
   {
     mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
@@ -1373,11 +1378,54 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   // present render target (if main scene)
   if(!renderToFbo)
   {
+    DALI_LOG_INFO(gLogFilter, Debug::General, "Present\n");
+
     DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
     auto renderTarget = sceneObject->GetSurfaceRenderTarget();
     mImpl->graphicsController.PresentRenderTarget(renderTarget);
     DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
   }
+}
+
+void RenderManager::ClearScene(Integration::Scene scene)
+{
+  Internal::Scene&   sceneInternal = GetImplementation(scene);
+  SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
+  if(!sceneObject)
+  {
+    return;
+  }
+
+  auto& currentClearValues = sceneObject->GetGraphicsRenderPassClearValues();
+  DALI_ASSERT_DEBUG(!currentClearValues.empty());
+
+  Graphics::RenderTarget* currentRenderTarget = sceneObject->GetSurfaceRenderTarget();
+  Graphics::RenderPass*   currentRenderPass   = sceneObject->GetGraphicsRenderPass(
+    Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE);
+
+  Rect<int32_t>    surfaceRect = sceneObject->GetSurfaceRect();
+  Graphics::Rect2D scissorArea{0, 0, uint32_t(surfaceRect.width), uint32_t(surfaceRect.height)};
+  int32_t          surfaceOrientation = sceneObject->GetSurfaceOrientation() + sceneObject->GetScreenOrientation();
+  if(surfaceOrientation >= 360)
+  {
+    surfaceOrientation -= 360;
+  }
+  scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, surfaceRect);
+
+  auto commandBuffer = mImpl->graphicsController.CreateCommandBuffer(Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::PRIMARY), nullptr);
+  commandBuffer->Begin(Graphics::CommandBufferBeginInfo()
+                         .SetUsage(0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT)
+                         .SetRenderTarget(*currentRenderTarget));
+
+  commandBuffer->BeginRenderPass(currentRenderPass, currentRenderTarget, scissorArea, currentClearValues);
+  commandBuffer->EndRenderPass(nullptr);
+  commandBuffer->End();
+
+  Graphics::SubmitInfo submitInfo;
+  submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+  submitInfo.cmdBuffer.push_back(commandBuffer.get());
+  mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
+  mImpl->graphicsController.PresentRenderTarget(currentRenderTarget);
 }
 
 void RenderManager::PostRender()

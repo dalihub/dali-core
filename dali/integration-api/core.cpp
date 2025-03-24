@@ -124,6 +124,11 @@ void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool ren
   mImpl->RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
+void Core::ClearScene(Integration::Scene scene)
+{
+  mImpl->ClearScene(scene);
+}
+
 void Core::PostRender()
 {
   mImpl->PostRender();

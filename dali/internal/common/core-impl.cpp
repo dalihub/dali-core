@@ -231,6 +231,11 @@ void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool ren
   mRenderManager->RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
+void Core::ClearScene(Integration::Scene scene)
+{
+  mRenderManager->ClearScene(scene);
+}
+
 void Core::PostRender()
 {
   mUpdateManager->PostRender();

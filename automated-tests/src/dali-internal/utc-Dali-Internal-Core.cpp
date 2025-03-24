@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,5 +220,32 @@ int UtcDaliCoreForceRelayout2(void)
 
   application.SendNotification();
 
+  END_TEST;
+}
+
+int UtcDaliCoreClearScene(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::ClearScene");
+
+  application.GetScene().SetBackgroundColor(Color::MAGENTA);
+
+  TestGraphicsController& controller = application.GetGraphicsController();
+  auto&                   contTrace  = controller.mCallStack;
+  auto&                   cmdTrace   = controller.mCommandBufferCallStack;
+  contTrace.Enable(true);
+  contTrace.EnableLogging(true);
+  cmdTrace.Enable(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render();
+
+  auto& core = application.GetCore();
+  core.ClearScene(application.GetScene());
+
+  DALI_TEST_CHECK(cmdTrace.FindMethod("BeginRenderPass"));
+  DALI_TEST_CHECK(contTrace.FindMethod("SubmitCommandBuffers"));
+  DALI_TEST_CHECK(contTrace.FindMethod("PresentRenderTarget"));
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,6 +260,7 @@ uint32_t RenderTask::GetRefreshRate() const
 
 bool RenderTask::ReadyToRender(BufferIndex updateBufferIndex)
 {
+  TASK_LOG_FMT(Debug::General, " Active(ReadyToRender):%s\n", mActive ? "T" : "F");
   return mActive;
 }
 
