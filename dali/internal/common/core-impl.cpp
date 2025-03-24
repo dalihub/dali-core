@@ -195,6 +195,7 @@ void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint
   // it is cached by frametime
   status.secondsFromLastFrame = elapsedSeconds;
 
+  static bool rendererAdded = false;
   // Render returns true when there are updates on the stage or one or more animations are completed.
   // Use the estimated time diff till we render as the elapsed time.
   status.keepUpdating = mUpdateManager->Update(elapsedSeconds,
@@ -202,7 +203,11 @@ void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint
                                                nextVSyncTimeMilliseconds,
                                                renderToFboEnabled,
                                                isRenderingToFbo,
-                                               uploadOnly);
+                                               uploadOnly,
+                                               rendererAdded);
+
+  // Get the value of renderer added from updateManager.
+  status.rendererAdded = rendererAdded;
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();
