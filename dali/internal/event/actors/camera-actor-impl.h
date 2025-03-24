@@ -179,9 +179,21 @@ public:
    * @param [in] viewport to use
    * @param [out] rayOrigin for the picking ray
    * @param [out] rayDirection for the picking ray
+   * @param [in] isDrawnOnFramebuffer to notify this camera is currently used for Framebuffer or not.
    * @return true if the building was successful, false if its not possible (camera is not valid for hit testing)
    */
-  bool BuildPickingRay(const Vector2& screenCoordinates, const Viewport& viewport, Vector4& rayOrigin, Vector4& rayDirection);
+  bool BuildPickingRay(const Vector2& screenCoordinates, const Viewport& viewport, Vector4& rayOrigin, Vector4& rayDirection, bool isDrawnOnFramebuffer = false);
+
+  /**
+   * Build a picking ray with this camera and given screen coordinates (Not considers viewport.)
+   * @param [in] screenCoordinates the ray passed through
+   * @param [in] screenSize screen Size.
+   * @param [out] rayOrigin for the picking ray
+   * @param [out] rayDirection for the picking ray
+   * @param [in] isDrawnOnFramebuffer to notify this camera is currently used for Framebuffer or not.
+   * @return true if the building was successful, false if its not possible (camera is not valid for hit testing)
+   */
+  bool BuildPickingRay(const Vector2& screenCoordinates, const Vector2& screenSize, Vector4& rayOrigin, Vector4& rayDirection, bool isDrawnOnFramebuffer = false);
 
   /**
    * Build a picking ray with this camera and given screen coordinates (Not considers viewport.)

@@ -571,7 +571,7 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
   }
 
   Ray ray;
-  if(!renderTask.GetCameraActor()->BuildPickingRay(screenCoordinates, screenSize, ray.origin, ray.direction))
+  if(!renderTask.GetCameraActor()->BuildPickingRay(screenCoordinates, screenSize, ray.origin, ray.direction, !!renderTask.GetFrameBuffer()))
   {
     return false;
   }
