@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -228,7 +228,7 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
 bool IsActorPickable(const Ray&   ray,
                      const float& projectedNearClippingDistance,
                      const float& projectedFarClippingDistance,
-                     Actor&       actor)
+                     const Actor& actor)
 {
   Vector2 hitPointLocal;
   float   distance;
@@ -309,8 +309,7 @@ bool IsActorExclusive(const Actor&                               actor,
                       const RenderTaskList::ExclusivesContainer& exclusives)
 
 {
-  auto result = std::find_if(exclusives.begin(), exclusives.end(), [&actor](const RenderTaskList::Exclusive& exclusive)
-                             { return exclusive.actor.GetActor() == &actor; });
+  auto result = std::find_if(exclusives.begin(), exclusives.end(), [&actor](const RenderTaskList::Exclusive& exclusive) { return exclusive.actor.GetActor() == &actor; });
   return (result != exclusives.end());
 }
 
@@ -337,7 +336,7 @@ inline bool IsActorValid(Actor&                                     actor,
 }
 
 bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultList,
-                             ActorPtr                                 currentActor,
+                             Actor&                                   currentActor,
                              HitCommonInformation&                    hitCommonInformation,
                              const Ray&                               ray,
                              const float&                             projectedNearClippingDistance,
@@ -347,30 +346,30 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
                              bool                                     isKeepingHitTestRequired,
                              bool                                     isOverlay)
 {
-  if(!isOverlay && currentActor->IsOverlay())
+  if(!isOverlay && currentActor.IsOverlay())
   {
     return false;
   }
 
   std::shared_ptr<HitResult> hitResultOfThisActor;
-  bool                       isClippingRequired = (layerBehavior != Dali::Layer::LAYER_3D) && ((currentActor->GetClippingMode() != ClippingMode::DISABLED) || (hitCheck.GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY));
+  bool                       isClippingRequired = (layerBehavior != Dali::Layer::LAYER_3D) && ((currentActor.GetClippingMode() != ClippingMode::DISABLED) || (hitCheck.GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY));
 
   if(isClippingRequired)
   {
-    if(!currentActor->IsLayer() && !IsActorPickable(ray, projectedNearClippingDistance, projectedFarClippingDistance, *(currentActor)))
+    if(!currentActor.IsLayer() && !IsActorPickable(ray, projectedNearClippingDistance, projectedFarClippingDistance, currentActor))
     {
       return false;
     }
   }
 
-  if(currentActor->GetChildCount() > 0)
+  if(currentActor.GetChildCount() > 0)
   {
-    ActorContainer&                  children = currentActor->GetChildrenInternal();
+    ActorContainer&                  children = currentActor.GetChildrenInternal();
     ActorContainer::reverse_iterator endIter  = children.rend();
     for(ActorContainer::reverse_iterator iter = children.rbegin(); endIter != iter; ++iter)
     {
-      ActorPtr childActor = *iter;
-      if(!IsActorValid(*childActor, hitCommonInformation.exclusives, hitCheck))
+      Actor& childActor = *((*iter).Get());
+      if(!IsActorValid(childActor, hitCommonInformation.exclusives, hitCheck))
       {
         continue;
       }
@@ -388,7 +387,7 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
     }
   }
 
-  hitResultOfThisActor = HitTestActor(ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, *currentActor, layerBehavior);
+  hitResultOfThisActor = HitTestActor(ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, currentActor, layerBehavior);
   if(!hitResultOfThisActor)
   {
     return false;
@@ -433,42 +432,43 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
   return true;
 }
 
-void RetrieveValidActorTrees(ActorContainer&                            validActorRoots,
-                             ActorPtr                                   parentActor,
+void RetrieveValidActorTrees(std::vector<Actor*>&                       validActorRoots,
+                             Actor&                                     parentActor,
                              const RenderTaskList::ExclusivesContainer& exclusives,
                              HitTestInterface&                          hitCheck,
                              const Ray&                                 ray,
                              const float&                               projectedNearClippingDistance,
                              const float&                               projectedFarClippingDistance)
 {
-  if(parentActor->GetChildCount() == 0)
+  if(parentActor.GetChildCount() == 0)
   {
     return;
   }
 
-  if((parentActor->GetClippingMode() == ClippingMode::CLIP_CHILDREN) &&
-     !IsActorPickable(ray, projectedNearClippingDistance, projectedFarClippingDistance, *parentActor))
+  if((parentActor.GetClippingMode() == ClippingMode::CLIP_CHILDREN) &&
+     !IsActorPickable(ray, projectedNearClippingDistance, projectedFarClippingDistance, parentActor))
   {
     return;
   }
 
-  ActorContainer&          children = parentActor->GetChildrenInternal();
+  ActorContainer&          children = parentActor.GetChildrenInternal();
   ActorContainer::iterator endIter  = children.end();
   for(ActorContainer::iterator iter = children.begin(); endIter != iter; ++iter)
   {
-    ActorPtr childActor = *iter;
-    if(childActor->IsLayer())
+    Actor& childActor = *((*iter).Get());
+    if(childActor.IsLayer())
     {
       continue;
     }
 
-    if(childActor->IsOverlay())
+    if(childActor.IsOverlay())
     {
-      bool     valid       = true;
-      ActorPtr currentNode = childActor;
-      while(currentNode)
+      bool   valid       = true;
+      Actor* currentNode = &childActor;
+      // Should not make valid to false for scene root layer.
+      while(currentNode && currentNode->GetParent())
       {
-        if(!IsActorValid(*childActor, exclusives, hitCheck))
+        if(!IsActorValid(*currentNode, exclusives, hitCheck))
         {
           valid = false;
           break;
@@ -477,12 +477,12 @@ void RetrieveValidActorTrees(ActorContainer&                            validAct
       }
       if(valid)
       {
-        validActorRoots.push_back(iter->Get());
+        validActorRoots.push_back(&childActor);
       }
     }
     else
     {
-      RetrieveValidActorTrees(validActorRoots, iter->Get(), exclusives, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
+      RetrieveValidActorTrees(validActorRoots, childActor, exclusives, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
     }
   }
 }
@@ -496,20 +496,20 @@ bool HitTestWithinSubTree(std::vector<std::shared_ptr<HitResult>>& hitResultList
                           HitTestInterface&                        hitCheck,
                           Dali::Layer::Behavior                    layerBehavior)
 {
-  ActorContainer validActorRoots;
+  std::vector<Actor*> validActorRoots;
   validActorRoots.push_back(&actor);
 
   if(actor.GetScene().HasOverlayContent())
   {
-    RetrieveValidActorTrees(validActorRoots, &actor, hitCommonInformation.exclusives, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
+    RetrieveValidActorTrees(validActorRoots, actor, hitCommonInformation.exclusives, hitCheck, ray, projectedNearClippingDistance, projectedFarClippingDistance);
   }
 
   bool isKeepingHitTestRequired = (hitCheck.GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY) || (layerBehavior == Dali::Layer::Behavior::LAYER_3D);
 
-  ActorContainer::reverse_iterator endIter = validActorRoots.rend();
-  for(ActorContainer::reverse_iterator iter = validActorRoots.rbegin(); endIter != iter; ++iter)
+  auto endIter = validActorRoots.rend();
+  for(auto iter = validActorRoots.rbegin(); endIter != iter; ++iter)
   {
-    if(HitTestActorRecursively(hitResultList, *iter, hitCommonInformation, ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, layerBehavior, isKeepingHitTestRequired, iter->Get()->IsOverlay()))
+    if(HitTestActorRecursively(hitResultList, *(*iter), hitCommonInformation, ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, layerBehavior, isKeepingHitTestRequired, (*iter)->IsOverlay()))
     {
       break;
     }
@@ -522,8 +522,7 @@ bool HitTestWithinSubTree(std::vector<std::shared_ptr<HitResult>>& hitResultList
 
   if(layerBehavior == Dali::Layer::Behavior::LAYER_3D)
   {
-    std::stable_sort(hitResultList.begin(), hitResultList.end(), [](std::shared_ptr<HitResult> first, std::shared_ptr<HitResult> second)
-                     {
+    std::stable_sort(hitResultList.begin(), hitResultList.end(), [](std::shared_ptr<HitResult> first, std::shared_ptr<HitResult> second) {
                         if(std::abs(first->mDistance - second->mDistance) < Dali::Epsilon<1000>::value)
                         {
                           return first->mActor->GetSortingDepth() > second->mActor->GetSortingDepth();
