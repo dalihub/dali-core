@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,7 +258,6 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
        !renderTask.ReadyToRender(updateBufferIndex))
     {
       // Skip to next task.
-      DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "  Skip to next task\n");
       continue;
     }
 

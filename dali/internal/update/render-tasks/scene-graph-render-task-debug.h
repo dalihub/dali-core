@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_DEBUG_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,9 @@ Debug::Filter* gRenderTaskLogFilter = Debug::Filter::New(Debug::NoLogging, false
   (state == RENDER_CONTINUOUSLY ? "RenderContinuously" : (state == RENDER_ONCE_WAITING_FOR_RESOURCES ? "RenderOnceWaiting" : (state == RENDERED_ONCE ? "RenderedOnce" : (state == RENDERED_ONCE_AND_NOTIFIED ? "RenderedOnceAndNotified" : "Unknown"))))
 
 #define TASK_LOG(level) \
-  DALI_LOG_INFO(gRenderTaskLogFilter, level, "this:%p\n", this)
+  DALI_LOG_INFO(gRenderTaskLogFilter, level, "SceneGraph::RenderTask::%s: this:%p\n", __FUNCTION__, this)
 #define TASK_LOG_FMT(level, format, ...) \
-  DALI_LOG_INFO(gRenderTaskLogFilter, level, "this:%p " format, this, ##__VA_ARGS__)
+  DALI_LOG_INFO(gRenderTaskLogFilter, level, "SceneGraph::RenderTask::%s: this:%p " format, __FUNCTION__, this, ##__VA_ARGS__)
 #else
 
 #define TASK_LOG(level)

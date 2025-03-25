@@ -371,7 +371,7 @@ public:
   void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo);
 
   /**
-   * Render a scene in the next frame. This method should be preceded by a call to PreRender.
+   * Render a scene in the next frame. This method should be preceded by a call up PreRender.
    * This method should be called twice. The first pass to render off-screen frame buffers if any,
    * and the second pass to render the surface.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
@@ -384,16 +384,8 @@ public:
   void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
 
   /**
-   * Clear the scene's surface if there is nothing else to draw.
-   *
-   * Don't need to call this if there is something to draw;
-   * @param[in] scene The scene to be cleared.
-   */
-  void ClearScene(Integration::Scene scene);
-
-  /**
    * This is called after rendering all the scenes in the next frame. This method should be
-   * followed by a call to RenderScene.
+   * followed by a call up RenderScene.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
    */
