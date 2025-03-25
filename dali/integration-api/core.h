@@ -83,6 +83,7 @@ public:
   UpdateStatus()
   : keepUpdating(false),
     needsNotification(false),
+    rendererAdded(false),
     secondsFromLastFrame(0.0f)
   {
   }
