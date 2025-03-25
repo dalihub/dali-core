@@ -70,6 +70,7 @@ DALI_PROPERTY("rendererOpacity", FLOAT, true, true, true, Dali::Renderer::Proper
 DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
 DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
 DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
+DALI_PROPERTY("updateAreaExtents", EXTENTS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_EXTENTS)
 DALI_PROPERTY_TABLE_END(DEFAULT_RENDERER_PROPERTY_START_INDEX, RendererDefaultProperties)
 
 // Property string to enumeration tables:
@@ -718,6 +719,19 @@ void Renderer::SetDefaultProperty(Property::Index        index,
       }
       break;
     }
+    case DevelRenderer::Property::UPDATE_AREA_EXTENTS:
+    {
+      Extents updateAreaExtents;
+      if(propertyValue.Get(updateAreaExtents))
+      {
+        if(mUpdateAreaExtents != updateAreaExtents)
+        {
+          mUpdateAreaExtents = updateAreaExtents;
+          SetUpdateAreaExtentsMessage(GetEventThreadServices(), GetRendererSceneObject(), mUpdateAreaExtents);
+        }
+      }
+      break;
+    }
   }
 }
 
@@ -884,6 +898,7 @@ Renderer::Renderer(const SceneGraph::Renderer* sceneObject)
   mDepthIndex(0),
   mIndexedDrawFirstElement(0),
   mIndexedDrawElementCount(0),
+  mUpdateAreaExtents(),
   mStencilParameters(RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP),
   mBlendingOptions(),
   mDepthFunction(DepthFunction::LESS),
@@ -1085,6 +1100,11 @@ bool Renderer::GetCachedPropertyValue(Property::Index index, Property::Value& va
     case DevelRenderer::Property::INSTANCE_COUNT:
     {
       value = int(mInstanceCount);
+      break;
+    }
+    case DevelRenderer::Property::UPDATE_AREA_EXTENTS:
+    {
+      value = mUpdateAreaExtents;
       break;
     }
     default:

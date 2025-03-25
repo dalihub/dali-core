@@ -7427,9 +7427,14 @@ int UtcDaliActorGeoTouchLowerBelow(void)
   actorC.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
   actorC.SetProperty(Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
 
+  actorA.SetProperty(Actor::Property::NAME, "actorA");
+  actorB.SetProperty(Actor::Property::NAME, "actorB");
+  actorC.SetProperty(Actor::Property::NAME, "actorC");
+
   Actor container = Actor::New();
   container.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   container.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  container.SetProperty(Actor::Property::NAME, "container");
   stage.Add(container);
 
   container.Add(actorA);

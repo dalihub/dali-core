@@ -61,9 +61,9 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsTouchConsumed();
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, const Integration::Scene::TouchPropagationType propagationType) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Vector2 hitPointLocal) override
   {
-    return actor->EmitHitTestResultSignal(point, hitPointLocal, timeStamp);
+    return actor->EmitHitTestResultSignal(GetPoint(), hitPointLocal, GetTimeStamp());
   }
 
   GestureType::Value mType;
@@ -139,7 +139,6 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
   {
     Actor*  hitTestActor(&GetImplementation(hitTestResults.actor));
     Actor*  actor(hitTestActor);
-    RayTest rayTest;
 
     while(actor)
     {
@@ -171,11 +170,11 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
             if((size.x > 0.0f) && (size.y > 0.0f))
             {
               // Ensure tap is within the actor's area
-              if(rayTest.SphereTest(*actor, hitTestResults.rayOrigin, hitTestResults.rayDirection)) // Quick check
+              if(RayTest::SphereTest(*actor, hitTestResults.rayOrigin, hitTestResults.rayDirection)) // Quick check
               {
                 Vector2 hitPointLocal;
                 float   distance(0.0f);
-                if(rayTest.ActorTest(*actor, hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance))
+                if(RayTest::ActorTest(*actor, hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance))
                 {
                   // One of the parents was the gestured actor so we can emit the signal for that actor.
                   EmitGestureSignal(actor, gestureDetectors, hitPointLocal);

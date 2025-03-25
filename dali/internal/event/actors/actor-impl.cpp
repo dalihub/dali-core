@@ -994,8 +994,25 @@ bool Actor::IsTransparent() const
 
 void Actor::SetDrawMode(DrawMode::Type drawMode)
 {
+  if(mDrawMode == drawMode)
+  {
+    return;
+  }
+
   // this flag is not animatable so keep the value
   mDrawMode = drawMode;
+
+  if(mScene)
+  {
+    if(IsOverlay())
+    {
+      mScene->SetOverlayContent();
+    }
+    else
+    {
+      mScene->RemoveOverlayContent();
+    }
+  }
 
   // node is being used in a separate thread; queue a message to set the value
   SetDrawModeMessage(GetEventThreadServices(), GetNode(), drawMode);
@@ -1404,7 +1421,7 @@ void Actor::NotifyStageConnection(bool notify)
   }
 }
 
-void Actor::DisconnectFromStage(bool notify)
+void Actor::DisconnectFromScene(bool notify)
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnSceneDisconnectionExternal callbacks.
@@ -1427,7 +1444,7 @@ void Actor::DisconnectFromStage(bool notify)
 
 /**
  * This method is called by an actor or its parent, before a node removal message is sent.
- * This is recursive; the child calls DisconnectFromStage() for its children.
+ * This is recursive; the child calls DisconnectFromScene() for its children.
  */
 void Actor::DisconnectFromSceneGraph()
 {
@@ -1670,7 +1687,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
       DisconnectNodeMessage(GetEventThreadServices().GetUpdateManager(), GetNode());
 
       // Instruct each actor to discard pointers to the scene-graph
-      DisconnectFromStage(notify);
+      DisconnectFromScene(notify);
     }
 
     mScene = nullptr;

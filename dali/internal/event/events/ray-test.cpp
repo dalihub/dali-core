@@ -54,11 +54,8 @@ namespace Dali
 {
 namespace Internal
 {
-RayTest::RayTest()
-{
-}
 
-bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir) const
+bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir)
 {
   /*
    http://wiki.cgsociety.org/index.php/Ray_Sphere_Intersection
@@ -152,7 +149,7 @@ bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin,
   return (b2 * b2 - a * c) >= 0.0f;
 }
 
-bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance) const
+bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance)
 {
   bool hit = false;
 
@@ -189,6 +186,84 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
       // Test with the actor's geometry.
       hit = (hitPointLocal.x >= touchAreaOffset.left - epsilon) && (hitPointLocal.x <= (size.x + touchAreaOffset.right + epsilon) && (hitPointLocal.y >= touchAreaOffset.top - epsilon) && (hitPointLocal.y <= (size.y + touchAreaOffset.bottom + epsilon)));
     }
+  }
+
+  return hit;
+}
+
+bool RayTest::ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector3& hitPointLocal, float& distance)
+{
+  bool hit = false;
+
+  if(actor.OnScene())
+  {
+    const Node& node = actor.GetNode();
+
+    // Transforms the ray to the local reference system.
+    // Calculate the inverse of Model matrix
+    Matrix modelMatrix(false /*don't init*/);
+    modelMatrix = node.GetWorldMatrix(0);
+    Matrix invModelMatrix = modelMatrix;
+    invModelMatrix.Invert();
+
+    Vector4 rayOriginLocal(invModelMatrix * rayOrigin);
+    Vector4 rayDirVector = rayDir;
+    rayDirVector.w = 0.0f;  // Make it Vector.
+    Vector4 rayDirLocal(invModelMatrix * rayDirVector);
+    rayDirLocal.Normalize();
+
+    Vector3 currentSize  = node.GetSize(EventThreadServices::Get().GetEventBufferIndex());
+    Vector3 AABBMin = Vector3(-currentSize.width * 0.5f, -currentSize.height * 0.5f, -currentSize.depth * 0.5f);
+    Vector3 AABBMax = Vector3(currentSize.width * 0.5f, currentSize.height * 0.5f, currentSize.depth * 0.5f);
+
+    float distanceMin = 0.0f;
+    float distanceMax = std::numeric_limits<float>::infinity();
+    for(uint32_t i = 0; i < 3u; ++i)
+    {
+      float rayOriginScalar = (i == 0) ? rayOriginLocal.x : ((i == 1) ? rayOriginLocal.y : rayOriginLocal.z);
+      float rayDirectionScalar = (i == 0) ? rayDirLocal.x : ((i == 1) ? rayDirLocal.y : rayDirLocal.z);
+      float boxMin = (i == 0) ? AABBMin.x : ((i == 1) ? AABBMin.y : AABBMin.z);
+      float boxMax = (i == 0) ? AABBMax.x : ((i == 1) ? AABBMax.y : AABBMax.z);
+
+      // Check the ray is parallel to an axis.
+      if(std::abs(rayDirectionScalar) < Math::MACHINE_EPSILON_1)
+      {
+        // If the ray is parallel to an axis and the ray's origin along that axis lies outside the
+        // corresponding minimum and maximum bounds of the AABB, there can be no intersection
+        // between the ray and the AABB.
+        if(rayOriginScalar < boxMin || rayOriginScalar > boxMax)
+        {
+          return false;
+        }
+      }
+      else
+      {
+        float hit1 = (boxMin - rayOriginScalar) / rayDirectionScalar;
+        float hit2 = (boxMax - rayOriginScalar) / rayDirectionScalar;
+
+        if(hit1 > hit2)
+        {
+          std::swap(hit1, hit2);
+        }
+
+        distanceMin = std::max(distanceMin, hit1);
+        distanceMax = std::min(distanceMax, hit2);
+
+        if(distanceMin > distanceMax)
+        {
+          return false;
+        }
+      }
+    }
+
+    Vector4 hitPointLocalVector4 = rayOriginLocal + rayDirLocal * distanceMin;
+    hitPointLocalVector4.w       = 1.0f; // Make it Position
+    distance                     = Vector3(rayOrigin - (modelMatrix * hitPointLocalVector4)).Length();
+    hitPointLocal                = Vector3(hitPointLocalVector4);
+    hitPointLocal.x += currentSize.x * 0.5f;
+    hitPointLocal.y = currentSize.y * 0.5f - hitPointLocal.y;
+
+    hit = true;
   }
 
   return hit;

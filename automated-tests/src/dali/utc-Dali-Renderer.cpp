@@ -306,12 +306,13 @@ int UtcDaliRendererDefaultProperties(void)
   DALI_PROPERTY("renderingBehavior", INTEGER, true, false, false, Dali::DevelRenderer::Property::RENDERING_BEHAVIOR)
   DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelRenderer::Property::BLEND_EQUATION)
   DALI_PROPERTY("instanceCount", INTEGER, true, false, false, Dali::DevelRenderer::Property::INSTANCE_COUNT)
+  DALI_PROPERTY("updateAreaExtents", EXTENTS, true, false, false, Dali::DevelRenderer::Property::UPDATE_AREA_EXTENTS)
 */
 
   Geometry geometry = CreateQuadGeometry();
   Shader   shader   = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
-  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 32, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetPropertyCount(), 33, TEST_LOCATION);
 
   TEST_RENDERER_PROPERTY(renderer, "depthIndex", Property::INTEGER, true, false, false, Renderer::Property::DEPTH_INDEX, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "faceCullingMode", Property::INTEGER, true, false, false, Renderer::Property::FACE_CULLING_MODE, TEST_LOCATION);
@@ -345,6 +346,7 @@ int UtcDaliRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "renderingBehavior", Property::INTEGER, true, false, false, DevelRenderer::Property::RENDERING_BEHAVIOR, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "blendEquation", Property::INTEGER, true, false, false, DevelRenderer::Property::BLEND_EQUATION, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "instanceCount", Property::INTEGER, true, false, false, DevelRenderer::Property::INSTANCE_COUNT, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "updateAreaExtents", Property::EXTENTS, true, false, false, DevelRenderer::Property::UPDATE_AREA_EXTENTS, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5238,6 +5240,8 @@ int UtcDaliRendererVertexRange(void)
   END_TEST;
 }
 
+namespace
+{
 TestGraphicsBuffer* FindUniformBuffer(int bufferIndex, TestGraphicsController& graphics)
 {
   int counter = 0;
@@ -5282,6 +5286,7 @@ void CreateRendererProperties(Renderer renderer, const Matrix& m, const Matrix& 
   renderer["uBlendShapeWeight[55]"]  = w2;
   renderer["uBlendShapeWeight[127]"] = w3;
 }
+} // namespace
 
 int UtcDaliRendererUniformBlocks01(void)
 {
@@ -5982,6 +5987,80 @@ int UtcDaliRendererDestructWorkerThreadN(void)
 
   // Always success
   DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+int utcDaliRendererPartialUpdateUpdateAreaExtents(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect with renderer's UPDATE_AREA_EXTENTS property");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Shader   shader   = Shader::New("VertexSource", "FragmentSource");
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+
+  // 1. Actor added, damaged rect is added size of actor
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check dirty rect empty
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Set update area extents
+  renderer.SetProperty(DevelRenderer::Property::UPDATE_AREA_EXTENTS, Dali::Extents(8u, 40u, 8u, 72u));
+  DALI_TEST_EQUALS(renderer.GetProperty<Extents>(DevelRenderer::Property::UPDATE_AREA_EXTENTS), Dali::Extents(8u, 40u, 8u, 72u), TEST_LOCATION);
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(0, 688, 80, 112); // in screen coordinates
+
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   END_TEST;
 }

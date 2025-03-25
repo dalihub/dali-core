@@ -468,6 +468,19 @@ public:
   }
 
   /**
+   * @brief Set the extents of update area. It will be used when we calculate damaged rect.
+   */
+  void SetUpdateAreaExtents(const Dali::Extents& updateAreaExtents);
+
+  /**
+   * @brief Get the extents of update area. It will be used when we calculate damaged rect.
+   */
+  Dali::Extents GetUpdateAreaExtents() const
+  {
+    return mUpdateAreaExtents;
+  }
+
+  /**
    * Sets RenderCallback object
    *
    * @param[in] callback Valid pointer to RenderCallback object
@@ -612,6 +625,8 @@ private:
   uint32_t             mResendFlag;                  ///< Indicate whether data should be resent to the renderer
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
   UniformMap::SizeType mShaderMapChangeCounter{0u};  ///< Value to check if uniform data should be updated
+
+  Dali::Extents mUpdateAreaExtents;
 
   DepthFunction::Type            mDepthFunction : 4;              ///< Local copy of the depth function
   FaceCullingMode::Type          mFaceCullingMode : 3;            ///< Local copy of the mode of face culling

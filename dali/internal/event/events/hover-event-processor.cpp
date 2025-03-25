@@ -251,7 +251,7 @@ struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
     return layer->IsHoverConsumed();
   }
 
-  bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, const Integration::Scene::TouchPropagationType propagationType) override
+  bool ActorRequiresHitResultCheck(Actor* actor, Vector2 hitPointLocal) override
   {
     // Hover event is always hit.
     return true;

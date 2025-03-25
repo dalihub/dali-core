@@ -92,20 +92,53 @@ struct HitTestInterface
    *       If false is returend, then this actor passes the hit-test and the next actor performs the hit-test.
    *
    * @param[in] actor The hit actor.
-   * @param[in] point The point of event touched.
    * @param[in] hitPointLocal The hit point in the Actor's local reference system.
-   * @param[in] timeStamp The time the event occurred.
    * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
    *
    * @return true if the actor should be the hit, false otherwise.
    */
-  virtual bool ActorRequiresHitResultCheck(Actor* actor, Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp, const Integration::Scene::TouchPropagationType propagationType) = 0;
+  virtual bool ActorRequiresHitResultCheck(Actor* actor, Vector2 hitPointLocal) = 0;
+
+  void SetPoint(const Integration::Point& point)
+  {
+    mPoint = point;
+  }
+
+  const Integration::Point& GetPoint() const
+  {
+    return mPoint;
+  }
+
+  void SetTimeStamp(uint32_t timeStamp)
+  {
+    mTimeStamp = timeStamp;
+  }
+
+  uint32_t GetTimeStamp() const
+  {
+    return mTimeStamp;
+  }
+
+  void SetPropagationType(const Integration::Scene::TouchPropagationType propagationtType)
+  {
+    mPropagationType = propagationtType;
+  }
+
+  Integration::Scene::TouchPropagationType GetPropagationType() const
+  {
+    return mPropagationType;
+  }
 
 protected:
   /**
    * Virtual destructor, no deletion through this interface
    */
   virtual ~HitTestInterface();
+
+private:
+  Integration::Point                       mPoint;
+  uint32_t                                 mTimeStamp{0u};
+  Integration::Scene::TouchPropagationType mPropagationType{Integration::Scene::TouchPropagationType::PARENT};
 };
 
 /**

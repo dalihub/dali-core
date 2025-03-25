@@ -647,7 +647,7 @@ int UtcDaliHitTestAlgorithmOrder1(void)
   offRenderTask.SetInputEnabled(true);
   offRenderTask.SetCameraActor(cameraActor);
   offRenderTask.SetSourceActor(green);
-  offRenderTask.SetScreenToFrameBufferMappingActor(green);
+  offRenderTask.SetScreenToFrameBufferMappingActor(blue);
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
@@ -973,7 +973,7 @@ int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
   offRenderTask.SetInputEnabled(true);
   offRenderTask.SetCameraActor(cameraActor);
   offRenderTask.SetSourceActor(green);
-  offRenderTask.SetScreenToFrameBufferMappingActor(green);
+  offRenderTask.SetScreenToFrameBufferMappingActor(blue);
 
   Dali::Texture texture      = Dali::Texture::New(TextureType::TEXTURE_2D, Pixel::RGB888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer   renderTarget = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
@@ -984,7 +984,7 @@ int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
   offRenderTask2.SetInputEnabled(true);
   offRenderTask2.SetCameraActor(cameraActor);
   offRenderTask2.SetSourceActor(green);
-  offRenderTask2.SetScreenToFrameBufferMappingActor(green);
+  offRenderTask2.SetScreenToFrameBufferMappingActor(blue);
   offRenderTask2.SetFrameBuffer(renderTarget);
 
   // Render and notify

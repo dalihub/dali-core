@@ -563,7 +563,8 @@ void CameraActor::ApplyDefaultProjection()
 bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
                                   const Viewport& viewport,
                                   Vector4&        rayOrigin,
-                                  Vector4&        rayDirection)
+                                  Vector4&        rayDirection,
+                                  bool            isDrawnOnFramebuffer)
 {
   bool success = true;
   if(mProjectionMode == Dali::Camera::PERSPECTIVE_PROJECTION)
@@ -574,7 +575,7 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.
-    Vector4       near(screenCoordinates.x - static_cast<float>(viewport.x),
+    Vector4 near(screenCoordinates.x - static_cast<float>(viewport.x),
                  static_cast<float>(viewport.height) - (screenCoordinates.y - static_cast<float>(viewport.y)),
                  0.f,
                  1.f);
@@ -584,6 +585,7 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
     // Compute the ray's director vector.
     rayDirection.x = near.x - rayOrigin.x;
     rayDirection.y = near.y - rayOrigin.y;
+    rayDirection.y = (isDrawnOnFramebuffer && mInvertYAxis) ? -rayDirection.y : rayDirection.y;
     rayDirection.z = near.z - rayOrigin.z;
     rayDirection.Normalize();
     rayDirection.w = 1.f;
@@ -602,6 +604,16 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
   }
 
   return success;
+}
+
+bool CameraActor::BuildPickingRay(const Vector2& screenCoordinates,
+                                  const Vector2& screenSize,
+                                  Vector4&       rayOrigin,
+                                  Vector4&       rayDirection,
+                                  bool           isDrawnOnFramebuffer)
+{
+  Viewport viewport(0, 0, screenSize.x, screenSize.y);
+  return BuildPickingRay(screenCoordinates, viewport, rayOrigin, rayDirection, isDrawnOnFramebuffer);
 }
 
 const Matrix& CameraActor::GetViewMatrix() const

@@ -351,14 +351,6 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
 void Animation::SetLoopingMode(bool loopingMode)
 {
   mAutoReverseEnabled = loopingMode;
-
-  for(auto&& item : mAnimators)
-  {
-    // Send some variables together to figure out the Animation status
-    item->SetSpeedFactor(mSpeedFactor);
-    item->SetLoopCount(mLoopCount);
-    item->SetLoopingMode(loopingMode);
-  }
 }
 
 void Animation::AddAnimator(OwnerPointer<AnimatorBase>& animator)
@@ -538,6 +530,18 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
         if(animatorDuration > 0.0f) // animators can be "immediate"
         {
           progress = Clamp((elapsedSecondsClamped - intervalDelay) / animatorDuration, 0.0f, 1.0f);
+        }
+        if(mAutoReverseEnabled)
+        {
+          if(mSpeedFactor > 0.0f)
+          {
+            progress = 1.0f - 2.0f * std::abs(progress - 0.5f);
+          }
+          // Reverse mode
+          else if(mSpeedFactor < 0.0f)
+          {
+            progress = 2.0f * std::abs(progress - 0.5f);
+          }
         }
         animator->Update(bufferIndex, progress, mIsFirstLoop ? mBlendPoint : 0.0f, bake);
 

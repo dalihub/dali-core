@@ -224,7 +224,30 @@ RenderTask::ScreenToFrameBufferFunction RenderTask::GetScreenToFrameBufferFuncti
 
 void RenderTask::SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor)
 {
+  if(mInputMappingActor == mappingActor)
+  {
+    return;
+  }
+
+  if(!mappingActor)
+  {
+    Dali::Actor actor = mInputMappingActor.GetHandle();
+    if(actor)
+    {
+      GetImplementation(actor).SetIsRenderTaskMappingActor(false);
+    }
+    mInputMappingActor.Reset();
+    return;
+  }
+
+  if(GetImplementation(mappingActor).IsRenderTaskMappingActor())
+  {
+    DALI_LOG_ERROR("The actor is already a mapping actor of another RenderTask\n");
+    return;
+  }
+
   mInputMappingActor = WeakHandle<Dali::Actor>(mappingActor);
+  GetImplementation(mappingActor).SetIsRenderTaskMappingActor(true);
 }
 
 Dali::Actor RenderTask::GetScreenToFrameBufferMappingActor() const
@@ -472,11 +495,8 @@ uint32_t RenderTask::GetRefreshRate() const
   return mRefreshRate;
 }
 
-bool RenderTask::IsHittable(Vector2& screenCoords) const
+bool RenderTask::IsInputAvailable() const
 {
-  // True when input is enabled, source & camera actor are valid
-  bool inputEnabled(false);
-
   Actor*       sourceActor = GetSourceActor();
   CameraActor* cameraActor = GetCameraActor();
 
@@ -486,16 +506,25 @@ bool RenderTask::IsHittable(Vector2& screenCoords) const
      nullptr != cameraActor &&
      cameraActor->OnScene())
   {
+    return true;
+  }
+  return false;
+}
+
+bool RenderTask::IsHittable(Vector2& screenCoords) const
+{
+  if(IsInputAvailable())
+  {
     // If the actors are rendered off-screen, then the screen coordinates must be converted
     // and the conversion function will tell us if they are inside or outside
     if(TranslateCoordinates(screenCoords))
     {
       // This is a suitable render-task for input handling
-      inputEnabled = true;
+      return true;
     }
   }
 
-  return inputEnabled;
+  return false;
 }
 
 bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
@@ -1052,6 +1081,13 @@ RenderTask::~RenderTask()
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::~RenderTask(this:%p)\n", this);
   // scene object deletion is handled by our parent
   // scene object handles observation of source and camera
+
+  Dali::Actor actor = mInputMappingActor.GetHandle();
+  if(actor)
+  {
+    GetImplementation(actor).SetIsRenderTaskMappingActor(false);
+  }
+  mInputMappingActor.Reset();
 
   ClearRenderResult();
 }

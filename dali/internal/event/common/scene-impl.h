@@ -203,6 +203,21 @@ public:
    */
   Vector4 GetBackgroundColor() const;
 
+  void SetOverlayContent()
+  {
+    mOverlayContentCount++;
+  }
+
+  void RemoveOverlayContent()
+  {
+    mOverlayContentCount--;
+  }
+
+  bool HasOverlayContent() const
+  {
+    return !!mOverlayContentCount;
+  }
+
   /**
    * @brief Get the Scene scene graph object
    *
@@ -475,7 +490,7 @@ private:
 
   LayerPtr mOverlayLayer;
 
-  // Ordered list of currently on-stage layers
+  // Ordered list of currently on-scene layers
   OwnerPointer<LayerList> mLayerList;
 
   IntrusivePtr<CameraActor> mDefaultCamera;
@@ -498,6 +513,8 @@ private:
 
   // The native window id
   int32_t mNativeId;
+
+  uint32_t mOverlayContentCount{0u};
 
   // The pan gesture state
   Dali::GestureState mPanGestureState;

@@ -1220,6 +1220,22 @@ public:
   }
 
   /**
+   * Sets this actor is used for mapping Actor of a RenderTask
+   */
+  void SetIsRenderTaskMappingActor(bool isRenderTaskMappingActor)
+  {
+    mIsRenderTaskMappingActor = isRenderTaskMappingActor;
+  }
+
+  /**
+   * Retrieves whether the Actor is used as a mapping Actor of a RenderTask.
+   */
+  bool IsRenderTaskMappingActor() const
+  {
+    return mIsRenderTaskMappingActor;
+  }
+
+  /**
    * @copydoc Dali::DevelActor::IsHittable()
    */
   bool IsHittable() const
@@ -1674,10 +1690,10 @@ protected:
   void NotifyStageConnection(bool notify);
 
   /**
-   * Called on a child during Remove() when the actor was previously on the Stage.
+   * Called on a child during Remove() when the actor was previously on the Scene.
    * @param[in] notify Emits notification if set to true.
    */
-  void DisconnectFromStage(bool notify);
+  void DisconnectFromScene(bool notify);
 
   /**
    * Disconnect the Node associated with this Actor from the scene-graph.
@@ -1685,7 +1701,7 @@ protected:
   void DisconnectFromSceneGraph();
 
   /**
-   * Helper for DisconnectFromStage, to notify a disconnected actor through the public API.
+   * Helper for DisconnectFromScene, to notify a disconnected actor through the public API.
    * @param[in] notify Emits notification if set to true.
    */
   void NotifyStageDisconnection(bool notify);
@@ -1862,7 +1878,7 @@ private:
 
   /**
    * For use in internal derived classes.
-   * This is called during DisconnectFromStage(), before the actor removes its node from the scene-graph.
+   * This is called during DisconnectFromScene(), before the actor removes its node from the scene-graph.
    * The derived class must not modify the actor hierachy (Add/Remove children) during this callback.
    */
   virtual void OnSceneDisconnectionInternal()
@@ -1879,7 +1895,7 @@ private:
 
   /**
    * For use in external (CustomActor) derived classes.
-   * This is called after the atomic DisconnectFromStage() traversal has been completed.
+   * This is called after the atomic DisconnectFromScene() traversal has been completed.
    */
   virtual void OnSceneDisconnectionExternal()
   {
@@ -2043,6 +2059,8 @@ protected:
   std::string mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+
+  bool mIsRenderTaskMappingActor{false};
 
   int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 

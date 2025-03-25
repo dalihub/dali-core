@@ -2,7 +2,7 @@
 #define DALI_RENDER_CALLBACK_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,10 +46,10 @@ struct DALI_CORE_API RenderCallbackInput
   Matrix                mvp;
   Matrix                projection;
   Size                  size;
-  Rect<int32_t>         clippingBox;
+  Rect<int32_t>         clippingBox; ///< in screen coordinates
   std::vector<uint32_t> textureBindings;
 
-  std::any eglContext;       ///< Storage for EGL Context
+  std::any eglContext;         ///< Storage for EGL Context
   bool     usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
 
   Matrix view; // Added at end to avoid abi break.
@@ -70,7 +70,6 @@ struct DALI_CORE_API RenderCallbackInput
 class DALI_CORE_API RenderCallback
 {
 public:
-
   /**
    * @brief Mode of execution of custom rendering code into the pipeline
    *
@@ -231,16 +230,16 @@ public:
    * @SINCE_2_3.12
    * @return Valid execution mode
    */
-   [[nodiscard]] ExecutionMode GetExecutionMode() const
-   {
-     return mExecutionMode;
-   }
+  [[nodiscard]] ExecutionMode GetExecutionMode() const
+  {
+    return mExecutionMode;
+  }
 
 private:
   std::unique_ptr<CallbackBase> mCallback; //< Callback base object
   RenderCallbackInput           mRenderCallbackInput;
   ExecutionMode                 mExecutionMode{ExecutionMode::DEFAULT};
-  std::vector<Dali::Texture> mTextureResources{};
+  std::vector<Dali::Texture>    mTextureResources{};
 };
 } // namespace Dali
 

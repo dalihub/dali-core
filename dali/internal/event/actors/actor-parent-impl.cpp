@@ -466,6 +466,11 @@ void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, ui
   // This stage is atomic; avoid emitting callbacks until all Actors are connected
   connectionList.push_back(ActorPtr(&mOwner));
 
+  if(mOwner.mScene && mOwner.IsOverlay())
+  {
+    mOwner.mScene->SetOverlayContent();
+  }
+
   // Recursively connect children
   if(mChildren)
   {
@@ -479,6 +484,11 @@ void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, ui
 
 void ActorParentImpl::RecursiveDisconnectFromScene(ActorContainer& disconnectionList)
 {
+  if(mOwner.mScene && mOwner.IsOverlay())
+  {
+    mOwner.mScene->RemoveOverlayContent();
+  }
+
   // need to change state first so that internals relying on IsOnScene() inside OnSceneDisconnectionInternal() get the correct value
   mOwner.mIsOnScene           = false;
   mOwner.mScene               = nullptr;

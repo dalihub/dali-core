@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/core-enumerations.h>
+#include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
 
 namespace Dali
@@ -28,7 +29,8 @@ namespace Internal
 namespace SceneGraph
 {
 Scene::Scene()
-: mFrameRenderedCallbacks(),
+: mRenderMessageDispatcher(nullptr),
+  mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
   mSurfaceRect(),
   mSurfaceOrientation(0),
@@ -45,6 +47,30 @@ Scene::~Scene()
 {
   mFrameRenderedCallbacks.clear();
   mFramePresentedCallbacks.clear();
+}
+
+void Scene::SetRenderMessageDispatcher(RenderMessageDispatcher* messageDispatcher)
+{
+  mRenderMessageDispatcher = messageDispatcher;
+}
+
+void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
+{
+  if(mRenderTarget != nullptr &&
+     mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface)
+  {
+    // Only recreate if the surface has changed.
+    mRenderTargetCreateInfo = renderTargetCreateInfo;
+    if(mGraphicsController) // shouldn't be null, as we can't have already set mRenderTarget unless graphics controller exists.
+    {
+      mRenderTarget = mGraphicsController->CreateRenderTarget(renderTargetCreateInfo, std::move(mRenderTarget));
+    }
+  }
+  else
+  {
+    // 2nd Stage initialization happens in RenderManager, not UpdateManager, so is delayed.
+    mRenderTargetCreateInfo = renderTargetCreateInfo;
+  }
 }
 
 void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
@@ -92,7 +118,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
   rpInfo.SetAttachments(attachmentDescriptions);
 
   // Add default render pass (loadOp = clear)
-  mRenderPass = graphicsController.CreateRenderPass(rpInfo, nullptr); // Warning: Shallow ptr
+  mRenderPass = graphicsController.CreateRenderPass(rpInfo, nullptr);
 
   desc.SetLoadOp(Graphics::AttachmentLoadOp::LOAD);
   attachmentDescriptions[0] = desc;
@@ -227,23 +253,18 @@ Scene::ItemsDirtyRectsContainer& Scene::GetItemsDirtyRects()
   return mItemsDirtyRects;
 }
 
-void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
+void Scene::SetClearColor(const Vector4& color)
 {
-  if(mRenderTarget != nullptr &&
-     mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface)
-  {
-    // Only recreate if the surface has changed.
-    mRenderTargetCreateInfo = renderTargetCreateInfo;
-    if(mGraphicsController) // shouldn't be null, as we can't have already set mRenderTarget unless graphics controller exists.
-    {
-      mRenderTarget = mGraphicsController->CreateRenderTarget(renderTargetCreateInfo, std::move(mRenderTarget));
-    }
-  }
-  else
-  {
-    // 2nd Stage initialization happens in RenderManager, not UpdateManager, so is delayed.
-    mRenderTargetCreateInfo = renderTargetCreateInfo;
-  }
+  DALI_ASSERT_DEBUG(!mClearValues.empty());
+  mClearValues[0].color = {color.r, color.g, color.b, color.a};
+}
+
+void Scene::SetClearColorInRenderQ(const Vector4& color)
+{
+  // Tramp the color through the render manager's queue to ensure it happens after Initialize().
+  using DerivedType = MessageValue1<Scene, Vector4>;
+  uint32_t* slot    = mRenderMessageDispatcher->ReserveMessageSlot(sizeof(DerivedType));
+  new(slot) DerivedType(this, &Scene::SetClearColor, color);
 }
 
 void Scene::KeepRendering(float durationSeconds)
