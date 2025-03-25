@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -673,7 +673,6 @@ public:
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object.
    * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
-   * @param[out] rendererAdded Whether at least one of renderer added to update manager, or not.
    * @return True if further updates are required e.g. during animations.
    */
   uint32_t Update(float    elapsedSeconds,
@@ -681,8 +680,7 @@ public:
                   uint32_t nextVSyncTimeMilliseconds,
                   bool     renderToFboEnabled,
                   bool     isRenderingToFbo,
-                  bool     uploadOnly,
-                  bool&    rendererAdded);
+                  bool     uploadOnly);
 
   /**
    * This is called after rendering all the scenes in the next frame.
