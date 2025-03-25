@@ -1396,13 +1396,6 @@ void RenderManager::ClearScene(Integration::Scene scene)
     return;
   }
 
-  // TODO : Optimize might be required here! For now, the number of connected scene is small. So it looks enough.
-  auto iter = std::find(mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), sceneObject);
-  if(iter == mImpl->sceneContainer.end())
-  {
-    return;
-  }
-
   auto& currentClearValues = sceneObject->GetGraphicsRenderPassClearValues();
   DALI_ASSERT_DEBUG(!currentClearValues.empty());
 
