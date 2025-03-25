@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -470,6 +470,8 @@ DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
  *   void MyCallbackName( Actor actor );
  * @endcode
  * actor The actor to intercept
+ *
+ * @warning You MUST NOT change the scene tree or RenderTask during this signal.
  *
  * @note This callback is called when the actor is hit.
  * If true is returned, TouchEvent is called from the this actor.
