@@ -895,9 +895,12 @@ Property::Value TypeInfo::GetPropertyDefaultValue(Property::Index index) const
 void TypeInfo::SetAnimatableProperty(BaseObject* object, Property::Index index, Property::Value value) const
 {
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-  if(iter != mRegisteredProperties.end() && iter->second.setFunc)
+  if(iter != mRegisteredProperties.end())
   {
-    iter->second.setFunc(object, index, value);
+    if(iter->second.setFunc)
+    {
+      iter->second.setFunc(object, index, value);
+    }
   }
   else if(GetBaseType(mBaseType, mTypeRegistry, mBaseTypeName))
   {
@@ -988,9 +991,12 @@ void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property
 Property::Value TypeInfo::GetAnimatableProperty(const BaseObject* object, Property::Index index) const
 {
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
-  if(iter != mRegisteredProperties.end() && iter->second.getFunc)
+  if(iter != mRegisteredProperties.end())
   {
-    return iter->second.getFunc(const_cast<BaseObject*>(object), index);
+    if(iter->second.getFunc)
+    {
+      return iter->second.getFunc(const_cast<BaseObject*>(object), index);
+    }
   }
   else if(GetBaseType(mBaseType, mTypeRegistry, mBaseTypeName))
   {
