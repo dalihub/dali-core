@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,11 +122,11 @@ PropertyRegistration::PropertyRegistration(TypeRegistration& registered, std::st
   Internal::TypeRegistry::Get()->RegisterProperty(registered, std::move(name), index, type, setFunc, getFunc);
 }
 
-AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type)
+AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type, TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc)
 {
   DALI_ASSERT_ALWAYS((index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, std::move(name), index, type);
+  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, std::move(name), index, type, setFunc, getFunc);
 }
 
 AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value)

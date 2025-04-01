@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -363,6 +363,13 @@ void Object::SetProperty(Property::Index index, Property::Value propertyValue)
       // update the cached property value
       animatableProperty->SetPropertyValue(propertyValue);
 
+      const TypeInfo* typeInfo(GetTypeInfo());
+      if(typeInfo)
+      {
+        // will do nothing if additional setter is nullptr
+        typeInfo->SetAnimatableProperty(this, index, propertyValue);
+      }
+
       // set the scene graph property value
       SetSceneGraphProperty(index, *animatableProperty, propertyValue);
     }
@@ -463,8 +470,18 @@ Property::Value Object::GetProperty(Property::Index index) const
     AnimatablePropertyMetadata* animatableProperty = GetSceneAnimatableProperty(index, nullptr);
     if(animatableProperty)
     {
-      // get the cached animatable property value
-      value = animatableProperty->GetPropertyValue();
+      const TypeInfo* typeInfo(GetTypeInfo());
+      if(typeInfo)
+      {
+        // call additional getter if set
+        value = typeInfo->GetAnimatableProperty(this, index);
+      }
+
+      if(value.GetType() == Property::Type::NONE)
+      {
+        // get the cached animatable property value
+        value = animatableProperty->GetPropertyValue();
+      }
     }
     else
     {

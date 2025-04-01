@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -504,9 +504,9 @@ void TypeInfo::AddProperty(std::string name, Property::Index index, Property::Ty
   }
 }
 
-void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Type type)
+void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
-  if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
+  if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(type, setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
   {
     DALI_LOG_ERROR("Property index already added to Type! name:%s, index:%d, type:%d\n", name.c_str(), index, static_cast<int32_t>(type));
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
@@ -892,6 +892,27 @@ Property::Value TypeInfo::GetPropertyDefaultValue(Property::Index index) const
   return Property::Value(); // return none
 }
 
+void TypeInfo::SetAnimatableProperty(BaseObject* object, Property::Index index, Property::Value value) const
+{
+  const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
+  if(iter != mRegisteredProperties.end())
+  {
+    if(iter->second.setFunc)
+    {
+      iter->second.setFunc(object, index, value);
+    }
+  }
+  else if(GetBaseType(mBaseType, mTypeRegistry, mBaseTypeName))
+  {
+    // call base type recursively
+    mBaseType->SetAnimatableProperty(object, index, std::move(value));
+  }
+  else
+  {
+    DALI_LOG_ERROR("Property index %d not found\n", index);
+  }
+}
+
 void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::Value value) const
 {
   const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
@@ -965,6 +986,26 @@ void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property
   {
     DALI_LOG_ERROR("Property %s not found", name.c_str());
   }
+}
+
+Property::Value TypeInfo::GetAnimatableProperty(const BaseObject* object, Property::Index index) const
+{
+  const auto& iter = mRegisteredProperties.Get(static_cast<std::uint32_t>(index));
+  if(iter != mRegisteredProperties.end())
+  {
+    if(iter->second.getFunc)
+    {
+      return iter->second.getFunc(const_cast<BaseObject*>(object), index);
+    }
+  }
+  else if(GetBaseType(mBaseType, mTypeRegistry, mBaseTypeName))
+  {
+    // call base type recursively
+    return mBaseType->GetAnimatableProperty(object, index);
+  }
+
+  // not an error, because scene graph might have the value
+  return Property::Value();
 }
 
 Property::Value TypeInfo::GetProperty(const BaseObject* object, Property::Index index) const

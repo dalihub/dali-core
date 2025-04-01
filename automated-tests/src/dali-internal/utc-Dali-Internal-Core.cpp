@@ -249,3 +249,52 @@ int UtcDaliCoreClearScene(void)
   DALI_TEST_CHECK(contTrace.FindMethod("PresentRenderTarget"));
   END_TEST;
 }
+
+int UtcDaliCoreClearSceneN(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::ClearScene with invalid scene");
+
+  application.GetScene().SetBackgroundColor(Color::MAGENTA);
+
+  // Dummy rendering several frames.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  TestGraphicsController& controller = application.GetGraphicsController();
+  auto&                   cmdTrace   = controller.mCommandBufferCallStack;
+
+  cmdTrace.Enable(true);
+  cmdTrace.EnableLogging(true);
+
+  cmdTrace.Reset();
+
+  // Create new scene befoer Render(), and after SendNotification()
+  application.SendNotification();
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  application.Render();
+
+  DALI_TEST_CHECK(!cmdTrace.FindMethod("BeginRenderPass"));
+
+  auto& core = application.GetCore();
+
+  // Do not create BeginRenderPass for invalid scene
+  core.ClearScene(newScene);
+  DALI_TEST_CHECK(!cmdTrace.FindMethod("BeginRenderPass"));
+
+  core.ClearScene(application.GetScene());
+  DALI_TEST_CHECK(cmdTrace.FindMethod("BeginRenderPass"));
+
+  cmdTrace.Reset();
+
+  // Frame update once. Now newScene is valid
+  application.SendNotification();
+  application.Render();
+
+  core.ClearScene(newScene);
+  DALI_TEST_CHECK(cmdTrace.FindMethod("BeginRenderPass"));
+
+  END_TEST;
+}

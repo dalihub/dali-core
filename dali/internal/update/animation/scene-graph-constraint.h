@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,11 @@ public:
               // The first observer is the target of the constraint
               mObservedOwners[0]->SetUpdated(true);
             }
+            // Optionally bake the final value
+            if(Dali::Constraint::BAKE == mRemoveAction)
+            {
+              mTargetProperty.Bake(updateBufferIndex, current);
+            }
           }
         }
         else
@@ -105,15 +110,15 @@ public:
               // The first observer is the target of the constraint
               mObservedOwners[0]->SetUpdated(true);
             }
+            // Optionally bake the final value
+            if(Dali::Constraint::BAKE == mRemoveAction)
+            {
+              mTargetProperty.Bake(updateBufferIndex, current);
+            }
           }
         }
 
-        // Optionally bake the final value
-        if(Dali::Constraint::BAKE == mRemoveAction)
-        {
-          mTargetProperty.Bake(updateBufferIndex, current);
-        }
-        else
+        if(Dali::Constraint::DISCARD == mRemoveAction)
         {
           mTargetProperty.Set(updateBufferIndex, current);
         }

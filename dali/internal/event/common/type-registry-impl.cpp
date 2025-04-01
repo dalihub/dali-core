@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -206,12 +206,12 @@ bool TypeRegistry::RegisterProperty(const std::string& objectName, std::string n
   return false;
 }
 
-bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type)
+bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
   auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
   if(iter != mRegistryLut.end())
   {
-    iter->second->AddAnimatableProperty(std::move(name), index, type);
+    iter->second->AddAnimatableProperty(std::move(name), index, type, setFunc, getFunc);
     return true;
   }
 
