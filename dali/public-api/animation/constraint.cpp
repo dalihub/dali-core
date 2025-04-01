@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,7 @@ Constraint::RemoveAction Constraint::GetRemoveAction() const
 
 void Constraint::SetTag(const uint32_t tag)
 {
+  DALI_ASSERT_ALWAYS(tag <= ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX && "Out of tag range!");
   GetImplementation(*this).SetTag(tag);
 }
 

@@ -2,7 +2,7 @@
 #define DALI_HANDLE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -582,7 +582,7 @@ public:
   // Constraints
 
   /**
-   * @brief Removes all constraints from an Object.
+   * @brief Removes all default tag constraints and custom constraints from an Object.
    *
    * @SINCE_1_0.0
    * @pre The object has been initialized.
@@ -591,12 +591,26 @@ public:
 
   /**
    * @brief Removes all the constraint from the Object with a matching tag.
+   * @note We can only use tag between [ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_START ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_END]
+   * or ConstraintTagRanges::DEFAULT_TAG
    *
    * @SINCE_1_0.0
    * @param[in] tag The tag of the constraints which will be removed
    * @pre The Object has been initialized.
    */
   void RemoveConstraints(uint32_t tag);
+
+  /**
+   * @brief Removes all the constraint from the Object with a range of tags [tagBegin tagEnd).
+   * @note We can only use tag between [ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_START ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_END]
+   * or ConstraintTagRanges::DEFAULT_TAG
+   *
+   * @SINCE_2_4.14
+   * @param[in] tagBegin The begin tag of the constraints which will be removed (include)
+   * @param[in] tagEnd The end tag of the constraints which will be removed (exclusived)
+   * @pre The Object has been initialized.
+   */
+  void RemoveConstraints(uint32_t tagBegin, uint32_t tagEnd);
 
   /**
    * @brief Index operator, using integer lookup.

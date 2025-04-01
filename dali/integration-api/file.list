@@ -5,6 +5,7 @@ SET( platform_abstraction_src_dir ${ROOT_SRC_DIR}/dali/integration-api )
 SET( platform_abstraction_src_files
    ${platform_abstraction_src_dir}/addon-manager.cpp
    ${platform_abstraction_src_dir}/bitmap.cpp
+   ${platform_abstraction_src_dir}/constraint-integ.cpp
    ${platform_abstraction_src_dir}/core.cpp
    ${platform_abstraction_src_dir}/debug.cpp
    ${platform_abstraction_src_dir}/input-options.cpp
@@ -34,6 +35,7 @@ SET( platform_abstraction_events_src_files
 SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/addon-manager.h
    ${platform_abstraction_src_dir}/bitmap.h
+   ${platform_abstraction_src_dir}/constraint-integ.h
    ${platform_abstraction_src_dir}/context-notifier.h
    ${platform_abstraction_src_dir}/core.h
    ${platform_abstraction_src_dir}/core-enumerations.h

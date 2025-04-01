@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CONSTRAINER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,8 +93,15 @@ protected:
    */
   void Observe(Dali::Handle& handle);
 
+  /**
+   * @brief Get the tag number for this constrainer.
+   * Each running constrainer will not have same tag number.
+   */
+  uint32_t GetTag();
+
 private:
   ObjectContainer mObservedObjects; ///< The list of object which have been constrained by the Constrainer
+  uint32_t        mTag;
 };
 
 } // namespace Internal

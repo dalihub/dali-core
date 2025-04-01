@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,12 +185,19 @@ void Handle::RemovePropertyNotifications()
 
 void Handle::RemoveConstraints()
 {
-  GetImplementation(*this).RemoveConstraints();
+  RemoveConstraints(Dali::ConstraintTagRanges::DEFAULT_TAG, Dali::ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX + 1u);
 }
 
 void Handle::RemoveConstraints(uint32_t tag)
 {
+  DALI_ASSERT_ALWAYS(tag <= ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX && "Out of tag range!");
   GetImplementation(*this).RemoveConstraints(tag);
+}
+
+void Handle::RemoveConstraints(uint32_t tagBegin, uint32_t tagEnd)
+{
+  DALI_ASSERT_ALWAYS(tagEnd <= ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX + 1u && "Out of tag range!");
+  GetImplementation(*this).RemoveConstraints(tagBegin, tagEnd);
 }
 
 IndirectValue Handle::operator[](Property::Index index)

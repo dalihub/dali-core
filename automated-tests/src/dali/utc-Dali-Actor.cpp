@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -3189,7 +3189,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   DALI_TEST_EQUALS(result1, 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(result2, 2u, TEST_LOCATION);
 
-  // 2. Remove Constraint2 and test...
+  // 4. Remove Constraint2 and test...
   result1 = 0;
   result2 = 0;
   actor.RemoveConstraints(constraint2Tag);
@@ -3202,10 +3202,37 @@ int UtcDaliActorRemoveConstraintTag(void)
   DALI_TEST_EQUALS(result1, 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(result2, 0u, TEST_LOCATION); ///< constraint 2 should not apply now.
 
-  // 2. Remove Constraint1 as well and test...
+  // 5. Remove Constraint1 as well and test...
   result1 = 0;
   result2 = 0;
   actor.RemoveConstraints(constraint1Tag);
+  // make color property dirty, which will trigger constraints to be reapplied.
+  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(result1, 0u, TEST_LOCATION); ///< constraint 1 should not apply now.
+  DALI_TEST_EQUALS(result2, 0u, TEST_LOCATION); ///< constraint 2 should not apply now.
+
+  // 5. Re-Apply Constraint1 and test...
+  result1 = 0;
+  result2 = 0;
+  constraint1.Apply();
+  constraint2.Apply();
+  // make color property dirty, which will trigger constraints to be reapplied.
+  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(result1, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(result2, 2u, TEST_LOCATION);
+
+  // 6. Remove Constraint1 and 2, and test...
+  result1 = 0;
+  result2 = 0;
+  actor.RemoveConstraints(constraint1Tag, constraint2Tag + 1u);
   // make color property dirty, which will trigger constraints to be reapplied.
   actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
   // flush the queue and render once
