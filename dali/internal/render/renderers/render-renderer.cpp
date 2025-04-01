@@ -585,6 +585,12 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     // submit draw
     commandBuffer.DrawNative(&info);
+
+    if(!isolatedNotDirect)
+    {
+      // Reset cached geometry. We might need to re-bind vertex attributes after direct render.
+      ReuseLatestBoundVertexAttributes(nullptr);
+    }
     return true;
   }
 
