@@ -26,6 +26,7 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/processor-interface.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/scene-pre-render-status.h>
 #include <dali/integration-api/trace.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
@@ -221,9 +222,9 @@ void Core::PreRender(RenderStatus& status, bool forceClear)
   mRenderManager->PreRender(status, forceClear);
 }
 
-bool Core::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+void Core::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects)
 {
-  return mRenderManager->PreRender(scene, damagedRects);
+  mRenderManager->PreRenderScene(scene, status, damagedRects);
 }
 
 void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo)

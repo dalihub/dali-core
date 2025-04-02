@@ -44,6 +44,7 @@ class RenderController;
 class PlatformAbstraction;
 class UpdateStatus;
 class RenderStatus;
+class ScenePreRenderStatus;
 struct Event;
 struct TouchEvent;
 } // namespace Integration
@@ -127,9 +128,9 @@ public:
   void PreRender(Integration::RenderStatus& status, bool forceClear);
 
   /**
-   * @copydoc Dali::Integration::Core::PreRender()
+   * @copydoc Dali::Integration::Core::PreRenderScene()
    */
-  bool PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects);
 
   /**
    * @copydoc Dali::Integration::Core::RenderScene()

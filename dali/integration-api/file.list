@@ -54,6 +54,7 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/resource-policies.h
    ${platform_abstraction_src_dir}/resource-types.h
    ${platform_abstraction_src_dir}/scene.h
+   ${platform_abstraction_src_dir}/scene-pre-render-status.h
    ${platform_abstraction_src_dir}/shader-integ.h
    ${platform_abstraction_src_dir}/testing.h
    ${platform_abstraction_src_dir}/texture-integ.h

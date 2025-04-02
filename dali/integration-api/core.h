@@ -51,6 +51,7 @@ class PlatformAbstraction;
 class Processor;
 class RenderController;
 class Scene;
+class ScenePreRenderStatus;
 struct Event;
 struct TouchEvent;
 
@@ -364,10 +365,11 @@ public:
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The GL context must have been created, and made current.
    * @param[in] scene The scene to be rendered.
+   * @param[out] status The status of pre render operation.
    * @param[out] damagedRects containing damaged render items rects for this pass.
    * @return true if the scene has something to render, false if there is nothing to render
    */
-  bool PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects);
 
   /**
    * Render a scene in the next frame. This method should be preceded by a call up PreRender.

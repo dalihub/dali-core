@@ -220,6 +220,9 @@ bool TestApplication::Render(uint32_t intervalMilliseconds, const char* location
   {
     for(auto&& scene : mScenes)
     {
+      std::vector<Rect<int>> damagedRects;
+
+      mCore->PreRenderScene(scene, mScenePreRenderStatus, damagedRects);
       mCore->RenderScene(mRenderStatus, scene, true /*render the off-screen buffers*/);
       mCore->RenderScene(mRenderStatus, scene, false /*render the surface*/);
     }
@@ -236,7 +239,7 @@ bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, 
   DoUpdate(intervalMilliseconds, location);
 
   mCore->PreRender(mRenderStatus, false /*do not force clear*/);
-  mCore->PreRender(mScene, damagedRects);
+  mCore->PreRenderScene(mScene, mScenePreRenderStatus, damagedRects);
 
   return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
 }
@@ -267,7 +270,7 @@ bool TestApplication::RenderWithPartialUpdate(uint32_t intervalMilliseconds, con
     std::vector<Rect<int>> damagedRects;
     Rect<int>              clippingRect{};
 
-    mCore->PreRender(scene, damagedRects);
+    mCore->PreRenderScene(scene, mScenePreRenderStatus, damagedRects);
     mCore->RenderScene(mRenderStatus, scene, true /*render the off-screen buffers*/);
     for(auto&& iter : damagedRects)
     {
@@ -305,8 +308,11 @@ bool TestApplication::GetRenderNeedsPostRender()
 
 bool TestApplication::RenderOnly()
 {
+  std::vector<Rect<int>> damagedRects;
+
   // Update Time values
   mCore->PreRender(mRenderStatus, false /*do not force clear*/);
+  mCore->PreRenderScene(mScene, mScenePreRenderStatus, damagedRects);
   mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
   mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/);
   mCore->PostRender();
