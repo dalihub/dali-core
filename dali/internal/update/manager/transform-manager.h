@@ -57,13 +57,15 @@ struct TransformComponentStatic
   TransformComponentStatic()
   : mAnchorPoint(AnchorPoint::DEFAULT),
     mParentOrigin(ParentOrigin::DEFAULT),
-    mPositionUsesAnchorPoint(true)
+    mPositionUsesAnchorPoint(true),
+    mIgnored(false)
   {
   }
 
   Vector3 mAnchorPoint;
   Vector3 mParentOrigin;
   bool    mPositionUsesAnchorPoint;
+  bool    mIgnored;
 };
 
 enum InheritanceMode
@@ -79,6 +81,7 @@ enum TransformManagerProperty
 {
   TRANSFORM_PROPERTY_POSITION = 0,
   TRANSFORM_PROPERTY_SCALE,
+  TRANSFORM_PROPERTY_IGNORED,
   TRANSFORM_PROPERTY_ANCHOR_POINT,
   TRANSFORM_PROPERTY_PARENT_ORIGIN,
   TRANSFORM_PROPERTY_SIZE,
@@ -370,6 +373,13 @@ public:
    */
   void SetPositionUsesAnchorPoint(TransformId id, bool value);
 
+  /**
+   * @brief Sets ignored value.
+   * @param[in] id Id of the transform component.
+   * @param[in] value True if the component is ignored.
+   */
+  void SetIgnored(TransformId id, bool value);
+
 private:
   //Helper struct to order components
   struct SOrderItem
@@ -422,6 +432,7 @@ private:
                                                                         ///< Or If we change static component changed, flag become non-zero. Age down at Update time.
                                                                         ///< Note that we don't replace dirty flag as BAKE even if we call Bake operation.
                                                                         ///< (Since single dirty flag controls multiple animatable properties ; Position, Size, Scale, Orientation.)
+  Vector<bool>       mIgnored;                                          ///< True if the component is ignored.
   Vector<bool>       mWorldMatrixDirty;                                 ///< 1u if the world matrix has been updated in this frame, 0 otherwise
   Vector<SOrderItem> mOrderedComponents;                                ///< Used to reorder components when hierarchy changes
 

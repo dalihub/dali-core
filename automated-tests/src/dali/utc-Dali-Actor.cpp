@@ -15626,3 +15626,66 @@ int UtcDaliActorDestructWorkerThreadN(void)
 
   END_TEST;
 }
+
+int UtcDaliActorIgnored(void)
+{
+  TestApplication application;
+
+  Actor   parent = Actor::New();
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  application.GetScene().Add(parent);
+
+  Actor child1 = Actor::New();
+  child1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  child1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.Add(child1);
+
+  Actor child2 = Actor::New();
+  child2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  child2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.Add(child2);
+
+  DALI_TEST_EQUALS(child1.IsIgnored(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(child2.IsIgnored(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  Vector3 childPosition1 = child1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  Vector3 childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  DALI_TEST_EQUALS(childPosition1, childPosition2, TEST_LOCATION);
+
+  parent.SetProperty(Actor::Property::POSITION, Vector2(100, 100));
+
+  application.SendNotification();
+  application.Render(0);
+
+  childPosition1 = child1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  DALI_TEST_EQUALS(childPosition1, childPosition2, TEST_LOCATION);
+  DALI_TEST_EQUALS(childPosition1, Vector3(100, 100, 0), TEST_LOCATION);
+
+  child2.SetIgnored(true);
+  parent.SetProperty(Actor::Property::POSITION, Vector2(200, 200));
+
+  application.SendNotification();
+  application.Render(0);
+
+  childPosition1 = child1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  DALI_TEST_NOT_EQUALS(childPosition1, childPosition2, 0.00001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(childPosition1, Vector3(200, 200, 0), TEST_LOCATION);
+
+  child2.SetIgnored(false);
+
+  application.SendNotification();
+  application.Render(0);
+
+  childPosition1 = child1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
+  DALI_TEST_EQUALS(childPosition1, childPosition2, TEST_LOCATION);
+  DALI_TEST_EQUALS(childPosition1, Vector3(200, 200, 0), TEST_LOCATION);
+
+  END_TEST;
+}

@@ -242,7 +242,8 @@ struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
 
   bool DescendActorHierarchy(Actor* actor) override
   {
-    return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
+    return (!actor->IsIgnored()) &&
+           actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
            actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
   }
 

@@ -90,7 +90,7 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
                            bool&       keepRendering)
 {
   // Short-circuit for invisible nodes
-  if(!node.IsVisible(updateBufferIndex))
+  if(!(node.IsVisible(updateBufferIndex) && !node.IsIgnored()))
   {
     node.GetPartialRenderingData().mVisible = false;
     return;

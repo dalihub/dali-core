@@ -1124,6 +1124,24 @@ public:
    */
   float GetRelayoutSize(Dimension::Type dimension) const;
 
+  /**
+   * @brief Sets a flag to identify whether the Actor is ignored or not.
+   * If the actor is marked as ignored, it will not be rendered and will be excluded from render thread computation.
+   * So, the current properties like WorldPosition and WorldColor become inaccurate.
+   *
+   * @SINCE_2_4.21
+   * @param[in] ignored True to make the actor be ignored.
+   */
+  void SetIgnored(bool ignored);
+
+  /**
+   * @brief Returns whether the Actor is ignored or not.
+   *
+   * @SINCE_2_4.21
+   * @return Return True if the Actor is ignored.
+   */
+  bool IsIgnored() const;
+
 public: // Renderer
   /**
    * @brief Adds a renderer to this actor.

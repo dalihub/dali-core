@@ -104,6 +104,11 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
                                      PropertyOwnerContainer& postPropertyOwners,
                                      bool                    updated)
 {
+  if(DALI_UNLIKELY(node.IsIgnored())) // almost never ever true
+  {
+    return NodePropertyFlags::NOTHING;
+  }
+
   // Apply constraints to the node
   ConstrainPropertyOwner(node, updateBufferIndex);
   if(!node.GetPostConstraints().Empty())
@@ -159,14 +164,14 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
   DALI_ASSERT_DEBUG(rootNode.IsRoot());
 
   // Short-circuit for invisible nodes
-  if(DALI_UNLIKELY(!rootNode.IsVisible(updateBufferIndex))) // almost never ever true
+  if(DALI_UNLIKELY(!(rootNode.IsVisible(updateBufferIndex) && !rootNode.IsIgnored()))) // almost never ever true
   {
     return NodePropertyFlags::NOTHING;
   }
 
   // If the root node was not previously visible
   BufferIndex previousBuffer = updateBufferIndex ? 0u : 1u;
-  if(DALI_UNLIKELY(!rootNode.IsVisible(previousBuffer))) // almost never ever true
+  if(DALI_UNLIKELY(!(rootNode.IsVisible(previousBuffer) && !rootNode.IsIgnored()))) // almost never ever true
   {
     // The node was skipped in the previous update; it must recalculate everything
     rootNode.SetAllDirtyFlags();

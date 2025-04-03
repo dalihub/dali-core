@@ -198,6 +198,17 @@ float Actor::GetRelayoutSize(Dimension::Type dimension) const
   return GetImplementation(*this).GetRelayoutSize(dimension);
 }
 
+void Actor::SetIgnored(bool ignored)
+{
+  GetImplementation(*this).SetIgnored(ignored);
+}
+
+bool Actor::IsIgnored() const
+{
+  return GetImplementation(*this).IsIgnored();
+}
+
+
 Actor::TouchEventSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();

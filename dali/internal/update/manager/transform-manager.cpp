@@ -254,6 +254,7 @@ TransformId TransformManager::CreateTransform()
     mSizeBase.PushBack(Vector3(0.0f, 0.0f, 0.0f));
     mComponentDirty.PushBack(CLEAN_FLAG);
     mWorldMatrixDirty.PushBack(false);
+    mIgnored.PushBack(false);
   }
   else
   {
@@ -271,6 +272,7 @@ TransformId TransformManager::CreateTransform()
     mSizeBase[mComponentCount]         = Vector3(0.0f, 0.0f, 0.0f);
     mComponentDirty[mComponentCount]   = CLEAN_FLAG;
     mWorldMatrixDirty[mComponentCount] = false;
+    mIgnored[mComponentCount] = false;
   }
 
   mComponentCount++;
@@ -293,6 +295,7 @@ void TransformManager::RemoveTransform(TransformId id)
   mSizeBase[index]                       = mSizeBase[mComponentCount];
   mComponentDirty[index]                 = mComponentDirty[mComponentCount];
   mWorldMatrixDirty[index]               = mWorldMatrixDirty[mComponentCount];
+  mIgnored[index]                        = mIgnored[mComponentCount];
   mBoundingSpheres[index]                = mBoundingSpheres[mComponentCount];
 
   TransformId lastItemId = mComponentId[mComponentCount];
@@ -363,6 +366,8 @@ void TransformManager::ResetToBaseValue()
   }
 }
 
+int cnt = 0;
+
 bool TransformManager::Update()
 {
   mUpdated = false;
@@ -385,6 +390,8 @@ bool TransformManager::Update()
     mReorder = false;
   }
 
+  cnt = 0;
+
   // Iterate through all components to compute its world matrix
   Vector3       centerPosition;
   Vector3       localPosition;
@@ -395,6 +402,13 @@ bool TransformManager::Update()
     if(DALI_LIKELY(mInheritanceMode[i] != DONT_INHERIT_TRANSFORM && mParent[i] != INVALID_TRANSFORM_ID))
     {
       const TransformId& parentIndex = mIds[mParent[i]];
+      mIgnored[i] = mIgnored[parentIndex] || mTxComponentStatic[i].mIgnored;
+      if(mIgnored[i])
+      {
+        mComponentDirty[i] >>= 1u; ///< age down.
+        continue;
+      }
+
       if(DALI_LIKELY(mInheritanceMode[i] == INHERIT_ALL))
       {
         if(mComponentDirty[i] || mWorldMatrixDirty[parentIndex])
@@ -483,6 +497,13 @@ bool TransformManager::Update()
     }
     else // Component has no parent or doesn't inherit transform
     {
+      mIgnored[i] = mTxComponentStatic[i].mIgnored;
+      if(mIgnored[i])
+      {
+        mComponentDirty[i] >>= 1u; ///< age down.
+        continue;
+      }
+
       if(mComponentDirty[i])
       {
         // TODO : We need to check mComponentDirty since we have to check the size changeness.
@@ -534,6 +555,7 @@ void TransformManager::SwapComponents(unsigned int i, unsigned int j)
   std::swap(mComponentDirty[i], mComponentDirty[j]);
   std::swap(mBoundingSpheres[i], mBoundingSpheres[j]);
   std::swap(mWorld[i], mWorld[j]);
+  std::swap(mIgnored[i], mIgnored[j]);
 
   mIds[mComponentId[i]] = i;
   mIds[mComponentId[j]] = j;
@@ -616,6 +638,7 @@ void TransformManager::ReorderComponents()
     mComponentDirty.Resize(mComponentCount);
     mWorldMatrixDirty.Resize(mComponentCount);
     mOrderedComponents.Resize(mComponentCount);
+    mIgnored.Resize(mComponentCount);
 
     mTxComponentAnimatable.ShrinkToFit();
     mTxComponentStatic.ShrinkToFit();
@@ -631,6 +654,7 @@ void TransformManager::ReorderComponents()
     mComponentDirty.ShrinkToFit();
     mWorldMatrixDirty.ShrinkToFit();
     mOrderedComponents.ShrinkToFit();
+    mIgnored.ShrinkToFit();
   }
 #endif
 }
@@ -1122,6 +1146,13 @@ void TransformManager::SetPositionUsesAnchorPoint(TransformId id, bool value)
   TransformId index(mIds[id]);
 
   SetTransfromPropertyIfChanged(mTxComponentStatic[index].mPositionUsesAnchorPoint, mComponentDirty[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+}
+
+void TransformManager::SetIgnored(TransformId id, bool value)
+{
+  TransformId index(mIds[id]);
+
+  SetTransfromPropertyIfChanged(mTxComponentStatic[index].mIgnored, mComponentDirty[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
 }
 
 } // namespace SceneGraph

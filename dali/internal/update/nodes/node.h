@@ -448,6 +448,32 @@ public:
   }
 
   /**
+   * Sets flag to identify whether the node is ignored or not.
+   * @param[in] ignored True to make the node be ignored.
+   */
+  void SetIgnored(const bool ignored)
+  {
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mIgnored != ignored)
+    {
+      mIgnored = ignored;
+      mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), mIgnored);
+    }
+  }
+
+  /**
+   * Retrieve Whether the node is ignored or not.
+   * @return True if the node is ignored.
+   */
+  bool IsIgnored() const
+  {
+    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    {
+      return mIgnored;
+    }
+    return false;
+  }
+
+  /**
    * Retrieve the local position of the node, relative to its parent.
    * @param[in] bufferIndex The buffer to read from.
    * @return The local position.
@@ -1173,6 +1199,7 @@ protected:
   bool               mUpdateAreaChanged : 1;       ///< True if the update area of the node is changed.
   bool               mUpdateAreaUseSize : 1;       ///< True if the update area of the node is same as node size.
   bool               mUseTextureUpdateArea : 1;    ///< Whether the actor uses the update area of the texture instead of its own.
+  bool               mIgnored : 1;                 ///< Whether the node is ignored or not.
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
@@ -1321,6 +1348,17 @@ inline void SetPositionUsesAnchorPointMessage(EventThreadServices& eventThreadSe
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint);
+}
+
+inline void SetIgnoredMessage(EventThreadServices& eventThreadServices, const Node& node, bool ignored)
+{
+  using LocalType = MessageValue1<Node, bool>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&node, &Node::SetIgnored, ignored);
 }
 
 inline void SetUpdateAreaHintMessage(EventThreadServices& eventThreadServices, const Node& node, const Vector4& updateAreaHint)

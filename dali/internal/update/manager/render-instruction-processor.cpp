@@ -150,7 +150,7 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
  * @param renderList to add the item to
  * @param renderable Node-Renderer pair
  * @param viewMatrix used to calculate modelview matrix for the item
- * @param viewMatrixChanged Whether view matrix chagned for this time or not.
+ * @param viewMatrixChanged Whether view matrix changed for this time or not.
  * @param camera The camera used to render
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param viewportSet Whether the viewport is set or not
@@ -312,7 +312,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
  * @param renderList to add the items to
  * @param renderers to render NodeRendererContainer Node-Renderer pairs
  * @param viewMatrix used to calculate modelview matrix for the items
- * @param viewMatrixChanged Whether view matrix chagned for this time or not.
+ * @param viewMatrixChanged Whether view matrix changed for this time or not.
  * @param camera The camera used to render
  * @param isLayer3d Whether we are processing a 3D layer or not
  * @param viewportSet Whether the viewport is set or not
