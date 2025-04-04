@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -949,6 +949,22 @@ int UtcDaliTypeRegistrySignalConnectorTypeN(void)
   DALI_TEST_EQUALS(CustomTestFunctor::mCallbackCount, 0, TEST_LOCATION);
   customHandle.GetCustomSignal().Emit();
   DALI_TEST_EQUALS(CustomTestFunctor::mCallbackCount, 0 /*never called*/, TEST_LOCATION);
+
+  // Test for connect by SignalConnectorType struct who has duplicated name.
+  try
+  {
+    SignalConnectorType invalidSignalConnector(customType1, "sig1", DoConnectSignalCustom);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false); // Should not come here.
+  }
+
+  // Should be a NOOP
+  DALI_TEST_EQUALS(CustomTestFunctor::mCallbackCount, 0, TEST_LOCATION);
+  customHandle.GetCustomSignal().Emit();
+  DALI_TEST_EQUALS(CustomTestFunctor::mCallbackCount, 0 /*never called*/, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -985,6 +1001,16 @@ int UtcDaliTypeRegistryTypeActionN(void)
 
   Property::Map attributes;
   DALI_TEST_CHECK(!handle.DoAction("unknownAction", attributes));
+
+  // Test for connect by TypeAction struct who has duplicated name.
+  try
+  {
+    TypeAction invalidAction(customType1, "act1", DoActionCustom);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(false); // Should not come here.
+  }
 
   END_TEST;
 }

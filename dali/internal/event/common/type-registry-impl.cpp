@@ -123,7 +123,7 @@ std::string TypeRegistry::Register(std::string                    uniqueTypeName
 
   if(!mRegistryLut.Register(ConstString(uniqueTypeName), new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount)))
   {
-    DALI_LOG_WARNING("Duplicate name in TypeRegistry for '%s'\n", +uniqueTypeName.c_str());
+    DALI_LOG_ERROR("Duplicate name in TypeRegistry for '%s'\n", +uniqueTypeName.c_str());
     DALI_ASSERT_ALWAYS(!"Duplicate type name in Type Registration");
     return uniqueTypeName; // never actually happening due to the assert
   }
@@ -143,7 +143,7 @@ void TypeRegistry::Register(std::string uniqueTypeName, const std::type_info& ba
 
   if(!mRegistryLut.Register(ConstString(uniqueTypeName), TypeRegistry::TypeInfoPointer(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance))))
   {
-    DALI_LOG_WARNING("Duplicate name in TypeRegistry for '%s'\n", +uniqueTypeName.c_str());
+    DALI_LOG_ERROR("Duplicate name in TypeRegistry for '%s'\n", +uniqueTypeName.c_str());
     DALI_ASSERT_ALWAYS(!"Duplicate type name in Type Registration");
     return; // never actually happening due to the assert
   }
@@ -270,7 +270,7 @@ bool TypeRegistry::DoActionTo(BaseObject* const object, const std::string& actio
 
   if(!done)
   {
-    DALI_LOG_WARNING("Type '%s' cannot do action '%s'\n", type->GetName().c_str(), actionName.c_str());
+    DALI_LOG_ERROR("Type '%s' cannot do action '%s'\n", type->GetName().c_str(), actionName.c_str());
   }
 
   return done;
@@ -287,7 +287,7 @@ bool TypeRegistry::ConnectSignal(BaseObject* object, ConnectionTrackerInterface*
 
   if(!connected)
   {
-    DALI_LOG_WARNING("Type '%s' signal '%s' connection failed \n", type->GetName().c_str(), signalName.c_str());
+    DALI_LOG_ERROR("Type '%s' signal '%s' connection failed \n", type->GetName().c_str(), signalName.c_str());
     // Ownership of functor was not passed to Dali::CallbackBase, so clean-up now
     delete functor;
   }

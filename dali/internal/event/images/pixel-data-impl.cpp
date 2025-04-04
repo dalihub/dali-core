@@ -133,7 +133,7 @@ uint32_t PixelData::GetStride() const
   }
   if(DALI_UNLIKELY(mStrideBytes % bytesPerPixel != 0u))
   {
-    DALI_LOG_WARNING("StrideByte value [%u] cannot divide by bpp [%u]!\n", mStrideBytes, bytesPerPixel);
+    DALI_LOG_ERROR("StrideByte value [%u] cannot divide by bpp [%u]!\n", mStrideBytes, bytesPerPixel);
   }
   return mStrideBytes / bytesPerPixel;
 }

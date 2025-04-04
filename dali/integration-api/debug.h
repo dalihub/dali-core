@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_DEBUG_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,7 +171,7 @@ DALI_CORE_API void UninstallLogFunction();
 #define DALI_LOG_RELEASE_INFO(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::INFO, format, ##__VA_ARGS__)
 
 /**
- * Provides unfiltered logging for debuf information
+ * Provides unfiltered logging for debug information
  */
 #define DALI_LOG_DEBUG_INFO(format, ...) Dali::Integration::Log::LogMessageWithFunctionLine(Dali::Integration::Log::DEBUG, format, ##__VA_ARGS__)
 

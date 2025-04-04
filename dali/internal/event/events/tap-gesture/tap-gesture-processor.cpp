@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -241,7 +241,7 @@ void TapGestureProcessor::SetMaximumAllowedTime(uint32_t time)
 {
   if(time == 0u)
   {
-    DALI_LOG_WARNING("MaximumAllowedTime must be greater than zero.");
+    DALI_LOG_ERROR("MaximumAllowedTime must be greater than zero.");
     return;
   }
   if(mMaximumAllowedTime != time)
@@ -268,7 +268,7 @@ void TapGestureProcessor::SetRecognizerTime(uint32_t time)
 {
   if(time == 0u)
   {
-    DALI_LOG_WARNING("RecognizerTime must be greater than zero.");
+    DALI_LOG_ERROR("RecognizerTime must be greater than zero.");
     return;
   }
   if(mRecognizerTime != time)
@@ -295,7 +295,7 @@ void TapGestureProcessor::SetMaximumMotionAllowedDistance(float distance)
 {
   if(distance < 0.0f)
   {
-    DALI_LOG_WARNING("distance must be greater than zero.");
+    DALI_LOG_ERROR("distance must be greater than zero.");
     return;
   }
 
