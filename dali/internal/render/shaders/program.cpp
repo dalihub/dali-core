@@ -144,7 +144,7 @@ void Program::BuildRequirements(
       //
       // If the name represents an element in an array of structs, it will contain an
       // index operator, but should be hashed in full.
-      auto hashValue = CalculateHash(item.name);
+      auto hashValue = CalculateHash(std::string_view(item.name.data(), item.name.size()));
       mReflection.emplace_back(ReflectionUniformInfo{hashValue, false, item});
 
       // update buffer index
@@ -166,7 +166,7 @@ void Program::BuildRequirements(
   auto samplers = graphicsReflection.GetSamplers(); // Only holds first element of arrays without [].
   for(const auto& sampler : samplers)
   {
-    mReflection.emplace_back(ReflectionUniformInfo{CalculateHash(sampler.name), false, sampler});
+    mReflection.emplace_back(ReflectionUniformInfo{CalculateHash(std::string_view(sampler.name.data(), sampler.name.size())), false, sampler});
   }
 
   // check for potential collisions

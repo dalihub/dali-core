@@ -6,6 +6,7 @@ SET( internal_src_files
   ${internal_src_dir}/common/blending-options.cpp
   ${internal_src_dir}/common/core-impl.cpp
   ${internal_src_dir}/common/dummy-memory-pool.cpp
+  ${internal_src_dir}/common/hash-utils.cpp
   ${internal_src_dir}/common/math.cpp
   ${internal_src_dir}/common/matrix-utils.cpp
   ${internal_src_dir}/common/message-buffer.cpp
