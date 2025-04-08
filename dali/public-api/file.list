@@ -115,6 +115,7 @@ SET( public_api_core_animation_header_files
   ${public_api_src_dir}/animation/constraint.h
   ${public_api_src_dir}/animation/constraints.h
   ${public_api_src_dir}/animation/constraint-source.h
+  ${public_api_src_dir}/animation/constraint-tag-ranges.h
   ${public_api_src_dir}/animation/key-frames.h
   ${public_api_src_dir}/animation/linear-constrainer.h
   ${public_api_src_dir}/animation/path.h

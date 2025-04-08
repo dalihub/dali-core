@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2149,6 +2149,42 @@ int UtcDaliHandleRemoveConstraintsNegative02(void)
   try
   {
     instance.RemoveConstraints();
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRemoveConstraintsNegative03(void)
+{
+  TestApplication application;
+  Dali::Handle    instance;
+  try
+  {
+    unsigned int arg1(0u);
+    unsigned int arg2(3u);
+    instance.RemoveConstraints(arg1, arg2);
+    DALI_TEST_CHECK(false); // Should not get here
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true); // We expect an assert
+  }
+  END_TEST;
+}
+
+int UtcDaliHandleRemoveConstraintsNegative04(void)
+{
+  TestApplication application;
+  Dali::Handle    instance = Dali::Handle::New();
+  try
+  {
+    unsigned int arg1(0u);
+    unsigned int arg2(Dali::ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX + 2u);
+    instance.RemoveConstraints(arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)

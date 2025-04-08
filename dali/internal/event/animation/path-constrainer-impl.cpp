@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/constraint-integ.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-array.h>
@@ -160,7 +161,8 @@ void PathConstrainer::Apply(Property target, Property source, const Vector2& ran
     Dali::Constraint constraint = Dali::Constraint::New<Vector3>(target.object, target.propertyIndex, PathConstraintFunctor(mPath, range, wrap));
     constraint.AddSource(Dali::Source(source.object, source.propertyIndex));
 
-    constraint.SetTag(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this))); // taking 32bits of this as tag
+    uint32_t tag = GetTag();
+    Dali::Integration::ConstraintSetInternalTag(constraint, tag);
     constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();
   }
@@ -170,7 +172,8 @@ void PathConstrainer::Apply(Property target, Property source, const Vector2& ran
     Dali::Constraint constraint = Dali::Constraint::New<Quaternion>(target.object, target.propertyIndex, PathConstraintFunctor(mPath, range, mForward, wrap));
     constraint.AddSource(Dali::Source(source.object, source.propertyIndex));
 
-    constraint.SetTag(static_cast<uint32_t>(reinterpret_cast<uintptr_t>(this))); // taking 32bits of this as tag
+    uint32_t tag = GetTag();
+    Dali::Integration::ConstraintSetInternalTag(constraint, tag);
     constraint.SetRemoveAction(Dali::Constraint::DISCARD);
     constraint.Apply();
   }

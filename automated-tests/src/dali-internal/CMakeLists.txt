@@ -9,6 +9,7 @@ SET(TC_SOURCES
   utc-Dali-Internal-AnimatableProperty.cpp
   utc-Dali-Internal-ActorObserver.cpp
   utc-Dali-Internal-ActorRelayout.cpp
+  utc-Dali-Internal-Constraint.cpp
   utc-Dali-Internal-ConstString.cpp
   utc-Dali-Internal-Core.cpp
   utc-Dali-Internal-Debug.cpp

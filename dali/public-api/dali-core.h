@@ -31,6 +31,7 @@
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint-source.h>
+#include <dali/public-api/animation/constraint-tag-ranges.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/animation/key-frames.h>
