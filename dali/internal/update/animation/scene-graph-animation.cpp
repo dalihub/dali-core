@@ -23,14 +23,35 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/math/math-utils.h>
 
 namespace // Unnamed namespace
 {
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gAnimFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_ANIMATION");
+#endif
+
+#if defined(DEBUG_ENABLED) || defined(TRACE_ENABLED)
+
+#if defined(TRACE_ENABLED)
+// DevNote : Use trace marker to print logs at release mode.
+#define DALI_LOG_ANIMATION_INFO(format, ...)         \
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled()) \
+  {                                                  \
+    DALI_LOG_DEBUG_INFO(format, ##__VA_ARGS__);      \
+  }                                                  \
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, format, ##__VA_ARGS__)
+#else
+#define DALI_LOG_ANIMATION_INFO(format, ...) \
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, format, ##__VA_ARGS__)
+#endif
+#else
+#define DALI_LOG_ANIMATION_INFO(format, ...)
 #endif
 
 // Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
@@ -244,7 +265,7 @@ void Animation::Pause()
 {
   if(mState == Playing)
   {
-    DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Pause (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+    DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms Pause (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
     mState = Paused;
   }
 }
@@ -268,7 +289,7 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
 
 void Animation::SetAnimatorsActive(bool active)
 {
-  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms %s (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop", "SRPD"[mState]);
+  DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms %s (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, active ? "Play" : "Stop", "SRPD"[mState]);
   for(auto&& item : mAnimators)
   {
     item->SetActive(active);
@@ -287,7 +308,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
     if(mEndAction != Dali::Animation::DISCARD)
     {
       Bake(bufferIndex, mEndAction);
-      DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Stop (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+      DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms Stop (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
       // Animators are automatically set to inactive in Bake
     }
@@ -323,7 +344,7 @@ void Animation::ClearAnimator(BufferIndex bufferIndex)
   mPlayedCount = 0;
   mCurrentLoop = 0;
 
-  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Clear (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+  DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms Clear (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 }
 
 void Animation::OnDestroy(BufferIndex bufferIndex)
@@ -342,7 +363,7 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
     }
   }
 
-  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Destroy (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
+  DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms Destroy (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
   mIsStopped = false; ///< Do not make notify.
   mState     = Destroyed;
@@ -445,10 +466,11 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stop
         {
           DALI_ASSERT_DEBUG(mCurrentLoop == mLoopCount);
           finished = true;
-          DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] with duration %f ms Finished (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
           // The animation has now been played to completion
           ++mPlayedCount;
+
+          DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms Finished (playcount:%d)(before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, mPlayedCount, "SRPD"[mState]);
 
           // Make elapsed second as edge of range forcely.
           mElapsedSeconds = edgeRangeSeconds + signSpeedFactor * Math::MACHINE_EPSILON_10;
