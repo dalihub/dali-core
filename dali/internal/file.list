@@ -103,6 +103,7 @@ SET( internal_src_files
   ${internal_src_dir}/event/rendering/visual-renderer-impl.cpp
   ${internal_src_dir}/event/rendering/sampler-impl.cpp
   ${internal_src_dir}/event/rendering/shader-impl.cpp
+  ${internal_src_dir}/event/rendering/uniform-block-impl.cpp
   ${internal_src_dir}/event/rendering/vertex-buffer-impl.cpp
   ${internal_src_dir}/event/size-negotiation/memory-pool-relayout-container.cpp
   ${internal_src_dir}/event/size-negotiation/relayout-controller-impl.cpp
@@ -114,6 +115,7 @@ SET( internal_src_files
   ${internal_src_dir}/render/common/render-item.cpp
   ${internal_src_dir}/render/common/render-tracker.cpp
   ${internal_src_dir}/render/common/render-manager.cpp
+  ${internal_src_dir}/render/common/shared-uniform-buffer-view-container.cpp
   ${internal_src_dir}/render/queue/render-queue.cpp
   ${internal_src_dir}/render/renderers/gpu-buffer.cpp
   ${internal_src_dir}/render/renderers/pipeline-cache.cpp
@@ -123,6 +125,7 @@ SET( internal_src_files
   ${internal_src_dir}/render/renderers/render-sampler.cpp
   ${internal_src_dir}/render/renderers/render-texture.cpp
   ${internal_src_dir}/render/renderers/render-vertex-buffer.cpp
+  ${internal_src_dir}/render/renderers/render-uniform-block.cpp
   ${internal_src_dir}/render/renderers/uniform-buffer.cpp
   ${internal_src_dir}/render/renderers/uniform-buffer-manager.cpp
   ${internal_src_dir}/render/renderers/uniform-buffer-view.cpp

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ void ProgramController::ResetUsedFlag()
   mClearCacheIterator = mProgramCache.Begin();
 }
 
-bool ProgramController::ClearUnusedCacheIncrementally(bool fullCollect)
+bool ProgramController::ClearUnusedCacheIncrementally(bool fullCollect, bool forceClearAll)
 {
   if(mProgramCacheAdded)
   {
@@ -68,7 +68,7 @@ bool ProgramController::ClearUnusedCacheIncrementally(bool fullCollect)
   // TODO : Could we check running time here, instead of check counter?
   for(; mClearCacheIterator != mProgramCache.End() && (fullCollect || ++checkedCount <= MAXIMUM_COLLECTING_ITEM_COUNTS_PER_GC_CALL);)
   {
-    if(!((*mClearCacheIterator)->IsUsed()))
+    if(forceClearAll || !((*mClearCacheIterator)->IsUsed()))
     {
       mClearCacheIterator = mProgramCache.Erase(mClearCacheIterator);
     }

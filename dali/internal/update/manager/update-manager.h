@@ -29,8 +29,9 @@
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
-#include <dali/internal/render/renderers/render-texture-key.h> // For RenderTextureKey
-#include <dali/internal/render/renderers/render-texture.h>     // For OwnerPointer<Render::Texture>
+#include <dali/internal/render/renderers/render-texture-key.h>   // For RenderTextureKey
+#include <dali/internal/render/renderers/render-texture.h>       // For OwnerPointer<Render::Texture>
+#include <dali/internal/render/renderers/render-uniform-block.h> // for OwnerPointer<Render::UniformBlock>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/render-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
@@ -392,6 +393,20 @@ public:
    */
   void RemoveTextureSet(TextureSet* textureSet);
 
+  // UniformBlock
+
+  /**
+   * Add uniform block.
+   * @param[in] uniformBlock The uniform block.
+   */
+  void AddUniformBlock(OwnerPointer<Render::UniformBlock>& uniformBlock);
+
+  /**
+   * Remove uniform block.
+   * @param[in] uniformBlock The uniform block.
+   */
+  void RemoveUniformBlock(Render::UniformBlock* uniformBlock);
+
   // Render tasks
 
   /**
@@ -706,6 +721,11 @@ public:
    *       for any other purposes.
    */
   void RequestRendering();
+
+  /**
+   * Request to clear the program cache at RenderManager.
+   */
+  void RequestClearProgramCache();
 
   /**
    * @brief Get the active Node pointer by node id.
@@ -1204,6 +1224,17 @@ inline void RequestRenderingMessage(UpdateManager& manager)
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::RequestRendering);
+}
+
+inline void RequestClearProgramCacheMessage(UpdateManager& manager)
+{
+  using LocalType = Message<UpdateManager>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::RequestClearProgramCache);
 }
 
 /**
@@ -1726,6 +1757,20 @@ inline void NotifyFrameCallbackMessage(UpdateManager& manager, FrameCallbackInte
   using LocalType = MessageValue2<UpdateManager, FrameCallbackInterface*, Dali::UpdateProxy::NotifySyncPoint>;
   uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
   new(slot) LocalType(&manager, &UpdateManager::NotifyFrameCallback, frameCallback, syncPoint);
+}
+
+inline void AddUniformBlockMessage(UpdateManager& manager, OwnerPointer<Render::UniformBlock>& uniformBlock)
+{
+  using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::UniformBlock>>;
+  uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&manager, &UpdateManager::AddUniformBlock, uniformBlock);
+}
+
+inline void RemoveUniformBlockMessage(UpdateManager& manager, Render::UniformBlock& uniformBlock)
+{
+  using LocalType = MessageValue1<UpdateManager, Render::UniformBlock*>;
+  uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&manager, &UpdateManager::RemoveUniformBlock, &uniformBlock);
 }
 
 } // namespace SceneGraph

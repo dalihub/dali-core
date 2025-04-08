@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,12 @@
 
 namespace Dali::Integration
 {
+Dali::Shader ShaderNewWithUniformBlock(std::string_view vertexShader, std::string_view fragmentShader, Shader::Hint::Value hints, std::string_view shaderName, std::vector<Dali::UniformBlock> uniformBlocks)
+{
+  Internal::ShaderPtr shader = Dali::Internal::Shader::New(vertexShader, fragmentShader, hints, shaderName, std::move(uniformBlocks));
+  return Shader(shader.Get());
+}
+
 std::string GenerateTaggedShaderPrefix(const std::string& shaderPrefix)
 {
   return Dali::Internal::Shader::GenerateTaggedShaderPrefix(shaderPrefix);

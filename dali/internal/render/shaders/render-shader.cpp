@@ -23,6 +23,7 @@
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/queue/render-queue.h>
+#include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/render/shaders/program.h>
 
 namespace Dali
@@ -74,6 +75,42 @@ const ShaderDataPtr& Shader::GetShaderData(uint32_t renderPassTag) const
   }
 
   return mDefaultShaderData;
+}
+
+void Shader::ConnectUniformBlock(Render::UniformBlock* uniformBlock)
+{
+  if(uniformBlock != nullptr)
+  {
+    // We may end up with: hashmap per shader, whereas, we could just store hash per ub
+    // and relatively quickly search vec of hashes, which will take less space if ubs
+    // are shared between shaders.
+
+    auto uniformBlockNameHash = uniformBlock->GetHash();
+    DALI_ASSERT_DEBUG(mBlocks.find(mBlockNamesHash) == mBlocks.end() && "Duplicated name of uniform connected!");
+    mBlockNamesHash ^= uniformBlockNameHash;
+    mBlocks.insert(std::make_pair(uniformBlockNameHash, uniformBlock));
+  }
+}
+
+void Shader::DisconnectUniformBlock(Render::UniformBlock* uniformBlock)
+{
+  if(uniformBlock != nullptr)
+  {
+    auto uniformBlockNameHash = uniformBlock->GetHash();
+    DALI_ASSERT_DEBUG(mBlocks.find(mBlockNamesHash) != mBlocks.end() && "Unconnected uniform disconnect!");
+    mBlockNamesHash ^= uniformBlockNameHash;
+    mBlocks.erase(uniformBlockNameHash);
+  }
+}
+
+const Shader::UniformBlockContainer& Shader::GetConnectedUniformBlocks() const
+{
+  return mBlocks;
+}
+
+std::size_t Shader::GetSharedUniformNamesHash() const
+{
+  return mBlockNamesHash;
 }
 
 } // namespace SceneGraph

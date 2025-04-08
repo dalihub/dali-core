@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -503,6 +503,9 @@ int UtcDaliVisualRendererAnimatedProperty03(void)
   Shader         shader   = Shader::New("VertexSource", "FragmentSource");
   Geometry       geometry = CreateQuadGeometry();
   VisualRenderer renderer = VisualRenderer::New(geometry, shader);
+
+  // Add all uniform mappings
+  renderer.RegisterVisualTransformUniform();
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);

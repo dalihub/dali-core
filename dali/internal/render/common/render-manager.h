@@ -363,6 +363,12 @@ public:
    */
   void RemoveRenderTracker(Render::RenderTracker* renderTracker);
 
+  /**
+   * Clear all cached programs and shaders from the cache. This will be used
+   * when we need recreate the Graphics::Program forcibly.
+   */
+  void ClearProgramCache();
+
   // This method should be called from Core::PreRender()
 
   /**

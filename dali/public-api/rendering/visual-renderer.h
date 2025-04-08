@@ -2,7 +2,7 @@
 #define DALI_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,6 +216,14 @@ public:
    * @return A reference to this handle
    */
   VisualRenderer& operator=(VisualRenderer&& rhs) noexcept;
+
+public:
+  /**
+   * @brief Register visual transform uniforms so we can use it as uniform properties.
+   *
+   * @SINCE_2_4.14
+   */
+  void RegisterVisualTransformUniform();
 
 public:
   /// @cond internal

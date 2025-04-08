@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
+#include <dali/internal/event/rendering/uniform-block-impl.h>
+#include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -135,10 +137,11 @@ void GetShaderData(const Property::Map& shaderMap, std::string& vertexShader, st
 
 } // unnamed namespace
 
-ShaderPtr Shader::New(std::string_view          vertexShader,
-                      std::string_view          fragmentShader,
-                      Dali::Shader::Hint::Value hints,
-                      std::string_view          shaderName)
+ShaderPtr Shader::New(std::string_view                vertexShader,
+                      std::string_view                fragmentShader,
+                      Dali::Shader::Hint::Value       hints,
+                      std::string_view                shaderName,
+                      std::vector<Dali::UniformBlock> uniformBlocks)
 {
   // create scene object first so it's guaranteed to exist for the event side
   auto                             sceneObject = new SceneGraph::Shader();
@@ -152,6 +155,15 @@ ShaderPtr Shader::New(std::string_view          vertexShader,
 
   services.RegisterObject(shader.Get());
   shader->UpdateShaderData(vertexShader, fragmentShader, DEFAULT_RENDER_PASS_TAG, hints, shaderName);
+
+  // Connect UniformBlock without clean up cache
+  for(auto&& uniformBlock : uniformBlocks)
+  {
+    if(uniformBlock)
+    {
+      GetImplementation(uniformBlock).ConnectToShader(shader.Get(), false);
+    }
+  }
 
   return shader;
 }
@@ -313,6 +325,52 @@ void Shader::SetShaderProperty(const Dali::Property::Value& shaderMap)
   else
   {
     DALI_LOG_ERROR("Shader program property should be a map or array of map.\n");
+  }
+}
+void Shader::ConnectUniformBlock(UniformBlock& uniformBlock, bool programCacheCleanRequired)
+{
+  AddObserver(uniformBlock);
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
+  {
+    auto& eventThreadServices = GetEventThreadServices();
+
+    {
+      using LocalType = MessageValue1<SceneGraph::Shader, Render::UniformBlock*>;
+      uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+      new(slot) LocalType(&GetShaderSceneObject(), &SceneGraph::Shader::ConnectUniformBlock, const_cast<Render::UniformBlock*>(&uniformBlock.GetUniformBlockSceneObject()));
+    }
+    if(programCacheCleanRequired)
+    {
+      RequestClearProgramCacheMessage(eventThreadServices.GetUpdateManager());
+    }
+  }
+}
+
+void Shader::DisconnectUniformBlock(UniformBlock& uniformBlock)
+{
+  RemoveObserver(uniformBlock);
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
+  {
+    auto& eventThreadServices = GetEventThreadServices();
+
+    {
+      using LocalType = MessageValue1<SceneGraph::Shader, Render::UniformBlock*>;
+      uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+      new(slot) LocalType(&GetShaderSceneObject(), &SceneGraph::Shader::DisconnectUniformBlock, const_cast<Render::UniformBlock*>(&uniformBlock.GetUniformBlockSceneObject()));
+    }
+    RequestClearProgramCacheMessage(eventThreadServices.GetUpdateManager());
+  }
+}
+
+void Shader::ObjectDestroyed(Object& object)
+{
+  auto* uniformBlock = dynamic_cast<UniformBlock*>(&object);
+  if(uniformBlock)
+  {
+    // Disconnect uniform block connection automatically if UniformBlock is destroyed.
+    DisconnectUniformBlock(*uniformBlock);
   }
 }
 
