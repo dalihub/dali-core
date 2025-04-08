@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/ordered-set.h>
+#include <dali/integration-api/scene-pre-render-status.h>
 #include <dali/integration-api/trace.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -678,18 +679,18 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   mImpl->commandBufferSubmitted = false;
 }
 
-bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects)
 {
-  bool             renderToScene = false;
   Internal::Scene& sceneInternal = GetImplementation(scene);
   Scene*           sceneObject   = sceneInternal.GetSceneObject();
 
   if(!sceneObject)
   {
     // May not be a scene object if the window is being removed.
-    return renderToScene;
+    return;
   }
 
+  bool           renderToScene    = false;
   const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
   for(uint32_t i = instructionCount; i > 0; --i)
   {
@@ -701,9 +702,13 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     }
   }
 
+  status.SetHadRenderInstructionToScene(sceneObject->HasRenderInstructionToScene());
+  status.SetHasRenderInstructionToScene(renderToScene);
+  sceneObject->SetHasRenderInstructionToScene(renderToScene);
+
   if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
   {
-    return renderToScene;
+    return;
   }
 
   if(!sceneObject || sceneObject->IsRenderingSkipped())
@@ -717,7 +722,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     {
       DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
     }
-    return renderToScene;
+    return;
   }
 
   class DamagedRectsCleaner
@@ -763,7 +768,7 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
     // Clear all dirty rects
     // The rects will be added when partial updated is enabled again
     itemsDirtyRects.clear();
-    return renderToScene;
+    return;
   }
 
   // Mark previous dirty rects in the std::unordered_map.
@@ -961,7 +966,6 @@ bool RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   {
     damagedRectCleaner.SetCleanOnReturn(false);
   }
-  return renderToScene;
 }
 
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo)

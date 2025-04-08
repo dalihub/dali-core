@@ -35,6 +35,7 @@ namespace Integration
 {
 class RenderStatus;
 class Scene;
+class ScenePreRenderStatus;
 } // namespace Integration
 
 struct Vector4;
@@ -381,11 +382,12 @@ public:
    * by a call up Update.
    * Multi-threading note: this method should be called from a dedicated rendering thread.
    * @pre The graphics implementation must be initialized
+   * @param[out] status The status of pre render operation.
    * @param[in] scene The scene to be rendered.
    * @param[out] damagedRects The list of damaged rects for the current render pass.
    * @return True if this scene will present, false otherwise.
    */
-  bool PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects);
+  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects);
 
   // This method should be called from Core::RenderScene()
 

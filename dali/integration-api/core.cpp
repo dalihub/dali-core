@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/processor-interface.h>
+#include <dali/integration-api/scene-pre-render-status.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-common.h>
@@ -109,9 +110,9 @@ void Core::PreRender(RenderStatus& status, bool forceClear)
   mImpl->PreRender(status, forceClear);
 }
 
-bool Core::PreRender(Integration::Scene& scene, std::vector<Rect<int>>& damagedRects)
+void Core::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects)
 {
-  return mImpl->PreRender(scene, damagedRects);
+  mImpl->PreRenderScene(scene, status, damagedRects);
 }
 
 void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo)

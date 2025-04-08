@@ -39,7 +39,8 @@ Scene::Scene()
   mRotationCompletedAcknowledgement(false),
   mSkipRendering(false),
   mNeedFullUpdate(false),
-  mPartialUpdateEnabled(true)
+  mPartialUpdateEnabled(true),
+  mHasRenderInstructionToScene(false)
 {
 }
 

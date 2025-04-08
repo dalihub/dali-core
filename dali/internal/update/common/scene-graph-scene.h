@@ -347,6 +347,16 @@ public:
     return mNeedFullUpdate;
   }
 
+  void SetHasRenderInstructionToScene(bool renderInstructionExist)
+  {
+    mHasRenderInstructionToScene = renderInstructionExist;
+  }
+
+  bool HasRenderInstructionToScene() const
+  {
+    return mHasRenderInstructionToScene;
+  }
+
   /**
    * Get the render target created for the scene
    *
@@ -439,10 +449,11 @@ private:
 
   float mKeepRenderingSeconds{0.0f}; ///< Time to keep rendering
 
-  bool mRotationCompletedAcknowledgement; ///< The flag of sending the acknowledgement to complete window rotation.
-  bool mSkipRendering;                    ///< A flag to skip rendering
-  bool mNeedFullUpdate;                   ///< A flag to update full area
-  bool mPartialUpdateEnabled;             ///< True if the partial update is enabled
+  bool mRotationCompletedAcknowledgement : 1; ///< The flag of sending the acknowledgement to complete window rotation.
+  bool mSkipRendering : 1;                    ///< A flag to skip rendering
+  bool mNeedFullUpdate : 1;                   ///< A flag to update full area
+  bool mPartialUpdateEnabled : 1;             ///< True if the partial update is enabled
+  bool mHasRenderInstructionToScene : 1;      ///< True if has render instruction to the scene. Update at PreRender time.
 
   // Render target, command buffer and render passes
 

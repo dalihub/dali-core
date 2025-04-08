@@ -39,6 +39,24 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 Debug::Filter* gAnimFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_ANIMATION");
 #endif
 
+#if defined(DEBUG_ENABLED) || defined(TRACE_ENABLED)
+
+#if defined(TRACE_ENABLED)
+// DevNote : Use trace marker to print logs at release mode.
+#define DALI_LOG_ANIMATION_INFO(format, ...)         \
+  if(gTraceFilter && gTraceFilter->IsTraceEnabled()) \
+  {                                                  \
+    DALI_LOG_DEBUG_INFO(format, ##__VA_ARGS__);      \
+  }                                                  \
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, format, ##__VA_ARGS__)
+#else
+#define DALI_LOG_ANIMATION_INFO(format, ...) \
+  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, format, ##__VA_ARGS__)
+#endif
+#else
+#define DALI_LOG_ANIMATION_INFO(format, ...)
+#endif
+
 #ifdef TRACE_ENABLED
 uint64_t GetNanoseconds()
 {
@@ -95,7 +113,7 @@ void AnimationPlaylist::OnClear(Animation& animation, bool ignoreRequired)
     mPlaylist.erase(iter);
   }
 
-  DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "OnClear(%d) Animation[%u]\n", ignoreRequired, animation.GetAnimationId());
+  DALI_LOG_ANIMATION_INFO("OnClear(%d) Animation[%u]\n", ignoreRequired, animation.GetAnimationId());
 
   if(ignoreRequired)
   {
@@ -107,7 +125,7 @@ void AnimationPlaylist::EventLoopFinished()
 {
   if(mIgnoredAnimations.size() > 0u)
   {
-    DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Ignored animations count[%zu]\n", mIgnoredAnimations.size());
+    DALI_LOG_ANIMATION_INFO("Ignored animations count[%zu]\n", mIgnoredAnimations.size());
     mIgnoredAnimations.clear();
   }
 }
@@ -147,6 +165,7 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
 
   for(const auto& notifierId : notifierIdList)
   {
+    DALI_LOG_ANIMATION_INFO("Animation[%u] notified.\n", notifierId);
     if(DALI_LIKELY(mIgnoredAnimations.find(notifierId) == mIgnoredAnimations.end()))
     {
       auto* animation = GetEventObject(notifierId);
@@ -166,17 +185,17 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
         }
         else
         {
-          DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] not finished actually...\n", notifierId);
+          DALI_LOG_ANIMATION_INFO("Animation[%u] not finished actually...\n", notifierId);
         }
       }
       else
       {
-        DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] destroyed!!\n", notifierId);
+        DALI_LOG_ANIMATION_INFO("Animation[%u] destroyed!!\n", notifierId);
       }
     }
     else
     {
-      DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Ignored (Clear() called)\n", notifierId);
+      DALI_LOG_ANIMATION_INFO("Animation[%u] Ignored (Clear() called)\n", notifierId);
     }
   }
 
@@ -203,7 +222,7 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
     }
     else
     {
-      DALI_LOG_INFO(gAnimFilter, Debug::Verbose, "Animation[%u] Ignored (Clear() called)\n", animation.GetAnimationId());
+      DALI_LOG_ANIMATION_INFO("Animation[%u] Ignored (Clear() called)\n", animation.GetAnimationId());
     }
   }
 
