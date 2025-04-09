@@ -250,6 +250,79 @@ int UtcDaliCoreClearScene(void)
   END_TEST;
 }
 
+int UtcDaliCoreRemoveSceneObjectAndClearSceneN(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::ClearScene with scene object removed scene");
+
+  application.GetScene().SetBackgroundColor(Color::MAGENTA);
+
+  // Dummy rendering several frames.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  DALI_TEST_CHECK(newScene);
+  application.AddScene(newScene);
+
+  // Dummy rendering several frames.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  TestGraphicsController& controller = application.GetGraphicsController();
+  auto&                   cmdTrace   = controller.mCommandBufferCallStack;
+
+  cmdTrace.Enable(true);
+  cmdTrace.EnableLogging(true);
+
+  cmdTrace.Reset();
+
+  DALI_TEST_CHECK(!cmdTrace.FindMethod("BeginRenderPass"));
+
+  auto& core = application.GetCore();
+
+  // Create BeginRenderPass both scenes
+  core.ClearScene(newScene);
+  DALI_TEST_CHECK(cmdTrace.FindMethod("BeginRenderPass"));
+  cmdTrace.Reset();
+
+  core.ClearScene(application.GetScene());
+  DALI_TEST_CHECK(cmdTrace.FindMethod("BeginRenderPass"));
+
+  // Dummy rendering several frames.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  cmdTrace.Reset();
+
+  newScene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
+
+  DALI_TEST_CHECK(!cmdTrace.FindMethod("BeginRenderPass"));
+
+  // Do not create BeginRenderPass for invalid scene
+  core.ClearScene(newScene);
+  DALI_TEST_CHECK(!cmdTrace.FindMethod("BeginRenderPass"));
+
+  core.ClearScene(application.GetScene());
+  DALI_TEST_CHECK(cmdTrace.FindMethod("BeginRenderPass"));
+
+  cmdTrace.Reset();
+
+  newScene.Discard();
+  newScene.Reset();
+
+  application.SendNotification();
+  application.Render(0);
+
+  END_TEST;
+}
+
 int UtcDaliCoreClearSceneN(void)
 {
   TestApplication application;
