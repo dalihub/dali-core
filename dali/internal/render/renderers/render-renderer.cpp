@@ -1091,36 +1091,16 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
     return;
   }
 
-  // Remove mNodeIndexMap and mUniformIndexMaps.
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
-  while(iter != mNodeIndexMap.end())
-  {
-    // Swap between end of mUniformIndexMaps and removed.
-    auto nodeIndex           = iter->index;
-    auto uniformIndexMapSize = mUniformIndexMaps.size();
-
-    // Remove node index map.
-    mNodeIndexMap.erase(iter);
-
-    if(nodeIndex + 1 != uniformIndexMapSize)
-    {
-      std::swap(mUniformIndexMaps[nodeIndex], mUniformIndexMaps[uniformIndexMapSize - 1u]);
-      // Change node index map.
-      for(auto&& renderItemLookup : mNodeIndexMap)
-      {
-        if(renderItemLookup.index == uniformIndexMapSize - 1u)
-        {
-          renderItemLookup.index = nodeIndex;
-          break;
-        }
-      }
-    }
-
-    // Remove uniform index maps.
-    mUniformIndexMaps.pop_back();
-
-    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
-  }
+  // Destroy whole mNodeIndexMap and mUniformIndexMaps container.
+  // It will be re-created at next render time.
+  // Note : Detach from the node will be happened at RenderManager::PreRender().
+  //        We don't worry about the mNodeIndexMap and mUniformIndexMaps become invalidated after this call.
+  mNodeIndexMap.clear();
+  mUniformIndexMaps.clear();
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mNodeIndexMap.shrink_to_fit();
+  mUniformIndexMaps.shrink_to_fit();
+#endif
 }
 
 void Renderer::ProgramDestroyed(const Program* program)
