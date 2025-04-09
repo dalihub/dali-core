@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include <dali/internal/update/queue/update-message-queue.h>
 
 // EXTERNAL INCLUDES
-#include <future> ///< for std::future and std::promise
 #include <chrono> ///< for std::chrono::milliseconds
+#include <future> ///< for std::future and std::promise
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
@@ -292,7 +292,7 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
 
     mImpl->queueWasEmpty = mImpl->processQueue.empty(); // Flag whether we processed anything
 
-    copiedProcessQueue = std::move(mImpl->processQueue); // Move message queue
+    copiedProcessQueue.swap(mImpl->processQueue); // Move message queue
 
     if(DALI_UNLIKELY(copiedProcessQueue.size() >= MAX_MESSAGES_ALLOWED_IN_PROCESS_QUEUE))
     {
