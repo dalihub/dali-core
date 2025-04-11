@@ -377,6 +377,7 @@ RenderManager::~RenderManager()
   // Ensure to release memory pool
   Render::Renderer::ResetMemoryPool();
   Render::Texture::ResetMemoryPool();
+  Render::UniformBufferView::ResetMemoryPool();
 }
 
 void RenderManager::ContextDestroyed()

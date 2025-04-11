@@ -99,9 +99,7 @@ void UniformBlock::WriteDynUniform(
   UniformBufferView&       ubo,
   BufferIndex              renderBufferIndex)
 {
-  int        arrayIndex = uniform.arrayIndex;
-  auto       dst        = ubo.GetOffset() + uniform.uniformOffset;
-  const auto dest       = dst + uniform.arrayElementStride * arrayIndex;
+  const auto dest = uniform.uniformOffset + uniform.arrayElementStride * uniform.arrayIndex;
 
   const auto valueAddress = propertyValue->GetValueAddress(renderBufferIndex);
 
