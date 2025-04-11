@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBuffer
 
   // Use current offset and increment it after
   auto offset = ubo->GetCurrentOffset();
-  auto retval = Graphics::UniquePtr<UniformBufferView>(new UniformBufferView(*ubo.get(), offset, size));
+  auto retval = Graphics::UniquePtr<UniformBufferView>(UniformBufferView::New(*ubo.get(), offset));
 
   // make sure new offset will meet alignment requirements
   uint32_t alignedSize = ubo->AlignSize(size);

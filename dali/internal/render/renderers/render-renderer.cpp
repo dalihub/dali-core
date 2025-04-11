@@ -937,8 +937,8 @@ void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::Unif
 template<>
 void Renderer::WriteUniform<Matrix3>(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const Matrix3& matrix)
 {
-  auto     dst       = ubo.GetOffset() + uniformInfo.offset;
-  uint32_t rowStride = 3 * sizeof(float); // Gles2 standalone buffer is tightly packed
+  const auto dst       = uniformInfo.offset;
+  uint32_t   rowStride = 3 * sizeof(float); // Gles2 standalone buffer is tightly packed
   if(uniformInfo.bufferIndex > 0)
   {
     rowStride = uniformInfo.matrixStride; // Gles3/Vulkan uniform block, mat3 row is padded to vec4
@@ -953,7 +953,7 @@ void Renderer::WriteUniform<Matrix3>(Render::UniformBufferView& ubo, const Graph
 
 void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
 {
-  ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
+  ubo.Write(data, size, uniformInfo.offset);
 }
 
 void Renderer::FillUniformBuffer(Program&                                                       program,
@@ -1010,9 +1010,7 @@ void Renderer::WriteDynUniform(
     return;
   }
 
-  int        arrayIndex = uniform.arrayIndex;
-  auto       dst        = ubo->GetOffset() + uniform.uniformOffset;
-  const auto dest       = dst + uniform.arrayElementStride * arrayIndex;
+  const auto dest = uniform.uniformOffset + uniform.arrayElementStride * uniform.arrayIndex;
 
   const auto valueAddress = propertyValue->GetValueAddress(updateBufferIndex);
 
