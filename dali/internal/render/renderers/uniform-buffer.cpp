@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ namespace Dali::Internal::Render
 {
 // GPU UBOs need to be double-buffered in order to avoid stalling the CPU during mapping/unmapping
 constexpr uint32_t INTERNAL_UBO_BUFFER_COUNT = 2u;
+constexpr uint32_t DEFAUT_MEMORY_ALIGNMENT{1};
 
 Graphics::UniquePtr<UniformBufferV2> UniformBufferV2::New(Dali::Graphics::Controller* controller, bool emulated, uint32_t alignment)
 {
@@ -37,7 +38,7 @@ Graphics::UniquePtr<UniformBufferV2> UniformBufferV2::New(Dali::Graphics::Contro
 
 UniformBufferV2::UniformBufferV2(Dali::Graphics::Controller* controller, bool emulated, uint32_t alignment)
 : mController(controller),
-  mBlockAlignment(alignment),
+  mBlockAlignment(alignment ? alignment : DEFAUT_MEMORY_ALIGNMENT),
   mCurrentGraphicsBufferIndex(0),
   mEmulated(emulated)
 {
@@ -130,15 +131,6 @@ void UniformBufferV2::Rollback()
   {
     mBufferList[mCurrentGraphicsBufferIndex].currentOffset = 0; // reset offset
   }
-}
-
-uint32_t UniformBufferV2::AlignSize(uint32_t size)
-{
-  if(size % mBlockAlignment != 0)
-  {
-    size = ((size / mBlockAlignment) + 1) * mBlockAlignment;
-  }
-  return size;
 }
 
 uint32_t UniformBufferV2::IncrementOffsetBy(uint32_t value)
