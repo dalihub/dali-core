@@ -106,12 +106,25 @@ struct ProgramCreateInfo
     return *this;
   }
 
+  /**
+   * @brief Sets whether the program is used the funcation of file-caching by DALi.
+   *
+   * @param[in] value true if the program is used internally by DALi. Otherwise false. Default is false.
+   * @return reference to this structure.
+   */
+  auto& SetFileCaching(bool value)
+  {
+    useFileCache = value;
+    return *this;
+  }
+
   GraphicsStructureType type{GraphicsStructureType::PROGRAM_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*  nextExtension{nullptr};
 
   std::string_view                name{};
   const std::vector<ShaderState>* shaderState{nullptr};
   const AllocationCallbacks*      allocationCallbacks{nullptr};
+  bool                            useFileCache{false};
 };
 
 } // namespace Graphics

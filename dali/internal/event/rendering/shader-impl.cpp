@@ -44,7 +44,8 @@ DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ShaderDefaultPropert
 Dali::Scripting::StringEnum ShaderHintsTable[] =
   {{"NONE", Dali::Shader::Hint::NONE},
    {"OUTPUT_IS_TRANSPARENT", Dali::Shader::Hint::OUTPUT_IS_TRANSPARENT},
-   {"MODIFIES_GEOMETRY", Dali::Shader::Hint::MODIFIES_GEOMETRY}};
+   {"MODIFIES_GEOMETRY", Dali::Shader::Hint::MODIFIES_GEOMETRY},
+   {"FILE_CACHE_SUPPORT", Dali::Shader::Hint::FILE_CACHE_SUPPORT}};
 
 const uint32_t ShaderHintsTableSize = static_cast<uint32_t>(sizeof(ShaderHintsTable) / sizeof(ShaderHintsTable[0]));
 

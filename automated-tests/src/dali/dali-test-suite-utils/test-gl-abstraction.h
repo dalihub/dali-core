@@ -2120,6 +2120,7 @@ public:
 
   inline void GetProgramBinary(GLuint program, GLsizei bufSize, GLsizei* length, GLenum* binaryFormat, GLvoid* binary) override
   {
+    *length = bufSize; // commonly it is same. so we provide bufSize for test
     mGetProgramBinaryCalled = true;
   }
 
