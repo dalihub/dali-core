@@ -377,7 +377,7 @@ void Animation::SetDuration(float seconds)
   }
 
   mDurationSeconds = seconds;
-  DALI_LOG_ANIMATION_INFO("Animation[%u] SetDuration %f (s)\n", mDurationSeconds);
+  DALI_LOG_ANIMATION_INFO("Animation[%u] SetDuration %f (s)\n", mAnimationId, mDurationSeconds);
 
   // mAnimation is being used in a separate thread; queue a message to set the value
   SetDurationMessage(GetEventThreadServices(), *mAnimation, seconds);
