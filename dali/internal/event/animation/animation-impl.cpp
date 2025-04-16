@@ -589,7 +589,7 @@ void Animation::Clear()
 {
   DALI_ASSERT_DEBUG(mAnimation);
 
-  DALI_LOG_ANIMATION_INFO("Animation[%u] Clear() connectors : %zu, internal state : %d\n", mAnimationId, mConnectors.Count(), GET_ANIMATION_INTERNAL_STATE_STRING(mState));
+  DALI_LOG_ANIMATION_INFO("Animation[%u] Clear() connectors : %zu, internal state : %s\n", mAnimationId, mConnectors.Count(), GET_ANIMATION_INTERNAL_STATE_STRING(mState));
 
   if(mConnectors.Empty() && mState == Dali::Internal::Animation::CLEARED)
   {
