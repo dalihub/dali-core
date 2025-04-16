@@ -1298,7 +1298,12 @@ void Object::RegisterAnimatableProperty(const TypeInfo&        typeInfo,
     }
   }
   RegisterSceneGraphProperty(propertyName, Property::INVALID_KEY, index, initialValue);
-  AddUniformMapping(index, propertyName);
+
+  // Add uniform mapping automatically only if index is not rage of WITHOUT_UNIFORM.
+  if(!(ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX <= index && index <= ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_MAX_INDEX))
+  {
+    AddUniformMapping(index, propertyName);
+  }
 }
 
 AnimatablePropertyMetadata* Object::GetSceneAnimatableProperty(Property::Index index, const Property::Value* value) const
