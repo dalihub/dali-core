@@ -581,6 +581,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     mRenderCallbackInput->size       = size;
     mRenderCallbackInput->view       = viewMatrix;
     mRenderCallbackInput->projection = projectionMatrix;
+    mRenderCallbackInput->worldColor = worldColor;
 
     MatrixUtils::MultiplyProjectionMatrix(mRenderCallbackInput->mvp, modelViewMatrix, projectionMatrix);
 

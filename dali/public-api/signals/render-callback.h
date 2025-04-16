@@ -52,7 +52,8 @@ struct DALI_CORE_API RenderCallbackInput
   std::any eglContext;         ///< Storage for EGL Context
   bool     usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
 
-  Matrix view; // Added at end to avoid abi break.
+  Matrix  view; // Added at end to avoid abi break.
+  Vector4 worldColor;
 };
 
 /**
