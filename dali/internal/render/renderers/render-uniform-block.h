@@ -69,6 +69,12 @@ private:
   using Hash = std::size_t;
   struct UniformIndexMap
   {
+    enum class State : uint8_t
+    {
+      INITIALIZE_REQUIRED,
+      INITIALIZED,
+      NOT_USED,
+    };
     ConstString              uniformName;            ///< The uniform name
     const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
@@ -80,7 +86,7 @@ private:
     int16_t  uniformLocation{0u};
     uint16_t uniformOffset{0u};
     uint16_t uniformBlockIndex{0u};
-    bool     initialized{false};
+    State    state{State::INITIALIZE_REQUIRED};
   };
 
   void WriteDynUniform(const PropertyInputImpl* propertyValue,

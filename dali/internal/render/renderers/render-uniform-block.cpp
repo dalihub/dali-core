@@ -57,33 +57,42 @@ void UniformBlock::WriteUniforms(BufferIndex renderBufferIndex, const Program& p
   {
     auto& uniform = iter;
 
-    if(!uniform.initialized)
+    switch(uniform.state)
     {
-      auto uniformInfo  = Graphics::UniformInfo{};
-      auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
-                                             uniform.uniformNameHash,
-                                             uniform.uniformNameHashNoArray,
-                                             uniformInfo);
-
-      if(!uniformFound)
+      case UniformIndexMap::State::INITIALIZE_REQUIRED:
       {
-        continue;
+        auto uniformInfo  = Graphics::UniformInfo{};
+        auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
+                                               uniform.uniformNameHash,
+                                               uniform.uniformNameHashNoArray,
+                                               uniformInfo);
+
+        if(!uniformFound)
+        {
+          uniform.state = UniformIndexMap::State::NOT_USED;
+          continue;
+        }
+
+        uniform.uniformOffset     = uniformInfo.offset;
+        uniform.uniformLocation   = int16_t(uniformInfo.location);
+        uniform.uniformBlockIndex = uniformInfo.bufferIndex;
+
+        const auto typeSize        = iter.propertyValue->GetValueSize();
+        uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+        uniform.matrixStride       = uniformInfo.matrixStride;
+
+        uniform.state = UniformIndexMap::State::INITIALIZED;
+        DALI_FALLTHROUGH;
       }
-
-      uniform.uniformOffset     = uniformInfo.offset;
-      uniform.uniformLocation   = int16_t(uniformInfo.location);
-      uniform.uniformBlockIndex = uniformInfo.bufferIndex;
-      uniform.initialized       = true;
-
-      const auto typeSize        = iter.propertyValue->GetValueSize();
-      uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
-      uniform.matrixStride       = uniformInfo.matrixStride;
-
-      WriteDynUniform(iter.propertyValue, uniform, ubo, renderBufferIndex);
-    }
-    else
-    {
-      WriteDynUniform(iter.propertyValue, uniform, ubo, renderBufferIndex);
+      case UniformIndexMap::State::INITIALIZED:
+      {
+        WriteDynUniform(iter.propertyValue, uniform, ubo, renderBufferIndex);
+        break;
+      }
+      default:
+      {
+        break;
+      }
     }
   }
 }

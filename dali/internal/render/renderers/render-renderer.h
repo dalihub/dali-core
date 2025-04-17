@@ -649,13 +649,13 @@ private:
    *
    * @param[in] propertyValue The property value to write
    * @param[in] uniform The map describing the uniform
-   * @param[in] uboViews Target uniform buffer object
+   * @param[in] ubo Target uniform buffer view
    * @param[in] updateBufferIndex update buffer index
    */
-  void WriteDynUniform(const PropertyInputImpl*                                       propertyValue,
-                       UniformIndexMap&                                               uniform,
-                       const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
-                       BufferIndex                                                    updateBufferIndex);
+  void WriteDynUniform(const PropertyInputImpl*   propertyValue,
+                       UniformIndexMap&           uniform,
+                       Render::UniformBufferView& ubo,
+                       BufferIndex                updateBufferIndex);
 
 private:
   Graphics::Controller*           mGraphicsController;
@@ -676,6 +676,12 @@ private:
 
   struct UniformIndexMap
   {
+    enum class State : uint8_t
+    {
+      INITIALIZE_REQUIRED,
+      INITIALIZED,
+      NOT_USED,
+    };
     ConstString              uniformName;            ///< The uniform name
     const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
@@ -687,7 +693,7 @@ private:
     int16_t  uniformLocation{0u};
     uint16_t uniformOffset{0u};
     uint16_t uniformBlockIndex{0u};
-    bool     initialized{false};
+    State    state{State::INITIALIZE_REQUIRED};
   };
 
   StencilParameters mStencilParameters; ///< Struct containing all stencil related options

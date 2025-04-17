@@ -967,50 +967,58 @@ void Renderer::FillUniformBuffer(Program&                                       
   {
     auto& uniform = iter;
 
-    if(!uniform.initialized)
+    switch(uniform.state)
     {
-      auto uniformInfo  = Graphics::UniformInfo{};
-      auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
-                                             uniform.uniformNameHash,
-                                             uniform.uniformNameHashNoArray,
-                                             uniformInfo);
-
-      if(!uniformFound)
+      case UniformIndexMap::State::INITIALIZE_REQUIRED:
       {
-        continue;
+        auto uniformInfo  = Graphics::UniformInfo{};
+        auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
+                                               uniform.uniformNameHash,
+                                               uniform.uniformNameHashNoArray,
+                                               uniformInfo);
+
+        if(!uniformFound)
+        {
+          uniform.state = UniformIndexMap::State::NOT_USED;
+          continue;
+        }
+
+        uniform.uniformOffset     = uniformInfo.offset;
+        uniform.uniformLocation   = int16_t(uniformInfo.location);
+        uniform.uniformBlockIndex = uniformInfo.bufferIndex;
+
+        const auto typeSize        = iter.propertyValue->GetValueSize();
+        uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+        uniform.matrixStride       = uniformInfo.matrixStride;
+
+        uniform.state = UniformIndexMap::State::INITIALIZED;
+        DALI_FALLTHROUGH;
       }
-
-      uniform.uniformOffset     = uniformInfo.offset;
-      uniform.uniformLocation   = int16_t(uniformInfo.location);
-      uniform.uniformBlockIndex = uniformInfo.bufferIndex;
-      uniform.initialized       = true;
-
-      const auto typeSize        = iter.propertyValue->GetValueSize();
-      uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
-      uniform.matrixStride       = uniformInfo.matrixStride;
-
-      WriteDynUniform(iter.propertyValue, uniform, uboViews, updateBufferIndex);
-    }
-    else
-    {
-      WriteDynUniform(iter.propertyValue, uniform, uboViews, updateBufferIndex);
+      case UniformIndexMap::State::INITIALIZED:
+      {
+        Render::UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
+        if(ubo == nullptr) // Uniform belongs to shared UniformBlock, can't overwrite
+        {
+          uniform.state = UniformIndexMap::State::NOT_USED;
+          continue;
+        }
+        WriteDynUniform(iter.propertyValue, uniform, *ubo, updateBufferIndex);
+        break;
+      }
+      default:
+      {
+        break;
+      }
     }
   }
 }
 
 void Renderer::WriteDynUniform(
-  const PropertyInputImpl*                                       propertyValue,
-  UniformIndexMap&                                               uniform,
-  const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
-  BufferIndex                                                    updateBufferIndex)
+  const PropertyInputImpl*   propertyValue,
+  UniformIndexMap&           uniform,
+  Render::UniformBufferView& ubo,
+  BufferIndex                updateBufferIndex)
 {
-  UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
-
-  if(ubo == nullptr) // Uniform belongs to shared UniformBlock, can't overwrite
-  {
-    return;
-  }
-
   const auto dest = uniform.uniformOffset + uniform.arrayElementStride * uniform.arrayIndex;
 
   const auto valueAddress = propertyValue->GetValueAddress(updateBufferIndex);
@@ -1023,15 +1031,15 @@ void Renderer::WriteDynUniform(
     const uint32_t matrixRow = (propertyValue->GetType() == Property::MATRIX3) ? 3 : 2;
     for(uint32_t i = 0; i < matrixRow; ++i)
     {
-      ubo->Write(reinterpret_cast<const float*>(valueAddress) + i * matrixRow,
-                 sizeof(float) * matrixRow,
-                 dest + (i * uniform.matrixStride));
+      ubo.Write(reinterpret_cast<const float*>(valueAddress) + i * matrixRow,
+                sizeof(float) * matrixRow,
+                dest + (i * uniform.matrixStride));
     }
   }
   else
   {
     const auto typeSize = propertyValue->GetValueSize();
-    ubo->Write(valueAddress, typeSize, dest);
+    ubo.Write(valueAddress, typeSize, dest);
   }
 }
 
