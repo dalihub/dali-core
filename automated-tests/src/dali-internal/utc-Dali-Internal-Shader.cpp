@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2024 Samsung Electronics Co., Ltd.
+* Copyright (c) 2025 Samsung Electronics Co., Ltd.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -378,5 +378,40 @@ int UtcDaliInternalShaderSaveAndLoad02(void)
 
   DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::SaveShaderBinaryFileFunc), false, TEST_LOCATION);
   DALI_TEST_EQUALS(platformAbstraction.WasCalled(TestPlatformAbstraction::LoadShaderBinaryFileFunc), true, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliInternalShaderNewWithUniformBlock(void)
+{
+  TestApplication application;
+
+  std::string vertexShader1   = "some vertex code\n";
+  std::string fragmentShader1 = "some fragment code\n";
+
+  std::string vertexShader2   = "some another vertex code\n";
+  std::string fragmentShader2 = "some another fragment code\n";
+
+  UniformBlock sharedUniformBlock1 = UniformBlock::New("ubo1");
+  UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
+  UniformBlock sharedUniformBlock3 = UniformBlock::New("ubo3");
+
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1});
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2, sharedUniformBlock3});
+  Shader shader3 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {});
+
+  Shader shader4 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader2, fragmentShader2, Shader::Hint::NONE, "", {sharedUniformBlock1});
+
+  DALI_TEST_CHECK(shader1);
+  DALI_TEST_CHECK(shader2);
+  DALI_TEST_CHECK(shader3);
+  DALI_TEST_CHECK(shader4);
+
+  DALI_TEST_CHECK(shader1 != shader2);
+  DALI_TEST_CHECK(shader1 != shader3);
+  DALI_TEST_CHECK(shader1 != shader4);
+  DALI_TEST_CHECK(shader2 != shader3);
+  DALI_TEST_CHECK(shader2 != shader4);
+  DALI_TEST_CHECK(shader3 != shader4);
+
   END_TEST;
 }

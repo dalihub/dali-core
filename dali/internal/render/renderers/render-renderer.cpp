@@ -26,6 +26,7 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/common/shared-uniform-buffer-view-container.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/render/renderers/pipeline-cache.h>
@@ -132,6 +133,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mRenderDataProvider(dataProvider),
   mGeometry(geometry),
   mProgramCache(nullptr),
+  mSharedUniformBufferViewContainer(nullptr),
   mStencilParameters(stencilParameters),
   mBlendingOptions(),
   mIndexedDrawFirstElement(0),
@@ -152,12 +154,13 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache)
+void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache, SharedUniformBufferViewContainer& sharedUniformBufferViewContainer)
 {
-  mGraphicsController   = &graphicsController;
-  mProgramCache         = &programCache;
-  mUniformBufferManager = &uniformBufferManager;
-  mPipelineCache        = &pipelineCache;
+  mGraphicsController               = &graphicsController;
+  mProgramCache                     = &programCache;
+  mUniformBufferManager             = &uniformBufferManager;
+  mPipelineCache                    = &pipelineCache;
+  mSharedUniformBufferViewContainer = &sharedUniformBufferViewContainer;
 
   // Add Observer now
   if(mGeometry)
@@ -444,6 +447,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
 
   Program* program = Program::New(*mProgramCache,
                                   shaderData,
+                                  shader.GetSharedUniformNamesHash(),
                                   *mGraphicsController);
   if(!program)
   {
@@ -489,7 +493,10 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     createInfo.SetShaderState(shaderStates);
     createInfo.SetName(shaderData->GetName());
     auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
-    program->SetGraphicsProgram(std::move(graphicsProgram), *mUniformBufferManager); // generates reflection
+    program->SetGraphicsProgram(std::move(graphicsProgram), *mUniformBufferManager, shader.GetConnectedUniformBlocks()); // generates reflection, defines memory reqs
+
+    // DevNode : We always clear the program caches whenever shared uniform blocks information changed to some shader.
+    //           So we can always assume that current Graphics::Program could be use current shader's connected uniform blocks.
   }
 
   // Set prefetched program to be used during rendering
@@ -574,6 +581,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     mRenderCallbackInput->size       = size;
     mRenderCallbackInput->view       = viewMatrix;
     mRenderCallbackInput->projection = projectionMatrix;
+    mRenderCallbackInput->worldColor = worldColor;
 
     MatrixUtils::MultiplyProjectionMatrix(mRenderCallbackInput->mvp, modelViewMatrix, projectionMatrix);
 
@@ -638,6 +646,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
       std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, *program);
       WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColor, scale, size, nodeIndex);
     }
+
     // @todo We should detect this case much earlier to prevent unnecessary work
     // Reuse latest bound vertex attributes location, or Bind buffers to attribute locations.
     if(ReuseLatestBoundVertexAttributes(mGeometry) || mGeometry->BindVertexAttributes(commandBuffer))
@@ -804,12 +813,36 @@ void Renderer::WriteUniformBuffer(
     bool standaloneUniforms = (i == 0);
     if(programRequirements.blockSize[i])
     {
-      auto uniformBufferView             = mUniformBufferManager->CreateUniformBufferView(programRequirements.blockSize[i], standaloneUniforms);
-      mUniformBufferBindings[i].buffer   = uniformBufferView->GetBuffer();
-      mUniformBufferBindings[i].offset   = uniformBufferView->GetOffset();
       mUniformBufferBindings[i].binding  = standaloneUniforms ? 0 : reflection.GetUniformBlockBinding(i);
       mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
-      uboViews[i].reset(uniformBufferView.release());
+
+      bool useSharedBlock = !standaloneUniforms &&
+                            programRequirements.sharedBlock[i];
+
+      if(useSharedBlock)
+      {
+        // If this block IS shared, Get uboView from SharedUniformBufferViewContainer,
+        // which all uniform values are written already.
+        // Write GPU buffer and offset to unfirom buffer bindings.
+        auto sharedUniformBufferViewPtr = mSharedUniformBufferViewContainer->GetSharedUniformBlockBufferView(*program, *programRequirements.sharedBlock[i]);
+
+        DALI_ASSERT_ALWAYS(sharedUniformBufferViewPtr && "SharedUniformBufferView not exist!");
+
+        mUniformBufferBindings[i].buffer = sharedUniformBufferViewPtr->GetBuffer();
+        mUniformBufferBindings[i].offset = sharedUniformBufferViewPtr->GetOffset();
+
+        uboViews[i].reset(nullptr);
+      }
+      else
+      {
+        // If this block is NOT shared, create new uboView.
+        auto uniformBufferView = mUniformBufferManager->CreateUniformBufferView(programRequirements.blockSize[i], standaloneUniforms);
+
+        mUniformBufferBindings[i].buffer = uniformBufferView->GetBuffer();
+        mUniformBufferBindings[i].offset = uniformBufferView->GetOffset();
+
+        uboViews[i].reset(uniformBufferView.release());
+      }
     }
   }
 
@@ -856,6 +889,7 @@ void Renderer::WriteUniformBuffer(
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, worldColor);
 
     // Write uniforms from the uniform map
+    // Uniforms for the Shared UniformBlock should not be in this map. If they are, they should be ignored.
     FillUniformBuffer(*program, instruction, uboViews, bufferIndex, nodeIndex);
 
     // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
@@ -881,7 +915,15 @@ bool Renderer::WriteDefaultUniformV2(const Graphics::UniformInfo* uniformInfo, c
 {
   if(uniformInfo && !uniformInfo->name.empty())
   {
-    WriteUniform(*uboViews[uniformInfo->bufferIndex], *uniformInfo, data);
+    // Test for non-null view first
+    auto ubo = uboViews[uniformInfo->bufferIndex].get();
+
+    if(ubo == nullptr) // Uniform belongs to shared UniformBlock, can't overwrite
+    {
+      return false;
+    }
+
+    WriteUniform(*ubo, *uniformInfo, data);
     return true;
   }
   return false;
@@ -896,8 +938,8 @@ void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::Unif
 template<>
 void Renderer::WriteUniform<Matrix3>(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const Matrix3& matrix)
 {
-  auto     dst       = ubo.GetOffset() + uniformInfo.offset;
-  uint32_t rowStride = 3 * sizeof(float); // Gles2 standalone buffer is tightly packed
+  const auto dst       = uniformInfo.offset;
+  uint32_t   rowStride = 3 * sizeof(float); // Gles2 standalone buffer is tightly packed
   if(uniformInfo.bufferIndex > 0)
   {
     rowStride = uniformInfo.matrixStride; // Gles3/Vulkan uniform block, mat3 row is padded to vec4
@@ -912,7 +954,7 @@ void Renderer::WriteUniform<Matrix3>(Render::UniformBufferView& ubo, const Graph
 
 void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::UniformInfo& uniformInfo, const void* data, uint32_t size)
 {
-  ubo.Write(data, size, ubo.GetOffset() + uniformInfo.offset);
+  ubo.Write(data, size, uniformInfo.offset);
 }
 
 void Renderer::FillUniformBuffer(Program&                                                       program,
@@ -932,6 +974,7 @@ void Renderer::FillUniformBuffer(Program&                                       
                                              uniform.uniformNameHash,
                                              uniform.uniformNameHashNoArray,
                                              uniformInfo);
+
       if(!uniformFound)
       {
         continue;
@@ -961,11 +1004,14 @@ void Renderer::WriteDynUniform(
   const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
   BufferIndex                                                    updateBufferIndex)
 {
-  const auto         typeSize   = propertyValue->GetValueSize();
-  UniformBufferView* ubo        = uboViews[uniform.uniformBlockIndex].get();
-  int                arrayIndex = uniform.arrayIndex;
-  auto               dst        = ubo->GetOffset() + uniform.uniformOffset;
-  const auto         dest       = dst + uniform.arrayElementStride * arrayIndex;
+  UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
+
+  if(ubo == nullptr) // Uniform belongs to shared UniformBlock, can't overwrite
+  {
+    return;
+  }
+
+  const auto dest = uniform.uniformOffset + uniform.arrayElementStride * uniform.arrayIndex;
 
   const auto valueAddress = propertyValue->GetValueAddress(updateBufferIndex);
 
@@ -984,6 +1030,7 @@ void Renderer::WriteDynUniform(
   }
   else
   {
+    const auto typeSize = propertyValue->GetValueSize();
     ubo->Write(valueAddress, typeSize, dest);
   }
 }
@@ -1043,36 +1090,16 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
     return;
   }
 
-  // Remove mNodeIndexMap and mUniformIndexMaps.
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
-  while(iter != mNodeIndexMap.end())
-  {
-    // Swap between end of mUniformIndexMaps and removed.
-    auto nodeIndex           = iter->index;
-    auto uniformIndexMapSize = mUniformIndexMaps.size();
-
-    // Remove node index map.
-    mNodeIndexMap.erase(iter);
-
-    if(nodeIndex + 1 != uniformIndexMapSize)
-    {
-      std::swap(mUniformIndexMaps[nodeIndex], mUniformIndexMaps[uniformIndexMapSize - 1u]);
-      // Change node index map.
-      for(auto&& renderItemLookup : mNodeIndexMap)
-      {
-        if(renderItemLookup.index == uniformIndexMapSize - 1u)
-        {
-          renderItemLookup.index = nodeIndex;
-          break;
-        }
-      }
-    }
-
-    // Remove uniform index maps.
-    mUniformIndexMaps.pop_back();
-
-    iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [&node](RenderItemLookup& element) { return element.node == &node; });
-  }
+  // Destroy whole mNodeIndexMap and mUniformIndexMaps container.
+  // It will be re-created at next render time.
+  // Note : Detach from the node will be happened at RenderManager::PreRender().
+  //        We don't worry about the mNodeIndexMap and mUniformIndexMaps become invalidated after this call.
+  mNodeIndexMap.clear();
+  mUniformIndexMaps.clear();
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+  mNodeIndexMap.shrink_to_fit();
+  mUniformIndexMaps.shrink_to_fit();
+#endif
 }
 
 void Renderer::ProgramDestroyed(const Program* program)

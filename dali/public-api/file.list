@@ -68,13 +68,14 @@ SET( public_api_src_files
   ${public_api_src_dir}/rendering/decorated-visual-renderer.cpp
   ${public_api_src_dir}/rendering/frame-buffer.cpp
   ${public_api_src_dir}/rendering/geometry.cpp
-  ${public_api_src_dir}/rendering/vertex-buffer.cpp
-  ${public_api_src_dir}/rendering/texture.cpp
-  ${public_api_src_dir}/rendering/texture-set.cpp
   ${public_api_src_dir}/rendering/renderer.cpp
-  ${public_api_src_dir}/rendering/visual-renderer.cpp
   ${public_api_src_dir}/rendering/sampler.cpp
   ${public_api_src_dir}/rendering/shader.cpp
+  ${public_api_src_dir}/rendering/texture.cpp
+  ${public_api_src_dir}/rendering/texture-set.cpp
+  ${public_api_src_dir}/rendering/uniform-block.cpp
+  ${public_api_src_dir}/rendering/vertex-buffer.cpp
+  ${public_api_src_dir}/rendering/visual-renderer.cpp
   ${public_api_src_dir}/signals/callback.cpp
   ${public_api_src_dir}/signals/connection-tracker.cpp
   ${public_api_src_dir}/signals/connection-tracker-interface.cpp
@@ -114,6 +115,7 @@ SET( public_api_core_animation_header_files
   ${public_api_src_dir}/animation/constraint.h
   ${public_api_src_dir}/animation/constraints.h
   ${public_api_src_dir}/animation/constraint-source.h
+  ${public_api_src_dir}/animation/constraint-tag-ranges.h
   ${public_api_src_dir}/animation/key-frames.h
   ${public_api_src_dir}/animation/linear-constrainer.h
   ${public_api_src_dir}/animation/path.h
@@ -221,13 +223,14 @@ SET( public_api_core_rendering_header_files
   ${public_api_src_dir}/rendering/decorated-visual-renderer.h
   ${public_api_src_dir}/rendering/frame-buffer.h
   ${public_api_src_dir}/rendering/geometry.h
-  ${public_api_src_dir}/rendering/vertex-buffer.h
-  ${public_api_src_dir}/rendering/texture.h
-  ${public_api_src_dir}/rendering/texture-set.h
   ${public_api_src_dir}/rendering/renderer.h
-  ${public_api_src_dir}/rendering/visual-renderer.h
   ${public_api_src_dir}/rendering/sampler.h
   ${public_api_src_dir}/rendering/shader.h
+  ${public_api_src_dir}/rendering/texture.h
+  ${public_api_src_dir}/rendering/texture-set.h
+  ${public_api_src_dir}/rendering/uniform-block.h
+  ${public_api_src_dir}/rendering/vertex-buffer.h
+  ${public_api_src_dir}/rendering/visual-renderer.h
 )
 
 

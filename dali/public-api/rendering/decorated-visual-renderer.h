@@ -2,7 +2,7 @@
 #define DALI_DECOREATED_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,6 +185,24 @@ public:
   DecoratedVisualRenderer& operator=(const DecoratedVisualRenderer& handle);
 
   /**
+   * @brief Move constructor.
+   *
+   * @SINCE_2_1.21
+   * @param[in] rhs A reference to the moved handle
+   */
+  DecoratedVisualRenderer(DecoratedVisualRenderer&& rhs) noexcept;
+
+  /**
+   * @brief Move assignment operator.
+   *
+   * @SINCE_2_1.21
+   * @param[in] rhs A reference to the moved handle
+   * @return A reference to this handle
+   */
+  DecoratedVisualRenderer& operator=(DecoratedVisualRenderer&& rhs) noexcept;
+
+public:
+  /**
    * @brief Register relate with corner radius uniforms so we can use it as uniform properties.
    *
    * @SINCE_2_1.21
@@ -211,23 +229,6 @@ public:
    * @SINCE_2_1.21
    */
   void RegisterBlurRadiusUniform();
-
-  /**
-   * @brief Move constructor.
-   *
-   * @SINCE_2_1.21
-   * @param[in] rhs A reference to the moved handle
-   */
-  DecoratedVisualRenderer(DecoratedVisualRenderer&& rhs) noexcept;
-
-  /**
-   * @brief Move assignment operator.
-   *
-   * @SINCE_2_1.21
-   * @param[in] rhs A reference to the moved handle
-   * @return A reference to this handle
-   */
-  DecoratedVisualRenderer& operator=(DecoratedVisualRenderer&& rhs) noexcept;
 
 public:
   /// @cond internal

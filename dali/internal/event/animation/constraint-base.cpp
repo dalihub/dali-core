@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,6 +196,17 @@ ConstraintBase::RemoveAction ConstraintBase::GetRemoveAction() const
 
 void ConstraintBase::SetTag(uint32_t tag)
 {
+  if(mTag != ConstraintTagRanges::DEFAULT_TAG && tag != ConstraintTagRanges::DEFAULT_TAG)
+  {
+    // Assert if application try to set tag to internal constraints,
+    // or internal engine try to set tag what application using.
+    DALI_ASSERT_ALWAYS(
+      (((ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_START <= mTag && mTag <= ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX) &&
+        (ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_START <= tag && tag <= ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX)) ||
+       ((ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START <= mTag && mTag <= ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_MAX) &&
+        (ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START <= tag && tag <= ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_MAX))) &&
+      "Cross tag setting is not allowed!");
+  }
   mTag = tag;
 }
 

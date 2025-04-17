@@ -446,7 +446,7 @@ void TypeInfo::AddActionFunction(std::string actionName, Dali::TypeInfo::ActionF
   {
     if(DALI_UNLIKELY(!mActions.Register(ConstString(actionName), function)))
     {
-      DALI_LOG_WARNING("Action already exists in TypeRegistry Type\n", actionName.c_str());
+      DALI_LOG_ERROR("Action already exists in TypeRegistry Type\n", actionName.c_str());
     }
   }
 }
@@ -461,7 +461,7 @@ void TypeInfo::AddConnectorFunction(std::string signalName, Dali::TypeInfo::Sign
   {
     if(DALI_UNLIKELY(!mSignalConnectors.Register(ConstString(signalName), function)))
     {
-      DALI_LOG_WARNING("Signal name already exists in TypeRegistry Type for signal connector function\n", signalName.c_str());
+      DALI_LOG_ERROR("Signal name already exists in TypeRegistry Type for signal connector function\n", signalName.c_str());
     }
   }
 }

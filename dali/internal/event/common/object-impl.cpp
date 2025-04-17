@@ -948,6 +948,35 @@ void Object::RemoveConstraints(uint32_t tag)
   }
 }
 
+void Object::RemoveConstraints(uint32_t tagBegin, uint32_t tagEnd)
+{
+  // guard against constraint sending messages during core destruction
+  if(mConstraints && Stage::IsInstalled())
+  {
+    auto iter(mConstraints->begin());
+    while(iter != mConstraints->end())
+    {
+      ConstraintBase& constraint = GetImplementation(*iter);
+      const uint32_t  tag        = constraint.GetTag();
+      if(tagBegin <= tag && tag < tagEnd)
+      {
+        GetImplementation(*iter).RemoveInternal();
+        iter = mConstraints->erase(iter);
+      }
+      else
+      {
+        ++iter;
+      }
+    }
+
+    if(mConstraints->empty())
+    {
+      delete mConstraints;
+      mConstraints = nullptr;
+    }
+  }
+}
+
 void Object::SetTypeInfo(const TypeInfo* typeInfo)
 {
   mTypeInfo = typeInfo;

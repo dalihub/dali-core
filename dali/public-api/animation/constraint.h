@@ -2,7 +2,7 @@
 #define DALI_CONSTRAINT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/constraint-source.h>
+#include <dali/public-api/animation/constraint-tag-ranges.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-input.h>
@@ -519,6 +520,8 @@ public:
 
   /**
    * @brief Sets a tag for the constraint so it can be identified later.
+   * @note We can only set tag between [ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_START ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_END]
+   * or ConstraintTagRanges::DEFAULT_TAG
    *
    * @SINCE_1_0.0
    * @param[in] tag An integer to identify the constraint

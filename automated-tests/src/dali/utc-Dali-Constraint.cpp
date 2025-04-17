@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -703,10 +703,14 @@ int UtcDaliConstraintTagP(void)
   constraint.SetTag(tag);
   DALI_TEST_EQUALS(constraint.GetTag(), tag, TEST_LOCATION);
 
+  const unsigned int tag2 = Dali::ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX;
+  constraint.SetTag(tag2);
+  DALI_TEST_EQUALS(constraint.GetTag(), tag2, TEST_LOCATION);
+
   END_TEST;
 }
 
-int UtcDaliConstraintSetTagN(void)
+int UtcDaliConstraintSetTagN1(void)
 {
   // Attempt to set from uninitialised constraint
 
@@ -716,6 +720,30 @@ int UtcDaliConstraintSetTagN(void)
   try
   {
     constraint.SetTag(123);
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintSetTagN2(void)
+{
+  // Attempt to set out of custom tag ranges
+
+  TestApplication application;
+
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_EQUALS(constraint.GetTag(), 0u, TEST_LOCATION);
+
+  try
+  {
+    const uint32_t tag = Dali::ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX + 1u;
+    constraint.SetTag(tag);
     DALI_TEST_CHECK(false); // Should not reach here!
   }
   catch(...)
@@ -1631,7 +1659,6 @@ int UtcDaliConstraintComponentNonTransformPropertyConstraintP(void)
   END_TEST;
 }
 
-
 namespace PostConstraintTest
 {
 void CheckComponentProperty(TestApplication& application, Actor& actor, Handle target)
@@ -1648,14 +1675,14 @@ void CheckComponentProperty(TestApplication& application, Actor& actor, Handle t
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3::ONE, TEST_LOCATION);
 
   Property::Index prePropertyIndex = target.RegisterProperty("testPreProperty", Vector3::ZERO);
-  Constraint preConstraint = Constraint::New<Vector3>(target, prePropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
+  Constraint      preConstraint    = Constraint::New<Vector3>(target, prePropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
     output = inputs[0]->GetVector3();
   });
   preConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
   preConstraint.Apply();
 
   Property::Index postPropertyIndex = target.RegisterProperty("testPostProperty", Vector3::ZERO);
-  Constraint postConstraint = Constraint::New<Vector3>(target, postPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
+  Constraint      postConstraint    = Constraint::New<Vector3>(target, postPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
     output = inputs[0]->GetVector3();
   });
   postConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
@@ -1670,7 +1697,7 @@ void CheckComponentProperty(TestApplication& application, Actor& actor, Handle t
   preConstraint.Remove();
   postConstraint.Remove();
 }
-}
+} // namespace PostConstraintTest
 
 int UtcDaliConstraintApplyPost(void)
 {

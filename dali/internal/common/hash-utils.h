@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HASH_UTILS_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,15 @@
 
 namespace Dali::Internal::HashUtils
 {
-constexpr std::size_t INITIAL_HASH_VALUE = 5381;
+using HashType = std::size_t;
+
+constexpr HashType INITIAL_HASH_VALUE = 5381;
 
 /*
  * djb2 (http://www.cse.yorku.ca/~oz/hash.html)
  */
 
-[[maybe_unused]] inline std::size_t HashString(const char* string, std::size_t& hash)
+[[maybe_unused]] inline HashType HashString(const char* string, HashType& hash)
 {
   while(int c = *string++)
   {
@@ -44,7 +46,7 @@ constexpr std::size_t INITIAL_HASH_VALUE = 5381;
   return hash;
 }
 
-[[maybe_unused]] inline std::size_t HashString(const char* string, std::size_t& hash, char terminator)
+[[maybe_unused]] inline HashType HashString(const char* string, HashType& hash, char terminator)
 {
   char c;
   while((c = *string++) && c != terminator)
@@ -54,16 +56,7 @@ constexpr std::size_t INITIAL_HASH_VALUE = 5381;
   return hash;
 }
 
-[[maybe_unused]] inline std::size_t HashStringView(const std::string_view& string, std::size_t& hash)
-{
-  for(auto c : string)
-  {
-    hash = hash * 33 + c;
-  }
-  return hash;
-}
-
-[[maybe_unused]] inline std::size_t HashStringView(const std::string_view& string, std::size_t& hash, char terminator)
+[[maybe_unused]] inline HashType HashStringView(const std::string_view& string, HashType& hash, char terminator)
 {
   for(auto c : string)
   {
@@ -71,50 +64,53 @@ constexpr std::size_t INITIAL_HASH_VALUE = 5381;
     {
       break;
     }
-    hash = hash * 33 + static_cast<std::size_t>(c);
+    hash = hash * 33 + static_cast<HashType>(c);
   }
   return hash;
 }
 
-[[maybe_unused]] inline std::size_t HashBuffer(const std::vector<std::uint8_t>& buffer, std::size_t& hash)
+// Hash functions with specified length, which we could optimize for
+[[maybe_unused]] HashType HashRawByteBufferMultipleComponent(const uint8_t* __restrict__ buffer, std::size_t bufferSize, HashType& hash);
+
+[[maybe_unused]] inline HashType HashRawByteBuffer(const uint8_t* __restrict__ buffer, std::size_t bufferSize, HashType& hash)
 {
-  for(const auto& c : buffer)
+  if(bufferSize > 8)
   {
-    hash = hash * 33 + c;
+    return HashRawByteBufferMultipleComponent(buffer, bufferSize, hash);
+  }
+
+  while(bufferSize--)
+  {
+    hash = hash * 33 + *(buffer++);
   }
   return hash;
 }
 
-[[maybe_unused]] inline std::size_t HashBuffer(const Dali::Vector<std::uint8_t>& buffer, std::size_t& hash)
+[[maybe_unused]] inline HashType HashStringView(const std::string_view& string, HashType& hash)
 {
-  for(const auto& c : buffer)
-  {
-    hash = hash * 33 + c;
-  }
-  return hash;
+  return HashRawByteBuffer(reinterpret_cast<const uint8_t*>(string.data()), string.size(), hash);
+}
+
+[[maybe_unused]] inline HashType HashBuffer(const std::vector<std::uint8_t>& buffer, HashType& hash)
+{
+  return HashRawByteBuffer(buffer.data(), buffer.size(), hash);
+}
+
+[[maybe_unused]] inline HashType HashBuffer(const Dali::Vector<std::uint8_t>& buffer, HashType& hash)
+{
+  return HashRawByteBuffer(buffer.Begin(), buffer.Count(), hash);
 }
 
 template<typename T>
-[[maybe_unused]] inline std::size_t HashRawBuffer(const T* buffer, std::size_t bufferSize, std::size_t& hash)
+[[maybe_unused]] inline HashType HashRawBuffer(const T* __restrict__ buffer, std::size_t bufferSize, HashType& hash)
 {
-  if constexpr(sizeof(T) == 1u)
-  {
-    while(bufferSize--)
-    {
-      hash = hash * 33 + *(buffer++);
-    }
-    return hash;
-  }
-  else
-  {
-    return HashRawBuffer(reinterpret_cast<const std::uint8_t*>(buffer), sizeof(T) * bufferSize, hash);
-  }
+  return HashRawByteBuffer(reinterpret_cast<const uint8_t*>(buffer), sizeof(T) * bufferSize, hash);
 }
 
 template<typename T>
-[[maybe_unused]] inline std::size_t HashRawValue(const T& value, std::size_t& hash)
+[[maybe_unused]] inline HashType HashRawValue(const T& value, HashType& hash)
 {
-  return HashRawBuffer(reinterpret_cast<const std::uint8_t*>(&value), sizeof(T), hash);
+  return HashRawBuffer(reinterpret_cast<const uint8_t*>(&value), sizeof(T), hash);
 }
 
 } // namespace Dali::Internal::HashUtils

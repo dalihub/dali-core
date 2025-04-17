@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,8 +74,6 @@ VisualRendererPtr VisualRenderer::New()
   // pass the pointer to base for message passing
   VisualRendererPtr rendererPtr(new VisualRenderer(sceneObjectKey.Get()));
 
-  rendererPtr->AddUniformMappings(); // Ensure properties are mapped to uniforms
-
   // transfer scene object ownership to update manager
   EventThreadServices&       eventThreadServices = rendererPtr->GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
@@ -86,7 +84,9 @@ VisualRendererPtr VisualRenderer::New()
 }
 
 VisualRenderer::VisualRenderer(const SceneGraph::Renderer* sceneObject)
-: Renderer(sceneObject)
+: Renderer(sceneObject),
+  mPropertyCache(),
+  mUniformMapped(false)
 {
 }
 
@@ -117,7 +117,6 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
         {
           const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
           auto                        visualProperties = sceneObject.GetVisualProperties();
-
           if(visualProperties)
           {
             BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformOffset, mPropertyCache.mTransformOffset);
@@ -519,14 +518,18 @@ const PropertyInputImpl* VisualRenderer::GetSceneObjectInputProperty(Property::I
   return nullptr;
 }
 
-void VisualRenderer::AddUniformMappings()
+void VisualRenderer::RegisterVisualTransformUniform()
 {
-  AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_OFFSET, ConstString("offset"));
-  AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_SIZE, ConstString("size"));
-  AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, ConstString("offsetSizeMode"));
-  AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ORIGIN, ConstString("origin"));
-  AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT, ConstString("anchorPoint"));
-  AddUniformMapping(Dali::VisualRenderer::Property::EXTRA_SIZE, ConstString("extraSize"));
+  if(!mUniformMapped)
+  {
+    mUniformMapped = true;
+    AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_OFFSET, ConstString("offset"));
+    AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_SIZE, ConstString("size"));
+    AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, ConstString("offsetSizeMode"));
+    AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ORIGIN, ConstString("origin"));
+    AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT, ConstString("anchorPoint"));
+    AddUniformMapping(Dali::VisualRenderer::Property::EXTRA_SIZE, ConstString("extraSize"));
+  }
 }
 
 } // namespace Internal

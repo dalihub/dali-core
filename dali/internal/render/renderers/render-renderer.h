@@ -45,6 +45,7 @@ namespace Internal
 {
 class Texture;
 class ProgramCache;
+class SharedUniformBufferViewContainer;
 
 namespace SceneGraph
 {
@@ -186,11 +187,13 @@ public:
    * @param[in] programCache Cache of program objects
    * @param[in] uniformBufferManager Uniform buffer manager
    * @param[in] pipelineCache Cache of pipelines
+   * @param[in] sharedUniformBufferViewContainer Container of shared uniform buffer views
    */
-  void Initialize(Graphics::Controller&         graphicsController,
-                  ProgramCache&                 programCache,
-                  Render::UniformBufferManager& uniformBufferManager,
-                  Render::PipelineCache&        pipelineCache);
+  void Initialize(Graphics::Controller&             graphicsController,
+                  ProgramCache&                     programCache,
+                  Render::UniformBufferManager&     uniformBufferManager,
+                  Render::PipelineCache&            pipelineCache,
+                  SharedUniformBufferViewContainer& sharedUniformBufferViewContainer);
 
   /**
    * Destructor
@@ -663,6 +666,7 @@ private:
   ProgramCache* mProgramCache{nullptr};
 
   Render::UniformBufferManager*               mUniformBufferManager{};
+  SharedUniformBufferViewContainer*           mSharedUniformBufferViewContainer{};
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
   Render::PipelineCache* mPipelineCache{nullptr};

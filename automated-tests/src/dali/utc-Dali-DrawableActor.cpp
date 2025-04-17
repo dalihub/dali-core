@@ -25,6 +25,7 @@ struct DrawableObject
     // Store the size and clipping box of rendered area
     size        = inputData.size;
     clippingBox = inputData.clippingBox;
+    worldColor  = inputData.worldColor;
 
     return false;
   }
@@ -34,6 +35,7 @@ struct DrawableObject
     // Store the size and clipping box of rendered area
     size        = inputData.size;
     clippingBox = inputData.clippingBox;
+    worldColor  = inputData.worldColor;
 
     auto count = inputData.textureBindings.size();
 
@@ -45,6 +47,7 @@ struct DrawableObject
 
   Size        size{};
   ClippingBox clippingBox{};
+  Vector4     worldColor{};
 };
 
 int UtcDaliRendererSetRenderCallbackP(void)
@@ -59,7 +62,9 @@ int UtcDaliRendererSetRenderCallbackP(void)
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
 
+  const float opacity = 0.5f;
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
   auto renderer = Renderer::New(*callback);
   actor.AddRenderer(renderer);
@@ -68,9 +73,9 @@ int UtcDaliRendererSetRenderCallbackP(void)
   application.SendNotification();
   application.Render();
 
-  // Check the size (whether callback has been called)
-  auto size(drawable.size);
+  // Check the size ad color (whether callback has been called)
   DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
 
   // render once again, for line coverage
   application.SendNotification();
@@ -91,14 +96,17 @@ int UtcDaliDrawableActor1P(void)
   DrawableActor drawableActor = DrawableActor::New(*callback);
   application.GetScene().Add(drawableActor);
 
+  const float opacity = 0.5f;
   drawableActor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  drawableActor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  // Check the size (whether callback has been called)
+  // Check the size and color (whether callback has been called)
   DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
 
   END_TEST;
 }
@@ -139,7 +147,7 @@ int UtcRenderCallbackTextureBindingP(void)
 
 int UtcDaliDrawableActor2P(void)
 {
-  tet_infoline("Testing Renderer:LSetRenderCallback() and check clipping box");
+  tet_infoline("Testing Renderer:LSetRenderCallback() and check clipping box and color");
   TestApplication application;
 
   DrawableObject drawable{};
@@ -151,14 +159,17 @@ int UtcDaliDrawableActor2P(void)
   application.GetScene().Add(parentActor);
   parentActor.Add(actor);
 
+  const float opacity = 0.5f;
   parentActor.SetProperty(Actor::Property::POSITION, Vector2(20, 50));
   parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::COLOR, Color::DARK_OLIVE_GREEN * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 200));
   actor.SetProperty(Actor::Property::POSITION, Vector2(50, 70));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
   auto renderer = Renderer::New(*callback);
   actor.AddRenderer(renderer);
@@ -167,8 +178,9 @@ int UtcDaliDrawableActor2P(void)
   application.SendNotification();
   application.Render();
 
-  // Check the size (whether callback has been called)
+  // Check the size and color (whether callback has been called)
   DALI_TEST_EQUALS(drawable.size, Size(100, 200), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity * opacity), TEST_LOCATION);
 
   // Check clippingBox. Note that clippingBox coordinate is in screen coordinates
   DALI_TEST_EQUALS(drawable.clippingBox, Rect<int32_t>(20 + 50, 800 - (50 + 70 + 200), 100, 200), TEST_LOCATION);

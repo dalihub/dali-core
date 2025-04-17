@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,9 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/shader-data.h>
 #include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
+#include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/shaders/program-cache.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
@@ -75,9 +77,9 @@ inline uint32_t AlignSize(uint32_t dataSize, uint32_t alignSize)
 
 // IMPLEMENTATION
 
-Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shaderData, Graphics::Controller& gfxController)
+Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shaderData, std::size_t sharedUniformNamesHash, Graphics::Controller& gfxController)
 {
-  size_t shaderHash = shaderData->GetHashValue();
+  size_t shaderHash = shaderData->GetHashValue() ^ sharedUniformNamesHash;
 
   Program* program = cache.GetProgram(shaderHash);
 
@@ -116,7 +118,10 @@ Program::~Program()
   // If someone call AddObserver / RemoveObserver after this, assert.
 }
 
-void Program::BuildReflection(const Graphics::Reflection& graphicsReflection, Render::UniformBufferManager& uniformBufferManager)
+void Program::BuildRequirements(
+  const Graphics::Reflection&                      graphicsReflection,
+  Render::UniformBufferManager&                    uniformBufferManager,
+  const SceneGraph::Shader::UniformBlockContainer& sharedUniformBlockContainer)
 {
   mReflectionDefaultUniforms.clear();
   mReflectionDefaultUniforms.resize(NUMBER_OF_DEFAULT_UNIFORMS);
@@ -139,7 +144,7 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection, Re
       //
       // If the name represents an element in an array of structs, it will contain an
       // index operator, but should be hashed in full.
-      auto hashValue = CalculateHash(item.name);
+      auto hashValue = CalculateHash(std::string_view(item.name.data(), item.name.size()));
       mReflection.emplace_back(ReflectionUniformInfo{hashValue, false, item});
 
       // update buffer index
@@ -161,7 +166,7 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection, Re
   auto samplers = graphicsReflection.GetSamplers(); // Only holds first element of arrays without [].
   for(const auto& sampler : samplers)
   {
-    mReflection.emplace_back(ReflectionUniformInfo{CalculateHash(sampler.name), false, sampler});
+    mReflection.emplace_back(ReflectionUniformInfo{CalculateHash(std::string_view(sampler.name.data(), sampler.name.size())), false, sampler});
   }
 
   // check for potential collisions
@@ -191,10 +196,13 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection, Re
 
   mUniformBlockMemoryRequirements.blockSize.resize(uniformBlockCount);
   mUniformBlockMemoryRequirements.blockSizeAligned.resize(uniformBlockCount);
-  mUniformBlockMemoryRequirements.blockCount           = uniformBlockCount;
-  mUniformBlockMemoryRequirements.totalSizeRequired    = 0u;
-  mUniformBlockMemoryRequirements.totalCpuSizeRequired = 0u;
-  mUniformBlockMemoryRequirements.totalGpuSizeRequired = 0u;
+  mUniformBlockMemoryRequirements.sharedBlock.resize(uniformBlockCount);
+
+  mUniformBlockMemoryRequirements.blockCount            = uniformBlockCount;
+  mUniformBlockMemoryRequirements.totalSizeRequired     = 0u;
+  mUniformBlockMemoryRequirements.totalCpuSizeRequired  = 0u;
+  mUniformBlockMemoryRequirements.totalGpuSizeRequired  = 0u;
+  mUniformBlockMemoryRequirements.sharedGpuSizeRequired = 0u;
 
   for(auto i = 0u; i < uniformBlockCount; ++i)
   {
@@ -209,16 +217,41 @@ void Program::BuildReflection(const Graphics::Reflection& graphicsReflection, Re
     mUniformBlockMemoryRequirements.blockSize[i]        = blockSize;
     mUniformBlockMemoryRequirements.blockSizeAligned[i] = alignedBlockSize;
 
-    mUniformBlockMemoryRequirements.totalSizeRequired += alignedBlockSize;
-    mUniformBlockMemoryRequirements.totalCpuSizeRequired += (standaloneUniformBlock) ? alignedBlockSize : 0;
-    mUniformBlockMemoryRequirements.totalGpuSizeRequired += (standaloneUniformBlock) ? 0 : alignedBlockSize;
+    bool sharedUniformUsed = false;
+
+    // Compare and find block name in sharedUniformBlockContainer
+    if(!standaloneUniformBlock)
+    {
+      auto uboNameHash = Dali::CalculateHash(std::string_view(uboInfo.name));
+      auto iter        = sharedUniformBlockContainer.find(uboNameHash);
+      if(iter != sharedUniformBlockContainer.end())
+      {
+        mUniformBlockMemoryRequirements.sharedBlock[i] = iter->second;
+        mUniformBlockMemoryRequirements.totalSizeRequired     += alignedBlockSize;
+        mUniformBlockMemoryRequirements.sharedGpuSizeRequired += alignedBlockSize;
+
+        sharedUniformUsed = true;
+      }
+    }
+
+    if(!sharedUniformUsed)
+    {
+      mUniformBlockMemoryRequirements.sharedBlock[i] = nullptr;
+
+      mUniformBlockMemoryRequirements.totalSizeRequired += alignedBlockSize;
+      mUniformBlockMemoryRequirements.totalCpuSizeRequired += (standaloneUniformBlock) ? alignedBlockSize : 0;
+      mUniformBlockMemoryRequirements.totalGpuSizeRequired += (standaloneUniformBlock) ? 0 : alignedBlockSize;
+    }
   }
 }
 
-void Program::SetGraphicsProgram(Graphics::UniquePtr<Graphics::Program>&& program, Render::UniformBufferManager& uniformBufferManager)
+void Program::SetGraphicsProgram(
+  Graphics::UniquePtr<Graphics::Program>&&         program,
+  Render::UniformBufferManager&                    uniformBufferManager,
+  const SceneGraph::Shader::UniformBlockContainer& uniformBlockContainer)
 {
   mGfxProgram = std::move(program);
-  BuildReflection(mGfxController.GetProgramReflection(*mGfxProgram.get()), uniformBufferManager);
+  BuildRequirements(mGfxController.GetProgramReflection(*mGfxProgram.get()), uniformBufferManager, uniformBlockContainer);
 }
 
 bool Program::GetUniform(const std::string_view& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const

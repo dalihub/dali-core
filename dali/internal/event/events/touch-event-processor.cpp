@@ -125,27 +125,40 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
 }
 
 // geometry
-// child -> below
-Dali::Actor EmitGeoInterceptTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, std::list<Dali::Internal::Actor*>& interceptActorList, const Dali::TouchEvent& touchEvent, ActorObserver& lastConsumedActor)
+// child -> parent
+Dali::Actor EmitGeoInterceptTouchSignals(Dali::Actor actor,
+                                        const Dali::TouchEvent& touchEvent,
+                                        ActorObserver& lastConsumedActor)
 {
-  interceptActorList.clear();
   Dali::Actor interceptedActor;
-  for(auto&& actor : actorLists)
+
+  if(actor)
   {
-    interceptActorList.push_back(actor);
-    if(ShouldEmitInterceptTouchEvent(*actor, touchEvent))
+    Dali::Actor parent = actor.GetParent();
+    if(parent)
     {
-      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_TOUCH_EVENT_SIGNAL");
-      if(actor->EmitInterceptTouchEventSignal(touchEvent))
-      {
-        interceptedActor = Dali::Actor(actor);
-        break;
-      }
+      // Recursively deliver events to the actor and its parents for intercept touch event.
+      interceptedActor = EmitGeoInterceptTouchSignals(parent, touchEvent, lastConsumedActor);
     }
-    // If there is a consumed actor, the intercept is sent only up to the moment before the consumed actor.
-    if(lastConsumedActor.GetActor() == actor)
+
+    if(!interceptedActor)
     {
-      break;
+      bool   intercepted = false;
+      Actor& actorImpl(GetImplementation(actor));
+      if(ShouldEmitInterceptTouchEvent(actorImpl, touchEvent))
+      {
+        DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_INTERCEPT_TOUCH_EVENT_SIGNAL");
+        intercepted = actorImpl.EmitInterceptTouchEventSignal(touchEvent);
+        if(intercepted)
+        {
+          interceptedActor = Dali::Actor(&actorImpl);
+        }
+      }
+      // If there is a consumed actor, the intercept is sent only up to the moment before the consumed actor.
+      if(lastConsumedActor.GetActor() == actor)
+      {
+        return interceptedActor;
+      }
     }
   }
   return interceptedActor;
@@ -462,10 +475,21 @@ struct TouchEventProcessor::Impl
         {
           Dali::Actor interceptedActor;
           // Let's find out if there is an intercept actor.
-          interceptedActor = EmitGeoInterceptTouchSignals(processor.mCandidateActorLists, processor.mInterceptedActorLists, localVars.touchEventHandle, processor.mLastConsumedActor);
+          interceptedActor = EmitGeoInterceptTouchSignals(localVars.primaryHitActor, localVars.touchEventHandle, processor.mLastConsumedActor);
           if(interceptedActor)
           {
             processor.mInterceptedTouchActor.SetActor(&GetImplementation(interceptedActor));
+
+            processor.mInterceptedActorLists.clear();
+            // Create a list of intercepted actors from the candidate list.
+            for(auto& actorImpl : processor.mCandidateActorLists)
+            {
+              processor.mInterceptedActorLists.push_back(actorImpl);
+              if(actorImpl == interceptedActor)
+              {
+                break;
+              }
+            }
 
             // If there is an interception, send an interrupted event to the last consumed actor or to the actor that hit previously.
             if(processor.mLastConsumedActor.GetActor() &&

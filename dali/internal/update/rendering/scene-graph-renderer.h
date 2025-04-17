@@ -38,6 +38,7 @@ namespace Render
 {
 class Renderer;
 class Geometry;
+class UniformBlock;
 } // namespace Render
 
 namespace SceneGraph

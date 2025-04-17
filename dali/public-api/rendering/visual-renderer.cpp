@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,11 @@ VisualRenderer& VisualRenderer::operator=(const VisualRenderer& handle) = defaul
 VisualRenderer::VisualRenderer(VisualRenderer&& rhs) noexcept = default;
 
 VisualRenderer& VisualRenderer::operator=(VisualRenderer&& rhs) noexcept = default;
+
+void VisualRenderer::RegisterVisualTransformUniform()
+{
+  GetImplementation(*this).RegisterVisualTransformUniform();
+}
 
 VisualRenderer::VisualRenderer(Internal::VisualRenderer* pointer)
 : Dali::Renderer(pointer)

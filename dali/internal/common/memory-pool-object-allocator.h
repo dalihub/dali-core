@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 #include <memory> ///< for std::unique_ptr
 
 // INTERNAL INCLUDES
