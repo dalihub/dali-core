@@ -687,7 +687,6 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   if(!sceneObject)
   {
     // May not be a scene object if the window is being removed.
-    DALI_LOG_ERROR("Scene was empty handle. Skip PreRenderScene\n");
     return;
   }
 
@@ -712,10 +711,17 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
     return;
   }
 
-  if(sceneObject->IsRenderingSkipped())
+  if(!sceneObject || sceneObject->IsRenderingSkipped())
   {
     // We don't need to calculate dirty rects
-    DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
+    if(!sceneObject)
+    {
+      DALI_LOG_ERROR("Scene was empty handle. Skip pre-rendering\n");
+    }
+    else
+    {
+      DALI_LOG_RELEASE_INFO("RenderingSkipped was set true. Skip pre-rendering\n");
+    }
     return;
   }
 
@@ -842,9 +848,6 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
             {
               RenderItem& item = renderList->GetItem(listIndex);
 
-              // For now, we don't allow to rendering nodeless renderer.
-              DALI_ASSERT_DEBUG(item.mNode && "RenderItem should have node!");
-
               // Get NodeInformation as const l-value, to reduce memory access operations.
               const SceneGraph::PartialRenderingData::NodeInfomations& nodeInfo = item.GetPartialRenderingDataNodeInfomations();
 
@@ -874,7 +877,8 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
               DirtyRectKey dirtyRectKey(item.mNode, item.mRenderer);
               // If the item refers to updated node or renderer.
               if(item.mIsUpdated ||
-                 (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated())))
+                 (item.mNode &&
+                  (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated()))))
               {
                 item.mIsUpdated = false; /// DevNote : Reset flag here, since RenderItem could be reused by renderList.ReuseCachedItems().
 
@@ -1393,7 +1397,6 @@ void RenderManager::ClearScene(Integration::Scene scene)
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
   if(!sceneObject)
   {
-    DALI_LOG_ERROR("Scene was empty handle. Skip ClearScene\n");
     return;
   }
 
