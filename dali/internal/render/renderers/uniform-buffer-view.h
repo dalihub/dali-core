@@ -57,6 +57,15 @@ public:
   static UniformBufferView* New(UniformBufferV2& ubo, uint32_t offset);
 
   /**
+   * Try to recycle input view. If recycle failed, inputed view memory freed, and new UniformView created.
+   * @param[in, out] oldView The old buffer view that want to recycle. Set as nullptr after recycle done.
+   * @param[in] ubo The buffer for this view
+   * @param[in] offset The offset of this view from ubo
+   * @return A UniformBufferView that recycled, or newly created.
+   */
+  static UniformBufferView* TryRecycle(UniformBufferView*& oldView, UniformBufferV2& ubo, uint32_t offset);
+
+  /**
    * Clear memory pool of UniformBufferView.
    * This should be called at the begin of Core.
    * (Since Core could be recreated, we need to reset the memory pool.)

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UNIFORM_BUFFER_MANAGER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public:
 
   void ContextDestroyed();
 
-  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView(uint32_t size, bool emulated = true);
+  Graphics::UniquePtr<UniformBufferView> CreateUniformBufferView(UniformBufferView*& oldView, uint32_t size, bool emulated = true);
 
   /**
    * @brief Registers scene with the manager

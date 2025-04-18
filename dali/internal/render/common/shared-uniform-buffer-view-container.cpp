@@ -109,13 +109,15 @@ void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex,
   uint32_t totalUniformBufferViewCount = 0u;
 #endif
 
+  static Render::UniformBufferView* sDummyView = nullptr;
+
   for(auto& item : mImpl->mSharedUniformBlockBufferViews)
   {
     const auto& program            = *item.first.program;
     auto&       sharedUniformBlock = *item.first.sharedUniformBlock;
     uint32_t    blockSize          = item.first.blockSize;
 
-    item.second = uniformBufferManager.CreateUniformBufferView(blockSize, false);
+    item.second = uniformBufferManager.CreateUniformBufferView(sDummyView, blockSize, false);
 
     if(DALI_UNLIKELY(!item.second))
     {

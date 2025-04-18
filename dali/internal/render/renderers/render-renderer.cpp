@@ -85,6 +85,12 @@ Dali::Internal::MemoryPoolObjectAllocator<Renderer>& GetRenderRendererMemoryPool
   static Dali::Internal::MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
   return gRenderRendererMemoryPool;
 }
+
+Render::UboViewContainer& GetUboViewList()
+{
+  static Render::UboViewContainer gUboViews;
+  return gUboViews;
+}
 } // namespace
 
 void Renderer::PrepareCommandBuffer()
@@ -93,6 +99,12 @@ void Renderer::PrepareCommandBuffer()
   ReuseLatestBoundVertexAttributes(nullptr);
 
   // todo : Fill here as many caches as we can store for reduce the number of command buffers
+}
+
+void Renderer::FinishedCommandBuffer()
+{
+  // Ensure to remove current frame's UBOView list now.
+  GetUboViewList().Clear();
 }
 
 RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider,
@@ -795,15 +807,15 @@ void Renderer::WriteUniformBuffer(
   const Vector3&                       size,
   std::size_t                          nodeIndex)
 {
-  auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
+  const auto& reflection = mGraphicsController->GetProgramReflection(program->GetGraphicsProgram());
 
   const auto& programRequirements = program->GetUniformBlocksMemoryRequirements();
 
   // Allocate UBO view per each block (include standalone block)
   auto blockCount = programRequirements.blockCount;
 
-  std::vector<std::unique_ptr<UniformBufferView>> uboViews;
-  uboViews.resize(blockCount);
+  auto& uboViews = GetUboViewList();
+  uboViews.Resize(blockCount);
 
   // Prepare bindings
   auto uboCount = reflection.GetUniformBlockCount();
@@ -832,17 +844,18 @@ void Renderer::WriteUniformBuffer(
         mUniformBufferBindings[i].buffer = sharedUniformBufferViewPtr->GetBuffer();
         mUniformBufferBindings[i].offset = sharedUniformBufferViewPtr->GetOffset();
 
-        uboViews[i].reset(nullptr);
+        delete uboViews[i];
+        uboViews[i] = nullptr;
       }
       else
       {
         // If this block is NOT shared, create new uboView.
-        auto uniformBufferView = mUniformBufferManager->CreateUniformBufferView(programRequirements.blockSize[i], standaloneUniforms);
+        auto uniformBufferView = mUniformBufferManager->CreateUniformBufferView(uboViews[i], programRequirements.blockSize[i], standaloneUniforms);
 
         mUniformBufferBindings[i].buffer = uniformBufferView->GetBuffer();
         mUniformBufferBindings[i].offset = uniformBufferView->GetOffset();
 
-        uboViews[i].reset(uniformBufferView.release());
+        uboViews[i] = uniformBufferView.release();
       }
     }
   }
@@ -850,7 +863,7 @@ void Renderer::WriteUniformBuffer(
   // update the uniform buffer
   // pass shared UBO and offset, return new offset for next item to be used
   // don't process bindings if there are no uniform buffers allocated
-  if(!uboViews.empty())
+  if(!uboViews.IsEmpty())
   {
     // Write default uniforms
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::MODEL_MATRIX), uboViews, modelMatrix);
@@ -912,12 +925,12 @@ bool Renderer::WriteDefaultUniform(const Graphics::UniformInfo* uniformInfo, Ren
 }
 
 template<class T>
-bool Renderer::WriteDefaultUniformV2(const Graphics::UniformInfo* uniformInfo, const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews, const T& data)
+bool Renderer::WriteDefaultUniformV2(const Graphics::UniformInfo* uniformInfo, const Render::UboViewContainer& uboViews, const T& data)
 {
   if(uniformInfo && !uniformInfo->name.empty())
   {
     // Test for non-null view first
-    auto ubo = uboViews[uniformInfo->bufferIndex].get();
+    auto* ubo = uboViews[uniformInfo->bufferIndex];
 
     if(ubo == nullptr) // Uniform belongs to shared UniformBlock, can't overwrite
     {
@@ -958,11 +971,11 @@ void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::Unif
   ubo.Write(data, size, uniformInfo.offset);
 }
 
-void Renderer::FillUniformBuffer(Program&                                                       program,
-                                 const SceneGraph::RenderInstruction&                           instruction,
-                                 const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
-                                 BufferIndex                                                    updateBufferIndex,
-                                 std::size_t                                                    nodeIndex)
+void Renderer::FillUniformBuffer(Program&                             program,
+                                 const SceneGraph::RenderInstruction& instruction,
+                                 const Render::UboViewContainer&      uboViews,
+                                 BufferIndex                          updateBufferIndex,
+                                 std::size_t                          nodeIndex)
 {
   for(auto& iter : mUniformIndexMaps[nodeIndex])
   {
@@ -997,7 +1010,7 @@ void Renderer::FillUniformBuffer(Program&                                       
       }
       case UniformIndexMap::State::INITIALIZED:
       {
-        Render::UniformBufferView* ubo = uboViews[uniform.uniformBlockIndex].get();
+        auto* ubo = uboViews[uniform.uniformBlockIndex];
         if(ubo == nullptr) // Uniform belongs to shared UniformBlock, can't overwrite
         {
           uniform.state = UniformIndexMap::State::NOT_USED;
