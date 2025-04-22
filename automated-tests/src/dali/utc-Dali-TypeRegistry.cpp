@@ -1855,6 +1855,86 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithSetGetFunctionN02(void)
   END_TEST;
 }
 
+int UtcDaliTypeRegistryAnimatablePropertyWithoutUniformRegistrationP(void)
+{
+  TestApplication application;
+  TypeRegistry    typeRegistry = TypeRegistry::Get();
+
+  auto&       graphics = application.GetGraphicsController();
+  std::string animatablePropertyName("animatableProp1");
+  std::string animatablePropertyWithoutUniformName("animatableProp2");
+
+  auto uniforms = std::vector<UniformData>{
+    {animatablePropertyName.c_str(), Dali::Property::Type::FLOAT},
+    {animatablePropertyWithoutUniformName.c_str(), Dali::Property::Type::FLOAT}};
+  graphics.AddCustomUniforms(uniforms);
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo(typeid(MyTestCustomActor));
+  DALI_TEST_CHECK(typeInfo);
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK(handle);
+  Actor customActor = Actor::DownCast(handle);
+  DALI_TEST_CHECK(customActor);
+  application.GetScene().Add(customActor);
+
+  unsigned int customPropertyCount(customActor.GetPropertyCount());
+
+  // Register animatable property
+  int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
+  Property::Type                 animatablePropertyType(Property::FLOAT);
+  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType, &SetProperty, &GetPropertyWithEmptyValueReturn);
+
+  // Register animatable property without uniform mapping
+  int                            animatablePropertyWithoutUniformIndex(ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX);
+  Property::Type                 animatablePropertyWithoutUniformType(Property::FLOAT);
+  AnimatablePropertyRegistration animatablePropertyWithoutUniform(customType1, animatablePropertyWithoutUniformName, animatablePropertyWithoutUniformIndex, animatablePropertyWithoutUniformType, &SetProperty, &GetPropertyWithEmptyValueReturn);
+
+  // Check property count after registration
+  DALI_TEST_EQUALS(customPropertyCount + 2u, customActor.GetPropertyCount(), TEST_LOCATION);
+
+  // Set the animatable property value
+  DALI_TEST_CHECK(!setPropertyCalled);
+  customActor.SetProperty(animatablePropertyIndex, 25.0f);
+  DALI_TEST_CHECK(setPropertyCalled);
+  setPropertyCalled = false;
+  customActor.SetProperty(animatablePropertyWithoutUniformIndex, 45.0f);
+  DALI_TEST_CHECK(setPropertyCalled);
+  setPropertyCalled = false;
+
+  // Add dummy renderer to check uniform call.
+  Actor    renderableActor = CreateRenderableActor();
+  Renderer renderer        = renderableActor.GetRendererAt(0u);
+  customActor.AddRenderer(renderer);
+
+  renderer.RegisterProperty(animatablePropertyName, 65.0f);
+  renderer.RegisterProperty(animatablePropertyWithoutUniformName, 85.0f);
+
+  customActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+
+  // Render and notify
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render();
+
+  // Check animatable property without uniform doesn't write uniform value.
+  float uniformValue = 0.0f;
+  bool  uniformValueExist;
+
+  // Check uniform use custom actor's value.
+  uniformValueExist = gl.GetUniformValue<float>(animatablePropertyName.c_str(), uniformValue);
+  DALI_TEST_EQUALS(uniformValueExist, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(uniformValue, 25.0f, TEST_LOCATION);
+
+  // Check non-uniform use renderer's value.
+  uniformValueExist = gl.GetUniformValue<float>(animatablePropertyWithoutUniformName.c_str(), uniformValue);
+  DALI_TEST_EQUALS(uniformValueExist, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(uniformValue, 85.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
 {
   TestApplication application;
