@@ -332,6 +332,40 @@ public:
         result = customFunction(progress);
       }
     }
+    else if(alphaFunctionMode == AlphaFunction::SPRING || alphaFunctionMode == AlphaFunction::CUSTOM_SPRING)
+    {
+      double stiffness = mAlphaFunction.GetSpringData().stiffness;
+      double damping   = mAlphaFunction.GetSpringData().damping;
+      double mass      = mAlphaFunction.GetSpringData().mass;
+
+      double omega0 = std::sqrt(stiffness / mass);
+      double zeta   = damping / (2.0f * std::sqrt(stiffness * mass));
+
+      double springProgress = (mAlphaFunction.GetMode() == Dali::AlphaFunction::Mode::SPRING) ? progress : progress * mDurationSeconds;
+
+      if(zeta < 1.0f)
+      {
+        double omegaTemp = std::sqrt(1.0f - zeta * zeta);
+        double omegaD    = omega0 * omegaTemp;
+        double envelope  = std::exp(-zeta * omega0 * springProgress);
+        result           = static_cast<float>(1.0 - envelope * (std::cos(omegaD * springProgress) + (zeta / omegaTemp) * std::sin(omegaD * springProgress)));
+      }
+      else
+      {
+        double sqrtTerm = std::sqrt(std::max(zeta * zeta - 1.0, 1e-6));
+        double r1       = -omega0 * (zeta - sqrtTerm);
+        double r2       = -omega0 * (zeta + sqrtTerm);
+        double A        = r2 / (r2 - r1);
+        double B        = 1.0 - A;
+        result          = 1.0 - A * std::exp(r1 * springProgress) - B * std::exp(r2 * springProgress);
+      }
+
+      // Heuristic. if the progress variable becomes 1.0 and the result is almost 1.0 too, return 1.0f.
+      if((1.0f - progress) < Math::MACHINE_EPSILON_1 && std::abs(1.0 - result) < static_cast<double>(Math::MACHINE_EPSILON_10000))
+      {
+        result = 1.0f;
+      }
+    }
     else
     {
       // If progress is very close to 0 or very close to 1 we don't need to evaluate the curve as the result will

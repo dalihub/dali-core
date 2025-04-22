@@ -22,6 +22,7 @@
 #include <cstdint> // uint8_t
 
 // INTERNAL INCLUDES
+#include <dali/public-api/animation/spring-data.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/compile-time-math.h>
@@ -79,7 +80,41 @@ public:
   {
     BUILTIN_FUNCTION, ///< The user has specified a built-in function @SINCE_1_0.0
     CUSTOM_FUNCTION,  ///< The user has provided a custom function @SINCE_1_0.0
-    BEZIER            ///< The user has provided the control points of a bezier curve @SINCE_1_0.0
+    BEZIER,           ///< The user has provided the control points of a bezier curve @SINCE_1_0.0
+    SPRING,           ///< The user has provided the spring type @SINCE_2_4.17
+    CUSTOM_SPRING     ///< The user has provided the spring data @SINCE_2_4.17
+  };
+
+  /**
+   * @brief Enumeration for predefined spring animation types.
+   * This presets are based on typical spring behavior tuned for different motion effects.
+   * @SINCE_2_4.17
+   */
+  enum SpringType : uint8_t
+  {
+    /**
+     * @brief Gentle spring. slower and smoother motion with less oscillation.
+     * @SINCE_2_4.17
+     */
+    GENTLE,
+
+    /**
+     * @brief Quick spring, Fast settling animation with minimal overshoot.
+     * @SINCE_2_4.17
+     */
+    QUICK,
+
+    /**
+     * @brief Bouncy spring. Highly elastic and oscillatory animation.
+     * @SINCE_2_4.17
+     */
+    BOUNCY,
+
+    /**
+     * @brief Slow spring. Smooth and relaxed motion with longer settling
+     * @SINCE_2_4.17
+     */
+    SLOW
   };
 
   /**
@@ -121,6 +156,26 @@ public:
   AlphaFunction(const Dali::Vector2& controlPoint0, const Dali::Vector2& controlPoint1);
 
   /**
+   * @brief Constructor for spring-based AlphaFunction using a predefined SpringType.
+   *
+   * @SINCE_2_4.17
+   * @param[in] springType The spring preset type to use (e.g., GENTLE, QUICK, etc.).
+   */
+  AlphaFunction(SpringType springType);
+
+  /**
+   * @brief Constructor for spring-based AlphaFunction using custom spring parameters.
+   *
+   * This allows creating a spring easing function with fully customizable physics behavior.
+   * @SINCE_2_4.17
+   * @param[in] springData The custom spring configuration (stiffness, damping, mass)
+   * @note Since this AlphaFunction follows a physics-based motion model, it does not guarantee
+   * that the value will exactly reach 1 at the end of the animation duration.
+   * To ensure the animation ends at 1, you may need to adjust the duration according to the spring configuration.
+   */
+  AlphaFunction(Dali::SpringData springData);
+
+  /**
    * @brief Returns the control points of the alpha function.
    * @SINCE_1_0.0
    * @return Vector4 containing the two control points of the curve
@@ -150,14 +205,22 @@ public:
    */
   Mode GetMode() const;
 
+  /**
+   * @brief Returns SpringData of spring animation
+   * @SINCE_2_4.17
+   * @return The SpringData of spring animation
+   */
+  const Dali::SpringData& GetSpringData() const;
+
 private:
-  Mode            mMode;    //< Enum indicating the functioning mode of the AlphaFunction
-  BuiltinFunction mBuiltin; //< Enum indicating the built-in alpha function
+  Mode             mMode;    //< Enum indicating the functioning mode of the AlphaFunction
+  BuiltinFunction  mBuiltin; //< Enum indicating the built-in alpha function
 
   union
   {
     Vector4                mBezierControlPoints; //< Control points for the bezier alpha function
     AlphaFunctionPrototype mCustom;              //< Pointer to an alpha function
+    Dali::SpringData       mSpringData;
   };
 };
 

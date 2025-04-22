@@ -37,6 +37,7 @@
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/animation/linear-constrainer.h>
 #include <dali/public-api/animation/path.h>
+#include <dali/public-api/animation/spring-data.h>
 #include <dali/public-api/animation/time-period.h>
 
 #include <dali/public-api/common/constants.h>
