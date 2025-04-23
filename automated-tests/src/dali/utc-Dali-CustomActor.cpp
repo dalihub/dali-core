@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1621,6 +1621,16 @@ int UtcDaliCustomActorPropertyRegistrationDefaultValue(void)
   // check that the default value is set for the derived instance as well
   DALI_TEST_EQUALS(derived.GetProperty(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX).Get<float>(), 10.f, TEST_LOCATION);
 
+  // add a property in base class
+  AnimatablePropertyRegistration(typeRegistration, "Foobar2", ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX, 30.f);
+
+  // should be one more property now
+  DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount() + 2, TEST_LOCATION);
+  // check that the default value is set for base class
+  DALI_TEST_EQUALS(UnregisteredCustomActor::New().GetProperty(ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX).Get<float>(), 30.f, TEST_LOCATION);
+  // check that the default value is set for the derived instance as well
+  DALI_TEST_EQUALS(derived.GetProperty(ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX).Get<float>(), 30.f, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -1711,6 +1721,51 @@ int UtcDaliCustomActorComponentPropertyConstraintsP(void)
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(derived.GetCurrentProperty(vec3PropIndex).Get<Vector3>(), Vector3(i * 2.0f, i * 4.0f, i * 8.0f), 0.0001f, TEST_LOCATION);
+  }
+
+  // Add a Vector4 property and its components for completeness
+  const Property::Index vec4PropIndex  = ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX + 1;
+  const Property::Index vec4xPropIndex = vec4PropIndex + 1;
+  const Property::Index vec4yPropIndex = vec4PropIndex + 2;
+  const Property::Index vec4zPropIndex = vec4PropIndex + 3;
+  const Property::Index vec4wPropIndex = vec4PropIndex + 4;
+
+  AnimatablePropertyRegistration(typeRegistration, "vec4Prop", vec4PropIndex, Vector4(10.0f, 20.0f, 30.0f, 40.0f));
+  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.x", vec4xPropIndex, vec4PropIndex, 0);
+  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.y", vec4yPropIndex, vec4PropIndex, 1);
+  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.z", vec4zPropIndex, vec4PropIndex, 2);
+  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.w", vec4wPropIndex, vec4PropIndex, 3);
+
+  tet_infoline("Test the default values of the registered vec4 property");
+  // should be more properties now
+  DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount() + 12, TEST_LOCATION);
+  // check that the default value is set for base class
+  DALI_TEST_EQUALS(UnregisteredCustomActor::New().GetProperty(vec4PropIndex).Get<Vector4>(), Vector4(10.f, 20.0f, 30.0f, 40.0f), 0.0001f, TEST_LOCATION);
+  // check that the default value is set for the derived instance as well
+  DALI_TEST_EQUALS(derived.GetProperty(vec4PropIndex).Get<Vector4>(), Vector4(10.f, 20.0f, 30.0f, 40.0f), 0.0001f, TEST_LOCATION);
+
+  tet_infoline("Test that the components of the registered property can be constrained");
+
+  // Try constraining the properties
+  Constraint vec4xConstraint = Constraint::New<float>(derived, vec4xPropIndex, &Test::Doubler);
+  vec4xConstraint.AddSource(LocalSource(Actor::Property::POSITION_X));
+  vec4xConstraint.Apply();
+  Constraint vec4yConstraint = Constraint::New<float>(derived, vec4yPropIndex, &Test::Doubler);
+  vec4yConstraint.AddSource(LocalSource(vec4xPropIndex));
+  vec4yConstraint.Apply();
+  Constraint vec4zConstraint = Constraint::New<float>(derived, vec4zPropIndex, &Test::Doubler);
+  vec4zConstraint.AddSource(LocalSource(vec4yPropIndex));
+  vec4zConstraint.Apply();
+  Constraint vec4wConstraint = Constraint::New<float>(derived, vec4wPropIndex, &Test::Doubler);
+  vec4wConstraint.AddSource(LocalSource(vec4zPropIndex));
+  vec4wConstraint.Apply();
+
+  for(int i = 1; i < 10; ++i)
+  {
+    derived[Actor::Property::POSITION_X] = i * 1.0f;
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(derived.GetCurrentProperty(vec4PropIndex).Get<Vector4>(), Vector4(i * 2.0f, i * 4.0f, i * 8.0f, i * 16.0f), 0.0001f, TEST_LOCATION);
   }
 
   END_TEST;
