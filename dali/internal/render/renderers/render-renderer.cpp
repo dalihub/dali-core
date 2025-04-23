@@ -492,6 +492,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     auto createInfo = Graphics::ProgramCreateInfo();
     createInfo.SetShaderState(shaderStates);
     createInfo.SetName(shaderData->GetName());
+    createInfo.SetFileCaching(shaderData->GetHints() & Dali::Shader::Hint::Value::FILE_CACHE_SUPPORT);
     auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
     program->SetGraphicsProgram(std::move(graphicsProgram), *mUniformBufferManager, shader.GetConnectedUniformBlocks()); // generates reflection, defines memory reqs
 
