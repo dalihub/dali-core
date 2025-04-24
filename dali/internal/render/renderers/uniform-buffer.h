@@ -64,17 +64,9 @@ public:
   void Rollback();
 
   /**
-   * Align size to the current block size
+   * Increase offset by value.
+   * Note that new offset will meet alignment requirements
    */
-  uint32_t AlignSize(uint32_t size) const
-  {
-    if(size % mBlockAlignment != 0)
-    {
-      size = ((size / mBlockAlignment) + 1) * mBlockAlignment;
-    }
-    return size;
-  }
-
   uint32_t IncrementOffsetBy(uint32_t value);
 
   bool MemoryCompare(void* data, uint32_t offset, uint32_t size);
