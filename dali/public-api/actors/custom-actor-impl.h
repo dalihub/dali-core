@@ -2,7 +2,7 @@
 #define DALI_CUSTOM_ACTOR_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,10 +196,34 @@ public:
    * This method is called by child class to set type itself.
    *
    * @SINCE_2_3.43
+   * @DEPRECATED_2_4.17 Use RegisterOffScreenRenderableType() instead.
    * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
    * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
    */
   void SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
+
+  /**
+   * @brief Register OffScreenRenderableType of this Actor.
+   * This method is called by child class to set type itself.
+   *
+   * @SINCE_2_4.17
+   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
+   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
+   * @note Each FORWARD / BACKWARD type could be added maxium 15 times.
+   * @post Call UnregisterOffScreenRenderableType() to unregister the type.
+   */
+  void RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
+
+  /**
+   * @brief Unregister OffScreenRenderableType of this Actor.
+   * This method is called by child class to set type itself.
+   *
+   * @SINCE_2_4.17
+   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
+   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
+   * @pre Call RegisterOffScreenRenderableType() before unregister the type.
+   */
+  void UnregisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
 
   /**
    * @brief Retrieves OffScreenRenderableType of this Actor.
