@@ -26,6 +26,7 @@
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/signals/render-callback.h>
 
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/blending-options.h>
@@ -67,6 +68,8 @@ using PipelineCacheL2Container = std::list<PipelineCacheL2>;
 using PipelineCachePtr         = PipelineCacheL2Container::iterator;
 
 using RendererKey = MemoryPoolKey<Render::Renderer>;
+
+using UboViewContainer = Dali::OwnerContainer<Render::UniformBufferView*>;
 } //namespace Render
 } //namespace Internal
 
@@ -123,6 +126,11 @@ public:
    * @brief Global static initialize for Render::Renderer before new CommandBuffer's Render fill start.
    */
   static void PrepareCommandBuffer();
+
+  /**
+   * @brief Global static finalize for Render::Renderer after new CommandBuffer's Render fill finished.
+   */
+  static void FinishedCommandBuffer();
 
   /**
    * Create a new renderer instance
@@ -500,9 +508,9 @@ public:
                            const T&                     data);
 
   template<class T>
-  bool WriteDefaultUniformV2(const Graphics::UniformInfo*                                   uniformInfo,
-                             const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
-                             const T&                                                       data);
+  bool WriteDefaultUniformV2(const Graphics::UniformInfo*    uniformInfo,
+                             const Render::UboViewContainer& uboViews,
+                             const T&                        data);
 
   template<class T>
   void WriteUniform(Render::UniformBufferView&   ubo,
@@ -638,11 +646,11 @@ private:
    * @param[in] updateBufferIndex update buffer index
    * @param[in] nodeIndex Index of node/renderer pair in mUniformIndexMaps
    */
-  void FillUniformBuffer(Program&                                                       program,
-                         const SceneGraph::RenderInstruction&                           instruction,
-                         const std::vector<std::unique_ptr<Render::UniformBufferView>>& uboViews,
-                         BufferIndex                                                    updateBufferIndex,
-                         std::size_t                                                    nodeIndex);
+  void FillUniformBuffer(Program&                             program,
+                         const SceneGraph::RenderInstruction& instruction,
+                         const Render::UboViewContainer&      uboViews,
+                         BufferIndex                          updateBufferIndex,
+                         std::size_t                          nodeIndex);
 
   /**
    * @brief Write dynamic (i.e. not default) uniform into the buffer

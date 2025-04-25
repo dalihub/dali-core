@@ -749,6 +749,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
       }
     }
   }
+
+  // Finalize Render::Renderer Render for this secondary command buffer.
+  Renderer::FinishedCommandBuffer();
   secondaryCommandBuffer.End();
 }
 

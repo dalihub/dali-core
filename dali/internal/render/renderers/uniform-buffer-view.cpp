@@ -39,6 +39,19 @@ UniformBufferView* UniformBufferView::New(UniformBufferV2& ubo, uint32_t offset)
   return new(GetUboViewMemoryPool().AllocateRaw()) UniformBufferView(ubo, offset);
 }
 
+UniformBufferView* UniformBufferView::TryRecycle(UniformBufferView*& oldView, UniformBufferV2& ubo, uint32_t offset)
+{
+  auto* ptr = oldView;
+  if(ptr)
+  {
+    oldView             = nullptr;
+    ptr->mUniformBuffer = &ubo;
+    ptr->mOffset        = offset;
+    return ptr;
+  }
+  return UniformBufferView::New(ubo, offset);
+}
+
 void UniformBufferView::ResetMemoryPool()
 {
   GetUboViewMemoryPool().ResetMemoryPool();

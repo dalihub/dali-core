@@ -60,7 +60,7 @@ void UniformBufferManager::SetCurrentSceneRenderInfo(SceneGraph::Scene* scene, b
   mCurrentUBOSet = FindSetForScene(scene);
 }
 
-Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBufferView(uint32_t size, bool emulated)
+Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBufferView(UniformBufferView*& oldView, uint32_t size, bool emulated)
 {
   // Allocate offset of given UBO (allocation strategy may reuse memory)
 
@@ -75,7 +75,7 @@ Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBuffer
 
   // Use current offset and increment it after
   auto offset = ubo->GetCurrentOffset();
-  auto retval = Graphics::UniquePtr<UniformBufferView>(UniformBufferView::New(*ubo.get(), offset));
+  auto retval = Graphics::UniquePtr<UniformBufferView>(UniformBufferView::TryRecycle(oldView, *ubo.get(), offset));
 
   // make sure new offset will meet alignment requirements
   uint32_t alignedSize = ubo->AlignSize(size);
