@@ -107,43 +107,43 @@ enum Type
   SIBLING_ORDER,
 
   /**
-    * @brief If this actor receives a touch-start event, then all following touch events are sent to this actor until a touch-end.
-    * @details Name "captureAllTouchAfterStart", type Property::BOOLEAN
-    * @note Default is false, i.e. actor under touch event will receive the touch even if touch started on this actor
-    */
+   * @brief If this actor receives a touch-start event, then all following touch events are sent to this actor until a touch-end.
+   * @details Name "captureAllTouchAfterStart", type Property::BOOLEAN
+   * @note Default is false, i.e. actor under touch event will receive the touch even if touch started on this actor
+   */
   CAPTURE_ALL_TOUCH_AFTER_START,
 
   /**
-    * @brief If you set the TOUCH_AREA_OFFSET on an actor, when you touch the actor, the touch area is expand from the size of actor.
-    * @details Name "touchAreaOffset", type Property::Rect<int> (left, right, bottom, top).
-    * For example
-    * @code{.cpp}
-    *  Actor actor = Actor::New();
-    *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
-    *  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(-10, 20, 30, -40));
-    *  actor.TouchedSignal().Connect(OnTouchCallback);
-    *
-    * +---------------------+
-    * |         ^           |
-    * |         |           |
-    * |         | -40       |
-    * |         |           |
-    * |         |           |
-    * |    +----+----+      |
-    * |    |         |      |
-    * | -10|         | 20   |
-    * |<---+         +----->|
-    * |    |         |      |
-    * |    |         |      |
-    * |    +----+----+      |
-    * |         |           |
-    * |         | 30        |
-    * |         |           |
-    * |         v           |
-    * +---------------------+
-    * @endcode
-    * The actual touched size is actor.width + touchAreaOffset.right - touchAreaOffset.left and actor.height + touchAreaOffset.bottom - touchAreaOffset.top
-    */
+   * @brief If you set the TOUCH_AREA_OFFSET on an actor, when you touch the actor, the touch area is expand from the size of actor.
+   * @details Name "touchAreaOffset", type Property::Rect<int> (left, right, bottom, top).
+   * For example
+   * @code{.cpp}
+   *  Actor actor = Actor::New();
+   *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+   *  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(-10, 20, 30, -40));
+   *  actor.TouchedSignal().Connect(OnTouchCallback);
+   *
+   * +---------------------+
+   * |         ^           |
+   * |         |           |
+   * |         | -40       |
+   * |         |           |
+   * |         |           |
+   * |    +----+----+      |
+   * |    |         |      |
+   * | -10|         | 20   |
+   * |<---+         +----->|
+   * |    |         |      |
+   * |    |         |      |
+   * |    +----+----+      |
+   * |         |           |
+   * |         | 30        |
+   * |         |           |
+   * |         v           |
+   * +---------------------+
+   * @endcode
+   * The actual touched size is actor.width + touchAreaOffset.right - touchAreaOffset.left and actor.height + touchAreaOffset.bottom - touchAreaOffset.top
+   */
   TOUCH_AREA_OFFSET,
 
   /**
@@ -206,7 +206,15 @@ enum Type
    * @details Name "dispatchHoverMotion", type Property::BOOLEAN
    * @note Default is true.
    */
-  DISPATCH_HOVER_MOTION
+  DISPATCH_HOVER_MOTION,
+
+  /**
+   * @brief The policy of depth index generate.
+   * @details Name "childrenDepthIndexPolicy", type Property::INTEGER
+   * @note Default is ChildrenDepthIndexPolicy::Type::INCREASE.
+   * @note Only has effort under Behavior::LAYER_UI.
+   */
+  CHILDREN_DEPTH_INDEX_POLICY,
 };
 
 } // namespace Property
@@ -220,6 +228,16 @@ enum Type
 };
 
 } // namespace VisibilityChange
+
+namespace ChildrenDepthIndexPolicy
+{
+enum Type
+{
+  INCREASE, ///< Increase depth index automatically. (Default)
+  EQUAL,    ///< Has same depth index for all children.
+};
+
+} // namespace ChildrenDepthIndexPolicy
 
 using VisibilityChangedSignalType = Signal<void(Actor, bool, VisibilityChange::Type)>; ///< Signal type of VisibilityChangedSignalType
 

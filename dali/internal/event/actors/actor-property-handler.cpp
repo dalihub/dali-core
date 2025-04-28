@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,6 +97,11 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(LAYOUT_DIRECTION)
   DALI_ENUM_TO_STRING_WITH_SCOPE(LayoutDirection, LEFT_TO_RIGHT)
   DALI_ENUM_TO_STRING_WITH_SCOPE(LayoutDirection, RIGHT_TO_LEFT)
 DALI_ENUM_TO_STRING_TABLE_END(LAYOUT_DIRECTION)
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN(CHILDREN_DEPTH_INDEX_POLICY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelActor::ChildrenDepthIndexPolicy, INCREASE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelActor::ChildrenDepthIndexPolicy, EQUAL)
+DALI_ENUM_TO_STRING_TABLE_END(CHILDREN_DEPTH_INDEX_POLICY)
 
 bool GetAnchorPointParentOriginConstant(const std::string& value, Vector3& anchor)
 {
@@ -323,7 +328,8 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     case Dali::Actor::Property::COLOR:
     {
       CheckValidAndSet<Vector4>(property,
-                                [&property, &actor](Vector4& color) {
+                                [&property, &actor](Vector4& color)
+                                {
                                   color.a = (property.GetType() == Property::VECTOR4) ? color.a : 1.0f;
                                   actor.SetColor(color);
                                 });
@@ -558,7 +564,8 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
     {
-      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mCaptureAllTouchAfterStart = value; });
+      CheckValidAndSet<bool>(property, [&actor](bool value)
+                             { actor.mCaptureAllTouchAfterStart = value; });
       break;
     }
 
@@ -594,14 +601,16 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH:
     {
-      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mAllowOnlyOwnTouch = value; });
+      CheckValidAndSet<bool>(property, [&actor](bool value)
+                             { actor.mAllowOnlyOwnTouch = value; });
       break;
     }
 
     case Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA:
     {
       CheckValidAndSet<bool>(property,
-                             [&actor](bool value) {
+                             [&actor](bool value)
+                             {
                                actor.mUseTextureUpdateArea = value;
                                UseTextureUpdateAreaMessage(actor.GetEventThreadServices(), actor.GetNode(), value);
                              });
@@ -610,13 +619,25 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION:
     {
-      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mDispatchTouchMotion = value; });
+      CheckValidAndSet<bool>(property, [&actor](bool value)
+                             { actor.mDispatchTouchMotion = value; });
       break;
     }
 
     case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
     {
-      CheckValidAndSet<bool>(property, [&actor](bool value) { actor.mDispatchHoverMotion = value; });
+      CheckValidAndSet<bool>(property, [&actor](bool value)
+                             { actor.mDispatchHoverMotion = value; });
+      break;
+    }
+
+    case Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY:
+    {
+      Dali::DevelActor::ChildrenDepthIndexPolicy::Type depthIndexPolicy = actor.mChildrenDepthIndexPolicy;
+      if(Scripting::GetEnumerationProperty<DevelActor::ChildrenDepthIndexPolicy::Type>(property, CHILDREN_DEPTH_INDEX_POLICY_TABLE, CHILDREN_DEPTH_INDEX_POLICY_TABLE_COUNT, depthIndexPolicy))
+      {
+        actor.SetChildrenDepthIndexPolicy(depthIndexPolicy);
+      }
       break;
     }
 
@@ -1684,6 +1705,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
     case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
     {
       value = actor.mDispatchHoverMotion;
+      break;
+    }
+
+    case Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY:
+    {
+      value = actor.mChildrenDepthIndexPolicy;
       break;
     }
 

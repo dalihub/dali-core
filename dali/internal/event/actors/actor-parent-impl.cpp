@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 #include <dali/devel-api/actors/layer-devel.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -44,7 +44,7 @@ void EmitSignal(Actor& actor, Signal& signal, Param... params)
   }
 }
 
-} //anonymous namespace
+} // anonymous namespace
 
 ActorParentImpl::ActorParentImpl(Actor& owner)
 : mOwner(owner),
@@ -432,10 +432,25 @@ void ActorParentImpl::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths
   // Create/add to children of this node
   if(mChildren)
   {
-    for(const auto& actor : *mChildren)
+    if(mOwner.GetChildrenDepthIndexPolicy() == DevelActor::ChildrenDepthIndexPolicy::INCREASE)
     {
-      ++depthIndex;
-      actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+      for(const auto& actor : *mChildren)
+      {
+        ++depthIndex;
+        actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+      }
+    }
+    else
+    {
+      int32_t       maxDepthIndex   = depthIndex;
+      const int32_t childDepthIndex = ++depthIndex;
+      for(const auto& actor : *mChildren)
+      {
+        depthIndex = childDepthIndex;
+        actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+        maxDepthIndex = std::max(maxDepthIndex, depthIndex);
+      }
+      depthIndex = maxDepthIndex;
     }
   }
 }
@@ -552,7 +567,7 @@ void ActorParentImpl::EmitVisibilityChangedSignalRecursively(
 {
   if(!visible && mOwner.OnScene())
   {
-    //The actor should receive an interrupted event when it is hidden.
+    // The actor should receive an interrupted event when it is hidden.
     mOwner.GetScene().SendInterruptedEvents(&mOwner);
   }
 
@@ -600,7 +615,6 @@ void ActorParentImpl::RequestRenderTaskReorderRecursively()
     }
   }
 }
-
 
 void ActorParentImpl::EmitChildAddedSignal(Actor& child)
 {

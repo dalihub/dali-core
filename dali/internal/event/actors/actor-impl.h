@@ -781,6 +781,13 @@ public:
     mSortedDepth = sortedDepth;
   }
 
+  inline DevelActor::ChildrenDepthIndexPolicy::Type GetChildrenDepthIndexPolicy() const
+  {
+    return mChildrenDepthIndexPolicy;
+  }
+
+  void SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Type childrenDepthIndexPolicy);
+
 public:
   // Size negotiation virtual functions
 
@@ -1878,8 +1885,8 @@ private:
   };
 
   // Remove default constructor and copy constructor
-  Actor()             = delete;
-  Actor(const Actor&) = delete;
+  Actor()                            = delete;
+  Actor(const Actor&)                = delete;
   Actor& operator=(const Actor& rhs) = delete;
 
   /**
@@ -2089,41 +2096,47 @@ protected:
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
 
-  bool mIsRenderTaskMappingActor{false};
-
   int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 
-  const bool               mIsRoot : 1;                    ///< Flag to identify the root actor
-  const bool               mIsLayer : 1;                   ///< Flag to identify that this is a layer
-  bool                     mIsOnScene : 1;                 ///< Flag to identify whether the actor is on-scene
-  bool                     mIsIgnored : 1;                 ///< Flag to identify whether the actor is ignored or not.
-  bool                     mSensitive : 1;                 ///< Whether the actor emits touch event signals
-  bool                     mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
-  bool                     mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation
-  bool                     mKeyboardFocusableChildren : 1; ///< Whether the children of this actor can be focusable by keyboard navigation.
-  bool                     mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
-  bool                     mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
-  bool                     mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
-  bool                     mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
-  bool                     mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.
-  bool                     mPositionUsesAnchorPoint : 1;   ///< Cached: Whether the position uses the anchor point or not.
-  bool                     mVisible : 1;                   ///< Cached: Whether the actor is visible or not.
-  bool                     mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
-  bool                     mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
-  bool                     mIsBlendEquationSet : 1;        ///< Flag to identify whether the Blend equation is set
-  bool                     mNeedGesturePropagation : 1;    ///< Whether the parent listens for gesture events or not
-  bool                     mUserInteractionEnabled : 1;    ///< Whether the actor should be enabled user interaction.
-  bool                     mAllowOnlyOwnTouch : 1;         ///< Whether the actor will only receive own touch. it only receives touches that started from itself.
-  bool                     mUseTextureUpdateArea : 1;      ///< Whether the actor uses the update area of the texture instead of its own.
-  bool                     mDispatchTouchMotion : 1;       ///< Whether to send touch motion events or not.
-  bool                     mDispatchHoverMotion : 1;       ///< Whether to send hover motion events or not.
-  LayoutDirection::Type    mLayoutDirection : 2;           ///< Layout direction, Left to Right or Right to Left.
-  DrawMode::Type           mDrawMode : 3;                  ///< Cached: How the actor and its children should be drawn
-  ColorMode                mColorMode : 3;                 ///< Cached: Determines whether mWorldColor is inherited
-  ClippingMode::Type       mClippingMode : 3;              ///< Cached: Determines which clipping mode (if any) to use.
-  PointState::Type         mHoverState : 3;                ///< Stores the HoverEvent state of actor.
-  DevelBlendEquation::Type mBlendEquation : 16;            ///< Cached: Determines which blend equation will be used to render renderers.
-  uint8_t                  mOffScreenRenderableBitField;   ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
+  const bool mIsRoot : 1;                    ///< Flag to identify the root actor
+  const bool mIsLayer : 1;                   ///< Flag to identify that this is a layer
+  bool       mIsOnScene : 1;                 ///< Flag to identify whether the actor is on-scene
+  bool       mIsIgnored : 1;                 ///< Flag to identify whether the actor is ignored or not.
+  bool       mSensitive : 1;                 ///< Whether the actor emits touch event signals
+  bool       mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
+  bool       mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation
+  bool       mKeyboardFocusableChildren : 1; ///< Whether the children of this actor can be focusable by keyboard navigation.
+  bool       mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
+
+  bool mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
+  bool mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
+  bool mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
+  bool mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.
+  bool mPositionUsesAnchorPoint : 1;   ///< Cached: Whether the position uses the anchor point or not.
+  bool mVisible : 1;                   ///< Cached: Whether the actor is visible or not.
+  bool mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
+  bool mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
+
+  bool mIsBlendEquationSet : 1;     ///< Flag to identify whether the Blend equation is set
+  bool mNeedGesturePropagation : 1; ///< Whether the parent listens for gesture events or not
+  bool mUserInteractionEnabled : 1; ///< Whether the actor should be enabled user interaction.
+  bool mAllowOnlyOwnTouch : 1;      ///< Whether the actor will only receive own touch. it only receives touches that started from itself.
+  bool mUseTextureUpdateArea : 1;   ///< Whether the actor uses the update area of the texture instead of its own.
+  bool mDispatchTouchMotion : 1;    ///< Whether to send touch motion events or not.
+  bool mDispatchHoverMotion : 1;    ///< Whether to send hover motion events or not.
+  bool mIsRenderTaskMappingActor : 1;
+
+  LayoutDirection::Type mLayoutDirection : 2; ///< Layout direction, Left to Right or Right to Left.
+  DrawMode::Type        mDrawMode : 3;        ///< Cached: How the actor and its children should be drawn
+  ColorMode             mColorMode : 3;       ///< Cached: Determines whether mWorldColor is inherited
+
+  DevelActor::ChildrenDepthIndexPolicy::Type mChildrenDepthIndexPolicy : 2; ///< Children's depth index generation policy. Only works under LAYER_UI
+  ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.
+  PointState::Type                           mHoverState : 3;               ///< Stores the HoverEvent state of actor.
+
+  DevelBlendEquation::Type mBlendEquation : 16; ///< Cached: Determines which blend equation will be used to render renderers.
+
+  uint8_t mOffScreenRenderableBitField; ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 
 private:
   static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
