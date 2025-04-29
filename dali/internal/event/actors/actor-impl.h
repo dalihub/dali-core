@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1611,13 +1611,25 @@ public:
   virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward);
 
   /**
-   * @brief Sets OffScreenRenderableType of this Actor.
+   * @brief Register OffScreenRenderableType of this Actor.
    * This method is called by child class to set type itself.
    *
    * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
    * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
+   * @note Each FORWARD / BACKWARD type could be added maxium 15 times.
+   * @post Call UnregisterOffScreenRenderableType() to unregister the type.
    */
-  void SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
+  void RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
+
+  /**
+   * @brief Unregister OffScreenRenderableType of this Actor.
+   * This method is called by child class to set type itself.
+   *
+   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
+   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
+   * @pre Call RegisterOffScreenRenderableType() before unregister the type.
+   */
+  void UnregisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
 
   /**
    * @brief Retrieves OffScreenRenderableType of this Actor.
@@ -2093,12 +2105,10 @@ protected:
   ClippingMode::Type       mClippingMode : 3;              ///< Cached: Determines which clipping mode (if any) to use.
   PointState::Type         mHoverState : 3;                ///< Stores the HoverEvent state of actor.
   DevelBlendEquation::Type mBlendEquation : 16;            ///< Cached: Determines which blend equation will be used to render renderers.
+  uint8_t                  mOffScreenRenderableBitField;   ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 
 private:
   static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
-
-  // OffScreenRenderable
-  OffScreenRenderable::Type mOffScreenRenderableType;
 
   struct PropertyHandler;
   struct SiblingHandler;
@@ -2128,6 +2138,13 @@ inline const Internal::Actor& GetImplementation(const Dali::Actor& actor)
 
   return static_cast<const Internal::Actor&>(handle);
 }
+
+// specialization has to be done in the same namespace
+template<>
+struct EnableBitMaskOperators<OffScreenRenderable::Type>
+{
+  static const bool ENABLE = true;
+};
 
 } // namespace Dali
 

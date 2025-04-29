@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -376,6 +376,12 @@ ActorContainer& GetVisibilityChagnedActorStack()
   static ActorContainer gVisibilityChangedActorStack; ///< Stack of visibility changed actors. Latest actor is the latest visibility changed actor.
   return gVisibilityChangedActorStack;
 }
+
+constexpr uint8_t EMPTY_OFF_SCREEN_RENDERABLE_BIT_FIELD     = 0x00;
+constexpr uint8_t OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK   = 0x0f;
+constexpr uint8_t OFF_SCREEN_RENDERABLE_TYPE_FORWARD_VALUE  = 0x01;
+constexpr uint8_t OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK  = 0xf0;
+constexpr uint8_t OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_VALUE = 0x10;
 
 } // unnamed namespace
 
@@ -1132,14 +1138,38 @@ void Actor::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool i
 {
 }
 
-void Actor::SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
+void Actor::RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
 {
-  mOffScreenRenderableType = offScreenRenderableType;
+  if(offScreenRenderableType & OffScreenRenderable::Type::FORWARD)
+  {
+    DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK) != OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK && "Off screen renderable type forward registered more than 16 times!");
+    mOffScreenRenderableBitField += OFF_SCREEN_RENDERABLE_TYPE_FORWARD_VALUE;
+  }
+  if(offScreenRenderableType & OffScreenRenderable::Type::BACKWARD)
+  {
+    DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK) != OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK && "Off screen renderable type backward registered more than 16 times!");
+    mOffScreenRenderableBitField += OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_VALUE;
+  }
+}
+
+void Actor::UnregisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
+{
+  if(offScreenRenderableType & OffScreenRenderable::Type::FORWARD)
+  {
+    DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK) != 0 && "Off screen renderable type forward not registered before!");
+    mOffScreenRenderableBitField -= OFF_SCREEN_RENDERABLE_TYPE_FORWARD_VALUE;
+  }
+  if(offScreenRenderableType & OffScreenRenderable::Type::BACKWARD)
+  {
+    DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK) != 0 && "Off screen renderable type backward not registered before!");
+    mOffScreenRenderableBitField -= OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_VALUE;
+  }
 }
 
 OffScreenRenderable::Type Actor::GetOffScreenRenderableType() const
 {
-  return mOffScreenRenderableType;
+  return ((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK) ? OffScreenRenderable::Type::FORWARD : OffScreenRenderable::Type::NONE) |
+         ((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK) ? OffScreenRenderable::Type::BACKWARD : OffScreenRenderable::Type::NONE);
 }
 
 void Actor::RequestRenderTaskReorder()
@@ -1241,7 +1271,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mClippingMode(ClippingMode::DISABLED),
   mHoverState(PointState::FINISHED),
   mBlendEquation(DevelBlendEquation::ADD),
-  mOffScreenRenderableType(OffScreenRenderable::Type::NONE)
+  mOffScreenRenderableBitField(EMPTY_OFF_SCREEN_RENDERABLE_BIT_FIELD)
 {
 }
 
