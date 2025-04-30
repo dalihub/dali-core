@@ -283,10 +283,7 @@ bool TapGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, 
 
 void TapGestureDetector::CancelProcessing()
 {
-  if(mGestureRecognizer)
-  {
-    mGestureRecognizer->CancelEvent();
-  }
+  // The tap gesture is not continuous. Since it is a gesture that occurs when up, CancelProcessing is not needed.
 }
 
 // This is an API that is called by FeedTouch and recognizes gestures directly from the Detector without going through the Reconizer.

@@ -81,6 +81,8 @@ GestureDetector::~GestureDetector()
       mGestureEventProcessor.RemoveGestureDetector(this);
     }
   }
+
+  mGestureRecognizer = nullptr;
 }
 
 void GestureDetector::Attach(Actor& actor)
@@ -338,7 +340,6 @@ void GestureDetector::SetDetected(bool detected)
 
 void GestureDetector::Clear()
 {
-  mGestureRecognizer = nullptr;
   mGestureEventProcessor.UnregisterGestureDetector(this);
   SetDetected(false);
 }
