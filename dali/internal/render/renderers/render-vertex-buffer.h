@@ -209,7 +209,7 @@ public:
 
   [[nodiscard]] inline bool IsDataChanged() const
   {
-    return mDataChanged;
+    return mDataChanged || mVertexBufferUpdateCallback;
   }
 
 private:
