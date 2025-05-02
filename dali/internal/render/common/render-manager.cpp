@@ -541,6 +541,7 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
+  DALI_LOG_RELEASE_INFO("InitializeScene %p\n", scene);
   scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
   mImpl->sceneContainer.push_back(scene);
   mImpl->uniformBufferManager->RegisterScene(scene);
@@ -548,6 +549,7 @@ void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 
 void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 {
+  DALI_LOG_RELEASE_INFO("UninitializeScene %p\n", scene);
   mImpl->uniformBufferManager->UnregisterScene(scene);
   auto iter = std::find(mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), scene);
   if(iter != mImpl->sceneContainer.end())
@@ -1010,9 +1012,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
-  if(!sceneObject)
+  if(!sceneObject || !sceneObject->GetSurfaceRenderTarget())
   {
-    DALI_LOG_ERROR("Scene was empty handle. Skip rendering\n");
+    DALI_LOG_ERROR("Scene was empty handle, or render target is null. Skip rendering (scene : %p, renderTarget : %p)\n", sceneObject, sceneObject ? sceneObject->GetSurfaceRenderTarget() : nullptr);
     return;
   }
   DALI_LOG_INFO(gLogFilter, Debug::General, "No early out\n");
@@ -1115,7 +1117,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
 
   auto sceneRenderTarget = sceneObject->GetSurfaceRenderTarget();
-  if(!renderToFbo)
+  if(!renderToFbo && sceneRenderTarget)
   {
     mImpl->graphicsController.EnableDepthStencilBuffer(*sceneRenderTarget, sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
   }
