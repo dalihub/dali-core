@@ -541,6 +541,7 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
+  DALI_LOG_RELEASE_INFO("InitializeScene %p\n", scene);
   scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
   mImpl->sceneContainer.push_back(scene);
   mImpl->uniformBufferManager->RegisterScene(scene);
@@ -548,6 +549,7 @@ void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 
 void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 {
+  DALI_LOG_RELEASE_INFO("UninitializeScene %p\n", scene);
   mImpl->uniformBufferManager->UnregisterScene(scene);
   auto iter = std::find(mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), scene);
   if(iter != mImpl->sceneContainer.end())
@@ -1115,7 +1117,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
 
   auto sceneRenderTarget = sceneObject->GetSurfaceRenderTarget();
-  if(!renderToFbo)
+  if(!renderToFbo && sceneRenderTarget)
   {
     mImpl->graphicsController.EnableDepthStencilBuffer(*sceneRenderTarget, sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
   }
@@ -1420,6 +1422,10 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
     DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
     auto renderTarget = sceneObject->GetSurfaceRenderTarget();
+    if(!renderTarget)
+    {
+      DALI_LOG_ERROR("Scene %p render target is null!!! Maybe memory corrupction happened!!\n", sceneObject);
+    }
     mImpl->graphicsController.PresentRenderTarget(renderTarget);
     DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
   }
