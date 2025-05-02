@@ -317,12 +317,14 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
+  DALI_LOG_RELEASE_INFO("InitializeScene %p\n", scene);
   scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
   mImpl->sceneContainer.push_back(scene);
 }
 
 void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 {
+  DALI_LOG_RELEASE_INFO("UninitializeScene %p\n", scene);
   auto iter = std::find(mImpl->sceneContainer.begin(), mImpl->sceneContainer.end(), scene);
   if(iter != mImpl->sceneContainer.end())
   {
@@ -501,7 +503,7 @@ void RenderManager::PreRender(Integration::Scene& scene, std::vector<Rect<int>>&
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
 
-  if(!sceneObject || sceneObject->IsRenderingSkipped())
+  if(!sceneObject || !sceneObject->GetSurfaceRenderTarget() || sceneObject->IsRenderingSkipped())
   {
     // We don't need to calculate dirty rects
     return;
@@ -769,7 +771,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
-  if(!sceneObject)
+  if(!sceneObject || !sceneObject->GetSurfaceRenderTarget())
   {
     return;
   }
