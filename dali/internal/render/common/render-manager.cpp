@@ -705,10 +705,10 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   Internal::Scene& sceneInternal = GetImplementation(scene);
   Scene*           sceneObject   = sceneInternal.GetSceneObject();
 
-  if(!sceneObject)
+  if(!sceneObject || !sceneObject->GetSurfaceRenderTarget())
   {
     // May not be a scene object if the window is being removed.
-    DALI_LOG_ERROR("Scene was empty handle. Skip PreRenderScene\n");
+    DALI_LOG_ERROR("Scene was empty handle, or render target is null. Skip PreRenderScene (scene : %p, renderTarget : %p)\n", sceneObject, sceneObject ? sceneObject->GetSurfaceRenderTarget() : nullptr);
     return;
   }
 
@@ -1439,9 +1439,10 @@ void RenderManager::ClearScene(Integration::Scene scene)
 {
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
-  if(!sceneObject)
+  if(!sceneObject || !sceneObject->GetSurfaceRenderTarget())
   {
-    DALI_LOG_ERROR("Scene was empty handle. Skip ClearScene\n");
+    // May not be a scene object if the window is being removed.
+    DALI_LOG_ERROR("Scene was empty handle, or render target is null. Skip ClearScene (scene : %p, renderTarget : %p)\n", sceneObject, sceneObject ? sceneObject->GetSurfaceRenderTarget() : nullptr);
     return;
   }
 
