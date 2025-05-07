@@ -81,7 +81,8 @@ enum Flags
   RESEND_WRITE_TO_COLOR_BUFFER       = 1 << 18,
   RESEND_SHADER                      = 1 << 19,
   RESEND_DRAW_COMMANDS               = 1 << 20,
-  RESEND_SET_RENDER_CALLBACK         = 1 << 21
+  RESEND_SET_RENDER_CALLBACK         = 1 << 21,
+  RESEND_SHARED_UNIFORM_BLOCK_USED   = 1 << 22,
 };
 
 inline Vector4 AdjustExtents(const Vector4& updateArea, const Dali::Extents& updateAreaExtents)
@@ -135,6 +136,7 @@ Renderer::Renderer()
   mVisualPropertiesDirtyFlags(CLEAN_FLAG),
   mRegenerateUniformMap(false),
   mPremultipledAlphaEnabled(false),
+  mUseSharedUniformBlock(true),
   mMixColor(Color::WHITE),
   mDepthIndex(0)
 {
@@ -352,6 +354,13 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
       using DerivedType = MessageValue1<Render::Renderer, Dali::RenderCallback*>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
       new(slot) DerivedType(rendererPtr, &Render::Renderer::SetRenderCallback, mRenderCallback);
+    }
+
+    if(mResendFlag & RESEND_SHARED_UNIFORM_BLOCK_USED)
+    {
+      using DerivedType = MessageValue1<Render::Renderer, bool>;
+      uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
+      new(slot) DerivedType(rendererPtr, &Render::Renderer::EnableSharedUniformBlock, mUseSharedUniformBlock);
     }
     mResendFlag = 0;
   }
@@ -921,6 +930,16 @@ void Renderer::AddInitializeResetter(ResetterManager& manager) const
 const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
 {
   return mCollectedUniformMap;
+}
+
+void Renderer::EnableSharedUniformBlock(bool enabled)
+{
+  if(mUseSharedUniformBlock != enabled)
+  {
+    mUseSharedUniformBlock = enabled;
+    mResendFlag |= RESEND_SHARED_UNIFORM_BLOCK_USED;
+    SetUpdated(true);
+  }
 }
 
 bool Renderer::IsUpdated() const

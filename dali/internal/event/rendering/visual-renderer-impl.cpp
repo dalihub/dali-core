@@ -25,6 +25,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/animatable-property-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/rendering/scene-graph-renderer-messages.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/object/type-registry.h>
 
@@ -522,6 +523,10 @@ void VisualRenderer::RegisterVisualTransformUniform()
 {
   if(!mUniformMapped)
   {
+    // Mark as we will not use shared uniform block.
+    // TODO : Currently, we ignore whole shared uniform blocks. We should specify the name of UBO in future.
+    EnableSharedUniformBlockMessage(GetEventThreadServices(), GetRendererSceneObject(), false);
+
     mUniformMapped = true;
     AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_OFFSET, ConstString("offset"));
     AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_SIZE, ConstString("size"));

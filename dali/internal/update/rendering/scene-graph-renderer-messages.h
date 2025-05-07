@@ -330,6 +330,13 @@ inline void SetUpdateAreaExtentsMessage(EventThreadServices& eventThreadServices
   new(slot) LocalType(&renderer, &SceneGraph::Renderer::SetUpdateAreaExtents, updateAreaExtents);
 }
 
+inline void EnableSharedUniformBlockMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, bool enabled)
+{
+  using LocalType = MessageValue1<Renderer, bool>;
+  uint32_t* slot  = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+  new(slot) LocalType(&renderer, &Renderer::EnableSharedUniformBlock, enabled);
+}
+
 } // namespace Dali::Internal::SceneGraph
 
 #endif //DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H

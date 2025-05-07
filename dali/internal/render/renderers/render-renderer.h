@@ -550,6 +550,28 @@ public:
    */
   Vector4 GetTextureUpdateArea() const noexcept;
 
+  /**
+   * @brief Mark whether we should consider shared uniform block, or ignore it.
+   * @todo Currently, we ignore whole shared uniform blocks. We should specify the name of UBO in future.
+   *
+   * @param[in] enabled True if we will use shared uniform block. False otherwise.
+   */
+  void EnableSharedUniformBlock(bool enabled)
+  {
+    mUseSharedUniformBlock = enabled;
+  }
+
+  /**
+   * @brief Check whether we should consider shared uniform block, or ignore it.
+   * @todo Currently, we ignore whole shared uniform blocks. We should specify the name of UBO in future.
+   *
+   * @return True if we will use shared uniform block. False otherwise.
+   */
+  [[nodiscard]] bool UseSharedUniformBlock() const
+  {
+    return mUseSharedUniformBlock;
+  }
+
 public: // From Program::LifecycleObserver
   /**
    * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
@@ -731,6 +753,7 @@ private:
   bool                  mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                  mShaderChanged : 1;             ///< Flag indicating the shader changed and uniform maps have to be updated
   bool                  mPipelineCached : 1;            ///< Flag indicating whether renderer cache valid pipeline or not.
+  bool                  mUseSharedUniformBlock : 1;     ///< Flag whether we should use shared uniform block or not. Usually it must be true.
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
   RenderCallback*                               mRenderCallback{nullptr};

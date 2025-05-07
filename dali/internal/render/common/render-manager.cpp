@@ -1104,6 +1104,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
               totalSizeCPU += memoryRequirements.totalCpuSizeRequired;
               totalSizeGPU += memoryRequirements.totalGpuSizeRequired;
+
+              if(!item.mRenderer->UseSharedUniformBlock())
+              {
+                totalSizeGPU += memoryRequirements.sharedGpuSizeRequired;
+              }
             }
           }
         }
