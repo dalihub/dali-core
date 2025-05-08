@@ -27,9 +27,21 @@ Debug::Filter* gUniformBufferLogFilter = Debug::Filter::New(Debug::NoLogging, fa
 
 namespace Dali::Internal::Render
 {
+namespace
+{
 // GPU UBOs need to be double-buffered in order to avoid stalling the CPU during mapping/unmapping
 constexpr uint32_t INTERNAL_UBO_BUFFER_COUNT = 2u;
 constexpr uint32_t DEFAUT_MEMORY_ALIGNMENT{1};
+
+/**
+ * Align size to the current block size.
+ */
+int AlignSize(int size, int align)
+{
+  return (size % align == 0) ? size : ((size / align) + 1) * align;
+}
+
+} // namespace
 
 Graphics::UniquePtr<UniformBufferV2> UniformBufferV2::New(Dali::Graphics::Controller* controller, bool emulated, uint32_t alignment)
 {
@@ -137,12 +149,12 @@ uint32_t UniformBufferV2::IncrementOffsetBy(uint32_t value)
 {
   if(mEmulated && !mBufferList.empty())
   {
-    mBufferList[mCurrentGraphicsBufferIndex].currentOffset += value; // reset offset
+    mBufferList[mCurrentGraphicsBufferIndex].currentOffset += AlignSize(value, mBlockAlignment); // reset offset
     return mBufferList[mCurrentGraphicsBufferIndex].currentOffset;
   } // GPU
   else if(!mBufferList.empty())
   {
-    mBufferList[mCurrentGraphicsBufferIndex].currentOffset += value; // reset offset
+    mBufferList[mCurrentGraphicsBufferIndex].currentOffset += AlignSize(value, mBlockAlignment); // reset offset
     return mBufferList[mCurrentGraphicsBufferIndex].currentOffset;
   }
   DALI_LOG_INFO(gUniformBufferLogFilter, Debug::General, "Buffer should be allocated before incrementing offset\n");

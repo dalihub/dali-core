@@ -245,7 +245,7 @@ int UtcDaliAnimationMoveConstructor(void)
 {
   TestApplication application;
 
-  //Animation
+  // Animation
 
   Animation animation = Animation::New(1.0f);
   DALI_TEST_CHECK(animation);
@@ -1665,7 +1665,7 @@ int UtcDaliAnimationSetCurrentProgressP(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
@@ -1693,7 +1693,7 @@ int UtcDaliAnimationSetCurrentProgressP(void)
   animation.Play(); // Test that calling play has no effect, when animation is already playing
   application.SendNotification();
 
-  //Set the progress to 70%
+  // Set the progress to 70%
   animation.SetCurrentProgress(0.7f);
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 100.0f) /* 80% progress */);
@@ -1728,7 +1728,7 @@ int UtcDaliAnimationSetCurrentProgressN(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
@@ -1740,7 +1740,7 @@ int UtcDaliAnimationSetCurrentProgressN(void)
   Vector3 targetPosition(100.0f, 100.0f, 100.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
-  //Trying to set the current cursor outside the range [0..1] is ignored
+  // Trying to set the current cursor outside the range [0..1] is ignored
   animation.SetCurrentProgress(-1.0f);
   application.SendNotification();
   DALI_TEST_EQUALS(0.0f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -1762,17 +1762,17 @@ int UtcDaliAnimationGetCurrentProgressP(void)
   Animation animation = Animation::New(0.0f);
   animation.Play();
 
-  //Test GetCurrentProgress return 0.0 as the duration is 0.0
+  // Test GetCurrentProgress return 0.0 as the duration is 0.0
   DALI_TEST_EQUALS(0.0f, animation.GetCurrentProgress(), TEST_LOCATION);
 
   animation.SetCurrentProgress(0.5f);
   application.SendNotification();
   application.Render(static_cast<unsigned int>(100.0f));
 
-  //Progress should still be 0.0
+  // Progress should still be 0.0
   DALI_TEST_EQUALS(0.0f, animation.GetCurrentProgress(), TEST_LOCATION);
 
-  //Set duration
+  // Set duration
   float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
   application.SendNotification();
@@ -1800,7 +1800,7 @@ int UtcDaliAnimationGetCurrentProgressP(void)
   animation.Play(); // Test that calling play has no effect, when animation is already playing
   application.SendNotification();
 
-  //Set the progress to 70%
+  // Set the progress to 70%
   animation.SetCurrentProgress(0.7f);
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 100.0f) /* 80% progress */);
@@ -1838,7 +1838,7 @@ int UtcDaliAnimationSetSpeedFactorP1(void)
   keyframes.Add(1.0f, targetPosition);
   animation.AnimateBetween(Property(actor, Actor::Property::POSITION), keyframes, AlphaFunction::LINEAR);
 
-  //Set speed to be x2
+  // Set speed to be x2
   animation.SetSpeedFactor(2.0f);
 
   // Start the animation
@@ -1978,7 +1978,7 @@ int UtcDaliAnimationSetSpeedFactorP3(void)
 
   tet_printf("Test half speed factor. Animation will take twice the duration\n");
 
-  //Set speed to be half of normal speed
+  // Set speed to be half of normal speed
   animation.SetSpeedFactor(0.5f);
 
   // Start the animation
@@ -2610,7 +2610,7 @@ int UtcDaliAnimationSetPlayRangeN(void)
   Animation animation = Animation::New(0);
   application.SendNotification();
 
-  //PlayRange out of bounds
+  // PlayRange out of bounds
   animation.SetPlayRange(Vector2(-1.0f, 1.0f));
   application.SendNotification();
   DALI_TEST_EQUALS(Vector2(0.0f, 1.0f), animation.GetPlayRange(), TEST_LOCATION);
@@ -2618,7 +2618,7 @@ int UtcDaliAnimationSetPlayRangeN(void)
   application.SendNotification();
   DALI_TEST_EQUALS(Vector2(0.0f, 1.0f), animation.GetPlayRange(), TEST_LOCATION);
 
-  //If playRange is not in the correct order it has to be ordered
+  // If playRange is not in the correct order it has to be ordered
   animation.SetPlayRange(Vector2(0.8f, 0.2f));
   application.SendNotification();
   DALI_TEST_EQUALS(Vector2(0.2f, 0.8f), animation.GetPlayRange(), TEST_LOCATION);
@@ -2637,7 +2637,7 @@ int UtcDaliAnimationGetPlayRangeP(void)
   Animation animation = Animation::New(1.0f);
   application.SendNotification();
 
-  //If PlayRange not specified it should be 0.0-1.0 by default
+  // If PlayRange not specified it should be 0.0-1.0 by default
   DALI_TEST_EQUALS(Vector2(0.0f, 1.0f), animation.GetPlayRange(), TEST_LOCATION);
 
   // Set range between 0.4 and 0.8
@@ -3256,7 +3256,7 @@ int UtcDaliAnimationPlayRangeP(void)
   AnimationFinishCheck finishCheck(signalReceived);
   animation.FinishedSignal().Connect(&application, finishCheck);
 
-  //Test that setting progress outside the range doesn't work
+  // Test that setting progress outside the range doesn't work
   animation.SetCurrentProgress(0.9f);
   application.SendNotification();
   application.Render(0);
@@ -3289,7 +3289,7 @@ int UtcDaliAnimationPlayRangeP(void)
   application.Render(0);
   DALI_TEST_EQUALS(targetPosition * 0.8f, actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
 
-  //Loop inside the range
+  // Loop inside the range
   finishCheck.Reset();
   animation.SetLooping(true);
   animation.Play();
@@ -3313,7 +3313,7 @@ int UtcDaliAnimationPlayRangeP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
 
-  //Test change range on the fly
+  // Test change range on the fly
   animation.SetPlayRange(Vector2(0.2f, 0.9f));
   application.SendNotification();
 
@@ -3402,7 +3402,7 @@ int UtcDaliAnimationPlayFromN(void)
   Vector3   targetPosition(100.0f, 100.0f, 100.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
-  //PlayFrom with an argument outside the range [0..1] will be ignored
+  // PlayFrom with an argument outside the range [0..1] will be ignored
   animation.PlayFrom(-1.0f);
   application.SendNotification();
   DALI_TEST_EQUALS(0.0f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -10811,7 +10811,7 @@ int UtcDaliAnimationAnimateBetweenActorVisibleCubicP(void)
   keyFrames.Add(0.8f, false);
   keyFrames.Add(1.0f, true);
 
-  //Cubic interpolation for boolean values should be ignored
+  // Cubic interpolation for boolean values should be ignored
   animation.AnimateBetween(Property(actor, Actor::Property::VISIBLE), keyFrames, Animation::CUBIC);
 
   // Start the animation
@@ -10964,7 +10964,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation01CubicP(void)
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, AngleAxis(Degree(60), Vector3::ZAXIS));
 
-  //Cubic interpolation should be ignored for quaternions
+  // Cubic interpolation should be ignored for quaternions
   animation.AnimateBetween(Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::CUBIC);
 
   // Start the animation
@@ -11010,7 +11010,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation02CubicP(void)
   keyFrames.Add(0.5f, AngleAxis(Degree(120), Vector3::XAXIS));
   keyFrames.Add(1.0f, AngleAxis(Degree(120), Vector3::YAXIS));
 
-  //Cubic interpolation should be ignored for quaternions
+  // Cubic interpolation should be ignored for quaternions
   animation.AnimateBetween(Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::CUBIC);
 
   // Start the animation
@@ -11542,7 +11542,7 @@ int UtcDaliAnimationAnimateP(void)
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
 
-  //Build the path
+  // Build the path
   Vector3 position0(30.0, 80.0, 0.0);
   Vector3 position1(70.0, 120.0, 0.0);
   Vector3 position2(100.0, 100.0, 0.0);
@@ -11552,11 +11552,11 @@ int UtcDaliAnimationAnimateP(void)
   path.AddPoint(position1);
   path.AddPoint(position2);
 
-  //Control points for first segment
+  // Control points for first segment
   path.AddControlPoint(Vector3(39.0, 90.0, 0.0));
   path.AddControlPoint(Vector3(56.0, 119.0, 0.0));
 
-  //Control points for second segment
+  // Control points for second segment
   path.AddControlPoint(Vector3(78.0, 120.0, 0.0));
   path.AddControlPoint(Vector3(93.0, 104.0, 0.0));
 
@@ -11621,7 +11621,7 @@ int UtcDaliAnimationAnimateAlphaFunctionP(void)
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
 
-  //Build the path
+  // Build the path
   Vector3 position0(30.0, 80.0, 0.0);
   Vector3 position1(70.0, 120.0, 0.0);
   Vector3 position2(100.0, 100.0, 0.0);
@@ -11631,11 +11631,11 @@ int UtcDaliAnimationAnimateAlphaFunctionP(void)
   path.AddPoint(position1);
   path.AddPoint(position2);
 
-  //Control points for first segment
+  // Control points for first segment
   path.AddControlPoint(Vector3(39.0, 90.0, 0.0));
   path.AddControlPoint(Vector3(56.0, 119.0, 0.0));
 
-  //Control points for second segment
+  // Control points for second segment
   path.AddControlPoint(Vector3(78.0, 120.0, 0.0));
   path.AddControlPoint(Vector3(93.0, 104.0, 0.0));
 
@@ -11700,7 +11700,7 @@ int UtcDaliAnimationAnimateTimePeriodP(void)
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
 
-  //Build the path
+  // Build the path
   Vector3 position0(30.0, 80.0, 0.0);
   Vector3 position1(70.0, 120.0, 0.0);
   Vector3 position2(100.0, 100.0, 0.0);
@@ -11710,11 +11710,11 @@ int UtcDaliAnimationAnimateTimePeriodP(void)
   path.AddPoint(position1);
   path.AddPoint(position2);
 
-  //Control points for first segment
+  // Control points for first segment
   path.AddControlPoint(Vector3(39.0, 90.0, 0.0));
   path.AddControlPoint(Vector3(56.0, 119.0, 0.0));
 
-  //Control points for second segment
+  // Control points for second segment
   path.AddControlPoint(Vector3(78.0, 120.0, 0.0));
   path.AddControlPoint(Vector3(93.0, 104.0, 0.0));
 
@@ -11779,7 +11779,7 @@ int UtcDaliAnimationAnimateAlphaFunctionTimePeriodP(void)
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
 
-  //Build the path
+  // Build the path
   Vector3 position0(30.0, 80.0, 0.0);
   Vector3 position1(70.0, 120.0, 0.0);
   Vector3 position2(100.0, 100.0, 0.0);
@@ -11789,11 +11789,11 @@ int UtcDaliAnimationAnimateAlphaFunctionTimePeriodP(void)
   path.AddPoint(position1);
   path.AddPoint(position2);
 
-  //Control points for first segment
+  // Control points for first segment
   path.AddControlPoint(Vector3(39.0, 90.0, 0.0));
   path.AddControlPoint(Vector3(56.0, 119.0, 0.0));
 
-  //Control points for second segment
+  // Control points for second segment
   path.AddControlPoint(Vector3(78.0, 120.0, 0.0));
   path.AddControlPoint(Vector3(93.0, 104.0, 0.0));
 
@@ -12355,7 +12355,7 @@ int UtcDaliAnimationSetAndGetTargetBeforePlayP(void)
   // Build the animation
   Animation animation = Animation::New(2.0f);
 
-  //Test GetCurrentProgress return 0.0 as the duration is 0.0
+  // Test GetCurrentProgress return 0.0 as the duration is 0.0
   DALI_TEST_EQUALS(0.0f, animation.GetCurrentProgress(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
 
@@ -12420,7 +12420,7 @@ int UtcDaliAnimationSetAndGetTargetBeforePlayMulitpleAnimatorsPositionP(void)
   // Build the animation
   Animation animation = Animation::New(2.0f);
 
-  //Test GetCurrentProgress return 0.0 as the duration is 0.0
+  // Test GetCurrentProgress return 0.0 as the duration is 0.0
   DALI_TEST_EQUALS(0.0f, animation.GetCurrentProgress(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector3(0.0f, 0.0f, 0.0f), actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
 
@@ -12824,7 +12824,7 @@ int UtcDaliAnimationProgressCallbackP(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
@@ -13105,7 +13105,7 @@ int UtcDaliAnimationPlayAfterP2(void)
     float     durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
     animation.SetLooping(true);
-    animation.SetSpeedFactor(-1.0f); //Set SpeedFactor as < 0
+    animation.SetSpeedFactor(-1.0f); // Set SpeedFactor as < 0
 
     bool                 signalReceived(false);
     AnimationFinishCheck finishCheck(signalReceived);
@@ -13843,7 +13843,7 @@ int UtcDaliAnimationProgressSignalConnectionWithoutProgressMarkerP(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
@@ -13896,7 +13896,7 @@ int UtcDaliAnimationMultipleProgressSignalsP(void)
   Animation animationAlpha = Animation::New(0.0f);
   Animation animationBeta  = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   float durationSeconds(1.0f);
   animationAlpha.SetDuration(durationSeconds);
   animationBeta.SetDuration(durationSeconds);
@@ -14004,7 +14004,7 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
   Animation animationAlpha = Animation::New(0.0f);
   Animation animationBeta  = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   const float durationSeconds(1.0f);
   animationAlpha.SetDuration(durationSeconds);
   animationBeta.SetDuration(durationSeconds);
@@ -14119,7 +14119,7 @@ int UtcDaliAnimationProgressSignalWithPlayAfterP(void)
   Animation animationAlpha = Animation::New(0.0f);
   Animation animationBeta  = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   float durationSeconds(1.0f);
   float delaySeconds(0.5f);
   animationAlpha.SetDuration(durationSeconds);
@@ -14229,7 +14229,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   const float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
@@ -14296,7 +14296,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
-    //Nothing check at 100% progress. cause It can be both 100% and 0%.
+    // Nothing check at 100% progress. cause It can be both 100% and 0%.
     application.SendNotification();
   }
   application.Render(10u);
@@ -14319,7 +14319,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   const float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
@@ -14383,7 +14383,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
-    //Nothing check at 100% progress. cause It can be both 100% and 0%.
+    // Nothing check at 100% progress. cause It can be both 100% and 0%.
     finishCheck.CheckSignalNotReceived();
     application.SendNotification();
   }
@@ -14412,11 +14412,11 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   const float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
-  //Set speed negative
+  // Set speed negative
   animation.SetSpeedFactor(-1.0f);
 
   // Set Looping Unlmited
@@ -14482,7 +14482,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
-    //Nothing check at 100% progress. cause It can be both 100% and 0%.
+    // Nothing check at 100% progress. cause It can be both 100% and 0%.
     finishCheck.CheckSignalNotReceived();
     application.SendNotification();
   }
@@ -14537,7 +14537,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
-    //Nothing check at 100% progress. cause It can be both 100% and 0%.
+    // Nothing check at 100% progress. cause It can be both 100% and 0%.
     application.SendNotification();
   }
   application.Render(10u);
@@ -14560,7 +14560,7 @@ int UtcDaliAnimationProgressCallbackInvalidSignalN(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   const float durationSeconds(1.0f);
   animation.SetDuration(durationSeconds);
 
@@ -14635,7 +14635,7 @@ int UtcDaliAnimationProgressCallbackLongDurationP(void)
   // Build the animation
   Animation animation = Animation::New(0.0f);
 
-  //Set duration
+  // Set duration
   float durationSeconds(5.0f);
   animation.SetDuration(durationSeconds);
 
@@ -17453,6 +17453,241 @@ int UtcDaliAnimationStressTest(void)
 
   // Restart the animation, with a different duration
   finishCheck.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSpringFinished(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimation spring test finished in expected time.");
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
+  application.GetScene().Add(actor);
+
+  SpringData springData{100.0f, 10.0f, 1.0f};
+  float      convergeDuration = SpringData::GetDuration(springData);
+  DALI_TEST_CHECK(convergeDuration < 2.0f);
+  tet_printf("convergeDuration : %f\n", convergeDuration);
+
+  Animation animation         = Animation::New(convergeDuration);
+  animation.AnimateTo(Property(actor, Dali::Actor::Property::POSITION_X), 100.0f, AlphaFunction(springData));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(400);
+  tet_printf("400ms : %f\n", actor.GetCurrentProperty<float>(Actor::Property::POSITION_X));
+  DALI_TEST_CHECK(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X) > 100.0f);
+
+  application.SendNotification();
+  application.Render(400);
+  tet_printf("800ms : %f\n", actor.GetCurrentProperty<float>(Actor::Property::POSITION_X));
+  DALI_TEST_CHECK(actor.GetCurrentProperty<float>(Actor::Property::POSITION_X) < 100.0f);
+
+  application.SendNotification();
+  application.Render(600);
+  tet_printf("1400ms : %f\n", actor.GetCurrentProperty<float>(Actor::Property::POSITION_X));
+  DALI_TEST_EQUALS(100.0f, actor.GetCurrentProperty<float>(Actor::Property::POSITION_X), 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSpringSetGet(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimation spring test finished in expected time.");
+
+  AlphaFunction springGentle(AlphaFunction::SpringType::GENTLE);
+  DALI_TEST_EQUALS(100.0f, springGentle.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(15.0f, springGentle.GetSpringData().damping, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springGentle.GetSpringData().mass, 0.01f, TEST_LOCATION);
+
+  AlphaFunction springQuick(AlphaFunction::SpringType::QUICK);
+  DALI_TEST_EQUALS(300.0f, springQuick.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(20.0f, springQuick.GetSpringData().damping, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springQuick.GetSpringData().mass, 0.01f, TEST_LOCATION);
+
+  AlphaFunction springBouncy(AlphaFunction::SpringType::BOUNCY);
+  DALI_TEST_EQUALS(600.0f, springBouncy.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(15.0f, springBouncy.GetSpringData().damping, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springBouncy.GetSpringData().mass, 0.01f, TEST_LOCATION);
+
+  AlphaFunction springSlow(AlphaFunction::SpringType::SLOW);
+  DALI_TEST_EQUALS(94.0f, springSlow.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(18.5f, springSlow.GetSpringData().damping, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springSlow.GetSpringData().mass, 0.01f, TEST_LOCATION);
+
+  AlphaFunction springCustom1({-10.0f, -9.0f, -8.0f});
+  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().damping, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().mass, 0.01f, TEST_LOCATION);
+
+  AlphaFunction springCustom2({10.0f, 9.0f, 8.0f});
+  DALI_TEST_EQUALS(10.0f, springCustom2.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(9.0f, springCustom2.GetSpringData().damping, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(8.0f, springCustom2.GetSpringData().mass, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSpringPreset(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimation spring test, preset case");
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
+  application.GetScene().Add(actor);
+
+  Animation animation = Animation::New(1.0f);
+  animation.AnimateTo(Property(actor, Dali::Actor::Property::POSITION_X), 100.0f, AlphaFunction(Dali::AlphaFunction::SpringType::SLOW));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(200);
+  float position200 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position200 > 0.0f);
+
+  application.SendNotification();
+  application.Render(200);
+  float position400 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position200 < position400);
+
+  application.SendNotification();
+  application.Render(200);
+  float position600 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position400 < position600);
+
+  application.SendNotification();
+  application.Render(200);
+  float position800 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position600 < position800);
+
+  application.SendNotification();
+  application.Render(200);
+  float position1000 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position800 < position1000);
+  tet_infoline("800 : %f, 1000 : %f position800, position1000");
+  DALI_TEST_EQUALS(100.0f, position1000, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSpringOverdamped(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimation spring test, overdamped case");
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
+  application.GetScene().Add(actor);
+
+  SpringData springData{80.0f, 20.0f, 1.0f};
+  float      convergeDuration = SpringData::GetDuration(springData);
+  DALI_TEST_CHECK(convergeDuration > 0.0f);
+
+  Animation animation = Animation::New(convergeDuration);
+  animation.AnimateTo(Property(actor, Dali::Actor::Property::POSITION_X), 100.0f, AlphaFunction(springData));
+  animation.Play();
+
+  uint32_t timestep = static_cast<uint32_t>(convergeDuration * 0.2f * 1000.0f);
+
+  application.SendNotification();
+  application.Render(timestep);
+  float position200 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position200 > 0.0f);
+
+  application.SendNotification();
+  application.Render(timestep);
+  float position400 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position200 < position400);
+
+  application.SendNotification();
+  application.Render(timestep);
+  float position600 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position400 < position600);
+
+  application.SendNotification();
+  application.Render(timestep);
+  float position800 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position600 < position800);
+
+  application.SendNotification();
+  application.Render(timestep);
+  float position1000 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position800 < position1000);
+  DALI_TEST_EQUALS(99.8f, position1000, 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSpringUnderdamped(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliAnimation spring test, overdamped case");
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
+  application.GetScene().Add(actor);
+
+  SpringData springData{600.0f, 15.0f, 1.0f};
+  float      convergeDuration = SpringData::GetDuration(springData);
+  DALI_TEST_CHECK(convergeDuration > 0.0f);
+  tet_printf("convergeDuration : %f\n", convergeDuration);
+
+  Animation animation = Animation::New(convergeDuration);
+  animation.AnimateTo(Property(actor, Dali::Actor::Property::POSITION_X), 100.0f, AlphaFunction(springData));
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(50);
+  float position50 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position50 > 0.0f);
+  DALI_TEST_CHECK(position50 < 100.0f);
+
+  application.SendNotification();
+  application.Render(100); // 150ms
+  float position150 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position150 > 100.0f);
+
+  application.SendNotification();
+  application.Render(150); // 300ms
+  float position300 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position300 < 100.0f);
+
+  application.SendNotification();
+  application.Render(150); // 450ms
+  float position450 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position450 > 100.0f);
+
+  application.SendNotification();
+  application.Render(100); // 550ms
+  float position550 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position550 < 100.0f);
+
+  application.SendNotification();
+  application.Render(150); // 700ms
+  float position700 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position700 > 100.0f);
+
+  application.SendNotification();
+  application.Render(150); // 850ms
+  float position850 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_CHECK(position850 < 100.0f);
+
+  application.SendNotification();
+  application.Render(150); // 1000ms
+  float position1000 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
+  DALI_TEST_EQUALS(position1000, 100.0f, 0.01f, TEST_LOCATION);
 
   END_TEST;
 }

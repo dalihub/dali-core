@@ -20,17 +20,50 @@
 
 // INTERNAL INCLUDES
 
+namespace
+{
+
+Dali::SpringData GetSpringDefaultData(Dali::AlphaFunction::SpringType springType)
+{
+  switch(springType)
+  {
+    case Dali::AlphaFunction::SpringType::GENTLE:
+    {
+      return {100.0f, 15.0f, 1.0f};
+    }
+    case Dali::AlphaFunction::SpringType::QUICK:
+    {
+      return {300.0f, 20.0f, 1.0f};
+    }
+    case Dali::AlphaFunction::SpringType::BOUNCY:
+    {
+      return {600.0f, 15.0f, 1.0f};
+    }
+    case Dali::AlphaFunction::SpringType::SLOW:
+    {
+      return {94.0f, 18.5f, 1.0f};
+    }
+    default:
+    {
+      return {100.0f, 15.0f, 1.0f};
+    }
+  }
+}
+}
+
 namespace Dali
 {
 AlphaFunction::AlphaFunction()
 : mMode(BUILTIN_FUNCTION),
-  mBuiltin(DEFAULT)
+  mBuiltin(DEFAULT),
+  mSpringData({100.0f, 15.0f, 1.0f})
 {
 }
 
 AlphaFunction::AlphaFunction(BuiltinFunction function)
 : mMode(BUILTIN_FUNCTION),
-  mBuiltin(function)
+  mBuiltin(function),
+  mSpringData({100.0f, 15.0f, 1.0f})
 {
 }
 
@@ -52,6 +85,20 @@ AlphaFunction::AlphaFunction(const Vector2& controlPoint0, const Vector2& contro
 {
 }
 
+AlphaFunction::AlphaFunction(SpringType springType)
+: mMode(SPRING),
+  mBuiltin(DEFAULT),
+  mSpringData(GetSpringDefaultData(springType))
+{
+}
+
+AlphaFunction::AlphaFunction(Dali::SpringData springData)
+: mMode(CUSTOM_SPRING),
+  mBuiltin(DEFAULT),
+  mSpringData(springData)
+{
+}
+
 Vector4 AlphaFunction::GetBezierControlPoints() const
 {
   return (mMode == BEZIER) ? mBezierControlPoints : Vector4::ZERO;
@@ -70,6 +117,11 @@ AlphaFunction::BuiltinFunction AlphaFunction::GetBuiltinFunction() const
 AlphaFunction::Mode AlphaFunction::GetMode() const
 {
   return mMode;
+}
+
+const Dali::SpringData& AlphaFunction::GetSpringData() const
+{
+  return mSpringData;
 }
 
 } // namespace Dali

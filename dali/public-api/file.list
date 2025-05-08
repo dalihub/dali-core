@@ -16,6 +16,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/animation/key-frames.cpp
   ${public_api_src_dir}/animation/linear-constrainer.cpp
   ${public_api_src_dir}/animation/path.cpp
+  ${public_api_src_dir}/animation/spring-data.cpp
   ${public_api_src_dir}/animation/time-period.cpp
   ${public_api_src_dir}/common/dali-common.cpp
   ${public_api_src_dir}/common/dali-vector.cpp
@@ -119,6 +120,7 @@ SET( public_api_core_animation_header_files
   ${public_api_src_dir}/animation/key-frames.h
   ${public_api_src_dir}/animation/linear-constrainer.h
   ${public_api_src_dir}/animation/path.h
+  ${public_api_src_dir}/animation/spring-data.h
   ${public_api_src_dir}/animation/time-period.h
 )
 

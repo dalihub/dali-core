@@ -77,9 +77,7 @@ Graphics::UniquePtr<UniformBufferView> UniformBufferManager::CreateUniformBuffer
   auto offset = ubo->GetCurrentOffset();
   auto retval = Graphics::UniquePtr<UniformBufferView>(UniformBufferView::TryRecycle(oldView, *ubo.get(), offset));
 
-  // make sure new offset will meet alignment requirements
-  uint32_t alignedSize = ubo->AlignSize(size);
-  ubo->IncrementOffsetBy(alignedSize);
+  ubo->IncrementOffsetBy(size);
   return retval;
 }
 

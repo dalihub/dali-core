@@ -1850,7 +1850,7 @@ public:
   : UnregisteredCustomActor(impl)
   {
     mImpl = &impl;
-    mImpl->SetOffScreenRenderableType(type);
+    mImpl->RegisterOffScreenRenderableType(type);
   }
   Dali::RenderTask GetForwardRenderTask()
   {
@@ -1859,6 +1859,18 @@ public:
   Dali::RenderTask GetBackwardRenderTask()
   {
     return mImpl->mBackwardRenderTask;
+  }
+  void RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type type)
+  {
+    tet_printf("type add : %d + %d\n", mImpl->GetOffScreenRenderableType(), type);
+    mImpl->RegisterOffScreenRenderableType(type);
+    mImpl->RequestRenderTaskReorder();
+  }
+  void UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type type)
+  {
+    tet_printf("type add : %d - %d\n", mImpl->GetOffScreenRenderableType(), type);
+    mImpl->UnregisterOffScreenRenderableType(type);
+    mImpl->RequestRenderTaskReorder();
   }
   OffScreenRenderable::Type GetOffScreenRenderableType()
   {
@@ -1885,7 +1897,7 @@ int UtcDaliCustomActorReordering(void)
    *      Fb   Gf
    *          / \
    *         H   I
-   * 
+   *
    * A, C are Layer. C has smaller Depth value than A.
    * B, E, F, G, and J are OffScreenCustomActor.
    * B, F, and J are Type BACKWARD.
@@ -1960,8 +1972,8 @@ int UtcDaliCustomActorReordering2(void)
    *          Al
    *       /     \
    *      Bb      Cb
-   * 
-   * A is Layer. 
+   *
+   * A is Layer.
    * B and C are BACKWARD OffScreenRenderable
    *
    * At the initial status, the OrderIndex of each RenderTask is
@@ -2026,6 +2038,195 @@ int UtcDaliCustomActorReordering2(void)
 
   tet_printf("B OrderIndex : %d, C OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
   DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorRegisterOffScreenRenderableTypeP(void)
+{
+  TestApplication application; // Need the type registry
+
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
+
+  /**
+   *        Al
+   *       /
+   *      Bb
+   *     / \
+   *    Cb  Df
+   *
+   * A is Layer.
+   * B and C are BACKWARD OffScreenRenderable,
+   * D is FORWARD OffScreenRenderable
+   *
+   * At the initial status, the OrderIndex of each RenderTask is
+   * B(Backward) - C(Backward) (D(Forward) is don't care)
+   *
+   *        Al
+   *       /
+   *      Bfb
+   *     / \
+   *   Cb   Df
+   *
+   * if we register B the forward renderable type, the OrderIndex of each RenderTask becomes
+   * (D(Forward) | C(Backward)) - B(Forward) - B(Backward)
+   *
+   *        Al
+   *       /
+   *      Bff
+   *     / \
+   *   Cfb   Df
+   *
+   * if we register B, C the forward renderable type again and B unregister backward,
+   * We don't care the order of C(Forward), C(Backward) and D(Forward).
+   * But all of them should be before B(Forward).
+   */
+
+  Layer                A_layer                = Layer::New();
+  OffScreenCustomActor B_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
+  OffScreenCustomActor C_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::BACKWARD);
+  OffScreenCustomActor D_offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::FORWARD);
+
+  application.GetScene().Add(A_layer);
+
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
+  tet_printf("task cnt before : %d\n", application.GetScene().GetRenderTaskList().GetTaskCount());
+
+  A_layer.Add(B_offScreenCustomActor);
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 3, TEST_LOCATION);
+
+  B_offScreenCustomActor.Add(C_offScreenCustomActor);
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 5, TEST_LOCATION);
+
+  B_offScreenCustomActor.Add(D_offScreenCustomActor);
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 7, TEST_LOCATION);
+
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : %d, D OrderIndex : %d\n", B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), D_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(B_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::BOTH, TEST_LOCATION);
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : f %d b %d, C OrderIndex : %d, D OrderIndex : %d\n", B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex(), B_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), D_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(D_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex() < B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex() < D_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex());
+
+  B_offScreenCustomActor.RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(B_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::BOTH, TEST_LOCATION);
+  C_offScreenCustomActor.RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(C_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::BOTH, TEST_LOCATION);
+  B_offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::BACKWARD);
+  DALI_TEST_EQUALS(B_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::FORWARD, TEST_LOCATION);
+  application.SendNotification();
+
+  tet_printf("B OrderIndex : %d, C OrderIndex : f %d b %d, D OrderIndex : %d\n", B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex(), C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex(), D_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(C_offScreenCustomActor.GetBackwardRenderTask().GetOrderIndex() < B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(C_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex() < B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+  DALI_TEST_CHECK(D_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex() < B_offScreenCustomActor.GetForwardRenderTask().GetOrderIndex());
+
+  tet_printf("Check unregister external type well\n");
+  B_offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(B_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::FORWARD, TEST_LOCATION);
+  B_offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(B_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::NONE, TEST_LOCATION);
+  C_offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::BACKWARD);
+  DALI_TEST_EQUALS(C_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::FORWARD, TEST_LOCATION);
+  C_offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(C_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::NONE, TEST_LOCATION);
+  D_offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(D_offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::NONE, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliCustomActorRegisterOffScreenRenderableTypeN(void)
+{
+  TestApplication application; // Need the type registry
+
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
+
+  Layer                layer                = Layer::New();
+  OffScreenCustomActor offScreenCustomActor = OffScreenCustomActor::New(OffScreenRenderable::Type::NONE);
+
+  application.GetScene().Add(layer);
+
+  DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
+
+  layer.Add(offScreenCustomActor);
+  application.SendNotification();
+
+  constexpr int MAX_REGISTERED_COUNT = 15;
+
+  for(int i = 0; i < MAX_REGISTERED_COUNT; ++i)
+  {
+    offScreenCustomActor.RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+    DALI_TEST_EQUALS(offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::FORWARD, TEST_LOCATION);
+  }
+
+  try
+  {
+    offScreenCustomActor.RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+    tet_result(TET_FAIL); // Should not reach here
+  }
+  catch(DaliException e)
+  {
+    DALI_TEST_ASSERT(e, "forward registered more than 16 times", TEST_LOCATION);
+  }
+
+  for(int i = 0; i < MAX_REGISTERED_COUNT; ++i)
+  {
+    offScreenCustomActor.RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type::BACKWARD);
+    DALI_TEST_EQUALS(offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::BOTH, TEST_LOCATION);
+  }
+
+  try
+  {
+    offScreenCustomActor.RegisterExternalOffScreenRenderableType(OffScreenRenderable::Type::BACKWARD);
+    tet_result(TET_FAIL); // Should not reach here
+  }
+  catch(DaliException e)
+  {
+    DALI_TEST_ASSERT(e, "backward registered more than 16 times", TEST_LOCATION);
+  }
+
+  for(int i = 0; i < MAX_REGISTERED_COUNT - 1; ++i)
+  {
+    offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+    DALI_TEST_EQUALS(offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::BOTH, TEST_LOCATION);
+  }
+  offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+  DALI_TEST_EQUALS(offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::BACKWARD, TEST_LOCATION);
+
+  try
+  {
+    offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::FORWARD);
+    tet_result(TET_FAIL); // Should not reach here
+  }
+  catch(DaliException e)
+  {
+    DALI_TEST_ASSERT(e, "forward not registered before", TEST_LOCATION);
+  }
+
+  for(int i = 0; i < MAX_REGISTERED_COUNT - 1; ++i)
+  {
+    offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::BACKWARD);
+    DALI_TEST_EQUALS(offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::BACKWARD, TEST_LOCATION);
+  }
+  offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::BACKWARD);
+  DALI_TEST_EQUALS(offScreenCustomActor.GetOffScreenRenderableType(), OffScreenRenderable::Type::NONE, TEST_LOCATION);
+
+  try
+  {
+    offScreenCustomActor.UnregisterExternalOffScreenRenderableType(OffScreenRenderable::Type::BACKWARD);
+    tet_result(TET_FAIL); // Should not reach here
+  }
+  catch(DaliException e)
+  {
+    DALI_TEST_ASSERT(e, "backward not registered before", TEST_LOCATION);
+  }
 
   END_TEST;
 }

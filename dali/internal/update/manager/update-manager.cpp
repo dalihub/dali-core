@@ -1507,6 +1507,11 @@ void UpdateManager::PostRender()
     shader->SetUpdated(false);
   }
 
+  for(auto&& uniformBlock : mImpl->uniformBlocks)
+  {
+    uniformBlock->SetUpdated(false);
+  }
+
   for(auto&& scene : mImpl->scenes)
   {
     scene->root->SetUpdatedTree(false);

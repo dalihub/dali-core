@@ -156,7 +156,8 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mDepthTestMode(depthTestMode),
   mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
   mShaderChanged(false),
-  mPipelineCached(false)
+  mPipelineCached(false),
+  mUseSharedUniformBlock(true)
 {
   if(blendingBitmask != 0u)
   {
@@ -830,7 +831,8 @@ void Renderer::WriteUniformBuffer(
       mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
 
       bool useSharedBlock = !standaloneUniforms &&
-                            programRequirements.sharedBlock[i];
+                            programRequirements.sharedBlock[i] &&
+                            UseSharedUniformBlock();
 
       if(useSharedBlock)
       {
@@ -1013,7 +1015,6 @@ void Renderer::FillUniformBuffer(Program&                             program,
         auto* ubo = uboViews[uniform.uniformBlockIndex];
         if(ubo == nullptr) // Uniform belongs to shared UniformBlock, can't overwrite
         {
-          uniform.state = UniformIndexMap::State::NOT_USED;
           continue;
         }
         WriteDynUniform(iter.propertyValue, uniform, *ubo, updateBufferIndex);

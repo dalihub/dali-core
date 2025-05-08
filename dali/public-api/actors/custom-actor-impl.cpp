@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,17 @@ void CustomActorImpl::OnPropertySet(Property::Index index, const Property::Value
 
 void CustomActorImpl::SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
 {
-  mOwner->SetOffScreenRenderableType(offScreenRenderableType);
+  RegisterOffScreenRenderableType(offScreenRenderableType);
+}
+
+void CustomActorImpl::RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
+{
+  mOwner->RegisterOffScreenRenderableType(offScreenRenderableType);
+}
+
+void CustomActorImpl::UnregisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
+{
+  mOwner->UnregisterOffScreenRenderableType(offScreenRenderableType);
 }
 
 OffScreenRenderable::Type CustomActorImpl::GetOffScreenRenderableType()

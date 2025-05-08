@@ -276,11 +276,6 @@ bool Geometry::Draw(
       numVertices = elementBufferCount;
       firstVertex = elementBufferOffset;
     }
-    else if(mVertexBuffers.Count() > 0)
-    {
-      // truncated, no value loss happening in practice
-      numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetRenderableElementCount());
-    }
     // In case we have more buffers, we select buffer with less elements to render
     // TODO: we may eventually support wrapping around buffers????
     else if(mVertexBuffers.Count() > 1)
@@ -291,6 +286,11 @@ bool Geometry::Draw(
         elementsCount = std::min(elementsCount, vertexBuffer->GetRenderableElementCount());
       }
       numVertices = elementsCount;
+    }
+    else if(mVertexBuffers.Count() == 1)
+    {
+      // truncated, no value loss happening in practice
+      numVertices = static_cast<uint32_t>(mVertexBuffers[0]->GetRenderableElementCount());
     }
 
     // Issue draw call only if there's non-zero numVertices

@@ -560,6 +560,12 @@ public: // From UniformMapDataProvider
    */
   const CollectedUniformMap& GetCollectedUniformMap() const override;
 
+public: // For VisualRenderer
+  /**
+   * Mark whether we should consider shared uniform block, or ignore it.
+   */
+  void EnableSharedUniformBlock(bool enabled);
+
 public: // For VisualProperties
   /**
    * To be used only for 1st stage initialization in event thread.
@@ -640,6 +646,7 @@ private:
 
   bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
   bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  bool mUseSharedUniformBlock : 1;
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};
