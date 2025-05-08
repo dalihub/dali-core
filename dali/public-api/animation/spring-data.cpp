@@ -44,19 +44,15 @@ SpringData::SpringData(float stiffness, float damping, float mass)
 {
 }
 
-float SpringData::GetDuration(const SpringData& springData)
+float SpringData::GetDuration()
 {
-  if(springData.stiffness < MIN_STIFFNESS || springData.damping < MIN_DAMPING || springData.mass < MIN_MASS)
+  if(stiffness < MIN_STIFFNESS || damping < MIN_DAMPING || mass < MIN_MASS)
   {
     return 0.0f;
   }
 
-  double stiffness = static_cast<double>(springData.stiffness);
-  double damping   = static_cast<double>(springData.damping);
-  double mass      = static_cast<double>(springData.mass);
-
-  double omega0 = std::sqrt(stiffness / mass);
-  double zeta   = damping / (2.0 * std::sqrt(stiffness * mass));
+  double omega0 = std::sqrt(static_cast<double>(stiffness) / static_cast<double>(mass));
+  double zeta   = static_cast<double>(damping) / (2.0 * std::sqrt(static_cast<double>(stiffness) * static_cast<double>(mass)));
   double time   = 0.0;
 
   if(zeta < 1.0)

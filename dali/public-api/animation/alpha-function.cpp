@@ -92,7 +92,7 @@ AlphaFunction::AlphaFunction(SpringType springType)
 {
 }
 
-AlphaFunction::AlphaFunction(Dali::SpringData springData)
+AlphaFunction::AlphaFunction(const Dali::SpringData& springData)
 : mMode(CUSTOM_SPRING),
   mBuiltin(DEFAULT),
   mSpringData(springData)

@@ -17469,11 +17469,11 @@ int UtcDaliAnimationSpringFinished(void)
   application.GetScene().Add(actor);
 
   SpringData springData{100.0f, 10.0f, 1.0f};
-  float      convergeDuration = SpringData::GetDuration(springData);
+  float      convergeDuration = springData.GetDuration();
   DALI_TEST_CHECK(convergeDuration < 2.0f);
   tet_printf("convergeDuration : %f\n", convergeDuration);
 
-  Animation animation         = Animation::New(convergeDuration);
+  Animation animation = Animation::New(convergeDuration);
   animation.AnimateTo(Property(actor, Dali::Actor::Property::POSITION_X), 100.0f, AlphaFunction(springData));
   animation.Play();
 
@@ -17590,7 +17590,7 @@ int UtcDaliAnimationSpringOverdamped(void)
   application.GetScene().Add(actor);
 
   SpringData springData{80.0f, 20.0f, 1.0f};
-  float      convergeDuration = SpringData::GetDuration(springData);
+  float      convergeDuration = springData.GetDuration();
   DALI_TEST_CHECK(convergeDuration > 0.0f);
 
   Animation animation = Animation::New(convergeDuration);
@@ -17640,7 +17640,7 @@ int UtcDaliAnimationSpringUnderdamped(void)
   application.GetScene().Add(actor);
 
   SpringData springData{600.0f, 15.0f, 1.0f};
-  float      convergeDuration = SpringData::GetDuration(springData);
+  float      convergeDuration = springData.GetDuration();
   DALI_TEST_CHECK(convergeDuration > 0.0f);
   tet_printf("convergeDuration : %f\n", convergeDuration);
 
