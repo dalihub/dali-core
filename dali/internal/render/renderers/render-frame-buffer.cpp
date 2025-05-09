@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/render/common/render-manager.h> ///< TODO : Could we remove it?
 #include <dali/internal/render/renderers/render-texture.h>
 
 namespace Dali
@@ -28,7 +29,9 @@ namespace Internal
 namespace Render
 {
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
-: mRenderResult(nullptr),
+: mDepthTexture(),
+  mDepthStencilTexture(),
+  mRenderResult(nullptr),
   mWidth(width),
   mHeight(height),
   mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
@@ -68,6 +71,8 @@ void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLe
     uint32_t                  attachmentId = mCreateInfo.colorAttachments.size();
     Graphics::ColorAttachment colorAttachment{attachmentId, texture->GetGraphicsObject(), layer, mipmapLevel, texture->GetPixelFormat()};
     mCreateInfo.colorAttachments.push_back(colorAttachment);
+
+    mColorTextures.push_back(Render::Texture::GetKey(texture));
   }
 }
 
@@ -83,6 +88,8 @@ void FrameBuffer::AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLe
     mCreateInfo.depthStencilAttachment.depthTexture = texture->GetGraphicsObject();
     mCreateInfo.depthStencilAttachment.depthUsage   = Graphics::DepthStencilAttachment::Usage::WRITE;
     mCreateInfo.depthStencilAttachment.depthLevel   = mipmapLevel;
+
+    mDepthTexture = Render::Texture::GetKey(texture);
   }
 }
 
@@ -97,6 +104,8 @@ void FrameBuffer::AttachDepthStencilTexture(Render::Texture* texture, uint32_t m
     mCreateInfo.depthStencilAttachment.stencilTexture = texture->GetGraphicsObject();
     mCreateInfo.depthStencilAttachment.stencilUsage   = Graphics::DepthStencilAttachment::Usage::WRITE;
     mCreateInfo.depthStencilAttachment.stencilLevel   = mipmapLevel;
+
+    mDepthStencilTexture = Render::Texture::GetKey(texture);
   }
 }
 
@@ -151,6 +160,26 @@ void FrameBuffer::SetRenderResultDrawn()
   mRenderedPixelData              = Dali::PixelData::New(mRenderResult, mWidth * mHeight * Dali::Pixel::GetBytesPerPixel(Pixel::Format::RGBA8888), mWidth, mHeight, Pixel::Format::RGBA8888, Dali::PixelData::DELETE_ARRAY);
   mRenderResult                   = nullptr;
   mIsKeepingRenderResultRequested = false;
+}
+
+void FrameBuffer::UpdateAttachedTextures(SceneGraph::RenderManager& renderManager)
+{
+  for(auto colorTexture : mColorTextures)
+  {
+    if(colorTexture)
+    {
+      renderManager.SetTextureUpdated(colorTexture);
+    }
+  }
+
+  if(mDepthTexture)
+  {
+    renderManager.SetTextureUpdated(mDepthTexture);
+  }
+  if(mDepthStencilTexture)
+  {
+    renderManager.SetTextureUpdated(mDepthStencilTexture);
+  }
 }
 
 // Called from Main thread.

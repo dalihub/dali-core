@@ -773,10 +773,17 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   for(uint32_t i = instructionCount; i > 0; --i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i - 1);
-    if(instruction.RenderListCount() > 0 && instruction.mFrameBuffer == nullptr)
+    if(instruction.mFrameBuffer)
     {
-      renderToScene = true;
-      break;
+      // TODO : For now, let we just always dirty the target of FBO texture
+      instruction.mFrameBuffer->UpdateAttachedTextures(*this);
+    }
+    else
+    {
+      if(instruction.RenderListCount() > 0)
+      {
+        renderToScene = true;
+      }
     }
   }
 
@@ -862,7 +869,6 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
 
     if(instruction.mFrameBuffer)
     {
-      cleanDamagedRect = true;
       continue; // TODO: reset, we don't deal with render tasks with framebuffers (for now)
     }
 

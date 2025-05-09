@@ -5009,16 +5009,16 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   newTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
   newTask.SetFrameBuffer(frameBuffer);
 
-  application.SendNotification();
-
   std::vector<Rect<int>> damagedRects;
   Rect<int>              clippingRect;
 
+  // First frame result.
+  application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  // Full update if there is off-screen rendering
-  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  clippingRect = Rect<int>(16, 768, 32, 32);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -5027,22 +5027,72 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  // Remove framebuffer
-  newTask.SetFrameBuffer(FrameBuffer());
+  damagedRects.clear();
+
+  // Second frame result. No dirty rects.
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Attach FBO texture to actor
+  DALI_TEST_GREATER(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  Renderer renderer = actor.GetRendererAt(0);
+  DALI_TEST_CHECK(renderer);
+  TextureSet textureSet = TextureSet::New();
+  DALI_TEST_CHECK(textureSet);
+  textureSet.SetTexture(0u, frameBufferTexture);
+
+  renderer.SetTextures(textureSet);
+
+  // Next frame after FBO. actor is drty always.
+  for(int i = 0; i < 10; ++i)
+  {
+    application.SendNotification();
+    application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+    clippingRect = Rect<int>(16, 768, 32, 32);
+    DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+    DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+    DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+    application.RenderWithPartialUpdate(damagedRects, clippingRect);
+    DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+    DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+    DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+    DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+    damagedRects.clear();
+  }
+
+  // Remove framebuffer texture
+  TextureSet newTextureSet = CreateTextureSet(Pixel::RGBA8888, 2, 2);
+  renderer.SetTextures(newTextureSet);
 
   application.SendNotification();
-
-  damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  // Full update
-  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  clippingRect = Rect<int>(16, 768, 32, 32);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+
+  // Second frame after remove fbo. No dirty rects.
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Set invalid viewport of the render task
+  newTask.SetFrameBuffer(FrameBuffer());
   newTask.SetViewportSize(Vector2(-100.0f, -100.0f));
 
   application.SendNotification();
@@ -5050,7 +5100,7 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  // Full update because the camera orientation is changed
+  // Full update because the task viewport is invalid
   clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);

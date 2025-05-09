@@ -22,6 +22,7 @@
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/renderers/render-sampler.h>
+#include <dali/internal/render/renderers/render-texture-key.h>
 
 #include <unordered_map>
 
@@ -34,7 +35,8 @@ namespace Internal
 namespace SceneGraph
 {
 class RenderInstruction;
-}
+class RenderManager;
+} //namespace SceneGraph
 
 namespace Render
 {
@@ -148,6 +150,12 @@ public:
   void SetRenderResultDrawn();
 
   /**
+   * @brief Mark all textures updated.
+   * @param[in] renderManager The render manager who will mark updated textures.
+   */
+  void UpdateAttachedTextures(SceneGraph::RenderManager& renderManager);
+
+  /**
    * @brief Get the number of textures bound to this frame buffer as color attachments.
    * @return The number of color attachments.
    */
@@ -175,6 +183,11 @@ private:
   Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
 
   Graphics::FramebufferCreateInfo mCreateInfo;
+
+  // Attachments texutres (not owned)
+  std::vector<Render::TextureKey> mColorTextures{};
+  Render::TextureKey              mDepthTexture;
+  Render::TextureKey              mDepthStencilTexture;
 
   bool            mIsKeepingRenderResultRequested{false};
   bool            mIsRenderResultDrawn{false};
