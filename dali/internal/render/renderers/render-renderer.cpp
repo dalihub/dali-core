@@ -711,7 +711,8 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
   const auto nodeChangeCounter          = nodePtr ? uniformMapNode.GetChangeCounter() : 0;
   const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
 
-  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element) { return (element.node == nodePtr && element.program == programPtr); });
+  auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element)
+                           { return (element.node == nodePtr && element.program == programPtr); });
 
   std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
@@ -1055,20 +1056,6 @@ void Renderer::WriteDynUniform(
   {
     const auto typeSize = propertyValue->GetValueSize();
     ubo.Write(valueAddress, typeSize, dest);
-  }
-}
-
-void Renderer::SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const
-{
-  if(!mRenderCallback)
-  {
-    sortAttributes.shader   = &mRenderDataProvider->GetShader();
-    sortAttributes.geometry = mGeometry;
-  }
-  else
-  {
-    sortAttributes.shader   = nullptr;
-    sortAttributes.geometry = nullptr;
   }
 }
 
