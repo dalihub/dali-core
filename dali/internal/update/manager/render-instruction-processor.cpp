@@ -212,13 +212,13 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d);
 
       const Vector4& nodeUpdateArea = nodePartialRenderingData.mNodeInfomations.updatedPositionSize;
-      const Vector3& nodeScale      = nodePartialRenderingData.mNodeInfomations.modelMatrix.GetScale();
+      const Vector2& nodeScaleXY    = nodePartialRenderingData.mNodeInfomations.modelMatrix.GetScaleXY();
 
       nodePartialRenderingDataUpdateChecked = true;
 
-      const Vector3& size = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f) * nodeScale;
+      const Vector2& sizeXY = Vector2(nodeUpdateArea.z * nodeScaleXY.x, nodeUpdateArea.w * nodeScaleXY.y);
 
-      if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
+      if(sizeXY.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
         MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodePartialRenderingData.mNodeInfomations.modelMatrix, viewMatrix);
         nodeModelViewMatrixSet = true;

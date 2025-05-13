@@ -2,7 +2,7 @@
 #define DALI_MATRIX_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,6 +265,16 @@ public:
    * @return The scale
    */
   Vector3 GetScale() const;
+
+  /**
+   * @brief Gets the x,y components of the scale as a Vector2.
+   * Note that transform scale always has positive components.
+   *
+   * This assumes the matrix is a transform matrix.
+   * @SINCE_2_4.19
+   * @return The scale of xy components
+   */
+  Vector2 GetScaleXY() const;
 
   /**
    * @brief Sets the translation.

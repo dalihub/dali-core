@@ -496,13 +496,16 @@ bool TransformManager::Update()
       }
     }
 
-    // Update the bounding sphere
-    Vec3 centerToEdge = {mSize[i].Length() * 0.5f, 0.0f, 0.0f};
-    Vec3 centerToEdgeWorldSpace;
-    TransformVector3(centerToEdgeWorldSpace, mWorld[i].AsFloat(), centerToEdge);
+    // TODO : We need to check mComponentDirty since we have to check the size changeness.
+    //        Could we check size changeness only?
+    if(mComponentDirty[i] || mWorldMatrixDirty[i])
+    {
+      // Update the bounding sphere
+      float centerToEdge           = mSize[i].Length() * 0.5f;
+      float centerToEdgeWorldSpace = TransformFloat(mWorld[i].AsFloat(), centerToEdge);
 
-    mBoundingSpheres[i]   = mWorld[i].GetTranslation();
-    mBoundingSpheres[i].w = Length(centerToEdgeWorldSpace);
+      mBoundingSpheres[i] = std::move(Vector4(mWorld[i].GetTranslation3(), centerToEdgeWorldSpace));
+    }
 
     mUpdated = mUpdated || mWorldMatrixDirty[i];
 

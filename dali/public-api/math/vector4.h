@@ -2,7 +2,7 @@
 #define DALI_VECTOR_4_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,15 @@ struct DALI_CORE_API Vector4
    * @param[in] vec3 Vector3 to copy from, w is initialized to 0
    */
   explicit Vector4(const Vector3& vec3);
+
+  /**
+   * @brief Conversion constructor from Vector3 and float.
+   *
+   * @SINCE_2_4.19
+   * @param[in] vec3 Vector3 to copy from
+   * @param[in] w w (or a/q) component
+   */
+  explicit Vector4(const Vector3& vec3, float w);
 
   // Constants
   static const Vector4 ONE;   ///< (1.0f,1.0f,1.0f,1.0f)
@@ -567,9 +576,9 @@ struct DALI_CORE_API Vector4
   };
 
 public:
-  Vector4(const Vector4&)     = default;            ///< Default copy constructor
-  Vector4(Vector4&&) noexcept = default;            ///< Default move constructor
-  Vector4& operator=(const Vector4&) = default;     ///< Default copy assignment operator
+  Vector4(const Vector4&)                = default; ///< Default copy constructor
+  Vector4(Vector4&&) noexcept            = default; ///< Default move constructor
+  Vector4& operator=(const Vector4&)     = default; ///< Default copy assignment operator
   Vector4& operator=(Vector4&&) noexcept = default; ///< Default move assignment operator
 };
 
