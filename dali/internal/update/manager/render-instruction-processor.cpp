@@ -520,15 +520,15 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   if(needToSort)
   {
     std::stable_sort(mSortingHelper.begin(), mSortingHelper.end(), mSortComparitors[comparitorIndex]);
-  }
 
-  // Reorder / re-populate the RenderItems in the RenderList to correct order based on the sortinghelper.
-  DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "Sorted Transparent List:\n");
-  RenderItemContainer::Iterator renderListIter = renderList.GetContainer().Begin();
-  for(uint32_t index = 0; index < renderableCount; ++index, ++renderListIter)
-  {
-    *renderListIter = mSortingHelper[index].renderItem;
-    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = node : %x renderer : %x\n", index, mSortingHelper[index].renderItem->mNode, mSortingHelper[index].renderItem->mRenderer.Get());
+    // Reorder / re-populate the RenderItems in the RenderList to correct order based on the sortinghelper.
+    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "Sorted Transparent List:\n");
+    RenderItemContainer::Iterator renderListIter = renderList.GetContainer().Begin();
+    for(uint32_t index = 0; index < renderableCount; ++index, ++renderListIter)
+    {
+      *renderListIter = mSortingHelper[index].renderItem;
+      DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = node : %x renderer : %x\n", index, mSortingHelper[index].renderItem->mNode, mSortingHelper[index].renderItem->mRenderer.Get());
+    }
   }
 }
 
