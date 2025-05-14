@@ -111,7 +111,7 @@ public:
     BOUNCY,
 
     /**
-     * @brief Slow spring. Smooth and relaxed motion with longer settling
+     * @brief Slow spring. Smooth and relaxed motion with longer settling.
      * @SINCE_2_4.17
      */
     SLOW
@@ -173,7 +173,7 @@ public:
    * that the value will exactly reach 1 at the end of the animation duration.
    * To ensure the animation ends at 1, you may need to adjust the duration according to the spring configuration.
    */
-  AlphaFunction(Dali::SpringData springData);
+  AlphaFunction(const Dali::SpringData& springData);
 
   /**
    * @brief Returns the control points of the alpha function.

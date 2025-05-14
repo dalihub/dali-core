@@ -81,11 +81,11 @@ bool CompareItems(const RenderInstructionProcessor::SortAttributes& lhs, const R
 {
   // @todo Consider replacing all these sortAttributes with a single long int that
   // encapsulates the same data (e.g. the middle-order bits of the ptrs).
-  if(lhs.renderItem->mDepthIndex == rhs.renderItem->mDepthIndex)
+  if(lhs.depthIndex == rhs.depthIndex)
   {
     return PartialCompareItems(lhs, rhs);
   }
-  return lhs.renderItem->mDepthIndex < rhs.renderItem->mDepthIndex;
+  return lhs.depthIndex < rhs.depthIndex;
 }
 
 /**
@@ -186,7 +186,8 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   // Don't cull items which have render callback
   bool hasRenderCallback = (rendererExist && renderable.mRenderer->GetRenderCallback());
 
-  auto requiredInsideCheck = [&]() {
+  auto requiredInsideCheck = [&]()
+  {
     if(node != stopperNode &&
        cullingEnabled &&
        !hasRenderCallback &&
@@ -211,13 +212,13 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d);
 
       const Vector4& nodeUpdateArea = nodePartialRenderingData.mNodeInfomations.updatedPositionSize;
-      const Vector3& nodeScale      = nodePartialRenderingData.mNodeInfomations.modelMatrix.GetScale();
+      const Vector2& nodeScaleXY    = nodePartialRenderingData.mNodeInfomations.modelMatrix.GetScaleXY();
 
       nodePartialRenderingDataUpdateChecked = true;
 
-      const Vector3& size = Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f) * nodeScale;
+      const Vector2& sizeXY = Vector2(nodeUpdateArea.z * nodeScaleXY.x, nodeUpdateArea.w * nodeScaleXY.y);
 
-      if(size.LengthSquared() > Math::MACHINE_EPSILON_1000)
+      if(sizeXY.LengthSquared() > Math::MACHINE_EPSILON_1000)
       {
         MatrixUtils::MultiplyTransformMatrix(nodeModelViewMatrix, nodePartialRenderingData.mNodeInfomations.modelMatrix, viewMatrix);
         nodeModelViewMatrixSet = true;
@@ -451,8 +452,10 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
 
   // List of zValue calculating functions.
   const Dali::Layer::SortFunctionType zValueFunctionFromVector3[] = {
-    [](const Vector3& position) { return position.z; },
-    [](const Vector3& position) { return position.LengthSquared(); },
+    [](const Vector3& position)
+    { return position.z; },
+    [](const Vector3& position)
+    { return position.LengthSquared(); },
     layer.GetSortFunction(),
   };
 
@@ -466,10 +469,19 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   //   2 is user defined function.
   const int zValueFunctionIndex = layer.UsesDefaultSortFunction() ? ((layer.GetBehavior() == Dali::Layer::LAYER_UI || isOrthographicCamera) ? 0 : 1) : 2;
 
+  // Here we determine which comparitor (of the 3) to use.
+  //   0 is LAYER_UI
+  //   1 is LAYER_3D
+  //   2 is LAYER_3D + Clipping
+  const int comparitorIndex = layer.GetBehavior() == Dali::Layer::LAYER_3D ? respectClippingOrder ? 2u : 1u : 0u;
+
+  bool needToSort = false;
+
   for(uint32_t index = 0; index < renderableCount; ++index)
   {
     RenderItemKey itemKey = renderList.GetItemKey(index);
     RenderItem&   item    = *itemKey.Get();
+
     if(DALI_LIKELY(item.mRenderer))
     {
       item.mRenderer->SetSortAttributes(mSortingHelper[index]);
@@ -478,27 +490,45 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
     // texture set
     mSortingHelper[index].textureSet = item.mTextureSet;
 
-    mSortingHelper[index].zValue = zValueFunctionFromVector3[zValueFunctionIndex](item.mModelViewMatrix.GetTranslation3()) - static_cast<float>(item.mDepthIndex);
+    if(comparitorIndex == 0)
+    {
+      // If we are under LAYER_UI, We don't need to get zValue and renderer sort attributes.
+      // Since all render items well-sorted by draw order normally.
+      mSortingHelper[index].depthIndex = item.mDepthIndex;
+    }
+    else
+    {
+      mSortingHelper[index].zValue = zValueFunctionFromVector3[zValueFunctionIndex](item.mModelViewMatrix.GetTranslation3()) - static_cast<float>(item.mDepthIndex);
+    }
 
     // Keep the renderitem pointer in the helper so we can quickly reorder items after sort.
     mSortingHelper[index].renderItem = itemKey;
+
+    if(!needToSort && index > 0u)
+    {
+      // Check if we need to sort the list.
+      // We only need to sort if the depth index is not the same as the previous item.
+      // This is a fast way of checking if we need to sort.
+      if(mSortComparitors[comparitorIndex](mSortingHelper[index], mSortingHelper[index - 1u]))
+      {
+        needToSort = true;
+      }
+    }
   }
 
-  // Here we determine which comparitor (of the 3) to use.
-  //   0 is LAYER_UI
-  //   1 is LAYER_3D
-  //   2 is LAYER_3D + Clipping
-  const unsigned int comparitorIndex = layer.GetBehavior() == Dali::Layer::LAYER_3D ? respectClippingOrder ? 2u : 1u : 0u;
-
-  std::stable_sort(mSortingHelper.begin(), mSortingHelper.end(), mSortComparitors[comparitorIndex]);
-
-  // Reorder / re-populate the RenderItems in the RenderList to correct order based on the sortinghelper.
-  DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "Sorted Transparent List:\n");
-  RenderItemContainer::Iterator renderListIter = renderList.GetContainer().Begin();
-  for(uint32_t index = 0; index < renderableCount; ++index, ++renderListIter)
+  // If we don't need to sort, we can skip the sort.
+  if(needToSort)
   {
-    *renderListIter = mSortingHelper[index].renderItem;
-    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = node : %x renderer : %x\n", index, mSortingHelper[index].renderItem->mNode, mSortingHelper[index].renderItem->mRenderer.Get());
+    std::stable_sort(mSortingHelper.begin(), mSortingHelper.end(), mSortComparitors[comparitorIndex]);
+
+    // Reorder / re-populate the RenderItems in the RenderList to correct order based on the sortinghelper.
+    DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "Sorted Transparent List:\n");
+    RenderItemContainer::Iterator renderListIter = renderList.GetContainer().Begin();
+    for(uint32_t index = 0; index < renderableCount; ++index, ++renderListIter)
+    {
+      *renderListIter = mSortingHelper[index].renderItem;
+      DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = node : %x renderer : %x\n", index, mSortingHelper[index].renderItem->mNode, mSortingHelper[index].renderItem->mRenderer.Get());
+    }
   }
 }
 

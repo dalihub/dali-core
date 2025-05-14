@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -415,6 +415,7 @@ int UtcDaliMatrixGetScale(void)
       for(float z = 0.0f; z < 2.0f; z += 0.1f)
       {
         Vector3 vScale(x, y, z);
+        Vector2 vScaleXY(x, y);
 
         for(float angle = 5.0f; angle <= 360.0f; angle += 15.0f)
         {
@@ -427,9 +428,11 @@ int UtcDaliMatrixGetScale(void)
           Matrix m1(false);
           m1.SetTransformComponents(vScale, rotation1, position1);
 
-          Vector3 scale2 = m1.GetScale();
+          Vector3 scale2   = m1.GetScale();
+          Vector2 scale2XY = m1.GetScaleXY();
 
           DALI_TEST_EQUALS(vScale, scale2, 0.001, TEST_LOCATION);
+          DALI_TEST_EQUALS(vScaleXY, scale2XY, 0.001, TEST_LOCATION);
         }
       }
     }

@@ -50,13 +50,14 @@ struct DALI_CORE_API SpringData
   float mass;      ///< Mass of the object. Affects inertia and the duration of the motion. Minimum value is 0.1.
 
   /**
-   * @brief Returns the time in seconds it takes for a Spring Animation to converge based on the input SpringData.
-   * The maximum value for the returned duration is 100 secons.
+   * @brief Returns the time in seconds it takes for a Spring Animation to converge based on the SpringData.
+   * The maximum value for the returned duration is 100 seconds.
    * Since this value is calculated in an incremental manner, it may take longer if used frequently.
    *
-   * @SINCE_2_4.17
+   * @SINCE_2_4.18
+   * @return Expected duration for input springData.
    */
-  static float GetDuration(const SpringData& springData);
+  float GetDuration();
 };
 
 /**

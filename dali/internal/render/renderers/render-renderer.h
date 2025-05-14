@@ -53,7 +53,7 @@ namespace SceneGraph
 class SceneController;
 class Shader;
 class NodeDataProvider;
-class RenderInstruction; //for reflection effect
+class RenderInstruction; // for reflection effect
 } // namespace SceneGraph
 
 namespace Render
@@ -70,8 +70,8 @@ using PipelineCachePtr         = PipelineCacheL2Container::iterator;
 using RendererKey = MemoryPoolKey<Render::Renderer>;
 
 using UboViewContainer = Dali::OwnerContainer<Render::UniformBufferView*>;
-} //namespace Render
-} //namespace Internal
+} // namespace Render
+} // namespace Internal
 
 // Ensure RendererKey can be used in Dali::Vector
 template<>
@@ -488,7 +488,19 @@ public:
    *
    * @param[out] sortAttributes
    */
-  void SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const;
+  void SetSortAttributes(SceneGraph::RenderInstructionProcessor::SortAttributes& sortAttributes) const
+  {
+    if(!mRenderCallback)
+    {
+      sortAttributes.shader   = &mRenderDataProvider->GetShader();
+      sortAttributes.geometry = mGeometry;
+    }
+    else
+    {
+      sortAttributes.shader   = nullptr;
+      sortAttributes.geometry = nullptr;
+    }
+  }
 
   /**
    * Sets the flag indicating whether shader changed.
@@ -738,8 +750,8 @@ private:
     const SceneGraph::NodeDataProvider* node{nullptr};    ///< Node key. It can be nullptr if this NodeIndex don't need node uniform
     const Program*                      program{nullptr}; ///< Program key.
 
-    std::size_t index{0};                       ///<Index into mUniformIndexMap
-    std::size_t nodeChangeCounter{0};           ///<The last known change counter for this node's uniform map
+    std::size_t index{0};                       ///< Index into mUniformIndexMap
+    std::size_t nodeChangeCounter{0};           ///< The last known change counter for this node's uniform map
     std::size_t renderItemMapChangeCounter{0u}; ///< Change counter of the renderer & shader collected uniform map for this render item (node/renderer pair)
   };
   std::vector<RenderItemLookup> mNodeIndexMap; ///< usually only 1 element.

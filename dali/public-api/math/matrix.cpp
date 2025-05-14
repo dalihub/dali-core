@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
@@ -290,17 +291,17 @@ Vector4 Matrix::operator*(const Vector4& rhs) const
   // e.g. q0 = d0 and d1
   // load and stores interleaved as NEON can load and store while calculating
   asm volatile(
-    "VLD1.F32     {q0}, [%1]        \n\t" //q0 = rhs
+    "VLD1.F32     {q0}, [%1]        \n\t" // q0 = rhs
     "VLD1.F32     {q9}, [%0]!       \n\t"
     "VMUL.F32     q10,  q9,   d0[0] \n\t"
     "VLD1.F32     {q9}, [%0]!       \n\t"
-    "VMLA.F32     q10,  q9,   d0[1] \n\t" //q10 = mMatrix[0..3] * rhs + mMatrix[4..7] * rhs
+    "VMLA.F32     q10,  q9,   d0[1] \n\t" // q10 = mMatrix[0..3] * rhs + mMatrix[4..7] * rhs
     "VLD1.F32     {q9}, [%0]!       \n\t"
     "VMUL.F32     q11,  q9,   d1[0] \n\t"
     "VLD1.F32     {q9}, [%0]!       \n\t"
-    "VMLA.F32     q11,  q9,   d1[1] \n\t" //q11 = mMatrix[8..11] * rhs + mMatrix[12..15] * rhs
+    "VMLA.F32     q11,  q9,   d1[1] \n\t" // q11 = mMatrix[8..11] * rhs + mMatrix[12..15] * rhs
     "VADD.F32     q10,  q10,  q11   \n\t"
-    "VST1.F32     {q10},[%2]        \n\t" //temp = q10 + q11
+    "VST1.F32     {q10},[%2]        \n\t" // temp = q10 + q11
     :
     : "r"(mMatrix), "r"(&rhs), "r"(&temp)
     : "q0", "q9", "q10", "q11", "memory");
@@ -564,7 +565,15 @@ void Matrix::SetInverseTransformComponents(const Vector3& xAxis,
 Vector3 Matrix::GetScale() const
 {
   // Derive scale from axis lengths.
-  return Vector3(GetXAxis().Length(), GetYAxis().Length(), GetZAxis().Length());
+  // Note : To avoid struct creation, let we access memory directoy, instead call GetXAxis(), GetYAxis() and GetZAxis().
+  return Vector3(reinterpret_cast<const Vector3&>(mMatrix[0]).Length(), reinterpret_cast<const Vector3&>(mMatrix[4]).Length(), reinterpret_cast<const Vector3&>(mMatrix[8]).Length());
+}
+
+Vector2 Matrix::GetScaleXY() const
+{
+  // Derive scale from axis lengths.
+  // Note : To avoid struct creation, let we access memory directoy, instead call GetXAxis() and GetYAxis().
+  return Vector2(reinterpret_cast<const Vector3&>(mMatrix[0]).Length(), reinterpret_cast<const Vector3&>(mMatrix[4]).Length());
 }
 
 void Matrix::GetTransformComponents(Vector3&    position,

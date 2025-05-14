@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -411,6 +411,9 @@ int UtcDaliLayerSetSortFunction(void)
 
   Layer root              = application.GetScene().GetLayer(0);
   gTestSortFunctionCalled = 0;
+
+  // Set the behavior to LAYER_3D and set the sort function
+  root.SetProperty(Layer::Property::BEHAVIOR, Dali::Layer::LAYER_3D);
   root.SetSortFunction(TestSortFunction);
 
   // flush the queue and render once
@@ -418,6 +421,39 @@ int UtcDaliLayerSetSortFunction(void)
   application.Render();
 
   DALI_TEST_CHECK(gTestSortFunctionCalled > 0);
+  END_TEST;
+}
+
+int UtcDaliLayerSetSortFunctionLayerUI(void)
+{
+  tet_infoline("Testing Dali::Layer::SetSortFunction()");
+  TestApplication application;
+
+  // create two transparent actors so there is something to sort
+  Actor actor  = CreateRenderableActor();
+  Actor actor2 = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(1, 1));
+  actor.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(1, 1));
+  actor2.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+
+  // add to scene
+  application.GetScene().Add(actor);
+  application.GetScene().Add(actor2);
+
+  Layer root              = application.GetScene().GetLayer(0);
+  gTestSortFunctionCalled = 0;
+
+  // Set the sort function
+  root.SetSortFunction(TestSortFunction);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // The sort function should not be called as the layer is LAYER_UI
+  // Since LAYER_UI don't use the sort function.
+  DALI_TEST_CHECK(gTestSortFunctionCalled == 0);
   END_TEST;
 }
 

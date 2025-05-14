@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,14 @@ Vector4::Vector4(const Vector3& vec3)
   y(vec3.y),
   z(vec3.z),
   w(0.0f)
+{
+}
+
+Vector4::Vector4(const Vector3& vec3, float w)
+: x(vec3.x),
+  y(vec3.y),
+  z(vec3.z),
+  w(w)
 {
 }
 

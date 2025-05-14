@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_PROCESSOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,11 @@ public:
     const Shader*           shader;     ///< The shader instance
     const void*             textureSet; ///< The textureSet instance
     const Render::Geometry* geometry;   ///< The geometry instance
-    float                   zValue;     ///< The Z value of the given renderer (either distance from camera, or a custom calculated value)
+    union
+    {
+      float   zValue;     ///< The Z value of the given renderer (either distance from camera, or a custom calculated value)
+      int32_t depthIndex; ///< The depth index of the given render item. Only be used for LAYER_UI
+    };
   };
 
   /**

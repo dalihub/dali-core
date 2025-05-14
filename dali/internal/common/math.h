@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MATH_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,15 @@ Vector2 Transform2D(const Matrix& matrix, const float x, const float y);
  * @return The lenght of the vector
  */
 float Length(const Vec3 v);
+
+/**
+ * @brief Applies a transformation matrix to a Vector3(x, 0, 0) and get the length of result matrix
+ *
+ * @param[in] m The transformation matrix
+ * @param[in] v The x components of vector to transform
+ * @return      The length of transformed vector
+ */
+float TransformFloat(const Mat4 m, const float x);
 
 } // namespace Internal
 

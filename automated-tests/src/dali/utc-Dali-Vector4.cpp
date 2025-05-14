@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,17 @@ int UtcDaliVector4Constructor05P(void)
   DALI_TEST_EQUALS(v.y, 2.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(v.z, 3.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(v.w, 0.0f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector4Constructor06P(void)
+{
+  Vector3 vec3(1.f, 2.f, 3.f);
+  Vector4 v(vec3, 4.f);
+  DALI_TEST_EQUALS(v.x, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.y, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.z, 3.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(v.w, 4.0f, TEST_LOCATION);
   END_TEST;
 }
 

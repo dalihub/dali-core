@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,14 @@ void Dali::Internal::TransformVector3(Vec3 result, const Mat4 m, const Vec3 v)
   Vec4 tempResult;
 
   asm volatile(
-    "VLD1.F32   {q0}, [%1]     \n\t" //Load "temp" from memory to register q0
-    "VLD1.F32   {q1}, [%0]!    \n\t" //Load first row of the matrix from memory to register q1
-    "VMUL.F32   q2, q1, d0[0]  \n\t" //q2 = (m[0..3] * v.x)
-    "VLD1.F32   {q1}, [%0]!    \n\t" //Load second row of the matrix from memory
-    "VMLA.F32   q2, q1, d0[1]  \n\t" //q2 = (m[0..3] * v.x) + (m[4..7] * v.y)
-    "VLD1.F32   {q1}, [%0]!    \n\t" //Load third row of the matrix from memory
-    "VMLA.F32   q2, q1, d1[0]  \n\t" //q2 = (m[0..3] * v.x) + (m[4..7] * v.y) + (m[8...11] * v.z)
-    "VST1.F32   {q2}, [%2]     \n\t" //Write the result back to memory
+    "VLD1.F32   {q0}, [%1]     \n\t" // Load "temp" from memory to register q0
+    "VLD1.F32   {q1}, [%0]!    \n\t" // Load first row of the matrix from memory to register q1
+    "VMUL.F32   q2, q1, d0[0]  \n\t" // q2 = (m[0..3] * v.x)
+    "VLD1.F32   {q1}, [%0]!    \n\t" // Load second row of the matrix from memory
+    "VMLA.F32   q2, q1, d0[1]  \n\t" // q2 = (m[0..3] * v.x) + (m[4..7] * v.y)
+    "VLD1.F32   {q1}, [%0]!    \n\t" // Load third row of the matrix from memory
+    "VMLA.F32   q2, q1, d1[0]  \n\t" // q2 = (m[0..3] * v.x) + (m[4..7] * v.y) + (m[8...11] * v.z)
+    "VST1.F32   {q2}, [%2]     \n\t" // Write the result back to memory
     :
     : "r"(m), "r"(temp), "r"(tempResult)
     : "q0", "q1", "q2", "memory");
@@ -78,4 +78,9 @@ Dali::Vector2 Dali::Internal::Transform2D(const Dali::Matrix& matrix, const floa
 float Dali::Internal::Length(const Vec3 v)
 {
   return sqrtf(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+}
+
+float Dali::Internal::TransformFloat(const Mat4 m, const float x)
+{
+  return sqrtf(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]) * x;
 }

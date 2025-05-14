@@ -940,7 +940,6 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   // (Since requested property base doesn't consider the lifecycle of PropertyBase,
   // It might be invalid after the previous update finished)
   DALI_ASSERT_DEBUG(mImpl->resetRequestedPropertyBases.empty() && "Reset to base values requested during the previous update!");
-  mImpl->resetRequestedPropertyBases.clear();
 
   // Reset node properties
   mImpl->nodeResetters.RequestResetToBaseValues();
@@ -952,11 +951,18 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
   mImpl->propertyResetters.RequestResetToBaseValues();
 
   // Actual reset to base values here
-  for(auto&& propertyBase : mImpl->resetRequestedPropertyBases)
+  if(!mImpl->resetRequestedPropertyBases.empty())
   {
-    propertyBase->ResetToBaseValue(bufferIndex);
+    decltype(mImpl->resetRequestedPropertyBases) propertyBaseList;
+
+    // Ensure to reset list as zero capacity (Since std::unordered_set::clear() is slow if capacity is not zero)
+    propertyBaseList.swap(mImpl->resetRequestedPropertyBases);
+
+    for(auto&& propertyBase : propertyBaseList)
+    {
+      propertyBase->ResetToBaseValue(bufferIndex);
+    }
   }
-  mImpl->resetRequestedPropertyBases.clear();
 
   // Clear all root nodes dirty flags
   for(auto& scene : mImpl->scenes)
