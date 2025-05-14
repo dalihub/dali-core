@@ -434,19 +434,30 @@ struct DALI_CORE_API Vector4
   /**
    * @brief Returns the dot product of this vector and another vector.
    *
-   * The dot product is the length of one vector in the direction of another vector.
-   * This is great for lighting, threshold testing the angle between two unit vectors,
-   * calculating the distance between two points in a particular direction.
    * @SINCE_1_0.0
+   * @note It will consider w parameter After 2.4.19
    * @param[in] other The other vector
    * @return The dot product
    */
   float Dot(const Vector4& other) const;
 
   /**
+   * @brief Returns the dot product of this vector and another vector.
+   *
+   * The dot product is the length of one vector in the direction of another vector.
+   * This is great for lighting, threshold testing the angle between two unit vectors,
+   * calculating the distance between two points in a particular direction.
+   * @SINCE_2_4.19
+   * @param[in] other The other vector
+   * @return The dot product
+   */
+  float Dot3(const Vector4& other) const;
+
+  /**
    * @brief Returns the 4d dot product of this vector and another vector.
    *
    * @SINCE_1_0.0
+   * @DEPRECATED_2_4.19 Use Dot instead.
    * @param[in] other The other vector
    * @return The dot product
    */
@@ -468,9 +479,18 @@ struct DALI_CORE_API Vector4
    * @brief Returns the length of the vector.
    *
    * @SINCE_1_0.0
+   * @note It will consider w parameter After 2.4.19
    * @return The length
    */
   float Length() const;
+
+  /**
+   * @brief Returns the length of the xyz components of vector.
+   *
+   * @SINCE_2_4.19
+   * @return The length
+   */
+  float Length3() const;
 
   /**
    * @brief Returns the length of the vector squared.
@@ -483,12 +503,31 @@ struct DALI_CORE_API Vector4
   float LengthSquared() const;
 
   /**
+   * @brief Returns the length of the xyz components of vector squared.
+   *
+   * This is faster than using Length3() when performing
+   * threshold checks as it avoids use of the square root.
+   * @SINCE_2_4.19
+   * @return The length of the vector squared
+   */
+  float LengthSquared3() const;
+
+  /**
    * @brief Normalizes the vector.
    *
    * Sets the vector to unit length whilst maintaining its direction.
    * @SINCE_1_0.0
+   * @note It will consider w parameter After 2.4.19
    */
   void Normalize();
+
+  /**
+   * @brief Normalizes the xyz components of vector. w component not be changed.
+   *
+   * Sets the vector to unit length whilst maintaining its direction.
+   * @SINCE_2_4.19
+   */
+  void Normalize3();
 
   /**
    * @brief Clamps the vector between minimum and maximum vectors.

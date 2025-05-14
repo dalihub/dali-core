@@ -51,7 +51,8 @@ int UtcDaliRandomAxisMethod(void)
   for(size_t i = 0; i < 100; i++)
   {
     Vector4 axis = Dali::Random::Axis();
-    DALI_TEST_EQUALS(axis.Length(), 1.0f, 0.0001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(axis.Length3(), 1.0f, 0.0001f, TEST_LOCATION);
+    DALI_TEST_EQUALS(axis.Length(), 1.0f, 0.0001f, TEST_LOCATION); // Check w is zero.
   }
   END_TEST;
 }

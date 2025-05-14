@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,13 +92,13 @@ Quaternion::Quaternion(const Vector3& v0, const Vector3& v1)
   float dot = v0.Dot(v1);
   if(dot > 1.0f - Math::MACHINE_EPSILON_1)
   {
-    //Identity quaternion
+    // Identity quaternion
     mVector.x = mVector.y = mVector.z = 0.0f;
     mVector.w                         = 1.0f;
   }
   else if(dot < -1.0f + Math::MACHINE_EPSILON_1)
   {
-    //180 degree rotation across the Z axis
+    // 180 degree rotation across the Z axis
     mVector.x = mVector.y = mVector.w = 0.0f;
     mVector.z                         = 1.0f;
   }
@@ -206,7 +206,7 @@ const Quaternion Quaternion::operator*(const Quaternion& other) const
 {
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 12);
 
-  return Quaternion(mVector.w * other.mVector.w - mVector.Dot(other.mVector),
+  return Quaternion(mVector.w * other.mVector.w - mVector.Dot3(other.mVector),
                     mVector.y * other.mVector.z - mVector.z * other.mVector.y + mVector.w * other.mVector.x + mVector.x * other.mVector.w,
                     mVector.z * other.mVector.x - mVector.x * other.mVector.z + mVector.w * other.mVector.y + mVector.y * other.mVector.w,
                     mVector.x * other.mVector.y - mVector.y * other.mVector.x + mVector.w * other.mVector.z + mVector.z * other.mVector.w);
@@ -263,7 +263,7 @@ const Quaternion& Quaternion::operator*=(const Quaternion& q)
 
   float x = mVector.x, y = mVector.y, z = mVector.z, w = mVector.w;
 
-  mVector.w = mVector.w * q.mVector.w - mVector.Dot(q.mVector);
+  mVector.w = mVector.w * q.mVector.w - mVector.Dot3(q.mVector);
   mVector.x = y * q.mVector.z - z * q.mVector.y + w * q.mVector.x + x * q.mVector.w;
   mVector.y = z * q.mVector.x - x * q.mVector.z + w * q.mVector.y + y * q.mVector.w;
   mVector.z = x * q.mVector.y - y * q.mVector.x + w * q.mVector.z + z * q.mVector.w;
@@ -302,12 +302,12 @@ bool Quaternion::operator!=(const Quaternion& rhs) const
 
 float Quaternion::Length() const
 {
-  return static_cast<float>(sqrt(mVector.w * mVector.w + mVector.Dot(mVector)));
+  return static_cast<float>(mVector.Length());
 }
 
 float Quaternion::LengthSquared() const
 {
-  return static_cast<float>(mVector.w * mVector.w + mVector.Dot(mVector));
+  return static_cast<float>(mVector.LengthSquared());
 }
 
 void Quaternion::Normalize()
@@ -360,7 +360,7 @@ Quaternion Quaternion::Exp() const
 {
   DALI_ASSERT_ALWAYS(EqualsZero(mVector.w) && "Cannot perform Exponent");
 
-  float      a    = mVector.Length();
+  float      a    = mVector.Length3();
   float      sina = sinf(a);
   Quaternion ret;
 
@@ -384,7 +384,7 @@ Quaternion Quaternion::Exp() const
 
 float Quaternion::Dot(const Quaternion& q1, const Quaternion& q2)
 {
-  return q1.mVector.Dot4(q2.mVector);
+  return q1.mVector.Dot(q2.mVector);
 }
 
 Quaternion Quaternion::Lerp(const Quaternion& q1, const Quaternion& q2, float t)
@@ -467,9 +467,9 @@ float Quaternion::AngleBetween(const Quaternion& q1, const Quaternion& q2)
   from.Normalize();
   to.Normalize();
 
-  //Formula for angle θ between two quaternion is:
-  //θ = cos^−1 (2⟨q1,q2⟩^2 − 1), Where (q1,q2) is inner product of the quaternions.
-  float X     = from.mVector.Dot4(to.mVector);
+  // Formula for angle θ between two quaternion is:
+  // θ = cos^−1 (2⟨q1,q2⟩^2 − 1), Where (q1,q2) is inner product of the quaternions.
+  float X     = from.mVector.Dot(to.mVector);
   float theta = acosf((2 * X * X) - 1); // float arc cosine
 
   return theta;

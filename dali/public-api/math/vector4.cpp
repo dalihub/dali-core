@@ -112,6 +112,13 @@ float Vector4::Dot(const Vector3& other) const
 
 float Vector4::Dot(const Vector4& other) const
 {
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4);
+
+  return x * other.x + y * other.y + z * other.z + w * other.w;
+}
+
+float Vector4::Dot3(const Vector4& other) const
+{
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);
 
   return x * other.x + y * other.y + z * other.z;
@@ -119,9 +126,7 @@ float Vector4::Dot(const Vector4& other) const
 
 float Vector4::Dot4(const Vector4& other) const
 {
-  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4);
-
-  return x * other.x + y * other.y + z * other.z + w * other.w;
+  return Dot(other);
 }
 
 Vector4 Vector4::Cross(const Vector4& other) const
@@ -137,12 +142,26 @@ Vector4 Vector4::Cross(const Vector4& other) const
 // Will always return positive square root
 float Vector4::Length() const
 {
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4);
+
+  return sqrtf(x * x + y * y + z * z + w * w);
+}
+
+float Vector4::Length3() const
+{
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);
 
   return sqrtf(x * x + y * y + z * z);
 }
 
 float Vector4::LengthSquared() const
+{
+  MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4);
+
+  return x * x + y * y + z * z + w * w;
+}
+
+float Vector4::LengthSquared3() const
 {
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 3);
 
@@ -152,6 +171,23 @@ float Vector4::LengthSquared() const
 void Vector4::Normalize()
 {
   const float length = Length();
+
+  // In the case where the length is exactly zero, the vector cannot be normalized.
+  if(!EqualsZero(length))
+  {
+    MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4);
+
+    const float inverseLength = 1.0f / length;
+    x *= inverseLength;
+    y *= inverseLength;
+    z *= inverseLength;
+    w *= inverseLength;
+  }
+}
+
+void Vector4::Normalize3()
+{
+  const float length = Length3();
 
   // In the case where the length is exactly zero, the vector cannot be normalized.
   if(!EqualsZero(length))

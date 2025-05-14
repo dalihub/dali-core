@@ -2,7 +2,7 @@
 #define DALI_RANDOM_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ inline Vector4 Axis()
     axis.z = Range(0.0f, 1.0f);
     axis.w = 0.0f;
   } while(axis == Vector4::ZERO);
-  axis.Normalize();
+  axis.Normalize3();
   return axis;
 }
 
