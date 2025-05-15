@@ -114,12 +114,12 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
     node.SetUpdated(true);
   }
 
-  RendererKey cacheRenderer                      = node.GetCacheRenderer();
-  const bool  isNodeExclusiveAtAnotherRenderTask = node.GetExclusiveRenderTaskCount() && !node.IsExclusiveRenderTask(&renderTask);
+  const uint32_t cacheCount                         = node.GetCacheRendererCount();
+  const bool     isNodeExclusiveAtAnotherRenderTask = node.GetExclusiveRenderTaskCount() && !node.IsExclusiveRenderTask(&renderTask);
 
   // Check whether node is exclusive to a different render-task
   // Check if node has pre-drawn cache to draw
-  if(isNodeExclusiveAtAnotherRenderTask && !cacheRenderer)
+  if(isNodeExclusiveAtAnotherRenderTask && cacheCount == 0u)
   {
     return;
   }
@@ -170,9 +170,13 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
 
   RenderableContainer& target = DALI_LIKELY(inheritedDrawMode == DrawMode::NORMAL) ? layer->colorRenderables : layer->overlayRenderables;
 
-  if(isNodeExclusiveAtAnotherRenderTask && cacheRenderer)
+  if(isNodeExclusiveAtAnotherRenderTask && cacheCount)
   {
-    target.PushBack(Renderable(&node, cacheRenderer));
+    for(uint32_t i = 0; i < cacheCount; ++i)
+    {
+      SceneGraph::RendererKey rendererKey = node.GetCacheRendererAt(i);
+      target.PushBack(Renderable(&node, rendererKey));
+    }
     return;
   }
 

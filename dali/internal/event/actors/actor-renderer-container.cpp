@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@
 
 namespace Dali::Internal
 {
-RendererContainer::RendererContainer(EventThreadServices& eventThreadServices)
-: EventThreadServicesHolder(eventThreadServices)
+RendererContainer::RendererContainer(EventThreadServices& eventThreadServices, bool isCache)
+: EventThreadServicesHolder(eventThreadServices),
+  mIsCache(isCache)
 {
 }
 
@@ -44,7 +45,16 @@ uint32_t RendererContainer::Add(const SceneGraph::Node& node, Renderer& renderer
   }
   RendererPtr rendererPtr = RendererPtr(&renderer);
   mRenderers.push_back(rendererPtr);
-  AttachRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
+
+  if(mIsCache)
+  {
+    AttachCacheRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
+  }
+  else
+  {
+    AttachRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
+  }
+
   return index;
 }
 
@@ -56,7 +66,15 @@ void RendererContainer::Remove(const SceneGraph::Node& node, Renderer& renderer)
     if((*iter).Get() == &renderer)
     {
       mRenderers.erase(iter);
-      DetachRendererMessage(GetEventThreadServices(), node, renderer.GetRendererSceneObject());
+
+      if(mIsCache)
+      {
+        DetachCacheRendererMessage(GetEventThreadServices(), node, renderer.GetRendererSceneObject());
+      }
+      else
+      {
+        DetachRendererMessage(GetEventThreadServices(), node, renderer.GetRendererSceneObject());
+      }
       break;
     }
   }
@@ -67,16 +85,35 @@ void RendererContainer::Remove(const SceneGraph::Node& node, uint32_t index)
   if(index < mRenderers.size())
   {
     RendererPtr renderer = mRenderers[index];
-    DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+
+    if(mIsCache)
+    {
+      DetachCacheRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+    }
+    else
+    {
+      DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+    }
+
     mRenderers.erase(mRenderers.begin() + index);
   }
 }
 
 void RendererContainer::RemoveAll(const SceneGraph::Node& node)
 {
-  for(auto&& renderer : mRenderers)
+  if(mIsCache)
   {
-    DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+    for(auto&& renderer : mRenderers)
+    {
+      DetachCacheRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+    }
+  }
+  else
+  {
+    for(auto&& renderer : mRenderers)
+    {
+      DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+    }
   }
   mRenderers.clear();
 }

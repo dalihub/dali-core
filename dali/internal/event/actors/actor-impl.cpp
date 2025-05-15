@@ -932,7 +932,7 @@ uint32_t Actor::AddRenderer(Renderer& renderer)
 {
   if(!mRenderers)
   {
-    mRenderers = new RendererContainer(GetEventThreadServices());
+    mRenderers = new RendererContainer(GetEventThreadServices(), false);
   }
   return mRenderers->Add(GetNode(), renderer, mIsBlendEquationSet, mBlendEquation);
 }
@@ -973,6 +973,10 @@ void Actor::SetBlendEquation(DevelBlendEquation::Type blendEquation)
       if(mRenderers)
       {
         mRenderers->SetBlending(blendEquation);
+      }
+      if(mCacheRenderers)
+      {
+        mCacheRenderers->SetBlending(blendEquation);
       }
     }
     mIsBlendEquationSet = true;
@@ -1180,34 +1184,27 @@ void Actor::RequestRenderTaskReorder()
   }
 }
 
-void Actor::SetCacheRenderer(Renderer& renderer)
+uint32_t Actor::AddCacheRenderer(Renderer& renderer)
 {
   const SceneGraph::Node& node = GetNode();
 
-  if(mCacheRenderer)
+  if(!mCacheRenderers)
   {
-    if(mCacheRenderer == RendererPtr(&renderer))
-    {
-      return;
-    }
-    RemoveCacheRenderer();
+    mCacheRenderers = new RendererContainer(GetEventThreadServices(), true);
   }
-
-  if(mIsBlendEquationSet)
-  {
-    renderer.SetBlendEquation(mBlendEquation);
-  }
-  mCacheRenderer = RendererPtr(&renderer);
-  AttachCacheRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
+  return mCacheRenderers->Add(node, renderer, mIsBlendEquationSet, mBlendEquation);
 }
 
-void Actor::RemoveCacheRenderer()
+uint32_t Actor::GetCacheRendererCount() const
 {
-  if(DALI_LIKELY(mCacheRenderer))
+  return mCacheRenderers ? mCacheRenderers->GetCount() : 0u;
+}
+
+void Actor::RemoveCacheRenderer(Renderer& renderer)
+{
+  if(mCacheRenderers)
   {
-    const SceneGraph::Node& node = GetNode();
-    DetachCacheRendererMessage(GetEventThreadServices(), node, mCacheRenderer->GetRendererSceneObject());
-    mCacheRenderer.Reset();
+    mCacheRenderers->Remove(GetNode(), renderer);
   }
 }
 
@@ -1218,6 +1215,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mParent(nullptr),
   mScene(nullptr),
   mRenderers(nullptr),
+  mCacheRenderers(nullptr),
   mParentOrigin(nullptr),
   mAnchorPoint(nullptr),
   mGestureData(nullptr),
@@ -1302,9 +1300,9 @@ Actor::~Actor()
       // Detach all renderers before delete container.
       mRenderers->RemoveAll(GetNode());
     }
-    if(mCacheRenderer)
+    if(mCacheRenderers)
     {
-      RemoveCacheRenderer();
+      mCacheRenderers->RemoveAll(GetNode());
     }
 
     // Root layer will destroy its node in its own destructor
@@ -1317,6 +1315,7 @@ Actor::~Actor()
   }
   // Cleanup renderer list
   delete mRenderers;
+  delete mCacheRenderers;
 
   // Cleanup optional gesture data
   delete mGestureData;

@@ -855,7 +855,7 @@ void UpdateManager::AttachRenderer(Node* node, Renderer* renderer)
 
 void UpdateManager::AttachCacheRenderer(Node* node, Renderer* renderer)
 {
-  node->SetCacheRenderer(Renderer::GetKey(renderer));
+  node->AddCacheRenderer(Renderer::GetKey(renderer));
   mImpl->renderersAdded = true;
 }
 

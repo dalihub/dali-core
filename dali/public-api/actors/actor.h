@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1191,6 +1191,29 @@ public: // Renderer
    *
    */
   void RemoveRenderer(uint32_t index);
+
+  /**
+   * @brief Add renderer drawing cached output to this Actor.
+   * @SINCE_2_3.54
+   * @param[in] renderer Renderer to set to the Actor
+   * @return The index of the Renderer that was added
+   * @pre The renderer must be initialized.
+   */
+  uint32_t AddCacheRenderer(Renderer& renderer);
+
+  /**
+   * @brief Get total number of cache renderers.
+   * @SINCE_2_4.19
+   * @return The size of cache renderer container
+   */
+  uint32_t GetCacheRendererCount() const;
+
+  /**
+   * @brief Removes cache renderer from the Actor.
+   * @param[in] renderer Renderer to erase.
+   * @SINCE_2_3.54
+   */
+  void RemoveCacheRenderer(Renderer& renderer);
 
 public: // Signals
   /**

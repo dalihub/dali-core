@@ -59,16 +59,6 @@ void CustomActorImpl::RequestRenderTaskReorder()
   mOwner->RequestRenderTaskReorder();
 }
 
-void CustomActorImpl::SetCacheRenderer(Renderer& renderer)
-{
-  mOwner->SetCacheRenderer(GetImplementation(renderer));
-}
-
-void CustomActorImpl::RemoveCacheRenderer()
-{
-  mOwner->RemoveCacheRenderer();
-}
-
 CustomActorImpl::CustomActorImpl(ActorFlags flags)
 : mOwner(nullptr),
   mFlags(flags)

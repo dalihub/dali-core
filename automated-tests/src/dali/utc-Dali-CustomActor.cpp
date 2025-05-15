@@ -2237,6 +2237,7 @@ int UtcDaliCustomActorImplSetRemoveCacheRenderer(void)
   DALI_TEST_EQUALS(application.GetScene().GetRenderTaskList().GetTaskCount(), 1, TEST_LOCATION);
 
   DerivedCustomActor customActor = DerivedCustomActor::New();
+  application.GetScene().Add(customActor);
 
   Geometry geometry  = CreateQuadGeometry();
   Shader   shader    = CreateShader();
@@ -2244,23 +2245,54 @@ int UtcDaliCustomActorImplSetRemoveCacheRenderer(void)
   Renderer renderer2 = Renderer::New(geometry, shader);
 
   customActor.AddRenderer(renderer);
-  customActor.GetImplementation().SetCacheRenderer(renderer);
-  customActor.GetImplementation().SetCacheRenderer(renderer2);
-  customActor.GetImplementation().SetCacheRenderer(renderer2);
-  DALI_TEST_EQUALS(customActor.GetRendererCount(), 1, TEST_LOCATION); // cache renderer is not counted.
+  customActor.AddCacheRenderer(renderer);
+  customActor.AddCacheRenderer(renderer2);
+  customActor.AddCacheRenderer(renderer2);
+  DALI_TEST_EQUALS(customActor.GetRendererCount(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetCacheRendererCount(), 2, TEST_LOCATION);
 
   customActor.RemoveRenderer(0u);
-  customActor.GetImplementation().SetCacheRenderer(renderer);
+  customActor.AddCacheRenderer(renderer);
 
   application.SendNotification();
   application.Render();
 
-  customActor.GetImplementation().RemoveCacheRenderer();
-  customActor.GetImplementation().RemoveCacheRenderer();
+  DALI_TEST_EQUALS(customActor.GetRendererCount(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetCacheRendererCount(), 2, TEST_LOCATION);
+
+  customActor.RemoveCacheRenderer(renderer);
+  customActor.RemoveCacheRenderer(renderer2);
   application.SendNotification();
   application.Render();
 
-  customActor.GetImplementation().SetCacheRenderer(renderer2);
+  DALI_TEST_EQUALS(customActor.GetCacheRendererCount(), 0, TEST_LOCATION);
+
+  customActor.AddCacheRenderer(renderer2);
+
+  CameraActor camera = CameraActor::New();
+  application.GetScene().Add(camera);
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     newTask  = taskList.CreateTask();
+  newTask.SetSourceActor(customActor);
+  newTask.SetExclusive(true);
+  newTask.SetCameraActor(camera);
+  newTask.SetInputEnabled(false);
+  newTask.SetClearColor(Color::TRANSPARENT);
+  newTask.SetClearEnabled(true);
+  newTask.SetFrameBuffer(FrameBuffer::New(10u, 10u));
+
+  RenderTask newTask2 = taskList.CreateTask();
+  newTask2.SetSourceActor(customActor);
+  newTask2.SetExclusive(true);
+  newTask2.SetCameraActor(camera);
+  newTask2.SetInputEnabled(false);
+  newTask2.SetClearColor(Color::TRANSPARENT);
+  newTask2.SetClearEnabled(true);
+  newTask2.SetFrameBuffer(FrameBuffer::New(10u, 10u));
+
+  application.SendNotification();
+  application.Render();
 
   tet_result(TET_PASS);
   END_TEST;

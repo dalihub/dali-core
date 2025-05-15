@@ -240,20 +240,6 @@ public:
   void RequestRenderTaskReorder();
 
   /**
-   * @brief Set renderer drawing cached output to this Actor.
-   * @SINCE_2_3.54
-   * @param[in] renderer Renderer to set to the Actor
-   * @pre The renderer must be initialized.
-   */
-  void SetCacheRenderer(Renderer& renderer);
-
-  /**
-   * @brief Removes cache renderer from the Actor.
-   * @SINCE_2_3.54
-   */
-  void RemoveCacheRenderer();
-
-  /**
    * @brief Called after the size negotiation has been finished for this control.
    *
    * The control is expected to assign this given size to itself/its children.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -5335,9 +5335,9 @@ int UtcDaliRenderTaskKeepRenderResult(void)
   rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   application.GetScene().Add(rootActor);
 
-  RenderTaskList          taskList           = application.GetScene().GetRenderTaskList();
-  Texture                 frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 10, 10);
-  FrameBuffer             frameBuffer        = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
+  RenderTaskList taskList           = application.GetScene().GetRenderTaskList();
+  Texture        frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 10, 10);
+  FrameBuffer    frameBuffer        = FrameBuffer::New(frameBufferTexture.GetWidth(), frameBufferTexture.GetHeight());
   frameBuffer.AttachColorTexture(frameBufferTexture);
 
   RenderTask newTask = taskList.CreateTask();
