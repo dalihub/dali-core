@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace // unnamed namespace
 const uint32_t UPDATE_COUNT         = 2u; // Update projection or view matrix this many frames after a change
 const uint32_t COPY_PREVIOUS_MATRIX = 1u; // Copy view or projection matrix from previous frame
 
-//For reflection and clipping plane
+// For reflection and clipping plane
 const float REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_A = 2.0f;
 const float REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_D = 1.0f;
 } // namespace
@@ -50,7 +50,7 @@ namespace SceneGraph
 {
 namespace
 {
-//Memory pool used to allocate new camera. Memory used by this pool will be released when shutting down DALi
+// Memory pool used to allocate new camera. Memory used by this pool will be released when shutting down DALi
 Dali::Internal::MemoryPoolObjectAllocator<Camera>& GetCameraMemoryPool()
 {
   static Dali::Internal::MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
@@ -234,7 +234,7 @@ void AdjustNearPlaneForPerspective(Matrix& perspective, const Vector4& clipPlane
     // v[5] * Q.y = (+-1.0f - v[9]) * Q.z
     Q.y = (((testCase & 2) ? 1.0f : -1.0f) - v[9]) * Q.z * inverseV5;
 
-    maximalCDotQ = std::max(maximalCDotQ, clipPlane.Dot(Q));
+    maximalCDotQ = std::max(maximalCDotQ, clipPlane.Dot3(Q));
   }
 
   float scale = 2.0f * far / maximalCDotQ;
@@ -308,7 +308,7 @@ void AdjustNearPlaneForOrthographic(Matrix& orthographic, const Vector4& clipPla
     // v[5] * Q.y = (+-1.0f - v[13])
     Q.y = (((testCase & 2) ? 1.0f : -1.0f) - v[13]) * inverseV5;
 
-    maximalCDotQ = std::max(maximalCDotQ, clipPlane.Dot(Q));
+    maximalCDotQ = std::max(maximalCDotQ, clipPlane.Dot3(Q));
   }
 
   float scale = 2.0f / maximalCDotQ;
@@ -436,7 +436,7 @@ void Camera::SetTargetPosition(const Vector3& targetPosition)
 
 void VectorReflectedByPlane(Vector4& out, Vector4& in, Vector4& plane)
 {
-  float d = float(2.0) * plane.Dot(in);
+  float d = float(2.0) * plane.Dot3(in);
   out.x   = static_cast<float>(in.x - plane.x * d);
   out.y   = static_cast<float>(in.y - plane.y * d);
   out.z   = static_cast<float>(in.z - plane.z * d);
@@ -855,7 +855,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
                       mFarClippingPlane[updateBufferIndex],
                       mInvertYAxis[0]);
 
-          //need to apply custom clipping plane
+          // need to apply custom clipping plane
           if(mUseReflectionClip)
           {
             Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
@@ -864,7 +864,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
             viewInv.Transpose();
 
             Dali::Vector4 adjReflectPlane = mReflectionPlane;
-            float         d               = mReflectionPlane.Dot(mReflectionEye);
+            float         d               = mReflectionPlane.Dot3(mReflectionEye);
             if(d < 0)
             {
               // Original eyesight was behind of mReflectionPlane. Reverse the plane.
@@ -887,7 +887,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
                        mFarClippingPlane[updateBufferIndex],
                        mInvertYAxis[0]);
 
-          //need to apply custom clipping plane
+          // need to apply custom clipping plane
           if(mUseReflectionClip)
           {
             Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
@@ -896,7 +896,7 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
             viewInv.Transpose();
 
             Dali::Vector4 adjReflectPlane = mReflectionPlane;
-            float         d               = mReflectionPlane.Dot(mReflectionEye);
+            float         d               = mReflectionPlane.Dot3(mReflectionEye);
             if(d < 0)
             {
               // Original eyesight was behind of mReflectionPlane. Reverse the plane.

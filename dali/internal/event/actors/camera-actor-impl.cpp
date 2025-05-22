@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ void BuildOrthoPickingRay(const Matrix&   viewMatrix,
   // Vector pointing from the camera to the near plane
   rayDir = cameraOrigin - nearPlaneOrigin;
   rayOrigin -= rayDir;
-  rayDir.Normalize();
+  rayDir.Normalize3();
   rayDir.w = 1.0f;
 }
 
@@ -277,7 +277,7 @@ void CameraActor::OnSceneConnectionInternal()
     {
       SetOrthographicProjection(GetScene().GetSize());
     }
-    else //if(mProjectionMode == Dali::Camera::PERSPECTIVE_PROJECTION)
+    else // if(mProjectionMode == Dali::Camera::PERSPECTIVE_PROJECTION)
     {
       SetPerspectiveProjection(GetScene().GetSize());
     }
@@ -575,7 +575,7 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.
-    Vector4 near(screenCoordinates.x - static_cast<float>(viewport.x),
+    Vector4       near(screenCoordinates.x - static_cast<float>(viewport.x),
                  static_cast<float>(viewport.height) - (screenCoordinates.y - static_cast<float>(viewport.y)),
                  0.f,
                  1.f);
@@ -587,7 +587,7 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
     rayDirection.y = near.y - rayOrigin.y;
     rayDirection.y = (isDrawnOnFramebuffer && mInvertYAxis) ? -rayDirection.y : rayDirection.y;
     rayDirection.z = near.z - rayOrigin.z;
-    rayDirection.Normalize();
+    rayDirection.Normalize3();
     rayDirection.w = 1.f;
   }
   else

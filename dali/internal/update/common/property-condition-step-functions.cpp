@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ bool Step::EvalAndCompareQuaternion(const Dali::PropertyInput& value, PropertyNo
   Quaternion propertyValue = value.GetQuaternion();
 
   Vector4     v          = propertyValue.EulerAngles();
-  const float checkValue = v.LengthSquared();
+  const float checkValue = v.LengthSquared3();
   bool        result     = Evaluate(checkValue, arg);
 
   if(result == false)
