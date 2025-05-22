@@ -53,6 +53,7 @@ struct SignalData
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
+    needGesturePropagation(false),
     receivedGesture()
   {
   }
@@ -61,7 +62,7 @@ struct SignalData
   {
     functorCalled     = false;
     voidFunctorCalled = false;
-
+    needGesturePropagation = false;
     receivedGesture.Reset();
 
     pannedActor.Reset();
@@ -69,6 +70,7 @@ struct SignalData
 
   bool       functorCalled;
   bool       voidFunctorCalled;
+  bool       needGesturePropagation;
   PanGesture receivedGesture;
   Actor      pannedActor;
 };
@@ -86,6 +88,10 @@ struct GestureReceivedFunctor
     signalData.functorCalled   = true;
     signalData.receivedGesture = pan;
     signalData.pannedActor     = actor;
+    if (signalData.needGesturePropagation)
+    {
+      Dali::DevelActor::SetNeedGesturePropagation(actor, true);
+    }
   }
 
   void operator()()
@@ -2988,7 +2994,7 @@ int UtcDaliPanGestureWhenGesturePropargation(void)
   pData.Reset();
 
   // If GesturePropargation is set, a gesture event is to pass over to the parent.
-  Dali::DevelActor::SetNeedGesturePropagation(childActor, true);
+  cData.needGesturePropagation = true;
 
   // So now the parent got the gesture event.
   TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);

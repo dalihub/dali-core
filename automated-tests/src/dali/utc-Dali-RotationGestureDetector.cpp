@@ -46,6 +46,7 @@ struct SignalData
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
+    needGesturePropagation(false),
     receivedGesture()
   {
   }
@@ -54,7 +55,7 @@ struct SignalData
   {
     functorCalled     = false;
     voidFunctorCalled = false;
-
+    needGesturePropagation = false;
     receivedGesture.Reset();
 
     rotatedActor.Reset();
@@ -62,6 +63,7 @@ struct SignalData
 
   bool            functorCalled;
   bool            voidFunctorCalled;
+  bool            needGesturePropagation;
   RotationGesture receivedGesture;
   Actor           rotatedActor;
 };
@@ -79,6 +81,10 @@ struct GestureReceivedFunctor
     signalData.functorCalled   = true;
     signalData.receivedGesture = rotation;
     signalData.rotatedActor    = actor;
+    if (signalData.needGesturePropagation)
+    {
+      Dali::DevelActor::SetNeedGesturePropagation(actor, true);
+    }
   }
 
   void operator()()
@@ -1134,7 +1140,7 @@ int UtcDaliRotationGestureWhenGesturePropargation(void)
   pData.Reset();
 
   // If GesturePropargation is set, a gesture event is to pass over to the parent.
-  Dali::DevelActor::SetNeedGesturePropagation(childActor, true);
+  cData.needGesturePropagation = true;
 
   // So now the parent got the gesture event.
   TestStartRotation(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 700);
