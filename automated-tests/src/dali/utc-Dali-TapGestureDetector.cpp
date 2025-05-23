@@ -55,7 +55,8 @@ struct SignalData
 {
   SignalData()
   : functorCalled(false),
-    voidFunctorCalled(false)
+    voidFunctorCalled(false),
+    needGesturePropagation(false)
   {
   }
 
@@ -63,7 +64,7 @@ struct SignalData
   {
     functorCalled     = false;
     voidFunctorCalled = false;
-
+    needGesturePropagation = false;
     receivedGesture.Reset();
 
     tappedActor.Reset();
@@ -71,6 +72,7 @@ struct SignalData
 
   bool       functorCalled;
   bool       voidFunctorCalled;
+  bool       needGesturePropagation;
   TapGesture receivedGesture;
   Actor      tappedActor;
 };
@@ -88,6 +90,10 @@ struct GestureReceivedFunctor
     signalData.functorCalled   = true;
     signalData.receivedGesture = tap;
     signalData.tappedActor     = actor;
+    if (signalData.needGesturePropagation)
+    {
+      Dali::DevelActor::SetNeedGesturePropagation(actor, true);
+    }
   }
 
   void operator()()
@@ -1066,7 +1072,7 @@ int UtcDaliTapGestureWhenGesturePropargation(void)
   pData.Reset();
 
   // If GesturePropargation is set, a gesture event is delivered to the parent.
-  Dali::DevelActor::SetNeedGesturePropagation(childActor, true);
+  cData.needGesturePropagation = true;
 
   // So now the parent got the gesture event.
   TestGenerateTap(application, 50.0f, 50.0f, 700);

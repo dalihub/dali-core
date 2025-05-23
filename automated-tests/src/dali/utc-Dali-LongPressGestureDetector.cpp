@@ -51,6 +51,7 @@ struct SignalData
   SignalData()
   : functorCalled(false),
     voidFunctorCalled(false),
+    needGesturePropagation(false),
     receivedGesture(),
     pressedActor()
   {
@@ -60,7 +61,7 @@ struct SignalData
   {
     functorCalled     = false;
     voidFunctorCalled = false;
-
+    needGesturePropagation = false;
     receivedGesture.Reset();
 
     pressedActor.Reset();
@@ -68,6 +69,7 @@ struct SignalData
 
   bool             functorCalled;
   bool             voidFunctorCalled;
+  bool             needGesturePropagation;
   LongPressGesture receivedGesture;
   Actor            pressedActor;
 };
@@ -85,6 +87,10 @@ struct GestureReceivedFunctor
     signalData.functorCalled   = true;
     signalData.receivedGesture = longPress;
     signalData.pressedActor    = actor;
+    if (signalData.needGesturePropagation)
+    {
+      Dali::DevelActor::SetNeedGesturePropagation(actor, true);
+    }
   }
 
   void operator()()
@@ -1125,7 +1131,7 @@ int UtcDaliLongPressGestureWhenGesturePropargation(void)
   pData.Reset();
 
   // If GesturePropargation is set, a gesture event is to pass over to the parent.
-  Dali::DevelActor::SetNeedGesturePropagation(childActor, true);
+  cData.needGesturePropagation = true;
 
   // So now the parent got the gesture event.
   TestGenerateLongPress(application, 50.0f, 50.0f);
