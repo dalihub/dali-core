@@ -168,6 +168,17 @@ public:
   /**
    * @brief Uploads data to the texture from a PixelData object.
    *
+   * @SINCE_2_4.26
+   * @param[in] pixelData The pixelData object
+   * @param[in] url The URL of the uploaded data
+   * @param[in] textureId Specifies the texture id to upload to (optional)
+   * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
+   */
+  bool Upload(PixelData pixelData, std::string url, int32_t textureId = -1);
+
+  /**
+   * @brief Uploads data to the texture from a PixelData object.
+   *
    * @SINCE_1_1.43
    * @param[in] pixelData The pixelData object
    * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise

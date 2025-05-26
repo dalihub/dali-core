@@ -59,6 +59,15 @@ Texture::Texture(Texture&& rhs) noexcept = default;
 
 Texture& Texture::operator=(Texture&& rhs) noexcept = default;
 
+bool Texture::Upload(PixelData pixelData, std::string url, int32_t textureId)
+{
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
+  return GetImplementation(*this).Upload(&internalPixelData, url, textureId);
+#endif
+  return Upload(pixelData);
+}
+
 bool Texture::Upload(PixelData pixelData)
 {
   Internal::PixelData& internalPixelData = GetImplementation(pixelData);

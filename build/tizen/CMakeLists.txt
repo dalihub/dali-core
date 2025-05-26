@@ -33,8 +33,8 @@ OPTION(ENABLE_COVERAGE       "Coverage" OFF)
 OPTION(ENABLE_TRACE          "Enable Trace" OFF)
 OPTION(ENABLE_PKG_CONFIGURE  "Use pkgconfig" ON)
 OPTION(ENABLE_LINK_TEST      "Enable the link test" ON)
-
 OPTION(ENABLE_LOW_SPEC_MEMORY_MANAGEMENT "Enable Memory management for low spec devices" OFF)
+OPTION(ENABLE_GPU_MEMORY_PROFILE "Enable GPU memory profiling" OFF)
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
   SET(dali-windows-dependencies_DIR "${CMAKE_INSTALL_PREFIX}/share/dali-windows-dependencies")
@@ -91,6 +91,10 @@ ENDIF()
 
 IF( ENABLE_LOW_SPEC_MEMORY_MANAGEMENT )
   ADD_DEFINITIONS("-DLOW_SPEC_MEMORY_MANAGEMENT_ENABLED")
+ENDIF()
+
+IF( ENABLE_GPU_MEMORY_PROFILE )
+  ADD_DEFINITIONS("-DENABLE_GPU_MEMORY_PROFILE")
 ENDIF()
 
 # Deployment folder should come from spec file or command line:
@@ -416,5 +420,6 @@ MESSAGE( STATUS "Trace:                 " ${ENABLE_TRACE} )
 MESSAGE( STATUS "Use pkg configure:     " ${ENABLE_PKG_CONFIGURE} )
 MESSAGE( STATUS "Enable link test:      " ${ENABLE_LINK_TEST} )
 MESSAGE( STATUS "Memory Management:     " ${ENABLE_LOW_SPEC_MEMORY_MANAGEMENT} )
+MESSAGE( STATUS "GPU memory profiling:  " ${ENABLE_GPU_MEMORY_PROFILE} )
 MESSAGE( STATUS "CXXFLAGS:              " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "LDFLAGS:               " ${CMAKE_SHARED_LINKER_FLAGS_INIT}${CMAKE_SHARED_LINKER_FLAGS} )
