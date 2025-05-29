@@ -201,7 +201,7 @@ bool HitTestActor(const RenderTask&                              renderTask,
                   const float&                                   nearClippingPlane,
                   const float&                                   farClippingPlane,
                   HitTestInterface&                              hitCheck,
-                  const RayTest&                                 rayTest,
+                  RayTest&                                       rayTest,
                   const Integration::Point&                      point,
                   const uint32_t                                 eventTime,
                   bool                                           clippingActor,
@@ -224,8 +224,21 @@ bool HitTestActor(const RenderTask&                              renderTask,
       Vector2 hitPointLocal;
       float   distance;
 
+      Vector3 hitPointLocal3D;
+      Dali::Layer::Behavior layerBehavior = actor.GetLayer().GetProperty<Dali::Layer::Behavior>(Dali::Layer::Property::BEHAVIOR);
+
+      bool isHitted = false;
+      if(layerBehavior == Dali::Layer::Behavior::LAYER_3D)
+      {
+        isHitted = rayTest.ActorBoundingBoxTest(actor, rayOrigin, rayDir, hitPointLocal3D, distance);
+      }
+      else
+      {
+        isHitted = rayTest.ActorTest(actor, rayOrigin, rayDir, hitPointLocal, distance);
+      }
+
       // Finally, perform a more accurate ray test to see if our ray actually hits the actor.
-      if(rayTest.ActorTest(actor, rayOrigin, rayDir, hitPointLocal, distance))
+      if(isHitted)
       {
         // Calculate z coordinate value in Camera Space.
         const Matrix&  viewMatrix          = renderTask.GetCameraActor()->GetViewMatrix();
@@ -341,7 +354,7 @@ HitActor HitTestWithinLayer(Actor&                                         actor
                             const bool&                                    overlayed,
                             bool&                                          overlayHit,
                             bool                                           layerIs3d,
-                            const RayTest&                                 rayTest,
+                            RayTest&                                       rayTest,
                             const Integration::Point&                      point,
                             const uint32_t                                 eventTime,
                             std::list<Dali::Internal::Actor*>&             actorLists,
@@ -533,7 +546,7 @@ void GeoHitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                           Vector2                                    screenCoordinates,
                           Results&                                   results,
                           HitTestInterface&                          hitCheck,
-                          const RayTest&                             rayTest)
+                          RayTest&                                   rayTest)
 {
   if(renderTask.IsHittable(screenCoordinates))
   {
@@ -648,7 +661,7 @@ bool HitTestRenderTask(const RenderTaskList::ExclusivesContainer& exclusives,
                        Vector2                                    screenCoordinates,
                        Results&                                   results,
                        HitTestInterface&                          hitCheck,
-                       const RayTest&                             rayTest)
+                       RayTest&                                   rayTest)
 {
   if(renderTask.IsHittable(screenCoordinates))
   {
