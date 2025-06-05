@@ -116,7 +116,8 @@ Node::Node()
   mTransparent(false),
   mUpdateAreaChanged(false),
   mUpdateAreaUseSize(true),
-  mUseTextureUpdateArea(false)
+  mUseTextureUpdateArea(false),
+  mIgnored(false)
 {
 #ifdef DEBUG_ENABLED
   gNodeCount++;
@@ -154,6 +155,7 @@ void Node::CreateTransform(SceneGraph::TransformManager* transformManager)
 
   // Set whether the position should use the anchor point
   transformManager->SetPositionUsesAnchorPoint(createdTransformId, mPositionUsesAnchorPoint);
+  transformManager->SetIgnored(createdTransformId, mIgnored);
 
   // Set TransformId after initialize done.
   mTransformManagerData.mId = createdTransformId;

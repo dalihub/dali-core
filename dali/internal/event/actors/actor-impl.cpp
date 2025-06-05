@@ -371,7 +371,7 @@ void CheckParentAndCall(ActorParent* parent, Actor& actor, Actor& target, ActorP
  * @brief Get the stack of visibility changed actors.
  * @return The global visibility changed actors stack.
  */
-ActorContainer& GetVisibilityChagnedActorStack()
+ActorContainer& GetVisibilityChangedActorStack()
 {
   static ActorContainer gVisibilityChangedActorStack; ///< Stack of visibility changed actors. Latest actor is the latest visibility changed actor.
   return gVisibilityChangedActorStack;
@@ -720,9 +720,9 @@ Matrix Actor::GetCurrentWorldMatrix() const
 
 ActorPtr Actor::GetVisiblityChangedActor()
 {
-  if(!GetVisibilityChagnedActorStack().empty())
+  if(!GetVisibilityChangedActorStack().empty())
   {
-    return GetVisibilityChagnedActorStack().back();
+    return GetVisibilityChangedActorStack().back();
   }
   return ActorPtr();
 }
@@ -1245,6 +1245,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mIsRoot(ROOT_LAYER == derivedType),
   mIsLayer(LAYER == derivedType || ROOT_LAYER == derivedType),
   mIsOnScene(false),
+  mIsIgnored(false),
   mSensitive(true),
   mLeaveRequired(false),
   mKeyboardFocusable(false),
@@ -1728,12 +1729,12 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     // Push the actor at the stack.
     // Note that another actor's visibility could be changed during visibility change callback.
     // So we need to stack those actors, and then use it.
-    GetVisibilityChagnedActorStack().emplace_back(this);
+    GetVisibilityChangedActorStack().emplace_back(this);
 
     EmitInheritedVisibilityChangedSignalRecursively(visiblility);
 
     // Pop the actor from the stack now
-    GetVisibilityChagnedActorStack().pop_back();
+    GetVisibilityChangedActorStack().pop_back();
   }
 }
 
@@ -1915,7 +1916,7 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     // Push the actor at the stack.
     // Note that another actor's visibility could be changed during visibility change callback.
     // So we need to stack those actors, and then use it.
-    GetVisibilityChagnedActorStack().emplace_back(this);
+    GetVisibilityChangedActorStack().emplace_back(this);
 
     // Emit the signal on this actor and all its children
     mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::SELF);
@@ -1926,7 +1927,7 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     }
 
     // Pop the actor from the stack now
-    GetVisibilityChagnedActorStack().pop_back();
+    GetVisibilityChangedActorStack().pop_back();
   }
 }
 
@@ -1987,6 +1988,20 @@ void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
   SetUpdateAreaHintMessage(GetEventThreadServices(), GetNode(), updateAreaHint);
+}
+
+void Actor::SetIgnored(bool ignored)
+{
+  if(ignored != mIsIgnored)
+  {
+    mIsIgnored = ignored;
+    SetIgnoredMessage(GetEventThreadServices(), GetNode(), mIsIgnored);
+  }
+}
+
+bool Actor::IsIgnored() const
+{
+  return mIsIgnored;
 }
 
 } // namespace Internal
