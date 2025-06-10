@@ -276,6 +276,7 @@ void Node::AddCacheRenderer(const RendererKey& renderer)
   }
 
   SetUpdated(true);
+  SetDirtyFlag(NodePropertyFlags::COLOR);
 
   mCacheRenderers.PushBack(renderer);
 }
@@ -290,6 +291,7 @@ void Node::RemoveCacheRenderer(const RendererKey& renderer)
       renderer->DetachFromNodeDataProvider(*this);
 
       SetUpdated(true);
+      SetDirtyFlag(NodePropertyFlags::COLOR);
       mCacheRenderers.Erase(mCacheRenderers.Begin() + i);
       return;
     }
