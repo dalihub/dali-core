@@ -1659,12 +1659,19 @@ public:
    * @param[in] renderer Renderer to set to the Actor
    * @pre The renderer must be initialized.
    */
-  void SetCacheRenderer(Renderer& renderer);
+  uint32_t AddCacheRenderer(Renderer& renderer);
+
+  /**
+   * Retrieves the number of cache renderers in this actor.
+   * @return The number of cache renderers.
+   */
+  uint32_t GetCacheRendererCount() const;
 
   /**
    * @brief Removes cache renderer from the Actor.
+   * @param[in] renderer The cache renderer to remove.
    */
-  void RemoveCacheRenderer();
+  void RemoveCacheRenderer(Renderer& renderer);
 
 protected:
   enum DerivedType
@@ -2048,15 +2055,15 @@ private:
   void SetUpdateAreaHint(const Vector4& updateAreaHint);
 
 protected:
-  ActorParentImpl    mParentImpl;    ///< Implementation of ActorParent;
-  ActorSizer         mSizer;         ///< Implementation for managing actor size
-  ActorParent*       mParent;        ///< Each actor (except the root) can have one parent
-  Scene*             mScene;         ///< The scene the actor is added to
-  RendererContainer* mRenderers;     ///< Renderer container
-  RendererPtr        mCacheRenderer; ///< Result of offscreen rendering
-  Vector3*           mParentOrigin;  ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
-  Vector3*           mAnchorPoint;   ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
-  ActorGestureData*  mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
+  ActorParentImpl    mParentImpl;     ///< Implementation of ActorParent;
+  ActorSizer         mSizer;          ///< Implementation for managing actor size
+  ActorParent*       mParent;         ///< Each actor (except the root) can have one parent
+  Scene*             mScene;          ///< The scene the actor is added to
+  RendererContainer* mRenderers;      ///< Renderer container
+  RendererContainer* mCacheRenderers; ///< Renderers rendering offscreen rendering results
+  Vector3*           mParentOrigin;   ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
+  Vector3*           mAnchorPoint;    ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
+  ActorGestureData*  mGestureData;    ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
   Dali::Actor::TouchEventSignalType                 mInterceptTouchedSignal;

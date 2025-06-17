@@ -268,22 +268,32 @@ public:
   }
 
   /**
-   * Set cache renderer which draws output of offscreen rendering
-   * Draws only when mOffScreenRendering is true
+   * Add cache renderer which draws output of offscreen rendering
    */
-  void SetCacheRenderer(const RendererKey& renderer);
+  void AddCacheRenderer(const RendererKey& renderer);
 
   /**
    * Remove cache renderer
    */
-  void RemoveCacheRenderer();
+  void RemoveCacheRenderer(const RendererKey& renderer);
 
   /**
    * Get cache renderer
+   * @param[in] index The index of the renderer in the node's cache renderer container
+   * @return RendererKey of cache renderer with given index
    */
-  RendererKey GetCacheRenderer() const
+  RendererKey GetCacheRendererAt(uint32_t index) const
   {
-    return mCacheRenderer;
+    return mCacheRenderers[index];
+  }
+
+  /**
+   * Retrieve the number of cache renderes for the node.
+   * @return The size of cache renderer container
+   */
+  uint32_t GetCacheRendererCount() const
+  {
+    return static_cast<uint32_t>(mCacheRenderers.Size());
   }
 
   // Containment methods
@@ -1177,8 +1187,8 @@ protected:
   Node*               mParent;               ///< Pointer to parent node (a child is owned by its parent)
   RenderTaskContainer mExclusiveRenderTasks; ///< Nodes can be marked as exclusive to multiple RenderTasks
 
-  RendererContainer mRenderers;     ///< Container of renderers; not owned
-  RendererKey       mCacheRenderer; ///< Result of offscreen rendering
+  RendererContainer mRenderers;      ///< Container of renderers; not owned
+  RendererContainer mCacheRenderers; ///< Container of renderers drawing offscreen rendering results
 
   NodeContainer mChildren; ///< Container of children; not owned
 
@@ -1308,13 +1318,13 @@ inline void DetachRendererMessage(EventThreadServices& eventThreadServices, cons
 
 inline void DetachCacheRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
 {
-  using LocalType = Message<Node>;
+  using LocalType = MessageValue1<Node, RendererKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::RemoveCacheRenderer);
+  new(slot) LocalType(&node, &Node::RemoveCacheRenderer, Renderer::GetKey(renderer));
 }
 
 inline void SetDepthIndexMessage(EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex)

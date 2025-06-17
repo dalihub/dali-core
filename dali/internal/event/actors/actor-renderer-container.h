@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTORS_ACTOR_RENDERER_CONTAINER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,9 @@ public:
    * Constructor.
    *
    * @param[in] eventThreadServices - thread services for sending messages
+   * @param[in] isCache - whether the container is for cache renderers(drawing offscreen rendering results)
    */
-  RendererContainer(EventThreadServices& eventThreadServices);
+  RendererContainer(EventThreadServices& eventThreadServices, bool isCache);
 
   /**
    * Add a renderer to this actor & actor's node, with blending applied if necessary.
@@ -103,6 +104,8 @@ public:
 
 private:
   std::vector<RendererPtr> mRenderers; ///< The contained renderers
+
+  bool mIsCache : 1; /// The container is for cache renderers
 };
 
 } // namespace Dali::Internal

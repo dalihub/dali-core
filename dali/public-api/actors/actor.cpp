@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,6 +258,21 @@ void Actor::RemoveRenderer(Renderer& renderer)
 void Actor::RemoveRenderer(uint32_t index)
 {
   GetImplementation(*this).RemoveRenderer(index);
+}
+
+uint32_t Actor::AddCacheRenderer(Renderer& renderer)
+{
+  return GetImplementation(*this).AddCacheRenderer(GetImplementation(renderer));
+}
+
+uint32_t Actor::GetCacheRendererCount() const
+{
+  return GetImplementation(*this).GetCacheRendererCount();
+}
+
+void Actor::RemoveCacheRenderer(Renderer& renderer)
+{
+  GetImplementation(*this).RemoveCacheRenderer(GetImplementation(renderer));
 }
 
 Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()

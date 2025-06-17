@@ -265,23 +265,34 @@ void Node::RemoveRenderer(const RendererKey& renderer)
   }
 }
 
-void Node::SetCacheRenderer(const RendererKey& renderer)
+void Node::AddCacheRenderer(const RendererKey& renderer)
 {
-  if(DALI_UNLIKELY(mCacheRenderer))
+  for(auto&& existingRenderer : mCacheRenderers)
   {
-    mCacheRenderer->DetachFromNodeDataProvider(*this);
+    if(existingRenderer == renderer)
+    {
+      return;
+    }
   }
+
   SetUpdated(true);
-  mCacheRenderer = renderer;
+
+  mCacheRenderers.PushBack(renderer);
 }
 
-void Node::RemoveCacheRenderer()
+void Node::RemoveCacheRenderer(const RendererKey& renderer)
 {
-  if(DALI_LIKELY(mCacheRenderer))
+  RendererContainer::SizeType rendererCount(mCacheRenderers.Size());
+  for(RendererContainer::SizeType i = 0; i < rendererCount; ++i)
   {
-    mCacheRenderer->DetachFromNodeDataProvider(*this);
-    SetUpdated(true);
-    mCacheRenderer = RendererKey{};
+    if(mCacheRenderers[i] == renderer)
+    {
+      renderer->DetachFromNodeDataProvider(*this);
+
+      SetUpdated(true);
+      mCacheRenderers.Erase(mCacheRenderers.Begin() + i);
+      return;
+    }
   }
 }
 
