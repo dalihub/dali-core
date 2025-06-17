@@ -292,8 +292,11 @@ void UniformBufferV2::WriteCPU(const void* data, uint32_t size, uint32_t offset)
 
   DALI_ASSERT_DEBUG(offset + size <= mBufferList[mCurrentGraphicsBufferIndex].capacity);
 
-  // just copy whatever comes here
-  memcpy(reinterpret_cast<uint8_t*>(mMappedPtr) + offset, data, size);
+  if(mMappedPtr)
+  {
+    // just copy whatever comes here
+    memcpy(reinterpret_cast<uint8_t*>(mMappedPtr) + offset, data, size);
+  }
 }
 
 void UniformBufferV2::WriteGPU(const void* data, uint32_t size, uint32_t offset)
@@ -306,7 +309,10 @@ void UniformBufferV2::WriteGPU(const void* data, uint32_t size, uint32_t offset)
 
   DALI_ASSERT_DEBUG(offset + size <= mBufferList[mCurrentGraphicsBufferIndex].capacity);
 
-  memcpy(reinterpret_cast<uint8_t*>(mMappedPtr) + offset, data, size);
+  if(mMappedPtr)
+  {
+    memcpy(reinterpret_cast<uint8_t*>(mMappedPtr) + offset, data, size);
+  }
 }
 
 void UniformBufferV2::MapCPU()
