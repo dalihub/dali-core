@@ -277,42 +277,45 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
   if(touch.GetPointCount() > 0 && actorImpl.OnScene())
   {
     const PointState::Type state = touch.GetState(0);
-    if(state == PointState::DOWN)
-    {
-      CancelProcessing();
-      Clear();
-      actorImpl.SetNeedGesturePropagation(false);
-      mGestureEventProcessor.RegisterGestureDetector(this);
-    }
-
-    Integration::TouchEvent touchEvent(touch.GetTime());
-    for(std::size_t i = 0; i < touch.GetPointCount(); i++)
-    {
-      Integration::Point point;
-      point.SetState(touch.GetState(i));
-      point.SetDeviceId(touch.GetDeviceId(i));
-      point.SetScreenPosition(touch.GetScreenPosition(i));
-      point.SetRadius(touch.GetRadius(i));
-      point.SetPressure(touch.GetPressure(i));
-      point.SetAngle(touch.GetAngle(i));
-      point.SetDeviceClass(touch.GetDeviceClass(i));
-      point.SetDeviceSubclass(touch.GetDeviceSubclass(i));
-      point.SetMouseButton(touch.GetMouseButton(i));
-      point.SetHitActor(touch.GetHitActor(i));
-      point.SetLocalPosition(touch.GetLocalPosition(i));
-      touchEvent.points.push_back(point);
-    }
-
     Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
-    mFeededActor.SetActor(&actorImpl);
-    mRenderTask = &GetImplementation(touchEventImpl.GetRenderTaskPtr());
-
-    if(!actorImpl.NeedGesturePropagation())
+    if(touchEventImpl.GetRenderTaskPtr())
     {
-      ProcessTouchEvent(actorImpl.GetScene(), touchEvent);
+      if(state == PointState::DOWN)
+      {
+        CancelProcessing();
+        Clear();
+        actorImpl.SetNeedGesturePropagation(false);
+        mGestureEventProcessor.RegisterGestureDetector(this);
+      }
+
+      Integration::TouchEvent touchEvent(touch.GetTime());
+      for(std::size_t i = 0; i < touch.GetPointCount(); i++)
+      {
+        Integration::Point point;
+        point.SetState(touch.GetState(i));
+        point.SetDeviceId(touch.GetDeviceId(i));
+        point.SetScreenPosition(touch.GetScreenPosition(i));
+        point.SetRadius(touch.GetRadius(i));
+        point.SetPressure(touch.GetPressure(i));
+        point.SetAngle(touch.GetAngle(i));
+        point.SetDeviceClass(touch.GetDeviceClass(i));
+        point.SetDeviceSubclass(touch.GetDeviceSubclass(i));
+        point.SetMouseButton(touch.GetMouseButton(i));
+        point.SetHitActor(touch.GetHitActor(i));
+        point.SetLocalPosition(touch.GetLocalPosition(i));
+        touchEvent.points.push_back(point);
+      }
+
+      mFeededActor.SetActor(&actorImpl);
+      mRenderTask = &GetImplementation(touchEventImpl.GetRenderTaskPtr());
+
+      if(!actorImpl.NeedGesturePropagation())
+      {
+        ProcessTouchEvent(actorImpl.GetScene(), touchEvent);
+      }
+      ret = IsDetected() && !actorImpl.NeedGesturePropagation();
     }
 
-    ret = IsDetected() && !actorImpl.NeedGesturePropagation();
     actorImpl.SetNeedGesturePropagation(false);
 
     if(state == PointState::FINISHED || state == PointState::INTERRUPTED)
