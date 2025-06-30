@@ -34,8 +34,8 @@ namespace Internal
 class PropertyDetails;
 
 /*
-* @copydoc Dali::TypeRegistry
-*/
+ * @copydoc Dali::TypeRegistry
+ */
 class TypeRegistry : public Dali::BaseObject
 {
 public:
@@ -167,10 +167,12 @@ public:
    * @param [in] registered TypeRegistration object used to register the type
    * @param [in] name Property name
    * @param [in] index Property index
-   * @param [in] value Property default value
+   * @param [in] defaultValue Property default value
+   * @param [in] setFunc An additional function to set the property (Can be nullptr).
+   * @param [in] getFunc An additional function to get the value of a property (Can be nullptr).
    * @return true if registered
    */
-  bool RegisterAnimatableProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Value defaultValue);
+  bool RegisterAnimatableProperty(TypeRegistration& registered, std::string name, Property::Index index, Property::Value defaultValue, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Register a component of a scene graph only property that supports components (i.e. Vector2, Vector3 and Vector4)

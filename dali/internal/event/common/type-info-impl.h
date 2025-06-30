@@ -182,9 +182,11 @@ public:
    * Adds an animatable property with the given default value.
    * @param[in] name The name of the property.
    * @param[in] index The index of the property
-   * @param[in] type The Property::Type.
+   * @param[in] defaultValue Property default value
+   * @param[in] setFunc An additional function to call to set the property (Can be nullptr).
+   * @param[in] getFunc An additional function to call to retrieve the value of the property (Can be nullptr).
    */
-  void AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue);
+  void AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc);
 
   /**
    * Adds a component of an animatable property to the type.

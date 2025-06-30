@@ -381,9 +381,16 @@ public:
    * @param[in] name The name of the property
    * @param[in] index The property index. Must be a value between ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX and ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX inclusive
    * @param[in] value The property default value
+   * @param[in] setFunc An additional function to call when setting the property (Can be nullptr).
+   * @param[in] getFunc An additional function to call to retrieve the current value of the property (Can be nullptr).
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  explicit AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value);
+  explicit AnimatablePropertyRegistration(TypeRegistration&             registered,
+                                          std::string                   name,
+                                          Property::Index               index,
+                                          const Property::Value&        value,
+                                          TypeInfo::SetPropertyFunction setFunc = nullptr,
+                                          TypeInfo::GetPropertyFunction getFunc = nullptr);
 };
 
 /**

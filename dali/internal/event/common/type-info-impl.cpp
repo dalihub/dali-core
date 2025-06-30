@@ -513,9 +513,9 @@ void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Pr
   }
 }
 
-void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue)
+void TypeInfo::AddAnimatableProperty(std::string name, Property::Index index, Property::Value defaultValue, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
-  if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(defaultValue.GetType(), ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
+  if(DALI_UNLIKELY(!mRegisteredProperties.Register(static_cast<std::uint32_t>(index), RegisteredProperty(defaultValue.GetType(), setFunc, getFunc, ConstString(name), Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX))))
   {
     DALI_LOG_ERROR("Property index already added to Type! name:%s, index:%d\n", name.c_str(), index);
     DALI_ASSERT_ALWAYS(!"Property index already added to Type");
