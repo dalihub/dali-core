@@ -1284,16 +1284,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       currentRenderPass   = sceneObject->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
     }
 
-    // Setup command buffer for this instruction.
-    currentCommandBuffer = instruction.GetCommandBuffer(mImpl->graphicsController);
-    commandBuffers.emplace_back(currentCommandBuffer);
-
-    currentCommandBuffer->Reset();
-    Graphics::CommandBufferBeginInfo info;
-    info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
-    info.SetRenderTarget(*currentRenderTarget);
-    currentCommandBuffer->Begin(info);
-
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
     {
       // Offscreen buffer rendering
@@ -1354,12 +1344,24 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       }
     }
 
+    // Get current instruction's command buffer, and reset it.
+    currentCommandBuffer = instruction.GetCommandBuffer(mImpl->graphicsController);
+    currentCommandBuffer->Reset();
+
     // Scissor's value should be set based on the default system coordinates.
     // When the surface is rotated, the input values already were set with the rotated angle.
     // So, re-calculation is needed.
     scissorArea = RecalculateScissorArea(scissorArea, surfaceOrientation, surfaceRect);
     if(scissorArea.width > 0 && scissorArea.height > 0)
     {
+      // Setup command buffer for this instruction.
+      commandBuffers.emplace_back(currentCommandBuffer);
+
+      Graphics::CommandBufferBeginInfo info;
+      info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
+      info.SetRenderTarget(*currentRenderTarget);
+      currentCommandBuffer->Begin(info);
+
       // Begin render pass
       currentCommandBuffer->BeginRenderPass(currentRenderPass,
                                             currentRenderTarget,
@@ -1418,17 +1420,17 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   {
     mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
     mImpl->commandBufferSubmitted = true;
-  }
 
-  // present render target (if main scene)
-  if(!renderToFbo)
-  {
-    DALI_LOG_INFO(gLogFilter, Debug::General, "Present\n");
+    // present render target (if main scene)
+    if(!renderToFbo)
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::General, "Present\n");
 
-    DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
-    auto renderTarget = sceneObject->GetSurfaceRenderTarget();
-    mImpl->graphicsController.PresentRenderTarget(renderTarget);
-    DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
+      DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
+      auto renderTarget = sceneObject->GetSurfaceRenderTarget();
+      mImpl->graphicsController.PresentRenderTarget(renderTarget);
+      DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
+    }
   }
 
   // RollBack Shared UBO view list to avoid leak.
@@ -1453,6 +1455,7 @@ void RenderManager::ClearScene(Integration::Scene scene)
     return;
   }
 
+  DALI_TRACE_BEGIN(gTraceFilter, "DALI_CLEAR_SCENE");
   auto& currentClearValues = sceneObject->GetGraphicsRenderPassClearValues();
   DALI_ASSERT_DEBUG(!currentClearValues.empty());
 
@@ -1483,6 +1486,7 @@ void RenderManager::ClearScene(Integration::Scene scene)
   submitInfo.cmdBuffer.push_back(commandBuffer.get());
   mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
   mImpl->graphicsController.PresentRenderTarget(currentRenderTarget);
+  DALI_TRACE_END(gTraceFilter, "DALI_CLEAR_SCENE");
 }
 
 void RenderManager::PostRender()
