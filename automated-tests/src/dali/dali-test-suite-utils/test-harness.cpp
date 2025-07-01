@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@
 #include <fstream>
 #include <map>
 #include <sstream>
+#include <thread>
 #include <vector>
 
 using std::chrono::steady_clock;
@@ -431,6 +432,21 @@ int32_t RunAll(const char* processName, ::testcase tc_array[], std::string match
   return numFailures;
 }
 
+int32_t GetAvailableCores()
+{
+  int32_t cores = std::thread::hardware_concurrency();
+
+  // Rough estimate of the number of cores currently available
+  double load[1];
+  if(getloadavg(load, 1) != -1)
+  {
+    int32_t available = std::max(0, static_cast<int>(cores - load[0])); // rough estimate
+    cores             = available;
+  }
+
+  return cores;
+}
+
 // Constantly runs up to MAX_NUM_CHILDREN processes
 int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::string match, bool reRunFailed, bool quiet)
 {
@@ -449,7 +465,7 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
   while(tc_array[nextTestCase].name || numRunningChildren > 0)
   {
     // Create more children (up to the max number or til the end of the array)
-    while(numRunningChildren < MAX_NUM_CHILDREN && tc_array[nextTestCase].name)
+    while(numRunningChildren < GetAvailableCores() && tc_array[nextTestCase].name)
     {
       bool run = true;
       if(!match.empty())
