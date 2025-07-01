@@ -38,7 +38,12 @@ function build
         BUILDSYSTEM="Ninja"
         BUILDCMD=ninja
     fi
-    (cd build ; cmake .. -DMODULE=$1 -G "$BUILDSYSTEM" ; $BUILDCMD -j7 )
+    CACHE_CPP='/usr/lib/ccache/g++' CACHE_CC='/usr/lib/ccache/gcc'
+    if [ -e $CACHE_CPP ] ; then
+        (cd build ; CXX=$CACHE_CPP CC=$CACHE_CC cmake .. -DMODULE=$1 -G "$BUILDSYSTEM" ; $BUILDCMD -j7 )
+    else
+        (cd build ; cmake .. -DMODULE=$1 -G "$BUILDSYSTEM" ; $BUILDCMD -j7 )
+    fi
 }
 
 if [ -n "$1" ] ; then
