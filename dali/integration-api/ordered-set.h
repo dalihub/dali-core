@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_ORDERED_SET_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
-#include <dali/devel-api/common/map-wrapper.h>
-#else
 #include <unordered_map>
-#endif
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -49,11 +45,7 @@ namespace Integration
  * @tparam KeyEqual Custom equal function of const T* type for MapContainer.
  *                  Return true if two const T* type is equal. Default as std::equal_to<const T*>
  */
-#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
-template<class T, bool owned = true, class Compare = std::less<const T*>>
-#else
 template<class T, bool owned = true, class Hash = std::hash<const T*>, class KeyEqual = std::equal_to<const T*>>
-#endif
 class OrderedSet
 {
 public:
@@ -63,11 +55,7 @@ public:
   using ConstIterator = typename ListContainer::const_iterator;
 
   // Find helper map container.
-#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
-  using MapContainer = typename std::map<const T*, Iterator, Compare>;
-#else
   using MapContainer = typename std::unordered_map<const T*, Iterator, Hash, KeyEqual>;
-#endif
 
   using SizeType = std::size_t;
 
@@ -84,9 +72,7 @@ public:
     mList(std::move(rhs.mList))
   {
     rhs.mMap.clear();
-#if !defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     rhs.mMap.rehash(0);
-#endif
     rhs.mList.clear();
   }
 
@@ -99,9 +85,7 @@ public:
     mMap  = std::move(rhs.mMap);
     mList = std::move(rhs.mList);
     rhs.mMap.clear();
-#if !defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     rhs.mMap.rehash(0);
-#endif
     rhs.mList.clear();
     return *this;
   }
@@ -176,12 +160,10 @@ public:
    */
   void Reserve(SizeType count)
   {
-#if !defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     if(mMap.size() < count)
     {
       mMap.rehash(count);
     }
-#endif
   }
 
   /**
@@ -230,13 +212,13 @@ public:
   void EraseObject(T* object)
   {
     // TODO : Should we allow duplicated erase?
-    //DALI_ASSERT_DEBUG(Find(object) != End());
+    // DALI_ASSERT_DEBUG(Find(object) != End());
     Erase(Find(object));
   }
   void EraseObject(const T* object)
   {
     // TODO : Should we allow duplicated erase?
-    //DALI_ASSERT_DEBUG(Find(object) != End());
+    // DALI_ASSERT_DEBUG(Find(object) != End());
     Erase(Find(object));
   }
 
@@ -332,9 +314,7 @@ public:
       }
     }
     mMap.clear();
-#if !defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     mMap.rehash(0);
-#endif
     mList.clear();
   }
 
@@ -352,7 +332,7 @@ public:
 
 private:
   // Delete copy operation.
-  OrderedSet(const OrderedSet&) = delete;
+  OrderedSet(const OrderedSet&)            = delete;
   OrderedSet& operator=(const OrderedSet&) = delete;
 
 private:
