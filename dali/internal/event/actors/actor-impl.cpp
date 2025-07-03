@@ -151,6 +151,7 @@ DALI_PROPERTY("allowOnlyOwnTouch", BOOLEAN, true, false, false, Dali::DevelActor
 DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA)
 DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION)
 DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_HOVER_MOTION)
+DALI_PROPERTY("childrenDepthIndexPolicy", INTEGER, true, false, false, Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
 // Signals
@@ -816,6 +817,16 @@ void Actor::SetInheritOrientation(bool inherit)
   }
 }
 
+void Actor::SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Type childrenDepthIndexPolicy)
+{
+  mChildrenDepthIndexPolicy = childrenDepthIndexPolicy;
+  RequestRenderTaskReorder();
+  if(mScene)
+  {
+    mScene->RequestRebuildDepthTree();
+  }
+}
+
 void Actor::SetSizeModeFactor(const Vector3& factor)
 {
   mSizer.SetSizeModeFactor(factor);
@@ -1264,9 +1275,11 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mUseTextureUpdateArea(false),
   mDispatchTouchMotion(true),
   mDispatchHoverMotion(true),
+  mIsRenderTaskMappingActor(false),
   mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
   mDrawMode(DrawMode::NORMAL),
   mColorMode(Node::DEFAULT_COLOR_MODE),
+  mChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::INCREASE),
   mClippingMode(ClippingMode::DISABLED),
   mHoverState(PointState::FINISHED),
   mBlendEquation(DevelBlendEquation::ADD),
