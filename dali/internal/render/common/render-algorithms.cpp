@@ -740,11 +740,16 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
           nodeScale = nodeInfo.modelMatrix.GetScale();
         }
 
+        // Ignore an item's world color when rendering offscreen cache
+        // to ensure we avoid repetitive calculations from different instructions.
+        bool           drawOffscreenRenderingCache = (item.mNode->GetCacheRendererCount() > 0u) && (instruction.mFrameBuffer != nullptr);
+        const Vector4& worldColor                  = drawOffscreenRenderingCache ? Vector4::ONE : nodeInfo.worldColor;
+
         auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, nodeInfo.worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTarget, queue);
+          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTarget, queue);
         }
       }
     }

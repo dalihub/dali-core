@@ -655,8 +655,14 @@ public:
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
-    // default first
-    if(mColorMode == USE_OWN_MULTIPLY_PARENT_ALPHA)
+    // When mParent draws offscreen cache, cut inheritance so that its world color is applied all at once on cache.
+    // Without this, world color is calculated twice(1. When drawing on offscreen cache, 2. When drawing the cache).
+    bool shouldAvoidRepetitiveInheritance = mParent->GetCacheRendererCount() > 0u;
+    if(shouldAvoidRepetitiveInheritance || mColorMode == USE_OWN_COLOR)
+    {
+      mWorldColor.Set(updateBufferIndex, mColor[updateBufferIndex]);
+    }
+    else if(mColorMode == USE_OWN_MULTIPLY_PARENT_ALPHA) // default
     {
       const Vector4& ownColor = mColor[updateBufferIndex];
       mWorldColor.Set(updateBufferIndex, ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColor(updateBufferIndex).a);
@@ -668,10 +674,6 @@ public:
     else if(mColorMode == USE_PARENT_COLOR)
     {
       mWorldColor.Set(updateBufferIndex, mParent->GetWorldColor(updateBufferIndex));
-    }
-    else // USE_OWN_COLOR
-    {
-      mWorldColor.Set(updateBufferIndex, mColor[updateBufferIndex]);
     }
   }
 
