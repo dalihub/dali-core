@@ -118,6 +118,18 @@ struct ProgramCreateInfo
     return *this;
   }
 
+  /**
+   * @brief Sets whether the program is used internally by DALi.
+   *
+   * @param[in] value true if the program is used internally by DALi. Otherwise false. Default is false.
+   * @return reference to this structure.
+   */
+  auto& SetInternal(bool value)
+  {
+    internal = value;
+    return *this;
+  }
+
   GraphicsStructureType type{GraphicsStructureType::PROGRAM_CREATE_INFO_STRUCT};
   ExtensionCreateInfo*  nextExtension{nullptr};
 
@@ -125,6 +137,7 @@ struct ProgramCreateInfo
   const std::vector<ShaderState>* shaderState{nullptr};
   const AllocationCallbacks*      allocationCallbacks{nullptr};
   bool                            useFileCache{false};
+  bool                            internal{false};
 };
 
 } // namespace Graphics

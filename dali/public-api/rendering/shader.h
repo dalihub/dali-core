@@ -92,6 +92,7 @@ public:
       OUTPUT_IS_TRANSPARENT = 0x01, ///< Might generate transparent alpha from opaque inputs                               @SINCE_1_1.45
       MODIFIES_GEOMETRY     = 0x02, ///< Might change position of vertices, this option disables any culling optimizations @SINCE_1_1.45
       FILE_CACHE_SUPPORT    = 0x04, ///< Cache the shader in a file                                                        @SINCE_2_4.15
+      INTERNAL              = 0x08, ///< internal shader, this hint is used by dali internally                             @SINCE_2_4.26
     };
   };
 
