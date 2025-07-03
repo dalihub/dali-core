@@ -74,6 +74,13 @@ public:
    */
   Render::TextureKey GetRenderTextureKey() const;
 
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  /**
+   * @copydoc Dali::Texture::Upload()
+   */
+  bool Upload(PixelDataPtr pixelData, std::string url, int32_t textureId);
+#endif
+
   /**
    * @copydoc Dali::Texture::Upload()
    */
@@ -169,6 +176,13 @@ public:
    */
   bool ApplyNativeFragmentShader(std::string& shader);
 
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  /**
+   * @brief Print TotalMemory
+   */
+  void PrintTotalMemory();
+#endif
+
 private: // implementation
   /**
    * Constructor
@@ -213,10 +227,15 @@ private:                                    // data
   ImageDimensions         mSize;        ///< Size of the texture
   Dali::TextureType::Type mType;        ///< Texture type (cached)
   Pixel::Format           mFormat;      ///< Pixel format
-
   uint32_t mResourceId;
-
   bool mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  // For memory profiling
+  int32_t mTextureId;
+  uint32_t mDataSize;
+  std::string mUrl;
+#endif
 };
 
 } // namespace Internal
