@@ -48,13 +48,20 @@ uint32_t      mvpBufferIndex;
 namespace
 {
 /**
- * Helper function to calculate the correct alignment of data for uniform buffers
- * @param dataSize size of uniform buffer
- * @return aligned offset of data
+ * @brief Store latest bound pipeline, and help that we can skip duplicated pipeline bind.
+ *
+ * @param[in] pipeline Current pipeline to be used, or nullptr if render finished
+ * @return True if we can reuse latest bound pipeline. False otherwise.
  */
-inline uint32_t GetUniformBufferDataAlignment(uint32_t dataSize)
+inline bool ReuseLatestBoundPipeline(const Graphics::Pipeline* pipeline)
 {
-  return ((dataSize / 256u) + ((dataSize % 256u) ? 1u : 0u)) * 256u;
+  static const Graphics::Pipeline* gLatestPipeline = nullptr;
+  if(gLatestPipeline == pipeline)
+  {
+    return true;
+  }
+  gLatestPipeline = pipeline;
+  return false;
 }
 
 /**
@@ -95,6 +102,9 @@ Render::UboViewContainer& GetUboViewList()
 
 void Renderer::PrepareCommandBuffer()
 {
+  // Reset latest pipeline informations, So we can bind the first of pipeline.
+  ReuseLatestBoundPipeline(nullptr);
+
   // Reset latest geometry informations, So we can bind the first of geometry.
   ReuseLatestBoundVertexAttributes(nullptr);
 
@@ -604,7 +614,8 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     if(!isolatedNotDirect)
     {
-      // Reset cached geometry. We might need to re-bind vertex attributes after direct render.
+      // Reset cached geometry. We might need to re-bind pipeline and vertex attributes after direct render.
+      ReuseLatestBoundPipeline(nullptr);
       ReuseLatestBoundVertexAttributes(nullptr);
     }
     return true;
@@ -653,7 +664,10 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
     auto& pipeline = PrepareGraphicsPipeline(*program, instruction, renderTarget, node, blend);
 
-    commandBuffer.BindPipeline(pipeline);
+    if(!ReuseLatestBoundPipeline(&pipeline))
+    {
+      commandBuffer.BindPipeline(pipeline);
+    }
 
     if(queueIndex == 0)
     {
