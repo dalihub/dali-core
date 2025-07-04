@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,15 +122,15 @@ enum class DrawNativeExecutionMode
 
 struct DrawNativeInfo
 {
-  DrawNativeAPI       api;      ///< API used by the callback
   Dali::CallbackBase* callback; ///< Callback pointer
+  DrawNativeAPI       api;      ///< API used by the callback
 
   /**
    * The call allows binding the resource so they can be passed into the callback
    * Each resource will pass API specific data (for example GL texture and buffer ids)
    */
-  Graphics::Texture** textureList;  ///< Textures to be used by the call
   uint32_t            textureCount; ///< Number of texture used by the callback
+  Graphics::Texture** textureList;  ///< Textures to be used by the call
   Graphics::Buffer**  bufferList;   ///< Buffers to be used by the call
   uint32_t            bufferCount;  ///< Number of buffers used by the callback
 
@@ -169,7 +169,7 @@ public:
   virtual ~CommandBuffer() = default;
 
   // not copyable
-  CommandBuffer(const CommandBuffer&) = delete;
+  CommandBuffer(const CommandBuffer&)            = delete;
   CommandBuffer& operator=(const CommandBuffer&) = delete;
 
   /**
@@ -482,7 +482,7 @@ public:
   virtual void SetDepthWriteEnable(bool depthWriteEnable) = 0;
 
 protected:
-  CommandBuffer(CommandBuffer&&) = default;
+  CommandBuffer(CommandBuffer&&)            = default;
   CommandBuffer& operator=(CommandBuffer&&) = default;
 };
 } // namespace Dali::Graphics
