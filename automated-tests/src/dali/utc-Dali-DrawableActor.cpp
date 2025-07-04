@@ -18,6 +18,8 @@
 #include <dali-test-suite-utils.h>
 #include <dali/public-api/actors/drawable-actor.h>
 
+namespace
+{
 struct DrawableObject
 {
   bool Render(const RenderCallbackInput& inputData)
@@ -49,6 +51,7 @@ struct DrawableObject
   ClippingBox clippingBox{};
   Vector4     worldColor{};
 };
+} // namespace
 
 int UtcDaliRendererSetRenderCallbackP(void)
 {
@@ -58,6 +61,40 @@ int UtcDaliRendererSetRenderCallbackP(void)
   DrawableObject drawable{};
 
   auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float opacity = 0.5f;
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
+
+  auto renderer = Renderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size ad color (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetRenderCallbackUnsafeP(void)
+{
+  tet_infoline("Testing Renderer:LSetRenderCallback() with Unsafe");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render, RenderCallback::ExecutionMode::UNSAFE);
 
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
