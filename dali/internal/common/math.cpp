@@ -29,7 +29,7 @@
 
 void Dali::Internal::TransformVector3(Vec3 result, const Mat4 m, const Vec3 v)
 {
-#ifndef __ARM_NEON__
+#if !defined(__ARM_NEON__) || defined(__APPLE__)
 
   result[0] = v[0] * m[0] + v[1] * m[4] + v[2] * m[8];
   result[1] = v[0] * m[1] + v[1] * m[5] + v[2] * m[9];
