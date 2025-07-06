@@ -114,7 +114,7 @@ void Geometry::RemoveVertexBuffer(const Render::VertexBuffer* vertexBuffer)
   {
     if(*iter == vertexBuffer)
     {
-      //This will delete the gpu buffer associated to the RenderVertexBuffer if there is one
+      // This will delete the gpu buffer associated to the RenderVertexBuffer if there is one
       mVertexBuffers.Remove(iter);
       mUpdated = true;
       break;
@@ -154,12 +154,15 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
       mIndicesChanged = false;
     }
 
+    // Make goemetry buffer changed as true if Type changed.
+    bool geometryBufferChanged = mUpdated;
     for(auto&& buffer : mVertexBuffers)
     {
-      mUpdated = mUpdated || buffer->IsDataChanged();
+      geometryBufferChanged = geometryBufferChanged || buffer->IsDataChanged();
+      mUpdated              = mUpdated || geometryBufferChanged || buffer->IsRedrawRequired();
       if(!buffer->Update(graphicsController))
       {
-        //Vertex buffer is not ready ( Size, data or format has not been specified yet )
+        // Vertex buffer is not ready ( Size, data or format has not been specified yet )
         return;
       }
     }
@@ -167,8 +170,10 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
     mHasBeenUploaded = true;
 
     // Notify to observers that geometry informations are changed
-    if(mUpdated)
+    if(geometryBufferChanged)
     {
+      mUpdated = true;
+
       mObserverNotifying = true;
       for(auto iter = mLifecycleObservers.begin(); iter != mLifecycleObservers.end();)
       {
@@ -189,7 +194,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
 
 bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
 {
-  //Bind buffers to attribute locations
+  // Bind buffers to attribute locations
   const auto vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
 
   std::vector<const Graphics::Buffer*> buffers;
@@ -248,13 +253,13 @@ bool Geometry::Draw(
     }
   }
 
-  //Draw call
+  // Draw call
   if(mIndexBuffer && mGeometryType != Dali::Geometry::POINTS)
   {
     // Issue draw call only if there's non-zero numIndices
     if(numIndices)
     {
-      //Indexed draw call
+      // Indexed draw call
       const Graphics::Buffer* ibo = mIndexBuffer->GetGraphicsObject();
       if(ibo)
       {
