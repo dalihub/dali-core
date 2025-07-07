@@ -186,7 +186,7 @@ public:
 #define ASSERT_LOCATION __PRETTY_FUNCTION__
 #endif
 #else
-#define ASSERT_LOCATION NULL
+#define ASSERT_LOCATION nullptr
 #endif
 
 #define DALI_ASSERT_ALWAYS(cond)                       \
