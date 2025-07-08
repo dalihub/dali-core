@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -693,7 +693,11 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
               }
             }
 
-            texture->Prepare(); // Ensure native texture is ready
+            if(texture->mId != 0 && !texture->Prepare()) // Ensure native texture is ready
+            {
+              // If native texture is not ready, skip next draw call.
+              isSkipCurrentDrawCall = true;
+            }
           }
         }
         break;
@@ -771,7 +775,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       }
       case CommandType::DRAW:
       {
-        if(currentPipeline)
+        if(!isSkipCurrentDrawCall && currentPipeline)
         {
           if(cmd.data.draw.draw.instanceCount == 0)
           {
@@ -787,11 +791,12 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
                                     cmd.data.draw.draw.instanceCount);
           }
         }
+        isSkipCurrentDrawCall = false;
         break;
       }
       case CommandType::DRAW_INDEXED:
       {
-        if(currentPipeline)
+        if(!isSkipCurrentDrawCall && currentPipeline)
         {
           if(cmd.data.draw.draw.instanceCount == 0)
           {
@@ -809,17 +814,19 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
                                       cmd.data.draw.drawIndexed.instanceCount);
           }
         }
+        isSkipCurrentDrawCall = false;
         break;
       }
       case CommandType::DRAW_INDEXED_INDIRECT:
       {
-        if(currentPipeline)
+        if(!isSkipCurrentDrawCall && currentPipeline)
         {
           mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
                            static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
                            GL_UNSIGNED_SHORT,
                            reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
         }
+        isSkipCurrentDrawCall = false;
         break;
       }
       case CommandType::SET_SCISSOR:

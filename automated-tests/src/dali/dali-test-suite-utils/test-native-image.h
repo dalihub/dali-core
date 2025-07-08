@@ -2,7 +2,7 @@
 #define TEST_NATIVE_IMAGE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,12 @@ public:
   {
     ++mTargetTextureCalls;
     mCallStack.PushCall("TargetTexture", "");
-    return mTargetTextureError--;
+    return mTargetTextureError > 0u ? mTargetTextureError-- : 0u;
   };
-  inline virtual void PrepareTexture()
+  inline virtual Dali::NativeImageInterface::PrepareTextureResult PrepareTexture()
   {
     mCallStack.PushCall("PrepareTexture", "");
+    return mPrepareTextureResult;
   };
   inline virtual uint32_t GetWidth() const
   {
@@ -83,7 +84,7 @@ public:
     mCallStack.PushCall("ApplyNativeFragmentShader", "");
     shader = "#extension GL_OES_EGL_image_external:require\n" + shader;
 
-    //Get custom sampler type name
+    // Get custom sampler type name
     const char* customSamplerTypename = GetCustomSamplerTypename();
     if(customSamplerTypename)
     {
@@ -134,11 +135,14 @@ private:
   Rect<uint32_t> mUpdatedArea{};
 
 public:
-  int32_t                mExtensionCreateCalls;
-  int32_t                mExtensionDestroyCalls;
-  int32_t                mTargetTextureCalls;
-  uint32_t               mTargetTextureError{0u};
-  bool                   createResult;
+  int32_t  mExtensionCreateCalls;
+  int32_t  mExtensionDestroyCalls;
+  int32_t  mTargetTextureCalls;
+  uint32_t mTargetTextureError{0u};
+  bool     createResult;
+
+  Dali::NativeImageInterface::PrepareTextureResult mPrepareTextureResult{Dali::NativeImageInterface::PrepareTextureResult::NO_ERROR};
+
   mutable TraceCallStack mCallStack;
 };
 
