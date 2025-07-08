@@ -1425,12 +1425,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     if(!renderToFbo)
     {
       DALI_LOG_INFO(gLogFilter, Debug::General, "Present\n");
+
       DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
       auto renderTarget = sceneObject->GetSurfaceRenderTarget();
-      if(!renderTarget)
-      {
-        DALI_LOG_ERROR("Scene %p render target is null!!! Maybe memory corrupction happened!!\n", sceneObject);
-      }
       mImpl->graphicsController.PresentRenderTarget(renderTarget);
       DALI_TRACE_END(gTraceFilter, "DALI_RENDER_FINISHED");
     }
