@@ -129,11 +129,11 @@ AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration&
   Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, std::move(name), index, type, setFunc, getFunc);
 }
 
-AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value)
+AnimatablePropertyRegistration::AnimatablePropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, const Property::Value& value, TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc)
 {
   DALI_ASSERT_ALWAYS((index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX));
 
-  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, std::move(name), index, value);
+  Internal::TypeRegistry::Get()->RegisterAnimatableProperty(registered, std::move(name), index, value, setFunc, getFunc);
 }
 
 AnimatablePropertyComponentRegistration::AnimatablePropertyComponentRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex)

@@ -94,6 +94,10 @@ See the README.md in dali-core/automated-tests.
 
          $ gbs build -A [TARGET_ARCH] --define "%enable_debug 1"
 
+### GPU PROFILE Builds
+
+         $ gbs build -A [TARGET_ARCH] --define "%enable_gpu_memory_profile 1"
+
 ## 3. Building for MS Windows
 
 Third party dependencies are built using vcpkg. Instructions on how to install vcpkg can be found in the
@@ -133,12 +137,13 @@ vcpkg-script folder in the windows-dependencies repository.
 
 
   * Options:
-    - CMAKE_TOOLCHAIN_FILE  ---> Needed to find packages installed by VCPKG.
-    - ENABLE_PKG_CONFIGURE  ---> Whether to install pkg configure files (not currently working on MS Windows. CMake modules used instead).
-    - ENABLE_LINK_TEST      ---> Whether to enable the link test (not currently working on MS Windows).
-    - CMAKE_INSTALL_PREFIX  ---> Were DALi is installed.
-    - INSTALL_CMAKE_MODULES ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
-    - ENABLE_DEBUG          ---> Whether to build with debug enabled.
+    - CMAKE_TOOLCHAIN_FILE       ---> Needed to find packages installed by VCPKG.
+    - ENABLE_PKG_CONFIGURE       ---> Whether to install pkg configure files (not currently working on MS Windows. CMake modules used instead).
+    - ENABLE_LINK_TEST           ---> Whether to enable the link test (not currently working on MS Windows).
+    - CMAKE_INSTALL_PREFIX       ---> Were DALi is installed.
+    - INSTALL_CMAKE_MODULES      ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
+    - ENABLE_DEBUG               ---> Whether to build with debug enabled.
+    - ENABLE_GPU_MEMORY_PROFILER ---> Whether to build with GPU memory profiler enabled.
 
 ## 4. Building for macOS
 
@@ -159,7 +164,7 @@ To build the repository enter the 'build/tizen' folder:
 ```
 Then run the following command to set up the build:
 ```zsh
-% cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX -DCMAKE_TOOLCHAIN_FILE=$VCPKG_FOLDER/scripts/buildsystems/vcpkg.cmake -DINSTALL_CMAKE_MODULES=ON
+% cmake -DCMAKE_INSTALL_PREFIX=$DESKTOP_PREFIX -DCMAKE_TOOLCHAIN_FILE=$VCPKG_FOLDER/scripts/buildsystems/vcpkg.cmake -DINSTALL_CMAKE_MODULES=ON .
 ```
 If a Debug build is required, then add `-DCMAKE_BUILD_TYPE=Debug -DENABLE_DEBUG=ON`
 

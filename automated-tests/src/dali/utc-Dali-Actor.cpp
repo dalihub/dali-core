@@ -10456,7 +10456,8 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   dataVCC.type         = DevelActor::VisibilityChange::PARENT;
 
   bool actorDSignalCalled  = false;
-  auto actorDSignalFunctor = [&]() {
+  auto actorDSignalFunctor = [&]()
+  {
     // Ensure that below codes run only 1 times.
     if(!actorDSignalCalled)
     {
@@ -10517,13 +10518,18 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
     }
   };
 
-  DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
-  DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
-  DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
-  DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) {
+  DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+                                                                                                   { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+                                                                                                   { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+                                                                                                   { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+                                                                                                   {
     dataVCB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
     actorDSignalFunctor(); }));
-  DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type) { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+                                                                                                   { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
   actorA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
   actorB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
@@ -15631,7 +15637,7 @@ int UtcDaliActorIgnored(void)
 {
   TestApplication application;
 
-  Actor   parent = Actor::New();
+  Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   application.GetScene().Add(parent);
@@ -15686,6 +15692,264 @@ int UtcDaliActorIgnored(void)
   childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
   DALI_TEST_EQUALS(childPosition1, childPosition2, TEST_LOCATION);
   DALI_TEST_EQUALS(childPosition1, Vector3(200, 200, 0), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorChildrenDepthIndexPolicyPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY).Get<int32_t>(), (int)DevelActor::ChildrenDepthIndexPolicy::INCREASE, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, DevelActor::ChildrenDepthIndexPolicy::EQUAL);
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY).Get<int32_t>(), (int)DevelActor::ChildrenDepthIndexPolicy::EQUAL, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY), Property::INTEGER, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY), "childrenDepthIndexPolicy", TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorChildrenDepthIndexPolicyPropertyN(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Make sure setting invalid types does not cause a crash
+  try
+  {
+    actor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, 1.0f);
+    actor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, Property::Map());
+    actor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, Property::Array());
+    tet_result(TET_PASS);
+  }
+  catch(...)
+  {
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliActorChildrenDepthIndexPolicyPropertyChangeRenderingOrder(void)
+{
+  TestApplication application;
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableSetUniformCallTrace(true);
+  glAbstraction.ResetSetUniformCallStack();
+  TraceCallStack& glSetUniformStack = glAbstraction.GetSetUniformTrace();
+
+  glAbstraction.ResetSetUniformCallStack();
+
+  application.SendNotification();
+  application.Render();
+
+  /**
+   *      rootActor(0)
+   *       /      \
+   *   actor1   actor2
+   *     |   \        \
+   * actor11 actor12  actor21
+   *     |
+   * actor111
+   *
+   * draw order : root - 1 - 11 - 111 - 12 - 2 - 21
+   */
+  Actor rootActor = CreateRenderableActor();
+  Actor actor1    = CreateRenderableActor();
+  Actor actor2    = CreateRenderableActor();
+  Actor actor11   = CreateRenderableActor();
+  Actor actor12   = CreateRenderableActor();
+  Actor actor111  = CreateRenderableActor();
+  Actor actor21   = CreateRenderableActor();
+
+  rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  rootActor.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
+  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor1.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor2.SetProperty(Actor::Property::POSITION, Vector2(30.0f, 10.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor11.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor11.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
+  actor11.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor12.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor12.SetProperty(Actor::Property::POSITION, Vector2(20.0f, 10.0f));
+  actor12.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor111.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor111.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
+  actor111.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor21.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  actor21.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
+  actor21.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+
+  application.GetScene().Add(rootActor);
+  rootActor.Add(actor1);
+  rootActor.Add(actor2);
+  actor1.Add(actor11);
+  actor11.Add(actor111);
+  actor1.Add(actor12);
+  actor2.Add(actor21);
+
+  // Register uniforms for check rendering order.
+  rootActor.RegisterProperty("uRendererColor", 0.0f);
+  actor1.RegisterProperty("uRendererColor", 1.0f);
+  actor2.RegisterProperty("uRendererColor", 2.0f);
+  actor11.RegisterProperty("uRendererColor", 11.0f);
+  actor12.RegisterProperty("uRendererColor", 12.0f);
+  actor111.RegisterProperty("uRendererColor", 3.0f); ///< Use 3.0 to avoid float point error.
+  actor21.RegisterProperty("uRendererColor", 21.0f);
+
+  application.SendNotification();
+  application.Render();
+
+  glSetUniformStack.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
+
+  // Test order of uniforms in stack
+  auto indexRoot = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "0.000000");
+  auto index1    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
+  auto index2    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  auto index11   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "11.000000");
+  auto index12   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "12.000000");
+  auto index111  = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  auto index21   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "21.000000");
+
+  DALI_TEST_EQUALS(indexRoot < index1, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index11, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index11 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index111 < index12, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index12 < index2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index21, true, TEST_LOCATION);
+
+  glSetUniformStack.Reset();
+
+  tet_printf("Change rootActor's children depth index policy as equal");
+  rootActor.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, DevelActor::ChildrenDepthIndexPolicy::EQUAL);
+
+  // draw order : root - (1 == 2) - (11 == 21) - 111 - 12
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
+
+  // Test order of uniforms in stack
+  indexRoot = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "0.000000");
+  index1    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
+  index2    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  index11   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "11.000000");
+  index12   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "12.000000");
+  index111  = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  index21   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "21.000000");
+
+  DALI_TEST_EQUALS(indexRoot < index1, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(indexRoot < index2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index11, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index11, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index21, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index21, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index11 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index21 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index111 < index12, true, TEST_LOCATION);
+
+  glSetUniformStack.Reset();
+
+  tet_printf("Change actor1's children depth index policy as equal");
+  actor1.SetProperty(DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY, "EQUAL");
+
+  // draw order : root - (1 == 2) - (11 == 12 == 21) - 111
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
+
+  // Test order of uniforms in stack
+  indexRoot = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "0.000000");
+  index1    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
+  index2    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  index11   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "11.000000");
+  index12   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "12.000000");
+  index111  = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  index21   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "21.000000");
+
+  DALI_TEST_EQUALS(indexRoot < index1, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(indexRoot < index2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index11, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index11, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index12, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index12, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index21, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index21, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index11 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index12 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index21 < index111, true, TEST_LOCATION);
+
+  glSetUniformStack.Reset();
+
+  tet_printf("Change rootActor's children depth index policy as increase again");
+  rootActor.SetProperty(rootActor.GetPropertyIndex("childrenDepthIndexPolicy"), "INCREASE");
+
+  // draw order : root - 1 - (11 == 12) - 111 - 2 - 21
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
+
+  // Test order of uniforms in stack
+  indexRoot = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "0.000000");
+  index1    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
+  index2    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  index11   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "11.000000");
+  index12   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "12.000000");
+  index111  = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  index21   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "21.000000");
+
+  DALI_TEST_EQUALS(indexRoot < index1, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index11, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index12, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index11 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index12 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index111 < index2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index21, true, TEST_LOCATION);
+
+  glSetUniformStack.Reset();
+
+  tet_printf("Change actor1's children depth index policy as increase again");
+  actor1.SetProperty(actor1.GetPropertyIndex("childrenDepthIndexPolicy"), DevelActor::ChildrenDepthIndexPolicy::INCREASE);
+
+  // draw order : root - 1 - 11 - 111 - 12 - 2 - 21
+  application.SendNotification();
+  application.Render();
+
+  tet_printf("Trace:%s \n", glSetUniformStack.GetTraceString().c_str());
+
+  // Test order of uniforms in stack
+  indexRoot = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "0.000000");
+  index1    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "1.000000");
+  index2    = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "2.000000");
+  index11   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "11.000000");
+  index12   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "12.000000");
+  index111  = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "3.000000");
+  index21   = glSetUniformStack.FindIndexFromMethodAndParams("uRendererColor", "21.000000");
+
+  DALI_TEST_EQUALS(indexRoot < index1, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index1 < index11, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index11 < index111, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index111 < index12, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index12 < index2, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index2 < index21, true, TEST_LOCATION);
 
   END_TEST;
 }

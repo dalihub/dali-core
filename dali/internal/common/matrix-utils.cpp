@@ -91,7 +91,7 @@ void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Matrix&
   const float* rhsPtr = rhs.AsFloat();
   const float* lhsPtr = lhs.AsFloat();
 
-#ifndef __ARM_NEON__
+#if !defined(__ARM_NEON__) || defined(__APPLE__)
 
   for(int32_t i = 0; i < 4; i++)
   {
@@ -181,7 +181,7 @@ void Multiply(Dali::Matrix& result, const Dali::Matrix& lhs, const Dali::Quatern
   float*       temp   = result.AsFloat();
   const float* lhsPtr = lhs.AsFloat();
 
-#ifndef __ARM_NEON__
+#if !defined(__ARM_NEON__) || defined(__APPLE__)
 
   for(int32_t i = 0; i < 4; i++)
   {
@@ -271,7 +271,7 @@ void MultiplyTransformMatrix(Dali::Matrix& result, const Dali::Matrix& lhs, cons
   const float* rhsPtr = rhs.AsFloat();
   const float* lhsPtr = lhs.AsFloat();
 
-#ifndef __ARM_NEON__
+#if !defined(__ARM_NEON__) || defined(__APPLE__)
 
   for(int32_t i = 0; i < 4; i++)
   {
@@ -351,7 +351,7 @@ void MultiplyProjectionMatrix(Dali::Matrix& result, const Dali::Matrix& lhs, con
   const float* rhsPtr = projection.AsFloat();
   const float* lhsPtr = lhs.AsFloat();
 
-#ifndef __ARM_NEON__
+#if !defined(__ARM_NEON__) || defined(__APPLE__)
 
   // We only use rhsPtr's 0, 1, 2, 4, 5, 6, 10, 11, 14, 15 index.
   const float rhs0  = rhsPtr[0];
@@ -428,7 +428,7 @@ void MultiplyAssign(Dali::Matrix& result, const Dali::Matrix& rhs)
   MATH_INCREASE_COUNTER(PerformanceMonitor::MATRIX_MULTIPLYS);
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 64); // 64 = 16*4
 
-#ifndef __ARM_NEON__
+#if !defined(__ARM_NEON__) || defined(__APPLE__)
 
   float*       lhsPtr = result.AsFloat();
   const float* rhsPtr = rhs.AsFloat();

@@ -275,7 +275,7 @@ Vector4 Matrix::operator*(const Vector4& rhs) const
 
   Vector4 temp;
 
-#ifndef __ARM_NEON__
+#if !defined(__ARM_NEON__) || defined(__APPLE__)
 
   temp.x = rhs.x * mMatrix[0] + rhs.y * mMatrix[4] + rhs.z * mMatrix[8] + rhs.w * mMatrix[12];
   temp.y = rhs.x * mMatrix[1] + rhs.y * mMatrix[5] + rhs.z * mMatrix[9] + rhs.w * mMatrix[13];

@@ -218,12 +218,12 @@ bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration
   return false;
 }
 
-bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Value value)
+bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Value defaultValue, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
   auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
   if(iter != mRegistryLut.end())
   {
-    iter->second->AddAnimatableProperty(std::move(name), index, std::move(value));
+    iter->second->AddAnimatableProperty(std::move(name), index, std::move(defaultValue), setFunc, getFunc);
     return true;
   }
 
