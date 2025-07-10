@@ -209,6 +209,11 @@ public:
 
   [[nodiscard]] inline bool IsDataChanged() const
   {
+    return mDataChanged;
+  }
+
+  [[nodiscard]] inline bool IsRedrawRequired() const
+  {
     return mDataChanged || mVertexBufferUpdateCallback;
   }
 
