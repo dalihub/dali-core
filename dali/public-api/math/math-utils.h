@@ -2,7 +2,7 @@
 #define DALI_MATH_UTILS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace Dali
  * @param[in] i Input number
  * @return The next power of two or i itself in case it's a power of two
  */
-inline uint32_t NextPowerOfTwo(uint32_t i)
+constexpr uint32_t NextPowerOfTwo(uint32_t i)
 {
   DALI_ASSERT_ALWAYS(i <= 1u << (sizeof(uint32_t) * 8 - 1) && "Return type cannot represent the next power of two greater than the argument.");
   if(i == 0u)
@@ -66,7 +66,7 @@ inline uint32_t NextPowerOfTwo(uint32_t i)
  * @param[in] i Input number
  * @return    True if i is power of two.
  */
-inline bool IsPowerOfTwo(uint32_t i)
+constexpr bool IsPowerOfTwo(uint32_t i)
 {
   return (i != 0u) && ((i & (i - 1u)) == 0u);
 }
@@ -81,7 +81,7 @@ inline bool IsPowerOfTwo(uint32_t i)
  * @return T the clamped value
  */
 template<typename T>
-inline const T& Clamp(const T& value, const T& min, const T& max)
+constexpr const T& Clamp(const T& value, const T& min, const T& max)
 {
   const T& constrainedUpper         = value < max ? value : max;
   const T& constrainedUpperAndLower = constrainedUpper > min ? constrainedUpper : min;
@@ -97,7 +97,7 @@ inline const T& Clamp(const T& value, const T& min, const T& max)
  * @param[in] max The maximum allowed value.
  */
 template<typename T>
-inline void ClampInPlace(T& value, const T& min, const T& max)
+constexpr void ClampInPlace(T& value, const T& min, const T& max)
 {
   const T& constrainedUpper         = value < max ? value : max;
   const T& constrainedUpperAndLower = constrainedUpper > min ? constrainedUpper : min;
@@ -115,7 +115,7 @@ inline void ClampInPlace(T& value, const T& min, const T& max)
  * @return A value between low and high.
  */
 template<typename T>
-inline const T Lerp(const float offset, const T& low, const T& high)
+constexpr const T Lerp(const float offset, const T& low, const T& high)
 {
   return low + ((high - low) * Clamp(offset, 0.0f, 1.0f));
 }
@@ -128,7 +128,7 @@ inline const T Lerp(const float offset, const T& low, const T& high)
  * @param[in] b the second value in the range.
  * @return a suitable epsilon
  */
-inline float GetRangedEpsilon(float a, float b)
+constexpr float GetRangedEpsilon(float a, float b)
 {
   const float   absA = fabsf(a);
   const float   absB = fabsf(b);
@@ -170,7 +170,7 @@ inline float GetRangedEpsilon(float a, float b)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wfloat-equal"
 #endif
-inline bool EqualsZero(float value)
+constexpr bool EqualsZero(float value)
 {
   return value == 0.0f;
 }
@@ -186,7 +186,7 @@ inline bool EqualsZero(float value)
  * @param[in] b the second value to compare
  * @return true if the values are equal within a minimal epsilon for their values
  */
-inline bool Equals(float a, float b)
+constexpr bool Equals(float a, float b)
 {
   return (fabsf(a - b) <= GetRangedEpsilon(a, b));
 }
@@ -200,7 +200,7 @@ inline bool Equals(float a, float b)
  * @param[in] epsilon the minimum epsilon value that will be used to consider the values different
  * @return true if the difference between the values is less than the epsilon
  */
-inline bool Equals(float a, float b, float epsilon)
+constexpr bool Equals(float a, float b, float epsilon)
 {
   return (fabsf(a - b) <= epsilon);
 }
@@ -213,11 +213,10 @@ inline bool Equals(float a, float b, float epsilon)
  * @param[in] pos decimal place
  * @return a rounded float
  */
-inline float Round(float value, int32_t pos)
+constexpr float Round(float value, int32_t pos)
 {
-  float temp;
-  temp = value * powf(10.f, static_cast<float>(pos));
-  temp = floorf(temp + 0.5f);
+  float temp = value * powf(10.f, static_cast<float>(pos));
+  temp       = floorf(temp + 0.5f);
   temp *= powf(10.f, static_cast<float>(-pos));
   return temp;
 }
@@ -257,7 +256,7 @@ inline float Round(float value, int32_t pos)
  * and result will always be equal to start.
  *
  */
-inline float WrapInDomain(float x, float start, float end)
+constexpr float WrapInDomain(float x, float start, float end)
 {
   float domain = end - start;
   x -= start;
@@ -301,7 +300,7 @@ inline float WrapInDomain(float x, float start, float end)
  * (start) to (end).
  *
  */
-inline float ShortestDistanceInDomain(float a, float b, float start, float end)
+constexpr float ShortestDistanceInDomain(float a, float b, float start, float end)
 {
   //  (a-start + end-b)
   float size = end - start;
@@ -339,7 +338,7 @@ inline float ShortestDistanceInDomain(float a, float b, float start, float end)
  * @return -1 for negative values, +1 for positive values and 0 if value is 0
  */
 template<typename T>
-int32_t Sign(T value)
+constexpr int32_t Sign(T value)
 {
   return (T(0) < value) - (value < T(0));
 }
