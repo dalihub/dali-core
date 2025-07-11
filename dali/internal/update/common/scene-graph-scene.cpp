@@ -77,7 +77,7 @@ void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateI
 
 void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
 {
-  mGraphicsController = &graphicsController;
+  RenderTargetGraphicsObjects::Initialize(graphicsController);
 
   // Create the render target for the surface. It should already have been sent via message.
   RenderTargetGraphicsObjects::CreateRenderTarget(graphicsController, mRenderTargetCreateInfo);

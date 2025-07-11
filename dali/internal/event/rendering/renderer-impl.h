@@ -191,8 +191,8 @@ public: // Default property extensions from Object
   Property::Value GetDefaultPropertyCurrentValue(Property::Index index) const override;
 
   /**
-    * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
-    */
+   * @copydoc Dali::Internal::Object::OnNotifyDefaultPropertyAnimation()
+   */
   void OnNotifyDefaultPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType) override;
 
   /**
@@ -223,6 +223,11 @@ public: // Default property extensions from Object
    */
   void SetRenderCallback(RenderCallback* callback);
 
+  /**
+   * @copydoc Dali::Renderer::TerminateRenderCallback()
+   */
+  void TerminateRenderCallback(bool invokeCallback);
+
 protected: // implementation
   /**
    * @brief Constructor.
@@ -237,7 +242,7 @@ protected: // implementation
   ~Renderer() override;
 
 private:
-  Renderer(const Renderer&) = delete;            ///< Deleted copy constructor
+  Renderer(const Renderer&)            = delete; ///< Deleted copy constructor
   Renderer& operator=(const Renderer&) = delete; ///< Deleted assignment operator
 
   /**

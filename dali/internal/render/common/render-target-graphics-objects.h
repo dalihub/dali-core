@@ -59,6 +59,14 @@ public:
    */
   RenderTargetGraphicsObjects() = default;
 
+  /**
+   * Initialize and register graphics controller.
+   */
+  void Initialize(Graphics::Controller& graphicsController)
+  {
+    mGraphicsController = &graphicsController;
+  }
+
   [[nodiscard]] Graphics::RenderTarget* GetGraphicsRenderTarget() const
   {
     return mRenderTarget.get();
@@ -179,6 +187,8 @@ public:
   }
 
 protected: /// TODO : Make it as private if possible
+  Graphics::Controller* mGraphicsController{nullptr};
+
   Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};
 
   /**
@@ -198,7 +208,6 @@ private:
 
   bool mObserverNotifying{false}; ///< Safety guard flag to ensure that the LifecycleObserver not be added or deleted while observing.
 };
-
 } // namespace Dali::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_RENDER_TARGET_GRAPHICS_OBJECTS_H

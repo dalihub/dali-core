@@ -1333,6 +1333,13 @@ void Renderer::SetRenderCallback(RenderCallback* callback)
                                                        callback);
 }
 
+void Renderer::TerminateRenderCallback(bool invokeCallback)
+{
+  Dali::Internal::SceneGraph::TerminateRenderCallbackMessage(GetEventThreadServices(),
+                                                             GetRendererSceneObject(),
+                                                             invokeCallback);
+}
+
 } // namespace Internal
 
 } // namespace Dali

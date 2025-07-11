@@ -362,6 +362,14 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 
     if(mResendFlag & RESEND_SET_RENDER_CALLBACK)
     {
+      if(mRenderCallback == nullptr)
+      {
+        // Terminate case.
+        using DerivedType = MessageValue1<Render::Renderer, bool>;
+        uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
+        new(slot) DerivedType(rendererPtr, &Render::Renderer::TerminateRenderCallback, mInvokeTerminateCallback);
+        mInvokeTerminateCallback = false;
+      }
       using DerivedType = MessageValue1<Render::Renderer, Dali::RenderCallback*>;
       uint32_t* slot    = mSceneController->GetRenderQueue().ReserveMessageSlot(updateBufferIndex, sizeof(DerivedType));
       new(slot) DerivedType(rendererPtr, &Render::Renderer::SetRenderCallback, mRenderCallback);
@@ -670,6 +678,12 @@ void Renderer::SetRenderCallback(RenderCallback* callback)
 
     SetUpdated(true);
   }
+}
+
+void Renderer::TerminateRenderCallback(bool invokeCallback)
+{
+  mInvokeTerminateCallback = invokeCallback;
+  SetRenderCallback(nullptr);
 }
 
 const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const

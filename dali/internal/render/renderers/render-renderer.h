@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <unordered_set>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -34,6 +37,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/property-input-impl.h>
+#include <dali/internal/render/common/render-target-graphics-objects.h> ///< For RenderTargetGraphicsObjects::LifecycleObserver
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
@@ -63,6 +67,7 @@ struct PipelineCacheL2;
 class UniformBufferManager;
 class UniformBufferV2;
 class Renderer;
+class TerminatedNativeDrawManager;
 
 using PipelineCacheL2Container = std::list<PipelineCacheL2>;
 using PipelineCachePtr         = PipelineCacheL2Container::iterator;
@@ -92,7 +97,7 @@ namespace Render
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer : public PipelineCacheL0::LifecycleObserver
+class Renderer : public PipelineCacheL0::LifecycleObserver, public SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver
 {
 public:
   /**
@@ -197,11 +202,12 @@ public:
    * @param[in] pipelineCache Cache of pipelines
    * @param[in] sharedUniformBufferViewContainer Container of shared uniform buffer views
    */
-  void Initialize(Graphics::Controller&             graphicsController,
-                  ProgramCache&                     programCache,
-                  Render::UniformBufferManager&     uniformBufferManager,
-                  Render::PipelineCache&            pipelineCache,
-                  SharedUniformBufferViewContainer& sharedUniformBufferViewContainer);
+  void Initialize(Graphics::Controller&                graphicsController,
+                  ProgramCache&                        programCache,
+                  Render::UniformBufferManager&        uniformBufferManager,
+                  Render::PipelineCache&               pipelineCache,
+                  Render::TerminatedNativeDrawManager& terminatedNativeDrawManager,
+                  SharedUniformBufferViewContainer&    sharedUniformBufferViewContainer);
 
   /**
    * Destructor
@@ -461,6 +467,13 @@ public:
   void SetRenderCallback(RenderCallback* callback);
 
   /**
+   * @brief Remove RenderCallback used for native rendering.
+   *
+   * @param[in] invokeCallback Invoke render callbacks forcibly if we need to catch terminate case at callback.
+   */
+  void TerminateRenderCallback(bool invokeCallback);
+
+  /**
    * Returns currently set RenderCallback object
    *
    * @return Valid pointer to RenderCallback object or nullptr
@@ -478,7 +491,8 @@ public:
   {
     if(!mRenderCallbackInput)
     {
-      mRenderCallbackInput = std::unique_ptr<RenderCallbackInput>(new RenderCallbackInput);
+      mRenderCallbackInput               = std::make_unique<RenderCallbackInput>();
+      mRenderCallbackInput->isTerminated = false;
     }
     return *mRenderCallbackInput;
   }
@@ -589,6 +603,12 @@ public: // From PipelineCacheL0::LifecycleObserver
    * @copydoc Dali::Internal::Render::PipelineCacheL0::LifecycleObserver::PipelineCacheInvalidated()
    */
   void PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::NotificationType notificationType) override;
+
+public: // From SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver::RenderTargetGraphicsObjectsDestroyed()
+   */
+  void RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects);
 
 private:
   struct UniformIndexMap;
@@ -766,9 +786,15 @@ private:
   bool                  mUseSharedUniformBlock : 1;     ///< Flag whether we should use shared uniform block or not. Usually it must be true.
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
-  RenderCallback*                               mRenderCallback{nullptr};
-  std::unique_ptr<RenderCallbackInput>          mRenderCallbackInput{nullptr};
-  std::vector<Graphics::Texture*>               mRenderCallbackTextureBindings{};
+
+  // For render callback features.
+  Render::TerminatedNativeDrawManager* mTerminatedNativeDrawManager{nullptr};
+  RenderCallback*                      mRenderCallback{nullptr};
+  std::unique_ptr<RenderCallbackInput> mRenderCallbackInput{nullptr};
+  std::vector<Graphics::Texture*>      mRenderCallbackTextureBindings{};
+
+  // Set of render targets that NativeDraw called. It will be used when we need to call NativeDraw callback's terminate callback.
+  std::unordered_set<const SceneGraph::RenderTargetGraphicsObjects*> mRenderCallbackInvokedTargets{};
 
   Program* mCurrentProgram{nullptr}; ///< Prefetched program
 };

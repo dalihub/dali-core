@@ -28,6 +28,7 @@ struct DrawableObject
     size        = inputData.size;
     clippingBox = inputData.clippingBox;
     worldColor  = inputData.worldColor;
+    terminate   = inputData.isTerminated;
 
     return false;
   }
@@ -50,6 +51,7 @@ struct DrawableObject
   Size        size{};
   ClippingBox clippingBox{};
   Vector4     worldColor{};
+  bool        terminate{};
 };
 } // namespace
 
@@ -77,6 +79,7 @@ int UtcDaliRendererSetRenderCallbackP(void)
   application.Render();
 
   // Check the size ad color (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
   DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
   DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
 
@@ -111,8 +114,157 @@ int UtcDaliRendererSetRenderCallbackUnsafeP(void)
   application.Render();
 
   // Check the size ad color (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
   DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
   DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliRendererTerminateRenderCallbackP(void)
+{
+  tet_infoline("Testing Renderer:LTerminateRenderCallback()");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float opacity = 0.5f;
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
+
+  auto renderer = Renderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size ad color (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
+
+  renderer.TerminateRenderCallback(true);
+
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+
+  // Wait render callback comes with terminate flag.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.terminate, true, TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliRendererTerminateRenderCallbackUnsafeP(void)
+{
+  tet_infoline("Testing Renderer:LTerminateRenderCallback() with Unsafe");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render, RenderCallback::ExecutionMode::UNSAFE);
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float opacity = 0.5f;
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
+
+  auto renderer = Renderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size ad color (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
+
+  renderer.TerminateRenderCallback(true);
+
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+
+  // Wait render callback comes with terminate flag.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.terminate, true, TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliRendererTerminateRenderCallbackUnsafeP2(void)
+{
+  tet_infoline("Testing Renderer:LTerminateRenderCallback() with Unsafe 2");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render, RenderCallback::ExecutionMode::UNSAFE);
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const float opacity = 0.5f;
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
+
+  auto renderer = Renderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check the size ad color (whether callback has been called)
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity), TEST_LOCATION);
+
+  // render once again, for line coverage
+  application.SendNotification();
+  application.Render();
+
+  renderer.TerminateRenderCallback(false);
+
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+
+  // Wait render callback comes with terminate flag.
+  application.SendNotification();
+  application.Render();
+
+  // Callback not comes!
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
 
   // render once again, for line coverage
   application.SendNotification();

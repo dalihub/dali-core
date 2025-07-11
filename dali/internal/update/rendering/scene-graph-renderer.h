@@ -489,6 +489,13 @@ public:
   void SetRenderCallback(RenderCallback* callback);
 
   /**
+   * @brief Remove RenderCallback what native rendering used.
+   *
+   * @param[in] invokeCallback Invoke render callbacks forcibly if we need to catch terminate case at callback.
+   */
+  void TerminateRenderCallback(bool invokeCallback);
+
+  /**
    * Returns currently set RenderCallback pointer
    *
    * @return RenderCallback pointer or nullptr
@@ -642,6 +649,7 @@ private:
   bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
   bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool mUseSharedUniformBlock : 1;
+  bool mInvokeTerminateCallback : 1;
 
   mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
 
