@@ -287,7 +287,7 @@ struct RenderManager::Impl
     frameBufferContainer.Clear();
     vertexBufferContainer.Clear();
     geometryContainer.Clear(); // clear now before the pipeline cache is deleted
-    rendererContainer.Clear();
+    rendererContainer.Clear(); // clear now before the program contoller and the pipeline cache are deleted
     textureContainer.Clear();
 
     mRenderTrackers.Clear();
@@ -1127,9 +1127,9 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
   }
 
-  auto sceneRenderTarget = sceneObject->GetSurfaceRenderTarget();
-  if(!renderToFbo && sceneRenderTarget)
+  if(!renderToFbo)
   {
+    auto sceneRenderTarget = sceneObject->GetSurfaceRenderTarget();
     mImpl->graphicsController.EnableDepthStencilBuffer(*sceneRenderTarget, sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
   }
   // Fill resource binding for the scene
@@ -1224,10 +1224,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       surfaceOrientation -= 360;
     }
 
-    Graphics::RenderTarget*           currentRenderTarget  = nullptr;
-    Graphics::RenderPass*             currentRenderPass    = nullptr;
-    Graphics::CommandBuffer*          currentCommandBuffer = nullptr;
-    std::vector<Graphics::ClearValue> currentClearValues{};
+    SceneGraph::RenderTargetGraphicsObjects* currentRenderTargetGraphicsObjects = nullptr;
+    Graphics::CommandBuffer*                 currentCommandBuffer               = nullptr;
 
     if(instruction.mFrameBuffer)
     {
@@ -1236,43 +1234,32 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         // If not yet ready, ignore.
         continue;
       }
-
-      auto& clearValues = instruction.mFrameBuffer->GetGraphicsRenderPassClearValues();
-
-      // Set the clear color for first color attachment
-      if(instruction.mIsClearColorSet && !clearValues.empty())
-      {
-        clearValues[0].color = {
-          instruction.mClearColor.r,
-          instruction.mClearColor.g,
-          instruction.mClearColor.b,
-          instruction.mClearColor.a};
-      }
-
-      currentClearValues = clearValues;
-
-      auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
-
-      // offscreen buffer
-      currentRenderTarget = instruction.mFrameBuffer->GetGraphicsRenderTarget();
-      currentRenderPass   = instruction.mFrameBuffer->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
+      currentRenderTargetGraphicsObjects = instruction.mFrameBuffer;
     }
     else // no framebuffer
     {
-      // surface
-      auto& clearValues = sceneObject->GetGraphicsRenderPassClearValues();
+      currentRenderTargetGraphicsObjects = sceneObject;
+    }
 
-      if(instruction.mIsClearColorSet)
-      {
-        clearValues[0].color = {
-          instruction.mClearColor.r,
-          instruction.mClearColor.g,
-          instruction.mClearColor.b,
-          instruction.mClearColor.a};
-      }
+    auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
 
-      currentClearValues = clearValues;
+    auto& currentRenderTarget = *currentRenderTargetGraphicsObjects->GetGraphicsRenderTarget();
+    auto& currentRenderPass   = *currentRenderTargetGraphicsObjects->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
 
+    auto& currentClearValues = currentRenderTargetGraphicsObjects->GetGraphicsRenderPassClearValues();
+
+    // Set the clear color for first color attachment
+    if(instruction.mIsClearColorSet && !currentClearValues.empty())
+    {
+      currentClearValues[0].color = {
+        instruction.mClearColor.r,
+        instruction.mClearColor.g,
+        instruction.mClearColor.b,
+        instruction.mClearColor.a};
+    }
+
+    if(!renderToFbo)
+    {
       // @todo SceneObject should already have the depth clear / stencil clear in the clearValues array.
       // if the window has a depth/stencil buffer.
       if((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE ||
@@ -1283,11 +1270,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
         currentClearValues.back().depthStencil.depth   = 1.0f;
         currentClearValues.back().depthStencil.stencil = 0;
       }
-
-      auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
-
-      currentRenderTarget = sceneObject->GetSurfaceRenderTarget();
-      currentRenderPass   = sceneObject->GetGraphicsRenderPass(loadOp, Graphics::AttachmentStoreOp::STORE);
     }
 
     if(!instruction.mIgnoreRenderToFbo && (instruction.mFrameBuffer != nullptr))
@@ -1365,12 +1347,12 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
       Graphics::CommandBufferBeginInfo info;
       info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
-      info.SetRenderTarget(*currentRenderTarget);
+      info.SetRenderTarget(currentRenderTarget);
       currentCommandBuffer->Begin(info);
 
       // Begin render pass
-      currentCommandBuffer->BeginRenderPass(currentRenderPass,
-                                            currentRenderTarget,
+      currentCommandBuffer->BeginRenderPass(&currentRenderPass,
+                                            &currentRenderTarget,
                                             scissorArea,
                                             currentClearValues);
 
@@ -1384,7 +1366,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
                                                        surfaceOrientation,
                                                        Uint16Pair(surfaceRect.width, surfaceRect.height),
                                                        currentRenderPass,
-                                                       currentRenderTarget,
+                                                       *currentRenderTargetGraphicsObjects,
                                                        currentCommandBuffer);
 
       Graphics::SyncObject* syncObject{nullptr};
@@ -1462,12 +1444,10 @@ void RenderManager::ClearScene(Integration::Scene scene)
   }
 
   DALI_TRACE_BEGIN(gTraceFilter, "DALI_CLEAR_SCENE");
-  auto& currentClearValues = sceneObject->GetGraphicsRenderPassClearValues();
+  auto& currentRenderTarget = *sceneObject->GetSurfaceRenderTarget();
+  auto& currentRenderPass   = *sceneObject->GetGraphicsRenderPass(Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE);
+  auto& currentClearValues  = sceneObject->GetGraphicsRenderPassClearValues();
   DALI_ASSERT_DEBUG(!currentClearValues.empty());
-
-  Graphics::RenderTarget* currentRenderTarget = sceneObject->GetSurfaceRenderTarget();
-  Graphics::RenderPass*   currentRenderPass   = sceneObject->GetGraphicsRenderPass(
-    Graphics::AttachmentLoadOp::CLEAR, Graphics::AttachmentStoreOp::STORE);
 
   Rect<int32_t>    surfaceRect = sceneObject->GetSurfaceRect();
   Graphics::Rect2D scissorArea{0, 0, uint32_t(surfaceRect.width), uint32_t(surfaceRect.height)};
@@ -1481,9 +1461,9 @@ void RenderManager::ClearScene(Integration::Scene scene)
   auto commandBuffer = mImpl->graphicsController.CreateCommandBuffer(Graphics::CommandBufferCreateInfo().SetLevel(Graphics::CommandBufferLevel::PRIMARY), nullptr);
   commandBuffer->Begin(Graphics::CommandBufferBeginInfo()
                          .SetUsage(0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT)
-                         .SetRenderTarget(*currentRenderTarget));
+                         .SetRenderTarget(currentRenderTarget));
 
-  commandBuffer->BeginRenderPass(currentRenderPass, currentRenderTarget, scissorArea, currentClearValues);
+  commandBuffer->BeginRenderPass(&currentRenderPass, &currentRenderTarget, scissorArea, currentClearValues);
   commandBuffer->EndRenderPass(nullptr);
   commandBuffer->End();
 
@@ -1491,7 +1471,7 @@ void RenderManager::ClearScene(Integration::Scene scene)
   submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
   submitInfo.cmdBuffer.push_back(commandBuffer.get());
   mImpl->graphicsController.SubmitCommandBuffers(submitInfo);
-  mImpl->graphicsController.PresentRenderTarget(currentRenderTarget);
+  mImpl->graphicsController.PresentRenderTarget(&currentRenderTarget);
   DALI_TRACE_END(gTraceFilter, "DALI_CLEAR_SCENE");
 }
 
