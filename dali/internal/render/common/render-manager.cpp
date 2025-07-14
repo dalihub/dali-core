@@ -726,7 +726,13 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
 
   status.SetHadRenderInstructionToScene(sceneObject->HasRenderInstructionToScene());
   status.SetHasRenderInstructionToScene(renderToScene);
-  sceneObject->SetHasRenderInstructionToScene(renderToScene);
+  status.SetSkipRendering(sceneObject->IsRenderingSkipped());
+
+  // Do not update render instruction infomation if rendering skipped!
+  if(!sceneObject->IsRenderingSkipped())
+  {
+    sceneObject->SetHasRenderInstructionToScene(renderToScene);
+  }
 
   if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
   {

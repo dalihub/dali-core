@@ -33,17 +33,18 @@
 namespace Dali::Integration
 {
 /**
-* The status of the Core::PreRenderScene operation.
-*/
+ * The status of the Core::PreRenderScene operation.
+ */
 class DALI_CORE_API ScenePreRenderStatus
 {
 public:
   /**
-  * Constructor
-  */
+   * Constructor
+   */
   ScenePreRenderStatus()
   : hasRenderInstructionToScene(false),
-    hadRenderInstructionToScene(false)
+    hadRenderInstructionToScene(false),
+    isRenderingSkipped(false)
   {
   }
 
@@ -67,9 +68,20 @@ public:
     return hadRenderInstructionToScene;
   }
 
+  void SetSkipRendering(bool renderingSkipped)
+  {
+    isRenderingSkipped = renderingSkipped;
+  }
+
+  bool IsRenderingSkipped() const
+  {
+    return isRenderingSkipped;
+  }
+
 private:
   bool hasRenderInstructionToScene : 1; ///< True if has render instruction to the scene.
   bool hadRenderInstructionToScene : 1; ///< True if had render instruction to the scene.
+  bool isRenderingSkipped : 1;
 };
 
 } // namespace Dali::Integration
