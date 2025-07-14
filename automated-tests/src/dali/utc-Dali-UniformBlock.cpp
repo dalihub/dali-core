@@ -265,7 +265,7 @@ int UtcDaliUniformBlockGetPropertyFromGraphics(void)
   const Vector2 value2ForUniformBlock(20.0f, 30.0f);
 
   const uint32_t uniformAlign     = sizeof(float) * 4;
-  const uint32_t uniformBlockSize = (uniformAlign)*2;
+  const uint32_t uniformBlockSize = (uniformAlign) * 2;
 
   tet_infoline("Prepare graphics to check UTC for testBlock\n");
   auto& graphics = application.GetGraphicsController();
@@ -324,7 +324,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics(void)
   DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
   DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
 
-  auto TestRawBuffer = [&](const float expectValue1, const Vector2& expectValue2) {
+  auto TestRawBuffer = [&](const float expectValue1, const Vector2& expectValue2)
+  {
     DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
     DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
 
@@ -533,6 +534,85 @@ int UtcDaliUniformBlockDestructWorkerThreadN(void)
 
   // Always success
   DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+int utcDaliUniformBlockPartialUpdate(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged rect when UniformBlock's property changed");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  Shader   shader   = Shader::New("VertexSource", "FragmentSource");
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  UniformBlock uniformBlock = UniformBlock::New("testBlock");
+  uniformBlock.ConnectToShader(shader);
+
+  Vector4         initialColor = Color::WHITE;
+  Property::Index colorIndex   = uniformBlock.RegisterProperty("uFadeColor", initialColor);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+
+  // 1. Actor added, damaged rect is added size of actor
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Check dirty rect empty
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Change uniform block property
+  uniformBlock.SetProperty(colorIndex, Color::RED);
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   END_TEST;
 }

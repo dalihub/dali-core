@@ -1513,12 +1513,12 @@ void UpdateManager::PostRender()
   // Reset dirty flag
   for(auto&& renderer : mImpl->renderers)
   {
-    renderer->SetUpdated(false);
+    renderer->ResetDirtyUpdated();
   }
 
   for(auto&& shader : mImpl->shaders)
   {
-    shader->SetUpdated(false);
+    shader->ResetUpdated();
   }
 
   for(auto&& uniformBlock : mImpl->uniformBlocks)

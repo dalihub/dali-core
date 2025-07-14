@@ -35,7 +35,17 @@ namespace SceneGraph
 namespace
 {
 static constexpr uint32_t DEFAULT_RENDER_PASS_TAG = 0u;
-}
+
+enum DirtyUpdateFlags
+{
+  NOT_CHECKED = 0,
+  CHECKED     = 0x80,
+
+  UPDATED_FLAG_SHIFT = 0,
+
+  IS_UPDATED_MASK = 1 << UPDATED_FLAG_SHIFT,
+};
+} // namespace
 
 Shader::~Shader()
 {
@@ -50,7 +60,8 @@ void Shader::UpdateShaderData(ShaderDataPtr shaderData)
   }
 
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", shaderData->GetHashValue());
-  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem) { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
+  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
+                                                                                   { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
   if(shaderDataIterator != mShaderDataList.end())
   {
     *shaderDataIterator = std::move(shaderData);
@@ -111,6 +122,43 @@ const Shader::UniformBlockContainer& Shader::GetConnectedUniformBlocks() const
 std::size_t Shader::GetSharedUniformNamesHash() const
 {
   return mBlockNamesHash;
+}
+
+bool Shader::IsUpdated() const
+{
+  // We should check Whether
+  // 1. Shadoer itself's property changed
+  // 2. One of connected UniformBlock's property changed.
+  CheckUpdated();
+  return mDirtyUpdated & IS_UPDATED_MASK;
+}
+
+void Shader::CheckUpdated() const
+{
+  if(mDirtyUpdated == NOT_CHECKED)
+  {
+    mDirtyUpdated |= CHECKED;
+    bool updated = Updated();
+    if(!updated)
+    {
+      for(const auto& uniformBlockPair : mBlocks)
+      {
+        const auto* uniformBlock = uniformBlockPair.second;
+        if(uniformBlock->Updated())
+        {
+          updated = true;
+          break;
+        }
+      }
+    }
+    mDirtyUpdated |= (updated) << UPDATED_FLAG_SHIFT;
+  }
+}
+
+void Shader::ResetUpdated()
+{
+  PropertyOwner::SetUpdated(false);
+  mDirtyUpdated = NOT_CHECKED;
 }
 
 } // namespace SceneGraph

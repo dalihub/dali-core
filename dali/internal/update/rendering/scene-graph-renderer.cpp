@@ -98,6 +98,17 @@ inline Vector4 AdjustExtents(const Vector4& updateArea, const Dali::Extents& upd
   return Vector4((left + right) * 0.5f, (top + bottom) * 0.5f, (right - left), (bottom - top));
 }
 
+enum DirtyUpdateFlags
+{
+  NOT_CHECKED = 0,
+  CHECKED     = 0x80,
+
+  DIRTY_FLAG_SHIFT   = 0,
+  UPDATED_FLAG_SHIFT = 1,
+
+  IS_DIRTY_MASK   = 1 << DIRTY_FLAG_SHIFT,
+  IS_UPDATED_MASK = (1 << UPDATED_FLAG_SHIFT) | IS_DIRTY_MASK,
+};
 } // Anonymous namespace
 
 RendererKey Renderer::NewKey()
@@ -899,7 +910,8 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
 bool Renderer::IsDirty() const
 {
   // Check whether the opacity property has changed
-  return (Updated() || !mMixColor.IsClean());
+  CheckDirtyUpdated();
+  return mDirtyUpdated & IS_DIRTY_MASK;
 }
 
 void Renderer::RequestResetToBaseValues()
@@ -947,13 +959,26 @@ bool Renderer::IsUpdated() const
   // We should check Whether
   // 1. Renderer itself's property changed
   // 2. Renderer's opacity changed
-  // 3. Shader's propperties are changed
+  // 3. Shader's propperties or UniformBlock's properties are changed
   // 4. Visual properties are changed
-  if(IsDirty() || (mShader && mShader->Updated()) || (mVisualPropertiesDirtyFlags != CLEAN_FLAG))
+  CheckDirtyUpdated();
+  return mDirtyUpdated & IS_UPDATED_MASK;
+}
+
+void Renderer::CheckDirtyUpdated() const
+{
+  if(mDirtyUpdated == NOT_CHECKED)
   {
-    return true;
+    mDirtyUpdated |= CHECKED;
+    mDirtyUpdated |= (Updated() || !mMixColor.IsClean()) << DIRTY_FLAG_SHIFT;
+    mDirtyUpdated |= ((mShader && mShader->IsUpdated()) || (mVisualPropertiesDirtyFlags != CLEAN_FLAG)) << UPDATED_FLAG_SHIFT;
   }
-  return false;
+}
+
+void Renderer::ResetDirtyUpdated()
+{
+  PropertyOwner::SetUpdated(false);
+  mDirtyUpdated = NOT_CHECKED;
 }
 
 Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept

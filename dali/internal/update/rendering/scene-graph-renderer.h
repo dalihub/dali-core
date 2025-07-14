@@ -532,6 +532,17 @@ public:
   }
 
   /**
+   * Update the result of Query of IsDirty() + IsUpdated() result.
+   * The result will be updated only 1 times per each frame.
+   */
+  void CheckDirtyUpdated() const;
+
+  /**
+   * Reset the dirty updated flag.
+   */
+  void ResetDirtyUpdated();
+
+  /**
    * Get the capacity of the memory pools
    * @return the capacity of the memory pools
    */
@@ -547,7 +558,7 @@ public: // PropertyOwner implementation
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
    */
-  virtual void ResetDefaultProperties(BufferIndex updateBufferIndex){};
+  virtual void ResetDefaultProperties(BufferIndex updateBufferIndex) {};
 
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
@@ -647,6 +658,8 @@ private:
   bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
   bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool mUseSharedUniformBlock : 1;
+
+  mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
   Dali::RenderCallback*                         mRenderCallback{nullptr};
