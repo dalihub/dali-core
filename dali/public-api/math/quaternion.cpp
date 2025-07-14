@@ -48,11 +48,6 @@ Quaternion::Quaternion(float cosThetaBy2, float iBySineTheta, float jBySineTheta
 {
 }
 
-Quaternion::Quaternion(const Vector4& vector)
-: mVector(vector)
-{
-}
-
 Quaternion::Quaternion(Radian angle, const Vector3& axis)
 {
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 4);
@@ -112,8 +107,6 @@ Quaternion::Quaternion(const Vector3& v0, const Vector3& v1)
     Normalize();
   }
 }
-
-Quaternion::~Quaternion() = default;
 
 bool Quaternion::IsIdentity() const
 {

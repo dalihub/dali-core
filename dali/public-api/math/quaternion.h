@@ -2,7 +2,7 @@
 #define DALI_QUATERNION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,10 @@ public:
    * @SINCE_1_0.0
    * @param[in] vector x,y,z fields represent i,j,k coefficients, w represents cos(theta/2)
    */
-  explicit Quaternion(const Vector4& vector);
+  explicit constexpr Quaternion(const Vector4& vector)
+  : mVector(vector)
+  {
+  }
 
   /**
    * @brief Constructor from an axis and angle.
@@ -122,7 +125,7 @@ public:
    *
    * @SINCE_1_0.0
    */
-  ~Quaternion();
+  ~Quaternion() = default;
 
   // Constants
 
@@ -466,9 +469,9 @@ private:
   /// @endcond
 
 public:
-  Quaternion(const Quaternion&)     = default;            ///< Default copy constructor
-  Quaternion(Quaternion&&) noexcept = default;            ///< Default move constructor
-  Quaternion& operator=(const Quaternion&) = default;     ///< Default copy assignment operator
+  Quaternion(const Quaternion&)                = default; ///< Default copy constructor
+  Quaternion(Quaternion&&) noexcept            = default; ///< Default move constructor
+  Quaternion& operator=(const Quaternion&)     = default; ///< Default copy assignment operator
   Quaternion& operator=(Quaternion&&) noexcept = default; ///< Default move assignment operator
 
 public:

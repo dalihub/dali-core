@@ -41,12 +41,14 @@ namespace SceneGraph
 namespace
 {
 // Default values for scale (1.0,1.0,1.0), orientation (Identity) and position (0.0,0.0,0.0)
-static const float gDefaultTransformComponentAnimatableData[] = {1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+static constexpr TransformComponentAnimatable gDefaultTransformComponentAnimatableData{Vector3(1.0f, 1.0f, 1.0f), Quaternion(Vector4(0.0f, 0.0f, 0.0f, 1.0f)), Vector3(0.0f, 0.0f, 0.0f)};
 
 // Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
-static const float gDefaultTransformComponentStaticData[] = {0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.5f, true};
+static constexpr TransformComponentStatic gDefaultTransformComponentStaticData{Vector3(0.5f, 0.5f, 0.5f), Vector3(0.0f, 0.0f, 0.5f), true, false};
 
-static const uint32_t STATIC_COMPONENT_FLAG = 0x01; ///< Indicates that the value when we change static transform components, so need to update at least 1 frame.
+static constexpr uint32_t STATIC_COMPONENT_FLAG = 0x01; ///< Indicates that the value when we change static transform components, so need to update at least 1 frame.
+
+static constexpr uint16_t IGNORED_COMPONENTS_SCENE_ID = 0xffff; ///< Special marker for ignored components, which we move them as end of components.
 
 static_assert(sizeof(gDefaultTransformComponentAnimatableData) == sizeof(TransformComponentAnimatable), "gDefaultTransformComponentAnimatableData should have the same number of floats as specified in TransformComponentAnimatable");
 static_assert(sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformComponentStatic), "gDefaultTransformComponentStaticData should have the same number of floats as specified in TransformComponentStatic");
@@ -225,6 +227,7 @@ inline void BakeTransfromPropertyIfChanged(T& current, T& base, uint8_t& compone
 
 TransformManager::TransformManager()
 : mComponentCount(0),
+  mIgnoredComponentCount(0),
   mDirtyFlags(CLEAN_FLAG),
   mReorder(false),
   mUpdated(false)
@@ -241,8 +244,9 @@ TransformId TransformManager::CreateTransform()
   if(mTxComponentAnimatable.Size() <= mComponentCount)
   {
     // Make room for another component
-    mTxComponentAnimatable.PushBack(TransformComponentAnimatable());
-    mTxComponentStatic.PushBack(TransformComponentStatic());
+    mTxComponentAnimatable.PushBack(gDefaultTransformComponentAnimatableData);
+    mTxComponentStatic.PushBack(gDefaultTransformComponentStaticData);
+    mTxComponentAnimatableBaseValue.PushBack(gDefaultTransformComponentAnimatableData);
     mInheritanceMode.PushBack(INHERIT_ALL);
     mComponentId.PushBack(id);
     mSize.PushBack(Vector3(0.0f, 0.0f, 0.0f));
@@ -250,11 +254,9 @@ TransformId TransformManager::CreateTransform()
     mWorld.PushBack(Matrix::IDENTITY);
     mLocal.PushBack(Matrix::IDENTITY);
     mBoundingSpheres.PushBack(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
-    mTxComponentAnimatableBaseValue.PushBack(TransformComponentAnimatable());
     mSizeBase.PushBack(Vector3(0.0f, 0.0f, 0.0f));
     mComponentDirty.PushBack(CLEAN_FLAG);
     mWorldMatrixDirty.PushBack(false);
-    mIgnored.PushBack(false);
   }
   else
   {
@@ -272,7 +274,11 @@ TransformId TransformManager::CreateTransform()
     mSizeBase[mComponentCount]         = Vector3(0.0f, 0.0f, 0.0f);
     mComponentDirty[mComponentCount]   = CLEAN_FLAG;
     mWorldMatrixDirty[mComponentCount] = false;
-    mIgnored[mComponentCount] = false;
+  }
+
+  if(mIgnoredComponentCount > 0u)
+  {
+    SwapComponents(mComponentCount, mComponentCount - mIgnoredComponentCount);
   }
 
   mComponentCount++;
@@ -295,7 +301,6 @@ void TransformManager::RemoveTransform(TransformId id)
   mSizeBase[index]                       = mSizeBase[mComponentCount];
   mComponentDirty[index]                 = mComponentDirty[mComponentCount];
   mWorldMatrixDirty[index]               = mWorldMatrixDirty[mComponentCount];
-  mIgnored[index]                        = mIgnored[mComponentCount];
   mBoundingSpheres[index]                = mBoundingSpheres[mComponentCount];
 
   TransformId lastItemId = mComponentId[mComponentCount];
@@ -351,6 +356,21 @@ void TransformManager::SetInheritOrientation(TransformId id, bool inherit)
 
 void TransformManager::ResetToBaseValue()
 {
+  // TODO : Is it possible to reset base value only for not ignored cases?
+  // if(mComponentCount > mIgnoredComponentCount)
+  // {
+  //   if(mDirtyFlags != CLEAN_FLAG)
+  //   {
+  //     memcpy(&mTxComponentAnimatable[0], &mTxComponentAnimatableBaseValue[0], sizeof(TransformComponentAnimatable) * (mComponentCount - mIgnoredComponentCount));
+  //     memcpy(&mSize[0], &mSizeBase[0], sizeof(Vector3) * (mComponentCount - mIgnoredComponentCount));
+  //   }
+
+  //   if(mUpdated)
+  //   {
+  //     memset(&mWorldMatrixDirty[0], false, sizeof(bool) * (mComponentCount - mIgnoredComponentCount));
+  //   }
+  // }
+
   if(mComponentCount)
   {
     if(mDirtyFlags != CLEAN_FLAG)
@@ -377,10 +397,6 @@ bool TransformManager::Update()
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Transform value is not changed. Skip transform update.\n");
     return false;
   }
-
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
-                                          { oss << "[" << mComponentCount << "]"; });
-
   if(mReorder)
   {
     DALI_TRACE_SCOPE(gTraceFilter, "DALI_TRANSFORM_REORDER");
@@ -390,6 +406,9 @@ bool TransformManager::Update()
     mReorder = false;
   }
 
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
+                                          { oss << "[" << mComponentCount << ", i:" << mIgnoredComponentCount << "]"; });
+
   cnt = 0;
 
   // Iterate through all components to compute its world matrix
@@ -397,17 +416,11 @@ bool TransformManager::Update()
   Vector3       localPosition;
   const Vector3 half(0.5f, 0.5f, 0.5f);
   const Vector3 topLeft(0.0f, 0.0f, 0.5f);
-  for(unsigned int i(0); i < mComponentCount; ++i)
+  for(unsigned int i(0); i < mComponentCount - mIgnoredComponentCount; ++i)
   {
     if(DALI_LIKELY(mInheritanceMode[i] != DONT_INHERIT_TRANSFORM && mParent[i] != INVALID_TRANSFORM_ID))
     {
       const TransformId& parentIndex = mIds[mParent[i]];
-      mIgnored[i] = mIgnored[parentIndex] || mTxComponentStatic[i].mIgnored;
-      if(mIgnored[i])
-      {
-        mComponentDirty[i] >>= 1u; ///< age down.
-        continue;
-      }
 
       if(DALI_LIKELY(mInheritanceMode[i] == INHERIT_ALL))
       {
@@ -497,13 +510,6 @@ bool TransformManager::Update()
     }
     else // Component has no parent or doesn't inherit transform
     {
-      mIgnored[i] = mTxComponentStatic[i].mIgnored;
-      if(mIgnored[i])
-      {
-        mComponentDirty[i] >>= 1u; ///< age down.
-        continue;
-      }
-
       if(mComponentDirty[i])
       {
         // TODO : We need to check mComponentDirty since we have to check the size changeness.
@@ -555,7 +561,6 @@ void TransformManager::SwapComponents(unsigned int i, unsigned int j)
   std::swap(mComponentDirty[i], mComponentDirty[j]);
   std::swap(mBoundingSpheres[i], mBoundingSpheres[j]);
   std::swap(mWorld[i], mWorld[j]);
-  std::swap(mIgnored[i], mIgnored[j]);
 
   mIds[mComponentId[i]] = i;
   mIds[mComponentId[j]] = j;
@@ -568,28 +573,55 @@ void TransformManager::ReorderComponents()
   uint16_t    sceneId = 0u;
   TransformId parentId;
 
+  mIgnoredComponentCount = 0u;
+
   // Create sceneId first
   for(TransformId i = 0; i < mComponentCount; ++i)
   {
     mOrderedComponents[i].id    = mComponentId[i];
     mOrderedComponents[i].level = 0u;
-
-    parentId = mParent[i];
-    if(parentId == INVALID_TRANSFORM_ID)
+    if(mTxComponentStatic[i].mIgnored)
     {
-      mOrderedComponents[i].sceneId = sceneId++;
+      mOrderedComponents[i].sceneId = IGNORED_COMPONENTS_SCENE_ID;
+      ++mIgnoredComponentCount;
+    }
+    else
+    {
+      parentId = mParent[i];
+      if(parentId == INVALID_TRANSFORM_ID)
+      {
+        mOrderedComponents[i].sceneId = sceneId++;
+
+        // Don't make non-ignored components ignored.
+        if(DALI_UNLIKELY(sceneId == IGNORED_COMPONENTS_SCENE_ID))
+        {
+          sceneId = 0U;
+        }
+      }
     }
   }
 
   // Propagate sceneId and level
   for(TransformId i = 0; i < mComponentCount; ++i)
   {
+    if(mTxComponentStatic[i].mIgnored)
+    {
+      continue;
+    }
     parentId = mParent[i];
+
     while(parentId != INVALID_TRANSFORM_ID)
     {
       const uint32_t parentIndex = mIds[parentId];
       ++mOrderedComponents[i].level;
       mOrderedComponents[i].sceneId = mOrderedComponents[parentIndex].sceneId;
+      if(mOrderedComponents[i].sceneId == IGNORED_COMPONENTS_SCENE_ID)
+      {
+        // Ignored case.
+        ++mIgnoredComponentCount;
+        break;
+      }
+
       if(parentIndex < i)
       {
         // Parent information update done. We can reuse it.
@@ -638,7 +670,6 @@ void TransformManager::ReorderComponents()
     mComponentDirty.Resize(mComponentCount);
     mWorldMatrixDirty.Resize(mComponentCount);
     mOrderedComponents.Resize(mComponentCount);
-    mIgnored.Resize(mComponentCount);
 
     mTxComponentAnimatable.ShrinkToFit();
     mTxComponentStatic.ShrinkToFit();
@@ -654,7 +685,6 @@ void TransformManager::ReorderComponents()
     mComponentDirty.ShrinkToFit();
     mWorldMatrixDirty.ShrinkToFit();
     mOrderedComponents.ShrinkToFit();
-    mIgnored.ShrinkToFit();
   }
 #endif
 }
@@ -1152,7 +1182,18 @@ void TransformManager::SetIgnored(TransformId id, bool value)
 {
   TransformId index(mIds[id]);
 
-  SetTransfromPropertyIfChanged(mTxComponentStatic[index].mIgnored, mComponentDirty[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+  if(mTxComponentStatic[index].mIgnored != value)
+  {
+    mReorder = true;
+
+    SetTransfromPropertyIfChanged(mTxComponentStatic[index].mIgnored, mComponentDirty[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+
+    // Ensure to make global dirty flag match with component if ignored become true -> false.
+    if(!value)
+    {
+      mDirtyFlags |= mComponentDirty[index];
+    }
+  }
 }
 
 } // namespace SceneGraph
