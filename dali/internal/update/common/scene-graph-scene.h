@@ -32,6 +32,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/common/render-instruction-container.h>
+#include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/renderers/render-renderer.h> // RendererKey
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -76,7 +77,7 @@ struct DirtyRectKey
     // Reference by : https://stackoverflow.com/a/21062236
     std::size_t operator()(DirtyRectKey const& key) const noexcept
     {
-      constexpr std::size_t nodeShift     = Dali::Log<1 + sizeof(Node)>::value;
+      constexpr std::size_t nodeShift = Dali::Log<1 + sizeof(Node)>::value;
 
 #if defined(__LP64__)
       constexpr std::size_t rendererShift = 0;
@@ -119,7 +120,7 @@ struct DirtyRectValue
  * mRenderTargetCreateInfo to be defined before Initialize is called in RenderManage's Queue.
  * Also, a scene's background color may also get set before Initialize is called.
  */
-class Scene
+class Scene : public RenderTargetGraphicsObjects
 {
 public:
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
@@ -358,51 +359,6 @@ public:
   }
 
   /**
-   * Get the render target created for the scene
-   *
-   * @return the render target
-   */
-  [[nodiscard]] Graphics::RenderTarget* GetSurfaceRenderTarget() const
-  {
-    return mRenderTarget.get();
-  }
-
-  /**
-   * Remove the render target of the surface
-   */
-  void RemoveSurfaceRenderTarget()
-  {
-    mRenderTarget.reset();
-  }
-
-  /**
-   * Get the graphics render pass created for the scene
-   *
-   * @return the graphics render pass
-   */
-  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass(Graphics::AttachmentLoadOp loadOp, Graphics::AttachmentStoreOp storeOp) const
-  {
-    if(loadOp == Graphics::AttachmentLoadOp::CLEAR)
-    {
-      return mRenderPass.get();
-    }
-    else
-    {
-      return mRenderPassNoClear.get();
-    }
-  }
-
-  /**
-   * Get an initialized array of clear values which then can be modified and accessed to BeginRenderPass() command.
-   *
-   * @return the array of clear values
-   */
-  [[nodiscard]] auto& GetGraphicsRenderPassClearValues()
-  {
-    return mClearValues;
-  }
-
-  /**
    * @brief Set a root of the Scene
    *
    * @param layer The root layer
@@ -428,6 +384,26 @@ public:
    * @return the ItemsDirtyRects
    */
   ItemsDirtyRectsContainer& GetItemsDirtyRects();
+
+public: // From RenderTargetGraphicsObjects
+  /**
+   * Get the render target created for the scene
+   *
+   * @return the render target
+   */
+  [[nodiscard]] Graphics::RenderTarget* GetSurfaceRenderTarget() const
+  {
+    return RenderTargetGraphicsObjects::GetGraphicsRenderTarget();
+  }
+
+  /**
+   * Remove the render target of the surface
+   */
+  void RemoveSurfaceRenderTarget()
+  {
+    RenderTargetGraphicsObjects::NotifyRenderTargetDestroyed();
+    mRenderTarget.reset();
+  }
 
 private:
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
@@ -459,20 +435,9 @@ private:
 
   Graphics::RenderTargetCreateInfo mRenderTargetCreateInfo; // Passed in by message before 2nd stage Initialization happens.
 
-  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr}; ///< This is created in Update/Render thread when surface is created/resized/replaced
-
-  /**
-   * Render pass is created on fly depending on Load and Store operations
-   * The default render pass (most likely to be used) is the load = CLEAR
-   * and store = STORE for color attachment.
-   */
-  Graphics::UniquePtr<Graphics::RenderPass> mRenderPass{nullptr};        ///< The render pass created to render the surface
-  Graphics::UniquePtr<Graphics::RenderPass> mRenderPassNoClear{nullptr}; ///< The render pass created to render the surface without clearing color
-
   SceneGraph::Layer* mRoot{nullptr}; ///< Root node
 
-  std::vector<Graphics::ClearValue> mClearValues{};     ///< Clear colors
-  ItemsDirtyRectsContainer          mItemsDirtyRects{}; ///< Dirty rect list
+  ItemsDirtyRectsContainer mItemsDirtyRects{}; ///< Dirty rect list
 };
 
 /// Messages

@@ -24,8 +24,9 @@
 #include <dali/public-api/common/list-wrapper.h>
 
 #include <dali/internal/common/blending-options.h>
-#include <dali/internal/render/renderers/render-geometry.h> ///< For Geometry::LifecycleObserver
-#include <dali/internal/render/shaders/program.h>           ///< For Program::LifecycleObserver
+#include <dali/internal/render/common/render-target-graphics-objects.h> ///< For RenderTargetGraphicsObjects::LifecycleObserver
+#include <dali/internal/render/renderers/render-geometry.h>             ///< For Geometry::LifecycleObserver
+#include <dali/internal/render/shaders/program.h>                       ///< For Program::LifecycleObserver
 
 namespace Dali::Internal
 {
@@ -43,7 +44,8 @@ using PipelineCacheL2Ptr       = PipelineCacheL2Container::iterator;
 using PipelineCacheL1Ptr       = PipelineCacheL1Container::iterator;
 using PipelineCacheL0Ptr       = PipelineCacheL0Container::iterator;
 
-using PipelineCachePtr = PipelineCacheL2Ptr;
+using PipelineLifecycleNotifierPtr = PipelineCacheL0Ptr;
+using PipelineCachePtr             = PipelineCacheL2Ptr;
 
 /**
  * Cache Level 2 : Last level of cache, stores actual pipeline
@@ -77,10 +79,38 @@ struct PipelineCacheL1
 };
 
 /**
- * Cache Level 0 : Stores geometry, program amd vertex input state
+ * Cache Level 0 : Stores geometry, program, render target and vertex input state
  */
 struct PipelineCacheL0 // L0 cache
 {
+  /**
+   * Observer to determine when PipelineCacheL0 is no longer present
+   */
+  class LifecycleObserver
+  {
+  public:
+    enum class NotificationType
+    {
+      NONE,
+      PROGRAM_DESTROYED,
+      GEOMETRY_BUFFER_CHANGED,
+      GEOMETRY_DESTROYED,
+      RENDER_TARGET_GRAPHICS_OBJECTS_DESTROYED,
+    };
+
+  public:
+    /**
+     * Called shortly before the geometry is destroyed.
+     */
+    virtual void PipelineCacheInvalidated(NotificationType notificationType) = 0;
+
+  protected:
+    /**
+     * Virtual destructor, no deletion through this interface
+     */
+    virtual ~LifecycleObserver() = default;
+  };
+
   PipelineCacheL1Ptr GetPipelineCacheL1(Render::Renderer* renderer, bool usingReflection);
 
   /**
@@ -88,11 +118,74 @@ struct PipelineCacheL0 // L0 cache
    */
   void ClearUnusedCache();
 
-  Geometry*                  geometry{};
-  Program*                   program{};
-  Graphics::VertexInputState inputState;
+  /**
+   * Allows Geometry to track the life-cycle of this object.
+   * Note that we allow to observe lifecycle multiple times.
+   * But GeometryDestroyed callback will be called only one time.
+   * @param[in] observer The observer to add.
+   */
+  void AddLifecycleObserver(LifecycleObserver& observer)
+  {
+    DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying PipelineCacheL0::LifecycleObservers");
+
+    auto iter = mLifecycleObservers.find(&observer);
+    if(iter != mLifecycleObservers.end())
+    {
+      // Increase the number of observer count
+      ++(iter->second);
+    }
+    else
+    {
+      mLifecycleObservers.insert({&observer, 1u});
+    }
+  }
+
+  /**
+   * The Geometry no longer needs to track the life-cycle of this object.
+   * @param[in] observer The observer that to remove.
+   */
+  void RemoveLifecycleObserver(LifecycleObserver& observer)
+  {
+    DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying PipelineCacheL0::LifecycleObservers");
+
+    auto iter = mLifecycleObservers.find(&observer);
+    DALI_ASSERT_ALWAYS(iter != mLifecycleObservers.end());
+
+    if(--(iter->second) == 0u)
+    {
+      mLifecycleObservers.erase(iter);
+    }
+  }
+
+  /**
+   * Notify to observers and clear.
+   */
+  void NotifyPipelineCacheDestroyed(PipelineCacheL0::LifecycleObserver::NotificationType notificationType)
+  {
+    mObserverNotifying = true;
+    for(auto&& iter : mLifecycleObservers)
+    {
+      auto* observer = iter.first;
+      observer->PipelineCacheInvalidated(notificationType);
+    }
+    mLifecycleObservers.clear();
+
+    // DevNote : We don't need to restore mObserverNotifying to false as we are in delete this object.
+  }
+
+  Geometry*                                geometry{};
+  Program*                                 program{};
+  SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects{};
+  Graphics::VertexInputState               inputState;
 
   PipelineCacheL1Container level1nodes;
+
+private:
+  using LifecycleObserverContainer = std::unordered_map<LifecycleObserver*, uint32_t>; ///< Lifecycle observers container. We allow to add same observer multiple times.
+                                                                                       ///< Key is a pointer to observer, value is the number of observer added.
+  LifecycleObserverContainer mLifecycleObservers{};
+
+  bool mObserverNotifying{false}; ///< Safety guard flag to ensure that the LifecycleObserver not be added or deleted while observing.
 };
 
 struct PipelineCacheQueryInfo
@@ -102,7 +195,7 @@ struct PipelineCacheQueryInfo
   Program*  program;
   Geometry* geometry;
 
-  Graphics::RenderTarget* renderTarget;
+  SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects;
 
   bool cameraUsingReflection;
 
@@ -118,7 +211,7 @@ struct PipelineCacheQueryInfo
   void GenerateHash();
 
   // Value comparision between two query info.
-  static bool Equal(const PipelineCacheQueryInfo& lhs, const PipelineCacheQueryInfo& rhs) noexcept;
+  static bool Equal(const PipelineCacheQueryInfo& lhs, const PipelineCacheQueryInfo& rhs, const bool compareRenderTarget) noexcept;
 };
 
 /**
@@ -126,14 +219,15 @@ struct PipelineCacheQueryInfo
  */
 struct PipelineResult
 {
-  Graphics::Pipeline* pipeline;
-  PipelineCachePtr    level2;
+  Graphics::Pipeline*          pipeline;
+  PipelineLifecycleNotifierPtr level0;
+  PipelineCachePtr             level2;
 };
 
 /**
  * Pipeline cache
  */
-class PipelineCache : public Program::LifecycleObserver, public Geometry::LifecycleObserver
+class PipelineCache : public Program::LifecycleObserver, public Geometry::LifecycleObserver, public SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver
 {
 public:
   /**
@@ -148,27 +242,11 @@ public:
   ~PipelineCache();
 
   /**
-   * Retrieves next cache level
-   */
-  PipelineCacheL0Ptr GetPipelineCacheL0(Program* program, Render::Geometry* geometry);
-
-  /**
    * Retrieves pipeline matching queryInfo struct
    *
    * May retrieve existing pipeline or create one or return nullptr.
    */
   PipelineResult GetPipeline(const PipelineCacheQueryInfo& queryInfo, bool createNewIfNotFound);
-
-  /**
-   * @brief Check whether we can reuse latest found PipelineResult.
-   * We can reuse latest pipeline only if query info is equal with latest query
-   * and we don't call CleanLatestUsedCache() before.
-   *
-   * @param[in] latestUsedCacheIndex Index of cache we want to compare.
-   * @param[in] queryInfo Query for current pipeline.
-   * @return True if we can reuse latest pipeline result. False otherwise
-   */
-  bool ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const;
 
   /**
    * @brief This is called before rendering every frame.
@@ -191,12 +269,18 @@ public: // From Geometry::LifecycleObserver
   /**
    * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryBufferChanged()
    */
-  Geometry::LifecycleObserver::NotifyReturnType GeometryBufferChanged(const Geometry* geometry);
+  void GeometryBufferChanged(const Geometry* geometry);
 
   /**
    * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
    */
   void GeometryDestroyed(const Geometry* geometry);
+
+public: // From SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver::RenderTargetGraphicsObjectsDestroyed()
+   */
+  void RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects);
 
 private:
   /**
@@ -214,6 +298,22 @@ private:
    */
   void ClearUnusedCache();
 
+  /**
+   * Retrieves next cache level
+   */
+  PipelineCacheL0Ptr GetPipelineCacheL0(Program* program, Render::Geometry* geometry, SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects);
+
+  /**
+   * @brief Check whether we can reuse latest found PipelineResult.
+   * We can reuse latest pipeline only if query info is equal with latest query
+   * and we don't call CleanLatestUsedCache() before.
+   *
+   * @param[in] latestUsedCacheIndex Index of cache we want to compare.
+   * @param[in] queryInfo Query for current pipeline.
+   * @return True if we can reuse latest pipeline result. False otherwise
+   */
+  bool ReuseLatestBoundPipeline(const int latestUsedCacheIndex, const PipelineCacheQueryInfo& queryInfo) const;
+
 private:
   Graphics::Controller*    graphicsController{nullptr};
   PipelineCacheL0Container level0nodes;
@@ -224,6 +324,8 @@ private:
   PipelineResult         mLatestResult[2]; ///< Latest used result. It will be invalidate when we call CleanLatestUsedCache() or some cache changed.
 
   uint32_t mFrameCount{0u};
+
+  const bool mPipelineUseRenderTarget; ///< Ask from Graphics::Controller
 };
 
 } // namespace Render

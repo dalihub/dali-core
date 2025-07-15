@@ -2,7 +2,7 @@
 #define DALI_NATIVE_IMAGE_INTERFACE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,28 @@ public:
   class Extension; ///< Forward declare future extension interface
 
   /**
+   * @brief Enumeration for PrepareTexture result.
+   * If it is normal case, result value between [NO_ERROR_MIN ~ NO_ERROR_MAX]
+   * If it is error case, result value between [ERROR_MIN ~ ERROR_MAX]
+   * @SINCE_2_4.28
+   */
+  enum PrepareTextureResult
+  {
+    NO_ERROR_MIN = 0,
+    NO_ERROR     = NO_ERROR_MIN, ///< Everything works okay without any error.     @SINCE_2_4.28
+    IMAGE_CHANGED,               ///< Not an error. just for notify image data changed. @SINCE_2_4.28
+    NO_ERROR_MAX = 0x0f,
+
+    ERROR_MIN             = NO_ERROR_MAX + 1,
+    NOT_INITIALIZED_IMAGE = ERROR_MIN, ///< Native image data not initialized yet. @SINCE_2_4.28
+    NOT_INITIALIZED_GRAPHICS,          ///< Graphics interface not initialized yet. @SINCE_2_4.28
+    NOT_SUPPORTED,                     ///< Native image not supported for this platform. @SINCE_2_4.28
+    ERROR_MAX = 0xff,
+
+    UNKNOWN_ERROR = ERROR_MAX,
+  };
+
+  /**
    * @brief Creates the resource for the NativeImage.
    *
    * e.g. For the EglImageKHR extension, this corresponds to calling eglCreateImageKHR().
@@ -80,8 +102,9 @@ public:
    * The correct texture sampler has already been bound before the function gets called.
    * @SINCE_1_0.0
    * @pre The graphics subsystem has been initialized
+   * @return The result of PrepareTexture API.
    */
-  virtual void PrepareTexture() = 0;
+  virtual PrepareTextureResult PrepareTexture() = 0;
 
   /**
    * @brief Returns the width of the NativeImage.
@@ -100,10 +123,10 @@ public:
   virtual uint32_t GetHeight() const = 0;
 
   /**
-  * @brief Queries whether blending is required.
-  * @SINCE_1_0.0
-  * @return True if blending is required
-  */
+   * @brief Queries whether blending is required.
+   * @SINCE_1_0.0
+   * @return True if blending is required
+   */
   virtual bool RequiresBlending() const = 0;
 
   /**

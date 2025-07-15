@@ -53,29 +53,29 @@ public:
   RenderAlgorithms& operator=(const RenderAlgorithms& rhs) = delete; // Prevent Copying
   /**
    * Process a render-instruction.
-   * @param[in] instruction            The render-instruction to process.
-   * @param[in] bufferIndex            The current render buffer index (previous update buffer)
-   * @param[in] depthBufferAvailable   Whether the depth buffer is available
-   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-   * @param[in] viewport               The viewport for drawing
-   * @param[in] rootClippingRect       The clipping rectangle
-   * @param[in] orientation            The Scene's surface orientation.
-   * @param[in] sceneSize              The Scene's surface size.
-   * @param[in] renderPass             The RenderPass associated with the renderTarget
-   * @param[in] renderTarget           The RenderTarget associated with instruction
-   * @param[in] commandBuffer          The CommandBuffer associated with the renderTarget
+   * @param[in] instruction                 The render-instruction to process.
+   * @param[in] bufferIndex                 The current render buffer index (previous update buffer)
+   * @param[in] depthBufferAvailable        Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable      Whether the stencil buffer is available
+   * @param[in] viewport                    The viewport for drawing
+   * @param[in] rootClippingRect            The clipping rectangle
+   * @param[in] orientation                 The Scene's surface orientation.
+   * @param[in] sceneSize                   The Scene's surface size.
+   * @param[in] renderPass                  The RenderPass associated with the renderTarget
+   * @param[in] renderTargetGraphicsObjects The RenderTargetGraphicsObjects associated with instruction
+   * @param[in] commandBuffer               The CommandBuffer associated with the renderTarget
    */
-  void ProcessRenderInstruction(const SceneGraph::RenderInstruction& instruction,
-                                BufferIndex                          bufferIndex,
-                                Integration::DepthBufferAvailable    depthBufferAvailable,
-                                Integration::StencilBufferAvailable  stencilBufferAvailable,
-                                const Rect<int32_t>&                 viewport,
-                                const Rect<int>&                     rootClippingRect,
-                                int                                  orientation,
-                                const Uint16Pair&                    sceneSize,
-                                Graphics::RenderPass*                renderPass,
-                                Graphics::RenderTarget*              renderTarget,
-                                Graphics::CommandBuffer*             commandBuffer);
+  void ProcessRenderInstruction(const SceneGraph::RenderInstruction&     instruction,
+                                BufferIndex                              bufferIndex,
+                                Integration::DepthBufferAvailable        depthBufferAvailable,
+                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                const Rect<int32_t>&                     viewport,
+                                const Rect<int>&                         rootClippingRect,
+                                int                                      orientation,
+                                const Uint16Pair&                        sceneSize,
+                                Graphics::RenderPass&                    renderPass,
+                                SceneGraph::RenderTargetGraphicsObjects& renderTargetGraphicsObjects,
+                                Graphics::CommandBuffer*                 commandBuffer);
 
 private:
   /**
@@ -119,17 +119,17 @@ private:
 
   /**
    * @brief Process a render-list.
-   * @param[in] renderList             The render-list to process.
-   * @param[in] buffer                 The current render buffer index (previous update buffer)
-   * @param[in] viewMatrix             The view matrix from the appropriate camera.
-   * @param[in] projectionMatrix       The projection matrix from the appropriate camera.
-   * @param[in] depthBufferAvailable   Whether the depth buffer is available
-   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
-   * @param[in] viewport               The Viewport
-   * @param[in] rootClippingRect       The root clipping rectangle
-   * @param[in] orientation            The Scene's surface orientation
-   * @param[in] sceneSize              The Scene's surface size.
-   * @param[in] renderTarget           The render target associated with render instruction
+   * @param[in] renderList                  The render-list to process.
+   * @param[in] buffer                      The current render buffer index (previous update buffer)
+   * @param[in] viewMatrix                  The view matrix from the appropriate camera.
+   * @param[in] projectionMatrix            The projection matrix from the appropriate camera.
+   * @param[in] depthBufferAvailable        Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable      Whether the stencil buffer is available
+   * @param[in] viewport                    The Viewport
+   * @param[in] rootClippingRect            The root clipping rectangle
+   * @param[in] orientation                 The Scene's surface orientation
+   * @param[in] sceneSize                   The Scene's surface size.
+   * @param[in] renderTargetGraphicsObjects The render target holder associated with render instruction
    */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
                                 BufferIndex                                          bufferIndex,
@@ -142,8 +142,8 @@ private:
                                 const Rect<int>&                                     rootClippingRect,
                                 int                                                  orientation,
                                 const Uint16Pair&                                    sceneSize,
-                                Graphics::RenderPass*                                renderPass,
-                                Graphics::RenderTarget*                              renderTarget);
+                                Graphics::RenderPass&                                renderPass,
+                                SceneGraph::RenderTargetGraphicsObjects&             renderTargetGraphicsObjects);
 
   // Member variables:
 

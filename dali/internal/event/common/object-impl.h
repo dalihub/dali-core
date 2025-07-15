@@ -304,6 +304,16 @@ public:
    */
   void NotifyPropertyAnimation(Animation& animation, Property::Index index, const Property::Value& value, Animation::Type animationType);
 
+  /**
+   * Animates animation property's animation depending on current animation state
+   * @param[in] index The index of the property.
+   * @param[in] state Current animation state
+   * @SINCE_2_4.27
+   */
+  virtual void AnimateAnimatableProperty(Property::Index index, Dali::Animation::State state)
+  {
+  }
+
   /******************************** Uniform Mappings ********************************/
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
                                      PropertyOwnerContainer& postPropertyOwners,
                                      bool                    updated)
 {
-  if(DALI_UNLIKELY(node.IsIgnored())) // almost never ever true
+  if(node.IsIgnored()) // Do nothing if ignored.
   {
     return NodePropertyFlags::NOTHING;
   }
@@ -210,6 +210,11 @@ inline void UpdateLayers(Node&             node,
                          BufferIndex       updateBufferIndex,
                          Layer&            currentLayer)
 {
+  if(node.IsIgnored()) // Do nothing if ignored.
+  {
+    return;
+  }
+
   // Some dirty flags are inherited from parent
   NodePropertyFlags nodeDirtyFlags = node.GetDirtyFlags() | node.GetInheritedDirtyFlags(parentFlags);
   nodeDirtyFlags |= (node.IsWorldMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
@@ -259,6 +264,11 @@ inline void UpdateLayers(Node&             node,
 void UpdateLayerTree(Layer&      layer,
                      BufferIndex updateBufferIndex)
 {
+  if(DALI_UNLIKELY(layer.IsIgnored())) // almost never ever true
+  {
+    return;
+  }
+
   NodePropertyFlags nodeDirtyFlags = layer.GetDirtyFlags();
   nodeDirtyFlags |= (layer.IsWorldMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
 

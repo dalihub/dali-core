@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/object/property.h>
@@ -173,6 +174,16 @@ public:
    * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize
    */
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
+
+  /**
+   * @brief Called when animating the owning actor's animatable property.
+   * @SINCE_2_4.27
+   * @param[in] index The animatable property index
+   * @param[in] state Current animation state
+   */
+  virtual void OnAnimateAnimatableProperty(Property::Index index, Dali::Animation::State state)
+  {
+  }
 
   /**
    * @brief Retrieves the off-screen RenderTasks associated with the Actor.

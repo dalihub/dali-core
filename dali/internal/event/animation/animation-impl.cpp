@@ -480,6 +480,8 @@ void Animation::Play()
 
   NotifyObjects(Notify::USE_TARGET_VALUE);
 
+  SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
+
   SendFinalProgressNotificationMessage();
 
   // mAnimation is being used in a separate thread; queue a Play message
@@ -498,6 +500,8 @@ void Animation::PlayFrom(float progress)
     InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
 
     NotifyObjects(Notify::USE_TARGET_VALUE);
+
+    SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
 
     SendFinalProgressNotificationMessage();
 
@@ -521,6 +525,8 @@ void Animation::PlayAfter(float delaySeconds)
   InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
 
   NotifyObjects(Notify::USE_TARGET_VALUE);
+
+  SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
 
   SendFinalProgressNotificationMessage();
 
@@ -582,6 +588,8 @@ void Animation::Stop()
     {
       NotifyObjects(Notify::USE_CURRENT_VALUE);
     }
+
+    SetObjectAnimatablePropertyAnimations(Dali::Animation::STOPPED);
   }
 }
 
@@ -602,6 +610,8 @@ void Animation::Clear()
   {
     NotifyObjects(Notify::USE_CURRENT_VALUE);
   }
+
+  SetObjectAnimatablePropertyAnimations(Dali::Animation::STOPPED);
 
   // Remove all the connectors
   mConnectors.Clear();
@@ -1030,6 +1040,10 @@ bool Animation::HasFinished()
     switch(mState)
     {
       case Internal::Animation::InternalState::PLAYING:
+      {
+        SetObjectAnimatablePropertyAnimations(Dali::Animation::STOPPED);
+        DALI_FALLTHROUGH;
+      }
       case Internal::Animation::InternalState::STOPPING:
       {
         mState      = Dali::Internal::Animation::STOPPED;
@@ -1390,6 +1404,27 @@ void Animation::AppendConnectorTargetValues(ConnectorTargetValues&& connectorTar
   if(DALI_UNLIKELY(mConnectorTargetValues.size() % WARNING_PRINT_THRESHOLD == 0))
   {
     DALI_LOG_ANIMATION_INFO("Animation[%u] Connect %zu Animators! Please check you might append too much items.\n", mAnimationId, mConnectorTargetValues.size());
+  }
+}
+
+void Animation::SetObjectAnimatablePropertyAnimations(Dali::Animation::State state)
+{
+  if(state != Dali::Animation::PAUSED)
+  {
+    for(auto it = mConnectorTargetValues.begin(); it != mConnectorTargetValues.end(); ++it)
+    {
+      AnimatorConnectorBase* connector     = mConnectors[it->connectorIndex];
+      const Property::Index  propertyIndex = connector->GetPropertyIndex();
+
+      if((propertyIndex >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (propertyIndex <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX))
+      {
+        Object* object = connector->GetObject();
+        if(object && object->IsAnimationPossible())
+        {
+          object->AnimateAnimatableProperty(propertyIndex, state);
+        }
+      }
+    }
   }
 }
 

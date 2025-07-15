@@ -35,9 +35,8 @@
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
-#include <dali/internal/render/renderers/render-geometry.h>
+#include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/uniform-buffer-manager.h>
-#include <dali/internal/render/shaders/program.h>
 #include <dali/internal/update/manager/render-instruction-processor.h>
 
 namespace Dali
@@ -54,6 +53,7 @@ class SceneController;
 class Shader;
 class NodeDataProvider;
 class RenderInstruction; // for reflection effect
+class RenderTargetGraphicsObjects;
 } // namespace SceneGraph
 
 namespace Render
@@ -92,7 +92,7 @@ namespace Render
  * These objects are used during RenderManager::Render(), so properties modified during
  * the Update must either be double-buffered, or set via a message added to the RenderQueue.
  */
-class Renderer : public Program::LifecycleObserver, public Geometry::LifecycleObserver
+class Renderer : public PipelineCacheL0::LifecycleObserver
 {
 public:
   /**
@@ -419,7 +419,7 @@ public:
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
    * @param[in] instruction. for use case like reflection where CullFace needs to be adjusted
-   * @param[in] renderTarget render target associated with instruction
+   * @param[in] renderTargetGraphicsObjects render target associated with instruction
    * @param[in] queueIndex Index of the render queue
    *
    * @return True if commands have been added to the command buffer
@@ -436,7 +436,7 @@ public:
               const Vector3&                                       size,
               bool                                                 blend,
               const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-              Graphics::RenderTarget*                              renderTarget,
+              SceneGraph::RenderTargetGraphicsObjects&             renderTargetGraphicsObjects,
               uint32_t                                             queueIndex);
 
   /**
@@ -584,22 +584,11 @@ public:
     return mUseSharedUniformBlock;
   }
 
-public: // From Program::LifecycleObserver
+public: // From PipelineCacheL0::LifecycleObserver
   /**
-   * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
+   * @copydoc Dali::Internal::Render::PipelineCacheL0::LifecycleObserver::PipelineCacheInvalidated()
    */
-  void ProgramDestroyed(const Program* program);
-
-public: // From Geometry::LifecycleObserver
-  /**
-   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryBufferChanged()
-   */
-  Geometry::LifecycleObserver::NotifyReturnType GeometryBufferChanged(const Geometry* geometry);
-
-  /**
-   * @copydoc Dali::Internal::Geometry::LifecycleObserver::GeometryDestroyed()
-   */
-  void GeometryDestroyed(const Geometry* geometry);
+  void PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::NotificationType notificationType) override;
 
 private:
   struct UniformIndexMap;
@@ -639,7 +628,7 @@ private:
   Graphics::Pipeline& PrepareGraphicsPipeline(
     Program&                                             program,
     const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-    Graphics::RenderTarget*                              renderTarget,
+    SceneGraph::RenderTargetGraphicsObjects&             renderTargetGraphicsObjects,
     const SceneGraph::NodeDataProvider&                  node,
     bool                                                 blend);
 
@@ -699,6 +688,12 @@ private:
                        Render::UniformBufferView& ubo,
                        BufferIndex                updateBufferIndex);
 
+  /**
+   * @brief Clear the pipeline cache.
+   * @param[in] notifyToCache True if we need to notify pipeline cache that renderer don't hold cache anymore.
+   */
+  void ClearPipelineCache(bool notifyToCache);
+
 private:
   Graphics::Controller*           mGraphicsController;
   SceneGraph::RenderDataProvider* mRenderDataProvider;
@@ -712,7 +707,9 @@ private:
   std::vector<Graphics::UniformBufferBinding> mUniformBufferBindings{};
 
   Render::PipelineCache* mPipelineCache{nullptr};
-  PipelineCachePtr       mPipeline{};
+
+  PipelineCachePtr             mPipeline{};
+  PipelineLifecycleNotifierPtr mPipelineLifecycleNotifier{};
 
   using Hash = std::size_t;
 
@@ -765,6 +762,7 @@ private:
   bool                  mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool                  mShaderChanged : 1;             ///< Flag indicating the shader changed and uniform maps have to be updated
   bool                  mPipelineCached : 1;            ///< Flag indicating whether renderer cache valid pipeline or not.
+  bool                  mPipelineNotifierCached : 1;    ///< Flag indicating whether renderer cache valid pipeline notifier or not.
   bool                  mUseSharedUniformBlock : 1;     ///< Flag whether we should use shared uniform block or not. Usually it must be true.
 
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff

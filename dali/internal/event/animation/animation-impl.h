@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -564,6 +564,12 @@ private:
    * @param[in] connectorTargetValues moved ConnectorTargetValues that will be append end of container
    */
   void AppendConnectorTargetValues(ConnectorTargetValues&& connectorTargetValues);
+
+  /**
+   * @brief Enable or disable animation of animatable properties in each connected object.
+   * @param[in] state Animation state to determine whether to enable or diable
+   */
+  void SetObjectAnimatablePropertyAnimations(Dali::Animation::State state);
 
 private:
   using AnimatorConnectorContainer     = OwnerContainer<AnimatorConnectorBase*>;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ TestNativeImage::TestNativeImage(uint32_t width, uint32_t height)
   mExtensionDestroyCalls(0),
   mTargetTextureCalls(0),
   createResult(true),
+  mPrepareTextureResult(Dali::NativeImageInterface::PrepareTextureResult::NO_ERROR),
   mCallStack(true, "NativeImage::")
 {
   mCallStack.EnableLogging(true);

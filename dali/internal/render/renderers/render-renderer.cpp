@@ -26,6 +26,7 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/common/shared-uniform-buffer-view-container.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
@@ -167,6 +168,7 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
   mShaderChanged(false),
   mPipelineCached(false),
+  mPipelineNotifierCached(false),
   mUseSharedUniformBlock(true)
 {
   if(blendingBitmask != 0u)
@@ -184,34 +186,12 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
   mUniformBufferManager             = &uniformBufferManager;
   mPipelineCache                    = &pipelineCache;
   mSharedUniformBufferViewContainer = &sharedUniformBufferViewContainer;
-
-  // Add Observer now
-  if(mGeometry)
-  {
-    mGeometry->AddLifecycleObserver(*this);
-  }
 }
 
 Renderer::~Renderer()
 {
   // Reset old pipeline
-  if(DALI_LIKELY(mPipelineCached))
-  {
-    mPipelineCache->ResetPipeline(mPipeline);
-    mPipelineCached = false;
-  }
-
-  // Stop observing
-  if(mCurrentProgram)
-  {
-    mCurrentProgram->RemoveLifecycleObserver(*this);
-    mCurrentProgram = nullptr;
-  }
-  if(mGeometry)
-  {
-    mGeometry->RemoveLifecycleObserver(*this);
-    mGeometry = nullptr;
-  }
+  ClearPipelineCache(true);
 }
 
 void Renderer::operator delete(void* ptr)
@@ -228,24 +208,10 @@ void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   if(mGeometry != geometry)
   {
-    if(mGeometry)
-    {
-      mGeometry->RemoveLifecycleObserver(*this);
-    }
-
     mGeometry = geometry;
 
-    if(mGeometry)
-    {
-      mGeometry->AddLifecycleObserver(*this);
-    }
-
     // Reset old pipeline
-    if(DALI_LIKELY(mPipelineCached))
-    {
-      mPipelineCache->ResetPipeline(mPipeline);
-      mPipelineCached = false;
-    }
+    ClearPipelineCache(true);
   }
 }
 
@@ -460,10 +426,6 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   if(!shaderData)
   {
     DALI_LOG_ERROR("Failed to get shader data.\n");
-    if(mCurrentProgram)
-    {
-      mCurrentProgram->RemoveLifecycleObserver(*this);
-    }
     mCurrentProgram = nullptr;
     return nullptr;
   }
@@ -475,10 +437,6 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   if(!program)
   {
     DALI_LOG_ERROR("Failed to create program for shader at address %p.\n", reinterpret_cast<const void*>(&shader));
-    if(mCurrentProgram)
-    {
-      mCurrentProgram->RemoveLifecycleObserver(*this);
-    }
     mCurrentProgram = nullptr;
     return nullptr;
   }
@@ -525,15 +483,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   }
 
   // Set prefetched program to be used during rendering
-  if(mCurrentProgram != program)
-  {
-    if(mCurrentProgram)
-    {
-      mCurrentProgram->RemoveLifecycleObserver(*this);
-    }
-    mCurrentProgram = program;
-    mCurrentProgram->AddLifecycleObserver(*this);
-  }
+  mCurrentProgram = program;
   return mCurrentProgram;
 }
 
@@ -549,7 +499,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Vector3&                                       size,
                       bool                                                 blend,
                       const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-                      Graphics::RenderTarget*                              renderTarget,
+                      SceneGraph::RenderTargetGraphicsObjects&             renderTargetGraphicsObjects,
                       uint32_t                                             queueIndex)
 {
   // Before doing anything test if the call happens in the right queue
@@ -663,7 +613,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   if(program)
   {
     // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
-    auto& pipeline = PrepareGraphicsPipeline(*program, instruction, renderTarget, node, blend);
+    auto& pipeline = PrepareGraphicsPipeline(*program, instruction, renderTargetGraphicsObjects, node, blend);
 
     if(!ReuseLatestBoundPipeline(&pipeline))
     {
@@ -1127,47 +1077,44 @@ void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& no
 #endif
 }
 
-void Renderer::ProgramDestroyed(const Program* program)
+void Renderer::PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::NotificationType notificationType)
 {
-  DALI_ASSERT_ALWAYS(mCurrentProgram == program && "Something wrong happend when Render::Renderer observed by program!");
-  mCurrentProgram = nullptr;
-
-  // The cached pipeline might be invalided after program destroyed.
+  // The cached pipeline might be invalided.
   // Remove current cached pipeline information.
-  // Note that reset flag is enought since mPipeline pointer will be invalidate now.
-  mPipelineCached = false;
+  // Note that reset flag is enought since mPipeline pointer and mPipelineLifecycleNotifier pointer will be invalidate now.
+  ClearPipelineCache(false);
 
-  // Destroy whole mNodeIndexMap and mUniformIndexMaps container.
-  // It will be re-created at next render time.
-  // Note : Destroy the program will be happened at RenderManager::PostRender().
-  //        We don't worry about the mNodeIndexMap and mUniformIndexMaps become invalidated after this call.
-  mNodeIndexMap.clear();
-  mUniformIndexMaps.clear();
-#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
-  mNodeIndexMap.shrink_to_fit();
-  mUniformIndexMaps.shrink_to_fit();
-#endif
-}
-
-Geometry::LifecycleObserver::NotifyReturnType Renderer::GeometryBufferChanged(const Geometry* geometry)
-{
-  DALI_ASSERT_ALWAYS(mGeometry == geometry && "Something wrong happend when Render::Renderer observed by geometry!");
-
-  // Reset old pipeline
-  if(DALI_LIKELY(mPipelineCached))
+  switch(notificationType)
   {
-    mPipelineCache->ResetPipeline(mPipeline);
-    mPipelineCached = false;
+    case PipelineCacheL0::LifecycleObserver::NotificationType::PROGRAM_DESTROYED:
+    {
+      mCurrentProgram = nullptr;
+
+      // Destroy whole mNodeIndexMap and mUniformIndexMaps container.
+      // It will be re-created at next render time.
+      // Note : Destroy the program will be happened at RenderManager::PostRender().
+      //        We don't worry about the mNodeIndexMap and mUniformIndexMaps become invalidated after this call.
+      mNodeIndexMap.clear();
+      mUniformIndexMaps.clear();
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+      mNodeIndexMap.shrink_to_fit();
+      mUniformIndexMaps.shrink_to_fit();
+#endif
+      break;
+    }
+    case PipelineCacheL0::LifecycleObserver::NotificationType::GEOMETRY_DESTROYED:
+    {
+      mGeometry = nullptr;
+      break;
+    }
+    case PipelineCacheL0::LifecycleObserver::NotificationType::NONE:
+    case PipelineCacheL0::LifecycleObserver::NotificationType::GEOMETRY_BUFFER_CHANGED:
+    case PipelineCacheL0::LifecycleObserver::NotificationType::RENDER_TARGET_GRAPHICS_OBJECTS_DESTROYED:
+    {
+      // Do nothing
+      break;
+    }
   }
-
-  return Geometry::LifecycleObserver::NotifyReturnType::KEEP_OBSERVING;
-}
-
-void Renderer::GeometryDestroyed(const Geometry* geometry)
-{
-  // Let just run the same logic with geometry buffer changed cases.
-  [[maybe_unused]] auto ret = GeometryBufferChanged(geometry);
-  mGeometry                 = nullptr;
 }
 
 Vector4 Renderer::GetTextureUpdateArea() const noexcept
@@ -1211,7 +1158,7 @@ Vector4 Renderer::GetTextureUpdateArea() const noexcept
 Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   Program&                                             program,
   const Dali::Internal::SceneGraph::RenderInstruction& instruction,
-  Graphics::RenderTarget*                              renderTarget,
+  SceneGraph::RenderTargetGraphicsObjects&             renderTargetGraphicsObjects,
   const SceneGraph::NodeDataProvider&                  node,
   bool                                                 blend)
 {
@@ -1219,32 +1166,64 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
 
   // Prepare query info
   PipelineCacheQueryInfo queryInfo{};
-  queryInfo.program               = &program;
-  queryInfo.renderer              = this;
-  queryInfo.geometry              = mGeometry;
-  queryInfo.blendingEnabled       = blend;
-  queryInfo.blendingOptions       = &mBlendingOptions;
-  queryInfo.alphaPremultiplied    = mPremultipliedAlphaEnabled;
-  queryInfo.cameraUsingReflection = instruction.GetCamera()->GetReflectionUsed();
-  queryInfo.renderTarget          = renderTarget;
+  queryInfo.program                     = &program;
+  queryInfo.renderer                    = this;
+  queryInfo.geometry                    = mGeometry;
+  queryInfo.blendingEnabled             = blend;
+  queryInfo.blendingOptions             = &mBlendingOptions;
+  queryInfo.alphaPremultiplied          = mPremultipliedAlphaEnabled;
+  queryInfo.cameraUsingReflection       = instruction.GetCamera()->GetReflectionUsed();
+  queryInfo.renderTargetGraphicsObjects = &renderTargetGraphicsObjects;
 
   queryInfo.GenerateHash();
-
-  // Reset old pipeline
-  if(DALI_LIKELY(mPipelineCached))
-  {
-    mPipelineCache->ResetPipeline(mPipeline);
-    mPipelineCached = false;
-  }
 
   // Find or generate new pipeline.
   auto pipelineResult = mPipelineCache->GetPipeline(queryInfo, true);
 
+  // Reset old pipeline
+  if(mPipelineCached)
+  {
+    mPipelineCache->ResetPipeline(mPipeline);
+  }
+
   mPipeline       = pipelineResult.level2;
   mPipelineCached = true;
 
+  if(!mPipelineNotifierCached || DALI_UNLIKELY(mPipelineLifecycleNotifier != pipelineResult.level0))
+  {
+    if(DALI_UNLIKELY(mPipelineNotifierCached))
+    {
+      mPipelineLifecycleNotifier->RemoveLifecycleObserver(*this);
+    }
+    mPipelineLifecycleNotifier = pipelineResult.level0;
+    mPipelineNotifierCached    = true;
+
+    mPipelineLifecycleNotifier->AddLifecycleObserver(*this);
+  }
+
   // should be never null?
   return *pipelineResult.pipeline;
+}
+
+void Renderer::ClearPipelineCache(bool notifyToCache)
+{
+  if(mPipelineCached)
+  {
+    if(notifyToCache)
+    {
+      mPipelineCache->ResetPipeline(mPipeline);
+    }
+    mPipelineCached = false;
+  }
+
+  if(mPipelineNotifierCached)
+  {
+    if(notifyToCache)
+    {
+      mPipelineLifecycleNotifier->RemoveLifecycleObserver(*this);
+    }
+    mPipelineNotifierCached = false;
+  }
 }
 
 void Renderer::SetRenderCallback(RenderCallback* callback)

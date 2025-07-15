@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -616,7 +616,7 @@ void PixelFormatToGl(Graphics::Format pixelFormat, GLenum& glFormat, GLint& glIn
 
     case Graphics::Format::UNDEFINED:
     {
-      //DALI_LOG_ERROR( "Invalid pixel format for bitmap\n" );
+      // DALI_LOG_ERROR( "Invalid pixel format for bitmap\n" );
       glFormat = 0;
       break;
     }
@@ -866,7 +866,7 @@ void TestGraphicsTexture::Initialize(GLuint target)
   mGlAbstraction.BindTexture(target, mId);
   mGlAbstraction.PixelStorei(GL_UNPACK_ALIGNMENT, 1); // We always use tightly packed data
 
-  //Apply default sampling parameters
+  // Apply default sampling parameters
   TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT);
   TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT);
   TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT);
@@ -902,6 +902,8 @@ GLuint TestGraphicsTexture::GetTarget()
 
 void TestGraphicsTexture::Bind(uint32_t textureUnit)
 {
+  // Warning : Real application didyt initialize native image this timing, due to the context mathing.
+  // Here now, we just keep this logic since test controller didn't have logic to re-initialize resource.
   if(mCreateInfo.nativeImagePtr)
   {
     if(mId == 0)
@@ -913,13 +915,20 @@ void TestGraphicsTexture::Bind(uint32_t textureUnit)
   mGlAbstraction.BindTexture(GetTarget(), mId);
 }
 
-void TestGraphicsTexture::Prepare()
+bool TestGraphicsTexture::Prepare()
 {
   if(mCreateInfo.nativeImagePtr)
   {
     // Ensure the native image is up-to-date
-    mCreateInfo.nativeImagePtr->PrepareTexture();
+    auto result = mCreateInfo.nativeImagePtr->PrepareTexture();
+    if(result == Dali::NativeImageInterface::PrepareTextureResult::IMAGE_CHANGED)
+    {
+      mCreateInfo.nativeImagePtr->TargetTexture();
+    }
+    return result >= Dali::NativeImageInterface::PrepareTextureResult::NO_ERROR_MIN &&
+           result <= Dali::NativeImageInterface::PrepareTextureResult::NO_ERROR_MAX;
   }
+  return true;
 }
 
 void TestGraphicsTexture::Update(Graphics::TextureUpdateInfo updateInfo, Graphics::TextureUpdateSourceInfo source)

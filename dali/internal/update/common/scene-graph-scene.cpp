@@ -57,6 +57,7 @@ void Scene::SetRenderMessageDispatcher(RenderMessageDispatcher* messageDispatche
 
 void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
 {
+  // TODO : protected data using here
   if(mRenderTarget != nullptr &&
      mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface)
   {
@@ -64,7 +65,7 @@ void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateI
     mRenderTargetCreateInfo = renderTargetCreateInfo;
     if(mGraphicsController) // shouldn't be null, as we can't have already set mRenderTarget unless graphics controller exists.
     {
-      mRenderTarget = mGraphicsController->CreateRenderTarget(renderTargetCreateInfo, std::move(mRenderTarget));
+      RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, mRenderTargetCreateInfo);
     }
   }
   else
@@ -79,14 +80,15 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
   mGraphicsController = &graphicsController;
 
   // Create the render target for the surface. It should already have been sent via message.
-  mRenderTarget = graphicsController.CreateRenderTarget(mRenderTargetCreateInfo, std::move(mRenderTarget));
+  RenderTargetGraphicsObjects::CreateRenderTarget(graphicsController, mRenderTargetCreateInfo);
 
   // Create the render pass for the surface
   std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
   // Default behaviour for color attachments is to CLEAR and STORE
-  mClearValues.clear();
-  mClearValues.emplace_back();
+  auto& clearValues = RenderTargetGraphicsObjects::GetGraphicsRenderPassClearValues();
+  clearValues.clear();
+  clearValues.emplace_back();
 
   // Assume single color attachment
   Graphics::AttachmentDescription desc{};
@@ -106,9 +108,9 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
     desc.SetStencilStoreOp(Graphics::AttachmentStoreOp::STORE);
     attachmentDescriptions.push_back(desc);
 
-    mClearValues.emplace_back();
-    mClearValues.back().depthStencil.depth   = 1.0f;
-    mClearValues.back().depthStencil.stencil = 0;
+    clearValues.emplace_back();
+    clearValues.back().depthStencil.depth   = 1.0f;
+    clearValues.back().depthStencil.stencil = 0;
   }
 
   /* Defines 2 render passes, one to clear, the other not.
@@ -119,7 +121,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
   rpInfo.SetAttachments(attachmentDescriptions);
 
   // Add default render pass (loadOp = clear)
-  mRenderPass = graphicsController.CreateRenderPass(rpInfo, nullptr);
+  RenderTargetGraphicsObjects::CreateRenderPass(graphicsController, rpInfo);
 
   desc.SetLoadOp(Graphics::AttachmentLoadOp::LOAD);
   attachmentDescriptions[0] = desc;
@@ -130,14 +132,16 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
     attachmentDescriptions.back() = desc;
   }
 
-  mRenderPassNoClear = graphicsController.CreateRenderPass(rpInfo, nullptr);
+  RenderTargetGraphicsObjects::CreateRenderPassNoClear(graphicsController, rpInfo);
 }
 
 void Scene::ContextDestroyed()
 {
+  // TODO : protected data using here
   mRenderPass.reset();
   mRenderPassNoClear.reset();
 
+  NotifyRenderTargetDestroyed();
   mRenderTarget.reset();
 }
 

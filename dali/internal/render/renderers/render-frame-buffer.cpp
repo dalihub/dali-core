@@ -189,7 +189,8 @@ bool FrameBuffer::CreateGraphicsObjects()
       std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
       // Default behaviour for color attachments is to CLEAR and STORE
-      mClearValues.clear();
+      auto& clearValues = RenderTargetGraphicsObjects::GetGraphicsRenderPassClearValues();
+      clearValues.clear();
       for(auto& attachments : mCreateInfo.colorAttachments)
       {
         if(attachments.texture)
@@ -198,7 +199,7 @@ bool FrameBuffer::CreateGraphicsObjects()
           desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
           desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
           attachmentDescriptions.push_back(desc);
-          mClearValues.emplace_back();
+          clearValues.emplace_back();
         }
       }
 
@@ -214,7 +215,9 @@ bool FrameBuffer::CreateGraphicsObjects()
           depthStencilDesc.SetStencilLoadOp(Graphics::AttachmentLoadOp::CLEAR)
             .SetStencilStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
         }
-        mClearValues.emplace_back();
+        clearValues.emplace_back();
+        clearValues.back().depthStencil.depth   = 1.0f;
+        clearValues.back().depthStencil.stencil = 0;
         attachmentDescriptions.push_back(depthStencilDesc);
       }
 
@@ -222,15 +225,15 @@ bool FrameBuffer::CreateGraphicsObjects()
       rpInfo.SetAttachments(attachmentDescriptions);
 
       // Add default render pass (loadOp = clear)
-      mRenderPass.emplace_back(mGraphicsController->CreateRenderPass(rpInfo, nullptr));
+      RenderTargetGraphicsObjects::CreateRenderPass(*mGraphicsController, rpInfo);
 
       // Add default render pass (loadOp = dontcare)
       attachmentDescriptions[0].SetLoadOp(Graphics::AttachmentLoadOp::DONT_CARE);
-      mRenderPass.emplace_back(mGraphicsController->CreateRenderPass(rpInfo, nullptr));
+      RenderTargetGraphicsObjects::CreateRenderPassNoClear(*mGraphicsController, rpInfo);
 
       std::vector<Graphics::RenderPass*> renderPasses;
-      renderPasses.push_back(mRenderPass[0].get());
-      renderPasses.push_back(mRenderPass[1].get());
+      renderPasses.push_back(mRenderPass.get());
+      renderPasses.push_back(mRenderPassNoClear.get());
       mCreateInfo.SetRenderPasses(std::move(renderPasses));
 
       mGraphicsObject = mGraphicsController->CreateFramebuffer(mCreateInfo, std::move(mGraphicsObject));
@@ -242,7 +245,7 @@ bool FrameBuffer::CreateGraphicsObjects()
         .SetExtent({mWidth, mHeight})
         .SetPreTransform(0 | Graphics::RenderTargetTransformFlagBits::TRANSFORM_IDENTITY_BIT);
 
-      mRenderTarget = mGraphicsController->CreateRenderTarget(rtInfo, std::move(mRenderTarget));
+      RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, rtInfo);
 
       created = true;
     }
@@ -258,20 +261,6 @@ uint32_t FrameBuffer::GetWidth() const
 uint32_t FrameBuffer::GetHeight() const
 {
   return mHeight;
-}
-
-[[nodiscard]] Graphics::RenderPass* FrameBuffer::GetGraphicsRenderPass(Graphics::AttachmentLoadOp  colorLoadOp,
-                                                                       Graphics::AttachmentStoreOp colorStoreOp) const
-{
-  // clear only when requested
-  if(colorLoadOp == Graphics::AttachmentLoadOp::CLEAR)
-  {
-    return mRenderPass[0].get();
-  }
-  else
-  {
-    return mRenderPass[1].get();
-  }
 }
 
 } // namespace Render

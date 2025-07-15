@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/devel-api/threading/mutex.h>
+#include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 
 #include <unordered_map>
@@ -39,7 +40,7 @@ namespace Render
 {
 class Texture;
 
-class FrameBuffer
+class FrameBuffer : public SceneGraph::RenderTargetGraphicsObjects
 {
 public:
   /**
@@ -166,24 +167,6 @@ public:
     return mGraphicsObject.get();
   }
 
-  [[nodiscard]] Graphics::RenderTarget* GetGraphicsRenderTarget() const
-  {
-    return mRenderTarget.get();
-  }
-
-  [[nodiscard]] Graphics::RenderPass* GetGraphicsRenderPass(Graphics::AttachmentLoadOp  colorLoadOp,
-                                                            Graphics::AttachmentStoreOp colorStoreOp) const;
-
-  /**
-   * The function returns initialized array of clear values
-   * which then can be modified and passed to BeginRenderPass()
-   * command.
-   */
-  [[nodiscard]] auto& GetGraphicsRenderPassClearValues()
-  {
-    return mClearValues;
-  }
-
   /**
    * @brief Undefined copy constructor. FrameBuffer cannot be copied
    */
@@ -199,18 +182,6 @@ private:
   Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
 
   Graphics::FramebufferCreateInfo mCreateInfo;
-
-  Graphics::UniquePtr<Graphics::RenderTarget> mRenderTarget{nullptr};
-
-  /**
-   * Render passes are created on fly depending on Load and Store operations
-   * The default render pass (most likely to be used) is the load = CLEAR
-   * and store = STORE for color attachment.
-   */
-  std::vector<Graphics::UniquePtr<Graphics::RenderPass>> mRenderPass{};
-
-  // clear colors
-  std::vector<Graphics::ClearValue> mClearValues{};
 
   bool            mIsKeepingRenderResultRequested{false};
   bool            mIsRenderResultDrawn{false};

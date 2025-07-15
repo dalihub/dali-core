@@ -113,7 +113,7 @@ int UtcDaliMathUtilsClampP(void)
 {
   Dali::TestApplication testApp;
 
-  //floats
+  // floats
   DALI_TEST_EQUALS(Clamp(-1.0f, 0.0f, 1.0f), 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(Clamp(0.0f, -1.0f, 1.0f), 0.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(Clamp(1.0f, 0.0f, 1.0f), 1.0f, TEST_LOCATION);
@@ -313,5 +313,71 @@ int UtcDaliMathUtilsRoundP(void)
   DALI_TEST_EQUALS(Round(0.99999f, 4), 1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(Round(-1.00001, 4), -1.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(Round(-0.99999f, 4), -1.0f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMathUtilsConstExprP(void)
+{
+  // Equals
+  constexpr float zero  = 0.0f;
+  constexpr float v1    = 1.49f;
+  constexpr float v2    = 3.51f;
+  constexpr float v1pv2 = v1 + v2;
+
+  static_assert(Equals(v1pv2, v1 + v2, 0.02f));
+  static_assert(EqualsZero(zero));
+
+  // NextPowerOfTwo
+  static_assert(NextPowerOfTwo(0) == 1);
+  static_assert(NextPowerOfTwo(0x0f) == 0x10);
+  static_assert(NextPowerOfTwo(0x20) == 0x20);
+  static_assert(NextPowerOfTwo(0x51) == 0x80);
+
+  // IsPowerOfTwo
+  static_assert(!IsPowerOfTwo(0));
+  static_assert(IsPowerOfTwo(0x1));
+  static_assert(IsPowerOfTwo(0x2));
+  static_assert(!IsPowerOfTwo(0x3));
+  static_assert(!IsPowerOfTwo(0x0f));
+  static_assert(IsPowerOfTwo(0x40));
+
+  // Clamp
+  static_assert(Clamp(0, 2, 5) == 2);
+  static_assert(Clamp(3, 2, 5) == 3);
+  static_assert(Clamp(7, 2, 5) == 5);
+  static_assert(Equals(Clamp(0.0f, 2.0f, 5.0f), 2.0f, 0.02f));
+  static_assert(Equals(Clamp(3.0f, 2.0f, 5.0f), 3.0f, 0.02f));
+  static_assert(Equals(Clamp(7.0f, 2.0f, 5.0f), 5.0f, 0.02f));
+
+  // Lerp
+  static_assert(Equals(Lerp(-0.5f, 2.0f, 6.0f), 2.0f, 0.02f));
+  static_assert(Equals(Lerp(0.5f, 2.0f, 6.0f), 4.0f, 0.02f));
+  static_assert(Equals(Lerp(1.5f, 2.0f, 6.0f), 6.0f, 0.02f));
+
+  // Round
+  static_assert(Equals(Round(v1, 0), 1.0f, 0.02f));
+  static_assert(Equals(Round(v1, 1), 1.5f, 0.02f));
+  static_assert(Equals(Round(v2, 0), 4.0f, 0.02f));
+  static_assert(Equals(Round(v2, 1), 3.5f, 0.02f));
+
+  // WrapInDomain
+  static_assert(Equals(WrapInDomain(-3.0f, 2.0f, 5.0f), 3.0f, 0.02f));
+  static_assert(Equals(WrapInDomain(0.0f, 2.0f, 5.0f), 3.0f, 0.02f));
+  static_assert(Equals(WrapInDomain(1.0f, 2.0f, 5.0f), 4.0f, 0.02f));
+  static_assert(Equals(WrapInDomain(2.1f, 2.0f, 5.0f), 2.1f, 0.02f));
+  static_assert(Equals(WrapInDomain(4.9f, 2.0f, 5.0f), 4.9f, 0.02f));
+  static_assert(Equals(WrapInDomain(5.1f, 2.0f, 5.0f), 2.1f, 0.02f));
+  static_assert(Equals(WrapInDomain(9.0f, 2.0f, 5.0f), 3.0f, 0.02f));
+  static_assert(Equals(WrapInDomain(12.0f, 2.0f, 5.0f), 3.0f, 0.02f));
+
+  // ShortestDistanceInDomain
+  static_assert(Equals(ShortestDistanceInDomain(2.1f, 4.9f, 2.0f, 5.0f), -0.2f, 0.02f));
+  static_assert(Equals(ShortestDistanceInDomain(2.3f, 2.1f, 2.0f, 5.0f), -0.2f, 0.02f));
+  static_assert(Equals(ShortestDistanceInDomain(2.1f, 2.3f, 2.0f, 5.0f), 0.2f, 0.02f));
+  static_assert(Equals(ShortestDistanceInDomain(2.2f, 3.69f, 2.0f, 5.0f), 1.49f, 0.02f));
+  static_assert(Equals(ShortestDistanceInDomain(2.2f, 3.71f, 2.0f, 5.0f), -1.49f, 0.02f));
+
+  // Always pass if compile success.
+  DALI_TEST_CHECK(true);
   END_TEST;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ int UtcDaliTextureUpload01(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   Texture      texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
@@ -216,7 +216,7 @@ int UtcDaliTextureUpload01(void)
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-  //Upload data to the texture
+  // Upload data to the texture
   callStack.Reset();
 
   unsigned int   bufferSize(width * height * 4);
@@ -226,14 +226,14 @@ int UtcDaliTextureUpload01(void)
   application.SendNotification();
   application.Render();
 
-  //TexImage2D should be called to upload the data
+  // TexImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
     DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
   }
 
-  //Upload part of the texture
+  // Upload part of the texture
   callStack.Reset();
   bufferSize                  = width * height;
   buffer                      = reinterpret_cast<unsigned char*>(malloc(bufferSize));
@@ -242,7 +242,7 @@ int UtcDaliTextureUpload01(void)
   application.SendNotification();
   application.Render();
 
-  //TexSubImage2D should be called to upload the data
+  // TexSubImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width / 2 << ", " << height / 2 << ", " << width / 2 << ", " << height / 2;
@@ -256,7 +256,7 @@ int UtcDaliTextureUpload02(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   Texture      texture = CreateTexture(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
@@ -280,7 +280,7 @@ int UtcDaliTextureUpload02(void)
   unsigned char* buffer    = reinterpret_cast<unsigned char*>(malloc(bufferSize));
   PixelData      pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
 
-  //Upload data to the POSITIVE_X face of the texture
+  // Upload data to the POSITIVE_X face of the texture
   {
     callStack.Reset();
 
@@ -288,7 +288,7 @@ int UtcDaliTextureUpload02(void)
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the POSITIVE_X face
+    // TexImage2D should be called to upload the data to the POSITIVE_X face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_POSITIVE_X << ", " << 0u << ", " << width << ", " << height;
@@ -296,7 +296,7 @@ int UtcDaliTextureUpload02(void)
     }
   }
 
-  //Upload data to the NEGATIVE_X face of the texture
+  // Upload data to the NEGATIVE_X face of the texture
   {
     callStack.Reset();
 
@@ -304,7 +304,7 @@ int UtcDaliTextureUpload02(void)
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the NEGATIVE_X face
+    // TexImage2D should be called to upload the data to the NEGATIVE_X face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_NEGATIVE_X << ", " << 0u << ", " << width << ", " << height;
@@ -312,14 +312,14 @@ int UtcDaliTextureUpload02(void)
     }
   }
 
-  //Upload data to the POSITIVE_Y face of the texture
+  // Upload data to the POSITIVE_Y face of the texture
   {
     callStack.Reset();
     texture.Upload(pixelData, CubeMapLayer::POSITIVE_Y, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the POSITIVE_Y face
+    // TexImage2D should be called to upload the data to the POSITIVE_Y face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_POSITIVE_Y << ", " << 0u << ", " << width << ", " << height;
@@ -327,14 +327,14 @@ int UtcDaliTextureUpload02(void)
     }
   }
 
-  //Upload data to the NEGATIVE_Y face of the texture
+  // Upload data to the NEGATIVE_Y face of the texture
   {
     callStack.Reset();
     texture.Upload(pixelData, CubeMapLayer::NEGATIVE_Y, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the NEGATIVE_Y face
+    // TexImage2D should be called to upload the data to the NEGATIVE_Y face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_NEGATIVE_Y << ", " << 0u << ", " << width << ", " << height;
@@ -342,14 +342,14 @@ int UtcDaliTextureUpload02(void)
     }
   }
 
-  //Upload data to the POSITIVE_Z face of the texture
+  // Upload data to the POSITIVE_Z face of the texture
   {
     callStack.Reset();
     texture.Upload(pixelData, CubeMapLayer::POSITIVE_Z, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the POSITIVE_Z face
+    // TexImage2D should be called to upload the data to the POSITIVE_Z face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_POSITIVE_Z << ", " << 0u << ", " << width << ", " << height;
@@ -357,14 +357,14 @@ int UtcDaliTextureUpload02(void)
     }
   }
 
-  //Upload data to the NEGATIVE_Z face of the texture
+  // Upload data to the NEGATIVE_Z face of the texture
   {
     callStack.Reset();
     texture.Upload(pixelData, CubeMapLayer::NEGATIVE_Z, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the NEGATIVE_Z face
+    // TexImage2D should be called to upload the data to the NEGATIVE_Z face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_NEGATIVE_Z << ", " << 0u << ", " << width << ", " << height;
@@ -379,7 +379,7 @@ int UtcDaliTextureUpload03(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   unsigned int widthMipmap1(32);
@@ -401,7 +401,7 @@ int UtcDaliTextureUpload03(void)
     DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
   }
 
-  //Upload data to the texture mipmap 0 and mipmap 1
+  // Upload data to the texture mipmap 0 and mipmap 1
   callStack.Reset();
 
   unsigned int   bufferSize(width * height * 4);
@@ -416,7 +416,7 @@ int UtcDaliTextureUpload03(void)
   application.SendNotification();
   application.Render();
 
-  //TexImage2D should be called to upload the data to mipmaps 0 and 1
+  // TexImage2D should be called to upload the data to mipmaps 0 and 1
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
@@ -435,7 +435,7 @@ int UtcDaliTextureUpload04(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   unsigned int widthMipmap1(32);
@@ -446,7 +446,7 @@ int UtcDaliTextureUpload04(void)
   application.GetGlAbstraction().EnableTextureCallTrace(true);
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-  //Upload data to the NEGATIVE_X face mipmap 0 and mipmap 1
+  // Upload data to the NEGATIVE_X face mipmap 0 and mipmap 1
   unsigned int   bufferSize(width * height * 4);
   unsigned char* buffer    = reinterpret_cast<unsigned char*>(malloc(bufferSize));
   PixelData      pixelData = PixelData::New(buffer, bufferSize, width, height, Pixel::RGBA8888, PixelData::FREE);
@@ -459,7 +459,7 @@ int UtcDaliTextureUpload04(void)
   application.SendNotification();
   application.Render();
 
-  //TexImage2D should be called to upload the data to mipmaps 0 and 1
+  // TexImage2D should be called to upload the data to mipmaps 0 and 1
   {
     std::stringstream out;
     out << GL_TEXTURE_CUBE_MAP_NEGATIVE_X << ", " << 0u << ", " << width << ", " << height;
@@ -525,7 +525,7 @@ int UtcDaliTextureUpload05(void)
   {
     TestApplication application;
 
-    //Create a texture with a compressed format
+    // Create a texture with a compressed format
     unsigned int width(64);
     unsigned int height(64);
     Texture      texture = CreateTexture(TextureType::TEXTURE_2D, COMPRESSED_PIXEL_FORMATS[index], width, height);
@@ -544,7 +544,7 @@ int UtcDaliTextureUpload05(void)
       DALI_TEST_CHECK(callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str()));
     }
 
-    //Upload data to the texture
+    // Upload data to the texture
     callStack.Reset();
 
     unsigned int   bufferSize(width * height * 4);
@@ -554,14 +554,14 @@ int UtcDaliTextureUpload05(void)
     application.SendNotification();
     application.Render();
 
-    //CompressedTexImage2D should be called to upload the data
+    // CompressedTexImage2D should be called to upload the data
     {
       std::stringstream out;
       out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
       DALI_TEST_CHECK(callStack.FindMethodAndParams("CompressedTexImage2D", out.str().c_str()));
     }
 
-    //Upload part of the texture
+    // Upload part of the texture
     callStack.Reset();
     bufferSize                  = width * height;
     buffer                      = reinterpret_cast<unsigned char*>(malloc(bufferSize));
@@ -570,7 +570,7 @@ int UtcDaliTextureUpload05(void)
     application.SendNotification();
     application.Render();
 
-    //CompressedTexSubImage2D should be called to upload the data
+    // CompressedTexSubImage2D should be called to upload the data
     {
       std::stringstream out;
       out << GL_TEXTURE_2D << ", " << 0u << ", " << width / 2 << ", " << height / 2 << ", " << width / 2 << ", " << height / 2;
@@ -587,7 +587,7 @@ int UtcDaliTextureUpload06(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   tet_infoline("Creating a Texure with an alpha channel");
@@ -641,7 +641,7 @@ int UtcDaliTextureUpload07(void)
   {
     TestApplication application;
 
-    //Create the texture
+    // Create the texture
     unsigned int width(64);
     unsigned int height(64);
     tet_infoline("Creating a floating point texture");
@@ -687,7 +687,7 @@ int UtcDaliTextureUpload08(void)
 {
   TestApplication application;
 
-  //Create the texture without pixel information
+  // Create the texture without pixel information
   tet_infoline("Creating a Texure without any size/format information");
   Texture texture = Texture::New(TextureType::TEXTURE_2D);
 
@@ -761,7 +761,7 @@ int UtcDaliTextureUpload09(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   uint32_t width(64u);
   uint32_t height(64u);
   Texture  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
@@ -773,7 +773,7 @@ int UtcDaliTextureUpload09(void)
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-  //Upload data to the texture
+  // Upload data to the texture
   callStack.Reset();
 
   uint32_t bufferSize(width * height * 4u);
@@ -793,7 +793,7 @@ int UtcDaliTextureUpload09(void)
   application.SendNotification();
   application.Render();
 
-  //TexImage2D should be called to upload the data
+  // TexImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
@@ -812,7 +812,7 @@ int UtcDaliTextureUpload10(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   uint32_t width(64u);
   uint32_t height(64u);
   Texture  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
@@ -824,7 +824,7 @@ int UtcDaliTextureUpload10(void)
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-  //Upload data to the texture
+  // Upload data to the texture
   callStack.Reset();
 
   uint32_t bufferSize(width * height * 4u);
@@ -844,7 +844,7 @@ int UtcDaliTextureUpload10(void)
   application.SendNotification();
   application.Render();
 
-  //TexImage2D should be called to upload the data
+  // TexImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
@@ -863,7 +863,7 @@ int UtcDaliTextureUploadSubPixelData01(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   Texture      texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
@@ -875,7 +875,7 @@ int UtcDaliTextureUploadSubPixelData01(void)
 
   TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
 
-  //Upload data to the texture
+  // Upload data to the texture
   callStack.Reset();
 
   uint32_t bufferWidth   = width * 2;
@@ -890,20 +890,20 @@ int UtcDaliTextureUploadSubPixelData01(void)
   application.SendNotification();
   application.Render();
 
-  //TexImage2D should be called to upload the data
+  // TexImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
     DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
   }
 
-  //Upload part of the texture
+  // Upload part of the texture
   callStack.Reset();
   DevelTexture::UploadSubPixelData(texture, pixelData, bufferXOffset, bufferYOffset, width / 2, height / 2, 0u, 0u, width / 2, height / 2, width / 2, height / 2);
   application.SendNotification();
   application.Render();
 
-  //TexSubImage2D should be called to upload the data
+  // TexSubImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << width / 2 << ", " << height / 2 << ", " << width / 2 << ", " << height / 2;
@@ -917,7 +917,7 @@ int UtcDaliTextureUploadSubPixelData02(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   Texture      texture = CreateTexture(TextureType::TEXTURE_CUBE, Pixel::RGBA8888, width, height);
@@ -946,7 +946,7 @@ int UtcDaliTextureUploadSubPixelData02(void)
   unsigned char* buffer    = reinterpret_cast<unsigned char*>(malloc(bufferSize));
   PixelData      pixelData = PixelData::New(buffer, bufferSize, bufferWidth, bufferHeight, Pixel::RGBA8888, PixelData::FREE);
 
-  //Upload data to the POSITIVE_X face of the texture
+  // Upload data to the POSITIVE_X face of the texture
   {
     callStack.Reset();
 
@@ -954,7 +954,7 @@ int UtcDaliTextureUploadSubPixelData02(void)
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the POSITIVE_X face
+    // TexImage2D should be called to upload the data to the POSITIVE_X face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_POSITIVE_X << ", " << 0u << ", " << width << ", " << height;
@@ -962,7 +962,7 @@ int UtcDaliTextureUploadSubPixelData02(void)
     }
   }
 
-  //Upload data to the NEGATIVE_X face of the texture
+  // Upload data to the NEGATIVE_X face of the texture
   {
     callStack.Reset();
 
@@ -970,7 +970,7 @@ int UtcDaliTextureUploadSubPixelData02(void)
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the NEGATIVE_X face
+    // TexImage2D should be called to upload the data to the NEGATIVE_X face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_NEGATIVE_X << ", " << 0u << ", " << width << ", " << height;
@@ -978,14 +978,14 @@ int UtcDaliTextureUploadSubPixelData02(void)
     }
   }
 
-  //Upload data to the POSITIVE_Y face of the texture
+  // Upload data to the POSITIVE_Y face of the texture
   {
     callStack.Reset();
     DevelTexture::UploadSubPixelData(texture, pixelData, bufferXOffset, bufferYOffset, width, height, CubeMapLayer::POSITIVE_Y, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the POSITIVE_Y face
+    // TexImage2D should be called to upload the data to the POSITIVE_Y face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_POSITIVE_Y << ", " << 0u << ", " << width << ", " << height;
@@ -993,14 +993,14 @@ int UtcDaliTextureUploadSubPixelData02(void)
     }
   }
 
-  //Upload data to the NEGATIVE_Y face of the texture
+  // Upload data to the NEGATIVE_Y face of the texture
   {
     callStack.Reset();
     DevelTexture::UploadSubPixelData(texture, pixelData, bufferXOffset, bufferYOffset, width, height, CubeMapLayer::NEGATIVE_Y, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the NEGATIVE_Y face
+    // TexImage2D should be called to upload the data to the NEGATIVE_Y face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_NEGATIVE_Y << ", " << 0u << ", " << width << ", " << height;
@@ -1008,14 +1008,14 @@ int UtcDaliTextureUploadSubPixelData02(void)
     }
   }
 
-  //Upload data to the POSITIVE_Z face of the texture
+  // Upload data to the POSITIVE_Z face of the texture
   {
     callStack.Reset();
     DevelTexture::UploadSubPixelData(texture, pixelData, bufferXOffset, bufferYOffset, width, height, CubeMapLayer::POSITIVE_Z, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the POSITIVE_Z face
+    // TexImage2D should be called to upload the data to the POSITIVE_Z face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_POSITIVE_Z << ", " << 0u << ", " << width << ", " << height;
@@ -1023,14 +1023,14 @@ int UtcDaliTextureUploadSubPixelData02(void)
     }
   }
 
-  //Upload data to the NEGATIVE_Z face of the texture
+  // Upload data to the NEGATIVE_Z face of the texture
   {
     callStack.Reset();
     DevelTexture::UploadSubPixelData(texture, pixelData, bufferXOffset, bufferYOffset, width, height, CubeMapLayer::NEGATIVE_Z, 0u, 0u, 0u, width, height);
     application.SendNotification();
     application.Render();
 
-    //TexImage2D should be called to upload the data to the NEGATIVE_Z face
+    // TexImage2D should be called to upload the data to the NEGATIVE_Z face
     {
       std::stringstream out;
       out << GL_TEXTURE_CUBE_MAP_NEGATIVE_Z << ", " << 0u << ", " << width << ", " << height;
@@ -1046,7 +1046,7 @@ int UtcDaliTextureUploadPixelFormats(void)
   TestApplication application;
   application.GetGlAbstraction().EnableTextureCallTrace(true);
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
 
@@ -1102,7 +1102,7 @@ int UtcDaliTextureUploadSmallerThanSize(void)
 {
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   Texture      texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
@@ -1126,7 +1126,7 @@ int UtcDaliTextureUploadSmallerThanSize(void)
     DALI_TEST_EQUALS(out.str(), params, TEST_LOCATION);
   }
 
-  //Upload data to the texture
+  // Upload data to the texture
   callStack.Reset();
 
   unsigned int   bufferSize(width * height * 4);
@@ -1136,7 +1136,7 @@ int UtcDaliTextureUploadSmallerThanSize(void)
   application.SendNotification();
   application.Render();
 
-  //TexSubImage2D should be called to upload the data
+  // TexSubImage2D should be called to upload the data
   {
     std::stringstream out;
     out << GL_TEXTURE_2D << ", " << 0u << ", " << 0u << ", " << 0u << ", " << width / 2 << ", " << height / 2;
@@ -1288,7 +1288,7 @@ int UtcDaliTextureContextLoss(void)
   tet_infoline("UtcDaliTextureContextLoss\n");
   TestApplication application;
 
-  //Create the texture
+  // Create the texture
   unsigned int width(64);
   unsigned int height(64);
   Texture      texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
@@ -1351,6 +1351,9 @@ int UtcDaliNativeImageTexture02(void)
     application.GetScene().Add(actor);
 
     DALI_TEST_CHECK(texture);
+
+    application.SendNotification();
+    application.Render(16);
 
     application.SendNotification();
     application.Render(16);
