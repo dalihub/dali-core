@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,13 @@ MultiPointEvent::MultiPointEvent(Type eventType)
 MultiPointEvent::MultiPointEvent(Type eventType, uint32_t time)
 : Event(eventType),
   time(time)
+{
+}
+
+MultiPointEvent::MultiPointEvent(Type eventType, const MultiPointEvent& rhs)
+: Event(eventType),
+  points(rhs.points),
+  time(rhs.time)
 {
 }
 

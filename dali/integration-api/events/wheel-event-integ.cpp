@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,17 @@ WheelEvent::WheelEvent(Type type, int direction, unsigned int modifiers, Vector2
   point(point),
   delta(delta),
   timeStamp(timeStamp)
+{
+}
+
+WheelEvent::WheelEvent(const WheelEvent& rhs)
+: Event(Wheel),
+  type(rhs.type),
+  direction(rhs.direction),
+  modifiers(rhs.modifiers),
+  point(rhs.point),
+  delta(rhs.delta),
+  timeStamp(rhs.timeStamp)
 {
 }
 

@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_KEY_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,11 @@ struct DALI_CORE_API KeyEvent : public Event
            const std::string&           deviceName,
            const Device::Class::Type    deviceClass,
            const Device::Subclass::Type deviceSubclass);
+
+  /**
+   * Copy constructor.
+   */
+  KeyEvent(const KeyEvent& rhs);
 
   /**
    * Virtual destructor
@@ -152,7 +157,6 @@ struct DALI_CORE_API KeyEvent : public Event
    * The time (in ms)  when key event was received.
    */
   uint32_t receiveTime;
-
 };
 
 } // namespace Integration

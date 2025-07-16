@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_WHEEL_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,11 @@ struct DALI_CORE_API WheelEvent : public Event
    * @param[in]  timeStamp  The time the wheel is being rolled.
    */
   WheelEvent(Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp);
+
+  /**
+   * Copy constructor.
+   */
+  WheelEvent(const WheelEvent& rhs);
 
   /**
    * Virtual destructor

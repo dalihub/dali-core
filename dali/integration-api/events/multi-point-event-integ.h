@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_MULTI_POINT_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,11 @@ protected:
    * Default Constructor
    */
   MultiPointEvent(Type eventType);
+
+  /**
+   * Copy Constructor
+   */
+  MultiPointEvent(Type eventType, const MultiPointEvent& rhs);
 
   /**
    * Constructor
