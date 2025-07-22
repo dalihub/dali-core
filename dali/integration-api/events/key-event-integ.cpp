@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,6 +70,25 @@ KeyEvent::KeyEvent(const std::string&           keyName,
   isRepeat(false),
   windowId(0),
   receiveTime(0)
+{
+}
+
+KeyEvent::KeyEvent(const KeyEvent& rhs)
+: Event(Key),
+  keyName(rhs.keyName),
+  logicalKey(rhs.logicalKey),
+  keyString(rhs.keyString),
+  keyCode(rhs.keyCode),
+  keyModifier(rhs.keyModifier),
+  time(rhs.time),
+  state(rhs.state),
+  compose(rhs.compose),
+  deviceName(rhs.deviceName),
+  deviceClass(rhs.deviceClass),
+  deviceSubclass(rhs.deviceSubclass),
+  isRepeat(rhs.isRepeat),
+  windowId(rhs.windowId),
+  receiveTime(rhs.receiveTime)
 {
 }
 

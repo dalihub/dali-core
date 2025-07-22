@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
+#include <dali/integration-api/trace.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
@@ -37,13 +38,10 @@ namespace Internal
 {
 namespace // unnamed namespace
 {
-static const std::size_t MAX_MESSAGE_SIZE = std::max(sizeof(Integration::TouchEvent),
-                                                     std::max(sizeof(Integration::KeyEvent), sizeof(Integration::WheelEvent)));
+static constexpr size_t WARNING_PRINT_THRESHOLD  = 100u;
+static constexpr size_t ASSERT_PROGRAM_THRESHOLD = 10000u;
 
-static const std::size_t INITIAL_MIN_CAPACITY = 4;
-
-static const std::size_t INITIAL_BUFFER_SIZE = MAX_MESSAGE_SIZE * INITIAL_MIN_CAPACITY;
-
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 } // unnamed namespace
 
 EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEventProcessor)
@@ -53,8 +51,8 @@ EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEvent
   mGestureEventProcessor(gestureEventProcessor),
   mKeyEventProcessor(scene),
   mWheelEventProcessor(scene),
-  mEventQueue0(INITIAL_BUFFER_SIZE),
-  mEventQueue1(INITIAL_BUFFER_SIZE),
+  mEventQueue0(),
+  mEventQueue1(),
   mCurrentEventQueue(&mEventQueue0),
   mTouchEventProcessors(),
   mActorTouchPoints(),
@@ -64,95 +62,76 @@ EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEvent
 
 EventProcessor::~EventProcessor()
 {
-  for(MessageBuffer::Iterator iter = mEventQueue0.Begin(); iter.IsValid(); iter.Next())
-  {
-    // Call virtual destructor explictly; since delete will not be called after placement new
-    Event* event = reinterpret_cast<Event*>(iter.Get());
-    event->~Event();
-  }
-
-  for(MessageBuffer::Iterator iter = mEventQueue1.Begin(); iter.IsValid(); iter.Next())
-  {
-    // Call virtual destructor explictly; since delete will not be called after placement new
-    Event* event = reinterpret_cast<Event*>(iter.Get());
-    event->~Event();
-  }
 }
 
 void EventProcessor::QueueEvent(const Event& event)
 {
+  auto& eventQueue = *mCurrentEventQueue;
+
+  // Call copy constructor for each type of the events.
   switch(event.type)
   {
     case Event::Touch:
     {
-      typedef Integration::TouchEvent DerivedType;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot(sizeof(DerivedType));
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new(slot) DerivedType(static_cast<const DerivedType&>(event));
-
+      using DerivedType = Integration::TouchEvent;
+      eventQueue.push(new DerivedType(static_cast<const DerivedType&>(event)));
       break;
     }
 
     case Event::Hover:
     {
       using DerivedType = Integration::HoverEvent;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot(sizeof(DerivedType));
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new(slot) DerivedType(static_cast<const DerivedType&>(event));
-
+      eventQueue.push(new DerivedType(static_cast<const DerivedType&>(event)));
       break;
     }
 
     case Event::Key:
     {
       using DerivedType = Integration::KeyEvent;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot(sizeof(DerivedType));
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new(slot) DerivedType(static_cast<const DerivedType&>(event));
-
+      eventQueue.push(new DerivedType(static_cast<const DerivedType&>(event)));
       break;
     }
 
     case Event::Wheel:
     {
       using DerivedType = Integration::WheelEvent;
-
-      // Reserve some memory inside the message queue
-      uint32_t* slot = mCurrentEventQueue->ReserveMessageSlot(sizeof(DerivedType));
-
-      // Construct message in the message queue memory; note that delete should not be called on the return value
-      new(slot) DerivedType(static_cast<const DerivedType&>(event));
-
+      eventQueue.push(new DerivedType(static_cast<const DerivedType&>(event)));
       break;
     }
+  }
+
+  if(DALI_UNLIKELY(eventQueue.size() % WARNING_PRINT_THRESHOLD == 0))
+  {
+    DALI_LOG_ERROR("QueueEvent %zu Events! Please check you might feed too much events during ProcessEvents!\n", eventQueue.size());
+    DALI_ASSERT_ALWAYS((eventQueue.size() < ASSERT_PROGRAM_THRESHOLD) && "Too much events queued.");
   }
 }
 
 void EventProcessor::ProcessEvents()
 {
-  MessageBuffer* queueToProcess = mCurrentEventQueue;
+  auto& queueToProcess = *mCurrentEventQueue;
+
+  if(queueToProcess.empty())
+  {
+    return;
+  }
 
   // Switch current queue; events can be added safely while iterating through the other queue.
   mCurrentEventQueue = (&mEventQueue0 == mCurrentEventQueue) ? &mEventQueue1 : &mEventQueue0;
 
-  for(MessageBuffer::Iterator iter = queueToProcess->Begin(); iter.IsValid(); iter.Next())
-  {
-    Event* event = reinterpret_cast<Event*>(iter.Get());
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SCENE_PROCESS_EVENTS", [&](std::ostringstream& oss)
+                                          { oss << "[" << queueToProcess.size() << "]"; });
 
-    switch(event->type)
+  while(!queueToProcess.empty())
+  {
+    // Get l-value of event.
+    const auto& event = *queueToProcess.front();
+
+    switch(event.type)
     {
       case Event::Touch:
       {
-        Integration::TouchEvent& touchEvent = static_cast<Integration::TouchEvent&>(*event);
+        const Integration::TouchEvent& touchEvent = static_cast<const Integration::TouchEvent&>(event);
 
         if(mScene.GetTouchPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY)
         {
@@ -189,8 +168,8 @@ void EventProcessor::ProcessEvents()
           // For each actor, the stored touch points are collected and the TouchEventProcessor is executed for each actor
           for(ActorTouchPointsContainer::iterator aItr = mActorTouchPoints.begin(); aItr != mActorTouchPoints.end(); aItr++)
           {
-            uint32_t actorId = aItr->first;
-            TouchPointsContainer& touchPoints = aItr->second;
+            uint32_t                actorId     = aItr->first;
+            TouchPointsContainer&   touchPoints = aItr->second;
             Integration::TouchEvent touchEventInternal(touchEvent.time);
 
             for(TouchPointsContainer::iterator tItr = touchPoints.begin(); tItr != touchPoints.end(); tItr++)
@@ -225,33 +204,33 @@ void EventProcessor::ProcessEvents()
 
       case Event::Hover:
       {
-        mHoverEventProcessor.ProcessHoverEvent(static_cast<const Integration::HoverEvent&>(*event));
+        mHoverEventProcessor.ProcessHoverEvent(static_cast<const Integration::HoverEvent&>(event));
         break;
       }
 
       case Event::Key:
       {
-        mKeyEventProcessor.ProcessKeyEvent(static_cast<const Integration::KeyEvent&>(*event));
+        mKeyEventProcessor.ProcessKeyEvent(static_cast<const Integration::KeyEvent&>(event));
         break;
       }
 
       case Event::Wheel:
       {
-        mWheelEventProcessor.ProcessWheelEvent(static_cast<const Integration::WheelEvent&>(*event));
+        mWheelEventProcessor.ProcessWheelEvent(static_cast<const Integration::WheelEvent&>(event));
         break;
       }
     }
-    // Call virtual destructor explictly; since delete will not be called after placement new
-    event->~Event();
-  }
 
-  queueToProcess->Reset();
+    // Pop the event end of the process, since we use l-value of events here.
+    queueToProcess.pop();
+  }
+  DALI_TRACE_END(gTraceFilter, "DALI_SCENE_PROCESS_EVENTS");
 }
 
-void EventProcessor::SendInterruptedEvents(Dali::Internal::Actor *actor)
+void EventProcessor::SendInterruptedEvents(Dali::Internal::Actor* actor)
 {
-    //TODO: Other event types should also be added if needed
-    mHoverEventProcessor.SendInterruptedHoverEvent(actor);
+  // TODO: Other event types should also be added if needed
+  mHoverEventProcessor.SendInterruptedHoverEvent(actor);
 }
 
 } // namespace Internal

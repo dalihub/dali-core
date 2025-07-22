@@ -79,6 +79,7 @@ GestureDetector::~GestureDetector()
     if(Stage::IsInstalled())
     {
       mGestureEventProcessor.RemoveGestureDetector(this);
+      Clear();
     }
   }
 

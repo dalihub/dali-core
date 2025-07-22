@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_TOUCH_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,11 @@ struct DALI_CORE_API TouchEvent : public MultiPointEvent
    * @param[in]  time  The time the event occurred.
    */
   TouchEvent(uint32_t time);
+
+  /**
+   * Copy constructor.
+   */
+  TouchEvent(const TouchEvent& rhs);
 
   /**
    * Virtual destructor

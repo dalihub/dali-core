@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_HOVER_EVENT_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,11 @@ struct DALI_CORE_API HoverEvent : public MultiPointEvent
    * @param[in]  time  The time the event occurred.
    */
   HoverEvent(uint32_t time);
+
+  /**
+   * Copy constructor.
+   */
+  HoverEvent(const HoverEvent& rhs);
 
   /**
    * Virtual destructor

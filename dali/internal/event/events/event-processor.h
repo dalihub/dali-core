@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
+#include <queue>
 #include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/point.h>
-#include <dali/internal/common/message-buffer.h>
+#include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/events/hover-event-processor.h>
 #include <dali/internal/event/events/key-event-processor.h>
 #include <dali/internal/event/events/touch-event-processor.h>
@@ -42,8 +43,8 @@ class Scene;
 class GestureEventProcessor;
 class NotificationManager;
 
-using TouchPointsContainer          = std::list<Integration::Point>;
-using ActorTouchPointsContainer     = std::unordered_map<uint32_t, TouchPointsContainer>;
+using TouchPointsContainer      = std::list<Integration::Point>;
+using ActorTouchPointsContainer = std::unordered_map<uint32_t, TouchPointsContainer>;
 
 using TouchEventProcessorsContainer = std::unordered_map<uint32_t, IntrusivePtr<TouchEventProcessor>>;
 using ActorIdDeviceIdContainer      = std::unordered_map<uint32_t, uint32_t>;
@@ -85,24 +86,26 @@ public:
    * This function is called when sending a interrupted event to a specific actor.
    * @param[in] actor The actor on which the event should occur.
    */
-  void SendInterruptedEvents(Dali::Internal::Actor *actor);
+  void SendInterruptedEvents(Dali::Internal::Actor* actor);
 
 private:
-  Scene&                         mScene;                 ///< The Scene events are processed for.
-  TouchEventProcessor            mTouchEventProcessor;   ///< Processes touch events.
-  HoverEventProcessor            mHoverEventProcessor;   ///< Processes hover events.
-  GestureEventProcessor&         mGestureEventProcessor; ///< Processes gesture events.
-  KeyEventProcessor              mKeyEventProcessor;     ///< Processes key events.
-  WheelEventProcessor            mWheelEventProcessor;   ///< Processes wheel events.
+  Scene&                 mScene;                 ///< The Scene events are processed for.
+  TouchEventProcessor    mTouchEventProcessor;   ///< Processes touch events.
+  HoverEventProcessor    mHoverEventProcessor;   ///< Processes hover events.
+  GestureEventProcessor& mGestureEventProcessor; ///< Processes gesture events.
+  KeyEventProcessor      mKeyEventProcessor;     ///< Processes key events.
+  WheelEventProcessor    mWheelEventProcessor;   ///< Processes wheel events.
 
   // Allow messages to be added safely to one queue, while processing (iterating through) the second queue.
-  MessageBuffer                  mEventQueue0;       ///< An event queue.
-  MessageBuffer                  mEventQueue1;       ///< Another event queue.
-  MessageBuffer*                 mCurrentEventQueue; ///< QueueEvent() will queue here.
+  using EventQueue = std::queue<OwnerPointer<const Dali::Integration::Event>>;
 
-  TouchEventProcessorsContainer  mTouchEventProcessors;  ///< List of touch processors by actor
-  ActorTouchPointsContainer      mActorTouchPoints;      ///< List of touch events by actor
-  ActorIdDeviceIdContainer       mActorIdDeviceId;       ///< List of actor id by touch device id
+  EventQueue  mEventQueue0;       ///< An event queue.
+  EventQueue  mEventQueue1;       ///< Another event queue.
+  EventQueue* mCurrentEventQueue; ///< QueueEvent() will queue here.
+
+  TouchEventProcessorsContainer mTouchEventProcessors; ///< List of touch processors by actor
+  ActorTouchPointsContainer     mActorTouchPoints;     ///< List of touch events by actor
+  ActorIdDeviceIdContainer      mActorIdDeviceId;      ///< List of actor id by touch device id
 };
 
 } // namespace Internal

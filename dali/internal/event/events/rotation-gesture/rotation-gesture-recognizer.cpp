@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,14 +214,8 @@ void RotationGestureRecognizer::SendRotation(GestureState state, const Integrati
 
     // We should use the current event in our calculations unless it does not have two points.
     // If it does not have two points, then we should use the last point in mTouchEvents.
-    Integration::TouchEvent event(currentEvent);
-    if(event.GetPointCount() != 2)
-    {
-      event = *mTouchEvents.rbegin();
-    }
-
-    const Integration::Point& currentPoint1(event.points[0]);
-    const Integration::Point& currentPoint2(event.points[1]);
+    const Integration::Point& currentPoint1((currentEvent.GetPointCount() != 2 ? (*mTouchEvents.rbegin()) : currentEvent).points[0]);
+    const Integration::Point& currentPoint2((currentEvent.GetPointCount() != 2 ? (*mTouchEvents.rbegin()) : currentEvent).points[1]);
 
     gesture.rotation    = GetAngle(currentPoint1, currentPoint2) - mStartingAngle;
     gesture.centerPoint = GetCenterPoint(currentPoint1, currentPoint2);
