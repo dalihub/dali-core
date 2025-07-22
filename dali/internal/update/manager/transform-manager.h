@@ -77,8 +77,10 @@ enum TransformManagerProperty
   TRANSFORM_PROPERTY_COUNT,
 };
 
-using TransformId                             = uint32_t; // 4,294,967,295 transforms supported
-static const TransformId INVALID_TRANSFORM_ID = -1;
+using TransformId                                         = uint32_t; // 4,294,967,294 transforms supported
+static const TransformId INVALID_TRANSFORM_ID             = -1;
+static const TransformId PARENT_OF_OFF_SCENE_TRANSFORM_ID = -1; // Special id to specify the node is scene offed. (Same as INVALID_TRANSFORM_ID)
+static const TransformId PARENT_OF_ROOT_NODE_TRANSFORM_ID = -2; // Special id to specify the root of each scene.
 
 class TransformManager;
 
@@ -123,6 +125,17 @@ namespace SceneGraph
 class TransformManager
 {
 public:
+  /**
+   * Checks if the TransformId is valid or not.
+   * @param[in] transformId The TransformId to check
+   * @return true if the TransformId is valid, false otherwise
+   */
+  inline static bool IsValidTransformId(const TransformId transformId)
+  {
+    // @code return transformId != PARENT_OF_OFF_SCENE_TRANSFORM_ID && transformId != PARENT_OF_ROOT_NODE_TRANSFORM_ID;
+    return (~(transformId | 0x1)) != 0;
+  }
+
   /**
    * Default constructor
    */

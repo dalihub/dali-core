@@ -126,7 +126,7 @@ Node::Node()
 
 Node::~Node()
 {
-  if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+  if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
   {
     mTransformManagerData.Manager()->RemoveTransform(mTransformManagerData.Id());
   }
@@ -156,6 +156,10 @@ void Node::CreateTransform(SceneGraph::TransformManager* transformManager)
   // Set whether the position should use the anchor point
   transformManager->SetPositionUsesAnchorPoint(createdTransformId, mPositionUsesAnchorPoint);
   transformManager->SetIgnored(createdTransformId, mIgnored);
+  if(DALI_UNLIKELY(mIsRoot))
+  {
+    transformManager->SetParent(createdTransformId, PARENT_OF_ROOT_NODE_TRANSFORM_ID);
+  }
 
   // Set TransformId after initialize done.
   mTransformManagerData.mId = createdTransformId;
@@ -166,6 +170,10 @@ void Node::SetRoot(bool isRoot)
   DALI_ASSERT_DEBUG(!isRoot || mParent == NULL); // Root nodes cannot have a parent
 
   mIsRoot = isRoot;
+  if(DALI_LIKELY(mIsRoot && TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+  {
+    mTransformManagerData.Manager()->SetParent(mTransformManagerData.Id(), PARENT_OF_ROOT_NODE_TRANSFORM_ID);
+  }
 }
 
 bool Node::IsAnimationPossible() const
@@ -343,7 +351,7 @@ void Node::SetParent(Node& parentNode)
 
   mParent = &parentNode;
 
-  if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+  if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
   {
     mTransformManagerData.Manager()->SetParent(mTransformManagerData.Id(), parentNode.GetTransformId());
   }
@@ -369,9 +377,9 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   // Remove all child pointers
   mChildren.Clear();
 
-  if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+  if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
   {
-    mTransformManagerData.Manager()->SetParent(mTransformManagerData.Id(), INVALID_TRANSFORM_ID);
+    mTransformManagerData.Manager()->SetParent(mTransformManagerData.Id(), PARENT_OF_OFF_SCENE_TRANSFORM_ID);
   }
 }
 
@@ -399,8 +407,8 @@ void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLaye
 
   // TODO : Can't we get modelMatrix and size as const l-value at onces?
   const auto&    transformId = mTransformManagerData.Id();
-  const Matrix&  modelMatrix = transformId == INVALID_TRANSFORM_ID ? Matrix::IDENTITY : mWorldMatrix.Get(0);
-  const Vector3& size        = transformId == INVALID_TRANSFORM_ID ? Vector3::ZERO : mSize.Get(0);
+  const Matrix&  modelMatrix = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mWorldMatrix.Get(0) : Matrix::IDENTITY;
+  const Vector3& size        = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mSize.Get(0) : Vector3::ZERO;
 
   const Vector4& updatedPositionSize = CalculateNodeUpdateArea(isLayer3d, modelMatrix, size);
 
