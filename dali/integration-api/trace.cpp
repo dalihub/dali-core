@@ -145,6 +145,16 @@ Tracer::Tracer(Filter* filter, const char* tag)
   }
 }
 
+Tracer::Tracer(Filter* filter, const char* tag, const char* message)
+: mTag(tag),
+  mFilter(filter)
+{
+  if(mFilter && mFilter->IsTraceEnabled())
+  {
+    mFilter->BeginTrace(mTag, message);
+  }
+}
+
 /**
  * Tracer Destructor
  */
