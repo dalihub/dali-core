@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TRANSFORM_MANAGER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,6 @@ namespace SceneGraph
  */
 struct TransformComponentAnimatable
 {
-  TransformComponentAnimatable()
-  : mScale(Vector3::ONE),
-    mOrientation(Quaternion::IDENTITY),
-    mPosition(Vector3::ZERO)
-  {
-  }
-
   Vector3    mScale;
   Quaternion mOrientation;
   Vector3    mPosition;
@@ -54,14 +47,6 @@ struct TransformComponentAnimatable
  */
 struct TransformComponentStatic
 {
-  TransformComponentStatic()
-  : mAnchorPoint(AnchorPoint::DEFAULT),
-    mParentOrigin(ParentOrigin::DEFAULT),
-    mPositionUsesAnchorPoint(true),
-    mIgnored(false)
-  {
-  }
-
   Vector3 mAnchorPoint;
   Vector3 mParentOrigin;
   bool    mPositionUsesAnchorPoint;
@@ -381,7 +366,7 @@ public:
   void SetIgnored(TransformId id, bool value);
 
 private:
-  //Helper struct to order components
+  // Helper struct to order components
   struct SOrderItem
   {
     bool operator<(const SOrderItem& item) const
@@ -415,7 +400,9 @@ private:
    */
   void ReorderComponents();
 
-  uint32_t                             mComponentCount;                 ///< Total number of components
+  uint32_t mComponentCount;        ///< Total number of components
+  uint32_t mIgnoredComponentCount; ///< Total number of ignored components
+
   FreeList                             mIds;                            ///< FreeList of Ids
   Vector<TransformComponentAnimatable> mTxComponentAnimatable;          ///< Animatable part of the components
   Vector<TransformComponentStatic>     mTxComponentStatic;              ///< Static part of the components
@@ -432,7 +419,6 @@ private:
                                                                         ///< Or If we change static component changed, flag become non-zero. Age down at Update time.
                                                                         ///< Note that we don't replace dirty flag as BAKE even if we call Bake operation.
                                                                         ///< (Since single dirty flag controls multiple animatable properties ; Position, Size, Scale, Orientation.)
-  Vector<bool>       mIgnored;                                          ///< True if the component is ignored.
   Vector<bool>       mWorldMatrixDirty;                                 ///< 1u if the world matrix has been updated in this frame, 0 otherwise
   Vector<SOrderItem> mOrderedComponents;                                ///< Used to reorder components when hierarchy changes
 
@@ -441,10 +427,10 @@ private:
   bool    mUpdated : 1; ///< Flag whether we have updated the transform components previous frame.
 };
 
-} //namespace SceneGraph
+} // namespace SceneGraph
 
-} //namespace Internal
+} // namespace Internal
 
-} //namespace Dali
+} // namespace Dali
 
 #endif // DALI_INTERNAL_TRANSFORM_MANAGER_H

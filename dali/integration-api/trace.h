@@ -179,6 +179,7 @@ class DALI_CORE_API Tracer final
 {
 public:
   Tracer(Filter* filter, const char* tag);
+  Tracer(Filter* filter, const char* tag, const char* message);
   ~Tracer();
 
 public:
@@ -262,6 +263,12 @@ public:
 #define DALI_TRACE_SCOPE(filter, tag) \
   Dali::Integration::Trace::Tracer logTracerScope(filter, tag);
 
+#define DALI_TRACE_SCOPE_WITH_FORMAT(filter, tag, format, ...) \
+  char __traceFormattedMessage[128]; \
+  snprintf(__traceFormattedMessage, sizeof(__traceFormattedMessage), format, ##__VA_ARGS__); \
+  Dali::Integration::Trace::Tracer logTracerScopeWithFormat(filter, tag, __traceFormattedMessage);
+
+
 #else // TRACE_ENABLED
 
 #define DALI_INIT_TRACE_FILTER(name, tag, enable)
@@ -273,6 +280,7 @@ public:
 #define DALI_TRACE_END_WITH_MESSAGE_GENERATOR(filter, tag, messageGenerator)
 #define DALI_TRACE_FUNCTION(filter)
 #define DALI_TRACE_SCOPE(filter, tag)
+#define DALI_TRACE_SCOPE_WITH_FORMAT(filter, tag, format, ...)
 
 #endif
 
