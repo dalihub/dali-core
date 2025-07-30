@@ -51,6 +51,7 @@ public:
   RenderAlgorithms(RenderAlgorithms& rhs) = delete; // Prevent copying
 
   RenderAlgorithms& operator=(const RenderAlgorithms& rhs) = delete; // Prevent Copying
+
   /**
    * Process a render-instruction.
    * @param[in] instruction                 The render-instruction to process.
