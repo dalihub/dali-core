@@ -1,19 +1,19 @@
 /*
-* Copyright (c) 2025 Samsung Electronics Co., Ltd.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-*/
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/shader-integ.h>
@@ -381,7 +381,7 @@ int UtcDaliInternalShaderSaveAndLoad02(void)
   END_TEST;
 }
 
-int UtcDaliInternalShaderNewWithUniformBlock(void)
+int UtcDaliInternalShaderNewWithUniformBlock01(void)
 {
   TestApplication application;
 
@@ -395,11 +395,11 @@ int UtcDaliInternalShaderNewWithUniformBlock(void)
   UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
   UniformBlock sharedUniformBlock3 = UniformBlock::New("ubo3");
 
-  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1});
-  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2, sharedUniformBlock3});
-  Shader shader3 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {});
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1}, false);
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2, sharedUniformBlock3}, true);
+  Shader shader3 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {}, false);
 
-  Shader shader4 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader2, fragmentShader2, Shader::Hint::NONE, "", {sharedUniformBlock1});
+  Shader shader4 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader2, fragmentShader2, Shader::Hint::NONE, "", {sharedUniformBlock1}, false);
 
   DALI_TEST_CHECK(shader1);
   DALI_TEST_CHECK(shader2);
@@ -412,6 +412,209 @@ int UtcDaliInternalShaderNewWithUniformBlock(void)
   DALI_TEST_CHECK(shader2 != shader3);
   DALI_TEST_CHECK(shader2 != shader4);
   DALI_TEST_CHECK(shader3 != shader4);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliInternalShaderNewWithUniformBlock02(void)
+{
+  TestApplication application;
+
+  std::string vertexShader1   = "some vertex code\n";
+  std::string fragmentShader1 = "some fragment code\n";
+
+  std::string vertexShader2   = "some another vertex code\n";
+  std::string fragmentShader2 = "some another fragment code\n";
+
+  UniformBlock sharedUniformBlock1 = UniformBlock::New("ubo1");
+  UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
+  UniformBlock sharedUniformBlock3 = UniformBlock::New("ubo3");
+
+  std::string   hintSet = "MODIFIES_GEOMETRY";
+  Property::Map map[2];
+  map[0]["vertex"]        = vertexShader1;
+  map[0]["fragment"]      = fragmentShader1;
+  map[0]["renderPassTag"] = 0;
+  map[0]["hints"]         = hintSet;
+  map[0]["name"]          = "Test0";
+
+  map[1]["vertex"]        = vertexShader2;
+  map[1]["fragment"]      = fragmentShader2;
+  map[1]["renderPassTag"] = 1;
+  map[1]["hints"]         = hintSet;
+  map[1]["name"]          = "Test1";
+
+  Property::Array array;
+  array.PushBack(map[0]);
+  array.PushBack(map[1]);
+
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(array, {sharedUniformBlock1}, false);
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(array, {sharedUniformBlock1, sharedUniformBlock2, sharedUniformBlock3}, true);
+  Shader shader3 = Dali::Integration::ShaderNewWithUniformBlock(array, {}, false);
+
+  Shader shader4 = Dali::Integration::ShaderNewWithUniformBlock(map[0], {sharedUniformBlock1}, false);
+  Shader shader5 = Dali::Integration::ShaderNewWithUniformBlock(map[1], {sharedUniformBlock1}, false);
+
+  DALI_TEST_CHECK(shader1);
+  DALI_TEST_CHECK(shader2);
+  DALI_TEST_CHECK(shader3);
+  DALI_TEST_CHECK(shader4);
+  DALI_TEST_CHECK(shader5);
+
+  DALI_TEST_CHECK(shader1 != shader2);
+  DALI_TEST_CHECK(shader1 != shader3);
+  DALI_TEST_CHECK(shader1 != shader4);
+  DALI_TEST_CHECK(shader1 != shader5);
+  DALI_TEST_CHECK(shader2 != shader3);
+  DALI_TEST_CHECK(shader2 != shader4);
+  DALI_TEST_CHECK(shader2 != shader5);
+  DALI_TEST_CHECK(shader3 != shader4);
+  DALI_TEST_CHECK(shader3 != shader5);
+  DALI_TEST_CHECK(shader4 != shader5);
+
+  application.SendNotification();
+  application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliInternalShaderNewWithStrongConnectedUniformBlock01(void)
+{
+  TestApplication application;
+
+  std::string vertexShader1   = "some vertex code\n";
+  std::string fragmentShader1 = "some fragment code\n";
+
+  UniformBlock sharedUniformBlock1 = UniformBlock::New("ubo1");
+  UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
+
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2}, false);
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1}, true);
+
+  DALI_TEST_CHECK(shader1);
+  DALI_TEST_CHECK(shader2);
+
+  struct TestObjectDestroyedCallback
+  {
+    TestObjectDestroyedCallback(bool& signalReceived, const Dali::RefObject*& objectPointer)
+    : mSignalVerified(signalReceived),
+      mObjectPointer(objectPointer)
+    {
+    }
+
+    void operator()(const Dali::RefObject* objectPointer)
+    {
+      tet_infoline("Verifying TestObjectDestroyedCallback()");
+
+      if(objectPointer == mObjectPointer)
+      {
+        mSignalVerified = true;
+      }
+    }
+
+    bool&                   mSignalVerified;
+    const Dali::RefObject*& mObjectPointer;
+  };
+
+  // Test whether ubo2 is destroyed and ubo1 is alive
+  const Dali::RefObject* ubo1Impl = sharedUniformBlock1.GetObjectPtr();
+  const Dali::RefObject* ubo2Impl = sharedUniformBlock2.GetObjectPtr();
+
+  bool ubo1Destroyed = false;
+  bool ubo2Destroyed = false;
+
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
+  DALI_TEST_CHECK(registry);
+  registry.ObjectDestroyedSignal().Connect(&application, TestObjectDestroyedCallback(ubo1Destroyed, ubo1Impl));
+  registry.ObjectDestroyedSignal().Connect(&application, TestObjectDestroyedCallback(ubo2Destroyed, ubo2Impl));
+
+  DALI_TEST_EQUALS(ubo1Destroyed, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ubo2Destroyed, false, TEST_LOCATION);
+
+  sharedUniformBlock1.Reset();
+  sharedUniformBlock2.Reset();
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // Now ubo2 is destroyed, but ubo1 still alive.
+  DALI_TEST_EQUALS(ubo1Destroyed, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ubo2Destroyed, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliInternalShaderNewWithStrongConnectedUniformBlock02(void)
+{
+  TestApplication application;
+
+  std::string vertexShader1   = "some vertex code\n";
+  std::string fragmentShader1 = "some fragment code\n";
+
+  UniformBlock sharedUniformBlock1 = UniformBlock::New("ubo1");
+  UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
+
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2}, false);
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1}, true);
+
+  DALI_TEST_CHECK(shader1);
+  DALI_TEST_CHECK(shader2);
+
+  struct TestObjectDestroyedCallback
+  {
+    TestObjectDestroyedCallback(bool& signalReceived, const Dali::RefObject*& objectPointer)
+    : mSignalVerified(signalReceived),
+      mObjectPointer(objectPointer)
+    {
+    }
+
+    void operator()(const Dali::RefObject* objectPointer)
+    {
+      tet_infoline("Verifying TestObjectDestroyedCallback()");
+
+      if(objectPointer == mObjectPointer)
+      {
+        mSignalVerified = true;
+      }
+    }
+
+    bool&                   mSignalVerified;
+    const Dali::RefObject*& mObjectPointer;
+  };
+
+  // Disconnect with strong-connected shader.
+  sharedUniformBlock1.DisconnectFromShader(shader2);
+
+  const Dali::RefObject* ubo1Impl = sharedUniformBlock1.GetObjectPtr();
+  const Dali::RefObject* ubo2Impl = sharedUniformBlock2.GetObjectPtr();
+
+  bool ubo1Destroyed = false;
+  bool ubo2Destroyed = false;
+
+  ObjectRegistry registry = application.GetCore().GetObjectRegistry();
+  DALI_TEST_CHECK(registry);
+  registry.ObjectDestroyedSignal().Connect(&application, TestObjectDestroyedCallback(ubo1Destroyed, ubo1Impl));
+  registry.ObjectDestroyedSignal().Connect(&application, TestObjectDestroyedCallback(ubo2Destroyed, ubo2Impl));
+
+  DALI_TEST_EQUALS(ubo1Destroyed, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ubo2Destroyed, false, TEST_LOCATION);
+
+  sharedUniformBlock1.Reset();
+  sharedUniformBlock2.Reset();
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // Now both ubo1 and ubo2 were destroyed.
+  DALI_TEST_EQUALS(ubo1Destroyed, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(ubo2Destroyed, true, TEST_LOCATION);
 
   END_TEST;
 }

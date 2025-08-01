@@ -28,13 +28,13 @@ Shader Shader::New(std::string_view vertexShader,
                    Hint::Value      hints,
                    std::string_view shaderName)
 {
-  Internal::ShaderPtr shader = Internal::Shader::New(vertexShader, fragmentShader, hints, shaderName, {});
+  Internal::ShaderPtr shader = Internal::Shader::New(vertexShader, fragmentShader, hints, shaderName, {}, false);
   return Shader(shader.Get());
 }
 
 Shader Shader::New(Dali::Property::Value shaderMap)
 {
-  Internal::ShaderPtr shader = Internal::Shader::New(shaderMap);
+  Internal::ShaderPtr shader = Internal::Shader::New(std::move(shaderMap), {}, false);
   return Shader(shader.Get());
 }
 

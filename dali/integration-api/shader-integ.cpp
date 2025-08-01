@@ -23,9 +23,15 @@
 
 namespace Dali::Integration
 {
-Dali::Shader ShaderNewWithUniformBlock(std::string_view vertexShader, std::string_view fragmentShader, Shader::Hint::Value hints, std::string_view shaderName, std::vector<Dali::UniformBlock> uniformBlocks)
+Dali::Shader ShaderNewWithUniformBlock(std::string_view vertexShader, std::string_view fragmentShader, Shader::Hint::Value hints, std::string_view shaderName, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection)
 {
-  Internal::ShaderPtr shader = Dali::Internal::Shader::New(vertexShader, fragmentShader, hints, shaderName, std::move(uniformBlocks));
+  Internal::ShaderPtr shader = Dali::Internal::Shader::New(vertexShader, fragmentShader, hints, shaderName, std::move(uniformBlocks), strongConnection);
+  return Shader(shader.Get());
+}
+
+Dali::Shader ShaderNewWithUniformBlock(Dali::Property::Value shaderMap, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection)
+{
+  Internal::ShaderPtr shader = Dali::Internal::Shader::New(std::move(shaderMap), std::move(uniformBlocks), strongConnection);
   return Shader(shader.Get());
 }
 

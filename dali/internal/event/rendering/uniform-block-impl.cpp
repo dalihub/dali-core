@@ -44,15 +44,18 @@ const Render::UniformBlock& UniformBlock::GetUniformBlockSceneObject() const
   return static_cast<const Render::UniformBlock&>(GetSceneObject());
 }
 
-bool UniformBlock::ConnectToShader(Shader* shader, bool programCacheCleanRequired)
+bool UniformBlock::ConnectToShader(Shader* shader, bool strongConnection, bool programCacheCleanRequired)
 {
   if(shader != nullptr)
   {
     if(mShaderContainer.find(shader) == mShaderContainer.end())
     {
-      mShaderContainer.insert(shader);
-      AddObserver(*shader);
-      shader->ConnectUniformBlock(*this, programCacheCleanRequired);
+      mShaderContainer.insert({shader, strongConnection});
+      if(!strongConnection)
+      {
+        AddObserver(*shader);
+      }
+      shader->ConnectUniformBlock(*this, strongConnection, programCacheCleanRequired);
       return true;
     }
   }
@@ -66,8 +69,11 @@ void UniformBlock::DisconnectFromShader(Shader* shader)
     auto iter = mShaderContainer.find(shader);
     if(iter != mShaderContainer.end())
     {
+      if(!iter->second)
+      {
+        RemoveObserver(*shader);
+      }
       mShaderContainer.erase(iter);
-      RemoveObserver(*shader);
       shader->DisconnectUniformBlock(*this);
     }
   }
@@ -98,4 +104,4 @@ UniformBlock::~UniformBlock()
   }
 }
 
-}; //namespace Dali::Internal
+}; // namespace Dali::Internal
