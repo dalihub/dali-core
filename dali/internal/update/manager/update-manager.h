@@ -37,7 +37,6 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/node-resetter.h>
 #include <dali/internal/update/common/property-resetter.h>
-#include <dali/internal/update/common/renderer-resetter.h>
 #include <dali/internal/update/common/resetter-manager.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
@@ -275,11 +274,6 @@ public:
    * @copydoc Dali::Internal::SceneGraph::ResetterManager::AddNodeResetter()
    */
   void AddNodeResetter(const Node& node) override;
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::ResetterManager::AddRendererResetter()
-   */
-  void AddRendererResetter(const Renderer& renderer) override;
 
   /**
    * @copydoc Dali::Internal::SceneGraph::ResetterManager::RequestPropertyBaseResetToBaseValue()

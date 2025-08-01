@@ -519,11 +519,6 @@ public:
   bool IsDirty() const;
 
   /**
-   * @brief Request to reset to base values of all animatable properties.
-   */
-  void RequestResetToBaseValues();
-
-  /**
    * @brief True if this renderer could be renderable. False otherwise.
    */
   bool IsRenderable() const
@@ -553,17 +548,6 @@ public: // PropertyOwner::MappingChanged
    * @copydoc PropertyOwner::OnMappingChanged
    */
   void OnMappingChanged() override;
-
-public: // PropertyOwner implementation
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
-   */
-  virtual void ResetDefaultProperties(BufferIndex updateBufferIndex) {};
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::AddInitializeResetter
-   */
-  void AddInitializeResetter(ResetterManager& manager) const override;
 
 public: // From UniformMapDataProvider
   /**

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_RESETTER_MANAGER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,12 +47,6 @@ public:
   virtual void AddNodeResetter(const Node& node) = 0;
 
   /**
-   * Add a renderer resetter. ResetterManager takes ownership of the object.
-   * It will be killed by ResetterManager when the renderer is destroyed
-   */
-  virtual void AddRendererResetter(const Renderer& renderer) = 0;
-
-  /**
    * @brief Request to reset base value.
    * @param[in] propertyBase The property base to reset.
    */
@@ -68,4 +62,4 @@ protected:
 
 } // namespace Dali::Internal::SceneGraph
 
-#endif //DALI_INTERNAL_SCENEGRAPH_RESETTER_MANAGER_H
+#endif // DALI_INTERNAL_SCENEGRAPH_RESETTER_MANAGER_H
