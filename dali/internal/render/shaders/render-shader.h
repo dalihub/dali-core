@@ -124,7 +124,7 @@ private: // Data
   UniformBlockContainer      mBlocks{};           ///< List of connected uniform blocks (not owned)
   std::size_t                mBlockNamesHash{0u}; ///< Simple hash of all connected uniform blocks name.
 
-  mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
+  mutable uint8_t mDirtyUpdated{0u}; ///< Dirty flag that we can change 1 times per each frame.
 };
 
 inline void UpdateShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)
