@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/device.h>
 #include <dali/public-api/events/point-state.h>
 #include <dali/public-api/object/base-handle.h>
 
@@ -181,6 +182,26 @@ public:
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
   const Vector2& GetScreenPosition(std::size_t point) const;
+
+  /**
+   * @brief Gets the device class type from which the hover event is originated.
+   *
+   * The device class type is classification type of the input device of event received.
+   * @SINCE_2_4.31
+   * @param[in] point The point required
+   * @return The type of the device class
+   */
+  Device::Class::Type GetDeviceClass(std::size_t point) const;
+
+  /**
+   * @brief Gets the subclass type of the device from which the hover event is originated.
+   *
+   * The device subclass type is subclassification type of the input device of event received.
+   * @SINCE_2_4.31
+   * @param[in] point The point required
+   * @return The type of the device subclass
+   */
+  Device::Subclass::Type GetDeviceSubclass(std::size_t point) const;
 
 public: // Not intended for application developers
   /// @cond internal

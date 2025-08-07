@@ -122,6 +122,8 @@ Integration::HoverEvent GenerateSingleHover(PointState::Type state, const Vector
   Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(Device::Class::MOUSE);
+  point.SetDeviceSubclass(Device::Subclass::NONE);
   hoverEvent.points.push_back(point);
   return hoverEvent;
 }
@@ -1674,6 +1676,74 @@ int UtcDaliHoverEnsureDifferentConsumerReceivesLeave(void)
   DALI_TEST_EQUALS(true, dataChildNoConsume.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, dataChildConsume.functorCalled, TEST_LOCATION);
   resetData();
+
+  END_TEST;
+}
+
+int UtcDaliHoverEventGetDeviceAPI(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's hovered signal
+  SignalData        data;
+  HoverEventFunctor functor(data);
+  actor.HoveredSignal().Connect(&application, functor);
+
+  Vector2 screenCoordinates(10.0f, 10.0f);
+  Vector2 localCoordinates;
+  actor.ScreenToLocal(localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y);
+
+  // Emit a started signal
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, screenCoordinates));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(data.hoverEvent.GetDeviceClass(0), Device::Class::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.hoverEvent.GetDeviceSubclass(0), Device::Subclass::NONE, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliHoverEventGetDeviceAPINegative(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's hovered signal
+  SignalData        data;
+  HoverEventFunctor functor(data);
+  actor.HoveredSignal().Connect(&application, functor);
+
+  Vector2 screenCoordinates(10.0f, 10.0f);
+  Vector2 localCoordinates;
+  actor.ScreenToLocal(localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y);
+
+  // Emit a started signal
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, screenCoordinates));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(data.hoverEvent.GetDeviceClass(-1), Device::Class::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.hoverEvent.GetDeviceSubclass(-1), Device::Subclass::NONE, TEST_LOCATION);
+  data.Reset();
 
   END_TEST;
 }
