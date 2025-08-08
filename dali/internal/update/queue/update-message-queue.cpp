@@ -156,6 +156,13 @@ MessageQueue::~MessageQueue()
   delete mImpl;
 }
 
+void MessageQueue::MoveMessageQueue(MessageQueue& destination, MessageQueue& source)
+{
+  delete destination.mImpl;
+  destination.mImpl = source.mImpl;
+  source.mImpl      = nullptr;
+}
+
 void MessageQueue::EventProcessingStarted()
 {
   mImpl->processingEvents = true; // called from event thread

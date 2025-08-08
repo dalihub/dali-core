@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,5 +59,114 @@ int UtcDaliCoreCheckMemoryPool(void)
   application.GetCore().LogMemoryPools();
 
   tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliCoreChangeCorePolicy(void)
+{
+  TestApplication application;
+
+  Integration::CorePolicyFlags corePolicyFlags = Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
+
+  // Note that we should not call this method after ContextCreated() has been called.
+  // But here is UTC, so we can call it after context creation at TestApplication initialized.
+  application.GetCore().ChangeCorePolicy(corePolicyFlags);
+
+  // Render something after policy changed.
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(16);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliCoreChangeCorePolicyN(void)
+{
+  TestApplication application;
+
+  Integration::CorePolicyFlags corePolicyFlags = Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
+
+  // Render something.
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Must throw an exception if we try to change the core policy after the context has been created.
+  try
+  {
+    application.GetCore().ChangeCorePolicy(corePolicyFlags);
+    tet_result(TET_FAIL);
+  }
+  catch(...)
+  {
+    tet_result(TET_PASS);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliCoreChangeGraphicsController(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    false, // Skip initialize().
+    false);
+
+  application.CreateCore();
+
+  // Just insert duplicated graphics controller, for line coverage
+  // Note that we should not call this method after ContextCreated() has been called.
+  // But here is UTC, so we can call it after context creation at TestApplication initialized.
+  Graphics::Controller& graphicsController = application.GetGraphicsController();
+  application.GetCore().ChangeGraphicsController(graphicsController);
+
+  application.CreateScene();
+  application.InitializeCore();
+
+  // Render something after graphics controller changed.
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(16);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}
+
+int UtcDaliCoreChangeGraphicsControllerN(void)
+{
+  TestApplication application;
+
+  // Render something.
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Must throw an exception if we try to change the graphics controller after the context has been created.
+  try
+  {
+    application.GetCore().ChangeGraphicsController(application.GetGraphicsController());
+    tet_result(TET_FAIL);
+  }
+  catch(...)
+  {
+    tet_result(TET_PASS);
+  }
+
   END_TEST;
 }

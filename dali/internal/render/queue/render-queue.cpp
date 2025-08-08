@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,31 +44,20 @@ RenderQueue::RenderQueue()
 
 RenderQueue::~RenderQueue()
 {
-  if(container0)
-  {
-    for(MessageBuffer::Iterator iter = container0->Begin(); iter.IsValid(); iter.Next())
-    {
-      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
+  DestroyMessageBuffer();
+}
 
-      // Call virtual destructor explicitly; since delete will not be called after placement new
-      message->~MessageBase();
-    }
+void RenderQueue::MoveRenderQueue(RenderQueue& destination, RenderQueue& source)
+{
+  destination.DestroyMessageBuffer();
 
-    delete container0;
-  }
+  destination.container0 = source.container0;
+  destination.container1 = source.container1;
+  destination.mCapacity.store(source.mCapacity.load());
 
-  if(container1)
-  {
-    for(MessageBuffer::Iterator iter = container1->Begin(); iter.IsValid(); iter.Next())
-    {
-      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
-
-      // Call virtual destructor explicitly; since delete will not be called after placement new
-      message->~MessageBase();
-    }
-
-    delete container1;
-  }
+  source.container0 = nullptr;
+  source.container1 = nullptr;
+  source.mCapacity  = 0u;
 }
 
 uint32_t* RenderQueue::ReserveMessageSlot(BufferIndex updateBufferIndex, std::size_t size)
@@ -139,6 +128,37 @@ void RenderQueue::LimitBufferCapacity(BufferIndex bufferIndex)
       container1 = nullptr;
       container1 = new MessageBuffer(INITIAL_BUFFER_SIZE);
     }
+  }
+}
+
+void RenderQueue::DestroyMessageBuffer()
+{
+  if(container0)
+  {
+    for(MessageBuffer::Iterator iter = container0->Begin(); iter.IsValid(); iter.Next())
+    {
+      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
+
+      // Call virtual destructor explicitly; since delete will not be called after placement new
+      message->~MessageBase();
+    }
+
+    delete container0;
+    container0 = nullptr;
+  }
+
+  if(container1)
+  {
+    for(MessageBuffer::Iterator iter = container1->Begin(); iter.IsValid(); iter.Next())
+    {
+      MessageBase* message = reinterpret_cast<MessageBase*>(iter.Get());
+
+      // Call virtual destructor explicitly; since delete will not be called after placement new
+      message->~MessageBase();
+    }
+
+    delete container1;
+    container1 = nullptr;
   }
 }
 

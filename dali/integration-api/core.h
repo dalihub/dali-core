@@ -252,6 +252,20 @@ public:
    */
   void Initialize();
 
+  /**
+   * @brief Change the core policy.
+   * @note We must not call this method after ContextCreated() has been called.
+   * @param[in] corePolicy Changed policy of core.
+   */
+  void ChangeCorePolicy(CorePolicyFlags corePolicy);
+
+  /**
+   * @brief Change the graphics controller.
+   * @note We must not call this method after ContextCreated() has been called.
+   * @param[in] graphicsController The interface providing graphics services
+   */
+  void ChangeGraphicsController(Graphics::Controller& graphicsController);
+
   // GL Context Lifecycle
 
   /**
