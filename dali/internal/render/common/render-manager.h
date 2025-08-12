@@ -74,6 +74,7 @@ public:
    * @param[in]  graphicsController         The graphics controller for a given rendering backend
    * @param[in]  depthBufferAvailable       Whether the depth buffer is available
    * @param[in]  stencilBufferAvailable     Whether the stencil buffer is available
+   * @param[in]  partialUpdateAvailable     Whether the partial update is available
    */
   static RenderManager* New(Graphics::Controller&               graphicsController,
                             Integration::DepthBufferAvailable   depthBufferAvailable,
@@ -84,6 +85,22 @@ public:
    * Non-virtual destructor; not intended as a base class
    */
   ~RenderManager();
+
+  /**
+   * Update graphics relative requirement.
+   * @param[in] depthBufferAvailable   Whether the depth buffer is available
+   * @param[in] stencilBufferAvailable Whether the stencil buffer is available
+   * @param[in] partialUpdateAvailable Whether the partial update is available
+   */
+  void UpdateGraphicsRequired(Integration::DepthBufferAvailable   depthBufferAvailable,
+                              Integration::StencilBufferAvailable stencilBufferAvailable,
+                              Integration::PartialUpdateAvailable partialUpdateAvailable);
+
+  /**
+   * Change the graphics controller.
+   * @param[in] graphicsController The graphics controller for a given rendering backend
+   */
+  void ChangeGraphicsController(Graphics::Controller& graphicsController);
 
   /**
    * The graphics context is being shutdown. Clean down any outstanding graphics resources.
@@ -441,6 +458,12 @@ public:
    * @pre The graphics implementation must be initialized
    */
   void PostRender();
+
+  /**
+   * @brief Returns GraphicsConfig
+   * @return A reference to the GraphicsConfig struct.
+   */
+  Integration::GraphicsConfig& GetGraphicsConfig() const;
 
 private:
   /**

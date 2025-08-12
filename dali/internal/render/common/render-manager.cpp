@@ -191,6 +191,15 @@ struct RenderManager::Impl
     pipelineCache.reset();     // clear now before the program contoller is deleted
   }
 
+  void UpdateGraphicsRequired(Integration::DepthBufferAvailable   depthBufferAvailable,
+                              Integration::StencilBufferAvailable stencilBufferAvailable,
+                              Integration::PartialUpdateAvailable partialUpdateAvailable)
+  {
+    this->depthBufferAvailable   = depthBufferAvailable;
+    this->stencilBufferAvailable = stencilBufferAvailable;
+    this->partialUpdateAvailable = partialUpdateAvailable;
+  }
+
   void AddRenderTracker(Render::RenderTracker* renderTracker)
   {
     DALI_ASSERT_DEBUG(renderTracker != nullptr);
@@ -378,6 +387,43 @@ RenderManager::~RenderManager()
   Render::Renderer::ResetMemoryPool();
   Render::Texture::ResetMemoryPool();
   Render::UniformBufferView::ResetMemoryPool();
+}
+
+void RenderManager::UpdateGraphicsRequired(Integration::DepthBufferAvailable   depthBufferAvailable,
+                                           Integration::StencilBufferAvailable stencilBufferAvailable,
+                                           Integration::PartialUpdateAvailable partialUpdateAvailable)
+{
+  DALI_ASSERT_ALWAYS(mImpl->sceneContainer.empty() &&
+                     "Could not change graphics required after some resource created!");
+
+  mImpl->UpdateGraphicsRequired(depthBufferAvailable, stencilBufferAvailable, partialUpdateAvailable);
+}
+
+void RenderManager::ChangeGraphicsController(Graphics::Controller& graphicsController)
+{
+  DALI_ASSERT_ALWAYS(mImpl->sceneContainer.empty() &&
+                     mImpl->renderedFrameBufferContainer.empty() &&
+                     mImpl->samplerContainer.Count() == 0u &&
+                     mImpl->frameBufferContainer.Count() == 0u &&
+                     mImpl->vertexBufferContainer.Count() == 0u &&
+                     mImpl->geometryContainer.Count() == 0u &&
+                     mImpl->rendererContainer.Count() == 0u &&
+                     mImpl->textureContainer.Count() == 0u &&
+                     mImpl->mRenderTrackers.Count() == 0u &&
+                     "Could not change graphics controller after some resource created!");
+
+  // Re-create Impl now.
+  auto* oldImpl = mImpl;
+
+  mImpl = new Impl(graphicsController,
+                   oldImpl->depthBufferAvailable,
+                   oldImpl->stencilBufferAvailable,
+                   oldImpl->partialUpdateAvailable);
+
+  // Move already stored messages to new impl.
+  RenderQueue::MoveRenderQueue(mImpl->renderQueue, oldImpl->renderQueue);
+
+  delete oldImpl;
 }
 
 void RenderManager::ContextDestroyed()
@@ -1561,6 +1607,11 @@ void RenderManager::PostRender()
   mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
+}
+
+Integration::GraphicsConfig& RenderManager::GetGraphicsConfig() const
+{
+  return mImpl->graphicsController.GetGraphicsConfig();
 }
 
 } // namespace SceneGraph

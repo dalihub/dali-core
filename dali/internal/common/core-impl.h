@@ -93,6 +93,16 @@ public:
   void Initialize();
 
   /**
+   * @copydoc Dali::Integration::Core::ChangeCorePolicy()
+   */
+  void ChangeCorePolicy(Integration::CorePolicyFlags corePolicy);
+
+  /**
+   * @copydoc Dali::Integration::Core::ChangeGraphicsController()
+   */
+  void ChangeGraphicsController(Graphics::Controller& graphicsController);
+
+  /**
    * @copydoc Dali::Integration::Core::GetContextNotifier()
    */
   Integration::ContextNotifierInterface* GetContextNotifier();
@@ -344,7 +354,7 @@ private:
   /**
    * Undefined copy and assignment operators
    */
-  Core(const Core& core) = delete;            // No definition
+  Core(const Core& core)            = delete; // No definition
   Core& operator=(const Core& core) = delete; // No definition
 
   /**
@@ -376,8 +386,6 @@ private:
 
   // The object registry
   ObjectRegistryPtr mObjectRegistry;
-
-  Graphics::Controller& mGraphicsController;
 
   uint32_t mProcessorOnceIndex : 1;     ///< Index of the once processor in mProcessorsOnce
   uint32_t mPostProcessorOnceIndex : 1; ///< Index of the once processor in mProcessorsOnce

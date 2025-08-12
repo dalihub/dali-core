@@ -98,6 +98,20 @@ public:
   const Vector2& GetScreenPosition(std::size_t point) const;
 
   /**
+   * @brief Get the device class the hover event originated from
+   *
+   * @return The device class
+   */
+  Device::Class::Type GetDeviceClass(std::size_t point) const;
+
+  /**
+   * @brief Get the device subclass the hover event originated from
+   *
+   * @return The device subclass
+   */
+  Device::Subclass::Type GetDeviceSubclass(std::size_t point) const;
+
+  /**
    * @brief Returns a const reference to a point at the index requested.
    *
    * The first point in the set is always the primary point (i.e. the first point touched in a multi-touch event).

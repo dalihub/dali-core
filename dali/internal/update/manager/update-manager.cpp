@@ -415,9 +415,9 @@ private:
 };
 
 UpdateManager::UpdateManager(NotificationManager&           notificationManager,
-                             CompleteNotificationInterface& animationFinishedNotifier,
+                             CompleteNotificationInterface& animationPlaylist,
                              PropertyNotifier&              propertyNotifier,
-                             RenderController&              controller,
+                             RenderController&              renderController,
                              RenderManager&                 renderManager,
                              RenderQueue&                   renderQueue,
                              RenderTaskProcessor&           renderTaskProcessor)
@@ -426,9 +426,9 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
   PropertyBase::RegisterResetterManager(*this);
 
   mImpl = new Impl(notificationManager,
-                   animationFinishedNotifier,
+                   animationPlaylist,
                    propertyNotifier,
-                   controller,
+                   renderController,
                    renderManager,
                    renderQueue,
                    mSceneGraphBuffers,
@@ -448,6 +448,44 @@ UpdateManager::~UpdateManager()
   RenderItem::ResetMemoryPool();
   RenderTaskList::ResetMemoryPool();
   TextureSet::ResetMemoryPool();
+}
+
+void UpdateManager::ChangeRenderQueue(RenderQueue& renderQueue)
+{
+  DALI_ASSERT_ALWAYS(mImpl->scenes.empty() &&
+                     mImpl->nodes.Count() == 1u /* dummy node */ &&
+                     mImpl->nodeIdMap.empty() &&
+                     mImpl->cameras.Count() == 0u &&
+                     mImpl->customObjects.Count() == 0u &&
+                     mImpl->animations.Count() == 0u &&
+                     mImpl->propertyNotifications.Count() == 0u &&
+                     mImpl->renderers.Count() == 0u &&
+                     mImpl->textureSets.Count() == 0u &&
+                     mImpl->shaders.Count() == 0u &&
+                     mImpl->uniformBlocks.Count() == 0u &&
+                     mImpl->propertyResetters.Empty() &&
+                     mImpl->nodeResetters.Empty() &&
+                     "Could not change render queue after some resource created!");
+
+  DALI_ASSERT_DEBUG((mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup.");
+
+  // Re-create Impl now.
+  auto* oldImpl = mImpl;
+
+  mImpl = new Impl(oldImpl->notificationManager,
+                   oldImpl->animationPlaylist,
+                   oldImpl->propertyNotifier,
+                   oldImpl->renderController,
+                   oldImpl->renderManager,
+                   renderQueue,
+                   mSceneGraphBuffers,
+                   oldImpl->renderTaskProcessor);
+
+  // Move already stored messages to new impl.
+  MessageQueue::MoveMessageQueue(mImpl->messageQueue, oldImpl->messageQueue);
+  SetShaderSaver(*oldImpl->shaderSaver);
+
+  delete oldImpl;
 }
 
 void UpdateManager::ContextDestroyed()
@@ -1513,12 +1551,12 @@ void UpdateManager::PostRender()
   // Reset dirty flag
   for(auto&& renderer : mImpl->renderers)
   {
-    renderer->SetUpdated(false);
+    renderer->ResetDirtyUpdated();
   }
 
   for(auto&& shader : mImpl->shaders)
   {
-    shader->SetUpdated(false);
+    shader->ResetUpdated();
   }
 
   for(auto&& uniformBlock : mImpl->uniformBlocks)

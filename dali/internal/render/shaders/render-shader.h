@@ -102,11 +102,29 @@ public:
    */
   std::size_t GetSharedUniformNamesHash() const;
 
+  /**
+   * @brief Check whether it's property, or one of UniformBlock's property was changed.
+   */
+  bool IsUpdated() const;
+
+  /**
+   * Update the result of Query of IsUpdated() result.
+   * The result will be updated only 1 times per each frame.
+   */
+  void CheckUpdated() const;
+
+  /**
+   * Reset the updated flag.
+   */
+  void ResetUpdated();
+
 private: // Data
   ShaderDataPtr              mDefaultShaderData{nullptr};
   std::vector<ShaderDataPtr> mShaderDataList{};
   UniformBlockContainer      mBlocks{};           ///< List of connected uniform blocks (not owned)
   std::size_t                mBlockNamesHash{0u}; ///< Simple hash of all connected uniform blocks name.
+
+  mutable uint8_t mDirtyUpdated{0u}; ///< Dirty flag that we can change 1 times per each frame.
 };
 
 inline void UpdateShaderDataMessage(EventThreadServices& eventThreadServices, const Shader& shader, ShaderDataPtr shaderData)

@@ -74,6 +74,16 @@ const Vector2& HoverEvent::GetScreenPosition(std::size_t point) const
   return GetImplementation(*this).GetScreenPosition(point);
 }
 
+Device::Class::Type HoverEvent::GetDeviceClass(std::size_t point) const
+{
+  return GetImplementation(*this).GetDeviceClass(point);
+}
+
+Device::Subclass::Type HoverEvent::GetDeviceSubclass(std::size_t point) const
+{
+  return GetImplementation(*this).GetDeviceSubclass(point);
+}
+
 HoverEvent::HoverEvent(Internal::HoverEvent* internal)
 : BaseHandle(internal)
 {

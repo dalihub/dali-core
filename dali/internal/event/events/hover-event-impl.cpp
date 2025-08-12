@@ -97,6 +97,24 @@ const Vector2& HoverEvent::GetScreenPosition(std::size_t point) const
   return Vector2::ZERO;
 }
 
+Device::Class::Type HoverEvent::GetDeviceClass(std::size_t point) const
+{
+  if(point < mPoints.size())
+  {
+    return mPoints[point].GetDeviceClass();
+  }
+  return Device::Class::NONE;
+}
+
+Device::Subclass::Type HoverEvent::GetDeviceSubclass(std::size_t point) const
+{
+  if(point < mPoints.size())
+  {
+    return mPoints[point].GetDeviceSubclass();
+  }
+  return Device::Subclass::NONE;
+}
+
 const Integration::Point& HoverEvent::GetPoint(std::size_t point) const
 {
   DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");

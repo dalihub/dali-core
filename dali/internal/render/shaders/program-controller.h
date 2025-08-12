@@ -96,7 +96,7 @@ public:
       mUsed = false;
     }
 
-    ProgramPair(const ProgramPair&) = delete;
+    ProgramPair(const ProgramPair&)            = delete;
     ProgramPair& operator=(const ProgramPair&) = delete;
 
   private: // Data
@@ -116,7 +116,7 @@ public:
    */
   ~ProgramController() override;
 
-  ProgramController(const ProgramController& rhs) = delete;
+  ProgramController(const ProgramController& rhs)            = delete;
   ProgramController& operator=(const ProgramController& rhs) = delete;
 
 public: // API

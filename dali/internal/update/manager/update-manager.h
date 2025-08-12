@@ -110,7 +110,7 @@ public:
    * @param[in] notificationManager This should be notified when animations have finished.
    * @param[in] animationPlaylist The CompleteNotificationInterface that handles the animations
    * @param[in] propertyNotifier The PropertyNotifier
-   * @param[in] controller After messages are flushed, we request a render from the RenderController.
+   * @param[in] renderController After messages are flushed, we request a render from the RenderController.
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
@@ -118,7 +118,7 @@ public:
   UpdateManager(NotificationManager&           notificationManager,
                 CompleteNotificationInterface& animationPlaylist,
                 PropertyNotifier&              propertyNotifier,
-                Integration::RenderController& controller,
+                Integration::RenderController& renderController,
                 RenderManager&                 renderManager,
                 RenderQueue&                   renderQueue,
                 RenderTaskProcessor&           renderTaskProcessor);
@@ -127,6 +127,12 @@ public:
    * Destructor.
    */
   ~UpdateManager() override;
+
+  /**
+   * @brief Change the render queue.
+   * @param[in] renderQueue New render queue.
+   */
+  void ChangeRenderQueue(RenderQueue& renderQueue);
 
   /**
    * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.

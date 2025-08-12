@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_QUEUE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,15 @@ public:
   ~RenderQueue();
 
   /**
+   * @brief Move all messages from source to destination
+   * @pre desination must not have any message queue.
+   * @note After move done, source will be invalidate. Must not call any API after.
+   * @param[in, out] destination Moved message queue to.
+   * @param[in] source Moving message queue from. Invalidate after call.
+   */
+  static void MoveRenderQueue(RenderQueue& destination, RenderQueue& source);
+
+  /**
    * Reserve space for another message in the queue; this must then be initialized by the caller.
    * The message will be read from the next render-thread tick.
    * @post Calling this method may invalidate any previously returned slots.
@@ -87,6 +96,11 @@ private:
    * @param[in] bufferIndex The current buffer index.
    */
   void LimitBufferCapacity(BufferIndex bufferIndex);
+
+  /**
+   * Remove and release all message buffers memories.
+   */
+  void DestroyMessageBuffer();
 
   // Undefined
   RenderQueue(const RenderQueue&);
