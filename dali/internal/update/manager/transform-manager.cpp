@@ -576,8 +576,10 @@ void TransformManager::ReorderComponents()
   // Create sceneId first
   for(TransformId i = 0; i < mComponentCount; ++i)
   {
-    mOrderedComponents[i].id    = mComponentId[i];
-    mOrderedComponents[i].level = 0u;
+    mOrderedComponents[i].id      = mComponentId[i];
+    mOrderedComponents[i].level   = 0u;
+    mOrderedComponents[i].sceneId = 0u;
+
     if(mTxComponentStatic[i].mIgnored)
     {
       mOrderedComponents[i].sceneId = IGNORED_COMPONENTS_SCENE_ID;
