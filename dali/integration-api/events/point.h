@@ -188,6 +188,17 @@ struct DALI_CORE_API Point
    */
   void SetMouseButton(MouseButton::Type button);
 
+  /**
+   * @brief Gets the device name the event originated from.
+   * @return The device name.
+   */
+  const std::string& GetDeviceName() const;
+
+  /**
+   * @brief Sets the device name the event originated from.
+   */
+  void SetDeviceName(std::string& deviceName);
+
 public: // Not intended for Integration API developers
   /**
    * @brief Sets the hit actor under this point.
@@ -229,7 +240,8 @@ private:
   Device::Subclass::Type mDeviceSubclass;
   float                  mPressure;    ///< The touch pressure.
   float                  mRadius;      ///< Radius of the press point, an average of the ellipse radius.
-  MouseButton::Type      mMouseButton; /// < mouse button value.
+  MouseButton::Type      mMouseButton; ///< mouse button value.
+  std::string            mDeviceName;  ///< device name string.
 };
 
 } // namespace Integration

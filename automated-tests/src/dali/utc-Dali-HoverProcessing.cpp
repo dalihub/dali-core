@@ -1747,3 +1747,73 @@ int UtcDaliHoverEventGetDeviceAPINegative(void)
 
   END_TEST;
 }
+
+int UtcDaliHoverEventGetDeviceNamePositive(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's hovered signal
+  SignalData        data;
+  HoverEventFunctor functor(data);
+  actor.HoveredSignal().Connect(&application, functor);
+  std::string deviceName("hwKeyboard");
+
+  Vector2 screenCoordinates(10.0f, 10.0f);
+  Vector2 localCoordinates;
+  actor.ScreenToLocal(localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y);
+
+  // Emit a down signal with deviceName
+  Integration::HoverEvent hoverEvent = GenerateSingleHover(PointState::STARTED, screenCoordinates);
+  hoverEvent.points[0].SetDeviceName(deviceName);
+
+  application.ProcessEvent(hoverEvent);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(data.hoverEvent.GetDeviceName(0), deviceName, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHoverEventGetDeviceNameNagative(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's hovered signal
+  SignalData        data;
+  HoverEventFunctor functor(data);
+  actor.HoveredSignal().Connect(&application, functor);
+
+  Vector2 screenCoordinates(10.0f, 10.0f);
+  Vector2 localCoordinates;
+  actor.ScreenToLocal(localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y);
+
+  // Emit a down signal with deviceName
+  Integration::HoverEvent hoverEvent = GenerateSingleHover(PointState::STARTED, screenCoordinates);
+
+  application.ProcessEvent(hoverEvent);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, data.hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(data.hoverEvent.GetDeviceName(1), "", TEST_LOCATION);
+
+  END_TEST;
+}

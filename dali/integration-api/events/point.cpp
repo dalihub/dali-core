@@ -31,7 +31,8 @@ Point::Point()
   mDeviceSubclass(Device::Subclass::NONE),
   mPressure(1.0f),
   mRadius(0.0f),
-  mMouseButton(MouseButton::INVALID)
+  mMouseButton(MouseButton::INVALID),
+  mDeviceName()
 {
 }
 
@@ -43,7 +44,8 @@ Point::Point(const TouchPoint& touchPoint)
   mDeviceSubclass(Device::Subclass::NONE),
   mPressure(1.0f),
   mRadius(0.0f),
-  mMouseButton(MouseButton::INVALID)
+  mMouseButton(MouseButton::INVALID),
+  mDeviceName()
 {
 }
 
@@ -173,6 +175,16 @@ MouseButton::Type Point::GetMouseButton() const
 void Point::SetMouseButton(MouseButton::Type button)
 {
   mMouseButton = button;
+}
+
+const std::string& Point::GetDeviceName() const
+{
+  return mDeviceName;
+}
+
+void Point::SetDeviceName(std::string& deviceName)
+{
+  mDeviceName = deviceName;
 }
 
 } // namespace Integration

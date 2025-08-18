@@ -115,6 +115,16 @@ Device::Subclass::Type HoverEvent::GetDeviceSubclass(std::size_t point) const
   return Device::Subclass::NONE;
 }
 
+const std::string& HoverEvent::GetDeviceName(std::size_t point) const
+{
+  static const std::string emptyString;
+  if(point < mPoints.size())
+  {
+    return mPoints[point].GetDeviceName();
+  }
+  return emptyString;
+}
+
 const Integration::Point& HoverEvent::GetPoint(std::size_t point) const
 {
   DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");
