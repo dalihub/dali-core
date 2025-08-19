@@ -27,67 +27,27 @@
 
 namespace Dali::Internal::Render
 {
-UniformBlock::~UniformBlock() = default;
-
-void UniformBlock::WriteUniforms(BufferIndex renderBufferIndex, const Program& program, Render::UniformBufferView& ubo)
+UniformBlock::~UniformBlock()
 {
-  if(mUpdateMaps)
+  // Remove observers.
+  ProgramDestroyed(nullptr);
+}
+
+void UniformBlock::WriteUniforms(BufferIndex renderBufferIndex, ProgramIndex programIndex, Render::UniformBufferView& ubo)
+{
+  for(auto& uniform : mUniformIndexMaps[programIndex])
   {
-    auto& uniformMap = GetUniformMap();
-
-    const uint32_t mapCount = uniformMap.Count();
-    mUniformIndexMap.clear();
-    mUniformIndexMap.resize(mapCount);
-
-    // Copy uniform map into mUniformIndexMap
-    uint32_t mapIndex = 0;
-    for(; mapIndex < mapCount; ++mapIndex)
-    {
-      mUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
-      mUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
-      mUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
-      mUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
-      mUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
-    }
-
-    mUpdateMaps = false;
-  }
-
-  for(auto& iter : mUniformIndexMap)
-  {
-    auto& uniform = iter;
-
     switch(uniform.state)
     {
-      case UniformIndexMap::State::INITIALIZE_REQUIRED:
-      {
-        auto uniformInfo  = Graphics::UniformInfo{};
-        auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
-                                               uniform.uniformNameHash,
-                                               uniform.uniformNameHashNoArray,
-                                               uniformInfo);
-
-        if(!uniformFound)
-        {
-          uniform.state = UniformIndexMap::State::NOT_USED;
-          continue;
-        }
-
-        uniform.uniformOffset     = uniformInfo.offset;
-        uniform.uniformLocation   = int16_t(uniformInfo.location);
-        uniform.uniformBlockIndex = uniformInfo.bufferIndex;
-
-        const auto typeSize        = iter.propertyValue->GetValueSize();
-        uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
-        uniform.matrixStride       = uniformInfo.matrixStride;
-
-        uniform.state = UniformIndexMap::State::INITIALIZED;
-        DALI_FALLTHROUGH;
-      }
       case UniformIndexMap::State::INITIALIZED:
       {
-        WriteDynUniform(iter.propertyValue, uniform, ubo, renderBufferIndex);
+        WriteDynUniform(uniform.propertyValue, uniform, ubo, renderBufferIndex);
         break;
+      }
+      case UniformIndexMap::State::INITIALIZE_REQUIRED:
+      {
+        DALI_ASSERT_DEBUG(false && "UniformIndexMap should be initialize at GetProgramIndex()!");
+        DALI_FALLTHROUGH;
       }
       default:
       {
@@ -99,7 +59,130 @@ void UniformBlock::WriteUniforms(BufferIndex renderBufferIndex, const Program& p
 
 void UniformBlock::OnMappingChanged()
 {
-  mUpdateMaps = true;
+  // Clear cached mappings
+  ProgramDestroyed(nullptr);
+}
+
+void UniformBlock::ProgramDestroyed(const Program* program)
+{
+  // Destroy whole mProgramToUniformIndexMap and mUniformIndexMaps container.
+  // It will be re-created at next render time.
+  // Note : Destroy the program will be happened at RenderManager::PostRender().
+  //        Also, OnMappingChanged() called at RenderManager::PreRender().
+  //        We don't worry about the mProgramToUniformIndexMap and mUniformIndexMaps become invalidated after this call.
+
+  for(auto& iter : mProgramToUniformIndexMap)
+  {
+    if(iter.first != program)
+    {
+      Program* mutableProgram = const_cast<Program*>(iter.first);
+      mutableProgram->RemoveLifecycleObserver(*this);
+    }
+  }
+
+  mProgramToUniformIndexMap.clear();
+  mProgramToUniformIndexMap.rehash(0u);
+  mUniformIndexMaps.clear();
+}
+
+UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)
+{
+  auto it = mProgramToUniformIndexMap.find(&program);
+  if(it != mProgramToUniformIndexMap.end())
+  {
+    return it->second;
+  }
+
+  ProgramIndex programIndex = mUniformIndexMaps.size();
+
+  auto& uniformMap = GetUniformMap();
+
+  const uint32_t mapCount = uniformMap.Count();
+
+  // Create index map for program from uniform map
+  UniformIndexMappings currentUniformIndexMap;
+  currentUniformIndexMap.resize(mapCount);
+
+  // Copy uniform map into uniformIndexMap
+  uint32_t mapIndex = 0;
+  for(; mapIndex < mapCount; ++mapIndex)
+  {
+    currentUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
+    currentUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
+    currentUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
+    currentUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
+    currentUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
+  }
+
+  // Initialize uniforms by current program.
+  for(auto& uniform : currentUniformIndexMap)
+  {
+    DALI_ASSERT_ALWAYS(uniform.state == UniformIndexMap::State::INITIALIZE_REQUIRED && "Something wrong!");
+
+    auto uniformInfo  = Graphics::UniformInfo{};
+    auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
+                                           uniform.uniformNameHash,
+                                           uniform.uniformNameHashNoArray,
+                                           uniformInfo);
+
+    if(!uniformFound)
+    {
+      uniform.state = UniformIndexMap::State::NOT_USED;
+      continue;
+    }
+
+    uniform.uniformOffset = uniformInfo.offset;
+
+    const auto typeSize        = uniform.propertyValue->GetValueSize();
+    uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+    uniform.matrixStride       = uniformInfo.matrixStride;
+
+    uniform.state = UniformIndexMap::State::INITIALIZED;
+  }
+
+  for(ProgramIndex cachedUniformIndexMap = 0; cachedUniformIndexMap < mUniformIndexMaps.size(); ++cachedUniformIndexMap)
+  {
+    // DevNote : Cache miss will be happened very rarely. Most of case, mUniformIndexMaps.size() is 1.
+    //           Also, the number of uniform is small enough usually.
+    //           So, full-search test is okay
+
+    bool found = true;
+    DALI_ASSERT_ALWAYS(mapCount == mUniformIndexMaps[cachedUniformIndexMap].size());
+    for(uint32_t i = 0; i < mapCount; ++i)
+    {
+      const auto& lhs = currentUniformIndexMap[i];
+      const auto& rhs = mUniformIndexMaps[cachedUniformIndexMap][i];
+
+      if(!((lhs.uniformOffset == rhs.uniformOffset) &&
+           (lhs.arrayElementStride == rhs.arrayElementStride) &&
+           (lhs.matrixStride == rhs.matrixStride) &&
+           (lhs.state == rhs.state)))
+      {
+        found = false;
+        break;
+      }
+    }
+    if(found)
+    {
+      programIndex = cachedUniformIndexMap;
+      break;
+    }
+  }
+
+  if(programIndex == mUniformIndexMaps.size())
+  {
+    // Create first index map from uniform map
+    mUniformIndexMaps.emplace_back(currentUniformIndexMap);
+  }
+
+  // Add observer to ensure cached index map cleared.
+  {
+    Program* mutableProgram = const_cast<Program*>(&program);
+    mutableProgram->AddLifecycleObserver(*this);
+  }
+  mProgramToUniformIndexMap.emplace(&program, programIndex);
+
+  return programIndex;
 }
 
 void UniformBlock::WriteDynUniform(

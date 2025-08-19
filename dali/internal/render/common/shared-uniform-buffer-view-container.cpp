@@ -52,8 +52,8 @@ public:
 
   struct ProgramUniformBlockPair
   {
-    ProgramUniformBlockPair(const Program* program, Render::UniformBlock* sharedUniformBlock, uint32_t blockSize)
-    : program(program),
+    ProgramUniformBlockPair(const Render::UniformBlock::ProgramIndex programIndex, Render::UniformBlock* sharedUniformBlock, uint32_t blockSize)
+    : programIndex(programIndex),
       sharedUniformBlock(sharedUniformBlock),
       blockSize(blockSize)
     {
@@ -63,7 +63,7 @@ public:
 
     bool operator==(const ProgramUniformBlockPair& rhs) const
     {
-      return program == rhs.program && sharedUniformBlock == rhs.sharedUniformBlock;
+      return programIndex == rhs.programIndex && sharedUniformBlock == rhs.sharedUniformBlock;
     }
 
     struct ProgramUniformBlockPairHash
@@ -71,17 +71,16 @@ public:
       // Reference by : https://stackoverflow.com/a/21062236
       std::size_t operator()(ProgramUniformBlockPair const& key) const noexcept
       {
-        constexpr std::size_t programShift      = Dali::Log<1 + sizeof(Program)>::value;
         constexpr std::size_t uniformBlockShift = Dali::Log<1 + sizeof(Render::UniformBlock)>::value;
         constexpr std::size_t zitterShift       = sizeof(std::size_t) * 4; // zitter shift to avoid hash collision
 
-        return ((reinterpret_cast<std::size_t>(key.program) >> programShift) << zitterShift) ^
+        return ((static_cast<std::size_t>(key.programIndex)) << zitterShift) ^
                (reinterpret_cast<std::size_t>(key.sharedUniformBlock) >> uniformBlockShift);
       }
     };
 
-    const Program*        program{nullptr};
-    Render::UniformBlock* sharedUniformBlock{nullptr};
+    const Render::UniformBlock::ProgramIndex programIndex{0u};
+    Render::UniformBlock*                    sharedUniformBlock{nullptr};
 
     const uint32_t blockSize{0u}; ///< Size of block for given pair. We don't need to compare this value for check hash.
   };
@@ -97,9 +96,15 @@ SharedUniformBufferViewContainer::SharedUniformBufferViewContainer()
 
 SharedUniformBufferViewContainer::~SharedUniformBufferViewContainer() = default;
 
-void SharedUniformBufferViewContainer::RegisterSharedUniformBlockAndPrograms(const Program& program, Render::UniformBlock& sharedUniformBlock, uint32_t blockSize)
+bool SharedUniformBufferViewContainer::RegisterSharedUniformBlockAndPrograms(const Program& program, Render::UniformBlock& sharedUniformBlock, uint32_t blockSize)
 {
-  mImpl->mSharedUniformBlockBufferViews.insert({Impl::ProgramUniformBlockPair(&program, &sharedUniformBlock, blockSize), nullptr});
+  Render::UniformBlock::ProgramIndex programIndex = sharedUniformBlock.GetProgramIndex(program);
+
+  auto ret = mImpl->mSharedUniformBlockBufferViews.insert({Impl::ProgramUniformBlockPair(programIndex, &sharedUniformBlock, blockSize), nullptr});
+
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registered : %zu, Program : %p, UBO : %p, blockSize : %u -- Registered : %d\n", mImpl->mSharedUniformBlockBufferViews.size(), &program, &sharedUniformBlock, blockSize, ret.second);
+
+  return ret.second;
 }
 
 void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex, Render::UniformBufferManager& uniformBufferManager)
@@ -113,7 +118,7 @@ void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex,
 
   for(auto& item : mImpl->mSharedUniformBlockBufferViews)
   {
-    const auto& program            = *item.first.program;
+    const auto& programIndex       = item.first.programIndex;
     auto&       sharedUniformBlock = *item.first.sharedUniformBlock;
     uint32_t    blockSize          = item.first.blockSize;
 
@@ -133,14 +138,17 @@ void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex,
     auto& ubo = *(item.second.get());
 
     // Write to the buffer view here, by value at sharedUniformBlock.
-    sharedUniformBlock.WriteUniforms(renderBufferIndex, program, ubo);
+    sharedUniformBlock.WriteUniforms(renderBufferIndex, programIndex, ubo);
   }
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registerd : %zu, SharedUniformBufferView count : %u, total block size:%u\n", mImpl->mSharedUniformBlockBufferViews.size(), totalUniformBufferViewCount, totalSize);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registered : %zu, SharedUniformBufferView count : %u, total block size:%u\n", mImpl->mSharedUniformBlockBufferViews.size(), totalUniformBufferViewCount, totalSize);
 }
 
 Render::UniformBufferView* SharedUniformBufferViewContainer::GetSharedUniformBlockBufferView(const Program& program, Render::UniformBlock& sharedUniformBlock) const
 {
-  auto iter = mImpl->mSharedUniformBlockBufferViews.find(Impl::ProgramUniformBlockPair(&program, &sharedUniformBlock, 0u));
+  Render::UniformBlock::ProgramIndex programIndex = sharedUniformBlock.GetProgramIndex(program);
+
+  auto key  = Impl::ProgramUniformBlockPair(programIndex, &sharedUniformBlock, 0u);
+  auto iter = mImpl->mSharedUniformBlockBufferViews.find(key);
   if(iter != mImpl->mSharedUniformBlockBufferViews.end())
   {
     return iter->second.get();

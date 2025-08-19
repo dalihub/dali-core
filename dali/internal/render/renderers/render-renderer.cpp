@@ -972,7 +972,6 @@ void Renderer::FillUniformBuffer(Program&                             program,
         }
 
         uniform.uniformOffset     = uniformInfo.offset;
-        uniform.uniformLocation   = int16_t(uniformInfo.location);
         uniform.uniformBlockIndex = uniformInfo.bufferIndex;
 
         const auto typeSize        = iter.propertyValue->GetValueSize();

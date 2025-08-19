@@ -330,7 +330,7 @@ int UtcDaliUniformBlockConnectToShaderStrong(void)
   END_TEST;
 }
 
-int UtcDaliUniformBlockGetPropertyFromGraphics(void)
+int UtcDaliUniformBlockGetPropertyFromGraphics01(void)
 {
   TestApplication application;
 
@@ -499,6 +499,180 @@ int UtcDaliUniformBlockGetPropertyFromGraphics(void)
     TestRawBuffer(value1ForActor * 3.0f, value2ForActor * 3.0f);
   }
 
+  END_TEST;
+}
+
+int UtcDaliUniformBlockGetPropertyFromGraphics02(void)
+{
+  TestApplication application;
+
+  const std::string uniformBlockName("testBlock");
+  const std::string uniformValue1Name("uValue1");
+  const std::string uniformValue2Name("uValue2");
+
+  // Values for actor
+  const float   value1ForActor1 = 1.0f;
+  const Vector2 value2ForActor1(-2.0f, -3.0f);
+  const float   value1ForActor2 = 3.0f;
+  const Vector2 value2ForActor2(-4.0f, -5.0f);
+
+  // Values for UniformBlock
+  const float   value1ForUniformBlock = 10.0f;
+  const Vector2 value2ForUniformBlock(20.0f, 30.0f);
+
+  const uint32_t uniformAlign     = sizeof(float) * 4;
+  const uint32_t uniformBlockSize = (uniformAlign) * 2;
+
+  tet_infoline("Prepare graphics to check UTC for testBlock\n");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  // Add custom uniform block
+  TestGraphicsReflection::TestUniformBlockInfo block{
+    uniformBlockName,
+    0,
+    0,
+    uniformBlockSize,
+    {
+      {uniformValue1Name, Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, 0, Property::Type::FLOAT, uniformAlign, 0},
+      {uniformValue2Name, Graphics::UniformClass::UNIFORM, 0, 0, {uniformAlign}, {2}, 0, Property::Type::VECTOR2, uniformAlign, 0},
+    }};
+  graphics.AddCustomUniformBlock(block);
+  tet_infoline("Prepare done\n");
+
+  // Create actor1
+  Shader   shader1   = Shader::New(VertexSource, FragmentSource);
+  Geometry geometry1 = CreateQuadGeometry();
+  Renderer renderer1 = Renderer::New(geometry1, shader1);
+
+  Actor actor1 = Actor::New();
+  actor1.AddRenderer(renderer1);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor1);
+
+  // Register a custom property
+  actor1.RegisterProperty(uniformValue1Name, value1ForActor1);
+  actor1.RegisterProperty(uniformValue2Name, value2ForActor1);
+
+  // Create actor2
+  Shader   shader2   = Shader::New(FragmentSource, VertexSource);
+  Geometry geometry2 = CreateQuadGeometry();
+  Renderer renderer2 = Renderer::New(geometry2, shader2);
+
+  Actor actor2 = Actor::New();
+  actor2.AddRenderer(renderer2);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  application.GetScene().Add(actor2);
+
+  // Register a custom property
+  actor2.RegisterProperty(uniformValue1Name, value1ForActor2);
+  actor2.RegisterProperty(uniformValue2Name, value2ForActor2);
+
+  // Connect 2 shader.
+  UniformBlock uniformBlock = UniformBlock::New("testBlock");
+  DALI_TEST_CHECK(uniformBlock);
+  DALI_TEST_EQUALS(uniformBlock.ConnectToShader(shader1), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(uniformBlock.ConnectToShader(shader2), true, TEST_LOCATION);
+
+  // Register a custom property
+  uniformBlock.RegisterProperty(uniformValue1Name, value1ForUniformBlock);
+  uniformBlock.RegisterProperty(uniformValue2Name, value2ForUniformBlock);
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
+
+  auto TestRawBuffer = [&](const float expectValue1, const Vector2& expectValue2)
+  {
+    DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
+    DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
+
+    tet_printf("Expect value : %f, %fx%f\n", expectValue1, expectValue2.x, expectValue2.y);
+
+    auto data = graphics.mLastUniformBinding.buffer->memory.data();
+    data += graphics.mLastUniformBinding.offset;
+    const float* fdata = reinterpret_cast<const float*>(data);
+    for(uint32_t i = 0u; i < uniformBlockSize / sizeof(float); i++)
+    {
+      tet_printf("%f ", fdata[i]);
+    }
+    tet_printf("\n");
+
+    DALI_TEST_EQUALS(fdata[0], expectValue1, TEST_LOCATION);
+    DALI_TEST_EQUALS(fdata[(uniformAlign / sizeof(float))], expectValue2.x, TEST_LOCATION);
+    DALI_TEST_EQUALS(fdata[(uniformAlign / sizeof(float)) + 1], expectValue2.y, TEST_LOCATION);
+  };
+
+  // Test the value
+  {
+    tet_printf("The result after connected!\n");
+    TestRawBuffer(value1ForUniformBlock, value2ForUniformBlock);
+  }
+
+  uniformBlock.DisconnectFromShader(shader1);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Test the value
+  {
+    tet_printf("The result after actor1 shader disconnected!\n");
+    TestRawBuffer(value1ForUniformBlock, value2ForUniformBlock);
+  }
+
+  uniformBlock.DisconnectFromShader(shader2);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Test the value
+  {
+    tet_printf("The result after disconnected! (Use standalone buffer)\n");
+    TestRawBuffer(value1ForActor2, value2ForActor2);
+  }
+
+  actor1.RaiseToTop();
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Test the value
+  {
+    tet_printf("The result after actor1 raise up! (Use standalone buffer)\n");
+    TestRawBuffer(value1ForActor1, value2ForActor1);
+  }
+
+  uniformBlock.ConnectToShader(shader1);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Test the value
+  {
+    tet_printf("The result after connected shader1 again\n");
+    TestRawBuffer(value1ForUniformBlock, value2ForUniformBlock);
+  }
+  uniformBlock.ConnectToShader(shader1);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Test the value
+  {
+    tet_printf("The result after connected again\n");
+    TestRawBuffer(value1ForUniformBlock, value2ForUniformBlock);
+  }
   END_TEST;
 }
 
