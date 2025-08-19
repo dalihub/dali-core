@@ -38,9 +38,23 @@ namespace Dali::Integration
  * @param[in] hints Hints to define the geometry of the rendered object
  * @param[in] shaderName The name of this shader.
  * @param[in] uniformBlocks Uniform blocks to be connected to shader.
+ * @param[in] strongConnection Whether we connect uniform blocks to shader strong or weak.
  * @return A handle to a shader effect
  */
-DALI_CORE_API Dali::Shader ShaderNewWithUniformBlock(std::string_view vertexShader, std::string_view fragmentShader, Shader::Hint::Value hints, std::string_view shaderName, std::vector<Dali::UniformBlock> uniformBlocks);
+DALI_CORE_API Dali::Shader ShaderNewWithUniformBlock(std::string_view vertexShader, std::string_view fragmentShader, Shader::Hint::Value hints, std::string_view shaderName, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection = false);
+
+/**
+ * @brief Creates Shader and connect by given uniform blocks
+ *
+ * @SINCE_2_4.31
+ * @param[in] shaderMap Property::Map of shader data or Property::Array of Property::Map.
+ * Property::Map format is {"renderPassTag":"", "vertex":"", "fragment":"", "hints":""}
+ * shaderMap can be Property::Array of Property::Map for multi pass shading.
+ * @param[in] uniformBlocks Uniform blocks to be connected to shader.
+ * @param[in] strongConnection Whether we connect uniform blocks to shader strong or weak.
+ * @return A handle to a shader effect
+ */
+DALI_CORE_API Dali::Shader ShaderNewWithUniformBlock(Dali::Property::Value shaderMap, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection = false);
 
 /**
  * @brief Generates tag 'legacy-prefix-end' with end position of

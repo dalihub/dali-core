@@ -97,7 +97,7 @@ void Shader::ConnectUniformBlock(Render::UniformBlock* uniformBlock)
     // are shared between shaders.
 
     auto uniformBlockNameHash = uniformBlock->GetHash();
-    DALI_ASSERT_DEBUG(mBlocks.find(mBlockNamesHash) == mBlocks.end() && "Duplicated name of uniform connected!");
+    DALI_ASSERT_DEBUG(mBlocks.find(uniformBlockNameHash) == mBlocks.end() && "Duplicated name of uniform connected!");
     mBlockNamesHash ^= uniformBlockNameHash;
     mBlocks.insert(std::make_pair(uniformBlockNameHash, uniformBlock));
   }
@@ -108,7 +108,7 @@ void Shader::DisconnectUniformBlock(Render::UniformBlock* uniformBlock)
   if(uniformBlock != nullptr)
   {
     auto uniformBlockNameHash = uniformBlock->GetHash();
-    DALI_ASSERT_DEBUG(mBlocks.find(mBlockNamesHash) != mBlocks.end() && "Unconnected uniform disconnect!");
+    DALI_ASSERT_DEBUG(mBlocks.find(uniformBlockNameHash) != mBlocks.end() && "Unconnected uniform disconnect!");
     mBlockNamesHash ^= uniformBlockNameHash;
     mBlocks.erase(uniformBlockNameHash);
   }

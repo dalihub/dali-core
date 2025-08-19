@@ -84,6 +84,11 @@ Device::Subclass::Type HoverEvent::GetDeviceSubclass(std::size_t point) const
   return GetImplementation(*this).GetDeviceSubclass(point);
 }
 
+const std::string& HoverEvent::GetDeviceName(std::size_t point) const
+{
+  return GetImplementation(*this).GetDeviceName(point);
+}
+
 HoverEvent::HoverEvent(Internal::HoverEvent* internal)
 : BaseHandle(internal)
 {

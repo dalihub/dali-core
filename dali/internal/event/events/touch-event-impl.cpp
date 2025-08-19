@@ -153,6 +153,16 @@ MouseButton::Type TouchEvent::GetMouseButton(std::size_t point) const
   return MouseButton::INVALID;
 }
 
+const std::string& TouchEvent::GetDeviceName(std::size_t point) const
+{
+  static const std::string emptyString;
+  if(point < mPoints.size())
+  {
+    return mPoints[point].GetDeviceName();
+  }
+  return emptyString;
+}
+
 void TouchEvent::AddPoint(const Integration::Point& point)
 {
   mPoints.push_back(point);

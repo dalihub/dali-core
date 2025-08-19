@@ -132,16 +132,17 @@ public:
   std::string_view GetUniformBlockName() const;
 
   /**
-   * @brief Weakly connect to a shader.
+   * @brief Connect to a shader.
    *
    * Return false if the UniformBlock cannot be connected to the shader.
    * (e.g. Shader is invalid, or the UniformBlock has already been connected to given shader)
    *
    * @SINCE_2_4.14
    * @param[in] shader A shader to connect to. Multiple shaders can be connected.
+   * @param[in] strongConnection If true, a strong connection is made to the shader. False as default, which means a weak connection.
    * @return True if we successfully connected to the shader, false otherwise.
    */
-  bool ConnectToShader(Shader shader);
+  bool ConnectToShader(Shader shader, bool strongConnection = false);
 
   /**
    * @brief Disconnect from a shader.
@@ -168,4 +169,4 @@ public:
  */
 } // namespace Dali
 
-#endif //DALI_RENDERING_UNIFORM_BLOCK_H
+#endif // DALI_RENDERING_UNIFORM_BLOCK_H

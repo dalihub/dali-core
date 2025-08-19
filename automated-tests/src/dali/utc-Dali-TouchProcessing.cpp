@@ -2545,3 +2545,62 @@ int UtcDaliTouchEventDispatchTouchMotionPropertySet(void)
 
   END_TEST;
 }
+
+
+int UtcDaliTouchEventGetDeviceNamePositive(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  HandleData              handleData;
+  TouchEventHandleFunctor functor(handleData);
+  actor.TouchedSignal().Connect(&application, functor);
+  std::string deviceName("hwKeyboard");
+
+  // Emit a down signal with deviceName
+  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  touchEvent.points[0].SetDeviceName(deviceName);
+  application.ProcessEvent(touchEvent);
+
+  TouchEvent data = handleData.receivedTouchHandle;
+  DALI_TEST_EQUALS(data.GetDeviceName(0), deviceName, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTouchEventGetDeviceNameNagative(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  HandleData              handleData;
+  TouchEventHandleFunctor functor(handleData);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Emit a down signal
+  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  application.ProcessEvent(touchEvent);
+
+  TouchEvent data = handleData.receivedTouchHandle;
+  DALI_TEST_EQUALS(data.GetDeviceName(1), "", TEST_LOCATION);
+
+  END_TEST;
+}

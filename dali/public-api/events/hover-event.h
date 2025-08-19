@@ -203,6 +203,14 @@ public:
    */
   Device::Subclass::Type GetDeviceSubclass(std::size_t point) const;
 
+  /**
+   * @brief Gets the device name
+   *
+   * @SINCE_2_4.34
+   * @return The device name string
+   */
+  const std::string& GetDeviceName(std::size_t point) const;
+
 public: // Not intended for application developers
   /// @cond internal
   /**

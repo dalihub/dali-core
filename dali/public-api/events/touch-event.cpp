@@ -113,6 +113,11 @@ RenderTask TouchEvent::GetRenderTask() const
   return GetImplementation(*this).GetRenderTask();
 }
 
+const std::string& TouchEvent::GetDeviceName(std::size_t point) const
+{
+  return GetImplementation(*this).GetDeviceName(point);
+}
+
 TouchEvent::TouchEvent(Internal::TouchEvent* internal)
 : BaseHandle(internal)
 {

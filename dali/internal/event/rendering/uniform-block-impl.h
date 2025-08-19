@@ -19,7 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <string_view>
-#include <unordered_set>
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
@@ -67,9 +67,9 @@ public:
   /**
    * @copydoc Dali::UniformBlock::ConnectToShader
    */
-  bool ConnectToShader(Shader* shader)
+  bool ConnectToShader(Shader* shader, bool strongConnection)
   {
-    return ConnectToShader(shader, true);
+    return ConnectToShader(shader, strongConnection, true);
   }
 
   /**
@@ -79,13 +79,14 @@ public:
 
 public:
   /**
-   * @brief Be connecteds to the shader.
+   * @brief Be connected to the shader.
    *
    * @param[in] shader The shader to be connected.
+   * @param[in] strongConnection Whether we connect uniform blocks to shader strong or weak.
    * @param[in] programCacheCleanRequired Whether program cache clean is required or not.
    * Could be false only if the shader never be rendered before. (e.g. shader constructor.)
    */
-  bool ConnectToShader(Shader* shader, bool programCacheCleanRequired);
+  bool ConnectToShader(Shader* shader, bool strongConnection, bool programCacheCleanRequired);
 
 protected: ///< From Dali::Internal::Object::Observer
   /**
@@ -123,18 +124,18 @@ protected: // implementation
   ~UniformBlock() override;
 
 private:
-  UniformBlock(const UniformBlock&) = delete;            ///< Deleted copy constructor
+  UniformBlock(const UniformBlock&)            = delete; ///< Deleted copy constructor
   UniformBlock& operator=(const UniformBlock&) = delete; ///< Deleted assignment operator
 
 private:
-  using ShaderContainer = std::unordered_set<Shader*>;
+  using ShaderContainer = std::unordered_map<Shader*, bool>;
 
-  ShaderContainer mShaderContainer; // List of shaders that are connected to this UniformBlock (not owned)
+  ShaderContainer mShaderContainer; // List of shaders that are connected to this UniformBlock (not owned) and strong connected.
 
   std::string_view mUniformBlockName; ///< The name of uniform blocks. String owned by scene object.
 };
 
-}; //namespace Dali::Internal
+}; // namespace Dali::Internal
 
 namespace Dali
 {
@@ -159,4 +160,4 @@ inline const Internal::UniformBlock& GetImplementation(const Dali::UniformBlock&
 
 } // namespace Dali
 
-#endif //DALI_INTERNAL_UNIFORM_BLOCK_H
+#endif // DALI_INTERNAL_UNIFORM_BLOCK_H

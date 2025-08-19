@@ -142,7 +142,8 @@ ShaderPtr Shader::New(std::string_view                vertexShader,
                       std::string_view                fragmentShader,
                       Dali::Shader::Hint::Value       hints,
                       std::string_view                shaderName,
-                      std::vector<Dali::UniformBlock> uniformBlocks)
+                      std::vector<Dali::UniformBlock> uniformBlocks,
+                      bool                            strongConnection)
 {
   // create scene object first so it's guaranteed to exist for the event side
   auto                             sceneObject = new SceneGraph::Shader();
@@ -162,14 +163,14 @@ ShaderPtr Shader::New(std::string_view                vertexShader,
   {
     if(uniformBlock)
     {
-      GetImplementation(uniformBlock).ConnectToShader(shader.Get(), false);
+      GetImplementation(uniformBlock).ConnectToShader(shader.Get(), strongConnection, false);
     }
   }
 
   return shader;
 }
 
-ShaderPtr Shader::New(Dali::Property::Value shaderMap)
+ShaderPtr Shader::New(Dali::Property::Value shaderMap, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection)
 {
   // create scene object first so it's guaranteed to exist for the event side
   auto                             sceneObject = new SceneGraph::Shader();
@@ -183,6 +184,15 @@ ShaderPtr Shader::New(Dali::Property::Value shaderMap)
 
   services.RegisterObject(shader.Get());
   shader->SetShaderProperty(shaderMap);
+
+  // Connect UniformBlock without clean up cache
+  for(auto&& uniformBlock : uniformBlocks)
+  {
+    if(uniformBlock)
+    {
+      GetImplementation(uniformBlock).ConnectToShader(shader.Get(), strongConnection, false);
+    }
+  }
 
   return shader;
 }
@@ -269,7 +279,8 @@ void Shader::UpdateShaderData(std::string_view          vertexSource,
   size_t                  shaderHash;
   Internal::ShaderDataPtr shaderData = shaderFactory.Load(vertexSource, fragmentSource, hints, renderPassTag, name, shaderHash);
 
-  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem) { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
+  std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
+                                                                                   { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
   if(shaderDataIterator != mShaderDataList.end())
   {
     *shaderDataIterator = shaderData;
@@ -328,9 +339,18 @@ void Shader::SetShaderProperty(const Dali::Property::Value& shaderMap)
     DALI_LOG_ERROR("Shader program property should be a map or array of map.\n");
   }
 }
-void Shader::ConnectUniformBlock(UniformBlock& uniformBlock, bool programCacheCleanRequired)
+
+void Shader::ConnectUniformBlock(UniformBlock& uniformBlock, bool strongConnection, bool programCacheCleanRequired)
 {
-  AddObserver(uniformBlock);
+  if(strongConnection)
+  {
+    mStrongConnectedUniformBlockList.push_back(Dali::UniformBlock(&uniformBlock));
+  }
+  else
+  {
+    AddObserver(uniformBlock);
+  }
+
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     auto& eventThreadServices = GetEventThreadServices();
@@ -351,6 +371,18 @@ void Shader::ConnectUniformBlock(UniformBlock& uniformBlock, bool programCacheCl
 void Shader::DisconnectUniformBlock(UniformBlock& uniformBlock)
 {
   RemoveObserver(uniformBlock);
+  for(auto iter = mStrongConnectedUniformBlockList.begin(); iter != mStrongConnectedUniformBlockList.end();)
+  {
+    if((*iter).GetObjectPtr() == &uniformBlock)
+    {
+      iter = mStrongConnectedUniformBlockList.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     auto& eventThreadServices = GetEventThreadServices();

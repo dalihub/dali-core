@@ -178,6 +178,12 @@ public:
    */
   MouseButton::Type GetMouseButton(std::size_t point) const;
 
+  /**
+   * @brief Gets the device name
+   * @return The device name string
+   */
+  const std::string& GetDeviceName(std::size_t point) const;
+
   Dali::RenderTask GetRenderTask() const
   {
     return mRenderTask;

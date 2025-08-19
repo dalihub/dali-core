@@ -51,11 +51,11 @@ std::string_view UniformBlock::GetUniformBlockName() const
   return GetImplementation(*this).GetUniformBlockName();
 }
 
-bool UniformBlock::ConnectToShader(Shader shader)
+bool UniformBlock::ConnectToShader(Shader shader, bool strongConnection)
 {
   if(DALI_LIKELY(shader))
   {
-    return GetImplementation(*this).ConnectToShader(&GetImplementation(shader));
+    return GetImplementation(*this).ConnectToShader(&GetImplementation(shader), strongConnection);
   }
   return false;
 }

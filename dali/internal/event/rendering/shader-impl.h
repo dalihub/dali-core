@@ -55,12 +55,13 @@ public:
                        std::string_view                fragmentShader,
                        Dali::Shader::Hint::Value       hints,
                        std::string_view                shaderName,
-                       std::vector<Dali::UniformBlock> uniformBlocks);
+                       std::vector<Dali::UniformBlock> uniformBlocks,
+                       bool                            strongConnection);
 
   /**
    * @copydoc Dali::Shader::New()
    */
-  static ShaderPtr New(Dali::Property::Value shaderMap);
+  static ShaderPtr New(Dali::Property::Value shaderMap, std::vector<Dali::UniformBlock> uniformBlocks, bool strongConnection);
 
   /**
    * Retrieve the scene-graph shader added by this object.
@@ -116,10 +117,11 @@ public:
    * @brief Connects to the uniform block.
    *
    * @param[in] uniformBlock The uniform block to connect.
+   * @param[in] strongConnection If true, a strong connection is made to the uniform block. False as default, which means a weak connection.
    * @param[in] programCacheCleanRequired Whether program cache clean is required or not.
    * Could be false only if the shader never be rendered before. (e.g. shader constructor.)
    */
-  void ConnectUniformBlock(UniformBlock& uniformBlock, bool programCacheCleanRequired = true);
+  void ConnectUniformBlock(UniformBlock& uniformBlock, bool strongConnection, bool programCacheCleanRequired = true);
 
   /**
    * @brief Disconnects to the uniform block.
@@ -155,12 +157,13 @@ protected:
   ~Shader() override;
 
 private: // unimplemented methods
-  Shader()              = delete;
-  Shader(const Shader&) = delete;
+  Shader()                         = delete;
+  Shader(const Shader&)            = delete;
   Shader& operator=(const Shader&) = delete;
 
 private:
   std::vector<Internal::ShaderDataPtr> mShaderDataList;
+  std::vector<Dali::UniformBlock>      mStrongConnectedUniformBlockList;
 
 public:
   /**

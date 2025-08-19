@@ -248,6 +248,88 @@ int UtcDaliUniformBlockConnectToShader(void)
   END_TEST;
 }
 
+int UtcDaliUniformBlockConnectToShaderStrong(void)
+{
+  TestApplication application;
+
+  Shader   shader   = Shader::New(VertexSource, FragmentSource);
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  UniformBlock uniformBlock1 = UniformBlock::New("testBlock1");
+  UniformBlock uniformBlock2 = UniformBlock::New("testBlock2");
+
+  tet_printf("Connect to shader as strong\n");
+  bool ret = uniformBlock1.ConnectToShader(shader, true);
+  DALI_TEST_EQUALS(ret, true, TEST_LOCATION);
+
+  tet_printf("Re-connect to already connected uniform block will be failed\n");
+  ret = uniformBlock1.ConnectToShader(shader);
+  DALI_TEST_EQUALS(ret, false, TEST_LOCATION);
+
+  tet_printf("Connect to shader as strong\n");
+  ret = uniformBlock2.ConnectToShader(shader, true);
+  DALI_TEST_EQUALS(ret, true, TEST_LOCATION);
+
+  tet_printf("Re-connect to already connected uniform block will be failed\n");
+  ret = uniformBlock2.ConnectToShader(shader, false);
+  DALI_TEST_EQUALS(ret, false, TEST_LOCATION);
+
+  tet_printf("Disconnect and then Re-connect as weak\n");
+  uniformBlock2.DisconnectFromShader(shader);
+  ret = uniformBlock2.ConnectToShader(shader, false);
+  DALI_TEST_EQUALS(ret, true, TEST_LOCATION);
+
+  struct TestObjectDestroyedCallback
+  {
+    TestObjectDestroyedCallback(bool& signalReceived, const Dali::RefObject*& objectPointer)
+    : mSignalVerified(signalReceived),
+      mObjectPointer(objectPointer)
+    {
+    }
+    void operator()(const Dali::RefObject* objectPointer)
+    {
+      tet_infoline("Verifying TestObjectDestroyedCallback()");
+      if(objectPointer == mObjectPointer)
+      {
+        mSignalVerified = true;
+      }
+    }
+    bool&                   mSignalVerified;
+    const Dali::RefObject*& mObjectPointer;
+  };
+  // Test whether ubo2 is destroyed and ubo1 is alive
+  const Dali::RefObject* ubo1Impl      = uniformBlock1.GetObjectPtr();
+  const Dali::RefObject* ubo2Impl      = uniformBlock2.GetObjectPtr();
+  bool                   ubo1Destroyed = false;
+  bool                   ubo2Destroyed = false;
+  ObjectRegistry         registry      = application.GetCore().GetObjectRegistry();
+  DALI_TEST_CHECK(registry);
+  registry.ObjectDestroyedSignal().Connect(&application, TestObjectDestroyedCallback(ubo1Destroyed, ubo1Impl));
+  registry.ObjectDestroyedSignal().Connect(&application, TestObjectDestroyedCallback(ubo2Destroyed, ubo2Impl));
+
+  DALI_TEST_EQUALS(ubo1Destroyed, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ubo2Destroyed, false, TEST_LOCATION);
+
+  uniformBlock1.Reset();
+  uniformBlock2.Reset();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // Now ubo2 is destroyed, but ubo1 still alive.
+  DALI_TEST_EQUALS(ubo1Destroyed, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ubo2Destroyed, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliUniformBlockGetPropertyFromGraphics(void)
 {
   TestApplication application;
