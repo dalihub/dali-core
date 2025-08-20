@@ -27,10 +27,10 @@ bool IsNative(Dali::Texture texture)
   return impl.IsNative();
 }
 
-bool ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader)
+bool ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader, int count)
 {
   auto& impl = GetImplementation(texture);
-  return impl.ApplyNativeFragmentShader(shader);
+  return impl.ApplyNativeFragmentShader(shader, count);
 }
 
 bool UploadSubPixelData(Texture   texture,

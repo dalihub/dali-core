@@ -141,9 +141,10 @@ public:
    * @brief Apply custom fragment prefix for rendering native image.
    *
    * @param[in,out] shader shader code that will be applied fragment prefix.
+   * @param[in] count the number of samplers those uses native image.
    * @return True if the shader is changed.
    */
-  virtual bool ApplyNativeFragmentShader(std::string& shader) = 0;
+  virtual bool ApplyNativeFragmentShader(std::string& shader, int count = 1) = 0;
 
   /**
    * @brief Get custom sampler type name for rendering native image.

@@ -79,7 +79,7 @@ public:
     mCallStack.PushCall("GetTextureTarget", "");
     return GL_TEXTURE_EXTERNAL_OES;
   };
-  inline virtual bool ApplyNativeFragmentShader(std::string& shader)
+  inline virtual bool ApplyNativeFragmentShader(std::string& shader, int count) override
   {
     mCallStack.PushCall("ApplyNativeFragmentShader", "");
     shader = "#extension GL_OES_EGL_image_external:require\n" + shader;

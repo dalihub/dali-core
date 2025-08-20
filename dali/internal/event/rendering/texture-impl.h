@@ -172,9 +172,10 @@ public:
    * @brief Apply any native texture code to the given fragment shader
    *
    * @param[in,out] shader The fragment shader
+   * @param[in] count the number of samplers those uses native image.
    * @return true if the shader has been modified.
    */
-  bool ApplyNativeFragmentShader(std::string& shader);
+  bool ApplyNativeFragmentShader(std::string& shader, int count);
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   /**
