@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_TRANSFORM_MANAGER_PROPERTY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ struct TransformManagerPropertyHandler : public AnimatablePropertyBase
   /**
    * @copydoc Dali::AnimatableProperty::BakeRelativeMultiply()
    */
-  virtual void BakeRelativeMultiply(BufferIndex bufferIndex, const T& value){};
+  virtual void BakeRelativeMultiply(BufferIndex bufferIndex, const T& value) {};
 
   /**
    * @copydoc Dali::AnimatableProperty::ResetToBaseValue()
@@ -413,7 +413,7 @@ public:
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
-    if(id != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(id)))
     {
       const Matrix& worldMatrix = transformManagerData->Manager()->GetWorldMatrix(id);
       if(mProperty == TRANSFORM_PROPERTY_WORLD_POSITION)
@@ -499,7 +499,7 @@ public:
   }
 
 private:
-  TransformManagerVector3Input(const TransformManagerVector3Input& property) = delete;
+  TransformManagerVector3Input(const TransformManagerVector3Input& property)       = delete;
   TransformManagerVector3Input& operator=(const TransformManagerVector3Input& rhs) = delete;
 
 public:
@@ -575,7 +575,7 @@ public:
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
-    if(id != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(id)))
     {
       const Matrix& worldMatrix = transformManagerData->Manager()->GetWorldMatrix(id);
       Vector3       position, scale;
@@ -655,7 +655,7 @@ public:
   }
 
 private:
-  TransformManagerQuaternionInput(const TransformManagerQuaternionInput& property) = delete;
+  TransformManagerQuaternionInput(const TransformManagerQuaternionInput& property)       = delete;
   TransformManagerQuaternionInput& operator=(const TransformManagerQuaternionInput& rhs) = delete;
 
 public:
@@ -729,7 +729,7 @@ public:
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
-    if(id != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(id)))
     {
       return transformManagerData->Manager()->GetWorldMatrix(id);
     }
@@ -744,7 +744,7 @@ public:
     static const Matrix identityMatrix(Matrix::IDENTITY);
     auto                transformManagerData = GetTxManagerData();
     auto                id                   = transformManagerData->Id();
-    if(id != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(id)))
     {
       return &(transformManagerData->Manager()->GetWorldMatrix(id));
     }
@@ -766,7 +766,7 @@ public:
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
-    if(id != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(id)))
     {
       return transformManagerData->Manager()->GetWorldMatrix(id);
     }
@@ -780,7 +780,7 @@ public:
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
-    DALI_ASSERT_ALWAYS(id != INVALID_TRANSFORM_ID);
+    DALI_ASSERT_ALWAYS(TransformManager::IsValidTransformId(id));
     return transformManagerData->Manager()->GetWorldMatrix(id);
   }
 
@@ -811,7 +811,7 @@ public:
   }
 
 private:
-  TransformManagerMatrixInput(const TransformManagerMatrixInput& property) = delete;
+  TransformManagerMatrixInput(const TransformManagerMatrixInput& property)       = delete;
   TransformManagerMatrixInput& operator=(const TransformManagerMatrixInput& rhs) = delete;
 };
 

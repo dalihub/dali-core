@@ -417,7 +417,7 @@ public:
    */
   const Vector3& GetParentOrigin() const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mParentOrigin.Get(0);
     }
@@ -440,7 +440,7 @@ public:
    */
   const Vector3& GetAnchorPoint() const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mAnchorPoint.Get(0);
     }
@@ -463,10 +463,13 @@ public:
    */
   void SetIgnored(const bool ignored)
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mIgnored != ignored)
+    if(mIgnored != ignored)
     {
       mIgnored = ignored;
-      mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), mIgnored);
+      if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+      {
+        mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), mIgnored);
+      }
     }
   }
 
@@ -476,11 +479,7 @@ public:
    */
   bool IsIgnored() const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
-    {
-      return mIgnored;
-    }
-    return false;
+    return mIgnored;
   }
 
   /**
@@ -490,7 +489,7 @@ public:
    */
   const Vector3& GetPosition(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mPosition.Get(bufferIndex);
     }
@@ -504,7 +503,7 @@ public:
    */
   const Vector3& GetWorldPosition(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mWorldPosition.Get(bufferIndex);
     }
@@ -517,7 +516,7 @@ public:
    */
   void SetInheritPosition(bool inherit)
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       mTransformManagerData.Manager()->SetInheritPosition(mTransformManagerData.Id(), inherit);
     }
@@ -530,7 +529,7 @@ public:
    */
   const Quaternion& GetOrientation(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mOrientation.Get(0);
     }
@@ -545,7 +544,7 @@ public:
    */
   const Quaternion& GetWorldOrientation(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mWorldOrientation.Get(0);
     }
@@ -558,7 +557,7 @@ public:
    */
   void SetInheritOrientation(bool inherit)
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       mTransformManagerData.Manager()->SetInheritOrientation(mTransformManagerData.Id(), inherit);
     }
@@ -571,7 +570,7 @@ public:
    */
   const Vector3& GetScale(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mScale.Get(0);
     }
@@ -586,7 +585,7 @@ public:
    */
   const Vector3& GetWorldScale(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mWorldScale.Get(0);
     }
@@ -599,7 +598,7 @@ public:
    */
   void SetInheritScale(bool inherit)
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       mTransformManagerData.Manager()->SetInheritScale(mTransformManagerData.Id(), inherit);
     }
@@ -727,7 +726,7 @@ public:
    */
   const Vector3& GetSize(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mSize.Get(0);
     }
@@ -785,7 +784,7 @@ public:
    */
   const Vector4& GetBoundingSphere() const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mTransformManagerData.Manager()->GetBoundingSphere(mTransformManagerData.Id());
     }
@@ -800,7 +799,7 @@ public:
    */
   void GetWorldMatrixAndSize(Matrix& worldMatrix, Vector3& size) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       mTransformManagerData.Manager()->GetWorldMatrixAndSize(mTransformManagerData.Id(), worldMatrix, size);
     }
@@ -812,7 +811,7 @@ public:
    */
   bool IsWorldMatrixDirty() const
   {
-    return (mTransformManagerData.Id() != INVALID_TRANSFORM_ID) &&
+    return (DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id()))) &&
            (mTransformManagerData.Manager()->IsWorldMatrixDirty(mTransformManagerData.Id()));
   }
 
@@ -823,7 +822,7 @@ public:
    */
   const Matrix& GetWorldMatrix(BufferIndex bufferIndex) const
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
       return mWorldMatrix.Get(bufferIndex);
     }
@@ -1002,7 +1001,7 @@ public:
    */
   void SetPositionUsesAnchorPoint(bool positionUsesAnchorPoint)
   {
-    if(mTransformManagerData.Id() != INVALID_TRANSFORM_ID && mPositionUsesAnchorPoint != positionUsesAnchorPoint)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())) && mPositionUsesAnchorPoint != positionUsesAnchorPoint)
     {
       mPositionUsesAnchorPoint = positionUsesAnchorPoint;
       mTransformManagerData.Manager()->SetPositionUsesAnchorPoint(mTransformManagerData.Id(), mPositionUsesAnchorPoint);
@@ -1122,10 +1121,10 @@ private: // from NodeDataProvider
 
 private:
   // Delete copy and move
-  Node(const Node&) = delete;
-  Node(Node&&)      = delete;
+  Node(const Node&)                = delete;
+  Node(Node&&)                     = delete;
   Node& operator=(const Node& rhs) = delete;
-  Node& operator=(Node&& rhs) = delete;
+  Node& operator=(Node&& rhs)      = delete;
 
   /**
    * Recursive helper to disconnect a Node and its children.

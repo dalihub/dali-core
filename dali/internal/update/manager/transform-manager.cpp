@@ -249,7 +249,7 @@ TransformId TransformManager::CreateTransform()
     mInheritanceMode.PushBack(INHERIT_ALL);
     mComponentId.PushBack(id);
     mSize.PushBack(Vector3(0.0f, 0.0f, 0.0f));
-    mParent.PushBack(INVALID_TRANSFORM_ID);
+    mParent.PushBack(PARENT_OF_OFF_SCENE_TRANSFORM_ID);
     mWorld.PushBack(Matrix::IDENTITY);
     mLocal.PushBack(Matrix::IDENTITY);
     mBoundingSpheres.PushBack(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
@@ -266,7 +266,7 @@ TransformId TransformManager::CreateTransform()
     mInheritanceMode[mComponentCount] = INHERIT_ALL;
     mComponentId[mComponentCount]     = id;
     mSize[mComponentCount]            = Vector3(0.0f, 0.0f, 0.0f);
-    mParent[mComponentCount]          = INVALID_TRANSFORM_ID;
+    mParent[mComponentCount]          = PARENT_OF_OFF_SCENE_TRANSFORM_ID;
     mLocal[mComponentCount].SetIdentity();
     mWorld[mComponentCount].SetIdentity();
     mBoundingSpheres[mComponentCount]  = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -275,12 +275,9 @@ TransformId TransformManager::CreateTransform()
     mWorldMatrixDirty[mComponentCount] = false;
   }
 
-  if(mIgnoredComponentCount > 0u)
-  {
-    SwapComponents(mComponentCount, mComponentCount - mIgnoredComponentCount);
-  }
-
-  mComponentCount++;
+  // New created transform could be marked as ignored.
+  ++mIgnoredComponentCount;
+  ++mComponentCount;
   return id;
 }
 
@@ -416,7 +413,7 @@ bool TransformManager::Update()
   const uint32_t validComponentCount = mComponentCount - mIgnoredComponentCount;
   for(uint32_t i = 0; i < validComponentCount; ++i)
   {
-    if(DALI_LIKELY(mInheritanceMode[i] != DONT_INHERIT_TRANSFORM && mParent[i] != INVALID_TRANSFORM_ID))
+    if(DALI_LIKELY(mInheritanceMode[i] != DONT_INHERIT_TRANSFORM && IsValidTransformId(mParent[i])))
     {
       const TransformId& parentIndex = mIds[mParent[i]];
 
@@ -568,8 +565,7 @@ void TransformManager::ReorderComponents()
 {
   mOrderedComponents.Resize(mComponentCount);
 
-  uint16_t    sceneId = 0u;
-  TransformId parentId;
+  uint16_t sceneId = 0u;
 
   mIgnoredComponentCount = 0u;
 
@@ -580,15 +576,17 @@ void TransformManager::ReorderComponents()
     mOrderedComponents[i].level   = 0u;
     mOrderedComponents[i].sceneId = 0u;
 
-    if(mTxComponentStatic[i].mIgnored)
+    const TransformId parentId = mParent[i];
+    if(mTxComponentStatic[i].mIgnored || parentId == PARENT_OF_OFF_SCENE_TRANSFORM_ID)
     {
+      // Make off-scene nodes as ignored.
+      // TODO : It break previous logic!
       mOrderedComponents[i].sceneId = IGNORED_COMPONENTS_SCENE_ID;
       ++mIgnoredComponentCount;
     }
     else
     {
-      parentId = mParent[i];
-      if(parentId == INVALID_TRANSFORM_ID)
+      if(DALI_UNLIKELY(parentId == PARENT_OF_ROOT_NODE_TRANSFORM_ID))
       {
         mOrderedComponents[i].sceneId = sceneId++;
 
@@ -608,9 +606,9 @@ void TransformManager::ReorderComponents()
     {
       continue;
     }
-    parentId = mParent[i];
+    TransformId parentId = mParent[i];
 
-    while(parentId != INVALID_TRANSFORM_ID)
+    while(IsValidTransformId(parentId))
     {
       const uint32_t parentIndex = mIds[parentId];
       ++mOrderedComponents[i].level;
