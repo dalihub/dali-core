@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,12 +43,6 @@ struct AnimatableDecoratedVisualProperties
   ~AnimatableDecoratedVisualProperties()
   {
   }
-
-public: // Public API
-  /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
-   */
-  void RequestResetToBaseValues();
 
 public:
   /**
@@ -118,11 +112,6 @@ struct AnimatableVisualProperties
   }
 
 public: // Public API
-  /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::RequestResetToBaseValues
-   */
-  void RequestResetToBaseValues();
-
   /**
    * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
    */

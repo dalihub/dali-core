@@ -34,7 +34,6 @@
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
 
 #include <dali/internal/update/common/property-resetter.h>
-#include <dali/internal/update/common/resetter-manager.h> ///< For AddInitializeResetter
 
 #include <dali/integration-api/debug.h>
 
@@ -915,15 +914,6 @@ bool Renderer::IsDirty() const
   return mDirtyUpdated & IS_DIRTY_MASK;
 }
 
-void Renderer::RequestResetToBaseValues()
-{
-  mMixColor.RequestResetToBaseValue();
-  if(mVisualProperties)
-  {
-    mVisualProperties->RequestResetToBaseValues();
-  }
-}
-
 uint32_t Renderer::GetMemoryPoolCapacity()
 {
   return GetRendererMemoryPool().GetCapacity();
@@ -933,11 +923,6 @@ void Renderer::OnMappingChanged()
 {
   // Properties have been registered on the base class.
   mRegenerateUniformMap = true; // Should remain true until this renderer is added to a RenderList.
-}
-
-void Renderer::AddInitializeResetter(ResetterManager& manager) const
-{
-  manager.AddRendererResetter(*this);
 }
 
 const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
