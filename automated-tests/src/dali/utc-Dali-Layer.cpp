@@ -23,6 +23,29 @@
 
 using namespace Dali;
 
+namespace
+{
+static int gTestSortFunctionCalled;
+
+static float TestSortFunction(const Vector3& /*position*/)
+{
+  ++gTestSortFunctionCalled;
+  return 0.0f;
+}
+
+Actor CreateActor(bool withAlpha)
+{
+  Texture texture = Texture::New(TextureType::TEXTURE_2D, withAlpha ? Pixel::Format::RGBA8888 : Pixel::Format::RGB888, 1u, 1u);
+
+  Actor actor = CreateRenderableActor(texture);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+
+  return actor;
+}
+
+} // namespace
+
 void layer_test_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -368,9 +391,9 @@ int UtcDaliLayerSetClippingBox(void)
   ClippingBox testBox(5, 6, 77, 83);
 
   Layer layer = Layer::New();
-  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t> >(Layer::Property::CLIPPING_BOX) != testBox);
+  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) != testBox);
   layer.SetProperty(Layer::Property::CLIPPING_BOX, testBox);
-  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t> >(Layer::Property::CLIPPING_BOX) == testBox);
+  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) == testBox);
   END_TEST;
 }
 
@@ -380,16 +403,8 @@ int UtcDaliLayerGetClippingBox(void)
   TestApplication application;
 
   Layer layer = Layer::New();
-  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t> >(Layer::Property::CLIPPING_BOX) == ClippingBox(0, 0, 0, 0));
+  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) == ClippingBox(0, 0, 0, 0));
   END_TEST;
-}
-
-static int gTestSortFunctionCalled;
-
-static float TestSortFunction(const Vector3& /*position*/)
-{
-  ++gTestSortFunctionCalled;
-  return 0.0f;
 }
 
 int UtcDaliLayerSetSortFunction(void)
@@ -599,21 +614,21 @@ int UtcDaliLayerDefaultProperties(void)
   actor.SetProperty(Layer::Property::CLIPPING_BOX, ClippingBox(0, 0, 0, 0));
 
   ClippingBox testBox(10, 20, 30, 40);
-  DALI_TEST_CHECK(actor.GetProperty<Rect<int32_t> >(Layer::Property::CLIPPING_BOX) != testBox);
+  DALI_TEST_CHECK(actor.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) != testBox);
 
   actor.SetProperty(Layer::Property::CLIPPING_BOX, Property::Value(Rect<int>(testBox)));
 
   DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::CLIPPING_BOX));
 
   Property::Value v = actor.GetProperty(Layer::Property::CLIPPING_BOX);
-  DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
+  DALI_TEST_CHECK(v.Get<Rect<int>>() == testBox);
 
   v = actor.GetCurrentProperty(Layer::Property::CLIPPING_BOX);
-  DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
+  DALI_TEST_CHECK(v.Get<Rect<int>>() == testBox);
 
   // set the same boundaries, but through a clipping box object
   actor.SetProperty(Layer::Property::CLIPPING_BOX, testBox);
-  DALI_TEST_CHECK(actor.GetProperty<Rect<int32_t> >(Layer::Property::CLIPPING_BOX) == testBox);
+  DALI_TEST_CHECK(actor.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) == testBox);
 
   actor.SetProperty(Layer::Property::BEHAVIOR, Property::Value(Layer::LAYER_UI));
   DALI_TEST_CHECK(Property::INTEGER == actor.GetPropertyType(Layer::Property::BEHAVIOR));
@@ -727,17 +742,6 @@ int UtcDaliLayerBehaviour(void)
   layer.SetProperty(Layer::Property::BEHAVIOR, Dali::Layer::LAYER_3D);
   DALI_TEST_EQUALS(layer.GetProperty<Layer::Behavior>(Layer::Property::BEHAVIOR), Dali::Layer::LAYER_3D, TEST_LOCATION);
   END_TEST;
-}
-
-Actor CreateActor(bool withAlpha)
-{
-  Texture texture = Texture::New(TextureType::TEXTURE_2D, withAlpha ? Pixel::Format::RGBA8888 : Pixel::Format::RGB888, 1u, 1u);
-
-  Actor actor = CreateRenderableActor(texture);
-  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-
-  return actor;
 }
 
 int UtcDaliLayer3DSort(void)
@@ -918,5 +922,118 @@ int UtcDaliLayerMoveBelowNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+int utcDaliLayerPartialUpdate(void)
+{
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  tet_infoline("Check the damaged area");
+
+  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  Rect<int>              expectedRect1, expectedRect2;
+
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // First render pass, nothing to render, adaptor would just do swap buffer.
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  Layer layer1 = Layer::New();
+  Layer layer2 = Layer::New();
+
+  // get root
+  Layer root = application.GetScene().GetLayer(0);
+
+  application.GetScene().Add(layer1);
+  application.GetScene().Add(layer2);
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actor1.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor1.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  layer1.Add(actor1);
+
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::POSITION, Vector3(32.0f, 16.0f, 0.0f));
+  actor2.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actor2.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  layer2.Add(actor2);
+
+  application.SendNotification();
+
+  // 1. Actor added, damaged rect is added size of actor
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect  = Rect<int>(16, 768, 64, 32); // in screen coordinates
+  expectedRect1 = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 1 last frames updates
+  expectedRect2 = Rect<int>(32, 768, 32, 32); // in screen coordinates, includes 1 last frames updates
+  DirtyRectChecker(damagedRects, {expectedRect1, expectedRect2}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
+  // Change layer order
+  layer1.Raise();
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+
+  application.SendNotification();
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
+
+  // Aligned by 16
+  clippingRect  = Rect<int>(16, 768, 64, 32); // in screen coordinates
+  expectedRect1 = Rect<int>(16, 768, 32, 32); // in screen coordinates, includes 1 last frames updates
+  expectedRect2 = Rect<int>(32, 768, 32, 32); // in screen coordinates, includes 1 last frames updates
+  DirtyRectChecker(damagedRects, {expectedRect1, expectedRect2}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Ensure the damaged rect is empty
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+
   END_TEST;
 }

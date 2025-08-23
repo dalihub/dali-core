@@ -1235,6 +1235,8 @@ void UpdateManager::SetLayerDepths(const SortedLayerPointers& layers, const Laye
   {
     if(scene && scene->root == rootLayer)
     {
+      scene->root->SetAllDirtyFlags();
+      scene->root->SetUpdated(true);
       scene->sortedLayerList = layers;
       break;
     }
