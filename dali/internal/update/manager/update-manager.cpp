@@ -364,7 +364,6 @@ struct UpdateManager::Impl
 
   ResetterContainer<PropertyResetterBase> propertyResetters; ///< A container of property resetters
   ResetterContainer<NodeResetter>         nodeResetters;     ///< A container of node resetters
-  ResetterContainer<RendererResetter>     rendererResetters; ///< A container of renderer resetters
 
   PropertyBaseResetRequestedContainer resetRequestedPropertyBases; ///< A container of property base to be resets
 
@@ -795,13 +794,6 @@ void UpdateManager::AddNodeResetter(const Node& node)
   mImpl->nodeResetters.PushBack(nodeResetter.Release());
 }
 
-void UpdateManager::AddRendererResetter(const Renderer& renderer)
-{
-  OwnerPointer<SceneGraph::RendererResetter> rendererResetter = SceneGraph::RendererResetter::New(renderer);
-  rendererResetter->Initialize();
-  mImpl->rendererResetters.PushBack(rendererResetter.Release());
-}
-
 void UpdateManager::RequestPropertyBaseResetToBaseValue(PropertyBase* propertyBase)
 {
   mImpl->resetRequestedPropertyBases.insert(propertyBase);
@@ -867,7 +859,6 @@ void UpdateManager::AddRenderer(const RendererKey& rendererKey)
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer);
 
   renderer->ConnectToSceneGraph(*mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex());
-  renderer->AddInitializeResetter(*this);
 
   mImpl->renderers.PushBack(rendererKey);
 }
@@ -982,9 +973,6 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
 
   // Reset node properties
   mImpl->nodeResetters.RequestResetToBaseValues();
-
-  // Reset renderer properties
-  mImpl->rendererResetters.RequestResetToBaseValues();
 
   // Reset all animating / constrained properties
   mImpl->propertyResetters.RequestResetToBaseValues();
@@ -1661,6 +1649,8 @@ void UpdateManager::SetLayerDepths(const SortedLayerPointers& layers, const Laye
   {
     if(scene && scene->root == rootLayer)
     {
+      scene->root->SetAllDirtyFlags();
+      scene->root->SetUpdated(true);
       scene->sortedLayerList = layers;
       break;
     }

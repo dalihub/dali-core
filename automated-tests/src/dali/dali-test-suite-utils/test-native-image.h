@@ -79,7 +79,11 @@ public:
     mCallStack.PushCall("GetTextureTarget", "");
     return GL_TEXTURE_EXTERNAL_OES;
   };
-  inline virtual bool ApplyNativeFragmentShader(std::string& shader)
+  inline virtual bool ApplyNativeFragmentShader(std::string& shader) override
+  {
+    return ApplyNativeFragmentShader(shader, 1);
+  }
+  inline virtual bool ApplyNativeFragmentShader(std::string& shader, int count) override
   {
     mCallStack.PushCall("ApplyNativeFragmentShader", "");
     shader = "#extension GL_OES_EGL_image_external:require\n" + shader;
@@ -88,10 +92,18 @@ public:
     const char* customSamplerTypename = GetCustomSamplerTypename();
     if(customSamplerTypename)
     {
-      size_t samplerPosition = shader.find("sampler2D");
-      if(samplerPosition != std::string::npos)
+      size_t pos           = 0;
+      int    replacedCount = 0;
+
+      while((pos = shader.find("sampler2D", pos)) != std::string::npos)
       {
-        shader.replace(samplerPosition, strlen("sampler2D"), customSamplerTypename);
+        if(count >= 0 && replacedCount >= count)
+        {
+          break;
+        }
+        shader.replace(pos, strlen("sampler2D"), customSamplerTypename);
+        pos += strlen(customSamplerTypename);
+        replacedCount++;
       }
     }
     return true;

@@ -40,9 +40,10 @@ bool DALI_CORE_API IsNative(Dali::Texture texture);
  *
  * @param[in] texture The texture the shader will apply to
  * @param[in] shader The fragment shader code to modify
+ * @param[in] count the number of samplers those uses native image.
  * @return True if the shader code was modified
  */
-bool DALI_CORE_API ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader);
+bool DALI_CORE_API ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader, int count = 1);
 
 /**
  * @brief Uploads data to the texture from a PixelData object.

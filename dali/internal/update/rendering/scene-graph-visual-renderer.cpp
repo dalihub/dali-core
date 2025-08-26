@@ -28,21 +28,6 @@ extern Debug::Filter* gSceneGraphRendererLogFilter; ///< Defined at scene-graph-
 #endif
 namespace VisualRenderer
 {
-void AnimatableVisualProperties::RequestResetToBaseValues()
-{
-  mTransformOffset.RequestResetToBaseValue();
-  mTransformSize.RequestResetToBaseValue();
-  mTransformOrigin.RequestResetToBaseValue();
-  mTransformAnchorPoint.RequestResetToBaseValue();
-  mTransformOffsetSizeMode.RequestResetToBaseValue();
-  mExtraSize.RequestResetToBaseValue();
-  mPreMultipliedAlpha.RequestResetToBaseValue();
-  if(mExtendedProperties)
-  {
-    mExtendedProperties->RequestResetToBaseValues();
-  }
-}
-
 Vector4 AnimatableVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
 {
   auto& coefficient = mCoefficient;
@@ -179,17 +164,6 @@ bool AnimatableVisualProperties::PrepareProperties()
   }
 
   return rendererUpdated;
-}
-
-void AnimatableDecoratedVisualProperties::RequestResetToBaseValues()
-{
-  mCornerRadius.RequestResetToBaseValue();
-  mCornerSquareness.RequestResetToBaseValue();
-  mCornerRadiusPolicy.RequestResetToBaseValue();
-  mBorderlineWidth.RequestResetToBaseValue();
-  mBorderlineColor.RequestResetToBaseValue();
-  mBorderlineOffset.RequestResetToBaseValue();
-  mBlurRadius.RequestResetToBaseValue();
 }
 
 bool AnimatableDecoratedVisualProperties::PrepareProperties()

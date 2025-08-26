@@ -1,6 +1,6 @@
 Name:       dali2
 Summary:    DALi 3D Engine
-Version:    2.4.32
+Version:    2.4.33
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -15,6 +15,13 @@ BuildRequires:  gawk
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
+%endif
+
+# For ASAN test
+%if "%{vd_asan}" == "1" || "%{asan}" == "1"
+BuildRequires: asan-force-options
+BuildRequires: asan-build-env
+BuildRequires: libasan
 %endif
 
 %description
@@ -71,9 +78,18 @@ LDFLAGS+=" --coverage "
 libtoolize --force
 cd %{_builddir}/%{name}-%{version}/build/tizen
 
-CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
-CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
-LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
+CFLAGS="${CFLAGS:-%optflags}" ;
+CXXFLAGS="${CXXFLAGS:-%optflags}" ;
+LDFLAGS="${LDFLAGS:-%optflags}" ;
+
+%if "%{vd_asan}" == "1" || "%{asan}" == "1"
+CFLAGS+=" -fsanitize=address"
+CXXFLAGS+=" -fsanitize=address -Wno-maybe-uninitialized"
+LDFLAGS+=" -fsanitize=address"
+%endif
+export CFLAGS;
+export CXXFLAGS;
+export LDFLAGS;
 
 cmake \
 %if 0%{?enable_debug}
