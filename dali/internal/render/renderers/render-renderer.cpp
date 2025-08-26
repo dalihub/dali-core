@@ -425,7 +425,6 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   const ShaderDataPtr& shaderData = shader.GetShaderData(instruction.mRenderPassTag);
   if(!shaderData)
   {
-    DALI_LOG_ERROR("Failed to get shader data.\n");
     mCurrentProgram = nullptr;
     return nullptr;
   }
