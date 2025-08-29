@@ -367,6 +367,30 @@ bool UpdateProxy::SetUpdateArea(uint32_t id, const Vector4& updateArea)
   return success;
 }
 
+bool UpdateProxy::SetIgnored(uint32_t id, bool ignored)
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    node->SetIgnored(ignored);
+    success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetIgnored(uint32_t id, bool& ignored) const
+{
+  bool                    success = false;
+  const SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    ignored = node->IsIgnored();
+    success = true;
+  }
+  return success;
+}
+
 } // namespace Internal
 
 } // namespace Dali
