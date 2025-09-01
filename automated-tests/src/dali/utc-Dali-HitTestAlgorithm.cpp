@@ -106,6 +106,54 @@ bool DefaultIsActorTouchableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::
     }
   }
 
+  tet_printf("hittable : %d, vis : %d, sen : %d, col : %d\n", hittable, actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE), actor.GetProperty<bool>(Actor::Property::SENSITIVE), (actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f));
+  return hittable;
+};
+
+std::vector<Dali::Actor> gOnceHitActorList;
+
+bool IsActorTouchableFunctionOnce(Dali::Actor actor, Dali::HitTestAlgorithm::TraverseType type)
+{
+  auto findIt = std::find(gOnceHitActorList.begin(), gOnceHitActorList.end(), actor);
+  if(findIt != gOnceHitActorList.end())
+  {
+    tet_infoline("Once Hitted before\n");
+    return false;
+  }
+
+  bool hittable = false;
+  switch(type)
+  {
+    case Dali::HitTestAlgorithm::CHECK_ACTOR:
+    {
+      if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) &&
+         actor.GetProperty<bool>(Actor::Property::SENSITIVE) &&
+         actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f)
+      {
+        hittable = true;
+      }
+      break;
+    }
+    case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
+    {
+      if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) && // Actor is visible, if not visible then none of its children are visible.
+         actor.GetProperty<bool>(Actor::Property::SENSITIVE))        // Actor is sensitive, if insensitive none of its children should be hittable either.
+      {
+        hittable = true;
+      }
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  if(hittable)
+  {
+    gOnceHitActorList.push_back(actor);
+  }
+  tet_printf("hittable : %d, vis : %d, sen : %d, col : %d\n", hittable, actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE), actor.GetProperty<bool>(Actor::Property::SENSITIVE), (actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f));
   return hittable;
 };
 
@@ -1624,5 +1672,260 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
   DALI_TEST_CHECK(hitTest(point10) == purple);
   DALI_TEST_CHECK(hitTest(point11) == rootLayer);
 
+  END_TEST;
+}
+
+
+// Test for the FBO hit-test fallback patch.
+// This test ensures that if a mapping actor is hit, but the subsequent FBO hit-test fails,
+// the mapping actor itself is returned as the hit result (acting as a fallback).
+// This test specifically covers the lines in HitTestActorOnce:
+//   hitResultOfThisActor->mHitType = HitType::HIT_ACTOR;
+//   hitResultList.push_back(hitResultOfThisActor);
+int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
+{
+  TestApplication application;
+  tet_infoline("Testing FBO fallback in HitTestActorOnce scenario");
+
+  Stage   stage     = Stage::GetCurrent();
+  Vector2 stageSize = stage.GetSize();
+
+  // Create actor hierarchy: Root -> Parent -> MappingActor
+  // This structure ensures HitTestActorRecursively is invoked and can find MappingActor as an exclusive child.
+  Actor rootActor = Actor::New(); // This will be the source actor for the default render task (e.g., root layer)
+  rootActor.SetProperty(Actor::Property::NAME, "RootActor");
+  rootActor.SetProperty(Actor::Property::SIZE, stageSize);
+  rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  // The rootActor is implicitly added to the stage as the source of the default render task.
+  // For the test, we add it explicitly to the stage to ensure it's part of the main scene graph.
+  stage.Add(rootActor);
+
+  Actor parentActor = Actor::New();
+  parentActor.SetProperty(Actor::Property::NAME, "ParentActor");
+  parentActor.SetProperty(Actor::Property::SIZE, stageSize * 0.8f);
+  parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  rootActor.Add(parentActor);
+
+  Actor mappingActor = Actor::New();
+  mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
+  mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.6f);
+  mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  mappingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  // To trigger HitTestActorOnce, mappingActor must be the source actor of an exclusive render task
+  // AND the mapping actor of the same render task.
+  parentActor.Add(mappingActor);
+
+  // Setup RenderTask for FBO
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     fboRenderTask  = renderTaskList.CreateTask();
+
+  Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
+  fboCamera[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(fboCamera);
+
+  // The mappingActor will serve as both the source and the mapping actor for the FBO render task.
+  // This makes it an "exclusive" actor, triggering the HitTestActorOnce path.
+  fboRenderTask.SetCameraActor(fboCamera);
+  fboRenderTask.SetSourceActor(mappingActor); // Source actor for the FBO content (is mappingActor itself)
+  fboRenderTask.SetScreenToFrameBufferMappingActor(mappingActor); // Mapping actor on the main scene
+
+  // Create a dummy FrameBuffer.
+  Texture    texture      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  frameBuffer.AttachColorTexture(texture);
+  fboRenderTask.SetFrameBuffer(frameBuffer);
+  fboRenderTask.SetInputEnabled(true);
+  fboRenderTask.SetExclusive(true); // This makes mappingActor an "exclusive" actor.
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Perform hit-test at the center of the stage, which should hit the mapping actor
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize * 0.5f, results, &IsActorTouchableFunctionOnce);
+  gOnceHitActorList.clear();
+
+  // IsActorTouchableFunctionOnce ensures mappingActor is only hittable once.
+  // It's hit initially on the main scene, but when HitTestFbo tries to hit it again
+  // as the source actor of the FBO task, the functor returns false.
+  // This causes HitTestFbo to fail, triggering the fallback logic in HitTestActorOnce
+  // which correctly returns mappingActor as the hit result.
+  tet_printf("hit name : %s\n", results.actor.GetProperty(Dali::Actor::Property::NAME).Get<std::string>().c_str());
+  DALI_TEST_CHECK(results.actor == mappingActor);
+//  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+  END_TEST;
+}
+
+// Test for the FBO hit-test fallback patch.
+// This test ensures that if a mapping actor is hit within a recursive search, but the subsequent FBO hit-test fails,
+// the mapping actor itself is returned as the hit result (acting as a fallback).
+int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
+{
+  TestApplication application;
+  tet_infoline("Testing FBO fallback in HitTestActorRecursively scenario");
+
+  Stage   stage     = Stage::GetCurrent();
+  Vector2 stageSize = stage.GetSize();
+
+  // Create actors: Root -> MappingActor -> Source
+  // This structure forces the HitTestActorRecursively path.
+  // MappingActor is the one that gets hit and is linked to an FBO.
+  // Source is the root of the FBO's render task.
+  Actor rootActor = Actor::New();
+  rootActor.SetProperty(Actor::Property::NAME, "RootActor");
+  rootActor.SetProperty(Actor::Property::SIZE, stageSize);
+  rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  stage.Add(rootActor);
+
+  Actor mappingActor = Actor::New();
+  mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
+  mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.5f);
+  mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  mappingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  rootActor.Add(mappingActor);
+
+  Actor sourceActor = Actor::New();
+  sourceActor.SetProperty(Actor::Property::NAME, "SourceActor");
+  sourceActor.SetProperty(Actor::Property::SIZE, stageSize * 0.4f);
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  // Note: sourceActor is NOT added to the stage. It's the root of the FBO task.
+  // This makes the FBO hit-test fail.
+
+  // Setup RenderTask for FBO
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     fboRenderTask  = renderTaskList.CreateTask();
+
+  Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
+  fboCamera[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(fboCamera);
+
+  fboRenderTask.SetCameraActor(fboCamera);
+  fboRenderTask.SetSourceActor(sourceActor);
+  fboRenderTask.SetScreenToFrameBufferMappingActor(mappingActor);
+
+  Texture    texture      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  frameBuffer.AttachColorTexture(texture);
+  fboRenderTask.SetFrameBuffer(frameBuffer);
+  fboRenderTask.SetInputEnabled(true);
+  fboRenderTask.SetExclusive(true); // This makes mappingActor an "exclusive" actor, triggering HitTestActorOnce
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Perform hit-test at the center of the mapping actor
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
+
+  // The expected behavior is:
+  // 1. HitTestActorRecursively is called on rootActor.
+  // 2. It finds mappingActor as a child.
+  // 3. Because mappingActor is exclusive, HitTestActorOnce is called.
+  // 4. mappingActor is hit.
+  // 5. GetFboRenderTask finds the fboRenderTask.
+  // 6. HitTestFbo is called, but it FAILS.
+  // 7. The patch ensures that mappingActor is returned as the hit.
+  DALI_TEST_CHECK(results.actor == mappingActor);
+  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+  END_TEST;
+}
+
+// Test for the FBO hit-test fallback patch in a Nested scenario.
+// Tree: MappingActor -> Source -> Child
+// If Child is not hittable, MappingActor should be hit.
+int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
+{
+  TestApplication application;
+  tet_infoline("Testing FBO fallback in a Nested scenario");
+
+  Stage   stage     = Stage::GetCurrent();
+  Vector2 stageSize = stage.GetSize();
+
+  // Create actors: MappingActor -> Source(Layer) -> Child
+  // MappingActor is itself, acting as a mapping actor.
+  // Source is a Layer, which is the source actor for the FBO.
+  // Child is an actor within the FBO's layer.
+  Actor mappingActor = Actor::New();
+  mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
+  mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.8f);
+  mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  mappingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  stage.Add(mappingActor);
+
+  Actor sourceLayer = Actor::New();
+  sourceLayer.SetProperty(Actor::Property::NAME, "SourceLayer");
+  sourceLayer.SetProperty(Actor::Property::SIZE, stageSize * 0.7f);
+  sourceLayer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  sourceLayer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sourceLayer.SetProperty(Actor::Property::SENSITIVE, false);
+  mappingActor.Add(sourceLayer);
+  // Note: sourceLayer is NOT added to the stage. It's the root of the FBO task.
+
+  Actor childActor = Actor::New();
+  childActor.SetProperty(Actor::Property::NAME, "ChildActor");
+  childActor.SetProperty(Actor::Property::SIZE, stageSize * 0.6f);
+  childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  childActor.SetProperty(Actor::Property::SENSITIVE, false); // Make child actor non-hittable
+  sourceLayer.Add(childActor);
+
+  // Setup RenderTask for FBO
+  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTask     fboRenderTask  = renderTaskList.CreateTask();
+
+  Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
+  fboCamera[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  stage.Add(fboCamera);
+
+  fboRenderTask.SetCameraActor(fboCamera);
+  fboRenderTask.SetSourceActor(sourceLayer);
+  fboRenderTask.SetScreenToFrameBufferMappingActor(mappingActor);
+
+  Texture    texture      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
+  FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
+  frameBuffer.AttachColorTexture(texture);
+  fboRenderTask.SetFrameBuffer(frameBuffer);
+  fboRenderTask.SetInputEnabled(true);
+  fboRenderTask.SetExclusive(true);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Perform hit-test at the center of the mapping actor
+  HitTestAlgorithm::Results results;
+  HitTest(stage, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
+
+  // The expected behavior is:
+  // 1. HitTestActorRecursively is called.
+  // 2. It finds mappingActor.
+  // 3. Because mappingActor is exclusive, HitTestActorOnce is called.
+  // 4. mappingActor is hit.
+  // 5. GetFboRenderTask finds the fboRenderTask.
+  // 6. HitTestFbo is called. It tries to hit childActor but fails because it's not sensitive.
+  // 7. The patch ensures that mappingActor is returned as the hit.
+  DALI_TEST_CHECK(results.actor == mappingActor);
+  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+
+  // Now, make the child actor hittable to ensure the normal path works
+  sourceLayer.SetProperty(Actor::Property::SENSITIVE, true);
+  childActor.SetProperty(Actor::Property::SENSITIVE, true);
+  application.SendNotification();
+  application.Render();
+
+  results = HitTestAlgorithm::Results();
+  HitTest(stage, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
+
+  DALI_TEST_CHECK(results.actor == childActor);
+  tet_printf("Hit actor (child sensitive): %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
   END_TEST;
 }
