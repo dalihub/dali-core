@@ -2101,7 +2101,6 @@ protected:
   const bool mIsRoot : 1;                    ///< Flag to identify the root actor
   const bool mIsLayer : 1;                   ///< Flag to identify that this is a layer
   bool       mIsOnScene : 1;                 ///< Flag to identify whether the actor is on-scene
-  bool       mIsIgnored : 1;                 ///< Flag to identify whether the actor is ignored or not.
   bool       mSensitive : 1;                 ///< Whether the actor emits touch event signals
   bool       mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool       mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation

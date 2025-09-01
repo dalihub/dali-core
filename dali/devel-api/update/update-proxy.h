@@ -237,6 +237,23 @@ public:
    */
   bool SetUpdateArea(uint32_t id, const Vector4& updateArea);
 
+  /**
+   * @brief Sets an Actor's ignored state from the Frame callback function.
+   * The change is applied immediately and persists until changed again.
+   * @param[in]  id       The Actor ID
+   * @param[in]  ignored  True to make the actor be ignored.
+   * @return Whether the method call was successful or not.
+   */
+  bool SetIgnored(uint32_t id, bool ignored);
+
+  /**
+   * @brief Gets an Actor's ignored state from the Frame callback function.
+   * @param[in]  id       The Actor ID
+   * @param[out] ignored  Set to the Actor's current ignored state, if Actor ID is valid
+   * @return Whether the method call was successful or not.
+   */
+  bool GetIgnored(uint32_t id, bool& ignored) const;
+
 public: // Not intended for application developers
   /// @cond internal
 
