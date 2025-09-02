@@ -364,6 +364,33 @@ public:
   bool mSetUpdateAreaCallSuccess{false};
 };
 
+class FrameCallbackSetIgnored : public FrameCallbackBasic
+{
+public:
+  FrameCallbackSetIgnored(unsigned int actorId, bool ignoredStateToSet)
+  : mActorId(actorId),
+    mIgnoredStateToSet(ignoredStateToSet)
+  {
+  }
+
+  virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+  {
+    FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+    mSetIgnoredCallSuccess = updateProxy.SetIgnored(mActorId, mIgnoredStateToSet);
+    return false; // Keep rendering for one more frame to check the result
+  }
+
+  virtual void Reset() override
+  {
+    FrameCallbackBasic::Reset();
+    mSetIgnoredCallSuccess = false;
+  }
+
+  const uint32_t mActorId;
+  const bool     mIgnoredStateToSet;
+  bool           mSetIgnoredCallSuccess{false};
+};
+
 } // namespace
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -392,6 +419,215 @@ int UtcDaliFrameCallbackCheckInstallationAndRemoval(void)
   application.Render();
 
   DALI_TEST_EQUALS(frameCallback.mCalled, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackSetIgnored(void)
+{
+  // Test UpdateProxy::SetIgnored functionality via FrameCallbackInterface
+
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  unsigned int actorId = actor.GetProperty<int>(Actor::Property::ID);
+
+  // Test setting ignored to true
+  {
+    FrameCallbackSetIgnored frameCallback(actorId, true);
+    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+
+    application.SendNotification();
+    application.Render(); // First render: SetIgnored(true) is called
+
+    DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mSetIgnoredCallSuccess, true, TEST_LOCATION);
+
+    // Remove callback to prevent it from being called again
+    DevelStage::RemoveFrameCallback(stage, frameCallback);
+
+    application.SendNotification();
+    application.Render(); // Second render: Check if Actor::IsIgnored() is true
+
+    DALI_TEST_EQUALS(actor.IsIgnored(), true, TEST_LOCATION);
+  }
+
+  // Test setting ignored to false
+  {
+    FrameCallbackSetIgnored frameCallback(actorId, false);
+    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+
+    application.SendNotification();
+    application.Render(); // Third render: SetIgnored(false) is called
+
+    DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mSetIgnoredCallSuccess, true, TEST_LOCATION);
+
+    // Remove callback
+    DevelStage::RemoveFrameCallback(stage, frameCallback);
+
+    application.SendNotification();
+    application.Render(); // Fourth render: Check if Actor::IsIgnored() is false
+
+    DALI_TEST_EQUALS(actor.IsIgnored(), false, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliFrameCallbackGetIgnored(void)
+{
+  // Test UpdateProxy::GetIgnored functionality via FrameCallbackInterface
+
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  stage.Add(actor);
+
+  unsigned int actorId = actor.GetProperty<int>(Actor::Property::ID);
+
+  // Test getting ignored state when it's false (default)
+  {
+    // First, ensure the actor is not ignored
+    actor.SetIgnored(false);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(actor.IsIgnored(), false, TEST_LOCATION);
+
+    class FrameCallbackGetIgnored : public FrameCallbackBasic
+    {
+    public:
+      FrameCallbackGetIgnored(unsigned int actorId)
+      : mActorId(actorId)
+      {
+      }
+
+      virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+      {
+        FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+        mGetIgnoredCallSuccess = updateProxy.GetIgnored(mActorId, mRetrievedIgnoredState);
+        return false;
+      }
+
+      virtual void Reset() override
+      {
+        FrameCallbackBasic::Reset();
+        mGetIgnoredCallSuccess = false;
+        mRetrievedIgnoredState = true; // Default to true to ensure it's set correctly
+      }
+
+      const uint32_t mActorId;
+      bool           mGetIgnoredCallSuccess{false};
+      bool           mRetrievedIgnoredState{true}; // Initialize to true to detect if it's set to false
+    };
+
+    FrameCallbackGetIgnored frameCallback(actorId);
+    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mGetIgnoredCallSuccess, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mRetrievedIgnoredState, false, TEST_LOCATION);
+
+    DevelStage::RemoveFrameCallback(stage, frameCallback);
+  }
+
+  // Test getting ignored state when it's true
+  {
+    // Set the actor to be ignored
+    actor.SetIgnored(true);
+    application.SendNotification();
+    application.Render();
+    DALI_TEST_EQUALS(actor.IsIgnored(), true, TEST_LOCATION);
+
+    class FrameCallbackGetIgnoredTrue : public FrameCallbackBasic
+    {
+    public:
+      FrameCallbackGetIgnoredTrue(unsigned int actorId)
+      : mActorId(actorId)
+      {
+      }
+
+      virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+      {
+        FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+        mGetIgnoredCallSuccess = updateProxy.GetIgnored(mActorId, mRetrievedIgnoredState);
+        return false;
+      }
+
+      virtual void Reset() override
+      {
+        FrameCallbackBasic::Reset();
+        mGetIgnoredCallSuccess = false;
+        mRetrievedIgnoredState = false; // Initialize to false to detect if it's set to true
+      }
+
+      const uint32_t mActorId;
+      bool           mGetIgnoredCallSuccess{false};
+      bool           mRetrievedIgnoredState{false};
+    };
+
+    FrameCallbackGetIgnoredTrue frameCallback(actorId);
+    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mGetIgnoredCallSuccess, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mRetrievedIgnoredState, true, TEST_LOCATION);
+
+    DevelStage::RemoveFrameCallback(stage, frameCallback);
+  }
+
+  // Test getting ignored state for an invalid actor ID
+  {
+    class FrameCallbackGetIgnoredInvalidId : public FrameCallbackBasic
+    {
+    public:
+      FrameCallbackGetIgnoredInvalidId(unsigned int actorId)
+      : mActorId(actorId)
+      {
+      }
+
+      virtual bool Update(Dali::UpdateProxy& updateProxy, float elapsedSeconds) override
+      {
+        FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
+        mGetIgnoredCallSuccess = updateProxy.GetIgnored(mActorId, mRetrievedIgnoredState);
+        return false;
+      }
+
+      virtual void Reset() override
+      {
+        FrameCallbackBasic::Reset();
+        mGetIgnoredCallSuccess = false;
+        mRetrievedIgnoredState = false;
+      }
+
+      const uint32_t mActorId;
+      bool           mGetIgnoredCallSuccess{false};
+      bool           mRetrievedIgnoredState{false};
+    };
+
+    FrameCallbackGetIgnoredInvalidId frameCallback(99999); // Invalid ID
+    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(frameCallback.mCalled, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(frameCallback.mGetIgnoredCallSuccess, false, TEST_LOCATION);
+    // mRetrievedIgnoredState should not be modified if the call fails
+    DALI_TEST_EQUALS(frameCallback.mRetrievedIgnoredState, false, TEST_LOCATION);
+
+    DevelStage::RemoveFrameCallback(stage, frameCallback);
+  }
 
   END_TEST;
 }

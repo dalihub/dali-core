@@ -128,6 +128,16 @@ bool UpdateProxy::SetUpdateArea(uint32_t id, const Vector4& updateArea)
   return mImpl.SetUpdateArea(id, updateArea);
 }
 
+bool UpdateProxy::SetIgnored(uint32_t id, bool ignored)
+{
+  return mImpl.SetIgnored(id, ignored);
+}
+
+bool UpdateProxy::GetIgnored(uint32_t id, bool& ignored) const
+{
+  return mImpl.GetIgnored(id, ignored);
+}
+
 UpdateProxy::UpdateProxy(Internal::UpdateProxy& impl)
 : mImpl(impl)
 {

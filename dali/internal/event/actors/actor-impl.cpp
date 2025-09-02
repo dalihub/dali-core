@@ -1254,7 +1254,6 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mIsRoot(ROOT_LAYER == derivedType),
   mIsLayer(LAYER == derivedType || ROOT_LAYER == derivedType),
   mIsOnScene(false),
-  mIsIgnored(false),
   mSensitive(true),
   mLeaveRequired(false),
   mKeyboardFocusable(false),
@@ -2004,16 +2003,13 @@ void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
 
 void Actor::SetIgnored(bool ignored)
 {
-  if(ignored != mIsIgnored)
-  {
-    mIsIgnored = ignored;
-    SetIgnoredMessage(GetEventThreadServices(), GetNode(), mIsIgnored);
-  }
+  // Send a message to the update thread to set the ignored state on the Node.
+  SetIgnoredMessage(GetEventThreadServices(), GetNode(), ignored);
 }
 
 bool Actor::IsIgnored() const
 {
-  return mIsIgnored;
+  return GetNode().IsIgnored();
 }
 
 } // namespace Internal

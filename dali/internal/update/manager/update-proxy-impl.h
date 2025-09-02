@@ -206,6 +206,16 @@ public:
    */
   bool SetUpdateArea(uint32_t id, const Vector4& updateArea);
 
+  /**
+   * @copydoc Dali::UpdateProxy::SetIgnored()
+   */
+  bool SetIgnored(uint32_t id, bool ignored);
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetIgnored()
+   */
+  bool GetIgnored(uint32_t id, bool& ignored) const;
+
 private:
   /**
    * @brief Retrieves the node with the specified ID.
