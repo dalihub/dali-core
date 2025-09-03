@@ -216,7 +216,6 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
  * @param[out] keepRendering              Gets set to true if rendering should be kept.
  * @param[in]  renderToFboEnabled         Whether rendering into the Frame Buffer Object is enabled (used to measure FPS above 60)
  * @param[in]  isRenderingToFbo           Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
- * @param[out] rendererAdded              Whether at least one of renderer added to render instructions, or not.
  * @param[in]  processOffscreen           Whether the offscreen render tasks are the ones processed. Otherwise it processes the onscreen tasks.
  */
 void ProcessTasks(BufferIndex                          updateBufferIndex,
@@ -227,7 +226,6 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
                   bool&                                keepRendering,
                   bool                                 renderToFboEnabled,
                   bool                                 isRenderingToFbo,
-                  bool&                                rendererAdded,
                   bool                                 processOffscreen)
 {
   uint32_t clippingId       = 0u;
@@ -309,15 +307,6 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
                                          instructions);
     }
 
-    // Check whether there is actual renderables here.
-    if(DALI_UNLIKELY(!rendererAdded))
-    {
-      if(!layer->colorRenderables.Empty() || !layer->overlayRenderables.Empty())
-      {
-        rendererAdded = true;
-      }
-    }
-
     if(!processOffscreen && isDefaultRenderTask && renderToFboEnabled && !isRenderingToFbo && hasFrameBuffer)
     {
       // Traverse the instructions of the default render task and mark them to be rendered into the frame buffer.
@@ -342,8 +331,7 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
                                   SortedLayerPointers&        sortedLayers,
                                   RenderInstructionContainer& instructions,
                                   bool                        renderToFboEnabled,
-                                  bool                        isRenderingToFbo,
-                                  bool&                       rendererAdded)
+                                  bool                        isRenderingToFbo)
 {
   RenderTaskList::RenderTaskContainer& taskContainer = renderTasks.GetTasks();
   bool                                 keepRendering = false;
@@ -372,7 +360,6 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
                keepRendering,
                renderToFboEnabled,
                isRenderingToFbo,
-               rendererAdded,
                true);
 
   DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "RenderTaskProcessor::Process() Onscreen\n");
@@ -388,7 +375,6 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
                keepRendering,
                renderToFboEnabled,
                isRenderingToFbo,
-               rendererAdded,
                false);
 
   return keepRendering;
