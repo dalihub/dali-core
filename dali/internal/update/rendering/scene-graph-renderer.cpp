@@ -147,6 +147,7 @@ Renderer::Renderer()
   mRegenerateUniformMap(false),
   mPremultipledAlphaEnabled(false),
   mUseSharedUniformBlock(true),
+  mInvokeTerminateCallback(false),
   mDirtyUpdated(NOT_CHECKED),
   mMixColor(Color::WHITE),
   mDepthIndex(0)
