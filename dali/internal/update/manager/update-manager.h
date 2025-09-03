@@ -688,7 +688,7 @@ public:
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object.
    * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
-   * @param[out] rendererAdded Whether at least one of renderer added to render instructions, or not.
+   * @param[out] rendererAdded Whether at least one of renderer added to update manager, or not.
    * @return True if further updates are required e.g. during animations.
    */
   uint32_t Update(float    elapsedSeconds,

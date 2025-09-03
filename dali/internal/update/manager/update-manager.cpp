@@ -1368,6 +1368,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // reset the update buffer index and make sure there is enough room in the instruction container
     if(mImpl->renderersAdded)
     {
+      rendererAdded = true;
       // Calculate how many render tasks we have in total
       std::size_t numberOfRenderTasks        = 0;
       std::size_t numberOfRenderInstructions = 0;
@@ -1405,8 +1406,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
                                                                      scene->sortedLayerList,
                                                                      scene->scene->GetRenderInstructions(),
                                                                      renderToFboEnabled,
-                                                                     isRenderingToFbo,
-                                                                     rendererAdded);
+                                                                     isRenderingToFbo);
 
             mImpl->renderInstructionCapacity += scene->scene->GetRenderInstructions().GetCapacity();
             scene->scene->SetSkipRendering(false);
