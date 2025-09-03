@@ -336,13 +336,6 @@ NodePropertyFlags Node::GetInheritedDirtyFlags(NodePropertyFlags parentFlags) co
                                         (static_cast<UnderlyingType>(parentFlags) & static_cast<UnderlyingType>(InheritedDirtyFlags)));
 }
 
-void Node::ResetDirtyFlags(BufferIndex updateBufferIndex)
-{
-  mDirtyFlags = NodePropertyFlags::NOTHING;
-
-  mUpdateAreaChanged = false;
-}
-
 void Node::SetParent(Node& parentNode)
 {
   DALI_ASSERT_ALWAYS(this != &parentNode);

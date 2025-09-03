@@ -36,6 +36,7 @@
 #include <dali/internal/render/shaders/render-shader.h> // for OwnerPointer< Shader >
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/node-resetter.h>
+#include <dali/internal/update/common/property-owner-flag-manager.h>
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/common/resetter-manager.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
@@ -101,7 +102,7 @@ class VertexBuffer;
  * It also maintains the lifecycle of nodes and other property owners that are
  * disconnected from the scene graph.
  */
-class UpdateManager : public ShaderSaver, public ResetterManager
+class UpdateManager : public ShaderSaver, public ResetterManager, public PropertyOwnerFlagManager
 {
 public:
   /**
@@ -262,6 +263,18 @@ public:
    * @return True if any animations are running.
    */
   bool IsAnimationRunning() const;
+
+  // PropertyOwnerFlagManager
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwnerFlagManager::RequestResetUpdated()
+   */
+  void RequestResetUpdated(const PropertyOwner& owner) override;
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwnerFlagManager::DiscardPropertyOwner()
+   */
+  void DiscardPropertyOwner(PropertyOwner* discardedOwner) override;
 
   // ResetterManager
 

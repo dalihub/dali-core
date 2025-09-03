@@ -113,10 +113,11 @@ public:
    */
   void CheckUpdated() const;
 
+public: // From PropertyOwner
   /**
-   * Reset the updated flag.
+   * @copydoc PropertyOwner::ResetUpdated
    */
-  void ResetUpdated();
+  void ResetUpdated() override;
 
 private: // Data
   ShaderDataPtr              mDefaultShaderData{nullptr};

@@ -19,9 +19,10 @@
 #include <dali/internal/update/manager/update-manager.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/set-wrapper.h>
+
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 #include <dali/devel-api/common/map-wrapper.h>
-#include <dali/devel-api/common/set-wrapper.h>
 #else
 #include <unordered_map>
 #include <unordered_set>
@@ -379,6 +380,9 @@ struct UpdateManager::Impl
   DiscardQueue<Render::UniformBlock*, OwnerContainer<Render::UniformBlock*>> uniformBlockDiscardQueue;
   DiscardQueue<MemoryPoolKey<Renderer>, OwnerKeyContainer<Renderer>>         rendererDiscardQueue;
   DiscardQueue<Scene*, OwnerContainer<Scene*>>                               sceneDiscardQueue;
+  DiscardQueue<PropertyOwner*, OwnerContainer<PropertyOwner*>>               customObjectDiscardQueue;
+
+  std::vector<PropertyOwner*> updatedPropertyOwnerContainer; ///< List of updated property owner (not owned)
 
   CompleteNotificationInterface::ParameterList notifyRequiredAnimations; ///< A temperal container of complete notify required animations, like animation finished, stopped, or loop completed.
 
@@ -423,6 +427,7 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
 : mImpl(nullptr)
 {
   PropertyBase::RegisterResetterManager(*this);
+  PropertyOwner::RegisterPropertyOwnerFlagManager(*this);
 
   mImpl = new Impl(notificationManager,
                    animationPlaylist,
@@ -438,6 +443,7 @@ UpdateManager::~UpdateManager()
 {
   delete mImpl;
   PropertyBase::UnregisterResetterManager();
+  PropertyOwner::UnregisterPropertyOwnerFlagManager();
 
   // Ensure to release memory pool
   Animation::ResetMemoryPool();
@@ -508,6 +514,7 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
   rootLayer->SetRoot(true);
 
   rootLayer->AddInitializeResetter(*this);
+  rootLayer->RequestResetUpdated();
 
   // Do not allow to insert duplicated nodes.
   // It could be happened if node id is overflowed.
@@ -557,6 +564,8 @@ void UpdateManager::AddNode(OwnerPointer<Node>& node)
 
   mImpl->nodes.PushBack(rawNode);
 
+  // Newly created nodes always need to reset flags.
+  rawNode->RequestResetUpdated();
   rawNode->CreateTransform(&mImpl->transformManager);
 }
 
@@ -663,7 +672,7 @@ void UpdateManager::AddObject(OwnerPointer<PropertyOwner>& object)
 
 void UpdateManager::RemoveObject(PropertyOwner* object)
 {
-  mImpl->customObjects.EraseObject(object);
+  EraseUsingDiscardQueue(mImpl->customObjects, object, mImpl->customObjectDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::CUSTOM_OBJECT;
 #endif
@@ -672,7 +681,7 @@ void UpdateManager::RemoveObject(PropertyOwner* object)
 void UpdateManager::AddRenderTaskList(OwnerPointer<RenderTaskList>& taskList)
 {
   RenderTaskList* taskListPointer = taskList.Release();
-  taskListPointer->Initialize(*this, mImpl->renderMessageDispatcher);
+  taskListPointer->Initialize(*this, *this, mImpl->renderMessageDispatcher);
 
   mImpl->scenes.back()->taskList = taskListPointer;
 }
@@ -779,6 +788,17 @@ bool UpdateManager::IsAnimationRunning() const
   }
 
   return false;
+}
+
+void UpdateManager::RequestResetUpdated(const PropertyOwner& owner)
+{
+  mImpl->updatedPropertyOwnerContainer.emplace_back(const_cast<PropertyOwner*>(&owner));
+}
+
+void UpdateManager::DiscardPropertyOwner(PropertyOwner* discardedOwner)
+{
+  // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
+  mImpl->customObjectDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), discardedOwner);
 }
 
 void UpdateManager::AddPropertyResetter(OwnerPointer<PropertyResetterBase>& propertyResetter)
@@ -989,21 +1009,6 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
     {
       propertyBase->ResetToBaseValue(bufferIndex);
     }
-  }
-
-  // Clear all root nodes dirty flags
-  for(auto& scene : mImpl->scenes)
-  {
-    auto root = scene->root;
-    root->ResetDirtyFlags(bufferIndex);
-  }
-
-  // Clear node dirty flags
-  Vector<Node*>::Iterator iter    = mImpl->nodes.Begin() + 1;
-  Vector<Node*>::Iterator endIter = mImpl->nodes.End();
-  for(; iter != endIter; ++iter)
-  {
-    (*iter)->ResetDirtyFlags(bufferIndex);
   }
 }
 
@@ -1251,6 +1256,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   mImpl->shaderDiscardQueue.Clear(bufferIndex);
   mImpl->rendererDiscardQueue.Clear(bufferIndex);
   mImpl->sceneDiscardQueue.Clear(bufferIndex);
+  mImpl->customObjectDiscardQueue.Clear(bufferIndex);
 
   bool isAnimationRunning = IsAnimationRunning();
 
@@ -1537,24 +1543,17 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 void UpdateManager::PostRender()
 {
   // Reset dirty flag
-  for(auto&& renderer : mImpl->renderers)
+  if(!mImpl->updatedPropertyOwnerContainer.empty())
   {
-    renderer->ResetDirtyUpdated();
-  }
+    for(auto* updatedPropertyOwner : mImpl->updatedPropertyOwnerContainer)
+    {
+      updatedPropertyOwner->ResetUpdated();
+    }
+    mImpl->updatedPropertyOwnerContainer.clear();
 
-  for(auto&& shader : mImpl->shaders)
-  {
-    shader->ResetUpdated();
-  }
-
-  for(auto&& uniformBlock : mImpl->uniformBlocks)
-  {
-    uniformBlock->SetUpdated(false);
-  }
-
-  for(auto&& scene : mImpl->scenes)
-  {
-    scene->root->SetUpdatedTree(false);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    mImpl->updatedPropertyOwnerContainer.shrink_to_fit();
+#endif
   }
 }
 

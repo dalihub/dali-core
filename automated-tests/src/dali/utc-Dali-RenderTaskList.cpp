@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,7 +144,7 @@ int UtcDaliRenderTaskListCreateTask(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskListRemoveTask(void)
+int UtcDaliRenderTaskListRemoveTask01(void)
 {
   TestApplication application;
 
@@ -158,6 +158,37 @@ int UtcDaliRenderTaskListRemoveTask(void)
 
   taskList.RemoveTask(newTask);
   DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListRemoveTask02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTaskList::RemoveTask() and render several frames");
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+
+  RenderTask newTask = taskList.CreateTask();
+  auto       actor   = CreateRenderableActor();
+  newTask.SetSourceActor(actor);
+  application.GetScene().Add(actor);
+  DALI_TEST_CHECK(2u == taskList.GetTaskCount());
+
+  // Change some PropertyBase - Resetter will mark new task updated
+  newTask.SetClearEnabled(true);
+  newTask.SetClearColor(Color::TRANSPARENT);
+
+  // Remove task at the same frame of creation or set proertpy.
+  taskList.RemoveTask(newTask);
+  DALI_TEST_CHECK(1u == taskList.GetTaskCount());
+
+  // Render 1 frame.
+  application.SendNotification();
+  application.Render();
+
+  // Check their is no crash.
   END_TEST;
 }
 

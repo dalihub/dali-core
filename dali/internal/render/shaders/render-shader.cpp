@@ -152,13 +152,16 @@ void Shader::CheckUpdated() const
       }
     }
     mDirtyUpdated |= (updated) << UPDATED_FLAG_SHIFT;
+
+    // TODO : Can we skip this reset?
+    RequestResetUpdated();
   }
 }
 
 void Shader::ResetUpdated()
 {
-  PropertyOwner::SetUpdated(false);
   mDirtyUpdated = NOT_CHECKED;
+  PropertyOwner::ResetUpdated();
 }
 
 } // namespace SceneGraph

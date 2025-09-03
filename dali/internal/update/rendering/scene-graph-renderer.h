@@ -540,21 +540,21 @@ public:
   void CheckDirtyUpdated() const;
 
   /**
-   * Reset the dirty updated flag.
-   */
-  void ResetDirtyUpdated();
-
-  /**
    * Get the capacity of the memory pools
    * @return the capacity of the memory pools
    */
   static uint32_t GetMemoryPoolCapacity();
 
-public: // PropertyOwner::MappingChanged
+public: // From PropertyOwner
   /**
    * @copydoc PropertyOwner::OnMappingChanged
    */
   void OnMappingChanged() override;
+
+  /**
+   * @copydoc PropertyOwner::ResetUpdated
+   */
+  void ResetUpdated() override;
 
 public: // From UniformMapDataProvider
   /**

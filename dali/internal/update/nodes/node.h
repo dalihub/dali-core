@@ -142,21 +142,6 @@ public:
   }
 
   /**
-   * Mark an node and its sub tree according to the updated flag.
-   * @param[in] updated The updated flag
-   * (used for partial rendering to mark an animating sub tree for example).
-   */
-  void SetUpdatedTree(bool updated)
-  {
-    mUpdated = updated;
-
-    for(Node* child : mChildren)
-    {
-      child->SetUpdatedTree(updated);
-    }
-  }
-
-  /**
    * This method sets clipping information on the node based on its hierarchy in the scene-graph.
    * A value is calculated that can be used during sorting to increase sort speed.
    * @param[in] clippingId The Clipping ID of the node to set
@@ -386,6 +371,10 @@ public:
    */
   void SetDirtyFlag(NodePropertyFlags flag)
   {
+    if(!(mDirtyFlags & flag))
+    {
+      RequestResetUpdated();
+    }
     mDirtyFlags |= flag;
   }
 
@@ -394,6 +383,10 @@ public:
    */
   void SetAllDirtyFlags()
   {
+    if(mDirtyFlags != NodePropertyFlags::ALL)
+    {
+      RequestResetUpdated();
+    }
     mDirtyFlags = NodePropertyFlags::ALL;
   }
 
@@ -755,10 +748,11 @@ public:
     {
       mUpdateAreaHint    = updateAreaHint;
       mUpdateAreaChanged = true;
+      RequestResetUpdated();
     }
 
     mUpdateAreaUseSize = (mUpdateAreaHint == Vector4::ZERO);
-    mDirtyFlags |= NodePropertyFlags::TRANSFORM;
+    SetDirtyFlag(NodePropertyFlags::TRANSFORM);
   }
 
   /**
@@ -1073,17 +1067,24 @@ public:
   void AddInitializeResetter(ResetterManager& manager) const override;
 
   /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetUpdated
+   */
+  void ResetUpdated() override
+  {
+    mDirtyFlags = NodePropertyFlags::NOTHING;
+
+    mUpdateAreaChanged = false;
+
+    PropertyOwner::ResetUpdated();
+  }
+
+  /**
    * Called by UpdateManager when the node is added.
    * Creates a new transform component in the transform manager and initialize all the properties
    * related to the transformation
    * @param[in] transformManager A pointer to the trnasform manager (Owned by UpdateManager)
    */
   void CreateTransform(SceneGraph::TransformManager* transformManager);
-
-  /**
-   * Reset dirty flags
-   */
-  void ResetDirtyFlags(BufferIndex updateBufferIndex);
 
 protected:
   /**

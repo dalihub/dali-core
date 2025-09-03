@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,7 @@ void RenderTaskList::ResetMemoryPool()
 RenderTaskList::RenderTaskList()
 : mNotificationObject(nullptr),
   mResetterManager(nullptr),
+  mPropertyOwnerFlagManager(nullptr),
   mRenderMessageDispatcher(nullptr)
 {
 }
@@ -62,10 +63,11 @@ void RenderTaskList::operator delete(void* ptr)
   GetRenderTaskListMemoryPool().FreeThreadSafe(static_cast<RenderTaskList*>(ptr));
 }
 
-void RenderTaskList::Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher)
+void RenderTaskList::Initialize(ResetterManager& resetterManager, PropertyOwnerFlagManager& propertyOwnerFlagManager, RenderMessageDispatcher& renderMessageDispatcher)
 {
-  mResetterManager         = &resetterManager;
-  mRenderMessageDispatcher = &renderMessageDispatcher;
+  mResetterManager          = &resetterManager;
+  mPropertyOwnerFlagManager = &propertyOwnerFlagManager;
+  mRenderMessageDispatcher  = &renderMessageDispatcher;
 }
 
 void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
@@ -83,8 +85,10 @@ void RenderTaskList::RemoveTask(RenderTask* task)
   auto iter = mRenderTasks.Find(task);
   if(iter != mRenderTasks.End())
   {
-    // Destroy the task
-    mRenderTasks.Erase(iter);
+    // Discard the task. Move ownership to property owner manager.
+    // DevNote : Since RenderTaskList itself could be removed at the same frame with
+    //           RenderTask dirty, discarded memory ownership must be out of RenderTaskList.
+    mPropertyOwnerFlagManager->DiscardPropertyOwner(mRenderTasks.Release(iter));
   }
 }
 
