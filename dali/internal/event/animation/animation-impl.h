@@ -571,6 +571,13 @@ private:
    */
   void SetObjectAnimatablePropertyAnimations(Dali::Animation::State state);
 
+  /**
+   * @brief Enable or disable animation of animatable property in each connected object by connectorBase.
+   * @param[in] connector The connector to notify.
+   * @param[in] state Animation state to determine whether to enable or diable
+   */
+  void SetObjectAnimatablePropertyAnimationAsConnector(AnimatorConnectorBase& connector, Dali::Animation::State state);
+
 private:
   using AnimatorConnectorContainer     = OwnerContainer<AnimatorConnectorBase*>;
   using ConnectorTargetValuesContainer = std::vector<ConnectorTargetValues>;

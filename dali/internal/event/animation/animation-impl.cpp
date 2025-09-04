@@ -476,11 +476,14 @@ void Animation::Play()
   // Update the current playlist
   mPlaylist.OnPlay(*this);
 
-  InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
+  const bool stateChanged = InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
 
   NotifyObjects(Notify::USE_TARGET_VALUE);
 
-  SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
+  if(stateChanged)
+  {
+    SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
+  }
 
   SendFinalProgressNotificationMessage();
 
@@ -497,11 +500,14 @@ void Animation::PlayFrom(float progress)
     // Update the current playlist
     mPlaylist.OnPlay(*this);
 
-    InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
+    const bool stateChanged = InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
 
     NotifyObjects(Notify::USE_TARGET_VALUE);
 
-    SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
+    if(stateChanged)
+    {
+      SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
+    }
 
     SendFinalProgressNotificationMessage();
 
@@ -522,11 +528,14 @@ void Animation::PlayAfter(float delaySeconds)
   // Update the current playlist
   mPlaylist.OnPlay(*this);
 
-  InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
+  const bool stateChanged = InternalStateConverter(GetAnimationId(), mState, Dali::Animation::PLAYING);
 
   NotifyObjects(Notify::USE_TARGET_VALUE);
 
-  SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
+  if(stateChanged)
+  {
+    SetObjectAnimatablePropertyAnimations(Dali::Animation::PLAYING);
+  }
 
   SendFinalProgressNotificationMessage();
 
@@ -544,6 +553,9 @@ void Animation::Pause()
 
     // Notify the objects with the _paused_, i.e. current values
     NotifyObjects(Notify::FORCE_CURRENT_VALUE);
+
+    // TODO : Could we send it as paused?
+    SetObjectAnimatablePropertyAnimations(Dali::Animation::STOPPED);
   }
 }
 
@@ -611,7 +623,10 @@ void Animation::Clear()
     NotifyObjects(Notify::USE_CURRENT_VALUE);
   }
 
-  SetObjectAnimatablePropertyAnimations(Dali::Animation::STOPPED);
+  if(InternalStateConverter(GetAnimationId(), mState, Dali::Animation::STOPPED))
+  {
+    SetObjectAnimatablePropertyAnimations(Dali::Animation::STOPPED);
+  }
 
   // Remove all the connectors
   mConnectors.Clear();
@@ -1129,6 +1144,12 @@ void Animation::AddAnimatorConnector(AnimatorConnectorBase* connector)
   connector->SetParent(*this);
 
   mConnectors.PushBack(connector);
+
+  // Send notify when animator connected during animation playing
+  if(DALI_UNLIKELY(GetState() == Dali::Animation::PLAYING))
+  {
+    SetObjectAnimatablePropertyAnimationAsConnector(*connector, Dali::Animation::PLAYING);
+  }
 }
 
 void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward)
@@ -1413,17 +1434,21 @@ void Animation::SetObjectAnimatablePropertyAnimations(Dali::Animation::State sta
   {
     for(auto it = mConnectorTargetValues.begin(); it != mConnectorTargetValues.end(); ++it)
     {
-      AnimatorConnectorBase* connector     = mConnectors[it->connectorIndex];
-      const Property::Index  propertyIndex = connector->GetPropertyIndex();
+      SetObjectAnimatablePropertyAnimationAsConnector(*mConnectors[it->connectorIndex], state);
+    }
+  }
+}
 
-      if((propertyIndex >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (propertyIndex <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX))
-      {
-        Object* object = connector->GetObject();
-        if(object && object->IsAnimationPossible())
-        {
-          object->AnimateAnimatableProperty(propertyIndex, state);
-        }
-      }
+void Animation::SetObjectAnimatablePropertyAnimationAsConnector(AnimatorConnectorBase& connector, Dali::Animation::State state)
+{
+  const Property::Index propertyIndex = connector.GetPropertyIndex();
+
+  if((propertyIndex >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX) && (propertyIndex <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX))
+  {
+    Object* object = connector.GetObject();
+    if(object && object->IsAnimationPossible())
+    {
+      object->AnimateAnimatableProperty(*this, propertyIndex, state);
     }
   }
 }
