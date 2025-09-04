@@ -1632,6 +1632,11 @@ void UpdateManager::RequestClearProgramCache()
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::ClearProgramCache);
 }
 
+void UpdateManager::ResetRendererAddedFlag()
+{
+  mImpl->renderersAdded = false;
+}
+
 Node* UpdateManager::GetNodePointerById(uint32_t nodeId) const
 {
   Node* foundNodePointer = nullptr;

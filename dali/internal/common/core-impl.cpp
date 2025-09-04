@@ -167,24 +167,6 @@ void Core::Initialize()
   mStage->Initialize(*mScenes[0]);
 }
 
-void Core::ChangeCorePolicy(Integration::CorePolicyFlags corePolicy)
-{
-  DALI_LOG_RELEASE_INFO("Core policy enum changed to : 0x%x\n", static_cast<uint32_t>(corePolicy));
-  mRenderManager->UpdateGraphicsRequired((corePolicy & Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE) ? Integration::DepthBufferAvailable::TRUE : Integration::DepthBufferAvailable::FALSE,
-                                         (corePolicy & Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE) ? Integration::StencilBufferAvailable::TRUE : Integration::StencilBufferAvailable::FALSE,
-                                         (corePolicy & Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE) ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
-}
-
-void Core::ChangeGraphicsController(Graphics::Controller& graphicsController)
-{
-  DALI_LOG_RELEASE_INFO("ChangeGraphicsController\n");
-  mRenderManager->ChangeGraphicsController(graphicsController);
-
-  // renderQueue recreated. Notify updated pointer to UpdateManager.
-  RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
-  mUpdateManager->ChangeRenderQueue(renderQueue);
-}
-
 Integration::ContextNotifierInterface* Core::GetContextNotifier()
 {
   return mStage.Get();
@@ -432,6 +414,36 @@ void Core::RelayoutAndFlush(SceneContainer& scenes)
 uint32_t Core::GetMaximumUpdateCount() const
 {
   return MAXIMUM_UPDATE_COUNT;
+}
+
+void Core::ChangeCorePolicy(Integration::CorePolicyFlags corePolicy)
+{
+  DALI_LOG_RELEASE_INFO("Core policy enum changed to : 0x%x\n", static_cast<uint32_t>(corePolicy));
+  mRenderManager->UpdateGraphicsRequired((corePolicy & Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE) ? Integration::DepthBufferAvailable::TRUE : Integration::DepthBufferAvailable::FALSE,
+                                         (corePolicy & Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE) ? Integration::StencilBufferAvailable::TRUE : Integration::StencilBufferAvailable::FALSE,
+                                         (corePolicy & Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE) ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
+}
+
+void Core::ChangeGraphicsController(Graphics::Controller& graphicsController)
+{
+  DALI_LOG_RELEASE_INFO("ChangeGraphicsController\n");
+  mRenderManager->ChangeGraphicsController(graphicsController);
+
+  // renderQueue recreated. Notify updated pointer to UpdateManager.
+  RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
+  mUpdateManager->ChangeRenderQueue(renderQueue);
+}
+
+void Core::PreInitializeCompleted()
+{
+  // Send message to update thread to reset renderer added flag
+  using LocalType = Message<UpdateManager>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = mUpdateManager->ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(mUpdateManager.Get(), &UpdateManager::ResetRendererAddedFlag);
 }
 
 void Core::RegisterProcessor(Integration::Processor& processor, bool postProcessor)

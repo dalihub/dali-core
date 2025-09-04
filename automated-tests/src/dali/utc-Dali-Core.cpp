@@ -170,3 +170,24 @@ int UtcDaliCoreChangeGraphicsControllerN(void)
 
   END_TEST;
 }
+
+int UtcDaliCorePreInitializeCompleted(void)
+{
+  TestApplication application;
+
+  // Create dummy actor.
+  Actor dummyActor = CreateRenderableActor();
+
+  application.GetCore().PreInitializeCompleted();
+
+  // Render something after pre-initialize completed.
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 200.0f));
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render(16);
+
+  tet_result(TET_PASS);
+  END_TEST;
+}

@@ -252,21 +252,7 @@ public:
    */
   void Initialize();
 
-  /**
-   * @brief Change the core policy.
-   * @note We must not call this method after ContextCreated() has been called.
-   * @param[in] corePolicy Changed policy of core.
-   */
-  void ChangeCorePolicy(CorePolicyFlags corePolicy);
-
-  /**
-   * @brief Change the graphics controller.
-   * @note We must not call this method after ContextCreated() has been called.
-   * @param[in] graphicsController The interface providing graphics services
-   */
-  void ChangeGraphicsController(Graphics::Controller& graphicsController);
-
-  // GL Context Lifecycle
+  // Graphics Context Lifecycle
 
   /**
    * Get the object that will notify the application/toolkit when context is lost/regained
@@ -426,6 +412,29 @@ public:
    */
   void PostRender();
 
+  // API for pre-initialized core.
+
+  /**
+   * @brief Change the core policy.
+   * @note We must not call this method after ContextCreated() has been called.
+   * @param[in] corePolicy Changed policy of core.
+   */
+  void ChangeCorePolicy(CorePolicyFlags corePolicy);
+
+  /**
+   * @brief Change the graphics controller.
+   * @note We must not call this method after ContextCreated() has been called.
+   * @param[in] graphicsController The interface providing graphics services
+   */
+  void ChangeGraphicsController(Graphics::Controller& graphicsController);
+
+  /**
+   * @brief Notify that pre-initialized core ready to used.
+   */
+  void PreInitializeCompleted();
+
+  // Processor
+
   /**
    * @brief Register a processor
    *
@@ -462,6 +471,8 @@ public:
    * @brief Unregister all processors and post processors (include once) what we registered before.
    */
   void UnregisterProcessors();
+
+  // ETC
 
   /**
    * @brief Gets the Object registry.

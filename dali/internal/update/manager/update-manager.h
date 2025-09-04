@@ -728,6 +728,11 @@ public:
   void RequestClearProgramCache();
 
   /**
+   * Resets the renderer added flag.
+   */
+  void ResetRendererAddedFlag();
+
+  /**
    * @brief Get the active Node pointer by node id.
    *
    * @param[in] nodeId The id of node what we want to get.
