@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TASK_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/weak-handle.h>
 #include <dali/public-api/render-tasks/render-task.h>
-#include <dali/public-api/images/pixel-data.h>
 
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/events/actor-observer.h>
@@ -151,6 +151,16 @@ public:
    * @copydoc Dali::RenderTask::ResetViewportGuideActor
    */
   void ResetViewportGuideActor();
+
+  /**
+   * @copydoc Dali::RenderTask::SetRenderedScaleFactor
+   */
+  void SetRenderedScaleFactor(const Vector2& scaleFactor);
+
+  /**
+   * @copydoc Dali::RenderTask::GetRenderedScaleFactor
+   */
+  Vector2 GetRenderedScaleFactor() const;
 
   /**
    * @copydoc Dali::RenderTask::SetViewportPosition
@@ -412,8 +422,8 @@ protected:
   ~RenderTask() override;
 
 private: // not copyable
-  RenderTask()                  = delete;
-  RenderTask(const RenderTask&) = delete;
+  RenderTask()                             = delete;
+  RenderTask(const RenderTask&)            = delete;
   RenderTask& operator=(const RenderTask&) = delete;
 
 private:
@@ -433,12 +443,14 @@ private:
 
   uint32_t mRefreshOnceCounter;
 
+  Vector2 mRenderedScaleFactor;
+
   FrameBufferPtr mFrameBuffer;
 
   Dali::RenderTask::ScreenToFrameBufferFunction mScreenToFrameBufferFunction; ///< Used to convert screen to frame-buffer coordinates
 
   uint32_t mRenderPassTag{0u};
-  int32_t mOrderIndex{0u};
+  int32_t  mOrderIndex{0u};
 
   uint32_t mRenderTaskId{0u};
 

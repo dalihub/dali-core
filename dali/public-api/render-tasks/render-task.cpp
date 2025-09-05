@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,6 +174,16 @@ Actor RenderTask::GetViewportGuideActor() const
 void RenderTask::ResetViewportGuideActor()
 {
   GetImplementation(*this).ResetViewportGuideActor();
+}
+
+void RenderTask::SetRenderedScaleFactor(const Vector2& scaleFactor)
+{
+  GetImplementation(*this).SetRenderedScaleFactor(scaleFactor);
+}
+
+Vector2 RenderTask::GetRenderedScaleFactor() const
+{
+  return GetImplementation(*this).GetRenderedScaleFactor();
 }
 
 void RenderTask::SetViewportPosition(Vector2 position)
