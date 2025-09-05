@@ -55,20 +55,12 @@ void Core::Initialize()
   mImpl->Initialize();
 }
 
-void Core::ChangeCorePolicy(CorePolicyFlags corePolicy)
-{
-  mImpl->ChangeCorePolicy(corePolicy);
-}
-
-void Core::ChangeGraphicsController(Graphics::Controller& graphicsController)
-{
-  mImpl->ChangeGraphicsController(graphicsController);
-}
-
 ContextNotifierInterface* Core::GetContextNotifier()
 {
   return mImpl->GetContextNotifier();
 }
+
+// Graphics Context Lifecycle
 
 void Core::ContextCreated()
 {
@@ -84,6 +76,8 @@ void Core::RecoverFromContextLoss()
 {
   mImpl->RecoverFromContextLoss();
 }
+
+// Core Lifecycle
 
 void Core::SceneCreated()
 {
@@ -145,6 +139,25 @@ void Core::PostRender()
   mImpl->PostRender();
 }
 
+// API for pre-initialized core.
+
+void Core::ChangeCorePolicy(CorePolicyFlags corePolicy)
+{
+  mImpl->ChangeCorePolicy(corePolicy);
+}
+
+void Core::ChangeGraphicsController(Graphics::Controller& graphicsController)
+{
+  mImpl->ChangeGraphicsController(graphicsController);
+}
+
+void Core::PreInitializeCompleted()
+{
+  mImpl->PreInitializeCompleted();
+}
+
+// Processor
+
 void Core::RegisterProcessor(Processor& processor, bool postProcessor)
 {
   mImpl->RegisterProcessor(processor, postProcessor);
@@ -169,6 +182,8 @@ void Core::UnregisterProcessors()
 {
   mImpl->UnregisterProcessors();
 }
+
+// ETC
 
 ObjectRegistry Core::GetObjectRegistry() const
 {

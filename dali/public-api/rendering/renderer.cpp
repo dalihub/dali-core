@@ -94,6 +94,11 @@ void Renderer::SetRenderCallback(RenderCallback* callback)
   GetImplementation(*this).SetRenderCallback(callback);
 }
 
+void Renderer::TerminateRenderCallback(bool invokeCallback)
+{
+  GetImplementation(*this).TerminateRenderCallback(invokeCallback);
+}
+
 Shader Renderer::GetShader() const
 {
   return Dali::Shader(GetImplementation(*this).GetShader().Get());
@@ -104,4 +109,4 @@ Renderer::Renderer(Internal::Renderer* pointer)
 {
 }
 
-} //namespace Dali
+} // namespace Dali

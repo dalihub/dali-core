@@ -54,6 +54,7 @@ struct DALI_CORE_API RenderCallbackInput
 
   Matrix  view; // Added at end to avoid abi break.
   Vector4 worldColor;
+  bool    isTerminated; ///< Whether this callback is for terminate case, or not. @SINCE_2_4.35
 };
 
 /**

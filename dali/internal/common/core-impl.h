@@ -93,16 +93,6 @@ public:
   void Initialize();
 
   /**
-   * @copydoc Dali::Integration::Core::ChangeCorePolicy()
-   */
-  void ChangeCorePolicy(Integration::CorePolicyFlags corePolicy);
-
-  /**
-   * @copydoc Dali::Integration::Core::ChangeGraphicsController()
-   */
-  void ChangeGraphicsController(Graphics::Controller& graphicsController);
-
-  /**
    * @copydoc Dali::Integration::Core::GetContextNotifier()
    */
   Integration::ContextNotifierInterface* GetContextNotifier();
@@ -186,6 +176,21 @@ public:
    * @copydoc Dali::Integration::Core::GetMaximumUpdateCount()
    */
   uint32_t GetMaximumUpdateCount() const;
+
+  /**
+   * @copydoc Dali::Integration::Core::ChangeCorePolicy()
+   */
+  void ChangeCorePolicy(Integration::CorePolicyFlags corePolicy);
+
+  /**
+   * @copydoc Dali::Integration::Core::ChangeGraphicsController()
+   */
+  void ChangeGraphicsController(Graphics::Controller& graphicsController);
+
+  /**
+   * @copydoc Dali::Integration::Core::PreInitializeCompleted()
+   */
+  void PreInitializeCompleted();
 
   /**
    * @copydoc Dali::Integration::Core::RegisterProcessor

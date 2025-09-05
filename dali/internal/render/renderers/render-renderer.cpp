@@ -28,6 +28,7 @@
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/common/shared-uniform-buffer-view-container.h>
+#include <dali/internal/render/common/terminated-native-draw-manager.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/render/renderers/pipeline-cache.h>
@@ -179,12 +180,13 @@ Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
   mBlendingOptions.SetBlendColor(blendColor);
 }
 
-void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache, SharedUniformBufferViewContainer& sharedUniformBufferViewContainer)
+void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache, Render::TerminatedNativeDrawManager& terminatedNativeDrawManager, SharedUniformBufferViewContainer& sharedUniformBufferViewContainer)
 {
   mGraphicsController               = &graphicsController;
   mProgramCache                     = &programCache;
   mUniformBufferManager             = &uniformBufferManager;
   mPipelineCache                    = &pipelineCache;
+  mTerminatedNativeDrawManager      = &terminatedNativeDrawManager;
   mSharedUniformBufferViewContainer = &sharedUniformBufferViewContainer;
 }
 
@@ -510,23 +512,20 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   // Check if there is render callback
   if(mRenderCallback)
   {
-    if(!mRenderCallbackInput)
-    {
-      mRenderCallbackInput = std::unique_ptr<RenderCallbackInput>(new RenderCallbackInput);
-    }
+    auto& renderCallbackInput = GetRenderCallbackInput();
 
-    bool isolatedNotDirect = (mRenderCallback->GetExecutionMode() == RenderCallback::ExecutionMode::ISOLATED);
+    const bool isolatedNotDirect = (mRenderCallback->GetExecutionMode() == RenderCallback::ExecutionMode::ISOLATED);
 
     Graphics::DrawNativeInfo info{};
     info.api      = Graphics::DrawNativeAPI::GLES;
     info.callback = &static_cast<Dali::CallbackBase&>(*mRenderCallback);
-    info.userData = mRenderCallbackInput.get();
+    info.userData = &renderCallbackInput;
 
     // Tell custom renderer whether code executes in isolation or is injected directly and may alter
     // state or DALi rendering pipeline
-    mRenderCallbackInput->usingOwnEglContext = isolatedNotDirect;
+    renderCallbackInput.usingOwnEglContext = isolatedNotDirect;
     // Set storage for the context to be used
-    info.glesNativeInfo.eglSharedContextStoragePointer = &mRenderCallbackInput->eglContext;
+    info.glesNativeInfo.eglSharedContextStoragePointer = &renderCallbackInput.eglContext;
     info.executionMode                                 = isolatedNotDirect ? Graphics::DrawNativeExecutionMode::ISOLATED : Graphics::DrawNativeExecutionMode::DIRECT;
     info.reserved                                      = nullptr;
 
@@ -535,7 +534,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     if(!textureResources.empty())
     {
       mRenderCallbackTextureBindings.clear();
-      mRenderCallbackInput->textureBindings.resize(textureResources.size());
+      renderCallbackInput.textureBindings.resize(textureResources.size());
       auto i = 0u;
       for(auto& texture : textureResources)
       {
@@ -545,22 +544,30 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
         auto properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
 
         mRenderCallbackTextureBindings.emplace_back(graphicsTexture);
-        mRenderCallbackInput->textureBindings[i++] = properties.nativeHandle;
+        renderCallbackInput.textureBindings[i++] = properties.nativeHandle;
       }
       info.textureCount = mRenderCallbackTextureBindings.size();
       info.textureList  = mRenderCallbackTextureBindings.data();
     }
 
     // pass render callback input
-    mRenderCallbackInput->size       = size;
-    mRenderCallbackInput->view       = viewMatrix;
-    mRenderCallbackInput->projection = projectionMatrix;
-    mRenderCallbackInput->worldColor = worldColor;
+    renderCallbackInput.size       = size;
+    renderCallbackInput.view       = viewMatrix;
+    renderCallbackInput.projection = projectionMatrix;
+    renderCallbackInput.worldColor = worldColor;
 
-    MatrixUtils::MultiplyProjectionMatrix(mRenderCallbackInput->mvp, modelViewMatrix, projectionMatrix);
+    MatrixUtils::MultiplyProjectionMatrix(renderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
 
     // submit draw
     commandBuffer.DrawNative(&info);
+
+    // Note : We should keep render target objects even if for Graphics::DrawNativeExecutionMode::DIRECT.
+    //        Since the context for direct rendering has ownership by the context which native draw callback called.
+    if(mRenderCallbackInvokedTargets.find(&renderTargetGraphicsObjects) == mRenderCallbackInvokedTargets.end())
+    {
+      mRenderCallbackInvokedTargets.insert(&renderTargetGraphicsObjects);
+      renderTargetGraphicsObjects.AddLifecycleObserver(*this);
+    }
 
     if(!isolatedNotDirect)
     {
@@ -1116,6 +1123,13 @@ void Renderer::PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::Noti
   }
 }
 
+void Renderer::RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects)
+{
+  mRenderCallbackInvokedTargets.erase(renderTargetGraphicsObjects);
+
+  // TODO : Could we send Terminate callback this case?
+}
+
 Vector4 Renderer::GetTextureUpdateArea() const noexcept
 {
   Vector4 result = Vector4::ZERO;
@@ -1227,7 +1241,42 @@ void Renderer::ClearPipelineCache(bool notifyToCache)
 
 void Renderer::SetRenderCallback(RenderCallback* callback)
 {
+  // RenderCallback changed! Remove cached render target objects first, and change callback.
+  if(mRenderCallback)
+  {
+    TerminateRenderCallback(false);
+  }
   mRenderCallback = callback;
+}
+
+void Renderer::TerminateRenderCallback(bool invokeCallback)
+{
+  for(const auto* renderTargetGraphicsObjects : mRenderCallbackInvokedTargets)
+  {
+    {
+      auto& mutableRenderTargetGraphicsObjects = *const_cast<SceneGraph::RenderTargetGraphicsObjects*>(renderTargetGraphicsObjects);
+      mutableRenderTargetGraphicsObjects.RemoveLifecycleObserver(*this);
+    }
+
+    // We should invoke it at the matched context :(
+    if(invokeCallback && mRenderCallback)
+    {
+      auto& renderCallbackInput = GetRenderCallbackInput();
+
+      const bool isolatedNotDirect = (mRenderCallback->GetExecutionMode() == RenderCallback::ExecutionMode::ISOLATED);
+
+      // Tell custom renderer whether code executes in isolation or is injected directly and may alter
+      // state or DALi rendering pipeline
+      renderCallbackInput.usingOwnEglContext = isolatedNotDirect;
+
+      // Add some special command for terminate
+      renderCallbackInput.isTerminated = true;
+
+      // We don't need callback input now. Move ownership to terminated native draw manager.
+      mTerminatedNativeDrawManager->RegisterTerminatedRenderCallback(*renderTargetGraphicsObjects, mRenderCallback, std::move(mRenderCallbackInput));
+    }
+  }
+  mRenderCallbackInvokedTargets.clear();
 }
 
 } // namespace Render

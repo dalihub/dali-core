@@ -39,8 +39,10 @@
 #include <dali/internal/render/common/render-algorithms.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/render-instruction.h>
+#include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/common/shared-uniform-buffer-view-container.h>
+#include <dali/internal/render/common/terminated-native-draw-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
@@ -173,6 +175,7 @@ struct RenderManager::Impl
   : graphicsController(graphicsController),
     renderAlgorithms(graphicsController),
     programController(graphicsController),
+    terminatedNativeDrawManager(graphicsController),
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
 #endif
@@ -336,7 +339,8 @@ struct RenderManager::Impl
   std::unique_ptr<Render::UniformBufferManager> uniformBufferManager; ///< The uniform buffer manager
   std::unique_ptr<Render::PipelineCache>        pipelineCache;
 
-  SharedUniformBufferViewContainer sharedUniformBufferViewContainer; ///< Shared Uniform Buffer Views
+  SharedUniformBufferViewContainer    sharedUniformBufferViewContainer; ///< Shared Uniform Buffer Views
+  Render::TerminatedNativeDrawManager terminatedNativeDrawManager;
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
@@ -460,7 +464,7 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 void RenderManager::AddRenderer(const Render::RendererKey& renderer)
 {
   // Initialize the renderer as we are now in render thread
-  renderer->Initialize(mImpl->graphicsController, mImpl->programController, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()), mImpl->sharedUniformBufferViewContainer);
+  renderer->Initialize(mImpl->graphicsController, mImpl->programController, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()), mImpl->terminatedNativeDrawManager, mImpl->sharedUniformBufferViewContainer);
 
   mImpl->rendererContainer.PushBack(renderer);
 }
@@ -830,7 +834,9 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
 
   Scene::ItemsDirtyRectsContainer& itemsDirtyRects = sceneObject->GetItemsDirtyRects();
 
-  if(!sceneObject->IsPartialUpdateEnabled())
+  // Full swap if scene disable partial update,
+  // or terminated native draw exist (to ensure scene context be used)
+  if(!sceneObject->IsPartialUpdateEnabled() || mImpl->terminatedNativeDrawManager.TerminatedCallbackExist(*sceneObject))
   {
     // Clear all dirty rects
     // The rects will be added when partial updated is enabled again
@@ -1287,6 +1293,13 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       currentRenderTargetGraphicsObjects = sceneObject;
     }
 
+    // If we have terminated render callbacks, we need to ensure they are processed.
+    if(DALI_UNLIKELY(mImpl->terminatedNativeDrawManager.TerminatedCallbackExist(*currentRenderTargetGraphicsObjects)))
+    {
+      // Process terminated render callbacks.
+      mImpl->terminatedNativeDrawManager.SubmitTerminatedRenderCallback(*currentRenderTargetGraphicsObjects);
+    }
+
     auto loadOp = instruction.mIsClearColorSet ? Graphics::AttachmentLoadOp::CLEAR : Graphics::AttachmentLoadOp::LOAD;
 
     auto& currentRenderTarget = *currentRenderTargetGraphicsObjects->GetGraphicsRenderTarget();
@@ -1523,6 +1536,13 @@ void RenderManager::ClearScene(Integration::Scene scene)
 
 void RenderManager::PostRender()
 {
+  // If we have terminated render callbacks and it didn't commit, we should process them here.
+  if(DALI_UNLIKELY(mImpl->terminatedNativeDrawManager.AnyTerminatedCallbackExist()))
+  {
+    // We can assume that FrameBuffer already create render targets before.
+    mImpl->terminatedNativeDrawManager.SubmitAllTerminatedRenderCallback();
+  }
+
   if(!mImpl->commandBufferSubmitted)
   {
     // Rendering is skipped but there may be pending tasks. Flush them.

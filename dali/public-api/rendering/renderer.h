@@ -609,6 +609,14 @@ public:
    */
   void SetRenderCallback(RenderCallback* callback);
 
+  /**
+   * @brief Remove RenderCallback used for native rendering.
+   *
+   * @SINCE_2_4.35
+   * @param[in] invokeCallback Invoke render callbacks forcibly if we need to catch terminate case at callback.
+   */
+  void TerminateRenderCallback(bool invokeCallback);
+
 public:
   /// @cond internal
   /**
@@ -624,6 +632,6 @@ public:
 /**
  * @}
  */
-} //namespace Dali
+} // namespace Dali
 
 #endif // DALI_RENDERER_H

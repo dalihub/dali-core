@@ -402,7 +402,8 @@ bool HitTestActorOnce(std::vector<std::shared_ptr<HitResult>>& hitResultList,
                       const float&                             projectedFarClippingDistance,
                       HitTestInterface&                        hitCheck,
                       Dali::Layer::Behavior                    layerBehavior,
-                      bool                                     isOverlay)
+                      bool                                     isOverlay,
+                      RenderTaskPtr                            fboRenderTask)
 {
   if(IsOverlayRoot(currentActor, isOverlay))
   {
@@ -421,18 +422,13 @@ bool HitTestActorOnce(std::vector<std::shared_ptr<HitResult>>& hitResultList,
     return false;
   }
 
-  RenderTaskPtr fboRenderTask = GetFboRenderTask(hitResultOfThisActor, hitCommonInformation.mappingActors);
-
-  if(fboRenderTask)
+  if(fboRenderTask && HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
   {
-    return HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck);
-  }
-  else
-  {
-    hitResultOfThisActor->mHitType = HitType::HIT_ACTOR;
-    hitResultList.push_back(hitResultOfThisActor);
+    return true;
   }
 
+  hitResultOfThisActor->mHitType = HitType::HIT_ACTOR;
+  hitResultList.push_back(hitResultOfThisActor);
   return true;
 }
 
@@ -480,12 +476,13 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
                                  { return exclusive.actor.GetActor() == &childActor; });
       bool isExclusive = result != hitCommonInformation.exclusives.end();
       bool isHit       = false;
+
       if(isExclusive)
       {
         bool isMappingActor = result->renderTaskPtr->GetScreenToFrameBufferMappingActor() == Dali::Actor(&childActor);
         if(isMappingActor)
         {
-          isHit = HitTestActorOnce(hitResultList, childActor, renderTaskSourceActor, hitCommonInformation, ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, layerBehavior, isOverlay);
+          isHit = HitTestActorOnce(hitResultList, childActor, renderTaskSourceActor, hitCommonInformation, ray, projectedNearClippingDistance, projectedFarClippingDistance, hitCheck, layerBehavior, isOverlay, result->renderTaskPtr);
         }
       }
       else
@@ -513,17 +510,13 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
   }
 
   RenderTaskPtr fboRenderTask = GetFboRenderTask(hitResultOfThisActor, hitCommonInformation.mappingActors);
-
-  if(fboRenderTask)
+  if(fboRenderTask && HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
   {
-    return HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck);
-  }
-  else
-  {
-    hitResultOfThisActor->mHitType = HitType::HIT_ACTOR;
-    hitResultList.push_back(hitResultOfThisActor);
+    return true;
   }
 
+  hitResultOfThisActor->mHitType = HitType::HIT_ACTOR;
+  hitResultList.push_back(hitResultOfThisActor);
   return true;
 }
 

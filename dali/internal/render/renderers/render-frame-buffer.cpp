@@ -56,11 +56,6 @@ void FrameBuffer::Destroy()
   mGraphicsObject.reset();
 }
 
-void FrameBuffer::Initialize(Graphics::Controller& graphicsController)
-{
-  mGraphicsController = &graphicsController;
-}
-
 void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
 {
   if(texture)

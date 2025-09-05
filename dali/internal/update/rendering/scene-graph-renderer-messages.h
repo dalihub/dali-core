@@ -316,6 +316,16 @@ inline void SetRenderCallbackMessage(EventThreadServices& eventThreadServices, c
   new(slot) LocalType(&renderer, &Renderer::SetRenderCallback, callback);
 }
 
+inline void TerminateRenderCallbackMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, bool invokeCallback)
+{
+  using LocalType = MessageValue1<Renderer, bool>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  new(slot) LocalType(&renderer, &Renderer::TerminateRenderCallback, invokeCallback);
+}
+
 inline void SetInstanceCountMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, uint32_t instanceCount)
 {
   using LocalType = MessageValue1<SceneGraph::Renderer, uint32_t>;
@@ -339,4 +349,4 @@ inline void EnableSharedUniformBlockMessage(EventThreadServices& eventThreadServ
 
 } // namespace Dali::Internal::SceneGraph
 
-#endif //DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H
+#endif // DALI_INTERNAL_SCENE_GRAPH_RENDERER_MESSAGES_H

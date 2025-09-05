@@ -466,6 +466,8 @@ public:
     if(mIgnored != ignored)
     {
       mIgnored = ignored;
+      SetUpdated(true);
+      SetAllDirtyFlags(); // TODO : Should we reset dirty flag more good way?
       if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
       {
         mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), mIgnored);

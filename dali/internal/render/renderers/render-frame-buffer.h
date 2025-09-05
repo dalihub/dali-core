@@ -54,12 +54,6 @@ public:
   virtual ~FrameBuffer();
 
   /**
-   * Creates a FrameBuffer object in the GPU.
-   * @param[in] graphicsController The Graphics Controller
-   */
-  virtual void Initialize(Graphics::Controller& graphicsController);
-
-  /**
    * Deletes the framebuffer object from the GPU
    */
   virtual void Destroy();
@@ -178,7 +172,6 @@ public:
   FrameBuffer& operator=(const FrameBuffer& rhs) = delete;
 
 private:
-  Graphics::Controller*                      mGraphicsController{nullptr};
   Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
 
   Graphics::FramebufferCreateInfo mCreateInfo;

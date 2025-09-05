@@ -116,6 +116,7 @@ SET( internal_src_files
   ${internal_src_dir}/render/common/render-tracker.cpp
   ${internal_src_dir}/render/common/render-manager.cpp
   ${internal_src_dir}/render/common/shared-uniform-buffer-view-container.cpp
+  ${internal_src_dir}/render/common/terminated-native-draw-manager.cpp
   ${internal_src_dir}/render/queue/render-queue.cpp
   ${internal_src_dir}/render/renderers/gpu-buffer.cpp
   ${internal_src_dir}/render/renderers/pipeline-cache.cpp

@@ -42,6 +42,7 @@ namespace Dali
 {
 namespace Internal
 {
+
 namespace SceneGraph
 {
 class RenderMessageDispatcher;
@@ -412,7 +413,6 @@ private:
   RenderInstructionContainer mInstructions; ///< Render instructions for the scene
 
   RenderMessageDispatcher* mRenderMessageDispatcher{nullptr}; ///< RenderManager message dispatcher
-  Graphics::Controller*    mGraphicsController{nullptr};      ///< Graphics controller
 
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks; ///< Frame presented callbacks
