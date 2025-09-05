@@ -18,15 +18,10 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 
-namespace Dali
-{
-namespace Internal
-{
-namespace Render
+namespace Dali::Internal::Render
 {
 namespace
 {
@@ -44,7 +39,7 @@ inline constexpr size_t GetSizeOfIndexFromIndexType(Dali::Graphics::Format graph
     }
     default:
     {
-      // TODO : Not implmeneted.
+      // TODO : Not implemented.
       return sizeof(uint16_t);
     }
   }
@@ -73,8 +68,8 @@ Geometry::~Geometry()
   }
   mLifecycleObservers.clear();
 
-  // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
-  // If someone call AddObserver / RemoveObserver after this, assert.
+  // Note: We don't need to restore mObserverNotifying to false as we are deleting the object.
+  // If someone calls AddObserver / RemoveObserver after this, assert.
 }
 
 void Geometry::AddVertexBuffer(Render::VertexBuffer* vertexBuffer)
@@ -143,18 +138,18 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
       {
         if(mIndexBuffer == nullptr)
         {
-          // Currently we are unable to reuse index buffer so the write policy is to preserve current content
+          // Currently we are unable to reuse the index buffer so the write policy is to preserve current content
           mIndexBuffer = new GpuBuffer(graphicsController, 0 | Graphics::BufferUsage::INDEX_BUFFER, GpuBuffer::WritePolicy::RETAIN);
         }
 
-        uint32_t bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());
+        auto bufferSize = static_cast<uint32_t>(sizeof(uint16_t) * mIndices.Size());
         mIndexBuffer->UpdateDataBuffer(graphicsController, bufferSize, &mIndices[0]);
       }
 
       mIndicesChanged = false;
     }
 
-    // Make goemetry buffer changed as true if Type changed.
+    // Make geometry buffer changed as true if Type changed.
     bool geometryBufferChanged = mUpdated;
     for(auto&& buffer : mVertexBuffers)
     {
@@ -169,7 +164,7 @@ void Geometry::Upload(Graphics::Controller& graphicsController)
 
     mHasBeenUploaded = true;
 
-    // Notify to observers that geometry informations are changed
+    // Notify to observers that geometry information has changed
     if(geometryBufferChanged)
     {
       mUpdated = true;
@@ -346,6 +341,4 @@ Graphics::PrimitiveTopology Geometry::GetTopology() const
   return topology;
 }
 
-} // namespace Render
-} // namespace Internal
-} // namespace Dali
+} // namespace Dali::Internal::Render

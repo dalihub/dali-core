@@ -155,6 +155,8 @@ public:
 
   uint32_t GetDeviceLimitation(Graphics::DeviceCapability capability) override;
 
+  bool IsCompatible(const Graphics::RenderTarget& renderTargetA, const Graphics::RenderTarget& renderTargetB, const Graphics::RenderPass& renderPassA, const Graphics::RenderPass& renderPassB) override;
+
   /**
    * @brief Executes batch update of textures
    *
