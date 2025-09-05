@@ -136,7 +136,7 @@ ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatri
   return ClippingBox(x, y, z - x, fabsf(w - y));
 }
 
-ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight)
+ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor)
 {
   // Calculate extent vector of the AABB:
   const float halfActorX = size.x * 0.5f;
@@ -149,9 +149,9 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
   // We place the coords into the array in clockwise order, so we know opposite corners are always i + 2 from corner i.
   // We skip the 4th corner here as we can calculate that from the other 3, bypassing matrix multiplication.
   // Note: The below transform methods use a fast (2D) matrix multiply (only 4 multiplications are done).
-  Vector2 corners[4]{Transform2D(modelViewMatrix, -halfActorX + position.x, -halfActorY + position.y),
-                     Transform2D(modelViewMatrix, halfActorX + position.x, -halfActorY + position.y),
-                     Transform2D(modelViewMatrix, halfActorX + position.x, halfActorY + position.y)};
+  Vector2 corners[4]{Transform2D(modelViewMatrix, -halfActorX + position.x, -halfActorY + position.y) * scaleFactor,
+                     Transform2D(modelViewMatrix, halfActorX + position.x, -halfActorY + position.y) * scaleFactor,
+                     Transform2D(modelViewMatrix, halfActorX + position.x, halfActorY + position.y) * scaleFactor};
 
   // As we are dealing with a rectangle, we can do a fast calculation to get the 4th corner from knowing the other 3 (even if rotated).
   corners[3] = Vector2(corners[0] + (corners[2] - corners[1]));
@@ -179,7 +179,6 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
   Vector4 aabb(corners[smallestX].x, corners[(smallestX + 3u) % 4].y, corners[(smallestX + 2u) % 4].x, corners[(smallestX + 1u) % 4].y);
 
   // Return the AABB in screen-space pixels (x, y, width, height).
-  // Note: This is a algebraic simplification of: ( viewport.x - aabb.width ) / 2 - ( ( aabb.width / 2 ) + aabb.x ) per axis.
   Vector4 aabbInScreen(static_cast<float>(viewportWidth) * 0.5f - aabb.z,
                        static_cast<float>(viewportHeight) * 0.5f - aabb.w,
                        static_cast<float>(viewportWidth) * 0.5f - aabb.x,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,6 +311,21 @@ void RenderTask::ResetViewportGuideActor()
     BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportPositionProperty, mViewportPosition);
     BakeMessage<Vector2>(eventThreadServices, *renderTask, *viewportSizeProperty, mViewportSize);
   }
+}
+
+void RenderTask::SetRenderedScaleFactor(const Vector2& scaleFactor)
+{
+  mRenderedScaleFactor = scaleFactor;
+
+  if(GetRenderTaskSceneObject())
+  {
+    SetRenderedScaleFactorMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), mRenderedScaleFactor);
+  }
+}
+
+Vector2 RenderTask::GetRenderedScaleFactor() const
+{
+  return mRenderedScaleFactor;
 }
 
 void RenderTask::SetViewportPosition(const Vector2& value)
@@ -796,6 +811,23 @@ void RenderTask::SetDefaultProperty(Property::Index index, const Property::Value
       SetSyncRequired(property.Get<bool>());
       break;
     }
+    case Dali::RenderTask::Property::RENDERED_SCALE_FACTOR:
+    {
+      Vector2 scaleFactor;
+      if(property.Get(scaleFactor))
+      {
+        SetRenderedScaleFactor(scaleFactor);
+      }
+      else
+      {
+        float scaleFactorFloat = 1.0f;
+        if(property.Get(scaleFactorFloat))
+        {
+          SetRenderedScaleFactor(Vector2(scaleFactorFloat, scaleFactorFloat));
+        }
+      }
+      break;
+    }
     default:
     {
       // nothing to do
@@ -828,6 +860,11 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
     case Dali::RenderTask::Property::REQUIRES_SYNC:
     {
       value = IsSyncRequired();
+      break;
+    }
+    case Dali::RenderTask::Property::RENDERED_SCALE_FACTOR:
+    {
+      value = GetRenderedScaleFactor();
       break;
     }
 
@@ -867,6 +904,11 @@ Property::Value RenderTask::GetDefaultPropertyCurrentValue(Property::Index index
       value = IsSyncRequired();
       break;
     }
+    case Dali::RenderTask::Property::RENDERED_SCALE_FACTOR:
+    {
+      value = GetRenderedScaleFactor();
+      break;
+    }
 
     default:
     {
@@ -903,6 +945,7 @@ void RenderTask::OnNotifyDefaultPropertyAnimation(Animation& animation, Property
           break;
         }
         case Dali::RenderTask::Property::REQUIRES_SYNC:
+        case Dali::RenderTask::Property::RENDERED_SCALE_FACTOR:
         default:
         {
           // Nothing to do as not animatable
@@ -932,6 +975,7 @@ void RenderTask::OnNotifyDefaultPropertyAnimation(Animation& animation, Property
           break;
         }
         case Dali::RenderTask::Property::REQUIRES_SYNC:
+        case Dali::RenderTask::Property::RENDERED_SCALE_FACTOR:
         default:
         {
           // Nothing to do as not animatable
@@ -1056,6 +1100,7 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
   mViewportSize(Vector2::ZERO),
   mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),
   mRefreshOnceCounter(0u),
+  mRenderedScaleFactor(Vector2::ONE),
   mScreenToFrameBufferFunction(Dali::RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION),
   mIsRequestedToKeepRenderResult(false),
   mExclusive(Dali::RenderTask::DEFAULT_EXCLUSIVE),
