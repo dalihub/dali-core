@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,19 @@ public:
    * @return This node is used to compute viewport of the render task.
    */
   Node* GetViewportGuideNode() const;
+
+  /**
+   * Sets the scale factor for rendered output.
+   * @param[in] scaleFactor The scaling factor to apply to the rendered content
+   * @note This affects the relationship between source content and final rendered output
+   */
+  void SetRenderedScaleFactor(const Vector2& scaleFactor);
+
+  /**
+   * Gets the current rendered output scale factor.
+   * @return The current scaling factor being applied to rendered content
+   */
+  Vector2 GetRenderedScaleFactor() const;
 
   /**
    * Set whether the RenderTask has exclusive access to the source nodes.
@@ -410,7 +423,7 @@ private:
   RenderTask();
 
   // Undefined
-  RenderTask(const RenderTask&) = delete;
+  RenderTask(const RenderTask&)            = delete;
   RenderTask& operator=(const RenderTask&) = delete;
 
 public:                                          // Animatable Properties
@@ -433,6 +446,8 @@ private:
   uint32_t mRefreshRate;         ///< REFRESH_ONCE, REFRESH_ALWAYS or render every N frames
   uint32_t mFrameCounter;        ///< counter for rendering every N frames
   uint32_t mRenderedOnceCounter; ///< Incremented whenever state changes to RENDERED_ONCE_AND_NOTIFIED
+
+  Vector2 mRenderedScaleFactor; ///< Scaling factor applied to the rendered output
 
   State mState; ///< Render state.
 

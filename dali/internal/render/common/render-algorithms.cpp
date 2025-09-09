@@ -457,7 +457,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
       // This is a clipping node. We generate the AABB for this node and intersect it with the previous intersection further up the tree.
 
       // Get the AABB bounding box for the current render item.
-      const ClippingBox scissorBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height));
+      const ClippingBox scissorBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height, instruction.mRenderedScaleFactor));
 
       // Get the AABB for the parent item that we must intersect with.
       const ClippingBox& parentBox(mScissorStack.back());
@@ -497,7 +497,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
     // callback so it may be clipped
     if(DALI_LIKELY(item.mRenderer) && item.mRenderer->GetRenderCallback())
     {
-      ClippingBox useClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height));
+      ClippingBox useClippingBox(RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3::ZERO, item.GetPartialRenderingDataNodeInfomations().size, mViewportRectangle.width, mViewportRectangle.height, instruction.mRenderedScaleFactor));
 
       Graphics::Viewport graphicsViewport   = ViewportFromClippingBox(Uint16Pair{0, 0}, mViewportRectangle, 0);
       Graphics::Rect2D   graphicsScissorBox = Rect2DFromClippingBox(useClippingBox, orientation, graphicsViewport);
@@ -696,7 +696,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     if(!rootClippingRect.IsEmpty())
     {
       Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(bufferIndex, nodeInfo.updatedPositionSize) : nodeInfo.updatedPositionSize;
-      auto    rect       = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), mViewportRectangle.width, mViewportRectangle.height);
+      auto    rect       = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), mViewportRectangle.width, mViewportRectangle.height, instruction.mRenderedScaleFactor);
 
       if(rect.Intersect(rootClippingRect))
       {
