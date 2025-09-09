@@ -100,6 +100,16 @@ Constraint::RemoveAction Constraint::GetRemoveAction() const
   return GetImplementation(*this).GetRemoveAction();
 }
 
+void Constraint::SetApplyRate(uint32_t applyRate)
+{
+  GetImplementation(*this).SetApplyRate(applyRate);
+}
+
+uint32_t Constraint::GetApplyRate() const
+{
+  return GetImplementation(*this).GetApplyRate();
+}
+
 void Constraint::SetTag(const uint32_t tag)
 {
   DALI_ASSERT_ALWAYS(tag <= ConstraintTagRanges::CUSTOM_CONSTRAINT_TAG_MAX && "Out of tag range!");

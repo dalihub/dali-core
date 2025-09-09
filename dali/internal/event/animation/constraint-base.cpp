@@ -60,10 +60,12 @@ ConstraintBase::ConstraintBase(Object& object, Property::Index targetPropertyInd
   mObservedObjects(),
   mTargetPropertyIndex(targetPropertyIndex),
   mRemoveAction(Dali::Constraint::DEFAULT_REMOVE_ACTION),
+  mApplyRate(Dali::Constraint::APPLY_ALWAYS),
   mTag(0),
   mApplied(false),
   mSourceDestroyed(false),
-  mIsPreConstraint(true)
+  mIsPreConstraint(true),
+  mConstraintResetterApplied(false)
 {
   ObserveObject(object);
 }
@@ -75,6 +77,7 @@ ConstraintBase* ConstraintBase::Clone(Object& object)
   // create the type specific object
   ConstraintBase* clone = DoClone(object);
   clone->SetRemoveAction(mRemoveAction);
+  clone->SetApplyRate(mApplyRate);
   clone->SetTag(mTag);
   return clone;
 }
@@ -147,6 +150,8 @@ void ConstraintBase::RemoveInternal()
   {
     mApplied = false;
 
+    mConstraintResetterApplied = false;
+
     // Guard against constraint sending messages during core destruction
     if(Stage::IsInstalled())
     {
@@ -192,6 +197,48 @@ void ConstraintBase::SetRemoveAction(ConstraintBase::RemoveAction action)
 ConstraintBase::RemoveAction ConstraintBase::GetRemoveAction() const
 {
   return mRemoveAction;
+}
+
+void ConstraintBase::SetApplyRate(uint32_t applyRate)
+{
+  mApplyRate = applyRate;
+
+  // Always send message to support apply whenever we call SetApplyRate(APPLY_ONCE)
+  if(mSceneGraphConstraint)
+  {
+    SetApplyRateMessage(GetEventThreadServices(), *(mSceneGraphConstraint), mApplyRate);
+    if(DALI_LIKELY(mTargetObject))
+    {
+      SceneGraph::PropertyOwner& targetObject = const_cast<SceneGraph::PropertyOwner&>(mTargetObject->GetSceneObject());
+
+      // TODO : Notify to property owner that apply rate chagend.
+
+      const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty(mTargetPropertyIndex);
+      // The targetProperty should exist, when targetObject exists
+      DALI_ASSERT_ALWAYS(nullptr != targetProperty && "Constraint target property does not exist");
+
+      if(!targetProperty->IsTransformManagerProperty())
+      {
+        if(mApplyRate == Dali::Constraint::APPLY_ONCE)
+        {
+          mConstraintResetterApplied = false;
+          auto resetter              = SceneGraph::BakerResetter::New(targetObject, *targetProperty, mRemoveAction == Dali::Constraint::RemoveAction::BAKE ? SceneGraph::BakerResetter::Lifetime::BAKE : SceneGraph::BakerResetter::Lifetime::SET);
+          AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
+        }
+        else if(!mConstraintResetterApplied)
+        {
+          mConstraintResetterApplied = true;
+          auto resetter              = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
+          AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
+        }
+      }
+    }
+  }
+}
+
+uint32_t ConstraintBase::GetApplyRate() const
+{
+  return mApplyRate;
 }
 
 void ConstraintBase::SetTag(uint32_t tag)

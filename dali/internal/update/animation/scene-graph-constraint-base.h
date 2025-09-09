@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ public:
    * @param ownerContainer the properties to constraint
    * @oparam removeAction perform when removed
    */
-  ConstraintBase(PropertyOwnerContainer& ownerContainer, RemoveAction removeAction);
+  ConstraintBase(PropertyOwnerContainer& ownerContainer, RemoveAction removeAction, uint32_t applyRate);
 
   /**
    * Virtual destructor.
@@ -125,6 +125,32 @@ public:
   RemoveAction GetRemoveAction() const
   {
     return mRemoveAction;
+  }
+
+  /**
+   * @copydoc Dali::Constraint::SetApplyRate()
+   */
+  void SetApplyRate(uint32_t applyRate)
+  {
+    mApplyRate = applyRate;
+
+    // Reset applied count so constraint called this frame.
+    mAppliedCount = 0u;
+
+    // Cancel previous resetter if new apply rate is once
+    if(mApplyRate == Dali::Constraint::APPLY_ONCE && mLifecycleObserver != nullptr)
+    {
+      mLifecycleObserver->ObjectDestroyed();
+      mLifecycleObserver = nullptr;
+    }
+  }
+
+  /**
+   * @copydoc Dali::Constraint::GetApplyRate()
+   */
+  uint32_t GetApplyRate() const
+  {
+    return mApplyRate;
   }
 
   /**
@@ -204,7 +230,7 @@ private:
     if(!mDisconnected)
     {
       // Discard pointer to destroyed property owner. Otherwise StopObservation() would crash when trying to remove
-      //the constraint from the destroyed PropertyOwner's observers list
+      // the constraint from the destroyed PropertyOwner's observers list
       PropertyOwnerIter iter = std::find(mObservedOwners.Begin(), mObservedOwners.End(), &owner);
       if(mObservedOwners.End() != iter)
       {
@@ -228,6 +254,8 @@ private:
 
 protected:
   RemoveAction mRemoveAction;
+  uint32_t     mApplyRate;
+  uint32_t     mAppliedCount;
 
   bool mFirstApply : 1;
   bool mDisconnected : 1;
@@ -254,6 +282,17 @@ inline void SetRemoveActionMessage(EventThreadServices& eventThreadServices, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&constraint, &ConstraintBase::SetRemoveAction, removeAction);
+}
+
+inline void SetApplyRateMessage(EventThreadServices& eventThreadServices, const ConstraintBase& constraint, uint32_t applyRate)
+{
+  using LocalType = MessageValue1<ConstraintBase, uint32_t>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&constraint, &ConstraintBase::SetApplyRate, applyRate);
 }
 
 } // namespace SceneGraph

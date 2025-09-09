@@ -204,7 +204,7 @@ public:
      * @brief Copies the actual object in Constraint::Function.
      *
      * @SINCE_1_0.0
-	 * @tparam T The type of the object
+     * @tparam T The type of the object
      */
     template<class T>
     struct ObjectCopyConstructorDispatcher
@@ -223,10 +223,10 @@ public:
       }
     };
 
-    Function(const Function&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
-    Function(Function&&)      = delete;            ///< Deleted move constructor. @SINCE_1_9.25
+    Function(const Function&)            = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+    Function(Function&&)                 = delete; ///< Deleted move constructor. @SINCE_1_9.25
     Function& operator=(const Function&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-    Function& operator=(Function&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
+    Function& operator=(Function&&)      = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
 
     /**
      * @brief Constructor used when copying the stored object.
@@ -276,6 +276,16 @@ public:
   {
     BAKE,   ///< When the constraint is fully-applied, the constrained value is saved. @SINCE_1_9.28
     DISCARD ///< When the constraint is removed, the constrained value is discarded. @SINCE_1_9.28
+  };
+
+  /**
+   * @brief Enumeration for the apply-rate of the constraint.
+   * @SINCE_2_4.37
+   */
+  enum ApplyRate
+  {
+    APPLY_ONCE   = 0, ///< Apply constraint once only e.g. bake a property and keep. @SINCE_2_4.37
+    APPLY_ALWAYS = 1  ///< Apply constraint every frame. @SINCE_2_4.37
   };
 
   static const RemoveAction DEFAULT_REMOVE_ACTION; ///< BAKE
@@ -517,6 +527,48 @@ public:
    * @return The remove-action
    */
   RemoveAction GetRemoveAction() const;
+
+  /**
+   * @brief Sets the apply-rate of the Constraint.
+   *
+   * The default is APPLY_ALWAYS (1), meaning that the Constraint
+   * will be processed every frame if the scene graph is changing.
+   * It may be desirable to process less frequently. For example,
+   * SetApplyRate(3) will process once every 3 frames if the scene
+   * graph is changing. If the scene graph is not changing, then the
+   * constraint task will not be processed, regardless of this value.
+   *
+   * The APPLY_ONCE (0) value means that the Constraint will be
+   * processed once only, to bake a property and keep it.
+   * Repeatedly calling SetApplyRate(APPLY_ONCE) will cause more
+   * bake to be taken.
+   *
+   * We can change apply-rate even if already Apply() called.
+   *
+   * Constraint will be processed at first frame of this API called.
+   * After then,
+   * - if APPLY_ONCE, Constarint will be skipped.
+   * - if not, Constraint will be skipped (applyRate - 1) frames,
+   *   and then applied, and so on.
+   *
+   * @note Unlike SetProperty, APPLY_ONCE is useful if we want to set
+   *       the property with the same function of constraint, and want
+   *       to ignore other animation or set property changeness ensurely.
+   *
+   * @warning If you are using some input-sensitive constraints (like
+   *          EqualToConstraint), be careful to use it. If applyRate
+   *          is not APPLY_ALWAYS, some frames will be skipped.
+   * @SINCE_2_4.37
+   * @param[in] applyRate The new apply rate
+   */
+  void SetApplyRate(uint32_t applyRate);
+
+  /**
+   * @brief Queries the apply-rate of the Constraint.
+   * @SINCE_2_4.37
+   * @return The apply-rate
+   */
+  uint32_t GetApplyRate() const;
 
   /**
    * @brief Sets a tag for the constraint so it can be identified later.

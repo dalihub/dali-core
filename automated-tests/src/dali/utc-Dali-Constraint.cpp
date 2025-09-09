@@ -496,6 +496,7 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
   constraint.AddSource(LocalSource(Actor::Property::COLOR));
   constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
   constraint.SetRemoveAction(Constraint::DISCARD);
+  constraint.SetApplyRate(3u);
   constraint.SetTag(123);
 
   // Clone the constraint & apply the clone
@@ -506,6 +507,7 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
   application.Render();
 
   DALI_TEST_EQUALS(constraint.GetRemoveAction(), constraintClone.GetRemoveAction(), TEST_LOCATION);
+  DALI_TEST_EQUALS(constraint.GetApplyRate(), constraintClone.GetApplyRate(), TEST_LOCATION);
   DALI_TEST_EQUALS(constraint.GetTag(), constraintClone.GetTag(), TEST_LOCATION);
 
   END_TEST;
@@ -873,6 +875,11 @@ int UtcDaliConstraintBakeRemoveAction(void)
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
 
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -913,6 +920,469 @@ int UtcDaliConstraintDiscardRemoveAction(void)
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), originalPosition, TEST_LOCATION);
   DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), originalPosition, TEST_LOCATION);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
+
+  END_TEST;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// Constraint::SetApplyRate
+// Constraint::GetApplyRate
+///////////////////////////////////////////////////////////////////////////////
+int UtcDaliConstraintApplyRateP(void)
+{
+  TestApplication application;
+
+  Actor      actor      = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_EQUALS(constraint.GetApplyRate(), Constraint::APPLY_ALWAYS, TEST_LOCATION);
+
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  DALI_TEST_EQUALS(constraint.GetApplyRate(), Constraint::APPLY_ONCE, TEST_LOCATION);
+
+  constraint.SetApplyRate(7u);
+  DALI_TEST_EQUALS(constraint.GetApplyRate(), 7u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintSetApplyRateN(void)
+{
+  // Attempt to set from uninitialised constraint
+
+  TestApplication application;
+
+  Constraint constraint;
+  try
+  {
+    constraint.SetApplyRate(Constraint::APPLY_ONCE);
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetApplyRateN(void)
+{
+  // Attempt to retrieve from uninitialised constraint
+
+  TestApplication application;
+
+  Constraint constraint;
+  try
+  {
+    uint32_t applyRate = constraint.GetApplyRate();
+    (void)applyRate;
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintSetApplyRateCallbackCount01(void)
+{
+  // Ensure the apply callback called only once
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Dummy animation to make actor is always dirty.
+  Animation animation = Animation::New(1);
+  animation.AnimateTo(Property(actor, Actor::Property::OPACITY), 0.5f);
+  animation.SetLooping(true);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  int calledCount = 0;
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+
+  // Create a constraint that constrains to position
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, CalledCountFunctor<Vector3>(calledCount));
+  constraint.SetRemoveAction(Constraint::BAKE);
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  // Check apply function called only once.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+
+  // Check changing apply-rate call function.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  // Check apply function called only once.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+  }
+
+  // Check function call per every 3 frames. It will be called apply rate changed frame.
+  constraint.SetApplyRate(3u);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+    calledCount = 0;
+  }
+
+  constraint.Remove();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  END_TEST;
+}
+
+int UtcDaliConstraintSetApplyRateCallbackCount02(void)
+{
+  // Ensure the apply callback called only once
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Dummy animation to make actor is always dirty.
+  Animation animation = Animation::New(1);
+  animation.AnimateTo(Property(actor, Actor::Property::OPACITY), 0.5f);
+  animation.SetLooping(true);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render();
+
+  int calledCount = 0;
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+
+  Property::Index customIndex = actor.RegisterProperty("customProperty", 0.0f);
+
+  // Create a constraint that constrains to position
+  Constraint constraint = Constraint::New<float>(actor, customIndex, CalledCountFunctor<float>(calledCount));
+  constraint.SetRemoveAction(Constraint::BAKE);
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  // Check apply function called only once.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+
+  // Check changing apply-rate call function.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  // Check apply function called only once.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+  }
+
+  // Check function call per every 3 frames. It will be called apply rate changed frame.
+  constraint.SetApplyRate(3u);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+    calledCount = 0;
+  }
+
+  // Change to APPLY_ONCE again (for line coverage)
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+
+  // Check changing apply-rate call function.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.Remove();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  END_TEST;
+}
+
+int UtcDaliConstraintSetApplyRateOnceBackEndAction(void)
+{
+  // Ensure value is baked when constraint is removed
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Should not equal position by default
+  Vector3 position(10.0f, 20.0f, 30.0f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
+
+  // Create a constraint that constrains to position
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, SetValueFunctor<Vector3>(position));
+  constraint.SetRemoveAction(Constraint::BAKE);
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
+
+  // Remove the constraint, it should still be at position
+  constraint.Remove();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintSetApplyRateOnceDiscardEndAction(void)
+{
+  // Ensure value is baked when constraint is removed
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Get and store current position
+  Vector3 originalPosition = actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
+
+  // Should not equal position by default
+  Vector3 position(10.0f, 20.0f, 30.0f);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
+
+  // Create a constraint that constrains to position
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, SetValueFunctor<Vector3>(position));
+  constraint.SetRemoveAction(Constraint::DISCARD);
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), position, TEST_LOCATION);
+
+  // Remove the constraint, it should still be at position
+  constraint.Remove();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), originalPosition, TEST_LOCATION);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), originalPosition, TEST_LOCATION);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION) != position);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintSetApplyRateOnceAfterChangeValue(void)
+{
+  // Ensure value is baked when constraint is removed
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  // Should not equal position by default
+  Vector3 originalValue(1.0f, 2.0f, 3.0f);
+  Vector3 targetValue(10.0f, 20.0f, 30.0f);
+
+  Property::Index customIndex = actor.RegisterProperty("customProperty", originalValue);
+
+  // Create a constraint that constrains to position
+  Constraint constraint = Constraint::New<Vector3>(actor, customIndex, SetValueFunctor<Vector3>(targetValue));
+  constraint.SetRemoveAction(Constraint::BAKE);
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), targetValue, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), targetValue, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), targetValue, TEST_LOCATION);
+
+  tet_printf("Change value by set property\n");
+  Vector3 changedValue(4.0f, 5.0f, 6.0f);
+  actor.SetProperty(customIndex, changedValue);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(customIndex), changedValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), targetValue, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), changedValue, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), changedValue, TEST_LOCATION);
+
+  tet_printf("Set APPLY_ONCE again\n");
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), targetValue, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), targetValue, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(customIndex), targetValue, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1675,16 +2145,14 @@ void CheckComponentProperty(TestApplication& application, Actor& actor, Handle t
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3::ONE, TEST_LOCATION);
 
   Property::Index prePropertyIndex = target.RegisterProperty("testPreProperty", Vector3::ZERO);
-  Constraint      preConstraint    = Constraint::New<Vector3>(target, prePropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
-    output = inputs[0]->GetVector3();
-  });
+  Constraint      preConstraint    = Constraint::New<Vector3>(target, prePropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                      { output = inputs[0]->GetVector3(); });
   preConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
   preConstraint.Apply();
 
   Property::Index postPropertyIndex = target.RegisterProperty("testPostProperty", Vector3::ZERO);
-  Constraint      postConstraint    = Constraint::New<Vector3>(target, postPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs) {
-    output = inputs[0]->GetVector3();
-  });
+  Constraint      postConstraint    = Constraint::New<Vector3>(target, postPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
+                                                       { output = inputs[0]->GetVector3(); });
   postConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
   postConstraint.ApplyPost();
 
