@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,8 @@ int UtcDaliIndexedConstStringMap(void)
 {
   IndexedConstStringMap<int> indexedMap;
 
-  auto IndexedMapGetValueTest = [](const IndexedConstStringMap<int>& indexedMap, ConstString key, bool registered, int element, const char* location) {
+  auto IndexedMapGetValueTest = [](const IndexedConstStringMap<int>& indexedMap, ConstString key, bool registered, int element, const char* location)
+  {
     const auto& iter = indexedMap.Get(key);
     DALI_TEST_EQUALS(!(iter == indexedMap.end()), registered, location);
     if(registered)
@@ -268,7 +269,8 @@ int UtcDaliIndexedConstStringMapNegative(void)
 
   IndexedConstStringMap<int> indexedMap;
 
-  auto IndexedMapAssertTestWithIndex = [](IndexedConstStringMap<int>& indexedMap, int testIndex) {
+  auto IndexedMapAssertTestWithIndex = [](IndexedConstStringMap<int>& indexedMap, int testIndex)
+  {
     tet_printf("operator[] test");
     // Assert when try to access as const operator[] input with not registered key.
     try

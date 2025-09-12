@@ -2,7 +2,7 @@
 #define DALI_SCENE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,16 +61,14 @@ struct Event;
  */
 class DALI_CORE_API Scene : public BaseHandle
 {
-
 public:
-
   /**
    * @brief Touch event propagation way
    */
   enum TouchPropagationType
   {
-    PARENT,     ///< events are propagated to parents in the traditional way
-    GEOMETRY    ///< events are propagated based on geometry.
+    PARENT,  ///< events are propagated to parents in the traditional way
+    GEOMETRY ///< events are propagated based on geometry.
   };
 
   using EventProcessingFinishedSignalType = Signal<void()>;                        ///< Event Processing finished signal type
@@ -550,7 +548,6 @@ public:
    * @return The signal to connect to
    */
   KeyEventSignalType& KeyEventMonitorSignal();
-
 
   /**
    * @brief This signal is emitted when the screen is touched and when the touch ends

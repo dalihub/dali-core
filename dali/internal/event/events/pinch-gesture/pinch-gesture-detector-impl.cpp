@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/events/gesture-requests.h>
-#include <dali/internal/event/common/scene-impl.h>
-#include <dali/public-api/events/pinch-gesture.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-impl.h>
 #include <dali/internal/event/events/pinch-gesture/pinch-gesture-recognizer.h>
+#include <dali/public-api/events/pinch-gesture.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
@@ -72,7 +72,7 @@ void PinchGestureDetector::EmitPinchGestureSignal(Dali::Actor actor, const Dali:
 {
   // Guard against destruction during signal emission
   Dali::PinchGestureDetector handle(this);
-  if(pinch.GetState() !=  GestureState::CONTINUING)
+  if(pinch.GetState() != GestureState::CONTINUING)
   {
     DALI_LOG_DEBUG_INFO("emitting pinch gesture actor id(%d) state(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID), pinch.GetState());
   }
@@ -138,11 +138,10 @@ void PinchGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::To
 {
   if(!mGestureRecognizer)
   {
-    const PinchGestureProcessor& mPinchGestureProcessor = mGestureEventProcessor.GetPinchGestureProcessor();
-    float minimumPinchDistance = mPinchGestureProcessor.GetMinimumPinchDistance();
-    uint32_t minimumTouchEvents = mPinchGestureProcessor.GetMinimumTouchEvents();
-    uint32_t minimumTouchEventsAfterStart = mPinchGestureProcessor.GetMinimumTouchEventsAfterStart();
-
+    const PinchGestureProcessor& mPinchGestureProcessor       = mGestureEventProcessor.GetPinchGestureProcessor();
+    float                        minimumPinchDistance         = mPinchGestureProcessor.GetMinimumPinchDistance();
+    uint32_t                     minimumTouchEvents           = mPinchGestureProcessor.GetMinimumTouchEvents();
+    uint32_t                     minimumTouchEventsAfterStart = mPinchGestureProcessor.GetMinimumTouchEventsAfterStart();
 
     Size size          = scene.GetSize();
     mGestureRecognizer = new PinchGestureRecognizer(*this, Vector2(size.width, size.height), scene.GetDpi(), minimumPinchDistance, minimumTouchEvents, minimumTouchEventsAfterStart);
@@ -164,8 +163,7 @@ void PinchGestureDetector::EmitPinchSignal(Actor* actor, const PinchGestureEvent
   pinch->SetSourceType(pinchEvent.sourceType);
   pinch->SetSourceData(pinchEvent.sourceData);
 
-
-  Dali::Actor                                    actorHandle(actor);
+  Dali::Actor actorHandle(actor);
   EmitPinchGestureSignal(actorHandle, Dali::PinchGesture(pinch.Get()));
 }
 
@@ -214,7 +212,6 @@ void PinchGestureDetector::Process(Scene& scene, const PinchGestureEvent& pinchE
     }
   }
 }
-
 
 } // namespace Internal
 

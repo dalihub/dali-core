@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,9 +171,9 @@ private:
   const TapGestureEvent* mCurrentTapEvent;   ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
   bool                   mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
 
-  uint32_t mMaximumAllowedTime;              ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
-  uint32_t mRecognizerTime;                  ///< The recognizer time required to be recognized as a tap gesture (millisecond)
-  float    mMaximumMotionAllowedDistance;    ///< The recognizer distance required to be recognized as a tap gesture
+  uint32_t mMaximumAllowedTime;           ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+  uint32_t mRecognizerTime;               ///< The recognizer time required to be recognized as a tap gesture (millisecond)
+  float    mMaximumMotionAllowedDistance; ///< The recognizer distance required to be recognized as a tap gesture
 };
 
 } // namespace Internal

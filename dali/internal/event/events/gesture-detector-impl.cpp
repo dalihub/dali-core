@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -278,7 +278,7 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
   Dali::Internal::Actor& actorImpl(GetImplementation(actor));
   if(touch.GetPointCount() > 0 && actorImpl.OnScene())
   {
-    const PointState::Type state = touch.GetState(0);
+    const PointState::Type      state = touch.GetState(0);
     Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
     if(touchEventImpl.GetRenderTaskPtr())
     {

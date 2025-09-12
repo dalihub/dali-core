@@ -2,7 +2,7 @@
 #define DALI_IMAGE_OPERATIONS_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,9 +50,9 @@ using ImageDimensions = Dali::Uint16Pair;
 namespace FittingMode
 {
 /**
-   * @brief Enumeration for FittingMode type.
-   * @SINCE_1_0.0
-   */
+ * @brief Enumeration for FittingMode type.
+ * @SINCE_1_0.0
+ */
 enum Type
 {
   SHRINK_TO_FIT, ///< Fit full image inside desired width & height, potentially not

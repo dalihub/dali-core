@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,9 +90,9 @@ TouchEventCombiner::~TouchEventCombiner() = default;
 TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent, bool isMultiTouchEvent)
 {
   TouchEventCombiner::EventDispatchType dispatchEvent(TouchEventCombiner::DISPATCH_NONE);
-  const PointState::Type                state    = point.GetState();
-  const int                             deviceId = point.GetDeviceId();
-  const Device::Class::Type             deviceType = point.GetDeviceClass();
+  const PointState::Type                state       = point.GetState();
+  const int                             deviceId    = point.GetDeviceId();
+  const Device::Class::Type             deviceType  = point.GetDeviceClass();
   const MouseButton::Type               mouseButton = point.GetMouseButton();
 
   switch(state)

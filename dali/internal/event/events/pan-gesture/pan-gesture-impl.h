@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,10 +45,10 @@ public:
   {
   }
 
-  PanGesture(const PanGesture&) = delete;            ///< Deleted copy constructor
-  PanGesture(PanGesture&&)      = delete;            ///< Deleted move constructor
+  PanGesture(const PanGesture&)            = delete; ///< Deleted copy constructor
+  PanGesture(PanGesture&&)                 = delete; ///< Deleted move constructor
   PanGesture& operator=(const PanGesture&) = delete; ///< Deleted copy assignment operator
-  PanGesture& operator=(PanGesture&&) = delete;      ///< Deleted move assignment operator
+  PanGesture& operator=(PanGesture&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * @brief Set The velocity at which the user is moving their fingers.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ class TestBaseObjectObserver : public BaseObjectObserver
 {
 public:
   TestBaseObjectObserver(Actor actor)
-  : BaseObjectObserver(actor) {}
+  : BaseObjectObserver(actor)
+  {
+  }
 
   void ObjectDestroyed() override
   {
@@ -54,12 +56,11 @@ private:
 
 } // anonymous namespace
 
-
 int UtcDaliBaseObjectObserverObjectDestroyedCalledOnObjectDestruction(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
+  Actor                  actor = Actor::New();
   TestBaseObjectObserver observer(actor);
   DALI_TEST_CHECK(!observer.objectDestroyed);
 
@@ -78,7 +79,7 @@ int UtcDaliBaseObjectObserverObjectDestroyedIsNotCalledIfObserverStopped(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
+  Actor                  actor = Actor::New();
   TestBaseObjectObserver observer(actor);
   DALI_TEST_CHECK(!observer.objectDestroyed);
 
@@ -98,7 +99,7 @@ int UtcDaliBaseObjectObserverObjectDestroyedIsNotCalledIfObserverNotStarted(void
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
+  Actor                  actor = Actor::New();
   TestBaseObjectObserver observer(actor);
   DALI_TEST_CHECK(!observer.objectDestroyed);
 
@@ -113,9 +114,10 @@ int UtcDaliBaseObjectObserverRecursiveStart(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
+  Actor                  actor = Actor::New();
   TestBaseObjectObserver observer(actor);
-  observer.SetCallback([&observer] {
+  observer.SetCallback([&observer]
+  {
     observer.StartObservingDestruction();
   });
 
@@ -132,9 +134,10 @@ int UtcDaliBaseObjectObserverRecursiveStop(void)
 {
   TestApplication application;
 
-  Actor actor = Actor::New();
+  Actor                  actor = Actor::New();
   TestBaseObjectObserver observer(actor);
-  observer.SetCallback([&observer] {
+  observer.SetCallback([&observer]
+  {
     observer.StopObservingDestruction();
   });
 

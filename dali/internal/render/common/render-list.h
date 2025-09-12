@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdint>
 #include <dali/internal/update/nodes/node.h>
+#include <cstdint>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
@@ -79,7 +79,7 @@ public:
   /*
    * Copy constructor and assignment operator not defined
    */
-  RenderList(const RenderList& rhs) = delete;
+  RenderList(const RenderList& rhs)                  = delete;
   const RenderList& operator=(const RenderList& rhs) = delete;
 
   /**

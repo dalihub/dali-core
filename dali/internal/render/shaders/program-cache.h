@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROGRAM_CACHE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ public: // API
    */
   virtual void AddProgram(size_t shaderHash, Program* program) = 0;
 
-  ProgramCache(const ProgramCache& rhs) = delete;
+  ProgramCache(const ProgramCache& rhs)            = delete;
   ProgramCache& operator=(const ProgramCache& rhs) = delete;
 };
 

@@ -2,7 +2,7 @@
 #define DALI_ANGLE_AXIS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,10 +68,10 @@ struct AngleAxis
   }
 
 public:
-  AngleAxis(const AngleAxis&) = default;            ///< Default copy constructor
-  AngleAxis(AngleAxis&&) noexcept = default;            ///< Default move constructor
-  AngleAxis& operator=(const AngleAxis&) = default; ///< Default copy assignment operator
-  AngleAxis& operator=(AngleAxis&&) noexcept = default;      ///< Default move assignment operator
+  AngleAxis(const AngleAxis&)                = default; ///< Default copy constructor
+  AngleAxis(AngleAxis&&) noexcept            = default; ///< Default move constructor
+  AngleAxis& operator=(const AngleAxis&)     = default; ///< Default copy assignment operator
+  AngleAxis& operator=(AngleAxis&&) noexcept = default; ///< Default move assignment operator
 
 public:
   Radian  angle; ///< The angle in radians

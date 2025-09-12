@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -817,7 +817,7 @@ int UtcDaliPropertyValueMoveAssignmentOperator(void)
   DALI_TEST_EQUALS(valueFloat, 1.0f, TEST_LOCATION);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
-#if(__GNUC__ >= 13)
+#if (__GNUC__ >= 13)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wself-move"
 #endif
@@ -825,7 +825,7 @@ int UtcDaliPropertyValueMoveAssignmentOperator(void)
   value2 = std::move(value2);
   DALI_TEST_EQUALS(true, value2.Get(valueFloat), TEST_LOCATION);
   DALI_TEST_EQUALS(valueFloat, 1.0f, TEST_LOCATION);
-#if(__GNUC__ >= 13)
+#if (__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
 

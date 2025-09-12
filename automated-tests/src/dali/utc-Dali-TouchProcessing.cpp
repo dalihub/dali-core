@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2290,7 +2290,6 @@ int UtcDaliTouchEventIntercept02(void)
   interceptData.Reset();
   parentData.Reset();
 
-
   END_TEST;
 }
 
@@ -2321,7 +2320,7 @@ int UtcDaliTouchEventIntercept03(void)
   application.SendNotification();
   application.Render();
 
-  Actor           rootActor(application.GetScene().GetRootLayer());
+  Actor rootActor(application.GetScene().GetRootLayer());
 
   // Connect to root actor's intercept touched signal
   SignalData        sceneData;
@@ -2338,7 +2337,6 @@ int UtcDaliTouchEventIntercept03(void)
   // Even if the layer is touch consumed, the root actor must be able to intercept touch.
   DALI_TEST_EQUALS(true, sceneData.functorCalled, TEST_LOCATION);
   sceneData.Reset();
-
 
   END_TEST;
 }
@@ -2545,7 +2543,6 @@ int UtcDaliTouchEventDispatchTouchMotionPropertySet(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTouchEventGetDeviceNamePositive(void)
 {

@@ -2,7 +2,7 @@
 #define DALI_ACTOR_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,7 +201,7 @@ enum Type
   BACKWARD = 2,                  // The Actor has RenderTasks those need reorder, And the Tasks will draw Actors those placed behinde of the Actor. @SINCE_2_3.43
   BOTH     = FORWARD | BACKWARD, // The Actor has RenderTasks for the both of FORWARD and BACKWARD. @SINCE_2_3.43
 };
-} // namespace OffScreenRenderables
+} //namespace OffScreenRenderable
 
 /**
  * @}

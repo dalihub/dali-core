@@ -157,14 +157,16 @@ void NotificationManager::ProcessMessages()
   const MessageContainer::Iterator end  = mImpl->eventMessageQueue.End();
   if(iter != end)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss) {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
+    {
       oss << "[" << mImpl->eventMessageQueue.Count() << "]";
     });
     for(; iter != end; ++iter)
     {
       (*iter)->Process(0u /*ignored*/);
     }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
+    {
       oss << "[" << mImpl->eventMessageQueue.Count() << "]";
     });
   }
@@ -175,7 +177,8 @@ void NotificationManager::ProcessMessages()
   const InterfaceContainer::iterator end2  = mImpl->eventInterfaceQueue.end();
   if(iter2 != end2)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss) {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
+    {
       oss << "[" << mImpl->eventInterfaceQueue.size() << "]";
     });
     for(; iter2 != end2; ++iter2)
@@ -186,7 +189,8 @@ void NotificationManager::ProcessMessages()
         interface->NotifyCompleted(std::move(iter2->second));
       }
     }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
+    {
       oss << "[" << mImpl->eventInterfaceQueue.size() << "]";
     });
   }

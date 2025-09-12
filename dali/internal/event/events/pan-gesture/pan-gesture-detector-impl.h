@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PAN_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,8 +197,8 @@ protected:
 
 private:
   // Undefined
-  PanGestureDetector()                          = delete;
-  PanGestureDetector(const PanGestureDetector&) = delete;
+  PanGestureDetector()                                         = delete;
+  PanGestureDetector(const PanGestureDetector&)                = delete;
   PanGestureDetector& operator=(const PanGestureDetector& rhs) = delete;
 
   /**

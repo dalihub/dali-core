@@ -90,7 +90,7 @@ struct PartialRenderingData
 
   private:
     // Let we don't allow to copy the matrix values.
-    NodeInfomations(const NodeInfomations&) = delete;
+    NodeInfomations(const NodeInfomations&)            = delete;
     NodeInfomations& operator=(const NodeInfomations&) = delete;
   } mNodeInfomations;
 

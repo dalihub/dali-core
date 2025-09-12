@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,8 +63,8 @@ struct SignalData
 
   void Reset()
   {
-    functorCalled     = false;
-    voidFunctorCalled = false;
+    functorCalled          = false;
+    voidFunctorCalled      = false;
     needGesturePropagation = false;
     receivedGesture.Reset();
 
@@ -91,7 +91,7 @@ struct GestureReceivedFunctor
     signalData.functorCalled   = true;
     signalData.receivedGesture = pan;
     signalData.pannedActor     = actor;
-    if (signalData.needGesturePropagation)
+    if(signalData.needGesturePropagation)
     {
       Dali::DevelActor::SetNeedGesturePropagation(actor, true);
     }
@@ -2966,13 +2966,14 @@ int UtcDaliPanGestureDisableDetectionDuringPanN(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(
     &application,
-    [&detector, &functorCalled](Actor actor, const PanGesture& pan) {
-      if(pan.GetState() == GestureState::FINISHED)
-      {
-        detector.Detach(actor);
-        functorCalled = true;
-      }
-    });
+    [&detector, &functorCalled](Actor actor, const PanGesture& pan)
+  {
+    if(pan.GetState() == GestureState::FINISHED)
+    {
+      detector.Detach(actor);
+      functorCalled = true;
+    }
+  });
 
   // Render and notify
   application.SendNotification();

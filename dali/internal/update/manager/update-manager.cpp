@@ -58,7 +58,7 @@
 // Un-comment to enable node tree debug logging
 // #define NODE_TREE_LOGGING 1
 
-#if(defined(DEBUG_ENABLED) && defined(NODE_TREE_LOGGING))
+#if (defined(DEBUG_ENABLED) && defined(NODE_TREE_LOGGING))
 #define SNAPSHOT_NODE_LOGGING                                                   \
   const uint32_t FRAME_COUNT_TRIGGER = 16;                                      \
   if(mImpl->frameCounter >= FRAME_COUNT_TRIGGER)                                \
@@ -501,7 +501,7 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
   Layer* rootLayer = layer.Release();
 
   DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
-                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
+  { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
@@ -1033,7 +1033,7 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   auto&& iter = mImpl->animations.Begin();
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
-                                          { oss << "[" << mImpl->animations.Count() << "]"; });
+  { oss << "[" << mImpl->animations.Count() << "]"; });
 
   while(iter != mImpl->animations.End())
   {
@@ -1085,7 +1085,7 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
-                                        { oss << "[" << mImpl->animations.Count() << "]"; });
+  { oss << "[" << mImpl->animations.Count() << "]"; });
 
   return animationActive;
 }
@@ -1189,7 +1189,7 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
   }
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss)
-                                          { oss << "[" << mImpl->renderers.Count() << "]"; });
+  { oss << "[" << mImpl->renderers.Count() << "]"; });
 
   for(const auto& rendererKey : mImpl->renderers)
   {
@@ -1291,7 +1291,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   if(updateScene || mImpl->previousUpdateScene)
   {
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_INTERNAL", [&](std::ostringstream& oss)
-                                            {
+    {
       oss << "[n:" << mImpl->nodes.Size() << ",";
       oss << "c:" << mImpl->customObjects.Size() << ",";
       oss << "a:" << mImpl->animations.Size() << ",";
@@ -1416,7 +1416,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
             scene->scene->SetSkipRendering(true);
           }
           DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROCESS_RENDER_TASK", [&](std::ostringstream& oss)
-                                                { oss << "[render instruction capacity : " << mImpl->renderInstructionCapacity << "]\n"; });
+          { oss << "[render instruction capacity : " << mImpl->renderInstructionCapacity << "]\n"; });
 
           numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count(bufferIndex);
         }
@@ -1680,7 +1680,7 @@ void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
       // Reorder children container only if sibiling order changed.
       NodeContainer& container = node->GetChildren();
       std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
-                { return a->GetDepthIndex() < b->GetDepthIndex(); });
+      { return a->GetDepthIndex() < b->GetDepthIndex(); });
     }
   }
 }

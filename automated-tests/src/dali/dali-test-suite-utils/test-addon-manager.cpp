@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,8 @@ void AddOnManager::RegisterAddOnDispatchTable(const AddOnDispatchTable* dispatch
 bool AddOnManager::GetAddOnInfo(const std::string& name, AddOnInfo& info)
 {
   auto retval = false;
-  std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &info](AddOnCacheEntry& entry) {
+  std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &info](AddOnCacheEntry& entry)
+  {
     if(entry.name == name)
     {
       entry.GetAddOnInfo(info);
@@ -148,7 +149,8 @@ std::vector<AddOnLibrary> AddOnManager::LoadAddOns(const std::vector<std::string
   for(auto& name : addonNames)
   {
     size_t index = 0;
-    auto   iter  = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &index](AddOnCacheEntry& entry) {
+    auto   iter  = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &index](AddOnCacheEntry& entry)
+       {
       index++;
       if(entry.name == name)
       {
@@ -173,7 +175,8 @@ AddOnLibrary AddOnManager::LoadAddOn(const std::string& addonName, const std::st
 {
   AddOnLibrary addOnLibrary = nullptr;
   size_t       index        = 0;
-  auto         iter         = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&addonName, &index](AddOnCacheEntry& entry) {
+  auto         iter         = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&addonName, &index](AddOnCacheEntry& entry)
+                  {
     index++;
     return (entry.name == addonName);
   });

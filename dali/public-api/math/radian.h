@@ -2,7 +2,7 @@
 #define DALI_RADIAN_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,9 +107,9 @@ struct Radian
   }
 
 public:
-  Radian(const Radian&)     = default;            ///< Default copy constructor
-  Radian(Radian&&) noexcept = default;            ///< Default move constructor
-  Radian& operator=(const Radian&) = default;     ///< Default copy assignment operator
+  Radian(const Radian&)                = default; ///< Default copy constructor
+  Radian(Radian&&) noexcept            = default; ///< Default move constructor
+  Radian& operator=(const Radian&)     = default; ///< Default copy assignment operator
   Radian& operator=(Radian&&) noexcept = default; ///< Default move assignment operator
 
 public:

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CAMERA_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -433,10 +433,10 @@ private:
   Camera();
 
   // Delete copy and move
-  Camera(const Camera&) = delete;
-  Camera(Camera&&)      = delete;
+  Camera(const Camera&)                = delete;
+  Camera(Camera&&)                     = delete;
   Camera& operator=(const Camera& rhs) = delete;
-  Camera& operator=(Camera&& rhs) = delete;
+  Camera& operator=(Camera&& rhs)      = delete;
 
   /**
    * Recalculates the view matrix.

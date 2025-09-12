@@ -2,7 +2,7 @@
 #define DALI_TEST_SUITE_UTILS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,9 @@
 #include <dali/public-api/dali-core.h>
 #include <test-compare-types.h>
 
-extern "C"
-{
-  void tet_infoline(const char* str);
-  void tet_printf(const char* format, ...);
+extern "C" {
+void tet_infoline(const char* str);
+void tet_printf(const char* format, ...);
 }
 
 #include "test-actor-utils.h"

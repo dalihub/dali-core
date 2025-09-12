@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,9 @@ namespace
 // Extracts the number from the src view and update the view.
 size_t ExtractNumber(std::string_view& src)
 {
-  auto   IsDigit = [](char c) { return (c >= '0' && c <= '9'); };
-  size_t number  = 0;
+  auto IsDigit = [](char c)
+  { return (c >= '0' && c <= '9'); };
+  size_t number = 0;
 
   for(auto i = 0u; i < src.size(); ++i)
   {

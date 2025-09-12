@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,32 +23,31 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
 namespace
 {
-  typedef int32_t TextureId;
-  struct TextureMemoryInfo
+typedef int32_t TextureId;
+struct TextureMemoryInfo
+{
+  TextureMemoryInfo(const TextureId textureId, const std::string url, const int32_t width, const int32_t height, const uint64_t memorySize)
+  : mTextureId(textureId),
+    mUrl(url),
+    mWidth(width),
+    mHeight(height),
+    mMemorySize(memorySize)
   {
-    TextureMemoryInfo(const TextureId textureId, const std::string url, const int32_t width, const int32_t height, const uint64_t memorySize)
-    : mTextureId(textureId),
-      mUrl(url),
-      mWidth(width),
-      mHeight(height),
-      mMemorySize(memorySize)
-    {
-    }
+  }
 
-    TextureId  mTextureId;  ///< The TextureId associated with this ExternalTexture
-    std::string mUrl;
-    int32_t mWidth;
-    int32_t mHeight;
-    uint64_t   mMemorySize; //< The memory size of texture
-  };
+  TextureId   mTextureId; ///< The TextureId associated with this ExternalTexture
+  std::string mUrl;
+  int32_t     mWidth;
+  int32_t     mHeight;
+  uint64_t    mMemorySize; //< The memory size of texture
+};
 
-  std::vector<TextureMemoryInfo> gTextureMemoryInfoQueue;
-  uint64_t gTotalTextureMemory; ///< Total memory used by textures
-}
+std::vector<TextureMemoryInfo> gTextureMemoryInfoQueue;
+uint64_t                       gTotalTextureMemory; ///< Total memory used by textures
+} //namespace
 #endif
 
 namespace Dali
@@ -94,9 +93,10 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
   mResourceId(0u),
   mUseUploadedParameter(mSize.GetWidth() == 0u && mSize.GetHeight() == 0u && mFormat == Pixel::INVALID)
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  ,mTextureId(-1)
-  ,mDataSize(0u)
-  ,mUrl("")
+  ,
+  mTextureId(-1),
+  mDataSize(0u),
+  mUrl("")
 #endif
 {
 }
@@ -111,9 +111,10 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mResourceId(0u),
   mUseUploadedParameter(false)
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  ,mTextureId(-1)
-  ,mDataSize(0u)
-  ,mUrl("")
+  ,
+  mTextureId(-1),
+  mDataSize(0u),
+  mUrl("")
 #endif
 {
 }
@@ -128,9 +129,10 @@ Texture::Texture(TextureType::Type type, uint32_t resourceId)
   mResourceId(resourceId),
   mUseUploadedParameter(true)
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  ,mTextureId(-1)
-  ,mDataSize(0u)
-  ,mUrl("")
+  ,
+  mTextureId(-1),
+  mDataSize(0u),
+  mUrl("")
 #endif
 {
 }
@@ -192,13 +194,11 @@ Texture::~Texture()
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
 bool Texture::Upload(PixelDataPtr pixelData, std::string url, int32_t textureId)
 {
-
-  mUrl = (url == "") ? "UNDEFINED_URL" : url;
+  mUrl       = (url == "") ? "UNDEFINED_URL" : url;
   mTextureId = textureId;
   return Upload(pixelData);
 }
 #endif
-
 
 bool Texture::Upload(PixelDataPtr pixelData)
 {
@@ -302,7 +302,7 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
             auto pixelSize = Pixel::GetBytesPerPixel(mFormat);
-            mDataSize = dataWidth*dataHeight*pixelSize;
+            mDataSize      = dataWidth * dataHeight * pixelSize;
             gTotalTextureMemory += mDataSize;
             gTextureMemoryInfoQueue.push_back(TextureMemoryInfo(mTextureId, mUrl, dataWidth, dataHeight, mDataSize));
             PrintTotalMemory();
@@ -424,9 +424,9 @@ void Texture::PrintTotalMemory()
     auto url = iter->mUrl;
     if(url.length() > 100)
     {
-      url = url.substr(0,97) + "...";
+      url = url.substr(0, 97) + "...";
     }
-    DALI_LOG_ERROR_NOFN("| %-100s | %4d x %4d |%8.2f \n",  url.c_str(), iter->mWidth, iter->mHeight, static_cast<double>(iter->mMemorySize) / (1024.0 * 1024.0));
+    DALI_LOG_ERROR_NOFN("| %-100s | %4d x %4d |%8.2f \n", url.c_str(), iter->mWidth, iter->mHeight, static_cast<double>(iter->mMemorySize) / (1024.0 * 1024.0));
   }
 
   DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");

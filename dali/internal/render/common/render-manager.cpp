@@ -1114,8 +1114,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       {
         const auto& renderList = instruction.GetRenderList(j);
         bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
-                               !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
-                               renderList->HasColorRenderItems());
+                                      !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
+                                      renderList->HasColorRenderItems());
         bool        usesDepthBuffer   = false;
         bool        usesStencilBuffer = false;
         for(auto k = 0u; k < renderList->Count(); ++k)

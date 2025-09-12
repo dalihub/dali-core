@@ -597,7 +597,8 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
   if(cleanup)
   {
     // Remove animators whose PropertyOwner has been destroyed
-    mAnimators.EraseIf([](auto& animator) { return animator->Orphan(); });
+    mAnimators.EraseIf([](auto& animator)
+    { return animator->Orphan(); });
 
     // Need to be re-sort if remained animators size is bigger than one.
     // Note that if animator contains only zero or one items, It is already sorted case.

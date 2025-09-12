@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_MEMORY_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public:
   virtual ~Memory() = default;
 
   // not copyable
-  Memory(const Memory&) = delete;
+  Memory(const Memory&)            = delete;
   Memory& operator=(const Memory&) = delete;
 
   /**
@@ -66,21 +66,21 @@ public:
   virtual void Unlock(bool flush) = 0;
 
   /**
-  * @brief Flushes memory
-  *
-  * Flushing makes a memory object instantly visible by the GPU.
-  *
-  * Example:
-  * Large Buffer object divided in two halves. Every frame only one half
-  * is being updated (permanently mapped, locked, written, unlocked). Calling
-  * FlushMemory() we can update the GPU without unmapping the Buffer object.
-  *
-  * In the scenario when the Memory is being unmapped, flushing is redundant.
-  */
+   * @brief Flushes memory
+   *
+   * Flushing makes a memory object instantly visible by the GPU.
+   *
+   * Example:
+   * Large Buffer object divided in two halves. Every frame only one half
+   * is being updated (permanently mapped, locked, written, unlocked). Calling
+   * FlushMemory() we can update the GPU without unmapping the Buffer object.
+   *
+   * In the scenario when the Memory is being unmapped, flushing is redundant.
+   */
   virtual void Flush() = 0;
 
 protected:
-  Memory(Memory&&) = default;
+  Memory(Memory&&)            = default;
   Memory& operator=(Memory&&) = default;
 };
 

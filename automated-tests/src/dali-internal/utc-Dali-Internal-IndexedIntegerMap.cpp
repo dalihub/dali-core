@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,8 @@ int UtcDaliIndexedIntegerMap(void)
   const std::uint32_t    keyThird  = 333333u;
   const std::uint32_t    keyFourth = 444444u;
 
-  auto IndexedMapGetValueTest = [](const IndexedIntegerMap<int>& indexedMap, std::uint32_t key, bool registered, int element, const char* location) {
+  auto IndexedMapGetValueTest = [](const IndexedIntegerMap<int>& indexedMap, std::uint32_t key, bool registered, int element, const char* location)
+  {
     const auto& iter = indexedMap.Get(key);
     DALI_TEST_EQUALS(!(iter == indexedMap.end()), registered, location);
     if(registered)
@@ -205,7 +206,8 @@ int UtcDaliIndexedIntegerMapNegative(void)
 
   IndexedIntegerMap<int> indexedMap;
 
-  auto IndexedMapAssertTestWithIndex = [](IndexedIntegerMap<int>& indexedMap, int testIndex) {
+  auto IndexedMapAssertTestWithIndex = [](IndexedIntegerMap<int>& indexedMap, int testIndex)
+  {
     tet_printf("operator[] test");
     // Assert when try to access as const operator[] input with not registered key.
     try
@@ -320,7 +322,8 @@ int UtcDaliIndexedIntegerMapStressTest(void)
     }
   }
 
-  auto IndexedMapGetValueTest = [](const IndexedIntegerMap<int>& indexedMap, std::uint32_t key, bool registered, int element) {
+  auto IndexedMapGetValueTest = [](const IndexedIntegerMap<int>& indexedMap, std::uint32_t key, bool registered, int element)
+  {
     const auto& iter = indexedMap.Get(key);
     DALI_TEST_CHECK(!(iter == indexedMap.end()) == registered);
     if(registered)

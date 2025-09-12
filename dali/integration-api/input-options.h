@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_INPUT_OPTIONS_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,7 +203,7 @@ DALI_CORE_API void SetLongPressMinimumHoldingTime(unsigned int value);
  *
  * This is the maximum allowable time interval to recognize as multi-tap.
  * If taps come in within this time, they are recognized as multi-tap.
-  *
+ *
  * @note If it's a double tap, it's like this:
  * |(touch down <--recognizerTime--> touch up) <--  wihtin maximumAllowedTime --> (touch down <--recognizerTime--> touch up)|
  *

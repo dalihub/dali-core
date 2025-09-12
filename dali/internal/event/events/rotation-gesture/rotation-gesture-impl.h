@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ROTATION_GESTURE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,10 +45,10 @@ public:
   {
   }
 
-  RotationGesture(const RotationGesture&) = delete;            ///< Deleted copy constructor
-  RotationGesture(RotationGesture&&)      = delete;            ///< Deleted move constructor
+  RotationGesture(const RotationGesture&)            = delete; ///< Deleted copy constructor
+  RotationGesture(RotationGesture&&)                 = delete; ///< Deleted move constructor
   RotationGesture& operator=(const RotationGesture&) = delete; ///< Deleted copy assignment operator
-  RotationGesture& operator=(RotationGesture&&) = delete;      ///< Deleted move assignment operator
+  RotationGesture& operator=(RotationGesture&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * @brief The overall rotation from the start of the rotation gesture till the latest rotation gesture.

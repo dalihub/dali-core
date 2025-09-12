@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LONG_PRESS_GESTURE_DETECTOR_IMPL_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
-#include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-event.h>
+#include <dali/public-api/events/long-press-gesture-detector.h>
 
 namespace Dali
 {
@@ -195,7 +195,7 @@ private:
   unsigned int mMinimumTouchesRequired;
   unsigned int mMaximumTouchesRequired;
 
-  ActorObserver          mCurrentLongPressActor;  ///< Current actor for which the long press gesture has been recognized.
+  ActorObserver mCurrentLongPressActor; ///< Current actor for which the long press gesture has been recognized.
 };
 
 } // namespace Internal

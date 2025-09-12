@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RAY_TEST_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,46 +39,46 @@ class EventThreadServices;
  */
 namespace RayTest
 {
-  /**
-   * Performs a ray-sphere test with the given pick-ray and the given actor's bounding sphere.
-   *
-   * @param[in] actor The actor to perform the ray-sphere test on
-   * @param[in] rayOrigin The ray origin in the world's reference system
-   * @param[in] rayDir The ray director vector in the world's reference system
-   * @return True if the ray intersects the actor's bounding sphere
-   *
-   * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
-   */
-  bool SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir);
+/**
+ * Performs a ray-sphere test with the given pick-ray and the given actor's bounding sphere.
+ *
+ * @param[in] actor The actor to perform the ray-sphere test on
+ * @param[in] rayOrigin The ray origin in the world's reference system
+ * @param[in] rayDir The ray director vector in the world's reference system
+ * @return True if the ray intersects the actor's bounding sphere
+ *
+ * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
+ */
+bool SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir);
 
-  /**
-   * Performs a ray-actor test with the given pick-ray and the given actor's geometry.
-   *
-   * @param[in] actor The actor to perform the ray-sphere test on
-   * @param[in] rayOrigin The ray origin in the world's reference system.
-   * @param[in] rayDir The ray director vector in the world's reference system.
-   * @param[out] hitPointLocal The hit point in the Actor's local reference system.
-   * @param[out] distance The distance from the hit point to the camera.
-   * @return True if the ray intersects the actor's geometry.
-   *
-   * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
-   */
-  bool ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance);
+/**
+ * Performs a ray-actor test with the given pick-ray and the given actor's geometry.
+ *
+ * @param[in] actor The actor to perform the ray-sphere test on
+ * @param[in] rayOrigin The ray origin in the world's reference system.
+ * @param[in] rayDir The ray director vector in the world's reference system.
+ * @param[out] hitPointLocal The hit point in the Actor's local reference system.
+ * @param[out] distance The distance from the hit point to the camera.
+ * @return True if the ray intersects the actor's geometry.
+ *
+ * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
+ */
+bool ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector2& hitPointLocal, float& distance);
 
-  /**
-   * Performs a ray-actor test with the given pick-ray and the given actor's Bounding Box.
-   *
-   * @param[in] actor The actor to perform the ray-sphere test on
-   * @param[in] rayOrigin The ray origin in the world's reference system.
-   * @param[in] rayDir The ray director vector in the world's reference system.
-   * @param[out] hitPointLocal The hit point in the Actor's local reference system.
-   * @param[out] distance The distance from the hit point to the camera.
-   * @return True if the ray intersects the actor's Bounding Box.
-   *
-   * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
-   */
-  bool ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector3& hitPointLocal, float& distance);
-};
+/**
+ * Performs a ray-actor test with the given pick-ray and the given actor's Bounding Box.
+ *
+ * @param[in] actor The actor to perform the ray-sphere test on
+ * @param[in] rayOrigin The ray origin in the world's reference system.
+ * @param[in] rayDir The ray director vector in the world's reference system.
+ * @param[out] hitPointLocal The hit point in the Actor's local reference system.
+ * @param[out] distance The distance from the hit point to the camera.
+ * @return True if the ray intersects the actor's Bounding Box.
+ *
+ * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
+ */
+bool ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& rayOrigin, const Vector4& rayDir, Vector3& hitPointLocal, float& distance);
+}; //namespace RayTest
 
 } // namespace Internal
 

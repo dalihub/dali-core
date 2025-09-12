@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_TRACE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -263,11 +263,10 @@ public:
 #define DALI_TRACE_SCOPE(filter, tag) \
   Dali::Integration::Trace::Tracer logTracerScope(filter, tag);
 
-#define DALI_TRACE_SCOPE_WITH_FORMAT(filter, tag, format, ...) \
-  char __traceFormattedMessage[128]; \
+#define DALI_TRACE_SCOPE_WITH_FORMAT(filter, tag, format, ...)                               \
+  char __traceFormattedMessage[128];                                                         \
   snprintf(__traceFormattedMessage, sizeof(__traceFormattedMessage), format, ##__VA_ARGS__); \
   Dali::Integration::Trace::Tracer logTracerScopeWithFormat(filter, tag, __traceFormattedMessage);
-
 
 #else // TRACE_ENABLED
 

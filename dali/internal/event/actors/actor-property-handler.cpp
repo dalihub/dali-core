@@ -329,10 +329,10 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     {
       CheckValidAndSet<Vector4>(property,
                                 [&property, &actor](Vector4& color)
-                                {
-                                  color.a = (property.GetType() == Property::VECTOR4) ? color.a : 1.0f;
-                                  actor.SetColor(color);
-                                });
+      {
+        color.a = (property.GetType() == Property::VECTOR4) ? color.a : 1.0f;
+        actor.SetColor(color);
+      });
       break;
     }
 
@@ -565,7 +565,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     case Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
-                             { actor.mCaptureAllTouchAfterStart = value; });
+      { actor.mCaptureAllTouchAfterStart = value; });
       break;
     }
 
@@ -602,7 +602,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     case Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
-                             { actor.mAllowOnlyOwnTouch = value; });
+      { actor.mAllowOnlyOwnTouch = value; });
       break;
     }
 
@@ -610,24 +610,24 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
     {
       CheckValidAndSet<bool>(property,
                              [&actor](bool value)
-                             {
-                               actor.mUseTextureUpdateArea = value;
-                               UseTextureUpdateAreaMessage(actor.GetEventThreadServices(), actor.GetNode(), value);
-                             });
+      {
+        actor.mUseTextureUpdateArea = value;
+        UseTextureUpdateAreaMessage(actor.GetEventThreadServices(), actor.GetNode(), value);
+      });
       break;
     }
 
     case Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
-                             { actor.mDispatchTouchMotion = value; });
+      { actor.mDispatchTouchMotion = value; });
       break;
     }
 
     case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
-                             { actor.mDispatchHoverMotion = value; });
+      { actor.mDispatchHoverMotion = value; });
       break;
     }
 

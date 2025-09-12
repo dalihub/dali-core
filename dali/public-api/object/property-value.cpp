@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -725,10 +725,10 @@ private:
   }
 
   /**
-  * Destroy the object created in the Data union memory by probing the
-  * type and calling the appropriate destructor.
-  * and also reset the type and memory location to reflect that .
-  */
+   * Destroy the object created in the Data union memory by probing the
+   * type and calling the appropriate destructor.
+   * and also reset the type and memory location to reflect that .
+   */
   void Destroy()
   {
     switch(GetType())

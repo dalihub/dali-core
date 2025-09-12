@@ -2,7 +2,7 @@
 #define DALI_ALPHA_FUNCTION_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ namespace Dali
 using AlphaFunctionPrototype = float (*)(float); ///< Prototype of an alpha function @SINCE_1_0.0
 
 /**
-   * @brief Alpha functions are used in animations to specify the rate of change of the animation parameter over time.
-   *
-   * Understanding an animation as a parametric function over time, the alpha function is applied to the parameter of
-   * the animation before computing the final animation value.
-   * @SINCE_1_0.0
-   */
+ * @brief Alpha functions are used in animations to specify the rate of change of the animation parameter over time.
+ *
+ * Understanding an animation as a parametric function over time, the alpha function is applied to the parameter of
+ * the animation before computing the final animation value.
+ * @SINCE_1_0.0
+ */
 class DALI_CORE_API AlphaFunction
 {
 public:
@@ -213,8 +213,8 @@ public:
   const Dali::SpringData& GetSpringData() const;
 
 private:
-  Mode             mMode;    //< Enum indicating the functioning mode of the AlphaFunction
-  BuiltinFunction  mBuiltin; //< Enum indicating the built-in alpha function
+  Mode            mMode;    //< Enum indicating the functioning mode of the AlphaFunction
+  BuiltinFunction mBuiltin; //< Enum indicating the built-in alpha function
 
   union
   {

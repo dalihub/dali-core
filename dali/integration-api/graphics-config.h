@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GRAPHICS_CONFIG_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,10 +36,10 @@ protected:
 
 public:
   // Not copyable but movable
-  GraphicsConfig(const GraphicsConfig&) = delete;            ///< Deleted copy constructor.
-  GraphicsConfig(GraphicsConfig&&)      = default;           ///< Default move constructor.
-  GraphicsConfig& operator=(const GraphicsConfig&) = delete; ///< Deleted copy assignment operator.
-  GraphicsConfig& operator=(GraphicsConfig&&) = default;     ///< Default move assignment operator.
+  GraphicsConfig(const GraphicsConfig&)            = delete;  ///< Deleted copy constructor.
+  GraphicsConfig(GraphicsConfig&&)                 = default; ///< Default move constructor.
+  GraphicsConfig& operator=(const GraphicsConfig&) = delete;  ///< Deleted copy assignment operator.
+  GraphicsConfig& operator=(GraphicsConfig&&)      = default; ///< Default move assignment operator.
 
   /**
    * Returns current graphicses can support the blend equation

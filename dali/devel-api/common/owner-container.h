@@ -2,7 +2,7 @@
 #define DALI_OWNER_CONTAINER_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,10 +60,10 @@ public:
   }
 
   // Not copyable or movable
-  OwnerContainer(const OwnerContainer&) = delete;            ///< Deleted copy constructor
-  OwnerContainer(OwnerContainer&&)      = delete;            ///< Deleted move constructor
+  OwnerContainer(const OwnerContainer&)            = delete; ///< Deleted copy constructor
+  OwnerContainer(OwnerContainer&&)                 = delete; ///< Deleted move constructor
   OwnerContainer& operator=(const OwnerContainer&) = delete; ///< Deleted copy assignment operator
-  OwnerContainer& operator=(OwnerContainer&&) = delete;      ///< Deleted move assignment operator
+  OwnerContainer& operator=(OwnerContainer&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * Test whether the container is empty.
@@ -96,7 +96,8 @@ public:
     auto begin = Vector<T>::Begin();
     auto end   = Vector<T>::End();
 
-    auto function = [predicate](auto& obj) {
+    auto function = [predicate](auto& obj)
+    {
       if(predicate(obj))
       {
         delete obj;

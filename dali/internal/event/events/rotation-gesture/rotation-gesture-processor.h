@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ROTATION_GESTURE_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public:
    */
   ~RotationGestureProcessor() override = default;
 
-  RotationGestureProcessor(const RotationGestureProcessor&) = delete;                ///< Deleted copy constructor.
+  RotationGestureProcessor(const RotationGestureProcessor&)                = delete; ///< Deleted copy constructor.
   RotationGestureProcessor& operator=(const RotationGestureProcessor& rhs) = delete; ///< Deleted copy assignment operator.
 
 public: // To be called by GestureEventProcessor

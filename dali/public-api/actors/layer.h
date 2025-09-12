@@ -2,7 +2,7 @@
 #define DALI_LAYER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -389,7 +389,7 @@ public:
    * @note All child layers use the same sort function. If a child layer is added to this
    * layer, then the sort function used by the child layer will also be the same.
    *
-  */
+   */
   void SetSortFunction(SortFunctionType function);
 
 public: // Not intended for application developers

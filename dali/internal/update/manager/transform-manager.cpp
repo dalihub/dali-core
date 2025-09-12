@@ -403,7 +403,7 @@ bool TransformManager::Update()
   }
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
-                                          { oss << "[" << mComponentCount << ", i:" << mIgnoredComponentCount << "]"; });
+  { oss << "[" << mComponentCount << ", i:" << mIgnoredComponentCount << "]"; });
 
   cnt = 0;
 
@@ -537,7 +537,7 @@ bool TransformManager::Update()
   mDirtyFlags >>= 1u; ///< age down.
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
-                                        { oss << "[componentsChanged:" << mUpdated << "]"; });
+  { oss << "[componentsChanged:" << mUpdated << "]"; });
 
   return mUpdated;
 }

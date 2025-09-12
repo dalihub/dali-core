@@ -159,7 +159,8 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
   uint64_t end   = 0u;
 #endif
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss)
+  {
     oss << "[n:" << notifierIdList.Count() << ",i:" << mIgnoredAnimations.size() << "]";
   });
 
@@ -226,7 +227,8 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
     }
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_FINISHED", [&](std::ostringstream& oss)
+  {
     oss << "[f:" << finishedAnimations.size() << ",i:" << mIgnoredAnimations.size();
 
     if(finishedAnimations.size() > 0u)

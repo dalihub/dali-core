@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_WHEEL_EVENT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,10 +124,10 @@ private:
 
   // Not copyable or movable
 
-  WheelEvent(const WheelEvent& rhs) = delete;            ///< Deleted copy constructor
-  WheelEvent(WheelEvent&& rhs)      = delete;            ///< Deleted move constructor
+  WheelEvent(const WheelEvent& rhs)            = delete; ///< Deleted copy constructor
+  WheelEvent(WheelEvent&& rhs)                 = delete; ///< Deleted move constructor
   WheelEvent& operator=(const WheelEvent& rhs) = delete; ///< Deleted copy assignment operator
-  WheelEvent& operator=(WheelEvent&& rhs) = delete;      ///< Deleted move assignment operator
+  WheelEvent& operator=(WheelEvent&& rhs)      = delete; ///< Deleted move assignment operator
 
 private:
   Dali::WheelEvent::Type mType;      ///< The type of the event

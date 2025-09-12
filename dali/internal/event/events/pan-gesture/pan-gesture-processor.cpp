@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -458,7 +458,7 @@ void PanGestureProcessor::SetMinimumDistance(int32_t value)
 {
   if(mGestureRecognizer)
   {
-    mMinimumDistance = value;
+    mMinimumDistance                    = value;
     PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
     if(panRecognizer)
     {
@@ -471,7 +471,7 @@ void PanGestureProcessor::SetMinimumPanEvents(int32_t value)
 {
   if(mGestureRecognizer)
   {
-    mMinimumPanEvents = value;
+    mMinimumPanEvents                   = value;
     PanGestureRecognizer* panRecognizer = dynamic_cast<PanGestureRecognizer*>(mGestureRecognizer.Get());
     if(panRecognizer)
     {
@@ -489,7 +489,6 @@ int32_t PanGestureProcessor::GetMinimumPanEvents() const
 {
   return mMinimumPanEvents;
 }
-
 
 const SceneGraph::PanGesture& PanGestureProcessor::GetSceneObject() const
 {
@@ -620,7 +619,8 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
       scene->SetLastPanGestureState(state);
     }
 
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+    {
       oss << "[" << gestureDetectors.size() << "]";
     });
 
@@ -632,8 +632,8 @@ void PanGestureProcessor::EmitPanSignal(Actor*                          actor,
       static_cast<PanGestureDetector*>(*iter)->EmitPanGestureSignal(actorHandle, Dali::PanGesture(pan.Get()));
     }
 
-
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PAN_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+    {
       oss << "[" << gestureDetectors.size() << "]";
     });
   }

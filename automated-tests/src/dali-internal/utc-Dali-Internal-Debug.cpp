@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,8 @@ int UtcDaliDebugTimeCheckerP(void)
 
   bool messageGeneratorExcuted = false;
 
-  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(enabledFilter, [&](std::ostringstream& oss) {
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(enabledFilter, [&](std::ostringstream& oss)
+  {
     messageGeneratorExcuted = true;
     oss << "complex message";
   });
@@ -160,7 +161,8 @@ int UtcDaliDebugTimeCheckerP(void)
   DALI_TEST_EQUALS(gCapturedLog.empty(), true, TEST_LOCATION);
 
   messageGeneratorExcuted = false;
-  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gDummyTimeCheckerFilter, [&](std::ostringstream& oss) {
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gDummyTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
     messageGeneratorExcuted = true;
     oss << "complex message";
   });

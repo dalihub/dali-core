@@ -2,7 +2,7 @@
 #define DALI_BASE_SIGNAL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -347,10 +347,10 @@ private:
    */
   void CleanupConnections();
 
-  BaseSignal(const BaseSignal&) = delete;            ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
-  BaseSignal(BaseSignal&&)      = delete;            ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
+  BaseSignal(const BaseSignal&)            = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
+  BaseSignal(BaseSignal&&)                 = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
   BaseSignal& operator=(const BaseSignal&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-  BaseSignal& operator=(BaseSignal&&) = delete;      ///< Deleted move assignment operator. @SINCE_1_9.25
+  BaseSignal& operator=(BaseSignal&&)      = delete; ///< Deleted move assignment operator. @SINCE_1_9.25
 
 private:
   struct DALI_INTERNAL Impl;

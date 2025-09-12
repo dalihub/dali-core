@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -880,7 +880,7 @@ int UtcDaliHitTestAlgorithmInMultipleLayer(void)
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Layer layer = Layer::New();
+  Layer layer                                        = Layer::New();
   layer[Dali::Actor::Property::NAME]                 = "Layer";
   layer[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
   layer[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
@@ -1015,7 +1015,7 @@ int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
   Stage   stage = Stage::GetCurrent();
   Vector2 stageSize(stage.GetSize());
 
-  Actor green                                       = Actor::New();
+  Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
   green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
@@ -1365,7 +1365,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
   Stage stage     = Stage::GetCurrent();
   Actor rootLayer = stage.GetRootLayer();
 
-  auto createActor = [&](const Vector3& position) {
+  auto createActor = [&](const Vector3& position)
+  {
     Actor actor = Handle::New<Actor>(
       {
         {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
@@ -1376,7 +1377,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
     return actor;
   };
 
-  auto hitTest = [&stage](const Vector2& screenCoordinates) {
+  auto hitTest = [&stage](const Vector2& screenCoordinates)
+  {
     HitTestAlgorithm::Results results;
     HitTest(stage, screenCoordinates, results, &DefaultIsActorTouchableFunction);
     return results.actor;
@@ -1587,7 +1589,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
   Stage stage     = Stage::GetCurrent();
   Actor rootLayer = stage.GetRootLayer();
 
-  auto createActor = [&](const Vector3& position) {
+  auto createActor = [&](const Vector3& position)
+  {
     Actor actor = Handle::New<Actor>(
       {
         {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
@@ -1598,7 +1601,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
     return actor;
   };
 
-  auto hitTest = [&stage](const Vector2& screenCoordinates) {
+  auto hitTest = [&stage](const Vector2& screenCoordinates)
+  {
     HitTestAlgorithm::Results results;
     HitTest(stage, screenCoordinates, results, &DefaultIsActorTouchableFunction);
     return results.actor;
@@ -1675,7 +1679,6 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
   END_TEST;
 }
 
-
 // Test for the FBO hit-test fallback patch.
 // This test ensures that if a mapping actor is hit, but the subsequent FBO hit-test fails,
 // the mapping actor itself is returned as the hit result (acting as a fallback).
@@ -1729,11 +1732,11 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   // The mappingActor will serve as both the source and the mapping actor for the FBO render task.
   // This makes it an "exclusive" actor, triggering the HitTestActorOnce path.
   fboRenderTask.SetCameraActor(fboCamera);
-  fboRenderTask.SetSourceActor(mappingActor); // Source actor for the FBO content (is mappingActor itself)
+  fboRenderTask.SetSourceActor(mappingActor);                     // Source actor for the FBO content (is mappingActor itself)
   fboRenderTask.SetScreenToFrameBufferMappingActor(mappingActor); // Mapping actor on the main scene
 
   // Create a dummy FrameBuffer.
-  Texture    texture      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
+  Texture     texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
   frameBuffer.AttachColorTexture(texture);
   fboRenderTask.SetFrameBuffer(frameBuffer);
@@ -1756,7 +1759,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   // which correctly returns mappingActor as the hit result.
   tet_printf("hit name : %s\n", results.actor.GetProperty(Dali::Actor::Property::NAME).Get<std::string>().c_str());
   DALI_TEST_CHECK(results.actor == mappingActor);
-//  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+  //  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
   END_TEST;
 }
 
@@ -1810,7 +1813,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
   fboRenderTask.SetSourceActor(sourceActor);
   fboRenderTask.SetScreenToFrameBufferMappingActor(mappingActor);
 
-  Texture    texture      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
+  Texture     texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
   frameBuffer.AttachColorTexture(texture);
   fboRenderTask.SetFrameBuffer(frameBuffer);
@@ -1890,7 +1893,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   fboRenderTask.SetSourceActor(sourceLayer);
   fboRenderTask.SetScreenToFrameBufferMappingActor(mappingActor);
 
-  Texture    texture      = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
+  Texture     texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, unsigned(stageSize.width), unsigned(stageSize.height));
   FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height, FrameBuffer::Attachment::DEPTH);
   frameBuffer.AttachColorTexture(texture);
   fboRenderTask.SetFrameBuffer(frameBuffer);

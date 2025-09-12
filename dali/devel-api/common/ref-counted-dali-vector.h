@@ -2,7 +2,7 @@
 #define REF_COUNTED_DALI_VECTOR_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,10 +55,10 @@ public:
   }
 
   // Not copyable or movable
-  RefCountedVector(const RefCountedVector&) = delete;            ///< Deleted copy constructor
-  RefCountedVector(RefCountedVector&&)      = delete;            ///< Deleted move constructor
+  RefCountedVector(const RefCountedVector&)            = delete; ///< Deleted copy constructor
+  RefCountedVector(RefCountedVector&&)                 = delete; ///< Deleted move constructor
   RefCountedVector& operator=(const RefCountedVector&) = delete; ///< Deleted copy assignment operator
-  RefCountedVector& operator=(RefCountedVector&&) = delete;      ///< Deleted move assignment operator
+  RefCountedVector& operator=(RefCountedVector&&)      = delete; ///< Deleted move assignment operator
 
 protected:
   virtual ~RefCountedVector()

@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_FRAMEBUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ public:
   virtual ~Framebuffer() = default;
 
   // not copyable
-  Framebuffer(const Framebuffer&) = delete;
+  Framebuffer(const Framebuffer&)            = delete;
   Framebuffer& operator=(const Framebuffer&) = delete;
 
 protected:
-  Framebuffer(Framebuffer&&) = default;
+  Framebuffer(Framebuffer&&)            = default;
   Framebuffer& operator=(Framebuffer&&) = default;
 };
 

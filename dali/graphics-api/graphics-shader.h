@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_SHADER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ public:
   virtual ~Shader() = default;
 
   // not copyable
-  Shader(const Shader&) = delete;
+  Shader(const Shader&)            = delete;
   Shader& operator=(const Shader&) = delete;
 
 protected:
-  Shader(Shader&&) = default;
+  Shader(Shader&&)            = default;
   Shader& operator=(Shader&&) = default;
 };
 

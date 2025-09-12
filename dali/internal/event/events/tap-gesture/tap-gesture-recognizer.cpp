@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           {
             const Vector2& screen(point.GetScreenPosition());
             Vector2        distanceDelta(std::abs(mTouchPosition.x - screen.x),
-                                std::abs(mTouchPosition.y - screen.y));
+                                         std::abs(mTouchPosition.y - screen.y));
             if(distanceDelta.x > mMaximumMotionAllowedDistance ||
                distanceDelta.y > mMaximumMotionAllowedDistance)
             {
@@ -124,7 +124,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         {
           const Vector2& screen(point.GetScreenPosition());
           Vector2        distanceDelta(std::abs(mTouchPosition.x - screen.x),
-                                std::abs(mTouchPosition.y - screen.y));
+                                       std::abs(mTouchPosition.y - screen.y));
 
           uint32_t timeDelta = event.time - mLastTapTime;
           mTouchTime         = event.time;
@@ -164,10 +164,10 @@ void TapGestureRecognizer::CancelEvent()
 
 void TapGestureRecognizer::SetupForTouchDown(const Integration::TouchEvent& event, const Integration::Point& point)
 {
-  mTouchPosition = point.GetScreenPosition();
-  mTouchTime     = event.time;
-  mLastTapTime   = 0u;
-  mState         = TOUCHED;
+  mTouchPosition  = point.GetScreenPosition();
+  mTouchTime      = event.time;
+  mLastTapTime    = 0u;
+  mState          = TOUCHED;
   mTapsRegistered = 0u;
 
   EmitPossibleState(event);
@@ -213,7 +213,7 @@ void TapGestureRecognizer::EmitSingleTap(uint32_t time, const Integration::Point
   TapGestureEvent event(GestureState::STARTED);
   const Vector2&  screen(point.GetScreenPosition());
   Vector2         distanceDelta(std::abs(mTouchPosition.x - screen.x),
-                        std::abs(mTouchPosition.y - screen.y));
+                                std::abs(mTouchPosition.y - screen.y));
 
   if(distanceDelta.x > mMaximumMotionAllowedDistance ||
      distanceDelta.y > mMaximumMotionAllowedDistance)
@@ -227,9 +227,9 @@ void TapGestureRecognizer::EmitSingleTap(uint32_t time, const Integration::Point
 void TapGestureRecognizer::EmitTap(uint32_t time, TapGestureEvent& event)
 {
   event.numberOfTaps = ++mTapsRegistered;
-  event.point  = mTouchPosition;
-  event.time   = time;
-  mLastTapTime = event.time;
+  event.point        = mTouchPosition;
+  event.time         = time;
+  mLastTapTime       = event.time;
 
   ProcessEvent(event);
 }

@@ -202,8 +202,8 @@ private: // Implementation
   Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
 
 public:
-  Program()               = delete;            ///< default constructor, not defined
-  Program(const Program&) = delete;            ///< copy constructor, not defined
+  Program()                          = delete; ///< default constructor, not defined
+  Program(const Program&)            = delete; ///< copy constructor, not defined
   Program& operator=(const Program&) = delete; ///< assignment operator, not defined
 
   /**

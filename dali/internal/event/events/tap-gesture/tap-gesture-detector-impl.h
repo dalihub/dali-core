@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TAP_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 #include <dali/public-api/events/tap-gesture-detector.h>
 #include <dali/public-api/events/tap-gesture.h>
-#include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 
 namespace Dali
 {
@@ -182,7 +182,7 @@ private: // GestureDetector overrides
    */
   void CancelProcessing() override;
 
-    /**
+  /**
    * This method is called whenever a tap gesture event occurs.
    * @param[in] scene The scene the tap gesture event occurs in.
    * @param[in] tapEvent The event that has occurred.
@@ -199,7 +199,7 @@ private:
   uint32_t         mWaitTime;
   Dali::Actor      mTappedActor;
   Dali::TapGesture mTap;
-  ActorObserver    mCurrentTapActor;    ///< The current actor that has been gestured.
+  ActorObserver    mCurrentTapActor; ///< The current actor that has been gestured.
   bool             mReceiveAllTapEvents : 1;
   bool             mPossibleProcessed : 1; ///< Indication of whether we've processed a touch down for this gestuee
 };

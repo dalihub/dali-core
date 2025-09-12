@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,8 +112,8 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         if((primaryPointState == PointState::DOWN) || (primaryPointState == PointState::STATIONARY) || (primaryPointState == PointState::MOTION))
         {
           mPrimaryTouchDownLocation = mPreviousPosition = event.points[0].GetScreenPosition();
-          mPrimaryTouchDownTime     = event.time;
-          mMotionEvents             = 0;
+          mPrimaryTouchDownTime                         = event.time;
+          mMotionEvents                                 = 0;
 
           uint32_t pointCount(event.GetPointCount());
           if(pointCount == mMinimumTouchesRequired)
@@ -150,7 +150,6 @@ void PanGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
               {
                 mState = STARTED;
               }
-
             }
           }
           else if(primaryPointState == PointState::UP)
@@ -341,7 +340,7 @@ bool PanGestureRecognizer::SendPan(GestureState state, const Integration::TouchE
         mThresholdAdjustmentPerFrame   = Vector2::ZERO;
       }
     }
-    else if (state == GestureState::CONTINUING && mPrimaryDeviceId != currentEvent.points[0].GetDeviceId())
+    else if(state == GestureState::CONTINUING && mPrimaryDeviceId != currentEvent.points[0].GetDeviceId())
     {
       return false;
     }

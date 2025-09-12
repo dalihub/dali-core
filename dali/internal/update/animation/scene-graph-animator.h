@@ -664,8 +664,8 @@ private:
   }
 
   // Undefined
-  AnimatorTransformProperty()                                 = delete;
-  AnimatorTransformProperty(const AnimatorTransformProperty&) = delete;
+  AnimatorTransformProperty()                                            = delete;
+  AnimatorTransformProperty(const AnimatorTransformProperty&)            = delete;
   AnimatorTransformProperty& operator=(const AnimatorTransformProperty&) = delete;
 
 protected:

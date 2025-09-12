@@ -199,7 +199,7 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
 PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::Geometry* geometry, SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects)
 {
   auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry, renderTargetGraphicsObjects](PipelineCacheL0& item)
-                         {
+  {
                              bool renderTargetCompatible = true;
                              if(item.renderTargetGraphicsObjects != nullptr && renderTargetGraphicsObjects != nullptr)
                              {
@@ -332,7 +332,7 @@ PipelineCacheL1Ptr PipelineCacheL0::GetPipelineCacheL1(Render::Renderer* rendere
 
   // If L1 not found by hash, create rasterization state describing pipeline and store it
   auto it = std::find_if(level1nodes.begin(), level1nodes.end(), [hash](PipelineCacheL1& item)
-                         { return item.hashCode == hash; });
+  { return item.hashCode == hash; });
 
   if(it == level1nodes.end())
   {
@@ -389,7 +389,7 @@ PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, 
 
   // Find by bitmask (L2 entries must be sorted by bitmask)
   auto it = std::find_if(level2nodes.begin(), level2nodes.end(), [bitmask](PipelineCacheL2& item)
-                         { return item.hash == bitmask; });
+  { return item.hash == bitmask; });
 
   // TODO: find better way of blend constants lookup
   PipelineCacheL2Ptr retval = level2nodes.end();
@@ -447,7 +447,7 @@ PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, 
     l2.hash = blendingOptions.GetBitmask();
 
     auto upperBound = std::upper_bound(level2nodes.begin(), level2nodes.end(), l2, [](const PipelineCacheL2& lhs, const PipelineCacheL2& rhs)
-                                       { return lhs.hash < rhs.hash; });
+    { return lhs.hash < rhs.hash; });
 
     level2nodes.insert(upperBound, std::move(l2));
 

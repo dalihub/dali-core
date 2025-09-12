@@ -205,7 +205,8 @@ void OutputTestResults(const char* processName, RunningTestCases& children)
   std::vector<TestCase> childTestCases;
   childTestCases.reserve(children.size());
   for(auto& element : children) childTestCases.push_back(element.second);
-  std::sort(childTestCases.begin(), childTestCases.end(), [](const TestCase& a, const TestCase& b) {
+  std::sort(childTestCases.begin(), childTestCases.end(), [](const TestCase& a, const TestCase& b)
+  {
     return a.testCase < b.testCase;
   });
 

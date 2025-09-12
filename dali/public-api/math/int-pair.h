@@ -2,7 +2,7 @@
 #define DALI_INT_PAIR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -227,9 +227,9 @@ public:
   }
 
 public:
-  IntPair(const IntPair&)     = default;            ///< Default copy constructor
-  IntPair(IntPair&&) noexcept = default;            ///< Default move constructor
-  IntPair& operator=(const IntPair&) = default;     ///< Default copy assignment operator
+  IntPair(const IntPair&)                = default; ///< Default copy constructor
+  IntPair(IntPair&&) noexcept            = default; ///< Default move constructor
+  IntPair& operator=(const IntPair&)     = default; ///< Default copy assignment operator
   IntPair& operator=(IntPair&&) noexcept = default; ///< Default move assignment operator
 
 private:
@@ -272,9 +272,9 @@ public:
   }
 
 public:
-  Int32Pair(const Int32Pair&)     = default;            ///< Default copy constructor
-  Int32Pair(Int32Pair&&) noexcept = default;            ///< Default move constructor
-  Int32Pair& operator=(const Int32Pair&) = default;     ///< Default copy assignment operator
+  Int32Pair(const Int32Pair&)                = default; ///< Default copy constructor
+  Int32Pair(Int32Pair&&) noexcept            = default; ///< Default move constructor
+  Int32Pair& operator=(const Int32Pair&)     = default; ///< Default copy assignment operator
   Int32Pair& operator=(Int32Pair&&) noexcept = default; ///< Default move assignment operator
 };
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PINCH_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
 #include <dali/public-api/events/pinch-gesture.h>
-#include <dali/internal/event/events/pinch-gesture/pinch-gesture-event.h>
 
 namespace Dali
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,20 +40,19 @@ void tet_result(int32_t value)
 #define END_TEST \
   return ((test_return_value > 0) ? 1 : 0)
 
-extern "C"
+extern "C" {
+void tet_infoline(const char* str)
 {
-  void tet_infoline(const char* str)
-  {
-    fprintf(stderr, "%s\n", str);
-  }
+  fprintf(stderr, "%s\n", str);
+}
 
-  void tet_printf(const char* format, ...)
-  {
-    va_list arg;
-    va_start(arg, format);
-    vfprintf(stderr, format, arg);
-    va_end(arg);
-  }
+void tet_printf(const char* format, ...)
+{
+  va_list arg;
+  va_start(arg, format);
+  vfprintf(stderr, format, arg);
+  va_end(arg);
+}
 }
 
 bool operator==(TimePeriod a, TimePeriod b)

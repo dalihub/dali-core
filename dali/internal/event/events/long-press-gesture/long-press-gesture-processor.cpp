@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,8 @@ void EmitLongPressSignal(
   longPress->SetSourceType(longPressEvent.sourceType);
   longPress->SetSourceData(longPressEvent.sourceData);
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_LONG_PRESS_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_LONG_PRESS_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+  {
     oss << "[" << gestureDetectors.size() << "]";
   });
 
@@ -75,7 +76,8 @@ void EmitLongPressSignal(
     static_cast<LongPressGestureDetector*>(*iter)->EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_LONG_PRESS_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_LONG_PRESS_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+  {
     oss << "[" << gestureDetectors.size() << "]";
   });
 }

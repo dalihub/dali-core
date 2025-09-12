@@ -2146,13 +2146,17 @@ void CheckComponentProperty(TestApplication& application, Actor& actor, Handle t
 
   Property::Index prePropertyIndex = target.RegisterProperty("testPreProperty", Vector3::ZERO);
   Constraint      preConstraint    = Constraint::New<Vector3>(target, prePropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                      { output = inputs[0]->GetVector3(); });
+          {
+    output = inputs[0]->GetVector3();
+  });
   preConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
   preConstraint.Apply();
 
   Property::Index postPropertyIndex = target.RegisterProperty("testPostProperty", Vector3::ZERO);
   Constraint      postConstraint    = Constraint::New<Vector3>(target, postPropertyIndex, [](Vector3& output, const PropertyInputContainer& inputs)
-                                                       { output = inputs[0]->GetVector3(); });
+          {
+    output = inputs[0]->GetVector3();
+  });
   postConstraint.AddSource(Source{actor, Actor::Property::WORLD_POSITION});
   postConstraint.ApplyPost();
 

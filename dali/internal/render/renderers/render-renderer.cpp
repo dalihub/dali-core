@@ -683,7 +683,7 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
   const auto renderItemMapChangeCounter = uniformMap.GetChangeCounter();
 
   auto iter = std::find_if(mNodeIndexMap.begin(), mNodeIndexMap.end(), [nodePtr, programPtr](RenderItemLookup& element)
-                           { return (element.node == nodePtr && element.program == programPtr); });
+  { return (element.node == nodePtr && element.program == programPtr); });
 
   std::size_t renderItemMapIndex;
   if(iter == mNodeIndexMap.end())
