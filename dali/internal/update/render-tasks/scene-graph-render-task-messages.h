@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_MESSAGES_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2023 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,17 +162,6 @@ inline void SetRenderPassTagMessage(EventThreadServices& eventThreadServices, co
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&task, &RenderTask::SetRenderPassTag, renderPass);
-}
-
-inline void SetRenderedScaleFactorMessage(EventThreadServices& eventThreadServices, const RenderTask& task, const Vector2& scaleFactor)
-{
-  using LocalType = MessageValue1<RenderTask, Vector2>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&task, &RenderTask::SetRenderedScaleFactor, scaleFactor);
 }
 
 } // namespace Dali::Internal::SceneGraph

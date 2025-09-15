@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,6 @@ namespace SceneGraph
 RenderInstruction::RenderInstruction()
 : mRenderTracker(nullptr),
   mClearColor(),
-  mRenderedScaleFactor(Vector2::ONE),
   mIsViewportSet(false),
   mIsClearColorSet(false),
   mIgnoreRenderToFbo(false),
@@ -110,18 +109,16 @@ const RenderList* RenderInstruction::GetRenderList(RenderListContainer::SizeType
 void RenderInstruction::Reset(Camera*              camera,
                               Render::FrameBuffer* frameBuffer,
                               const Viewport*      viewport,
-                              const Vector4*       clearColor,
-                              const Vector2        scaleFactor)
+                              const Vector4*       clearColor)
 {
-  mCamera              = camera;
-  mViewport            = viewport ? *viewport : Viewport();
-  mIsViewportSet       = nullptr != viewport;
-  mClearColor          = clearColor ? *clearColor : Color::BLACK;
-  mRenderedScaleFactor = scaleFactor;
-  mIsClearColorSet     = nullptr != clearColor;
-  mRenderTracker       = nullptr;
-  mNextFreeRenderList  = 0;
-  mFrameBuffer         = frameBuffer;
+  mCamera             = camera;
+  mViewport           = viewport ? *viewport : Viewport();
+  mIsViewportSet      = nullptr != viewport;
+  mClearColor         = clearColor ? *clearColor : Color::BLACK;
+  mIsClearColorSet    = nullptr != clearColor;
+  mRenderTracker      = nullptr;
+  mNextFreeRenderList = 0;
+  mFrameBuffer        = frameBuffer;
 
   RenderListContainer::Iterator      iter = mRenderLists.Begin();
   RenderListContainer::ConstIterator end  = mRenderLists.End();

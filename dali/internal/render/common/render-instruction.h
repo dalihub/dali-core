@@ -100,16 +100,14 @@ public:
    * preparation for building a set of instructions for the renderer.
    *
    * @param[in] camera to use to get view and projection matrices.
-   * @param[in] frameBuffer The off-screen render target, or 0
+   * @param[in] offscreenId A resource Id of an off-screen render target, or 0
    * @param[in] viewport A pointer to a viewport, of NULL.
    * @param[in] clearColor A pointer to a color to clear with, or NULL if no clear is required.
-   * @param[in] scaleFactor The scale factor between scene viewport and framebuffer.
    */
   void Reset(Camera*              camera,
              Render::FrameBuffer* frameBuffer,
              const Viewport*      viewport,
-             const Vector4*       clearColor,
-             const Vector2        scaleFactor);
+             const Vector4*       clearColor);
 
   /**
    * Get the view matrix for rendering
@@ -157,7 +155,6 @@ public:
 
   Viewport mViewport;              ///< Optional viewport
   Vector4  mClearColor;            ///< Optional color to clear with
-  Vector2  mRenderedScaleFactor;   ///< Optional scale factor between viewport and input scene
   bool     mIsViewportSet : 1;     ///< Flag to determine whether the viewport is set
   bool     mIsClearColorSet : 1;   ///< Flag to determine whether the clearColor is set
   bool     mIgnoreRenderToFbo : 1; ///< Whether to ignore the render to FBO option (used to measure the performance above 60 fps)

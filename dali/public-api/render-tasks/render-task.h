@@ -2,7 +2,7 @@
 #define DALI_RENDER_TASK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,14 +124,6 @@ public:
        * @note The use of GL sync might cause deadlock with multiple access to the single pixmap happening in the same time.
        */
       REQUIRES_SYNC,
-      /**
-       * @brief name "renderedScaleFactor", type Vector2 or FLOAT
-       * @details The scale factor between source scene and rendered target.
-       *  For example, if we render 200x200 scene into 50x400 FBO, rendered scale factor is Vector2(0.5f, 2.0f).
-       *  If property set as float type, value become assigned componentwise.
-       * @SINCE_2_4.36
-       */
-      RENDERED_SCALE_FACTOR,
     };
   };
 
@@ -395,22 +387,6 @@ public:
   void ResetViewportGuideActor();
 
   /**
-   * @brief Sets the scale factor for rendered output.
-   * @details The scale factor between source scene and rendered target.
-   *  For example, if we render 200x200 scene into 50x400 FBO, rendered scale factor is Vector2(0.5f, 2.0f).
-   * @SINCE_2_4.36
-   * @param[in] scaleFactor The scaling factor to apply to the rendered content
-   */
-  void SetRenderedScaleFactor(const Vector2& scaleFactor);
-
-  /**
-   * @brief Gets the current rendered output scale factor.
-   * @SINCE_2_4.36
-   * @return The current scaling factor being applied to rendered content
-   */
-  Vector2 GetRenderedScaleFactor() const;
-
-  /**
    * @brief Sets the GL viewport position used when rendering.
    *
    * This specifies the transformation between normalized device coordinates and target window (or frame-buffer) coordinates.
@@ -670,4 +646,4 @@ public: // Not intended for application developers
  */
 } // namespace Dali
 
-#endif // DALI_RENDER_TASK_H
+#endif //DALI_RENDER_TASK_H

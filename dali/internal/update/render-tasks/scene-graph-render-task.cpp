@@ -145,16 +145,6 @@ Node* RenderTask::GetViewportGuideNode() const
   return mViewportGuideNode;
 }
 
-void RenderTask::SetRenderedScaleFactor(const Vector2& scaleFactor)
-{
-  mRenderedScaleFactor = scaleFactor;
-}
-
-Vector2 RenderTask::GetRenderedScaleFactor() const
-{
-  return mRenderedScaleFactor;
-}
-
 void RenderTask::SetExclusive(bool exclusive)
 {
   mExclusive = exclusive;
@@ -423,8 +413,7 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
   mRenderInstruction[updateBufferIndex].Reset(mCameraNode,
                                               GetFrameBuffer(),
                                               viewportSet ? &viewport : nullptr,
-                                              mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr,
-                                              mRenderedScaleFactor);
+                                              mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr);
 
   if(mRequiresSync &&
      mRefreshRate == Dali::RenderTask::REFRESH_ONCE)
@@ -604,7 +593,6 @@ RenderTask::RenderTask()
   mRefreshRate(Dali::RenderTask::DEFAULT_REFRESH_RATE),
   mFrameCounter(0u),
   mRenderedOnceCounter(0u),
-  mRenderedScaleFactor(Vector2::ONE),
   mState((Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
            ? RENDER_CONTINUOUSLY
            : RENDER_ONCE_WAITING_FOR_RESOURCES),

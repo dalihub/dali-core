@@ -145,7 +145,7 @@ inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& 
     updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(renderBufferIndex, updatedPositionSize) : updatedPositionSize;
   }
 
-  return RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height, Vector2::ONE);
+  return RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height);
 }
 
 inline void AlignDamagedRect(Rect<int32_t>& rect)

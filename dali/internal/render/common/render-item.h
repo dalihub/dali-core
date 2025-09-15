@@ -115,10 +115,9 @@ struct RenderItem
    * @param[in]    size              The size of the render item
    * @param[in]    viewportWidth     The width of the viewport to calculate for
    * @param[in]    viewportHeight    The height of the viewport to calculate for
-   * @param[in]    scaleFactor       The scale factor between viewport and object.
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  static ClippingBox CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor);
+  static ClippingBox CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight);
 
   /**
    * @brief Returns true if this node/renderer uses the depth buffer (read or write)
@@ -175,7 +174,7 @@ private:
   RenderItem();
 
   // RenderItems should not be copied as they are heavy
-  RenderItem(const RenderItem& item)            = delete;
+  RenderItem(const RenderItem& item) = delete;
   RenderItem& operator=(const RenderItem& item) = delete;
 };
 

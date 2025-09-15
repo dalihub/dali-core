@@ -838,8 +838,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
 
   Integration::Scene stage = application.GetScene();
 
-  auto CreateRenderableActorWithName = [](const char* name) -> Actor
-  {
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
     actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -953,8 +952,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
 
   Integration::Scene stage = application.GetScene();
 
-  auto CreateRenderableActorWithName = [](const char* name) -> Actor
-  {
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
     actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -1184,8 +1182,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
 
   Integration::Scene stage = application.GetScene();
 
-  auto CreateRenderableActorWithName = [](const char* name) -> Actor
-  {
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
     actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -1300,8 +1297,7 @@ int UtcDaliRenderTaskRenderUntil06(void)
 
   Integration::Scene stage = application.GetScene();
 
-  auto CreateRenderableActorWithName = [](const char* name) -> Actor
-  {
+  auto CreateRenderableActorWithName = [](const char* name) -> Actor {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
     actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -4313,131 +4309,6 @@ int UtcDaliRenderTaskClippingMode02(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskClippingMode03(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing clipping mode: CLIP_TO_BOUNDING_BOX. with RenderedScaleFactor\n");
-
-  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
-  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
-
-  enabledDisableTrace.Enable(true);
-  scissorTrace.Enable(true);
-
-  // SETUP AN OFFSCREEN RENDER TASK
-  Actor rootActor = Actor::New();
-  application.GetScene().Add(rootActor);
-
-  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
-  offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  application.GetScene().Add(offscreenCameraActor);
-
-  Shader     shader     = CreateShader();
-  Texture    image      = CreateTexture();
-  TextureSet textureSet = CreateTextureSet(image);
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, shader);
-  renderer.SetTextures(textureSet);
-
-  Vector2 position(100.0f, 100.0f);
-  Vector2 size(200.0f, 200.0f);
-  Actor   secondRootActor = Actor::New();
-  secondRootActor.AddRenderer(renderer);
-  secondRootActor.SetProperty(Actor::Property::POSITION, position);
-  secondRootActor.SetProperty(Actor::Property::SIZE, size);
-  secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
-  application.GetScene().Add(secondRootActor);
-
-  float downscaledFactor = 0.5f;
-
-  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true, static_cast<uint32_t>(TestApplication::DEFAULT_SURFACE_WIDTH * downscaledFactor), static_cast<uint32_t>(TestApplication::DEFAULT_SURFACE_HEIGHT * downscaledFactor));
-  newTask.SetRenderedScaleFactor(Vector2(downscaledFactor, downscaledFactor));
-
-  application.SendNotification();
-  application.Render();
-
-  std::ostringstream scissor;
-  scissor << std::hex << GL_SCISSOR_TEST;
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
-
-  // Check the scissor was set, and the coordinates are correct.
-  Vector4           expectResults = Vector4(position.x, TestApplication::DEFAULT_SURFACE_HEIGHT - size.height - position.y, size.width, size.height) * downscaledFactor; // (50, 250, 100, 100)
-  std::stringstream compareParametersString;
-  compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
-  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with the expected result
-
-  END_TEST;
-}
-
-int UtcDaliRenderTaskClippingMode04(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing clipping mode with the inverted camera: CLIP_TO_BOUNDING_BOX. with RenderedScaleFactor\n");
-
-  TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
-  TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
-  TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
-
-  enabledDisableTrace.Enable(true);
-  scissorTrace.Enable(true);
-
-  // SETUP AN OFFSCREEN RENDER TASK
-  Actor rootActor = Actor::New();
-  application.GetScene().Add(rootActor);
-
-  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
-  offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  offscreenCameraActor.SetInvertYAxis(true);
-  application.GetScene().Add(offscreenCameraActor);
-
-  Shader     shader     = CreateShader();
-  Texture    image      = CreateTexture();
-  TextureSet textureSet = CreateTextureSet(image);
-
-  Geometry geometry = CreateQuadGeometry();
-  Renderer renderer = Renderer::New(geometry, shader);
-  renderer.SetTextures(textureSet);
-
-  Vector2 position(100.0f, 100.0f);
-  Vector2 size(200.0f, 200.0f);
-  Actor   secondRootActor = Actor::New();
-  secondRootActor.AddRenderer(renderer);
-  secondRootActor.SetProperty(Actor::Property::POSITION, position);
-  secondRootActor.SetProperty(Actor::Property::SIZE, size);
-  secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
-  application.GetScene().Add(secondRootActor);
-
-  float downscaledFactor = 0.5f;
-
-  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true, static_cast<uint32_t>(TestApplication::DEFAULT_SURFACE_WIDTH * downscaledFactor), static_cast<uint32_t>(TestApplication::DEFAULT_SURFACE_HEIGHT * downscaledFactor));
-  newTask.SetRenderedScaleFactor(Vector2(downscaledFactor, downscaledFactor));
-
-  application.SendNotification();
-  application.Render();
-
-  std::ostringstream scissor;
-  scissor << std::hex << GL_SCISSOR_TEST;
-  DALI_TEST_CHECK(enabledDisableTrace.FindMethodAndParams("Enable", scissor.str()));
-
-  // Check the scissor was set, and the coordinates are correct.
-  Vector4           expectResults = Vector4(position.x, position.y, size.width, size.height) * downscaledFactor; // (50, 50, 100, 100)
-  std::stringstream compareParametersString;
-  compareParametersString << expectResults.x << ", " << expectResults.y << ", " << expectResults.z << ", " << expectResults.w;
-  DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with the expected result
-
-  END_TEST;
-}
-
 int UtcDaliRenderTaskUploadOnly(void)
 {
   TestApplication application;
@@ -5501,80 +5372,6 @@ int UtcDaliRenderTaskKeepRenderResult(void)
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK(!newTask.GetRenderResult());
-
-  END_TEST;
-}
-
-int UtcDaliRenderTaskSetGetRenderedScaleFactor(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask::SetRenderedScaleFactor() and GetRenderedScaleFactor()");
-
-  // Create a render task
-  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
-  RenderTask     task     = taskList.CreateTask();
-
-  // Default value should be Vector2::ONE
-  Vector2 defaultScale = task.GetRenderedScaleFactor();
-  DALI_TEST_EQUALS(defaultScale, Vector2::ONE, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), Vector2::ONE, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), Vector2::ONE, TEST_LOCATION);
-
-  // Test setting and getting a new scale factor
-  Vector2 testScale(0.5f, 0.5f);
-  task.SetRenderedScaleFactor(testScale);
-  DALI_TEST_EQUALS(task.GetRenderedScaleFactor(), testScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), testScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), testScale, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render();
-
-  // Test setting and getting another scale factor
-  Vector2 anotherTestScale(1.5f, 2.0f);
-  task.SetProperty(RenderTask::Property::RENDERED_SCALE_FACTOR, anotherTestScale);
-  DALI_TEST_EQUALS(task.GetRenderedScaleFactor(), anotherTestScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), anotherTestScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), anotherTestScale, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render();
-
-  // Test setting zero scale (should be allowed)
-  Vector2 zeroScale(0.0f, 0.0f);
-  task.SetRenderedScaleFactor(zeroScale);
-  DALI_TEST_EQUALS(task.GetRenderedScaleFactor(), zeroScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), zeroScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), zeroScale, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render();
-
-  // Test setting negative scale (should be allowed)
-  Vector2 negativeScale(-1.0f, -2.0f);
-  task.SetRenderedScaleFactor(negativeScale);
-  DALI_TEST_EQUALS(task.GetRenderedScaleFactor(), negativeScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), negativeScale, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), negativeScale, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render();
-
-  // Test setting float type value (single float value allowed)
-  float   singleFloat = 4.0f;
-  Vector2 singleFloatV2(singleFloat, singleFloat);
-  task.SetProperty(RenderTask::Property::RENDERED_SCALE_FACTOR, singleFloat);
-  DALI_TEST_EQUALS(task.GetRenderedScaleFactor(), singleFloatV2, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), singleFloatV2, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), singleFloatV2, TEST_LOCATION);
-
-  // Test setting non-scalar type value (value should not be updated)
-  Property::Array invalidArray;
-  task.SetProperty(RenderTask::Property::RENDERED_SCALE_FACTOR, invalidArray);
-  DALI_TEST_EQUALS(task.GetRenderedScaleFactor(), singleFloatV2, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), singleFloatV2, TEST_LOCATION);
-  DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), singleFloatV2, TEST_LOCATION);
 
   END_TEST;
 }
