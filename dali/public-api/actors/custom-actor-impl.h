@@ -178,10 +178,11 @@ public:
   /**
    * @brief Called when animating the owning actor's animatable property.
    * @SINCE_2_4.27
+   * @param[in] animation The object which is animating the owning actor
    * @param[in] index The animatable property index
    * @param[in] state Current animation state
    */
-  virtual void OnAnimateAnimatableProperty(Property::Index index, Dali::Animation::State state)
+  virtual void OnAnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state)
   {
   }
 

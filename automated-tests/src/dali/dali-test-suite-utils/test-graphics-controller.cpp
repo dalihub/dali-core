@@ -1560,4 +1560,9 @@ uint32_t TestGraphicsController::GetDeviceLimitation(Graphics::DeviceCapability 
   return 0;
 }
 
+bool TestGraphicsController::IsCompatible(const Graphics::RenderTarget& renderTargetA, const Graphics::RenderTarget& renderTargetB, const Graphics::RenderPass& renderPassA, const Graphics::RenderPass& renderPassB)
+{
+  return true;
+}
+
 } // namespace Dali

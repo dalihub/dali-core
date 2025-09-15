@@ -306,11 +306,12 @@ public:
 
   /**
    * Animates animation property's animation depending on current animation state
+   * @param[in] animation The animation animating the property.
    * @param[in] index The index of the property.
    * @param[in] state Current animation state
    * @SINCE_2_4.27
    */
-  virtual void AnimateAnimatableProperty(Property::Index index, Dali::Animation::State state)
+  virtual void AnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state)
   {
   }
 
@@ -555,8 +556,8 @@ private: // Default property extensions for derived classes
 
 private:
   // no default, copy or assignment
-  Object()                  = delete;
-  Object(const Object& rhs) = delete;
+  Object()                             = delete;
+  Object(const Object& rhs)            = delete;
   Object& operator=(const Object& rhs) = delete;
 
   /**

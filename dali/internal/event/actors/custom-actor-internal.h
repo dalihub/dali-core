@@ -131,9 +131,10 @@ private:
   /**
    * @copydoc Dali::Internal::Object::AnimateAnimatableProperty()
    */
-  void AnimateAnimatableProperty(Property::Index index, Dali::Animation::State state) override
+  void AnimateAnimatableProperty(Animation& animation, Property::Index index, Dali::Animation::State state) override
   {
-    mImpl->OnAnimateAnimatableProperty(index, state);
+    Dali::Animation animationHandle(&animation);
+    mImpl->OnAnimateAnimatableProperty(animationHandle, index, state);
   }
 
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
@@ -219,8 +220,8 @@ private:
   CustomActor(const SceneGraph::Node& node, CustomActorImpl& extension);
 
   // no default or copy constructor or assignment
-  CustomActor()                   = delete;
-  CustomActor(const CustomActor&) = delete;
+  CustomActor()                                  = delete;
+  CustomActor(const CustomActor&)                = delete;
   CustomActor& operator=(const CustomActor& rhs) = delete;
 
 protected:

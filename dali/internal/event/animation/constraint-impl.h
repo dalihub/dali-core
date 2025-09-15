@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTIVE_CONSTRAINT_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,8 +99,8 @@ private:
   }
 
   // Undefined
-  Constraint()                  = delete;
-  Constraint(const Constraint&) = delete;
+  Constraint()                                 = delete;
+  Constraint(const Constraint&)                = delete;
   Constraint& operator=(const Constraint& rhs) = delete;
 
   /**
@@ -129,23 +129,35 @@ private:
       // Create the SceneGraphConstraint and PropertyResetter, and connect them to the scene-graph
       const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty(mTargetPropertyIndex);
       DALI_ASSERT_ALWAYS(targetProperty && "Constraint target property does not exist");
-      if(targetProperty->IsTransformManagerProperty()) //It is a property managed by the transform manager
+      if(targetProperty->IsTransformManagerProperty()) // It is a property managed by the transform manager
       {
         // Connect the constraint
         mSceneGraphConstraint = SceneGraph::Constraint<PropertyType, TransformManagerPropertyAccessor<PropertyType> >::New(*targetProperty,
                                                                                                                            propertyOwners,
                                                                                                                            func,
-                                                                                                                           mRemoveAction);
+                                                                                                                           mRemoveAction,
+                                                                                                                           mApplyRate);
         // Don't create a resetter for transform manager property, it's less efficient
       }
-      else //SceneGraph property
+      else // SceneGraph property
       {
         // Connect the constraint
         mSceneGraphConstraint = SceneGraph::Constraint<PropertyType, PropertyAccessor<PropertyType> >::New(*targetProperty,
                                                                                                            propertyOwners,
                                                                                                            func,
-                                                                                                           mRemoveAction);
-        resetter              = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
+                                                                                                           mRemoveAction,
+                                                                                                           mApplyRate);
+
+        if(mApplyRate == Dali::Constraint::APPLY_ONCE)
+        {
+          resetter = SceneGraph::BakerResetter::New(targetObject, *targetProperty, mRemoveAction == Dali::Constraint::RemoveAction::BAKE ? SceneGraph::BakerResetter::Lifetime::BAKE : SceneGraph::BakerResetter::Lifetime::SET);
+        }
+        else
+        {
+          mConstraintResetterApplied = true;
+
+          resetter = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
+        }
       }
       OwnerPointer<SceneGraph::ConstraintBase> transferOwnership(const_cast<SceneGraph::ConstraintBase*>(mSceneGraphConstraint));
       if(isPreConstraint)
@@ -256,8 +268,8 @@ private:
   }
 
   // Undefined
-  Constraint()                  = delete;
-  Constraint(const Constraint&) = delete;
+  Constraint()                                 = delete;
+  Constraint(const Constraint&)                = delete;
   Constraint& operator=(const Constraint& rhs) = delete;
 
   /**
@@ -292,7 +304,7 @@ private:
         // Not a Vector2, Vector3 or Vector4 component, expecting float type
         DALI_ASSERT_DEBUG(PropertyTypes::Get<float>() == targetProperty->GetType());
 
-        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyAccessor<float> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyAccessor<float> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
         resetterRequired      = true;
       }
       else
@@ -312,7 +324,17 @@ private:
         }
         if(resetterRequired)
         {
-          OwnerPointer<SceneGraph::PropertyResetterBase> resetter = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
+          OwnerPointer<SceneGraph::PropertyResetterBase> resetter;
+          if(mApplyRate == Dali::Constraint::APPLY_ONCE)
+          {
+            resetter = SceneGraph::BakerResetter::New(targetObject, *targetProperty, mRemoveAction == Dali::Constraint::RemoveAction::BAKE ? SceneGraph::BakerResetter::Lifetime::BAKE : SceneGraph::BakerResetter::Lifetime::SET);
+          }
+          else
+          {
+            mConstraintResetterApplied = true;
+
+            resetter = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
+          }
           AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
         }
       }
@@ -365,11 +387,11 @@ private:
       // Constrain float component of Vector2 property
       if(0 == componentIndex)
       {
-        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector2> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector2> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
       }
       else if(1 == componentIndex)
       {
-        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector2> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector2> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
       }
       resetterRequired = (mSceneGraphConstraint != nullptr);
     }
@@ -383,21 +405,24 @@ private:
           mSceneGraphConstraint = SceneGraph::Constraint<float, TransformManagerPropertyComponentAccessor<Vector3, 0> >::New(*targetProperty,
                                                                                                                              propertyOwners,
                                                                                                                              func,
-                                                                                                                             mRemoveAction);
+                                                                                                                             mRemoveAction,
+                                                                                                                             mApplyRate);
         }
         else if(1 == componentIndex)
         {
           mSceneGraphConstraint = SceneGraph::Constraint<float, TransformManagerPropertyComponentAccessor<Vector3, 1> >::New(*targetProperty,
                                                                                                                              propertyOwners,
                                                                                                                              func,
-                                                                                                                             mRemoveAction);
+                                                                                                                             mRemoveAction,
+                                                                                                                             mApplyRate);
         }
         else if(2 == componentIndex)
         {
           mSceneGraphConstraint = SceneGraph::Constraint<float, TransformManagerPropertyComponentAccessor<Vector3, 2> >::New(*targetProperty,
                                                                                                                              propertyOwners,
                                                                                                                              func,
-                                                                                                                             mRemoveAction);
+                                                                                                                             mRemoveAction,
+                                                                                                                             mApplyRate);
         }
         // Do not create a resetter for transform manager property
       }
@@ -405,15 +430,15 @@ private:
       {
         if(0 == componentIndex)
         {
-          mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+          mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
         }
         else if(1 == componentIndex)
         {
-          mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+          mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
         }
         else if(2 == componentIndex)
         {
-          mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorZ<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+          mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorZ<Vector3> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
         }
         resetterRequired = (mSceneGraphConstraint != nullptr);
       }
@@ -423,19 +448,19 @@ private:
       // Constrain float component of Vector4 property
       if(0 == componentIndex)
       {
-        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorX<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
       }
       else if(1 == componentIndex)
       {
-        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorY<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
       }
       else if(2 == componentIndex)
       {
-        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorZ<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorZ<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
       }
       else if(3 == componentIndex)
       {
-        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorW<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction);
+        mSceneGraphConstraint = SceneGraph::Constraint<float, PropertyComponentAccessorW<Vector4> >::New(*targetProperty, propertyOwners, func, mRemoveAction, mApplyRate);
       }
 
       resetterRequired = (mSceneGraphConstraint != nullptr);

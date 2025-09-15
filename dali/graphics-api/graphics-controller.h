@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -440,6 +440,8 @@ public: // ResourceId relative API.
    * @return Limitation of that capability
    */
   virtual uint32_t GetDeviceLimitation(Graphics::DeviceCapability capability) = 0;
+
+  virtual bool IsCompatible(const Graphics::RenderTarget& renderTargetA, const Graphics::RenderTarget& renderTargetB, const Graphics::RenderPass& renderPassA, const Graphics::RenderPass& renderPassB) = 0;
 
 protected:
   /**

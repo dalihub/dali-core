@@ -155,7 +155,7 @@ int UtcDaliCorePipelineCacheTest(void)
 
   // Test another actor with seperated scene.
 
-  // Create a new Scene with render target
+  // Create a new Scene with compatible render target
   Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
   DALI_TEST_CHECK(newScene);
   application.AddScene(newScene);
@@ -169,10 +169,10 @@ int UtcDaliCorePipelineCacheTest(void)
   application.SendNotification();
   application.Render();
 
-  // Test whether new render target pipeline is set in cache
-  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 3, TEST_LOCATION);
+  // Test that there is no new pipelone
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 2, TEST_LOCATION);
 
-  // Remove renderer to test whether old pipeline is removed
+  // Remove renderer to test whether pipeline is removed
   application.GetScene().Remove(actor1);
   actor1.RemoveRenderer(renderer1);
   renderer1.Reset();
@@ -184,7 +184,7 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   // Test whether both newScene and actor exist.
-  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
 
   // Remove scene
   application.RemoveScene(newScene);

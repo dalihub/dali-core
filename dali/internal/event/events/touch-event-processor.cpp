@@ -534,7 +534,7 @@ struct TouchEventProcessor::Impl
             {
               // If consumed, the actors who previously received the touch are interrupted, indicating that the touch has been consumed by another actor.
               // backworkd
-              if(localVars.primaryPointState != PointState::DOWN)
+              if(processor.mLastRenderTask && localVars.primaryPointState != PointState::DOWN)
               {
                 std::list<Dali::Internal::Actor*>::reverse_iterator rIter = std::find(processor.mCandidateActorLists.rbegin(), processor.mCandidateActorLists.rend(), localVars.consumedActor);
                 if(rIter != processor.mCandidateActorLists.rend())

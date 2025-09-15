@@ -48,13 +48,15 @@ public:
    * @param[in] targetProperty The target property.
    * @param[in] ownerSet A set of property owners; func is connected to the properties provided by these objects.
    * @param[in] func The function to calculate the final constrained value.
-   * @param[in] removeAction Remove action to perform when constraint is removed
+   * @param[in] removeAction Remove action to perform when constraint is removed.
+   * @param[in] applyRate Apply rate for this constraint.
    * @return A smart-pointer to a newly allocated constraint.
    */
   static ConstraintBase* New(const PropertyBase&     targetProperty,
                              PropertyOwnerContainer& ownerContainer,
                              ConstraintFunctionPtr   func,
-                             RemoveAction            removeAction)
+                             RemoveAction            removeAction,
+                             uint32_t                applyRate)
   {
     // Scene-graph thread can edit these objects
     PropertyBase& property = const_cast<PropertyBase&>(targetProperty);
@@ -62,7 +64,8 @@ public:
     return new Constraint<PropertyType, PropertyAccessorType>(property,
                                                               ownerContainer,
                                                               func,
-                                                              removeAction);
+                                                              removeAction,
+                                                              applyRate);
   }
 
   /**
@@ -79,51 +82,72 @@ public:
     {
       if(mFunc->InputsInitialized())
       {
-        PropertyType current = mTargetProperty.Get(updateBufferIndex);
-        PropertyType old     = mTargetProperty.Get(!updateBufferIndex);
-
-        mFunc->Apply(updateBufferIndex, current);
-
-        // Compare with value of the previous frame
-        if constexpr(std::is_same_v<PropertyType, float>)
+        bool applyRequired = false;
+        if(mApplyRate == Dali::Constraint::APPLY_ONCE)
         {
-          if(!Equals(old, current))
+          if(mAppliedCount == 0u)
           {
-            if(!mObservedOwners.Empty())
-            {
-              // The first observer is the target of the constraint
-              mObservedOwners[0]->SetUpdated(true);
-            }
-            // Optionally bake the final value
-            if(Dali::Constraint::BAKE == mRemoveAction)
-            {
-              mTargetProperty.Bake(updateBufferIndex, current);
-            }
+            ++mAppliedCount;
+            applyRequired = true;
           }
         }
         else
         {
-          if(old != current)
+          applyRequired = (((mAppliedCount++) % mApplyRate) == 0);
+        }
+
+        if(applyRequired)
+        {
+          PropertyType current = mTargetProperty.Get(updateBufferIndex);
+          PropertyType old     = mTargetProperty.Get(!updateBufferIndex);
+
+          mFunc->Apply(updateBufferIndex, current);
+
+          // Compare with value of the previous frame
+          if constexpr(std::is_same_v<PropertyType, float>)
           {
-            if(!mObservedOwners.Empty())
+            if(!Equals(old, current))
             {
-              // The first observer is the target of the constraint
-              mObservedOwners[0]->SetUpdated(true);
-            }
-            // Optionally bake the final value
-            if(Dali::Constraint::BAKE == mRemoveAction)
-            {
-              mTargetProperty.Bake(updateBufferIndex, current);
+              if(!mObservedOwners.Empty())
+              {
+                // The first observer is the target of the constraint
+                mObservedOwners[0]->SetUpdated(true);
+              }
+              // Optionally bake the final value
+              if(Dali::Constraint::BAKE == mRemoveAction)
+              {
+                mTargetProperty.Bake(updateBufferIndex, current);
+              }
             }
           }
-        }
+          else
+          {
+            if(old != current)
+            {
+              if(!mObservedOwners.Empty())
+              {
+                // The first observer is the target of the constraint
+                mObservedOwners[0]->SetUpdated(true);
+              }
+              // Optionally bake the final value
+              if(Dali::Constraint::BAKE == mRemoveAction)
+              {
+                mTargetProperty.Bake(updateBufferIndex, current);
+              }
+            }
+          }
 
-        if(Dali::Constraint::DISCARD == mRemoveAction)
+          if(Dali::Constraint::DISCARD == mRemoveAction)
+          {
+            mTargetProperty.Set(updateBufferIndex, current);
+          }
+
+          INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_APPLIED);
+        }
+        else
         {
-          mTargetProperty.Set(updateBufferIndex, current);
+          INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_SKIPPED);
         }
-
-        INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_APPLIED);
       }
       else
       {
@@ -139,16 +163,17 @@ private:
   Constraint(PropertyBase&           targetProperty,
              PropertyOwnerContainer& ownerContainer,
              ConstraintFunctionPtr   func,
-             RemoveAction            removeAction)
-  : ConstraintBase(ownerContainer, removeAction),
+             RemoveAction            removeAction,
+             uint32_t                applyRate)
+  : ConstraintBase(ownerContainer, removeAction, applyRate),
     mTargetProperty(&targetProperty),
     mFunc(func)
   {
   }
 
   // Undefined
-  Constraint()                             = delete;
-  Constraint(const Constraint& constraint) = delete;
+  Constraint()                                 = delete;
+  Constraint(const Constraint& constraint)     = delete;
   Constraint& operator=(const Constraint& rhs) = delete;
 
   /**

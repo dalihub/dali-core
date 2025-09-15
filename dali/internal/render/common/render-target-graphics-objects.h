@@ -96,6 +96,17 @@ public:
     return mClearValues;
   }
 
+  [[nodiscard]] bool IsCompatible(RenderTargetGraphicsObjects* rhs)
+  {
+    // Query the backend to ensure that the render targets and the render passes are compatible
+    // for the purpose of defining pipelines.
+    if(this != rhs && rhs != nullptr)
+    {
+      return mGraphicsController->IsCompatible(*mRenderTarget.get(), *rhs->mRenderTarget.get(), *mRenderPass.get(), *rhs->mRenderPass.get());
+    }
+    return true;
+  }
+
 public:
   void CreateRenderTarget(Graphics::Controller& graphicsController, const Graphics::RenderTargetCreateInfo& rtInfo)
   {

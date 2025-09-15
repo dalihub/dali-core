@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,8 +29,10 @@ uint32_t ConstraintBase::mCurrentInstanceCount = 0;
 uint32_t ConstraintBase::mTotalInstanceCount   = 0;
 #endif
 
-ConstraintBase::ConstraintBase(PropertyOwnerContainer& ownerSet, RemoveAction removeAction)
+ConstraintBase::ConstraintBase(PropertyOwnerContainer& ownerSet, RemoveAction removeAction, uint32_t applyRate)
 : mRemoveAction(removeAction),
+  mApplyRate(applyRate),
+  mAppliedCount(0u),
   mFirstApply(true),
   mDisconnected(true),
   mObservedOwners(ownerSet),

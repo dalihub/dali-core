@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTIVE_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,6 +129,16 @@ public:
   RemoveAction GetRemoveAction() const;
 
   /**
+   * @copydoc Dali::Constraint::SetApplyRate()
+   */
+  void SetApplyRate(uint32_t applyRate);
+
+  /**
+   * @copydoc Dali::Constraint::GetApplyRate()
+   */
+  uint32_t GetApplyRate() const;
+
+  /**
    * @copydoc Dali::Constraint::SetTag()
    */
   void SetTag(uint32_t tag);
@@ -197,10 +207,13 @@ protected:
   ObjectContainer                   mObservedObjects; // We don't observe the same object twice
   Property::Index                   mTargetPropertyIndex;
   RemoveAction                      mRemoveAction;
+  uint32_t                          mApplyRate;
   uint32_t                          mTag;
   bool                              mApplied : 1;         ///< Whether the constraint has been applied
   bool                              mSourceDestroyed : 1; ///< Is set to true if any of our input source objects are destroyed
   bool                              mIsPreConstraint : 1; ///< Is set to true if this constraint is run before transform.
+
+  bool mConstraintResetterApplied : 1;
 };
 
 } // namespace Internal

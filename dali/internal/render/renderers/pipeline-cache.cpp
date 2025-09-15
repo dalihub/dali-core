@@ -199,7 +199,15 @@ constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendE
 PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::Geometry* geometry, SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects)
 {
   auto it = std::find_if(level0nodes.begin(), level0nodes.end(), [program, geometry, renderTargetGraphicsObjects](PipelineCacheL0& item)
-                         { return ((item.program == program && item.geometry == geometry && item.renderTargetGraphicsObjects == renderTargetGraphicsObjects)); });
+                         {
+                             bool renderTargetCompatible = true;
+                             if(item.renderTargetGraphicsObjects != nullptr && renderTargetGraphicsObjects != nullptr)
+                             {
+                               renderTargetCompatible = item.renderTargetGraphicsObjects->IsCompatible(renderTargetGraphicsObjects);
+                             }
+                             return (item.program == program &&
+                                     item.geometry == geometry &&
+                                     renderTargetCompatible); });
 
   // Add new node to cache
   if(it == level0nodes.end())
