@@ -47,7 +47,7 @@ static constexpr Vector3 CENTER(0.5f, 0.5f, 0.5f);
 static constexpr Vector3 TOP_LEFT(0.0f, 0.0f, 0.5f);
 
 // Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
-static constexpr TransformComponentStatic gDefaultTransformComponentStaticData{CENTER, TOP_LEFT, true, false};
+static constexpr TransformComponentStatic gDefaultTransformComponentStaticData{CENTER, TOP_LEFT, true, false, true};
 
 static constexpr uint32_t STATIC_COMPONENT_FLAG = 0x01; ///< Indicates that the value when we change static transform components, so need to update at least 1 frame.
 
@@ -635,13 +635,15 @@ void TransformManager::ReorderComponents()
 
   std::stable_sort(mOrderedComponents.Begin(), mOrderedComponents.End());
   TransformId previousIndex = 0;
-  for(TransformId newIndex = 0; newIndex < mComponentCount - 1; ++newIndex)
+  for(TransformId newIndex = 0; newIndex < mComponentCount; ++newIndex)
   {
     previousIndex = mIds[mOrderedComponents[newIndex].id];
     if(previousIndex != newIndex)
     {
       SwapComponents(previousIndex, newIndex);
     }
+
+    mTxComponentStatic[newIndex].mWorldIgnored = (newIndex >= mComponentCount - mIgnoredComponentCount);
   }
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
@@ -1192,6 +1194,16 @@ void TransformManager::SetIgnored(TransformId id, bool value)
       mDirtyFlags |= mComponentDirty[index];
     }
   }
+}
+
+const bool& TransformManager::IsIgnored(TransformId id) const
+{
+  return mTxComponentStatic[mIds[id]].mIgnored;
+}
+
+const bool& TransformManager::IsWorldIgnored(TransformId id) const
+{
+  return mTxComponentStatic[mIds[id]].mWorldIgnored;
 }
 
 } // namespace SceneGraph

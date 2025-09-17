@@ -336,11 +336,61 @@ public:
   }
 };
 
+template<typename T>
+struct TransformManagerPropertyInputHandler : public PropertyInputImpl
+{
+  /**
+   * Constructor
+   */
+  TransformManagerPropertyInputHandler() = default;
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
+   */
+  Dali::Property::Type GetType() const override
+  {
+    return Dali::PropertyTypes::Get<T>();
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
+   */
+  size_t GetValueSize() const override
+  {
+    return sizeof(T);
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
+   */
+  bool InputInitialized() const override
+  {
+    return true;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
+   * @note A constraint can only receive the inherited property from the previous frame.
+   */
+  bool InputChanged() const override
+  {
+    return true;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::IsTransformManagerProperty()
+   */
+  bool IsTransformManagerProperty() const override
+  {
+    return true;
+  }
+};
+
 /**
  * A Vector3 property used as input.
  */
 template<size_t TxMgrDataOffset>
-class TransformManagerVector3Input : public PropertyInputImpl
+class TransformManagerVector3Input final : public TransformManagerPropertyInputHandler<Vector3>
 {
 public:
   enum
@@ -371,39 +421,6 @@ public:
    * Virtual destructor.
    */
   ~TransformManagerVector3Input() override = default;
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
-   */
-  Dali::Property::Type GetType() const override
-  {
-    return Dali::PropertyTypes::Get<Vector3>();
-  }
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::IsClean()
-   */
-  virtual bool IsClean() const
-  {
-    return false;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
-   */
-  bool InputInitialized() const override
-  {
-    return true;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   * @note A constraint can only receive the inherited property from the previous frame.
-   */
-  bool InputChanged() const override
-  {
-    return true;
-  }
 
   /**
    * Helper function to get the transform components out of the world matrix.
@@ -445,14 +462,6 @@ public:
   }
 
   /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
-   */
-  size_t GetValueSize() const override
-  {
-    return sizeof(Vector3);
-  }
-
-  /**
    * @copydoc Dali::PropertyInput::GetConstraintInputVector3()
    */
   const Vector3& GetConstraintInputVector3(BufferIndex bufferIndex) const override
@@ -490,14 +499,6 @@ public:
     return mValue;
   }
 
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::IsTransformManagerProperty()
-   */
-  bool IsTransformManagerProperty() const override
-  {
-    return true;
-  }
-
 private:
   TransformManagerVector3Input(const TransformManagerVector3Input& property)       = delete;
   TransformManagerVector3Input& operator=(const TransformManagerVector3Input& rhs) = delete;
@@ -511,7 +512,7 @@ public:
  * A Quaternion property used as input.
  */
 template<size_t TxMgrDataOffset>
-class TransformManagerQuaternionInput final : public PropertyInputImpl
+class TransformManagerQuaternionInput final : public TransformManagerPropertyInputHandler<Quaternion>
 {
 public:
   enum
@@ -533,39 +534,6 @@ public:
    * Constructor
    */
   TransformManagerQuaternionInput() = default;
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
-   */
-  Dali::Property::Type GetType() const override
-  {
-    return Dali::PropertyTypes::Get<Quaternion>();
-  }
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::IsClean()
-   */
-  virtual bool IsClean() const
-  {
-    return false;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
-   */
-  bool InputInitialized() const override
-  {
-    return true;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   * @note A constraint can only receive the inherited property from the previous frame.
-   */
-  bool InputChanged() const override
-  {
-    return true;
-  }
 
   /**
    * Helper function to get the orientation out of the world matrix.
@@ -598,14 +566,6 @@ public:
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
     return &GetQuaternion(bufferIndex);
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
-   */
-  size_t GetValueSize() const override
-  {
-    return sizeof(Vector4);
   }
 
   /**
@@ -646,14 +606,6 @@ public:
     return mValue;
   }
 
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::IsTransformManagerProperty()
-   */
-  bool IsTransformManagerProperty() const override
-  {
-    return true;
-  }
-
 private:
   TransformManagerQuaternionInput(const TransformManagerQuaternionInput& property)       = delete;
   TransformManagerQuaternionInput& operator=(const TransformManagerQuaternionInput& rhs) = delete;
@@ -666,7 +618,7 @@ public:
  * A Matrix property used as input.
  */
 template<size_t TxMgrDataOffset>
-class TransformManagerMatrixInput final : public PropertyInputImpl
+class TransformManagerMatrixInput final : public TransformManagerPropertyInputHandler<Matrix>
 {
 public:
   enum
@@ -688,39 +640,6 @@ public:
    * Constructor
    */
   TransformManagerMatrixInput() = default;
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
-   */
-  Dali::Property::Type GetType() const override
-  {
-    return Dali::PropertyTypes::Get<Matrix>();
-  }
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::IsClean()
-   */
-  virtual bool IsClean() const
-  {
-    return false;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
-   */
-  bool InputInitialized() const override
-  {
-    return true;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   * @note A constraint can only receive the inherited property from the previous frame.
-   */
-  bool InputChanged() const override
-  {
-    return true;
-  }
 
   /**
    * @copydoc Dali::PropertyInput::GetMatrix()
@@ -749,14 +668,6 @@ public:
       return &(transformManagerData->Manager()->GetWorldMatrix(id));
     }
     return &identityMatrix;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetValueSize()
-   */
-  size_t GetValueSize() const override
-  {
-    return sizeof(Matrix);
   }
 
   /**
@@ -802,17 +713,111 @@ public:
     return GetMatrix(bufferIndex);
   }
 
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::IsTransformManagerProperty()
-   */
-  bool IsTransformManagerProperty() const override
-  {
-    return true;
-  }
-
 private:
   TransformManagerMatrixInput(const TransformManagerMatrixInput& property)       = delete;
   TransformManagerMatrixInput& operator=(const TransformManagerMatrixInput& rhs) = delete;
+};
+
+/**
+ * A Boolean property used as input.
+ */
+template<bool IsWorldT, size_t TxMgrDataOffset>
+class TransformManagerBooleanIgnoredInput final : public TransformManagerPropertyInputHandler<bool>
+{
+public:
+  enum
+  {
+    TRANSFORM_MANAGER_DATA_OFFSET = TxMgrDataOffset
+  };
+  TransformManagerData* GetTxManagerData()
+  {
+    return reinterpret_cast<TransformManagerData*>(
+      reinterpret_cast<uint8_t*>(this) - TRANSFORM_MANAGER_DATA_OFFSET);
+  }
+  const TransformManagerData* GetTxManagerData() const
+  {
+    return reinterpret_cast<const TransformManagerData*>(
+      reinterpret_cast<const uint8_t*>(this) - TRANSFORM_MANAGER_DATA_OFFSET);
+  }
+
+  /**
+   * Constructor
+   */
+  TransformManagerBooleanIgnoredInput() = default;
+
+  /**
+   * @copydoc Dali::PropertyInput::GetMatrix()
+   */
+  const bool& GetBoolean(BufferIndex bufferIndex) const override
+  {
+    auto transformManagerData = GetTxManagerData();
+    auto id                   = transformManagerData->Id();
+    if constexpr(IsWorldT)
+    {
+      return transformManagerData->Manager()->IsWorldIgnored(id);
+    }
+    else
+    {
+      return transformManagerData->Manager()->IsIgnored(id);
+    }
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
+   */
+  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  {
+    DALI_ASSERT_ALWAYS(0 && "TransformManagerBooleanIgnoredInput should not be animation");
+    return nullptr;
+  }
+
+  /**
+   * @copydoc Dali::PropertyInput::GetConstraintInputMatrix()
+   */
+  const bool& GetConstraintInputBoolean(BufferIndex bufferIndex) const override
+  {
+    return GetBoolean(bufferIndex);
+  }
+
+  /**
+   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   */
+  bool& Get(BufferIndex bufferIndex)
+  {
+    auto transformManagerData = GetTxManagerData();
+    auto id                   = transformManagerData->Id();
+    DALI_ASSERT_ALWAYS(TransformManager::IsValidTransformId(id));
+    if constexpr(IsWorldT)
+    {
+      return transformManagerData->Manager()->IsWorldIgnored(id);
+    }
+    else
+    {
+      return transformManagerData->Manager()->IsIgnored(id);
+    }
+  }
+
+  /**
+   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   */
+  const bool& Get(BufferIndex bufferIndex) const
+  {
+    return GetBoolean(bufferIndex);
+  }
+
+  /**
+   * Retrieve the property value.
+   * @param[in] bufferIndex The buffer to read.
+   * @return The property value.
+   */
+  const bool& operator[](BufferIndex bufferIndex) const
+  {
+    return GetBoolean(bufferIndex);
+  }
+
+private:
+  TransformManagerBooleanIgnoredInput(const TransformManagerBooleanIgnoredInput& property)       = delete;
+  TransformManagerBooleanIgnoredInput& operator=(const TransformManagerBooleanIgnoredInput& rhs) = delete;
 };
 
 } // namespace SceneGraph
