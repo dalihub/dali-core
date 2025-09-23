@@ -2,7 +2,7 @@
 #define DALI_VECTOR_2_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -413,11 +413,11 @@ public:
   void Normalize();
 
   /**
-    * @brief Clamps the vector between minimum and maximum vectors.
-    *
-    * @SINCE_1_0.0
-    * @param[in] min The minimum vector
-    * @param[in] max The maximum vector
+   * @brief Clamps the vector between minimum and maximum vectors.
+   *
+   * @SINCE_1_0.0
+   * @param[in] min The minimum vector
+   * @param[in] max The maximum vector
    */
   void Clamp(const Vector2& min, const Vector2& max);
 
@@ -452,9 +452,9 @@ public:
   }
 
 public:
-  Vector2(const Vector2&)     = default;            ///< Default copy constructor
-  Vector2(Vector2&&) noexcept = default;            ///< Default move constructor
-  Vector2& operator=(const Vector2&) = default;     ///< Default copy assignment operator
+  Vector2(const Vector2&)                = default; ///< Default copy constructor
+  Vector2(Vector2&&) noexcept            = default; ///< Default move constructor
+  Vector2& operator=(const Vector2&)     = default; ///< Default copy assignment operator
   Vector2& operator=(Vector2&&) noexcept = default; ///< Default move assignment operator
 
 public: // Data

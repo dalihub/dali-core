@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,10 +102,10 @@ protected:
 
 public:
   // Not copyable but movable
-  GlAbstraction(const GlAbstraction&) = delete;            ///< Deleted copy constructor.
-  GlAbstraction(GlAbstraction&&)      = default;           ///< Default move constructor.
-  GlAbstraction& operator=(const GlAbstraction&) = delete; ///< Deleted copy assignment operator.
-  GlAbstraction& operator=(GlAbstraction&&) = default;     ///< Default move assignment operator.
+  GlAbstraction(const GlAbstraction&)            = delete;  ///< Deleted copy constructor.
+  GlAbstraction(GlAbstraction&&)                 = default; ///< Default move constructor.
+  GlAbstraction& operator=(const GlAbstraction&) = delete;  ///< Deleted copy assignment operator.
+  GlAbstraction& operator=(GlAbstraction&&)      = default; ///< Default move assignment operator.
 
   /**
    * Invoked by Render thread before Core::Render.

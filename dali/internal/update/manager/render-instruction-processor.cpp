@@ -453,9 +453,9 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   // List of zValue calculating functions.
   const Dali::Layer::SortFunctionType zValueFunctionFromVector3[] = {
     [](const Vector3& position)
-    { return position.z; },
+  { return position.z; },
     [](const Vector3& position)
-    { return position.LengthSquared(); },
+  { return position.LengthSquared(); },
     layer.GetSortFunction(),
   };
 

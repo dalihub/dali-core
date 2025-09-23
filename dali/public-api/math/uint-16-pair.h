@@ -2,7 +2,7 @@
 #define DALI_UINT_16_PAIR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,9 +97,9 @@ public:
   }
 
 public:
-  Uint16Pair(const Uint16Pair&)     = default;            ///< Default copy constructor
-  Uint16Pair(Uint16Pair&&) noexcept = default;            ///< Default move constructor
-  Uint16Pair& operator=(const Uint16Pair&) = default;     ///< Default copy assignment operator
+  Uint16Pair(const Uint16Pair&)                = default; ///< Default copy constructor
+  Uint16Pair(Uint16Pair&&) noexcept            = default; ///< Default move constructor
+  Uint16Pair& operator=(const Uint16Pair&)     = default; ///< Default copy assignment operator
   Uint16Pair& operator=(Uint16Pair&&) noexcept = default; ///< Default move assignment operator
 };
 

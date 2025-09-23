@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_PROCESSOR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,10 +66,10 @@ public:
 
   // Movable but not copyable
 
-  FrameCallbackProcessor(const FrameCallbackProcessor&) = delete;            ///< Deleted copy constructor.
-  FrameCallbackProcessor(FrameCallbackProcessor&&)      = default;           ///< Default move constructor.
-  FrameCallbackProcessor& operator=(const FrameCallbackProcessor&) = delete; ///< Deleted copy assignment operator.
-  FrameCallbackProcessor& operator=(FrameCallbackProcessor&&) = delete;      ///< Deleted move assignment operator.
+  FrameCallbackProcessor(const FrameCallbackProcessor&)            = delete;  ///< Deleted copy constructor.
+  FrameCallbackProcessor(FrameCallbackProcessor&&)                 = default; ///< Default move constructor.
+  FrameCallbackProcessor& operator=(const FrameCallbackProcessor&) = delete;  ///< Deleted copy assignment operator.
+  FrameCallbackProcessor& operator=(FrameCallbackProcessor&&)      = delete;  ///< Deleted move assignment operator.
 
   /**
    * Adds an implementation of the FrameCallbackInterface.

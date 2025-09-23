@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ Gesture::Gesture(Internal::Gesture* internal)
 
 Gesture::Gesture(const Gesture& rhs) = default;
 
-Gesture::Gesture(Gesture&& rhs)noexcept = default;
+Gesture::Gesture(Gesture&& rhs) noexcept = default;
 
 Gesture& Gesture::operator=(const Gesture& rhs) = default;
 
-Gesture& Gesture::operator=(Gesture&& rhs)noexcept = default;
+Gesture& Gesture::operator=(Gesture&& rhs) noexcept = default;
 
 Gesture::~Gesture() = default;
 

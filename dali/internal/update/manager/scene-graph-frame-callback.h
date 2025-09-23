@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,10 +87,10 @@ public:
 
   // Movable but not copyable
 
-  FrameCallback(const FrameCallback&) = delete;            ///< Deleted copy constructor.
-  FrameCallback(FrameCallback&&)      = default;           ///< Default move constructor.
-  FrameCallback& operator=(const FrameCallback&) = delete; ///< Deleted copy assignment operator.
-  FrameCallback& operator=(FrameCallback&&) = default;     ///< Default move assignment operator.
+  FrameCallback(const FrameCallback&)            = delete;  ///< Deleted copy constructor.
+  FrameCallback(FrameCallback&&)                 = default; ///< Default move constructor.
+  FrameCallback& operator=(const FrameCallback&) = delete;  ///< Deleted copy assignment operator.
+  FrameCallback& operator=(FrameCallback&&)      = default; ///< Default move assignment operator.
 
   /**
    * Called from the update-thread after the scene has been updated, and is ready to render.

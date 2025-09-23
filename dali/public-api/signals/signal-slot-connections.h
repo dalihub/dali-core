@@ -2,7 +2,7 @@
 #define DALI_SIGNAL_SLOT_CONNECTIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ public:
     return mCallback;
   }
 
-  SignalConnection(const SignalConnection&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
+  SignalConnection(const SignalConnection&)            = delete; ///< Deleted copy constructor. @SINCE_1_0.0
   SignalConnection& operator=(const SignalConnection&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
 
   /**

@@ -312,7 +312,7 @@ bool IsActorExclusive(const Actor&                               actor,
 
 {
   auto result = std::find_if(exclusives.begin(), exclusives.end(), [&actor](const RenderTaskList::Exclusive& exclusive)
-                             { return exclusive.actor.GetActor() == &actor; });
+  { return exclusive.actor.GetActor() == &actor; });
   return (result != exclusives.end());
 }
 
@@ -473,7 +473,7 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
 
       // Even though the actor is exclusive by the RenderTask, if it is mapping actor, it should be checked.
       auto result      = std::find_if(hitCommonInformation.exclusives.begin(), hitCommonInformation.exclusives.end(), [&childActor](const RenderTaskList::Exclusive& exclusive)
-                                 { return exclusive.actor.GetActor() == &childActor; });
+           { return exclusive.actor.GetActor() == &childActor; });
       bool isExclusive = result != hitCommonInformation.exclusives.end();
       bool isHit       = false;
 
@@ -612,7 +612,7 @@ bool HitTestWithinSubTree(std::vector<std::shared_ptr<HitResult>>& hitResultList
   if(layerBehavior == Dali::Layer::Behavior::LAYER_3D)
   {
     std::stable_sort(hitResultList.begin(), hitResultList.end(), [](std::shared_ptr<HitResult> first, std::shared_ptr<HitResult> second)
-                     {
+    {
                         if(std::abs(first->mDistance - second->mDistance) < Dali::Epsilon<1000>::value)
                         {
                           return first->mActor->GetSortingDepth() > second->mActor->GetSortingDepth();
@@ -698,14 +698,14 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
 
     std::vector<std::shared_ptr<HitResult>> subTreeHitResultList;
     bool                                    isHit = HitTestWithinSubTree(subTreeHitResultList,
-                                      *testRootActor,
-                                      *sourceActor,
-                                      hitCommonInformation,
-                                      ray,
-                                      projectedNearClippingDistance,
-                                      projectedFarClippingDistance,
-                                      hitCheck,
-                                      layer->GetBehavior());
+                                                                         *testRootActor,
+                                                                         *sourceActor,
+                                                                         hitCommonInformation,
+                                                                         ray,
+                                                                         projectedNearClippingDistance,
+                                                                         projectedFarClippingDistance,
+                                                                         hitCheck,
+                                                                         layer->GetBehavior());
 
     if(!isHit && hitCheck.DoesLayerConsumeHit(layer))
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -751,7 +751,6 @@ int UtcDaliPanGestureRecognizerUpdateParamsMinNum(void)
   END_TEST;
 }
 
-
 int UtcDaliPanGestureRecognizerNewParamsMinDistance(void)
 {
   TestApplication application;
@@ -834,9 +833,9 @@ int UtcDaliPanGestureRecognizerUpdateParamsMinDistance(void)
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 70.0f), 453));
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 80.0f), 554));
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 90.0f), 655));
-  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 100.0f),756));
-  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 110.0f),857));
-  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 120.0f),858));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 100.0f), 756));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 110.0f), 857));
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 120.0f), 858));
 
   application.SendNotification();
 

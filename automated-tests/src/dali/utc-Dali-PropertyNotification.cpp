@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -435,7 +435,7 @@ int UtcDaliPropertyNotificationGetProperty(void)
   Actor actor = Actor::New();
 
   PropertyNotification notification   = actor.AddPropertyNotification(Actor::Property::POSITION_X,
-                                                                    GreaterThanCondition(100.0f));
+                                                                      GreaterThanCondition(100.0f));
   Property::Index      targetProperty = notification.GetTargetProperty();
 
   DALI_TEST_EQUALS(targetProperty, (Property::Index)Actor::Property::POSITION_X, TEST_LOCATION);
@@ -1129,7 +1129,7 @@ int UtcDaliPropertyNotificationStepQuaternion(void)
   DALI_TEST_CHECK(gCallBackCalled);
 
   tet_printf("Test notify should not be called");
-  gCallBackCalled = false;
+  gCallBackCalled     = false;
   Animation animation = Animation::New(RENDER_FRAME_INTERVAL);
   animation.AnimateTo(Property(actor, Actor::Property::ORIENTATION), Quaternion(Radian(Degree(90.0f)), Vector3::XAXIS));
   animation.Play();

@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_RENDER_PASS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ public:
   virtual ~RenderPass() = default;
 
   // not copyable
-  RenderPass(const RenderPass&) = delete;
+  RenderPass(const RenderPass&)            = delete;
   RenderPass& operator=(const RenderPass&) = delete;
 
 protected:
-  RenderPass(RenderPass&&) = default;
+  RenderPass(RenderPass&&)            = default;
   RenderPass& operator=(RenderPass&&) = default;
 };
 

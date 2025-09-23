@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,6 @@ bool TapGestureDetector::CheckMinMaxTapsRequired()
   {
     return true;
   }
-
 }
 
 void TapGestureDetector::SetMinimumTapsRequired(uint32_t taps)
@@ -186,7 +185,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
   {
     numberOfTaps = tap.GetNumberOfTaps() % mMaximumTapsRequired;
     numberOfTaps = numberOfTaps == 0u ? mMaximumTapsRequired : numberOfTaps;
-    if (numberOfTaps >= mMinimumTapsRequired)
+    if(numberOfTaps >= mMinimumTapsRequired)
     {
       Internal::TapGesturePtr internalTap(new Internal::TapGesture(tap.GetState()));
       internalTap->SetTime(tap.GetTime());
@@ -295,12 +294,12 @@ void TapGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
     request.minTouches = GetMinimumTapsRequired();
     request.maxTouches = GetMaximumTapsRequired();
 
-    Size size          = scene.GetSize();
+    Size                       size                 = scene.GetSize();
     const TapGestureProcessor& mTapGestureProcessor = mGestureEventProcessor.GetTapGestureProcessor();
 
-    uint32_t maximumAllowedTime          = mTapGestureProcessor.GetMaximumAllowedTime();
-    uint32_t recognizerTime              = mTapGestureProcessor.GetRecognizerTime();
-    float maximumMotionAllowedDistance   = mTapGestureProcessor.GetMaximumMotionAllowedDistance();
+    uint32_t maximumAllowedTime           = mTapGestureProcessor.GetMaximumAllowedTime();
+    uint32_t recognizerTime               = mTapGestureProcessor.GetRecognizerTime();
+    float    maximumMotionAllowedDistance = mTapGestureProcessor.GetMaximumMotionAllowedDistance();
 
     mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), maximumAllowedTime, recognizerTime, maximumMotionAllowedDistance);
   }

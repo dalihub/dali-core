@@ -576,9 +576,9 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.
     Vector4       near(screenCoordinates.x - static_cast<float>(viewport.x),
-                 static_cast<float>(viewport.height) - (screenCoordinates.y - static_cast<float>(viewport.y)),
-                 0.f,
-                 1.f);
+                       static_cast<float>(viewport.height) - (screenCoordinates.y - static_cast<float>(viewport.y)),
+                       0.f,
+                       1.f);
     const Matrix& inverseViewProjection = GetCameraSceneObject().GetInverseViewProjectionMatrix(GetEventThreadServices().GetEventBufferIndex());
     success                             = Unproject(near, inverseViewProjection, static_cast<float>(viewport.width), static_cast<float>(viewport.height), near);
 

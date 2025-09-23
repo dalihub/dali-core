@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_PROXY_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,10 +67,10 @@ public:
 
   // Movable but not copyable
 
-  UpdateProxy(const UpdateProxy&) = delete;            ///< Deleted copy constructor.
-  UpdateProxy(UpdateProxy&&)      = default;           ///< Default move constructor.
-  UpdateProxy& operator=(const UpdateProxy&) = delete; ///< Deleted copy assignment operator.
-  UpdateProxy& operator=(UpdateProxy&&) = delete;      ///< Deleted move assignment operator.
+  UpdateProxy(const UpdateProxy&)            = delete;  ///< Deleted copy constructor.
+  UpdateProxy(UpdateProxy&&)                 = default; ///< Default move constructor.
+  UpdateProxy& operator=(const UpdateProxy&) = delete;  ///< Deleted copy assignment operator.
+  UpdateProxy& operator=(UpdateProxy&&)      = delete;  ///< Deleted move assignment operator.
 
   /**
    * @copydoc Dali::UpdateProxy::GetPosition()
@@ -188,7 +188,7 @@ public:
    * this returns INVALID_SYNC. It is intended that this method is only called
    * once per Update(), so clears any stored sync point.
    * @return Valid sync point or INVALID_SYNC
-  */
+   */
   Dali::UpdateProxy::NotifySyncPoint PopSyncPoint();
 
   /**

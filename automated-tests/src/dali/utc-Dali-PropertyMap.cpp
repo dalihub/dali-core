@@ -131,14 +131,14 @@ int UtcDaliPropertyMapMoveAssignmentOperator(void)
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
-#if(__GNUC__ >= 13)
+#if (__GNUC__ >= 13)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wself-move"
 #endif
   // Self assignment
   map2 = std::move(map2);
   DALI_TEST_EQUALS(3u, map2.Count(), TEST_LOCATION); // No debug assert as nothing should happen
-#if(__GNUC__ >= 13)
+#if (__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
 

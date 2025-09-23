@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,33 +147,36 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
     uint64_t end        = 0u;
 #endif
 
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss) {
+    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss)
+    {
       oss << "[" << mFrameCallbacks.size() << "]";
     });
 
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
-      mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback) {
+      mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback)
+    {
 #ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          start = GetNanoseconds();
-        }
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        start = GetNanoseconds();
+      }
 #endif
-        FrameCallback::RequestFlags requests = frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
+      FrameCallback::RequestFlags requests = frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
 #ifdef TRACE_ENABLED
-        if(gTraceFilter && gTraceFilter->IsTraceEnabled())
-        {
-          end = GetNanoseconds();
-          frameCallbackTimeChecker.emplace_back(end - start, ++frameIndex);
-        }
+      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      {
+        end = GetNanoseconds();
+        frameCallbackTimeChecker.emplace_back(end - start, ++frameIndex);
+      }
 #endif
-        keepRendering |= (requests & FrameCallback::KEEP_RENDERING);
-        return (requests & FrameCallback::CONTINUE_CALLING) == 0;
-      });
+      keepRendering |= (requests & FrameCallback::KEEP_RENDERING);
+      return (requests & FrameCallback::CONTINUE_CALLING) == 0;
+    });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss) {
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss)
+    {
       oss << "[" << mFrameCallbacks.size() << ",";
 
       std::sort(frameCallbackTimeChecker.rbegin(), frameCallbackTimeChecker.rend());

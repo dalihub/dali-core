@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -421,8 +421,8 @@ public:
   Integration::Scene::EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
 
   /**
-    * @copydoc Integration::Scene::TouchedSignal()
-    */
+   * @copydoc Integration::Scene::TouchedSignal()
+   */
   Integration::Scene::TouchEventSignalType& TouchedSignal();
 
   /**
@@ -534,7 +534,6 @@ private:
   // The wheel event signal
   Integration::Scene::WheelEventSignalType          mWheelEventSignal;
   Integration::Scene::WheelEventGeneratedSignalType mWheelEventGeneratedSignal;
-
 };
 
 } // namespace Internal

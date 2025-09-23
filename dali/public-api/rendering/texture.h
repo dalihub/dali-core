@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,10 @@ enum Type
 namespace CubeMapLayer
 {
 /**
-   * @brief Faces of a cube map.
-   * These constants should be used as the "layer" parameter when uploading a cube-map with Texture::Upload.
-   * @SINCE_1_1.43
-   */
+ * @brief Faces of a cube map.
+ * These constants should be used as the "layer" parameter when uploading a cube-map with Texture::Upload.
+ * @SINCE_1_1.43
+ */
 const uint32_t POSITIVE_X = 0u; ///< CubeMap image for +x @SINCE_1_1.43
 const uint32_t NEGATIVE_X = 1u; ///< CubeMap image for -x @SINCE_1_1.43
 const uint32_t POSITIVE_Y = 2u; ///< CubeMap image for +y @SINCE_1_1.43

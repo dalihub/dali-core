@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,11 +57,13 @@ int UtcDaliFreeListAddGetRemove(void)
   FreeList list1;
   FreeList list2;
 
-  auto FreeListAddTest = [](FreeList& list, std::uint32_t value, std::uint32_t exceptIndex, const char* location) {
+  auto FreeListAddTest = [](FreeList& list, std::uint32_t value, std::uint32_t exceptIndex, const char* location)
+  {
     std::uint32_t index = list.Add(value);
     DALI_TEST_EQUALS(index, exceptIndex, location);
   };
-  auto FreeListGetTest = [](const FreeList& list, std::uint32_t exceptValue, std::uint32_t index, const char* location) {
+  auto FreeListGetTest = [](const FreeList& list, std::uint32_t exceptValue, std::uint32_t index, const char* location)
+  {
     std::uint32_t value = list[index];
     DALI_TEST_EQUALS(value, exceptValue, location);
   };

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ROTATION_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/gesture-detector-impl.h>
+#include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 #include <dali/public-api/events/rotation-gesture-detector.h>
 #include <dali/public-api/events/rotation-gesture.h>
-#include <dali/internal/event/events/rotation-gesture/rotation-gesture-event.h>
 
 namespace Dali
 {
@@ -52,7 +52,7 @@ public: // Creation
 
   // Not copyable
 
-  RotationGestureDetector(const RotationGestureDetector&) = delete;                ///< Deleted copy constructor
+  RotationGestureDetector(const RotationGestureDetector&)                = delete; ///< Deleted copy constructor
   RotationGestureDetector& operator=(const RotationGestureDetector& rhs) = delete; ///< Deleted copy assignment operator
 
 public:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -252,7 +252,8 @@ void BaseSignal::CleanupConnections()
   if(!mSignalConnections.empty())
   {
     //Remove Signals that are already markeed nullptr.
-    mSignalConnections.remove_if([](auto& elem) { return (elem) ? false : true; });
+    mSignalConnections.remove_if([](auto& elem)
+    { return (elem) ? false : true; });
   }
   mNullConnections = 0;
 }

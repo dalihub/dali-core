@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_MESSAGES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,7 +203,7 @@ private:
    * @param[in] property The property to bake.
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
-  */
+   */
   NodePropertyComponentMessage(UpdateManager&               updateManager,
                                const Node*                  node,
                                const AnimatableProperty<P>* property,
@@ -349,7 +349,7 @@ private:
    * @param[in] property The property to bake.
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
-  */
+   */
   NodeTransformComponentMessage(UpdateManager&                            updateManager,
                                 const Node*                               node,
                                 const TransformManagerPropertyHandler<P>* property,

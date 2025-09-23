@@ -999,7 +999,6 @@ int UtcDaliTouchEventCombinerHoverDownAfterTouchUp(void)
     DALI_TEST_EQUALS(hoverEvent.points[0].GetScreenPosition(), point.GetScreenPosition(), TEST_LOCATION);
   }
 
-
   time++;
 
   // down event
@@ -1034,7 +1033,6 @@ int UtcDaliTouchEventCombinerHoverDownAfterTouchUp(void)
 
   END_TEST;
 }
-
 
 int UtcDaliTouchEventCombinerMultipleMouseButton(void)
 {
@@ -1085,7 +1083,7 @@ int UtcDaliTouchEventCombinerMultipleMouseButton(void)
     DALI_TEST_EQUALS(touchEvent.GetPointCount(), 2, TEST_LOCATION);
   }
 
-    // up event
+  // up event
   {
     Integration::TouchEvent touchEvent;
     Integration::HoverEvent hoverEvent;

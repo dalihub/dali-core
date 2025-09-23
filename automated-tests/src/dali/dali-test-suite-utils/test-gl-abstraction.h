@@ -2,7 +2,7 @@
 #define TEST_GL_ABSTRACTION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2120,7 +2120,7 @@ public:
 
   inline void GetProgramBinary(GLuint program, GLsizei bufSize, GLsizei* length, GLenum* binaryFormat, GLvoid* binary) override
   {
-    *length = bufSize; // commonly it is same. so we provide bufSize for test
+    *length                 = bufSize; // commonly it is same. so we provide bufSize for test
     mGetProgramBinaryCalled = true;
   }
 

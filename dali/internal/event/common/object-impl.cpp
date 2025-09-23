@@ -1566,7 +1566,7 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
         // unreachable code due to higher level logic
       }
     } // switch(type)
-  }   // if animatable
+  } // if animatable
 
   return value;
 }

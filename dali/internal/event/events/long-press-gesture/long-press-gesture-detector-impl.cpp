@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-impl.h>
 #include <dali/internal/event/events/long-press-gesture/long-press-gesture-recognizer.h>
 #include <dali/public-api/object/type-registry.h>
@@ -217,9 +217,9 @@ void LongPressGestureDetector::ProcessTouchEvent(Scene& scene, const Integration
     request.minTouches = GetMinimumTouchesRequired();
     request.maxTouches = GetMaximumTouchesRequired();
 
-    Size size = scene.GetSize();
+    Size     size               = scene.GetSize();
     uint32_t minimumHoldingTime = GetMinimumHoldingTime();
-    mGestureRecognizer = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request), minimumHoldingTime);
+    mGestureRecognizer          = new LongPressGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const LongPressGestureRequest&>(request), minimumHoldingTime);
   }
   mGestureRecognizer->SendEvent(scene, event);
 }
@@ -239,7 +239,7 @@ void LongPressGestureDetector::Process(Scene& scene, const LongPressGestureEvent
       Actor* currentGesturedActor = mCurrentLongPressActor.GetActor();
       if(currentGesturedActor && CheckGestureDetector(&longPressEvent, currentGesturedActor, mRenderTask))
       {
-        Vector2     actorCoords;
+        Vector2 actorCoords;
         currentGesturedActor->ScreenToLocal(*mRenderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
         EmitLongPressSignal(currentGesturedActor, longPressEvent, actorCoords);
       }
@@ -298,10 +298,9 @@ void LongPressGestureDetector::EmitLongPressSignal(Actor* actor, const LongPress
   longPress->SetSourceType(longPressEvent.sourceType);
   longPress->SetSourceData(longPressEvent.sourceData);
 
-  Dali::Actor                                    actorHandle(actor);
+  Dali::Actor actorHandle(actor);
   EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));
 }
-
 
 } // namespace Internal
 

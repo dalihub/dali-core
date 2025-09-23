@@ -280,7 +280,7 @@ void Shader::UpdateShaderData(std::string_view          vertexSource,
   Internal::ShaderDataPtr shaderData = shaderFactory.Load(vertexSource, fragmentSource, hints, renderPassTag, name, shaderHash);
 
   std::vector<Internal::ShaderDataPtr>::iterator shaderDataIterator = std::find_if(mShaderDataList.begin(), mShaderDataList.end(), [&shaderData](const Internal::ShaderDataPtr& shaderDataItem)
-                                                                                   { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
+  { return shaderDataItem->GetRenderPassTag() == shaderData->GetRenderPassTag(); });
   if(shaderDataIterator != mShaderDataList.end())
   {
     *shaderDataIterator = shaderData;

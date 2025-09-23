@@ -2,7 +2,7 @@
 #define DALI_UPDATE_PROXY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -270,10 +270,10 @@ public: // Not intended for application developers
 
   // Not copyable or movable
 
-  UpdateProxy(const UpdateProxy&) = delete;            ///< Deleted copy constructor
-  UpdateProxy(UpdateProxy&&)      = delete;            ///< Deleted move constructor
+  UpdateProxy(const UpdateProxy&)            = delete; ///< Deleted copy constructor
+  UpdateProxy(UpdateProxy&&)                 = delete; ///< Deleted move constructor
   UpdateProxy& operator=(const UpdateProxy&) = delete; ///< Deleted copy assignment operator
-  UpdateProxy& operator=(UpdateProxy&&) = delete;      ///< Deleted move assignment operator
+  UpdateProxy& operator=(UpdateProxy&&)      = delete; ///< Deleted move assignment operator
 
   /// @endcond
 

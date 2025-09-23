@@ -2141,7 +2141,11 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
      0.0f,
      100.0f, // POS
      {
-       /**/ 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, /* Loop */
+       /**/ 30.0f,
+       40.0f,
+       50.0f,
+       60.0f,
+       70.0f, /* Loop */
        /**/ 30.0f,
        40.0f,
        50.0f,
@@ -2163,10 +2167,7 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
      20.0f,
      50.0f,                                   // POS
      {/**/ 30.0f, 40.0f, 50.0f, 50.0f, 50.0f, /* Loop */
-      /**/ 30.0f,
-      40.0f,
-      50.0f,
-      50.0f, /* Reverse direction @ frame #9 */
+      /**/ 30.0f, 40.0f, 50.0f, 50.0f,        /* Reverse direction @ frame #9 */
       /**/ 50.0f,
       /**/ 40.0f,
       /**/ 30.0f,
@@ -2208,21 +2209,7 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
      25.0f, // POS
      {
        /**/
-       /**/ 25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f,
-       25.0f
+       /**/ 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f, 25.0f
        /**/
      }},
 
@@ -2235,21 +2222,7 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
      100.0f, // POS
      {
        /**/
-       /**/ 85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f,
-       85.0f
+       /**/ 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f, 85.0f
        /**/
      }},
     // Actor 5 - Middle of range
@@ -2372,7 +2345,11 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount01(void)
      0.0f,
      100.0f, // POS
      {
-       /**/ 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, /* Loop */
+       /**/ 30.0f,
+       40.0f,
+       50.0f,
+       60.0f,
+       70.0f, /* Loop */
        /**/ 30.0f,
        40.0f,
        50.0f,

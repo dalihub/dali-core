@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,13 +83,13 @@ const char* TOUCH_POINT_STATE[6] =
 bool ShouldEmitInterceptTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
   PointState::Type state = event.GetState(0);
-  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || state == PointState::INTERRUPTED ) && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || state == PointState::INTERRUPTED) && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
 }
 
 bool ShouldEmitTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
   PointState::Type state = event.GetState(0);
-  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || state == PointState::INTERRUPTED ) && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || state == PointState::INTERRUPTED) && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
 }
 
 // child -> parent
@@ -126,9 +126,9 @@ Dali::Actor EmitInterceptTouchSignals(Dali::Actor actor, const Dali::TouchEvent&
 
 // geometry
 // child -> parent
-Dali::Actor EmitGeoInterceptTouchSignals(Dali::Actor actor,
-                                        const Dali::TouchEvent& touchEvent,
-                                        ActorObserver& lastConsumedActor)
+Dali::Actor EmitGeoInterceptTouchSignals(Dali::Actor             actor,
+                                         const Dali::TouchEvent& touchEvent,
+                                         ActorObserver&          lastConsumedActor)
 {
   Dali::Actor interceptedActor;
 

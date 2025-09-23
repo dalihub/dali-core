@@ -2,7 +2,7 @@
 #define DALI_BASE_OBJECT_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,10 +121,10 @@ protected:
 private:
   // Not copyable or movable
 
-  BaseObject(const BaseObject& rhs) = delete;            ///< Deleted copy constructor
-  BaseObject(BaseObject&& rhs)      = delete;            ///< Deleted move constructor
+  BaseObject(const BaseObject& rhs)            = delete; ///< Deleted copy constructor
+  BaseObject(BaseObject&& rhs)                 = delete; ///< Deleted move constructor
   BaseObject& operator=(const BaseObject& rhs) = delete; ///< Deleted copy assignment operator
-  BaseObject& operator=(BaseObject&& rhs) = delete;      ///< Deleted move assignment operator
+  BaseObject& operator=(BaseObject&& rhs)      = delete; ///< Deleted move assignment operator
 
 public:
   class DALI_INTERNAL Impl;

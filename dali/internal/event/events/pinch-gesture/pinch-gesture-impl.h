@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PINCH_GESTURE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,10 +45,10 @@ public:
   {
   }
 
-  PinchGesture(const PinchGesture&) = delete;            ///< Deleted copy constructor
-  PinchGesture(PinchGesture&&)      = delete;            ///< Deleted move constructor
+  PinchGesture(const PinchGesture&)            = delete; ///< Deleted copy constructor
+  PinchGesture(PinchGesture&&)                 = delete; ///< Deleted move constructor
   PinchGesture& operator=(const PinchGesture&) = delete; ///< Deleted copy assignment operator
-  PinchGesture& operator=(PinchGesture&&) = delete;      ///< Deleted move assignment operator
+  PinchGesture& operator=(PinchGesture&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * @brief The scale factor from the start of the pinch gesture till the latest pinch gesture.

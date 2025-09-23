@@ -2,7 +2,7 @@
 #define DALI_ADDON_DISPATCH_TABLE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 #include <dali/public-api/common/vector-wrapper.h>
 #include <algorithm>
-#include <string>
 #include <cstdint>
+#include <string>
 
 namespace Dali
 {
@@ -74,7 +74,8 @@ struct DispatchTable
    */
   Entry operator[](const char* functionName)
   {
-    auto iter = std::find_if(entries.begin(), entries.end(), [functionName](Entry& entry) {
+    auto iter = std::find_if(entries.begin(), entries.end(), [functionName](Entry& entry)
+    {
       if(entry.functionName == functionName)
       {
         return true;
@@ -122,7 +123,8 @@ struct DispatchTable
       return nullptr;
     }
 
-    auto iter = std::find_if(entries.begin(), entries.end(), [funcName, entries = &this->entries](Entry& entry) {
+    auto iter = std::find_if(entries.begin(), entries.end(), [funcName, entries = &this->entries](Entry& entry)
+    {
       return (entry.functionName == funcName);
     });
     if(iter != entries.end())

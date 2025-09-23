@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_PROXY_PROPERTY_MODIFIER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public:
 
   // Movable but not copyable
 
-  PropertyModifier(const PropertyModifier&) = delete;            ///< Deleted copy constructor.
+  PropertyModifier(const PropertyModifier&)            = delete; ///< Deleted copy constructor.
   PropertyModifier& operator=(const PropertyModifier&) = delete; ///< Deleted assignment operator.
 
   /**
@@ -168,10 +168,10 @@ public:
     SceneGraph::Node*         node;
     SceneGraph::PropertyBase* propertyBase;
 
-    NodePropertyPair(const NodePropertyPair&) = delete;            ///< Deleted copy constructor.
-    NodePropertyPair(NodePropertyPair&&)      = default;           ///< Default move constructor.
-    NodePropertyPair& operator=(const NodePropertyPair&) = delete; ///< Deleted assignment operator.
-    NodePropertyPair& operator=(NodePropertyPair&&) = default;     ///< Default move assignment operator.
+    NodePropertyPair(const NodePropertyPair&)            = delete;  ///< Deleted copy constructor.
+    NodePropertyPair(NodePropertyPair&&)                 = default; ///< Default move constructor.
+    NodePropertyPair& operator=(const NodePropertyPair&) = delete;  ///< Deleted assignment operator.
+    NodePropertyPair& operator=(NodePropertyPair&&)      = default; ///< Default move assignment operator.
 
     /**
      * Comparison operator

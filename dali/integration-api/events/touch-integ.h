@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_TOUCH_INTEG_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 #include <dali/devel-api/events/touch-point.h>
 #include <dali/integration-api/events/point.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/hover-event.h>
+#include <dali/public-api/events/touch-event.h>
 
 namespace Dali
 {
@@ -63,7 +63,6 @@ DALI_CORE_API Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const TouchPoin
  * @return A new hover data handle.
  */
 DALI_CORE_API Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const Dali::Integration::Point& point);
-
 
 } // namespace Integration
 

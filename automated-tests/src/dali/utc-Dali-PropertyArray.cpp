@@ -367,14 +367,14 @@ int UtcDaliPropertyArrayMoveAssignmentOperator(void)
   DALI_TEST_ASSERTION(const_cast<const Property::Array&>(array1)[0], exceptionMessage);
 
   // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
-#if(__GNUC__ >= 13)
+#if (__GNUC__ >= 13)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wself-move"
 #endif
   // Self assignemnt
   array2 = std::move(array2);
   DALI_TEST_EQUALS(3u, array2.Size(), TEST_LOCATION); // still works, no debug assert
-#if(__GNUC__ >= 13)
+#if (__GNUC__ >= 13)
 #pragma GCC diagnostic pop
 #endif
 

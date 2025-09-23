@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,6 @@ public:
    */
   void SetRecognizerTime(uint32_t time);
 
-
   /**
    * @brief This method sets the recognizer distance required to be recognized as a tap gesture
    *
@@ -101,7 +100,6 @@ public:
    * @param[in] distance The distance
    */
   void SetMaximumMotionAllowedDistance(float distance);
-
 
 private:
   /**
@@ -132,7 +130,7 @@ private:
    *
    * @param[in] time time of this latest touch event
    * @param[in] point position touch event occurred
-    */
+   */
   void EmitSingleTap(uint32_t time, const Integration::Point& point);
 
   /**

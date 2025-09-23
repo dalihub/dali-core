@@ -64,7 +64,7 @@ public:
   SharedUniformBufferViewContainer();
 
 public:
-  SharedUniformBufferViewContainer(const SharedUniformBufferViewContainer&) = delete;            ///< copy constructor, not defined
+  SharedUniformBufferViewContainer(const SharedUniformBufferViewContainer&)            = delete; ///< copy constructor, not defined
   SharedUniformBufferViewContainer& operator=(const SharedUniformBufferViewContainer&) = delete; ///< assignment operator, not defined
 
   /**

@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,25 +31,25 @@ namespace Integration
 namespace RenderTaskList
 {
 /**
-   * @brief Helper function to create a new RenderTaskList object.
-   *
-   * A RenderTaskList is an ordered list of render tasks that describes
-   * how the Dali scene should be rendered.
-   *
-   * @return A handle to a newly allocated RenderTaskList
-   */
+ * @brief Helper function to create a new RenderTaskList object.
+ *
+ * A RenderTaskList is an ordered list of render tasks that describes
+ * how the Dali scene should be rendered.
+ *
+ * @return A handle to a newly allocated RenderTaskList
+ */
 DALI_CORE_API Dali::RenderTaskList New();
 
 /**
-   * @brief Helper function to create a new RenderTask.
-   *
-   * The created task will be appended to the list of render-tasks.
-   *
-   * @param[in] taskList 　　　The render task list containing all the render-tasks.
-   * @param[in] sourceActor The actor and its children to be rendered for this render task.
-   * @param[in] cameraActor The actor from which the scene is viewed for this render task.
-   * @return A valid handle to a new RenderTask
-   */
+ * @brief Helper function to create a new RenderTask.
+ *
+ * The created task will be appended to the list of render-tasks.
+ *
+ * @param[in] taskList 　　　The render task list containing all the render-tasks.
+ * @param[in] sourceActor The actor and its children to be rendered for this render task.
+ * @param[in] cameraActor The actor from which the scene is viewed for this render task.
+ * @return A valid handle to a new RenderTask
+ */
 DALI_CORE_API Dali::RenderTask CreateTask(Dali::RenderTaskList& taskList, Dali::Actor& sourceActor, Dali::CameraActor& cameraActor);
 
 } // namespace RenderTaskList

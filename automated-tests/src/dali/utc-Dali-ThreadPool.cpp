@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,8 @@ Dali::UniqueFutureGroup ForEachMT(Dali::ThreadPool*                             
 
   for(auto threadIndex = 0u; threadIndex < workerCount; ++threadIndex)
   {
-    Dali::Task lambda = [task, i, j](int workerIndex) {
+    Dali::Task lambda = [task, i, j](int workerIndex)
+    {
       task(uint32_t(workerIndex), i, j);
     };
     tasks.emplace_back(lambda);
@@ -84,7 +85,8 @@ int UtcDaliThreadPoolMultipleTasks(void)
   std::fill(outputs.begin(), outputs.end(), 0);
 
   // submit
-  auto future = ForEachMT(&gThreadPool, 0, inputs.size(), [&inputs, &outputs](uint32_t workerIndex, uint32_t begin, uint32_t end) {
+  auto future = ForEachMT(&gThreadPool, 0, inputs.size(), [&inputs, &outputs](uint32_t workerIndex, uint32_t begin, uint32_t end)
+  {
     for(auto i = begin; i < end; ++i)
     {
       outputs[workerIndex] += inputs[i];
@@ -117,7 +119,8 @@ int UtcDaliThreadPoolSingleTask(void)
 
   // some long lasting task
   int  counter = 0;
-  auto task    = [&counter](int workerIndex) {
+  auto task    = [&counter](int workerIndex)
+  {
     for(int i = 0; i < 10; ++i)
     {
       counter++;
@@ -152,7 +155,8 @@ int UtcDaliThreadPoolSubmitTasksCopyArray(void)
   std::vector<Dali::Task> tasks;
   for(int i = 0; i < 1024; ++i)
   {
-    auto task = [&dataSrc, &dataDst, i](int workerIndex) {
+    auto task = [&dataSrc, &dataDst, i](int workerIndex)
+    {
       for(int k = 0; k < 1024; ++k)
       {
         dataDst[i * 1024 + k] = dataSrc[i * 1024 + k];

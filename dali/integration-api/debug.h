@@ -499,12 +499,12 @@ public:                                    \
 #if defined(DEBUG_ENABLED)
 
 /**
-  * @brief Get the monotonic time since the clock's epoch.
-  *
-  * @param[out]  timeInNanoseconds  The time in nanoseconds since the reference point.
-  *
-  * @note The maximum value timeInNanoseconds can hold is 0xFFFFFFFFFFFFFFFF which is 1.844674407e+19. Therefore, this can overflow after approximately 584 years.
-  */
+ * @brief Get the monotonic time since the clock's epoch.
+ *
+ * @param[out]  timeInNanoseconds  The time in nanoseconds since the reference point.
+ *
+ * @note The maximum value timeInNanoseconds can hold is 0xFFFFFFFFFFFFFFFF which is 1.844674407e+19. Therefore, this can overflow after approximately 584 years.
+ */
 DALI_CORE_API void GetNanoseconds(uint64_t& timeInNanoseconds);
 
 #define DALI_LOG_TIMER_START(timeVariable) \

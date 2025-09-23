@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_LAYER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,10 +242,10 @@ private:
   Layer();
 
   // Delete copy and move
-  Layer(const Layer&) = delete;
-  Layer(Layer&&)      = delete;
+  Layer(const Layer&)                = delete;
+  Layer(Layer&&)                     = delete;
   Layer& operator=(const Layer& rhs) = delete;
-  Layer& operator=(Layer&& rhs) = delete;
+  Layer& operator=(Layer&& rhs)      = delete;
 
 public: // For update-algorithms
   RenderableContainer colorRenderables;

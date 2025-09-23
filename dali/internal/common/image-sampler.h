@@ -2,7 +2,7 @@
 #define DALI_IMAGE_SAMPLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,8 @@ namespace Internal
 namespace ImageSampler
 {
 /**
-    * Bitshift values
-    */
+ * Bitshift values
+ */
 enum
 {
   MINIFY_BIT_SHIFT  = 0,
@@ -42,8 +42,8 @@ enum
 };
 
 /**
-    * Mask values
-    */
+ * Mask values
+ */
 enum
 {
   MASK_MINIFY_FILTER  = 0x000F,
@@ -53,48 +53,48 @@ enum
 };
 
 /**
-    * Precalculate default sampler bitfield
-    */
+ * Precalculate default sampler bitfield
+ */
 enum
 {
   DEFAULT_BITFIELD = (Dali::FilterMode::DEFAULT << MINIFY_BIT_SHIFT) | (Dali::FilterMode::DEFAULT << MAGNIFY_BIT_SHIFT) | (Dali::WrapMode::DEFAULT << UWRAP_BIT_SHIFT) | (Dali::WrapMode::DEFAULT << VWRAP_BIT_SHIFT)
 };
 
 /**
-   * @brief Pack the filter mode into a bitfield.
-   *
-   * @param[in] minify The minification filter.
-   * @param[in] magnify The magnification filter.
-   * @return Return the packed bitfield.
-   */
+ * @brief Pack the filter mode into a bitfield.
+ *
+ * @param[in] minify The minification filter.
+ * @param[in] magnify The magnification filter.
+ * @return Return the packed bitfield.
+ */
 unsigned int PackBitfield(FilterMode::Type minify, FilterMode::Type magnify, WrapMode::Type uWrap = WrapMode::DEFAULT, WrapMode::Type vWrap = WrapMode::DEFAULT);
 
 /**
-   * @brief Return the minification filter from a packed bitfield.
-   *
-   * @return Return the minification filter.
-   */
+ * @brief Return the minification filter from a packed bitfield.
+ *
+ * @return Return the minification filter.
+ */
 FilterMode::Type GetMinifyFilterMode(unsigned int bitfield);
 
 /**
-   * @brief Return the magnification filter from a packed bitfield.
-   *
-   * @return Return the magnification filter.
-   */
+ * @brief Return the magnification filter from a packed bitfield.
+ *
+ * @return Return the magnification filter.
+ */
 FilterMode::Type GetMagnifyFilterMode(unsigned int bitfield);
 
 /**
-    * @brief Return the wrap mode in x direction from a packed bitfield.
-    *
-    * @return Return the wrap mode.
-    */
+ * @brief Return the wrap mode in x direction from a packed bitfield.
+ *
+ * @return Return the wrap mode.
+ */
 WrapMode::Type GetUWrapMode(unsigned int bitfield);
 
 /**
-    * @brief Return the wrap mode in y direction from a packed bitfield.
-    *
-    * @return Return the wrap mode.
-    */
+ * @brief Return the wrap mode in y direction from a packed bitfield.
+ *
+ * @return Return the wrap mode.
+ */
 WrapMode::Type GetVWrapMode(unsigned int bitfield);
 
 } // namespace ImageSampler

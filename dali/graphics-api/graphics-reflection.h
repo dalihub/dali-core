@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_REFLECTION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public:
   virtual ~Reflection() = default;
 
   // not copyable
-  Reflection(const Reflection&) = delete;
+  Reflection(const Reflection&)            = delete;
   Reflection& operator=(const Reflection&) = delete;
 
   // Vertex attributes
@@ -184,7 +184,7 @@ public:
   virtual Graphics::ShaderLanguage GetLanguage() const = 0;
 
 protected:
-  Reflection(Reflection&&) = default;
+  Reflection(Reflection&&)            = default;
   Reflection& operator=(Reflection&&) = default;
 };
 

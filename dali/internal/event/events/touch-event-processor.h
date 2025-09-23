@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,10 +70,10 @@ public:
   bool ProcessTouchEvent(const Integration::TouchEvent& event);
 
   // Movable but not copyable
-  TouchEventProcessor(const TouchEventProcessor&) = delete;
-  TouchEventProcessor(TouchEventProcessor&&)      = default;
+  TouchEventProcessor(const TouchEventProcessor&)            = delete;
+  TouchEventProcessor(TouchEventProcessor&&)                 = default;
   TouchEventProcessor& operator=(const TouchEventProcessor&) = delete;
-  TouchEventProcessor& operator=(TouchEventProcessor&&) = default;
+  TouchEventProcessor& operator=(TouchEventProcessor&&)      = default;
 
 private:
   /**

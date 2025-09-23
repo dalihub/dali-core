@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOUCH_EVENT_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,10 +67,10 @@ public:
    */
   static TouchEventPtr Clone(const TouchEvent& other);
 
-  TouchEvent(const TouchEvent& other) = delete;            ///< Deleted copy constructor.
-  TouchEvent(TouchEvent&& other)      = delete;            ///< Deleted move constructor.
+  TouchEvent(const TouchEvent& other)            = delete; ///< Deleted copy constructor.
+  TouchEvent(TouchEvent&& other)                 = delete; ///< Deleted move constructor.
   TouchEvent& operator=(const TouchEvent& other) = delete; ///< Deleted copy assignment operator.
-  TouchEvent& operator=(TouchEvent&& other) = delete;      ///< Deleted move assignment operator.
+  TouchEvent& operator=(TouchEvent&& other)      = delete; ///< Deleted move assignment operator.
 
   // Getters
 

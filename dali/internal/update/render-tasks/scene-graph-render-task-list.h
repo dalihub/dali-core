@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/common/property-owner-flag-manager.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 namespace Dali
@@ -72,9 +73,10 @@ public:
   /**
    * Set the resetterManager and renderMessageDispatcher to send message.
    * @param[in] resetterManager to send resetter
+   * @param[in] propertyOwnerFlagManager to discard render task
    * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
    */
-  void Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher);
+  void Initialize(ResetterManager& resetterManager, PropertyOwnerFlagManager& propertyOwnerFlagManager, RenderMessageDispatcher& renderMessageDispatcher);
 
   /**
    * Add a new RenderTask to the list.
@@ -141,10 +143,11 @@ private:
   RenderTaskList& operator=(const RenderTaskList&);
 
 private:
-  CompleteNotificationInterface* mNotificationObject;      ///< object to pass in to the complete notification
-  ResetterManager*               mResetterManager;         ///< for sending bake resetter if rendertask initalized
-  RenderMessageDispatcher*       mRenderMessageDispatcher; ///< for sending messages to render thread
-  RenderTaskContainer            mRenderTasks;             ///< A container of owned RenderTasks
+  CompleteNotificationInterface* mNotificationObject;       ///< object to pass in to the complete notification
+  ResetterManager*               mResetterManager;          ///< for sending bake resetter if rendertask initalized
+  PropertyOwnerFlagManager*      mPropertyOwnerFlagManager; ///< for sending discard it rendertask destroyed
+  RenderMessageDispatcher*       mRenderMessageDispatcher;  ///< for sending messages to render thread
+  RenderTaskContainer            mRenderTasks;              ///< A container of owned RenderTasks
 };
 
 // Messages for RenderTaskList

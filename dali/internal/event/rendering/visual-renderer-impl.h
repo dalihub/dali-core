@@ -113,7 +113,7 @@ protected:
   ~VisualRenderer() override;
 
 private:
-  VisualRenderer(const VisualRenderer&) = delete;
+  VisualRenderer(const VisualRenderer&)            = delete;
   VisualRenderer& operator=(const VisualRenderer&) = delete;
 
 public:

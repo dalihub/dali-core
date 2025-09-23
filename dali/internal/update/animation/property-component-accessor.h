@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_COMPONENT_ACCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,8 +104,8 @@ public:
 
 private:
   // Undefined
-  PropertyComponentAccessorX()                                           = delete;
-  PropertyComponentAccessorX(const PropertyComponentAccessorX& property) = delete;
+  PropertyComponentAccessorX()                                                 = delete;
+  PropertyComponentAccessorX(const PropertyComponentAccessorX& property)       = delete;
   PropertyComponentAccessorX& operator=(const PropertyComponentAccessorX& rhs) = delete;
 
 private:
@@ -190,8 +190,8 @@ public:
 
 private:
   // Undefined
-  PropertyComponentAccessorY()                                           = delete;
-  PropertyComponentAccessorY(const PropertyComponentAccessorY& property) = delete;
+  PropertyComponentAccessorY()                                                 = delete;
+  PropertyComponentAccessorY(const PropertyComponentAccessorY& property)       = delete;
   PropertyComponentAccessorY& operator=(const PropertyComponentAccessorY& rhs) = delete;
 
 private:
@@ -276,8 +276,8 @@ public:
 
 private:
   // Undefined
-  PropertyComponentAccessorZ()                                           = delete;
-  PropertyComponentAccessorZ(const PropertyComponentAccessorZ& property) = delete;
+  PropertyComponentAccessorZ()                                                 = delete;
+  PropertyComponentAccessorZ(const PropertyComponentAccessorZ& property)       = delete;
   PropertyComponentAccessorZ& operator=(const PropertyComponentAccessorZ& rhs) = delete;
 
 private:
@@ -362,8 +362,8 @@ public:
 
 private:
   // Undefined
-  PropertyComponentAccessorW()                                           = delete;
-  PropertyComponentAccessorW(const PropertyComponentAccessorW& property) = delete;
+  PropertyComponentAccessorW()                                                 = delete;
+  PropertyComponentAccessorW(const PropertyComponentAccessorW& property)       = delete;
   PropertyComponentAccessorW& operator=(const PropertyComponentAccessorW& rhs) = delete;
 
 private:

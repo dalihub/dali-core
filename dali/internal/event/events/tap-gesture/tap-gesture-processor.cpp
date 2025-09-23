@@ -70,7 +70,8 @@ void EmitTapSignal(
   tap->SetSourceType(tapEvent.sourceType);
   tap->SetSourceData(tapEvent.sourceData);
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+  {
     oss << "[" << gestureDetectors.size() << "]";
   });
 
@@ -81,7 +82,8 @@ void EmitTapSignal(
     static_cast<TapGestureDetector*>(*iter)->EmitTapGestureSignal(actorHandle, Dali::TapGesture(tap.Get()));
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+  {
     oss << "[" << gestureDetectors.size() << "]";
   });
 }

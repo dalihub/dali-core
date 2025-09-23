@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -664,7 +664,6 @@ int UtcDaliGeoHoverLeaveParentConsumer(void)
 
   END_TEST;
 }
-
 
 int UtcDaliGeoHoverLeaveWithDispatchMotion(void)
 {
@@ -1503,7 +1502,8 @@ int UtcDaliGeoHoverEnsureDifferentConsumerReceivesInterrupted(void)
   SignalData        dataChildConsume;
   HoverEventFunctor functorChildConsume(dataChildConsume);
 
-  auto resetData = [&]() { dataParent.Reset(); dataChildNoConsume.Reset(); dataChildConsume.Reset(); };
+  auto resetData = [&]()
+  { dataParent.Reset(); dataChildNoConsume.Reset(); dataChildConsume.Reset(); };
 
   // Emit a started
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));

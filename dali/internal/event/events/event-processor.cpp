@@ -120,7 +120,7 @@ void EventProcessor::ProcessEvents()
   mCurrentEventQueue = (&mEventQueue0 == mCurrentEventQueue) ? &mEventQueue1 : &mEventQueue0;
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_SCENE_PROCESS_EVENTS", [&](std::ostringstream& oss)
-                                          { oss << "[" << queueToProcess.size() << "]"; });
+  { oss << "[" << queueToProcess.size() << "]"; });
 
   while(!queueToProcess.empty())
   {

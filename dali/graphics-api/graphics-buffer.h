@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_BUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ public:
   virtual ~Buffer() = default;
 
   // not copyable
-  Buffer(const Buffer&) = delete;
+  Buffer(const Buffer&)            = delete;
   Buffer& operator=(const Buffer&) = delete;
 
 protected:
-  Buffer(Buffer&&) = default;
+  Buffer(Buffer&&)            = default;
   Buffer& operator=(Buffer&&) = default;
 };
 

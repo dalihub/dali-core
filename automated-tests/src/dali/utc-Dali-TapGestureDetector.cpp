@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ struct SignalData
 
   void Reset()
   {
-    functorCalled     = false;
-    voidFunctorCalled = false;
+    functorCalled          = false;
+    voidFunctorCalled      = false;
     needGesturePropagation = false;
     receivedGesture.Reset();
 
@@ -90,7 +90,7 @@ struct GestureReceivedFunctor
     signalData.functorCalled   = true;
     signalData.receivedGesture = tap;
     signalData.tappedActor     = actor;
-    if (signalData.needGesturePropagation)
+    if(signalData.needGesturePropagation)
     {
       Dali::DevelActor::SetNeedGesturePropagation(actor, true);
     }
@@ -1006,10 +1006,11 @@ int UtcDaliTapGestureDisableDetectionDuringTapN(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(
     &application,
-    [&detector, &functorCalled](Actor actor, const TapGesture& gesture) {
-      detector.Detach(actor);
-      functorCalled = true;
-    });
+    [&detector, &functorCalled](Actor actor, const TapGesture& gesture)
+  {
+    detector.Detach(actor);
+    functorCalled = true;
+  });
 
   // Render and notify
   application.SendNotification();
@@ -1391,10 +1392,10 @@ int UtcDaliTapGestureSignalReceptionWithGeometryHittest(void)
 
 int UtcDaliTapGestureHandleEvent(void)
 {
-  TestApplication application;
-  Integration::Scene scene     = application.GetScene();
-  RenderTaskList   taskList  = scene.GetRenderTaskList();
-  Dali::RenderTask task      = taskList.GetTask(0);
+  TestApplication    application;
+  Integration::Scene scene    = application.GetScene();
+  RenderTaskList     taskList = scene.GetRenderTaskList();
+  Dali::RenderTask   task     = taskList.GetTask(0);
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1424,7 +1425,7 @@ int UtcDaliTapGestureHandleEvent(void)
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
   parentDetector.HandleEvent(parentActor, touchEventHandle);
 
-  tp = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 150);
+  tp             = GenerateSingleTouch(PointState::UP, Vector2(50.0f, 50.0f), 1, 150);
   touchEventImpl = new Internal::TouchEvent(150);
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);

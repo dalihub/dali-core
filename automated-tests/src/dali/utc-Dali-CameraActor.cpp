@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1005,7 +1005,8 @@ int UtcDaliCameraActorSetOrthographicProjectionP1(void)
   actor.GetProperty(CameraActor::Property::FAR_PLANE_DISTANCE).Get(defaultFarPlaneDistance);
   Vector3 defaultPos = actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
 
-  auto TestOrthographicPlaneDistance = [&](float width, float height, float expectOrthographicSize) {
+  auto TestOrthographicPlaneDistance = [&](float width, float height, float expectOrthographicSize)
+  {
     actor.SetOrthographicProjection(Size(width, height));
 
     DALI_TEST_EQUALS(expectOrthographicSize, actor.GetProperty(Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE).Get<float>(), TEST_LOCATION);
@@ -1638,13 +1639,13 @@ int UtcDaliCameraActorAnimatedProperties03(void)
   actor.SetProperty(Actor::Property::POSITION, Vector2(0.1f, 0.0f));
   application.GetScene().Add(actor);
 
-  Radian sourceFoV    = Radian(0.6f);
-  float  sourceAspect = 0.7f;
+  Radian sourceFoV          = Radian(0.6f);
+  float  sourceAspect       = 0.7f;
   float  sourceNearDistance = 0.5f;
   float  sourceFarDistance  = 1000.0f;
 
-  Radian targetFoV    = Radian(0.1f);
-  float  targetAspect = 1.3f;
+  Radian targetFoV          = Radian(0.1f);
+  float  targetAspect       = 1.3f;
   float  targetNearDistance = 20.5f;
   float  targetFarDistance  = 30.0f;
 
@@ -1840,7 +1841,8 @@ int UtcDaliCameraActorAnimatedProperties04(void)
   application.Render();
   camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix3);
 
-  auto TestAnimationProgress = [&]() {
+  auto TestAnimationProgress = [&]()
+  {
     Matrix projectionMatrix;
 
     application.SendNotification();
@@ -1853,7 +1855,8 @@ int UtcDaliCameraActorAnimatedProperties04(void)
     float expectTop;
     float expectBottom;
 
-    auto UpdateExpectPlaneDistance = [&]() {
+    auto UpdateExpectPlaneDistance = [&]()
+    {
       bool isVertical = camera.GetProperty<int>(DevelCameraActor::Property::PROJECTION_DIRECTION) == static_cast<int>(DevelCameraActor::ProjectionDirection::VERTICAL);
       expectLeft      = -(isVertical ? expectOrthographic * expectAspect : expectOrthographic);
       expectRight     = (isVertical ? expectOrthographic * expectAspect : expectOrthographic);
@@ -2011,7 +2014,8 @@ int UtcDaliCameraActorAnimatedProperties05(void)
   application.Render();
   camera.GetProperty(CameraActor::Property::PROJECTION_MATRIX).Get(expectedProjectionMatrix3);
 
-  auto TestAnimationProgress = [&]() {
+  auto TestAnimationProgress = [&]()
+  {
     Matrix projectionMatrix;
 
     application.SendNotification();
@@ -2024,7 +2028,8 @@ int UtcDaliCameraActorAnimatedProperties05(void)
     float expectTop;
     float expectBottom;
 
-    auto UpdateExpectPlaneDistance = [&]() {
+    auto UpdateExpectPlaneDistance = [&]()
+    {
       bool isVertical = camera.GetProperty<int>(DevelCameraActor::Property::PROJECTION_DIRECTION) == static_cast<int>(DevelCameraActor::ProjectionDirection::VERTICAL);
       expectLeft      = -(isVertical ? expectOrthographic * expectAspect : expectOrthographic);
       expectRight     = (isVertical ? expectOrthographic * expectAspect : expectOrthographic);
@@ -3045,11 +3050,11 @@ int UtcDaliCameraActorConstraintInputProperty(void)
   application.Render();
 
   Constraint projectionModePropertyConstraint      = Constraint::New<float>(actor, projectionModePropertyIndex, [](float& output, const PropertyInputContainer& inputs)
-                                                                    { output = static_cast<float>(inputs[0]->GetInteger()); });
+       { output = static_cast<float>(inputs[0]->GetInteger()); });
   Constraint projectionDirectionPropertyConstraint = Constraint::New<float>(actor, projectionDirectionPropertyIndex, [](float& output, const PropertyInputContainer& inputs)
-                                                                    { output = static_cast<float>(inputs[0]->GetInteger()); });
+  { output = static_cast<float>(inputs[0]->GetInteger()); });
   Constraint invertYAxisPropertyConstraint         = Constraint::New<float>(actor, invertYAxisPropertyIndex, [](float& output, const PropertyInputContainer& inputs)
-                                                                    { output = static_cast<float>(inputs[0]->GetBoolean()); });
+          { output = static_cast<float>(inputs[0]->GetBoolean()); });
   Constraint nearClippingPlanePropertyConstraint   = Constraint::New<float>(actor, nearClippingPlanePropertyIndex, EqualToConstraint());
   Constraint farClippingPlanePropertyConstraint    = Constraint::New<float>(actor, farClippingPlanePropertyIndex, EqualToConstraint());
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,8 @@ void EmitRotationSignal(
   rotation->SetSourceType(rotationEvent.sourceType);
   rotation->SetSourceData(rotationEvent.sourceData);
 
-  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+  DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+  {
     oss << "[" << gestureDetectors.size() << "]";
   });
 
@@ -76,7 +77,8 @@ void EmitRotationSignal(
     static_cast<RotationGestureDetector*>(*iter)->EmitRotationGestureSignal(actorHandle, Dali::RotationGesture(rotation.Get()));
   }
 
-  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL", [&](std::ostringstream& oss) {
+  DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL", [&](std::ostringstream& oss)
+  {
     oss << "[" << gestureDetectors.size() << "]";
   });
 }

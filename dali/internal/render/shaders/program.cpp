@@ -227,7 +227,7 @@ void Program::BuildRequirements(
       if(iter != sharedUniformBlockContainer.end())
       {
         mUniformBlockMemoryRequirements.sharedBlock[i] = iter->second;
-        mUniformBlockMemoryRequirements.totalSizeRequired     += alignedBlockSize;
+        mUniformBlockMemoryRequirements.totalSizeRequired += alignedBlockSize;
         mUniformBlockMemoryRequirements.sharedGpuSizeRequired += alignedBlockSize;
 
         sharedUniformUsed = true;

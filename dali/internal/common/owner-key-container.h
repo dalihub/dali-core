@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OWNER_KEY_CONTAINER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,10 +54,10 @@ public:
   }
 
   // Not copyable or movable
-  OwnerKeyContainer(const OwnerKeyContainer&) = delete;            ///< Deleted copy constructor
-  OwnerKeyContainer(OwnerKeyContainer&&)      = delete;            ///< Deleted move constructor
+  OwnerKeyContainer(const OwnerKeyContainer&)            = delete; ///< Deleted copy constructor
+  OwnerKeyContainer(OwnerKeyContainer&&)                 = delete; ///< Deleted move constructor
   OwnerKeyContainer& operator=(const OwnerKeyContainer&) = delete; ///< Deleted copy assignment operator
-  OwnerKeyContainer& operator=(OwnerKeyContainer&&) = delete;      ///< Deleted move assignment operator
+  OwnerKeyContainer& operator=(OwnerKeyContainer&&)      = delete; ///< Deleted move assignment operator
 
   /**
    * Test whether the container is empty.
@@ -90,7 +90,8 @@ public:
     auto begin = BaseType::Begin();
     auto end   = BaseType::End();
 
-    auto function = [predicate](auto& key) {
+    auto function = [predicate](auto& key)
+    {
       if(predicate(key.Get()))
       {
         delete key.Get();

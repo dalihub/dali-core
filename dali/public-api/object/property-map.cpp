@@ -373,7 +373,8 @@ bool Property::Map::Remove(Property::Index key)
 {
   if(DALI_LIKELY(mImpl))
   {
-    auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element) { return element.first == key; });
+    auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element)
+    { return element.first == key; });
     if(iter != mImpl->mIndexValueContainer.end())
     {
       if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
@@ -394,7 +395,8 @@ bool Property::Map::Remove(std::string_view key)
 {
   if(DALI_LIKELY(mImpl))
   {
-    auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element) { return element.first == key; });
+    auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element)
+    { return element.first == key; });
     if(iter != mImpl->mStringValueContainer.end())
     {
       if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)

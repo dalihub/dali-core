@@ -2,7 +2,7 @@
 #define TEST_SYNC_IMPLEMENTATION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ public: // TEST FUNCTIONS
    */
   int32_t GetNumberOfSyncObjects();
 
-  TestGraphicsSyncImplementation(const TestGraphicsSyncImplementation&) = delete;
+  TestGraphicsSyncImplementation(const TestGraphicsSyncImplementation&)            = delete;
   TestGraphicsSyncImplementation& operator=(const TestGraphicsSyncImplementation&) = delete;
 
 private:

@@ -616,8 +616,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   // Note: The depth buffer is enabled or disabled on a per-renderer basis.
   // Here we pre-calculate the value to use if these modes are set to AUTO.
   const bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
-                               !(renderList.GetSourceLayer()->IsDepthTestDisabled()) &&
-                               renderList.HasColorRenderItems());
+                                      !(renderList.GetSourceLayer()->IsDepthTestDisabled()) &&
+                                      renderList.HasColorRenderItems());
   const std::size_t count = renderList.Count();
   uint32_t          lastClippingDepth(0u);
   uint32_t          lastClippingId(0u);
@@ -646,14 +646,14 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   // Add root clipping rect (set manually for Render function by partial update for example)
   // on the bottom of the stack
   Graphics::Viewport graphicsViewport = ViewportFromClippingBox(sceneSize, mViewportRectangle, 0);
-  if(!rootClippingRect.IsEmpty())
+  if(!rootClippingRect.IsEmpty() && instruction.mFrameBuffer == nullptr)
   {
     secondaryCommandBuffer.SetScissorTestEnable(true);
     secondaryCommandBuffer.SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
     mScissorStack.push_back(rootClippingRect);
   }
   // We are not performing a layer clip and no clipping rect set. Add the viewport as the root scissor rectangle.
-  else if(!renderList.IsClipping())
+  else if(!renderList.IsClipping() || instruction.mFrameBuffer != nullptr)
   {
     secondaryCommandBuffer.SetScissorTestEnable(false);
     //@todo Vk requires a scissor to be set, as we have turned on dynamic state scissor in the pipelines.
@@ -780,7 +780,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 Graphics::CommandBuffer*                 commandBuffer)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
-                                          { oss << "[" << instruction.RenderListCount() << "]"; });
+  { oss << "[" << instruction.RenderListCount() << "]"; });
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 

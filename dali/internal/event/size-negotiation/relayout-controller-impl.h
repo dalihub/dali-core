@@ -201,7 +201,7 @@ private:
   void RequestRelayoutRecursively(Internal::Actor& actorImpl);
 
   // Undefined
-  RelayoutController(const RelayoutController&) = delete;
+  RelayoutController(const RelayoutController&)            = delete;
   RelayoutController& operator=(const RelayoutController&) = delete;
 
 private:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ void UniformMap::Add(UniformPropertyMapping newMap)
 {
   auto iter = std::find_if(mUniformMaps.Begin(),
                            mUniformMaps.End(),
-                           [&](auto& element) { return element.uniformName == newMap.uniformName; });
+                           [&](auto& element)
+  { return element.uniformName == newMap.uniformName; });
 
   if(iter != mUniformMaps.End())
   {
@@ -54,7 +55,8 @@ void UniformMap::Remove(ConstString uniformName)
 {
   auto iter = std::find_if(mUniformMaps.Begin(),
                            mUniformMaps.End(),
-                           [&](auto& element) { return element.uniformName == uniformName; });
+                           [&](auto& element)
+  { return element.uniformName == uniformName; });
 
   if(iter != mUniformMaps.End())
   {
@@ -67,7 +69,8 @@ const PropertyInputImpl* UniformMap::Find(ConstString uniformName)
 {
   auto iter = std::find_if(mUniformMaps.Begin(),
                            mUniformMaps.End(),
-                           [&](auto& element) { return element.uniformName == uniformName; });
+                           [&](auto& element)
+  { return element.uniformName == uniformName; });
 
   return (iter != mUniformMaps.End()) ? (*iter).propertyPtr : nullptr;
 }

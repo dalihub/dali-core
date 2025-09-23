@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,8 @@ int UtcDaliTapGestureActorBoundingBoxTestP(void)
   application.Render(0);
 
   Vector3 hitPointLocal;
-  float distance;
-  bool success = Dali::Internal::RayTest::ActorBoundingBoxTest(GetImplementation(actor), Vector4(0.0f, 0.0f, 10.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 0.0f), hitPointLocal, distance);
+  float   distance;
+  bool    success = Dali::Internal::RayTest::ActorBoundingBoxTest(GetImplementation(actor), Vector4(0.0f, 0.0f, 10.0f, 1.0f), Vector4(0.0f, 0.0f, -1.0f, 0.0f), hitPointLocal, distance);
 
   tet_printf("hitPointLocal : %f, %f, %f\n", hitPointLocal.x, hitPointLocal.y, hitPointLocal.z);
   tet_printf("distance : %f\n", distance);
@@ -83,8 +83,8 @@ int UtcDaliTapGestureActorBoundingBoxTestN(void)
   application.Render(0);
 
   Vector3 hitPointLocal;
-  float distance;
-  bool success = Dali::Internal::RayTest::ActorBoundingBoxTest(GetImplementation(actor), Vector4(0.0f, 0.0f, 10.0f, 1.0f), Vector4(0.0f, 0.5f, -1.0f, 0.0f), hitPointLocal, distance);
+  float   distance;
+  bool    success = Dali::Internal::RayTest::ActorBoundingBoxTest(GetImplementation(actor), Vector4(0.0f, 0.0f, 10.0f, 1.0f), Vector4(0.0f, 0.5f, -1.0f, 0.0f), hitPointLocal, distance);
 
   DALI_TEST_EQUAL(success, false);
 

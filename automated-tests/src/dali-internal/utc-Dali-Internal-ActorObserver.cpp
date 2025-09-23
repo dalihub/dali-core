@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,7 @@ int UtcDaliActorObserverGracefulDeletion(void)
         ActorObserver actorObserver;
         actorObserver.SetActor(&actorImpl);
       } // ActorObserver goes out of scope
-    }   // Actor goes out of scope
+    } // Actor goes out of scope
 
     // If we get here without a crash, then it's all good
     DALI_TEST_CHECK(true);
@@ -231,7 +231,7 @@ int UtcDaliActorObserverEnsureRValueCleansUp(void)
         observer1.SetActor(&actorImpl);
         ActorObserver observer2(std::move(observer1));
       } // Both observers die here
-    }   // Actor goes out of scope
+    } // Actor goes out of scope
 
     // If we get here without a crash, then it's all good
     DALI_TEST_CHECK(true);

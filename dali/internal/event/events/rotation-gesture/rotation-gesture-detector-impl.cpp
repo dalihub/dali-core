@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,12 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/public-api/events/rotation-gesture.h>
-#include <dali/public-api/object/type-registry.h>
+#include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
+#include <dali/public-api/events/rotation-gesture.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
@@ -69,7 +69,7 @@ void RotationGestureDetector::EmitRotationGestureSignal(Dali::Actor actor, const
 {
   // Guard against destruction during signal emission
   Dali::RotationGestureDetector handle(this);
-  if(rotation.GetState() !=  GestureState::CONTINUING)
+  if(rotation.GetState() != GestureState::CONTINUING)
   {
     DALI_LOG_DEBUG_INFO("emitting rotation gesture actor id(%d) state(%d)\n", actor.GetProperty<int32_t>(Dali::Actor::Property::ID), rotation.GetState());
   }
@@ -112,7 +112,6 @@ void RotationGestureDetector::OnActorDetach(Actor& actor)
   }
 }
 
-
 bool RotationGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
 {
   Dali::TouchEvent touchEvent(touch);
@@ -131,9 +130,9 @@ void RotationGestureDetector::ProcessTouchEvent(Scene& scene, const Integration:
 {
   if(!mGestureRecognizer)
   {
-    const RotationGestureProcessor& rotationGestureProcessor = mGestureEventProcessor.GetRotationGestureProcessor();
-    uint32_t minimumTouchEvents = rotationGestureProcessor.GetMinimumTouchEvents();
-    uint32_t minimumTouchEventsAfterStart = rotationGestureProcessor.GetMinimumTouchEventsAfterStart();
+    const RotationGestureProcessor& rotationGestureProcessor     = mGestureEventProcessor.GetRotationGestureProcessor();
+    uint32_t                        minimumTouchEvents           = rotationGestureProcessor.GetMinimumTouchEvents();
+    uint32_t                        minimumTouchEventsAfterStart = rotationGestureProcessor.GetMinimumTouchEventsAfterStart();
 
     mGestureRecognizer = new RotationGestureRecognizer(*this, minimumTouchEvents, minimumTouchEventsAfterStart);
   }
@@ -148,9 +147,9 @@ void RotationGestureDetector::ProcessTouchEvent(Scene& scene, const Integration:
  * @param[in]  localCenter       Relative to the actor attached to the detector.
  */
 void RotationGestureDetector::EmitRotationSignal(
-  Actor*                          actor,
-  const RotationGestureEvent&     rotationEvent,
-  Vector2                         localCenter)
+  Actor*                      actor,
+  const RotationGestureEvent& rotationEvent,
+  Vector2                     localCenter)
 {
   SetDetected(true);
   Internal::RotationGesturePtr rotation(new Internal::RotationGesture(rotationEvent.state));
@@ -161,7 +160,7 @@ void RotationGestureDetector::EmitRotationSignal(
   rotation->SetSourceType(rotationEvent.sourceType);
   rotation->SetSourceData(rotationEvent.sourceData);
 
-  Dali::Actor                                    actorHandle(actor);
+  Dali::Actor actorHandle(actor);
   EmitRotationGestureSignal(actorHandle, Dali::RotationGesture(rotation.Get()));
 }
 

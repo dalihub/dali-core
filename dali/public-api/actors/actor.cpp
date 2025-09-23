@@ -208,7 +208,6 @@ bool Actor::IsIgnored() const
   return GetImplementation(*this).IsIgnored();
 }
 
-
 Actor::TouchEventSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();

@@ -19,9 +19,10 @@
 #include <dali/internal/update/manager/update-manager.h>
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/set-wrapper.h>
+
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 #include <dali/devel-api/common/map-wrapper.h>
-#include <dali/devel-api/common/set-wrapper.h>
 #else
 #include <unordered_map>
 #include <unordered_set>
@@ -58,7 +59,7 @@
 // Un-comment to enable node tree debug logging
 // #define NODE_TREE_LOGGING 1
 
-#if(defined(DEBUG_ENABLED) && defined(NODE_TREE_LOGGING))
+#if (defined(DEBUG_ENABLED) && defined(NODE_TREE_LOGGING))
 #define SNAPSHOT_NODE_LOGGING                                                   \
   const uint32_t FRAME_COUNT_TRIGGER = 16;                                      \
   if(mImpl->frameCounter >= FRAME_COUNT_TRIGGER)                                \
@@ -379,6 +380,9 @@ struct UpdateManager::Impl
   DiscardQueue<Render::UniformBlock*, OwnerContainer<Render::UniformBlock*>> uniformBlockDiscardQueue;
   DiscardQueue<MemoryPoolKey<Renderer>, OwnerKeyContainer<Renderer>>         rendererDiscardQueue;
   DiscardQueue<Scene*, OwnerContainer<Scene*>>                               sceneDiscardQueue;
+  DiscardQueue<PropertyOwner*, OwnerContainer<PropertyOwner*>>               customObjectDiscardQueue;
+
+  std::vector<PropertyOwner*> updatedPropertyOwnerContainer; ///< List of updated property owner (not owned)
 
   CompleteNotificationInterface::ParameterList notifyRequiredAnimations; ///< A temperal container of complete notify required animations, like animation finished, stopped, or loop completed.
 
@@ -423,6 +427,7 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
 : mImpl(nullptr)
 {
   PropertyBase::RegisterResetterManager(*this);
+  PropertyOwner::RegisterPropertyOwnerFlagManager(*this);
 
   mImpl = new Impl(notificationManager,
                    animationPlaylist,
@@ -438,6 +443,7 @@ UpdateManager::~UpdateManager()
 {
   delete mImpl;
   PropertyBase::UnregisterResetterManager();
+  PropertyOwner::UnregisterPropertyOwnerFlagManager();
 
   // Ensure to release memory pool
   Animation::ResetMemoryPool();
@@ -501,13 +507,14 @@ void UpdateManager::InstallRoot(OwnerPointer<Layer>& layer)
   Layer* rootLayer = layer.Release();
 
   DALI_ASSERT_DEBUG(std::find_if(mImpl->scenes.begin(), mImpl->scenes.end(), [rootLayer](Impl::SceneInfoPtr& scene)
-                                 { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
+  { return scene && scene->root == rootLayer; }) == mImpl->scenes.end() &&
                     "Root Node already installed");
 
   rootLayer->CreateTransform(&mImpl->transformManager);
   rootLayer->SetRoot(true);
 
   rootLayer->AddInitializeResetter(*this);
+  rootLayer->RequestResetUpdated();
 
   // Do not allow to insert duplicated nodes.
   // It could be happened if node id is overflowed.
@@ -557,6 +564,8 @@ void UpdateManager::AddNode(OwnerPointer<Node>& node)
 
   mImpl->nodes.PushBack(rawNode);
 
+  // Newly created nodes always need to reset flags.
+  rawNode->RequestResetUpdated();
   rawNode->CreateTransform(&mImpl->transformManager);
 }
 
@@ -663,7 +672,7 @@ void UpdateManager::AddObject(OwnerPointer<PropertyOwner>& object)
 
 void UpdateManager::RemoveObject(PropertyOwner* object)
 {
-  mImpl->customObjects.EraseObject(object);
+  EraseUsingDiscardQueue(mImpl->customObjects, object, mImpl->customObjectDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::CUSTOM_OBJECT;
 #endif
@@ -672,7 +681,7 @@ void UpdateManager::RemoveObject(PropertyOwner* object)
 void UpdateManager::AddRenderTaskList(OwnerPointer<RenderTaskList>& taskList)
 {
   RenderTaskList* taskListPointer = taskList.Release();
-  taskListPointer->Initialize(*this, mImpl->renderMessageDispatcher);
+  taskListPointer->Initialize(*this, *this, mImpl->renderMessageDispatcher);
 
   mImpl->scenes.back()->taskList = taskListPointer;
 }
@@ -779,6 +788,17 @@ bool UpdateManager::IsAnimationRunning() const
   }
 
   return false;
+}
+
+void UpdateManager::RequestResetUpdated(const PropertyOwner& owner)
+{
+  mImpl->updatedPropertyOwnerContainer.emplace_back(const_cast<PropertyOwner*>(&owner));
+}
+
+void UpdateManager::DiscardPropertyOwner(PropertyOwner* discardedOwner)
+{
+  // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
+  mImpl->customObjectDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), discardedOwner);
 }
 
 void UpdateManager::AddPropertyResetter(OwnerPointer<PropertyResetterBase>& propertyResetter)
@@ -990,21 +1010,6 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
       propertyBase->ResetToBaseValue(bufferIndex);
     }
   }
-
-  // Clear all root nodes dirty flags
-  for(auto& scene : mImpl->scenes)
-  {
-    auto root = scene->root;
-    root->ResetDirtyFlags(bufferIndex);
-  }
-
-  // Clear node dirty flags
-  Vector<Node*>::Iterator iter    = mImpl->nodes.Begin() + 1;
-  Vector<Node*>::Iterator endIter = mImpl->nodes.End();
-  for(; iter != endIter; ++iter)
-  {
-    (*iter)->ResetDirtyFlags(bufferIndex);
-  }
 }
 
 bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds)
@@ -1033,7 +1038,7 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   auto&& iter = mImpl->animations.Begin();
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
-                                          { oss << "[" << mImpl->animations.Count() << "]"; });
+  { oss << "[" << mImpl->animations.Count() << "]"; });
 
   while(iter != mImpl->animations.End())
   {
@@ -1085,7 +1090,7 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
-                                        { oss << "[" << mImpl->animations.Count() << "]"; });
+  { oss << "[" << mImpl->animations.Count() << "]"; });
 
   return animationActive;
 }
@@ -1189,7 +1194,7 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
   }
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss)
-                                          { oss << "[" << mImpl->renderers.Count() << "]"; });
+  { oss << "[" << mImpl->renderers.Count() << "]"; });
 
   for(const auto& rendererKey : mImpl->renderers)
   {
@@ -1251,6 +1256,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   mImpl->shaderDiscardQueue.Clear(bufferIndex);
   mImpl->rendererDiscardQueue.Clear(bufferIndex);
   mImpl->sceneDiscardQueue.Clear(bufferIndex);
+  mImpl->customObjectDiscardQueue.Clear(bufferIndex);
 
   bool isAnimationRunning = IsAnimationRunning();
 
@@ -1291,7 +1297,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   if(updateScene || mImpl->previousUpdateScene)
   {
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_INTERNAL", [&](std::ostringstream& oss)
-                                            {
+    {
       oss << "[n:" << mImpl->nodes.Size() << ",";
       oss << "c:" << mImpl->customObjects.Size() << ",";
       oss << "a:" << mImpl->animations.Size() << ",";
@@ -1416,7 +1422,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
             scene->scene->SetSkipRendering(true);
           }
           DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROCESS_RENDER_TASK", [&](std::ostringstream& oss)
-                                                { oss << "[render instruction capacity : " << mImpl->renderInstructionCapacity << "]\n"; });
+          { oss << "[render instruction capacity : " << mImpl->renderInstructionCapacity << "]\n"; });
 
           numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count(bufferIndex);
         }
@@ -1537,24 +1543,17 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 void UpdateManager::PostRender()
 {
   // Reset dirty flag
-  for(auto&& renderer : mImpl->renderers)
+  if(!mImpl->updatedPropertyOwnerContainer.empty())
   {
-    renderer->ResetDirtyUpdated();
-  }
+    for(auto* updatedPropertyOwner : mImpl->updatedPropertyOwnerContainer)
+    {
+      updatedPropertyOwner->ResetUpdated();
+    }
+    mImpl->updatedPropertyOwnerContainer.clear();
 
-  for(auto&& shader : mImpl->shaders)
-  {
-    shader->ResetUpdated();
-  }
-
-  for(auto&& uniformBlock : mImpl->uniformBlocks)
-  {
-    uniformBlock->SetUpdated(false);
-  }
-
-  for(auto&& scene : mImpl->scenes)
-  {
-    scene->root->SetUpdatedTree(false);
+#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+    mImpl->updatedPropertyOwnerContainer.shrink_to_fit();
+#endif
   }
 }
 
@@ -1680,7 +1679,7 @@ void UpdateManager::SetDepthIndices(OwnerPointer<NodeDepths>& nodeDepths)
       // Reorder children container only if sibiling order changed.
       NodeContainer& container = node->GetChildren();
       std::sort(container.Begin(), container.End(), [](Node* a, Node* b)
-                { return a->GetDepthIndex() < b->GetDepthIndex(); });
+      { return a->GetDepthIndex() < b->GetDepthIndex(); });
     }
   }
 }

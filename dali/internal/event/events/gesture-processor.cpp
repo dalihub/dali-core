@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,8 +138,8 @@ void GestureProcessor::ProcessAndEmit(HitTestAlgorithm::Results& hitTestResults)
 {
   if(hitTestResults.actor)
   {
-    Actor*  hitTestActor(&GetImplementation(hitTestResults.actor));
-    Actor*  actor(hitTestActor);
+    Actor* hitTestActor(&GetImplementation(hitTestResults.actor));
+    Actor* actor(hitTestActor);
 
     while(actor)
     {

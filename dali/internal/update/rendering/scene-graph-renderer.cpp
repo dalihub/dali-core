@@ -973,13 +973,16 @@ void Renderer::CheckDirtyUpdated() const
     mDirtyUpdated |= CHECKED;
     mDirtyUpdated |= (Updated() || !mMixColor.IsClean()) << DIRTY_FLAG_SHIFT;
     mDirtyUpdated |= ((mShader && mShader->IsUpdated()) || (mVisualPropertiesDirtyFlags != CLEAN_FLAG)) << UPDATED_FLAG_SHIFT;
+
+    // TODO : Can we skip this reset?
+    RequestResetUpdated();
   }
 }
 
-void Renderer::ResetDirtyUpdated()
+void Renderer::ResetUpdated()
 {
-  PropertyOwner::SetUpdated(false);
   mDirtyUpdated = NOT_CHECKED;
+  PropertyOwner::ResetUpdated();
 }
 
 Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept

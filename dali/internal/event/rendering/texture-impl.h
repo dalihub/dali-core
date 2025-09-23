@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NEW_TEXTURE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -228,13 +228,13 @@ private:                                    // data
   ImageDimensions         mSize;        ///< Size of the texture
   Dali::TextureType::Type mType;        ///< Texture type (cached)
   Pixel::Format           mFormat;      ///< Pixel format
-  uint32_t mResourceId;
-  bool mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
+  uint32_t                mResourceId;
+  bool                    mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   // For memory profiling
-  int32_t mTextureId;
-  uint32_t mDataSize;
+  int32_t     mTextureId;
+  uint32_t    mDataSize;
   std::string mUrl;
 #endif
 };

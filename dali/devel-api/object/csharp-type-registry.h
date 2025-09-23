@@ -2,7 +2,7 @@
 #define DALI_CSHARP_TYPE_REGISTRY_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,15 +48,15 @@ DALI_CORE_API bool RegisterType(const std::string&             name,
                                 CSharpTypeInfo::CreateFunction f);
 
 /**
-   * Register an event-thread only property with a type (used by C# Custom controls)
-   * @param [in] objectName name of the object used to register the type
-   * @param [in] name Property name
-   * @param [in] index Property index
-   * @param [in] type Property type
-   * @param [in] setFunc The function to set the property (Can be NULL).
-   * @param [in] getFunc The function to get the value of a property.
-   * @return true if the property could be registered.
-  */
+ * Register an event-thread only property with a type (used by C# Custom controls)
+ * @param [in] objectName name of the object used to register the type
+ * @param [in] name Property name
+ * @param [in] index Property index
+ * @param [in] type Property type
+ * @param [in] setFunc The function to set the property (Can be NULL).
+ * @param [in] getFunc The function to get the value of a property.
+ * @return true if the property could be registered.
+ */
 DALI_CORE_API bool RegisterProperty(const std::string&                  objectName,
                                     const std::string&                  name,
                                     Property::Index                     index,

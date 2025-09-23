@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include <dali/internal/update/common/property-owner-flag-manager.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -32,9 +33,28 @@ namespace Internal
 {
 namespace SceneGraph
 {
+namespace
+{
+PropertyOwnerFlagManager* gPropertyOwnerFlagManager = nullptr;
+} // unnamed namespace
+
 PropertyOwner* PropertyOwner::New()
 {
   return new PropertyOwner();
+}
+
+void PropertyOwner::RegisterPropertyOwnerFlagManager(PropertyOwnerFlagManager& manager)
+{
+  DALI_ASSERT_ALWAYS(gPropertyOwnerFlagManager == nullptr && "PropertyOwner::RegisterPropertyOwnerFlagManager called twice!");
+
+  gPropertyOwnerFlagManager = &manager;
+}
+
+void PropertyOwner::UnregisterPropertyOwnerFlagManager()
+{
+  DALI_ASSERT_ALWAYS(gPropertyOwnerFlagManager && "PropertyOwner::RegisterPropertyOwnerFlagManager not be called before!");
+
+  gPropertyOwnerFlagManager = nullptr;
 }
 
 PropertyOwner::~PropertyOwner()
@@ -153,6 +173,13 @@ void PropertyOwner::InstallCustomProperty(OwnerPointer<PropertyBase>& property)
   mCustomProperties.PushBack(property.Release());
 }
 
+void PropertyOwner::RequestResetUpdated() const
+{
+  DALI_ASSERT_ALWAYS(gPropertyOwnerFlagManager && "PropertyOwner::SetUpdated called without RegisterPropertyOwnerFlagManager!!");
+
+  gPropertyOwnerFlagManager->RequestResetUpdated(*this);
+}
+
 ConstraintOwnerContainer& PropertyOwner::GetConstraints()
 {
   return mConstraints;
@@ -176,7 +203,7 @@ void PropertyOwner::RemoveConstraint(ConstraintBase* constraint)
     }
   }
 
-  //it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
+  // it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
 }
 
 ConstraintOwnerContainer& PropertyOwner::GetPostConstraints()
@@ -202,7 +229,7 @@ void PropertyOwner::RemovePostConstraint(ConstraintBase* constraint)
     }
   }
 
-  //it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
+  // it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
 }
 
 PropertyOwner::PropertyOwner()

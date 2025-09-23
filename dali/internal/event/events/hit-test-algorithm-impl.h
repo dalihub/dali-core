@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HIT_TEST_ALGORITHM_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,14 @@ namespace HitTestAlgorithm
 {
 struct Results
 {
-  RenderTaskPtr      renderTask;                ///< The render-task displaying the actor.
-  Dali::Actor        actor;                     ///< The hit actor.
-  Vector2            actorCoordinates;          ///< The actor coordinates.
-  Vector4            rayOrigin;                 ///< The point of origin of the ray.
-  Vector4            rayDirection;              ///< The direction vector of the ray.
-  Integration::Point point;                     ///< The point of event touched.
-  uint32_t           eventTime;                 ///< The time the event occurred.
-  std::list<Dali::Internal::Actor*> actorLists; ///< If the geometry hittest way is used, a list of actors that can be hit is stored.
+  RenderTaskPtr                     renderTask;       ///< The render-task displaying the actor.
+  Dali::Actor                       actor;            ///< The hit actor.
+  Vector2                           actorCoordinates; ///< The actor coordinates.
+  Vector4                           rayOrigin;        ///< The point of origin of the ray.
+  Vector4                           rayDirection;     ///< The direction vector of the ray.
+  Integration::Point                point;            ///< The point of event touched.
+  uint32_t                          eventTime;        ///< The time the event occurred.
+  std::list<Dali::Internal::Actor*> actorLists;       ///< If the geometry hittest way is used, a list of actors that can be hit is stored.
 };
 
 /**

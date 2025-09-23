@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Dali
 class BaseObjectObserver::Impl : public BaseObject::Impl::Observer
 {
 public:
-explicit Impl(const BaseHandle& handle)
+  explicit Impl(const BaseHandle& handle)
   {
     if(handle)
     {
@@ -39,9 +39,9 @@ explicit Impl(const BaseHandle& handle)
     Stop();
   }
 
-  void Start(BaseObjectObserver *observerBase)
+  void Start(BaseObjectObserver* observerBase)
   {
-    if (mObject && !mObserverBase && observerBase)
+    if(mObject && !mObserverBase && observerBase)
     {
       mObserverBase = observerBase;
       BaseObject::Impl::Get(*mObject).AddObserver(*this);
@@ -67,7 +67,7 @@ explicit Impl(const BaseHandle& handle)
   }
 
 private:
-  Dali::BaseObject* mObject{nullptr};
+  Dali::BaseObject*   mObject{nullptr};
   BaseObjectObserver* mObserverBase{nullptr};
 };
 

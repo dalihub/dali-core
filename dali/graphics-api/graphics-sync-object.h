@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_GRAPHICS_SYNC_OBJECT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ public:
   virtual ~SyncObject() = default;
 
   // Definitely not copyable:
-  SyncObject(const SyncObject&) = delete;
+  SyncObject(const SyncObject&)            = delete;
   SyncObject& operator=(const SyncObject&) = delete;
 
   /**
@@ -38,7 +38,7 @@ public:
   virtual bool IsSynced() = 0;
 
 protected:
-  SyncObject(SyncObject&&) = default;
+  SyncObject(SyncObject&&)            = default;
   SyncObject& operator=(SyncObject&&) = default;
 };
 

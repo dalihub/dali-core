@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -431,7 +431,7 @@ int UtcDaliVertexBufferSetDataNegative01(void)
 
 int UtcDaliVertexBufferSetDataNegative02(void)
 {
-  TestApplication    application;
+  TestApplication application;
 
   Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
                                                          {"aTexCoord", Property::VECTOR2},
@@ -456,7 +456,7 @@ int UtcDaliVertexBufferSetDataNegative02(void)
 
 int UtcDaliVertexBufferSetDataWithZeroLength(void)
 {
-  TestApplication    application;
+  TestApplication application;
 
   Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
                                                          {"aTexCoord", Property::VECTOR2},

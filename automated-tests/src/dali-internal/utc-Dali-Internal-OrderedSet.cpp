@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <chrono>    ///< std::chrono::system_clock
 #include <algorithm> ///< std::shuffle
+#include <chrono>    ///< std::chrono::system_clock
 #include <random>    ///< std::default_random_engine
 #include <utility>
 
@@ -537,8 +537,8 @@ int UtcDaliOrderedSetReorderCacheMap(void)
     // Randomly erase item, and check again until all items removed.
     while(!set.IsEmpty())
     {
-      int removeIndex = rand()%set.Count();
-      auto iter = set.Find(shuffleList[removeIndex].second);
+      int  removeIndex = rand() % set.Count();
+      auto iter        = set.Find(shuffleList[removeIndex].second);
       DALI_TEST_CHECK(iter != set.End());
       set.Erase(iter);
       for(int i = removeIndex + 1; i < n; ++i)

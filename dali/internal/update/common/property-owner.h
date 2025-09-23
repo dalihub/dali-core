@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ namespace SceneGraph
 {
 class PropertyOwner;
 class ResetterManager;
+class PropertyOwnerFlagManager;
 
 using OwnedPropertyContainer = OwnerContainer<PropertyBase*>;
 using OwnedPropertyIter      = OwnedPropertyContainer::Iterator;
@@ -99,6 +100,18 @@ public:
    * @return A newly allocated object.
    */
   static PropertyOwner* New();
+
+  /**
+   * @brief Registers a property owner flag manager to control flag resetted.
+   *
+   * @param [in] manager The manager to register.
+   */
+  static void RegisterPropertyOwnerFlagManager(PropertyOwnerFlagManager& manager);
+
+  /**
+   * @brief Unregisters a property owner flag manager.
+   */
+  static void UnregisterPropertyOwnerFlagManager();
 
   /**
    * Virtual destructor; this is intended as a base class.
@@ -176,11 +189,29 @@ public:
   }
 
   /**
+   * Request to call ResetUpdated() for this frame at the end of update/render loop.
+   */
+  void RequestResetUpdated() const;
+
+  /**
+   * Reset flag implements at the end of update/render loop.
+   * @note Need to base call at the end of function call.
+   */
+  virtual void ResetUpdated()
+  {
+    mUpdated = false;
+  }
+
+  /**
    * Mark an property owner with the updated flag.
    * @param[in] updated The updated flag
    */
   void SetUpdated(bool updated)
   {
+    if(!mUpdated && updated)
+    {
+      RequestResetUpdated();
+    }
     mUpdated = updated;
   }
 

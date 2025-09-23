@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_BUFFER_CREATE_INFO
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ struct BufferCreateInfo
    * @param[in] value Flags
    * @return reference to this structure
    */
-  auto& SetBufferPropertiesFlags( BufferPropertiesFlags value )
+  auto& SetBufferPropertiesFlags(BufferPropertiesFlags value)
   {
     propertiesFlags = value;
     return *this;
@@ -107,11 +107,11 @@ struct BufferCreateInfo
     return *this;
   }
 
-  GraphicsStructureType type{GraphicsStructureType::BUFFER_CREATE_INFO_STRUCT};
-  ExtensionCreateInfo*  nextExtension{nullptr};
-  BufferUsageFlags      usage{};
-  uint32_t              size{0u};
-  BufferPropertiesFlags propertiesFlags{};
+  GraphicsStructureType      type{GraphicsStructureType::BUFFER_CREATE_INFO_STRUCT};
+  ExtensionCreateInfo*       nextExtension{nullptr};
+  BufferUsageFlags           usage{};
+  uint32_t                   size{0u};
+  BufferPropertiesFlags      propertiesFlags{};
   const AllocationCallbacks* allocationCallbacks{nullptr};
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,19 @@
 #include <cstdio>
 
 // Link with TET Test application, need to redefine TET functions
-extern "C"
+extern "C" {
+void tet_infoline(const char* str)
 {
-  void tet_infoline(const char* str)
-  {
-    puts(str);
-  }
+  puts(str);
+}
 
-  void tet_printf(const char* str, ...)
-  {
-    va_list args;
-    va_start(args, str);
-    vprintf(str, args);
-    va_end(args);
-  }
+void tet_printf(const char* str, ...)
+{
+  va_list args;
+  va_start(args, str);
+  vprintf(str, args);
+  va_end(args);
+}
 }
 
 #include "test-application.h"

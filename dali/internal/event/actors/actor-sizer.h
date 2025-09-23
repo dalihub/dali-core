@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_SIZER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,8 +85,8 @@ public:
   ~ActorSizer();
 
   // Remove default constructor, copy constructor and assignment operator
-  ActorSizer()                  = delete;
-  ActorSizer(const ActorSizer&) = delete;
+  ActorSizer()                            = delete;
+  ActorSizer(const ActorSizer&)           = delete;
   ActorSizer& operator=(const ActorSizer) = delete;
 
   ///@copydoc Actor::SetSizerModeFactor
@@ -258,12 +258,12 @@ private:
   Relayouter& EnsureRelayouter();
 
   /**
-  * @brief Extract a given dimension from a Vector3
-  *
-  * @param[in] values The values to extract from
-  * @param[in] dimension The dimension to extract
-  * @return Return the value for the dimension
-  */
+   * @brief Extract a given dimension from a Vector3
+   *
+   * @param[in] values The values to extract from
+   * @param[in] dimension The dimension to extract
+   * @return Return the value for the dimension
+   */
   float GetDimensionValue(const Vector3& values, const Dimension::Type dimension) const;
 
   /**

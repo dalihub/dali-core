@@ -2,7 +2,7 @@
 #define DALI_BASE_OBJECT_OBSERVER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,10 +53,10 @@ public:
   virtual void ObjectDestroyed() = 0;
 
   // deleted constructors and operators
-  BaseObjectObserver(const BaseObjectObserver& handle) = delete;
+  BaseObjectObserver(const BaseObjectObserver& handle)         = delete;
   BaseObjectObserver& operator=(const BaseObjectObserver& rhs) = delete;
-  BaseObjectObserver(BaseObjectObserver&& rhs) = delete;
-  BaseObjectObserver& operator=(BaseObjectObserver&& rhs) = delete;
+  BaseObjectObserver(BaseObjectObserver&& rhs)                 = delete;
+  BaseObjectObserver& operator=(BaseObjectObserver&& rhs)      = delete;
 
 private:
   /// @cond internal

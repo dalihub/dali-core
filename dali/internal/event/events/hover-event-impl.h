@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HOVER_EVENT_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,10 +157,10 @@ private:
 
   // Not copyable or movable
 
-  HoverEvent(const HoverEvent& rhs) = delete;            ///< Deleted copy constructor
-  HoverEvent(HoverEvent&& rhs)      = delete;            ///< Deleted move constructor
+  HoverEvent(const HoverEvent& rhs)            = delete; ///< Deleted copy constructor
+  HoverEvent(HoverEvent&& rhs)                 = delete; ///< Deleted move constructor
   HoverEvent& operator=(const HoverEvent& rhs) = delete; ///< Deleted copy assignment operator
-  HoverEvent& operator=(HoverEvent&& rhs) = delete;      ///< Deleted move assignment operator
+  HoverEvent& operator=(HoverEvent&& rhs)      = delete; ///< Deleted move assignment operator
 
 private:
   std::vector<Integration::Point> mPoints; ///< Container of the points for this hover event
