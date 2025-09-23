@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
@@ -151,6 +151,16 @@ public:
   uint32_t GetApplyRate() const
   {
     return mApplyRate;
+  }
+
+  /**
+   * Gets the number of applied count.
+   * Usually be used when we determine APPLY_ONCE need to be applied or not.
+   * @return The number of applied count for this constraint.
+   */
+  uint32_t GetAppliedCount() const
+  {
+    return mAppliedCount;
   }
 
   /**
