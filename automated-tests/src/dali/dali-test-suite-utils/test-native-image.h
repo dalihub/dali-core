@@ -128,6 +128,11 @@ public:
     return mUpdatedArea;
   }
 
+  inline void PostRender() override
+  {
+    mCallStack.PushCall("PostRender", "");
+  }
+
   inline virtual Dali::NativeImageInterface::Extension* GetExtension()
   {
     return nullptr;
