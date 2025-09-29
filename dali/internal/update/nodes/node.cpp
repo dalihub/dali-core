@@ -22,6 +22,7 @@
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/common/discard-queue.h>
+#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 
@@ -29,13 +30,9 @@
 
 namespace
 {
-// Memory pool used to allocate new nodes. Memory used by this pool will be released when process dies
-//  or DALI library is unloaded
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node>& GetNodeMemoryPool()
-{
-  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node> gNodeMemoryPool;
-  return gNodeMemoryPool;
-}
+Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
+static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::NODE;
+
 #ifdef DEBUG_ENABLED
 // keep track of nodes alive, to ensure we have 0 when the process exits or DALi library is unloaded
 int32_t gNodeCount = 0;
@@ -60,7 +57,8 @@ uint32_t Node::mNodeCounter = 0; ///< A counter to provide unique node ids, up-t
 
 Node* Node::New()
 {
-  return new(GetNodeMemoryPool().AllocateRawThreadSafe()) Node;
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Node::RegisterMemoryPoolCollection not called!");
+  return new(gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType)) Node;
 }
 
 void Node::Delete(Node* node)
@@ -71,8 +69,9 @@ void Node::Delete(Node* node)
     // Manually call the destructor
     node->~Node();
 
+    DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Node::RegisterMemoryPoolCollection not called!");
     // Mark the memory it used as free in the memory pool
-    GetNodeMemoryPool().FreeThreadSafe(node);
+    gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, static_cast<void*>(node));
   }
   else
   {
@@ -81,9 +80,14 @@ void Node::Delete(Node* node)
   }
 }
 
-void Node::ResetMemoryPool()
+void Node::RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection)
 {
-  GetNodeMemoryPool().ResetMemoryPool();
+  gMemoryPoolCollection = &memoryPoolCollection;
+}
+
+void Node::UnregisterMemoryPoolCollection()
+{
+  gMemoryPoolCollection = nullptr;
 }
 
 Node::Node()
@@ -374,11 +378,6 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   {
     mTransformManagerData.Manager()->SetParent(mTransformManagerData.Id(), PARENT_OF_OFF_SCENE_TRANSFORM_ID);
   }
-}
-
-uint32_t Node::GetMemoryPoolCapacity()
-{
-  return GetNodeMemoryPool().GetCapacity();
 }
 
 void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLayer3d)

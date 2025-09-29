@@ -33,6 +33,7 @@ class CompleteNotificationInterface;
 
 namespace SceneGraph
 {
+class MemoryPoolCollection;
 class RenderMessageDispatcher;
 class RenderTask;
 class ResetterManager;
@@ -52,12 +53,16 @@ public:
   static RenderTaskList* New();
 
   /**
-   * Clear memory pool of render task list.
+   * Register memory pool of render task list.
    * This should be called at the begin of Core.
-   * (Since Core could be recreated, we need to reset the memory pool.)
-   * After this API call, all SceneGraph::RenderTaskList classes are invalid.
    */
-  static void ResetMemoryPool();
+  static void RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection);
+
+  /**
+   * Unregister memory pool of render task list.
+   * This should be called at the end of Core.
+   */
+  static void UnregisterMemoryPoolCollection();
 
   /**
    * Destructor
@@ -118,11 +123,6 @@ public:
    * Get the Notification interface for when 1+ render tasks have finished
    */
   CompleteNotificationInterface* GetCompleteNotificationInterface();
-
-  /**
-   * Get the capacity of the memory pools
-   */
-  static uint32_t GetMemoryPoolCapacity();
 
   /**
    * @brief Sort RenderTasks along OrderIndex
