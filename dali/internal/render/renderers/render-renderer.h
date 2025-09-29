@@ -745,11 +745,11 @@ private:
     const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
-    int32_t                  arrayIndex{-1};         ///< The array index
-    uint32_t                 arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
-    uint32_t                 matrixStride{0u};       ///< The stride for a matrix row
+    int32_t                  arrayIndex{-1}; ///< The array index
 
-    int16_t  uniformLocation{0u};
+    uint32_t arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
+    uint32_t matrixStride{0u};       ///< The stride for a matrix row
+
     uint16_t uniformOffset{0u};
     uint16_t uniformBlockIndex{0u};
     State    state{State::INITIALIZE_REQUIRED};

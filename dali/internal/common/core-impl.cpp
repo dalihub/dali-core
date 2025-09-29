@@ -160,6 +160,10 @@ Core::~Core()
 
   // remove (last?) reference to stage
   mStage.Reset();
+
+  // Remove UpdateManager first. And then, remove RenderManager later
+  mUpdateManager.Reset();
+  mRenderManager.Reset();
 }
 
 void Core::Initialize()

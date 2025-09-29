@@ -82,8 +82,9 @@ public:
    * @param[in] program Program who using shared uniform block
    * @param[in] sharedUniformBlock UniformBlock who has the uniform informations.
    * @param[in] blockSize Size of uniform block.
+   * @return True if new program registered into shared uniform blocks. False if we can reuse previous registered program.
    */
-  void RegisterSharedUniformBlockAndPrograms(const Program& program, Render::UniformBlock& sharedUniformBlock, uint32_t blockSize);
+  bool RegisterSharedUniformBlockAndPrograms(const Program& program, Render::UniformBlock& sharedUniformBlock, uint32_t blockSize);
 
   /**
    * @brief Create UniformBufferView for each pair of program and shared uniform blocks.
