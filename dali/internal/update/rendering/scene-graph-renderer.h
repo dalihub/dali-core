@@ -43,6 +43,7 @@ class UniformBlock;
 
 namespace SceneGraph
 {
+class MemoryPoolCollection;
 class SceneController;
 
 class Renderer;
@@ -92,12 +93,16 @@ public:
   static RendererKey NewKey();
 
   /**
-   * Clear memory pool of renderers.
+   * Register memory pool of renderer.
    * This should be called at the begin of Core.
-   * (Since Core could be recreated, we need to reset the memory pool.)
-   * After this API call, all SceneGraph::Renderer classes are invalid.
    */
-  static void ResetMemoryPool();
+  static void RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection);
+
+  /**
+   * Unregister memory pool of renderer.
+   * This should be called at the end of Core.
+   */
+  static void UnregisterMemoryPoolCollection();
 
   /**
    * Destructor
@@ -538,12 +543,6 @@ public:
    * The result will be updated only 1 times per each frame.
    */
   void CheckDirtyUpdated() const;
-
-  /**
-   * Get the capacity of the memory pools
-   * @return the capacity of the memory pools
-   */
-  static uint32_t GetMemoryPoolCapacity();
 
 public: // From PropertyOwner
   /**

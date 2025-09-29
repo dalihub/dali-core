@@ -44,6 +44,7 @@
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 #include <dali/internal/update/common/discard-queue.h>
+#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -103,7 +104,10 @@ Core::Core(RenderController&            renderController,
 
   mRenderTaskProcessor = new SceneGraph::RenderTaskProcessor();
 
+  mMemoryPoolCollection = new SceneGraph::MemoryPoolCollection();
+
   mRenderManager = RenderManager::New(graphicsController,
+                                      *mMemoryPoolCollection,
                                       (corePolicy & Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE) ? Integration::DepthBufferAvailable::TRUE : Integration::DepthBufferAvailable::FALSE,
                                       (corePolicy & Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE) ? Integration::StencilBufferAvailable::TRUE : Integration::StencilBufferAvailable::FALSE,
                                       (corePolicy & Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE) ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
@@ -116,7 +120,8 @@ Core::Core(RenderController&            renderController,
                                      renderController,
                                      *mRenderManager,
                                      renderQueue,
-                                     *mRenderTaskProcessor);
+                                     *mRenderTaskProcessor,
+                                     *mMemoryPoolCollection);
 
   mRenderManager->SetShaderSaver(*mUpdateManager);
 
@@ -158,12 +163,30 @@ Core::~Core()
   // Stop relayout requests being raised on stage destruction
   mRelayoutController.Reset();
 
+  // Remove all Scenes
+  mScenes.clear();
+
   // remove (last?) reference to stage
   mStage.Reset();
 
-  // Remove UpdateManager first. And then, remove RenderManager later
+  // Destroy before UpdateManager.
+  mGestureEventProcessor.Reset();
+  mPropertyNotificationManager.Reset();
+  mNotificationManager.Reset();
+  mAnimationPlaylist.Reset();
+
+  // Destroy before RenderManager.
   mUpdateManager.Reset();
+
+  // Destroy RenderManager.
   mRenderManager.Reset();
+
+  // Destroy after RenderManager.
+  mMemoryPoolCollection.Reset();
+
+  // Other classes - Don't care of destruct order.
+  mShaderFactory.Reset();
+  mRenderTaskProcessor.Reset();
 }
 
 void Core::Initialize()
@@ -796,30 +819,43 @@ ObjectRegistry& Core::GetObjectRegistry() const
 
 void Core::LogMemoryPools() const
 {
-  uint32_t animationPoolCapacity    = SceneGraph::Animation::GetMemoryPoolCapacity();
-  uint32_t renderItemPoolCapacity   = SceneGraph::RenderItem::GetMemoryPoolCapacity();
+  uint32_t animationPoolCapacity    = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::ANIMATION);
+  uint32_t renderItemPoolCapacity   = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_ITEM);
   uint32_t relayoutItemPoolCapacity = mRelayoutController->GetMemoryPoolCapacity();
-  uint32_t rendererPoolCapacity     = SceneGraph::Renderer::GetMemoryPoolCapacity();
-  uint32_t textureSetPoolCapacity   = SceneGraph::TextureSet::GetMemoryPoolCapacity();
-  uint32_t renderTaskPoolCapacity   = SceneGraph::RenderTaskList::GetMemoryPoolCapacity();
-  uint32_t nodePoolCapacity         = SceneGraph::Node::GetMemoryPoolCapacity();
+  uint32_t rendererPoolCapacity     = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDERER);
+  uint32_t textureSetPoolCapacity   = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::TEXTURE_SET);
+  uint32_t renderTaskPoolCapacity   = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TASK_LIST);
+  uint32_t nodePoolCapacity         = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::NODE);
+  uint32_t cameraPoolCapacity       = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::CAMERA);
+
+  uint32_t renderRendererPoolCapacity = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_RENDERER);
+  uint32_t renderTexturePoolCapacity  = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TEXTURE);
+  uint32_t renderUboViewPoolCapacity  = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_UBO_VIEW);
 
   DALI_LOG_RELEASE_INFO(
     "\nMemory Pool capacities:\n"
-    "  Animations:    %lu\n"
-    "  RenderItems:   %lu\n"
-    "  RelayoutItems: %lu\n"
-    "  Renderers:     %lu\n"
-    "  TextureSets:   %lu\n"
-    "  RenderTasks:   %lu\n"
-    "  Nodes:         %lu\n",
+    "  Animations:        %lu\n"
+    "  RenderItems:       %lu\n"
+    "  RelayoutItems:     %lu\n"
+    "  Renderers:         %lu\n"
+    "  TextureSets:       %lu\n"
+    "  RenderTasks:       %lu\n"
+    "  Nodes:             %lu\n"
+    "  Cameras:           %lu\n"
+    "  Render::Renderers: %lu\n"
+    "  Render::Textures:  %lu\n"
+    "  Render::UBOViews:  %lu\n",
     animationPoolCapacity,
     renderItemPoolCapacity,
     relayoutItemPoolCapacity,
     rendererPoolCapacity,
     textureSetPoolCapacity,
     renderTaskPoolCapacity,
-    nodePoolCapacity);
+    nodePoolCapacity,
+    cameraPoolCapacity,
+    renderRendererPoolCapacity,
+    renderTexturePoolCapacity,
+    renderUboViewPoolCapacity);
 
   uint32_t updateQCapacity = mUpdateManager->GetUpdateMessageQueueCapacity();
   uint32_t renderQCapacity = mUpdateManager->GetRenderMessageQueueCapacity();

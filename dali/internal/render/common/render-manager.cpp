@@ -366,10 +366,16 @@ struct RenderManager::Impl
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
+                                  MemoryPoolCollection&               memoryPoolCollection,
                                   Integration::DepthBufferAvailable   depthBufferAvailable,
                                   Integration::StencilBufferAvailable stencilBufferAvailable,
                                   Integration::PartialUpdateAvailable partialUpdateAvailable)
 {
+  // Register memory pool
+  Render::Renderer::RegisterMemoryPoolCollection(memoryPoolCollection);
+  Render::Texture::RegisterMemoryPoolCollection(memoryPoolCollection);
+  Render::UniformBufferView::RegisterMemoryPoolCollection(memoryPoolCollection);
+
   auto* manager  = new RenderManager;
   manager->mImpl = new Impl(graphicsController,
                             depthBufferAvailable,
@@ -387,10 +393,10 @@ RenderManager::~RenderManager()
 {
   delete mImpl;
 
-  // Ensure to release memory pool
-  Render::Renderer::ResetMemoryPool();
-  Render::Texture::ResetMemoryPool();
-  Render::UniformBufferView::ResetMemoryPool();
+  // Unregister memory pool
+  Render::Renderer::UnregisterMemoryPoolCollection();
+  Render::Texture::UnregisterMemoryPoolCollection();
+  Render::UniformBufferView::UnregisterMemoryPoolCollection();
 }
 
 void RenderManager::UpdateGraphicsRequired(Integration::DepthBufferAvailable   depthBufferAvailable,

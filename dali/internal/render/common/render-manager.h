@@ -56,6 +56,7 @@ class Texture;
 
 namespace SceneGraph
 {
+class MemoryPoolCollection;
 class RenderQueue;
 class RenderInstruction;
 class RenderInstructionContainer;
@@ -72,11 +73,13 @@ public:
   /**
    * Construct a new RenderManager.
    * @param[in]  graphicsController         The graphics controller for a given rendering backend
+   * @param[in]  memoryPoolCollection       Memory pool collection.
    * @param[in]  depthBufferAvailable       Whether the depth buffer is available
    * @param[in]  stencilBufferAvailable     Whether the stencil buffer is available
    * @param[in]  partialUpdateAvailable     Whether the partial update is available
    */
   static RenderManager* New(Graphics::Controller&               graphicsController,
+                            MemoryPoolCollection&               memoryPoolCollection,
                             Integration::DepthBufferAvailable   depthBufferAvailable,
                             Integration::StencilBufferAvailable stencilBufferAvailable,
                             Integration::PartialUpdateAvailable partialUpdateAvailable);

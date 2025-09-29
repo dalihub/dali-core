@@ -28,6 +28,7 @@
 #include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
+#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>
@@ -49,12 +50,8 @@ Debug::Filter* gSceneGraphRendererLogFilter = Debug::Filter::New(Debug::NoLoggin
 
 namespace // unnamed namespace
 {
-// Memory pool used to allocate new renderers. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Renderer>& GetRendererMemoryPool()
-{
-  static Dali::Internal::MemoryPoolObjectAllocator<Renderer> gRendererMemoryPool;
-  return gRendererMemoryPool;
-}
+Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
+static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDERER;
 
 // Flags for re-sending data to renderer.
 enum Flags
@@ -112,15 +109,21 @@ enum DirtyUpdateFlags
 
 RendererKey Renderer::NewKey()
 {
-  void* ptr = GetRendererMemoryPool().AllocateRawThreadSafe();
-  auto  key = GetRendererMemoryPool().GetKeyFromPtr(static_cast<Renderer*>(ptr));
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "SG::Renderer::RegisterMemoryPoolCollection not called!");
+  void* ptr = gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType);
+  auto  key = gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr);
   new(ptr) Renderer();
   return RendererKey(key);
 }
 
-void Renderer::ResetMemoryPool()
+void Renderer::RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection)
 {
-  GetRendererMemoryPool().ResetMemoryPool();
+  gMemoryPoolCollection = &memoryPoolCollection;
+}
+
+void Renderer::UnregisterMemoryPoolCollection()
+{
+  gMemoryPoolCollection = nullptr;
 }
 
 Renderer::Renderer()
@@ -160,22 +163,26 @@ Renderer::~Renderer()
 
 void Renderer::operator delete(void* ptr)
 {
-  GetRendererMemoryPool().FreeThreadSafe(static_cast<Renderer*>(ptr));
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "SG::Renderer::RegisterMemoryPoolCollection not called!");
+  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
 }
 
 Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
 {
-  return GetRendererMemoryPool().GetPtrFromKey(rendererKey);
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "SG::Renderer::RegisterMemoryPoolCollection not called!");
+  return static_cast<Renderer*>(gMemoryPoolCollection->GetPtrFromKey(gMemoryPoolType, rendererKey));
 }
 
 RendererKey Renderer::GetKey(const Renderer& renderer)
 {
-  return RendererKey(GetRendererMemoryPool().GetKeyFromPtr(const_cast<Renderer*>(&renderer)));
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "SG::Renderer::RegisterMemoryPoolCollection not called!");
+  return RendererKey(gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, static_cast<void*>(const_cast<Renderer*>(&renderer))));
 }
 
 RendererKey Renderer::GetKey(Renderer* renderer)
 {
-  return RendererKey(GetRendererMemoryPool().GetKeyFromPtr(renderer));
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "SG::Renderer::RegisterMemoryPoolCollection not called!");
+  return RendererKey(gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, static_cast<void*>(renderer)));
 }
 
 bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
@@ -927,11 +934,6 @@ bool Renderer::IsDirty() const
   // Check whether the opacity property has changed
   CheckDirtyUpdated();
   return mDirtyUpdated & IS_DIRTY_MASK;
-}
-
-uint32_t Renderer::GetMemoryPoolCapacity()
-{
-  return GetRendererMemoryPool().GetCapacity();
 }
 
 void Renderer::OnMappingChanged()
