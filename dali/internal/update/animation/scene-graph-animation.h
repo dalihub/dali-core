@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class MemoryPoolCollection;
 /**
  * Animations are used to change the properties of scene graph objects, as part of a scene
  * managers "update" phase. An animation is a container of Animator objects; the actual setting
@@ -65,16 +64,12 @@ public:
   static Animation* New(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction);
 
   /**
-   * Register memory pool of animation.
+   * Clear memory pool of animation.
    * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::Animation classes are invalid.
    */
-  static void RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection);
-
-  /**
-   * Unregister memory pool of animation.
-   * This should be called at the end of Core.
-   */
-  static void UnregisterMemoryPoolCollection();
+  static void ResetMemoryPool();
 
   /**
    * Virtual destructor
@@ -320,6 +315,8 @@ public:
    * @param[out] progressReached True if progress marker reached
    */
   void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stopped, bool& finished, bool& progressReached);
+
+  static uint32_t GetMemoryPoolCapacity();
 
 protected:
   /**

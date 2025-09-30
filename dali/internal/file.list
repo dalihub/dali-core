@@ -145,7 +145,6 @@ SET( internal_src_files
   ${internal_src_dir}/update/common/property-condition-variable-step-functions.cpp
   ${internal_src_dir}/update/common/property-owner.cpp
   ${internal_src_dir}/update/common/scene-graph-buffers.cpp
-  ${internal_src_dir}/update/common/scene-graph-memory-pool-collection.cpp
   ${internal_src_dir}/update/common/scene-graph-property-notification.cpp
   ${internal_src_dir}/update/common/scene-graph-scene.cpp
   ${internal_src_dir}/update/common/uniform-map.cpp

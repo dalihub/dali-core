@@ -21,12 +21,15 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/update/common/resetter-manager.h> ///< For AddInitializeResetter
-#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 
 namespace //Unnamed namespace
 {
-Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
-static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TASK_LIST;
+//Memory pool used to allocate new RenderTaskLists. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList>& GetRenderTaskListMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> gRenderTaskListMemoryPool;
+  return gRenderTaskListMemoryPool;
+}
 } // unnamed namespace
 
 namespace Dali
@@ -37,18 +40,12 @@ namespace SceneGraph
 {
 RenderTaskList* RenderTaskList::New()
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "RenderTaskList::RegisterMemoryPoolCollection not called!");
-  return new(gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType)) RenderTaskList();
+  return new(GetRenderTaskListMemoryPool().AllocateRawThreadSafe()) RenderTaskList();
 }
 
-void RenderTaskList::RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection)
+void RenderTaskList::ResetMemoryPool()
 {
-  gMemoryPoolCollection = &memoryPoolCollection;
-}
-
-void RenderTaskList::UnregisterMemoryPoolCollection()
-{
-  gMemoryPoolCollection = nullptr;
+  GetRenderTaskListMemoryPool().ResetMemoryPool();
 }
 
 RenderTaskList::RenderTaskList()
@@ -63,8 +60,7 @@ RenderTaskList::~RenderTaskList() = default;
 
 void RenderTaskList::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "RenderTaskList::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  GetRenderTaskListMemoryPool().FreeThreadSafe(static_cast<RenderTaskList*>(ptr));
 }
 
 void RenderTaskList::Initialize(ResetterManager& resetterManager, PropertyOwnerFlagManager& propertyOwnerFlagManager, RenderMessageDispatcher& renderMessageDispatcher)
@@ -135,6 +131,11 @@ void RenderTaskList::SetCompleteNotificationInterface(CompleteNotificationInterf
 CompleteNotificationInterface* RenderTaskList::GetCompleteNotificationInterface()
 {
   return mNotificationObject;
+}
+
+uint32_t RenderTaskList::GetMemoryPoolCapacity()
+{
+  return GetRenderTaskListMemoryPool().GetCapacity();
 }
 
 } // namespace SceneGraph

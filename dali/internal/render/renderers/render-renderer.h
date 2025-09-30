@@ -56,7 +56,6 @@ namespace SceneGraph
 class SceneController;
 class Shader;
 class NodeDataProvider;
-class MemoryPoolCollection;
 class RenderInstruction; // for reflection effect
 class RenderTargetGraphicsObjects;
 } // namespace SceneGraph
@@ -163,16 +162,12 @@ public:
                             StencilParameters&              stencilParameters);
 
   /**
-   * Register memory pool of render renderer.
+   * Clear memory pool of renderer.
    * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all Render::Renderer classes are invalid.
    */
-  static void RegisterMemoryPoolCollection(SceneGraph::MemoryPoolCollection& memoryPoolCollection);
-
-  /**
-   * Unregister memory pool of render renderer.
-   * This should be called at the end of Core.
-   */
-  static void UnregisterMemoryPoolCollection();
+  static void ResetMemoryPool();
 
   /**
    * Constructor.

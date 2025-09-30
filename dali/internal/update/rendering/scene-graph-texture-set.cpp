@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,24 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/update/rendering/scene-graph-texture-set.h>
+#include "scene-graph-texture-set.h"
 
 // INTERNAL HEADERS
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/renderers/render-texture.h>
-#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 namespace //Unnamed namespace
 {
-Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
-static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::TEXTURE_SET;
+//Memory pool used to allocate new texture sets. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet>& GetTextureSetMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet> gTextureSetMemoryPool;
+  return gTextureSetMemoryPool;
+}
 } // namespace
 
 namespace Dali
@@ -40,18 +43,12 @@ namespace SceneGraph
 {
 TextureSet* TextureSet::New()
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "TextureSet::RegisterMemoryPoolCollection not called!");
-  return new(gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType)) TextureSet();
+  return new(GetTextureSetMemoryPool().AllocateRawThreadSafe()) TextureSet();
 }
 
-void TextureSet::RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection)
+void TextureSet::ResetMemoryPool()
 {
-  gMemoryPoolCollection = &memoryPoolCollection;
-}
-
-void TextureSet::UnregisterMemoryPoolCollection()
-{
-  gMemoryPoolCollection = nullptr;
+  GetTextureSetMemoryPool().ResetMemoryPool();
 }
 
 TextureSet::TextureSet()
@@ -67,8 +64,7 @@ TextureSet::~TextureSet()
 
 void TextureSet::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "TextureSet::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  GetTextureSetMemoryPool().FreeThreadSafe(static_cast<TextureSet*>(ptr));
 }
 
 void TextureSet::SetSampler(uint32_t index, Render::Sampler* sampler)
@@ -184,6 +180,11 @@ bool TextureSet::HasAlpha() const
 void TextureSet::SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher)
 {
   mRenderMessageDispatcher = renderMessageDispatcher;
+}
+
+uint32_t TextureSet::GetMemoryPoolCapacity()
+{
+  return GetTextureSetMemoryPool().GetCapacity();
 }
 
 } // namespace SceneGraph

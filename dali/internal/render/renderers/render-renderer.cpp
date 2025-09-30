@@ -39,7 +39,6 @@
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/render-shader.h>
-#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/public-api/signals/render-callback.h>
 
@@ -50,9 +49,6 @@ uint32_t      mvpBufferIndex;
 
 namespace
 {
-Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
-static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_RENDERER;
-
 /**
  * @brief Store latest bound pipeline, and help that we can skip duplicated pipeline bind.
  *
@@ -93,6 +89,12 @@ namespace Render
 {
 namespace
 {
+Dali::Internal::MemoryPoolObjectAllocator<Renderer>& GetRenderRendererMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Renderer> gRenderRendererMemoryPool;
+  return gRenderRendererMemoryPool;
+}
+
 Render::UboViewContainer& GetUboViewList()
 {
   static Render::UboViewContainer gUboViews;
@@ -128,23 +130,17 @@ RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider,
                              DepthFunction::Type             depthFunction,
                              StencilParameters&              stencilParameters)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Renderer::RegisterMemoryPoolCollection not called!");
-  void* ptr = gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType);
-  auto  key = gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr);
+  void* ptr = GetRenderRendererMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetRenderRendererMemoryPool().GetKeyFromPtr(static_cast<Renderer*>(ptr));
 
   // Use placement new to construct renderer.
   new(ptr) Renderer(dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction, stencilParameters);
   return RendererKey(key);
 }
 
-void Renderer::RegisterMemoryPoolCollection(SceneGraph::MemoryPoolCollection& memoryPoolCollection)
+void Renderer::ResetMemoryPool()
 {
-  gMemoryPoolCollection = &memoryPoolCollection;
-}
-
-void Renderer::UnregisterMemoryPoolCollection()
-{
-  gMemoryPoolCollection = nullptr;
+  GetRenderRendererMemoryPool().ResetMemoryPool();
 }
 
 Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
@@ -202,14 +198,12 @@ Renderer::~Renderer()
 
 void Renderer::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Renderer::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  GetRenderRendererMemoryPool().FreeThreadSafe(static_cast<Renderer*>(ptr));
 }
 
 Renderer* Renderer::Get(RendererKey::KeyType rendererKey)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Renderer::RegisterMemoryPoolCollection not called!");
-  return static_cast<Render::Renderer*>(gMemoryPoolCollection->GetPtrFromKey(gMemoryPoolType, rendererKey));
+  return GetRenderRendererMemoryPool().GetPtrFromKey(rendererKey);
 }
 
 void Renderer::SetGeometry(Render::Geometry* geometry)

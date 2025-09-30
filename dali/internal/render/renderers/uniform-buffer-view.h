@@ -28,16 +28,8 @@ namespace Dali
 namespace Graphics
 {
 class Buffer;
-} // namespace Graphics
-
-namespace Internal
-{
-namespace SceneGraph
-{
-class MemoryPoolCollection;
-} // namespace SceneGraph
-
-namespace Render
+}
+namespace Internal::Render
 {
 class UniformBufferV2;
 
@@ -74,16 +66,12 @@ public:
   static UniformBufferView* TryRecycle(UniformBufferView*& oldView, UniformBufferV2& ubo, uint32_t offset);
 
   /**
-   * Register memory pool of UBO view.
+   * Clear memory pool of UniformBufferView.
    * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all UniformBufferView classes are invalid.
    */
-  static void RegisterMemoryPoolCollection(SceneGraph::MemoryPoolCollection& memoryPoolCollection);
-
-  /**
-   * Unregister memory pool of UBO view.
-   * This should be called at the end of Core.
-   */
-  static void UnregisterMemoryPoolCollection();
+  static void ResetMemoryPool();
 
   ~UniformBufferView();
 
@@ -130,7 +118,6 @@ private:
   UniformBufferV2* mUniformBuffer{nullptr}; ///< UniformBuffer that the view views
   uint32_t         mOffset{0u};             ///< Offset within the buffer
 };
-} // namespace Render
-} // namespace Internal
-} // namespace Dali
+} // Namespace Internal::Render
+} // Namespace Dali
 #endif //DALI_INTERNAL_UNIFORM_BUFFER_VIEW_H

@@ -24,7 +24,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 
 namespace Dali
 {
@@ -38,15 +37,19 @@ namespace
 Debug::Filter* gTextureFilter = Debug::Filter::New(Debug::Concise, false, "LOG_TEXTURE");
 #endif
 
-Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
-static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TEXTURE;
+// Memory pool used to allocate new textures. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Texture>& GetTextureMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Texture> gTextureMemoryPool;
+  return gTextureMemoryPool;
+}
+
 } //Unnamed namespace
 
 TextureKey Texture::NewKey(Type type, Pixel::Format format, ImageDimensions size)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
-  void* ptr = gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType);
-  auto  key = gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr);
+  void* ptr = GetTextureMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetTextureMemoryPool().GetKeyFromPtr(static_cast<Texture*>(ptr));
   new(ptr) Texture(type, format, size);
 
   return TextureKey(key);
@@ -54,9 +57,8 @@ TextureKey Texture::NewKey(Type type, Pixel::Format format, ImageDimensions size
 
 TextureKey Texture::NewKey(NativeImageInterfacePtr nativeImageInterface)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
-  void* ptr = gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType);
-  auto  key = gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr);
+  void* ptr = GetTextureMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetTextureMemoryPool().GetKeyFromPtr(static_cast<Texture*>(ptr));
   new(ptr) Texture(nativeImageInterface);
 
   return TextureKey(key);
@@ -64,22 +66,16 @@ TextureKey Texture::NewKey(NativeImageInterfacePtr nativeImageInterface)
 
 TextureKey Texture::NewKey(Type type, uint32_t resourceId)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
-  void* ptr = gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType);
-  auto  key = gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr);
+  void* ptr = GetTextureMemoryPool().AllocateRawThreadSafe();
+  auto  key = GetTextureMemoryPool().GetKeyFromPtr(static_cast<Texture*>(ptr));
   new(ptr) Texture(type, resourceId);
 
   return TextureKey(key);
 }
 
-void Texture::RegisterMemoryPoolCollection(SceneGraph::MemoryPoolCollection& memoryPoolCollection)
+void Texture::ResetMemoryPool()
 {
-  gMemoryPoolCollection = &memoryPoolCollection;
-}
-
-void Texture::UnregisterMemoryPoolCollection()
-{
-  gMemoryPoolCollection = nullptr;
+  GetTextureMemoryPool().ResetMemoryPool();
 }
 
 Texture::Texture(Type type, Pixel::Format format, ImageDimensions size)
@@ -137,14 +133,12 @@ Texture::~Texture() = default;
 
 void Texture::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  GetTextureMemoryPool().FreeThreadSafe(static_cast<Texture*>(ptr));
 }
 
 Render::Texture* Texture::Get(TextureKey::KeyType key)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
-  return static_cast<Render::Texture*>(gMemoryPoolCollection->GetPtrFromKey(gMemoryPoolType, key));
+  return GetTextureMemoryPool().GetPtrFromKey(key);
 }
 
 void Texture::Initialize(Graphics::Controller& graphicsController, SceneGraph::RenderManager& renderManager)
@@ -351,8 +345,7 @@ void Texture::NotifyTextureUpdated()
 {
   if(mRenderManager)
   {
-    DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
-    mRenderManager->SetTextureUpdated(TextureKey(gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, this)));
+    mRenderManager->SetTextureUpdated(TextureKey(GetTextureMemoryPool().GetKeyFromPtr(this)));
   }
 }
 

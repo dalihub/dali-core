@@ -37,8 +37,6 @@ class Renderer;
 
 namespace SceneGraph
 {
-class MemoryPoolCollection;
-
 /**
  * A RenderItem contains all the data needed for rendering
  */
@@ -57,16 +55,12 @@ struct RenderItem
   static RenderItemKey NewKey();
 
   /**
-   * Register memory pool of render item.
+   * Clear memory pool of render item.
    * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::RenderItem classes are invalid.
    */
-  static void RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection);
-
-  /**
-   * Unregister memory pool of render item.
-   * This should be called at the end of Core.
-   */
-  static void UnregisterMemoryPoolCollection();
+  static void ResetMemoryPool();
 
   /**
    * Non-virtual destructor; RenderItem is not suitable as a base class.
@@ -79,6 +73,21 @@ struct RenderItem
    * @return a ptr to the given object, or nullptr if not found/invalid
    */
   static RenderItem* Get(RenderItemKey::KeyType key);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool.
+   */
+  static RenderItemKey GetKey(const RenderItem& renderer);
+
+  /**
+   * Get the key of the given renderer in the associated memory pool.
+   * @param[in] renderer the given renderer
+   * @return The key in the associated memory pool, or -1 if not
+   * found.
+   */
+  static RenderItemKey GetKey(RenderItem* renderer);
 
   /**
    * Produce a 2D AABB in transformed space
@@ -148,6 +157,11 @@ struct RenderItem
 
   bool mIsOpaque : 1;
   bool mIsUpdated : 1;
+
+  /**
+   * Get the capacity of the global pool.
+   */
+  static uint32_t GetMemoryPoolCapacity();
 
   /**
    * @return true if this render item uses the depth buffer (reads or writes to it)

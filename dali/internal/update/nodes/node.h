@@ -56,7 +56,6 @@ struct ParameterType<ClippingMode::Type> : public BasicType<ClippingMode::Type>
 namespace SceneGraph
 {
 class Layer;
-class MemoryPoolCollection;
 class RenderTask;
 class UpdateManager;
 class ResetterManager;
@@ -94,16 +93,12 @@ public:
   static void Delete(Node* node);
 
   /**
-   * Register memory pool of node.
+   * Clear memory pool of node.
    * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::Node classes are invalid.
    */
-  static void RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection);
-
-  /**
-   * Unregister memory pool of node.
-   * This should be called at the end of Core.
-   */
-  static void UnregisterMemoryPoolCollection();
+  static void ResetMemoryPool();
 
   /**
    * Called during UpdateManager::DestroyNode shortly before Node is destroyed.
@@ -1028,6 +1023,14 @@ public:
   {
     return mCulled[bufferIndex];
   }
+
+  /**
+   * @brief Get the total capacity of the memory pools
+   * @return The capacity of the memory pools
+   *
+   * @note This is different to the node count.
+   */
+  static uint32_t GetMemoryPoolCapacity();
 
   /**
    * @brief Update partial rendering data from the latest node infomations.

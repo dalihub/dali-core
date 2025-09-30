@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ class Texture;
 } // namespace Render
 namespace SceneGraph
 {
-class MemoryPoolCollection;
 class Renderer;
 class RenderMessageDispatcher;
 
@@ -49,16 +48,12 @@ public:
   static TextureSet* New();
 
   /**
-   * Register memory pool of texture set.
+   * Clear memory pool of texture set.
    * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::TextureSet classes are invalid.
    */
-  static void RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection);
-
-  /**
-   * Unregister memory pool of texture set.
-   * This should be called at the end of Core.
-   */
-  static void UnregisterMemoryPoolCollection();
+  static void ResetMemoryPool();
 
   /**
    * Destructor. Not virtual as not a base class and not inheriting anything
@@ -112,6 +107,12 @@ public:
    * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
    */
   void SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher);
+
+  /**
+   * Get the capacity of the memory pools
+   * @return the capacity of the memory pools
+   */
+  static uint32_t GetMemoryPoolCapacity();
 
 private:
   /**

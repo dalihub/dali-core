@@ -40,7 +40,6 @@
 #include <dali/internal/event/effects/shader-factory.h>
 
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/manager/frame-callback-processor.h>
@@ -246,9 +245,6 @@ struct UpdateManager::Impl
 
   ~Impl()
   {
-    // Ensure to scene context destroyed.
-    ContextDestroyed();
-
     // Disconnect render tasks from nodes, before destroying the nodes
     for(auto&& scene : scenes)
     {
@@ -427,21 +423,11 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
                              RenderController&              renderController,
                              RenderManager&                 renderManager,
                              RenderQueue&                   renderQueue,
-                             RenderTaskProcessor&           renderTaskProcessor,
-                             MemoryPoolCollection&          memoryPoolCollection)
+                             RenderTaskProcessor&           renderTaskProcessor)
 : mImpl(nullptr)
 {
   PropertyBase::RegisterResetterManager(*this);
   PropertyOwner::RegisterPropertyOwnerFlagManager(*this);
-
-  // Register memory pool
-  Animation::RegisterMemoryPoolCollection(memoryPoolCollection);
-  Camera::RegisterMemoryPoolCollection(memoryPoolCollection);
-  Node::RegisterMemoryPoolCollection(memoryPoolCollection);
-  Renderer::RegisterMemoryPoolCollection(memoryPoolCollection);
-  RenderItem::RegisterMemoryPoolCollection(memoryPoolCollection);
-  RenderTaskList::RegisterMemoryPoolCollection(memoryPoolCollection);
-  TextureSet::RegisterMemoryPoolCollection(memoryPoolCollection);
 
   mImpl = new Impl(notificationManager,
                    animationPlaylist,
@@ -456,18 +442,17 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
 UpdateManager::~UpdateManager()
 {
   delete mImpl;
-
-  // Unregister memory pool
-  Animation::UnregisterMemoryPoolCollection();
-  Camera::UnregisterMemoryPoolCollection();
-  Node::UnregisterMemoryPoolCollection();
-  Renderer::UnregisterMemoryPoolCollection();
-  RenderItem::UnregisterMemoryPoolCollection();
-  RenderTaskList::UnregisterMemoryPoolCollection();
-  TextureSet::UnregisterMemoryPoolCollection();
-
   PropertyBase::UnregisterResetterManager();
   PropertyOwner::UnregisterPropertyOwnerFlagManager();
+
+  // Ensure to release memory pool
+  Animation::ResetMemoryPool();
+  Camera::ResetMemoryPool();
+  Node::ResetMemoryPool();
+  Renderer::ResetMemoryPool();
+  RenderItem::ResetMemoryPool();
+  RenderTaskList::ResetMemoryPool();
+  TextureSet::ResetMemoryPool();
 }
 
 void UpdateManager::ChangeRenderQueue(RenderQueue& renderQueue)

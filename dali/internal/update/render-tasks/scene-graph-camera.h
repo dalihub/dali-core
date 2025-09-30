@@ -33,7 +33,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class MemoryPoolCollection;
 class SceneController;
 
 template<>
@@ -102,16 +101,12 @@ public:
   static Camera* New();
 
   /**
-   * Register memory pool of camera.
+   * Clear memory pool of camera.
    * This should be called at the begin of Core.
+   * (Since Core could be recreated, we need to reset the memory pool.)
+   * After this API call, all SceneGraph::Camera classes are invalid.
    */
-  static void RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection);
-
-  /**
-   * Unregister memory pool of camera.
-   * This should be called at the end of Core.
-   */
-  static void UnregisterMemoryPoolCollection();
+  static void ResetMemoryPool();
 
   /**
    * Virtual destructor

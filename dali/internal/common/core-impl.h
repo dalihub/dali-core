@@ -63,7 +63,6 @@ class EventThreadServices;
 
 namespace SceneGraph
 {
-class MemoryPoolCollection;
 class UpdateManager;
 class RenderManager;
 class RenderTaskProcessor;
@@ -377,17 +376,16 @@ private:
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   IntrusivePtr<RelayoutController>          mRelayoutController;          ///< Size negotiation relayout controller
 
-  OwnerPointer<SceneGraph::MemoryPoolCollection> mMemoryPoolCollection;  ///< collection of SceneGraph memory pool
-  OwnerPointer<SceneGraph::RenderTaskProcessor>  mRenderTaskProcessor;   ///< Handles the processing of render tasks
-  OwnerPointer<SceneGraph::RenderManager>        mRenderManager;         ///< Render manager
-  OwnerPointer<SceneGraph::UpdateManager>        mUpdateManager;         ///< Update manager
-  OwnerPointer<ShaderFactory>                    mShaderFactory;         ///< Shader resource factory
-  OwnerPointer<NotificationManager>              mNotificationManager;   ///< Notification manager
-  OwnerPointer<GestureEventProcessor>            mGestureEventProcessor; ///< The gesture event processor
-  Dali::Vector<Integration::Processor*>          mProcessors;            ///< Registered processors (not owned)
-  Dali::Vector<Integration::Processor*>          mPostProcessors;        ///< Registered post processors those will called after relayout(not owned)
-  Dali::Vector<Integration::Processor*>          mProcessorsOnce[2];     ///< Registered processors for once (not owned)
-  Dali::Vector<Integration::Processor*>          mPostProcessorsOnce[2]; ///< Registered post processors for once. those will called after relayout(not owned)
+  OwnerPointer<SceneGraph::RenderTaskProcessor> mRenderTaskProcessor;   ///< Handles the processing of render tasks
+  OwnerPointer<SceneGraph::RenderManager>       mRenderManager;         ///< Render manager
+  OwnerPointer<SceneGraph::UpdateManager>       mUpdateManager;         ///< Update manager
+  OwnerPointer<ShaderFactory>                   mShaderFactory;         ///< Shader resource factory
+  OwnerPointer<NotificationManager>             mNotificationManager;   ///< Notification manager
+  OwnerPointer<GestureEventProcessor>           mGestureEventProcessor; ///< The gesture event processor
+  Dali::Vector<Integration::Processor*>         mProcessors;            ///< Registered processors (not owned)
+  Dali::Vector<Integration::Processor*>         mPostProcessors;        ///< Registered post processors those will called after relayout(not owned)
+  Dali::Vector<Integration::Processor*>         mProcessorsOnce[2];     ///< Registered processors for once (not owned)
+  Dali::Vector<Integration::Processor*>         mPostProcessorsOnce[2]; ///< Registered post processors for once. those will called after relayout(not owned)
 
   SceneContainer mScenes; ///< A container of scenes that bound to a surface for rendering, owned by Core
 

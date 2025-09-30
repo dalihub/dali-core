@@ -22,12 +22,15 @@
 #include <dali/internal/common/math.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/renderers/render-renderer.h>
-#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 
 namespace
 {
-Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
-static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_ITEM;
+// Memory pool used to allocate new RenderItems. Memory used by this pool will be released when shutting down DALi
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem>& GetRenderItemPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem> gRenderItemPool(true /* Forcibly use memory pool */);
+  return gRenderItemPool;
+}
 } // namespace
 
 namespace Dali
@@ -36,23 +39,22 @@ namespace Internal
 {
 namespace SceneGraph
 {
+RenderItem* RenderItem::New()
+{
+  return new(GetRenderItemPool().AllocateRaw()) RenderItem();
+}
+
 RenderItemKey RenderItem::NewKey()
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "RenderItem::RegisterMemoryPoolCollection not called!");
-  void* ptr = gMemoryPoolCollection->AllocateRaw(gMemoryPoolType);
-  auto  key = gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr);
+  void* ptr = GetRenderItemPool().AllocateRaw();
+  auto  key = GetRenderItemPool().GetKeyFromPtr(static_cast<RenderItem*>(ptr));
   new(ptr) RenderItem();
   return RenderItemKey(key);
 }
 
-void RenderItem::RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection)
+void RenderItem::ResetMemoryPool()
 {
-  gMemoryPoolCollection = &memoryPoolCollection;
-}
-
-void RenderItem::UnregisterMemoryPoolCollection()
-{
-  gMemoryPoolCollection = nullptr;
+  GetRenderItemPool().ResetMemoryPool();
 }
 
 RenderItem::RenderItem()
@@ -68,16 +70,19 @@ RenderItem::RenderItem()
 
 RenderItem::~RenderItem() = default;
 
-void RenderItem::operator delete(void* ptr)
-{
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "RenderItem::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->Free(gMemoryPoolType, ptr);
-}
-
 RenderItem* RenderItem::Get(RenderItemKey::KeyType key)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "RenderItem::RegisterMemoryPoolCollection not called!");
-  return static_cast<RenderItem*>(gMemoryPoolCollection->GetPtrFromKey(gMemoryPoolType, key));
+  return GetRenderItemPool().GetPtrFromKey(key);
+}
+
+RenderItemKey RenderItem::GetKey(const RenderItem& renderItem)
+{
+  return RenderItemKey(GetRenderItemPool().GetKeyFromPtr(const_cast<RenderItem*>(&renderItem)));
+}
+
+RenderItemKey RenderItem::GetKey(RenderItem* renderItem)
+{
+  return RenderItemKey(GetRenderItemPool().GetKeyFromPtr(renderItem));
 }
 
 ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size)
@@ -234,6 +239,16 @@ bool RenderItem::UsesStencilBuffer() const
     }
   }
   return usesStencil;
+}
+
+void RenderItem::operator delete(void* ptr)
+{
+  GetRenderItemPool().Free(static_cast<RenderItem*>(ptr));
+}
+
+uint32_t RenderItem::GetMemoryPoolCapacity()
+{
+  return GetRenderItemPool().GetCapacity();
 }
 
 } // namespace SceneGraph

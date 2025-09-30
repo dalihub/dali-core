@@ -21,21 +21,22 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/renderers/uniform-buffer.h>
-#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 
 namespace Dali::Internal::Render
 {
 namespace
 {
-
-Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
-static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_UBO_VIEW;
+// Memory pool used to allocate new uniform buffer view. Memory used by this pool will be released when process dies
+Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::UniformBufferView>& GetUboViewMemoryPool()
+{
+  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::UniformBufferView> gUboViewMemoryPool;
+  return gUboViewMemoryPool;
+}
 } // namespace
 
 UniformBufferView* UniformBufferView::New(UniformBufferV2& ubo, uint32_t offset)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "UniformBufferView::RegisterMemoryPoolCollection not called!");
-  return new(gMemoryPoolCollection->AllocateRaw(gMemoryPoolType)) UniformBufferView(ubo, offset);
+  return new(GetUboViewMemoryPool().AllocateRaw()) UniformBufferView(ubo, offset);
 }
 
 UniformBufferView* UniformBufferView::TryRecycle(UniformBufferView*& oldView, UniformBufferV2& ubo, uint32_t offset)
@@ -51,14 +52,9 @@ UniformBufferView* UniformBufferView::TryRecycle(UniformBufferView*& oldView, Un
   return UniformBufferView::New(ubo, offset);
 }
 
-void UniformBufferView::RegisterMemoryPoolCollection(SceneGraph::MemoryPoolCollection& memoryPoolCollection)
+void UniformBufferView::ResetMemoryPool()
 {
-  gMemoryPoolCollection = &memoryPoolCollection;
-}
-
-void UniformBufferView::UnregisterMemoryPoolCollection()
-{
-  gMemoryPoolCollection = nullptr;
+  GetUboViewMemoryPool().ResetMemoryPool();
 }
 
 UniformBufferView::UniformBufferView(UniformBufferV2& ubo, uint32_t offset)
@@ -71,8 +67,7 @@ UniformBufferView::~UniformBufferView() = default;
 
 void UniformBufferView::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "UniformBufferView::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->Free(gMemoryPoolType, ptr);
+  GetUboViewMemoryPool().Free(static_cast<UniformBufferView*>(ptr));
 }
 
 void UniformBufferView::Write(const void* data, uint32_t size, uint32_t offset)
