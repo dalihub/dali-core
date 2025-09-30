@@ -366,10 +366,16 @@ struct RenderManager::Impl
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
+                                  MemoryPoolCollection&               memoryPoolCollection,
                                   Integration::DepthBufferAvailable   depthBufferAvailable,
                                   Integration::StencilBufferAvailable stencilBufferAvailable,
                                   Integration::PartialUpdateAvailable partialUpdateAvailable)
 {
+  // Register memory pool
+  Render::Renderer::RegisterMemoryPoolCollection(memoryPoolCollection);
+  Render::Texture::RegisterMemoryPoolCollection(memoryPoolCollection);
+  Render::UniformBufferView::RegisterMemoryPoolCollection(memoryPoolCollection);
+
   auto* manager  = new RenderManager;
   manager->mImpl = new Impl(graphicsController,
                             depthBufferAvailable,
@@ -387,10 +393,10 @@ RenderManager::~RenderManager()
 {
   delete mImpl;
 
-  // Ensure to release memory pool
-  Render::Renderer::ResetMemoryPool();
-  Render::Texture::ResetMemoryPool();
-  Render::UniformBufferView::ResetMemoryPool();
+  // Unregister memory pool
+  Render::Renderer::UnregisterMemoryPoolCollection();
+  Render::Texture::UnregisterMemoryPoolCollection();
+  Render::UniformBufferView::UnregisterMemoryPoolCollection();
 }
 
 void RenderManager::UpdateGraphicsRequired(Integration::DepthBufferAvailable   depthBufferAvailable,
@@ -1142,15 +1148,16 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
                 if(memoryRequirements.sharedGpuSizeRequired > 0u)
                 {
-                  totalSizeGPU += memoryRequirements.sharedGpuSizeRequired; ///< Add it only 1 times.
-
-                  // TODO : Prepare to create UBOView for each UBO Blocks.
+                  // Prepare to create UBOView for each UBO Blocks and program.
                   for(uint32_t i = 1u; i < memoryRequirements.sharedBlock.size(); ++i)
                   {
                     auto* uniformBlock = memoryRequirements.sharedBlock[i];
                     if(uniformBlock)
                     {
-                      mImpl->sharedUniformBufferViewContainer.RegisterSharedUniformBlockAndPrograms(*program, *uniformBlock, memoryRequirements.blockSize[i]);
+                      if(mImpl->sharedUniformBufferViewContainer.RegisterSharedUniformBlockAndPrograms(*program, *uniformBlock, memoryRequirements.blockSize[i]))
+                      {
+                        totalSizeGPU += memoryRequirements.blockSizeAligned[i]; ///< Add it only 1 times.
+                      }
                     }
                   }
                 }

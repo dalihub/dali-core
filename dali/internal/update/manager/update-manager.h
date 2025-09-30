@@ -88,6 +88,7 @@ struct ParameterType<PropertyNotification::NotifyMode>
 namespace SceneGraph
 {
 class Animation;
+class MemoryPoolCollection;
 class RenderManager;
 class RenderTaskList;
 class RenderTaskProcessor;
@@ -114,6 +115,7 @@ public:
    * @param[in] renderManager This is responsible for rendering the results of each "update".
    * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
+   * @param[in] memoryPoolCollection Memory pool collection.
    */
   UpdateManager(NotificationManager&           notificationManager,
                 CompleteNotificationInterface& animationPlaylist,
@@ -121,7 +123,8 @@ public:
                 Integration::RenderController& renderController,
                 RenderManager&                 renderManager,
                 RenderQueue&                   renderQueue,
-                RenderTaskProcessor&           renderTaskProcessor);
+                RenderTaskProcessor&           renderTaskProcessor,
+                MemoryPoolCollection&          memoryPoolCollection);
 
   /**
    * Destructor.

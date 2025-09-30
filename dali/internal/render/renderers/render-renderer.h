@@ -56,6 +56,7 @@ namespace SceneGraph
 class SceneController;
 class Shader;
 class NodeDataProvider;
+class MemoryPoolCollection;
 class RenderInstruction; // for reflection effect
 class RenderTargetGraphicsObjects;
 } // namespace SceneGraph
@@ -162,12 +163,16 @@ public:
                             StencilParameters&              stencilParameters);
 
   /**
-   * Clear memory pool of renderer.
+   * Register memory pool of render renderer.
    * This should be called at the begin of Core.
-   * (Since Core could be recreated, we need to reset the memory pool.)
-   * After this API call, all Render::Renderer classes are invalid.
    */
-  static void ResetMemoryPool();
+  static void RegisterMemoryPoolCollection(SceneGraph::MemoryPoolCollection& memoryPoolCollection);
+
+  /**
+   * Unregister memory pool of render renderer.
+   * This should be called at the end of Core.
+   */
+  static void UnregisterMemoryPoolCollection();
 
   /**
    * Constructor.
@@ -745,11 +750,11 @@ private:
     const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
-    int32_t                  arrayIndex{-1};         ///< The array index
-    uint32_t                 arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
-    uint32_t                 matrixStride{0u};       ///< The stride for a matrix row
+    int32_t                  arrayIndex{-1}; ///< The array index
 
-    int16_t  uniformLocation{0u};
+    uint32_t arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
+    uint32_t matrixStride{0u};       ///< The stride for a matrix row
+
     uint16_t uniformOffset{0u};
     uint16_t uniformBlockIndex{0u};
     State    state{State::INITIALIZE_REQUIRED};

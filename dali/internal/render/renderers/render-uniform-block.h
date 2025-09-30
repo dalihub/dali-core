@@ -19,11 +19,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
+#include <dali/internal/render/shaders/program.h> ///< for Program::LifecycleObserver
 #include <dali/internal/update/common/property-owner.h>
 
 namespace Dali::Internal
 {
-class Program;
 namespace Render
 {
 class UniformBufferView;
@@ -37,16 +37,18 @@ class UniformBufferView;
  * for this block, and only properties registered with this uniform
  * block are written to that memory area.
  */
-class UniformBlock : public SceneGraph::PropertyOwner
+class UniformBlock : public SceneGraph::PropertyOwner, public Program::LifecycleObserver
 {
 public:
+  using ProgramIndex = uint32_t;
+
   UniformBlock(std::string&& blockName)
   : mName(std::move(blockName)),
     mNameHash(CalculateHash(std::string_view(mName))),
-    mUniformIndexMap(),
-    mUpdateMaps(true)
+    mUniformIndexMaps()
   {
   }
+
   ~UniformBlock() override;
 
   const std::string& GetName() const
@@ -59,10 +61,18 @@ public:
     return mNameHash;
   }
 
-  void WriteUniforms(BufferIndex renderBufferIndex, const Program& program, UniformBufferView& ubo);
+  void WriteUniforms(BufferIndex renderBufferIndex, ProgramIndex programIndex, UniformBufferView& ubo);
+
+  ProgramIndex GetProgramIndex(const Program& program);
 
 protected: // From SceneGraph::PropertyOwner
   void OnMappingChanged() override;
+
+public: // From Program::LifecycleObserver
+  /**
+   * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
+   */
+  void ProgramDestroyed(const Program* program);
 
 private:
   // Copy of Render::Renderer::UniformIndexMap;
@@ -79,13 +89,12 @@ private:
     const PropertyInputImpl* propertyValue{nullptr}; ///< The property value
     Hash                     uniformNameHash{0u};
     Hash                     uniformNameHashNoArray{0u};
-    int32_t                  arrayIndex{-1};         ///< The array index
-    uint32_t                 arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
-    uint32_t                 matrixStride{0u};       ///< The stride for a matrix row
+    int32_t                  arrayIndex{-1}; ///< The array index
 
-    int16_t  uniformLocation{0u};
+    uint32_t arrayElementStride{0u}; ///< The stride for element of an array (0 - tightly packed)
+    uint32_t matrixStride{0u};       ///< The stride for a matrix row
+
     uint16_t uniformOffset{0u};
-    uint16_t uniformBlockIndex{0u};
     State    state{State::INITIALIZE_REQUIRED};
   };
 
@@ -98,13 +107,14 @@ private:
   std::string mName;
   const Hash  mNameHash{0u};
 
-  using UniformIndexMappings = std::vector<UniformIndexMap>;
-  UniformIndexMappings mUniformIndexMap;
+  /** Map to index of mUniformIndexMaps per each programs */
+  std::unordered_map<const Program*, ProgramIndex> mProgramToUniformIndexMap;
 
-  bool mUpdateMaps : 1;
+  using UniformIndexMappings = std::vector<UniformIndexMap>;
+  std::vector<UniformIndexMappings> mUniformIndexMaps;
 };
 } // namespace Render
 
 } // namespace Dali::Internal
 
-#endif //DALI_INTERNAL_RENDER_RENDER_UNIFORM_BLOCK_H
+#endif // DALI_INTERNAL_RENDER_RENDER_UNIFORM_BLOCK_H

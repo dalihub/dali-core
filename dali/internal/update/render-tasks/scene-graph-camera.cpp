@@ -25,6 +25,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
@@ -50,12 +51,8 @@ namespace SceneGraph
 {
 namespace
 {
-// Memory pool used to allocate new camera. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Camera>& GetCameraMemoryPool()
-{
-  static Dali::Internal::MemoryPoolObjectAllocator<Camera> gCameraMemoryPool;
-  return gCameraMemoryPool;
-}
+Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
+static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::CAMERA;
 
 template<typename T>
 T Sign(T value)
@@ -360,19 +357,26 @@ Camera::Camera()
 
 Camera* Camera::New()
 {
-  return new(GetCameraMemoryPool().AllocateRawThreadSafe()) Camera();
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Camera::RegisterMemoryPoolCollection not called!");
+  return new(gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType)) Camera();
 }
 
-void Camera::ResetMemoryPool()
+void Camera::RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection)
 {
-  GetCameraMemoryPool().ResetMemoryPool();
+  gMemoryPoolCollection = &memoryPoolCollection;
+}
+
+void Camera::UnregisterMemoryPoolCollection()
+{
+  gMemoryPoolCollection = nullptr;
 }
 
 Camera::~Camera() = default;
 
 void Camera::operator delete(void* ptr)
 {
-  GetCameraMemoryPool().FreeThreadSafe(static_cast<Camera*>(ptr));
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Camera::RegisterMemoryPoolCollection not called!");
+  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
 }
 
 void Camera::SetType(Dali::Camera::Type type)

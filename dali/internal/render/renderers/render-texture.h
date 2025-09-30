@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TEXTURE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ namespace Internal
 {
 namespace SceneGraph
 {
+class MemoryPoolCollection;
 class RenderManager;
 } // namespace SceneGraph
 
@@ -68,12 +69,16 @@ public:
   static TextureKey NewKey(Type type, uint32_t resourceId);
 
   /**
-   * Clear memory pool of texture.
+   * Register memory pool of texture.
    * This should be called at the begin of Core.
-   * (Since Core could be recreated, we need to reset the memory pool.)
-   * After this API call, all Render::Texture classes are invalid.
    */
-  static void ResetMemoryPool();
+  static void RegisterMemoryPoolCollection(SceneGraph::MemoryPoolCollection& memoryPoolCollection);
+
+  /**
+   * Unregister memory pool of texture.
+   * This should be called at the end of Core.
+   */
+  static void UnregisterMemoryPoolCollection();
 
   /**
    * Constructor

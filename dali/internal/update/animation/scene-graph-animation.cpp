@@ -26,6 +26,7 @@
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/public-api/math/math-utils.h>
 
 namespace // Unnamed namespace
@@ -54,12 +55,8 @@ Debug::Filter* gAnimFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_L
 #define DALI_LOG_ANIMATION_INFO(format, ...)
 #endif
 
-// Memory pool used to allocate new animations. Memory used by this pool will be released when shutting down DALi
-Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation>& GetAnimationMemoryPool()
-{
-  static Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation> gAnimationMemoryPool;
-  return gAnimationMemoryPool;
-}
+Dali::Internal::SceneGraph::MemoryPoolCollection*                                 gMemoryPoolCollection = nullptr;
+static constexpr Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType gMemoryPoolType       = Dali::Internal::SceneGraph::MemoryPoolCollection::MemoryPoolType::ANIMATION;
 
 inline void WrapInPlayRange(float& elapsed, const float& playRangeStartSeconds, const float& playRangeEndSeconds)
 {
@@ -89,12 +86,18 @@ namespace SceneGraph
 {
 Animation* Animation::New(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, EndAction endAction, EndAction disconnectAction)
 {
-  return new(GetAnimationMemoryPool().AllocateRawThreadSafe()) Animation(durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction);
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Animation::RegisterMemoryPoolCollection not called!");
+  return new(gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType)) Animation(durationSeconds, speedFactor, playRange, loopCount, endAction, disconnectAction);
 }
 
-void Animation::ResetMemoryPool()
+void Animation::RegisterMemoryPoolCollection(MemoryPoolCollection& memoryPoolCollection)
 {
-  GetAnimationMemoryPool().ResetMemoryPool();
+  gMemoryPoolCollection = &memoryPoolCollection;
+}
+
+void Animation::UnregisterMemoryPoolCollection()
+{
+  gMemoryPoolCollection = nullptr;
 }
 
 Animation::Animation(float durationSeconds, float speedFactor, const Vector2& playRange, int32_t loopCount, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction)
@@ -124,7 +127,8 @@ Animation::~Animation() = default;
 
 void Animation::operator delete(void* ptr)
 {
-  GetAnimationMemoryPool().FreeThreadSafe(static_cast<Animation*>(ptr));
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Animation::RegisterMemoryPoolCollection not called!");
+  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
 }
 
 void Animation::SetDuration(float durationSeconds)
@@ -604,11 +608,6 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
     // Note that if animator contains only zero or one items, It is already sorted case.
     mAnimatorSortRequired = (mAnimators.Count() >= 2);
   }
-}
-
-uint32_t Animation::GetMemoryPoolCapacity()
-{
-  return GetAnimationMemoryPool().GetCapacity();
 }
 
 } // namespace SceneGraph
