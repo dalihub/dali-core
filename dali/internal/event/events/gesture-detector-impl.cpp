@@ -76,7 +76,7 @@ GestureDetector::~GestureDetector()
     mAttachedActors.clear();
 
     // Guard to allow handle destruction after Core has been destroyed
-    if(Stage::IsInstalled())
+    if(DALI_LIKELY(Stage::IsInstalled()))
     {
       mGestureEventProcessor.RemoveGestureDetector(this);
     }
@@ -94,7 +94,7 @@ void GestureDetector::Attach(Actor& actor)
     if(actor.OnScene())
     {
       // Register with EventProcessor if first actor being added
-      if(mAttachedActors.empty())
+      if(mAttachedActors.empty() && DALI_LIKELY(Stage::IsInstalled()))
       {
         mGestureEventProcessor.AddGestureDetector(this, actor.GetScene());
       }
@@ -131,7 +131,7 @@ void GestureDetector::SceneObjectAdded(Object& object)
       mPendingAttachActors.erase(match);
 
       // Register with EventProcessor if first actor being added
-      if(mAttachedActors.empty())
+      if(mAttachedActors.empty() && DALI_LIKELY(Stage::IsInstalled()))
       {
         mGestureEventProcessor.AddGestureDetector(this, actor.GetScene());
       }
@@ -192,7 +192,7 @@ void GestureDetector::Detach(Actor& actor)
       if(mAttachedActors.empty())
       {
         // Guard to allow handle destruction after Core has been destroyed
-        if(Stage::IsInstalled())
+        if(DALI_LIKELY(Stage::IsInstalled()))
         {
           mGestureEventProcessor.RemoveGestureDetector(this);
         }
@@ -243,7 +243,7 @@ void GestureDetector::DetachAll()
     }
 
     // Guard to allow handle destruction after Core has been destroyed
-    if(Stage::IsInstalled())
+    if(DALI_LIKELY(Stage::IsInstalled()))
     {
       // Unregister from gesture event processor
       mGestureEventProcessor.RemoveGestureDetector(this);
@@ -287,7 +287,11 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
         CancelProcessing();
         Clear();
         actorImpl.SetNeedGesturePropagation(false);
-        mGestureEventProcessor.RegisterGestureDetector(this);
+        // Guard to allow handle destruction after Core has been destroyed
+        if(DALI_LIKELY(Stage::IsInstalled()))
+        {
+          mGestureEventProcessor.RegisterGestureDetector(this);
+        }
       }
 
       Integration::TouchEvent touchEvent(touch.GetTime());
@@ -330,7 +334,11 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
 
 void GestureDetector::CancelAllOtherGestureDetectors()
 {
-  mGestureEventProcessor.CancelAllOtherGestureDetectors(this);
+  // Guard to allow handle destruction after Core has been destroyed
+  if(DALI_LIKELY(Stage::IsInstalled()))
+  {
+    mGestureEventProcessor.CancelAllOtherGestureDetectors(this);
+  }
 }
 
 bool GestureDetector::IsDetected() const
@@ -345,7 +353,11 @@ void GestureDetector::SetDetected(bool detected)
 
 void GestureDetector::Clear()
 {
-  mGestureEventProcessor.UnregisterGestureDetector(this);
+  // Guard to allow handle destruction after Core has been destroyed
+  if(DALI_LIKELY(Stage::IsInstalled()))
+  {
+    mGestureEventProcessor.UnregisterGestureDetector(this);
+  }
   SetDetected(false);
 }
 
@@ -382,7 +394,7 @@ void GestureDetector::ObjectDestroyed(Object& object)
       if(mAttachedActors.empty())
       {
         // Guard to allow handle destruction after Core has been destroyed
-        if(Stage::IsInstalled())
+        if(DALI_LIKELY(Stage::IsInstalled()))
         {
           mGestureEventProcessor.RemoveGestureDetector(this);
         }
