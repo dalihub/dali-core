@@ -135,7 +135,12 @@ Vector2 CalculateScreenPosition(const SceneSizeType& sceneSize, const Matrix& wo
   localAnchorPosition.w       = 1.0f; // Correct Numerical Error.
 
   const Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f);
-  return halfSceneSize + (Vector3(worldTransformMatrix * localAnchorPosition) - cameraPosition).GetVectorXY();
+  Vector4       worldP    = worldTransformMatrix * localAnchorPosition;
+  Vector3       worldP3   = Vector3(worldP);
+  Vector3       cameraSP3 = worldP3 - cameraPosition;
+  Vector2       cameraSP2 = cameraSP3.GetVectorXY();
+  Vector2       result    = halfSceneSize + cameraSP2;
+  return result;
 }
 
 /**
