@@ -292,76 +292,26 @@ DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor);
 DALI_CORE_API Actor GetVisiblityChangedActor();
 
 /**
- * @brief Calculate the current position of the actor in screen coordinates using event-side properties.
+ * Calculates screen position.
  *
- * This function calculates the screen coordinates of an actor by automatically detecting
- * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
- *
- * For 2D calculation (when no 3D layers in ancestors):
- * - Uses 2D-specific optimizations
- * - Assumes orthographic projection and no camera rotation
- * - Z coordinates are treated as 0 for screen position calculation
- * - Faster calculation with 2D limitations
- *
- * For 3D calculation (when 3D layers exist in ancestors):
- * - Uses full 3D projection with view and projection matrices
- * - Supports perspective projection, camera rotation, and full 3D transforms
- * - Considers Z depth for proper screen coordinate projection
- * - More accurate but computationally expensive
- *
- * @return Returns the screen position of actor. Returns (0,0) if actor is not on scene.
+ * @return position of anchor point from top-left corner on screen respectively.
  */
 DALI_CORE_API Vector2 CalculateScreenPosition(Actor actor);
 
 /**
- * Calculates screen position and size using event-side properties.
+ * Calculates screen position and size.
  *
- * This function calculates the bounding box screen coordinates and size of an actor
- * by automatically detecting whether to use 2D or 3D calculation based on the
- * actor's context and ancestor layers.
- *
- * For 2D calculation (when no 3D layers in ancestors):
- * - Uses 2D-specific optimizations
- * - Assumes orthographic projection and no camera rotation
- * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
- * - Faster calculation with 2D limitations
- *
- * For 3D calculation (when 3D layers exist in ancestors):
- * - Uses full 3D projection with view and projection matrices
- * - Supports perspective projection, camera rotation, and full 3D transforms
- * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
- * - Accounts for perspective foreshortening and 3D rotation effects
- * - More accurate but computationally expensive
- *
- * @return Rect containing position of top-left corner on screen and size respectively.
- *         Returns (0,0,0,0) if actor is not on scene.
+ * @return pair of two values, position of top-left corner on screen and size respectively.
  */
 DALI_CORE_API Rect<> CalculateScreenExtents(Actor actor);
 
 /**
- * Calculates screen position and size from current node values.
+ * Calculates screen position and size from the scene-graph values.
  *
- * This function calculates the bounding box screen coordinates and size of an actor
- * using the current state from the update thread (node). It automatically detects
- * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
+ * It will use already calculated informations on scene-graph so calculation will be fast.
+ * But the result doesn't applied what this event-loop updated. For example, it will return wrong value in Relayout API.
  *
- * For 2D calculation (when no 3D layers in ancestors):
- * - Uses 2D-specific optimizations
- * - Assumes orthographic projection and no camera rotation
- * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
- * - Uses current node state for the specified buffer index
- * - Faster calculation with 2D limitations
- *
- * For 3D calculation (when 3D layers exist in ancestors):
- * - Uses full 3D projection with view and projection matrices
- * - Supports perspective projection, camera rotation, and full 3D transforms
- * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
- * - Accounts for perspective foreshortening and 3D rotation effects
- * - Uses current node state for the specified buffer index
- * - More accurate but computationally expensive
- *
- * @return Rect containing position of top-left corner on screen and size respectively.
- *         Returns (0,0,0,0) if actor is not on scene.
+ * @return pair of two values, position of top-left corner on screen and size respectively.
  */
 DALI_CORE_API Rect<> CalculateCurrentScreenExtents(Actor actor);
 
