@@ -284,6 +284,10 @@ Vector4 Matrix::operator*(const Vector4& rhs) const
 
 #else
 
+  float*       tempPtr = temp.AsFloat();
+  const float* rhsPtr  = rhs.AsFloat();
+  const float* lhsPtr  = &mMatrix[0];
+
   // 64 32bit registers,
   // aliased to
   // d = 64 bit double-word d0 -d31
@@ -303,7 +307,7 @@ Vector4 Matrix::operator*(const Vector4& rhs) const
     "VADD.F32     q10,  q10,  q11   \n\t"
     "VST1.F32     {q10},[%2]        \n\t" // temp = q10 + q11
     :
-    : "r"(mMatrix), "r"(&rhs), "r"(&temp)
+    : "r"(lhsPtr), "r"(rhsPtr), "r"(tempPtr)
     : "q0", "q9", "q10", "q11", "memory");
 #endif
   return temp;
