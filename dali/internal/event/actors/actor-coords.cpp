@@ -96,69 +96,96 @@ Quaternion GetOrientationFromForwardAndUpVector(Vector3 forward, Vector3 up)
   return Quaternion(vX, vY, vZ);
 }
 
-// Common API for calculating screen position
-
 /**
- * @brief Retrieve actor's world position by Event related properties after calculating the world transform matrix.
+ * @brief Helper function to calculate actor's screen position in 2D space
  *
- * @param[in] actor The actor that wants to get WorldPosition
- * @param[out] worldTransformMatrix Calculated world matrix as output. We can reuse this value in other logics.
- * @return Calculated world position
+ * This function calculates the screen coordinates of an actor in 2D space using
+ * the world transform matrix, actor size, anchor point, and camera position.
+ * 3D use cases are not supported.
+ *
+ * @note This function operates under the following assumptions:
+ *       - 2D space only (Z coordinates are always treated as 0)
+ *       - No camera rotation (camera always faces +Z direction)
+ *       - No perspective projection (orthographic projection or simple parallel translation)
+ *
+ * @param[in] worldTransformMatrix The actor's world space transform matrix.
+ *                                  This matrix includes the actor's position, rotation, and scale.
+ * @param[in] actorSize The actor's size (width, height, depth).
+ *                      In 2D space, the depth value is not used.
+ * @param[in] anchor The actor's anchor point (0.0 ~ 1.0 range).
+ *                   (0,0) means top-left, (1,1) means bottom-right.
+ * @param[in] cameraPosition The camera's world space position.
+ *                           For screen coordinate calculation, camera position is subtracted from actor position.
+ *
+ * @return Vector2 The calculated screen coordinates. Returns (0,0) if actor is not on scene or calculation fails.
+ *
+ * @see CalculateCurrentActorScreenPosition, CalculateActorScreenPosition
  */
-Vector3 RetrieveCalculatedWorldPosition(const Actor& actor, Matrix& worldTransformMatrix)
+template<typename SceneSizeType>
+Vector2 CalculateScreenPosition(const SceneSizeType& sceneSize, const Matrix& worldTransformMatrix, const Vector3& actorSize, const Vector2& anchor, const Vector3& cameraPosition)
 {
-  worldTransformMatrix = Dali::Internal::CalculateActorWorldTransform(actor);
+  Vector2 halfSize = Vector2(actorSize.x, actorSize.y) * 0.5f;
 
-  Scene& scene = actor.GetScene();
+  Vector4 pos0 = Vector4(-halfSize.x, -halfSize.y, 0.0f, 1.0f);
+  Vector4 pos1 = Vector4(halfSize.x, -halfSize.y, 0.0f, 1.0f);
+  Vector4 pos2 = Vector4(-halfSize.x, halfSize.y, 0.0f, 1.0f);
+  Vector4 pos3 = Vector4(halfSize.x, halfSize.y, 0.0f, 1.0f);
 
-  Vector3 worldPosition  = worldTransformMatrix.GetTranslation3();
-  Vector3 cameraPosition = Dali::Internal::CalculateActorWorldTransform(scene.GetDefaultCameraActor()).GetTranslation3();
-  worldPosition -= cameraPosition;
+  Vector4 localAnchorPosition = (pos0 * (1.0f - anchor.x) + pos1 * anchor.x) * (1.0f - anchor.y) + (pos2 * (1.0f - anchor.x) + pos3 * anchor.x) * anchor.y;
+  localAnchorPosition.w       = 1.0f; // Correct Numerical Error.
 
-  return worldPosition;
+  const Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+  Vector4       worldP    = worldTransformMatrix * localAnchorPosition;
+  Vector3       worldP3   = Vector3(worldP);
+  Vector3       cameraSP3 = worldP3 - cameraPosition;
+  Vector2       cameraSP2 = cameraSP3.GetVectorXY();
+  Vector2       result    = halfSceneSize + cameraSP2;
+  return result;
 }
 
 /**
- * @brief Calculate actor's current world position by Update related properties.
+ * @brief Helper function to calculate actor's screen extents in 2D space
  *
- * @param[in] actor The actor that wants to get WorldPosition
- * @param[in] bufferIndex Buffer index of update
- * @return Calculated world position
- */
-Vector3 CalculateCurrentWorldPosition(const Actor& actor, BufferIndex bufferIndex)
-{
-  Scene& scene = actor.GetScene();
-
-  Vector3 worldPosition  = actor.GetNode().GetWorldPosition(bufferIndex);
-  Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition(bufferIndex);
-  worldPosition -= cameraPosition;
-
-  return worldPosition;
-}
-
-/**
- * @brief Calculate actor's scaled size by world scale.
+ * This function calculates the bounding box screen coordinates and size of an actor
+ * in 2D space using the world transform matrix, actor size, and camera position.
+ * It transforms the 4 corner points of the actor and determines the area from
+ * their minimum/maximum coordinates.
  *
- * @param[in] actor The actor that wants to get scaled size
- * @param[in] worldTransformMatrix The actor's world matrix
- * @return The size scaled by world scale
- */
-Vector3 CalculateScaledActorSize(const Actor& actor, const Matrix& worldTransformMatrix)
-{
-  return actor.GetTargetSize() * worldTransformMatrix.GetScale();
-}
-
-/**
- * @brief Calculate actor's current scaled size by world scale.
+ * @note This function operates under the following assumptions:
+ *       - 2D space only (Z coordinates are always treated as 0)
+ *       - No camera rotation (camera always faces +Z direction)
+ *       - No perspective projection (orthographic projection or simple parallel translation)
+ *       - Accurate bounding box calculation considering actor rotation
  *
- * @param[in] actor The actor that wants to get scaled size
- * @param[in] bufferIndex Buffer index of update
- * @return The size scaled by world scale
+ * @param[out] position The calculated top-left coordinate of the screen area.
+ *                       This is a relative coordinate considering camera position.
+ * @param[out] size The calculated width and height of the screen area.
+ *                  This is the actual visible size with actor rotation applied.
+ * @param[in] worldTransformMatrix The actor's world space transform matrix.
+ *                                  This matrix includes the actor's position, rotation, and scale.
+ * @param[in] actorSize The actor's size (width, height, depth).
+ *                      In 2D space, the depth value is not used.
+ * @param[in] cameraPosition The camera's world space position.
+ *                           For screen coordinate calculation, camera position is subtracted from all coordinates.
+ *
+ * @see CalculateCurrentActorScreenExtents, CalculateActorScreenExtents
  */
-Vector3 CalculateCurrentScaledActorSize(const Actor& actor, BufferIndex bufferIndex)
+template<typename SceneSizeType>
+void CalculateScreenExtents(Vector2& position, Vector2& size, const SceneSizeType& sceneSize, const Matrix& worldTransformMatrix, const Vector3& actorSize, const Vector3& cameraPosition)
 {
-  auto& node = actor.GetNode();
-  return node.GetSize(bufferIndex) * node.GetWorldScale(bufferIndex);
+  Vector2 halfSize = Vector2(actorSize.x, actorSize.y) * 0.5f;
+
+  Vector4 pos0 = worldTransformMatrix * Vector4(-halfSize.x, -halfSize.y, 0.0f, 1.0f);
+  Vector4 pos1 = worldTransformMatrix * Vector4(halfSize.x, -halfSize.y, 0.0f, 1.0f);
+  Vector4 pos2 = worldTransformMatrix * Vector4(-halfSize.x, halfSize.y, 0.0f, 1.0f);
+  Vector4 pos3 = worldTransformMatrix * Vector4(halfSize.x, halfSize.y, 0.0f, 1.0f);
+
+  Vector2 min = Vector2(std::min(pos0.x, std::min(pos1.x, std::min(pos2.x, pos3.x))), std::min(pos0.y, std::min(pos1.y, std::min(pos2.y, pos3.y))));
+  Vector2 max = Vector2(std::max(pos0.x, std::max(pos1.x, std::max(pos2.x, pos3.x))), std::max(pos0.y, std::max(pos1.y, std::max(pos2.y, pos3.y))));
+
+  const Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+  position = halfSceneSize + (min - cameraPosition.GetVectorXY());
+  size     = max - min;
 }
 
 /**
@@ -287,17 +314,15 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor)
   Vector2 result;
   if(actor.OnScene())
   {
-    Matrix worldTransformMatrix(false); // Do not initialize. It will be calculated in RetrieveCalculatedWorldPosition API.
+    Matrix  worldTransformMatrix = Dali::Internal::CalculateActorWorldTransform(actor);
+    Vector3 actorSize            = actor.GetTargetSize();
 
-    Vector3 worldPosition = RetrieveCalculatedWorldPosition(actor, worldTransformMatrix);
-    Vector3 actorSize     = CalculateScaledActorSize(actor, worldTransformMatrix);
+    Scene&  scene          = actor.GetScene();
+    Vector3 cameraPosition = Dali::Internal::CalculateActorWorldTransform(scene.GetDefaultCameraActor()).GetTranslation3();
+    Vector2 anchor         = actor.GetAnchorPointForPosition().GetVectorXY();
 
-    const auto& sceneSize = actor.GetScene().GetSize();
-
-    Vector2 screenPositionTopLeft = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
-    Vector2 anchorPointOffSet     = (actorSize * actor.GetAnchorPointForPosition()).GetVectorXY();
-
-    result = screenPositionTopLeft + anchorPointOffSet;
+    const auto& sceneSize = scene.GetSize();
+    result = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
   }
   return result;
 }
@@ -307,15 +332,16 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferInde
   Vector2 result;
   if(actor.OnScene())
   {
-    Vector3 worldPosition = CalculateCurrentWorldPosition(actor, bufferIndex);
-    Vector3 actorSize     = CalculateCurrentScaledActorSize(actor, bufferIndex);
+    Matrix  worldTransformMatrix(false);
+    Vector3 actorSize;
+    actor.GetNode().GetWorldMatrixAndSize(worldTransformMatrix, actorSize);
 
-    const auto& sceneSize = actor.GetScene().GetCurrentSurfaceRect(); // Use the update object's size
+    Scene&  scene          = actor.GetScene();
+    Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition(bufferIndex);
+    Vector2 anchor         = actor.GetAnchorPointForPosition().GetVectorXY();
 
-    Vector2 screenPositionTopLeft = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
-    Vector2 anchorPointOffSet     = (actorSize * actor.GetAnchorPointForPosition()).GetVectorXY();
-
-    result = screenPositionTopLeft + anchorPointOffSet;
+    const auto& sceneSize = scene.GetCurrentSurfaceRect();
+    result = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
   }
   return result;
 }
@@ -326,15 +352,14 @@ Rect<> CalculateActorScreenExtents(const Actor& actor)
   Vector2 size2;
   if(actor.OnScene())
   {
-    Matrix worldTransformMatrix(false); // Do not initialize. It will be calculated in RetrieveCalculatedWorldPosition API.
+    Matrix  worldTransformMatrix = Dali::Internal::CalculateActorWorldTransform(actor);
+    Vector3 actorSize            = actor.GetTargetSize();
 
-    Vector3 worldPosition = RetrieveCalculatedWorldPosition(actor, worldTransformMatrix);
-    Vector3 actorSize     = CalculateScaledActorSize(actor, worldTransformMatrix);
+    Scene&  scene          = actor.GetScene();
+    Vector3 cameraPosition = Dali::Internal::CalculateActorWorldTransform(scene.GetDefaultCameraActor()).GetTranslation3();
 
-    const auto& sceneSize = actor.GetScene().GetSize();
-
-    position2 = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
-    size2     = Vector2(actorSize.width, actorSize.height);
+    const auto& sceneSize = scene.GetSize();
+    CalculateScreenExtents(position2, size2, sceneSize, worldTransformMatrix, actorSize, cameraPosition);
   }
   return {position2.x, position2.y, size2.x, size2.y};
 }
@@ -345,13 +370,15 @@ Rect<> CalculateCurrentActorScreenExtents(const Actor& actor, BufferIndex buffer
   Vector2 size2;
   if(actor.OnScene())
   {
-    Vector3 worldPosition = CalculateCurrentWorldPosition(actor, bufferIndex);
-    Vector3 actorSize     = CalculateCurrentScaledActorSize(actor, bufferIndex);
+    Matrix  worldTransformMatrix(false);
+    Vector3 actorSize;
+    actor.GetNode().GetWorldMatrixAndSize(worldTransformMatrix, actorSize);
 
-    const auto& sceneSize = actor.GetScene().GetCurrentSurfaceRect(); // Use the update object's size
+    Scene&  scene          = actor.GetScene();
+    Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition(bufferIndex);
 
-    position2 = CalculateActorTopLeftScreenPosition(sceneSize, actorSize, worldPosition);
-    size2     = Vector2(actorSize.width, actorSize.height);
+    const auto& sceneSize = scene.GetCurrentSurfaceRect();
+    CalculateScreenExtents(position2, size2, sceneSize, worldTransformMatrix, actorSize, cameraPosition);
   }
   return {position2.x, position2.y, size2.x, size2.y};
 }
