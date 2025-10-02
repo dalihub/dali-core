@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <string>
 
 #if defined(BACKTRACE_ENABLED)
-#if defined(__GLIBC__)
+#if defined(__GLIBC__) || defined(ANDROID)
 #include <execinfo.h>
 #endif
 #include <cxxabi.h>
