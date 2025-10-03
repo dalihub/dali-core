@@ -185,43 +185,26 @@ bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
 {
   // Bind buffers to attribute locations
   const auto vertexBufferCount = static_cast<uint32_t>(mVertexBuffers.Count());
-  if(DALI_UNLIKELY(vertexBufferCount == 0u))
-  {
-    return false;
-  }
 
   std::vector<const Graphics::Buffer*> buffers;
   std::vector<uint32_t>                offsets;
 
-  buffers.resize(vertexBufferCount);
-  offsets.resize(vertexBufferCount);
-
-  auto buffersIter = buffers.begin();
-  auto offsetsIter = offsets.begin();
-  for(auto& vertexBuffer : mVertexBuffers)
+  for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
-    const GpuBuffer* gpuBuffer = vertexBuffer->GetGpuBuffer();
-    if(DALI_LIKELY(gpuBuffer))
+    const GpuBuffer* gpuBuffer = mVertexBuffers[i]->GetGpuBuffer();
+    if(gpuBuffer)
     {
       const Graphics::Buffer* buffer = gpuBuffer->GetGraphicsObject();
 
-      if(DALI_LIKELY(buffer))
+      if(buffer)
       {
-        *(buffersIter++) = buffer;
-        *(offsetsIter++) = 0u;
+        buffers.push_back(buffer);
+        offsets.push_back(0u);
       }
-      else
-      {
-        break;
-      }
-    }
-    else
-    {
-      break;
     }
     //@todo Figure out why this is being drawn without geometry having been uploaded
   }
-  if(DALI_UNLIKELY(buffersIter != buffers.end()))
+  if(buffers.empty() || buffers.size() != vertexBufferCount)
   {
     return false;
   }

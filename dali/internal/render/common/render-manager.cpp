@@ -1185,20 +1185,19 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     mImpl->graphicsController.EnableDepthStencilBuffer(*sceneRenderTarget, sceneNeedsDepthBuffer, sceneNeedsStencilBuffer);
   }
   // Fill resource binding for the scene
+  std::vector<Graphics::SceneResourceBinding> sceneResourceBindings;
   if(!programUsageCount.empty())
   {
-    // Use standalone buffer to avoid memory allocation.
-    static std::vector<Graphics::SceneResourceBinding> sSceneResourceBindings;
-    sSceneResourceBindings.resize(programUsageCount.size());
-    auto iter = sSceneResourceBindings.begin();
+    sceneResourceBindings.resize(programUsageCount.size());
+    auto iter = sceneResourceBindings.begin();
     for(auto& item : programUsageCount)
     {
       iter->type           = Graphics::ResourceType::PROGRAM;
       iter->programBinding = &item.second;
       ++iter;
     }
-    mImpl->graphicsController.SetResourceBindingHints(sSceneResourceBindings);
   }
+  mImpl->graphicsController.SetResourceBindingHints(sceneResourceBindings);
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Render scene (%s), CPU:%d GPU:%d\n", renderToFbo ? "Offscreen" : "Onscreen", totalSizeCPU, totalSizeGPU);
 
@@ -1255,10 +1254,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
   }
 
-  // Use standalone buffer to avoid memory allocation.
-  static std::vector<Graphics::CommandBuffer*> sCommandBuffers;
-
-  uint32_t commandBuffersCount = 0u;
+  std::vector<Graphics::CommandBuffer*> commandBuffers;
 
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
@@ -1406,11 +1402,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     if(scissorArea.width > 0 && scissorArea.height > 0)
     {
       // Setup command buffer for this instruction.
-      if(DALI_UNLIKELY(sCommandBuffers.size() == commandBuffersCount))
-      {
-        sCommandBuffers.resize((commandBuffersCount << 1) | 1);
-      }
-      sCommandBuffers[commandBuffersCount++] = currentCommandBuffer;
+      commandBuffers.emplace_back(currentCommandBuffer);
 
       Graphics::CommandBufferBeginInfo info;
       info.usage = 0 | Graphics::CommandBufferUsageFlagBits::ONE_TIME_SUBMIT;
@@ -1461,11 +1453,12 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   // Submit command buffers
   Graphics::SubmitInfo submitInfo;
-  submitInfo.flags     = 0 | Graphics::SubmitFlagBits::FLUSH;
-  submitInfo.cmdBuffer = std::vector<Graphics::CommandBuffer*>(sCommandBuffers.begin(), sCommandBuffers.begin() + commandBuffersCount);
-  for(auto commandBuffer : submitInfo.cmdBuffer)
+  submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+
+  for(auto commandBuffer : commandBuffers)
   {
     commandBuffer->End();
+    submitInfo.cmdBuffer.push_back(commandBuffer);
   }
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "CmdBuffer count: %u\n", submitInfo.cmdBuffer.size());

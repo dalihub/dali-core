@@ -225,13 +225,15 @@ void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, 
 
 bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
 {
+  uint32_t textureUnit = 0;
+
   auto textures(mRenderDataProvider->GetTextures());
   auto samplers(mRenderDataProvider->GetSamplers());
+
+  std::vector<Graphics::TextureBinding> textureBindings;
+
   if(textures != nullptr)
   {
-    std::vector<Graphics::TextureBinding> textureBindings;
-    uint32_t                              textureUnit = 0;
-
     const std::uint32_t texturesCount(static_cast<std::uint32_t>(textures->Count()));
     textureBindings.reserve(texturesCount);
 
@@ -246,7 +248,8 @@ bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
 
         const Graphics::Sampler* graphicsSampler = samplers ? ((i < (*samplers).Size() && (*samplers)[i]) ? (*samplers)[i]->GetGraphicsObject() : nullptr) : nullptr;
 
-        textureBindings.push_back({graphicsTexture, graphicsSampler, textureUnit});
+        const Graphics::TextureBinding textureBinding{graphicsTexture, graphicsSampler, textureUnit};
+        textureBindings.push_back(textureBinding);
 
         ++textureUnit;
       }
@@ -256,7 +259,10 @@ bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
         return false;
       }
     }
+  }
 
+  if(!textureBindings.empty())
+  {
     commandBuffer.BindTextures(textureBindings);
   }
 
@@ -578,29 +584,26 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     return false;
   }
 
-  // Use standalone buffer to avoid memory allocation.
-  static std::vector<DevelRenderer::DrawCommand*> sCommands;
+  // Prepare commands
+  std::vector<DevelRenderer::DrawCommand*> commands;
+  for(auto& cmd : mDrawCommands)
+  {
+    if(cmd.queue == queueIndex)
+    {
+      commands.emplace_back(&cmd);
+    }
+  }
 
-  // Prepare commands if draw commands exist
+  // Have commands but nothing to be drawn - abort
+  if(!mDrawCommands.empty() && commands.empty())
+  {
+    return false;
+  }
+
+  // Set blending mode
   if(!mDrawCommands.empty())
   {
-    sCommands.clear();
-    for(auto& cmd : mDrawCommands)
-    {
-      if(cmd.queue == queueIndex)
-      {
-        sCommands.emplace_back(&cmd);
-      }
-    }
-
-    // Have commands but nothing to be drawn - abort
-    if(sCommands.empty())
-    {
-      return false;
-    }
-
-    // Set blending mode
-    blend = (sCommands[0]->queue != DevelRenderer::RENDER_QUEUE_OPAQUE) && blend;
+    blend = (commands[0]->queue != DevelRenderer::RENDER_QUEUE_OPAQUE) && blend;
   }
 
   bool drawn = false;
@@ -641,7 +644,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
       }
       else
       {
-        for(auto& cmd : sCommands)
+        for(auto& cmd : commands)
         {
           drawn |= mGeometry->Draw(*mGraphicsController, commandBuffer, cmd->firstIndex, cmd->elementCount, instanceCount);
         }

@@ -794,7 +794,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
   {
     std::vector<const Graphics::CommandBuffer*> buffers;
     const RenderListContainer::SizeType         count = instruction.RenderListCount();
-    buffers.reserve(count);
 
     // Iterate through each render list in order. If a pair of render lists
     // are marked as interleaved, then process them together.
