@@ -592,24 +592,24 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
   // Prepare commands
   std::vector<DevelRenderer::DrawCommand*> commands;
-  for(auto& cmd : mDrawCommands)
-  {
-    if(cmd.queue == queueIndex)
-    {
-      commands.emplace_back(&cmd);
-    }
-  }
-
-  // Have commands but nothing to be drawn - abort
-  if(!mDrawCommands.empty() && commands.empty())
-  {
-    return false;
-  }
-
-  // Set blending mode
   if(!mDrawCommands.empty())
   {
-    blend = (commands[0]->queue != DevelRenderer::RENDER_QUEUE_OPAQUE) && blend;
+    for(auto& cmd : mDrawCommands)
+    {
+      if(cmd.queue == queueIndex)
+      {
+        commands.emplace_back(&cmd);
+      }
+    }
+
+    // Have commands but nothing to be drawn - abort
+    if(commands.empty())
+    {
+      return false;
+    }
+
+    // Set blending mode
+    blend = blend && (commands[0]->queue != DevelRenderer::RENDER_QUEUE_OPAQUE);
   }
 
   bool drawn = false;

@@ -188,6 +188,8 @@ bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
 
   std::vector<const Graphics::Buffer*> buffers;
   std::vector<uint32_t>                offsets;
+  buffers.reserve(vertexBufferCount);
+  offsets.reserve(vertexBufferCount);
 
   for(uint32_t i = 0; i < vertexBufferCount; ++i)
   {
@@ -198,8 +200,8 @@ bool Geometry::BindVertexAttributes(Graphics::CommandBuffer& commandBuffer)
 
       if(buffer)
       {
-        buffers.push_back(buffer);
-        offsets.push_back(0u);
+        buffers.emplace_back(buffer);
+        offsets.emplace_back(0u);
       }
     }
     //@todo Figure out why this is being drawn without geometry having been uploaded

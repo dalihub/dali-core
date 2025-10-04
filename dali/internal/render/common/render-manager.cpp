@@ -1461,11 +1461,12 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   // Submit command buffers
   Graphics::SubmitInfo submitInfo;
   submitInfo.flags = 0 | Graphics::SubmitFlagBits::FLUSH;
+  submitInfo.cmdBuffer.reserve(commandBuffers.size());
 
   for(auto commandBuffer : commandBuffers)
   {
     commandBuffer->End();
-    submitInfo.cmdBuffer.push_back(commandBuffer);
+    submitInfo.cmdBuffer.emplace_back(commandBuffer);
   }
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "CmdBuffer count: %u\n", submitInfo.cmdBuffer.size());
