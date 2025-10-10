@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
           isNodeUnderRootNode = true;
           break;
         }
-        nodeStack.push_back({iterateNodeId, iterateNode});
+        nodeStack.emplace_back(iterateNodeId, iterateNode);
 
         // Go to parent.
         iterateNode = iterateNode->GetParent();

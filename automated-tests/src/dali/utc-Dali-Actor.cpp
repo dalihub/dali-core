@@ -1543,6 +1543,154 @@ int UtcDaliActorCalculateScreenExtents(void)
   END_TEST;
 }
 
+int UtcDaliActorCalculateScreenExtentsWithRotation(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  auto expectedExtent = Rect<>{1.0f, 1.5f, 2.0f, 1.0f};
+  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::ZAXIS));
+
+  application.SendNotification();
+  application.Render();
+
+  expectedExtent = Rect<>{1.5f, 1.0f, 1.0f, 2.0f};
+  actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  END_TEST;
+}
+
+int UtcDaliActorCalculateCurrentScreenExtentsWithRotation(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  auto expectedExtent = Rect<>{1.0f, 1.5f, 2.0f, 1.0f};
+  auto actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::ZAXIS));
+
+  application.SendNotification();
+  application.Render();
+
+  expectedExtent = Rect<>{1.5f, 1.0f, 1.0f, 2.0f};
+  actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
+  DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  END_TEST;
+}
+
+int UtcDaliActorCalculateScreenPositionWithRotation(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  auto expectedPosition = Vector2(2.0f, 2.0f);
+  auto actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::ZAXIS));
+
+  application.SendNotification();
+  application.Render();
+
+  expectedPosition = Vector2(2.0f, 2.0f);
+  actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  END_TEST;
+}
+
+int UtcDaliActorCalculateCurrentScreenPositionWithRotation(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
+  actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  auto expectedPosition = Vector2(2.0f, 2.0f);
+  auto actualPosition   = actor.GetProperty<Vector2>(Dali::Actor::Property::SCREEN_POSITION);
+  DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Radian(Degree(90.0f)), Vector3::ZAXIS));
+
+  application.SendNotification();
+  application.Render();
+
+  expectedPosition = Vector2(2.0f, 2.0f);
+  actualPosition   = actor.GetProperty<Vector2>(Dali::Actor::Property::SCREEN_POSITION);
+  DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  application.GetScene().Remove(actor);
+  END_TEST;
+}
+
 int UtcDaliActorCalculateCurrentScreenExtents(void)
 {
   TestApplication application;
