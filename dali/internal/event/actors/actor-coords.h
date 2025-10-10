@@ -94,83 +94,44 @@ bool ConvertScreenToLocalRenderTaskList(
   float                 screenY);
 
 /**
- * Calculate the screen position of the actor from its transform and anchor point
+ * Calculate the screen position of the actor from it's transform and anchor point
  *
- * This function calculates the screen coordinates of an actor in 2D space using
- * the actor's target (goal) state properties. It calculates the world transform
- * from scratch using only event-side properties and does not rely on the update
- * thread to have already calculated the transform.
- *
- * @note This function operates under the following assumptions:
- *       - 2D space only (Z coordinates are always treated as 0)
- *       - No camera rotation (camera always faces +Z direction)
- *       - No perspective projection (orthographic projection or simple parallel translation)
- *       - Uses actor's target size and target transform properties
+ * This calculates the world transform from scratch using only event
+ * side properties - it does not rely on the update thread to have
+ * already calculated the transform.
  *
  * @param[in] actor The actor to calculate the screen position for
- * @return Vector2 The calculated screen coordinates. Returns (0,0) if actor is not on scene
+ * @return the screen position
  */
 const Vector2 CalculateActorScreenPosition(const Actor& actor);
 
 /**
- * Calculate the current screen position of the actor from its node transform and anchor point
- *
- * This function calculates the screen coordinates of an actor in 2D space using
- * the actor's current state from the node. It uses the current world matrix
- * and size from the update thread for the specified buffer index.
- *
- * @note This function operates under the following assumptions:
- *       - 2D space only (Z coordinates are always treated as 0)
- *       - No camera rotation (camera always faces +Z direction)
- *       - No perspective projection (orthographic projection or simple parallel translation)
- *       - Uses actor's current node state for the specified buffer index
+ * Calculate the screen position of the actor from it's node transform and anchor point
  *
  * @param[in] actor The actor to calculate the screen position for
- * @param[in] bufferIndex The current event buffer index for accessing current node state
- * @return Vector2 The calculated screen coordinates. Returns (0,0) if actor is not on scene
+ * @param[in] bufferIndex The current event buffer index
+ * @return the screen position
  */
 const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferIndex bufferIndex);
 
 /**
- * Calculate the screen extents of the actor from its transform, anchor point and size
+ * Calculate the screen extents of the actor from it's transform, anchor point and size
  *
- * This function calculates the bounding box screen coordinates and size of an actor
- * in 2D space using the actor's target (goal) state properties. It transforms the
- * 4 corner points of the actor and determines the area from their minimum/maximum
- * coordinates. The world transform is calculated from scratch using only event-side
- * properties and does not rely on the update thread.
+ * This calculates the world transform from scratch using only event
+ * side properties - it does not rely on the update thread to have
+ * already calculated the transform.
  *
- * @note This function operates under the following assumptions:
- *       - 2D space only (Z coordinates are always treated as 0)
- *       - No camera rotation (camera always faces +Z direction)
- *       - No perspective projection (orthographic projection or simple parallel translation)
- *       - Uses actor's target size and target transform properties
- *       - Accurate bounding box calculation considering actor rotation
- *
- * @param[in] actor The actor to calculate the screen extents for
- * @return Rect<> The calculated screen extents (x, y, width, height). Returns (0,0,0,0) if actor is not on scene
+ * @param[in] actor The actor
+ * @return the screen extents of the actor
  */
 Rect<> CalculateActorScreenExtents(const Actor& actor);
 
 /**
- * Calculate the current screen extents of the actor from its node transform, anchor point and size
+ * Calculate the screen extents of the actor from it's node transform, anchor point and size
  *
- * This function calculates the bounding box screen coordinates and size of an actor
- * in 2D space using the actor's current state from the node. It transforms the
- * 4 corner points of the actor and determines the area from their minimum/maximum
- * coordinates using the current world matrix and size from the update thread
- * for the specified buffer index.
- *
- * @note This function operates under the following assumptions:
- *       - 2D space only (Z coordinates are always treated as 0)
- *       - No camera rotation (camera always faces +Z direction)
- *       - No perspective projection (orthographic projection or simple parallel translation)
- *       - Uses actor's current node state for the specified buffer index
- *       - Accurate bounding box calculation considering actor rotation
- *
- * @param[in] actor The actor to calculate the screen extents for
- * @param[in] bufferIndex The current event buffer index for accessing current node state
- * @return Rect<> The calculated screen extents (x, y, width, height). Returns (0,0,0,0) if actor is not on scene
+ * @param[in] actor The actor
+ * @param[in] bufferIndex The current event buffer index
+ * @return the screen extents of the actor
  */
 Rect<> CalculateCurrentActorScreenExtents(const Actor& actor, BufferIndex bufferIndex);
 

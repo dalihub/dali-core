@@ -663,9 +663,7 @@ public:
       /**
        * @brief Returns the screen position of the Actor
        * @details Name "screenPosition", type Property::VECTOR2. Read-only
-       * @note Automatically detects 2D or 3D calculation based on actor context and ancestor layers.
-       * @note For 2D: Uses optimized calculation with orthographic projection (Z=0, only Z-axis rotation considered).
-       * @note For 3D: Uses full 3D projection with perspective and camera rotation.
+       * @note This assumes default camera and default render-task and the Z position is ZERO.
        * @note The last known frame is used for the calculation. May not match a position value just set.
        * @SINCE_1_9.17
        */
