@@ -1145,6 +1145,11 @@ public:
   bool IsIgnored() const;
 
   /**
+   * @copydoc Dali::Actor::IsCurrentWorldIgnored
+   */
+  bool IsCurrentWorldIgnored() const;
+
+  /**
    * @copydoc Dali::Actor::AddRenderer()
    */
   uint32_t AddRenderer(Renderer& renderer);
@@ -1310,7 +1315,7 @@ public:
    */
   bool IsHittable() const
   {
-    return (IsUserInteractionEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected();
+    return (IsUserInteractionEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsCurrentWorldIgnored());
   }
 
   /**
@@ -2195,6 +2200,7 @@ protected:
   bool mDispatchTouchMotion : 1;    ///< Whether to send touch motion events or not.
   bool mDispatchHoverMotion : 1;    ///< Whether to send hover motion events or not.
   bool mIsRenderTaskMappingActor : 1;
+  bool mIgnored : 1; ///< Whether the actor is ignored or not.
 
   LayoutDirection::Type mLayoutDirection : 2; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type        mDrawMode : 3;        ///< Cached: How the actor and its children should be drawn

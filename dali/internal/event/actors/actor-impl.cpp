@@ -152,6 +152,8 @@ DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelAc
 DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION)
 DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_HOVER_MOTION)
 DALI_PROPERTY("childrenDepthIndexPolicy", INTEGER, true, false, false, Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY)
+DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::DevelActor::Property::IGNORED)
+DALI_PROPERTY("worldIgnored", BOOLEAN, false, false, true, Dali::DevelActor::Property::WORLD_IGNORED)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
 // Signals
@@ -1275,6 +1277,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mDispatchTouchMotion(true),
   mDispatchHoverMotion(true),
   mIsRenderTaskMappingActor(false),
+  mIgnored(false),
   mLayoutDirection(LayoutDirection::LEFT_TO_RIGHT),
   mDrawMode(DrawMode::NORMAL),
   mColorMode(Node::DEFAULT_COLOR_MODE),
@@ -2003,13 +2006,21 @@ void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
 
 void Actor::SetIgnored(bool ignored)
 {
+  // Always send message, even if the value hasn't changed, to ensure the Node is updated
+  mIgnored = ignored;
+
   // Send a message to the update thread to set the ignored state on the Node.
   SetIgnoredMessage(GetEventThreadServices(), GetNode(), ignored);
 }
 
 bool Actor::IsIgnored() const
 {
-  return GetNode().IsIgnored();
+  return mIgnored;
+}
+
+bool Actor::IsCurrentWorldIgnored() const
+{
+  return GetNode().IsWorldIgnored();
 }
 
 } // namespace Internal

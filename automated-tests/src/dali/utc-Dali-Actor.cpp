@@ -197,6 +197,29 @@ struct OrientationComponentConstraint
     orientation = parentOrientation;
   }
 };
+
+struct TestConstraintIgnored
+{
+  TestConstraintIgnored(bool& ignored, bool& worldIgnored)
+  : ignored(ignored),
+    worldIgnored(worldIgnored)
+  {
+  }
+
+  void operator()(Vector4& color, const PropertyInputContainer& inputs)
+  {
+    gTestConstraintCalled = true;
+
+    // For line coverage
+    [[maybe_unused]] auto _ = inputs[0]->GetType();
+
+    ignored      = inputs[0]->GetBoolean();
+    worldIgnored = inputs[1]->GetBoolean();
+  }
+
+  bool& ignored;
+  bool& worldIgnored;
+};
 // OnRelayout
 
 static bool                     gOnRelayoutCallBackCalled = false;
@@ -379,9 +402,9 @@ struct ChildOrderChangedFunctor
   Actor& mActor;
 };
 
-struct CulledPropertyNotificationFunctor
+struct PropertyNotificationFunctor
 {
-  CulledPropertyNotificationFunctor(bool& signalCalled, PropertyNotification& propertyNotification)
+  PropertyNotificationFunctor(bool& signalCalled, PropertyNotification& propertyNotification)
   : mSignalCalled(signalCalled),
     mPropertyNotification(propertyNotification)
   {
@@ -11265,10 +11288,10 @@ int utcDaliActorCulled(void)
   notification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
 
   // Connect NotifySignal
-  bool                              propertyNotificationSignal(false);
-  PropertyNotification              source;
-  CulledPropertyNotificationFunctor f(propertyNotificationSignal, source);
-  notification.NotifySignal().Connect(&application, f);
+  bool                        propertyNotificationSignal(false);
+  PropertyNotification        source;
+  PropertyNotificationFunctor notifiedFunctor(propertyNotificationSignal, source);
+  notification.NotifySignal().Connect(&application, notifiedFunctor);
 
   actor.SetProperty(Actor::Property::POSITION, Vector2(1000.0f, 1000.0f));
 
@@ -15781,7 +15804,50 @@ int UtcDaliActorDestructWorkerThreadN(void)
   END_TEST;
 }
 
-int UtcDaliActorIgnored(void)
+int UtcDaliActorIgnoredPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::IGNORED, true);
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::IGNORED).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::IGNORED), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::IGNORED), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::IGNORED), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::IGNORED), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::IGNORED), "ignored", TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorWorldIgnoredPropertyP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  application.GetScene().Add(actor);
+
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::WORLD_IGNORED), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::WORLD_IGNORED), "worldIgnored", TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliActorIgnored01(void)
 {
   TestApplication application;
 
@@ -15800,11 +15866,42 @@ int UtcDaliActorIgnored(void)
   child2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
   parent.Add(child2);
 
-  DALI_TEST_EQUALS(child1.IsIgnored(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(child2.IsIgnored(), false, TEST_LOCATION);
+  PropertyNotification notification = child2.AddPropertyNotification(DevelActor::Property::IGNORED, LessThanCondition(0.5f));
+  notification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
+
+  // Connect NotifySignal
+  bool                        propertyNotificationSignal(false);
+  PropertyNotification        source;
+  PropertyNotificationFunctor notifiedFunctor(propertyNotificationSignal, source);
+  notification.NotifySignal().Connect(&application, notifiedFunctor);
+
+  auto TestIgnoredProperties = [&](Actor actor, bool event, bool current, bool world, const char* testLocation)
+  {
+    DALI_TEST_EQUALS(actor.IsIgnored(), event, testLocation);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::IGNORED), event, testLocation);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::IGNORED), current, testLocation);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), world, testLocation);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), world, testLocation);
+  };
+
+  TestIgnoredProperties(parent, false, false, true, TEST_LOCATION); // Since scene-off case mark as world-ignored.
+  TestIgnoredProperties(child1, false, false, true, TEST_LOCATION); // Since scene-off case mark as world-ignored.
+  TestIgnoredProperties(child2, false, false, true, TEST_LOCATION); // Since scene-off case mark as world-ignored.
+
+  DALI_TEST_EQUALS(propertyNotificationSignal, false, TEST_LOCATION);
+  DALI_TEST_CHECK(!source);
 
   application.SendNotification();
   application.Render(0);
+
+  TestIgnoredProperties(parent, false, false, false, TEST_LOCATION);
+  TestIgnoredProperties(child1, false, false, false, TEST_LOCATION);
+  TestIgnoredProperties(child2, false, false, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+  propertyNotificationSignal = false;
+  source.Reset();
 
   Vector3 childPosition1 = child1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
   Vector3 childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
@@ -15820,11 +15917,25 @@ int UtcDaliActorIgnored(void)
   DALI_TEST_EQUALS(childPosition1, childPosition2, TEST_LOCATION);
   DALI_TEST_EQUALS(childPosition1, Vector3(100, 100, 0), TEST_LOCATION);
 
-  child2.SetIgnored(true);
+  child2.SetProperty(DevelActor::Property::IGNORED, true);
   parent.SetProperty(Actor::Property::POSITION, Vector2(200, 200));
+
+  TestIgnoredProperties(parent, false, false, false, TEST_LOCATION);
+  TestIgnoredProperties(child1, false, false, false, TEST_LOCATION);
+  TestIgnoredProperties(child2, true, false, false, TEST_LOCATION); // Not updated yet.
 
   application.SendNotification();
   application.Render(0);
+
+  TestIgnoredProperties(child2, true, true, true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(propertyNotificationSignal, false, TEST_LOCATION);
+  DALI_TEST_CHECK(!source);
+  application.SendNotification();
+  DALI_TEST_EQUALS(propertyNotificationSignal, true, TEST_LOCATION);
+  DALI_TEST_CHECK(source);
+  propertyNotificationSignal = false;
+  source.Reset();
 
   childPosition1 = child1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
   childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
@@ -15832,14 +15943,101 @@ int UtcDaliActorIgnored(void)
   DALI_TEST_EQUALS(childPosition1, Vector3(200, 200, 0), TEST_LOCATION);
 
   child2.SetIgnored(false);
+  parent.SetIgnored(true);
+  parent.SetProperty(Actor::Property::POSITION, Vector2(300, 300));
+
+  TestIgnoredProperties(parent, true, false, false, TEST_LOCATION); // Not updated yet.
+  TestIgnoredProperties(child1, false, false, false, TEST_LOCATION);
+  TestIgnoredProperties(child2, false, true, true, TEST_LOCATION); // Not updated yet.
 
   application.SendNotification();
   application.Render(0);
 
+  TestIgnoredProperties(parent, true, true, true, TEST_LOCATION);
+  TestIgnoredProperties(child1, false, false, true, TEST_LOCATION);
+  TestIgnoredProperties(child2, false, false, true, TEST_LOCATION);
+
   childPosition1 = child1.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
   childPosition2 = child2.GetProperty<Vector3>(Actor::Property::WORLD_POSITION);
-  DALI_TEST_EQUALS(childPosition1, childPosition2, TEST_LOCATION);
+  DALI_TEST_NOT_EQUALS(childPosition1, childPosition2, 0.00001f, TEST_LOCATION);
   DALI_TEST_EQUALS(childPosition1, Vector3(200, 200, 0), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(propertyNotificationSignal, false, TEST_LOCATION);
+  DALI_TEST_CHECK(!source);
+  application.SendNotification();
+  DALI_TEST_EQUALS(propertyNotificationSignal, true, TEST_LOCATION);
+  DALI_TEST_CHECK(source);
+  propertyNotificationSignal = false;
+  source.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliActorIgnoredConstraintInput(void)
+{
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  application.GetScene().Add(parent);
+
+  Actor child = Actor::New();
+  child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.Add(child);
+
+  gTestConstraintCalled = false;
+
+  bool ignored      = false;
+  bool worldIgnored = true;
+
+  Constraint constraint = Constraint::New<Vector4>(parent, Actor::Property::COLOR, TestConstraintIgnored(ignored, worldIgnored));
+  constraint.AddSource(Source(child, DevelActor::Property::IGNORED));
+  constraint.AddSource(Source(child, DevelActor::Property::WORLD_IGNORED));
+  constraint.ApplyPost();
+
+  DALI_TEST_EQUALS(gTestConstraintCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ignored, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(worldIgnored, true, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gTestConstraintCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(ignored, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(worldIgnored, false, TEST_LOCATION);
+
+  gTestConstraintCalled = false;
+
+  child.SetProperty(DevelActor::Property::IGNORED, true);
+
+  DALI_TEST_EQUALS(gTestConstraintCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ignored, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(worldIgnored, false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gTestConstraintCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(ignored, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(worldIgnored, true, TEST_LOCATION);
+
+  gTestConstraintCalled = false;
+
+  child.SetIgnored(false);
+
+  DALI_TEST_EQUALS(gTestConstraintCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(ignored, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(worldIgnored, true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(gTestConstraintCalled, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(ignored, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(worldIgnored, false, TEST_LOCATION);
 
   END_TEST;
 }

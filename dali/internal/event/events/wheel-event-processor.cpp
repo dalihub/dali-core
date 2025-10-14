@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,7 +138,9 @@ bool IsActorWheelableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::Travers
     }
     case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
     {
-      if(actor.GetProperty<bool>(Dali::Actor::Property::VISIBLE)) // Actor is visible, if not visible then none of its children are visible.
+      if(actor.GetProperty<bool>(Dali::Actor::Property::VISIBLE) &&       // Actor is visible, if not visible then none of its children are visible.
+         actor.GetProperty<bool>(Dali::Actor::Property::SENSITIVE) &&     // Actor is sensitive, if insensitive none of its children should be hittable either.
+         (!actor.GetProperty<bool>(Dali::DevelActor::Property::IGNORED))) // Actor is not ignored, if ignored none of its children should be hittable either.
       {
         hittable = true;
       }

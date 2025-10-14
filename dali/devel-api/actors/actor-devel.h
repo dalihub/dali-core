@@ -215,6 +215,21 @@ enum Type
    * @note Only has effort under Behavior::LAYER_UI.
    */
   CHILDREN_DEPTH_INDEX_POLICY,
+
+  /**
+   * @brief The flag to identify whether the Actor and it's descendants are ignored or not.
+   * If true, it will not be rendered and will be excluded from render thread computation.
+   * @details Name "ignored", type Property::BOOLEAN
+   * @note Default is false.
+   */
+  IGNORED,
+
+  /**
+   * @brief The flag to identify whether the Actor is ignored or not at previous frame.
+   * @details Name "worldIgnored", type Property::BOOLEAN, read-only
+   * @note Disconnected actor from scene also be marks as ignored.
+   */
+  WORLD_IGNORED,
 };
 
 } // namespace Property

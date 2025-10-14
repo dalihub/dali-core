@@ -456,33 +456,6 @@ public:
   }
 
   /**
-   * Sets flag to identify whether the node is ignored or not.
-   * @param[in] ignored True to make the node be ignored.
-   */
-  void SetIgnored(const bool ignored)
-  {
-    if(mIgnored != ignored)
-    {
-      mIgnored = ignored;
-      SetUpdated(true);
-      SetAllDirtyFlags(); // TODO : Should we reset dirty flag more good way?
-      if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
-      {
-        mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), mIgnored);
-      }
-    }
-  }
-
-  /**
-   * Retrieve Whether the node is ignored or not.
-   * @return True if the node is ignored.
-   */
-  bool IsIgnored() const
-  {
-    return mIgnored;
-  }
-
-  /**
    * Retrieve the local position of the node, relative to its parent.
    * @param[in] bufferIndex The buffer to read from.
    * @return The local position.
@@ -832,6 +805,46 @@ public:
   }
 
   /**
+   * Sets flag to identify whether the node is ignored or not.
+   * @param[in] ignored True to make the node be ignored.
+   */
+  void SetIgnored(const bool ignored)
+  {
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    {
+      SetUpdated(true);
+      SetAllDirtyFlags(); // TODO : Should we reset dirty flag more good way?
+      mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), ignored);
+    }
+  }
+
+  /**
+   * Retrieve Whether the node is ignored or not.
+   * @return True if the node is ignored.
+   */
+  bool IsIgnored() const
+  {
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    {
+      return mIgnored.Get(0);
+    }
+    return false;
+  }
+
+  /**
+   * Retrieve Whether the node is world ignored or not.
+   * @return True if the node is world ignored.
+   */
+  bool IsWorldIgnored() const
+  {
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    {
+      return mWorldIgnored.Get(0);
+    }
+    return true;
+  }
+
+  /**
    * Add RenderTask that will exclusively render this node.
    * @param[in] renderTask The render-task to render this node exclusively.
    */
@@ -1159,6 +1172,7 @@ public: // Default properties
 
   PROPERTY_WRAPPER(mSize, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_POSITION,
                    mPosition); // Local transform; distance between parent-origin & anchor-point
+
   PROPERTY_WRAPPER(mPosition, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SCALE,
                    mScale); // Local transform; scale relative to parent node
 
@@ -1170,6 +1184,10 @@ public: // Default properties
   TEMPLATE_WRAPPER(mWorldPosition, TransformManagerVector3Input, mWorldScale);       // Full inherited scale
   TEMPLATE_WRAPPER(mWorldScale, TransformManagerQuaternionInput, mWorldOrientation); // Full inherited orientation
   TEMPLATE_WRAPPER(mWorldOrientation, TransformManagerMatrixInput, mWorldMatrix);    // Full inherited world matrix
+
+  // Ignore properties.
+  PROPERTY_WRAPPER(mWorldMatrix, TransformManagerBooleanIgnoredInput, false, mIgnored);
+  PROPERTY_WRAPPER(mIgnored, TransformManagerBooleanIgnoredInput, true, mWorldIgnored);
 
   AnimatableProperty<bool>    mVisible;        ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<bool>    mCulled;         ///< True if the node is culled. This is not animatable. It is just double-buffered.
@@ -1210,7 +1228,6 @@ protected:
   bool               mUpdateAreaChanged : 1;       ///< True if the update area of the node is changed.
   bool               mUpdateAreaUseSize : 1;       ///< True if the update area of the node is same as node size.
   bool               mUseTextureUpdateArea : 1;    ///< Whether the actor uses the update area of the texture instead of its own.
-  bool               mIgnored : 1;                 ///< Whether the node is ignored or not.
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

@@ -641,6 +641,15 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
+    case Dali::DevelActor::Property::IGNORED:
+    {
+      CheckValidAndSet<bool>(property, [&actor](bool value)
+      {
+        actor.SetIgnored(value);
+      });
+      break;
+    }
+
     default:
     {
       // this can happen in the case of a non-animatable default property so just do nothing
@@ -1227,6 +1236,16 @@ const PropertyInputImpl* Actor::PropertyHandler::GetSceneObjectInputProperty(Pro
       property = &node.mCulled;
       break;
     }
+    case Dali::DevelActor::Property::IGNORED:
+    {
+      property = &node.mIgnored;
+      break;
+    }
+    case Dali::DevelActor::Property::WORLD_IGNORED:
+    {
+      property = &node.mWorldIgnored;
+      break;
+    }
     default:
     {
       break;
@@ -1714,6 +1733,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
+    case Dali::DevelActor::Property::IGNORED:
+    {
+      value = actor.IsIgnored();
+      break;
+    }
+
     default:
     {
       // Must be a scene-graph only property
@@ -1913,6 +1938,19 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
       value = actor.GetNode().IsTextureUpdateAreaUsed();
       break;
     }
+
+    case Dali::DevelActor::Property::IGNORED:
+    {
+      value = actor.GetNode().IsIgnored();
+      break;
+    }
+
+    case Dali::DevelActor::Property::WORLD_IGNORED:
+    {
+      value = actor.IsCurrentWorldIgnored();
+      break;
+    }
+
     default:
     {
       // Must be an event-side only property
