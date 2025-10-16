@@ -258,6 +258,16 @@ Scene::ItemsDirtyRectsContainer& Scene::GetItemsDirtyRects()
   return mItemsDirtyRects;
 }
 
+void Scene::ClearItemsDirtyRects()
+{
+  mNeedFullUpdate = true; // Full update if dirty rect cleared.
+
+  mItemsDirtyRects.clear();
+#ifndef LOW_SPEC_MEMORY_MANAGEMENT_ENABLED
+  mItemsDirtyRects.rehash(0);
+#endif
+}
+
 void Scene::SetClearColor(const Vector4& color)
 {
   DALI_ASSERT_DEBUG(!mClearValues.empty());
@@ -286,7 +296,6 @@ bool Scene::KeepRenderingCheck(float elapsedSeconds)
     return true;
   }
 
-  mNeedFullUpdate       = false;
   mKeepRenderingSeconds = 0.0f;
   return false;
 }
