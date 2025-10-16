@@ -16,6 +16,7 @@
  */
 
 #include "test-application.h"
+#include "dali-test-suite-utils.h"
 
 namespace Dali
 {
@@ -194,7 +195,7 @@ void TestApplication::DoUpdate(uint32_t intervalMilliseconds, const char* locati
      mRenderStatus.NeedsUpdate() == false &&
      !GetRenderController().WasCalled(TestRenderController::RequestUpdateFunc))
   {
-    fprintf(stderr, "WARNING - Update not required :%s\n", location == NULL ? "NULL" : location);
+    tet_printf("WARNING - Update not required :%s\n", location == NULL ? "NULL" : location);
   }
 
   uint32_t nextVSyncTime  = mLastVSyncTime + intervalMilliseconds;
@@ -247,7 +248,14 @@ bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, 
 bool TestApplication::RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect)
 {
   mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
-  mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/, clippingRect);
+  if(!clippingRect.IsEmpty())
+  {
+    mCore->RenderScene(mRenderStatus, mScene, false /*render the surface*/, clippingRect);
+  }
+  else
+  {
+    tet_printf("INFO - damagedRect is empty!\n");
+  }
   mCore->PostRender();
 
   mFrame++;
@@ -276,7 +284,14 @@ bool TestApplication::RenderWithPartialUpdate(uint32_t intervalMilliseconds, con
     {
       clippingRect.Merge(iter);
     }
-    mCore->RenderScene(mRenderStatus, scene, false /*render the surface*/, clippingRect);
+    if(!clippingRect.IsEmpty())
+    {
+      mCore->RenderScene(mRenderStatus, scene, false /*render the surface*/, clippingRect);
+    }
+    else
+    {
+      tet_printf("INFO - damagedRect is empty!\n");
+    }
   }
   mCore->PostRender();
 

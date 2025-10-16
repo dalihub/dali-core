@@ -1072,14 +1072,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Rendering to %s\n", renderToFbo ? "Framebuffer" : "Surface");
 
-  if(mImpl->partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE && !renderToFbo && clippingRect.IsEmpty())
-  {
-    DALI_LOG_INFO(gLogFilter, Debug::General, "PartialUpdate and no clip\n");
-    DALI_LOG_DEBUG_INFO("ClippingRect was empty. Skip rendering\n");
-    // Should not get here anymore - copied this check to caller.
-    return;
-  }
-
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();
   if(!sceneObject || !sceneObject->GetSurfaceRenderTarget())
