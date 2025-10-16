@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include <dali/internal/update/animation/scene-graph-constraint-container.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/public-api/actors/draw-mode.h>
@@ -51,15 +52,13 @@ Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UP
  * @param propertyOwner to constrain
  * @param updateBufferIndex buffer index to use
  */
-void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint)
+void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint, PropertyOwnerContainer& postPropertyOwners)
 {
-  ConstraintOwnerContainer& constraints = (isPreConstraint) ? propertyOwner.GetConstraints() : propertyOwner.GetPostConstraints();
-
-  const ConstraintIter endIter = constraints.End();
-  for(ConstraintIter iter = constraints.Begin(); iter != endIter; ++iter)
+  ConstraintContainer& constraints = (isPreConstraint) ? propertyOwner.GetConstraints() : propertyOwner.GetPostConstraints();
+  constraints.Apply(updateBufferIndex);
+  if(isPreConstraint && propertyOwner.GetPostConstraintsActivatedCount() > 0u)
   {
-    ConstraintBase& constraint = **iter;
-    constraint.Apply(updateBufferIndex);
+    postPropertyOwners.PushBack(&propertyOwner);
   }
 }
 
@@ -110,11 +109,7 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
   }
 
   // Apply constraints to the node
-  ConstrainPropertyOwner(node, updateBufferIndex);
-  if(!node.GetPostConstraints().Empty())
-  {
-    postPropertyOwners.PushBack(&node);
-  }
+  ConstrainPropertyOwner(node, updateBufferIndex, true, postPropertyOwners);
 
   // Some dirty flags are inherited from parent
   NodePropertyFlags nodeDirtyFlags = node.GetDirtyFlags() | node.GetInheritedDirtyFlags(parentFlags);

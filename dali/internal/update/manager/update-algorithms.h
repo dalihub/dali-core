@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_ALGORITHMS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,9 @@ using PropertyOwnerContainer = Dali::Vector<PropertyOwner*>;
  * @param[in] propertyOwner The PropertyOwner to constrain
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] isPreConstraint True if the constraint is performed before transform.
+ * @param[in,out] postPropertyOwners Collected property owner list if property owner has post constraint. Only be used if isPreConstraint is true.
  */
-void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint = true);
+void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint, PropertyOwnerContainer& postPropertyOwners);
 
 /**
  * Update a tree of nodes
