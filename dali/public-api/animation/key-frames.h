@@ -2,7 +2,7 @@
 #define DALI_KEY_FRAMES_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,7 @@ public:
    *
    * The key frames should be added in time order.
    * @SINCE_1_0.0
+   * @DEPRECATED_2_4.41
    * @param[in] progress A progress value between 0.0 and 1.0
    * @param[in] value A value
    * @param[in] alpha The alpha function used to blend to the next keyframe
