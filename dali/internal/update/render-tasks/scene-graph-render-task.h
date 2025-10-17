@@ -388,6 +388,11 @@ public:
   void SetRenderPassTag(uint32_t renderPassTag);
 
   /**
+   * @brief The render task will be destroyed.
+   */
+  void Destroy();
+
+  /**
    * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
    */
   void ContextDestroyed();

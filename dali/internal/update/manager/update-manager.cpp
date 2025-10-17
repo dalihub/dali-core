@@ -254,11 +254,7 @@ struct UpdateManager::Impl
     {
       if(scene && scene->taskList)
       {
-        RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
-        for(auto&& task : tasks)
-        {
-          task->SetSourceNode(nullptr);
-        }
+        scene->taskList.Reset();
       }
     }
 

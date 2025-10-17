@@ -5628,3 +5628,93 @@ int UtcDaliRenderTaskSetGetRenderedScaleFactor(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskExclusiveAddCacheRenderer(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing that exclusive RenderTask with AddCacheRenderer calls draw, and still draws after RenderTask removed");
+
+  // Setup GL abstraction for tracking draw calls
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Create scene and actors
+  Integration::Scene stage    = application.GetScene();
+  RenderTaskList     taskList = stage.GetRenderTaskList();
+
+  // Create a renderable actor
+  Texture image           = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
+  Actor   renderableActor = CreateRenderableActor(image);
+  renderableActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  stage.Add(renderableActor);
+
+  // Create camera for offscreen rendering
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  stage.Add(offscreenCameraActor);
+
+  // Create framebuffer for offscreen rendering
+  FrameBuffer frameBuffer        = FrameBuffer::New(100, 100);
+  Texture     frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  // Create exclusive render task
+  RenderTask exclusiveTask = taskList.CreateTask();
+  exclusiveTask.SetCameraActor(offscreenCameraActor);
+  exclusiveTask.SetSourceActor(renderableActor);
+  exclusiveTask.SetInputEnabled(false);
+  exclusiveTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  exclusiveTask.SetClearEnabled(true);
+  exclusiveTask.SetExclusive(true);
+  exclusiveTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+  exclusiveTask.SetFrameBuffer(frameBuffer);
+
+  // Add cache renderer to the exclusive task
+  Shader   cachedShader  = CreateShader();
+  Geometry quadGeometry  = CreateQuadGeometry();
+  Renderer cacheRenderer = Renderer::New(quadGeometry, cachedShader);
+  DALI_TEST_CHECK(cacheRenderer);
+  TextureSet textureSet = TextureSet::New();
+  DALI_TEST_CHECK(textureSet);
+  textureSet.SetTexture(0u, frameBufferTexture);
+  cacheRenderer.SetTextures(textureSet);
+  renderableActor.AddCacheRenderer(cacheRenderer);
+
+  // Initial render - should draw the actor
+  application.SendNotification();
+  application.Render();
+
+  // Check that draw was called for the exclusive task
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawElements") || drawTrace.FindMethod("DrawArrays"));
+  int initialDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
+  DALI_TEST_GREATER(initialDrawCount, 0, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Second render - should still draw due to REFRESH_ALWAYS
+  application.SendNotification();
+  application.Render();
+
+  // Check that draw was called again
+  int secondDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
+  DALI_TEST_GREATER(secondDrawCount, 0, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Remove the exclusive render task
+  renderableActor.RemoveCacheRenderer(cacheRenderer);
+  taskList.RemoveTask(exclusiveTask);
+
+  // Render after removing the exclusive task - should still draw the cache renderer
+  application.SendNotification();
+  application.Render();
+
+  // Check that draw is still called for the cache renderer even after task removal
+  int afterRemovalDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
+  DALI_TEST_GREATER(afterRemovalDrawCount, 0, TEST_LOCATION);
+
+  tet_printf("Initial draws: %d, Second draws: %d, After removal draws: %d\n", initialDrawCount, secondDrawCount, afterRemovalDrawCount);
+
+  END_TEST;
+}
