@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_FRAMES_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,10 +66,9 @@ public:
    * added, it will throw a run time assert.
    * @param[in] time The time (between 0 and 1)
    * @param[in] value The value of the keyframe at the given time
-   * @param[in] alpha An alpha function to blend between this key frame and the
    * next key frame.
    */
-  void Add(float time, const Property::Value& value, AlphaFunction alpha);
+  void Add(float time, const Property::Value& value);
 
   /**
    * Return the key frames without specialization. The GetSpecialization methods
@@ -156,7 +155,7 @@ public:
    * @param[in] v - value
    * @param[in] alpha - Alpha function for blending to the next keyframe
    */
-  void AddKeyFrame(float t, V v, AlphaFunction alpha)
+  void AddKeyFrame(float t, V v)
   {
     mChannel.mValues.push_back({t, v});
   }
