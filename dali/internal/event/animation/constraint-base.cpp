@@ -211,7 +211,14 @@ void ConstraintBase::SetApplyRate(uint32_t applyRate)
     {
       SceneGraph::PropertyOwner& targetObject = const_cast<SceneGraph::PropertyOwner&>(mTargetObject->GetSceneObject());
 
-      // TODO : Notify to property owner that apply rate chagend.
+      if(mIsPreConstraint)
+      {
+        ConstraintApplyRateChangedMessage(GetEventThreadServices(), targetObject, *(mSceneGraphConstraint));
+      }
+      else
+      {
+        PostConstraintApplyRateChangedMessage(GetEventThreadServices(), targetObject, *(mSceneGraphConstraint));
+      }
 
       const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty(mTargetPropertyIndex);
       // The targetProperty should exist, when targetObject exists

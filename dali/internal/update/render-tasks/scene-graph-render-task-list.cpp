@@ -59,7 +59,10 @@ RenderTaskList::RenderTaskList()
 {
 }
 
-RenderTaskList::~RenderTaskList() = default;
+RenderTaskList::~RenderTaskList()
+{
+  DestroyTasks();
+}
 
 void RenderTaskList::operator delete(void* ptr)
 {
@@ -89,11 +92,35 @@ void RenderTaskList::RemoveTask(RenderTask* task)
   auto iter = mRenderTasks.Find(task);
   if(iter != mRenderTasks.End())
   {
+    // Destroy variables synchronously before discard queue destruct the task.
+    task->Destroy();
+
     // Discard the task. Move ownership to property owner manager.
     // DevNote : Since RenderTaskList itself could be removed at the same frame with
     //           RenderTask dirty, discarded memory ownership must be out of RenderTaskList.
     mPropertyOwnerFlagManager->DiscardPropertyOwner(mRenderTasks.Release(iter));
   }
+}
+
+void RenderTaskList::DestroyTasks()
+{
+  for(auto iter = mRenderTasks.Begin(), endIter = mRenderTasks.End(); iter != endIter; ++iter)
+  {
+    // Destroy variables synchronously before discard queue destruct the task.
+    SceneGraph::RenderTask* task = *iter;
+    task->Destroy();
+
+    // Discard the task. Move ownership to property owner manager.
+    // DevNote : Since RenderTaskList itself could be removed at the same frame with
+    //           RenderTask dirty, discarded memory ownership must be out of RenderTaskList.
+    mPropertyOwnerFlagManager->DiscardPropertyOwner(task);
+
+    // Store nullptr to iter, to avoid delete called.
+    (*iter) = nullptr;
+  }
+
+  // Container changed. Should clear it now.
+  mRenderTasks.Clear();
 }
 
 void RenderTaskList::SortTasks(OwnerPointer<std::vector<const SceneGraph::RenderTask*>>& sortedTasks)

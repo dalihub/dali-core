@@ -29,7 +29,7 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
+#include <dali/internal/update/animation/scene-graph-constraint-container.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/uniform-map.h>
@@ -239,6 +239,12 @@ public:
   void RemoveConstraint(ConstraintBase* constraint);
 
   /**
+   * Notify that constraint apply rate chagned.
+   * @param[in] constraint The apply rate changed constraint.
+   */
+  void ConstraintApplyRateChanged(ConstraintBase* constraint);
+
+  /**
    * Apply a post constraint.
    * @param[in] constraint The constraint to apply.
    */
@@ -251,16 +257,28 @@ public:
   void RemovePostConstraint(ConstraintBase* constraint);
 
   /**
+   * Notify that post constraint apply rate chagned.
+   * @param[in] constraint The apply rate changed post constraint.
+   */
+  void PostConstraintApplyRateChanged(ConstraintBase* constraint);
+
+  /**
    * Retrieve the constraints that are currently applied.
    * @return A container of constraints.
    */
-  ConstraintOwnerContainer& GetConstraints();
+  ConstraintContainer& GetConstraints();
 
   /**
    * Retrieve the post constraints that are currently applied.
    * @return A container of post constraints.
    */
-  ConstraintOwnerContainer& GetPostConstraints();
+  ConstraintContainer& GetPostConstraints();
+
+  /**
+   * Retrieve the number of activated post constraints that are currently applied.
+   * @return The number of activated post constraints.
+   */
+  uint32_t GetPostConstraintsActivatedCount() const;
 
   /**
    * @copydoc UniformMap::Add
@@ -337,8 +355,8 @@ private:
 
   ObserverContainer mObservers; ///< Container of observer raw-pointers (not owned)
 
-  ConstraintOwnerContainer mConstraints;     ///< Container of owned constraints
-  ConstraintOwnerContainer mPostConstraints; ///< Container of owned constraints
+  ConstraintContainer mConstraints;     ///< Container of owned constraints
+  ConstraintContainer mPostConstraints; ///< Container of owned constraints
 
   bool mObserverNotifying : 1; ///< Whether we are currently notifying observers.
 };

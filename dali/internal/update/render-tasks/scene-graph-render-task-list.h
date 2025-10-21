@@ -96,6 +96,11 @@ public:
   void RemoveTask(RenderTask* task);
 
   /**
+   * Remove all RenderTasks from the list.
+   */
+  void DestroyTasks();
+
+  /**
    * Retrieve the count of RenderTasks.
    * @return The count.
    */

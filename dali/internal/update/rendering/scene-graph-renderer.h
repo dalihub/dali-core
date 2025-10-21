@@ -26,6 +26,7 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer

@@ -501,7 +501,8 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
 
   // Clone the constraint & apply the clone
   Constraint constraintClone = constraint.Clone(clone);
-  constraintClone.Apply();
+  constraint.Apply();
+  constraintClone.ApplyPost();
 
   application.SendNotification();
   application.Render();
@@ -1090,6 +1091,97 @@ int UtcDaliConstraintSetApplyRateCallbackCount01(void)
     calledCount = 0;
   }
 
+  // Change to APPLY_ONCE again (for line coverage)
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+
+  // Check changing apply-rate call function.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.Remove();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  // Test for post.
+  DALI_TEST_EQUALS(constraint.GetApplyRate(), Constraint::APPLY_ONCE, TEST_LOCATION);
+  constraint.ApplyPost();
+
+  application.SendNotification();
+  application.Render();
+
+  // Check newly applied constraint call function.
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  // Check apply function called only once.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+
+  // Check changing apply-rate call function.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  // Check apply function called only once.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+  }
+
+  // Check function call per every 3 frames. It will be called apply rate changed frame.
+  constraint.SetApplyRate(3u);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+    calledCount = 0;
+  }
+
   constraint.Remove();
 
   application.SendNotification();
@@ -1125,7 +1217,7 @@ int UtcDaliConstraintSetApplyRateCallbackCount02(void)
 
   Property::Index customIndex = actor.RegisterProperty("customProperty", 0.0f);
 
-  // Create a constraint that constrains to position
+  // Create a constraint that constrains to custom property
   Constraint constraint = Constraint::New<float>(actor, customIndex, CalledCountFunctor<float>(calledCount));
   constraint.SetRemoveAction(Constraint::BAKE);
   constraint.SetApplyRate(Constraint::APPLY_ONCE);
@@ -1154,6 +1246,77 @@ int UtcDaliConstraintSetApplyRateCallbackCount02(void)
   application.SendNotification();
   application.Render();
 
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  // Check apply function called only once.
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+  }
+
+  // Check function call per every 3 frames. It will be called apply rate changed frame.
+  constraint.SetApplyRate(3u);
+
+  for(int trialCount = 0; trialCount < 10; ++trialCount)
+  {
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+    calledCount = 0;
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+    calledCount = 0;
+  }
+
+  // Change to APPLY_ONCE again (for line coverage)
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+
+  // Check changing apply-rate call function.
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
+  calledCount = 0;
+
+  constraint.Remove();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(calledCount, 0, TEST_LOCATION);
+  calledCount = 0;
+
+  // Test for post.
+  DALI_TEST_EQUALS(constraint.GetApplyRate(), Constraint::APPLY_ONCE, TEST_LOCATION);
+  constraint.ApplyPost();
+
+  application.SendNotification();
+  application.Render();
+
+  // Check newly applied constraint call function.
   DALI_TEST_EQUALS(calledCount, 1, TEST_LOCATION);
   calledCount = 0;
 

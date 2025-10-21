@@ -137,6 +137,15 @@ private:
     mImpl->OnAnimateAnimatableProperty(animationHandle, index, state);
   }
 
+  /**
+   * @copydoc Dali::Internal::Object::ConstraintAnimatableProperty()
+   */
+  void ConstraintAnimatableProperty(ConstraintBase& constraint, Property::Index index, bool applied) override
+  {
+    Dali::Constraint constraintHandle(&constraint);
+    mImpl->OnConstraintAnimatableProperty(constraintHandle, index, applied);
+  }
+
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
   {
     mImpl->GetOffScreenRenderTasks(tasks, isForward);

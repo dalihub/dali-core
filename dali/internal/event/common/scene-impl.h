@@ -95,6 +95,11 @@ public:
   bool IsVisible() const;
 
   /**
+   * @copydoc Dali::Integration::Scene::RequestFullUpdate
+   */
+  void RequestFullUpdate();
+
+  /**
    * @copydoc Dali::Integration::Scene::GetSize
    */
   Size GetSize() const;

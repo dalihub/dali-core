@@ -182,6 +182,22 @@ bool Scene::IsVisible() const
   return mIsVisible;
 }
 
+void Scene::RequestFullUpdate()
+{
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
+  {
+    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+
+    using LocalType = Message<Internal::SceneGraph::Scene>;
+
+    // Reserve some memory inside the message queue
+    uint32_t* slot = tls->GetUpdateManager().ReserveMessageSlot(sizeof(LocalType));
+
+    // Construct message in the message queue memory; note that delete should not be called on the return value
+    new(slot) LocalType(mSceneObject, &Internal::SceneGraph::Scene::ClearItemsDirtyRects);
+  }
+}
+
 Size Scene::GetSize() const
 {
   return mSize;
@@ -262,7 +278,7 @@ void Scene::SurfaceResized(float width, float height)
 
 void Scene::SurfaceReplaced()
 {
-  if(mSceneObject)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
   {
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     SurfaceReplacedMessage(tls->GetUpdateManager(), *mSceneObject);

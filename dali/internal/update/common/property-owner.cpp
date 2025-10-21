@@ -180,7 +180,7 @@ void PropertyOwner::RequestResetUpdated() const
   gPropertyOwnerFlagManager->RequestResetUpdated(*this);
 }
 
-ConstraintOwnerContainer& PropertyOwner::GetConstraints()
+ConstraintContainer& PropertyOwner::GetConstraints()
 {
   return mConstraints;
 }
@@ -193,22 +193,23 @@ void PropertyOwner::ApplyConstraint(OwnerPointer<ConstraintBase>& constraint)
 
 void PropertyOwner::RemoveConstraint(ConstraintBase* constraint)
 {
-  const ConstraintIter constraintEndIter = mConstraints.End();
-  for(ConstraintIter iter = mConstraints.Begin(); constraintEndIter != iter; ++iter)
-  {
-    if(*iter == constraint)
-    {
-      mConstraints.Erase(iter);
-      return; // We're finished
-    }
-  }
-
+  mConstraints.EraseObject(constraint);
   // it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
 }
 
-ConstraintOwnerContainer& PropertyOwner::GetPostConstraints()
+void PropertyOwner::ConstraintApplyRateChanged(ConstraintBase* constraint)
+{
+  mConstraints.ApplyRateChanged(constraint);
+}
+
+ConstraintContainer& PropertyOwner::GetPostConstraints()
 {
   return mPostConstraints;
+}
+
+uint32_t PropertyOwner::GetPostConstraintsActivatedCount() const
+{
+  return mPostConstraints.ActivateCount();
 }
 
 void PropertyOwner::ApplyPostConstraint(OwnerPointer<ConstraintBase>& constraint)
@@ -219,17 +220,13 @@ void PropertyOwner::ApplyPostConstraint(OwnerPointer<ConstraintBase>& constraint
 
 void PropertyOwner::RemovePostConstraint(ConstraintBase* constraint)
 {
-  const ConstraintIter constraintEndIter = mPostConstraints.End();
-  for(ConstraintIter iter = mPostConstraints.Begin(); constraintEndIter != iter; ++iter)
-  {
-    if(*iter == constraint)
-    {
-      mPostConstraints.Erase(iter);
-      return; // We're finished
-    }
-  }
-
+  mPostConstraints.EraseObject(constraint);
   // it may be that the constraint has already been removed e.g. from disconnection from scene graph, so nothing needs to be done
+}
+
+void PropertyOwner::PostConstraintApplyRateChanged(ConstraintBase* constraint)
+{
+  mPostConstraints.ApplyRateChanged(constraint);
 }
 
 PropertyOwner::PropertyOwner()

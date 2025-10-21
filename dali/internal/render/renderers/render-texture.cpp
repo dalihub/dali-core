@@ -147,6 +147,12 @@ Render::Texture* Texture::Get(TextureKey::KeyType key)
   return static_cast<Render::Texture*>(gMemoryPoolCollection->GetPtrFromKey(gMemoryPoolType, key));
 }
 
+TextureKey Texture::GetKey(Render::Texture* ptr)
+{
+  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
+  return TextureKey(gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr));
+}
+
 void Texture::Initialize(Graphics::Controller& graphicsController, SceneGraph::RenderManager& renderManager)
 {
   mGraphicsController = &graphicsController;
