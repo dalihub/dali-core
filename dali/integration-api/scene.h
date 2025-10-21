@@ -185,6 +185,12 @@ public:
   bool IsVisible() const;
 
   /**
+   * @brief Informs the scene need full update.
+   * @SINCE_2_4.42
+   */
+  void RequestFullUpdate();
+
+  /**
    * @brief Returns the size of the Scene in pixels as a Vector.
    *
    * The x component will be the width of the Scene in pixels.

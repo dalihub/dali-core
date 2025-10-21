@@ -342,11 +342,14 @@ public:
 
   /**
    * @brief Query if the scene needs full update
+   * @note This will reset full-update flag
    * @return True if the scene needs full update
    */
-  bool IsNeededFullUpdate() const
+  bool IsFullUpdateNeeded()
   {
-    return mNeedFullUpdate;
+    bool needFullUpdate = mNeedFullUpdate;
+    mNeedFullUpdate     = false;
+    return needFullUpdate;
   }
 
   void SetHasRenderInstructionToScene(bool renderInstructionExist)
@@ -385,6 +388,12 @@ public:
    * @return the ItemsDirtyRects
    */
   ItemsDirtyRectsContainer& GetItemsDirtyRects();
+
+  /**
+   * @brief Clear ItemsDirtyRects.
+   * @note We will full-update next frame.
+   */
+  void ClearItemsDirtyRects();
 
 public: // From RenderTargetGraphicsObjects
   /**
