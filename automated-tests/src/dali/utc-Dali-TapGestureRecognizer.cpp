@@ -742,3 +742,81 @@ int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
 
   END_TEST;
 }
+
+int UtcDaliTapGestureRecognizerTwoActors(void)
+{
+  TestApplication application;
+
+  // Create first actor
+  Actor actor1 = Actor::New();
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor1);
+
+  // Create second actor
+  Actor actor2 = Actor::New();
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::POSITION_X, 100.0f);
+  application.GetScene().Add(actor2);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Create tap gesture detectors for each actor
+  TapGestureDetector detector1 = TapGestureDetector::New();
+  TapGestureDetector detector2 = TapGestureDetector::New();
+
+  detector1.Attach(actor1);
+  detector2.Attach(actor2);
+
+  // Set up signal data for each actor
+  SignalData             data1;
+  GestureReceivedFunctor functor1(data1);
+  detector1.DetectedSignal().Connect(&application, functor1);
+
+  SignalData             data2;
+  GestureReceivedFunctor functor2(data2);
+  detector2.DetectedSignal().Connect(&application, functor2);
+
+  // Test 1: Tap on first actor
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(95.0f, 50.0f), 150));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(95.0f, 50.0f), 200));
+  application.SendNotification();
+  application.GetPlatform().TriggerTimer();
+
+  DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, actor1 == data1.tappedActor, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
+
+  // Reset signal data
+  data1.Reset();
+  data2.Reset();
+
+  // Test 2: Tap on second actor
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(105.0f, 50.0f), 250));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(105.0f, 50.0f), 300));
+  application.SendNotification();
+  application.GetPlatform().TriggerTimer();
+
+  DALI_TEST_EQUALS(false, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, actor2 == data2.tappedActor, TEST_LOCATION);
+
+  // Reset signal data
+  data1.Reset();
+  data2.Reset();
+
+  // Test 3: Tap on first actor again to verify independence
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(95.0f, 50.0f), 350));
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(95.0f, 50.0f), 400));
+  application.SendNotification();
+  application.GetPlatform().TriggerTimer();
+
+  DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, actor1 == data1.tappedActor, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}

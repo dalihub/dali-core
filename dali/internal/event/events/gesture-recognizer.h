@@ -44,6 +44,12 @@ class RecognizerObserver
 public:
   virtual void Process(Scene& scene, const T& event) = 0;
 
+  /**
+   * Get the current gestured actor
+   * @return The current gestured actor, or nullptr if no actor is currently gestured
+   */
+  virtual Actor* GetCurrentGesturedActor() = 0;
+
   virtual ~RecognizerObserver() = default;
   ;
 };

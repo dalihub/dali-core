@@ -24,6 +24,7 @@
 #include <cstdint>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/events/gesture-recognizer.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-event.h>
 
@@ -122,8 +123,9 @@ private:
    * Emit a touch down event for hit testing
    *
    * @param[in] event registered touch event
+   * @param[in] touchPosition position touch event occurred
    */
-  void EmitPossibleState(const Integration::TouchEvent& event);
+  void EmitPossibleState(const Integration::TouchEvent& event, const Vector2& touchPosition);
 
   /**
    * Force a touch event sequence to be treated as a single tap
@@ -147,6 +149,18 @@ private:
    * @param[in] tap event for processing
    */
   void ProcessEvent(TapGestureEvent& event);
+
+  /**
+   * Get the current gestured actor from the gesture processor.
+   * @return The most recent hit actor, or empty handle if no hit-test was performed
+   */
+  Dali::Actor GetCurrentGesturedActor();
+
+  /**
+   * Update the current actor based on hit-test result.
+   * @return true if the actor changed, false if the actor is the same
+   */
+  bool UpdateCurrentActor();
 
 private:
   // Reference to the gesture processor for this recognizer
@@ -173,6 +187,7 @@ private:
   uint32_t mMaximumAllowedTime;           ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
   uint32_t mRecognizerTime;               ///< The recognizer time required to be recognized as a tap gesture (millisecond)
   float    mMaximumMotionAllowedDistance; ///< The recognizer distance required to be recognized as a tap gesture
+  ActorObserver mCurrentActor;             ///< The current actor that was hit-tested at the touch position
 };
 
 } // namespace Internal

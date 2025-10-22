@@ -82,6 +82,12 @@ public: // To be called by GestureEventProcessor
   void Process(Scene& scene, const PinchGestureEvent& pinchEvent) override;
 
   /**
+   * Get the current gestured actor
+   * @return The current gestured actor, or nullptr if no actor is currently gestured
+   */
+  Actor* GetCurrentGesturedActor() override;
+
+  /**
    * Adds a gesture detector to this gesture processor.
    * If this is the first gesture detector being added, then this method registers the required
    * gesture with the adaptor.

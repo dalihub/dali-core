@@ -230,7 +230,7 @@ void LongPressGestureDetector::Process(Scene& scene, const LongPressGestureEvent
   {
     case GestureState::POSSIBLE:
     {
-      mCurrentLongPressActor.SetActor(mFeededActor.GetActor());
+      mCurrentLongPressActor.SetActor(GetCurrentGesturedActor());
       break;
     }
 
@@ -300,6 +300,12 @@ void LongPressGestureDetector::EmitLongPressSignal(Actor* actor, const LongPress
 
   Dali::Actor actorHandle(actor);
   EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));
+}
+
+Actor* LongPressGestureDetector::GetCurrentGesturedActor()
+{
+  // Return the current feeded actor
+  return GestureDetector::GetCurrentGesturedActor();
 }
 
 } // namespace Internal

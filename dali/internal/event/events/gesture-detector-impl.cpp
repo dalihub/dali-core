@@ -403,6 +403,12 @@ void GestureDetector::ObjectDestroyed(Object& object)
   }
 }
 
+Actor* GestureDetector::GetCurrentGesturedActor()
+{
+  // Return the current feeded actor
+  return mFeededActor.GetActor();
+}
+
 } // namespace Internal
 
 } // namespace Dali

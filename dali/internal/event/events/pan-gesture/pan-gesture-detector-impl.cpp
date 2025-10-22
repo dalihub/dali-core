@@ -516,7 +516,7 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
   {
     case GestureState::POSSIBLE:
     {
-      mCurrentPanActor.SetActor(mFeededActor.GetActor());
+      mCurrentPanActor.SetActor(GetCurrentGesturedActor());
       mPossiblePanPosition = panEvent.currentPosition;
       break;
     }
@@ -525,7 +525,7 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
     {
       // The pan gesture should only be sent to the gesture detector which first received it so that
       // it can be told when the gesture ends as well.
-      Actor* feededActor = mFeededActor.GetActor();
+      Actor* feededActor = GetCurrentGesturedActor();
       if(feededActor && CheckGestureDetector(&panEvent, feededActor, mRenderTask, mPossiblePanPosition))
       {
         Vector2 actorCoords;
@@ -547,7 +547,7 @@ void PanGestureDetector::Process(Scene& scene, const PanGestureEvent& panEvent)
     case GestureState::CONTINUING:
     {
       Actor* currentGesturedActor = mCurrentPanActor.GetActor();
-      Actor* feededActor          = mFeededActor.GetActor();
+      Actor* feededActor          = GetCurrentGesturedActor();
       if(currentGesturedActor && currentGesturedActor->NeedGesturePropagation() && feededActor && feededActor != currentGesturedActor)
       {
         if(feededActor->IsHittable() && CheckGestureDetector(&panEvent, feededActor, mRenderTask, mPossiblePanPosition))
@@ -745,6 +745,12 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
   Dali::Actor actorHandle(actor);
 
   EmitPanGestureSignal(actorHandle, Dali::PanGesture(pan.Get()));
+}
+
+Actor* PanGestureDetector::GetCurrentGesturedActor()
+{
+  // Return the current feeded actor
+  return GestureDetector::GetCurrentGesturedActor();
 }
 
 } // namespace Internal

@@ -189,6 +189,12 @@ private: // GestureDetector overrides
    */
   void Process(Scene& scene, const LongPressGestureEvent& longPressEvent) override;
 
+  /**
+   * Get the current gestured actor
+   * @return The current gestured actor, or nullptr if no actor is currently gestured
+   */
+  Actor* GetCurrentGesturedActor() override;
+
 private:
   Dali::LongPressGestureDetector::DetectedSignalType mDetectedSignal;
 

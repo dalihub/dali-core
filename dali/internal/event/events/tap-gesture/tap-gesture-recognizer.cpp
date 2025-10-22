@@ -26,6 +26,7 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 
@@ -137,7 +138,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           }
           else
           {
-            EmitPossibleState(event);
+            EmitPossibleState(event, screen);
           }
         }
         break;
@@ -164,22 +165,42 @@ void TapGestureRecognizer::CancelEvent()
 
 void TapGestureRecognizer::SetupForTouchDown(const Integration::TouchEvent& event, const Integration::Point& point)
 {
-  mTouchPosition  = point.GetScreenPosition();
-  mTouchTime      = event.time;
-  mLastTapTime    = 0u;
-  mState          = TOUCHED;
-  mTapsRegistered = 0u;
-
-  EmitPossibleState(event);
+  mCurrentActor.ResetActor();
+  EmitPossibleState(event, point.GetScreenPosition());
 }
 
-void TapGestureRecognizer::EmitPossibleState(const Integration::TouchEvent& event)
+void TapGestureRecognizer::EmitPossibleState(const Integration::TouchEvent& event, const Vector2& touchPosition)
 {
   TapGestureEvent tapEvent(GestureState::POSSIBLE);
-  tapEvent.point = mTouchPosition;
+  tapEvent.point = touchPosition;
   tapEvent.time  = event.time;
 
   ProcessEvent(tapEvent);
+
+  // After ProcessEvent, check if the hit-tested actor has changed
+  if(UpdateCurrentActor())
+  {
+    // Actor changed, reset tap state for the new actor
+    mTouchPosition  = touchPosition;
+    mTouchTime      = event.time;
+    mLastTapTime    = 0u;
+    mTapsRegistered = 0u;
+    mState          = TOUCHED;
+  }
+}
+
+bool TapGestureRecognizer::UpdateCurrentActor()
+{
+  Dali::Actor currentActor = GetCurrentGesturedActor();
+  Actor* currentInternalActor = currentActor ? &GetImplementation(currentActor) : nullptr;
+
+  if(currentInternalActor != mCurrentActor.GetActor())
+  {
+    mCurrentActor.SetActor(currentInternalActor);
+    return true; // Actor changed
+  }
+
+  return false; // Actor unchanged
 }
 
 void TapGestureRecognizer::Update(const GestureRequest& request)
@@ -245,6 +266,13 @@ void TapGestureRecognizer::ProcessEvent(TapGestureEvent& event)
     GestureRecognizerPtr recognizerHandle = this;
     mObserver.Process(*mScene, event);
   }
+}
+
+Dali::Actor TapGestureRecognizer::GetCurrentGesturedActor()
+{
+  // Use the RecognizerObserver interface to get the current gestured actor
+  Actor* currentActor = mObserver.GetCurrentGesturedActor();
+  return Dali::Actor(currentActor);
 }
 
 } // namespace Internal

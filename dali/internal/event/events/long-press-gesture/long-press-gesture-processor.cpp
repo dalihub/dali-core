@@ -277,6 +277,12 @@ void LongPressGestureProcessor::GestureDetectorUpdated(LongPressGestureDetector*
   UpdateDetection();
 }
 
+Actor* LongPressGestureProcessor::GetCurrentGesturedActor()
+{
+  // Call the base class implementation
+  return GestureProcessor::GetCurrentGesturedActor();
+}
+
 void LongPressGestureProcessor::SetMinimumHoldingTime(uint32_t time)
 {
   if(time > 0u && mMinimumHoldingTime != time)
