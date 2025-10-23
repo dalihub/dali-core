@@ -664,7 +664,7 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, TimeP
 void Animation::AnimateBy(Property& target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period)
 {
   Object&              object       = GetImplementation(target.object);
-  const Property::Type propertyType = (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? object.GetPropertyType(target.propertyIndex) : Property::FLOAT;
+  const Property::Type propertyType = object.GetPropertyType(target.propertyIndex);
 
   // validate and convert animation parameters, if component index is set then use float as checked type
   ValidateAndConvertParameters(propertyType, period, relativeValue);
@@ -680,7 +680,6 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
     {
       AddAnimatorConnector(AnimatorConnector<bool>::New(object,
                                                         target.propertyIndex,
-                                                        target.componentIndex,
                                                         AnimateByBoolean(relativeValue.Get<bool>()),
                                                         alpha,
                                                         period));
@@ -691,7 +690,6 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
     {
       AddAnimatorConnector(AnimatorConnector<int32_t>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateByInteger(relativeValue.Get<int32_t>()),
                                                            alpha,
                                                            period));
@@ -702,7 +700,6 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
     {
       AddAnimatorConnector(AnimatorConnector<float>::New(object,
                                                          target.propertyIndex,
-                                                         target.componentIndex,
                                                          AnimateByFloat(relativeValue.Get<float>()),
                                                          alpha,
                                                          period));
@@ -713,7 +710,6 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
     {
       AddAnimatorConnector(AnimatorConnector<Vector2>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateByVector2(relativeValue.Get<Vector2>()),
                                                            alpha,
                                                            period));
@@ -724,7 +720,6 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
     {
       AddAnimatorConnector(AnimatorConnector<Vector3>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateByVector3(relativeValue.Get<Vector3>()),
                                                            alpha,
                                                            period));
@@ -735,7 +730,6 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
     {
       AddAnimatorConnector(AnimatorConnector<Vector4>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateByVector4(relativeValue.Get<Vector4>()),
                                                            alpha,
                                                            period));
@@ -748,7 +742,6 @@ void Animation::AnimateBy(Property& target, Property::Value relativeValue, Alpha
 
       AddAnimatorConnector(AnimatorConnector<Quaternion>::New(object,
                                                               target.propertyIndex,
-                                                              target.componentIndex,
                                                               RotateByAngleAxis(angleAxis.angle, angleAxis.axis),
                                                               alpha,
                                                               period));
@@ -782,7 +775,7 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Ti
 void Animation::AnimateTo(Property& target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period)
 {
   Object&              object       = GetImplementation(target.object);
-  const Property::Type propertyType = (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? object.GetPropertyType(target.propertyIndex) : Property::FLOAT;
+  const Property::Type propertyType = object.GetPropertyType(target.propertyIndex);
 
   // validate and convert animation parameters, if component index is set then use float as checked type
   ValidateAndConvertParameters(propertyType, period, destinationValue);
@@ -798,7 +791,6 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
     {
       AddAnimatorConnector(AnimatorConnector<bool>::New(object,
                                                         target.propertyIndex,
-                                                        target.componentIndex,
                                                         AnimateToBoolean(destinationValue.Get<bool>()),
                                                         alpha,
                                                         period));
@@ -809,7 +801,6 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
     {
       AddAnimatorConnector(AnimatorConnector<int32_t>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateToInteger(destinationValue.Get<int32_t>()),
                                                            alpha,
                                                            period));
@@ -820,7 +811,6 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
     {
       AddAnimatorConnector(AnimatorConnector<float>::New(object,
                                                          target.propertyIndex,
-                                                         target.componentIndex,
                                                          AnimateToFloat(destinationValue.Get<float>()),
                                                          alpha,
                                                          period));
@@ -831,7 +821,6 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
     {
       AddAnimatorConnector(AnimatorConnector<Vector2>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateToVector2(destinationValue.Get<Vector2>()),
                                                            alpha,
                                                            period));
@@ -842,7 +831,6 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
     {
       AddAnimatorConnector(AnimatorConnector<Vector3>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateToVector3(destinationValue.Get<Vector3>()),
                                                            alpha,
                                                            period));
@@ -853,7 +841,6 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
     {
       AddAnimatorConnector(AnimatorConnector<Vector4>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            AnimateToVector4(destinationValue.Get<Vector4>()),
                                                            alpha,
                                                            period));
@@ -864,7 +851,6 @@ void Animation::AnimateTo(Property& target, Property::Value destinationValue, Al
     {
       AddAnimatorConnector(AnimatorConnector<Quaternion>::New(object,
                                                               target.propertyIndex,
-                                                              target.componentIndex,
                                                               RotateToQuaternion(destinationValue.Get<Quaternion>()),
                                                               alpha,
                                                               period));
@@ -920,7 +906,7 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
   Object&          object        = GetImplementation(target.object);
   const KeyFrames& keyFramesImpl = GetImplementation(keyFrames);
 
-  const Property::Type propertyType = (target.componentIndex == Property::INVALID_COMPONENT_INDEX) ? object.GetPropertyType(target.propertyIndex) : Property::FLOAT;
+  const Property::Type propertyType = object.GetPropertyType(target.propertyIndex);
 
   auto lastKeyFrameValue = keyFramesImpl.GetLastKeyFrameValue();
   ValidateAndConvertParameters(propertyType, period, lastKeyFrameValue);
@@ -956,7 +942,6 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
       auto kf = GetSpecialization<const KeyFrameBoolean*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<bool>::New(object,
                                                         target.propertyIndex,
-                                                        target.componentIndex,
                                                         KeyFrameBooleanFunctor(*kf), // takes a copy of the keyframe
                                                         alpha,
                                                         period));
@@ -968,7 +953,6 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
       auto kf = GetSpecialization<const KeyFrameInteger*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<int32_t>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            KeyFrameIntegerFunctor(*kf, interpolation), // takes a copy of the keyframe
                                                            alpha,
                                                            period));
@@ -980,7 +964,6 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
       auto kf = GetSpecialization<const KeyFrameNumber*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<float>::New(object,
                                                          target.propertyIndex,
-                                                         target.componentIndex,
                                                          KeyFrameNumberFunctor(*kf, interpolation), // takes a copy of the keyframe
                                                          alpha,
                                                          period));
@@ -992,7 +975,6 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
       auto kf = GetSpecialization<const KeyFrameVector2*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Vector2>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            KeyFrameVector2Functor(*kf, interpolation), // takes a copy of the keyframe
                                                            alpha,
                                                            period));
@@ -1004,7 +986,6 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
       auto kf = GetSpecialization<const KeyFrameVector3*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Vector3>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            KeyFrameVector3Functor(*kf, interpolation), // takes a copy of the keyframe
                                                            alpha,
                                                            period));
@@ -1016,7 +997,6 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
       auto kf = GetSpecialization<const KeyFrameVector4*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Vector4>::New(object,
                                                            target.propertyIndex,
-                                                           target.componentIndex,
                                                            KeyFrameVector4Functor(*kf, interpolation), // takes a copy of the keyframe
                                                            alpha,
                                                            period));
@@ -1028,7 +1008,6 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
       auto kf = GetSpecialization<const KeyFrameQuaternion*>(keyFramesImpl);
       AddAnimatorConnector(AnimatorConnector<Quaternion>::New(object,
                                                               target.propertyIndex,
-                                                              target.componentIndex,
                                                               KeyFrameQuaternionFunctor(*kf), // takes a copy of the keyframe
                                                               alpha,
                                                               period));
@@ -1176,7 +1155,6 @@ void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward, 
   // Position animation
   AddAnimatorConnector(AnimatorConnector<Vector3>::New(actor,
                                                        Dali::Actor::Property::POSITION,
-                                                       Property::INVALID_COMPONENT_INDEX,
                                                        PathPositionFunctor(pathCopy),
                                                        alpha,
                                                        period));
@@ -1187,7 +1165,6 @@ void Animation::Animate(Actor& actor, const Path& path, const Vector3& forward, 
     // Rotation animation
     AddAnimatorConnector(AnimatorConnector<Quaternion>::New(actor,
                                                             Dali::Actor::Property::ORIENTATION,
-                                                            Property::INVALID_COMPONENT_INDEX,
                                                             PathRotationFunctor(pathCopy, forward),
                                                             alpha,
                                                             period));
@@ -1200,7 +1177,6 @@ void Animation::Show(Actor& actor, float delaySeconds)
 
   AddAnimatorConnector(AnimatorConnector<bool>::New(actor,
                                                     Dali::Actor::Property::VISIBLE,
-                                                    Property::INVALID_COMPONENT_INDEX,
                                                     AnimateToBoolean(SHOW_VALUE),
                                                     mDefaultAlpha,
                                                     TimePeriod(delaySeconds, 0.0f /*immediate*/)));
@@ -1212,7 +1188,6 @@ void Animation::Hide(Actor& actor, float delaySeconds)
 
   AddAnimatorConnector(AnimatorConnector<bool>::New(actor,
                                                     Dali::Actor::Property::VISIBLE,
-                                                    Property::INVALID_COMPONENT_INDEX,
                                                     AnimateToBoolean(HIDE_VALUE),
                                                     mDefaultAlpha,
                                                     TimePeriod(delaySeconds, 0.0f /*immediate*/)));

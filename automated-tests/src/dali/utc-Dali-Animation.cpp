@@ -1261,50 +1261,6 @@ int UtcDaliAnimationSetEndActionP03(void)
   finishCheck.Reset();
   DALI_TEST_CHECK(animation.GetEndAction() == Animation::DISCARD);
 
-  float     customPropertyYValue = 100.0f;
-  Animation animation2           = Animation::New(durationSeconds);
-  DALI_TEST_CHECK(animation2.GetEndAction() == Animation::BAKE);
-  animation2.AnimateTo(Property(actor, customPropertyIndex, 1), customPropertyYValue, AlphaFunction::LINEAR);
-  animation.Play();
-  animation2.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f));
-  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
-
-  // Check whether we need to keep update at least 2 frames after discard-animation finished.
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
-
-  tet_printf("EndAction::Discard Animation finished\n");
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS(targetValue.x, actor.GetCurrentProperty<Vector3>(customPropertyIndex).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue, actor.GetCurrentProperty<Vector3>(customPropertyIndex).y, TEST_LOCATION);
-  DALI_TEST_EQUALS(targetValue.z, actor.GetCurrentProperty<Vector3>(customPropertyIndex).z, TEST_LOCATION);
-
-  // The position should be discarded in the next frame
-  // And also, check whether we need to keep update next frames after discard-animation finished.
-  tet_printf("Check current value return well\n");
-  application.Render(0);
-  DALI_TEST_EQUALS(initialValue.x /*discarded*/, actor.GetCurrentProperty<Vector3>(customPropertyIndex).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue /*baked*/, actor.GetCurrentProperty<Vector3>(customPropertyIndex).y, TEST_LOCATION);
-  DALI_TEST_EQUALS(initialValue.z /*discarded*/, actor.GetCurrentProperty<Vector3>(customPropertyIndex).z, TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
-
-  // Check that nothing has changed after a couple of buffer swaps
-  // After 2 frames rendered, UpdateStatus will not mark as animation runing.
-  application.Render(0);
-  DALI_TEST_EQUALS(initialValue.x, actor.GetCurrentProperty<Vector3>(customPropertyIndex).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue, actor.GetCurrentProperty<Vector3>(customPropertyIndex).y, TEST_LOCATION);
-  DALI_TEST_EQUALS(initialValue.z, actor.GetCurrentProperty<Vector3>(customPropertyIndex).z, TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
-
-  application.Render(0);
-  DALI_TEST_EQUALS(initialValue.x, actor.GetCurrentProperty<Vector3>(customPropertyIndex).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue, actor.GetCurrentProperty<Vector3>(customPropertyIndex).y, TEST_LOCATION);
-  DALI_TEST_EQUALS(initialValue.z, actor.GetCurrentProperty<Vector3>(customPropertyIndex).z, TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
   END_TEST;
 }
 
@@ -1437,47 +1393,6 @@ int UtcDaliAnimationSetEndActionP04(void)
   // Test EndAction::Discard, animate again, but don't bake this time
   finishCheck.Reset();
   DALI_TEST_CHECK(animation.GetEndAction() == Animation::DISCARD);
-
-  float     customPropertyYValue = 5.0f;
-  Animation animation2           = Animation::New(durationSeconds);
-  DALI_TEST_CHECK(animation2.GetEndAction() == Animation::BAKE);
-  animation2.AnimateTo(Property(visualRenderer, Dali::VisualRenderer::Property::TRANSFORM_SIZE, 1), customPropertyYValue, AlphaFunction::LINEAR);
-  animation.Play();
-  animation2.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f));
-  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
-
-  // Check whether we need to keep update at least 2 frames after discard-animation finished.
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
-
-  tet_printf("EndAction::Discard Animation finished\n");
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS(targetValue.x, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
-
-  // The position should be discarded in the next frame
-  // And also, check whether we need to keep update next frames after discard-animation finished.
-  tet_printf("Check current value return well\n");
-  application.Render(0);
-  DALI_TEST_EQUALS(initialValue.x /*discarded*/, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue /*baked*/, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
-
-  // Check that nothing has changed after a couple of buffer swaps
-  // After 2 frames rendered, UpdateStatus will not mark as animation runing.
-  application.Render(0);
-  DALI_TEST_EQUALS(initialValue.x, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
-
-  application.Render(0);
-  DALI_TEST_EQUALS(initialValue.x, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).x, TEST_LOCATION);
-  DALI_TEST_EQUALS(customPropertyYValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE).y, TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
   END_TEST;
 }
 
@@ -2141,15 +2056,8 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
      0.0f,
      100.0f, // POS
      {
-       /**/ 30.0f,
-       40.0f,
-       50.0f,
-       60.0f,
-       70.0f, /* Loop */
-       /**/ 30.0f,
-       40.0f,
-       50.0f,
-       60.0f, /* Reverse direction */
+       /**/ 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, /* Loop */
+       /**/ 30.0f, 40.0f, 50.0f, 60.0f,        /* Reverse direction */
        /**/ 50.0f,
        /**/ 40.0f,
        /**/ 30.0f,
@@ -2345,21 +2253,9 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount01(void)
      0.0f,
      100.0f, // POS
      {
-       /**/ 30.0f,
-       40.0f,
-       50.0f,
-       60.0f,
-       70.0f, /* Loop */
-       /**/ 30.0f,
-       40.0f,
-       50.0f,
-       60.0f,
-       70.0f,
-       /**/ 30.0f,
-       40.0f,
-       50.0f,
-       60.0f,
-       70.0f,
+       /**/ 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, /* Loop */
+       /**/ 30.0f, 40.0f, 50.0f, 60.0f, 70.0f,
+       /**/ 30.0f, 40.0f, 50.0f, 60.0f, 70.0f,
        /**/
      }};
 
@@ -7723,67 +7619,6 @@ int UtcDaliAnimationAnimateToVector3AlphaFunctionTimePeriodP(void)
   float     delay = 0.5f;
   animation.AnimateTo(Property(actor, "testProperty"),
                       targetValue,
-                      AlphaFunction::LINEAR,
-                      TimePeriod(delay, durationSeconds - delay));
-
-  // Start the animation
-  animation.Play();
-
-  bool                 signalReceived(false);
-  AnimationFinishCheck finishCheck(signalReceived);
-  animation.FinishedSignal().Connect(&application, finishCheck);
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) /* 50% animation progress, 0% animator progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(index), startValue, TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) /* 75% animation progress, 50% animator progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(index), startValue + (relativeValue * 0.5f), TEST_LOCATION);
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds * 250.0f) + 1u /*just beyond the animation duration*/);
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(index), targetValue, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliAnimationAnimateToVector3ComponentP(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  // Register a Vector3 property
-  Vector3         startValue(10.0f, 10.0f, 10.0f);
-  Property::Index index = actor.RegisterProperty("testProperty", startValue);
-  application.GetScene().Add(actor);
-  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(index), startValue, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(index), startValue, TEST_LOCATION);
-
-  // Build the animation
-  float     durationSeconds(1.0f);
-  Animation animation = Animation::New(durationSeconds);
-  Vector3   targetValue(30.0f, 30.0f, 10.0f);
-  Vector3   relativeValue(targetValue - startValue);
-  float     delay = 0.5f;
-  animation.AnimateTo(Property(actor, "testProperty", 0),
-                      30.0f,
-                      AlphaFunction::LINEAR,
-                      TimePeriod(delay, durationSeconds - delay));
-  animation.AnimateTo(Property(actor, index, 1),
-                      30.0f,
                       AlphaFunction::LINEAR,
                       TimePeriod(delay, durationSeconds - delay));
 
