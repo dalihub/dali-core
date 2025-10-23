@@ -421,6 +421,11 @@ void RelayoutController::OnObjectDestroyed(const Dali::RefObject* object)
 
 void RelayoutController::Relayout()
 {
+  if(!mEnabled)
+  {
+    return;
+  }
+
   // Only do something when requested
   if(mRelayoutFlag)
   {
@@ -506,6 +511,8 @@ void RelayoutController::Relayout()
 
 void RelayoutController::SetEnabled(bool enabled)
 {
+  DALI_LOG_INFO(gLogFilter, Debug::General, "[Internal::RelayoutController::SetEnabled(%d)]\n", enabled);
+
   mEnabled = enabled;
 }
 

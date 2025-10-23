@@ -159,6 +159,11 @@ public:
   void SceneCreated();
 
   /**
+   * @copydoc Dali::Integration::Core::SceneDestroyed()
+   */
+  void SceneDestroyed();
+
+  /**
    * @copydoc Dali::Integration::Core::QueueEvent(const Integration::Event&)
    */
   void QueueEvent(const Integration::Event& event);
@@ -212,11 +217,6 @@ public:
    * @copydoc Dali::Integration::Core::UnregisterProcessorOnce
    */
   void UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor = false);
-
-  /**
-   * @copydoc Dali::Integration::Core::UnregisterProcessors
-   */
-  void UnregisterProcessors();
 
   /**
    * @copydoc Dali::Internal::ThreadLocalStorage::AddScene()
@@ -282,6 +282,11 @@ private:
    * Run each registered postprocessor
    */
   void RunPostProcessors();
+
+  /**
+   * Unregister all processors and post processors (include once) what we registered before.
+   */
+  void UnregisterProcessors();
 
   /**
    * Run registered processors, and relayout, and flush messages

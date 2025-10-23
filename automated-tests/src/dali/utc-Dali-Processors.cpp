@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -536,7 +536,7 @@ int UtcDaliCoreProcessorGetProcessorName(void)
   END_TEST;
 }
 
-int UtcDaliCoreProcessorUnregisterProcessors(void)
+int UtcDaliCoreProcessorUnregisterProcessorsWhenSceneDestroyed(void)
 {
   TestApplication application;
 
@@ -583,7 +583,10 @@ int UtcDaliCoreProcessorUnregisterProcessors(void)
   core.RegisterProcessorOnce(testProcessor4);
   core.RegisterProcessorOnce(testProcessor5, true);
 
-  core.UnregisterProcessors();
+  // Force-call SceneDestroyed() now.
+  // Now Processor will not be called anymore
+  core.SceneDestroyed();
+
   application.SendNotification();
   tet_infoline("Test that all processors has not been executed again");
   DALI_TEST_CHECK(testProcessor1.processRun == false);
