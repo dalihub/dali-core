@@ -152,7 +152,7 @@ private:
         {
           resetter = SceneGraph::BakerResetter::New(targetObject, *targetProperty, mRemoveAction == Dali::Constraint::RemoveAction::BAKE ? SceneGraph::BakerResetter::Lifetime::BAKE : SceneGraph::BakerResetter::Lifetime::SET);
         }
-        else
+        else if(!mConstraintResetterApplied)
         {
           mConstraintResetterApplied = true;
 
@@ -329,13 +329,16 @@ private:
           {
             resetter = SceneGraph::BakerResetter::New(targetObject, *targetProperty, mRemoveAction == Dali::Constraint::RemoveAction::BAKE ? SceneGraph::BakerResetter::Lifetime::BAKE : SceneGraph::BakerResetter::Lifetime::SET);
           }
-          else
+          else if(!mConstraintResetterApplied)
           {
             mConstraintResetterApplied = true;
 
             resetter = SceneGraph::ConstraintResetter::New(targetObject, *targetProperty, *mSceneGraphConstraint);
           }
-          AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
+          if(resetter)
+          {
+            AddResetterMessage(GetEventThreadServices().GetUpdateManager(), resetter);
+          }
         }
       }
     }
