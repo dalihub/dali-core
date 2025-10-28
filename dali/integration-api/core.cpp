@@ -84,6 +84,11 @@ void Core::SceneCreated()
   mImpl->SceneCreated();
 }
 
+void Core::SceneDestroyed()
+{
+  mImpl->SceneDestroyed();
+}
+
 void Core::QueueEvent(const Event& event)
 {
   mImpl->QueueEvent(event);
@@ -176,11 +181,6 @@ void Core::RegisterProcessorOnce(Processor& processor, bool postProcessor)
 void Core::UnregisterProcessorOnce(Processor& processor, bool postProcessor)
 {
   mImpl->UnregisterProcessorOnce(processor, postProcessor);
-}
-
-void Core::UnregisterProcessors()
-{
-  mImpl->UnregisterProcessors();
 }
 
 // ETC

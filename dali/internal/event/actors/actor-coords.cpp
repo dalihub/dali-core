@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,11 +135,11 @@ Vector2 CalculateScreenPosition(const SceneSizeType& sceneSize, const Matrix& wo
   localAnchorPosition.w       = 1.0f; // Correct Numerical Error.
 
   const Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f);
-  Vector4       worldP    = worldTransformMatrix * localAnchorPosition;
-  Vector3       worldP3   = Vector3(worldP);
-  Vector3       cameraSP3 = worldP3 - cameraPosition;
-  Vector2       cameraSP2 = cameraSP3.GetVectorXY();
-  Vector2       result    = halfSceneSize + cameraSP2;
+  const Vector4 worldP    = worldTransformMatrix * localAnchorPosition;
+  const Vector3 worldP3   = Vector3(worldP);
+  const Vector3 cameraSP3 = worldP3 - cameraPosition;
+  const Vector2 cameraSP2 = cameraSP3.GetVectorXY();
+  const Vector2 result    = halfSceneSize + cameraSP2;
   return result;
 }
 
@@ -175,17 +175,39 @@ void CalculateScreenExtents(Vector2& position, Vector2& size, const SceneSizeTyp
 {
   Vector2 halfSize = Vector2(actorSize.x, actorSize.y) * 0.5f;
 
-  Vector4 pos0 = worldTransformMatrix * Vector4(-halfSize.x, -halfSize.y, 0.0f, 1.0f);
-  Vector4 pos1 = worldTransformMatrix * Vector4(halfSize.x, -halfSize.y, 0.0f, 1.0f);
-  Vector4 pos2 = worldTransformMatrix * Vector4(-halfSize.x, halfSize.y, 0.0f, 1.0f);
-  Vector4 pos3 = worldTransformMatrix * Vector4(halfSize.x, halfSize.y, 0.0f, 1.0f);
+  /**
+   * @code
+   * Vector4 pos0 = worldTransformMatrix * Vector4(-halfSize.x, -halfSize.y, 0.0f, 1.0f);
+   * Vector4 pos1 = worldTransformMatrix * Vector4(halfSize.x, -halfSize.y, 0.0f, 1.0f);
+   * Vector4 pos2 = worldTransformMatrix * Vector4(-halfSize.x, halfSize.y, 0.0f, 1.0f);
+   * Vector4 pos3 = worldTransformMatrix * Vector4(halfSize.x, halfSize.y, 0.0f, 1.0f);
+   *
+   * Vector2 minPos = Vector2(std::min(pos0.x, std::min(pos1.x, std::min(pos2.x, pos3.x))), std::min(pos0.y, std::min(pos1.y, std::min(pos2.y, pos3.y))));
+   * Vector2 maxPos = Vector2(std::max(pos0.x, std::max(pos1.x, std::max(pos2.x, pos3.x))), std::max(pos0.y, std::max(pos1.y, std::max(pos2.y, pos3.y))));
+   * @endcode
+   */
 
-  Vector2 min = Vector2(std::min(pos0.x, std::min(pos1.x, std::min(pos2.x, pos3.x))), std::min(pos0.y, std::min(pos1.y, std::min(pos2.y, pos3.y))));
-  Vector2 max = Vector2(std::max(pos0.x, std::max(pos1.x, std::max(pos2.x, pos3.x))), std::max(pos0.y, std::max(pos1.y, std::max(pos2.y, pos3.y))));
+  Matrix boundingBox(false);
+  float* rhsPtr = boundingBox.AsFloat();
+  rhsPtr[0] = rhsPtr[8] = -halfSize.x;
+  rhsPtr[4] = rhsPtr[12] = halfSize.x;
+  rhsPtr[1] = rhsPtr[5] = -halfSize.y;
+  rhsPtr[9] = rhsPtr[13] = halfSize.y;
+  rhsPtr[2] = rhsPtr[6] = rhsPtr[10] = rhsPtr[14] = 0.0f;
+  rhsPtr[3] = rhsPtr[7] = rhsPtr[11] = rhsPtr[15] = 1.0f;
+
+  const Matrix worldBoundingBox = worldTransformMatrix * boundingBox;
+  const float* retPtr           = worldBoundingBox.AsFloat();
+
+  const Vector2 minPos = Vector2(std::min(retPtr[0], std::min(retPtr[4], std::min(retPtr[8], retPtr[12]))), std::min(retPtr[1], std::min(retPtr[5], std::min(retPtr[9], retPtr[13]))));
+  const Vector2 maxPos = Vector2(std::max(retPtr[0], std::max(retPtr[4], std::max(retPtr[8], retPtr[12]))), std::max(retPtr[1], std::max(retPtr[5], std::max(retPtr[9], retPtr[13]))));
 
   const Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f);
-  position = halfSceneSize + (min - cameraPosition.GetVectorXY());
-  size     = max - min;
+  const Vector2 cameraP2  = cameraPosition.GetVectorXY();
+  const Vector2 cameraSP2 = minPos - cameraP2;
+
+  position = halfSceneSize + cameraSP2;
+  size     = maxPos - minPos;
 }
 
 /**
@@ -322,7 +344,7 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor)
     Vector2 anchor         = actor.GetAnchorPointForPosition().GetVectorXY();
 
     const auto& sceneSize = scene.GetSize();
-    result = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
+    result                = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
   }
   return result;
 }
@@ -341,7 +363,7 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferInde
     Vector2 anchor         = actor.GetAnchorPointForPosition().GetVectorXY();
 
     const auto& sceneSize = scene.GetCurrentSurfaceRect();
-    result = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
+    result                = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
   }
   return result;
 }

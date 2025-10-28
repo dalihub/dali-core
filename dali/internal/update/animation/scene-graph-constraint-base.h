@@ -89,6 +89,7 @@ public:
    */
   void AddLifecycleObserver(LifecycleObserver& observer)
   {
+    DALI_ASSERT_ALWAYS(mLifecycleObserver == nullptr && "ConstraintBase can only have one LifecycleObserver");
     mLifecycleObserver = &observer;
   }
 

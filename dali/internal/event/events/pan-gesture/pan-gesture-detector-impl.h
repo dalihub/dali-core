@@ -255,6 +255,12 @@ private:
   void Process(Scene& scene, const PanGestureEvent& panEvent) override;
 
   /**
+   * Get the current gestured actor
+   * @return The current gestured actor, or nullptr if no actor is currently gestured
+   */
+  Actor* GetCurrentGesturedActor() override;
+
+  /**
    * Creates a PanGesture and emit its detected signal.
    * @param[in]  actor             The actor that has been panned.
    * @param[in]  panEvent          The panEvent received from the adaptor.

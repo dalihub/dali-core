@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATOR_CONNECTOR_BASE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,12 @@ public:
    */
   AnimatorConnectorBase(Object&           object,
                         Property::Index   propertyIndex,
-                        int32_t           componentIndex,
                         AlphaFunction     alpha,
                         const TimePeriod& period)
   : mObject(&object),
     mAlphaFunction(alpha),
     mTimePeriod(period),
-    mPropertyIndex(propertyIndex),
-    mComponentIndex(componentIndex)
+    mPropertyIndex(propertyIndex)
   {
     object.AddObserver(*this);
   }
@@ -91,13 +89,9 @@ public:
 
     // Check if property is a component of another property
     const int32_t componentIndex = mObject->GetPropertyComponentIndex(mPropertyIndex);
-    if(componentIndex != Property::INVALID_COMPONENT_INDEX)
-    {
-      mComponentIndex = componentIndex;
-    }
 
     // call the type specific method to create the concrete animator
-    bool resetterRequired = DoCreateAnimator(propertyOwner, *baseProperty);
+    bool resetterRequired = DoCreateAnimator(propertyOwner, *baseProperty, componentIndex);
 
     DALI_ASSERT_DEBUG(mAnimator != nullptr);
 
@@ -117,7 +111,7 @@ public:
   /**
    * Type specific extension of animator creation
    */
-  virtual bool DoCreateAnimator(const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty) = 0;
+  virtual bool DoCreateAnimator(const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty, const int32_t componentIndex) = 0;
 
   /**
    * Set the parent of the AnimatorConnector.
@@ -152,11 +146,6 @@ public:
   Property::Index GetPropertyIndex() const
   {
     return mPropertyIndex;
-  }
-
-  int32_t GetComponentIndex() const
-  {
-    return mComponentIndex;
   }
 
 private:
@@ -196,7 +185,6 @@ protected:
   TimePeriod    mTimePeriod;
 
   Property::Index mPropertyIndex;
-  int32_t         mComponentIndex;
 };
 
 } // namespace Internal

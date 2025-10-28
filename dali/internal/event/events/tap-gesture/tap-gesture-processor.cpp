@@ -359,6 +359,11 @@ bool TapGestureProcessor::CheckGestureDetector(GestureDetector* detector, Actor*
   return ret;
 }
 
+Actor* TapGestureProcessor::GetCurrentGesturedActor()
+{
+  return GestureProcessor::GetCurrentGesturedActor();
+}
+
 void TapGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates)
 {
   DALI_ASSERT_DEBUG(mCurrentTapEvent);

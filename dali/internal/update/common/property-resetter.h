@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_PROPERTY_RESETTER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public:
    *
    * Watches the property owner to track if it's disconnected or not.
    */
-  void Initialize()
+  virtual void Initialize()
   {
     DALI_ASSERT_ALWAYS(!mInitialized && "Dont call PropertyResetterBase::Initialize() twice");
 
@@ -279,7 +279,7 @@ public:
   {
     // Disconnect from modifier object. Although this resetter should match the lifecycle of the modifier object,
     // there are situations where it is deleted first (e.g. if the property owner is destroyed)
-    if(mModifier)
+    if(DALI_LIKELY(mInitialized) && mModifier)
     {
       mModifier->RemoveLifecycleObserver(*this);
     }
@@ -298,8 +298,17 @@ private:
   : PropertyResetterBase(propertyOwner, baseProperty),
     mModifier(modifier)
   {
+  }
+
+  /**
+   * Second phase initialization at render thread.
+   */
+  void Initialize() override
+  {
     // Track the lifecycle of the modifying object
     mModifier->AddLifecycleObserver(*this);
+
+    PropertyResetterBase::Initialize();
   }
 
   /**

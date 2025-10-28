@@ -1093,6 +1093,8 @@ int UtcDaliConstraintSetApplyRateCallbackCount01(void)
 
   // Change to APPLY_ONCE again (for line coverage)
   constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  constraint.SetApplyRate(Constraint::APPLY_ALWAYS);
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
 
   // Check changing apply-rate call function.
   application.SendNotification();
@@ -1292,6 +1294,8 @@ int UtcDaliConstraintSetApplyRateCallbackCount02(void)
   }
 
   // Change to APPLY_ONCE again (for line coverage)
+  constraint.SetApplyRate(Constraint::APPLY_ONCE);
+  constraint.SetApplyRate(Constraint::APPLY_ALWAYS);
   constraint.SetApplyRate(Constraint::APPLY_ONCE);
 
   // Check changing apply-rate call function.

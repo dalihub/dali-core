@@ -4640,6 +4640,41 @@ int UtcDaliActorOnRelayoutSignal(void)
   END_TEST;
 }
 
+int UtcDaliActorOnRelayoutSignalN(void)
+{
+  tet_infoline("Testing Dali::Actor::OnRelayoutSignal() not comming after application terminated.");
+
+  Actor actor;
+  {
+    TestApplication application;
+
+    // Clean test data
+    gOnRelayoutCallBackCalled = false;
+    gActorNamesRelayout.clear();
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::NAME, "actor");
+    actor.OnRelayoutSignal().Connect(OnRelayoutCallback);
+
+    // Sanity check
+    DALI_TEST_CHECK(!gOnRelayoutCallBackCalled);
+
+    // Add actor to stage
+    application.GetScene().Add(actor);
+
+    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 2.0));
+
+    // OnRelayout will not be emitted
+    DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
+  }
+
+  // OnRelayout will not be emitted
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliActorGetHierachyDepth(void)
 {
   TestApplication application;
