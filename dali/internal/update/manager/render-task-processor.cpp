@@ -66,7 +66,7 @@ Layer* FindLayer(Node& node)
  * @param[in]  updateBufferIndex The current update buffer index.
  * @param[in]  node The current node of the scene-graph.
  * @param[in]  parentVisibilityChanged The parent node's visibility might be changed at current frame. (Due to visibility property, or ancient's clipping mode change)
- * @param[in]  currentLayer The current layer containing lists of opaque/transparent renderables.
+ * @param[in]  currentLayer The current layer containing lists of opaque/transparent renderables. If node is layer, currentLayer is node itself.
  * @param[in]  renderTask The current render-task.
  * @param[in]  inheritedDrawMode The draw mode of the parent
  * @param[in]  parentDepthIndex The inherited parent node depth index
@@ -90,7 +90,7 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
                            bool&       keepRendering)
 {
   // Short-circuit for invisible nodes
-  if(!(node.IsVisible(updateBufferIndex) && !node.IsIgnored()))
+  if(!node.IsVisible(updateBufferIndex) || node.IsIgnored())
   {
     node.GetPartialRenderingData().mVisible = false;
     return;
@@ -124,23 +124,9 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
     return;
   }
 
-  // Assume all children go to this layer (if this node is a layer).
-  Layer* layer = node.GetLayer();
-  if(layer)
-  {
-    // Layers do not inherit the DrawMode from their parents
-    inheritedDrawMode = node.GetDrawMode();
-  }
-  else
-  {
-    // This node is not a layer.
-    layer = &currentLayer;
-    inheritedDrawMode |= node.GetDrawMode();
-  }
-
-  DALI_ASSERT_DEBUG(NULL != layer);
-
   const uint32_t count = node.GetRendererCount();
+
+  RenderableContainer& target = inheritedDrawMode == DrawMode::NORMAL ? currentLayer.colorRenderables : currentLayer.overlayRenderables;
 
   // Update the clipping Id and depth for this node (if clipping is enabled).
   const Dali::ClippingMode::Type clippingMode = node.GetClippingMode();
@@ -152,7 +138,6 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
       // If we do not have any renderers, create one to house the scissor operation.
       if(count == 0u)
       {
-        RenderableContainer& target = (inheritedDrawMode == DrawMode::NORMAL) ? layer->colorRenderables : layer->overlayRenderables;
         target.PushBack(Renderable(&node, RendererKey{}));
       }
     }
@@ -168,22 +153,19 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
   // Set the information in the node.
   node.SetClippingInformation(currentClippingId, clippingDepth, scissorDepth);
 
-  RenderableContainer& target = DALI_LIKELY(inheritedDrawMode == DrawMode::NORMAL) ? layer->colorRenderables : layer->overlayRenderables;
-
   if(isNodeExclusiveAtAnotherRenderTask && cacheCount)
   {
-    for(uint32_t i = 0; i < cacheCount; ++i)
+    const auto& cacheRenderers = node.GetCacheRendererContainer();
+    for(auto rendererKey : cacheRenderers)
     {
-      SceneGraph::RendererKey rendererKey = node.GetCacheRendererAt(i);
       target.PushBack(Renderable(&node, rendererKey));
     }
     return;
   }
 
-  for(uint32_t i = 0; i < count; ++i)
+  const auto& renderers = node.GetRendererContainer();
+  for(auto rendererKey : renderers)
   {
-    SceneGraph::RendererKey rendererKey = node.GetRendererAt(i);
-
     target.PushBack(Renderable(&node, rendererKey));
     keepRendering = keepRendering || (rendererKey->GetRenderingBehavior() == DevelRenderer::Rendering::CONTINUOUSLY);
   }
@@ -199,8 +181,20 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
   const NodeIter endIter  = children.End();
   for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
   {
-    Node& child = **iter;
-    AddRenderablesForTask(updateBufferIndex, child, parentVisibilityChanged, *layer, renderTask, inheritedDrawMode, currentClippingId, clippingDepth, scissorDepth, clippingUsed, keepRendering);
+    Node&      child        = **iter;
+    const bool childIsLayer = child.IsLayer();
+
+    AddRenderablesForTask(updateBufferIndex,
+                          child,
+                          parentVisibilityChanged,
+                          DALI_UNLIKELY(childIsLayer) ? *child.GetLayer() : currentLayer,
+                          renderTask,
+                          (DALI_UNLIKELY(childIsLayer) ? DrawMode::NORMAL : inheritedDrawMode) | child.GetDrawMode(), // Layers do not inherit the DrawMode from their parents
+                          currentClippingId,
+                          clippingDepth,
+                          scissorDepth,
+                          clippingUsed,
+                          keepRendering);
   }
 }
 
