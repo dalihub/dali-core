@@ -54,7 +54,7 @@ namespace
  * Function which compares render items by shader/textureSet/geometry
  * @param[in] lhs Left hand side item
  * @param[in] rhs Right hand side item
- * @return True if left item is greater than right
+ * @return True if left item is less than right
  */
 inline bool PartialCompareItems(const RenderInstructionProcessor::SortAttributes& lhs,
                                 const RenderInstructionProcessor::SortAttributes& rhs)
@@ -71,29 +71,25 @@ inline bool PartialCompareItems(const RenderInstructionProcessor::SortAttributes
 }
 
 /**
- * Function which sorts render items by depth index then by instance
- * ptrs of shader/textureSet/geometry.
+ * Function which sorts render items by depth index.
  * @param[in] lhs Left hand side item
  * @param[in] rhs Right hand side item
- * @return True if left item is greater than right
+ * @return True if left item is less than right
  */
 bool CompareItems(const RenderInstructionProcessor::SortAttributes& lhs, const RenderInstructionProcessor::SortAttributes& rhs)
 {
-  // @todo Consider replacing all these sortAttributes with a single long int that
-  // encapsulates the same data (e.g. the middle-order bits of the ptrs).
   if(lhs.depthIndex == rhs.depthIndex)
   {
-    return PartialCompareItems(lhs, rhs);
+    return false;
   }
   return lhs.depthIndex < rhs.depthIndex;
 }
 
 /**
- * Function which sorts the render items by Z function, then
- * by instance ptrs of shader / geometry / material.
+ * Function which sorts the render items by Z function.
  * @param[in] lhs Left hand side item
  * @param[in] rhs Right hand side item
- * @return True if left item is greater than right
+ * @return True if left item is less than right
  */
 bool CompareItems3D(const RenderInstructionProcessor::SortAttributes& lhs, const RenderInstructionProcessor::SortAttributes& rhs)
 {
@@ -102,8 +98,8 @@ bool CompareItems3D(const RenderInstructionProcessor::SortAttributes& lhs, const
   {
     if(lhsIsOpaque)
     {
-      // If both RenderItems are opaque, sort using shader, then material then geometry.
-      return PartialCompareItems(lhs, rhs);
+      // If both RenderItems are opaque, sort using shader, then material then geometry at second phase sorting.
+      return false;
     }
     else
     {
@@ -112,10 +108,10 @@ bool CompareItems3D(const RenderInstructionProcessor::SortAttributes& lhs, const
         return lhs.renderItem->mDepthIndex < rhs.renderItem->mDepthIndex;
       }
 
-      // If both RenderItems are transparent, sort using Z, then shader, then material, then geometry.
+      // If both RenderItems are transparent, sort using Z, then shader, then material, then geometry at second phase sorting.
       if(Equals(lhs.zValue, rhs.zValue))
       {
-        return PartialCompareItems(lhs, rhs);
+        return false;
       }
       return lhs.zValue > rhs.zValue;
     }
@@ -127,10 +123,10 @@ bool CompareItems3D(const RenderInstructionProcessor::SortAttributes& lhs, const
 }
 
 /**
- * Function which sorts render items by clipping hierarchy, then Z function and instance ptrs of shader / geometry / material.
+ * Function which sorts render items by clipping hierarchy, then Z function.
  * @param[in] lhs Left hand side item
  * @param[in] rhs Right hand side item
- * @return True if left item is greater than right
+ * @return True if left item is less than right
  */
 bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes& lhs, const RenderInstructionProcessor::SortAttributes& rhs)
 {
@@ -475,20 +471,13 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   //   2 is LAYER_3D + Clipping
   const int comparitorIndex = layer.GetBehavior() == Dali::Layer::LAYER_3D ? respectClippingOrder ? 2u : 1u : 0u;
 
-  bool needToSort = false;
+  bool needToSort               = false;
+  bool needToSortWithAttributes = false;
 
   for(uint32_t index = 0; index < renderableCount; ++index)
   {
     RenderItemKey itemKey = renderList.GetItemKey(index);
     RenderItem&   item    = *itemKey.Get();
-
-    if(DALI_LIKELY(item.mRenderer))
-    {
-      item.mRenderer->SetSortAttributes(mSortingHelper[index]);
-    }
-
-    // texture set
-    mSortingHelper[index].textureSet = item.mTextureSet;
 
     if(comparitorIndex == 0)
     {
@@ -511,15 +500,58 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
       // This is a fast way of checking if we need to sort.
       if(mSortComparitors[comparitorIndex](mSortingHelper[index], mSortingHelper[index - 1u]))
       {
-        needToSort = true;
+        needToSort               = true;
+        needToSortWithAttributes = true;
+      }
+      // Check if we need to sort with attributes.
+      // If !(New < Prev) and !(Prev < New), that mean Prev == New. So we have to sort again by extra attributes.
+      else if(!needToSortWithAttributes && !(mSortComparitors[comparitorIndex](mSortingHelper[index - 1u], mSortingHelper[index])))
+      {
+        needToSortWithAttributes = true;
       }
     }
   }
 
   // If we don't need to sort, we can skip the sort.
-  if(needToSort)
+  if(needToSort || needToSortWithAttributes)
   {
-    std::stable_sort(mSortingHelper.begin(), mSortingHelper.end(), mSortComparitors[comparitorIndex]);
+    if(needToSort)
+    {
+      std::stable_sort(mSortingHelper.begin(), mSortingHelper.end(), mSortComparitors[comparitorIndex]);
+    }
+    if(needToSortWithAttributes)
+    {
+      for(auto iter = mSortingHelper.begin(), endIter = mSortingHelper.end(); iter != endIter;)
+      {
+        auto     jter  = iter;
+        uint32_t count = 0u;
+
+        // Collect the number of render items that has same order with *iter.
+        while(++jter != endIter && !mSortComparitors[comparitorIndex](*iter, *jter))
+        {
+          ++count;
+        }
+        if(count > 1u)
+        {
+          // Set sort attributes here.
+          for(auto kter = iter; kter != jter; ++kter)
+          {
+            const auto& item = *((*kter).renderItem.Get());
+            if(DALI_LIKELY(item.mRenderer))
+            {
+              item.mRenderer->SetSortAttributes(*kter);
+            }
+
+            // texture set
+            (*kter).textureSet = item.mTextureSet;
+          }
+
+          // Sort by partial attributes.
+          std::stable_sort(iter, jter, PartialCompareItems);
+        }
+        iter = jter;
+      }
+    }
 
     // Reorder / re-populate the RenderItems in the RenderList to correct order based on the sortinghelper.
     DALI_LOG_INFO(gRenderListLogFilter, Debug::Verbose, "Sorted Transparent List:\n");
