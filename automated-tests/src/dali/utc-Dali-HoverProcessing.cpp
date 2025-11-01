@@ -538,6 +538,134 @@ int UtcDaliHoverInterruptedParentConsumer(void)
   END_TEST;
 }
 
+int UtcDaliHoverDeliverInterruptedEventToHoverStartedActor(void)
+{
+  // Test DeliverInterruptedEventToHoverStartedActor function
+  // Start hover on one actor, move to another, then finish
+  // The first actor should receive an interrupted event
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  Actor actor1 = Actor::New();
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::NAME, "actor1");
+  scene.Add(actor1);
+
+  Actor actor2 = Actor::New();
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::NAME, "actor2");
+  scene.Add(actor2);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actors' hovered signals
+  SignalData data1, data2;
+  HoverEventFunctor functor1(data1);
+  HoverEventFunctor functor2(data2, false); // Don't consume to allow propagation
+  actor1.HoveredSignal().Connect(&application, functor1);
+  actor2.HoveredSignal().Connect(&application, functor2);
+
+  // Start hover on actor1
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data1.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(data1.hoveredActor == actor1);
+  data1.Reset();
+  data2.Reset();
+
+  // Move to actor2 (actor1 should get leave, actor2 should get started)
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, data2.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(data2.hoveredActor == actor2);
+  data1.Reset();
+  data2.Reset();
+
+  // Finish on actor2 - actor1 should receive interrupted via DeliverInterruptedEventToHoverStartedActor
+  application.ProcessEvent(GenerateSingleHover(PointState::FINISHED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data1.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::FINISHED, data2.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(data1.hoveredActor == actor1);
+  DALI_TEST_CHECK(data2.hoveredActor == actor2);
+  data1.Reset();
+  data2.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliHoverDeliverInterruptedEventToHoverStartedActorNoInterrupt(void)
+{
+  TestApplication    application;
+  Integration::Scene scene = application.GetScene();
+
+  Actor actor1 = Actor::New();
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::NAME, "actor1");
+  scene.Add(actor1);
+
+  Actor actor2 = Actor::New();
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::NAME, "actor2");
+  scene.Add(actor2);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actors' hovered signals
+  SignalData data1, data2;
+  HoverEventFunctor functor1(data1); // Consume events
+  HoverEventFunctor functor2(data2, false); // Don't consume
+  actor1.HoveredSignal().Connect(&application, functor1);
+  actor2.HoveredSignal().Connect(&application, functor2);
+
+  // Set actor to require leave events
+  actor1.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+  actor2.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+
+  // Start hover on actor1
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data1.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(data1.hoveredActor == actor1);
+  data1.Reset();
+  data2.Reset();
+
+  // Move to actor2
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::LEAVE, data1.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, data2.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_CHECK(data1.hoveredActor == actor1);
+  DALI_TEST_CHECK(data2.hoveredActor == actor2);
+  data1.Reset();
+  data2.Reset();
+
+  // Finish on actor2 - actor1 should not receive interrupted because it consumed the start event
+  application.ProcessEvent(GenerateSingleHover(PointState::FINISHED, Vector2(110.0f, 110.0f)));
+  DALI_TEST_EQUALS(false, data1.functorCalled, TEST_LOCATION); // Should not receive interrupted
+  DALI_TEST_EQUALS(true, data2.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::FINISHED, data2.hoverEvent.GetState(0), TEST_LOCATION);
+  data1.Reset();
+  data2.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliHoverLeave(void)
 {
   TestApplication application;
