@@ -605,6 +605,7 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
       char*   testCaseStrapline;
       int32_t numChars = asprintf(&testCaseStrapline, "Test case %s", tc_array[failedTestCases[i]].name);
       printf("\n%s\n", testCaseStrapline);
+      free(testCaseStrapline);
       for(int32_t j = 0; j < numChars; j++)
       {
         printf("=");

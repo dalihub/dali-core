@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ TestPlatformAbstraction::TestPlatformAbstraction()
   mSaveFileResult(false),
   mSynchronouslyLoadedResource(),
   mTimerId(0),
-  mCallbackFunction(nullptr)
+  mTimerPairsWaiting()
 {
   Initialize();
 }
@@ -99,6 +99,9 @@ void TestPlatformAbstraction::Initialize()
   mIsLoadingResult = false;
   mSynchronouslyLoadedResource.Reset();
   mDecodedBitmap.Reset();
+
+  mTimerId = 0;
+  mTimerPairsWaiting.clear();
 }
 
 bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
@@ -157,22 +160,54 @@ void TestPlatformAbstraction::SetDecodedBitmap(Integration::BitmapPtr bitmap)
 
 uint32_t TestPlatformAbstraction::StartTimer(uint32_t milliseconds, CallbackBase* callback)
 {
-  mCallbackFunction = callback;
   mTimerId++;
+  mTimerPairsWaiting.push_back(std::make_pair(mTimerId, std::unique_ptr<CallbackBase>(callback)));
   return mTimerId;
 }
 
 void TestPlatformAbstraction::TriggerTimer()
 {
-  if(mCallbackFunction != nullptr)
+  // Copy the callbacks first, to allow to remove timer during execution
+  std::vector<std::pair<uint32_t, CallbackBase*>> timerPairs;
+  for(auto& pair : mTimerPairsWaiting)
   {
-    CallbackBase::Execute(*mCallbackFunction);
+    timerPairs.push_back(std::make_pair(pair.first, pair.second.get()));
+  }
+
+  for(auto& pair : timerPairs)
+  {
+    bool valid = false;
+    for(auto& originalPair : mTimerPairsWaiting)
+    {
+      if(originalPair.first == pair.first)
+      {
+        valid = true;
+        break;
+      }
+    }
+
+    if(valid)
+    {
+      if(pair.second != nullptr)
+      {
+        CallbackBase::Execute(*pair.second);
+      }
+
+      // Remove from the original list
+      mTimerPairsWaiting.erase(std::remove_if(mTimerPairsWaiting.begin(), mTimerPairsWaiting.end(),
+                                              [&](const std::pair<uint32_t, std::unique_ptr<CallbackBase>>& originalPair)
+      { return originalPair.first == pair.first; }),
+                               mTimerPairsWaiting.end());
+    }
   }
 }
 
 void TestPlatformAbstraction::CancelTimer(uint32_t timerId)
 {
-  mCallbackFunction = nullptr;
+  mTimerPairsWaiting.erase(std::remove_if(mTimerPairsWaiting.begin(), mTimerPairsWaiting.end(),
+                                          [&](const std::pair<uint32_t, std::unique_ptr<CallbackBase>>& originalPair)
+  { return originalPair.first == timerId; }),
+                           mTimerPairsWaiting.end());
 }
 
 } // namespace Dali
