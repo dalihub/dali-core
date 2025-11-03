@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,11 +95,11 @@ int UtcDaliInternalTransformPropertyGetValueSize(void)
 {
   struct PropertyValueSizeTestCase
   {
-    Dali::Internal::PropertyInputImpl* property;
-    Property::Value                    value;
-    size_t                             size;
+    std::unique_ptr<Dali::Internal::PropertyInputImpl> property;
+    Property::Value                                    value;
+    size_t                                             size;
     PropertyValueSizeTestCase(Dali::Internal::PropertyInputImpl* p, Property::Value v, size_t s)
-    : property(p),
+    : property(std::unique_ptr<Dali::Internal::PropertyInputImpl>(p)),
       value(v),
       size(s)
     {
