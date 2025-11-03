@@ -2,7 +2,7 @@
 #define DALI_TEST_PLATFORM_ABSTRACTION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -202,8 +202,8 @@ private:
   Integration::ResourcePointer mSynchronouslyLoadedResource;
   Integration::BitmapPtr       mDecodedBitmap;
 
-  uint32_t      mTimerId;
-  CallbackBase* mCallbackFunction;
+  uint32_t                                                        mTimerId;
+  std::vector<std::pair<uint32_t, std::unique_ptr<CallbackBase>>> mTimerPairsWaiting;
 };
 
 } // namespace Dali

@@ -556,7 +556,7 @@ public:
   struct ProgramCache
   {
     std::map<Graphics::PipelineStage, std::vector<uint8_t>> shaders;
-    TestGraphicsProgramImpl*                                programImpl;
+    std::shared_ptr<TestGraphicsProgramImpl>                programImpl;
   };
   std::vector<ProgramCache> mProgramCache;
 
