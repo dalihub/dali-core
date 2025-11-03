@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MESSAGE_DISPATCHER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 
@@ -56,10 +57,10 @@ public:
 
   /**
    * Add a Renderer.
-   * @param[in] renderer The renderer to add.
+   * @param[in] rendererKeyPointer The renderer to add.
    * @post renderer ownership is transferred.
    */
-  void AddRenderer(const Render::RendererKey& renderer);
+  void AddRenderer(OwnerKeyType<Render::Renderer>& rendererKeyPointer);
 
   /**
    * Remove a Renderer.
