@@ -495,6 +495,7 @@ int UtcDaliSceneDiscard(void)
   DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 2);
 
   // Request to discard the scene from the Core
+  scene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
   scene.Discard();
   DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 1);
 
@@ -569,6 +570,7 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 2);
 
   // Request to discard the scene from the Core
+  scene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
   scene.Discard();
   DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 1);
 

@@ -188,6 +188,7 @@ int UtcDaliCorePipelineCacheTest(void)
 
   // Remove scene
   application.RemoveScene(newScene);
+  newScene.RemoveSceneObject();
   newScene.Discard();
   newScene.Reset();
 

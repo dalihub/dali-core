@@ -205,6 +205,7 @@ struct Command
 
   ~Command()
   {
+    using namespace std; ///< for std::~vector destructor calls
     switch(type)
     {
       case CommandType::BEGIN_RENDER_PASS:
@@ -212,6 +213,54 @@ struct Command
         data.beginRenderPass.~BeginRenderPassDescriptor();
         break;
       }
+      case CommandType::EXECUTE_COMMAND_BUFFERS:
+      {
+        data.executeCommandBuffers.buffers.~vector();
+        break;
+      }
+      case CommandType::BIND_VERTEX_BUFFERS:
+      {
+        data.bindVertexBuffers.vertexBufferBindings.~vector();
+        break;
+      }
+      case CommandType::BIND_SAMPLERS:
+      {
+        data.bindSamplers.samplerBindings.~vector();
+        break;
+      }
+      case CommandType::BIND_TEXTURES:
+      {
+        data.bindTextures.textureBindings.~vector();
+        break;
+      }
+      case CommandType::BIND_UNIFORM_BUFFER:
+      {
+        data.bindUniformBuffers.uniformBufferBindings.~vector();
+        break;
+      }
+      case CommandType::BEGIN:
+      case CommandType::END:
+      case CommandType::END_RENDER_PASS:
+      case CommandType::BIND_INDEX_BUFFER:
+      case CommandType::BIND_PIPELINE:
+      case CommandType::DRAW_NATIVE:
+      case CommandType::DRAW:
+      case CommandType::DRAW_INDEXED:
+      case CommandType::DRAW_INDEXED_INDIRECT:
+      case CommandType::FLUSH:
+      case CommandType::SET_SCISSOR:
+      case CommandType::SET_SCISSOR_TEST:
+      case CommandType::SET_VIEWPORT:
+      case CommandType::SET_VIEWPORT_TEST:
+      case CommandType::SET_COLOR_MASK:
+      case CommandType::CLEAR_STENCIL_BUFFER:
+      case CommandType::CLEAR_DEPTH_BUFFER:
+      case CommandType::SET_STENCIL_TEST_ENABLE:
+      case CommandType::SET_STENCIL_WRITE_MASK:
+      case CommandType::SET_STENCIL_STATE:
+      case CommandType::SET_DEPTH_COMPARE_OP:
+      case CommandType::SET_DEPTH_TEST_ENABLE:
+      case CommandType::SET_DEPTH_WRITE_ENABLE:
       default:
       {
         break;

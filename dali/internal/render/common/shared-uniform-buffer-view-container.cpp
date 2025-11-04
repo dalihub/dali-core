@@ -86,7 +86,10 @@ public:
   };
 
   using UniformBufferViewContainer = std::unordered_map<ProgramUniformBlockPair, Dali::Graphics::UniquePtr<Render::UniformBufferView>, ProgramUniformBlockPair::ProgramUniformBlockPairHash>;
-  UniformBufferViewContainer mSharedUniformBlockBufferViews{};
+  UniformBufferViewContainer         mSharedUniformBlockBufferViews{};
+  Render::UniformBlock::ProgramIndex mLatestQueryIndex{0u};
+  Render::UniformBlock*              mLatestQueryBlock{nullptr};
+  Render::UniformBufferView*         mLatestResult{nullptr};
 };
 
 SharedUniformBufferViewContainer::SharedUniformBufferViewContainer()
@@ -135,6 +138,14 @@ void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex,
     ++totalUniformBufferViewCount;
 #endif
 
+    // To skip hash table search for single-container cases.
+    if(mImpl->mLatestQueryBlock == nullptr)
+    {
+      mImpl->mLatestQueryIndex = programIndex;
+      mImpl->mLatestQueryBlock = &sharedUniformBlock;
+      mImpl->mLatestResult     = item.second.get();
+    }
+
     auto& ubo = *(item.second.get());
 
     // Write to the buffer view here, by value at sharedUniformBlock.
@@ -147,19 +158,35 @@ Render::UniformBufferView* SharedUniformBufferViewContainer::GetSharedUniformBlo
 {
   Render::UniformBlock::ProgramIndex programIndex = sharedUniformBlock.GetProgramIndex(program);
 
-  auto key  = Impl::ProgramUniformBlockPair(programIndex, &sharedUniformBlock, 0u);
+  if(mImpl->mLatestQueryIndex == programIndex && mImpl->mLatestQueryBlock == &sharedUniformBlock)
+  {
+    return mImpl->mLatestResult;
+  }
+
+  mImpl->mLatestQueryIndex = programIndex;
+  mImpl->mLatestQueryBlock = &sharedUniformBlock;
+
+  auto key = Impl::ProgramUniformBlockPair(mImpl->mLatestQueryIndex, mImpl->mLatestQueryBlock, 0u);
+
   auto iter = mImpl->mSharedUniformBlockBufferViews.find(key);
   if(iter != mImpl->mSharedUniformBlockBufferViews.end())
   {
-    return iter->second.get();
+    return mImpl->mLatestResult = iter->second.get();
   }
-  return nullptr;
+  return mImpl->mLatestResult = nullptr;
 }
 
 void SharedUniformBufferViewContainer::Finalize()
 {
   mImpl->mSharedUniformBlockBufferViews.clear();
-  mImpl->mSharedUniformBlockBufferViews.rehash(0);
+
+  if(mImpl->mSharedUniformBlockBufferViews.size() > 1u)
+  {
+    mImpl->mSharedUniformBlockBufferViews.rehash(0);
+  }
+
+  // Reset only mLatestQueryBlock is enough.
+  mImpl->mLatestQueryBlock = nullptr;
 }
 
 } // namespace Dali::Internal

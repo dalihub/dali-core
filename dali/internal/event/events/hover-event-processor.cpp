@@ -230,6 +230,21 @@ Dali::Actor EmitHoverSignals(Actor* actor, RenderTask& renderTask, const HoverEv
 }
 
 /**
+ * Clear hover start consumed actor if it matches the given actor
+ */
+void ClearHoverStartConsumedActorIfNeeded(ActorObserver& hoverStartConsumedActor, Actor* actor)
+{
+  if(actor)
+  {
+    Actor* consumedActor = hoverStartConsumedActor.GetActor();
+    if(consumedActor && actor == consumedActor)
+    {
+      hoverStartConsumedActor.SetActor(nullptr);
+    }
+  }
+}
+
+/**
  * Used in the hit-test algorithm to check whether the actor is hoverable.
  */
 struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
@@ -486,20 +501,17 @@ struct HoverEventProcessor::Impl
               std::list<Dali::Internal::Actor*>::reverse_iterator rLastIter = processor.mLastActorLists.rbegin();
               for(; rLastIter != processor.mLastActorLists.rend(); rLastIter++)
               {
-                bool                                                find           = false;
-                std::list<Dali::Internal::Actor*>::reverse_iterator rCandidateIter = processor.mCandidateActorLists.rbegin();
-                for(; rCandidateIter != processor.mCandidateActorLists.rend(); rCandidateIter++)
-                {
-                  if(*rCandidateIter == *rLastIter)
-                  {
-                    find = true;
-                    break;
-                  }
-                }
-                if(!find)
+                bool foundInCandidates = std::any_of(
+                  processor.mCandidateActorLists.rbegin(),
+                  processor.mCandidateActorLists.rend(),
+                  [rLastIter](Actor* candidate) { return candidate == *rLastIter; }
+                );
+
+                if(!foundInCandidates)
                 {
                   DALI_LOG_RELEASE_INFO("LeaveActor(Hit): (%p) %d %s\n", reinterpret_cast<void*>(*rLastIter), (*rLastIter)->GetId(), (*rLastIter)->GetName().data());
                   leaveEventConsumer = EmitHoverSignals(*rLastIter, lastRenderTaskImpl, localVars.hoverEvent, PointState::LEAVE, localVars.isGeometry);
+                  ClearHoverStartConsumedActorIfNeeded(processor.mHoverStartConsumedActor, *rLastIter);
                 }
                 // If the actor has been consumed, you do not need to proceed.
                 if(*rLastIter == localVars.lastConsumedActor)
@@ -513,6 +525,7 @@ struct HoverEventProcessor::Impl
               // In the case of isGeometry, it is not propagated but only sent to actors who are not hittable.
               DALI_LOG_RELEASE_INFO("LeaveActor(Hit): (%p) %d %s\n", reinterpret_cast<void*>(localVars.lastPrimaryHitActor), localVars.lastPrimaryHitActor->GetId(), localVars.lastPrimaryHitActor->GetName().data());
               leaveEventConsumer = EmitHoverSignals(processor.mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, localVars.hoverEvent, PointState::LEAVE, localVars.isGeometry);
+              ClearHoverStartConsumedActorIfNeeded(processor.mHoverStartConsumedActor, processor.mLastPrimaryHitActor.GetActor());
             }
           }
           else if(localVars.primaryPointState != PointState::STARTED)
@@ -521,6 +534,7 @@ struct HoverEventProcessor::Impl
             // An interrupted event is sent to allow some actors to go back to their original state (i.e. Button controls)
             DALI_LOG_RELEASE_INFO("InterruptedActor(Hit): (%p) %d %s\n", reinterpret_cast<void*>(localVars.lastPrimaryHitActor), localVars.lastPrimaryHitActor->GetId(), localVars.lastPrimaryHitActor->GetName().data());
             leaveEventConsumer = EmitHoverSignals(processor.mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, localVars.hoverEvent, PointState::INTERRUPTED, localVars.isGeometry);
+            ClearHoverStartConsumedActorIfNeeded(processor.mHoverStartConsumedActor, processor.mLastPrimaryHitActor.GetActor());
           }
         }
 
@@ -539,6 +553,7 @@ struct HoverEventProcessor::Impl
             {
               DALI_LOG_RELEASE_INFO("LeaveActor(Consume): (%p) %d %s\n", reinterpret_cast<void*>(localVars.lastConsumedActor), localVars.lastConsumedActor->GetId(), localVars.lastConsumedActor->GetName().data());
               EmitHoverSignals(localVars.lastConsumedActor, lastRenderTaskImpl, localVars.hoverEvent, PointState::LEAVE, localVars.isGeometry);
+              ClearHoverStartConsumedActorIfNeeded(processor.mHoverStartConsumedActor, localVars.lastConsumedActor);
             }
           }
           else if(localVars.primaryPointState != PointState::STARTED)
@@ -547,6 +562,7 @@ struct HoverEventProcessor::Impl
             // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
             DALI_LOG_RELEASE_INFO("InterruptedActor(Consume): (%p) %d %s\n", reinterpret_cast<void*>(localVars.lastConsumedActor), localVars.lastConsumedActor->GetId(), localVars.lastConsumedActor->GetName().data());
             EmitHoverSignals(processor.mLastConsumedActor.GetActor(), lastRenderTaskImpl, localVars.hoverEvent, PointState::INTERRUPTED, localVars.isGeometry);
+            ClearHoverStartConsumedActorIfNeeded(processor.mHoverStartConsumedActor, processor.mLastConsumedActor.GetActor());
           }
         }
       }

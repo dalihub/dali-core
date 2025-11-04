@@ -109,6 +109,7 @@ TestApplication::~TestApplication()
   }
   Dali::Integration::Log::UninstallLogFunction();
   delete mCore;
+  delete mRenderSurface;
 }
 
 void TestApplication::LogContext(bool start, const char* tag, const char* message)

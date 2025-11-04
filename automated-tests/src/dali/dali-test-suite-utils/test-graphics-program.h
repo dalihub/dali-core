@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_PROGRAM_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 #include <dali/graphics-api/graphics-program.h>
 #include "test-gl-abstraction.h"
 #include "test-graphics-reflection.h"
+
+#include <memory>
 
 namespace Dali
 {
@@ -57,7 +59,7 @@ public:
 class TestGraphicsProgram : public Graphics::Program
 {
 public:
-  TestGraphicsProgram(TestGraphicsProgramImpl* impl);
+  TestGraphicsProgram(std::shared_ptr<TestGraphicsProgramImpl> impl);
 
   const TestGraphicsReflection& GetReflection() const
   {
@@ -74,7 +76,7 @@ public:
   }
 
 public:
-  TestGraphicsProgramImpl* mImpl;
+  std::shared_ptr<TestGraphicsProgramImpl> mImpl{nullptr};
 };
 
 } // namespace Dali
