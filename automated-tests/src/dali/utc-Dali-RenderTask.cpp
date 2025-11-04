@@ -5009,16 +5009,16 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   newTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
   newTask.SetFrameBuffer(frameBuffer);
 
-  application.SendNotification();
-
   std::vector<Rect<int>> damagedRects;
   Rect<int>              clippingRect;
 
+  // First frame result.
+  application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  // Full update if there is off-screen rendering
-  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  clippingRect = Rect<int>(16, 768, 32, 32);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -5027,22 +5027,72 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  // Remove framebuffer
-  newTask.SetFrameBuffer(FrameBuffer());
+  damagedRects.clear();
+
+  // Second frame result. No dirty rects.
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Attach FBO texture to actor
+  DALI_TEST_GREATER(actor.GetRendererCount(), 0u, TEST_LOCATION);
+  Renderer renderer = actor.GetRendererAt(0);
+  DALI_TEST_CHECK(renderer);
+  TextureSet textureSet = TextureSet::New();
+  DALI_TEST_CHECK(textureSet);
+  textureSet.SetTexture(0u, frameBufferTexture);
+
+  renderer.SetTextures(textureSet);
+
+  // Next frame after FBO. actor is drty always.
+  for(int i = 0; i < 10; ++i)
+  {
+    application.SendNotification();
+    application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+    clippingRect = Rect<int>(16, 768, 32, 32);
+    DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+    DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+    DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+
+    application.RenderWithPartialUpdate(damagedRects, clippingRect);
+    DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+    DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+    DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+    DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+    damagedRects.clear();
+  }
+
+  // Remove framebuffer texture
+  TextureSet newTextureSet = CreateTextureSet(Pixel::RGBA8888, 2, 2);
+  renderer.SetTextures(newTextureSet);
 
   application.SendNotification();
-
-  damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  // Full update
-  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  clippingRect = Rect<int>(16, 768, 32, 32);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  damagedRects.clear();
+
+  // Second frame after remove fbo. No dirty rects.
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Set invalid viewport of the render task
+  newTask.SetFrameBuffer(FrameBuffer());
   newTask.SetViewportSize(Vector2(-100.0f, -100.0f));
 
   application.SendNotification();
@@ -5050,7 +5100,7 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  // Full update because the camera orientation is changed
+  // Full update because the task viewport is invalid
   clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
@@ -5575,6 +5625,96 @@ int UtcDaliRenderTaskSetGetRenderedScaleFactor(void)
   DALI_TEST_EQUALS(task.GetRenderedScaleFactor(), singleFloatV2, TEST_LOCATION);
   DALI_TEST_EQUALS(task.GetProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), singleFloatV2, TEST_LOCATION);
   DALI_TEST_EQUALS(task.GetCurrentProperty<Vector2>(RenderTask::Property::RENDERED_SCALE_FACTOR), singleFloatV2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskExclusiveAddCacheRenderer(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing that exclusive RenderTask with AddCacheRenderer calls draw, and still draws after RenderTask removed");
+
+  // Setup GL abstraction for tracking draw calls
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Create scene and actors
+  Integration::Scene stage    = application.GetScene();
+  RenderTaskList     taskList = stage.GetRenderTaskList();
+
+  // Create a renderable actor
+  Texture image           = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
+  Actor   renderableActor = CreateRenderableActor(image);
+  renderableActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  stage.Add(renderableActor);
+
+  // Create camera for offscreen rendering
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  stage.Add(offscreenCameraActor);
+
+  // Create framebuffer for offscreen rendering
+  FrameBuffer frameBuffer        = FrameBuffer::New(100, 100);
+  Texture     frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  // Create exclusive render task
+  RenderTask exclusiveTask = taskList.CreateTask();
+  exclusiveTask.SetCameraActor(offscreenCameraActor);
+  exclusiveTask.SetSourceActor(renderableActor);
+  exclusiveTask.SetInputEnabled(false);
+  exclusiveTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  exclusiveTask.SetClearEnabled(true);
+  exclusiveTask.SetExclusive(true);
+  exclusiveTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+  exclusiveTask.SetFrameBuffer(frameBuffer);
+
+  // Add cache renderer to the exclusive task
+  Shader   cachedShader  = CreateShader();
+  Geometry quadGeometry  = CreateQuadGeometry();
+  Renderer cacheRenderer = Renderer::New(quadGeometry, cachedShader);
+  DALI_TEST_CHECK(cacheRenderer);
+  TextureSet textureSet = TextureSet::New();
+  DALI_TEST_CHECK(textureSet);
+  textureSet.SetTexture(0u, frameBufferTexture);
+  cacheRenderer.SetTextures(textureSet);
+  renderableActor.AddCacheRenderer(cacheRenderer);
+
+  // Initial render - should draw the actor
+  application.SendNotification();
+  application.Render();
+
+  // Check that draw was called for the exclusive task
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawElements") || drawTrace.FindMethod("DrawArrays"));
+  int initialDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
+  DALI_TEST_GREATER(initialDrawCount, 0, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Second render - should still draw due to REFRESH_ALWAYS
+  application.SendNotification();
+  application.Render();
+
+  // Check that draw was called again
+  int secondDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
+  DALI_TEST_GREATER(secondDrawCount, 0, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  // Remove the exclusive render task
+  renderableActor.RemoveCacheRenderer(cacheRenderer);
+  taskList.RemoveTask(exclusiveTask);
+
+  // Render after removing the exclusive task - should still draw the cache renderer
+  application.SendNotification();
+  application.Render();
+
+  // Check that draw is still called for the cache renderer even after task removal
+  int afterRemovalDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
+  DALI_TEST_GREATER(afterRemovalDrawCount, 0, TEST_LOCATION);
+
+  tet_printf("Initial draws: %d, Second draws: %d, After removal draws: %d\n", initialDrawCount, secondDrawCount, afterRemovalDrawCount);
 
   END_TEST;
 }

@@ -190,6 +190,16 @@ public:
   virtual Rect<uint32_t> GetUpdatedArea() = 0;
 
   /**
+   * @brief Called after rendering is completed to perform post-render operations.
+   *
+   * This method is called internally after the rendering process is finished,
+   * allowing native image implementations to perform any necessary cleanup
+   * or post-processing operations.
+   * @SINCE_2_4.43
+   */
+  virtual void PostRender() = 0;
+
+  /**
    * @brief Retrieves the extension for the interface.
    *
    * @SINCE_1_0.0

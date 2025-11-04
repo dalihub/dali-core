@@ -138,6 +138,12 @@ private: // GestureDetector overrides
   void Process(Scene& scene, const PinchGestureEvent& pinchEvent) override;
 
   /**
+   * Get the current gestured actor
+   * @return The current gestured actor, or nullptr if no actor is currently gestured
+   */
+  Actor* GetCurrentGesturedActor() override;
+
+  /**
    * Creates a PinchGesture and asks the specified detector to emit its detected signal.
    * @param[in]  actor       The actor that has been pinched.
    * @param[in]  pinchEvent  The pinchEvent received from the adaptor.

@@ -173,7 +173,7 @@ void PinchGestureDetector::Process(Scene& scene, const PinchGestureEvent& pinchE
   {
     case GestureState::STARTED:
     {
-      Actor* feededActor = mFeededActor.GetActor();
+      Actor* feededActor = GetCurrentGesturedActor();
       if(feededActor && CheckGestureDetector(&pinchEvent, feededActor, mRenderTask))
       {
         Vector2     actorCoords;
@@ -188,7 +188,7 @@ void PinchGestureDetector::Process(Scene& scene, const PinchGestureEvent& pinchE
     case GestureState::FINISHED:
     case GestureState::CANCELLED:
     {
-      Actor* feededActor = mFeededActor.GetActor();
+      Actor* feededActor = GetCurrentGesturedActor();
       if(feededActor && feededActor->IsHittable() && mRenderTask)
       {
         Vector2     actorCoords;
@@ -211,6 +211,12 @@ void PinchGestureDetector::Process(Scene& scene, const PinchGestureEvent& pinchE
       break;
     }
   }
+}
+
+Actor* PinchGestureDetector::GetCurrentGesturedActor()
+{
+  // Return the current feeded actor
+  return GestureDetector::GetCurrentGesturedActor();
 }
 
 } // namespace Internal

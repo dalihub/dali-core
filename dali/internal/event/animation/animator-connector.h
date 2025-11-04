@@ -54,7 +54,6 @@ public:
    * Construct a new animator connector.
    * @param[in] object The object for a scene-graph object to animate.
    * @param[in] propertyIndex The index of a property provided by the object.
-   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4 (INVALID_PROPERTY_COMPONENTINDEX to use the whole property)
    * @param[in] animatorFunction A function used to animate the property.
    * @param[in] alpha The alpha function to apply.
    * @param[in] period The time period of the animator.
@@ -62,14 +61,12 @@ public:
    */
   static AnimatorConnectorBase* New(Object&           object,
                                     Property::Index   propertyIndex,
-                                    int32_t           componentIndex,
                                     AnimatorFunction  animatorFunction,
                                     AlphaFunction     alpha,
                                     const TimePeriod& period)
   {
     return new AnimatorConnector(object,
                                  propertyIndex,
-                                 componentIndex,
                                  std::move(animatorFunction),
                                  alpha,
                                  period);
@@ -86,11 +83,10 @@ private:
    */
   AnimatorConnector(Object&           object,
                     Property::Index   propertyIndex,
-                    int32_t           componentIndex,
                     AnimatorFunction  animatorFunction,
                     AlphaFunction     alpha,
                     const TimePeriod& period)
-  : AnimatorConnectorBase(object, propertyIndex, componentIndex, alpha, period),
+  : AnimatorConnectorBase(object, propertyIndex, alpha, period),
     mAnimatorFunction(std::move(animatorFunction))
   {
   }
@@ -103,11 +99,11 @@ private:
   /**
    * @copydoc AnimatorConnectorBase::DoCreateAnimator()
    */
-  bool DoCreateAnimator(const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty) final
+  bool DoCreateAnimator(const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty, const int32_t componentIndex) final
   {
     bool resetterRequired = false;
     // components only supported for float property type
-    DALI_ASSERT_DEBUG(mComponentIndex == Property::INVALID_COMPONENT_INDEX);
+    DALI_ASSERT_DEBUG(componentIndex == Property::INVALID_COMPONENT_INDEX);
     // Animating the whole property
 
     // Cast to AnimatableProperty
@@ -162,7 +158,6 @@ public:
    * Construct a new animator connector.
    * @param[in] object The object for a scene-graph object to animate.
    * @param[in] propertyIndex The index of a property provided by the object.
-   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4 (INVALID_PROPERTY_COMPONENTINDEX to use the whole property)
    * @param[in] animatorFunction A function used to animate the property.
    * @param[in] alpha The alpha function to apply.
    * @param[in] period The time period of the animator.
@@ -170,14 +165,12 @@ public:
    */
   static AnimatorConnectorBase* New(Object&           object,
                                     Property::Index   propertyIndex,
-                                    int32_t           componentIndex,
                                     AnimatorFunction  animatorFunction,
                                     AlphaFunction     alpha,
                                     const TimePeriod& period)
   {
     return new AnimatorConnector(object,
                                  propertyIndex,
-                                 componentIndex,
                                  std::move(animatorFunction),
                                  alpha,
                                  period);
@@ -194,11 +187,10 @@ private:
    */
   AnimatorConnector(Object&           object,
                     Property::Index   propertyIndex,
-                    int32_t           componentIndex,
                     AnimatorFunction  animatorFunction,
                     AlphaFunction     alpha,
                     const TimePeriod& period)
-  : AnimatorConnectorBase(object, propertyIndex, componentIndex, alpha, period),
+  : AnimatorConnectorBase(object, propertyIndex, alpha, period),
     mAnimatorFunction(std::move(animatorFunction))
   {
   }
@@ -211,10 +203,10 @@ private:
   /**
    * @copydoc AnimatorConnectorBase::DoCreateAnimator()
    */
-  bool DoCreateAnimator(const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty) final
+  bool DoCreateAnimator(const SceneGraph::PropertyOwner& propertyOwner, const SceneGraph::PropertyBase& baseProperty, const int32_t componentIndex) final
   {
     bool resetterRequired = false;
-    if(mComponentIndex == Property::INVALID_COMPONENT_INDEX)
+    if(componentIndex == Property::INVALID_COMPONENT_INDEX)
     {
       // Animating the whole property
 
@@ -261,7 +253,7 @@ private:
           const SceneGraph::AnimatableProperty<Vector2>* animatableProperty = dynamic_cast<const SceneGraph::AnimatableProperty<Vector2>*>(&baseProperty);
           DALI_ASSERT_DEBUG(animatableProperty && "Animating non-animatable property");
 
-          switch(mComponentIndex)
+          switch(componentIndex)
           {
             case 0:
             {
@@ -300,29 +292,39 @@ private:
           {
             if(baseProperty.IsTransformManagerProperty())
             {
-              if(mComponentIndex == 0)
+              switch(componentIndex)
               {
-                mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 0> >::New(propertyOwner,
-                                                                                                                                      baseProperty,
-                                                                                                                                      std::move(mAnimatorFunction),
-                                                                                                                                      mAlphaFunction,
-                                                                                                                                      mTimePeriod);
-              }
-              else if(mComponentIndex == 1)
-              {
-                mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 1> >::New(propertyOwner,
-                                                                                                                                      baseProperty,
-                                                                                                                                      std::move(mAnimatorFunction),
-                                                                                                                                      mAlphaFunction,
-                                                                                                                                      mTimePeriod);
-              }
-              else if(mComponentIndex == 2)
-              {
-                mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 2> >::New(propertyOwner,
-                                                                                                                                      baseProperty,
-                                                                                                                                      std::move(mAnimatorFunction),
-                                                                                                                                      mAlphaFunction,
-                                                                                                                                      mTimePeriod);
+                case 0:
+                {
+                  mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 0> >::New(propertyOwner,
+                                                                                                                                        baseProperty,
+                                                                                                                                        std::move(mAnimatorFunction),
+                                                                                                                                        mAlphaFunction,
+                                                                                                                                        mTimePeriod);
+                  break;
+                }
+                case 1:
+                {
+                  mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 1> >::New(propertyOwner,
+                                                                                                                                        baseProperty,
+                                                                                                                                        std::move(mAnimatorFunction),
+                                                                                                                                        mAlphaFunction,
+                                                                                                                                        mTimePeriod);
+                  break;
+                }
+                case 2:
+                {
+                  mAnimator = SceneGraph::AnimatorTransformProperty<float, TransformManagerPropertyComponentAccessor<Vector3, 2> >::New(propertyOwner,
+                                                                                                                                        baseProperty,
+                                                                                                                                        std::move(mAnimatorFunction),
+                                                                                                                                        mAlphaFunction,
+                                                                                                                                        mTimePeriod);
+                  break;
+                }
+                default:
+                {
+                  break;
+                }
               }
             }
             else
@@ -336,7 +338,7 @@ private:
             // Dynamic cast will fail if BaseProperty is not a Vector3 AnimatableProperty
             DALI_ASSERT_DEBUG(animatableProperty && "Animating non-animatable property");
 
-            switch(mComponentIndex)
+            switch(componentIndex)
             {
               case 0:
               {
@@ -384,7 +386,7 @@ private:
           //Dynamic cast will fail if BaseProperty is not a Vector4 AnimatableProperty
           DALI_ASSERT_DEBUG(animatableProperty && "Animating non-animatable property");
 
-          switch(mComponentIndex)
+          switch(componentIndex)
           {
             case 0:
             {

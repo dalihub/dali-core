@@ -5735,11 +5735,15 @@ int UtcDaliRendererUniformMat3StandaloneStride(void)
   DALI_TEST_CHECK(gl.GetUniformValue<Matrix3>("uANormalMatrix", uniformValue));
   DALI_TEST_EQUALS(uniformValue, value.Get<Matrix3>(), TEST_LOCATION);
 
-  float* els = value.Get<Matrix3>().AsFloat();
+  // Now set a non-identity matrix3
+  Matrix3 notIdentity;
+  float*  els = notIdentity.AsFloat();
   for(int i = 0; i < 9; ++i)
   {
     *els++ = i * 1.0f;
   }
+  value = Property::Value(notIdentity);
+
   shader.SetProperty(index, value);
   application.SendNotification();
   application.Render(0);

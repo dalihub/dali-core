@@ -187,6 +187,17 @@ public:
   }
 
   /**
+   * @brief Called when apply constraint property or removed.
+   * @SINCE_2_4.41
+   * @param[in] constraint The constraint constrainting the property.
+   * @param[in] index The animatable property index
+   * @param[in] applied Whether it is applied or not.
+   */
+  virtual void OnConstraintAnimatableProperty(Constraint& constraint, Property::Index index, bool applied)
+  {
+  }
+
+  /**
    * @brief Retrieves the off-screen RenderTasks associated with the Actor.
    * This method returns the internal RenderTasks held by the Actor. This tasks are
    * used for off-screen rendering, and the system will assign order index to each

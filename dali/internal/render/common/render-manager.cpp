@@ -773,10 +773,17 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   for(uint32_t i = instructionCount; i > 0; --i)
   {
     RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i - 1);
-    if(instruction.RenderListCount() > 0 && instruction.mFrameBuffer == nullptr)
+    if(instruction.mFrameBuffer)
     {
-      renderToScene = true;
-      break;
+      // TODO : For now, let we just always dirty the target of FBO texture
+      instruction.mFrameBuffer->UpdateAttachedTextures(*this);
+    }
+    else
+    {
+      if(instruction.RenderListCount() > 0)
+      {
+        renderToScene = true;
+      }
     }
   }
 
@@ -805,11 +812,18 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   class DamagedRectsCleaner
   {
   public:
-    explicit DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects, Rect<int>& surfaceRect)
+    explicit DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects, Rect<int>& surfaceRect, Scene*& sceneObject)
     : mDamagedRects(damagedRects),
       mSurfaceRect(surfaceRect),
+      mSceneObject(sceneObject),
+      mFullUpdateNextFrame(true),
       mCleanOnReturn(true)
     {
+    }
+
+    void VerifyDirtyRectsDone()
+    {
+      mFullUpdateNextFrame = false;
     }
 
     void SetCleanOnReturn(bool cleanOnReturn)
@@ -819,6 +833,11 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
 
     ~DamagedRectsCleaner()
     {
+      if(mFullUpdateNextFrame)
+      {
+        // Clear all dirty rects
+        mSceneObject->ClearItemsDirtyRects();
+      }
       if(mCleanOnReturn)
       {
         mDamagedRects.clear();
@@ -829,26 +848,26 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   private:
     std::vector<Rect<int>>& mDamagedRects;
     Rect<int>               mSurfaceRect;
+    Scene*&                 mSceneObject;
+    bool                    mFullUpdateNextFrame;
     bool                    mCleanOnReturn;
   };
 
   Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
-  DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect);
+  DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect, sceneObject);
   bool                cleanDamagedRect = false;
-
-  Scene::ItemsDirtyRectsContainer& itemsDirtyRects = sceneObject->GetItemsDirtyRects();
 
   // Full swap if scene disable partial update,
   // or terminated native draw exist (to ensure scene context be used)
   if(!sceneObject->IsPartialUpdateEnabled() || mImpl->terminatedNativeDrawManager.TerminatedCallbackExist(*sceneObject))
   {
-    // Clear all dirty rects
     // The rects will be added when partial updated is enabled again
-    itemsDirtyRects.clear();
     return;
   }
+
+  Scene::ItemsDirtyRectsContainer& itemsDirtyRects = sceneObject->GetItemsDirtyRects();
 
   // Mark previous dirty rects in the std::unordered_map.
   for(auto& dirtyRectPair : itemsDirtyRects)
@@ -862,7 +881,6 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
 
     if(instruction.mFrameBuffer)
     {
-      cleanDamagedRect = true;
       continue; // TODO: reset, we don't deal with render tasks with framebuffers (for now)
     }
 
@@ -884,14 +902,12 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
          orientationAngle != ANGLE_180 ||
          scale != Vector3(1.0f, 1.0f, 1.0f))
       {
-        cleanDamagedRect = true;
-        continue;
+        return;
       }
     }
     else
     {
-      cleanDamagedRect = true;
-      continue;
+      return;
     }
 
     Rect<int32_t> viewportRect;
@@ -901,8 +917,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
       viewportRect.Set(instruction.mViewport.x, y, instruction.mViewport.width, instruction.mViewport.height);
       if(viewportRect.IsEmpty() || !viewportRect.IsValid())
       {
-        cleanDamagedRect = true;
-        continue; // just skip funny use cases for now, empty viewport means it is set somewhere else
+        return; // just skip funny use cases for now, empty viewport means it is set somewhere else
       }
     }
     else
@@ -936,23 +951,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
               // If the item does 3D transformation, make full update
               if(nodeInfo.updatedPositionSize == Vector4::ZERO)
               {
-                cleanDamagedRect = true;
-
-                // Save the full rect in the damaged list. We need it when this item is removed
-                DirtyRectKey dirtyRectKey(item.mNode, item.mRenderer);
-                auto         dirtyRectPos = itemsDirtyRects.find(dirtyRectKey);
-                if(dirtyRectPos != itemsDirtyRects.end())
-                {
-                  // Replace the rect
-                  dirtyRectPos->second.visited = true;
-                  dirtyRectPos->second.rect    = surfaceRect;
-                }
-                else
-                {
-                  // Else, just insert the new dirtyrect
-                  itemsDirtyRects.insert({dirtyRectKey, surfaceRect});
-                }
-                continue;
+                return;
               }
 
               Rect<int>    rect;
@@ -1019,6 +1018,10 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
     }
   }
 
+  // Now we can ensure that current frame item dirty rects collected well.
+  // Do not mark as full-update next frame.
+  damagedRectCleaner.VerifyDirtyRectsDone();
+
   // Check removed nodes or removed renderers dirty rects
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   for(auto iter = itemsDirtyRects.begin(); iter != itemsDirtyRects.end();)
@@ -1038,7 +1041,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
     }
   }
 
-  if(sceneObject->IsNeededFullUpdate())
+  if(sceneObject->IsFullUpdateNeeded())
   {
     cleanDamagedRect = true; // And make full update at this frame
   }
@@ -1065,14 +1068,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Rendering to %s\n", renderToFbo ? "Framebuffer" : "Surface");
-
-  if(mImpl->partialUpdateAvailable == Integration::PartialUpdateAvailable::TRUE && !renderToFbo && clippingRect.IsEmpty())
-  {
-    DALI_LOG_INFO(gLogFilter, Debug::General, "PartialUpdate and no clip\n");
-    DALI_LOG_DEBUG_INFO("ClippingRect was empty. Skip rendering\n");
-    // Should not get here anymore - copied this check to caller.
-    return;
-  }
 
   Internal::Scene&   sceneInternal = GetImplementation(scene);
   SceneGraph::Scene* sceneObject   = sceneInternal.GetSceneObject();

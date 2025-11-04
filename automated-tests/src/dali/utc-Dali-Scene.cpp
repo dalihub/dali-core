@@ -326,6 +326,24 @@ int UtcDaliSceneRemove(void)
   END_TEST;
 }
 
+int UtcDaliSceneRequestFullUpdateP(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::RequestFullUpdate");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  scene.RequestFullUpdate();
+
+  application.SendNotification();
+  application.Render();
+
+  // Just check their is no exceptions
+  tet_result(TET_PASS);
+
+  END_TEST;
+}
+
 int UtcDaliSceneGetSize(void)
 {
   TestApplication application;
@@ -477,6 +495,7 @@ int UtcDaliSceneDiscard(void)
   DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 2);
 
   // Request to discard the scene from the Core
+  scene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
   scene.Discard();
   DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 1);
 
@@ -551,6 +570,7 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 2);
 
   // Request to discard the scene from the Core
+  scene.RemoveSceneObject(); // Scene's scene graph lifecycle is NOT managed by scene handle
   scene.Discard();
   DALI_TEST_CHECK(scene.GetBaseObject().ReferenceCount() == 1);
 
@@ -3307,6 +3327,96 @@ int UtcDaliSceneDestructWorkerThreadN(void)
 
   // Always success
   DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+int UtcDaliSceneRequestFullUpdatePartialRendering(void)
+{
+  tet_infoline("Test that RequestFullUpdate() properly full-update");
+
+  TestApplication application(
+    TestApplication::DEFAULT_SURFACE_WIDTH,
+    TestApplication::DEFAULT_SURFACE_HEIGHT,
+    TestApplication::DEFAULT_HORIZONTAL_DPI,
+    TestApplication::DEFAULT_VERTICAL_DPI,
+    true,
+    true);
+
+  auto scene = application.GetScene();
+  DALI_TEST_CHECK(scene);
+
+  // Create an actor to generate dirty rects
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  scene.Add(actor);
+
+  std::vector<Rect<int>> damagedRects;
+  Rect<int>              clippingRect;
+  Rect<int>              expectedRect1, expectedRect2;
+
+  // Initial render to populate dirty rects
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Should have dirty rects from adding the actor
+  DALI_TEST_EQUALS(damagedRects.size(), 1u, TEST_LOCATION);
+
+  clippingRect  = Rect<int>(0, 784, 32, 32); // in screen coordinates;
+  expectedRect1 = Rect<int>(0, 784, 32, 32); // in screen coordinates, includes 1 last frames updates
+
+  DirtyRectChecker(damagedRects, {expectedRect1}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Clear damaged rects for next frame
+  damagedRects.clear();
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Should be no dirty rects now
+  DALI_TEST_EQUALS(damagedRects.size(), 0u, TEST_LOCATION);
+
+  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  // Update only several frames!
+  application.SendNotification();
+  application.Render(0, TEST_LOCATION, true);
+  application.SendNotification();
+  application.Render(0, TEST_LOCATION, true);
+  application.SendNotification();
+  application.Render(0, TEST_LOCATION, true);
+
+  // Create new actor and remove old actor to generate dirty rects
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 16.0f, 0.0f));
+  scene.Add(actor2);
+
+  actor.Unparent();
+
+  // Update only several frames again!
+  application.SendNotification();
+  application.Render(0, TEST_LOCATION, true);
+  application.SendNotification();
+  application.Render(0, TEST_LOCATION, true);
+  application.SendNotification();
+  application.Render(0, TEST_LOCATION, true);
+
+  tet_printf("Call scene.RequestFullUpdate()\n");
+  scene.RequestFullUpdate();
+
+  damagedRects.clear();
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+
+  // Should be full-update this frame
+  DALI_TEST_EQUALS(damagedRects.size(), 1u, TEST_LOCATION);
+  clippingRect  = TestApplication::DEFAULT_SURFACE_RECT;
+  expectedRect1 = TestApplication::DEFAULT_SURFACE_RECT;
+  DirtyRectChecker(damagedRects, {expectedRect1}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   END_TEST;
 }

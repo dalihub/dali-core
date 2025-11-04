@@ -889,6 +889,7 @@ void Object::ApplyConstraint(ConstraintBase& constraint)
   {
     mConstraints = new ConstraintContainer;
   }
+  ConstraintAnimatableProperty(constraint, constraint.GetTargetProperty(), true);
   mConstraints->push_back(Dali::Constraint(&constraint));
 }
 
@@ -901,6 +902,7 @@ void Object::RemoveConstraint(ConstraintBase& constraint)
     if(it != mConstraints->end())
     {
       mConstraints->erase(it);
+      ConstraintAnimatableProperty(constraint, constraint.GetTargetProperty(), false);
     }
   }
 }
@@ -912,7 +914,9 @@ void Object::RemoveConstraints()
   {
     for(auto&& item : *mConstraints)
     {
-      GetImplementation(item).RemoveInternal();
+      ConstraintBase& constraint = GetImplementation(item);
+      constraint.RemoveInternal();
+      ConstraintAnimatableProperty(constraint, constraint.GetTargetProperty(), false);
     }
 
     delete mConstraints;
@@ -931,7 +935,8 @@ void Object::RemoveConstraints(uint32_t tag)
       ConstraintBase& constraint = GetImplementation(*iter);
       if(constraint.GetTag() == tag)
       {
-        GetImplementation(*iter).RemoveInternal();
+        constraint.RemoveInternal();
+        ConstraintAnimatableProperty(constraint, constraint.GetTargetProperty(), false);
         iter = mConstraints->erase(iter);
       }
       else
@@ -951,7 +956,7 @@ void Object::RemoveConstraints(uint32_t tag)
 void Object::RemoveConstraints(uint32_t tagBegin, uint32_t tagEnd)
 {
   // guard against constraint sending messages during core destruction
-  if(mConstraints && Stage::IsInstalled())
+  if(mConstraints && tagBegin < tagEnd && Stage::IsInstalled())
   {
     auto iter(mConstraints->begin());
     while(iter != mConstraints->end())
@@ -960,7 +965,8 @@ void Object::RemoveConstraints(uint32_t tagBegin, uint32_t tagEnd)
       const uint32_t  tag        = constraint.GetTag();
       if(tagBegin <= tag && tag < tagEnd)
       {
-        GetImplementation(*iter).RemoveInternal();
+        constraint.RemoveInternal();
+        ConstraintAnimatableProperty(constraint, constraint.GetTargetProperty(), false);
         iter = mConstraints->erase(iter);
       }
       else

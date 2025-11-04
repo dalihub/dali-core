@@ -324,6 +324,12 @@ void PinchGestureProcessor::GestureDetectorUpdated(PinchGestureDetector* gesture
   // Nothing to do as PinchGestureDetector does not have any specific parameters.
 }
 
+Actor* PinchGestureProcessor::GetCurrentGesturedActor()
+{
+  // Call the base class implementation
+  return GestureProcessor::GetCurrentGesturedActor();
+}
+
 void PinchGestureProcessor::OnGesturedActorStageDisconnection()
 {
   mCurrentPinchEmitters.clear();

@@ -229,6 +229,15 @@ public:
   }
 
   /**
+   * Get the container of renderers for the node.
+   * @return The renderers
+   */
+  const RendererContainer& GetRendererContainer() const
+  {
+    return mRenderers;
+  }
+
+  /**
    * Add a renderer to the node
    * @param[in] renderer The renderer to add to the node
    */
@@ -255,6 +264,15 @@ public:
   uint32_t GetRendererCount() const
   {
     return static_cast<uint32_t>(mRenderers.Size());
+  }
+
+  /**
+   * Get the container of cache renderers for the node.
+   * @return The cache renderers
+   */
+  const RendererContainer& GetCacheRendererContainer() const
+  {
+    return mCacheRenderers;
   }
 
   /**

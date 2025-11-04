@@ -43,33 +43,7 @@ RenderTask* RenderTask::New()
 
 RenderTask::~RenderTask()
 {
-  if(mSourceNode)
-  {
-    mSourceNode->RemoveObserver(*this);
-    if(mExclusive)
-    {
-      mSourceNode->RemoveExclusiveRenderTask(this);
-    }
-  }
-  if(mStopperNode)
-  {
-    mStopperNode->RemoveObserver(*this);
-  }
-  if(mCameraNode)
-  {
-    mCameraNode->RemoveObserver(*this);
-  }
-  if(mViewportGuideNode)
-  {
-    mViewportGuideNode->RemoveObserver(*this);
-  }
-  if(mRenderSyncTracker)
-  {
-    if(DALI_LIKELY(mRenderMessageDispatcher))
-    {
-      mRenderMessageDispatcher->RemoveRenderTracker(*mRenderSyncTracker);
-    }
-  }
+  Destroy();
 }
 
 void RenderTask::Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher)
@@ -514,6 +488,44 @@ void RenderTask::SetSyncRequired(bool requiresSync)
 void RenderTask::SetRenderPassTag(uint32_t renderPassTag)
 {
   mRenderPassTag = renderPassTag;
+}
+
+void RenderTask::Destroy()
+{
+  TASK_LOG(Debug::General);
+
+  if(mSourceNode)
+  {
+    mSourceNode->RemoveObserver(*this);
+    if(mExclusive)
+    {
+      mSourceNode->RemoveExclusiveRenderTask(this);
+    }
+    mSourceNode = nullptr;
+  }
+  if(mStopperNode)
+  {
+    mStopperNode->RemoveObserver(*this);
+    mStopperNode = nullptr;
+  }
+  if(mCameraNode)
+  {
+    mCameraNode->RemoveObserver(*this);
+    mCameraNode = nullptr;
+  }
+  if(mViewportGuideNode)
+  {
+    mViewportGuideNode->RemoveObserver(*this);
+    mViewportGuideNode = nullptr;
+  }
+  if(mRenderSyncTracker)
+  {
+    if(DALI_LIKELY(mRenderMessageDispatcher))
+    {
+      mRenderMessageDispatcher->RemoveRenderTracker(*mRenderSyncTracker);
+    }
+    mRenderSyncTracker = nullptr;
+  }
 }
 
 void RenderTask::ContextDestroyed()

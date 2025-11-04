@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ Property::Type KeyFrames::GetType() const
   return mType;
 }
 
-void KeyFrames::Add(float time, const Property::Value& value, AlphaFunction alpha)
+void KeyFrames::Add(float time, const Property::Value& value)
 {
   if(mType == Property::NONE)
   {
@@ -100,43 +100,43 @@ void KeyFrames::Add(float time, const Property::Value& value, AlphaFunction alph
     case Property::BOOLEAN:
     {
       Internal::KeyFrameBoolean* kf = static_cast<Internal::KeyFrameBoolean*>(keyframes);
-      kf->AddKeyFrame(time, value.Get<bool>(), alpha);
+      kf->AddKeyFrame(time, value.Get<bool>());
       break;
     }
     case Property::INTEGER:
     {
       Internal::KeyFrameInteger* kf = static_cast<Internal::KeyFrameInteger*>(keyframes);
-      kf->AddKeyFrame(time, value.Get<int>(), alpha);
+      kf->AddKeyFrame(time, value.Get<int>());
       break;
     }
     case Property::FLOAT:
     {
       Internal::KeyFrameNumber* kf = static_cast<Internal::KeyFrameNumber*>(keyframes);
-      kf->AddKeyFrame(time, value.Get<float>(), alpha);
+      kf->AddKeyFrame(time, value.Get<float>());
       break;
     }
     case Property::VECTOR2:
     {
       Internal::KeyFrameVector2* kf = static_cast<Internal::KeyFrameVector2*>(keyframes);
-      kf->AddKeyFrame(time, value.Get<Vector2>(), alpha);
+      kf->AddKeyFrame(time, value.Get<Vector2>());
       break;
     }
     case Property::VECTOR3:
     {
       Internal::KeyFrameVector3* kf = static_cast<Internal::KeyFrameVector3*>(keyframes);
-      kf->AddKeyFrame(time, value.Get<Vector3>(), alpha);
+      kf->AddKeyFrame(time, value.Get<Vector3>());
       break;
     }
     case Property::VECTOR4:
     {
       Internal::KeyFrameVector4* kf = static_cast<Internal::KeyFrameVector4*>(keyframes);
-      kf->AddKeyFrame(time, value.Get<Vector4>(), alpha);
+      kf->AddKeyFrame(time, value.Get<Vector4>());
       break;
     }
     case Property::ROTATION:
     {
       Internal::KeyFrameQuaternion* kf = static_cast<Internal::KeyFrameQuaternion*>(keyframes);
-      kf->AddKeyFrame(time, value.Get<Quaternion>(), alpha);
+      kf->AddKeyFrame(time, value.Get<Quaternion>());
       break;
     }
     default:

@@ -294,6 +294,11 @@ public:
   void SceneCreated();
 
   /**
+   * Notify Core that the scene will be destroyed.
+   */
+  void SceneDestroyed();
+
+  /**
    * Queue an event with Core.
    * Pre-processing of events may be beneficial e.g. a series of motion events could be throttled, so that only the last event is queued.
    * Multi-threading note: this method should be called from the main thread.
@@ -466,11 +471,6 @@ public:
    * @param[in] postProcessor True if the processor to be unregister is for post processor.
    */
   void UnregisterProcessorOnce(Processor& processor, bool postProcessor = false);
-
-  /**
-   * @brief Unregister all processors and post processors (include once) what we registered before.
-   */
-  void UnregisterProcessors();
 
   // ETC
 

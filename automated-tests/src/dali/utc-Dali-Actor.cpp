@@ -3670,14 +3670,14 @@ int UtcDaliActorHitTest(void)
   tet_infoline(" UtcDaliActorHitTest");
 
   // Fill a vector with different hit tests.
-  struct HitTestData* hitTestData[] = {
+  static std::unique_ptr<HitTestData> hitTestData[] = {
     //                    scale                     touch point           result
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(289.f, 400.f), true),  // touch point close to the right edge (inside)
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(291.f, 400.f), false), // touch point close to the right edge (outside)
-    new HitTestData(Vector3(110.f, 100.f, 1.f), Vector2(291.f, 400.f), true),  // same point as above with a wider scale. Should be inside.
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(200.f, 451.f), false), // touch point close to the down edge (outside)
-    new HitTestData(Vector3(100.f, 110.f, 1.f), Vector2(200.f, 451.f), true),  // same point as above with a wider scale. Should be inside.
-    NULL,
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(289.f, 400.f), true),  // touch point close to the right edge (inside)
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(291.f, 400.f), false), // touch point close to the right edge (outside)
+    std::make_unique<HitTestData>(Vector3(110.f, 100.f, 1.f), Vector2(291.f, 400.f), true),  // same point as above with a wider scale. Should be inside.
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(200.f, 451.f), false), // touch point close to the down edge (outside)
+    std::make_unique<HitTestData>(Vector3(100.f, 110.f, 1.f), Vector2(200.f, 451.f), true),  // same point as above with a wider scale. Should be inside.
+    nullptr,
   };
 
   // get the root layer
@@ -3753,14 +3753,14 @@ int UtcDaliActorGeoHitTest(void)
   tet_infoline(" UtcDaliActorHitTest");
 
   // Fill a vector with different hit tests.
-  struct HitTestData* hitTestData[] = {
+  static std::unique_ptr<HitTestData> hitTestData[] = {
     //                    scale                     touch point           result
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(289.f, 400.f), true),  // touch point close to the right edge (inside)
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(291.f, 400.f), false), // touch point close to the right edge (outside)
-    new HitTestData(Vector3(110.f, 100.f, 1.f), Vector2(291.f, 400.f), true),  // same point as above with a wider scale. Should be inside.
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(200.f, 451.f), false), // touch point close to the down edge (outside)
-    new HitTestData(Vector3(100.f, 110.f, 1.f), Vector2(200.f, 451.f), true),  // same point as above with a wider scale. Should be inside.
-    NULL,
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(289.f, 400.f), true),  // touch point close to the right edge (inside)
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(291.f, 400.f), false), // touch point close to the right edge (outside)
+    std::make_unique<HitTestData>(Vector3(110.f, 100.f, 1.f), Vector2(291.f, 400.f), true),  // same point as above with a wider scale. Should be inside.
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(200.f, 451.f), false), // touch point close to the down edge (outside)
+    std::make_unique<HitTestData>(Vector3(100.f, 110.f, 1.f), Vector2(200.f, 451.f), true),  // same point as above with a wider scale. Should be inside.
+    nullptr,
   };
 
   // get the root layer
@@ -4636,6 +4636,41 @@ int UtcDaliActorOnRelayoutSignal(void)
   // OnRelayout emitted
   DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, true, TEST_LOCATION);
   DALI_TEST_EQUALS("actor", gActorNamesRelayout[0], TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorOnRelayoutSignalN(void)
+{
+  tet_infoline("Testing Dali::Actor::OnRelayoutSignal() not comming after application terminated.");
+
+  Actor actor;
+  {
+    TestApplication application;
+
+    // Clean test data
+    gOnRelayoutCallBackCalled = false;
+    gActorNamesRelayout.clear();
+
+    Actor actor = Actor::New();
+    actor.SetProperty(Actor::Property::NAME, "actor");
+    actor.OnRelayoutSignal().Connect(OnRelayoutCallback);
+
+    // Sanity check
+    DALI_TEST_CHECK(!gOnRelayoutCallBackCalled);
+
+    // Add actor to stage
+    application.GetScene().Add(actor);
+
+    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    actor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 2.0));
+
+    // OnRelayout will not be emitted
+    DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
+  }
+
+  // OnRelayout will not be emitted
+  DALI_TEST_EQUALS(gOnRelayoutCallBackCalled, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -14732,14 +14767,14 @@ int UtcDaliActorDoesWantedHitTest(void)
   tet_infoline(" UtcDaliActorDoesWantedHitTest");
 
   // Fill a vector with different hit tests.
-  struct HitTestData* hitTestData[] = {
+  static std::unique_ptr<HitTestData> hitTestData[] = {
     //                    scale                     touch point           result
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(289.f, 400.f), true),  // touch point close to the right edge (inside)
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(291.f, 400.f), false), // touch point close to the right edge (outside)
-    new HitTestData(Vector3(110.f, 100.f, 1.f), Vector2(291.f, 400.f), true),  // same point as above with a wider scale. Should be inside.
-    new HitTestData(Vector3(100.f, 100.f, 1.f), Vector2(200.f, 451.f), false), // touch point close to the down edge (outside)
-    new HitTestData(Vector3(100.f, 110.f, 1.f), Vector2(200.f, 451.f), true),  // same point as above with a wider scale. Should be inside.
-    NULL,
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(289.f, 400.f), true),  // touch point close to the right edge (inside)
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(291.f, 400.f), false), // touch point close to the right edge (outside)
+    std::make_unique<HitTestData>(Vector3(110.f, 100.f, 1.f), Vector2(291.f, 400.f), true),  // same point as above with a wider scale. Should be inside.
+    std::make_unique<HitTestData>(Vector3(100.f, 100.f, 1.f), Vector2(200.f, 451.f), false), // touch point close to the down edge (outside)
+    std::make_unique<HitTestData>(Vector3(100.f, 110.f, 1.f), Vector2(200.f, 451.f), true),  // same point as above with a wider scale. Should be inside.
+    nullptr,
   };
 
   // get the root layer

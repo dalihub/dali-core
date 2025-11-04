@@ -344,6 +344,12 @@ void PanGestureProcessor::GestureDetectorUpdated(PanGestureDetector* gestureDete
   UpdateDetection();
 }
 
+Actor* PanGestureProcessor::GetCurrentGesturedActor()
+{
+  // Call the base class implementation
+  return GestureProcessor::GetCurrentGesturedActor();
+}
+
 bool PanGestureProcessor::SetPanGestureProperties(const Dali::PanGesture& pan)
 {
   // If we are currently processing a pan gesture then just ignore

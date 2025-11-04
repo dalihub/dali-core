@@ -315,6 +315,17 @@ public:
   {
   }
 
+  /**
+   * Apply constraint property or removed.
+   * @param[in] constraint The constraint constrainting the property.
+   * @param[in] index The index of the property.
+   * @param[in] applied Whether it is applied or not.
+   * @SINCE_2_4.41
+   */
+  virtual void ConstraintAnimatableProperty(ConstraintBase& constraint, Property::Index index, bool applied)
+  {
+  }
+
   /******************************** Uniform Mappings ********************************/
 
   /**

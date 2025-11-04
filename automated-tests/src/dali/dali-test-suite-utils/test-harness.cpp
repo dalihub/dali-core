@@ -398,7 +398,8 @@ int32_t RunAll(const char* processName, ::testcase tc_array[], std::string match
     bool     run = true;
     if(!match.empty())
     {
-      if(match.compare(0, match.size(), testCase.name, match.size()))
+      size_t nameLen = strnlen(testCase.name, match.size());
+      if(nameLen != match.size() || match.compare(0, match.size(), testCase.name, match.size()))
       {
         run = false;
       }
@@ -471,7 +472,8 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
       bool run = true;
       if(!match.empty())
       {
-        if(match.compare(0, match.size(), tc_array[nextTestCase].name, match.size()))
+        size_t nameLen = strnlen(tc_array[nextTestCase].name, match.size());
+        if(nameLen != match.size() || match.compare(0, match.size(), tc_array[nextTestCase].name, match.size()))
         {
           run = false;
         }
@@ -605,6 +607,7 @@ int32_t RunAllInParallel(const char* processName, ::testcase tc_array[], std::st
       char*   testCaseStrapline;
       int32_t numChars = asprintf(&testCaseStrapline, "Test case %s", tc_array[failedTestCases[i]].name);
       printf("\n%s\n", testCaseStrapline);
+      free(testCaseStrapline);
       for(int32_t j = 0; j < numChars; j++)
       {
         printf("=");

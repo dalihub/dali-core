@@ -135,6 +135,12 @@ public:
   void SetDetected(bool detected);
 
   /**
+   * Get the current gestured actor
+   * @return The current gestured actor, or nullptr if no actor is currently gestured
+   */
+  Actor* GetCurrentGesturedActor();
+
+  /**
    * gesture-detector meets the parameters of the current gesture.
    *
    * @param[in]  gestureEvent The gesture event.

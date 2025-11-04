@@ -317,7 +317,7 @@ void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)
     }
     case GestureState::STARTED:
     {
-      Actor* feededActor = mFeededActor.GetActor();
+      Actor* feededActor = GetCurrentGesturedActor();
       if(feededActor && CheckGestureDetector(&tapEvent, feededActor, mRenderTask) && mPossibleProcessed)
       {
         Vector2 actorCoords;
@@ -360,6 +360,12 @@ void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)
       break;
     }
   }
+}
+
+Actor* TapGestureDetector::GetCurrentGesturedActor()
+{
+  // Return the current feeded actor
+  return GestureDetector::GetCurrentGesturedActor();
 }
 
 } // namespace Internal

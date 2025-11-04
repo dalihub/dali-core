@@ -254,11 +254,7 @@ struct UpdateManager::Impl
     {
       if(scene && scene->taskList)
       {
-        RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
-        for(auto&& task : tasks)
-        {
-          task->SetSourceNode(nullptr);
-        }
+        scene->taskList.Reset();
       }
     }
 
@@ -1115,11 +1111,7 @@ void UpdateManager::ConstrainCustomObjects(PropertyOwnerContainer& postPropertyO
   // Constrain custom objects (in construction order)
   for(auto&& object : mImpl->customObjects)
   {
-    ConstrainPropertyOwner(*object, bufferIndex);
-    if(!object->GetPostConstraints().Empty())
-    {
-      postPropertyOwners.PushBack(object);
-    }
+    ConstrainPropertyOwner(*object, bufferIndex, true, postPropertyOwners);
   }
 }
 
@@ -1133,11 +1125,7 @@ void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwn
       RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
       for(auto&& task : tasks)
       {
-        ConstrainPropertyOwner(*task, bufferIndex);
-        if(!task->GetPostConstraints().Empty())
-        {
-          postPropertyOwners.PushBack(task);
-        }
+        ConstrainPropertyOwner(*task, bufferIndex, true, postPropertyOwners);
       }
     }
   }
@@ -1148,19 +1136,11 @@ void UpdateManager::ConstrainShaders(PropertyOwnerContainer& postPropertyOwners,
   // constrain shaders... (in construction order)
   for(auto&& shader : mImpl->shaders)
   {
-    ConstrainPropertyOwner(*shader, bufferIndex);
-    if(!shader->GetPostConstraints().Empty())
-    {
-      postPropertyOwners.PushBack(shader);
-    }
+    ConstrainPropertyOwner(*shader, bufferIndex, true, postPropertyOwners);
   }
   for(auto&& uniformBlock : mImpl->uniformBlocks)
   {
-    ConstrainPropertyOwner(*uniformBlock, bufferIndex);
-    if(!uniformBlock->GetPostConstraints().Empty())
-    {
-      postPropertyOwners.PushBack(uniformBlock);
-    }
+    ConstrainPropertyOwner(*uniformBlock, bufferIndex, true, postPropertyOwners);
   }
 }
 
@@ -1215,11 +1195,7 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
   {
     // Apply constraints
     auto renderer = rendererKey.Get();
-    ConstrainPropertyOwner(*renderer, bufferIndex);
-    if(!renderer->GetPostConstraints().Empty())
-    {
-      postPropertyOwners.PushBack(renderer);
-    }
+    ConstrainPropertyOwner(*renderer, bufferIndex, true, postPropertyOwners);
 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
   }
@@ -1370,7 +1346,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // Constraint applied after transform manager updated. Only required property owner processed.
     for(auto&& propertyOwner : postPropertyOwners)
     {
-      ConstrainPropertyOwner(*propertyOwner, bufferIndex, false);
+      ConstrainPropertyOwner(*propertyOwner, bufferIndex, false, postPropertyOwners);
     }
 
     // Initialise layer renderable reuse

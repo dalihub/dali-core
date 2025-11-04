@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,16 @@ namespace
 {
 static bool CreateCustomNamedInitCalled = false;
 
+static std::unique_ptr<BaseHandle>      csharpCreatedHandle;
+static std::unique_ptr<Property::Value> csharpCreatedValue;
+
 BaseHandle* CreateCustomNamedInit(const char* const typeName)
 {
   CreateCustomNamedInitCalled = true;
 
-  BaseHandle* x = new BaseHandle();
+  csharpCreatedHandle = std::make_unique<BaseHandle>();
 
-  return x;
+  return csharpCreatedHandle.get();
 }
 
 // Property Registration
@@ -55,8 +58,8 @@ void SetProperty(BaseObject* object, const char* const propertyName, Property::V
 Property::Value* GetProperty(BaseObject* object, const char* const propertyName)
 {
   getPropertyCalled  = true;
-  Property::Value* x = new Property::Value(10);
-  return x;
+  csharpCreatedValue = std::make_unique<Property::Value>(10);
+  return csharpCreatedValue.get();
 }
 
 } // namespace

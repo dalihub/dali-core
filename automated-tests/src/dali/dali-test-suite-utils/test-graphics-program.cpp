@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ bool TestGraphicsProgramImpl::GetParameter(uint32_t parameterId, void* outData)
   return true;
 }
 
-TestGraphicsProgram::TestGraphicsProgram(TestGraphicsProgramImpl* impl)
+TestGraphicsProgram::TestGraphicsProgram(std::shared_ptr<TestGraphicsProgramImpl> impl)
 {
   mImpl = impl;
 }

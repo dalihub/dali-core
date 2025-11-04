@@ -289,6 +289,12 @@ uint32_t RotationGestureProcessor::GetMinimumTouchEventsAfterStart() const
   return mMinimumTouchEventsAfterStart;
 }
 
+Actor* RotationGestureProcessor::GetCurrentGesturedActor()
+{
+  // Call the base class implementation
+  return GestureProcessor::GetCurrentGesturedActor();
+}
+
 void RotationGestureProcessor::OnGesturedActorStageDisconnection()
 {
   mCurrentRotationEmitters.clear();

@@ -170,7 +170,7 @@ void RotationGestureDetector::Process(Scene& scene, const RotationGestureEvent& 
   {
     case GestureState::STARTED:
     {
-      Actor* feededActor = mFeededActor.GetActor();
+      Actor* feededActor = GetCurrentGesturedActor();
       if(feededActor && CheckGestureDetector(&rotationEvent, feededActor, mRenderTask))
       {
         Vector2     actorCoords;
@@ -187,7 +187,7 @@ void RotationGestureDetector::Process(Scene& scene, const RotationGestureEvent& 
     {
       // Only send subsequent rotation gesture signals if we processed the rotation gesture when it started.
       // Check if actor is still touchable.
-      Actor* feededActor = mFeededActor.GetActor();
+      Actor* feededActor = GetCurrentGesturedActor();
       if(feededActor && feededActor->IsHittable() && mRenderTask)
       {
         Vector2     actorCoords;
@@ -206,6 +206,12 @@ void RotationGestureDetector::Process(Scene& scene, const RotationGestureEvent& 
       break;
     }
   }
+}
+
+Actor* RotationGestureDetector::GetCurrentGesturedActor()
+{
+  // Return the current feeded actor
+  return GestureDetector::GetCurrentGesturedActor();
 }
 
 } // namespace Internal

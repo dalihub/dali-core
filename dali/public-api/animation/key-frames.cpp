@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,12 +56,12 @@ Property::Type KeyFrames::GetType() const
 
 void KeyFrames::Add(float time, Property::Value value)
 {
-  Add(time, std::move(value), AlphaFunction::DEFAULT);
+  GetImplementation(*this).Add(time, std::move(value));
 }
 
-void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)
+void KeyFrames::Add(float time, Property::Value value, AlphaFunction /* not used */)
 {
-  GetImplementation(*this).Add(time, value, alpha);
+  Add(time, std::move(value));
 }
 
 KeyFrames::KeyFrames(Internal::KeyFrames* internal)
