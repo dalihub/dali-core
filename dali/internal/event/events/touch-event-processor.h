@@ -48,7 +48,7 @@ struct ActorObserver;
  *
  * - Hit Testing & Touch Event Delivery are described in Dali::Actor.
  */
-class TouchEventProcessor : public RefObject
+class TouchEventProcessor
 {
 public:
   /**
