@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,16 +39,16 @@ RenderMessageDispatcher::RenderMessageDispatcher(RenderManager& renderManager, R
 
 RenderMessageDispatcher::~RenderMessageDispatcher() = default;
 
-void RenderMessageDispatcher::AddRenderer(const Render::RendererKey& renderer)
+void RenderMessageDispatcher::AddRenderer(OwnerKeyType<Render::Renderer>& rendererKeyPointer)
 {
   // Message has ownership of renderer while in transit from update -> render
-  typedef MessageValue1<RenderManager, Render::RendererKey> DerivedType;
+  typedef MessageValue1<RenderManager, OwnerKeyType<Render::Renderer>> DerivedType;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mRenderQueue.ReserveMessageSlot(mBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new(slot) DerivedType(&mRenderManager, &RenderManager::AddRenderer, renderer);
+  new(slot) DerivedType(&mRenderManager, &RenderManager::AddRenderer, rendererKeyPointer);
 }
 
 void RenderMessageDispatcher::RemoveRenderer(const Render::RendererKey& renderer)
