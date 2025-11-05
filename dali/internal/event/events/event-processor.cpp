@@ -62,6 +62,9 @@ EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEvent
 
 EventProcessor::~EventProcessor()
 {
+  mActorTouchPoints.clear();
+  mActorIdDeviceId.clear();
+  mTouchEventProcessors.clear();
 }
 
 void EventProcessor::QueueEvent(const Event& event)
@@ -177,13 +180,11 @@ void EventProcessor::ProcessEvents()
               touchEventInternal.AddPoint(*tItr);
             }
 
-            auto processor = mTouchEventProcessors.find(actorId);
-            if(processor == mTouchEventProcessors.end())
+            auto result = mTouchEventProcessors.emplace(actorId, std::make_unique<TouchEventProcessor>(mScene));
+            if(result.first->second)
             {
-              mTouchEventProcessors[actorId] = new TouchEventProcessor(mScene);
+              result.first->second->ProcessTouchEvent(touchEventInternal);
             }
-
-            mTouchEventProcessors[actorId]->ProcessTouchEvent(touchEventInternal);
           }
 
           // All touch events have been processed, it should be cleared.
