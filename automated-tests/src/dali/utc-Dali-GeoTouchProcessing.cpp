@@ -1417,6 +1417,101 @@ int UtcDaliGeoTouchEventLayerConsumesTouch(void)
   END_TEST;
 }
 
+int UtcDaliGeoTouchEventTrackingActorLists(void)
+{
+  TestApplication application;
+
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  // Create three-layer hierarchy: a (root) -> b (middle) -> c (leaf)
+  Actor actorA = Actor::New();
+  actorA.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actorA);
+
+  Actor actorB = Actor::New();
+  actorB.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.Add(actorB);
+
+  Actor actorC = Actor::New();
+  actorC.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorB.Add(actorC);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actors' touched signals
+  SignalData        dataA;
+  TouchEventFunctor functorA(dataA, false /* Do not consume */);
+  actorA.TouchedSignal().Connect(&application, functorA);
+
+  SignalData        dataB;
+  TouchEventFunctor functorB(dataB, true /* Consume */);
+  actorB.TouchedSignal().Connect(&application, functorB);
+
+  SignalData        dataC;
+  TouchEventFunctor functorC(dataC, true /* Consume */);
+  actorC.TouchedSignal().Connect(&application, functorC);
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+  DALI_TEST_EQUALS(false, dataA.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataB.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataC.functorCalled, TEST_LOCATION);
+  // c should receive DOWN (consumer)
+  DALI_TEST_EQUALS(PointState::DOWN, dataC.receivedTouch.points[0].state, TEST_LOCATION);
+
+  dataA.Reset();
+  dataB.Reset();
+  dataC.Reset();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Now make b intercept and consume on motion
+  TouchEventFunctor interceptFunctorB(dataB, true /* Consume */);
+  Dali::DevelActor::InterceptTouchedSignal(actorB).Connect(&application, interceptFunctorB);
+
+  // Emit a motion signal - b should intercept and consume
+  // c should receive INTERRUPTED (was in tracking list and was previous consumer)
+  // a should NOT receive INTERRUPTED (was not in tracking list from previous DOWN)
+  // b should receive MOTION (new consumer)
+  application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 20.0f)));
+  DALI_TEST_EQUALS(false, dataA.functorCalled, TEST_LOCATION); // a should not be called
+  DALI_TEST_EQUALS(true, dataB.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, dataC.functorCalled, TEST_LOCATION);
+
+  // b should receive MOTION (new consumer via intercept)
+  DALI_TEST_EQUALS(PointState::MOTION, dataB.receivedTouch.points[0].state, TEST_LOCATION);
+  // c should receive INTERRUPTED (was in tracking list)
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, dataC.receivedTouch.points[0].state, TEST_LOCATION);
+
+  dataA.Reset();
+  dataB.Reset();
+  dataC.Reset();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit up signal - only the current consumer (b) should receive it
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(30.0f, 30.0f)));
+  DALI_TEST_EQUALS(true, dataB.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataA.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, dataC.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::UP, dataB.receivedTouch.points[0].state, TEST_LOCATION);
+
+  dataA.Reset();
+  dataB.Reset();
+  dataC.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliGeoTouchEventClippedActor(void)
 {
   TestApplication    application;
