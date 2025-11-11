@@ -48,7 +48,7 @@ struct ActorObserver;
  *
  * - Hit Testing & Touch Event Delivery are described in Dali::Actor.
  */
-class TouchEventProcessor : public RefObject
+class TouchEventProcessor
 {
 public:
   /**
@@ -98,6 +98,7 @@ private:
   PointState::Type                  mLastPrimaryPointState;  ///< Stores the last primary point state
   std::list<Dali::Internal::Actor*> mInterceptedActorLists;  ///< Stores the list from root to intercepted actors.
   std::list<Dali::Internal::Actor*> mCandidateActorLists;    ///< Stores a list of actors that can be touched, from leaf actor to root.
+  std::list<Dali::Internal::Actor*> mTrackingActorLists;     ///< Stores a list of touched actors.
 
   struct Impl;
 };

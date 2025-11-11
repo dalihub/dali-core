@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_ABSTRACTION_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <climits>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -60,6 +61,13 @@ struct OwnedType
   using PassingType = OwnerPointer<Type>&;
 };
 
+template<typename Type>
+struct OwnedKeyType
+{
+  using HolderType  = OwnerKeyType<Type>;
+  using PassingType = OwnerKeyType<Type>&;
+};
+
 // Default for Vector3 and other structures
 template<class T>
 struct ParameterType : public ComplexType<T>
@@ -69,6 +77,11 @@ struct ParameterType : public ComplexType<T>
 // For message owned parameters
 template<class T>
 struct ParameterType<OwnerPointer<T> > : public OwnedType<T>
+{
+};
+
+template<class T>
+struct ParameterType<OwnerKeyType<T> > : public OwnedKeyType<T>
 {
 };
 
