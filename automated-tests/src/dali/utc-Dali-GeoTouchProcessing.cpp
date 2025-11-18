@@ -856,8 +856,8 @@ int UtcDaliGeoTouchEventActorBecomesInsensitiveParentConsumer(void)
 
   // Emit a motion signal, signalled with an interrupted (should get interrupted even if within root actor)
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));
-  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION);
+  // data has already been interrupted before, so there is no need to interrupt it again.
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION);
   END_TEST;
