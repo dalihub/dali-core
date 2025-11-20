@@ -2,7 +2,7 @@
 #define DALI_BASE_HANDLE_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,14 +132,14 @@ public:
    * @SINCE_1_0.0
    * @param[in] connectionTracker A connection tracker which can be used to disconnect
    * @param[in] signalName Name of the signal to connect to
-   * @param[in] functor The functor to copy
+   * @param[in] functor The functor to move
    * @return True if the signal was available
    * @pre The signal must be available in this object.
    */
   template<class T>
-  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, const T& functor)
+  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, T&& functor)
   {
-    return DoConnectSignal(connectionTracker, signalName, FunctorDelegate::New(functor));
+    return DoConnectSignal(connectionTracker, signalName, FunctorDelegate::New(std::move(functor)));
   }
 
   /**

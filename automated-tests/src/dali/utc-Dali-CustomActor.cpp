@@ -715,6 +715,9 @@ int UtcDaliCustomActorAddParentDuringOnSceneDisconnection(void)
   DALI_TEST_EQUALS("ActorA: OnChildAdd", MasterCallStack[4], TEST_LOCATION);
   DALI_TEST_EQUALS("ActorB: OnSceneDisconnection", MasterCallStack[5], TEST_LOCATION);
 
+  // break the ref loop: actorA --> actorB --> scene --> actorA.
+  actorB.Unparent();
+
   // Excercise the message passing to Update thread
 
   application.SendNotification();
