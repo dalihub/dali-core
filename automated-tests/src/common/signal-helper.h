@@ -678,11 +678,12 @@ class TestEmitDuringCallback : public ConnectionTracker
 {
 public:
   TestEmitDuringCallback()
-  : mVoidSignalVoid(NULL),
-    mFloatRet0ParamSignal(NULL),
-    mFloatRet1ParamSignal(NULL),
-    mFloatRet2ParamSignal(NULL),
-    mFloatRet3ParamSignal(NULL),
+  : mVoidSignalVoid(nullptr),
+    mFloatRet0ParamSignal(nullptr),
+    mFloatRet1ParamSignal(nullptr),
+    mFloatRet2ParamSignal(nullptr),
+    mFloatRet3ParamSignal(nullptr),
+    mBoolRet2ParamSignal(nullptr),
     mHandled(false)
   {
   }
@@ -720,6 +721,12 @@ public:
     signal.Connect(this, &TestEmitDuringCallback::DeleteSignalDuringEmit);
   }
 
+  void DeleteDuringEmitConnect(TestSignals::BoolRet2ValueParamSignal& signal)
+  {
+    mBoolRet2ParamSignal = &signal;
+    signal.Connect(this, &TestEmitDuringCallback::DeleteBoolRet2ParamSignalDuringEmit);
+  }
+
   void DeleteDuringEmitConnect(TestSignals::FloatRet0ParamSignal& signal)
   {
     mFloatRet0ParamSignal = &signal;
@@ -744,6 +751,13 @@ public:
     // deleting the signal during the emit
     delete mFloatRet0ParamSignal;
     return 0.0f;
+  }
+
+  bool DeleteBoolRet2ParamSignalDuringEmit(float p1, int p2)
+  {
+    // deleting the signal during the emit
+    delete mBoolRet2ParamSignal;
+    return false;
   }
 
   float FloatRet0Param()
@@ -776,6 +790,7 @@ public:
   TestSignals::FloatRet1ParamSignal*      mFloatRet1ParamSignal;
   TestSignals::FloatRet2ValueParamSignal* mFloatRet2ParamSignal;
   TestSignals::FloatRet3ValueParamSignal* mFloatRet3ParamSignal;
+  TestSignals::BoolRet2ValueParamSignal*  mBoolRet2ParamSignal;
 
   bool mHandled;
 };
