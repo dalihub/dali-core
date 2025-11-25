@@ -1708,8 +1708,6 @@ void Actor::SetParent(ActorParent* parent, bool notify)
   }
   else // parent being set to NULL
   {
-    DALI_ASSERT_ALWAYS(mParent != nullptr && "Actor should have a parent");
-
     if(!EventThreadServices::IsShuttingDown() && // Don't emit signals or send messages during Core destruction
        OnScene())
     {

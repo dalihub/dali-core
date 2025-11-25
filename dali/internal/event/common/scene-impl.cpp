@@ -86,6 +86,7 @@ Scene::~Scene()
   {
     // we are closing down so just delete the root, no point emit disconnect
     // signals or send messages to update
+    mRootLayer->UnparentChildren();
     mRootLayer.Reset();
   }
 
