@@ -354,6 +354,55 @@ int UtcDaliTouchEventNormalProcessing01(void)
   END_TEST;
 }
 
+int UtcDaliTouchEventCapturingActorMultiTouchClear(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Set actor to capture all touch after start
+  actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, true);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Test multi-touch scenario: ID 0, 1, 2 DOWN -> MOTION -> ID 0 UP
+  // Multi-touch down
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STARTED, Vector2(10.0f, 10.0f), PointState::STARTED, Vector2(20.0f, 20.0f), 100));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, data.receivedTouch.GetPointCount(), TEST_LOCATION);
+  data.Reset();
+
+  // Multi-touch motion
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(110.0f, 110.0f), PointState::MOTION, Vector2(120.0f, 120.0f), 110));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, data.receivedTouch.GetPointCount(), TEST_LOCATION);
+  data.Reset();
+
+  // Up event
+  application.ProcessEvent(GenerateDoubleTouch(PointState::FINISHED, Vector2(110.0f, 110.0f), PointState::STATIONARY, Vector2(120.0f, 120.0f), 120));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::FINISHED, data.receivedTouch.GetPoint(0).state, TEST_LOCATION);
+  data.Reset();
+
+  // Continue with remaining touch points to verify touch processor is still active
+  application.ProcessEvent(GenerateSingleTouch(PointState::FINISHED, Vector2(120.0f, 120.0f)));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::FINISHED, data.receivedTouch.GetPoint(0).state, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliTouchEventNormalProcessing02(void)
 {
   TestApplication application;
