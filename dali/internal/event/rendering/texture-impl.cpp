@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/render-controller.h>
+#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -156,8 +157,9 @@ void Texture::Initialize()
         mTextureKey = Render::Texture::NewKey(mType, mFormat, mSize);
       }
     }
+    OwnerKeyType<Render::Texture> transferKeyOwnership(mTextureKey);
 
-    AddTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
+    AddTextureMessage(GetEventThreadServices().GetUpdateManager(), transferKeyOwnership);
   }
 }
 

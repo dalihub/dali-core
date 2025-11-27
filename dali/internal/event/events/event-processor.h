@@ -46,7 +46,7 @@ class NotificationManager;
 using TouchPointsContainer      = std::list<Integration::Point>;
 using ActorTouchPointsContainer = std::unordered_map<uint32_t, TouchPointsContainer>;
 
-using TouchEventProcessorsContainer = std::unordered_map<uint32_t, IntrusivePtr<TouchEventProcessor>>;
+using TouchEventProcessorsContainer = std::unordered_map<uint32_t, std::unique_ptr<TouchEventProcessor>>;
 using ActorIdDeviceIdContainer      = std::unordered_map<uint32_t, uint32_t>;
 /**
  * The EventProcessor processes any events that are received by Dali.  Such events include

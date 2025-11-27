@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
+#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/animatable-property-messages.h>
@@ -68,7 +69,8 @@ TypeRegistration mType(typeid(Dali::VisualRenderer), typeid(Dali::Renderer), Cre
 VisualRendererPtr VisualRenderer::New()
 {
   // create scene object first so it's guaranteed to exist for the event side
-  auto sceneObjectKey = SceneGraph::Renderer::NewKey();
+  auto                               sceneObjectKey = SceneGraph::Renderer::NewKey();
+  OwnerKeyType<SceneGraph::Renderer> transferKeyOwnership(sceneObjectKey);
 
   sceneObjectKey->SetVisualProperties(new SceneGraph::VisualRenderer::AnimatableVisualProperties(*sceneObjectKey.Get()));
 
@@ -78,7 +80,7 @@ VisualRendererPtr VisualRenderer::New()
   // transfer scene object ownership to update manager
   EventThreadServices&       eventThreadServices = rendererPtr->GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-  AddRendererMessage(updateManager, sceneObjectKey);
+  AddRendererMessage(updateManager, transferKeyOwnership);
 
   eventThreadServices.RegisterObject(rendererPtr.Get());
   return rendererPtr;

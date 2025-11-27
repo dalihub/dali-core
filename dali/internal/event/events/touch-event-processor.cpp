@@ -211,6 +211,38 @@ Dali::Actor EmitTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEve
 /**
  *  Recursively deliver events to the actor and its below actor, until the event is consumed or the stage is reached.
  */
+Dali::Actor EmitGeoTouchSignalsWithTracking(std::list<Dali::Internal::Actor*>& actorLists, std::list<Dali::Internal::Actor*>& trackingLists, const Dali::TouchEvent& touchEvent)
+{
+  Dali::Actor consumedActor;
+
+  std::list<Dali::Internal::Actor*>::reverse_iterator rIter = actorLists.rbegin();
+  for(; rIter != actorLists.rend(); rIter++)
+  {
+    Actor* actorImpl(*rIter);
+    // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
+    if(ShouldEmitTouchEvent(*actorImpl, touchEvent))
+    {
+      // Check if actor is already in tracking list to avoid duplicates
+      if(std::find(trackingLists.begin(), trackingLists.end(), actorImpl) == trackingLists.end())
+      {
+        trackingLists.push_back(actorImpl);
+      }
+
+      DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
+      if(actorImpl->EmitTouchEventSignal(touchEvent))
+      {
+        // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
+        consumedActor = Dali::Actor(actorImpl);
+        break;
+      }
+    }
+  }
+  return consumedActor;
+}
+
+/**
+ *  Recursively deliver events to the actor and its below actor, until the event is consumed or the stage is reached.
+ */
 Dali::Actor EmitGeoTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, const Dali::TouchEvent& touchEvent)
 {
   Dali::Actor consumedActor;
@@ -497,6 +529,11 @@ struct TouchEventProcessor::Impl
                processor.mLastRenderTask &&
                processor.mLastPrimaryPointState != PointState::FINISHED)
             {
+              auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), processor.mLastConsumedActor.GetActor());
+              if(it != processor.mTrackingActorLists.end())
+              {
+                processor.mTrackingActorLists.erase(it);
+              }
               EmitTouchSignals(processor.mLastConsumedActor.GetActor(), *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
               processor.mTouchDownConsumedActor.SetActor(nullptr);
               processor.mLastConsumedActor.SetActor(nullptr);
@@ -514,6 +551,11 @@ struct TouchEventProcessor::Impl
                 {
                   break;
                 }
+                auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                if(it != processor.mTrackingActorLists.end())
+                {
+                  processor.mTrackingActorLists.erase(it);
+                }
                 EmitTouchSignals(actorImpl, *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
               }
             }
@@ -528,25 +570,29 @@ struct TouchEventProcessor::Impl
           else
           {
             // Let's propagate touch events from the intercepted actor or start propagating touch events from the leaf actor.
-            localVars.consumedActor = EmitGeoTouchSignals(interceptedActor ? processor.mInterceptedActorLists : processor.mCandidateActorLists, localVars.touchEventHandle);
+            localVars.consumedActor = EmitGeoTouchSignalsWithTracking(interceptedActor ? processor.mInterceptedActorLists : processor.mCandidateActorLists, processor.mTrackingActorLists, localVars.touchEventHandle);
 
             if(localVars.consumedActor)
             {
               // If consumed, the actors who previously received the touch are interrupted, indicating that the touch has been consumed by another actor.
-              // backworkd
               if(processor.mLastRenderTask && localVars.primaryPointState != PointState::DOWN)
               {
+                // backward
                 std::list<Dali::Internal::Actor*>::reverse_iterator rIter = std::find(processor.mCandidateActorLists.rbegin(), processor.mCandidateActorLists.rend(), localVars.consumedActor);
                 if(rIter != processor.mCandidateActorLists.rend())
                 {
                   for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
                   {
                     Actor* actorImpl(*rIter);
-                    EmitTouchSignals(actorImpl, *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+                    auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                    if(it != processor.mTrackingActorLists.end())
+                    {
+                      processor.mTrackingActorLists.erase(it);
+                      EmitTouchSignals(actorImpl, *processor.mLastRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+                    }
                   }
                 }
               }
-
               //forward
               std::list<Dali::Internal::Actor*>::iterator iter = std::find(processor.mCandidateActorLists.begin(), processor.mCandidateActorLists.end(), localVars.consumedActor);
               if(iter != processor.mCandidateActorLists.end())
@@ -554,7 +600,12 @@ struct TouchEventProcessor::Impl
                 for(++iter; iter != processor.mCandidateActorLists.end(); ++iter)
                 {
                   Actor* actorImpl(*iter);
-                  EmitTouchSignals(actorImpl, *localVars.currentRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+                  auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                  if(it != processor.mTrackingActorLists.end())
+                  {
+                    processor.mTrackingActorLists.erase(it);
+                    EmitTouchSignals(actorImpl, *localVars.currentRenderTask.Get(), localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+                  }
                 }
               }
             }
@@ -668,10 +719,14 @@ struct TouchEventProcessor::Impl
           {
             if(!localVars.lastPrimaryHitActor->IsHittable() || !IsActuallySensitive(localVars.lastPrimaryHitActor))
             {
-              // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
-              // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
-              DALI_LOG_RELEASE_INFO("InterruptedActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(localVars.lastPrimaryHitActor), localVars.lastPrimaryHitActor->GetName().data());
-              leaveEventConsumer = EmitTouchSignals(localVars.lastPrimaryHitActor, lastRenderTaskImpl, localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+              auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), localVars.lastPrimaryHitActor);
+              if(it != processor.mTrackingActorLists.end())
+              {
+                // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
+                // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
+                DALI_LOG_RELEASE_INFO("InterruptedActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(localVars.lastPrimaryHitActor), localVars.lastPrimaryHitActor->GetName().data());
+                leaveEventConsumer = EmitTouchSignals(localVars.lastPrimaryHitActor, lastRenderTaskImpl, localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
+              }
             }
           }
 
@@ -1039,6 +1094,7 @@ void TouchEventProcessor::Clear()
   mOwnTouchActor.SetActor(nullptr);
   mInterceptedTouchActor.SetActor(nullptr);
   mLastRenderTask.Reset();
+  mTrackingActorLists.clear();
   mLastPrimaryPointState = PointState::FINISHED;
 }
 
