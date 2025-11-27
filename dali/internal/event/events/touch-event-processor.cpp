@@ -668,14 +668,10 @@ struct TouchEventProcessor::Impl
           {
             if(!localVars.lastPrimaryHitActor->IsHittable() || !IsActuallySensitive(localVars.lastPrimaryHitActor))
             {
-              auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), localVars.lastPrimaryHitActor);
-              if(it != processor.mTrackingActorLists.end())
-              {
-                // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
-                // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
-                DALI_LOG_RELEASE_INFO("InterruptedActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(localVars.lastPrimaryHitActor), localVars.lastPrimaryHitActor->GetName().data());
-                leaveEventConsumer = EmitTouchSignals(localVars.lastPrimaryHitActor, lastRenderTaskImpl, localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
-              }
+              // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
+              // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
+              DALI_LOG_RELEASE_INFO("InterruptedActor(Hit):     (%p) %s\n", reinterpret_cast<void*>(localVars.lastPrimaryHitActor), localVars.lastPrimaryHitActor->GetName().data());
+              leaveEventConsumer = EmitTouchSignals(localVars.lastPrimaryHitActor, lastRenderTaskImpl, localVars.touchEventImpl, PointState::INTERRUPTED, localVars.isGeometry);
             }
           }
 
