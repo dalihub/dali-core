@@ -883,10 +883,9 @@ void UpdateManager::SetShaderSaver(ShaderSaver& upstream)
   mImpl->shaderSaver = &upstream;
 }
 
-void UpdateManager::AddRenderer(OwnerKeyType<Renderer>& rendererKeyPointer)
+void UpdateManager::AddRenderer(const RendererKey& rendererKey)
 {
-  RendererKey           rendererKey = rendererKeyPointer.Release();
-  SceneGraph::Renderer* renderer    = rendererKey.Get();
+  SceneGraph::Renderer* renderer = rendererKey.Get();
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer);
 
@@ -1890,15 +1889,15 @@ void UpdateManager::AttachVertexBuffer(Render::Geometry* geometry, Render::Verte
   new(slot) DerivedType(&mImpl->renderManager, &RenderManager::AttachVertexBuffer, geometry, vertexBuffer);
 }
 
-void UpdateManager::AddTexture(OwnerKeyType<Render::Texture>& textureKeyPointer)
+void UpdateManager::AddTexture(const Render::TextureKey& texture)
 {
-  using DerivedType = MessageValue1<RenderManager, OwnerKeyType<Render::Texture>>;
+  using DerivedType = MessageValue1<RenderManager, Render::TextureKey>;
 
   // Reserve some memory inside the render queue
   uint32_t* slot = mImpl->renderQueue.ReserveMessageSlot(mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof(DerivedType));
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::AddTexture, textureKeyPointer);
+  new(slot) DerivedType(&mImpl->renderManager, &RenderManager::AddTexture, texture);
 }
 
 void UpdateManager::RemoveTexture(const Render::TextureKey& texture)

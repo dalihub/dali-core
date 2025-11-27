@@ -467,10 +467,8 @@ void RenderManager::SetShaderSaver(ShaderSaver& upstream)
 {
 }
 
-void RenderManager::AddRenderer(OwnerKeyType<Render::Renderer>& rendererKeyPointer)
+void RenderManager::AddRenderer(const Render::RendererKey& renderer)
 {
-  Render::RendererKey renderer = rendererKeyPointer.Release();
-
   // Initialize the renderer as we are now in render thread
   renderer->Initialize(mImpl->graphicsController, mImpl->programController, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()), mImpl->terminatedNativeDrawManager, mImpl->sharedUniformBufferViewContainer);
 
@@ -496,9 +494,8 @@ void RenderManager::RemoveSampler(Render::Sampler* sampler)
   mImpl->samplerContainer.EraseObject(sampler);
 }
 
-void RenderManager::AddTexture(OwnerKeyType<Render::Texture>& textureKeyPointer)
+void RenderManager::AddTexture(const Render::TextureKey& textureKey)
 {
-  Render::TextureKey textureKey = textureKeyPointer.Release();
   DALI_ASSERT_DEBUG(textureKey && "Trying to add empty texture key");
 
   textureKey->Initialize(mImpl->graphicsController, *this);

@@ -21,7 +21,6 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
-#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/queue/render-queue.h>
@@ -783,8 +782,7 @@ void Renderer::ConnectToSceneGraph(SceneController& sceneController, BufferIndex
 
   mRenderer = Render::Renderer::NewKey(this, mGeometry, mBlendBitmask, GetBlendColor(), static_cast<FaceCullingMode::Type>(mFaceCullingMode), mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters);
 
-  OwnerKeyType<Render::Renderer> transferKeyOwnership(mRenderer);
-  mSceneController->GetRenderMessageDispatcher().AddRenderer(transferKeyOwnership);
+  mSceneController->GetRenderMessageDispatcher().AddRenderer(mRenderer);
 }
 
 // Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )

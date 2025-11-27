@@ -23,7 +23,6 @@
 #include <iostream>
 
 // Internal headers are allowed here
-#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -58,14 +57,13 @@ struct DerivedRenderer : public Dali::Internal::Renderer
 {
   static IntrusivePtr<DerivedRenderer> New()
   {
-    auto                                                               sceneObjectKey = Dali::Internal::SceneGraph::Renderer::NewKey();
-    Dali::Internal::OwnerKeyType<Dali::Internal::SceneGraph::Renderer> transferKeyOwnership(sceneObjectKey);
-    IntrusivePtr<DerivedRenderer>                                      impl = new DerivedRenderer(sceneObjectKey.Get());
+    auto                          sceneObjectKey = Dali::Internal::SceneGraph::Renderer::NewKey();
+    IntrusivePtr<DerivedRenderer> impl           = new DerivedRenderer(sceneObjectKey.Get());
 
     // transfer scene object ownership to update manager
     Internal::EventThreadServices&       eventThreadServices = impl->GetEventThreadServices();
     Internal::SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
-    AddRendererMessage(updateManager, transferKeyOwnership);
+    AddRendererMessage(updateManager, sceneObjectKey);
     eventThreadServices.RegisterObject(impl.Get());
     return impl;
   }

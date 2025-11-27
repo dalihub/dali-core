@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/core-enumerations.h>
-#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/renderers/render-renderer.h>
@@ -135,10 +134,10 @@ public:
 
   /**
    * Add a Renderer to the render manager.
-   * @param[in] rendererKeyPointer The renderer to add.
+   * @param[in] renderer The renderer to add.
    * @post renderer is notionally owned by RenderManager
    */
-  void AddRenderer(OwnerKeyType<Render::Renderer>& rendererKeyPointer);
+  void AddRenderer(const Render::RendererKey& renderer);
 
   /**
    * Remove a Renderer from the render manager.
@@ -264,9 +263,9 @@ public:
 
   /**
    * Adds a texture to the render manager
-   * @param[in] textureKeyPointer The texture to add
+   * @param[in] texture The texture to add
    */
-  void AddTexture(OwnerKeyType<Render::Texture>& textureKeyPointer);
+  void AddTexture(const Render::TextureKey& texture);
 
   /**
    * Removes a texture from the render manager

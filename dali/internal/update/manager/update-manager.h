@@ -25,7 +25,6 @@
 #include <dali/devel-api/common/stage-devel.h>
 
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/common/shader-saver.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -360,9 +359,9 @@ public:
 
   /**
    * Add a new renderer to scene
-   * @param rendererKeyPointer to add
+   * @param renderer to add
    */
-  void AddRenderer(OwnerKeyType<Renderer>& rendererKeyPointer);
+  void AddRenderer(const RendererKey& renderer);
 
   /**
    * Remove a renderer from scene
@@ -604,10 +603,10 @@ public:
 
   /**
    * Adds a texture to the render manager
-   * @param[in] textureKeyPointer The texture to add
+   * @param[in] texture The texture to add
    * The texture will be owned by RenderManager
    */
-  void AddTexture(OwnerKeyType<Render::Texture>& textureKeyPointer);
+  void AddTexture(const Render::TextureKey& texture);
 
   /**
    * Removes a texture from the render manager
@@ -1276,14 +1275,14 @@ inline void SetLayerDepthsMessage(UpdateManager& manager, const std::vector<Laye
   new(slot) LocalType(&manager, &UpdateManager::SetLayerDepths, layers, rootLayer);
 }
 
-inline void AddRendererMessage(UpdateManager& manager, OwnerKeyType<Renderer>& rendererKeyPointer)
+inline void AddRendererMessage(UpdateManager& manager, const RendererKey& rendererKey)
 {
-  using LocalType = MessageValue1<UpdateManager, OwnerKeyType<Renderer>>;
+  using LocalType = MessageValue1<UpdateManager, RendererKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AddRenderer, rendererKeyPointer);
+  new(slot) LocalType(&manager, &UpdateManager::AddRenderer, rendererKey);
 }
 
 inline void RemoveRendererMessage(UpdateManager& manager, const RendererKey& rendererKey)
@@ -1565,9 +1564,9 @@ inline void SetGeometryTypeMessage(UpdateManager& manager, Render::Geometry& geo
   new(slot) LocalType(&manager, &UpdateManager::SetGeometryType, &geometry, geometryType);
 }
 
-inline void AddTextureMessage(UpdateManager& manager, OwnerKeyType<Render::Texture>& texture)
+inline void AddTextureMessage(UpdateManager& manager, const Render::TextureKey& texture)
 {
-  using LocalType = MessageValue1<UpdateManager, OwnerKeyType<Render::Texture>>;
+  using LocalType = MessageValue1<UpdateManager, Render::TextureKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
