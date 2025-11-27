@@ -72,6 +72,10 @@ void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateI
   {
     // 2nd Stage initialization happens in RenderManager, not UpdateManager, so is delayed.
     mRenderTargetCreateInfo = renderTargetCreateInfo;
+    if(mRenderTarget != nullptr)
+    {
+      mGraphicsController->UpdateRenderTarget(*mRenderTarget, mRenderTargetCreateInfo);
+    }
   }
 }
 

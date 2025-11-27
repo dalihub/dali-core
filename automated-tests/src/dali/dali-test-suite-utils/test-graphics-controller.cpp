@@ -1565,4 +1565,11 @@ bool TestGraphicsController::IsCompatible(const Graphics::RenderTarget& renderTa
   return true;
 }
 
+void TestGraphicsController::UpdateRenderTarget(Graphics::RenderTarget& renderTarget, const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
+{
+  auto testRenderTarget                      = Uncast<TestGraphicsRenderTarget>(&renderTarget);
+  testRenderTarget->mCreateInfo.extent       = renderTargetCreateInfo.extent;
+  testRenderTarget->mCreateInfo.preTransform = renderTargetCreateInfo.preTransform;
+}
+
 } // namespace Dali
