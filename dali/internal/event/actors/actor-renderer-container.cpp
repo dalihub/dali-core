@@ -69,11 +69,11 @@ void RendererContainer::Remove(const SceneGraph::Node& node, Renderer& renderer)
 
       if(mIsCache)
       {
-        DetachCacheRendererMessage(GetEventThreadServices(), node, renderer.GetRendererSceneObject());
+        DetachCacheRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
       }
       else
       {
-        DetachRendererMessage(GetEventThreadServices(), node, renderer.GetRendererSceneObject());
+        DetachRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer.GetRendererSceneObject());
       }
       break;
     }
@@ -88,11 +88,11 @@ void RendererContainer::Remove(const SceneGraph::Node& node, uint32_t index)
 
     if(mIsCache)
     {
-      DetachCacheRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+      DetachCacheRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer->GetRendererSceneObject());
     }
     else
     {
-      DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+      DetachRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer->GetRendererSceneObject());
     }
 
     mRenderers.erase(mRenderers.begin() + index);
@@ -105,14 +105,14 @@ void RendererContainer::RemoveAll(const SceneGraph::Node& node)
   {
     for(auto&& renderer : mRenderers)
     {
-      DetachCacheRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+      DetachCacheRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer->GetRendererSceneObject());
     }
   }
   else
   {
     for(auto&& renderer : mRenderers)
     {
-      DetachRendererMessage(GetEventThreadServices(), node, renderer->GetRendererSceneObject());
+      DetachRendererMessage(GetEventThreadServices().GetUpdateManager(), node, renderer->GetRendererSceneObject());
     }
   }
   mRenderers.clear();

@@ -121,6 +121,7 @@ Renderer::Renderer()
   mTextureSet(nullptr),
   mGeometry(nullptr),
   mShader(nullptr),
+  mVisualProperties(nullptr),
   mBlendColor(nullptr),
   mStencilParameters(RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP),
   mIndexedDrawFirstElement(0u),
@@ -587,17 +588,27 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
   return mRenderingBehavior;
 }
 
-void Renderer::DetachFromNodeDataProvider(const NodeDataProvider& node)
+void Renderer::AttachToNode(const Node& node)
 {
-  // TODO : Can we send this by Resend flag, or message?
-  // Currently, we call DetachFromNodeDataProvider function even if Renderer is destroyed case.
-  // We don't need to call that function if mRenderer is destroyed.
-  //
-  // But also, there is no way to validate node's lifecycle. So just detach synchronously.
+  if(mVisualProperties)
+  {
+    DALI_ASSERT_ALWAYS(mVisualProperties->mAttachedNode == nullptr && "VisualRenderer don't allow to attach multiple nodes!");
+    mVisualProperties->mAttachedNode = &node;
+  }
+}
+
+void Renderer::DetachFromNode(const Node& node)
+{
   if(mRenderer)
   {
     Render::Renderer* rendererPtr = mRenderer.Get();
-    rendererPtr->DetachFromNodeDataProvider(node);
+    rendererPtr->DetachFromNodeDataProvider(static_cast<const NodeDataProvider&>(node));
+  }
+
+  if(mVisualProperties)
+  {
+    DALI_ASSERT_ALWAYS((mVisualProperties->mAttachedNode == &node) && "Detaching node which was not attached!");
+    mVisualProperties->mAttachedNode = nullptr;
   }
 }
 
@@ -818,6 +829,16 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
     return AdjustExtents(mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, originalUpdateArea), mUpdateAreaExtents);
   }
   return AdjustExtents(originalUpdateArea, mUpdateAreaExtents);
+}
+
+bool Renderer::IsObservingNodeDeactivated() const
+{
+  // TODO : Could we use this feature for general renderer?
+  if(mVisualProperties)
+  {
+    return !mVisualProperties->mAttachedNode || mVisualProperties->mAttachedNode->IsWorldIgnored();
+  }
+  return false;
 }
 
 void Renderer::OnVisualRendererPropertyUpdated(bool bake)

@@ -1341,28 +1341,6 @@ inline void SetTransparentMessage(EventThreadServices& eventThreadServices, cons
   new(slot) LocalType(&node, &Node::SetTransparent, transparent);
 }
 
-inline void DetachRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
-{
-  using LocalType = MessageValue1<Node, RendererKey>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::RemoveRenderer, Renderer::GetKey(renderer));
-}
-
-inline void DetachCacheRendererMessage(EventThreadServices& eventThreadServices, const Node& node, const Renderer& renderer)
-{
-  using LocalType = MessageValue1<Node, RendererKey>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::RemoveCacheRenderer, Renderer::GetKey(renderer));
-}
-
 inline void SetDepthIndexMessage(EventThreadServices& eventThreadServices, const Node& node, uint32_t depthIndex)
 {
   using LocalType = MessageValue1<Node, uint32_t>;

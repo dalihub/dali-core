@@ -81,13 +81,13 @@ DecoratedVisualRendererPtr DecoratedVisualRenderer::New()
   auto                               sceneObjectKey = SceneGraph::Renderer::NewKey();
   OwnerKeyType<SceneGraph::Renderer> transferKeyOwnership(sceneObjectKey);
 
-  auto animatableVisualProperties          = new SceneGraph::VisualRenderer::AnimatableVisualProperties(*sceneObjectKey.Get());
-  auto animatableDecoratedVisualProperties = new SceneGraph::VisualRenderer::AnimatableDecoratedVisualProperties(*sceneObjectKey.Get());
+  auto visualProperties          = new SceneGraph::VisualRenderer::VisualProperties(*sceneObjectKey.Get());
+  auto decoratedVisualProperties = new SceneGraph::VisualRenderer::DecoratedVisualProperties(*sceneObjectKey.Get());
 
-  // Append extended properties as AnimatableDecoratedVisualProperties.
-  animatableVisualProperties->mExtendedProperties = animatableDecoratedVisualProperties;
+  // Append extended properties as DecoratedVisualProperties.
+  visualProperties->mExtendedProperties = decoratedVisualProperties;
 
-  sceneObjectKey->SetVisualProperties(animatableVisualProperties);
+  sceneObjectKey->SetVisualProperties(visualProperties);
 
   // pass the pointer to base for message passing
   DecoratedVisualRendererPtr rendererPtr(new DecoratedVisualRenderer(sceneObjectKey.Get()));

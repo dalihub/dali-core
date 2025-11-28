@@ -361,16 +361,31 @@ public:
 
   /**
    * Attach a renderer to node
-   * @param renderer to attach
+   * @param[in] node target
+   * @param[in] renderer to attach
    */
-  void AttachRenderer(Node* node, Renderer* renderer);
+  void AttachRenderer(Node* node, const RendererKey& renderer);
 
   /**
    * Attach cache renderer to node
    * @param[in] node target
    * @param[in] renderer to attach
    */
-  void AttachCacheRenderer(Node* node, Renderer* renderer);
+  void AttachCacheRenderer(Node* node, const RendererKey& renderer);
+
+  /**
+   * Detach a renderer from node
+   * @param[in] node target
+   * @param[in] renderer to detach
+   */
+  void DetachRenderer(Node* node, const RendererKey& renderer);
+
+  /**
+   * Detach cache renderer from node
+   * @param[in] node target
+   * @param[in] renderer to detach
+   */
+  void DetachCacheRenderer(Node* node, const RendererKey& renderer);
 
   // Gestures
 
@@ -1139,22 +1154,44 @@ inline void RemoveRendererMessage(UpdateManager& manager, const RendererKey& ren
 
 inline void AttachRendererMessage(UpdateManager& manager, const Node& node, const Renderer& renderer)
 {
-  using LocalType = MessageValue2<UpdateManager, Node*, Renderer*>;
+  using LocalType = MessageValue2<UpdateManager, Node*, RendererKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AttachRenderer, const_cast<Node*>(&node), const_cast<Renderer*>(&renderer));
+  new(slot) LocalType(&manager, &UpdateManager::AttachRenderer, const_cast<Node*>(&node), Renderer::GetKey(renderer));
 }
 
 inline void AttachCacheRendererMessage(UpdateManager& manager, const Node& node, const Renderer& renderer)
 {
-  using LocalType = MessageValue2<UpdateManager, Node*, Renderer*>;
+  using LocalType = MessageValue2<UpdateManager, Node*, RendererKey>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AttachCacheRenderer, const_cast<Node*>(&node), const_cast<Renderer*>(&renderer));
+  new(slot) LocalType(&manager, &UpdateManager::AttachCacheRenderer, const_cast<Node*>(&node), Renderer::GetKey(renderer));
+}
+
+inline void DetachRendererMessage(UpdateManager& manager, const Node& node, const Renderer& renderer)
+{
+  using LocalType = MessageValue2<UpdateManager, Node*, RendererKey>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::DetachRenderer, const_cast<Node*>(&node), Renderer::GetKey(renderer));
+}
+
+inline void DetachCacheRendererMessage(UpdateManager& manager, const Node& node, const Renderer& renderer)
+{
+  using LocalType = MessageValue2<UpdateManager, Node*, RendererKey>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&manager, &UpdateManager::DetachCacheRenderer, const_cast<Node*>(&node), Renderer::GetKey(renderer));
 }
 
 // The render thread can safely change the Shader

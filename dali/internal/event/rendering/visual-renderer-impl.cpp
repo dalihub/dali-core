@@ -72,7 +72,7 @@ VisualRendererPtr VisualRenderer::New()
   auto                               sceneObjectKey = SceneGraph::Renderer::NewKey();
   OwnerKeyType<SceneGraph::Renderer> transferKeyOwnership(sceneObjectKey);
 
-  sceneObjectKey->SetVisualProperties(new SceneGraph::VisualRenderer::AnimatableVisualProperties(*sceneObjectKey.Get()));
+  sceneObjectKey->SetVisualProperties(new SceneGraph::VisualRenderer::VisualProperties(*sceneObjectKey.Get()));
 
   // pass the pointer to base for message passing
   VisualRendererPtr rendererPtr(new VisualRenderer(sceneObjectKey.Get()));

@@ -2347,11 +2347,15 @@ int UtcDaliConstraintApplyPost(void)
 
   Geometry       targetGeometry = CreateQuadGeometry();
   Shader         targetShader   = CreateShader();
+  UniformBlock   targetUniforms = UniformBlock::New("testBlock");
   Renderer       targetRenderer = Renderer::New(targetGeometry, targetShader);
   Actor          targetActor    = Actor::New();
   RenderTaskList taskList       = application.GetScene().GetRenderTaskList();
 
+  targetActor.AddRenderer(targetRenderer);
   application.GetScene().Add(targetActor);
+
+  PostConstraintTest::CheckComponentProperty(application, actor, targetUniforms);       // UniformBlock
   PostConstraintTest::CheckComponentProperty(application, actor, targetShader);         // Shader
   PostConstraintTest::CheckComponentProperty(application, actor, targetRenderer);       // Renderer
   PostConstraintTest::CheckComponentProperty(application, actor, targetActor);          // Actor(Node)

@@ -31,6 +31,8 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h> // Dali::Renderer
 
+#include <unordered_map>
+
 namespace Dali
 {
 namespace Internal
@@ -50,6 +52,7 @@ class RenderManagerDispatcher;
 class Renderer;
 class TextureSet;
 class Geometry;
+class Node;
 
 using RendererKey = MemoryPoolKey<SceneGraph::Renderer>;
 
@@ -439,10 +442,16 @@ public:
   void DisconnectFromSceneGraph(RenderManagerDispatcher& renderManagerDispacher);
 
   /**
+   * Attached to the scene graph object.
+   * @param[in] node node who attach this renderer.
+   */
+  void AttachToNode(const Node& node);
+
+  /**
    * Detached from the scene graph object.
    * @param[in] node node who detach this renderer.
    */
-  void DetachFromNodeDataProvider(const NodeDataProvider& node);
+  void DetachFromNode(const Node& node);
 
   /**
    * @copydoc RenderDataProvider::GetUniformMapDataProvider()
@@ -566,11 +575,16 @@ public: // For VisualRenderer
    */
   void EnableSharedUniformBlock(bool enabled);
 
+  /**
+   * @return True if we are VisualRenderer, and ObservingNode is world-ignored.
+   */
+  bool IsObservingNodeDeactivated() const;
+
 public: // For VisualProperties
   /**
    * To be used only for 1st stage initialization in event thread.
    */
-  void SetVisualProperties(VisualRenderer::AnimatableVisualProperties* visualProperties)
+  void SetVisualProperties(VisualRenderer::VisualProperties* visualProperties)
   {
     mVisualProperties = visualProperties;
 
@@ -581,7 +595,7 @@ public: // For VisualProperties
   /**
    * May be accessed from event thread
    */
-  const VisualRenderer::AnimatableVisualProperties* GetVisualProperties() const
+  const VisualRenderer::VisualProperties* GetVisualProperties() const
   {
     return mVisualProperties.Get();
   }
@@ -619,8 +633,8 @@ private:
   Render::Geometry*   mGeometry;   ///< The geometry this renderer uses. (Not owned)
   Shader*             mShader;     ///< The shader this renderer uses. (Not owned)
 
-  OwnerPointer<VisualRenderer::AnimatableVisualProperties> mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
-  OwnerPointer<Vector4>                                    mBlendColor;                ///< The blend color for blending operation
+  OwnerPointer<VisualRenderer::VisualProperties> mVisualProperties; ///< VisualProperties (optional/owned)
+  OwnerPointer<Vector4>                          mBlendColor;       ///< The blend color for blending operation
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
