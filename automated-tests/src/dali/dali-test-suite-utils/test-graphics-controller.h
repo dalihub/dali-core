@@ -157,6 +157,8 @@ public:
 
   bool IsCompatible(const Graphics::RenderTarget& renderTargetA, const Graphics::RenderTarget& renderTargetB, const Graphics::RenderPass& renderPassA, const Graphics::RenderPass& renderPassB) override;
 
+  void UpdateRenderTarget(Graphics::RenderTarget& renderTargetA, const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo) override;
+
   /**
    * @brief Executes batch update of textures
    *

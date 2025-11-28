@@ -443,6 +443,8 @@ public: // ResourceId relative API.
 
   virtual bool IsCompatible(const Graphics::RenderTarget& renderTargetA, const Graphics::RenderTarget& renderTargetB, const Graphics::RenderPass& renderPassA, const Graphics::RenderPass& renderPassB) = 0;
 
+  virtual void UpdateRenderTarget(Graphics::RenderTarget& renderTarget, const RenderTargetCreateInfo& renderTargetCreateInfo) = 0;
+
 protected:
   /**
    * Creates controller
