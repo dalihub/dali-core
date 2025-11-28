@@ -325,7 +325,12 @@ IF( ENABLE_COVERAGE )
     EXECUTE_PROCESS( COMMAND bash -c "${LCOV_BIN} --version | cut -d' ' -f4" OUTPUT_VARIABLE LCOV_VERSION )
     STRING( REPLACE "." ";" LCOV_VLIST ${LCOV_VERSION})
     IF( NOT $<VERSION_LESS:${LCOV_VERSION},"1.10"> )
-      SET(LCOV_OPTS --rc lcov_branch_coverage=1)
+      # lcov version 2.0 and later have different options for branch coverage, and need to ignore some errors
+      IF( NOT $<VERSION_LESS:${LCOV_VERSION},"2.0"> )
+        SET(LCOV_OPTS --rc branch_coverage=1 --rc geninfo_unexecuted_blocks=1 --rc no_exception_branch=1 --ignore-errors unused --ignore-errors empty --ignore-errors negative --ignore-errors mismatch)
+      ELSE()
+        SET(LCOV_OPTS --rc lcov_branch_coverage=1)
+      ENDIF()
     ENDIF()
 
     ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}rename_cov_data ./rename-cov-data )
