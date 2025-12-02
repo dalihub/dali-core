@@ -813,8 +813,24 @@ struct TouchEventProcessor::Impl
     // If our primary point is an Up event, then the primary point (in multi-touch) will change next
     // time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
 
+    bool shouldClear = false;
     TouchEventProcessor& processor(localVars.processor);
     if(localVars.primaryPointState == PointState::UP)
+    {
+      // Check if we have a capturing touch actor
+      if(processor.mCapturingTouchActor.GetActor())
+      {
+        // When capturing touch actor is set, only clear if there's only one touch point
+        shouldClear = (localVars.touchEventImpl->GetPointCount() == 1);
+      }
+      else
+      {
+        // No capturing touch actor
+        shouldClear = true;
+      }
+    }
+
+    if(shouldClear)
     {
       processor.Clear();
     }
