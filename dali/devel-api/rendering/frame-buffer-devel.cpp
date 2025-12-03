@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,10 @@ void SetMultiSamplingLevel(FrameBuffer frameBuffer, uint8_t multiSamplingLevel)
 {
   GetImplementation(frameBuffer).SetMultiSamplingLevel(multiSamplingLevel);
 }
+uint8_t GetMultiSamplingLevel(FrameBuffer frameBuffer)
+{
+  return GetImplementation(frameBuffer).GetMultiSamplingLevel();
+}
 
 Texture GetColorTexture(const FrameBuffer frameBuffer, uint8_t index)
 {
@@ -74,6 +78,21 @@ Texture GetDepthStencilTexture(FrameBuffer frameBuffer)
 {
   Internal::Texture* texturePtr = GetImplementation(frameBuffer).GetDepthStencilTexture();
   return Dali::Texture(texturePtr);
+}
+
+uint8_t GetColorAttachmentCount(const FrameBuffer frameBuffer)
+{
+  return GetImplementation(frameBuffer).GetColorAttachmentCount();
+}
+
+Uint16Pair GetSize(FrameBuffer frameBuffer)
+{
+  return GetImplementation(frameBuffer).GetSize();
+}
+
+FrameBuffer::Attachment::Mask GetMask(FrameBuffer frameBuffer)
+{
+  return GetImplementation(frameBuffer).GetMask();
 }
 
 } // namespace DevelFrameBuffer

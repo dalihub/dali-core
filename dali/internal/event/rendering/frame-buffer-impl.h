@@ -90,6 +90,14 @@ public:
   void SetMultiSamplingLevel(uint8_t multiSamplingLevel);
 
   /**
+   * @copydoc Dali::DevelFrameBuffer::SetMultiSamplingLevel()
+   */
+  uint8_t GetMultiSamplingLevel()
+  {
+    return mMultiSamplingLevel;
+  }
+
+  /**
    * @copydoc Dali::FrameBuffer::GetColorTexture()
    */
   Texture* GetColorTexture(uint8_t index) const;
@@ -112,6 +120,15 @@ public:
   void SetSize(uint32_t width, uint32_t height);
 
   /**
+   * @brief Get the framebuffer size
+   * @return The size of the framebuffer
+   */
+  Uint16Pair GetSize()
+  {
+    return Uint16Pair(mWidth, mHeight);
+  }
+
+  /**
    * @brief Requests to Keep rendering result.
    */
   void KeepRenderResult();
@@ -128,6 +145,26 @@ public:
    * If the frame is not yet rendered, empty handle is returned.
    */
   Dali::PixelData GetRenderResult();
+
+  /**
+   * @brief Get the number of color attachments
+   *
+   * @return the number of color attachments
+   */
+  uint8_t GetColorAttachmentCount() const
+  {
+    return mColorAttachmentCount;
+  }
+
+  /**
+   * @brief Get the bitmask of attachments that should be implicitly created
+   *
+   * @return the depth/stencil attachment bitmask.
+   */
+  Mask GetMask() const
+  {
+    return mAttachments;
+  }
 
 private: // implementation
   /**
@@ -158,6 +195,7 @@ private:                                        // data
   uint32_t   mHeight;
   Mask       mAttachments; ///< Bit-mask of type FrameBuffer::Attachment::Mask
   uint8_t    mColorAttachmentCount;
+  uint8_t    mMultiSamplingLevel{0};
 };
 
 } // namespace Internal

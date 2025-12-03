@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/devel-api/rendering/frame-buffer-devel.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
+
 using namespace Dali;
 
 #include <mesh-builder.h>
@@ -85,6 +86,12 @@ int UtcDaliFrameBufferNew01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(framebuffer), 0u, TEST_LOCATION);
+  Texture colorAttachment = DevelFrameBuffer::GetColorTexture(framebuffer, 0u);
+  Texture depthAttachment = DevelFrameBuffer::GetDepthTexture(framebuffer);
+  DALI_TEST_CHECK(!colorAttachment);
+  DALI_TEST_CHECK(!depthAttachment);
+
   END_TEST;
 }
 
@@ -108,6 +115,13 @@ int UtcDaliFrameBufferNew02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), 0u, TEST_LOCATION);
+  Texture colorAttachment = DevelFrameBuffer::GetColorTexture(frameBuffer, 0u);
+  Texture depthAttachment = DevelFrameBuffer::GetDepthTexture(frameBuffer);
+  DALI_TEST_CHECK(!colorAttachment);
+  DALI_TEST_CHECK(depthAttachment && depthAttachment == depthTexture);
+
+  DALI_TEST_EQUALS((int)DevelFrameBuffer::GetMask(frameBuffer), (int)FrameBuffer::Attachment::DEPTH, TEST_LOCATION);
   END_TEST;
 }
 
@@ -129,6 +143,15 @@ int UtcDaliFrameBufferNew03(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), 0u, TEST_LOCATION);
+  Texture colorAttachment        = DevelFrameBuffer::GetColorTexture(frameBuffer, 0u);
+  Texture depthAttachment        = DevelFrameBuffer::GetDepthTexture(frameBuffer);
+  Texture depthStencilAttachment = DevelFrameBuffer::GetDepthStencilTexture(frameBuffer);
+  DALI_TEST_CHECK(!colorAttachment);
+  DALI_TEST_CHECK(!depthAttachment);
+  DALI_TEST_CHECK(depthStencilAttachment && depthStencilAttachment == stencilTexture);
+
+  DALI_TEST_EQUALS((int)DevelFrameBuffer::GetMask(frameBuffer), (int)FrameBuffer::Attachment::STENCIL, TEST_LOCATION);
 
   END_TEST;
 }
@@ -152,6 +175,8 @@ int UtcDaliFrameBufferNew04(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  DALI_TEST_EQUALS((int)DevelFrameBuffer::GetMask(frameBuffer), (int)FrameBuffer::Attachment::DEPTH_STENCIL, TEST_LOCATION);
 
   END_TEST;
 }
@@ -202,6 +227,18 @@ int UtcDaliFrameBufferNewWithColor01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK(frameBuffer.GetColorTexture());
+
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), 1u, TEST_LOCATION);
+  Texture colorAttachment        = DevelFrameBuffer::GetColorTexture(frameBuffer, 0u);
+  Texture depthAttachment        = DevelFrameBuffer::GetDepthTexture(frameBuffer);
+  Texture depthStencilAttachment = DevelFrameBuffer::GetDepthStencilTexture(frameBuffer);
+  DALI_TEST_CHECK(colorAttachment && colorAttachment == frameBuffer.GetColorTexture());
+  DALI_TEST_CHECK(!depthAttachment);
+  DALI_TEST_CHECK(!depthStencilAttachment);
+
+  auto size = DevelFrameBuffer::GetSize(frameBuffer);
+  DALI_TEST_EQUALS(size.GetWidth(), width, TEST_LOCATION);
+  DALI_TEST_EQUALS(size.GetHeight(), height, TEST_LOCATION);
   END_TEST;
 }
 
@@ -219,6 +256,9 @@ int UtcDaliFrameBufferNewWithColor02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK(frameBuffer.GetColorTexture());
+
+  DALI_TEST_EQUALS((int)DevelFrameBuffer::GetMask(frameBuffer), (int)FrameBuffer::Attachment::COLOR, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -240,6 +280,8 @@ int UtcDaliFrameBufferNewWithColor03(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   // check that texture is not empty handle
   DALI_TEST_CHECK(frameBuffer.GetColorTexture());
+  Texture colorAttachment = DevelFrameBuffer::GetColorTexture(frameBuffer, 0u);
+  DALI_TEST_CHECK(colorAttachment && colorAttachment == frameBuffer.GetColorTexture());
   END_TEST;
 }
 
@@ -408,6 +450,8 @@ int UtcDaliFrameBufferAttachColorTexture01(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), 1u, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -431,6 +475,7 @@ int UtcDaliFrameBufferAttachColorTexture02(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -455,6 +500,7 @@ int UtcDaliFrameBufferAttachColorTexture03(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -479,6 +525,7 @@ int UtcDaliFrameBufferAttachColorTexture04(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -490,12 +537,12 @@ int UtcDaliFrameBufferAttachColorTexture05(void)
   unsigned int width(64);
   unsigned int height(64);
   FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::NONE);
-  Texture      texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
 
-  // N.B. it doesn't make sense per se, however the OGL standard doesn't seem to forbid attaching the same texture to different slots.
+  std::vector<Texture> textures;
   for(int i = 0; i < Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS + 1; ++i)
   {
-    frameBuffer.AttachColorTexture(texture);
+    textures.push_back(Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height));
+    frameBuffer.AttachColorTexture(textures.back());
   }
   CreateRenderTask(application, frameBuffer);
   application.SendNotification();
@@ -504,6 +551,10 @@ int UtcDaliFrameBufferAttachColorTexture05(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetColorAttachmentCount(frameBuffer), Dali::DevelFrameBuffer::MAX_COLOR_ATTACHMENTS, TEST_LOCATION);
+  auto colorTexture2 = DevelFrameBuffer::GetColorTexture(frameBuffer, 2);
+  DALI_TEST_CHECK(colorTexture2 == textures[2]);
 
   END_TEST;
 }
@@ -575,7 +626,7 @@ int UtcDaliFrameBufferSetMultiSampingLevel(void)
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
 
-  // We don't have getter API for multisampling level. No testing.
+  DALI_TEST_EQUALS(DevelFrameBuffer::GetMultiSamplingLevel(frameBuffer), 4u, TEST_LOCATION);
 
   END_TEST;
 }
