@@ -428,7 +428,7 @@ public: // ResourceId relative API.
   Graphics::UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) override;
 
   bool          HasClipMatrix() const override;
-  const Matrix& GetClipMatrix() const override;
+  const Matrix& GetClipMatrix(const Graphics::RenderTarget* renderTarget) const override;
 
 public: // Test Functions
   void SetAutoAttrCreation(bool v)

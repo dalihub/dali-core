@@ -680,7 +680,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   Matrix clippedProjectionMatrix(projectionMatrix);
   if(mGraphicsController.HasClipMatrix())
   {
-    Matrix::Multiply(clippedProjectionMatrix, projectionMatrix, mGraphicsController.GetClipMatrix());
+    Matrix::Multiply(clippedProjectionMatrix, projectionMatrix, mGraphicsController.GetClipMatrix(renderTargetGraphicsObjects.GetGraphicsRenderTarget()));
   }
 
   // Loop through all RenderItems in the RenderList, set up any prerequisites to render them, then perform the render.
