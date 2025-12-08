@@ -2,7 +2,7 @@
 #define DALI_FRAME_BUFFER_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,6 +87,24 @@ DALI_CORE_API void AttachDepthStencilTexture(FrameBuffer frameBuffer, Texture& t
 DALI_CORE_API void SetMultiSamplingLevel(FrameBuffer frameBuffer, uint8_t multiSamplingLevel);
 
 /**
+ * @brief Get the level of multisampling for this frame buffer
+ *
+ * @param[in] frameBuffer The FrameBuffer handle
+ *
+ * @return The multisampling level applied to this framebuffer
+ */
+DALI_CORE_API uint8_t GetMultiSamplingLevel(FrameBuffer frameBuffer);
+
+/**
+ * @brief Get the count of color attachments
+ *
+ * @param[in] frameBuffer A handle to the Framebuffer
+ *
+ * @return the number of attached color textures.
+ */
+DALI_CORE_API uint8_t GetColorAttachmentCount(const FrameBuffer frameBuffer);
+
+/**
  * @brief Gets the color texture at the given @a index used as output in the frame buffer.
  *
  * @param[in] frameBuffer A handle to the FrameBuffer
@@ -116,6 +134,22 @@ DALI_CORE_API Texture GetDepthTexture(FrameBuffer frameBuffer);
  * @return A handle of the texture used as depth/stencil output, or an uninitialized handle
  */
 DALI_CORE_API Texture GetDepthStencilTexture(FrameBuffer frameBuffer);
+
+/**
+ * @brief Gets the size of the framebuffer
+ *
+ * @param[in] frameBuffer The FrameBuffer handle
+ *
+ * @return The size of the framebuffer
+ */
+DALI_CORE_API Uint16Pair GetSize(FrameBuffer frameBuffer);
+
+/**
+ * @brief Gets the depth/stencil implicit attachment mask
+ *
+ * @return Bitmask describing which of depth/stencil attachments are implicity created
+ */
+DALI_CORE_API FrameBuffer::Attachment::Mask GetMask(FrameBuffer frameBuffer);
 
 } // namespace DevelFrameBuffer
 

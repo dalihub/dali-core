@@ -429,10 +429,15 @@ public: // ResourceId relative API.
 
   /**
    * @brief Get the alternative clipping matrix.
+   * Each graphics backend may have different clip space; and this ensures we translate
+   * into the right clipspace for the render target. (Offscreens may also be inverted
+   * using this matrix)
    *
-   * @return the clipping matrix
+   * @param[in] renderTarget
+   *
+   * @return the clipping matrix appropriate for the given render target.
    */
-  virtual const Matrix& GetClipMatrix() const = 0;
+  virtual const Matrix& GetClipMatrix(const Graphics::RenderTarget* renderTarget) const = 0;
 
   /**
    * @brief Returns device limitation for specified capability
