@@ -190,6 +190,15 @@ void EventProcessor::ProcessEvents()
           // All touch events have been processed, it should be cleared.
           if(touchEvent.GetPointCount() == 1 && (touchEvent.GetPoint(0).GetState() == PointState::UP || touchEvent.GetPoint(0).GetState() == PointState::INTERRUPTED))
           {
+            // If interrupted, send ProcessTouchEvent to all touch processors
+            if(touchEvent.GetPoint(0).GetState() == PointState::INTERRUPTED)
+            {
+              for(const auto& processorPair : mTouchEventProcessors)
+              {
+                // Send ProcessTouchEvent to all existing touch processors
+                processorPair.second->ProcessTouchEvent(touchEvent);
+              }
+            }
             mActorIdDeviceId.clear();
             mTouchEventProcessors.clear();
           }
