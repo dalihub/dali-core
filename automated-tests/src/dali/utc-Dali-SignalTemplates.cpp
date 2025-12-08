@@ -1632,6 +1632,16 @@ int UtcDaliSignalDeleteDuringEmit(void)
   }
 
   {
+    TestSignals::BoolRet2ValueParamSignal* signal = new TestSignals::BoolRet2ValueParamSignal;
+
+    TestEmitDuringCallback handler1;
+    handler1.DeleteDuringEmitConnect(*signal);
+
+    // should just log an error
+    signal->EmitOr(1.0f, 2);
+  }
+
+  {
     TestSignals::FloatRet0ParamSignal* signal = new TestSignals::FloatRet0ParamSignal;
 
     TestEmitDuringCallback handler1;
@@ -2229,6 +2239,34 @@ int UtcDaliSlotDelegateMethods(void)
 
   handlers.mSlotDelegate.DisconnectAll();
   DALI_TEST_EQUALS(0, handlers.mSlotDelegate.GetConnectionCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSignalEmitOr(void)
+{
+  TestApplication application; // Create core for debug logging
+
+  TestSignals::BoolRet2ValueParamSignal signal;
+  DALI_TEST_CHECK(signal.Empty());
+  TestSlotHandler handler;
+  signal.Connect(&handler, &TestSlotHandler::BoolSlotFloatValueIntValue);
+  DALI_TEST_CHECK(signal.GetConnectionCount() == 1);
+
+  handler.mBoolReturn = true;
+  bool result = signal.EmitOr(1.0f, 2);
+  DALI_TEST_CHECK(result);
+
+  TestSlotHandler handler1;
+  signal.Connect(&handler1, &TestSlotHandler::BoolSlotFloatValueIntValue);
+  DALI_TEST_CHECK(signal.GetConnectionCount() == 2);
+
+  handler1.mBoolReturn = false;
+  result = signal.EmitOr(1.0f, 2);
+  DALI_TEST_CHECK(result);
+
+  result = signal.Emit(1.0f, 2);
+  DALI_TEST_CHECK(!result);
 
   END_TEST;
 }
