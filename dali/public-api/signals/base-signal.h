@@ -193,6 +193,13 @@ public:
       CleanupConnections();
       mSignalDeleted = nullptr;
     }
+    else
+    {
+      // After the signal is deleted, mFlag pointer in guard becomes invalid.
+      // So mFlag need be set a null pointer to avoid the case that a wild pointer would be set
+      // a value in EmitGuard's destructor.
+      guard.mFlag = nullptr;
+    }
 
     return returnVal;
   }
@@ -232,6 +239,13 @@ public:
       // Cleanup NULL values from Connection container
       CleanupConnections();
       mSignalDeleted = nullptr;
+    }
+    else
+    {
+      // After the signal is deleted, mFlag pointer in guard becomes invalid.
+      // So mFlag need be set a null pointer to avoid the case that a wild pointer would be set
+      // a value in EmitGuard's destructor.
+      guard.mFlag = nullptr;
     }
 
     return returnVal;
@@ -277,6 +291,13 @@ public:
       // Cleanup NULL values from Connection container
       CleanupConnections();
       mSignalDeleted = nullptr;
+    }
+    else
+    {
+      // After the signal is deleted, mFlag pointer in guard becomes invalid.
+      // So mFlag need be set a null pointer to avoid the case that a wild pointer would be set
+      // a value in EmitGuard's destructor.
+      guard.mFlag = nullptr;
     }
   }
 

@@ -969,6 +969,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
 
   if(event.points[0].GetState() == PointState::INTERRUPTED)
   {
+    DALI_LOG_RELEASE_INFO("INTERRUPED");
     Impl::EmitInterruptedEvent(localVars, event);
     return false; // No need for hit testing & already an interrupted event so just return false
   }

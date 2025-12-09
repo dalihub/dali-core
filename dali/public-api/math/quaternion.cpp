@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <ostream>
+#include <algorithm>
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
@@ -120,7 +121,7 @@ bool Quaternion::IsIdentity() const
 
 bool Quaternion::ToAxisAngle(Vector3& axis, Radian& angle) const
 {
-  angle          = acosf(mVector.w);
+  angle          = acosf(std::clamp(mVector.w, -1.0f, 1.0f));
   bool converted = false;
   // pre-compute to save time
   const float sine = sinf(angle.radian);
@@ -180,7 +181,7 @@ Vector4 Quaternion::EulerAngles() const
 
   Vector4 euler;
   euler.x = atan2f(2.0f * (mVector.y * mVector.z + mVector.x * mVector.w), -sqx - sqy + sqz + sqw);
-  euler.y = asinf(-2.0f * (mVector.x * mVector.z - mVector.y * mVector.w));
+  euler.y = asinf(std::clamp(-2.0f * (mVector.x * mVector.z - mVector.y * mVector.w), -1.0f, 1.0f));
   euler.z = atan2f(2.0f * (mVector.x * mVector.y + mVector.z * mVector.w), sqx - sqy - sqz + sqw);
   return euler;
 }
@@ -328,7 +329,7 @@ void Quaternion::Invert()
 
 Quaternion Quaternion::Log() const
 {
-  float      a    = acosf(mVector.w);
+  float      a    = acosf(std::clamp(mVector.w, -1.0f, 1.0f));
   float      sina = sinf(a);
   Quaternion ret;
 
@@ -434,7 +435,7 @@ Quaternion Quaternion::SlerpNoInvert(const Quaternion& q1, const Quaternion& q2,
   {
     MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 2);
 
-    float theta = acosf(cosTheta);
+    float theta = acosf(std::clamp(cosTheta, -1.0f, 1.0f));
     return (q1 * sinf(theta * (1.0f - t)) + q2 * sinf(theta * t)) / sinf(theta);
   }
   else
@@ -463,7 +464,7 @@ float Quaternion::AngleBetween(const Quaternion& q1, const Quaternion& q2)
   // Formula for angle θ between two quaternion is:
   // θ = cos^−1 (2⟨q1,q2⟩^2 − 1), Where (q1,q2) is inner product of the quaternions.
   float X     = from.mVector.Dot(to.mVector);
-  float theta = acosf((2 * X * X) - 1); // float arc cosine
+  float theta = acosf(std::clamp((2.0f * X * X) - 1.0f, -1.0f, 1.0f)); // float arc cosine
 
   return theta;
 }
