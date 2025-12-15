@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,37 +36,40 @@ class TestGraphicsCommandBuffer;
 class TestGraphicsSampler;
 class TestGraphicsPipeline;
 
-enum class CommandType
+enum class CommandType : uint32_t
 {
-  FLUSH                   = 1 << 0,
-  BIND_TEXTURES           = 1 << 1,
-  BIND_SAMPLERS           = 1 << 2,
-  BIND_VERTEX_BUFFERS     = 1 << 3,
-  BIND_INDEX_BUFFER       = 1 << 4,
-  BIND_UNIFORM_BUFFER     = 1 << 5,
-  BIND_PIPELINE           = 1 << 6,
-  DRAW                    = 1 << 7,
-  DRAW_INDEXED            = 1 << 8,
-  DRAW_INDEXED_INDIRECT   = 1 << 9,
-  SET_SCISSOR             = 1 << 10,
-  SET_SCISSOR_TEST        = 1 << 11,
-  SET_VIEWPORT            = 1 << 12,
-  SET_VIEWPORT_TEST       = 1 << 13,
-  BEGIN_RENDER_PASS       = 1 << 14,
-  END_RENDER_PASS         = 1 << 15,
-  EXECUTE_COMMAND_BUFFERS = 1 << 16,
-  SET_COLOR_MASK          = 1 << 17,
-  CLEAR_STENCIL_BUFFER    = 1 << 18,
-  CLEAR_DEPTH_BUFFER      = 1 << 19,
-  SET_STENCIL_TEST_ENABLE = 1 << 20,
-  SET_STENCIL_WRITE_MASK  = 1 << 21,
-  SET_STENCIL_STATE       = 1 << 22,
-  SET_DEPTH_COMPARE_OP    = 1 << 23,
-  SET_DEPTH_TEST_ENABLE   = 1 << 24,
-  SET_DEPTH_WRITE_ENABLE  = 1 << 25,
-  DRAW_NATIVE             = 1 << 26,
-  BEGIN                   = 1 << 27,
-  END                     = 1 << 28
+  FLUSH                   = 1u << 0,
+  BIND_TEXTURES           = 1u << 1,
+  BIND_SAMPLERS           = 1u << 2,
+  BIND_VERTEX_BUFFERS     = 1u << 3,
+  BIND_INDEX_BUFFER       = 1u << 4,
+  BIND_UNIFORM_BUFFER     = 1u << 5,
+  BIND_PIPELINE           = 1u << 6,
+  DRAW                    = 1u << 7,
+  DRAW_INDEXED            = 1u << 8,
+  DRAW_INDEXED_INDIRECT   = 1u << 9,
+  SET_SCISSOR             = 1u << 10,
+  SET_SCISSOR_TEST        = 1u << 11,
+  SET_VIEWPORT            = 1u << 12,
+  SET_VIEWPORT_TEST       = 1u << 13,
+  BEGIN_RENDER_PASS       = 1u << 14,
+  END_RENDER_PASS         = 1u << 15,
+  EXECUTE_COMMAND_BUFFERS = 1u << 16,
+  SET_COLOR_MASK          = 1u << 17,
+  CLEAR_STENCIL_BUFFER    = 1u << 18,
+  CLEAR_DEPTH_BUFFER      = 1u << 19,
+  SET_STENCIL_TEST_ENABLE = 1u << 20,
+  SET_STENCIL_WRITE_MASK  = 1u << 21,
+  SET_STENCIL_STATE       = 1u << 22,
+  SET_DEPTH_COMPARE_OP    = 1u << 23,
+  SET_DEPTH_TEST_ENABLE   = 1u << 24,
+  SET_DEPTH_WRITE_ENABLE  = 1u << 25,
+  SET_COLOR_BLEND_ENABLE  = 1u << 26,
+  SET_COLOR_BLEND_EQUATION = 1u << 27,
+  SET_COLOR_BLEND_ADVANCED = 1u << 28,
+  DRAW_NATIVE             = 1u << 29,
+  BEGIN                   = 1u << 30,
+  END                     = 1u << 31
 };
 
 std::ostream& operator<<(std::ostream& os, Graphics::StencilOp op);
@@ -261,6 +264,9 @@ struct Command
       case CommandType::SET_DEPTH_COMPARE_OP:
       case CommandType::SET_DEPTH_TEST_ENABLE:
       case CommandType::SET_DEPTH_WRITE_ENABLE:
+      case CommandType::SET_COLOR_BLEND_ENABLE:
+      case CommandType::SET_COLOR_BLEND_EQUATION:
+      case CommandType::SET_COLOR_BLEND_ADVANCED:
       default:
       {
         break;
@@ -423,6 +429,31 @@ struct Command
       case CommandType::SET_DEPTH_WRITE_ENABLE:
       {
         data.depth.writeEnabled = rhs.data.depth.writeEnabled;
+        break;
+      }
+      case CommandType::SET_COLOR_BLEND_ENABLE:
+      {
+        data.colorBlendEnable.attachment = rhs.data.colorBlendEnable.attachment;
+        data.colorBlendEnable.enabled = rhs.data.colorBlendEnable.enabled;
+        break;
+      }
+      case CommandType::SET_COLOR_BLEND_EQUATION:
+      {
+        data.colorBlendEquation.attachment = rhs.data.colorBlendEquation.attachment;
+        data.colorBlendEquation.srcColorBlendFactor = rhs.data.colorBlendEquation.srcColorBlendFactor;
+        data.colorBlendEquation.dstColorBlendFactor = rhs.data.colorBlendEquation.dstColorBlendFactor;
+        data.colorBlendEquation.colorBlendOp = rhs.data.colorBlendEquation.colorBlendOp;
+        data.colorBlendEquation.srcAlphaBlendFactor = rhs.data.colorBlendEquation.srcAlphaBlendFactor;
+        data.colorBlendEquation.dstAlphaBlendFactor = rhs.data.colorBlendEquation.dstAlphaBlendFactor;
+        data.colorBlendEquation.alphaBlendOp = rhs.data.colorBlendEquation.alphaBlendOp;
+        break;
+      }
+      case CommandType::SET_COLOR_BLEND_ADVANCED:
+      {
+        data.colorBlendAdvanced.attachment = rhs.data.colorBlendAdvanced.attachment;
+        data.colorBlendAdvanced.srcPremultiplied = rhs.data.colorBlendAdvanced.srcPremultiplied;
+        data.colorBlendAdvanced.dstPremultiplied = rhs.data.colorBlendAdvanced.dstPremultiplied;
+        data.colorBlendAdvanced.blendOp = rhs.data.colorBlendAdvanced.blendOp;
         break;
       }
       default:
@@ -589,6 +620,31 @@ struct Command
         data.depth.writeEnabled = rhs.data.depth.writeEnabled;
         break;
       }
+      case CommandType::SET_COLOR_BLEND_ENABLE:
+      {
+        data.colorBlendEnable.attachment = rhs.data.colorBlendEnable.attachment;
+        data.colorBlendEnable.enabled = rhs.data.colorBlendEnable.enabled;
+        break;
+      }
+      case CommandType::SET_COLOR_BLEND_EQUATION:
+      {
+        data.colorBlendEquation.attachment = rhs.data.colorBlendEquation.attachment;
+        data.colorBlendEquation.srcColorBlendFactor = rhs.data.colorBlendEquation.srcColorBlendFactor;
+        data.colorBlendEquation.dstColorBlendFactor = rhs.data.colorBlendEquation.dstColorBlendFactor;
+        data.colorBlendEquation.colorBlendOp = rhs.data.colorBlendEquation.colorBlendOp;
+        data.colorBlendEquation.srcAlphaBlendFactor = rhs.data.colorBlendEquation.srcAlphaBlendFactor;
+        data.colorBlendEquation.dstAlphaBlendFactor = rhs.data.colorBlendEquation.dstAlphaBlendFactor;
+        data.colorBlendEquation.alphaBlendOp = rhs.data.colorBlendEquation.alphaBlendOp;
+        break;
+      }
+      case CommandType::SET_COLOR_BLEND_ADVANCED:
+      {
+        data.colorBlendAdvanced.attachment = rhs.data.colorBlendAdvanced.attachment;
+        data.colorBlendAdvanced.srcPremultiplied = rhs.data.colorBlendAdvanced.srcPremultiplied;
+        data.colorBlendAdvanced.dstPremultiplied = rhs.data.colorBlendAdvanced.dstPremultiplied;
+        data.colorBlendAdvanced.blendOp = rhs.data.colorBlendAdvanced.blendOp;
+        break;
+      }
       default:
       {
         break;
@@ -716,6 +772,31 @@ struct Command
     {
       bool enabled;
     } colorMask;
+
+    struct
+    {
+      uint32_t attachment;
+      bool enabled;
+    } colorBlendEnable;
+
+    struct
+    {
+      uint32_t attachment;
+      Graphics::BlendFactor srcColorBlendFactor;
+      Graphics::BlendFactor dstColorBlendFactor;
+      Graphics::BlendOp colorBlendOp;
+      Graphics::BlendFactor srcAlphaBlendFactor;
+      Graphics::BlendFactor dstAlphaBlendFactor;
+      Graphics::BlendOp alphaBlendOp;
+    } colorBlendEquation;
+
+    struct
+    {
+      uint32_t attachment;
+      bool srcPremultiplied;
+      bool dstPremultiplied;
+      Graphics::BlendOp blendOp;
+    } colorBlendAdvanced;
   } data;
 };
 
@@ -1131,6 +1212,68 @@ public:
     mCallStack.PushCall("ClearDepthBuffer", "");
     mCommands.emplace_back();
     mCommands.back().type = CommandType::CLEAR_DEPTH_BUFFER;
+  }
+
+  void SetColorBlendEnable(uint32_t attachment, bool enabled) override
+  {
+    TraceCallStack::NamedParams params;
+    params["attachment"] << attachment;
+    params["enabled"] << (enabled ? "T" : "F");
+    mCallStack.PushCall("SetColorBlendEnable", params.str(), params);
+
+    mCommands.emplace_back(CommandType::SET_COLOR_BLEND_ENABLE);
+    auto& cmd = mCommands.back().data.colorBlendEnable;
+    cmd.attachment = attachment;
+    cmd.enabled = enabled;
+  }
+
+  void SetColorBlendEquation(uint32_t attachment,
+                             Graphics::BlendFactor srcColorBlendFactor,
+                             Graphics::BlendFactor dstColorBlendFactor,
+                             Graphics::BlendOp colorBlendOp,
+                             Graphics::BlendFactor srcAlphaBlendFactor,
+                             Graphics::BlendFactor dstAlphaBlendFactor,
+                             Graphics::BlendOp alphaBlendOp) override
+  {
+    TraceCallStack::NamedParams params;
+    params["attachment"] << attachment;
+    params["srcColorBlendFactor"] << srcColorBlendFactor;
+    params["dstColorBlendFactor"] << dstColorBlendFactor;
+    params["colorBlendOp"] << colorBlendOp;
+    params["srcAlphaBlendFactor"] << srcAlphaBlendFactor;
+    params["dstAlphaBlendFactor"] << dstAlphaBlendFactor;
+    params["alphaBlendOp"] << alphaBlendOp;
+    mCallStack.PushCall("SetColorBlendEquation", params.str(), params);
+
+    mCommands.emplace_back(CommandType::SET_COLOR_BLEND_EQUATION);
+    auto& cmd = mCommands.back().data.colorBlendEquation;
+    cmd.attachment = attachment;
+    cmd.srcColorBlendFactor = srcColorBlendFactor;
+    cmd.dstColorBlendFactor = dstColorBlendFactor;
+    cmd.colorBlendOp = colorBlendOp;
+    cmd.srcAlphaBlendFactor = srcAlphaBlendFactor;
+    cmd.dstAlphaBlendFactor = dstAlphaBlendFactor;
+    cmd.alphaBlendOp = alphaBlendOp;
+  }
+
+  void SetColorBlendAdvanced(uint32_t attachment,
+                             bool     srcPremultiplied,
+                             bool     dstPremultiplied,
+                             Graphics::BlendOp      blendOp) override
+  {
+    TraceCallStack::NamedParams params;
+    params["attachment"] << attachment;
+    params["srcPremultiplied"] << (srcPremultiplied ? "T" : "F");
+    params["dstPremultiplied"] << (dstPremultiplied ? "T" : "F");
+    params["blendOp"] << blendOp;
+    mCallStack.PushCall("SetColorBlendAdvanced", params.str(), params);
+
+    mCommands.emplace_back(CommandType::SET_COLOR_BLEND_ADVANCED);
+    auto& cmd = mCommands.back().data.colorBlendAdvanced;
+    cmd.attachment = attachment;
+    cmd.srcPremultiplied = srcPremultiplied;
+    cmd.dstPremultiplied = dstPremultiplied;
+    cmd.blendOp = blendOp;
   }
 
   [[nodiscard]] const std::vector<Command>& GetCommands() const

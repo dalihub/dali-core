@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_COMMAND_BUFFER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -480,6 +480,47 @@ public:
    * @param[in] depthWriteEnabled True if the depth buffer can be updated or cleared.
    */
   virtual void SetDepthWriteEnable(bool depthWriteEnable) = 0;
+
+  /**
+   * @brief Enables/disables color blending for specific attachment
+   *
+   * @param[in] attachment Color attachment index
+   * @param[in] enabled Whether blending should be enabled
+   */
+  virtual void SetColorBlendEnable(uint32_t attachment, bool enabled) = 0;
+
+  /**
+   * @brief Sets color blend equation for specific attachment
+   *
+   * @param[in] attachment Color attachment index
+   * @param[in] srcColorBlendFactor Source color blend factor
+   * @param[in] dstColorBlendFactor Destination color blend factor
+   * @param[in] colorBlendOp Color blend operation
+   * @param[in] srcAlphaBlendFactor Source alpha blend factor
+   * @param[in] dstAlphaBlendFactor Destination alpha blend factor
+   * @param[in] alphaBlendOp Alpha blend operation
+   */
+  virtual void SetColorBlendEquation(uint32_t attachment,
+                                     BlendFactor srcColorBlendFactor,
+                                     BlendFactor dstColorBlendFactor,
+                                     BlendOp colorBlendOp,
+                                     BlendFactor srcAlphaBlendFactor,
+                                     BlendFactor dstAlphaBlendFactor,
+                                     BlendOp alphaBlendOp) = 0;
+
+  /**
+   * @brief Sets advanced color blend equation
+   *
+   * @param[in] attachment Color attachment index
+   * @param[in] srcPremultiplied Whether source color is premultiplied
+   * @param[in] dstPremultiplied Whether destination color is premultiplied
+   * @param[in] blendOverlap Blend overlap mode
+   * @param[in] blendOp Advanced blend operation
+   */
+  virtual void SetColorBlendAdvanced(uint32_t attachment,
+                                     bool     srcPremultiplied,
+                                     bool     dstPremultiplied,
+                                     BlendOp      blendOp) = 0;
 
 protected:
   CommandBuffer(CommandBuffer&&)            = default;

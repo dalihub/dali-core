@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -491,7 +491,7 @@ void PipelineCacheQueryInfo::GenerateHash()
          (static_cast<std::size_t>(geometry->GetTopology()) << 2u) ^
          (static_cast<std::size_t>(renderer->GetFaceCullMode()) << 5u) ^
          ((cameraUsingReflection ? 1u : 0u) << 8u) ^
-         (blendingEnabled ? static_cast<std::size_t>(blendingOptions->GetBitmask()) : 0xDA11u);
+         (blendingEnabled ? static_cast<std::size_t>(isDynamicBlendEnabled ? 0xDA12u : blendingOptions->GetBitmask()) : 0xDA11u);
 }
 
 bool PipelineCacheQueryInfo::Equal(const PipelineCacheQueryInfo& lhs, const PipelineCacheQueryInfo& rhs, const bool compareRenderTarget) noexcept
@@ -507,11 +507,13 @@ bool PipelineCacheQueryInfo::Equal(const PipelineCacheQueryInfo& lhs, const Pipe
                    (lhs.renderer->GetFaceCullMode() == rhs.renderer->GetFaceCullMode()) &&
                    (lhs.cameraUsingReflection == rhs.cameraUsingReflection) &&
                    (!lhs.blendingEnabled ||
-                    (lhs.blendingOptions->GetBitmask() == rhs.blendingOptions->GetBitmask() &&
-                     ((lhs.blendingOptions->GetBlendColor() == nullptr && rhs.blendingOptions->GetBlendColor() == nullptr) ||
-                      (lhs.blendingOptions->GetBlendColor() &&
-                       rhs.blendingOptions->GetBlendColor() &&
-                       (*lhs.blendingOptions->GetBlendColor() == *rhs.blendingOptions->GetBlendColor())))));
+                    (lhs.isDynamicBlendEnabled == rhs.isDynamicBlendEnabled &&
+                     ((lhs.isDynamicBlendEnabled) ||
+                      (lhs.blendingOptions->GetBitmask() == rhs.blendingOptions->GetBitmask() &&
+                       ((lhs.blendingOptions->GetBlendColor() == nullptr && rhs.blendingOptions->GetBlendColor() == nullptr) ||
+                        (lhs.blendingOptions->GetBlendColor() &&
+                         rhs.blendingOptions->GetBlendColor() &&
+                         (*lhs.blendingOptions->GetBlendColor() == *rhs.blendingOptions->GetBlendColor())))))));
 
   return ret;
 }
@@ -557,21 +559,55 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
   // Create new pipeline at level2 if requested
   if(level2->pipeline == nullptr && createNewIfNotFound)
   {
-    Graphics::ProgramState programState{};
-    programState.program = &queryInfo.program->GetGraphicsProgram();
-    // Create the pipeline
-    Graphics::PipelineCreateInfo createInfo;
-    createInfo
-      .SetInputAssemblyState(&level1->ia)
-      .SetVertexInputState(&level0->inputState)
-      .SetRasterizationState(&level1->rs)
-      .SetColorBlendState(&level2->colorBlendState)
-      .SetProgramState(&programState)
-      .SetRenderTarget(level0->renderTargetGraphicsObjects ? level0->renderTargetGraphicsObjects->GetGraphicsRenderTarget() : nullptr);
+    if(IsDynamicBlendEnabled() && queryInfo.blendingEnabled)
+    {
+      if(!level1->dynamicBlendPipeline)
+      {
+        Graphics::ProgramState programState{};
+        programState.program = &queryInfo.program->GetGraphicsProgram();
 
-    // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
-    // and re-drawn in multiple instructions).
-    level2->pipeline = graphicsController->CreatePipeline(createInfo, nullptr);
+        // Create the pipeline
+        Graphics::PipelineCreateInfo createInfo;
+        createInfo
+          .SetInputAssemblyState(&level1->ia)
+          .SetVertexInputState(&level0->inputState)
+          .SetRasterizationState(&level1->rs)
+          .SetColorBlendState(nullptr)
+          .SetProgramState(&programState)
+          .SetRenderTarget(level0->renderTargetGraphicsObjects ? level0->renderTargetGraphicsObjects->GetGraphicsRenderTarget() : nullptr)
+          .SetDynamicStateMask(mSupportedDynamicStates);
+
+        level1->dynamicBlendPipeline = graphicsController->CreatePipeline(createInfo, nullptr);
+      }
+      // Share the dynamic blend pipeline
+      Graphics::DefaultDeleter<Graphics::Pipeline> deleter;
+      deleter.deleteFunction = [](Graphics::Pipeline*){};
+      level2->pipeline = Graphics::UniquePtr<Graphics::Pipeline>(level1->dynamicBlendPipeline.get(), deleter);
+    }
+    else
+    {
+      Graphics::ProgramState programState{};
+      programState.program = &queryInfo.program->GetGraphicsProgram();
+
+      // Create the pipeline
+      Graphics::PipelineCreateInfo createInfo;
+      createInfo
+        .SetInputAssemblyState(&level1->ia)
+        .SetVertexInputState(&level0->inputState)
+        .SetRasterizationState(&level1->rs)
+        .SetColorBlendState(IsDynamicBlendEnabled() ? nullptr : &level2->colorBlendState)
+        .SetProgramState(&programState)
+        .SetRenderTarget(level0->renderTargetGraphicsObjects ? level0->renderTargetGraphicsObjects->GetGraphicsRenderTarget() : nullptr);
+
+      if(IsDynamicBlendEnabled())
+      {
+        createInfo.SetDynamicStateMask(mSupportedDynamicStates);
+      }
+
+      // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
+      // and re-drawn in multiple instructions).
+      level2->pipeline = graphicsController->CreatePipeline(createInfo, nullptr);
+    }
   }
 
   PipelineResult result{};
@@ -740,6 +776,17 @@ void PipelineCache::RenderTargetGraphicsObjectsDestroyed(const SceneGraph::Rende
       }
     }
   }
+}
+
+bool PipelineCache::IsDynamicBlendEnabled() const
+{
+  if(!mDeviceCapabilitiesCached)
+  {
+    mSupportedDynamicStates = graphicsController->GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES);
+    mDynamicBlendEnabled = (mSupportedDynamicStates & (Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT | Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT)) != 0;
+    mDeviceCapabilitiesCached = true;
+  }
+  return mDynamicBlendEnabled;
 }
 
 } // namespace Dali::Internal::Render

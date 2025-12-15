@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_API_TYPES
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -664,9 +664,11 @@ const uint32_t DEPTH_BOUNDS_BIT         = 1 << 5;
 const uint32_t STENCIL_COMPARE_MASK_BIT = 1 << 6;
 const uint32_t STENCIL_WRITE_MASK_BIT   = 1 << 7;
 const uint32_t STENCIL_REFERENCE_BIT    = 1 << 8;
+const uint32_t COLOR_BLEND_ENABLE_BIT   = 1 << 9;
+const uint32_t COLOR_BLEND_EQUATION_BIT = 1 << 10;
 } // namespace PipelineDynamicStateBits
 
-const uint32_t PIPELINE_DYNAMIC_STATE_COUNT(9u);
+const uint32_t PIPELINE_DYNAMIC_STATE_COUNT(11u);
 
 using PipelineDynamicStateMask = uint32_t;
 
@@ -1691,7 +1693,8 @@ inline RenderTargetTransformFlags operator|(T flags, RenderTargetTransformFlagBi
 
 enum class DeviceCapability
 {
-  MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT
+  MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
+  SUPPORTED_DYNAMIC_STATES
 };
 
 /**
