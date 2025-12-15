@@ -424,8 +424,7 @@ bool HitTestActorOnce(std::vector<std::shared_ptr<HitResult>>& hitResultList,
 
   if(fboRenderTask)
   {
-    bool hit = HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck);
-    if(hit && hitCheck.GetPropagationType() == Integration::Scene::TouchPropagationType::PARENT)
+    if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
     {
       return true;
     }
@@ -516,8 +515,7 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
   RenderTaskPtr fboRenderTask = GetFboRenderTask(hitResultOfThisActor, hitCommonInformation.mappingActors);
   if(fboRenderTask)
   {
-    bool hit = HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck);
-    if(hit && hitCheck.GetPropagationType() == Integration::Scene::TouchPropagationType::PARENT)
+    if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
     {
       return true;
     }
@@ -525,6 +523,7 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
 
   hitResultOfThisActor->mHitType = HitType::HIT_ACTOR;
   hitResultList.push_back(hitResultOfThisActor);
+
   return true;
 }
 
