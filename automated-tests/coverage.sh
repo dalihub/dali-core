@@ -17,7 +17,19 @@ fi
 
 
 # From lcov version 1.10 onwards, branch coverage is off by default and earlier versions do not support the rc option
-LCOV_OPTS=`if [ \`printf "\\\`lcov --version | cut -d' ' -f4\\\`\n1.10\n" | sort -V | head -n 1\` = 1.10 ] ; then echo "--rc lcov_branch_coverage=1" ; fi`
+LCOV_VERSION=`lcov --version | cut -d' ' -f4`
+LCOV_OPTS=""
+
+if [ `printf "$LCOV_VERSION\n1.10\n" | sort -V | head -n 1` = 1.10 ] ; then
+    # lcov version 2.0 and later have different options for branch coverage, and need to ignore some errors
+    if [ `printf "$LCOV_VERSION\n2.0\n" | sort -V | head -n 1` = 2.0 ] ; then
+        LCOV_OPTS="--rc branch_coverage=1 --rc geninfo_unexecuted_blocks=1 --rc no_exception_branch=1 --ignore-errors unused --ignore-errors empty --ignore-errors negative --ignore-errors mismatch"
+    else
+        LCOV_OPTS="--rc lcov_branch_coverage=1"
+    fi
+fi
+echo "lcov version $LCOV_VERSION detected"
+echo "lcov option = \"$LCOV_OPTS\""
 
 for i in `find . -name "*.dir"` ; do
     (

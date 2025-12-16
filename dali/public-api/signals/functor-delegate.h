@@ -2,7 +2,7 @@
 #define DALI_FUNCTOR_DELEGATE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -80,13 +83,13 @@ public:
    * @brief Constructor which copies a function object.
    *
    * @SINCE_1_0.0
-   * @param[in] functor The functor object to copy, either a class with operator() or a C function
+   * @param[in] functor The functor object to move, either a class with operator() or a C function
    * @return A pointer to the new function object
    */
   template<typename T>
-  static FunctorDelegate* New(const T& functor)
+  static FunctorDelegate* New(T&& functor)
   {
-    return new FunctorDelegate(reinterpret_cast<void*>(new T(functor)), // heap allocate the functor
+    return new FunctorDelegate(reinterpret_cast<void*>(new T(std::move(functor))), // heap allocate the functor
                                reinterpret_cast<FunctorDelegate::Dispatcher>(&FunctorDispatcher<T>::Dispatch),
                                reinterpret_cast<FunctorDelegate::Destructor>(&FunctorDestroyer<T>::Delete));
   }

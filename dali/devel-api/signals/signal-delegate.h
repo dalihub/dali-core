@@ -2,7 +2,7 @@
 #define DALI_SIGNAL_DELEGATE_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,16 +62,11 @@ public:
   {
     if(!mIsConnected)
     {
-      // Note: We have to new the CallbackBaseFunctor rather than have it as a concrete object, as it
-      // is converted to a FunctorDelegate again within ConnectSignal. FunctorDelegates gain ownership
-      // of any functor they are created from and therefore always attempt to delete them.
-      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor(new CallbackFunctorDelegate0(functorDelegate));
-      mConnectActor.ConnectSignal(connectionTracker, mSignalName, *callbackFunctor);
+      CallbackBaseFunctor callbackFunctor(new CallbackFunctorDelegate0(functorDelegate));
+      mConnectActor.ConnectSignal(connectionTracker, mSignalName, std::move(callbackFunctor));
       mIsConnected = true;
-
       return true;
     }
-
     return false;
   }
 
@@ -89,13 +84,11 @@ public:
   {
     if(!mIsConnected)
     {
-      CallbackBaseFunctor* callbackFunctor = new CallbackBaseFunctor(MakeCallback(object, memberFunction));
-      mConnectActor.ConnectSignal(object, mSignalName, *callbackFunctor);
+      CallbackBaseFunctor callbackFunctor(MakeCallback(object, memberFunction));
+      mConnectActor.ConnectSignal(object, mSignalName, std::move(callbackFunctor));
       mIsConnected = true;
-
       return true;
     }
-
     return false;
   }
 
@@ -122,6 +115,13 @@ private:
      * @param[in] callback A CallbackBase which can be created from a member function, or a FunctorDelegate.
      */
     CallbackBaseFunctor(CallbackBase* callback);
+
+    /**
+     * @brief Move constructor.
+     *
+     * @param[in] other A reference to the moved functor.
+     */
+    CallbackBaseFunctor(CallbackBaseFunctor&& other) noexcept;
 
     /**
      * @brief Executes the functor.

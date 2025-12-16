@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2025 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,11 @@ public:
   SignalDelegateTestClass(Actor connectActor, std::string connectSignal)
   {
     mSignalDelegate = new SignalDelegate(connectActor, connectSignal);
+  }
+
+  ~SignalDelegateTestClass() override
+  {
+    delete mSignalDelegate;
   }
 
   void ConnectToInternalMember()
@@ -222,6 +227,8 @@ int UtcDaliSignalDelegateConnectToFunctorP(void)
   // Check the global flag to confirm the signal was received.
   DALI_TEST_CHECK(gSignalReceived);
 
+  delete testTracker;
+
   END_TEST;
 }
 
@@ -254,6 +261,8 @@ int UtcDaliSignalDelegateConnectToFunctorN(void)
 
   // Check the global flag to confirm the signal was received.
   DALI_TEST_CHECK(!gSignalReceived);
+
+  delete testTracker;
 
   END_TEST;
 }
