@@ -422,7 +422,7 @@ bool HitTestActorOnce(std::vector<std::shared_ptr<HitResult>>& hitResultList,
     return false;
   }
 
-  if(fboRenderTask)
+  if(fboRenderTask && currentActor.GetCurrentOpacity() > FULLY_TRANSPARENT)
   {
     if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
     {
@@ -512,12 +512,15 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
     return false;
   }
 
-  RenderTaskPtr fboRenderTask = GetFboRenderTask(hitResultOfThisActor, hitCommonInformation.mappingActors);
-  if(fboRenderTask)
+  if(currentActor.GetCurrentOpacity() > FULLY_TRANSPARENT)
   {
-    if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
+    RenderTaskPtr fboRenderTask = GetFboRenderTask(hitResultOfThisActor, hitCommonInformation.mappingActors);
+    if(fboRenderTask)
     {
-      return true;
+      if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
+      {
+        return true;
+      }
     }
   }
 
