@@ -41,7 +41,7 @@ namespace SceneGraph
 class Node;
 class Camera;
 class RenderInstruction;
-class RenderMessageDispatcher;
+class RenderManagerDispatcher;
 class ResetterManager;
 
 /**
@@ -71,9 +71,9 @@ public:
   /**
    * Initialize the render task. Called in update thread
    * @param[in] resetterManager to send resetter
-   * @param[in] renderMessageDispatcher to send messages to render thread
+   * @param[in] renderManagerDispatcher The renderManagerDispatcher to assign render tracker.
    */
-  void Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher);
+  void Initialize(ResetterManager& resetterManager, RenderManagerDispatcher& renderManagerDispatcher);
 
   /**
    * Set the nodes to be rendered.
@@ -438,7 +438,7 @@ public:                                          // Animatable Properties
 
 private:
   ResetterManager*         mResetterManager;
-  RenderMessageDispatcher* mRenderMessageDispatcher;
+  RenderManagerDispatcher* mRenderManagerDispatcher;
   Render::RenderTracker*   mRenderSyncTracker;
   Node*                    mSourceNode;
   Node*                    mStopperNode;

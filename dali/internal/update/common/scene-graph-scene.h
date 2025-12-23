@@ -45,7 +45,6 @@ namespace Internal
 
 namespace SceneGraph
 {
-class RenderMessageDispatcher;
 class RenderInstructionContainer;
 class Node;
 
@@ -139,12 +138,6 @@ public:
    * Destructor
    */
   virtual ~Scene();
-
-  /**
-   * Set the render message dispatcher.
-   * Called from UpdateManagerQueue, before Initialize.
-   */
-  void SetRenderMessageDispatcher(RenderMessageDispatcher* dispatcher);
 
   /**
    * Set the render target of the surface
@@ -300,16 +293,6 @@ public:
   void SetClearColor(const Vector4& color);
 
   /**
-   * @brief Set the clear color for the scene's ClearOp render pass
-   *
-   * @note Needs to run after 2nd stage Initialize in RenderManagerQ, so
-   * has to re-send.
-   *
-   * @param[in] color The color to clear for the render pass
-   */
-  void SetClearColorInRenderQ(const Vector4& color);
-
-  /**
    * @brief Keep rendering for at least the given amount of time.
    *
    * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
@@ -420,8 +403,6 @@ private:
   // Update manager updates instructions for the next frame while we render the current one
 
   RenderInstructionContainer mInstructions; ///< Render instructions for the scene
-
-  RenderMessageDispatcher* mRenderMessageDispatcher{nullptr}; ///< RenderManager message dispatcher
 
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks; ///< Frame presented callbacks
@@ -546,7 +527,7 @@ inline void SetClearColorMessage(EventThreadServices& eventThreadServices, const
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&scene, &Scene::SetClearColorInRenderQ, color);
+  new(slot) LocalType(&scene, &Scene::SetClearColor, color);
 }
 
 } // namespace SceneGraph

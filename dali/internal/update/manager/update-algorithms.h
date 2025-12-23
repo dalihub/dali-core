@@ -30,7 +30,6 @@ namespace SceneGraph
 {
 class Layer;
 class PropertyOwner;
-class RenderQueue;
 
 using PropertyOwnerContainer = Dali::Vector<PropertyOwner*>;
 
@@ -48,13 +47,11 @@ void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBuff
  * The inherited properties of each node are recalculated if necessary.
  * @param[in] rootNode The root of a tree of nodes.
  * @param[in] updateBufferIndex The current update buffer index.
- * @param[in] renderQueue Used to query messages for the next Render.
  * @param[out] postPropertyOwner property owners those have post constraint.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
 NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
                                  BufferIndex             updateBufferIndex,
-                                 RenderQueue&            renderQueue,
                                  PropertyOwnerContainer& postPropertyOwners);
 /**
  * This updates all the sub-layer's reusability flags without affecting

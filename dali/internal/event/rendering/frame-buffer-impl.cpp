@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #include <dali/internal/event/rendering/frame-buffer-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/render/renderers/render-frame-buffer-messages.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -56,7 +58,7 @@ void FrameBuffer::Initialize()
   mRenderObject = new Render::FrameBuffer(mWidth, mHeight, mAttachments);
 
   OwnerPointer<Render::FrameBuffer> transferOwnership(mRenderObject);
-  AddFrameBuffer(GetEventThreadServices().GetUpdateManager(), transferOwnership);
+  SceneGraph::AddFrameBufferMessage(GetEventThreadServices().GetUpdateManager(), transferOwnership);
 }
 
 void FrameBuffer::AttachColorTexture(TexturePtr texture, uint32_t mipmapLevel, uint32_t layer)
@@ -75,7 +77,7 @@ void FrameBuffer::AttachColorTexture(TexturePtr texture, uint32_t mipmapLevel, u
     mColor[mColorAttachmentCount] = texture;
     ++mColorAttachmentCount;
 
-    AttachColorTextureToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel, layer);
+    Render::AttachColorTextureMessage(GetEventThreadServices(), *mRenderObject, texture->GetRenderTextureKey(), mipmapLevel, layer);
   }
 }
 
@@ -89,7 +91,7 @@ void FrameBuffer::AttachDepthTexture(TexturePtr texture, uint32_t mipmapLevel)
   else
   {
     mDepth = texture;
-    AttachDepthTextureToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
+    Render::AttachDepthTextureMessage(GetEventThreadServices(), *mRenderObject, texture->GetRenderTextureKey(), mipmapLevel);
   }
 }
 
@@ -103,14 +105,14 @@ void FrameBuffer::AttachDepthStencilTexture(TexturePtr texture, unsigned int mip
   else
   {
     mStencil = texture;
-    AttachDepthStencilTextureToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, texture->GetRenderTextureKey().Get(), mipmapLevel);
+    Render::AttachDepthStencilTextureMessage(GetEventThreadServices(), *mRenderObject, texture->GetRenderTextureKey(), mipmapLevel);
   }
 }
 
 void FrameBuffer::SetMultiSamplingLevel(uint8_t multiSamplingLevel)
 {
   mMultiSamplingLevel = multiSamplingLevel;
-  SetMultiSamplingLevelToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject, multiSamplingLevel);
+  Render::SetMultiSamplingLevelMessage(GetEventThreadServices(), *mRenderObject, multiSamplingLevel);
 }
 
 Texture* FrameBuffer::GetColorTexture(uint8_t index) const
@@ -136,14 +138,14 @@ void FrameBuffer::SetSize(uint32_t width, uint32_t height)
 
 void FrameBuffer::KeepRenderResult()
 {
-  KeepRenderResultToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
+  Render::KeepRenderResultMessage(GetEventThreadServices(), *mRenderObject);
 }
 
 void FrameBuffer::ClearRenderResult()
 {
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
   {
-    ClearRenderResultToFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
+    Render::ClearRenderResultMessage(GetEventThreadServices(), *mRenderObject);
   }
 }
 
@@ -161,7 +163,7 @@ FrameBuffer::~FrameBuffer()
 
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
   {
-    RemoveFrameBuffer(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
+    SceneGraph::RemoveFrameBufferMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
   }
 }
 

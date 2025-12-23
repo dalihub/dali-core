@@ -52,7 +52,6 @@
 #include <dali/internal/render/common/render-manager.h>
 
 using Dali::Internal::SceneGraph::RenderManager;
-using Dali::Internal::SceneGraph::RenderQueue;
 using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace
@@ -112,14 +111,11 @@ Core::Core(RenderController&            renderController,
                                       (corePolicy & Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE) ? Integration::StencilBufferAvailable::TRUE : Integration::StencilBufferAvailable::FALSE,
                                       (corePolicy & Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE) ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
 
-  RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
-
   mUpdateManager = new UpdateManager(*mNotificationManager,
                                      *mAnimationPlaylist,
                                      *mPropertyNotificationManager,
                                      renderController,
                                      *mRenderManager,
-                                     renderQueue,
                                      *mRenderTaskProcessor,
                                      *mMemoryPoolCollection);
 
@@ -468,10 +464,6 @@ void Core::ChangeGraphicsController(Graphics::Controller& graphicsController)
 {
   DALI_LOG_RELEASE_INFO("ChangeGraphicsController\n");
   mRenderManager->ChangeGraphicsController(graphicsController);
-
-  // renderQueue recreated. Notify updated pointer to UpdateManager.
-  RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
-  mUpdateManager->ChangeRenderQueue(renderQueue);
 }
 
 void Core::PreInitializeCompleted()
@@ -871,14 +863,11 @@ void Core::LogMemoryPools() const
     renderUboViewPoolCapacity);
 
   uint32_t updateQCapacity = mUpdateManager->GetUpdateMessageQueueCapacity();
-  uint32_t renderQCapacity = mUpdateManager->GetRenderMessageQueueCapacity();
 
   DALI_LOG_RELEASE_INFO(
     "\nMessage Queue capacities:\n"
-    "  UpdateQueue: %lu\n"
-    "  RenderQueue: %lu\n",
-    updateQCapacity,
-    renderQCapacity);
+    "  UpdateQueue: %lu\n",
+    updateQCapacity);
 
   size_t renderInstructionCapacity = mUpdateManager->GetRenderInstructionCapacity();
   DALI_LOG_RELEASE_INFO("\nRenderInstruction capacity: %lu\n", renderInstructionCapacity);

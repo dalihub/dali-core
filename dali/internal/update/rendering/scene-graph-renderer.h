@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class UniformBlock;
 namespace SceneGraph
 {
 class MemoryPoolCollection;
-class SceneController;
+class RenderManagerDispatcher;
 
 class Renderer;
 class TextureSet;
@@ -428,17 +428,15 @@ public:
   /**
    * Connect the object to the scene graph
    *
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   * @param[in] renderManagerDispacher The render manager dispatcher - used for sending messages to render thread
    */
-  void ConnectToSceneGraph(SceneController& sceneController, BufferIndex bufferIndex);
+  void ConnectToSceneGraph(RenderManagerDispatcher& renderManagerDispacher);
 
   /**
    * Disconnect the object from the scene graph
-   * @param[in] sceneController The scene controller - used for sending messages to render thread
-   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   * @param[in] renderManagerDispacher The render manager dispatcher - used for sending messages to render thread
    */
-  void DisconnectFromSceneGraph(SceneController& sceneController, BufferIndex bufferIndex);
+  void DisconnectFromSceneGraph(RenderManagerDispatcher& renderManagerDispacher);
 
   /**
    * Detached from the scene graph object.
@@ -616,11 +614,10 @@ private:
 private:
   CollectedUniformMap mCollectedUniformMap; ///< Uniform maps collected by the renderer
 
-  SceneController*    mSceneController; ///< Used for initializing renderers
-  Render::RendererKey mRenderer;        ///< Key to the renderer (that's owned by RenderManager)
-  TextureSet*         mTextureSet;      ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*   mGeometry;        ///< The geometry this renderer uses. (Not owned)
-  Shader*             mShader;          ///< The shader this renderer uses. (Not owned)
+  Render::RendererKey mRenderer;   ///< Key to the renderer (that's owned by RenderManager)
+  TextureSet*         mTextureSet; ///< The texture set this renderer uses. (Not owned)
+  Render::Geometry*   mGeometry;   ///< The geometry this renderer uses. (Not owned)
+  Shader*             mShader;     ///< The shader this renderer uses. (Not owned)
 
   OwnerPointer<VisualRenderer::AnimatableVisualProperties> mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
   OwnerPointer<Vector4>                                    mBlendColor;                ///< The blend color for blending operation
@@ -631,7 +628,6 @@ private:
   uint32_t             mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
   uint32_t             mInstanceCount{0};            ///< The number of instances to be drawn
   uint32_t             mBlendBitmask;                ///< The bitmask of blending options
-  uint32_t             mResendFlag;                  ///< Indicate whether data should be resent to the renderer
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
   UniformMap::SizeType mShaderMapChangeCounter{0u};  ///< Value to check if uniform data should be updated
 
@@ -649,12 +645,10 @@ private:
   bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
   bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool mUseSharedUniformBlock : 1;
-  bool mInvokeTerminateCallback : 1;
 
   mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
 
-  std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands;
-  Dali::RenderCallback*                         mRenderCallback{nullptr};
+  Dali::RenderCallback* mRenderCallback{nullptr};
 
 public:
   AnimatableProperty<Vector4> mMixColor;   ///< The mix color value

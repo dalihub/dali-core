@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,15 +39,15 @@ VertexBuffer::VertexBuffer()
 
 VertexBuffer::~VertexBuffer() = default;
 
-void VertexBuffer::SetFormat(VertexBuffer::Format* format)
+void VertexBuffer::SetFormat(OwnerPointer<Render::VertexBuffer::Format>& format)
 {
-  mFormat      = format;
+  mFormat      = format.Release();
   mDataChanged = true;
 }
 
-void VertexBuffer::SetData(Dali::Vector<uint8_t>* data, uint32_t size)
+void VertexBuffer::SetData(OwnerPointer<Dali::Vector<uint8_t>>& data, uint32_t size)
 {
-  mData        = data;
+  mData        = data.Release();
   mSize        = size;
   mDataChanged = true;
 }

@@ -37,23 +37,22 @@ class RenderTracker;
 namespace SceneGraph
 {
 class RenderManager;
-class RenderQueue;
 
 /**
- * A utility class for sending messages to the render-thread.
+ * A utility class for sending functions to the render manager, without include render-manager header.
  */
-class RenderMessageDispatcher
+class RenderManagerDispatcher
 {
 public:
   /**
    * Constructor
    */
-  RenderMessageDispatcher(RenderManager& renderManager, RenderQueue& renderQueue, const SceneGraphBuffers& buffers);
+  RenderManagerDispatcher(RenderManager& renderManager);
 
   /**
    * Destructor
    */
-  virtual ~RenderMessageDispatcher();
+  virtual ~RenderManagerDispatcher();
 
   /**
    * Add a Renderer.
@@ -64,10 +63,10 @@ public:
 
   /**
    * Remove a Renderer.
-   * @param[in] renderer The renderer to remove.
+   * @param[in] rendererKey The renderer to remove.
    * @post renderer will be destroyed in the next Render.
    */
-  void RemoveRenderer(const Render::RendererKey& renderer);
+  void RemoveRenderer(const Render::RendererKey& rendererKey);
 
   /**
    * Add a Render tracker.
@@ -84,23 +83,19 @@ public:
   void RemoveRenderTracker(Render::RenderTracker& renderTracker);
 
   /**
+   * Mark texture updated.
+   * @param[in] textureKey The texture to be updated.
+   */
+  void SetTextureUpdated(const Render::TextureKey& textureKey);
+
+  /**
    * Return the render manager.
    * @return A reference to the render manager.
    */
   RenderManager& GetRenderManager();
 
-  /**
-   * Reserve space for another message in the queue.
-   * @param[in] size The message size with respect to the size of type "char".
-   * @return A pointer to the first char allocated for the message.
-   */
-  uint32_t* ReserveMessageSlot(std::size_t size);
-
 private:
   RenderManager& mRenderManager;
-  RenderQueue&   mRenderQueue;
-
-  const SceneGraphBuffers& mBuffers;
 };
 
 } // namespace SceneGraph
