@@ -460,9 +460,10 @@ public:
   /**
    * If we need a program, prepare it and return it.
    * @param[in] instruction The render instruction
+   * @param[in] cacheSharedUniformBlock Cache the shared uniform block or not.
    * @return the prepared program, or nullptr.
    */
-  Program* PrepareProgram(const SceneGraph::RenderInstruction& instruction);
+  Program* PrepareProgram(const SceneGraph::RenderInstruction& instruction, bool cacheSharedUniformBlock);
 
   /**
    * Sets RenderCallback object
@@ -735,6 +736,11 @@ private:
 
   PipelineCachePtr             mPipeline{};
   PipelineLifecycleNotifierPtr mPipelineLifecycleNotifier{};
+
+  // mSharedUboCache[renderpassTag][program][uniformBlockIndex] = matched UBO.
+  // Clear this cache when program destroyed / shader changed.
+  using SharedUniformBlockCache = std::unordered_map<uint32_t, std::unordered_map<const Program*, std::unordered_map<uint32_t, Render::UniformBlock*>>>;
+  SharedUniformBlockCache mSharedUboCache{};
 
   using Hash = std::size_t;
 

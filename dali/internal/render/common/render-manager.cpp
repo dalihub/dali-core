@@ -240,7 +240,15 @@ struct RenderManager::Impl
    */
   void RequestProgramCacheCleanIfNeed()
   {
-    if(programCacheCleanRequestedFrame == 0u)
+    if(DALI_UNLIKELY(clearCacheRequired))
+    {
+      clearCacheRequired = false;
+      ClearProgramCache();
+
+      // Reset current frame count.
+      programCacheCleanRequestedFrame = 0u;
+    }
+    else if(programCacheCleanRequestedFrame == 0u)
     {
       if(DALI_UNLIKELY(programController.GetCachedProgramCount() > programCacheCleanRequiredThreshold))
       {
@@ -363,6 +371,7 @@ struct RenderManager::Impl
 
   bool lastFrameWasRendered{false}; ///< Keeps track of the last frame being rendered due to having render instructions
   bool commandBufferSubmitted{false};
+  bool clearCacheRequired{false};
 };
 
 RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
@@ -714,7 +723,7 @@ void RenderManager::RemoveRenderTracker(Render::RenderTracker* renderTracker)
 
 void RenderManager::ClearProgramCache()
 {
-  mImpl->ClearProgramCache();
+  mImpl->clearCacheRequired = true;
 }
 
 void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear)
@@ -1131,7 +1140,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
             usesDepthBuffer = usesDepthBuffer || item.UsesDepthBuffer(autoDepthTestMode);
 
             // Prepare and store used programs for further processing
-            auto program = item.mRenderer->PrepareProgram(instruction);
+            // Register SharedUniformBlock infomations here.
+            auto program = item.mRenderer->PrepareProgram(instruction, true);
             if(program)
             {
               const auto& memoryRequirements = program->GetUniformBlocksMemoryRequirements();
@@ -1143,22 +1153,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
               if(it == programUsageCount.end())
               {
                 programUsageCount[key] = Graphics::ProgramResourceBindingInfo{.program = key, .count = 1};
-
-                if(memoryRequirements.sharedGpuSizeRequired > 0u)
-                {
-                  // Prepare to create UBOView for each UBO Blocks and program.
-                  for(uint32_t i = 1u; i < memoryRequirements.sharedBlock.size(); ++i)
-                  {
-                    auto* uniformBlock = memoryRequirements.sharedBlock[i];
-                    if(uniformBlock)
-                    {
-                      if(mImpl->sharedUniformBufferViewContainer.RegisterSharedUniformBlockAndPrograms(*program, *uniformBlock, memoryRequirements.blockSize[i]))
-                      {
-                        totalSizeGPU += memoryRequirements.blockSizeAligned[i]; ///< Add it only 1 times.
-                      }
-                    }
-                  }
-                }
               }
               else
               {
@@ -1203,6 +1197,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     }
   }
   mImpl->graphicsController.SetResourceBindingHints(sceneResourceBindings);
+
+  totalSizeGPU += mImpl->sharedUniformBufferViewContainer.GetTotalAlignedBlockSize();
 
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Render scene (%s), CPU:%d GPU:%d\n", renderToFbo ? "Offscreen" : "Onscreen", totalSizeCPU, totalSizeGPU);
 

@@ -676,6 +676,162 @@ int UtcDaliUniformBlockGetPropertyFromGraphics02(void)
   END_TEST;
 }
 
+int UtcDaliUniformBlockGetPropertyFromGraphics03(void)
+{
+  tet_infoline("Test for same UBO block name with seperated object.\n");
+
+  TestApplication application;
+
+  const std::string uniformBlockName("testBlock");
+  const std::string uniformValue1Name("uValue1");
+  const std::string uniformValue2Name("uValue2");
+
+  // Values for UniformBlock
+  const float   value1ForUniformBlock1 = 10.0f;
+  const Vector2 value2ForUniformBlock1(20.0f, 30.0f);
+  const float   value1ForUniformBlock2 = 40.0f;
+  const Vector2 value2ForUniformBlock2(50.0f, 60.0f);
+
+  const uint32_t uniformAlign     = sizeof(float) * 4;
+  const uint32_t uniformBlockSize = (uniformAlign) * 2;
+
+  tet_infoline("Prepare graphics to check UTC for testBlock\n");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  // Add custom uniform block
+  TestGraphicsReflection::TestUniformBlockInfo block{
+    uniformBlockName,
+    0,
+    0,
+    uniformBlockSize,
+    {
+      {uniformValue1Name, Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, 0, Property::Type::FLOAT, uniformAlign, 0},
+      {uniformValue2Name, Graphics::UniformClass::UNIFORM, 0, 0, {uniformAlign}, {2}, 0, Property::Type::VECTOR2, uniformAlign, 0},
+    }};
+  graphics.AddCustomUniformBlock(block);
+  tet_infoline("Prepare done\n");
+
+  // Create actor1
+  Shader   shader1   = Shader::New(VertexSource, FragmentSource);
+  Geometry geometry1 = CreateQuadGeometry();
+  Renderer renderer1 = Renderer::New(geometry1, shader1);
+
+  Actor actor1 = Actor::New();
+  actor1.AddRenderer(renderer1);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor1);
+
+  // Create actor2
+  Shader   shader2   = Shader::New(FragmentSource, VertexSource);
+  Geometry geometry2 = CreateQuadGeometry();
+  Renderer renderer2 = Renderer::New(geometry2, shader2);
+
+  Actor actor2 = Actor::New();
+  actor2.AddRenderer(renderer2);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(300.0f, 300.0f));
+  application.GetScene().Add(actor2);
+
+  tet_printf("Create UBO for actor1.\n");
+  UniformBlock uniformBlock1 = UniformBlock::New("testBlock");
+  DALI_TEST_CHECK(uniformBlock1);
+  DALI_TEST_EQUALS(uniformBlock1.ConnectToShader(shader1), true, TEST_LOCATION);
+
+  // Register a custom property
+  uniformBlock1.RegisterProperty(uniformValue1Name, value1ForUniformBlock1);
+  uniformBlock1.RegisterProperty(uniformValue2Name, value2ForUniformBlock1);
+
+  tet_printf("Create UBO for actor2.\n");
+  UniformBlock uniformBlock2 = UniformBlock::New("testBlock");
+  DALI_TEST_CHECK(uniformBlock2);
+  DALI_TEST_EQUALS(uniformBlock2.ConnectToShader(shader2), true, TEST_LOCATION);
+
+  // Register a custom property
+  uniformBlock2.RegisterProperty(uniformValue1Name, value1ForUniformBlock2);
+  uniformBlock2.RegisterProperty(uniformValue2Name, value2ForUniformBlock2);
+
+  TraceCallStack& graphicsTrace = graphics.mCallStack;
+  TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
+  graphicsTrace.EnableLogging(true);
+  cmdTrace.EnableLogging(true);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
+  DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
+
+  auto TestRawBuffer = [&](const float expectValue1, const Vector2& expectValue2, const char* location)
+  {
+    DALI_TEST_CHECK(graphics.mLastUniformBinding.buffer != nullptr);
+    DALI_TEST_CHECK(graphics.mLastUniformBinding.emulated == false);
+
+    tet_printf("Expect value : %f, %fx%f\n", expectValue1, expectValue2.x, expectValue2.y);
+
+    bool  found  = false;
+    auto& memory = graphics.mLastUniformBinding.buffer->memory;
+    auto  data   = memory.data();
+    for(uint32_t offset = 0; offset + uniformAlign * 2 <= memory.size(); offset += UNIFORM_BLOCK_ALIGNMENT)
+    {
+      const float* fdata = reinterpret_cast<const float*>(data + offset);
+      tet_printf("[%u] ", offset);
+      for(uint32_t i = 0u; i < uniformBlockSize / sizeof(float); i++)
+      {
+        tet_printf("%f ", fdata[i]);
+      }
+      tet_printf("\n");
+
+      if(CompareType<float>(fdata[0], expectValue1, 0.01f) &&
+         CompareType<float>(fdata[(uniformAlign / sizeof(float))], expectValue2.x, 0.01f) &&
+         CompareType<float>(fdata[(uniformAlign / sizeof(float)) + 1], expectValue2.y, 0.01f))
+      {
+        found = true;
+        break;
+      }
+    }
+    DALI_TEST_EQUALS(found, true, location);
+  };
+
+  // Test the value
+  {
+    tet_printf("The result after connected!\n");
+    TestRawBuffer(value1ForUniformBlock1, value2ForUniformBlock1, TEST_LOCATION);
+    TestRawBuffer(value1ForUniformBlock2, value2ForUniformBlock2, TEST_LOCATION);
+  }
+
+  const float   changedValue1ForUniformBlock1 = -value1ForUniformBlock1;
+  const Vector2 changedValue2ForUniformBlock1 = -value2ForUniformBlock1;
+  uniformBlock1.RegisterProperty(uniformValue1Name, changedValue1ForUniformBlock1);
+  uniformBlock1.RegisterProperty(uniformValue2Name, changedValue2ForUniformBlock1);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Test the value
+  {
+    tet_printf("The result after change value!\n");
+    TestRawBuffer(changedValue1ForUniformBlock1, changedValue2ForUniformBlock1, TEST_LOCATION);
+    TestRawBuffer(value1ForUniformBlock2, value2ForUniformBlock2, TEST_LOCATION);
+  }
+
+  uniformBlock1.DisconnectFromShader(shader1);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Test the value
+  {
+    tet_printf("The result after shader1 disconnected!\n");
+    TestRawBuffer(value1ForUniformBlock2, value2ForUniformBlock2, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliUniformBlockConstraint01(void)
 {
   TestApplication application;

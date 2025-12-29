@@ -196,7 +196,7 @@ void Program::BuildRequirements(
 
   mUniformBlockMemoryRequirements.blockSize.resize(uniformBlockCount);
   mUniformBlockMemoryRequirements.blockSizeAligned.resize(uniformBlockCount);
-  mUniformBlockMemoryRequirements.sharedBlock.resize(uniformBlockCount);
+  mUniformBlockMemoryRequirements.sharedBlockNameHash.resize(uniformBlockCount);
 
   mUniformBlockMemoryRequirements.blockCount            = uniformBlockCount;
   mUniformBlockMemoryRequirements.totalSizeRequired     = 0u;
@@ -214,8 +214,9 @@ void Program::BuildRequirements(
     uint32_t blockAlignment   = uniformBufferManager.GetUniformBlockAlignment(standaloneUniformBlock);
     auto     alignedBlockSize = AlignSize(blockSize, blockAlignment);
 
-    mUniformBlockMemoryRequirements.blockSize[i]        = blockSize;
-    mUniformBlockMemoryRequirements.blockSizeAligned[i] = alignedBlockSize;
+    mUniformBlockMemoryRequirements.blockSize[i]           = blockSize;
+    mUniformBlockMemoryRequirements.blockSizeAligned[i]    = alignedBlockSize;
+    mUniformBlockMemoryRequirements.sharedBlockNameHash[i] = 0u;
 
     bool sharedUniformUsed = false;
 
@@ -226,7 +227,7 @@ void Program::BuildRequirements(
       auto iter        = sharedUniformBlockContainer.find(uboNameHash);
       if(iter != sharedUniformBlockContainer.end())
       {
-        mUniformBlockMemoryRequirements.sharedBlock[i] = iter->second;
+        mUniformBlockMemoryRequirements.sharedBlockNameHash[i] = uboNameHash;
         mUniformBlockMemoryRequirements.totalSizeRequired += alignedBlockSize;
         mUniformBlockMemoryRequirements.sharedGpuSizeRequired += alignedBlockSize;
 
@@ -236,8 +237,6 @@ void Program::BuildRequirements(
 
     if(!sharedUniformUsed)
     {
-      mUniformBlockMemoryRequirements.sharedBlock[i] = nullptr;
-
       mUniformBlockMemoryRequirements.totalSizeRequired += alignedBlockSize;
       mUniformBlockMemoryRequirements.totalCpuSizeRequired += (standaloneUniformBlock) ? alignedBlockSize : 0;
       mUniformBlockMemoryRequirements.totalGpuSizeRequired += (standaloneUniformBlock) ? 0 : alignedBlockSize;
@@ -248,10 +247,10 @@ void Program::BuildRequirements(
 void Program::SetGraphicsProgram(
   Graphics::UniquePtr<Graphics::Program>&&         program,
   Render::UniformBufferManager&                    uniformBufferManager,
-  const SceneGraph::Shader::UniformBlockContainer& uniformBlockContainer)
+  const SceneGraph::Shader::UniformBlockContainer& sharedUniformBlockContainer)
 {
   mGfxProgram = std::move(program);
-  BuildRequirements(mGfxController.GetProgramReflection(*mGfxProgram.get()), uniformBufferManager, uniformBlockContainer);
+  BuildRequirements(mGfxController.GetProgramReflection(*mGfxProgram.get()), uniformBufferManager, sharedUniformBlockContainer);
 }
 
 bool Program::GetUniform(const std::string_view& name, Hash hashedName, Hash hashedNameNoArray, Graphics::UniformInfo& out) const

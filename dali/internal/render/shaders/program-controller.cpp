@@ -54,7 +54,7 @@ void ProgramController::ResetUsedFlag()
 
 bool ProgramController::ClearUnusedCacheIncrementally(bool fullCollect, bool forceClearAll)
 {
-  if(mProgramCacheAdded)
+  if(mProgramCacheAdded || forceClearAll)
   {
     // Clear from begin again if cache container changed.
     mClearCacheIterator = mProgramCache.Begin();
