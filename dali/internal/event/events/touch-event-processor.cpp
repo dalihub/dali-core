@@ -584,7 +584,7 @@ struct TouchEventProcessor::Impl
                   for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
                   {
                     Actor* actorImpl(*rIter);
-                    auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                    auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
                     if(it != processor.mTrackingActorLists.end())
                     {
                       processor.mTrackingActorLists.erase(it);
@@ -600,7 +600,7 @@ struct TouchEventProcessor::Impl
                 for(++iter; iter != processor.mCandidateActorLists.end(); ++iter)
                 {
                   Actor* actorImpl(*iter);
-                  auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                  auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
                   if(it != processor.mTrackingActorLists.end())
                   {
                     processor.mTrackingActorLists.erase(it);
@@ -953,7 +953,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
 
   if(event.points[0].GetState() == PointState::INTERRUPTED)
   {
-    DALI_LOG_RELEASE_INFO("INTERRUPED");
+    DALI_LOG_RELEASE_INFO("INTERRUPTED");
     Impl::EmitInterruptedEvent(localVars, event);
     return false; // No need for hit testing & already an interrupted event so just return false
   }
