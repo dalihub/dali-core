@@ -584,7 +584,7 @@ struct TouchEventProcessor::Impl
                   for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
                   {
                     Actor* actorImpl(*rIter);
-                    auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                    auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
                     if(it != processor.mTrackingActorLists.end())
                     {
                       processor.mTrackingActorLists.erase(it);
@@ -600,7 +600,7 @@ struct TouchEventProcessor::Impl
                 for(++iter; iter != processor.mCandidateActorLists.end(); ++iter)
                 {
                   Actor* actorImpl(*iter);
-                  auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                  auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
                   if(it != processor.mTrackingActorLists.end())
                   {
                     processor.mTrackingActorLists.erase(it);
@@ -813,7 +813,7 @@ struct TouchEventProcessor::Impl
     // If our primary point is an Up event, then the primary point (in multi-touch) will change next
     // time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
 
-    bool shouldClear = false;
+    bool                 shouldClear = false;
     TouchEventProcessor& processor(localVars.processor);
     if(localVars.primaryPointState == PointState::UP)
     {
@@ -969,7 +969,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
 
   if(event.points[0].GetState() == PointState::INTERRUPTED)
   {
-    DALI_LOG_RELEASE_INFO("INTERRUPED");
+    DALI_LOG_RELEASE_INFO("INTERRUPTED");
     Impl::EmitInterruptedEvent(localVars, event);
     return false; // No need for hit testing & already an interrupted event so just return false
   }
