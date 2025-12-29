@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/const-string.h>
@@ -245,10 +246,11 @@ public:
     uint32_t sharedGpuSizeRequired{0u}; ///< requirements of explicitly allocated blocks
 
     // Per block
-    std::vector<uint32_t>              blockSize{};
-    std::vector<uint32_t>              blockSizeAligned{};
-    std::vector<Render::UniformBlock*> sharedBlock{};
+    std::vector<uint32_t> blockSize{};
+    std::vector<uint32_t> blockSizeAligned{};
+    std::vector<size_t>   sharedBlockNameHash{}; ///< 0u if not shared block. otherwise, shared block.
   };
+
   /**
    * Retrieves uniform blocks requirements
    *
