@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -951,11 +951,16 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   // 1) Check if it is an interrupted event - we should inform our last primary hit actor about this
   //    and emit the stage signal as well.
 
+  bool isInterrupted = false;
   if(event.points[0].GetState() == PointState::INTERRUPTED)
   {
-    DALI_LOG_RELEASE_INFO("INTERRUPTED");
-    Impl::EmitInterruptedEvent(localVars, event);
-    return false; // No need for hit testing & already an interrupted event so just return false
+    if(!localVars.isGeometry)
+    {
+      DALI_LOG_RELEASE_INFO("INTERRUPTED");
+      Impl::EmitInterruptedEvent(localVars, event);
+      return false; // No need for hit testing & already an interrupted event so just return false
+    }
+    isInterrupted = true;
   }
 
   // 2) Hit Testing.
@@ -1033,6 +1038,13 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   // 6) Emit an interrupted event to the touch-down actor if it hasn't consumed the up and
   //    emit the stage touched event if required.
   Impl::DeliverEventToTouchDownActorAndScene(localVars, event);
+
+  // If no events are consumed or intercepted in the Geometry mode, perform EmitInterruptedEvent.
+  if(localVars.isGeometry && isInterrupted && !consumed && !mInterceptedTouchActor.GetActor())
+  {
+    DALI_LOG_RELEASE_INFO("INTERRUPTED");
+    Impl::EmitInterruptedEvent(localVars, event);
+  }
 
   return consumed;
 }
