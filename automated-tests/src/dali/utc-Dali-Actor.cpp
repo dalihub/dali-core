@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -352,6 +352,7 @@ struct InheritedVisibilityChangedFunctorData
       DALI_TEST_EQUALS(changedActor, compareChangedActor, TEST_INNER_LOCATION(location));
     }
     DALI_TEST_EQUALS(actor, compareActor, TEST_INNER_LOCATION(location));
+    DALI_TEST_EQUALS(calculatedVisible, visible, TEST_INNER_LOCATION(location));
     DALI_TEST_EQUALS(visible, compareVisible, TEST_INNER_LOCATION(location));
   }
 
@@ -363,6 +364,7 @@ struct InheritedVisibilityChangedFunctorData
   Actor actor;
   Actor changedActor;
   bool  visible;
+  bool  calculatedVisible;
   bool  called;
 };
 
@@ -375,10 +377,11 @@ struct InheritedVisibilityChangedFunctor
 
   void operator()(Actor actor, bool visible)
   {
-    data.actor        = actor;
-    data.changedActor = DevelActor::GetVisiblityChangedActor();
-    data.visible      = visible;
-    data.called       = true;
+    data.actor             = actor;
+    data.changedActor      = DevelActor::GetVisiblityChangedActor();
+    data.visible           = visible;
+    data.calculatedVisible = DevelActor::GetInheritedVisible(actor);
+    data.called            = true;
   }
 
   InheritedVisibilityChangedFunctorData& data;
@@ -15599,6 +15602,92 @@ int UtcDaliActorCalculateWorldColor04(void)
 
   Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR);
   DALI_TEST_EQUALS(color, actualColor, 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorCalculateInheritedVisible01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test basic calculation");
+
+  Actor rootActor   = Actor::New();
+  Actor branchActor = Actor::New();
+  Actor leafActor   = Actor::New();
+
+  rootActor[Actor::Property::POSITION]    = Vector3(100.0f, 0.0f, 0.0f);
+  rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
+  rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
+
+  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+
+  application.GetScene().Add(rootActor);
+  rootActor.Add(branchActor);
+  branchActor.Add(leafActor);
+
+  application.SendNotification();
+  application.Render(0);
+
+  auto CheckInheritedVisible = [&](Actor actor, bool expectVisible, bool expectInheritedVisible, const char* location)
+  {
+    DALI_TEST_EQUALS(expectVisible, actor.GetProperty<bool>(Actor::Property::VISIBLE), location);
+    DALI_TEST_EQUALS(expectInheritedVisible, DevelActor::GetInheritedVisible(actor), location);
+  };
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, true, true, TEST_LOCATION);
+
+  branchActor.SetProperty(Actor::Property::VISIBLE, false);
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+
+  application.GetScene().Hide();
+
+  CheckInheritedVisible(rootActor, true, false, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+
+  application.GetScene().Show();
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+
+  leafActor.SetProperty(Actor::Property::VISIBLE, false);
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, false, false, TEST_LOCATION);
+
+  branchActor.SetProperty(Actor::Property::VISIBLE, true);
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, false, false, TEST_LOCATION);
+
+  branchActor.Unparent();
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, true, false, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, false, false, TEST_LOCATION);
+
+  leafActor.SetProperty(Actor::Property::VISIBLE, true);
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, true, false, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+
+  rootActor.Add(branchActor);
+
+  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(branchActor, true, true, TEST_LOCATION);
+  CheckInheritedVisible(leafActor, true, true, TEST_LOCATION);
 
   END_TEST;
 }

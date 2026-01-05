@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -864,6 +864,23 @@ Vector4 CalculateActorWorldColor(const Actor& actor)
   }
 
   return worldColor;
+}
+
+bool CalculateActorInheritedVisible(const Actor& actor)
+{
+  bool inheritedVisible = false;
+  if(actor.OnScene())
+  {
+    const auto& scene         = actor.GetScene();
+    inheritedVisible          = scene.IsVisible();
+    const Actor* currentActor = &actor;
+    while(inheritedVisible && currentActor)
+    {
+      inheritedVisible &= currentActor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
+      currentActor = currentActor->GetParent();
+    }
+  }
+  return inheritedVisible;
 }
 
 Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)
