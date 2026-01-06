@@ -55,7 +55,7 @@ RenderTaskList::RenderTaskList()
 : mNotificationObject(nullptr),
   mResetterManager(nullptr),
   mPropertyOwnerFlagManager(nullptr),
-  mRenderMessageDispatcher(nullptr)
+  mRenderManagerDispatcher(nullptr)
 {
 }
 
@@ -70,19 +70,19 @@ void RenderTaskList::operator delete(void* ptr)
   gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
 }
 
-void RenderTaskList::Initialize(ResetterManager& resetterManager, PropertyOwnerFlagManager& propertyOwnerFlagManager, RenderMessageDispatcher& renderMessageDispatcher)
+void RenderTaskList::Initialize(ResetterManager& resetterManager, PropertyOwnerFlagManager& propertyOwnerFlagManager, RenderManagerDispatcher& renderManagerDispatcher)
 {
   mResetterManager          = &resetterManager;
   mPropertyOwnerFlagManager = &propertyOwnerFlagManager;
-  mRenderMessageDispatcher  = &renderMessageDispatcher;
+  mRenderManagerDispatcher  = &renderManagerDispatcher;
 }
 
 void RenderTaskList::AddTask(OwnerPointer<RenderTask>& newTask)
 {
   DALI_ASSERT_DEBUG(newTask && "SceneGraph RenderTask is null");
-  DALI_ASSERT_DEBUG(mRenderMessageDispatcher != NULL && "RenderMessageDispatcher is null");
+  DALI_ASSERT_DEBUG(mRenderManagerDispatcher != NULL && "RenderManagerDispatcher is null");
 
-  newTask->Initialize(*mResetterManager, *mRenderMessageDispatcher);
+  newTask->Initialize(*mResetterManager, *mRenderManagerDispatcher);
 
   mRenderTasks.PushBack(newTask.Release());
 }

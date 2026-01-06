@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,6 @@ class SharedUniformBufferViewContainer;
 
 namespace SceneGraph
 {
-class SceneController;
 class Shader;
 class NodeDataProvider;
 class MemoryPoolCollection;
@@ -96,7 +95,7 @@ namespace Render
 /**
  * Renderers are used to render meshes
  * These objects are used during RenderManager::Render(), so properties modified during
- * the Update must either be double-buffered, or set via a message added to the RenderQueue.
+ * the Update must either be double-buffered.
  */
 class Renderer : public PipelineCacheL0::LifecycleObserver, public SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver
 {

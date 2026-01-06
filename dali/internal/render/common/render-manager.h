@@ -58,7 +58,6 @@ class Texture;
 namespace SceneGraph
 {
 class MemoryPoolCollection;
-class RenderQueue;
 class RenderInstruction;
 class RenderInstructionContainer;
 class Shader;
@@ -112,12 +111,6 @@ public:
   void ContextDestroyed();
 
   /**
-   * Retrieve the RenderQueue. Messages should only be added to this from the update-thread.
-   * @return The render queue.
-   */
-  RenderQueue& GetRenderQueue();
-
-  /**
    * Set the upstream interface for compiled shader binaries to be sent back to for eventual
    * caching and saving.
    * @param[in] upstream The abstract interface to send any received ShaderDatas onwards to..
@@ -125,13 +118,7 @@ public:
    */
   void SetShaderSaver(ShaderSaver& upstream);
 
-  // The foltlowing methods should be called via RenderQueue messages
-
-  /*
-   * Set the frame time delta (time elapsed since the last frame.
-   * @param[in] deltaTime the delta time
-   */
-  void SetFrameDeltaTime(float deltaTime);
+  // The foltlowing methods should be called from UpdateManager message.
 
   /**
    * Add a Renderer to the render manager.
@@ -162,21 +149,6 @@ public:
   void RemoveSampler(Render::Sampler* sampler);
 
   /**
-   * Set minification and magnification filter modes for a sampler
-   * @param[in] minFilterMode Filter mode to use when the texture is minificated
-   * @param[in] magFilterMode Filter mode to use when the texture is magnified
-   */
-  void SetFilterMode(Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode);
-
-  /**
-   * Set wrapping mode for a sampler
-   * @param[in] rWrapMode Wrap mode in the z direction
-   * @param[in] uWrapMode Wrap mode in the x direction
-   * @param[in] vWrapMode Wrap mode in the y direction
-   */
-  void SetWrapMode(Render::Sampler* sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode);
-
-  /**
    * Add a property buffer to the render manager.
    * @param[in] vertexBuffer The property buffer to add.
    * @post propertBuffer is owned by RenderManager
@@ -205,64 +177,6 @@ public:
   void RemoveGeometry(Render::Geometry* geometry);
 
   /**
-   * Adds a property buffer to a geometry from the render manager.
-   * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer to remove.
-   */
-  void AttachVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer);
-
-  /**
-   * Remove a property buffer from a Render::Geometry from the render manager.
-   * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer to remove.
-   * @post property buffer is destroyed.
-   */
-  void RemoveVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer);
-
-  /**
-   * Sets the format of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
-   * @param[in] format The new format of the buffer
-   */
-  void SetVertexBufferFormat(Render::VertexBuffer* vertexBuffer, OwnerPointer<Render::VertexBuffer::Format>& format);
-
-  /**
-   * Sets the data of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
-   * @param[in] data The new data of the buffer
-   * @param[in] size The new size of the buffer
-   */
-  void SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size);
-
-  /**
-   * Sets vertex buffer update callback
-   * @param vertexBuffer
-   * @param callback
-   */
-  void SetVertexBufferUpdateCallback(Render::VertexBuffer* vertexBuffer, Dali::VertexBufferUpdateCallback* callback);
-
-  /**
-   * Sets the data for the index buffer of an existing geometry
-   * @param[in] geometry The geometry
-   * @param[in] data A vector containing the indices
-   */
-  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& data);
-
-  /**
-   * Sets the data for the index buffer of an existing geometry
-   * @param[in] geometry The geometry
-   * @param[in] data A vector containing the indices
-   */
-  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& data);
-
-  /**
-   * Set the geometry type of an existing render geometry
-   * @param[in] geometry The render geometry
-   * @param[in] geometryType The new geometry type
-   */
-  void SetGeometryType(Render::Geometry* geometry, uint32_t geometryType);
-
-  /**
    * Adds a texture to the render manager
    * @param[in] textureKeyPointer The texture to add
    */
@@ -273,34 +187,6 @@ public:
    * @param[in] texture The texture to remove
    */
   void RemoveTexture(const Render::TextureKey& texture);
-
-  /**
-   * Uploads data to an existing texture
-   * @param[in] texture The texture
-   * @param[in] pixelData The pixel data object
-   * @param[in] params The parameters for the upload
-   */
-  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Graphics::UploadParams& params);
-
-  /**
-   * Generates mipmaps for a given texture
-   * @param[in] texture The texture
-   */
-  void GenerateMipmaps(const Render::TextureKey& texture);
-
-  /**
-   * Set the texture size for a given texture
-   * @param[in] texture The texture
-   * @param[in] size The texture size
-   */
-  void SetTextureSize(const Render::TextureKey& texture, const Dali::ImageDimensions& size);
-
-  /**
-   * Set the texture pixel format for a given texture
-   * @param[in] texture The texture
-   * @param[in] pixelFormat The texture pixel format
-   */
-  void SetTextureFormat(const Render::TextureKey& texture, Dali::Pixel::Format pixelFormat);
 
   /**
    * Sets the updated flag of a texture
@@ -319,38 +205,6 @@ public:
    * @param[in] frameBuffer The framebuffer to remove
    */
   void RemoveFrameBuffer(Render::FrameBuffer* frameBuffer);
-
-  /**
-   * Attaches a texture as color output to the existing frame buffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
-   */
-  void AttachColorTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer);
-
-  /**
-   * Attaches a texture as depth output to the existing frame buffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   */
-  void AttachDepthTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel);
-
-  /**
-   * Attaches a texture as depth/stencil output to the existing frame buffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   */
-  void AttachDepthStencilTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel);
-
-  /**
-   * Set a multisampling level value as texture output to the existing frame buffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] multiSamplingLevel The level of multisampling
-   */
-  void SetMultiSamplingLevelToFrameBuffer(Render::FrameBuffer* frameBuffer, uint8_t multiSamplingLevel);
 
   /**
    * Initializes a Scene to the render manager

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_SAMPLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,10 +127,10 @@ struct Sampler
    * @param[in] minFilterMode The filter to use under minification
    * @param[in] magFilterMode The filter to use under magnification
    */
-  inline void SetFilterMode(unsigned int minFilterMode, unsigned int magFilterMode)
+  inline void SetFilterMode(Dali::FilterMode::Type minFilterMode, Dali::FilterMode::Type magFilterMode)
   {
-    mMinificationFilter  = static_cast<Dali::FilterMode::Type>(minFilterMode);
-    mMagnificationFilter = static_cast<Dali::FilterMode::Type>(magFilterMode);
+    mMinificationFilter  = minFilterMode;
+    mMagnificationFilter = magFilterMode;
     mIsDirty             = true;
   }
 
@@ -141,11 +141,11 @@ struct Sampler
    * @param[in] sWrapMode Wrapping mode in x direction
    * @param[in] tWrapMode Wrapping mode in y direction
    */
-  inline void SetWrapMode(unsigned int rWrapMode, unsigned int sWrapMode, unsigned int tWrapMode)
+  inline void SetWrapMode(Dali::WrapMode::Type rWrapMode, Dali::WrapMode::Type sWrapMode, Dali::WrapMode::Type tWrapMode)
   {
-    mRWrapMode = static_cast<Dali::WrapMode::Type>(rWrapMode);
-    mSWrapMode = static_cast<Dali::WrapMode::Type>(sWrapMode);
-    mTWrapMode = static_cast<Dali::WrapMode::Type>(tWrapMode);
+    mRWrapMode = rWrapMode;
+    mSWrapMode = sWrapMode;
+    mTWrapMode = tWrapMode;
     mIsDirty   = true;
   }
 

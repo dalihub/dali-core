@@ -34,7 +34,7 @@ class CompleteNotificationInterface;
 namespace SceneGraph
 {
 class MemoryPoolCollection;
-class RenderMessageDispatcher;
+class RenderManagerDispatcher;
 class RenderTask;
 class ResetterManager;
 
@@ -76,12 +76,12 @@ public:
   void operator delete(void* ptr);
 
   /**
-   * Set the resetterManager and renderMessageDispatcher to send message.
+   * Set the resetterManager and renderManagerDispatcher to assign render tracker.
    * @param[in] resetterManager to send resetter
    * @param[in] propertyOwnerFlagManager to discard render task
-   * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
+   * @param[in] renderManagerDispatcher The renderManagerDispatcher to assign render tracker.
    */
-  void Initialize(ResetterManager& resetterManager, PropertyOwnerFlagManager& propertyOwnerFlagManager, RenderMessageDispatcher& renderMessageDispatcher);
+  void Initialize(ResetterManager& resetterManager, PropertyOwnerFlagManager& propertyOwnerFlagManager, RenderManagerDispatcher& renderManagerDispatcher);
 
   /**
    * Add a new RenderTask to the list.
@@ -151,7 +151,7 @@ private:
   CompleteNotificationInterface* mNotificationObject;       ///< object to pass in to the complete notification
   ResetterManager*               mResetterManager;          ///< for sending bake resetter if rendertask initalized
   PropertyOwnerFlagManager*      mPropertyOwnerFlagManager; ///< for sending discard it rendertask destroyed
-  RenderMessageDispatcher*       mRenderMessageDispatcher;  ///< for sending messages to render thread
+  RenderManagerDispatcher*       mRenderManagerDispatcher;  ///< for sending functions to render-manager
   RenderTaskContainer            mRenderTasks;              ///< A container of owned RenderTasks
 };
 

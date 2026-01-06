@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/render-instruction.h>
 #include <dali/internal/render/common/render-tracker.h>
-#include <dali/internal/update/controllers/render-message-dispatcher.h>
+#include <dali/internal/update/controllers/render-manager-dispatcher.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/math/matrix.h>
 
@@ -46,10 +46,10 @@ RenderTask::~RenderTask()
   Destroy();
 }
 
-void RenderTask::Initialize(ResetterManager& resetterManager, RenderMessageDispatcher& renderMessageDispatcher)
+void RenderTask::Initialize(ResetterManager& resetterManager, RenderManagerDispatcher& renderManagerDispatcher)
 {
   mResetterManager         = &resetterManager;
-  mRenderMessageDispatcher = &renderMessageDispatcher;
+  mRenderManagerDispatcher = &renderManagerDispatcher;
 }
 
 void RenderTask::SetSourceNode(Node* node)
@@ -406,10 +406,10 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
     // create tracker if one doesn't yet exist.
     if(!mRenderSyncTracker)
     {
-      DALI_ASSERT_ALWAYS(mRenderMessageDispatcher && "We don't allow to call PrepareRenderInstruction after Graphics context destroyed!");
+      DALI_ASSERT_ALWAYS(mRenderManagerDispatcher && "We don't allow to call PrepareRenderInstruction after Graphics context destroyed!");
 
       mRenderSyncTracker = new Render::RenderTracker();
-      mRenderMessageDispatcher->AddRenderTracker(*mRenderSyncTracker);
+      mRenderManagerDispatcher->AddRenderTracker(*mRenderSyncTracker);
     }
     mRenderInstruction[updateBufferIndex].mRenderTracker = mRenderSyncTracker;
   }
@@ -520,9 +520,9 @@ void RenderTask::Destroy()
   }
   if(mRenderSyncTracker)
   {
-    if(DALI_LIKELY(mRenderMessageDispatcher))
+    if(DALI_LIKELY(mRenderManagerDispatcher))
     {
-      mRenderMessageDispatcher->RemoveRenderTracker(*mRenderSyncTracker);
+      mRenderManagerDispatcher->RemoveRenderTracker(*mRenderSyncTracker);
     }
     mRenderSyncTracker = nullptr;
   }
@@ -534,7 +534,7 @@ void RenderTask::ContextDestroyed()
   // (Since RenderManager::ContextDestroyed will delete it.)
   mRenderSyncTracker = nullptr;
 
-  mRenderMessageDispatcher = nullptr;
+  mRenderManagerDispatcher = nullptr;
 
   mRenderInstruction[0].ContextDestroyed();
   mRenderInstruction[1].ContextDestroyed();
@@ -606,7 +606,7 @@ RenderTask::RenderTask()
   mViewportSize(Vector2::ZERO),
   mClearColor(Dali::RenderTask::DEFAULT_CLEAR_COLOR),
   mResetterManager(nullptr),
-  mRenderMessageDispatcher(nullptr),
+  mRenderManagerDispatcher(nullptr),
   mRenderSyncTracker(nullptr),
   mSourceNode(nullptr),
   mStopperNode(nullptr),

@@ -38,7 +38,7 @@ namespace SceneGraph
 {
 class MemoryPoolCollection;
 class Renderer;
-class RenderMessageDispatcher;
+class RenderManagerDispatcher;
 
 class TextureSet
 {
@@ -108,10 +108,10 @@ public:
   }
 
   /**
-   * Set the renderMessageDispatcher to send message.
-   * @param[in] renderMessageDispatcher The renderMessageDispatcher to send messages.
+   * Set the renderManagerDispatcher to call function to render-manager.
+   * @param[in] renderManagerDispatcher The renderManagerDispatcher to notify texture updated to render-manager.
    */
-  void SetRenderMessageDispatcher(RenderMessageDispatcher* renderMessageDispatcher);
+  void SetRenderManagerDispatcher(RenderManagerDispatcher* renderManagerDispatcher);
 
 private:
   /**
@@ -142,7 +142,7 @@ private:
 private:
   Vector<Render::Sampler*>   mSamplers;                         ///< List of samplers used by each texture. Not owned
   Vector<Render::TextureKey> mTextures;                         ///< List of Textures. Not owned
-  RenderMessageDispatcher*   mRenderMessageDispatcher{nullptr}; ///< for sending messages to render thread. Not owned
+  RenderManagerDispatcher*   mRenderManagerDispatcher{nullptr}; ///< for sending messages to render thread. Not owned
   bool                       mHasAlpha;                         ///< if any of the textures has an alpha channel
 };
 

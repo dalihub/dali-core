@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,21 +92,21 @@ public:
    * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
    * @note A maximum of Dali::FrameBuffer::MAX_COLOR_ATTACHMENTS are supported.
    */
-  void AttachColorTexture(Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer);
+  void AttachColorTexture(const Render::TextureKey& texture, uint32_t mipmapLevel, uint32_t layer);
 
   /**
    * @brief Attaches a texture for the depth rendering. This API is valid only for frame buffer with DEPTH attachments.
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    */
-  void AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLevel);
+  void AttachDepthTexture(const Render::TextureKey& texture, uint32_t mipmapLevel);
 
   /**
    * @brief Attaches a texture for the depth/stencil rendering. This API is valid only for frame buffer with DEPTH_STENCIL attachments.
    * @param[in] texture The texture that will be used as output when rendering
    * @param[in] mipmapLevel The mipmap of the texture to be attached
    */
-  void AttachDepthStencilTexture(Render::Texture* texture, uint32_t mipmapLevel);
+  void AttachDepthStencilTexture(const Render::TextureKey& texture, uint32_t mipmapLevel);
 
   /**
    * @brief Sets the level of multisampling in the frame buffer. This API is valid only GL_EXT_multisampled_render_to_texture supported.
