@@ -425,7 +425,7 @@ bool Renderer::NeedsProgram() const
   return (!mRenderCallback && mGeometry != nullptr);
 }
 
-Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instruction)
+Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instruction, bool cacheSharedUniformBlock)
 {
   // Create Program
   const SceneGraph::Shader& shader = mRenderDataProvider->GetShader();
@@ -447,6 +447,8 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     mCurrentProgram = nullptr;
     return nullptr;
   }
+
+  const auto& connectedUniformBlocks = shader.GetConnectedUniformBlocks();
 
   // If program doesn't have Gfx program object assigned yet, prepare it.
   if(!program->GetGraphicsProgramPtr())
@@ -483,10 +485,31 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     createInfo.SetFileCaching(shaderData->GetHints() & Dali::Shader::Hint::Value::FILE_CACHE_SUPPORT);
     createInfo.SetInternal(shaderData->GetHints() & Dali::Shader::Hint::Value::INTERNAL);
     auto graphicsProgram = mGraphicsController->CreateProgram(createInfo, nullptr);
-    program->SetGraphicsProgram(std::move(graphicsProgram), *mUniformBufferManager, shader.GetConnectedUniformBlocks()); // generates reflection, defines memory reqs
+    program->SetGraphicsProgram(std::move(graphicsProgram), *mUniformBufferManager, connectedUniformBlocks); // generates reflection, defines memory reqs
 
     // DevNode : We always clear the program caches whenever shared uniform blocks information changed to some shader.
     //           So we can always assume that current Graphics::Program could be use current shader's connected uniform blocks.
+  }
+
+  // Update mSharedUboCache.
+  if(cacheSharedUniformBlock && !connectedUniformBlocks.empty())
+  {
+    const auto& programRequirements = program->GetUniformBlocksMemoryRequirements();
+
+    for(uint32_t i = 1u; i < programRequirements.blockCount; ++i)
+    {
+      auto uboNameHash = programRequirements.sharedBlockNameHash[i];
+      if(uboNameHash != 0)
+      {
+        auto iter = connectedUniformBlocks.find(uboNameHash);
+        if(DALI_LIKELY(iter != connectedUniformBlocks.end()))
+        {
+          auto* sharedUniformBlock                                = iter->second;
+          mSharedUboCache[instruction.mRenderPassTag][program][i] = sharedUniformBlock;
+          mSharedUniformBufferViewContainer->RegisterSharedUniformBlockAndPrograms(*program, *(iter->second), programRequirements.blockSize[i], programRequirements.blockSizeAligned[i]);
+        }
+      }
+    }
   }
 
   // Set prefetched program to be used during rendering
@@ -621,7 +644,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   }
 
   // We should have a shader here (as only RenderCallback has no shader, and that's been early out)
-  Program* program = PrepareProgram(instruction);
+  Program* program = PrepareProgram(instruction, false);
   if(program)
   {
     // Prepare the graphics pipeline. This may either re-use an existing pipeline or create a new one.
@@ -809,25 +832,50 @@ void Renderer::WriteUniformBuffer(
       mUniformBufferBindings[i].dataSize = reflection.GetUniformBlockSize(i);
 
       bool useSharedBlock = !standaloneUniforms &&
-                            programRequirements.sharedBlock[i] &&
+                            programRequirements.sharedBlockNameHash[i] &&
                             UseSharedUniformBlock();
 
       if(useSharedBlock)
       {
-        // If this block IS shared, Get uboView from SharedUniformBufferViewContainer,
-        // which all uniform values are written already.
-        // Write GPU buffer and offset to unfirom buffer bindings.
-        auto sharedUniformBufferViewPtr = mSharedUniformBufferViewContainer->GetSharedUniformBlockBufferView(*program, *programRequirements.sharedBlock[i]);
+        useSharedBlock                           = false;
+        Render::UniformBlock* sharedUniformBlock = nullptr;
+        {
+          auto iter1 = mSharedUboCache.find(instruction.mRenderPassTag);
+          if(iter1 != mSharedUboCache.end())
+          {
+            auto iter2 = iter1->second.find(program);
+            if(iter2 != iter1->second.end())
+            {
+              auto iter3 = iter2->second.find(i);
+              if(iter3 != iter2->second.end())
+              {
+                useSharedBlock     = true;
+                sharedUniformBlock = iter3->second;
+              }
+            }
+          }
+        }
 
-        DALI_ASSERT_ALWAYS(sharedUniformBufferViewPtr && "SharedUniformBufferView not exist!");
+        DALI_ASSERT_ALWAYS(sharedUniformBlock && "SharedUniformBlock cache broken!");
 
-        mUniformBufferBindings[i].buffer = sharedUniformBufferViewPtr->GetBuffer();
-        mUniformBufferBindings[i].offset = sharedUniformBufferViewPtr->GetOffset();
+        if(useSharedBlock)
+        {
+          // If this block IS shared, Get uboView from SharedUniformBufferViewContainer,
+          // which all uniform values are written already.
+          // Write GPU buffer and offset to unfirom buffer bindings.
+          auto sharedUniformBufferViewPtr = mSharedUniformBufferViewContainer->GetSharedUniformBlockBufferView(*program, *sharedUniformBlock);
 
-        delete uboViews[i];
-        uboViews[i] = nullptr;
+          DALI_ASSERT_ALWAYS(sharedUniformBufferViewPtr && "SharedUniformBufferView not exist!");
+
+          mUniformBufferBindings[i].buffer = sharedUniformBufferViewPtr->GetBuffer();
+          mUniformBufferBindings[i].offset = sharedUniformBufferViewPtr->GetOffset();
+
+          delete uboViews[i];
+          uboViews[i] = nullptr;
+        }
       }
-      else
+
+      if(!useSharedBlock)
       {
         // If this block is NOT shared, create new uboView.
         auto uniformBufferView = mUniformBufferManager->CreateUniformBufferView(uboViews[i], programRequirements.blockSize[i], standaloneUniforms);
@@ -1038,6 +1086,7 @@ void Renderer::WriteDynUniform(
 void Renderer::SetShaderChanged(bool value)
 {
   mShaderChanged = value;
+  mSharedUboCache.clear();
 }
 
 bool Renderer::Updated()
@@ -1097,9 +1146,16 @@ void Renderer::PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::Noti
 
   switch(notificationType)
   {
+    case PipelineCacheL0::LifecycleObserver::NotificationType::NONE:
+    {
+      mGeometry = nullptr;
+      DALI_FALLTHROUGH;
+    }
     case PipelineCacheL0::LifecycleObserver::NotificationType::PROGRAM_DESTROYED:
     {
       mCurrentProgram = nullptr;
+
+      mSharedUboCache.clear();
 
       // Destroy whole mNodeIndexMap and mUniformIndexMaps container.
       // It will be re-created at next render time.
@@ -1118,7 +1174,6 @@ void Renderer::PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::Noti
       mGeometry = nullptr;
       break;
     }
-    case PipelineCacheL0::LifecycleObserver::NotificationType::NONE:
     case PipelineCacheL0::LifecycleObserver::NotificationType::GEOMETRY_BUFFER_CHANGED:
     case PipelineCacheL0::LifecycleObserver::NotificationType::RENDER_TARGET_GRAPHICS_OBJECTS_DESTROYED:
     {

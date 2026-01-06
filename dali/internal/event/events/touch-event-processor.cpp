@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -584,7 +584,7 @@ struct TouchEventProcessor::Impl
                   for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
                   {
                     Actor* actorImpl(*rIter);
-                    auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                    auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
                     if(it != processor.mTrackingActorLists.end())
                     {
                       processor.mTrackingActorLists.erase(it);
@@ -600,7 +600,7 @@ struct TouchEventProcessor::Impl
                 for(++iter; iter != processor.mCandidateActorLists.end(); ++iter)
                 {
                   Actor* actorImpl(*iter);
-                  auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                  auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
                   if(it != processor.mTrackingActorLists.end())
                   {
                     processor.mTrackingActorLists.erase(it);
@@ -813,7 +813,7 @@ struct TouchEventProcessor::Impl
     // If our primary point is an Up event, then the primary point (in multi-touch) will change next
     // time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
 
-    bool shouldClear = false;
+    bool                 shouldClear = false;
     TouchEventProcessor& processor(localVars.processor);
     if(localVars.primaryPointState == PointState::UP)
     {
@@ -967,11 +967,16 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   // 1) Check if it is an interrupted event - we should inform our last primary hit actor about this
   //    and emit the stage signal as well.
 
+  bool isInterrupted = false;
   if(event.points[0].GetState() == PointState::INTERRUPTED)
   {
-    DALI_LOG_RELEASE_INFO("INTERRUPED");
-    Impl::EmitInterruptedEvent(localVars, event);
-    return false; // No need for hit testing & already an interrupted event so just return false
+    if(!localVars.isGeometry)
+    {
+      DALI_LOG_RELEASE_INFO("INTERRUPTED");
+      Impl::EmitInterruptedEvent(localVars, event);
+      return false; // No need for hit testing & already an interrupted event so just return false
+    }
+    isInterrupted = true;
   }
 
   // 2) Hit Testing.
@@ -1049,6 +1054,13 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   // 6) Emit an interrupted event to the touch-down actor if it hasn't consumed the up and
   //    emit the stage touched event if required.
   Impl::DeliverEventToTouchDownActorAndScene(localVars, event);
+
+  // If no events are consumed or intercepted in the Geometry mode, perform EmitInterruptedEvent.
+  if(localVars.isGeometry && isInterrupted && !consumed && !mInterceptedTouchActor.GetActor())
+  {
+    DALI_LOG_RELEASE_INFO("INTERRUPTED");
+    Impl::EmitInterruptedEvent(localVars, event);
+  }
 
   return consumed;
 }

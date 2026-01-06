@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2778,6 +2778,52 @@ int UtcDaliGeoTouchEventDispatchTouchMotionPropertySet(void)
   data.Reset();
 
   data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliGeoTouchEventInterruptedIntercept(void)
+{
+  TestApplication application;
+
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor rootActor(application.GetScene().GetRootLayer());
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal - DO NOT CONSUME
+  SignalData        data;
+  TouchEventFunctor functor(data, false);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Connect to root actor's touched signal - request intercept
+  SignalData        rootData;
+  TouchEventFunctor rootFunctor(rootData); // Consumes signal
+
+  // Emit a down signal
+  application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
+
+  // Verify actor received DOWN
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, data.receivedTouch.points[0].state, TEST_LOCATION);
+  data.Reset();
+  rootData.Reset();
+
+  DevelActor::InterceptTouchedSignal(rootActor).Connect(&application, rootFunctor);
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(200.0f, 200.0f)));
+
+  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION);
 
   END_TEST;
 }

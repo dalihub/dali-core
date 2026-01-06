@@ -418,6 +418,13 @@ Shader::~Shader()
   {
     EventThreadServices&       eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager       = eventThreadServices.GetUpdateManager();
+
+    // TODO : Need to clear cache for strong-connected case.
+    // For now, block this code until gltf-conformance.test SIGSEGV fixed.
+    // if(DALI_UNLIKELY(!mStrongConnectedUniformBlockList.empty()))
+    // {
+    //   RequestClearProgramCacheMessage(updateManager);
+    // }
     RemoveShaderMessage(updateManager, &GetShaderSceneObject());
 
     eventThreadServices.UnregisterObject(this);

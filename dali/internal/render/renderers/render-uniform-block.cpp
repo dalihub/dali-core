@@ -65,24 +65,27 @@ void UniformBlock::OnMappingChanged()
 
 void UniformBlock::ProgramDestroyed(const Program* program)
 {
-  // Destroy whole mProgramToUniformIndexMap and mUniformIndexMaps container.
-  // It will be re-created at next render time.
-  // Note : Destroy the program will be happened at RenderManager::PostRender().
-  //        Also, OnMappingChanged() called at RenderManager::PreRender().
-  //        We don't worry about the mProgramToUniformIndexMap and mUniformIndexMaps become invalidated after this call.
-
-  for(auto& iter : mProgramToUniformIndexMap)
+  if(!mProgramToUniformIndexMap.empty())
   {
-    if(iter.first != program)
-    {
-      Program* mutableProgram = const_cast<Program*>(iter.first);
-      mutableProgram->RemoveLifecycleObserver(*this);
-    }
-  }
+    // Destroy whole mProgramToUniformIndexMap and mUniformIndexMaps container.
+    // It will be re-created at next render time.
+    // Note : Destroy the program will be happened at RenderManager::PostRender().
+    //        Also, OnMappingChanged() called at RenderManager::PreRender().
+    //        We don't worry about the mProgramToUniformIndexMap and mUniformIndexMaps become invalidated after this call.
 
-  mProgramToUniformIndexMap.clear();
-  mProgramToUniformIndexMap.rehash(0u);
-  mUniformIndexMaps.clear();
+    for(auto& iter : mProgramToUniformIndexMap)
+    {
+      if(iter.first != program)
+      {
+        Program* mutableProgram = const_cast<Program*>(iter.first);
+        mutableProgram->RemoveLifecycleObserver(*this);
+      }
+    }
+
+    mProgramToUniformIndexMap.clear();
+    mProgramToUniformIndexMap.rehash(0u);
+    mUniformIndexMaps.clear();
+  }
 }
 
 UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)

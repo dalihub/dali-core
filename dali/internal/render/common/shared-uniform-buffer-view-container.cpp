@@ -52,10 +52,11 @@ public:
 
   struct ProgramUniformBlockPair
   {
-    ProgramUniformBlockPair(const Render::UniformBlock::ProgramIndex programIndex, Render::UniformBlock* sharedUniformBlock, uint32_t blockSize)
+    ProgramUniformBlockPair(const Render::UniformBlock::ProgramIndex programIndex, Render::UniformBlock* sharedUniformBlock, uint32_t blockSize, uint32_t blockSizeAligned)
     : programIndex(programIndex),
       sharedUniformBlock(sharedUniformBlock),
-      blockSize(blockSize)
+      blockSize(blockSize),
+      blockSizeAligned(blockSizeAligned)
     {
     }
 
@@ -83,10 +84,14 @@ public:
     Render::UniformBlock*                    sharedUniformBlock{nullptr};
 
     const uint32_t blockSize{0u}; ///< Size of block for given pair. We don't need to compare this value for check hash.
+    const uint32_t blockSizeAligned{0u};
   };
 
   using UniformBufferViewContainer = std::unordered_map<ProgramUniformBlockPair, Dali::Graphics::UniquePtr<Render::UniformBufferView>, ProgramUniformBlockPair::ProgramUniformBlockPairHash>;
-  UniformBufferViewContainer         mSharedUniformBlockBufferViews{};
+  UniformBufferViewContainer mSharedUniformBlockBufferViews{};
+
+  uint32_t mTotalAlignedBlockSize{0u};
+
   Render::UniformBlock::ProgramIndex mLatestQueryIndex{0u};
   Render::UniformBlock*              mLatestQueryBlock{nullptr};
   Render::UniformBufferView*         mLatestResult{nullptr};
@@ -99,15 +104,25 @@ SharedUniformBufferViewContainer::SharedUniformBufferViewContainer()
 
 SharedUniformBufferViewContainer::~SharedUniformBufferViewContainer() = default;
 
-bool SharedUniformBufferViewContainer::RegisterSharedUniformBlockAndPrograms(const Program& program, Render::UniformBlock& sharedUniformBlock, uint32_t blockSize)
+bool SharedUniformBufferViewContainer::RegisterSharedUniformBlockAndPrograms(const Program& program, Render::UniformBlock& sharedUniformBlock, uint32_t blockSize, uint32_t blockSizeAligned)
 {
   Render::UniformBlock::ProgramIndex programIndex = sharedUniformBlock.GetProgramIndex(program);
 
-  auto ret = mImpl->mSharedUniformBlockBufferViews.insert({Impl::ProgramUniformBlockPair(programIndex, &sharedUniformBlock, blockSize), nullptr});
+  auto ret = mImpl->mSharedUniformBlockBufferViews.insert({Impl::ProgramUniformBlockPair(programIndex, &sharedUniformBlock, blockSize, blockSizeAligned), nullptr});
 
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registered : %zu, Program : %p, UBO : %p, blockSize : %u -- Registered : %d\n", mImpl->mSharedUniformBlockBufferViews.size(), &program, &sharedUniformBlock, blockSize, ret.second);
+  if(ret.second)
+  {
+    mImpl->mTotalAlignedBlockSize += blockSizeAligned;
+  }
+
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registered : %zu, Program : %p, UBO : %p, blockSize : %u %u -- Registered : %d. Total GPU size : %u\n", mImpl->mSharedUniformBlockBufferViews.size(), &program, &sharedUniformBlock, blockSize, blockSizeAligned, ret.second, mImpl->mTotalAlignedBlockSize);
 
   return ret.second;
+}
+
+uint32_t SharedUniformBufferViewContainer::GetTotalAlignedBlockSize() const
+{
+  return mImpl->mTotalAlignedBlockSize;
 }
 
 void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex, Render::UniformBufferManager& uniformBufferManager)
@@ -151,7 +166,7 @@ void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex,
     // Write to the buffer view here, by value at sharedUniformBlock.
     sharedUniformBlock.WriteUniforms(renderBufferIndex, programIndex, ubo);
   }
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registered : %zu, SharedUniformBufferView count : %u, total block size:%u\n", mImpl->mSharedUniformBlockBufferViews.size(), totalUniformBufferViewCount, totalSize);
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registered : %zu, SharedUniformBufferView count : %u, total block size:%u %u\n", mImpl->mSharedUniformBlockBufferViews.size(), totalUniformBufferViewCount, totalSize, mImpl->mTotalAlignedBlockSize);
 }
 
 Render::UniformBufferView* SharedUniformBufferViewContainer::GetSharedUniformBlockBufferView(const Program& program, Render::UniformBlock& sharedUniformBlock) const
@@ -166,7 +181,7 @@ Render::UniformBufferView* SharedUniformBufferViewContainer::GetSharedUniformBlo
   mImpl->mLatestQueryIndex = programIndex;
   mImpl->mLatestQueryBlock = &sharedUniformBlock;
 
-  auto key = Impl::ProgramUniformBlockPair(mImpl->mLatestQueryIndex, mImpl->mLatestQueryBlock, 0u);
+  auto key = Impl::ProgramUniformBlockPair(mImpl->mLatestQueryIndex, mImpl->mLatestQueryBlock, 0u, 0u);
 
   auto iter = mImpl->mSharedUniformBlockBufferViews.find(key);
   if(iter != mImpl->mSharedUniformBlockBufferViews.end())
@@ -178,15 +193,20 @@ Render::UniformBufferView* SharedUniformBufferViewContainer::GetSharedUniformBlo
 
 void SharedUniformBufferViewContainer::Finalize()
 {
-  mImpl->mSharedUniformBlockBufferViews.clear();
-
   if(mImpl->mSharedUniformBlockBufferViews.size() > 1u)
   {
+    mImpl->mSharedUniformBlockBufferViews.clear();
     mImpl->mSharedUniformBlockBufferViews.rehash(0);
+  }
+  else
+  {
+    mImpl->mSharedUniformBlockBufferViews.clear();
   }
 
   // Reset only mLatestQueryBlock is enough.
   mImpl->mLatestQueryBlock = nullptr;
+
+  mImpl->mTotalAlignedBlockSize = 0u;
 }
 
 } // namespace Dali::Internal

@@ -259,7 +259,7 @@ std::shared_ptr<HitResult> HitTestActor(Actor&                renderTaskSourceAc
   // It don't need to mark sourceActor to MappingActor, because the mapping is not for the current RenderTask.
   if(!hitCheck.IsActorHittable(&actor))
   {
-    if(!(actor.IsRenderTaskMappingActor() && (&renderTaskSourceActor != &actor)))
+    if(!(actor.IsRenderTaskMappingActor() && (&renderTaskSourceActor != &actor) && actor.GetCurrentWorldColor().a > FULLY_TRANSPARENT))
     {
       return nullptr;
     }
@@ -422,11 +422,14 @@ bool HitTestActorOnce(std::vector<std::shared_ptr<HitResult>>& hitResultList,
     return false;
   }
 
-  if(fboRenderTask && currentActor.GetCurrentOpacity() > FULLY_TRANSPARENT)
+  if(fboRenderTask)
   {
     if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
     {
-      return true;
+      if(hitResultOfThisActor->mActor == fboRenderTask->GetSourceActor())
+      {
+        return true;
+      }
     }
   }
 
@@ -512,12 +515,12 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
     return false;
   }
 
-  if(currentActor.GetCurrentOpacity() > FULLY_TRANSPARENT)
+  RenderTaskPtr fboRenderTask = GetFboRenderTask(hitResultOfThisActor, hitCommonInformation.mappingActors);
+  if(fboRenderTask)
   {
-    RenderTaskPtr fboRenderTask = GetFboRenderTask(hitResultOfThisActor, hitCommonInformation.mappingActors);
-    if(fboRenderTask)
+    if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
     {
-      if(HitTestFbo(hitResultList, hitResultOfThisActor, fboRenderTask, hitCommonInformation, hitCheck))
+      if(hitResultOfThisActor->mActor == fboRenderTask->GetSourceActor())
       {
         return true;
       }
@@ -526,7 +529,6 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
 
   hitResultOfThisActor->mHitType = HitType::HIT_ACTOR;
   hitResultList.push_back(hitResultOfThisActor);
-
   return true;
 }
 
