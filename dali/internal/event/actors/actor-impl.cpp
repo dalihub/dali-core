@@ -1566,12 +1566,6 @@ void Actor::SetDefaultProperty(Property::Index index, const Property::Value& pro
   PropertyHandler::SetDefaultProperty(*this, index, property);
 }
 
-// TODO: This method needs to be removed
-void Actor::SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value)
-{
-  PropertyHandler::SetSceneGraphProperty(index, entry, value, GetEventThreadServices(), GetNode());
-}
-
 Property::Value Actor::GetDefaultProperty(Property::Index index) const
 {
   Property::Value value;

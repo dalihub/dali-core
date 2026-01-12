@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OBJECT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -594,7 +594,7 @@ private:
    * @param [in] entry An entry from the property lookup container.
    * @param [in] value The new value of the property.
    */
-  virtual void SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value);
+  void SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value);
 
 protected:
   // mutable because it's lazy initialised and GetSceneObject has to be const so it can be called from const methods
