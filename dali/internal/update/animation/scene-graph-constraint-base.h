@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,11 +275,6 @@ protected:
 
 private:
   LifecycleObserver* mLifecycleObserver; ///< Resetter observers this object
-
-#ifdef DEBUG_ENABLED
-  static uint32_t mCurrentInstanceCount; ///< The current number of Constraint instances in existence.
-  static uint32_t mTotalInstanceCount;   ///< The total number of Constraint instances created during the Dali core lifetime.
-#endif
 };
 
 // Messages for ConstraintBase
