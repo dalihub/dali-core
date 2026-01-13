@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ bool IsNative(Dali::Texture texture)
   return impl.IsNative();
 }
 
-bool ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader, int count)
+bool ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader, int mask)
 {
   auto& impl = GetImplementation(texture);
-  return impl.ApplyNativeFragmentShader(shader, count);
+  return impl.ApplyNativeFragmentShader(shader, mask);
 }
 
 bool UploadSubPixelData(Texture   texture,

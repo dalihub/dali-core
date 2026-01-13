@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_NEW_TEXTURE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -172,10 +172,10 @@ public:
    * @brief Apply any native texture code to the given fragment shader
    *
    * @param[in,out] shader The fragment shader
-   * @param[in] count the number of samplers those uses native image.
+   * @param[in] mask the mask of samplers those uses native image.
    * @return true if the shader has been modified.
    */
-  bool ApplyNativeFragmentShader(std::string& shader, int count);
+  bool ApplyNativeFragmentShader(std::string& shader, int mask);
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   /**

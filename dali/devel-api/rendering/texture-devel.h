@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_DEVEL_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,10 +40,11 @@ bool DALI_CORE_API IsNative(Dali::Texture texture);
  *
  * @param[in] texture The texture the shader will apply to
  * @param[in] shader The fragment shader code to modify
- * @param[in] count the number of samplers those uses native image.
+ * @param[in] mask the mask of samplers those uses native image.
+ *                 For example, if mask = 0x5, 1st and 3rd samplers become native samplers.
  * @return True if the shader code was modified
  */
-bool DALI_CORE_API ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader, int count = 1);
+bool DALI_CORE_API ApplyNativeFragmentShader(Dali::Texture texture, std::string& shader, int mask = 1);
 
 /**
  * @brief Uploads data to the texture from a PixelData object.

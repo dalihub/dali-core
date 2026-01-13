@@ -2,7 +2,7 @@
 #define TEST_NATIVE_IMAGE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public:
   {
     return ApplyNativeFragmentShader(shader, 1);
   }
-  inline virtual bool ApplyNativeFragmentShader(std::string& shader, int count) override
+  inline virtual bool ApplyNativeFragmentShader(std::string& shader, int mask) override
   {
     mCallStack.PushCall("ApplyNativeFragmentShader", "");
     shader = "#extension GL_OES_EGL_image_external:require\n" + shader;
@@ -92,18 +92,20 @@ public:
     const char* customSamplerTypename = GetCustomSamplerTypename();
     if(customSamplerTypename)
     {
-      size_t pos           = 0;
-      int    replacedCount = 0;
+      size_t pos = 0;
 
-      while((pos = shader.find("sampler2D", pos)) != std::string::npos)
+      while(mask && (pos = shader.find("sampler2D", pos)) != std::string::npos)
       {
-        if(count >= 0 && replacedCount >= count)
+        if(mask & 1)
         {
-          break;
+          shader.replace(pos, strlen("sampler2D"), customSamplerTypename);
+          pos += strlen(customSamplerTypename);
         }
-        shader.replace(pos, strlen("sampler2D"), customSamplerTypename);
-        pos += strlen(customSamplerTypename);
-        replacedCount++;
+        else
+        {
+          pos += strlen("sampler2D");
+        }
+        mask >>= 1;
       }
     }
     return true;
