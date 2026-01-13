@@ -117,7 +117,6 @@ SET( internal_src_files
   ${internal_src_dir}/render/common/render-manager.cpp
   ${internal_src_dir}/render/common/shared-uniform-buffer-view-container.cpp
   ${internal_src_dir}/render/common/terminated-native-draw-manager.cpp
-  ${internal_src_dir}/render/queue/render-queue.cpp
   ${internal_src_dir}/render/renderers/gpu-buffer.cpp
   ${internal_src_dir}/render/renderers/pipeline-cache.cpp
   ${internal_src_dir}/render/renderers/render-frame-buffer.cpp
@@ -150,8 +149,7 @@ SET( internal_src_files
   ${internal_src_dir}/update/common/scene-graph-property-notification.cpp
   ${internal_src_dir}/update/common/scene-graph-scene.cpp
   ${internal_src_dir}/update/common/uniform-map.cpp
-  ${internal_src_dir}/update/controllers/render-message-dispatcher.cpp
-  ${internal_src_dir}/update/controllers/scene-controller-impl.cpp
+  ${internal_src_dir}/update/controllers/render-manager-dispatcher.cpp
   ${internal_src_dir}/update/gestures/pan-gesture-profiling.cpp
   ${internal_src_dir}/update/gestures/scene-graph-pan-gesture.cpp
   ${internal_src_dir}/update/queue/update-message-queue.cpp

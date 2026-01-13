@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/render/renderers/render-texture-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
@@ -159,7 +160,7 @@ void Texture::Initialize()
     }
     OwnerKeyType<Render::Texture> transferKeyOwnership(mTextureKey);
 
-    AddTextureMessage(GetEventThreadServices().GetUpdateManager(), transferKeyOwnership);
+    SceneGraph::AddTextureMessage(GetEventThreadServices().GetUpdateManager(), transferKeyOwnership);
   }
 }
 
@@ -189,7 +190,7 @@ Texture::~Texture()
     }
 #endif
 
-    RemoveTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
+    SceneGraph::RemoveTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
   }
 }
 
@@ -321,7 +322,7 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
                                              static_cast<uint16_t>(yOffset),
                                              static_cast<uint16_t>(width),
                                              static_cast<uint16_t>(height)};
-            UploadTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey, pixelData, params);
+            Render::UploadTextureMessage(GetEventThreadServices(), mTextureKey, pixelData, params);
 
             result = true;
           }
@@ -345,7 +346,7 @@ void Texture::GenerateMipmaps()
 {
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
-    GenerateMipmapsMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
+    Render::GenerateMipmapsMessage(GetEventThreadServices(), mTextureKey);
   }
   else
   {
@@ -383,7 +384,7 @@ void Texture::SetSize(const ImageDimensions& size)
   mSize = size;
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
-    SetTextureSizeMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey, mSize);
+    Render::SetTextureSizeMessage(GetEventThreadServices(), mTextureKey, mSize);
   }
 }
 
@@ -392,7 +393,7 @@ void Texture::SetPixelFormat(Pixel::Format format)
   mFormat = format;
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mTextureKey))
   {
-    SetTextureFormatMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey, mFormat);
+    Render::SetTextureFormatMessage(GetEventThreadServices(), mTextureKey, mFormat);
   }
 }
 

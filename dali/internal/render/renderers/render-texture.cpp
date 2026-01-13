@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -336,6 +336,8 @@ void Texture::Upload(PixelDataPtr pixelData, const Graphics::UploadParams& param
   mGraphicsController->UpdateTextures({info}, {updateSourceInfo});
 
   SetUpdated(true);
+
+  NotifyTextureUpdated();
 }
 
 bool Texture::HasAlphaChannel() const
@@ -378,6 +380,8 @@ void Texture::GenerateMipmaps()
   }
 
   mGraphicsController->GenerateTextureMipmaps(*mGraphicsTexture.get());
+
+  NotifyTextureUpdated();
 }
 
 void Texture::OnRenderFinished()

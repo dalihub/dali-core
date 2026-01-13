@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_PROPERTY_HANDLER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,14 +37,6 @@ struct Actor::PropertyHandler
     Internal::Actor&       actor,
     Property::Index        index,
     const Property::Value& property);
-
-  /// @copydoc Actor::SetSceneGraphProperty
-  static void SetSceneGraphProperty(
-    Property::Index         index,
-    const PropertyMetadata& entry,
-    const Property::Value&  value,
-    EventThreadServices&    eventThreadServices,
-    const SceneGraph::Node& node);
 
   /// @copydoc Actor::OnNotifyDefaultPropertyAnimation
   static void OnNotifyDefaultPropertyAnimation(

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/render/renderers/render-sampler-messages.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -38,7 +39,7 @@ void Sampler::SetFilterMode(Dali::FilterMode::Type minFilter, Dali::FilterMode::
 {
   if(nullptr != mRenderObject)
   {
-    SetFilterModeMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(minFilter), static_cast<unsigned int>(magFilter));
+    Render::SetFilterModeMessage(GetEventThreadServices(), *mRenderObject, minFilter, magFilter);
   }
 }
 
@@ -46,7 +47,7 @@ void Sampler::SetWrapMode(Dali::WrapMode::Type rWrap, Dali::WrapMode::Type sWrap
 {
   if(nullptr != mRenderObject)
   {
-    SetWrapModeMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, static_cast<unsigned int>(rWrap), static_cast<unsigned int>(sWrap), static_cast<unsigned int>(tWrap));
+    Render::SetWrapModeMessage(GetEventThreadServices(), *mRenderObject, rWrap, sWrap, tWrap);
   }
 }
 
@@ -67,7 +68,7 @@ void Sampler::Initialize()
 
   mRenderObject = new Render::Sampler();
   OwnerPointer<Render::Sampler> transferOwnership(mRenderObject);
-  AddSamplerMessage(updateManager, transferOwnership);
+  SceneGraph::AddSamplerMessage(updateManager, transferOwnership);
 }
 
 Sampler::~Sampler()
@@ -80,7 +81,7 @@ Sampler::~Sampler()
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
   {
     SceneGraph::UpdateManager& updateManager = GetEventThreadServices().GetUpdateManager();
-    RemoveSamplerMessage(updateManager, *mRenderObject);
+    SceneGraph::RemoveSamplerMessage(updateManager, *mRenderObject);
   }
 }
 

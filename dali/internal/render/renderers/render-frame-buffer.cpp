@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ void FrameBuffer::Destroy()
   mGraphicsObject.reset();
 }
 
-void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
+void FrameBuffer::AttachColorTexture(const Render::TextureKey& texture, uint32_t mipmapLevel, uint32_t layer)
 {
   if(texture)
   {
@@ -72,11 +72,11 @@ void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLe
     Graphics::ColorAttachment colorAttachment{attachmentId, texture->GetGraphicsObject(), layer, mipmapLevel, texture->GetPixelFormat()};
     mCreateInfo.colorAttachments.push_back(colorAttachment);
 
-    mColorTextures.push_back(Render::Texture::GetKey(texture));
+    mColorTextures.push_back(texture);
   }
 }
 
-void FrameBuffer::AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLevel)
+void FrameBuffer::AttachDepthTexture(const Render::TextureKey& texture, uint32_t mipmapLevel)
 {
   if(texture)
   {
@@ -89,11 +89,11 @@ void FrameBuffer::AttachDepthTexture(Render::Texture* texture, uint32_t mipmapLe
     mCreateInfo.depthStencilAttachment.depthUsage   = Graphics::DepthStencilAttachment::Usage::WRITE;
     mCreateInfo.depthStencilAttachment.depthLevel   = mipmapLevel;
 
-    mDepthTexture = Render::Texture::GetKey(texture);
+    mDepthTexture = texture;
   }
 }
 
-void FrameBuffer::AttachDepthStencilTexture(Render::Texture* texture, uint32_t mipmapLevel)
+void FrameBuffer::AttachDepthStencilTexture(const Render::TextureKey& texture, uint32_t mipmapLevel)
 {
   if(texture)
   {
@@ -105,7 +105,7 @@ void FrameBuffer::AttachDepthStencilTexture(Render::Texture* texture, uint32_t m
     mCreateInfo.depthStencilAttachment.stencilUsage   = Graphics::DepthStencilAttachment::Usage::WRITE;
     mCreateInfo.depthStencilAttachment.stencilLevel   = mipmapLevel;
 
-    mDepthStencilTexture = Render::Texture::GetKey(texture);
+    mDepthStencilTexture = texture;
   }
 }
 

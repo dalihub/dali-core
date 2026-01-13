@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1564,12 +1564,6 @@ void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
 void Actor::SetDefaultProperty(Property::Index index, const Property::Value& property)
 {
   PropertyHandler::SetDefaultProperty(*this, index, property);
-}
-
-// TODO: This method needs to be removed
-void Actor::SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value)
-{
-  PropertyHandler::SetSceneGraphProperty(index, entry, value, GetEventThreadServices(), GetNode());
 }
 
 Property::Value Actor::GetDefaultProperty(Property::Index index) const

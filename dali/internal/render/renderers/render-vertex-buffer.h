@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ public:
    *
    * @param[in] format The format for the VertexBuffer
    */
-  void SetFormat(VertexBuffer::Format* format);
+  void SetFormat(OwnerPointer<Render::VertexBuffer::Format>& format);
 
   /**
    * @brief Set the data of the VertexBuffer
@@ -107,7 +107,7 @@ public:
    * @param[in] data The new data of the VertexBuffer
    * @param[in] size The new size of the buffer
    */
-  void SetData(Dali::Vector<uint8_t>* data, uint32_t size);
+  void SetData(OwnerPointer<Dali::Vector<uint8_t>>& data, uint32_t size);
 
   /**
    * @brief Sets vertex buffer update callback
@@ -218,9 +218,9 @@ public:
   }
 
 private:
-  OwnerPointer<VertexBuffer::Format>   mFormat;    ///< Format of the buffer
-  OwnerPointer<Dali::Vector<uint8_t> > mData;      ///< Data
-  OwnerPointer<GpuBuffer>              mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderVertexBuffer
+  OwnerPointer<VertexBuffer::Format>  mFormat;    ///< Format of the buffer
+  OwnerPointer<Dali::Vector<uint8_t>> mData;      ///< Data
+  OwnerPointer<GpuBuffer>             mGpuBuffer; ///< Pointer to the GpuBuffer associated with this RenderVertexBuffer
 
   uint32_t                                          mSize;         ///< Number of Elements in the buffer
   uint32_t                                          mDivisor{0};   ///< The divisor (0:not instanced, >=1:instanced)

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/events/actor-observer.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/events/point-state.h>
@@ -87,18 +88,18 @@ private:
    */
   void Clear();
 
-  Scene&                            mScene;                  ///< Used to deliver touch events
-  ActorObserver                     mLastPrimaryHitActor;    ///< Stores the last primary point hit actor
-  ActorObserver                     mLastConsumedActor;      ///< Stores the last consumed actor
-  ActorObserver                     mCapturingTouchActor;    ///< Stored the actor that captures touch
-  ActorObserver                     mOwnTouchActor;          ///< Stored the actor that own touch
-  ActorObserver                     mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
-  ActorObserver                     mInterceptedTouchActor;  ///< Stores the intercepted actor
-  RenderTaskPtr                     mLastRenderTask;         ///< The RenderTask used for the last hit actor
-  PointState::Type                  mLastPrimaryPointState;  ///< Stores the last primary point state
-  std::list<Dali::Internal::Actor*> mInterceptedActorLists;  ///< Stores the list from root to intercepted actors.
-  std::list<Dali::Internal::Actor*> mCandidateActorLists;    ///< Stores a list of actors that can be touched, from leaf actor to root.
-  std::list<Dali::Internal::Actor*> mTrackingActorLists;     ///< Stores a list of touched actors.
+  Scene&              mScene;                  ///< Used to deliver touch events
+  ActorObserver       mLastPrimaryHitActor;    ///< Stores the last primary point hit actor
+  ActorObserver       mLastConsumedActor;      ///< Stores the last consumed actor
+  ActorObserver       mCapturingTouchActor;    ///< Stored the actor that captures touch
+  ActorObserver       mOwnTouchActor;          ///< Stored the actor that own touch
+  ActorObserver       mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
+  ActorObserver       mInterceptedTouchActor;  ///< Stores the intercepted actor
+  RenderTaskPtr       mLastRenderTask;         ///< The RenderTask used for the last hit actor
+  PointState::Type    mLastPrimaryPointState;  ///< Stores the last primary point state
+  std::list<ActorPtr> mInterceptedActorLists;  ///< Stores the list from root to intercepted actors.
+  std::list<ActorPtr> mCandidateActorLists;    ///< Stores a list of actors that can be touched, from leaf actor to root.
+  std::list<ActorPtr> mTrackingActorLists;     ///< Stores a list of touched actors.
 
   struct Impl;
 };

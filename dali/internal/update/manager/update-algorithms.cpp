@@ -99,7 +99,6 @@ inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags, Buff
 inline NodePropertyFlags UpdateNodes(Node&                   node,
                                      NodePropertyFlags       parentFlags,
                                      BufferIndex             updateBufferIndex,
-                                     RenderQueue&            renderQueue,
                                      PropertyOwnerContainer& postPropertyOwners,
                                      bool                    updated)
 {
@@ -140,7 +139,6 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
     cumulativeDirtyFlags |= UpdateNodes(child,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
-                                        renderQueue,
                                         postPropertyOwners,
                                         updated);
   }
@@ -153,7 +151,6 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
  */
 NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
                                  BufferIndex             updateBufferIndex,
-                                 RenderQueue&            renderQueue,
                                  PropertyOwnerContainer& postPropertyOwners)
 {
   DALI_ASSERT_DEBUG(rootNode.IsRoot());
@@ -192,7 +189,6 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
     cumulativeDirtyFlags |= UpdateNodes(child,
                                         nodeDirtyFlags,
                                         updateBufferIndex,
-                                        renderQueue,
                                         postPropertyOwners,
                                         updated);
   }

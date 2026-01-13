@@ -211,21 +211,22 @@ Dali::Actor EmitTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEve
 /**
  *  Recursively deliver events to the actor and its below actor, until the event is consumed or the stage is reached.
  */
-Dali::Actor EmitGeoTouchSignalsWithTracking(std::list<Dali::Internal::Actor*>& actorLists, std::list<Dali::Internal::Actor*>& trackingLists, const Dali::TouchEvent& touchEvent)
+Dali::Actor EmitGeoTouchSignalsWithTracking(std::list<ActorPtr>& actorLists, std::list<ActorPtr>& trackingLists, const Dali::TouchEvent& touchEvent)
 {
   Dali::Actor consumedActor;
 
-  std::list<Dali::Internal::Actor*>::reverse_iterator rIter = actorLists.rbegin();
+  std::list<ActorPtr>::reverse_iterator rIter = actorLists.rbegin();
   for(; rIter != actorLists.rend(); rIter++)
   {
-    Actor* actorImpl(*rIter);
+    ActorPtr actorPtr = *rIter;
+    Actor* actorImpl  = actorPtr.Get();
     // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
     if(ShouldEmitTouchEvent(*actorImpl, touchEvent))
     {
       // Check if actor is already in tracking list to avoid duplicates
-      if(std::find(trackingLists.begin(), trackingLists.end(), actorImpl) == trackingLists.end())
+      if(std::find(trackingLists.begin(), trackingLists.end(), actorPtr) == trackingLists.end())
       {
-        trackingLists.push_back(actorImpl);
+        trackingLists.push_back(actorPtr);
       }
 
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
@@ -243,14 +244,15 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(std::list<Dali::Internal::Actor*>& a
 /**
  *  Recursively deliver events to the actor and its below actor, until the event is consumed or the stage is reached.
  */
-Dali::Actor EmitGeoTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, const Dali::TouchEvent& touchEvent)
+Dali::Actor EmitGeoTouchSignals(std::list<ActorPtr>& actorLists, const Dali::TouchEvent& touchEvent)
 {
   Dali::Actor consumedActor;
 
-  std::list<Dali::Internal::Actor*>::reverse_iterator rIter = actorLists.rbegin();
+  std::list<ActorPtr>::reverse_iterator rIter = actorLists.rbegin();
   for(; rIter != actorLists.rend(); rIter++)
   {
-    Actor* actorImpl(*rIter);
+    ActorPtr actorPtr = *rIter;
+    Actor* actorImpl  = actorPtr.Get();
     // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
     if(ShouldEmitTouchEvent(*actorImpl, touchEvent))
     {
@@ -277,7 +279,7 @@ Dali::Actor AllocAndEmitTouchSignals(unsigned long time, Dali::Actor actor, cons
   return EmitTouchSignals(actor, touchEventHandle);
 }
 
-Dali::Actor GeoAllocAndEmitTouchSignals(std::list<Dali::Internal::Actor*>& actorLists, unsigned long time, const Integration::Point& point, RenderTaskPtr renderTask)
+Dali::Actor GeoAllocAndEmitTouchSignals(std::list<ActorPtr>& actorLists, unsigned long time, const Integration::Point& point, RenderTaskPtr renderTask)
 {
   TouchEventPtr    touchEvent(new TouchEvent(time));
   Dali::TouchEvent touchEventHandle(touchEvent.Get());
@@ -312,8 +314,8 @@ Dali::Actor EmitTouchSignals(Actor* actor, RenderTask& renderTask, const TouchEv
 
     if(isGeometry)
     {
-      std::list<Dali::Internal::Actor*> actorLists;
-      actorLists.push_back(actor);
+      std::list<ActorPtr> actorLists;
+      actorLists.push_back(ActorPtr(actor));
       consumingActor = EmitGeoTouchSignals(actorLists, Dali::TouchEvent(touchEventImpl.Get()));
     }
     else
@@ -342,7 +344,7 @@ void ParsePrimaryTouchPoint(
   const RenderTaskPtr&               lastRenderTask,
   const Integration::Point&          currentPoint,
   const Internal::Scene&             scene,
-  std::list<Dali::Internal::Actor*>& actorLists)
+  std::list<ActorPtr>& actorLists)
 {
   Actor* capturingTouchActor = capturingTouchActorObserver.GetActor();
 
@@ -374,7 +376,12 @@ void ParsePrimaryTouchPoint(
       }
       if(isGeometry)
       {
-        actorLists = hitTestResults.actorLists;
+        // Convert raw actor pointers to ActorPtr
+        actorLists.clear();
+        for(auto* rawActor : hitTestResults.actorLists)
+        {
+          actorLists.push_back(ActorPtr(rawActor));
+        }
       }
     }
   }
@@ -405,16 +412,16 @@ struct TouchEventProcessor::Impl
       {
         Dali::Actor touchConsumedActorHandle(touchConsumedActor);
         currentPoint.SetHitActor(touchConsumedActorHandle);
-        std::list<Dali::Internal::Actor*> actorLists;
-        actorLists.push_back(touchConsumedActor);
+        std::list<ActorPtr> actorLists;
+        actorLists.push_back(ActorPtr(touchConsumedActor));
         GeoAllocAndEmitTouchSignals(actorLists, event.time, currentPoint, localVars.processor.mLastRenderTask);
       }
       else if(touchDownConsumedActor)
       {
         Dali::Actor touchDownConsumedActorHandle(touchDownConsumedActor);
         currentPoint.SetHitActor(touchDownConsumedActorHandle);
-        std::list<Dali::Internal::Actor*> actorLists;
-        actorLists.push_back(touchDownConsumedActor);
+        std::list<ActorPtr> actorLists;
+        actorLists.push_back(ActorPtr(touchDownConsumedActor));
         GeoAllocAndEmitTouchSignals(actorLists, event.time, currentPoint, localVars.processor.mLastRenderTask);
       }
       else if(lastPrimaryHitActor)
@@ -498,8 +505,8 @@ struct TouchEventProcessor::Impl
           }
           else // If there is an intercepted actor, send a touch event starting from the intercepted actor.
           {
-            Dali::Actor                       interceptedTouchActorHandle(interceptedTouchActor);
-            std::list<Dali::Internal::Actor*> interceptActorLists = localVars.processor.mInterceptedActorLists;
+            Dali::Actor         interceptedTouchActorHandle(interceptedTouchActor);
+            std::list<ActorPtr> interceptActorLists = localVars.processor.mInterceptedActorLists;
             localVars.consumedActor                               = EmitGeoTouchSignals(interceptActorLists, localVars.touchEventHandle);
           }
         }
@@ -514,10 +521,10 @@ struct TouchEventProcessor::Impl
 
             processor.mInterceptedActorLists.clear();
             // Create a list of intercepted actors from the candidate list.
-            for(auto& actorImpl : processor.mCandidateActorLists)
+            for(auto& actorPtr : processor.mCandidateActorLists)
             {
-              processor.mInterceptedActorLists.push_back(actorImpl);
-              if(actorImpl == interceptedActor)
+              processor.mInterceptedActorLists.push_back(actorPtr);
+              if(actorPtr.Get() == interceptedActor)
               {
                 break;
               }
@@ -529,7 +536,7 @@ struct TouchEventProcessor::Impl
                processor.mLastRenderTask &&
                processor.mLastPrimaryPointState != PointState::FINISHED)
             {
-              auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), processor.mLastConsumedActor.GetActor());
+              auto it = std::find_if(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), [&](const ActorPtr& ptr) { return ptr.Get() == processor.mLastConsumedActor.GetActor(); });
               if(it != processor.mTrackingActorLists.end())
               {
                 processor.mTrackingActorLists.erase(it);
@@ -543,15 +550,16 @@ struct TouchEventProcessor::Impl
                     processor.mLastRenderTask &&
                     processor.mLastPrimaryPointState != PointState::FINISHED)
             {
-              std::list<Dali::Internal::Actor*>::reverse_iterator rIter = processor.mCandidateActorLists.rbegin();
+              std::list<ActorPtr>::reverse_iterator rIter = processor.mCandidateActorLists.rbegin();
               for(; rIter != processor.mCandidateActorLists.rend(); rIter++)
               {
-                Actor* actorImpl(*rIter);
+                ActorPtr actorPtr = *rIter;
+                Actor* actorImpl  = actorPtr.Get();
                 if(actorImpl == interceptedActor)
                 {
                   break;
                 }
-                auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorPtr);
                 if(it != processor.mTrackingActorLists.end())
                 {
                   processor.mTrackingActorLists.erase(it);
@@ -578,13 +586,14 @@ struct TouchEventProcessor::Impl
               if(processor.mLastRenderTask && localVars.primaryPointState != PointState::DOWN)
               {
                 // backward
-                std::list<Dali::Internal::Actor*>::reverse_iterator rIter = std::find(processor.mCandidateActorLists.rbegin(), processor.mCandidateActorLists.rend(), localVars.consumedActor);
+                std::list<ActorPtr>::reverse_iterator rIter = std::find_if(processor.mCandidateActorLists.rbegin(), processor.mCandidateActorLists.rend(), [&](const ActorPtr& ptr) { return ptr.Get() == localVars.consumedActor; });
                 if(rIter != processor.mCandidateActorLists.rend())
                 {
                   for(++rIter; rIter != processor.mCandidateActorLists.rend(); ++rIter)
                   {
-                    Actor* actorImpl(*rIter);
-                    auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                    ActorPtr actorPtr = *rIter;
+                    Actor* actorImpl  = actorPtr.Get();
+                    auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorPtr);
                     if(it != processor.mTrackingActorLists.end())
                     {
                       processor.mTrackingActorLists.erase(it);
@@ -594,13 +603,14 @@ struct TouchEventProcessor::Impl
                 }
               }
               //forward
-              std::list<Dali::Internal::Actor*>::iterator iter = std::find(processor.mCandidateActorLists.begin(), processor.mCandidateActorLists.end(), localVars.consumedActor);
+              std::list<ActorPtr>::iterator iter = std::find_if(processor.mCandidateActorLists.begin(), processor.mCandidateActorLists.end(), [&](const ActorPtr& ptr) { return ptr.Get() == localVars.consumedActor; });
               if(iter != processor.mCandidateActorLists.end())
               {
                 for(++iter; iter != processor.mCandidateActorLists.end(); ++iter)
                 {
-                  Actor* actorImpl(*iter);
-                  auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorImpl);
+                  ActorPtr actorPtr = *iter;
+                  Actor* actorImpl  = actorPtr.Get();
+                  auto   it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), actorPtr);
                   if(it != processor.mTrackingActorLists.end())
                   {
                     processor.mTrackingActorLists.erase(it);
@@ -719,7 +729,7 @@ struct TouchEventProcessor::Impl
           {
             if(!localVars.lastPrimaryHitActor->IsHittable() || !IsActuallySensitive(localVars.lastPrimaryHitActor))
             {
-              auto it = std::find(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), localVars.lastPrimaryHitActor);
+              auto it = std::find_if(processor.mTrackingActorLists.begin(), processor.mTrackingActorLists.end(), [&](const ActorPtr& ptr) { return ptr.Get() == localVars.lastPrimaryHitActor; });
               if(it != processor.mTrackingActorLists.end())
               {
                 // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
@@ -899,8 +909,8 @@ struct TouchEventProcessor::Impl
 
             if(localVars.isGeometry)
             {
-              std::list<Dali::Internal::Actor*> actorLists;
-              actorLists.push_back(touchDownConsumedActor);
+              std::list<ActorPtr> actorLists;
+              actorLists.push_back(ActorPtr(touchDownConsumedActor));
               GeoAllocAndEmitTouchSignals(actorLists, event.time, currentPoint, nullptr /* Not Required for this use case */);
             }
             else
@@ -1075,8 +1085,8 @@ void TouchEventProcessor::OnObservedActorDisconnected(Actor* actor)
     point.SetHitActor(actorHandle);
     if(actor == mLastConsumedActor.GetActor())
     {
-      std::list<Dali::Internal::Actor*> actorLists;
-      actorLists.push_back(mLastConsumedActor.GetActor());
+      std::list<ActorPtr> actorLists;
+      actorLists.push_back(ActorPtr(mLastConsumedActor.GetActor()));
       GeoAllocAndEmitTouchSignals(actorLists, 0, point, mLastRenderTask);
     }
     else if(!mLastConsumedActor.GetActor())

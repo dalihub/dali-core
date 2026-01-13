@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 
+#include <dali/internal/render/renderers/render-geometry-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -37,7 +38,7 @@ GeometryPtr Geometry::New()
 uint32_t Geometry::AddVertexBuffer(VertexBuffer& vertexBuffer)
 {
   mVertexBuffers.push_back(&vertexBuffer);
-  SceneGraph::AttachVertexBufferMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, *vertexBuffer.GetRenderObject());
+  Render::AttachVertexBufferMessage(GetEventThreadServices(), *mRenderObject, *vertexBuffer.GetRenderObject());
   return static_cast<uint32_t>(mVertexBuffers.size() - 1u);
 }
 
@@ -49,7 +50,7 @@ uint32_t Geometry::GetNumberOfVertexBuffers() const
 void Geometry::RemoveVertexBuffer(uint32_t index)
 {
   const Render::VertexBuffer& renderVertexBuffer = static_cast<const Render::VertexBuffer&>(*(mVertexBuffers[index]->GetRenderObject()));
-  SceneGraph::RemoveVertexBufferMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, renderVertexBuffer);
+  Render::RemoveVertexBufferMessage(GetEventThreadServices(), *mRenderObject, renderVertexBuffer);
 
   mVertexBuffers.erase(mVertexBuffers.begin() + index);
 }
@@ -63,7 +64,7 @@ void Geometry::SetIndexBuffer(const uint16_t* indices, uint32_t count)
     std::copy(indices, indices + count, indexData.Begin());
   }
 
-  SceneGraph::SetIndexBufferMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, indexData);
+  Render::SetIndexBufferMessage(GetEventThreadServices(), *mRenderObject, indexData);
 }
 
 void Geometry::SetIndexBuffer(const uint32_t* indices, uint32_t count)
@@ -75,14 +76,14 @@ void Geometry::SetIndexBuffer(const uint32_t* indices, uint32_t count)
     std::copy(indices, indices + count, indexData.Begin());
   }
 
-  SceneGraph::SetIndexBufferMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, indexData);
+  Render::SetIndexBufferMessage(GetEventThreadServices(), *mRenderObject, indexData);
 }
 
 void Geometry::SetType(Dali::Geometry::Type geometryType)
 {
   if(geometryType != mType)
   {
-    SceneGraph::SetGeometryTypeMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject, geometryType);
+    Render::SetGeometryTypeMessage(GetEventThreadServices(), *mRenderObject, geometryType);
 
     mType = geometryType;
   }
@@ -109,7 +110,7 @@ void Geometry::Initialize()
 {
   mRenderObject = new Render::Geometry();
   OwnerPointer<Render::Geometry> transferOwnership(mRenderObject);
-  AddGeometry(GetEventThreadServices().GetUpdateManager(), transferOwnership);
+  SceneGraph::AddGeometryMessage(GetEventThreadServices().GetUpdateManager(), transferOwnership);
 }
 
 Geometry::~Geometry()
@@ -121,7 +122,7 @@ Geometry::~Geometry()
 
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mRenderObject))
   {
-    RemoveGeometry(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
+    SceneGraph::RemoveGeometryMessage(GetEventThreadServices().GetUpdateManager(), *mRenderObject);
   }
 }
 

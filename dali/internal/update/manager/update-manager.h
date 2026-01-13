@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,8 +52,6 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>    // for OwnerPointer< Renderer >
 #include <dali/internal/update/rendering/scene-graph-texture-set.h> // for OwnerPointer< TextureSet >
 
-#include <dali/graphics-api/graphics-texture-upload-helper.h> // for Graphics::UploadParams
-
 // EXTERNAL INCLUDES
 #include <cstddef>
 
@@ -93,7 +91,6 @@ class MemoryPoolCollection;
 class RenderManager;
 class RenderTaskList;
 class RenderTaskProcessor;
-class RenderQueue;
 class VertexBuffer;
 
 /**
@@ -114,7 +111,6 @@ public:
    * @param[in] propertyNotifier The PropertyNotifier
    * @param[in] renderController After messages are flushed, we request a render from the RenderController.
    * @param[in] renderManager This is responsible for rendering the results of each "update".
-   * @param[in] renderQueue Used to queue messages for the next render.
    * @param[in] renderTaskProcessor Handles RenderTasks and RenderInstrucitons.
    * @param[in] memoryPoolCollection Memory pool collection.
    */
@@ -123,7 +119,6 @@ public:
                 PropertyNotifier&              propertyNotifier,
                 Integration::RenderController& renderController,
                 RenderManager&                 renderManager,
-                RenderQueue&                   renderQueue,
                 RenderTaskProcessor&           renderTaskProcessor,
                 MemoryPoolCollection&          memoryPoolCollection);
 
@@ -131,12 +126,6 @@ public:
    * Destructor.
    */
   ~UpdateManager() override;
-
-  /**
-   * @brief Change the render queue.
-   * @param[in] renderQueue New render queue.
-   */
-  void ChangeRenderQueue(RenderQueue& renderQueue);
 
   /**
    * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
@@ -189,7 +178,7 @@ public:
 
   /**
    * Destroy a Node owned by UpdateManager.
-   * This is not immediate; Nodes are passed to the RenderQueue to allow GL resources to be deleted.
+   * This is not immediate; Nodes are passed to the RenderManager to allow GL resources to be deleted.
    * In the following update, the previously queued Nodes may be deleted.
    * @pre The node has been disconnected from the scene-graph i.e. has no parent or children.
    * @param[in] node The node to destroy.
@@ -474,6 +463,21 @@ public:
    */
   bool FlushQueue();
 
+  // API list to call RenderManager directly.
+
+  /**
+   * This is called when the surface of the scene has been replaced.
+   * @param[in] scene The scene.
+   */
+  void SurfaceReplaced(Scene* scene);
+
+  /**
+   * Request to clear the program cache at RenderManager.
+   */
+  void RequestClearProgramCache();
+
+  // Sampler
+
   /**
    * Add a new sampler to RenderManager
    * @param[in] sampler The sampler to add
@@ -489,22 +493,7 @@ public:
    */
   void RemoveSampler(Render::Sampler* sampler);
 
-  /**
-   * Sets the filter modes for an existing sampler
-   * @param[in] sampler The sampler
-   * @param[in] minFilterMode The filter to use under minification
-   * @param[in] magFilterMode The filter to use under magnification
-   */
-  void SetFilterMode(Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode);
-
-  /**
-   * Sets the wrap mode for an existing sampler
-   * @param[in] sampler The sampler
-   * @param[in] rWrapMode Wrapping mode in z direction
-   * @param[in] sWrapMode Wrapping mode in x direction
-   * @param[in] tWrapMode Wrapping mode in y direction
-   */
-  void SetWrapMode(Render::Sampler* sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode);
+  // Vertex Buffer
 
   /**
    * Add a new property buffer to RenderManager
@@ -521,36 +510,7 @@ public:
    */
   void RemoveVertexBuffer(Render::VertexBuffer* propertryBuffer);
 
-  /**
-   * Sets the format of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
-   * @param[in] format The new format of the buffer
-   * @post Sends a message to RenderManager to set the new format to the property buffer.
-   */
-  void SetVertexBufferFormat(Render::VertexBuffer* vertexBuffer, OwnerPointer<Render::VertexBuffer::Format>& format);
-
-  /**
-   * Sets the data of an existing property buffer
-   * @param[in] vertexBuffer The property buffer.
-   * @param[in] data The new data of the buffer
-   * @param[in] size The new size of the buffer
-   * @post Sends a message to RenderManager to set the new data to the property buffer.
-   */
-  void SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size);
-
-  /**
-   * Sets the divisor of a vertex buffer. This is used by the GPU to provide
-   * instanced drawing.
-   * @param[in] vertexBuffer The property buffer.
-   * @param[in] divisor The instance divisor. 0 to turn instancing off.
-   */
-  void SetVertexBufferDivisor(Render::VertexBuffer* vertexBuffer, uint32_t divisor);
-  /**
-   * Sets vertex buffer update callback
-   * @param[in] vertexBuffer
-   * @param[in] callback
-   */
-  void SetVertexBufferUpdateCallback(Render::VertexBuffer* vertexBuffer, Dali::VertexBufferUpdateCallback* callback);
+  // Geometry
 
   /**
    * Adds a geometry to the RenderManager
@@ -567,40 +527,7 @@ public:
    */
   void RemoveGeometry(Render::Geometry* geometry);
 
-  /**
-   * Sets the geometry type of an existing Geometry
-   * @param[in] geometry The geometry
-   * @param[in] geometryType The type of the geometry
-   */
-  void SetGeometryType(Render::Geometry* geometry, uint32_t geometryType);
-
-  /**
-   * Sets the index buffer to be used by a geometry
-   * @param[in] geometry The geometry
-   * @param[in] indices A vector containing the indices for the geometry
-   */
-  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices);
-
-  /**
-   * Sets the index buffer to be used by a geometry
-   * @param[in] geometry The geometry
-   * @param[in] indices A vector containing the indices for the geometry
-   */
-  void SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& indices);
-
-  /**
-   * Adds a vertex buffer to a geometry
-   * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer
-   */
-  void AttachVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer);
-
-  /**
-   * Removes a vertex buffer from a geometry
-   * @param[in] geometry The geometry
-   * @param[in] vertexBuffer The property buffer
-   */
-  void RemoveVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer);
+  // Texture
 
   /**
    * Adds a texture to the render manager
@@ -616,33 +543,7 @@ public:
    */
   void RemoveTexture(const Render::TextureKey& texture);
 
-  /**
-   * Uploads data to a texture owned by the RenderManager
-   * @param[in] texture The texture
-   * @param[in] pixelData The pixel data object
-   * @param[in] params The parameters for the upload
-   */
-  void UploadTexture(const Render::TextureKey& texture, PixelDataPtr pixelData, const Graphics::UploadParams& params);
-
-  /**
-   * Generates mipmaps for a texture owned by the RenderManager
-   * @param[in] texture The texture
-   */
-  void GenerateMipmaps(const Render::TextureKey& texture);
-
-  /**
-   * Set the texture size owned by the RenderManager
-   * @param[in] texture The texture
-   * @param[in] size The texture size
-   */
-  void SetTextureSize(const Render::TextureKey& texture, const Dali::ImageDimensions& size);
-
-  /**
-   * Set the texture pixel format owned by the RenderManager
-   * @param[in] texture The texture
-   * @param[in] pixelFormat The texture pixel format
-   */
-  void SetTextureFormat(const Render::TextureKey& texture, Dali::Pixel::Format pixelFormat);
+  // FrameBuffer
 
   /**
    * Adds a framebuffer to the render manager
@@ -657,44 +558,6 @@ public:
    * @post The FrameBuffer will be destroyed in the render thread
    */
   void RemoveFrameBuffer(Render::FrameBuffer* frameBuffer);
-
-  /**
-   * Attach a texture as color output to an existing FrameBuffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   * @param[in] layer Indicates which layer of a cube map or array texture to attach. Unused for 2D textures
-   */
-  void AttachColorTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t face);
-
-  /**
-   * Attach a texture as depth output to an existing FrameBuffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   */
-  void AttachDepthTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel);
-
-  /**
-   * Attach a texture as depth/stencil output to an existing FrameBuffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] texture The texture that will be used as output when rendering
-   * @param[in] mipmapLevel The mipmap of the texture to be attached
-   */
-  void AttachDepthStencilTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel);
-
-  /**
-   * Set a multisampling level value as texture output to the existing FrameBuffer
-   * @param[in] frameBuffer The FrameBuffer
-   * @param[in] multiSamplingLevel The level of multisampling
-   */
-  void SetMultiSamplingLevelToFrameBuffer(Render::FrameBuffer* frameBuffer, uint8_t multiSamplingLevel);
-
-  /**
-   * This is called when the surface of the scene has been replaced.
-   * @param[in] scene The scene.
-   */
-  void SurfaceReplaced(Scene* scene);
 
 public:
   /**
@@ -738,11 +601,6 @@ public:
    *       for any other purposes.
    */
   void RequestRendering();
-
-  /**
-   * Request to clear the program cache at RenderManager.
-   */
-  void RequestClearProgramCache();
 
   /**
    * Resets the renderer added flag.
@@ -791,26 +649,9 @@ public:
   void NotifyFrameCallback(FrameCallbackInterface* frameCallback, Dali::UpdateProxy::NotifySyncPoint syncPoint);
 
   /**
-   * Requests to keep render result of the framebuffer.
-   * @param[in] frameBuffer The FrameBuffer
-   */
-  void KeepRenderResultToFrameBuffer(Render::FrameBuffer* frameBuffer);
-
-  /**
-   * Requests to clear kept render result of the framebuffer.
-   * @param[in] frameBuffer The FrameBuffer
-   */
-  void ClearRenderResultToFrameBuffer(Render::FrameBuffer* frameBuffer);
-
-  /**
    * Get the update message queue capacity (mutex locked)
    */
   std::size_t GetUpdateMessageQueueCapacity() const;
-
-  /**
-   * Get the render message queue capacity
-   */
-  std::size_t GetRenderMessageQueueCapacity() const;
 
   /**
    * Get the render instruction capacity
@@ -1363,29 +1204,7 @@ inline void RemoveSamplerMessage(UpdateManager& manager, Render::Sampler& sample
   new(slot) LocalType(&manager, &UpdateManager::RemoveSampler, &sampler);
 }
 
-inline void SetFilterModeMessage(UpdateManager& manager, Render::Sampler& sampler, uint32_t minFilterMode, uint32_t magFilterMode)
-{
-  using LocalType = MessageValue3<UpdateManager, Render::Sampler*, uint32_t, uint32_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetFilterMode, &sampler, minFilterMode, magFilterMode);
-}
-
-inline void SetWrapModeMessage(UpdateManager& manager, Render::Sampler& sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode)
-{
-  using LocalType = MessageValue4<UpdateManager, Render::Sampler*, uint32_t, uint32_t, uint32_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetWrapMode, &sampler, rWrapMode, sWrapMode, tWrapMode);
-}
-
-inline void AddVertexBuffer(UpdateManager& manager, OwnerPointer<Render::VertexBuffer>& vertexBuffer)
+inline void AddVertexBufferMessage(UpdateManager& manager, OwnerPointer<Render::VertexBuffer>& vertexBuffer)
 {
   // Message has ownership of vertexBuffer while in transit from event -> update
   using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::VertexBuffer>>;
@@ -1397,7 +1216,7 @@ inline void AddVertexBuffer(UpdateManager& manager, OwnerPointer<Render::VertexB
   new(slot) LocalType(&manager, &UpdateManager::AddVertexBuffer, vertexBuffer);
 }
 
-inline void RemoveVertexBuffer(UpdateManager& manager, Render::VertexBuffer& vertexBuffer)
+inline void RemoveVertexBufferMessage(UpdateManager& manager, Render::VertexBuffer& vertexBuffer)
 {
   using LocalType = MessageValue1<UpdateManager, Render::VertexBuffer*>;
 
@@ -1408,50 +1227,7 @@ inline void RemoveVertexBuffer(UpdateManager& manager, Render::VertexBuffer& ver
   new(slot) LocalType(&manager, &UpdateManager::RemoveVertexBuffer, &vertexBuffer);
 }
 
-inline void SetVertexBufferFormat(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, OwnerPointer<Render::VertexBuffer::Format>& format)
-{
-  // Message has ownership of VertexBuffer::Format while in transit from event -> update
-  using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, OwnerPointer<Render::VertexBuffer::Format>>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferFormat, &vertexBuffer, format);
-}
-
-inline void SetVertexBufferData(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size)
-{
-  // Message has ownership of VertexBuffer data while in transit from event -> update
-  using LocalType = MessageValue3<UpdateManager, Render::VertexBuffer*, OwnerPointer<Vector<uint8_t>>, uint32_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferData, &vertexBuffer, data, size);
-}
-
-inline void SetVertexBufferDivisorMessage(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, uint32_t divisor)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, uint32_t>;
-  uint32_t* slot  = manager.ReserveMessageSlot(sizeof(LocalType));
-  new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferDivisor, &vertexBuffer, divisor);
-}
-
-inline void SetVertexBufferUpdateCallbackMessage(UpdateManager& manager, Render::VertexBuffer& vertexBuffer, Dali::VertexBufferUpdateCallback* callback)
-{
-  // Message has ownership of VertexBuffer data while in transit from event -> update
-  using LocalType = MessageValue2<UpdateManager, Render::VertexBuffer*, Dali::VertexBufferUpdateCallback*>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetVertexBufferUpdateCallback, &vertexBuffer, callback);
-}
-
-inline void AddGeometry(UpdateManager& manager, OwnerPointer<Render::Geometry>& geometry)
+inline void AddGeometryMessage(UpdateManager& manager, OwnerPointer<Render::Geometry>& geometry)
 {
   // Message has ownership of Geometry while in transit from event -> update
   using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::Geometry>>;
@@ -1463,7 +1239,7 @@ inline void AddGeometry(UpdateManager& manager, OwnerPointer<Render::Geometry>& 
   new(slot) LocalType(&manager, &UpdateManager::AddGeometry, geometry);
 }
 
-inline void RemoveGeometry(UpdateManager& manager, Render::Geometry& geometry)
+inline void RemoveGeometryMessage(UpdateManager& manager, Render::Geometry& geometry)
 {
   using LocalType = MessageValue1<UpdateManager, Render::Geometry*>;
 
@@ -1472,97 +1248,6 @@ inline void RemoveGeometry(UpdateManager& manager, Render::Geometry& geometry)
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::RemoveGeometry, &geometry);
-}
-
-inline void AttachVertexBufferMessage(UpdateManager& manager, Render::Geometry& geometry, const Render::VertexBuffer& vertexBuffer)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::Geometry*, Render::VertexBuffer*>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AttachVertexBuffer, &geometry, const_cast<Render::VertexBuffer*>(&vertexBuffer));
-}
-
-inline void RemoveVertexBufferMessage(UpdateManager& manager, Render::Geometry& geometry, const Render::VertexBuffer& vertexBuffer)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::Geometry*, Render::VertexBuffer*>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::RemoveVertexBuffer, &geometry, const_cast<Render::VertexBuffer*>(&vertexBuffer));
-}
-
-// Custom message type for SetIndexBuffer() used to move data with Vector::Swap()
-template<typename T, typename IndexContainerType>
-class IndexBufferMessage : public MessageBase
-{
-public:
-  /**
-   * Constructor which does a Vector::Swap()
-   */
-  IndexBufferMessage(T* manager, Render::Geometry* geometry, IndexContainerType& indices)
-  : MessageBase(),
-    mManager(manager),
-    mRenderGeometry(geometry)
-  {
-    mIndices.Swap(indices);
-  }
-
-  /**
-   * Virtual destructor
-   */
-  ~IndexBufferMessage() override = default;
-
-  /**
-   * @copydoc MessageBase::Process
-   */
-  void Process(BufferIndex /*bufferIndex*/) override
-  {
-    DALI_ASSERT_DEBUG(mManager && "Message does not have an object");
-    mManager->SetIndexBuffer(mRenderGeometry, mIndices);
-  }
-
-private:
-  T*                 mManager;
-  Render::Geometry*  mRenderGeometry;
-  IndexContainerType mIndices;
-};
-
-inline void SetIndexBufferMessage(UpdateManager& manager, Render::Geometry& geometry, Render::Geometry::Uint16ContainerType& indices)
-{
-  using LocalType = IndexBufferMessage<UpdateManager, Render::Geometry::Uint16ContainerType>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &geometry, indices);
-}
-
-inline void SetIndexBufferMessage(UpdateManager& manager, Render::Geometry& geometry, Render::Geometry::Uint32ContainerType& indices)
-{
-  using LocalType = IndexBufferMessage<UpdateManager, Render::Geometry::Uint32ContainerType>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &geometry, indices);
-}
-
-inline void SetGeometryTypeMessage(UpdateManager& manager, Render::Geometry& geometry, uint32_t geometryType)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::Geometry*, uint32_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetGeometryType, &geometry, geometryType);
 }
 
 inline void AddTextureMessage(UpdateManager& manager, OwnerKeyType<Render::Texture>& texture)
@@ -1587,51 +1272,7 @@ inline void RemoveTextureMessage(UpdateManager& manager, const Render::TextureKe
   new(slot) LocalType(&manager, &UpdateManager::RemoveTexture, texture);
 }
 
-inline void UploadTextureMessage(UpdateManager& manager, Render::TextureKey texture, PixelDataPtr pixelData, const Graphics::UploadParams& params)
-{
-  using LocalType = MessageValue3<UpdateManager, Render::TextureKey, PixelDataPtr, Graphics::UploadParams>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::UploadTexture, texture, pixelData, params);
-}
-
-inline void GenerateMipmapsMessage(UpdateManager& manager, Render::TextureKey texture)
-{
-  using LocalType = MessageValue1<UpdateManager, Render::TextureKey>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::GenerateMipmaps, texture);
-}
-
-inline void SetTextureSizeMessage(UpdateManager& manager, Render::TextureKey texture, const Dali::ImageDimensions& size)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::TextureKey, Dali::ImageDimensions>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetTextureSize, texture, size);
-}
-
-inline void SetTextureFormatMessage(UpdateManager& manager, Render::TextureKey texture, Dali::Pixel::Format pixelFormat)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::TextureKey, Dali::Pixel::Format>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetTextureFormat, texture, pixelFormat);
-}
-
-inline void AddFrameBuffer(UpdateManager& manager, OwnerPointer<Render::FrameBuffer>& frameBuffer)
+inline void AddFrameBufferMessage(UpdateManager& manager, OwnerPointer<Render::FrameBuffer>& frameBuffer)
 {
   using LocalType = MessageValue1<UpdateManager, OwnerPointer<Render::FrameBuffer>>;
 
@@ -1642,7 +1283,7 @@ inline void AddFrameBuffer(UpdateManager& manager, OwnerPointer<Render::FrameBuf
   new(slot) LocalType(&manager, &UpdateManager::AddFrameBuffer, frameBuffer);
 }
 
-inline void RemoveFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer)
+inline void RemoveFrameBufferMessage(UpdateManager& manager, Render::FrameBuffer& frameBuffer)
 {
   using LocalType = MessageValue1<UpdateManager, Render::FrameBuffer*>;
 
@@ -1651,72 +1292,6 @@ inline void RemoveFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frame
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&manager, &UpdateManager::RemoveFrameBuffer, &frameBuffer);
-}
-
-inline void AttachColorTextureToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
-{
-  using LocalType = MessageValue4<UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t, uint32_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AttachColorTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel, layer);
-}
-
-inline void AttachDepthTextureToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel)
-{
-  using LocalType = MessageValue3<UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AttachDepthTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel);
-}
-
-inline void AttachDepthStencilTextureToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer, Render::Texture* texture, uint32_t mipmapLevel)
-{
-  using LocalType = MessageValue3<UpdateManager, Render::FrameBuffer*, Render::Texture*, uint32_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::AttachDepthStencilTextureToFrameBuffer, &frameBuffer, texture, mipmapLevel);
-}
-
-inline void SetMultiSamplingLevelToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer, uint8_t multiSamplingLevel)
-{
-  using LocalType = MessageValue2<UpdateManager, Render::FrameBuffer*, uint8_t>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::SetMultiSamplingLevelToFrameBuffer, &frameBuffer, multiSamplingLevel);
-}
-
-inline void KeepRenderResultToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer)
-{
-  using LocalType = MessageValue1<UpdateManager, Render::FrameBuffer*>;
-
-  // Reserve some memory inside the render queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::KeepRenderResultToFrameBuffer, &frameBuffer);
-}
-
-inline void ClearRenderResultToFrameBuffer(UpdateManager& manager, Render::FrameBuffer& frameBuffer)
-{
-  using LocalType = MessageValue1<UpdateManager, Render::FrameBuffer*>;
-
-  // Reserve some memory inside the render queue
-  uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&manager, &UpdateManager::ClearRenderResultToFrameBuffer, &frameBuffer);
 }
 
 inline void SetDepthIndicesMessage(UpdateManager& manager, OwnerPointer<NodeDepths>& nodeDepths)

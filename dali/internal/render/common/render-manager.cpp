@@ -43,7 +43,6 @@
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/common/shared-uniform-buffer-view-container.h>
 #include <dali/internal/render/common/terminated-native-draw-manager.h>
-#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/pipeline-cache.h>
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 #include <dali/internal/render/renderers/render-texture.h>
@@ -326,7 +325,6 @@ struct RenderManager::Impl
 
   // the order is important for destruction,
   Graphics::Controller&           graphicsController;
-  RenderQueue                     renderQueue;      ///< A message queue for receiving messages from the update-thread.
   std::vector<SceneGraph::Scene*> sceneContainer;   ///< List of pointers to the scene graph objects of the scenes
   Render::RenderAlgorithms        renderAlgorithms; ///< The RenderAlgorithms object is used to action the renders required by a RenderInstruction
 
@@ -439,9 +437,6 @@ void RenderManager::ChangeGraphicsController(Graphics::Controller& graphicsContr
                    oldImpl->stencilBufferAvailable,
                    oldImpl->partialUpdateAvailable);
 
-  // Move already stored messages to new impl.
-  RenderQueue::MoveRenderQueue(mImpl->renderQueue, oldImpl->renderQueue);
-
   delete oldImpl;
 }
 
@@ -465,11 +460,6 @@ void RenderManager::ContextDestroyed()
 
   // Remove owned render context
   mImpl->ContextDestroyed();
-}
-
-RenderQueue& RenderManager::GetRenderQueue()
-{
-  return mImpl->renderQueue;
 }
 
 void RenderManager::SetShaderSaver(ShaderSaver& upstream)
@@ -536,54 +526,12 @@ void RenderManager::RemoveTexture(const Render::TextureKey& textureKey)
   }
 }
 
-void RenderManager::UploadTexture(const Render::TextureKey& textureKey, PixelDataPtr pixelData, const Graphics::UploadParams& params)
-{
-  DALI_ASSERT_DEBUG(textureKey && "Trying to upload to empty texture key");
-  textureKey->Upload(pixelData, params);
-
-  mImpl->updatedTextures.PushBack(textureKey);
-}
-
-void RenderManager::GenerateMipmaps(const Render::TextureKey& textureKey)
-{
-  DALI_ASSERT_DEBUG(textureKey && "Trying to generate mipmaps on empty texture key");
-  textureKey->GenerateMipmaps();
-
-  mImpl->updatedTextures.PushBack(textureKey);
-}
-
-void RenderManager::SetTextureSize(const Render::TextureKey& textureKey, const Dali::ImageDimensions& size)
-{
-  DALI_ASSERT_DEBUG(textureKey && "Trying to set size on empty texture key");
-  textureKey->SetWidth(size.GetWidth());
-  textureKey->SetHeight(size.GetHeight());
-}
-
-void RenderManager::SetTextureFormat(const Render::TextureKey& textureKey, Dali::Pixel::Format pixelFormat)
-{
-  DALI_ASSERT_DEBUG(textureKey && "Trying to set pixel format on empty texture key");
-  textureKey->SetPixelFormat(pixelFormat);
-}
-
 void RenderManager::SetTextureUpdated(const Render::TextureKey& textureKey)
 {
   DALI_ASSERT_DEBUG(textureKey && "Trying to set updated on empty texture key");
   textureKey->SetUpdated(true);
 
   mImpl->updatedTextures.PushBack(textureKey);
-}
-
-void RenderManager::SetFilterMode(Render::Sampler* sampler, uint32_t minFilterMode, uint32_t magFilterMode)
-{
-  sampler->SetFilterMode(static_cast<Dali::FilterMode::Type>(minFilterMode),
-                         static_cast<Dali::FilterMode::Type>(magFilterMode));
-}
-
-void RenderManager::SetWrapMode(Render::Sampler* sampler, uint32_t rWrapMode, uint32_t sWrapMode, uint32_t tWrapMode)
-{
-  sampler->SetWrapMode(static_cast<Dali::WrapMode::Type>(rWrapMode),
-                       static_cast<Dali::WrapMode::Type>(sWrapMode),
-                       static_cast<Dali::WrapMode::Type>(tWrapMode));
 }
 
 void RenderManager::AddFrameBuffer(OwnerPointer<Render::FrameBuffer>& frameBuffer)
@@ -631,26 +579,6 @@ void RenderManager::SurfaceReplaced(SceneGraph::Scene* scene)
   scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
 }
 
-void RenderManager::AttachColorTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
-{
-  frameBuffer->AttachColorTexture(texture, mipmapLevel, layer);
-}
-
-void RenderManager::AttachDepthTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel)
-{
-  frameBuffer->AttachDepthTexture(texture, mipmapLevel);
-}
-
-void RenderManager::AttachDepthStencilTextureToFrameBuffer(Render::FrameBuffer* frameBuffer, Render::Texture* texture, uint32_t mipmapLevel)
-{
-  frameBuffer->AttachDepthStencilTexture(texture, mipmapLevel);
-}
-
-void RenderManager::SetMultiSamplingLevelToFrameBuffer(Render::FrameBuffer* frameBuffer, uint8_t multiSamplingLevel)
-{
-  frameBuffer->SetMultiSamplingLevel(multiSamplingLevel);
-}
-
 void RenderManager::AddVertexBuffer(OwnerPointer<Render::VertexBuffer>& vertexBuffer)
 {
   mImpl->vertexBufferContainer.PushBack(vertexBuffer.Release());
@@ -661,31 +589,6 @@ void RenderManager::RemoveVertexBuffer(Render::VertexBuffer* vertexBuffer)
   mImpl->vertexBufferContainer.EraseObject(vertexBuffer);
 }
 
-void RenderManager::SetVertexBufferFormat(Render::VertexBuffer* vertexBuffer, OwnerPointer<Render::VertexBuffer::Format>& format)
-{
-  vertexBuffer->SetFormat(format.Release());
-}
-
-void RenderManager::SetVertexBufferData(Render::VertexBuffer* vertexBuffer, OwnerPointer<Vector<uint8_t>>& data, uint32_t size)
-{
-  vertexBuffer->SetData(data.Release(), size);
-}
-
-void RenderManager::SetVertexBufferUpdateCallback(Render::VertexBuffer* vertexBuffer, Dali::VertexBufferUpdateCallback* callback)
-{
-  vertexBuffer->SetVertexBufferUpdateCallback(callback);
-}
-
-void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint16ContainerType& indices)
-{
-  geometry->SetIndexBuffer(indices);
-}
-
-void RenderManager::SetIndexBuffer(Render::Geometry* geometry, Render::Geometry::Uint32ContainerType& indices)
-{
-  geometry->SetIndexBuffer(indices);
-}
-
 void RenderManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 {
   mImpl->geometryContainer.PushBack(geometry.Release());
@@ -694,21 +597,6 @@ void RenderManager::AddGeometry(OwnerPointer<Render::Geometry>& geometry)
 void RenderManager::RemoveGeometry(Render::Geometry* geometry)
 {
   mImpl->geometryContainer.EraseObject(geometry);
-}
-
-void RenderManager::AttachVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
-{
-  geometry->AddVertexBuffer(vertexBuffer);
-}
-
-void RenderManager::RemoveVertexBuffer(Render::Geometry* geometry, Render::VertexBuffer* vertexBuffer)
-{
-  geometry->RemoveVertexBuffer(vertexBuffer);
-}
-
-void RenderManager::SetGeometryType(Render::Geometry* geometry, uint32_t geometryType)
-{
-  geometry->SetType(Render::Geometry::Type(geometryType));
 }
 
 void RenderManager::AddRenderTracker(Render::RenderTracker* renderTracker)
@@ -733,9 +621,6 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
 
   // Increment the frame count at the beginning of each frame
   ++mImpl->frameCount;
-
-  // Process messages queued during previous update
-  mImpl->renderQueue.ProcessMessages(mImpl->renderBufferIndex);
 
   uint32_t totalInstructionCount = 0u;
   for(auto& i : mImpl->sceneContainer)

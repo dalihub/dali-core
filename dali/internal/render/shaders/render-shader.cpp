@@ -22,7 +22,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/common/render-debug.h>
-#include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/render/shaders/program.h>
 
