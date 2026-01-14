@@ -380,7 +380,7 @@ struct InheritedVisibilityChangedFunctor
     data.actor             = actor;
     data.changedActor      = DevelActor::GetVisiblityChangedActor();
     data.visible           = visible;
-    data.calculatedVisible = DevelActor::GetInheritedVisible(actor);
+    data.calculatedVisible = DevelActor::IsEffectivelyVisible(actor);
     data.called            = true;
   }
 
@@ -15634,7 +15634,7 @@ int UtcDaliActorCalculateInheritedVisible01(void)
   auto CheckInheritedVisible = [&](Actor actor, bool expectVisible, bool expectInheritedVisible, const char* location)
   {
     DALI_TEST_EQUALS(expectVisible, actor.GetProperty<bool>(Actor::Property::VISIBLE), location);
-    DALI_TEST_EQUALS(expectInheritedVisible, DevelActor::GetInheritedVisible(actor), location);
+    DALI_TEST_EQUALS(expectInheritedVisible, DevelActor::IsEffectivelyVisible(actor), location);
   };
 
   CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
