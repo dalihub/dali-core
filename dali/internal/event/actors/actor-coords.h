@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_ACTORS_ACTOR_COORDS_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -329,6 +329,18 @@ Matrix CalculateActorWorldTransform(const Actor& actor);
  * @return the world color
  */
 Vector4 CalculateActorWorldColor(const Actor& actor);
+
+/**
+ * Get the inherited visibility of the actor.
+ *
+ * This calcualtes the visible of the actor from scratch using
+ * only event side properties. It does not rely on the update thread
+ * to have already calculated the visible.
+ *
+ * @param[in] actor The actor to calculate the inherited visible for
+ * @return the inherited visible
+ */
+bool CalculateActorInheritedVisible(const Actor& actor);
 
 /**
  * @brief Get the rotate of the actor look at specific position.

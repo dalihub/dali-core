@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -603,6 +603,18 @@ DALI_CORE_API Matrix GetWorldTransform(Actor actor);
  * @return the world color
  */
 DALI_CORE_API Vector4 GetWorldColor(Actor actor);
+
+/**
+ * Get the inherited visibility of the actor.
+ *
+ * This calcualtes the visible of the actor from scratch using
+ * only event side properties. It does not rely on the update thread
+ * to have already calculated the visible.
+ *
+ * @param[in] actor The actor to calculate the inherited visible for
+ * @return the inherited visible
+ */
+DALI_CORE_API bool GetInheritedVisible(Actor actor);
 
 /**
  * Rotate the actor look at specific position.
