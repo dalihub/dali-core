@@ -605,16 +605,19 @@ DALI_CORE_API Matrix GetWorldTransform(Actor actor);
 DALI_CORE_API Vector4 GetWorldColor(Actor actor);
 
 /**
- * Get the inherited visibility of the actor.
+ * Get the effective visibility of the actor.
  *
- * This calcualtes the visible of the actor from scratch using
+ * This calculates the effective visibility of the actor from scratch using
  * only event side properties. It does not rely on the update thread
- * to have already calculated the visible.
+ * to have already calculated the visibility.
  *
- * @param[in] actor The actor to calculate the inherited visible for
- * @return the inherited visible
+ * The effective visibility takes into account the actor's own visibility
+ * property as well as the visibility of all its parents in the hierarchy.
+ *
+ * @param[in] actor The actor to calculate the effective visibility for
+ * @return False if the actor or any of its parents is not visible, or if the scene is off. True otherwise.
  */
-DALI_CORE_API bool GetInheritedVisible(Actor actor);
+DALI_CORE_API bool IsEffectivelyVisible(Actor actor);
 
 /**
  * Rotate the actor look at specific position.

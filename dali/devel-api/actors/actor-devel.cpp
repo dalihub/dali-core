@@ -99,7 +99,7 @@ Vector4 GetWorldColor(Actor actor)
   return CalculateActorWorldColor(GetImplementation(actor));
 }
 
-bool GetInheritedVisible(Actor actor)
+bool IsEffectivelyVisible(Actor actor)
 {
   return CalculateActorInheritedVisible(GetImplementation(actor));
 }
