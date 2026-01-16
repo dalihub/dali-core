@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -653,6 +653,36 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     if(!ReuseLatestBoundPipeline(&pipeline))
     {
       commandBuffer.BindPipeline(pipeline);
+
+      const auto& colorBlendState = mPipeline->colorBlendState;
+      bool dynamicBlendEnabled = mPipelineCache->IsDynamicBlendEnabled();
+
+      if(dynamicBlendEnabled)
+      {
+        if(colorBlendState.blendEnable)
+        {
+          commandBuffer.SetColorBlendEnable(0, true);
+          commandBuffer.SetColorBlendEquation(0,
+                                              colorBlendState.srcColorBlendFactor,
+                                              colorBlendState.dstColorBlendFactor,
+                                              colorBlendState.colorBlendOp,
+                                              colorBlendState.srcAlphaBlendFactor,
+                                              colorBlendState.dstAlphaBlendFactor,
+                                              colorBlendState.alphaBlendOp);
+
+          if(colorBlendState.colorBlendOp >= Graphics::ADVANCED_BLEND_OPTIONS_START)
+          {
+            commandBuffer.SetColorBlendAdvanced(0,
+                                                true, // srcPremultiplied
+                                                true, // dstPremultiplied
+                                                colorBlendState.colorBlendOp);
+          }
+        }
+        else
+        {
+          commandBuffer.SetColorBlendEnable(0, false);
+        }
+      }
     }
 
     if(queueIndex == 0)
@@ -1245,6 +1275,7 @@ Graphics::Pipeline& Renderer::PrepareGraphicsPipeline(
   queryInfo.blendingEnabled             = blend;
   queryInfo.blendingOptions             = &mBlendingOptions;
   queryInfo.alphaPremultiplied          = mPremultipliedAlphaEnabled;
+  queryInfo.isDynamicBlendEnabled       = mPipelineCache->IsDynamicBlendEnabled();
   queryInfo.cameraUsingReflection       = instruction.GetCamera()->GetReflectionUsed();
   queryInfo.renderTargetGraphicsObjects = &renderTargetGraphicsObjects;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -933,6 +933,41 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
         break;
       }
 
+      case CommandType::SET_COLOR_BLEND_ENABLE:
+      {
+        if(cmd.data.colorBlendEnable.enabled)
+        {
+          mGl.Enable(GL_BLEND);
+        }
+        else
+        {
+          mGl.Disable(GL_BLEND);
+        }
+        break;
+      }
+
+      case CommandType::SET_COLOR_BLEND_EQUATION:
+      {
+        auto& eq = cmd.data.colorBlendEquation;
+        mGl.BlendFuncSeparate(GetBlendFactor(eq.srcColorBlendFactor),
+                              GetBlendFactor(eq.dstColorBlendFactor),
+                              GetBlendFactor(eq.srcAlphaBlendFactor),
+                              GetBlendFactor(eq.dstAlphaBlendFactor));
+        if(eq.colorBlendOp != eq.alphaBlendOp)
+        {
+          mGl.BlendEquationSeparate(GetBlendOp(eq.colorBlendOp), GetBlendOp(eq.alphaBlendOp));
+        }
+        else
+        {
+          mGl.BlendEquation(GetBlendOp(eq.colorBlendOp));
+        }
+        break;
+      }
+      case CommandType::SET_COLOR_BLEND_ADVANCED:
+      {
+        break;
+      }
+
       case CommandType::EXECUTE_COMMAND_BUFFERS:
       {
         // Process secondary command buffers
@@ -1552,6 +1587,11 @@ const Matrix& TestGraphicsController::GetClipMatrix(const Graphics::RenderTarget
 
 uint32_t TestGraphicsController::GetDeviceLimitation(Graphics::DeviceCapability capability)
 {
+  if(mDeviceLimitations.find(capability) != mDeviceLimitations.end())
+  {
+    return mDeviceLimitations[capability];
+  }
+
   if(capability == Graphics::DeviceCapability::MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT)
   {
     auto& gl           = *const_cast<TestGlAbstraction*>(&mGl);

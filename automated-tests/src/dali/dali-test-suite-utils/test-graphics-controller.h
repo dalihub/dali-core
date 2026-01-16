@@ -2,7 +2,7 @@
 #define TEST_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,6 +152,17 @@ public:
    * @brief Lifecycle destroy event
    */
   void Destroy() override;
+
+  /**
+   * @brief Sets device limitation for specified capability
+   * @param[in] capability The device capability to set limitation for
+   * @param[in] value The limitation value to set (0 means no limitation)
+   * @note Call before initializing graphics resources
+   */
+  void SetDeviceLimitation(Graphics::DeviceCapability capability, uint32_t value)
+  {
+    mDeviceLimitations[capability] = value;
+  }
 
   uint32_t GetDeviceLimitation(Graphics::DeviceCapability capability) override;
 
@@ -573,6 +584,7 @@ public:
   std::vector<UniformData>                                  mCustomUniforms;
   std::vector<TestGraphicsReflection::TestUniformBlockInfo> mCustomUniformBlocks;
   UniformBufferBindingDescriptor                            mLastUniformBinding;
+  std::map<Graphics::DeviceCapability, uint32_t>            mDeviceLimitations;
 };
 
 } // namespace Dali
