@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/internal/event/animation/constraint-base.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -36,6 +37,17 @@ namespace Internal
 {
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gConstraintFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_CONSTRAINT");
+#endif
+
+#if defined(DEBUG_ENABLED)
+#define DALI_LOG_CONSTRAINT_INFO(format, ...) \
+  DALI_LOG_INFO(gConstraintFilter, Debug::Verbose, format, ##__VA_ARGS__)
+#else
+#define DALI_LOG_CONSTRAINT_INFO(format, ...)
+#endif
+
 /**
  * Helper to add only unique entries to the propertyOwner container
  * @param propertyOwners to add the entries to
@@ -67,6 +79,7 @@ ConstraintBase::ConstraintBase(Object& object, Property::Index targetPropertyInd
   mIsPreConstraint(true),
   mConstraintResetterApplied(false)
 {
+  DALI_LOG_CONSTRAINT_INFO("Constraint[%p] index[%u]\n", this, mTargetPropertyIndex);
   ObserveObject(object);
 }
 
@@ -84,6 +97,7 @@ ConstraintBase* ConstraintBase::Clone(Object& object)
 
 ConstraintBase::~ConstraintBase()
 {
+  DALI_LOG_CONSTRAINT_INFO("~Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] with sources[%zu]\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate, mSources.size());
   if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
   {
     DALI_LOG_ERROR("~ConstraintBase[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
@@ -120,6 +134,7 @@ void ConstraintBase::Apply(bool isPreConstraint)
     mIsPreConstraint = isPreConstraint;
     ConnectConstraint(mIsPreConstraint);
 
+    DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] with sources[%zu] Apply(%d)\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate, mSources.size(), isPreConstraint);
     mTargetObject->ApplyConstraint(*this);
   }
   else
@@ -148,6 +163,7 @@ void ConstraintBase::RemoveInternal()
 {
   if(mApplied)
   {
+    DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] with sources[%zu] Remove(%d)\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate, mSources.size(), mIsPreConstraint);
     mApplied = false;
 
     mConstraintResetterApplied = false;
@@ -191,6 +207,7 @@ Property::Index ConstraintBase::GetTargetProperty()
 
 void ConstraintBase::SetRemoveAction(ConstraintBase::RemoveAction action)
 {
+  DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] with sources[%zu] SetRemoveAction() %d -> %d\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate, mSources.size(), static_cast<int>(mRemoveAction), static_cast<int>(action));
   mRemoveAction = action;
 }
 
@@ -201,6 +218,7 @@ ConstraintBase::RemoveAction ConstraintBase::GetRemoveAction() const
 
 void ConstraintBase::SetApplyRate(uint32_t applyRate)
 {
+  DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] with sources[%zu] SetApplyRate() %u -> %u\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate, mSources.size(), mApplyRate, applyRate);
   mApplyRate = applyRate;
 
   // Always send message to support apply whenever we call SetApplyRate(APPLY_ONCE)
@@ -261,6 +279,7 @@ void ConstraintBase::SetTag(uint32_t tag)
         (ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START <= tag && tag <= ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_MAX))) &&
       "Cross tag setting is not allowed!");
   }
+  DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] SetTag() %u\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate, tag);
   mTag = tag;
 }
 
@@ -271,6 +290,7 @@ uint32_t ConstraintBase::GetTag() const
 
 void ConstraintBase::SceneObjectAdded(Object& object)
 {
+  DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] SceneObjectAdded()\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate);
   if(mApplied &&
      (nullptr == mSceneGraphConstraint) &&
      mTargetObject)
@@ -281,6 +301,7 @@ void ConstraintBase::SceneObjectAdded(Object& object)
 
 void ConstraintBase::SceneObjectRemoved(Object& object)
 {
+  DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] SceneObjectRemoved()\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate);
   if(mSceneGraphConstraint)
   {
     // An input property owning source has been deleted, need to tell the scene-graph-constraint owner to remove it
@@ -301,6 +322,8 @@ void ConstraintBase::SceneObjectRemoved(Object& object)
 
 void ConstraintBase::ObjectDestroyed(Object& object)
 {
+  DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] ObjectDestroyed()\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate);
+
   // Remove object pointer from observation set
   ObjectIter iter = std::find(mObservedObjects.Begin(), mObservedObjects.End(), &object);
   DALI_ASSERT_DEBUG(mObservedObjects.End() != iter);
