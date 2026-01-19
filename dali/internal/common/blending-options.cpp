@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -478,7 +478,7 @@ const Vector4* BlendingOptions::GetBlendColor() const
   return mBlendColor.Get();
 }
 
-bool BlendingOptions::IsAdvancedBlendEquationApplied()
+bool BlendingOptions::IsAdvancedBlendEquationApplied() const
 {
   unsigned int indexRgb = mBitmask & MASK_EQUATION_RGB;
   indexRgb              = indexRgb >> SHIFT_TO_EQUATION_RGB;
