@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1551,6 +1551,35 @@ int UtcDaliTextureApplyFragShaderP2(void)
   DALI_TEST_CHECK(baseFragShader.compare(fragShader));
   DALI_TEST_CHECK(!fragShader.empty());
   DALI_TEST_CHECK(fragShader.find("samplerExternalOES") < fragShader.length());
+  END_TEST;
+}
+
+int UtcDaliTextureApplyFragShaderP3(void)
+{
+  TestApplication        application;
+  TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
+  Texture                nativeTexture   = Texture::New(*testNativeImage);
+  DALI_TEST_CHECK(nativeTexture);
+
+  const std::string baseFragShader =
+    "varying mediump vec4 uColor;\n"
+    "varying vec2 vTexCoord;\n"
+    "uniform sampler2D uNative0;\n"
+    "uniform sampler2D uNative1;\n"
+    "void main(){\n"
+    "  gl_FragColor=uColor*texture2D(uNative0, vTexCoord)*texture2D(uNative1, vTexCoord);\n"
+    "}\n";
+  std::string fragShader = baseFragShader;
+  bool        applied    = DevelTexture::ApplyNativeFragmentShader(nativeTexture, fragShader, 2);
+
+  DALI_TEST_CHECK(applied);
+  DALI_TEST_CHECK(baseFragShader.compare(fragShader));
+  DALI_TEST_CHECK(!fragShader.empty());
+  DALI_TEST_CHECK(fragShader.find("sampler2D") < fragShader.length());
+  DALI_TEST_CHECK(fragShader.find("samplerExternalOES") < fragShader.length());
+
+  // Must change second sampler.
+  DALI_TEST_CHECK(fragShader.find("sampler2D") < fragShader.find("samplerExternalOES"));
   END_TEST;
 }
 

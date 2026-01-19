@@ -2,7 +2,7 @@
 #define DALI_NATIVE_IMAGE_INTERFACE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,11 +150,12 @@ public:
    * @brief Apply custom fragment prefix for rendering native image.
    *
    * @param[in,out] shader shader code that will be applied fragment prefix.
-   * @param[in] count the number of samplers those uses native image.
+   * @param[in] mask the mask of samplers those uses native image.
+   *                 For example, if mask = 0x5, 1st and 3rd samplers become native samplers.
    * @SINCE_2_4.33
    * @return True if the shader is changed.
    */
-  virtual bool ApplyNativeFragmentShader(std::string& shader, int count) = 0;
+  virtual bool ApplyNativeFragmentShader(std::string& shader, int mask) = 0;
 
   /**
    * @brief Get custom sampler type name for rendering native image.

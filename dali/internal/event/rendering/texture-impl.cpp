@@ -402,12 +402,12 @@ bool Texture::IsNative() const
   return static_cast<bool>(mNativeImage);
 }
 
-bool Texture::ApplyNativeFragmentShader(std::string& shader, int count)
+bool Texture::ApplyNativeFragmentShader(std::string& shader, int mask)
 {
   bool modified = false;
   if(mNativeImage && !shader.empty())
   {
-    modified = mNativeImage->ApplyNativeFragmentShader(shader, count);
+    modified = mNativeImage->ApplyNativeFragmentShader(shader, mask);
   }
 
   return modified;
