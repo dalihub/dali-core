@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,14 @@
 #include <dali/internal/update/nodes/node-helper.h> ///< For property wrapper macro
 #include <dali/internal/update/rendering/scene-graph-visual-renderer-property.h>
 
-namespace Dali::Internal::SceneGraph::VisualRenderer
+namespace Dali::Internal::SceneGraph
 {
-struct AnimatableDecoratedVisualProperties
+class Node;
+namespace VisualRenderer
 {
-  AnimatableDecoratedVisualProperties(VisualRendererPropertyObserver& owner)
+struct DecoratedVisualProperties
+{
+  DecoratedVisualProperties(VisualRendererPropertyObserver& owner)
   : mCoefficient(owner),
     mBorderlineWidth(0.0f),
     mBorderlineOffset(0.0f),
@@ -40,7 +43,7 @@ struct AnimatableDecoratedVisualProperties
   {
   }
 
-  ~AnimatableDecoratedVisualProperties()
+  ~DecoratedVisualProperties()
   {
   }
 
@@ -88,9 +91,9 @@ public: // Default properties
   AnimatableProperty<float>   mCornerRadiusPolicy;
 };
 
-struct AnimatableVisualProperties
+struct VisualProperties
 {
-  AnimatableVisualProperties(VisualRendererPropertyObserver& owner)
+  VisualProperties(VisualRendererPropertyObserver& owner)
   : mCoefficient(owner),
     mTransformOffset(Vector2::ZERO),
     mTransformSize(Vector2::ONE),
@@ -99,11 +102,12 @@ struct AnimatableVisualProperties
     mTransformOffsetSizeMode(Vector4::ZERO),
     mExtraSize(Vector2::ZERO),
     mPreMultipliedAlpha(0.0f),
+    mAttachedNode(nullptr),
     mExtendedProperties(nullptr)
   {
   }
 
-  ~AnimatableVisualProperties()
+  ~VisualProperties()
   {
     if(mExtendedProperties)
     {
@@ -166,9 +170,12 @@ public: // Default properties
   // Properties that don't give any effort to coefficient.
   AnimatableProperty<float> mPreMultipliedAlpha;
 
+  const Node* mAttachedNode{nullptr}; ///< Node attached to this visual renderer (not owned)
+
 public: // Extended properties for decorated visual properties
-  AnimatableDecoratedVisualProperties* mExtendedProperties{nullptr};
+  DecoratedVisualProperties* mExtendedProperties{nullptr};
 };
-} // namespace Dali::Internal::SceneGraph::VisualRenderer
+} // namespace VisualRenderer
+} // namespace Dali::Internal::SceneGraph
 
 #endif // DALI_INTERNAL_SCENE_GRAPH_VISUAL_RENDERER_H

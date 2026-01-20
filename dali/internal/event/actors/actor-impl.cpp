@@ -1687,14 +1687,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
       // Instruct each actor to create a corresponding node in the scene graph
       ConnectToScene(parentActor->GetHierarchyDepth(), parentActor->GetLayer3DParentCount(), notify);
 
-      Actor* actor = this;
-      // OnScene should be checked, this actor can be removed during OnSceneConnection.
-      emitInheritedVisible = OnScene() && mScene->IsVisible();
-      while(emitInheritedVisible && actor)
-      {
-        emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
-        actor = actor->GetParent();
-      }
+      emitInheritedVisible = CalculateActorInheritedVisible(*this);
     }
 
     // Resolve the name and index for the child properties if any
@@ -1705,14 +1698,8 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     if(!EventThreadServices::IsShuttingDown() && // Don't emit signals or send messages during Core destruction
        OnScene())
     {
-      Actor* actor         = this;
-      emitInheritedVisible = mScene->IsVisible();
-      while(emitInheritedVisible && actor)
-      {
-        emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
-        actor = actor->GetParent();
-      }
-      visiblility = false;
+      emitInheritedVisible = CalculateActorInheritedVisible(*this);
+      visiblility          = false;
     }
 
     mParent = nullptr;
@@ -1909,13 +1896,7 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
       RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
     }
 
-    Actor* actor                = this->GetParent();
-    bool   emitInheritedVisible = OnScene() && mScene->IsVisible();
-    while(emitInheritedVisible && actor)
-    {
-      emitInheritedVisible &= actor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
-      actor = actor->GetParent();
-    }
+    bool emitInheritedVisible = this->GetParent() ? CalculateActorInheritedVisible(*(this->GetParent())) : (OnScene() && mScene->IsVisible());
 
     mVisible = visible;
 

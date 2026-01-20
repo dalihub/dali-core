@@ -223,6 +223,7 @@ struct UpdateManager::Impl
     nodeDirtyFlags(NodePropertyFlags::TRANSFORM), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter(0),
     renderingBehavior(DevelStage::Rendering::IF_REQUIRED),
+    activatedRendererCount(0),
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
 #endif
@@ -231,7 +232,8 @@ struct UpdateManager::Impl
     previousUpdateScene(false),
     renderTaskWaiting(false),
     renderersAdded(false),
-    renderingRequired(false)
+    renderingRequired(false),
+    renderersReorderRequired(false)
   {
     // create first 'dummy' node
     nodes.PushBack(nullptr);
@@ -389,6 +391,11 @@ struct UpdateManager::Impl
   uint32_t                 frameCounter;      ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
   DevelStage::Rendering    renderingBehavior; ///< Set via DevelStage::SetRenderingBehavior
 
+  uint32_t activatedRendererCount; ///< The number of valid renderers. (Deactivated only for VisualRenderer case now.)
+                                   ///< At Renderer container, [0 ~ activatedRendererCount) are activated, and [activatedRendererCount ~ renderers.Count()) deactivated.
+                                   ///< Deactivated didn't call PrepareRenderer(), for performance.
+                                   ///< This value validate after renderersReorderRequired become false, and invalidate after renderersReorderRequired become true.
+
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
 #endif
@@ -400,6 +407,7 @@ struct UpdateManager::Impl
   bool renderTaskWaiting : 1;             ///< A REFRESH_ONCE render task is waiting to be rendered
   bool renderersAdded : 1;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool renderingRequired : 1;             ///< True if required to render the current frame
+  bool renderersReorderRequired : 1;      ///< True if we need to count activated / deactivaed renderers.
 
 private:
   Impl(const Impl&);            ///< Undefined
@@ -827,6 +835,7 @@ void UpdateManager::AddRenderer(OwnerKeyType<Renderer>& rendererKeyPointer)
 
   renderer->ConnectToSceneGraph(mImpl->renderManagerDispatcher);
 
+  // DevNote : First created renderer is deactivated. We dont need to reorder renderers.
   mImpl->renderers.PushBack(rendererKey);
 }
 
@@ -836,6 +845,9 @@ void UpdateManager::RemoveRenderer(const RendererKey& rendererKey)
 
   // Find the renderer and destroy it
   EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+
+  // DevNote : EraseUsingDiscardQueue keep renderer's order. We dont need to reorder renderers.
+
   // Need to remove the render object as well
   rendererKey->DisconnectFromSceneGraph(mImpl->renderManagerDispatcher);
 
@@ -844,16 +856,30 @@ void UpdateManager::RemoveRenderer(const RendererKey& rendererKey)
 #endif
 }
 
-void UpdateManager::AttachRenderer(Node* node, Renderer* renderer)
+void UpdateManager::AttachRenderer(Node* node, const RendererKey& renderer)
 {
-  node->AddRenderer(Renderer::GetKey(renderer));
-  mImpl->renderersAdded = true;
+  node->AddRenderer(renderer);
+  mImpl->renderersAdded           = true;
+  mImpl->renderersReorderRequired = true;
 }
 
-void UpdateManager::AttachCacheRenderer(Node* node, Renderer* renderer)
+void UpdateManager::AttachCacheRenderer(Node* node, const RendererKey& renderer)
 {
-  node->AddCacheRenderer(Renderer::GetKey(renderer));
-  mImpl->renderersAdded = true;
+  node->AddCacheRenderer(renderer);
+  mImpl->renderersAdded           = true;
+  mImpl->renderersReorderRequired = true;
+}
+
+void UpdateManager::DetachRenderer(Node* node, const RendererKey& renderer)
+{
+  node->RemoveRenderer(renderer);
+  mImpl->renderersReorderRequired = true;
+}
+
+void UpdateManager::DetachCacheRenderer(Node* node, const RendererKey& renderer)
+{
+  node->RemoveCacheRenderer(renderer);
+  mImpl->renderersReorderRequired = true;
 }
 
 void UpdateManager::SetPanGestureProcessor(PanGesture* panGestureProcessor)
@@ -1119,19 +1145,80 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
     return;
   }
 
+  // ConnectNode / DisconnectNode / SetAllDirtyFlags() called case (like SetIgnored)
+  const bool fullUpdate = (mImpl->nodeDirtyFlags & (NodePropertyFlags::DESCENDENT_HIERARCHY_CHANGED));
+
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss)
-  { oss << "[" << mImpl->renderers.Count() << "]"; });
+  { oss << "[" << mImpl->renderers.Count() << ", force:" << fullUpdate << ", nodeDirty:" << mImpl->nodeDirtyFlags << "]"; });
 
-  for(const auto& rendererKey : mImpl->renderers)
+  // TODO : Clean up this code in future.
+  if(fullUpdate)
   {
-    // Apply constraints
-    auto renderer = rendererKey.Get();
-    ConstrainPropertyOwner(*renderer, bufferIndex, true, postPropertyOwners);
+    // nodeDirtyFlags changed. Node's Ignore property might be changed.
+    mImpl->renderersReorderRequired = true;
+    for(const auto& rendererKey : mImpl->renderers)
+    {
+      // Apply constraints
+      auto renderer = rendererKey.Get();
+      ConstrainPropertyOwner(*renderer, bufferIndex, true, postPropertyOwners);
 
-    mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
+      mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
+    }
+
+    DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_RENDERERS");
   }
+  else
+  {
+    if(mImpl->renderersReorderRequired)
+    {
+      // Reset flag only here.
+      mImpl->renderersReorderRequired = false;
 
-  DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_RENDERERS");
+      // Move deactivated renderers to end, and activated renderers as front
+      // We should keep order stable.
+      DALI_TRACE_BEGIN(gTraceFilter, "DALI_REORDER_RENDERERS");
+      decltype(mImpl->renderers) deactivatedRenderers;
+      for(auto iter = mImpl->renderers.Begin(); iter != mImpl->renderers.End();)
+      {
+        if((*iter)->IsObservingNodeDeactivated())
+        {
+          deactivatedRenderers.PushBack(mImpl->renderers.Release(iter));
+          // Note : we can use iter again since OwnerKeyContainer use linear memory pointer.
+        }
+        else
+        {
+          ++iter;
+        }
+      }
+      mImpl->activatedRendererCount = mImpl->renderers.Count();
+
+      while(!deactivatedRenderers.Empty())
+      {
+        auto endIter = deactivatedRenderers.End();
+        mImpl->renderers.PushBack(deactivatedRenderers.Release(--endIter));
+      }
+      DALI_TRACE_END(gTraceFilter, "DALI_REORDER_RENDERERS");
+    }
+
+    uint32_t count = mImpl->activatedRendererCount;
+    if(count > 0u)
+    {
+      for(const auto& rendererKey : mImpl->renderers)
+      {
+        // Apply constraints
+        auto renderer = rendererKey.Get();
+        ConstrainPropertyOwner(*renderer, bufferIndex, true, postPropertyOwners);
+
+        mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
+        if(--count == 0)
+        {
+          break;
+        }
+      }
+    }
+    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss)
+    { oss << "[" << mImpl->renderers.Count() << ", i:" << (mImpl->renderers.Count() - mImpl->activatedRendererCount) << "]"; });
+  }
 }
 
 void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)

@@ -2,7 +2,7 @@
 #define DALI_ACTOR_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -603,6 +603,21 @@ DALI_CORE_API Matrix GetWorldTransform(Actor actor);
  * @return the world color
  */
 DALI_CORE_API Vector4 GetWorldColor(Actor actor);
+
+/**
+ * Get the effective visibility of the actor.
+ *
+ * This calculates the effective visibility of the actor from scratch using
+ * only event side properties. It does not rely on the update thread
+ * to have already calculated the visibility.
+ *
+ * The effective visibility takes into account the actor's own visibility
+ * property as well as the visibility of all its parents in the hierarchy.
+ *
+ * @param[in] actor The actor to calculate the effective visibility for
+ * @return False if the actor or any of its parents is not visible, or if the scene is off. True otherwise.
+ */
+DALI_CORE_API bool IsEffectivelyVisible(Actor actor);
 
 /**
  * Rotate the actor look at specific position.

@@ -257,6 +257,8 @@ void Node::AddRenderer(const RendererKey& renderer)
   SetUpdated(true);
 
   mRenderers.PushBack(renderer);
+
+  renderer->AttachToNode(*this);
 }
 
 void Node::RemoveRenderer(const RendererKey& renderer)
@@ -266,7 +268,7 @@ void Node::RemoveRenderer(const RendererKey& renderer)
   {
     if(mRenderers[i] == renderer)
     {
-      renderer->DetachFromNodeDataProvider(*this);
+      renderer->DetachFromNode(*this);
 
       SetUpdated(true);
       mRenderers.Erase(mRenderers.Begin() + i);
@@ -289,6 +291,8 @@ void Node::AddCacheRenderer(const RendererKey& renderer)
   SetDirtyFlag(NodePropertyFlags::COLOR);
 
   mCacheRenderers.PushBack(renderer);
+
+  renderer->AttachToNode(*this);
 }
 
 void Node::RemoveCacheRenderer(const RendererKey& renderer)
@@ -298,7 +302,7 @@ void Node::RemoveCacheRenderer(const RendererKey& renderer)
   {
     if(mCacheRenderers[i] == renderer)
     {
-      renderer->DetachFromNodeDataProvider(*this);
+      renderer->DetachFromNode(*this);
 
       SetUpdated(true);
       SetDirtyFlag(NodePropertyFlags::COLOR);

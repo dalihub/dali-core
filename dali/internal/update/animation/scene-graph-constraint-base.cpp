@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,31 @@
 // CLASS HEADER
 #include <dali/internal/update/animation/scene-graph-constraint.h>
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+
 namespace Dali
 {
 namespace Internal
 {
 namespace SceneGraph
 {
-#ifdef DEBUG_ENABLED
-uint32_t ConstraintBase::mCurrentInstanceCount = 0;
-uint32_t ConstraintBase::mTotalInstanceCount   = 0;
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gConstraintFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LOG_CONSTRAINT");
+
+uint32_t mCurrentInstanceCount = 0;
+uint32_t mTotalInstanceCount   = 0;
 #endif
+
+#if defined(DEBUG_ENABLED)
+#define DALI_LOG_CONSTRAINT_INFO(format, ...) \
+  DALI_LOG_INFO(gConstraintFilter, Debug::Verbose, format, ##__VA_ARGS__)
+#else
+#define DALI_LOG_CONSTRAINT_INFO(format, ...)
+#endif
+} // namespace
 
 ConstraintBase::ConstraintBase(PropertyOwnerContainer& ownerSet, RemoveAction removeAction, uint32_t applyRate)
 : mRemoveAction(removeAction),
@@ -38,6 +53,7 @@ ConstraintBase::ConstraintBase(PropertyOwnerContainer& ownerSet, RemoveAction re
   mObservedOwners(ownerSet),
   mLifecycleObserver(nullptr)
 {
+  DALI_LOG_CONSTRAINT_INFO("SG[%p](r:%d, c:%d)\n", this, mApplyRate, mAppliedCount);
 #ifdef DEBUG_ENABLED
   ++mCurrentInstanceCount;
   ++mTotalInstanceCount;
@@ -46,6 +62,7 @@ ConstraintBase::ConstraintBase(PropertyOwnerContainer& ownerSet, RemoveAction re
 
 ConstraintBase::~ConstraintBase()
 {
+  DALI_LOG_CONSTRAINT_INFO("~SG[%p](r:%d, c:%d)\n", this, mApplyRate, mAppliedCount);
   if(!mDisconnected)
   {
     StopObservation();

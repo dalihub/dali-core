@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_PIPELINE_CACHE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,8 @@ struct PipelineCacheL1
 
   PipelineCacheL2Container noBlends; // special case
   PipelineCacheL2Container level2nodes;
+
+  Graphics::UniquePtr<Graphics::Pipeline> dynamicBlendPipeline{};
 };
 
 /**
@@ -202,6 +204,7 @@ struct PipelineCacheQueryInfo
   // Blending
   bool             blendingEnabled;
   bool             alphaPremultiplied;
+  bool             isDynamicBlendEnabled;
   BlendingOptions* blendingOptions;
 
   // Lightweight hash value before compare each query.
@@ -258,6 +261,12 @@ public:
    * @param pipelineCache The pipeline cache to decrease the reference count
    */
   void ResetPipeline(PipelineCachePtr pipelineCache);
+
+  /**
+   * @brief Check if dynamic blending is enabled
+   * @return True if dynamic blending is enabled, false otherwise
+   */
+  bool IsDynamicBlendEnabled() const;
 
 public: // From Program::LifecycleObserver
   /**
@@ -324,8 +333,10 @@ private:
   PipelineResult         mLatestResult[2]; ///< Latest used result. It will be invalidate when we call CleanLatestUsedCache() or some cache changed.
 
   uint32_t mFrameCount{0u};
-
   const bool mPipelineUseRenderTarget; ///< Ask from Graphics::Controller
+  mutable uint32_t mSupportedDynamicStates{0u};
+  mutable bool mDynamicBlendEnabled{false};
+  mutable bool mDeviceCapabilitiesCached{false};
 };
 
 } // namespace Render
