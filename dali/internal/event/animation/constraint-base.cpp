@@ -288,6 +288,58 @@ uint32_t ConstraintBase::GetTag() const
   return mTag;
 }
 
+Dali::Constraint::State ConstraintBase::GetState() const
+{
+  if(DALI_UNLIKELY(mSourceDestroyed))
+  {
+    return Dali::Constraint::State::OBJECT_DESTROYED;
+  }
+  if(!mApplied)
+  {
+    return Dali::Constraint::State::INITIALIZED;
+  }
+
+  // Applied cases
+  if(mSceneGraphConstraint)
+  {
+    return mIsPreConstraint ? Dali::Constraint::State::APPLIED : Dali::Constraint::State::POST_APPLIED;
+  }
+  else
+  {
+    return mIsPreConstraint ? Dali::Constraint::State::APPLIED_OBJECT_OFF_SCENE : Dali::Constraint::State::POST_APPLIED_OBJECT_OFF_SCENE;
+  }
+}
+
+uint32_t ConstraintBase::GetSourceCount() const
+{
+  return static_cast<uint32_t>(mSources.size());
+}
+
+Dali::ConstraintSource ConstraintBase::GetSourceAt(uint32_t index) const
+{
+  DALI_ASSERT_ALWAYS(index < static_cast<uint32_t>(mSources.size()) && "Constraint GetSourceAt index out of bounds");
+
+  const Source& internalSource = mSources[index];
+
+  switch(internalSource.sourceType)
+  {
+    case Dali::SourceType::OBJECT_PROPERTY:
+    {
+      auto handle = Dali::Handle(internalSource.object);
+      return Dali::ConstraintSource(Dali::Source(handle, internalSource.propertyIndex));
+    }
+    case Dali::SourceType::LOCAL_PROPERTY:
+    default: ///< Never ever comes here, but for coverage.
+    {
+      return Dali::ConstraintSource(Dali::LocalSource(internalSource.propertyIndex));
+    }
+    case Dali::SourceType::PARENT_PROPERTY:
+    {
+      return Dali::ConstraintSource(Dali::ParentSource(internalSource.propertyIndex));
+    }
+  }
+}
+
 void ConstraintBase::SceneObjectAdded(Object& object)
 {
   DALI_LOG_CONSTRAINT_INFO("Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] SceneObjectAdded()\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate);
