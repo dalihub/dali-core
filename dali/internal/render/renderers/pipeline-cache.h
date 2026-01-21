@@ -63,7 +63,7 @@ struct PipelineCacheL2
  */
 struct PipelineCacheL1
 {
-  PipelineCacheL2Ptr GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions);
+  PipelineCacheL2Ptr GetPipelineCacheL2(bool blend, bool isDynamicBlendEnabled, bool premul, BlendingOptions& blendingOptions);
 
   /**
    * @brief Clear unused caches.
@@ -74,10 +74,9 @@ struct PipelineCacheL1
   Graphics::RasterizationState rs{};
   Graphics::InputAssemblyState ia{};
 
-  PipelineCacheL2Container noBlends; // special case
+  PipelineCacheL2Container noBlends;              // special case
+  PipelineCacheL2Container dynamicBlendPipelines; // special case
   PipelineCacheL2Container level2nodes;
-
-  Graphics::UniquePtr<Graphics::Pipeline> dynamicBlendPipeline{};
 };
 
 /**
@@ -268,6 +267,15 @@ public:
    */
   bool IsDynamicBlendEnabled() const;
 
+  /**
+   * @brief Get Graphics::ColorBlendState from blending options
+   *
+   * @param[in] blendEnabled Blend enabled or not.
+   * @param[in] preMultipliedAlpha Whether we use pre-multiplied alpha or not.
+   * @param[in] blendingOptions Option of blending.
+   */
+  static Graphics::ColorBlendState ConvertColorBlendState(bool blendEnabled, bool preMultipliedAlpha, const BlendingOptions& blendingOptions);
+
 public: // From Program::LifecycleObserver
   /**
    * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
@@ -332,11 +340,11 @@ private:
   PipelineCacheQueryInfo mLatestQuery[2];  ///< Latest requested query info. It will be invalidate after query's renderer / geometry / blendingOptions value changed.
   PipelineResult         mLatestResult[2]; ///< Latest used result. It will be invalidate when we call CleanLatestUsedCache() or some cache changed.
 
-  uint32_t mFrameCount{0u};
-  const bool mPipelineUseRenderTarget; ///< Ask from Graphics::Controller
+  uint32_t         mFrameCount{0u};
+  const bool       mPipelineUseRenderTarget; ///< Ask from Graphics::Controller
   mutable uint32_t mSupportedDynamicStates{0u};
-  mutable bool mDynamicBlendEnabled{false};
-  mutable bool mDeviceCapabilitiesCached{false};
+  mutable bool     mDynamicBlendEnabled{false};
+  mutable bool     mDeviceCapabilitiesCached{false};
 };
 
 } // namespace Render

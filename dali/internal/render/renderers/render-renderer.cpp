@@ -87,6 +87,30 @@ inline bool ReuseLatestBoundVertexAttributes(const Render::Geometry* geometry)
   return false;
 }
 
+/**
+ * @brief Store latest bound blending option, and help that we can skip duplicated dynamic blend option bind.
+ *
+ * @param[in] blendingOptions Current blendingOptions to be used, or nullptr if want to reset cache
+ * @return True if we can reuse latest bound blending options. False otherwise.
+ */
+inline bool ReuseLatestBoundBlendingOptions(bool blendEnabled, bool preMultipliedAlpha, const BlendingOptions* blendingOptions)
+{
+  static bool                   gBlendEnabled         = false;
+  static bool                   gPreMultipliedAlpha   = false;
+  static const BlendingOptions* gLatestBlendingOption = nullptr;
+
+  if((gBlendEnabled == blendEnabled) &&
+     (!blendEnabled || gPreMultipliedAlpha == preMultipliedAlpha) &&
+     (gLatestBlendingOption && blendingOptions && (!blendEnabled || gLatestBlendingOption->GetBitmask() == blendingOptions->GetBitmask())))
+  {
+    return true;
+  }
+  gBlendEnabled         = blendEnabled;
+  gPreMultipliedAlpha   = preMultipliedAlpha;
+  gLatestBlendingOption = blendingOptions;
+  return false;
+}
+
 } // namespace
 
 namespace Render
@@ -107,6 +131,9 @@ void Renderer::PrepareCommandBuffer()
 
   // Reset latest geometry informations, So we can bind the first of geometry.
   ReuseLatestBoundVertexAttributes(nullptr);
+
+  // Reset latest blending option infomations, So we can bind the first of dynamic pipeline blending.
+  ReuseLatestBoundBlendingOptions(false, false, nullptr);
 
   // todo : Fill here as many caches as we can store for reduce the number of command buffers
 }
@@ -600,9 +627,8 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     if(!isolatedNotDirect)
     {
-      // Reset cached geometry. We might need to re-bind pipeline and vertex attributes after direct render.
-      ReuseLatestBoundPipeline(nullptr);
-      ReuseLatestBoundVertexAttributes(nullptr);
+      // Reset cached geometry, pipeline, etc. We might need to re-bind pipeline and vertex attributes after direct render.
+      Renderer::PrepareCommandBuffer();
     }
     return true;
   }
@@ -653,35 +679,37 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     if(!ReuseLatestBoundPipeline(&pipeline))
     {
       commandBuffer.BindPipeline(pipeline);
-
-      const auto& colorBlendState = mPipeline->colorBlendState;
-      bool dynamicBlendEnabled = mPipelineCache->IsDynamicBlendEnabled();
-
-      if(dynamicBlendEnabled)
+      if(mPipelineCache->IsDynamicBlendEnabled())
       {
-        if(colorBlendState.blendEnable)
-        {
-          commandBuffer.SetColorBlendEnable(0, true);
-          commandBuffer.SetColorBlendEquation(0,
-                                              colorBlendState.srcColorBlendFactor,
-                                              colorBlendState.dstColorBlendFactor,
-                                              colorBlendState.colorBlendOp,
-                                              colorBlendState.srcAlphaBlendFactor,
-                                              colorBlendState.dstAlphaBlendFactor,
-                                              colorBlendState.alphaBlendOp);
+        // Clear blending options whenever pipeline changed.
+        ReuseLatestBoundBlendingOptions(false, false, nullptr);
+      }
+    }
+    if(mPipelineCache->IsDynamicBlendEnabled() && !ReuseLatestBoundBlendingOptions(blend, mPremultipliedAlphaEnabled, &mBlendingOptions))
+    {
+      if(blend)
+      {
+        const auto& colorBlendState = PipelineCache::ConvertColorBlendState(blend, mPremultipliedAlphaEnabled, mBlendingOptions);
+        commandBuffer.SetColorBlendEnable(0, colorBlendState.blendEnable);
+        commandBuffer.SetColorBlendEquation(0,
+                                            colorBlendState.srcColorBlendFactor,
+                                            colorBlendState.dstColorBlendFactor,
+                                            colorBlendState.colorBlendOp,
+                                            colorBlendState.srcAlphaBlendFactor,
+                                            colorBlendState.dstAlphaBlendFactor,
+                                            colorBlendState.alphaBlendOp);
 
-          if(colorBlendState.colorBlendOp >= Graphics::ADVANCED_BLEND_OPTIONS_START)
-          {
-            commandBuffer.SetColorBlendAdvanced(0,
-                                                true, // srcPremultiplied
-                                                true, // dstPremultiplied
-                                                colorBlendState.colorBlendOp);
-          }
-        }
-        else
+        if(mBlendingOptions.IsAdvancedBlendEquationApplied())
         {
-          commandBuffer.SetColorBlendEnable(0, false);
+          commandBuffer.SetColorBlendAdvanced(0,
+                                              true, // srcPremultiplied. TODO : mPremultipliedAlphaEnabled?
+                                              true, // dstPremultiplied
+                                              colorBlendState.colorBlendOp);
         }
+      }
+      else
+      {
+        commandBuffer.SetColorBlendEnable(0, false);
       }
     }
 

@@ -2,7 +2,7 @@
 #define DALI_BLENDING_OPTIONS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ struct BlendingOptions
    * Query whether current blend equation is advanced option.
    * @return True if current blend equation is advanced.
    */
-  bool IsAdvancedBlendEquationApplied();
+  bool IsAdvancedBlendEquationApplied() const;
 
   /**
    * Query whether input bit mask include advanced blend equation.
