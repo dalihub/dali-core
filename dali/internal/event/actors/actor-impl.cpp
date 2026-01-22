@@ -759,7 +759,7 @@ float Actor::GetCurrentOpacity() const
 
 const Vector4& Actor::GetCurrentWorldColor() const
 {
-  return GetNode().GetWorldColor(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetWorldColor();
 }
 
 void Actor::SetColor(const Vector4& color)

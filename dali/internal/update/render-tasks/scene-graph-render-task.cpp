@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,7 +369,7 @@ const Matrix& RenderTask::GetViewMatrix(BufferIndex bufferIndex) const
 {
   DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
-  return mCameraNode->GetViewMatrix(bufferIndex);
+  return mCameraNode->GetViewMatrix();
 }
 
 const SceneGraph::Camera& RenderTask::GetCamera() const
@@ -382,7 +382,7 @@ const Matrix& RenderTask::GetProjectionMatrix(BufferIndex bufferIndex) const
 {
   DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
-  return mCameraNode->GetProjectionMatrix(bufferIndex);
+  return mCameraNode->GetProjectionMatrix();
 }
 
 RenderInstruction& RenderTask::GetRenderInstruction(BufferIndex updateBufferIndex)
@@ -403,8 +403,8 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
   renderInstruction.Reset(mCameraNode,
                           GetFrameBuffer(),
                           viewportSet ? &viewport : nullptr,
-                                              mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr,
-                                              mRenderedScaleFactor);
+                          mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr,
+                          mRenderedScaleFactor);
 
   if(mRequiresSync &&
      mRefreshRate == Dali::RenderTask::REFRESH_ONCE)

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,24 +113,22 @@ public:
 
   /**
    * Get the view matrix for rendering
-   * @param index of the rendering side
    * @return the view matrix
    */
-  [[nodiscard]] const Matrix* GetViewMatrix(BufferIndex index) const
+  [[nodiscard]] const Matrix* GetViewMatrix() const
   {
     // inlined as this is called once per frame per render instruction
-    return &mCamera->GetViewMatrix(index);
+    return &mCamera->GetViewMatrix();
   }
 
   /**
    * Get the projection matrix for rendering
-   * @param index of the rendering side
    * @return the projection matrix
    */
-  [[nodiscard]] const Matrix* GetProjectionMatrix(BufferIndex index) const
+  [[nodiscard]] const Matrix* GetProjectionMatrix() const
   {
     // inlined as this is called once per frame per render instruction
-    return &mCamera->GetFinalProjectionMatrix(index);
+    return &mCamera->GetFinalProjectionMatrix();
   }
   // for reflection effect
   [[nodiscard]] const Camera* GetCamera() const

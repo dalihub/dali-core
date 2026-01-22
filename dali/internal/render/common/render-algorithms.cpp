@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -784,8 +784,8 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
-  const Matrix* viewMatrix       = instruction.GetViewMatrix(bufferIndex);
-  const Matrix* projectionMatrix = instruction.GetProjectionMatrix(bufferIndex);
+  const Matrix* viewMatrix       = instruction.GetViewMatrix();
+  const Matrix* projectionMatrix = instruction.GetProjectionMatrix();
 
   DALI_ASSERT_DEBUG(viewMatrix);
   DALI_ASSERT_DEBUG(projectionMatrix);

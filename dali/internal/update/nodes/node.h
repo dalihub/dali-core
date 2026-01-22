@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -628,11 +628,10 @@ public:
   /**
    * Sets the color of the node derived from the color of all its parents.
    * @param[in] color The world color.
-   * @param[in] updateBufferIndex The current update buffer index.
    */
-  void SetWorldColor(const Vector4& color, BufferIndex updateBufferIndex)
+  void SetWorldColor(const Vector4& color)
   {
-    mWorldColor.Set(updateBufferIndex, color);
+    mWorldColor.Set(color);
   }
 
   /**
@@ -650,43 +649,31 @@ public:
     bool shouldAvoidRepetitiveInheritance = mParent->GetCacheRendererCount() > 0u;
     if(shouldAvoidRepetitiveInheritance || mColorMode == USE_OWN_COLOR)
     {
-      mWorldColor.Set(updateBufferIndex, mColor[updateBufferIndex]);
+      mWorldColor.Set(mColor[updateBufferIndex]);
     }
     else if(mColorMode == USE_OWN_MULTIPLY_PARENT_ALPHA) // default
     {
       const Vector4& ownColor = mColor[updateBufferIndex];
-      mWorldColor.Set(updateBufferIndex, ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColor(updateBufferIndex).a);
+      mWorldColor.Set(ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColor().a);
     }
     else if(mColorMode == USE_OWN_MULTIPLY_PARENT_COLOR)
     {
-      mWorldColor.Set(updateBufferIndex, mParent->GetWorldColor(updateBufferIndex) * mColor[updateBufferIndex]);
+      mWorldColor.Set(mParent->GetWorldColor() * mColor[updateBufferIndex]);
     }
     else if(mColorMode == USE_PARENT_COLOR)
     {
-      mWorldColor.Set(updateBufferIndex, mParent->GetWorldColor(updateBufferIndex));
+      mWorldColor.Set(mParent->GetWorldColor());
     }
-  }
-
-  /**
-   * Copies the previous inherited scale, if this changed in the previous frame.
-   * This method should be called instead of InheritWorldScale i.e. if the inherited scale
-   * does not need to be recalculated in the current frame.
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void CopyPreviousWorldColor(BufferIndex updateBufferIndex)
-  {
-    mWorldColor.CopyPrevious(updateBufferIndex);
   }
 
   /**
    * Retrieve the color of the node, possibly derived from the color
    * of all its parents, depending on the value of mColorMode.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The world color.
    */
-  const Vector4& GetWorldColor(BufferIndex bufferIndex) const
+  const Vector4& GetWorldColor() const
   {
-    return mWorldColor[bufferIndex];
+    return mWorldColor.Get();
   }
 
   /**
@@ -1137,9 +1124,9 @@ private: // from NodeDataProvider
   /**
    * @copydoc NodeDataProvider::GetRenderColor
    */
-  const Vector4& GetRenderColor(BufferIndex bufferIndex) const override
+  const Vector4& GetRenderColor() const override
   {
-    return GetWorldColor(bufferIndex);
+    return GetWorldColor();
   }
 
   /**

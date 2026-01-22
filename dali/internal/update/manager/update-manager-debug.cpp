@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ void PrintNodeTree(const Node& node, BufferIndex bufferIndex, std::string indent
             << " World Pos: " << node.GetWorldPosition(bufferIndex)
             << " World Ori: " << node.GetWorldOrientation(bufferIndex)
             << " World Scale: " << node.GetWorldScale(bufferIndex)
-            << " World Color: " << node.GetWorldColor(bufferIndex)
+            << " World Color: " << node.GetWorldColor()
             << " World Matrix: " << node.GetWorldMatrix(bufferIndex)
             << std::endl;
 

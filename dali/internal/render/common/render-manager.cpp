@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -822,8 +822,8 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
       viewportRect = surfaceRect;
     }
 
-    const Matrix* viewMatrix       = instruction.GetViewMatrix(mImpl->renderBufferIndex);
-    const Matrix* projectionMatrix = instruction.GetProjectionMatrix(mImpl->renderBufferIndex);
+    const Matrix* viewMatrix       = instruction.GetViewMatrix();
+    const Matrix* projectionMatrix = instruction.GetProjectionMatrix();
     if(viewMatrix && projectionMatrix)
     {
       const RenderListContainer::SizeType count = instruction.RenderListCount();

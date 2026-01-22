@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,12 +70,7 @@ inline void UpdateRootNodeOpacity(Layer& rootNode, NodePropertyFlags nodeDirtyFl
 {
   if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
-    rootNode.SetWorldColor(rootNode.GetColor(updateBufferIndex), updateBufferIndex);
-  }
-  else
-  {
-    // Copy previous value, in case it changed in the previous frame
-    rootNode.CopyPreviousWorldColor(updateBufferIndex);
+    rootNode.SetWorldColor(rootNode.GetColor(updateBufferIndex));
   }
 }
 
@@ -85,11 +80,6 @@ inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags, Buff
   if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
     node.InheritWorldColor(updateBufferIndex);
-  }
-  else
-  {
-    // Copy inherited value, if changed in the previous frame
-    node.CopyPreviousWorldColor(updateBufferIndex);
   }
 }
 

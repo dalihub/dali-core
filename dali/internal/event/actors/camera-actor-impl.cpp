@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -579,7 +579,7 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
                        static_cast<float>(viewport.height) - (screenCoordinates.y - static_cast<float>(viewport.y)),
                        0.f,
                        1.f);
-    const Matrix& inverseViewProjection = GetCameraSceneObject().GetInverseViewProjectionMatrix(GetEventThreadServices().GetEventBufferIndex());
+    const Matrix& inverseViewProjection = GetCameraSceneObject().GetInverseViewProjectionMatrix();
     success                             = Unproject(near, inverseViewProjection, static_cast<float>(viewport.width), static_cast<float>(viewport.height), near);
 
     // Compute the ray's director vector.
@@ -620,7 +620,7 @@ const Matrix& CameraActor::GetViewMatrix() const
 {
   if(OnScene())
   {
-    return GetCameraSceneObject().GetViewMatrix(GetEventThreadServices().GetEventBufferIndex());
+    return GetCameraSceneObject().GetViewMatrix();
   }
   else
   {
@@ -632,7 +632,7 @@ const Matrix& CameraActor::GetProjectionMatrix() const
 {
   if(OnScene())
   {
-    return GetCameraSceneObject().GetProjectionMatrix(GetEventThreadServices().GetEventBufferIndex());
+    return GetCameraSceneObject().GetProjectionMatrix();
   }
   else
   {
@@ -1075,12 +1075,12 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Inde
     }
     case Dali::CameraActor::Property::PROJECTION_MATRIX:
     {
-      property = GetCameraSceneObject().GetProjectionMatrix();
+      property = GetCameraSceneObject().GetProjectionMatrixProperty();
       break;
     }
     case Dali::CameraActor::Property::VIEW_MATRIX:
     {
-      property = GetCameraSceneObject().GetViewMatrix();
+      property = GetCameraSceneObject().GetViewMatrixProperty();
       break;
     }
     case Dali::CameraActor::Property::INVERT_Y_AXIS:

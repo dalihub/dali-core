@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -318,6 +318,15 @@ void AdjustNearPlaneForOrthographic(Matrix& orthographic, const Vector4& clipPla
   v[14] = scaledPlaneVector.w - 1.0f;
 }
 
+void VectorReflectedByPlane(Vector4& out, Vector4& in, Vector4& plane)
+{
+  float d = float(2.0) * plane.Dot3(in);
+  out.x   = static_cast<float>(in.x - plane.x * d);
+  out.y   = static_cast<float>(in.y - plane.y * d);
+  out.z   = static_cast<float>(in.z - plane.z * d);
+  out.w   = static_cast<float>(in.w - plane.w * d);
+}
+
 } // unnamed namespace
 
 const Dali::Camera::Type                          Camera::DEFAULT_TYPE(Dali::Camera::FREE_LOOK);
@@ -438,15 +447,6 @@ void Camera::SetTargetPosition(const Vector3& targetPosition)
   mUpdateViewFlag = UPDATE_COUNT;
 }
 
-void VectorReflectedByPlane(Vector4& out, Vector4& in, Vector4& plane)
-{
-  float d = float(2.0) * plane.Dot3(in);
-  out.x   = static_cast<float>(in.x - plane.x * d);
-  out.y   = static_cast<float>(in.y - plane.y * d);
-  out.z   = static_cast<float>(in.z - plane.z * d);
-  out.w   = static_cast<float>(in.w - plane.w * d);
-}
-
 void Camera::SetReflectByPlane(const Vector4& plane)
 {
   // Note :  we assume that plane.xyz is normal vector.
@@ -476,9 +476,10 @@ void Camera::SetReflectByPlane(const Vector4& plane)
   v[14] = -2 * plane.z * plane.w;
   v[15] = 1.0f;
 
-  mUseReflection   = true;
-  mReflectionPlane = plane;
-  mUpdateViewFlag  = UPDATE_COUNT;
+  mUseReflection        = true;
+  mReflectionPlane      = plane;
+  mUpdateViewFlag       = UPDATE_COUNT;
+  mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
 void Camera::RotateProjection(int rotationAngle)
@@ -487,24 +488,24 @@ void Camera::RotateProjection(int rotationAngle)
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-const Matrix& Camera::GetProjectionMatrix(BufferIndex bufferIndex) const
+const Matrix& Camera::GetProjectionMatrix() const
 {
-  return mProjectionMatrix[bufferIndex];
+  return mProjectionMatrix.Get();
 }
 
-const Matrix& Camera::GetViewMatrix(BufferIndex bufferIndex) const
+const Matrix& Camera::GetViewMatrix() const
 {
-  return mViewMatrix[bufferIndex];
+  return mViewMatrix.Get();
 }
 
-const Matrix& Camera::GetInverseViewProjectionMatrix(BufferIndex bufferIndex) const
+const Matrix& Camera::GetInverseViewProjectionMatrix() const
 {
-  return mInverseViewProjection[bufferIndex];
+  return mInverseViewProjection;
 }
 
-const Matrix& Camera::GetFinalProjectionMatrix(BufferIndex bufferIndex) const
+const Matrix& Camera::GetFinalProjectionMatrix() const
 {
-  return mFinalProjection[bufferIndex];
+  return mFinalProjection;
 }
 
 const PropertyBase* Camera::GetProjectionMode() const
@@ -532,12 +533,12 @@ const PropertyBase* Camera::GetFarPlaneDistance() const
   return &mFarClippingPlane;
 }
 
-const PropertyInputImpl* Camera::GetProjectionMatrix() const
+const PropertyInputImpl* Camera::GetProjectionMatrixProperty() const
 {
   return &mProjectionMatrix;
 }
 
-const PropertyInputImpl* Camera::GetViewMatrix() const
+const PropertyInputImpl* Camera::GetViewMatrixProperty() const
 {
   return &mViewMatrix;
 }
@@ -587,24 +588,17 @@ void Camera::Update(BufferIndex updateBufferIndex)
   if(viewUpdateCount > COPY_PREVIOUS_MATRIX || projectionUpdateCount > COPY_PREVIOUS_MATRIX)
   {
     // either has actually changed so recalculate
-    MatrixUtils::MultiplyProjectionMatrix(mInverseViewProjection[updateBufferIndex], mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
-    UpdateFrustum(updateBufferIndex);
+    MatrixUtils::MultiplyProjectionMatrix(mInverseViewProjection, mViewMatrix.Get(), mProjectionMatrix.Get());
+    UpdateFrustum();
 
     // ignore the error, if the view projection is incorrect (non inversible) then you will have tough times anyways
-    static_cast<void>(mInverseViewProjection[updateBufferIndex].Invert());
-  }
-  else if(viewUpdateCount == COPY_PREVIOUS_MATRIX || projectionUpdateCount == COPY_PREVIOUS_MATRIX)
-  {
-    // neither has actually changed, but we might copied previous frames value so need to
-    // copy the previous inverse and frustum as well
-    mInverseViewProjection[updateBufferIndex] = mInverseViewProjection[updateBufferIndex ? 0 : 1];
-    mFrustum[updateBufferIndex]               = mFrustum[updateBufferIndex ? 0 : 1];
+    static_cast<void>(mInverseViewProjection.Invert());
   }
 }
 
 bool Camera::ViewMatrixUpdated() const
 {
-  return 0u != mUpdateViewFlag;
+  return UPDATE_COUNT == mUpdateViewFlag;
 }
 
 bool Camera::IsProjectionMatrixAnimated() const
@@ -630,172 +624,167 @@ void Camera::AddInitializeResetter(ResetterManager& manager) const
 uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
 {
   uint32_t retval(mUpdateViewFlag);
-  if(0u != mUpdateViewFlag)
+  if(UPDATE_COUNT == mUpdateViewFlag)
   {
-    if(COPY_PREVIOUS_MATRIX == mUpdateViewFlag)
+    switch(mType)
     {
-      // The projection matrix was updated in the previous frame; copy it
-      mViewMatrix.CopyPrevious(updateBufferIndex);
-    }
-    else // UPDATE_COUNT == mUpdateViewFlag
-    {
-      switch(mType)
+      // camera orientation taken from node - i.e. look in abitrary, unconstrained direction
+      case Dali::Camera::FREE_LOOK:
       {
-        // camera orientation taken from node - i.e. look in abitrary, unconstrained direction
-        case Dali::Camera::FREE_LOOK:
-        {
-          Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-          viewMatrix         = GetWorldMatrix(updateBufferIndex);
+        Matrix& viewMatrix = mViewMatrix.Get();
+        viewMatrix         = GetWorldMatrix(updateBufferIndex);
 
-          if(mUseReflection)
-          {
-            const Matrix& owningNodeMatrix(GetWorldMatrix(updateBufferIndex));
-            Vector3       position{}, scale{};
-            Quaternion    orientation{};
-            owningNodeMatrix.GetTransformComponents(position, orientation, scale);
-            mReflectionEye     = position;
-            mUseReflectionClip = true;
-
-            Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-            Matrix  oldViewMatrix(viewMatrix);
-            MatrixUtils::MultiplyTransformMatrix(viewMatrix, oldViewMatrix, mReflectionMtx);
-          }
-
-          viewMatrix.Invert();
-          mViewMatrix.SetDirty(updateBufferIndex);
-          break;
-        }
-
-        // camera orientation constrained to look at a target
-        case Dali::Camera::LOOK_AT_TARGET:
+        if(mUseReflection)
         {
           const Matrix& owningNodeMatrix(GetWorldMatrix(updateBufferIndex));
-          Vector3       position, scale;
-          Quaternion    orientation;
+          Vector3       position{}, scale{};
+          Quaternion    orientation{};
           owningNodeMatrix.GetTransformComponents(position, orientation, scale);
-          Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
+          mReflectionEye     = position;
+          mUseReflectionClip = true;
 
-          if(mUseReflection)
-          {
-            Vector3 up        = orientation.Rotate(Vector3::YAXIS);
-            Vector4 position4 = Vector4(position);
-            Vector4 target4   = Vector4(mTargetPosition);
-            Vector4 up4       = Vector4(up);
-            Vector4 positionNew;
-            Vector4 targetNew;
-            Vector4 upNew;
-            Vector3 positionNew3;
-            Vector3 targetNewVector3;
-            Vector3 upNew3;
-
-            // eye
-            VectorReflectedByPlane(positionNew, position4, mReflectionPlane);
-            VectorReflectedByPlane(targetNew, target4, mReflectionPlane);
-            VectorReflectedByPlane(upNew, up4, mReflectionPlane);
-
-            positionNew3     = Vector3(positionNew);
-            targetNewVector3 = Vector3(targetNew);
-            upNew3           = Vector3(upNew);
-            LookAt(viewMatrix, positionNew3, targetNewVector3, upNew3);
-
-            // Invert X
-            float* vZ = viewMatrix.AsFloat();
-            vZ[0]     = -vZ[0];
-            vZ[4]     = -vZ[4];
-            vZ[8]     = -vZ[8];
-            vZ[12]    = -vZ[12];
-
-            mReflectionEye     = positionNew;
-            mUseReflectionClip = true;
-          }
-          else
-          {
-            LookAt(viewMatrix, position, mTargetPosition, orientation.Rotate(Vector3::YAXIS));
-          }
-          mViewMatrix.SetDirty(updateBufferIndex);
-          break;
+          Matrix& viewMatrix = mViewMatrix.Get();
+          Matrix  oldViewMatrix(viewMatrix);
+          MatrixUtils::MultiplyTransformMatrix(viewMatrix, oldViewMatrix, mReflectionMtx);
         }
+
+        viewMatrix.Invert();
+        mViewMatrix.SetDirty();
+        break;
+      }
+
+      // camera orientation constrained to look at a target
+      case Dali::Camera::LOOK_AT_TARGET:
+      {
+        const Matrix& owningNodeMatrix(GetWorldMatrix(updateBufferIndex));
+        Vector3       position, scale;
+        Quaternion    orientation;
+        owningNodeMatrix.GetTransformComponents(position, orientation, scale);
+        Matrix& viewMatrix = mViewMatrix.Get();
+
+        if(mUseReflection)
+        {
+          Vector3 up        = orientation.Rotate(Vector3::YAXIS);
+          Vector4 position4 = Vector4(position);
+          Vector4 target4   = Vector4(mTargetPosition);
+          Vector4 up4       = Vector4(up);
+          Vector4 positionNew;
+          Vector4 targetNew;
+          Vector4 upNew;
+          Vector3 positionNew3;
+          Vector3 targetNewVector3;
+          Vector3 upNew3;
+
+          // eye
+          VectorReflectedByPlane(positionNew, position4, mReflectionPlane);
+          VectorReflectedByPlane(targetNew, target4, mReflectionPlane);
+          VectorReflectedByPlane(upNew, up4, mReflectionPlane);
+
+          positionNew3     = Vector3(positionNew);
+          targetNewVector3 = Vector3(targetNew);
+          upNew3           = Vector3(upNew);
+          LookAt(viewMatrix, positionNew3, targetNewVector3, upNew3);
+
+          // Invert X
+          float* vZ = viewMatrix.AsFloat();
+          vZ[0]     = -vZ[0];
+          vZ[4]     = -vZ[4];
+          vZ[8]     = -vZ[8];
+          vZ[12]    = -vZ[12];
+
+          mReflectionEye     = positionNew;
+          mUseReflectionClip = true;
+        }
+        else
+        {
+          LookAt(viewMatrix, position, mTargetPosition, orientation.Rotate(Vector3::YAXIS));
+        }
+        mViewMatrix.SetDirty();
+        break;
       }
     }
     --mUpdateViewFlag;
   }
+  else
+  {
+    mViewMatrix.CleanDirty();
+    mUpdateViewFlag = 0u;
+  }
+
   return retval;
 }
 
-void Camera::UpdateFrustum(BufferIndex updateBufferIndex, bool normalize)
+void Camera::UpdateFrustum(bool normalize)
 {
   // Extract the clip matrix planes
   Matrix clipMatrix(false); // Don't initialize.
-  MatrixUtils::MultiplyProjectionMatrix(clipMatrix, mViewMatrix[updateBufferIndex], mProjectionMatrix[updateBufferIndex]);
+  MatrixUtils::MultiplyProjectionMatrix(clipMatrix, mViewMatrix.Get(), mProjectionMatrix.Get());
 
-  const float*   cm     = clipMatrix.AsFloat();
-  FrustumPlanes& planes = mFrustum[updateBufferIndex];
+  const float* cm = clipMatrix.AsFloat();
 
   // Left
-  planes.mPlanes[0].mNormal.x = cm[3] + cm[0]; // column 4 + column 1
-  planes.mPlanes[0].mNormal.y = cm[7] + cm[4];
-  planes.mPlanes[0].mNormal.z = cm[11] + cm[8];
-  planes.mPlanes[0].mDistance = cm[15] + cm[12];
+  mFrustum.mPlanes[0].mNormal.x = cm[3] + cm[0]; // column 4 + column 1
+  mFrustum.mPlanes[0].mNormal.y = cm[7] + cm[4];
+  mFrustum.mPlanes[0].mNormal.z = cm[11] + cm[8];
+  mFrustum.mPlanes[0].mDistance = cm[15] + cm[12];
 
   // Right
-  planes.mPlanes[1].mNormal.x = cm[3] - cm[0]; // column 4 - column 1
-  planes.mPlanes[1].mNormal.y = cm[7] - cm[4];
-  planes.mPlanes[1].mNormal.z = cm[11] - cm[8];
-  planes.mPlanes[1].mDistance = cm[15] - cm[12];
+  mFrustum.mPlanes[1].mNormal.x = cm[3] - cm[0]; // column 4 - column 1
+  mFrustum.mPlanes[1].mNormal.y = cm[7] - cm[4];
+  mFrustum.mPlanes[1].mNormal.z = cm[11] - cm[8];
+  mFrustum.mPlanes[1].mDistance = cm[15] - cm[12];
 
   // Bottom
-  planes.mPlanes[2].mNormal.x = cm[3] + cm[1]; // column 4 + column 2
-  planes.mPlanes[2].mNormal.y = cm[7] + cm[5];
-  planes.mPlanes[2].mNormal.z = cm[11] + cm[9];
-  planes.mPlanes[2].mDistance = cm[15] + cm[13];
+  mFrustum.mPlanes[2].mNormal.x = cm[3] + cm[1]; // column 4 + column 2
+  mFrustum.mPlanes[2].mNormal.y = cm[7] + cm[5];
+  mFrustum.mPlanes[2].mNormal.z = cm[11] + cm[9];
+  mFrustum.mPlanes[2].mDistance = cm[15] + cm[13];
 
   // Top
-  planes.mPlanes[3].mNormal.x = cm[3] - cm[1]; // column 4 - column 2
-  planes.mPlanes[3].mNormal.y = cm[7] - cm[5];
-  planes.mPlanes[3].mNormal.z = cm[11] - cm[9];
-  planes.mPlanes[3].mDistance = cm[15] - cm[13];
+  mFrustum.mPlanes[3].mNormal.x = cm[3] - cm[1]; // column 4 - column 2
+  mFrustum.mPlanes[3].mNormal.y = cm[7] - cm[5];
+  mFrustum.mPlanes[3].mNormal.z = cm[11] - cm[9];
+  mFrustum.mPlanes[3].mDistance = cm[15] - cm[13];
 
   // Near
-  planes.mPlanes[4].mNormal.x = cm[3] + cm[2]; // column 4 + column 3
-  planes.mPlanes[4].mNormal.y = cm[7] + cm[6];
-  planes.mPlanes[4].mNormal.z = cm[11] + cm[10];
-  planes.mPlanes[4].mDistance = cm[15] + cm[14];
+  mFrustum.mPlanes[4].mNormal.x = cm[3] + cm[2]; // column 4 + column 3
+  mFrustum.mPlanes[4].mNormal.y = cm[7] + cm[6];
+  mFrustum.mPlanes[4].mNormal.z = cm[11] + cm[10];
+  mFrustum.mPlanes[4].mDistance = cm[15] + cm[14];
 
   // Far
-  planes.mPlanes[5].mNormal.x = cm[3] - cm[2]; // column 4 - column 3
-  planes.mPlanes[5].mNormal.y = cm[7] - cm[6];
-  planes.mPlanes[5].mNormal.z = cm[11] - cm[10];
-  planes.mPlanes[5].mDistance = cm[15] - cm[14];
+  mFrustum.mPlanes[5].mNormal.x = cm[3] - cm[2]; // column 4 - column 3
+  mFrustum.mPlanes[5].mNormal.y = cm[7] - cm[6];
+  mFrustum.mPlanes[5].mNormal.z = cm[11] - cm[10];
+  mFrustum.mPlanes[5].mDistance = cm[15] - cm[14];
 
   if(normalize)
   {
     for(uint32_t i = 0; i < 6; ++i)
     {
       // Normalize planes to ensure correct bounding distance checking
-      Plane& plane = planes.mPlanes[i];
+      Plane& plane = mFrustum.mPlanes[i];
       float  l     = 1.0f / plane.mNormal.Length();
       plane.mNormal *= l;
       plane.mDistance *= l;
 
-      planes.mSign[i] = Vector3(Sign(plane.mNormal.x), Sign(plane.mNormal.y), Sign(plane.mNormal.z));
+      mFrustum.mSign[i] = Vector3(Sign(plane.mNormal.x), Sign(plane.mNormal.y), Sign(plane.mNormal.z));
     }
   }
   else
   {
     for(uint32_t i = 0; i < 6; ++i)
     {
-      planes.mSign[i] = Vector3(Sign(planes.mPlanes[i].mNormal.x), Sign(planes.mPlanes[i].mNormal.y), Sign(planes.mPlanes[i].mNormal.z));
+      mFrustum.mSign[i] = Vector3(Sign(mFrustum.mPlanes[i].mNormal.x), Sign(mFrustum.mPlanes[i].mNormal.y), Sign(mFrustum.mPlanes[i].mNormal.z));
     }
   }
-  mFrustum[updateBufferIndex ? 0 : 1] = planes;
 }
 
-bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius) const
+bool Camera::CheckSphereInFrustum(const Vector3& origin, float radius) const
 {
-  const FrustumPlanes& planes = mFrustum[bufferIndex];
   for(uint32_t i = 0; i < 6; ++i)
   {
-    if((planes.mPlanes[i].mDistance + planes.mPlanes[i].mNormal.Dot(origin)) < -radius)
+    if((mFrustum.mPlanes[i].mDistance + mFrustum.mPlanes[i].mNormal.Dot(origin)) < -radius)
     {
       return false;
     }
@@ -803,12 +792,11 @@ bool Camera::CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin
   return true;
 }
 
-bool Camera::CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents) const
+bool Camera::CheckAABBInFrustum(const Vector3& origin, const Vector3& halfExtents) const
 {
-  const FrustumPlanes& planes = mFrustum[bufferIndex];
   for(uint32_t i = 0; i < 6; ++i)
   {
-    if(planes.mPlanes[i].mNormal.Dot(origin + (halfExtents * planes.mSign[i])) > -(planes.mPlanes[i].mDistance))
+    if(mFrustum.mPlanes[i].mNormal.Dot(origin + (halfExtents * mFrustum.mSign[i])) > -(mFrustum.mPlanes[i].mDistance))
     {
       continue;
     }
@@ -817,6 +805,7 @@ bool Camera::CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, 
   }
   return true;
 }
+
 Dali::Rect<int32_t> Camera::GetOrthographicClippingBox(BufferIndex bufferIndex) const
 {
   const float orthographicSize = mOrthographicSize[bufferIndex];
@@ -831,119 +820,113 @@ Dali::Rect<int32_t> Camera::GetOrthographicClippingBox(BufferIndex bufferIndex) 
 uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
 {
   uint32_t retval(mUpdateProjectionFlag);
-  // Early-exit if no update required
-  if(0u != mUpdateProjectionFlag)
+
+  if(UPDATE_COUNT == mUpdateProjectionFlag)
   {
-    Matrix& finalProjection = mFinalProjection[updateBufferIndex];
-    finalProjection.SetIdentity();
-
-    if(COPY_PREVIOUS_MATRIX == mUpdateProjectionFlag)
+    switch(mProjectionMode[0])
     {
-      // The projection matrix was updated in the previous frame; copy it
-      mProjectionMatrix.CopyPrevious(updateBufferIndex);
+      case Dali::Camera::PERSPECTIVE_PROJECTION:
+      {
+        Matrix& projectionMatrix = mProjectionMatrix.Get();
+        Perspective(projectionMatrix,
+                    static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
+                    mFieldOfView[updateBufferIndex],
+                    mAspectRatio[updateBufferIndex],
+                    mNearClippingPlane[updateBufferIndex],
+                    mFarClippingPlane[updateBufferIndex],
+                    mInvertYAxis[0]);
 
-      finalProjection = mFinalProjection[updateBufferIndex ? 0 : 1];
+        // need to apply custom clipping plane
+        if(mUseReflectionClip)
+        {
+          Matrix& viewMatrix = mViewMatrix.Get();
+          Matrix  viewInv    = viewMatrix;
+          viewInv.Invert();
+          viewInv.Transpose();
+
+          Dali::Vector4 adjReflectPlane = mReflectionPlane;
+          float         d               = mReflectionPlane.Dot3(mReflectionEye);
+          if(d < 0)
+          {
+            // Original eyesight was behind of mReflectionPlane. Reverse the plane.
+            adjReflectPlane = -adjReflectPlane;
+          }
+
+          Vector4 customClipping = viewInv * adjReflectPlane;
+          AdjustNearPlaneForPerspective(projectionMatrix, customClipping, mFarClippingPlane[updateBufferIndex]);
+        }
+        break;
+      }
+      case Dali::Camera::ORTHOGRAPHIC_PROJECTION:
+      {
+        Matrix& projectionMatrix = mProjectionMatrix.Get();
+        Orthographic(projectionMatrix,
+                     static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
+                     mOrthographicSize[updateBufferIndex],
+                     mAspectRatio[updateBufferIndex],
+                     mNearClippingPlane[updateBufferIndex],
+                     mFarClippingPlane[updateBufferIndex],
+                     mInvertYAxis[0]);
+
+        // need to apply custom clipping plane
+        if(mUseReflectionClip)
+        {
+          Matrix& viewMatrix = mViewMatrix.Get();
+          Matrix  viewInv    = viewMatrix;
+          viewInv.Invert();
+          viewInv.Transpose();
+
+          Dali::Vector4 adjReflectPlane = mReflectionPlane;
+          float         d               = mReflectionPlane.Dot3(mReflectionEye);
+          if(d < 0)
+          {
+            // Original eyesight was behind of mReflectionPlane. Reverse the plane.
+            adjReflectPlane = -adjReflectPlane;
+          }
+
+          Vector4 customClipping = viewInv * adjReflectPlane;
+          AdjustNearPlaneForOrthographic(projectionMatrix, customClipping, mFarClippingPlane[updateBufferIndex]);
+        }
+        break;
+      }
     }
-    else // UPDATE_COUNT == mUpdateProjectionFlag
+
+    mProjectionMatrix.SetDirty();
+
+    Quaternion rotationAngle;
+    switch(mProjectionRotation)
     {
-      switch(mProjectionMode[0])
+      case 90:
       {
-        case Dali::Camera::PERSPECTIVE_PROJECTION:
-        {
-          Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
-          Perspective(projectionMatrix,
-                      static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
-                      mFieldOfView[updateBufferIndex],
-                      mAspectRatio[updateBufferIndex],
-                      mNearClippingPlane[updateBufferIndex],
-                      mFarClippingPlane[updateBufferIndex],
-                      mInvertYAxis[0]);
-
-          // need to apply custom clipping plane
-          if(mUseReflectionClip)
-          {
-            Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-            Matrix  viewInv    = viewMatrix;
-            viewInv.Invert();
-            viewInv.Transpose();
-
-            Dali::Vector4 adjReflectPlane = mReflectionPlane;
-            float         d               = mReflectionPlane.Dot3(mReflectionEye);
-            if(d < 0)
-            {
-              // Original eyesight was behind of mReflectionPlane. Reverse the plane.
-              adjReflectPlane = -adjReflectPlane;
-            }
-
-            Vector4 customClipping = viewInv * adjReflectPlane;
-            AdjustNearPlaneForPerspective(projectionMatrix, customClipping, mFarClippingPlane[updateBufferIndex]);
-          }
-          break;
-        }
-        case Dali::Camera::ORTHOGRAPHIC_PROJECTION:
-        {
-          Matrix& projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
-          Orthographic(projectionMatrix,
-                       static_cast<Dali::DevelCameraActor::ProjectionDirection>(mProjectionDirection[0]),
-                       mOrthographicSize[updateBufferIndex],
-                       mAspectRatio[updateBufferIndex],
-                       mNearClippingPlane[updateBufferIndex],
-                       mFarClippingPlane[updateBufferIndex],
-                       mInvertYAxis[0]);
-
-          // need to apply custom clipping plane
-          if(mUseReflectionClip)
-          {
-            Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-            Matrix  viewInv    = viewMatrix;
-            viewInv.Invert();
-            viewInv.Transpose();
-
-            Dali::Vector4 adjReflectPlane = mReflectionPlane;
-            float         d               = mReflectionPlane.Dot3(mReflectionEye);
-            if(d < 0)
-            {
-              // Original eyesight was behind of mReflectionPlane. Reverse the plane.
-              adjReflectPlane = -adjReflectPlane;
-            }
-
-            Vector4 customClipping = viewInv * adjReflectPlane;
-            AdjustNearPlaneForOrthographic(projectionMatrix, customClipping, mFarClippingPlane[updateBufferIndex]);
-          }
-          break;
-        }
+        rotationAngle = Quaternion(Dali::ANGLE_90, Vector3::ZAXIS);
+        break;
       }
-
-      mProjectionMatrix.SetDirty(updateBufferIndex);
-
-      Quaternion rotationAngle;
-      switch(mProjectionRotation)
+      case 180:
       {
-        case 90:
-        {
-          rotationAngle = Quaternion(Dali::ANGLE_90, Vector3::ZAXIS);
-          break;
-        }
-        case 180:
-        {
-          rotationAngle = Quaternion(Dali::ANGLE_180, Vector3::ZAXIS);
-          break;
-        }
-        case 270:
-        {
-          rotationAngle = Quaternion(Dali::ANGLE_270, Vector3::ZAXIS);
-          break;
-        }
-        default:
-          rotationAngle = Quaternion(Dali::ANGLE_0, Vector3::ZAXIS);
-          break;
+        rotationAngle = Quaternion(Dali::ANGLE_180, Vector3::ZAXIS);
+        break;
       }
-
-      // TODO : Can't we make finalProjection without matrix multiply?
-      MatrixUtils::Multiply(finalProjection, mProjectionMatrix.Get(updateBufferIndex), rotationAngle);
+      case 270:
+      {
+        rotationAngle = Quaternion(Dali::ANGLE_270, Vector3::ZAXIS);
+        break;
+      }
+      default:
+        rotationAngle = Quaternion(Dali::ANGLE_0, Vector3::ZAXIS);
+        break;
     }
+
+    // TODO : Can't we make finalProjection without matrix multiply?
+    MatrixUtils::Multiply(mFinalProjection, mProjectionMatrix.Get(), rotationAngle);
+
     --mUpdateProjectionFlag;
   }
+  else
+  {
+    mProjectionMatrix.CleanDirty();
+    mUpdateProjectionFlag = 0u;
+  }
+
   return retval;
 }
 
