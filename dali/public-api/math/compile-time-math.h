@@ -145,11 +145,7 @@ struct Epsilon
 {
   // take log10 of the number to get to the nearest power of 10 number and divide that by 10
   // template recursion will take care of the rest
-#ifdef _CPP11
   static constexpr float value = 10.0f * Epsilon<Power<10, Log<N, 10>::value>::value / 10>::value;
-#else
-  static const float value = 10.0f * Epsilon<Power<10, Log<N, 10>::value>::value / 10>::value;
-#endif
 };
 
 /**
@@ -161,11 +157,7 @@ struct Epsilon
 template<>
 struct Epsilon<1>
 {
-#ifdef _CPP11
   static constexpr float value = FLT_EPSILON;
-#else
-  static const float value = FLT_EPSILON;
-#endif
 };
 
 /**
@@ -177,11 +169,7 @@ struct Epsilon<1>
 template<>
 struct Epsilon<0>
 {
-#ifdef _CPP11
   static constexpr float value = FLT_MIN;
-#else
-  static const float value = FLT_MIN;
-#endif
 };
 
 /**
