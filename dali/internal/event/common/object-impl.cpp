@@ -1337,11 +1337,21 @@ void Object::RegisterAnimatableProperty(const TypeInfo&        typeInfo,
   // If the property is not a component of a base property, register the whole property itself.
   auto            propertyName = ConstString(typeInfo.GetPropertyName(index));
   Property::Value initialValue;
+  bool            valueSet = false;
+
   if(value)
   {
     initialValue = *value;
+
+    // Check whether value type is match with property type.
+    auto propertyType = typeInfo.GetPropertyType(index);
+    if(propertyType == Property::NONE || initialValue.ConvertType(propertyType))
+    {
+      valueSet = true;
+    }
   }
-  else
+
+  if(!valueSet)
   {
     initialValue = typeInfo.GetPropertyDefaultValue(index); // recurses type hierarchy
     if(Property::NONE == initialValue.GetType())
@@ -1349,7 +1359,7 @@ void Object::RegisterAnimatableProperty(const TypeInfo&        typeInfo,
       initialValue = Property::Value(typeInfo.GetPropertyType(index)); // recurses type hierarchy
     }
   }
-  RegisterSceneGraphProperty(propertyName, Property::INVALID_KEY, index, initialValue);
+  RegisterSceneGraphProperty(propertyName, Property::INVALID_KEY, index, std::move(initialValue));
 
   // Add uniform mapping automatically only if index is not rage of WITHOUT_UNIFORM.
   if(!(ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX <= index && index <= ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_MAX_INDEX))
