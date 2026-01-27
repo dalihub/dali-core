@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_FRAME_BUFFER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,7 +195,7 @@ private:                                        // data
   uint32_t   mHeight;
   Mask       mAttachments; ///< Bit-mask of type FrameBuffer::Attachment::Mask
   uint8_t    mColorAttachmentCount;
-  uint8_t    mMultiSamplingLevel{0};
+  uint8_t    mMultiSamplingLevel{1};
 };
 
 } // namespace Internal
