@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/camera-actor-devel.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/inherited-property.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/actors/camera-actor.h>
@@ -283,33 +282,30 @@ public:
   }
 
   /**
-   * Retrieve the view-matrix; this is double buffered for input handling.
-   * @param[in] bufferIndex The buffer to read from.
+   * Retrieve the view-matrix.
    * @return The view-matrix.
    */
-  const Matrix& GetViewMatrix(BufferIndex bufferIndex) const;
+  const Matrix& GetViewMatrix() const;
 
   /**
    * @brief Check to see if a sphere lies within the view frustum.
    *
-   * @param bufferIndex The buffer to read from.
    * @param origin The world position center of the sphere to check.
    * @param radius The length of the sphere radius in world scale.
    *
    * @return false if the sphere lies outside of the frustum.
    */
-  bool CheckSphereInFrustum(BufferIndex bufferIndex, const Vector3& origin, float radius) const;
+  bool CheckSphereInFrustum(const Vector3& origin, float radius) const;
 
   /**
    * @brief Check to see if a bounding box lies within the view frustum.
    *
-   * @param bufferIndex The buffer to read from.
    * @param origin the world position center of the cubeoid to check.
    * @param halfExtents The half length of the cubeoid in world co-ordinates in each axis.
    *
    * @return false if the cubeoid lies completely outside of the frustum, true otherwise
    */
-  bool CheckAABBInFrustum(BufferIndex bufferIndex, const Vector3& origin, const Vector3& halfExtents) const;
+  bool CheckAABBInFrustum(const Vector3& origin, const Vector3& halfExtents) const;
 
   /**
    * @brief Calculate orthographic clipping box by this camera's orthographic size.
@@ -317,25 +313,22 @@ public:
   Dali::Rect<int32_t> GetOrthographicClippingBox(BufferIndex bufferIndex) const;
 
   /**
-   * Retrieve the projection-matrix; this is double buffered for input handling.
-   * @param[in] bufferIndex The buffer to read from.
+   * Retrieve the projection-matrix.
    * @return The projection-matrix.
    */
-  const Matrix& GetProjectionMatrix(BufferIndex bufferIndex) const;
+  const Matrix& GetProjectionMatrix() const;
 
   /**
-   * Retrieve the inverted view-projection-matrix; this is double buffered for input handling.
-   * @param[in] bufferIndex The buffer to read from.
+   * Retrieve the inverted view-projection-matrix.
    * @return The inverse view-projection-matrix.
    */
-  const Matrix& GetInverseViewProjectionMatrix(BufferIndex bufferIndex) const;
+  const Matrix& GetInverseViewProjectionMatrix() const;
 
   /**
-   * Retrieve the final projection-matrix; this is double buffered for input handling.
-   * @param[in] bufferIndex The buffer to read from.
+   * Retrieve the final projection-matrix.
    * @return The projection-matrix that should be used to render.
    */
-  const Matrix& GetFinalProjectionMatrix(BufferIndex bufferIndex) const;
+  const Matrix& GetFinalProjectionMatrix() const;
 
   /**
    * Retrieve the projection mode property querying interface.
@@ -377,14 +370,14 @@ public:
    * @pre The camera is on-stage.
    * @return The projection-matrix property querying interface.
    */
-  const PropertyInputImpl* GetProjectionMatrix() const;
+  const PropertyInputImpl* GetProjectionMatrixProperty() const;
 
   /**
    * Retrieve the viewMatrix property querying interface.
    * @pre The camera is on-stage.
    * @return The viewMatrix property querying interface.
    */
-  const PropertyInputImpl* GetViewMatrix() const;
+  const PropertyInputImpl* GetViewMatrixProperty() const;
 
   /**
    * Retrieve the value of InvertYAxis property querying interface.
@@ -460,10 +453,9 @@ private:
   /**
    * @brief Extracts the frustum planes.
    *
-   * @param[in] bufferIndex The current update buffer index.
    * @param[in] normalize will normalize plane equation coefficients by default.
    */
-  void UpdateFrustum(BufferIndex updateBufferIndex, bool normalize = true);
+  void UpdateFrustum(bool normalize = true);
 
   uint32_t mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   uint32_t mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
@@ -489,12 +481,12 @@ public:                                                                         
   bool          mUseReflection{false};
   bool          mUseReflectionClip{false};
 
-  InheritedMatrix mViewMatrix;       ///< The viewMatrix; this is double buffered for input handling.
-  InheritedMatrix mProjectionMatrix; ///< The projectionMatrix; this is double buffered for input handling.
+  InheritedMatrix mViewMatrix;       ///< The viewMatrix
+  InheritedMatrix mProjectionMatrix; ///< The projectionMatrix
 
-  DoubleBuffered<FrustumPlanes> mFrustum;               ///< Clipping frustum; double buffered for input handling
-  DoubleBuffered<Matrix>        mInverseViewProjection; ///< Inverted viewprojection; double buffered for input handling
-  DoubleBuffered<Matrix>        mFinalProjection;       ///< Final projection matrix; double buffered for input handling
+  FrustumPlanes mFrustum;               ///< Clipping frustum
+  Matrix        mInverseViewProjection; ///< Inverted viewprojection
+  Matrix        mFinalProjection;       ///< Final projection matrix
 };
 
 } // namespace SceneGraph

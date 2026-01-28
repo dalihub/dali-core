@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,12 +63,15 @@ int UtcDaliInternalPropertyGetValueAddress(void)
   properties.emplace_back(new AnimatableProperty<Matrix>(Matrix::IDENTITY), Matrix::IDENTITY, sizeof(Matrix));
   properties.emplace_back(new AnimatableProperty<Matrix3>(Matrix3::IDENTITY), Matrix3::IDENTITY, sizeof(Matrix3));
 
-  properties.emplace_back(new InheritedVector3(Vector3(1.0f, 1.0f, 1.0f)), Vector3(1.0f, 1.0f, 1.0f), sizeof(Vector3));
   properties.emplace_back(new InheritedColor(Color::SIENNA), Color::SIENNA, sizeof(Vector4));
-  properties.emplace_back(new InheritedQuaternion(), Quaternion(Radian(1.619f), Vector3::ZAXIS), sizeof(Quaternion));
-  static_cast<InheritedQuaternion*>(properties.back().property.get())->Set(0, properties.back().value.Get<Quaternion>());
+  DALI_TEST_EQUALS(static_cast<InheritedColor*>(properties.back().property.get())->InputChanged(), true, TEST_LOCATION);
+  DALI_TEST_VALUE_EQUALS(static_cast<InheritedColor*>(properties.back().property.get())->GetVector4(0), Color::SIENNA, 0.001f, TEST_LOCATION);
+  DALI_TEST_VALUE_EQUALS(static_cast<InheritedColor*>(properties.back().property.get())->GetConstraintInputVector4(0), Color::SIENNA, 0.001f, TEST_LOCATION);
+
   properties.emplace_back(new InheritedMatrix(), Matrix::IDENTITY, sizeof(Matrix));
-  static_cast<InheritedMatrix*>(properties.back().property.get())->Set(0, properties.back().value.Get<Matrix>());
+  static_cast<InheritedMatrix*>(properties.back().property.get())->Set(properties.back().value.Get<Matrix>());
+  DALI_TEST_EQUALS(static_cast<InheritedMatrix*>(properties.back().property.get())->InputChanged(), true, TEST_LOCATION);
+  DALI_TEST_VALUE_EQUALS(static_cast<InheritedMatrix*>(properties.back().property.get())->GetMatrix(0), Matrix::IDENTITY, 0.001f, TEST_LOCATION);
 
   properties.emplace_back(new GesturePropertyBool(), true, sizeof(bool));
   static_cast<GesturePropertyBool*>(properties.back().property.get())->Set(true);

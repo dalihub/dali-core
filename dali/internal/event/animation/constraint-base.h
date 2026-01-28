@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTIVE_CONSTRAINT_BASE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,21 @@ public:
    * @copydoc Dali::Constraint::GetTag()
    */
   uint32_t GetTag() const;
+
+  /**
+   * @copydoc Dali::Constraint::GetState()
+   */
+  Dali::Constraint::State GetState() const;
+
+  /**
+   * @copydoc Dali::Constraint::GetSourceCount()
+   */
+  uint32_t GetSourceCount() const;
+
+  /**
+   * @copydoc Dali::Constraint::GetSourceAt()
+   */
+  Dali::ConstraintSource GetSourceAt(uint32_t index) const;
 
 private: // Object::Observer methods
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,7 +204,7 @@ bool IsWithinSourceActors(const Actor& sourceActor, Actor& actor)
       break;
     }
 
-    if(currentActor->GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD)
+    if(!!(currentActor->GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD))
     {
       isInside = false;
       break;
@@ -219,13 +219,13 @@ void FindOffScreenRenderableWithinSubTree(Actor& rootActor, Actor& actor, uint32
   if(&actor != renderableData[subTreeIndex].first)
   {
     // New BACKWARD OffScreen Renderable
-    if(actor.GetOffScreenRenderableType() & OffScreenRenderable::Type::BACKWARD)
+    if(!!(actor.GetOffScreenRenderableType() & OffScreenRenderable::Type::BACKWARD))
     {
       renderableData[subTreeIndex].second.push_back(&actor);
     }
 
     // New FORWARD OffScreen Renderable. It makes new subTree.
-    if(actor.GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD)
+    if(!!(actor.GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD))
     {
       ForwardOffScreenRenderableSubTree newSubTree;
       newSubTree.first = &actor;
@@ -341,7 +341,7 @@ void RenderTaskList::ReorderTasks(Dali::Internal::LayerList& layerList)
         }
       }
 
-      if(subTree.first && subTree.first->GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD)
+      if(subTree.first && !!(subTree.first->GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD))
       {
         std::vector<Dali::RenderTask> tasks;
         subTree.first->GetOffScreenRenderTasks(tasks, true);

@@ -2,7 +2,7 @@
 #define DALI_CONSTRAINT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -286,6 +286,26 @@ public:
   {
     APPLY_ONCE   = 0, ///< Apply constraint once only e.g. bake a property and keep. @SINCE_2_4.37
     APPLY_ALWAYS = 1  ///< Apply constraint every frame. @SINCE_2_4.37
+  };
+
+  /**
+   * @brief Enumeration for the state of the constraint.
+   * @SINCE_2_5.7
+   */
+  enum State
+  {
+    INITIALIZED = 0, ///< Initial state, or removed. @SINCE_2_5.7
+
+    // Apply called case.
+    APPLIED      = 100, ///< Apply() called. @SINCE_2_5.7
+    POST_APPLIED = 101, ///< ApplyPost() called. @SINCE_2_5.7
+
+    // Paused case due to some reason.
+    APPLIED_OBJECT_OFF_SCENE      = 200, ///< Apply() called, but some object scene offed. Will be applied if all scene on again @SINCE_2_5.7
+    POST_APPLIED_OBJECT_OFF_SCENE = 201, ///< ApplyPost() called, but some object scene offed. Will be post-applied if all scene on again @SINCE_2_5.7
+
+    // Stopped case due to some reason.
+    OBJECT_DESTROYED = 300, ///< Object destroyed. Could never be applied again. @SINCE_2_5.7
   };
 
   static const RemoveAction DEFAULT_REMOVE_ACTION; ///< BAKE
@@ -587,6 +607,31 @@ public:
    * @return The tag
    */
   uint32_t GetTag() const;
+
+  /**
+   * @brief Gets the state of constraint.
+   *
+   * @SINCE_2_5.7
+   * @return The state of current constraint.
+   */
+  Constraint::State GetState() const;
+
+  /**
+   * @brief Gets the number of constraint sources.
+   *
+   * @SINCE_2_5.7
+   * @return The number of constraint sources
+   */
+  uint32_t GetSourceCount() const;
+
+  /**
+   * @brief Gets the constraint source at the specified index.
+   *
+   * @SINCE_2_5.7
+   * @param[in] index The index of the constraint source to retrieve
+   * @return The constraint source at the specified index
+   */
+  ConstraintSource GetSourceAt(uint32_t index) const;
 
 public: // Not intended for use by Application developers
   /// @cond internal

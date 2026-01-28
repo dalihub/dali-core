@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1814,11 +1814,11 @@ public:
   void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
   {
     tasks.clear();
-    if(isForward && GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD && mForwardRenderTask)
+    if(isForward && !!(GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD) && mForwardRenderTask)
     {
       tasks.push_back(mForwardRenderTask);
     }
-    if(!isForward && GetOffScreenRenderableType() & OffScreenRenderable::Type::BACKWARD && mBackwardRenderTask)
+    if(!isForward && !!(GetOffScreenRenderableType() & OffScreenRenderable::Type::BACKWARD) && mBackwardRenderTask)
     {
       tasks.push_back(mBackwardRenderTask);
     }

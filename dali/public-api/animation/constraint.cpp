@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,21 @@ void Constraint::SetTag(const uint32_t tag)
 uint32_t Constraint::GetTag() const
 {
   return GetImplementation(*this).GetTag();
+}
+
+Constraint::State Constraint::GetState() const
+{
+  return GetImplementation(*this).GetState();
+}
+
+uint32_t Constraint::GetSourceCount() const
+{
+  return GetImplementation(*this).GetSourceCount();
+}
+
+ConstraintSource Constraint::GetSourceAt(uint32_t index) const
+{
+  return GetImplementation(*this).GetSourceAt(index);
 }
 
 Constraint::Constraint(Internal::ConstraintBase* constraint)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -369,7 +369,7 @@ const Matrix& RenderTask::GetViewMatrix(BufferIndex bufferIndex) const
 {
   DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
-  return mCameraNode->GetViewMatrix(bufferIndex);
+  return mCameraNode->GetViewMatrix();
 }
 
 const SceneGraph::Camera& RenderTask::GetCamera() const
@@ -382,7 +382,12 @@ const Matrix& RenderTask::GetProjectionMatrix(BufferIndex bufferIndex) const
 {
   DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
-  return mCameraNode->GetProjectionMatrix(bufferIndex);
+  return mCameraNode->GetProjectionMatrix();
+}
+
+RenderInstruction& RenderTask::GetRenderInstruction(BufferIndex updateBufferIndex)
+{
+  return mRenderInstruction;
 }
 
 RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBufferIndex)
@@ -394,11 +399,12 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
   Viewport viewport;
   bool     viewportSet = QueryViewport(updateBufferIndex, viewport);
 
-  mRenderInstruction[updateBufferIndex].Reset(mCameraNode,
-                                              GetFrameBuffer(),
-                                              viewportSet ? &viewport : nullptr,
-                                              mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr,
-                                              mRenderedScaleFactor);
+  auto& renderInstruction = GetRenderInstruction(updateBufferIndex);
+  renderInstruction.Reset(mCameraNode,
+                          GetFrameBuffer(),
+                          viewportSet ? &viewport : nullptr,
+                          mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr,
+                          mRenderedScaleFactor);
 
   if(mRequiresSync &&
      mRefreshRate == Dali::RenderTask::REFRESH_ONCE)
@@ -411,16 +417,16 @@ RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBuffer
       mRenderSyncTracker = new Render::RenderTracker();
       mRenderManagerDispatcher->AddRenderTracker(*mRenderSyncTracker);
     }
-    mRenderInstruction[updateBufferIndex].mRenderTracker = mRenderSyncTracker;
+    renderInstruction.mRenderTracker = mRenderSyncTracker;
   }
   else
   {
     // no sync needed, texture FBOs are "ready" the same frame they are rendered to
-    mRenderInstruction[updateBufferIndex].mRenderTracker = nullptr;
+    renderInstruction.mRenderTracker = nullptr;
   }
 
-  mRenderInstruction[updateBufferIndex].mRenderPassTag = mRenderPassTag;
-  return mRenderInstruction[updateBufferIndex];
+  renderInstruction.mRenderPassTag = mRenderPassTag;
+  return renderInstruction;
 }
 
 bool RenderTask::ViewMatrixUpdated()
@@ -536,8 +542,7 @@ void RenderTask::ContextDestroyed()
 
   mRenderManagerDispatcher = nullptr;
 
-  mRenderInstruction[0].ContextDestroyed();
-  mRenderInstruction[1].ContextDestroyed();
+  mRenderInstruction.ContextDestroyed();
 }
 
 void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)

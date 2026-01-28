@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -201,7 +201,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
     const Vector4& boundingSphere = node->GetBoundingSphere();
 
     inside = (boundingSphere.w > Math::MACHINE_EPSILON_1000) &&
-             (camera.CheckSphereInFrustum(updateBufferIndex, Vector3(boundingSphere), boundingSphere.w));
+             (camera.CheckSphereInFrustum(Vector3(boundingSphere), boundingSphere.w));
 
     if(inside && !isLayer3d && viewportSet)
     {

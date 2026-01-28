@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2360,6 +2360,639 @@ int UtcDaliConstraintApplyPost(void)
   PostConstraintTest::CheckComponentProperty(application, actor, targetRenderer);       // Renderer
   PostConstraintTest::CheckComponentProperty(application, actor, targetActor);          // Actor(Node)
   PostConstraintTest::CheckComponentProperty(application, actor, taskList.GetTask(0u)); // RenderTask
+
+  END_TEST;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Constraint::GetSourceCount
+// Constraint::GetSourceAt
+///////////////////////////////////////////////////////////////////////////////
+int UtcDaliConstraintGetSourceCountP(void)
+{
+  // Test GetSourceCount() with various numbers of sources
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Create a constraint with no sources initially
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+
+  // Initially should have 0 sources
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 0u, TEST_LOCATION);
+
+  // Add sources one by one and check count
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 1u, TEST_LOCATION);
+
+  constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 2u, TEST_LOCATION);
+
+  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
+
+  constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 4u, TEST_LOCATION);
+
+  // Apply the constraint and verify count is still correct
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 4u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetSourceCountN(void)
+{
+  // Test GetSourceCount() with uninitialized constraint
+
+  TestApplication application;
+
+  Constraint constraint;
+  try
+  {
+    uint32_t count = constraint.GetSourceCount();
+    (void)count;
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetSourceAtP(void)
+{
+  // Test GetSourceAt() with various source types
+
+  TestApplication application;
+
+  Actor actor       = Actor::New();
+  Actor sourceActor = Actor::New();
+  application.GetScene().Add(actor);
+  application.GetScene().Add(sourceActor);
+
+  // Create a constraint and add different types of sources
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 0u, TEST_LOCATION);
+
+  // Add local source
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 1u, TEST_LOCATION);
+
+  // Add parent source
+  constraint.AddSource(ParentSource(Actor::Property::ORIENTATION));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 2u, TEST_LOCATION);
+
+  // Add object source
+  constraint.AddSource(Source(sourceActor, Actor::Property::COLOR));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
+
+  // Add another local source
+  constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 4u, TEST_LOCATION);
+
+  // Test retrieving each source
+  ConstraintSource source0 = constraint.GetSourceAt(0u);
+  DALI_TEST_EQUALS(source0.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source0.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+
+  ConstraintSource source1 = constraint.GetSourceAt(1u);
+  DALI_TEST_EQUALS(source1.sourceType, Dali::SourceType::PARENT_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source1.propertyIndex, static_cast<Property::Index>(Actor::Property::ORIENTATION), TEST_LOCATION);
+
+  ConstraintSource source2 = constraint.GetSourceAt(2u);
+  DALI_TEST_EQUALS(source2.sourceType, Dali::SourceType::OBJECT_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source2.propertyIndex, static_cast<Property::Index>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_CHECK(source2.object == sourceActor);
+
+  ConstraintSource source3 = constraint.GetSourceAt(3u);
+  DALI_TEST_EQUALS(source3.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(source3.propertyIndex, static_cast<Property::Index>(Actor::Property::VISIBLE), TEST_LOCATION);
+
+  // Apply constraint and verify sources are still accessible
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+
+  // Verify sources after applying
+  ConstraintSource sourceAfterApply = constraint.GetSourceAt(0u);
+  DALI_TEST_EQUALS(sourceAfterApply.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(sourceAfterApply.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetSourceAtN(void)
+{
+  // Test GetSourceAt() with uninitialized constraint
+
+  TestApplication application;
+
+  Constraint constraint;
+  try
+  {
+    ConstraintSource source = constraint.GetSourceAt(0u);
+    (void)source;
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetSourceAtOutOfBoundsN(void)
+{
+  // Test GetSourceAt() with out of bounds index
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 1u, TEST_LOCATION);
+
+  // Test with index equal to count (should be out of bounds)
+  try
+  {
+    ConstraintSource source = constraint.GetSourceAt(1u);
+    (void)source;
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  // Test with index greater than count
+  try
+  {
+    ConstraintSource source = constraint.GetSourceAt(5u);
+    (void)source;
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetSourceAtEmptyConstraintN(void)
+{
+  // Test GetSourceAt() with constraint that has no sources
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 0u, TEST_LOCATION);
+
+  // Test with index 0 on empty constraint
+  try
+  {
+    ConstraintSource source = constraint.GetSourceAt(0u);
+    (void)source;
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetSourceAtWithClone(void)
+{
+  // Test that GetSourceCount() and GetSourceAt() work correctly with cloned constraints
+
+  TestApplication application;
+
+  Actor actor      = Actor::New();
+  Actor cloneActor = Actor::New();
+  application.GetScene().Add(actor);
+  application.GetScene().Add(cloneActor);
+
+  // Create original constraint with sources
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+  constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
+  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
+
+  // Clone the constraint
+  Constraint clonedConstraint = constraint.Clone(cloneActor);
+
+  // Verify original constraint sources
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
+  ConstraintSource originalSource0 = constraint.GetSourceAt(0u);
+  DALI_TEST_EQUALS(originalSource0.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(originalSource0.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+
+  // Verify cloned constraint sources
+  DALI_TEST_EQUALS(clonedConstraint.GetSourceCount(), 3u, TEST_LOCATION);
+  ConstraintSource clonedSource0 = clonedConstraint.GetSourceAt(0u);
+  DALI_TEST_EQUALS(clonedSource0.sourceType, Dali::SourceType::LOCAL_PROPERTY, TEST_LOCATION);
+  DALI_TEST_EQUALS(clonedSource0.propertyIndex, static_cast<Property::Index>(Actor::Property::SIZE), TEST_LOCATION);
+
+  // Apply both constraints and verify sources are still accessible
+  constraint.Apply();
+  clonedConstraint.Apply();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(clonedConstraint.GetSourceCount(), 3u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Constraint::GetState
+///////////////////////////////////////////////////////////////////////////////
+int UtcDaliConstraintGetStateP(void)
+{
+  // Test GetState() with various constraint states
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Create a constraint
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+
+  // Initially should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Apply the constraint - should be in APPLIED state
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Remove the constraint - should return to INITIALIZED state
+  constraint.Remove();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // ApplyPost the constraint - should be in POST_APPLIED state
+  constraint.ApplyPost();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::POST_APPLIED, TEST_LOCATION);
+
+  // Remove the constraint - should return to INITIALIZED state
+  constraint.Remove();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateOffSceneP(void)
+{
+  // Test GetState() when constraint is applied to off-stage actor
+
+  TestApplication application;
+
+  Actor actor = Actor::New(); // Don't add to stage yet
+
+  // Create a constraint
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+
+  // Initially should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Apply the constraint while actor is off-stage - should be in APPLIED state
+  // TODO : Could we change this behavior? For now we cannot control it.
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Add actor to stage - should transition to APPLIED state
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Remove actor from stage - should transition to APPLIED_OBJECT_OFF_SCENE state
+  actor.Unparent();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED_OBJECT_OFF_SCENE, TEST_LOCATION);
+
+  // Add actor to stage - should transition to APPLIED state
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateApplyPostOffSceneP(void)
+{
+  // Test GetState() when ApplyPost is used with off-stage actor
+
+  TestApplication application;
+
+  Actor actor = Actor::New(); // Don't add to stage yet
+
+  // Create a constraint
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+
+  // Initially should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // ApplyPost the constraint while actor is off-stage - should be in POST_APPLIED state
+  // TODO : Could we change this behavior? For now we cannot control it.
+  constraint.ApplyPost();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::POST_APPLIED, TEST_LOCATION);
+
+  // Add actor to stage - should transition to POST_APPLIED state
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::POST_APPLIED, TEST_LOCATION);
+
+  // Remove actor from stage - should transition to POST_APPLIED_OBJECT_OFF_SCENE state
+  actor.Unparent();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::POST_APPLIED_OBJECT_OFF_SCENE, TEST_LOCATION);
+
+  // Add actor to stage - should transition to POST_APPLIED state
+  application.GetScene().Add(actor);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::POST_APPLIED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateSourceOffSceneP(void)
+{
+  // Test GetState() when constraint is created but actor is not yet on stage
+
+  TestApplication application;
+
+  Actor actor       = Actor::New();
+  Actor sourceActor = Actor::New();
+  application.GetScene().Add(actor);
+  application.GetScene().Add(sourceActor);
+
+  // Create a constraint and apply before adding to stage
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+  constraint.AddSource(Source(sourceActor, Actor::Property::SIZE));
+
+  // Initially should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Apply the constraint
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Remove sourceActor from stage - should transition to APPLIED_OBJECT_OFF_SCENE state
+  sourceActor.Unparent();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED_OBJECT_OFF_SCENE, TEST_LOCATION);
+
+  // Add actor to stage - should transition to APPLIED state
+  application.GetScene().Add(sourceActor);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateObjectDestroyedP(void)
+{
+  // Test GetState() when constraint is applied to off-stage actor
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Create a constraint
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+
+  // Initially should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Add actor to stage - should transition to APPLIED state
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Remove actor from stage - should transition to APPLIED_OBJECT_OFF_SCENE state
+  actor.Unparent();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED_OBJECT_OFF_SCENE, TEST_LOCATION);
+
+  // Destroy the actor - should transition to OBJECT_DESTROYED state
+  actor.Reset();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+
+  // State kept as OBJECT_DESTROYED whatever we doing.
+  constraint.Apply();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+  constraint.Remove();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+  constraint.ApplyPost();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateSourceObjectDestroyedP(void)
+{
+  // Test GetState() when constraint is applied to off-stage actor
+
+  TestApplication application;
+
+  Actor actor       = Actor::New();
+  Actor sourceActor = Actor::New();
+  application.GetScene().Add(actor);
+  application.GetScene().Add(sourceActor);
+
+  // Create a constraint
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+  constraint.AddSource(Source(sourceActor, Actor::Property::SIZE));
+
+  // Initially should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Add actor to stage - should transition to APPLIED state
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Remove sourceActor from stage - should transition to APPLIED_OBJECT_OFF_SCENE state
+  sourceActor.Unparent();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED_OBJECT_OFF_SCENE, TEST_LOCATION);
+
+  // Destroy the sourceActor - should transition to OBJECT_DESTROYED state
+  sourceActor.Reset();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+
+  // State kept as OBJECT_DESTROYED whatever we doing.
+  constraint.Apply();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+  constraint.Remove();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+  constraint.ApplyPost();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+  constraint.AddSource(LocalSource(Actor::Property::SIZE));
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::OBJECT_DESTROYED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateMultipleApplyP(void)
+{
+  // Test GetState() when Apply is called multiple times
+
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  // Create a constraint
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+
+  // Initially should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Apply the constraint
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Apply again - should remain in APPLIED state (no-op)
+  constraint.Apply();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // ApplyPost call - should remain in APPLIED state (no-op)
+  constraint.ApplyPost();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateN(void)
+{
+  // Test GetState() with uninitialized constraint
+
+  TestApplication application;
+
+  Constraint constraint;
+  try
+  {
+    Constraint::State state = constraint.GetState();
+    (void)state;
+    DALI_TEST_CHECK(false); // Should not reach here!
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliConstraintGetStateWithCloneP(void)
+{
+  // Test GetState() with cloned constraints
+
+  TestApplication application;
+
+  Actor actor      = Actor::New();
+  Actor cloneActor = Actor::New();
+  application.GetScene().Add(actor);
+  application.GetScene().Add(cloneActor);
+
+  // Create original constraint
+  Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
+  DALI_TEST_CHECK(constraint);
+
+  // Original constraint should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Apply original constraint
+  constraint.Apply();
+
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+
+  // Clone the constraint
+  Constraint clonedConstraint = constraint.Clone(cloneActor);
+  DALI_TEST_CHECK(clonedConstraint);
+
+  // cloned constraints should be in INITIALIZED state
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+  DALI_TEST_EQUALS(clonedConstraint.GetState(), Constraint::INITIALIZED, TEST_LOCATION);
+
+  // Apply cloned constraint
+  clonedConstraint.Apply();
+  application.SendNotification();
+  application.Render();
+
+  // Both should be APPLIED
+  DALI_TEST_EQUALS(constraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
+  DALI_TEST_EQUALS(clonedConstraint.GetState(), Constraint::APPLIED, TEST_LOCATION);
 
   END_TEST;
 }

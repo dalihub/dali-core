@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +89,7 @@ struct Property::Value::Impl
   {
     // DevNote - This feature should be keeped to be opitmized.
     // See patch with name : Added small buffer optimization to Property::Value.
+    static_assert(sizeof(Metadata) == 4);
     static_assert(sizeof(Impl) == 16);
     static_assert(alignof(Impl) == alignof(Impl*));
 
@@ -503,8 +504,8 @@ struct Property::Value::Impl
 
   void SetType(Type typeValue)
   {
-    mData.mMetadata.type = typeValue;
-    mData.mMetadata.hash = 0u; ///< Reset hash value when changing type.
+    mData.mMetadata.type    = typeValue;
+    mData.mMetadata.hash[0] = mData.mMetadata.hash[1] = mData.mMetadata.hash[2] = 0u; ///< Reset hash value when changing type.
   }
 
   bool ConvertType(const Property::Type targetType)
@@ -609,7 +610,9 @@ struct Property::Value::Impl
 
   std::size_t GetHash() const
   {
-    std::size_t hash = mData.mMetadata.hash;
+    std::size_t hash = (static_cast<std::size_t>(mData.mMetadata.hash[0]) << 16) |
+                       (static_cast<std::size_t>(mData.mMetadata.hash[1]) << 8) |
+                       (static_cast<std::size_t>(mData.mMetadata.hash[2]) << 0);
     if(hash == 0u)
     {
       hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
@@ -702,7 +705,9 @@ struct Property::Value::Impl
       // Don't store hash result for array and map type. (Since their value might be changed later)
       if(!(mData.mMetadata.type == Property::ARRAY || mData.mMetadata.type == Property::MAP))
       {
-        mData.mMetadata.hash = hash;
+        mData.mMetadata.hash[0] = static_cast<uint8_t>((hash >> 16) & 0xff);
+        mData.mMetadata.hash[1] = static_cast<uint8_t>((hash >> 8) & 0xff);
+        mData.mMetadata.hash[2] = static_cast<uint8_t>((hash >> 0) & 0xff);
       }
     }
 
@@ -801,13 +806,13 @@ private:
   }
 
   /**
-   * Data for property type and hash value.
+   * Data for property type and hash value with 24-bit.
    */
   struct Metadata
   {
-    Type             type : 8;
-    mutable uint32_t hash : 24;
-  }; // TODO : Tell the compiler it is okay to use a single 32 bit load. For example : __attribute__((packed, aligned(4))) for gcc
+    Type            type : 8;
+    mutable uint8_t hash[3]; ///< Keep as 3 array to support various compiler.
+  };
 
   /*
    * This wrapper struct is used for

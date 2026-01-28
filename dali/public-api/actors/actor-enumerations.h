@@ -2,7 +2,7 @@
 #define DALI_ACTOR_ENUMERATIONS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,13 +194,28 @@ enum Type
  */
 namespace OffScreenRenderable
 {
-enum Type
+enum class Type
 {
   NONE     = 0,                  // The Actor has no OffScreenRenderables. @SINCE_2_3.43
   FORWARD  = 1,                  // The Actor has RenderTasks those need reorder. And the Tasks will draw Actors those placed in front of the Actor. @SINCE_2_3.43
   BACKWARD = 2,                  // The Actor has RenderTasks those need reorder, And the Tasks will draw Actors those placed behinde of the Actor. @SINCE_2_3.43
   BOTH     = FORWARD | BACKWARD, // The Actor has RenderTasks for the both of FORWARD and BACKWARD. @SINCE_2_3.43
 };
+
+inline Type operator&(Type lhs, Type rhs)
+{
+  return static_cast<Type>(static_cast<int>(lhs) & static_cast<int>(rhs));
+}
+
+inline bool operator==(Type lhs, Type rhs)
+{
+  return static_cast<int>(lhs) == static_cast<int>(rhs);
+}
+
+inline bool operator!(Type t)
+{
+  return !static_cast<int>(t);
+}
 } //namespace OffScreenRenderable
 
 /**

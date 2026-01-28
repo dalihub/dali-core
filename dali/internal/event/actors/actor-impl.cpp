@@ -759,7 +759,7 @@ float Actor::GetCurrentOpacity() const
 
 const Vector4& Actor::GetCurrentWorldColor() const
 {
-  return GetNode().GetWorldColor(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetWorldColor();
 }
 
 void Actor::SetColor(const Vector4& color)
@@ -1157,12 +1157,12 @@ void Actor::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool i
 
 void Actor::RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
 {
-  if(offScreenRenderableType & OffScreenRenderable::Type::FORWARD)
+  if(!!(offScreenRenderableType & OffScreenRenderable::Type::FORWARD))
   {
     DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK) != OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK && "Off screen renderable type forward registered more than 16 times!");
     mOffScreenRenderableBitField += OFF_SCREEN_RENDERABLE_TYPE_FORWARD_VALUE;
   }
-  if(offScreenRenderableType & OffScreenRenderable::Type::BACKWARD)
+  if(!!(offScreenRenderableType & OffScreenRenderable::Type::BACKWARD))
   {
     DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK) != OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK && "Off screen renderable type backward registered more than 16 times!");
     mOffScreenRenderableBitField += OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_VALUE;
@@ -1171,12 +1171,12 @@ void Actor::RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenR
 
 void Actor::UnregisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
 {
-  if(offScreenRenderableType & OffScreenRenderable::Type::FORWARD)
+  if(!!(offScreenRenderableType & OffScreenRenderable::Type::FORWARD))
   {
     DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_FORWARD_MASK) != 0 && "Off screen renderable type forward not registered before!");
     mOffScreenRenderableBitField -= OFF_SCREEN_RENDERABLE_TYPE_FORWARD_VALUE;
   }
-  if(offScreenRenderableType & OffScreenRenderable::Type::BACKWARD)
+  if(!!(offScreenRenderableType & OffScreenRenderable::Type::BACKWARD))
   {
     DALI_ASSERT_DEBUG((mOffScreenRenderableBitField & OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_MASK) != 0 && "Off screen renderable type backward not registered before!");
     mOffScreenRenderableBitField -= OFF_SCREEN_RENDERABLE_TYPE_BACKWARD_VALUE;

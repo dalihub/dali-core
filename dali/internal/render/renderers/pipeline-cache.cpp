@@ -364,8 +364,28 @@ void PipelineCacheL0::ClearUnusedCache()
   }
 }
 
-PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, BlendingOptions& blendingOptions)
+PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool isDynamicBlendEnabled, bool premul, BlendingOptions& blendingOptions)
 {
+  // early out
+  if(isDynamicBlendEnabled)
+  {
+    if(DALI_UNLIKELY(dynamicBlendPipelines.empty()))
+    {
+      dynamicBlendPipelines.emplace_back(PipelineCacheL2{});
+    }
+
+    auto& dynamicBlend = *dynamicBlendPipelines.begin();
+
+    if(dynamicBlend.pipeline == nullptr)
+    {
+      // DevNote : We don't use colorBlendState for dynamic blend case. But just clean up for avoid SVACE false alarm.
+      dynamicBlend.hash = 0;
+      memset(&dynamicBlend.colorBlendState, 0, sizeof(Graphics::ColorBlendState));
+    }
+
+    return dynamicBlendPipelines.begin();
+  }
+
   // early out
   if(!blend)
   {
@@ -415,36 +435,9 @@ PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, 
   {
     // create new entry and return it with null pipeline
     PipelineCacheL2 l2{};
-    l2.pipeline           = nullptr;
-    auto& colorBlendState = l2.colorBlendState;
-    colorBlendState.SetBlendEnable(true);
-    Graphics::BlendOp rgbOp   = ConvertBlendEquation(blendingOptions.GetBlendEquationRgb());
-    Graphics::BlendOp alphaOp = ConvertBlendEquation(blendingOptions.GetBlendEquationAlpha());
-    if(blendingOptions.IsAdvancedBlendEquationApplied() && premul)
-    {
-      if(rgbOp != alphaOp)
-      {
-        DALI_LOG_ERROR("Advanced Blend Equation MUST be applied by using BlendEquation.\n");
-        alphaOp = rgbOp;
-      }
-    }
-
-    colorBlendState
-      .SetSrcColorBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendSrcFactorRgb()))
-      .SetSrcAlphaBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendSrcFactorAlpha()))
-      .SetDstColorBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendDestFactorRgb()))
-      .SetDstAlphaBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendDestFactorAlpha()))
-      .SetColorBlendOp(rgbOp)
-      .SetAlphaBlendOp(alphaOp);
-
-    // Blend color is optional and rarely used
-    auto* blendColor = const_cast<Vector4*>(blendingOptions.GetBlendColor());
-    if(blendColor)
-    {
-      colorBlendState.SetBlendConstants(blendColor->AsFloat());
-    }
-
-    l2.hash = blendingOptions.GetBitmask();
+    l2.pipeline        = nullptr;
+    l2.colorBlendState = PipelineCache::ConvertColorBlendState(blend, premul, blendingOptions);
+    l2.hash            = blendingOptions.GetBitmask();
 
     auto upperBound = std::upper_bound(level2nodes.begin(), level2nodes.end(), l2, [](const PipelineCacheL2& lhs, const PipelineCacheL2& rhs)
     { return lhs.hash < rhs.hash; });
@@ -452,7 +445,7 @@ PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, 
     level2nodes.insert(upperBound, std::move(l2));
 
     // run same function to retrieve retval
-    retval = GetPipelineCacheL2(blend, premul, blendingOptions);
+    retval = GetPipelineCacheL2(blend, isDynamicBlendEnabled, premul, blendingOptions);
   }
 
   return retval;
@@ -460,6 +453,15 @@ PipelineCacheL2Ptr PipelineCacheL1::GetPipelineCacheL2(bool blend, bool premul, 
 
 bool PipelineCacheL1::ClearUnusedCache()
 {
+  if(!dynamicBlendPipelines.empty())
+  {
+    if(dynamicBlendPipelines.begin()->referenceCount > 0)
+    {
+      return false;
+    }
+    dynamicBlendPipelines.clear();
+  }
+
   for(auto iter = level2nodes.begin(); iter != level2nodes.end();)
   {
     if(iter->referenceCount == 0)
@@ -472,9 +474,13 @@ bool PipelineCacheL1::ClearUnusedCache()
     }
   }
 
-  if(!noBlends.empty() && noBlends.begin()->referenceCount > 0)
+  if(!noBlends.empty())
   {
-    return false;
+    if(noBlends.begin()->referenceCount > 0)
+    {
+      return false;
+    }
+    noBlends.clear();
   }
 
   return level2nodes.empty();
@@ -554,60 +560,33 @@ PipelineResult PipelineCache::GetPipeline(const PipelineCacheQueryInfo& queryInf
   auto level0 = GetPipelineCacheL0(queryInfo.program, queryInfo.geometry, mPipelineUseRenderTarget ? queryInfo.renderTargetGraphicsObjects : nullptr);
   auto level1 = level0->GetPipelineCacheL1(queryInfo.renderer, queryInfo.cameraUsingReflection);
 
-  PipelineCachePtr level2 = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
+  const bool       isDynamicBlendEnabled = queryInfo.isDynamicBlendEnabled;
+  PipelineCachePtr level2                = level1->GetPipelineCacheL2(queryInfo.blendingEnabled, queryInfo.isDynamicBlendEnabled, queryInfo.alphaPremultiplied, *queryInfo.blendingOptions);
 
   // Create new pipeline at level2 if requested
   if(level2->pipeline == nullptr && createNewIfNotFound)
   {
-    if(IsDynamicBlendEnabled() && queryInfo.blendingEnabled)
+    Graphics::ProgramState programState{};
+    programState.program = &queryInfo.program->GetGraphicsProgram();
+
+    // Create the pipeline
+    Graphics::PipelineCreateInfo createInfo;
+    createInfo
+      .SetInputAssemblyState(&level1->ia)
+      .SetVertexInputState(&level0->inputState)
+      .SetRasterizationState(&level1->rs)
+      .SetColorBlendState(isDynamicBlendEnabled ? nullptr : &level2->colorBlendState)
+      .SetProgramState(&programState)
+      .SetRenderTarget(level0->renderTargetGraphicsObjects ? level0->renderTargetGraphicsObjects->GetGraphicsRenderTarget() : nullptr);
+
+    if(isDynamicBlendEnabled)
     {
-      if(!level1->dynamicBlendPipeline)
-      {
-        Graphics::ProgramState programState{};
-        programState.program = &queryInfo.program->GetGraphicsProgram();
-
-        // Create the pipeline
-        Graphics::PipelineCreateInfo createInfo;
-        createInfo
-          .SetInputAssemblyState(&level1->ia)
-          .SetVertexInputState(&level0->inputState)
-          .SetRasterizationState(&level1->rs)
-          .SetColorBlendState(nullptr)
-          .SetProgramState(&programState)
-          .SetRenderTarget(level0->renderTargetGraphicsObjects ? level0->renderTargetGraphicsObjects->GetGraphicsRenderTarget() : nullptr)
-          .SetDynamicStateMask(mSupportedDynamicStates);
-
-        level1->dynamicBlendPipeline = graphicsController->CreatePipeline(createInfo, nullptr);
-      }
-      // Share the dynamic blend pipeline
-      Graphics::DefaultDeleter<Graphics::Pipeline> deleter;
-      deleter.deleteFunction = [](Graphics::Pipeline*){};
-      level2->pipeline = Graphics::UniquePtr<Graphics::Pipeline>(level1->dynamicBlendPipeline.get(), deleter);
+      createInfo.SetDynamicStateMask(mSupportedDynamicStates);
     }
-    else
-    {
-      Graphics::ProgramState programState{};
-      programState.program = &queryInfo.program->GetGraphicsProgram();
 
-      // Create the pipeline
-      Graphics::PipelineCreateInfo createInfo;
-      createInfo
-        .SetInputAssemblyState(&level1->ia)
-        .SetVertexInputState(&level0->inputState)
-        .SetRasterizationState(&level1->rs)
-        .SetColorBlendState(IsDynamicBlendEnabled() ? nullptr : &level2->colorBlendState)
-        .SetProgramState(&programState)
-        .SetRenderTarget(level0->renderTargetGraphicsObjects ? level0->renderTargetGraphicsObjects->GetGraphicsRenderTarget() : nullptr);
-
-      if(IsDynamicBlendEnabled())
-      {
-        createInfo.SetDynamicStateMask(mSupportedDynamicStates);
-      }
-
-      // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
-      // and re-drawn in multiple instructions).
-      level2->pipeline = graphicsController->CreatePipeline(createInfo, nullptr);
-    }
+    // Store a pipeline per renderer per render (renderer can be owned by multiple nodes,
+    // and re-drawn in multiple instructions).
+    level2->pipeline = graphicsController->CreatePipeline(createInfo, nullptr);
   }
 
   PipelineResult result{};
@@ -782,11 +761,51 @@ bool PipelineCache::IsDynamicBlendEnabled() const
 {
   if(!mDeviceCapabilitiesCached)
   {
-    mSupportedDynamicStates = graphicsController->GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES);
-    mDynamicBlendEnabled = (mSupportedDynamicStates & (Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT | Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT)) != 0;
+    mSupportedDynamicStates   = graphicsController->GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES);
+    mDynamicBlendEnabled      = (mSupportedDynamicStates & (Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT | Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT)) != 0;
     mDeviceCapabilitiesCached = true;
   }
   return mDynamicBlendEnabled;
+}
+
+Graphics::ColorBlendState PipelineCache::ConvertColorBlendState(bool blendEnabled, bool preMultipliedAlpha, const BlendingOptions& blendingOptions)
+{
+  Graphics::ColorBlendState colorBlendState{};
+  if(blendEnabled)
+  {
+    colorBlendState.SetBlendEnable(true);
+
+    Graphics::BlendOp rgbOp   = ConvertBlendEquation(blendingOptions.GetBlendEquationRgb());
+    Graphics::BlendOp alphaOp = ConvertBlendEquation(blendingOptions.GetBlendEquationAlpha());
+    if(blendingOptions.IsAdvancedBlendEquationApplied() && preMultipliedAlpha)
+    {
+      if(rgbOp != alphaOp)
+      {
+        DALI_LOG_ERROR("Advanced Blend Equation MUST be applied by using BlendEquation.\n");
+        alphaOp = rgbOp;
+      }
+    }
+
+    colorBlendState
+      .SetSrcColorBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendSrcFactorRgb()))
+      .SetSrcAlphaBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendSrcFactorAlpha()))
+      .SetDstColorBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendDestFactorRgb()))
+      .SetDstAlphaBlendFactor(ConvertBlendFactor(blendingOptions.GetBlendDestFactorAlpha()))
+      .SetColorBlendOp(rgbOp)
+      .SetAlphaBlendOp(alphaOp);
+
+    // Blend color is optional and rarely used
+    auto* blendColor = const_cast<Vector4*>(blendingOptions.GetBlendColor());
+    if(blendColor)
+    {
+      colorBlendState.SetBlendConstants(blendColor->AsFloat());
+    }
+  }
+  else
+  {
+    colorBlendState.SetBlendEnable(false);
+  }
+  return colorBlendState;
 }
 
 } // namespace Dali::Internal::Render

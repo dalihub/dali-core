@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -397,7 +397,7 @@ void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLaye
     mPartialRenderingData.MakeExpired();
   }
 
-  const Vector4& worldColor = GetWorldColor(updateBufferIndex);
+  const Vector4& worldColor = GetWorldColor();
 
   // TODO : Can't we get modelMatrix and size as const l-value at onces?
   const auto&    transformId = mTransformManagerData.Id();
