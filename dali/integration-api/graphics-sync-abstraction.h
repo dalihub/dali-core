@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GRAPHICS_SYNC_ABSTRACTION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,20 @@ protected:
 public:
   class SyncObject
   {
+  public:
+    /**
+     * @brief Sync object type
+     *
+     * Defines the type of sync object that can be created. Different sync types
+     * provide different synchronization capabilities and are used for different
+     * synchronization scenarios.
+     */
+    enum class SyncType
+    {
+      FENCE_SYNC,       ///< Standard fence sync for GPU-CPU synchronization within the same process
+      NATIVE_FENCE_SYNC ///< Native fence sync that supports cross-process synchronization via file descriptors
+    };
+
   protected:
     /**
      * Virtual protected destructor, no deletion through this interface. This prevents
@@ -71,9 +85,10 @@ public:
   /**
    * Create a synchronisation object based on the resource id, typically that of
    * a framebuffer texture. It can then be polled using the same resource id.
+   * @param[in] type The type of sync object to create (FENCE_SYNC or NATIVE_FENCE_SYNC)
    * @return A pointer to an opaque sync object
    */
-  virtual SyncObject* CreateSyncObject() = 0;
+  virtual SyncObject* CreateSyncObject(SyncObject::SyncType type) = 0;
 
   /**
    * Destroy the synchronisation object.
