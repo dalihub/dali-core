@@ -2,7 +2,7 @@
 #define DALI_DRAWABLE_ACTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,9 @@ public:
   DrawableActor& operator=(DrawableActor&& rhs) noexcept = default;
 
 private:
-  explicit DrawableActor(Internal::DrawableActor* internal);
+  /// @cond internal
+  explicit DALI_INTERNAL DrawableActor(Internal::DrawableActor* internal);
+  /// @endcond
 };
 } // namespace Dali
 
