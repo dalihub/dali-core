@@ -103,6 +103,7 @@ SET(TC_SOURCES
         utc-Dali-CSharp-TypeRegistry.cpp
         utc-Dali-UniformBlock.cpp
         utc-Dali-Utility.cpp
+        utc-Dali-UniquePtr.cpp
         utc-Dali-Vector.cpp
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp

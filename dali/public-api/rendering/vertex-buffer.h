@@ -2,7 +2,7 @@
 #define DALI_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <string>  // std::string
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/handle.h>       // Dali::Handle
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map
 
@@ -78,7 +79,7 @@ public:
    * @return Returns valid VertexBufferUpdateCallback object
    */
   template<class T>
-  static std::unique_ptr<VertexBufferUpdateCallback> New(T* object, FuncType<T> functor)
+  static UniquePtr<VertexBufferUpdateCallback> New(T* object, FuncType<T> functor)
   {
     auto callback = Dali::MakeCallback(object, functor);
     return New(callback);
@@ -94,11 +95,11 @@ public:
   uint32_t Invoke(void* data, size_t size);
 
 private:
-  static std::unique_ptr<VertexBufferUpdateCallback> New(CallbackBase* callbackBase);
+  static UniquePtr<VertexBufferUpdateCallback> New(CallbackBase* callbackBase);
 
   struct Impl;
-  explicit VertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback::Impl>&& impl);
-  std::unique_ptr<Impl> mImpl;
+  explicit VertexBufferUpdateCallback(UniquePtr<VertexBufferUpdateCallback::Impl>&& impl);
+  UniquePtr<Impl> mImpl;
 };
 
 /**
@@ -265,7 +266,7 @@ public:
    *
    * @param[in] updateCallback Valid VertexBufferUpdateCallback object
    */
-  void SetVertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback>&& updateCallback);
+  void SetVertexBufferUpdateCallback(UniquePtr<VertexBufferUpdateCallback>&& updateCallback);
 
   /**
    * @brief Clears attached vertex buffer update callback

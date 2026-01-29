@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
@@ -27,7 +28,6 @@
 #include <dali/public-api/signals/callback.h>
 
 // EXTERNAL INCLUDES
-#include <memory>
 #include <utility>
 
 namespace Dali
@@ -141,9 +141,9 @@ public:
    * @return Unique pointer to the RenderCallback instance
    */
   template<class T>
-  static std::unique_ptr<Dali::RenderCallback> New(T* object, FuncType<T> func)
+  static UniquePtr<Dali::RenderCallback> New(T* object, FuncType<T> func)
   {
-    return std::make_unique<Dali::RenderCallback>(object, func, ExecutionMode::DEFAULT);
+    return MakeUnique<Dali::RenderCallback>(object, func, ExecutionMode::DEFAULT);
   }
 
   /**
@@ -156,9 +156,9 @@ public:
    * @return Unique pointer to the RenderCallback instance
    */
   template<class T>
-  static std::unique_ptr<Dali::RenderCallback> New(T* object, FuncType<T> func, ExecutionMode executionMode)
+  static UniquePtr<Dali::RenderCallback> New(T* object, FuncType<T> func, ExecutionMode executionMode)
   {
-    return std::make_unique<Dali::RenderCallback>(object, func, executionMode);
+    return MakeUnique<Dali::RenderCallback>(object, func, executionMode);
   }
 
   /**
@@ -169,7 +169,7 @@ public:
    */
   explicit operator Dali::CallbackBase*()
   {
-    return mCallback.get();
+    return mCallback.Get();
   }
 
   /**
@@ -237,10 +237,10 @@ public:
   }
 
 private:
-  std::unique_ptr<Dali::CallbackBase> mCallback; //< Callback base object
-  Dali::RenderCallbackInput           mRenderCallbackInput;
-  ExecutionMode                       mExecutionMode{ExecutionMode::DEFAULT};
-  Dali::Vector<Dali::Texture>         mTextureResources{};
+  UniquePtr<Dali::CallbackBase> mCallback; //< Callback base object
+  Dali::RenderCallbackInput     mRenderCallbackInput;
+  ExecutionMode                 mExecutionMode{ExecutionMode::DEFAULT};
+  Dali::Vector<Dali::Texture>   mTextureResources{};
 };
 } // namespace Dali
 

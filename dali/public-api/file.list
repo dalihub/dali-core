@@ -137,6 +137,7 @@ SET( public_api_core_common_header_files
   ${public_api_src_dir}/common/intrusive-ptr.h
   ${public_api_src_dir}/common/type-traits.h
   ${public_api_src_dir}/common/list-wrapper.h
+  ${public_api_src_dir}/common/unique-ptr.h
   ${public_api_src_dir}/common/vector-wrapper.h
 )
 

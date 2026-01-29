@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ void BaseObject::OnDestroy()
   DALI_ASSERT_ALWAYS(mImpl && "~BaseObject OnDestroy should not be called twice!");
 
   // Notify BaseObject::Impl::Observer destroyed first.
-  mImpl.reset();
+  mImpl.Reset();
 }
 
 void BaseObject::RegisterObject()
