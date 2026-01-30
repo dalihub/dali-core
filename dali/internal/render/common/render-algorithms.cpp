@@ -340,7 +340,7 @@ inline void SetupStencilClipping(const RenderItem& item, Graphics::CommandBuffer
  *  - If AUTO is selected for reading, the decision will be based on the Layer Behavior.
  *  - If AUTO is selected for writing, the decision will be based on the items opacity.
  * @param[in]     item                The RenderItem to set up the depth buffer for.
- * @param[in,out] secondaryCommandBuffer The secondary command buffer to write depth commands to
+ * @param[in,out] commandBuffer       The command buffer to write depth commands to
  * @param[in]     depthTestEnabled    True if depth testing has been enabled.
  * @param[in/out] firstDepthBufferUse Initialize to true on the first call, this method will set it to false afterwards.
  */
@@ -598,6 +598,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
 }
 
 inline void RenderAlgorithms::ProcessRenderList(const RenderList&                        renderList,
+                                                Graphics::CommandBuffer&                 commandBuffer,
                                                 BufferIndex                              bufferIndex,
                                                 const Matrix&                            viewMatrix,
                                                 const Matrix&                            projectionMatrix,
@@ -626,18 +627,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   mViewportRectangle = viewport;
 
-  auto* mutableRenderList      = const_cast<RenderList*>(&renderList);
-  auto& secondaryCommandBuffer = mutableRenderList->GetCommandBuffer(mGraphicsController);
-  secondaryCommandBuffer.Reset();
-
-  // We are always "inside" a render pass here.
-  Graphics::CommandBufferBeginInfo info;
-  info.SetUsage(0 | Graphics::CommandBufferUsageFlagBits::RENDER_PASS_CONTINUE)
-    .SetRenderPass(renderPass)
-    .SetRenderTarget(*renderTargetGraphicsObjects.GetGraphicsRenderTarget());
-  secondaryCommandBuffer.Begin(info);
-
-  secondaryCommandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
+  commandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
   mHasLayerScissor = false;
 
   // Setup Scissor testing (for both viewport and per-node scissor)
@@ -648,29 +638,29 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   Graphics::Viewport graphicsViewport = ViewportFromClippingBox(sceneSize, mViewportRectangle, 0);
   if(!rootClippingRect.IsEmpty() && instruction.mFrameBuffer == nullptr)
   {
-    secondaryCommandBuffer.SetScissorTestEnable(true);
-    secondaryCommandBuffer.SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
+    commandBuffer.SetScissorTestEnable(true);
+    commandBuffer.SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
     mScissorStack.push_back(rootClippingRect);
   }
   // We are not performing a layer clip and no clipping rect set. Add the viewport as the root scissor rectangle.
   else if(!renderList.IsClipping() || instruction.mFrameBuffer != nullptr)
   {
-    secondaryCommandBuffer.SetScissorTestEnable(false);
+    commandBuffer.SetScissorTestEnable(false);
     //@todo Vk requires a scissor to be set, as we have turned on dynamic state scissor in the pipelines.
-    secondaryCommandBuffer.SetScissor(Rect2DFromClippingBox(mViewportRectangle, orientation, graphicsViewport));
+    commandBuffer.SetScissor(Rect2DFromClippingBox(mViewportRectangle, orientation, graphicsViewport));
     mScissorStack.push_back(mViewportRectangle);
   }
 
   if(renderList.IsClipping())
   {
-    secondaryCommandBuffer.SetScissorTestEnable(true);
+    commandBuffer.SetScissorTestEnable(true);
     const ClippingBox& layerScissorBox = renderList.GetClippingBox();
-    secondaryCommandBuffer.SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
+    commandBuffer.SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
     mScissorStack.push_back(layerScissorBox);
     mHasLayerScissor = true;
   }
 
-  // Prepare Render::Renderer Render for this secondary command buffer.
+  // Prepare Render::Renderer Render
   Renderer::PrepareCommandBuffer();
 
   const SceneGraph::Node* lastRenderedNode = nullptr;
@@ -712,7 +702,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
     // Set up clipping based on both the Renderer and Actor APIs.
     // The Renderer API will be used if specified. If AUTO, the Actors automatic clipping feature will be used.
-    SetupClipping(item, secondaryCommandBuffer, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction, orientation);
+    SetupClipping(item, commandBuffer, usedStencilBuffer, lastClippingDepth, lastClippingId, stencilBufferAvailable, instruction, orientation);
 
     if(DALI_LIKELY(item.mRenderer))
     {
@@ -723,7 +713,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
       // always disable depth testing and writing. Color Renderers will enable them if the Layer does.
       if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE)
       {
-        SetupDepthBuffer(item, secondaryCommandBuffer, autoDepthTestMode, firstDepthBufferUse);
+        SetupDepthBuffer(item, commandBuffer, autoDepthTestMode, firstDepthBufferUse);
       }
 
       // Depending on whether the renderer has draw commands attached or not the rendering process will
@@ -749,15 +739,14 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(secondaryCommandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTargetGraphicsObjects, queue);
+          item.mRenderer->Render(commandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTargetGraphicsObjects, queue);
         }
       }
     }
   }
 
-  // Finalize Render::Renderer Render for this secondary command buffer.
+  // Finalize Render::Renderer Render
   Renderer::FinishedCommandBuffer();
-  secondaryCommandBuffer.End();
 }
 
 RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
@@ -768,6 +757,7 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 }
 
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&                 instruction,
+                                                Graphics::CommandBuffer&                 commandBuffer,
                                                 BufferIndex                              bufferIndex,
                                                 Integration::DepthBufferAvailable        depthBufferAvailable,
                                                 Integration::StencilBufferAvailable      stencilBufferAvailable,
@@ -776,8 +766,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 int                                      orientation,
                                                 const Uint16Pair&                        sceneSize,
                                                 Graphics::RenderPass&                    renderPass,
-                                                SceneGraph::RenderTargetGraphicsObjects& renderTargetGraphicsObjects,
-                                                Graphics::CommandBuffer*                 commandBuffer)
+                                                SceneGraph::RenderTargetGraphicsObjects& renderTargetGraphicsObjects)
 {
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
   { oss << "[" << instruction.RenderListCount() << "]"; });
@@ -792,9 +781,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
 
   if(viewMatrix && projectionMatrix)
   {
-    std::vector<const Graphics::CommandBuffer*> buffers;
-    const RenderListContainer::SizeType         count = instruction.RenderListCount();
-    buffers.reserve(count);
+    const RenderListContainer::SizeType count = instruction.RenderListCount();
 
     // Iterate through each render list in order. If a pair of render lists
     // are marked as interleaved, then process them together.
@@ -805,6 +792,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
       if(renderList && !renderList->IsEmpty())
       {
         ProcessRenderList(*renderList,
+                          commandBuffer,
                           bufferIndex,
                           *viewMatrix,
                           *projectionMatrix,
@@ -817,18 +805,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                           sceneSize,
                           renderPass,
                           renderTargetGraphicsObjects);
-
-        // Execute command buffer
-        auto* secondaryCommandBuffer = renderList->GetCommandBuffer();
-        if(secondaryCommandBuffer)
-        {
-          buffers.emplace_back(secondaryCommandBuffer);
-        }
       }
-    }
-    if(!buffers.empty())
-    {
-      commandBuffer->ExecuteCommandBuffers(std::move(buffers));
     }
   }
   DALI_TRACE_END(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS");

@@ -67,6 +67,7 @@ public:
    * @param[in] commandBuffer               The CommandBuffer associated with the renderTarget
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction&     instruction,
+                                Graphics::CommandBuffer&                 commandBuffer,
                                 BufferIndex                              bufferIndex,
                                 Integration::DepthBufferAvailable        depthBufferAvailable,
                                 Integration::StencilBufferAvailable      stencilBufferAvailable,
@@ -75,8 +76,7 @@ public:
                                 int                                      orientation,
                                 const Uint16Pair&                        sceneSize,
                                 Graphics::RenderPass&                    renderPass,
-                                SceneGraph::RenderTargetGraphicsObjects& renderTargetGraphicsObjects,
-                                Graphics::CommandBuffer*                 commandBuffer);
+                                SceneGraph::RenderTargetGraphicsObjects& renderTargetGraphicsObjects);
 
 private:
   /**
@@ -133,6 +133,7 @@ private:
    * @param[in] renderTargetGraphicsObjects The render target holder associated with render instruction
    */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
+                                Graphics::CommandBuffer&                             commandBuffer,
                                 BufferIndex                                          bufferIndex,
                                 const Matrix&                                        viewMatrix,
                                 const Matrix&                                        projectionMatrix,
@@ -151,8 +152,6 @@ private:
   using ScissorStackType = std::vector<Dali::ClippingBox>; ///< The container type used to maintain the applied scissor hierarchy
 
   Graphics::Controller& mGraphicsController;
-
-  std::vector<Graphics::CommandBuffer*> mGraphicsRenderItemCommandBuffers{}; ///< Collection of command buffers issuing single draw call
 
   ScissorStackType  mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
   Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
