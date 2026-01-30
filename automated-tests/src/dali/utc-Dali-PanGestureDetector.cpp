@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1615,7 +1615,7 @@ int UtcDaliPanGestureAngleHandling(void)
   bool found = false;
   for(size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT)
+    if(detector.GetAngle(i).angle == PanGestureDetector::DIRECTION_LEFT)
     {
       tet_result(TET_PASS);
       found = true;
@@ -1640,7 +1640,7 @@ int UtcDaliPanGestureAngleHandling(void)
   DALI_TEST_EQUALS(detector.GetAngleCount(), 1u, TEST_LOCATION);
   for(size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT)
+    if(detector.GetAngle(i).angle == PanGestureDetector::DIRECTION_RIGHT)
     {
       tet_printf("%s, angle not removed\n", TEST_LOCATION);
       tet_result(TET_FAIL);
@@ -1672,10 +1672,10 @@ int UtcDaliPanGestureGetAngle(void)
   detector.AddAngle(PanGestureDetector::DIRECTION_DOWN);
   DALI_TEST_EQUALS(detector.GetAngleCount(), 4, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, PanGestureDetector::DIRECTION_LEFT, TEST_LOCATION);
-  DALI_TEST_EQUALS(detector.GetAngle(1).first, PanGestureDetector::DIRECTION_RIGHT, TEST_LOCATION);
-  DALI_TEST_EQUALS(detector.GetAngle(2).first, PanGestureDetector::DIRECTION_UP, TEST_LOCATION);
-  DALI_TEST_EQUALS(detector.GetAngle(3).first, PanGestureDetector::DIRECTION_DOWN, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, PanGestureDetector::DIRECTION_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(1).angle, PanGestureDetector::DIRECTION_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(2).angle, PanGestureDetector::DIRECTION_UP, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(3).angle, PanGestureDetector::DIRECTION_DOWN, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1697,31 +1697,31 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   //
 
   detector.AddAngle(Degree(180.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-180.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, Radian(Degree(-180.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(190.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-170.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, Radian(Degree(-170.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(-190.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(170.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, Radian(Degree(170.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(350.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(-350.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(370.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(Degree(-370.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).first, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).angle, Radian(Degree(-10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   //
@@ -1729,19 +1729,19 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   //
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(0.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(0.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).threshold, Radian(Degree(0.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(-10.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).threshold, Radian(Degree(10.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(-181.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).threshold, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
 
   detector.AddAngle(PanGestureDetector::DIRECTION_RIGHT, Degree(181.0f));
-  DALI_TEST_EQUALS(detector.GetAngle(0).second, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
+  DALI_TEST_EQUALS(detector.GetAngle(0).threshold, Radian(Degree(180.0f)), 0.000001, TEST_LOCATION);
   detector.ClearAngles();
   END_TEST;
 }
@@ -1838,7 +1838,7 @@ int UtcDaliPanGestureDirectionHandling(void)
   bool found = false;
   for(size_t i = 0; detector.GetAngleCount(); i++)
   {
-    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT)
+    if(detector.GetAngle(i).angle == PanGestureDetector::DIRECTION_LEFT)
     {
       tet_result(TET_PASS);
       found = true;
@@ -1855,7 +1855,7 @@ int UtcDaliPanGestureDirectionHandling(void)
   found = false;
   for(size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT)
+    if(detector.GetAngle(i).angle == PanGestureDetector::DIRECTION_RIGHT)
     {
       tet_result(TET_PASS);
       found = true;
