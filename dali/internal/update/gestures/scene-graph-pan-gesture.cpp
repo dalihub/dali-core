@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -680,15 +680,6 @@ void PanGesture::EnableProfiling()
   {
     mProfiling = new PanGestureProfiling();
   }
-}
-
-void PanGesture::ResetDefaultProperties(BufferIndex updateBufferIndex)
-{
-  mScreenPosition.Reset();
-  mScreenDisplacement.Reset();
-  mLocalPosition.Reset();
-  mLocalDisplacement.Reset();
-  mPanning.Reset();
 }
 
 PanGesture::PanGesture()

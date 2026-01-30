@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_BASE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,14 +73,6 @@ public:
    * @param [in] currentBufferIndex The current buffer index.
    */
   virtual void ResetToBaseValue(BufferIndex updateBufferIndex) = 0;
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   */
-  bool InputChanged() const override
-  {
-    return !IsClean();
-  }
 
   /**
    * Query whether the property has changed.

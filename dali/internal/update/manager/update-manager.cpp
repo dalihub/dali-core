@@ -996,7 +996,6 @@ bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncT
   if(mImpl->panGestureProcessor)
   {
     // gesture processor only supports default properties
-    mImpl->panGestureProcessor->ResetDefaultProperties(bufferIndex); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
     gestureUpdated |= mImpl->panGestureProcessor->UpdateProperties(lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds);
   }
 

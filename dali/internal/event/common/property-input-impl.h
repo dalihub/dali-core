@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_PROPERTY_INPUT_IMPL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,6 @@ public:
    * @return True if initialized, otherwise the constraint should be skipped.
    */
   virtual bool InputInitialized() const = 0;
-
-  /**
-   * Query the input value (for a constraint) has changed.
-   * @return True if the input value has changed.
-   */
-  virtual bool InputChanged() const = 0;
 
   /**
    * Retrieve a boolean value.

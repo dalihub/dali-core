@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_CONSTRAINT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,27 +136,6 @@ public:
     }
 
     return true;
-  }
-
-  /**
-   * Query whether any of the inputs have changed
-   * @return True if any of the inputs have changed.
-   */
-  bool InputsChanged()
-  {
-    uint32_t index(0u);
-    for(const PropertyInputImpl* input = GetInput(index);
-        nullptr != input;
-        input = GetInput(++index))
-    {
-      if(input->InputChanged())
-      {
-        // At least one of the inputs has changed
-        return true;
-      }
-    }
-
-    return false;
   }
 
   /**

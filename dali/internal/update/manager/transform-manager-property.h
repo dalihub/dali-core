@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_TRANSFORM_MANAGER_PROPERTY_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -364,15 +364,6 @@ struct TransformManagerPropertyInputHandler : public PropertyInputImpl
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
   bool InputInitialized() const override
-  {
-    return true;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   * @note A constraint can only receive the inherited property from the previous frame.
-   */
-  bool InputChanged() const override
   {
     return true;
   }
