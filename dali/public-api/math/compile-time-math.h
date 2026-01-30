@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
-#include <stdlib.h>
 #include <cfloat>
+#include <cstdlib> // size_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
