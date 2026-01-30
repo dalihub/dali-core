@@ -2,7 +2,7 @@
 #define DALI_UINT_16_PAIR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace Dali
  * common architectures.
  * @SINCE_1_0.0
  */
-class Uint16Pair : public IntPair<16, false>
+class Uint16Pair : public IntPair<uint16_t, uint16_t, uint32_t>
 {
 public:
   /**
