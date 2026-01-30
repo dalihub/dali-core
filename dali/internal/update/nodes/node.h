@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include <dali/public-api/math/quaternion.h>
 
 // EXTERNAL INCLUDES
-#include <ostream>
 #include <algorithm>
+#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
@@ -121,7 +121,7 @@ bool Quaternion::IsIdentity() const
 
 bool Quaternion::ToAxisAngle(Vector3& axis, Radian& angle) const
 {
-  angle          = acosf(std::clamp(mVector.w, -1.0f, 1.0f));
+  angle          = acosf(Dali::Clamp(mVector.w, -1.0f, 1.0f));
   bool converted = false;
   // pre-compute to save time
   const float sine = sinf(angle.radian);
@@ -181,7 +181,7 @@ Vector4 Quaternion::EulerAngles() const
 
   Vector4 euler;
   euler.x = atan2f(2.0f * (mVector.y * mVector.z + mVector.x * mVector.w), -sqx - sqy + sqz + sqw);
-  euler.y = asinf(std::clamp(-2.0f * (mVector.x * mVector.z - mVector.y * mVector.w), -1.0f, 1.0f));
+  euler.y = asinf(Dali::Clamp(-2.0f * (mVector.x * mVector.z - mVector.y * mVector.w), -1.0f, 1.0f));
   euler.z = atan2f(2.0f * (mVector.x * mVector.y + mVector.z * mVector.w), sqx - sqy - sqz + sqw);
   return euler;
 }
@@ -329,7 +329,7 @@ void Quaternion::Invert()
 
 Quaternion Quaternion::Log() const
 {
-  float      a    = acosf(std::clamp(mVector.w, -1.0f, 1.0f));
+  float      a    = acosf(Dali::Clamp(mVector.w, -1.0f, 1.0f));
   float      sina = sinf(a);
   Quaternion ret;
 
@@ -435,7 +435,7 @@ Quaternion Quaternion::SlerpNoInvert(const Quaternion& q1, const Quaternion& q2,
   {
     MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 2);
 
-    float theta = acosf(std::clamp(cosTheta, -1.0f, 1.0f));
+    float theta = acosf(Dali::Clamp(cosTheta, -1.0f, 1.0f));
     return (q1 * sinf(theta * (1.0f - t)) + q2 * sinf(theta * t)) / sinf(theta);
   }
   else
@@ -464,7 +464,7 @@ float Quaternion::AngleBetween(const Quaternion& q1, const Quaternion& q2)
   // Formula for angle θ between two quaternion is:
   // θ = cos^−1 (2⟨q1,q2⟩^2 − 1), Where (q1,q2) is inner product of the quaternions.
   float X     = from.mVector.Dot(to.mVector);
-  float theta = acosf(std::clamp((2.0f * X * X) - 1.0f, -1.0f, 1.0f)); // float arc cosine
+  float theta = acosf(Dali::Clamp((2.0f * X * X) - 1.0f, -1.0f, 1.0f)); // float arc cosine
 
   return theta;
 }

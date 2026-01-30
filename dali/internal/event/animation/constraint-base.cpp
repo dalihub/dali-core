@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/animation/constraint-base.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/event-thread-services.h>

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/set-wrapper.h>
+#include <algorithm>
 
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
 #include <dali/devel-api/common/map-wrapper.h>

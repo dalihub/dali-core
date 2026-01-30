@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/update/animation/scene-graph-constraint-container.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>

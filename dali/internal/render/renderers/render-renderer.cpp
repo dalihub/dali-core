@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/render/renderers/render-renderer.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>

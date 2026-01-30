@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
