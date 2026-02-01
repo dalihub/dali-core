@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,11 @@ namespace Internal
 namespace SceneGraph
 {
 class Renderer;
-}
+namespace VisualRenderer
+{
+class VisualProperties;
+} // namespace VisualRenderer
+} // namespace SceneGraph
 
 class VisualRenderer;
 using VisualRendererPtr = IntrusivePtr<VisualRenderer>;
@@ -125,13 +129,15 @@ public:
     Vector2 mTransformAnchorPoint{Vector2::ZERO};
     Vector4 mTransformOffsetSizeMode{Vector2::ZERO};
     Vector2 mExtraSize{Vector2::ZERO};
-    float   mPreMultipliedAlpha{0.0f};
   };
 
 private:
   VisualPropertyCache mPropertyCache;
 
+  SceneGraph::VisualRenderer::VisualProperties* mVisualProperties; ///< VisualProperties. Generated at first time of RegisterVisualTransformUniform(). Not owned
+
   bool mUniformMapped : 1;
+  bool mPropertyCacheChanged : 1;
 };
 
 } // namespace Internal

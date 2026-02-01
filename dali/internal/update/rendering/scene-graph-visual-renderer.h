@@ -26,9 +26,9 @@
 
 namespace Dali::Internal::SceneGraph::VisualRenderer
 {
-struct AnimatableDecoratedVisualProperties
+struct DecoratedVisualProperties
 {
-  AnimatableDecoratedVisualProperties(VisualRendererPropertyObserver& owner)
+  DecoratedVisualProperties(VisualRendererPropertyObserver& owner)
   : mCoefficient(owner),
     mBorderlineWidth(0.0f),
     mBorderlineOffset(0.0f),
@@ -40,9 +40,17 @@ struct AnimatableDecoratedVisualProperties
   {
   }
 
-  ~AnimatableDecoratedVisualProperties()
+  ~DecoratedVisualProperties()
   {
   }
+
+public: // Public API
+  /**
+   * @brief Get the update area after visual properties applied.
+   * @param[in] bufferIndex The current buffer index.
+   * @param[in, out] updateArea The original update area before apply the visual properties. Stored into this value after calculated
+   */
+  void GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept;
 
 public:
   /**
@@ -88,34 +96,30 @@ public: // Default properties
   AnimatableProperty<float>   mCornerRadiusPolicy;
 };
 
-struct AnimatableVisualProperties
+struct VisualProperties
 {
-  AnimatableVisualProperties(VisualRendererPropertyObserver& owner)
+  VisualProperties(VisualRendererPropertyObserver& owner)
   : mCoefficient(owner),
     mTransformOffset(Vector2::ZERO),
     mTransformSize(Vector2::ONE),
     mTransformOrigin(Vector2::ZERO),
     mTransformAnchorPoint(Vector2::ZERO),
     mTransformOffsetSizeMode(Vector4::ZERO),
-    mExtraSize(Vector2::ZERO),
-    mPreMultipliedAlpha(0.0f),
-    mExtendedProperties(nullptr)
+    mExtraSize(Vector2::ZERO)
   {
   }
 
-  ~AnimatableVisualProperties()
+  ~VisualProperties()
   {
-    if(mExtendedProperties)
-    {
-      delete mExtendedProperties;
-    }
   }
 
 public: // Public API
   /**
-   * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
+   * @brief Get the update area after visual properties applied.
+   * @param[in] bufferIndex The current buffer index.
+   * @param[in, out] updateArea The original update area before apply the visual properties. Stored into this value after calculated
    */
-  Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept;
+  void GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept;
 
 public:
   /**
@@ -164,10 +168,6 @@ public: // Default properties
   PROPERTY_WRAPPER(mTransformOffsetSizeMode, VisualRendererProperty, Vector2, mExtraSize);
 
   // Properties that don't give any effort to coefficient.
-  AnimatableProperty<float> mPreMultipliedAlpha;
-
-public: // Extended properties for decorated visual properties
-  AnimatableDecoratedVisualProperties* mExtendedProperties{nullptr};
 };
 } // namespace Dali::Internal::SceneGraph::VisualRenderer
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,6 +242,10 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty01(void)
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(cornerRadiusIndex), Vector4(1.0f, 10.0f, 5.0f, 0.0f), 0.001f, TEST_LOCATION);
 
+  // We must call RegisterXXXUniform() before animate decorated visual renderer properties.
+  // Before, corner radius could not be animated.
+  renderer.RegisterCornerRadiusUniform();
+
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, Vector4(1.0f, 0.0f, 1.0f, 0.0f));
@@ -296,6 +300,13 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), -1.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 0.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
+
+  // We must call RegisterXXXUniform() before animate decorated visual renderer properties.
+  // Before, corner radius could not be animated.
+  renderer.RegisterCornerRadiusUniform();
+  renderer.RegisterCornerSquarenessUniform();
+  renderer.RegisterBorderlineUniform();
+  renderer.RegisterBlurRadiusUniform();
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateBy(Property(renderer, DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4(10.0f, 100.0f, 100.0f, 10.0f));
@@ -808,6 +819,10 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty05(void)
 
   Property::Index index = VisualRenderer::Property::TRANSFORM_SIZE;
   renderer.SetProperty(index, Vector2(1.0f, 0.5f));
+
+  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
+  // Before, transform could not be animated.
+  renderer.RegisterVisualTransformUniform();
 
   application.SendNotification();
   application.Render(0);

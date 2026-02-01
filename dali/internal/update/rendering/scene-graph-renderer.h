@@ -572,9 +572,20 @@ public: // For VisualProperties
   /**
    * To be used only for 1st stage initialization in event thread.
    */
-  void SetVisualProperties(VisualRenderer::AnimatableVisualProperties* visualProperties)
+  void SetDummyVisualProperties();
+
+  /**
+   * Set the visual propertiess at render thread.
+   * @param[in] visualProperties The visual properties to set
+   */
+  void SetVisualProperties(OwnerPointer<VisualRenderer::VisualProperties>& visualProperties)
   {
-    mVisualProperties = visualProperties;
+    if(DALI_UNLIKELY(mOwnsVisualProperties))
+    {
+      delete mVisualProperties;
+    }
+    mVisualProperties     = visualProperties.Release();
+    mOwnsVisualProperties = true;
 
     // Initialize visual dirty flags.
     mVisualPropertiesDirtyFlags = BAKED_FLAG;
@@ -583,9 +594,40 @@ public: // For VisualProperties
   /**
    * May be accessed from event thread
    */
-  const VisualRenderer::AnimatableVisualProperties* GetVisualProperties() const
+  const VisualRenderer::VisualProperties* GetVisualProperties() const
   {
-    return mVisualProperties.Get();
+    return mVisualProperties;
+  }
+
+public: // For DecoratedVisualProperties
+  /**
+   * To be used only for 1st stage initialization in event thread.
+   */
+  void SetDummyDecoratedVisualProperties();
+
+  /**
+   * Set the decorated visual propertiess at render thread.
+   * @param[in] decoratedVisualProperties The decorated visual properties to set
+   */
+  void SetDecoratedVisualProperties(OwnerPointer<VisualRenderer::DecoratedVisualProperties>& decoratedVisualProperties)
+  {
+    if(DALI_UNLIKELY(mOwnsDecoratedVisualProperties))
+    {
+      delete mDecoratedVisualProperties;
+    }
+    mDecoratedVisualProperties     = decoratedVisualProperties.Release();
+    mOwnsDecoratedVisualProperties = true;
+
+    // Initialize visual dirty flags.
+    mVisualPropertiesDirtyFlags = BAKED_FLAG;
+  }
+
+  /**
+   * May be accessed from event thread
+   */
+  const VisualRenderer::DecoratedVisualProperties* GetDecoratedVisualProperties() const
+  {
+    return mDecoratedVisualProperties;
   }
 
 public: // From VisualRenderer::VisualRendererPropertyObserver
@@ -622,8 +664,10 @@ private:
   Render::Geometry*   mGeometry;        ///< The geometry this renderer uses. (Not owned)
   Shader*             mShader;          ///< The shader this renderer uses. (Not owned)
 
-  OwnerPointer<VisualRenderer::AnimatableVisualProperties> mVisualProperties{nullptr}; ///< VisualProperties (optional/owned)
-  OwnerPointer<Vector4>                                    mBlendColor;                ///< The blend color for blending operation
+  OwnerPointer<Vector4> mBlendColor; ///< The blend color for blending operation
+
+  VisualRenderer::VisualProperties*          mVisualProperties;          ///< VisualProperties (optional/owned if flagged)
+  VisualRenderer::DecoratedVisualProperties* mDecoratedVisualProperties; ///< DecoratedVisualProperties (optional/owned if flagged)
 
   Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
 
@@ -644,12 +688,16 @@ private:
   DepthTestMode::Type            mDepthTestMode : 3;              ///< Local copy of the depth test mode
   DevelRenderer::Rendering::Type mRenderingBehavior : 2;          ///< The rendering behavior
   Decay                          mUpdateDecay : 2;                ///< Update decay (aging)
-  uint8_t                        mVisualPropertiesDirtyFlags : 2; ///< Update decay for visual properties (aging)
+  bool                           mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
 
-  bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
+  uint8_t mVisualPropertiesDirtyFlags : 2; ///< Update decay for visual properties (aging)
+
   bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
   bool mUseSharedUniformBlock : 1;
   bool mInvokeTerminateCallback : 1;
+
+  bool mOwnsVisualProperties : 1;          ///< Whether this renderer owns the VisualProperties
+  bool mOwnsDecoratedVisualProperties : 1; ///< Whether this renderer owns the DecoratedVisualProperties
 
   mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
 

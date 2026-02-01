@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_DECORATED_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,11 @@ namespace Internal
 namespace SceneGraph
 {
 class Renderer;
-}
+namespace VisualRenderer
+{
+class DecoratedVisualProperties;
+} // namespace VisualRenderer
+} // namespace SceneGraph
 
 class DecoratedVisualRenderer;
 using DecoratedVisualRendererPtr = IntrusivePtr<DecoratedVisualRenderer>;
@@ -155,7 +159,10 @@ public:
 private:
   DecoratedVisualPropertyCache mDecoratedPropertyCache;
 
+  SceneGraph::VisualRenderer::DecoratedVisualProperties* mDecoratedVisualProperties{nullptr}; ///< DecoratedVisualProperties. Generated at first time of Register~~~Uniform(). Not owned
+
   uint8_t mAddUniformFlag : 5;
+  bool    mPropertyCacheChanged : 1;
 };
 
 } // namespace Internal

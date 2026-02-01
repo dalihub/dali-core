@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1286,6 +1286,10 @@ int UtcDaliAnimationSetEndActionP04(void)
   float     durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE);
+
+  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
+  // Before, transform could not be animated.
+  visualRenderer.RegisterVisualTransformUniform();
 
   Vector2 targetValue(1.0f, 1.0f);
   animation.AnimateTo(Property(visualRenderer, Dali::VisualRenderer::Property::TRANSFORM_SIZE), targetValue, AlphaFunction::LINEAR);
