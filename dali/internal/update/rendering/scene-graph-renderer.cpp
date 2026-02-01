@@ -111,6 +111,26 @@ ReturnType GetRenderFunction(const Render::RendererKey& rendererKey, ReturnType 
   return ((*rendererKey.Get()).*member)();
 }
 
+class DummyVisualRendererPropertyObserver : public SceneGraph::VisualRenderer::VisualRendererPropertyObserver
+{
+public:
+  ~DummyVisualRendererPropertyObserver() override = default;
+
+  void OnVisualRendererPropertyUpdated(bool /*updated*/) override
+  {
+    // Do nothing
+  }
+
+  uint8_t GetUpdatedFlag() const override
+  {
+    return 0;
+  }
+};
+
+DummyVisualRendererPropertyObserver                   gDummyVisualRendererPropertyObserver;
+SceneGraph::VisualRenderer::VisualProperties          gDummyVisualRendererVisualProperties(gDummyVisualRendererPropertyObserver);
+SceneGraph::VisualRenderer::DecoratedVisualProperties gDummyVisualRendererDecoratedVisualProperties(gDummyVisualRendererPropertyObserver);
+
 } // Anonymous namespace
 
 RendererKey Renderer::NewKey()
@@ -136,15 +156,19 @@ Renderer::Renderer()
 : mRenderer{},
   mTextureSet(nullptr),
   mShader(nullptr),
+  mAttachedNode(nullptr),
   mVisualProperties(nullptr),
+  mDecoratedVisualProperties(nullptr),
   mUpdateAreaExtents(),
   mBlendMode(BlendMode::AUTO),
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
   mUpdateDecay(Renderer::Decay::INITIAL),
-  mVisualPropertiesDirtyFlags(CLEAN_FLAG),
   mRegenerateUniformMap(false),
-  mAdvancedBlendEquationApplied(false),
+  mVisualPropertiesDirtyFlags(CLEAN_FLAG),
   mIsRenderableFlag(0u),
+  mAdvancedBlendEquationApplied(false),
+  mOwnsVisualProperties(false),
+  mOwnsDecoratedVisualProperties(false),
   mDirtyUpdated(NOT_CHECKED),
   mMixColor(Color::WHITE),
   mDepthIndex(0)
@@ -155,6 +179,14 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
+  if(mOwnsVisualProperties)
+  {
+    delete mVisualProperties;
+  }
+  if(mOwnsDecoratedVisualProperties)
+  {
+    delete mDecoratedVisualProperties;
+  }
 }
 
 void Renderer::operator delete(void* ptr)
@@ -210,9 +242,14 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
   // Age down visual properties dirty flag
   if(mVisualPropertiesDirtyFlags != CLEAN_FLAG)
   {
-    DALI_ASSERT_DEBUG(mVisualProperties && "Visual Property not created yet! something wrong (maybe event message flush ordering issue)");
-
-    rendererUpdated |= mVisualProperties->PrepareProperties();
+    if(mVisualProperties)
+    {
+      rendererUpdated |= mVisualProperties->PrepareProperties();
+    }
+    if(mDecoratedVisualProperties)
+    {
+      rendererUpdated |= mDecoratedVisualProperties->PrepareProperties();
+    }
     mVisualPropertiesDirtyFlags >>= 1;
   }
 
@@ -534,10 +571,11 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
 
 void Renderer::AttachToNode(const Node& node)
 {
+  // TODO : Could we use this feature for general renderer?
   if(mVisualProperties)
   {
-    DALI_ASSERT_ALWAYS(mVisualProperties->mAttachedNode == nullptr && "VisualRenderer don't allow to attach multiple nodes!");
-    mVisualProperties->mAttachedNode = &node;
+    DALI_ASSERT_ALWAYS(mAttachedNode == nullptr && "VisualRenderer don't allow to attach multiple nodes!");
+    mAttachedNode = &node;
   }
 }
 
@@ -549,10 +587,11 @@ void Renderer::DetachFromNode(const Node& node)
     rendererPtr->DetachFromNodeDataProvider(static_cast<const NodeDataProvider&>(node));
   }
 
+  // TODO : Could we use this feature for general renderer?
   if(mVisualProperties)
   {
-    DALI_ASSERT_ALWAYS((mVisualProperties->mAttachedNode == &node) && "Detaching node which was not attached!");
-    mVisualProperties->mAttachedNode = nullptr;
+    DALI_ASSERT_ALWAYS((mAttachedNode == &node) && "Detaching node which was not attached!");
+    mAttachedNode = nullptr;
   }
 }
 
@@ -767,11 +806,16 @@ void Renderer::ResetUpdated()
 
 Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
 {
+  Vector4 updateArea = originalUpdateArea;
   if(mVisualProperties)
   {
-    return AdjustExtents(mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, originalUpdateArea), mUpdateAreaExtents);
+    mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
   }
-  return AdjustExtents(originalUpdateArea, mUpdateAreaExtents);
+  if(mDecoratedVisualProperties)
+  {
+    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
+  }
+  return AdjustExtents(updateArea, mUpdateAreaExtents);
 }
 
 bool Renderer::IsObservingNodeDeactivated() const
@@ -779,10 +823,34 @@ bool Renderer::IsObservingNodeDeactivated() const
   // TODO : Could we use this feature for general renderer?
   if(mVisualProperties)
   {
-    return !mVisualProperties->mAttachedNode || mVisualProperties->mAttachedNode->IsWorldIgnored();
+    return !mAttachedNode || mAttachedNode->IsWorldIgnored();
   }
   return false;
 }
+
+// For VisualRenderer and DecoratedVisualRenderer
+
+void Renderer::SetDummyVisualProperties()
+{
+  DALI_ASSERT_ALWAYS(!mVisualProperties && "Visual Properties already set!");
+  mVisualProperties     = &gDummyVisualRendererVisualProperties;
+  mOwnsVisualProperties = false;
+
+  // Initialize visual dirty flags.
+  mVisualPropertiesDirtyFlags = BAKED_FLAG;
+}
+
+void Renderer::SetDummyDecoratedVisualProperties()
+{
+  DALI_ASSERT_ALWAYS(!mDecoratedVisualProperties && "Decorated Visual Properties already set!");
+  mDecoratedVisualProperties     = &gDummyVisualRendererDecoratedVisualProperties;
+  mOwnsDecoratedVisualProperties = false;
+
+  // Initialize visual dirty flags.
+  mVisualPropertiesDirtyFlags = BAKED_FLAG;
+}
+
+// From VisualRenderer::VisualRendererPropertyObserver
 
 void Renderer::OnVisualRendererPropertyUpdated(bool bake)
 {

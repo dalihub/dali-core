@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ extern Debug::Filter* gSceneGraphRendererLogFilter; ///< Defined at scene-graph-
 #endif
 namespace VisualRenderer
 {
-Vector4 VisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
+void VisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept
 {
   auto& coefficient = mCoefficient;
 
@@ -89,38 +89,6 @@ Vector4 VisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBuffe
     coefficient.MarkCoefficientCalculated();
   }
 
-  float coefD = 0.0f; ///< Default as 0.0f when we don't use decorated renderer.
-
-  if(mExtendedProperties)
-  {
-    auto& decoratedCoefficient = mExtendedProperties->mCoefficient;
-
-    // Recalculate only if coefficient need to be updated.
-    if(!decoratedCoefficient.IsCoefficientCalculated())
-    {
-      // DecoratedVisualProperty
-      const float borderlineWidth  = mExtendedProperties->mBorderlineWidth.Get(updateBufferIndex);
-      const float borderlineOffset = mExtendedProperties->mBorderlineOffset.Get(updateBufferIndex);
-      const float blurRadius       = mExtendedProperties->mBlurRadius.Get(updateBufferIndex);
-
-      // Extra padding information for anti-alias
-      const float extraPadding = 2.0f;
-
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline width  %5.3f\n", borderlineWidth);
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline offset %5.3f\n", borderlineOffset);
-      DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "blur radius       %5.3f\n", blurRadius);
-
-      // D coefficients be used only decoratedVisual.
-      // It can be calculated parallely with visual transform.
-      decoratedCoefficient.coefD = (1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth + (2.0f * blurRadius) + extraPadding;
-
-      decoratedCoefficient.MarkCoefficientCalculated();
-    }
-
-    // Update coefD so we can use this value out of this scope.
-    coefD = decoratedCoefficient.coefD;
-  }
-
   // Calculate vertex position by coefficient
   // It will reduce the number of operations
 
@@ -137,33 +105,57 @@ Vector4 VisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBuffe
   // Then, resultPosition = basicVertexPosition
   //       resultSize     = scaleVertexPosition
 
-  const Vector2 originalXY = Vector2(originalUpdateArea.x, originalUpdateArea.y);
-  const Vector2 originalWH = Vector2(originalUpdateArea.z, originalUpdateArea.w);
+  const Vector2 originalXY = Vector2(updateArea.x, updateArea.y);
+  const Vector2 originalWH = Vector2(updateArea.z, updateArea.w);
 
   const Vector2 basicVertexPosition = coefficient.coefXB * originalWH + coefficient.coefCB + originalXY;
-  const Vector2 scaleVertexPosition = coefficient.coefXA * originalWH + coefficient.coefCA + Vector2(coefD, coefD);
+  const Vector2 scaleVertexPosition = coefficient.coefXA * originalWH + coefficient.coefCA;
 
-  const Vector4 resultArea = Vector4(basicVertexPosition.x,
-                                     basicVertexPosition.y,
-                                     scaleVertexPosition.x,
-                                     scaleVertexPosition.y);
+  updateArea = Vector4(basicVertexPosition.x,
+                       basicVertexPosition.y,
+                       scaleVertexPosition.x,
+                       scaleVertexPosition.y);
 
-  DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f %f %f--> %f %f %f %f\n", originalUpdateArea.x, originalUpdateArea.y, originalUpdateArea.z, originalUpdateArea.w, resultArea.x, resultArea.y, resultArea.z, resultArea.w);
-
-  return resultArea;
+  DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f %f %f--> %f %f %f %f\n", originalXY.x, originalXY.y, originalWH.width, originalWH.height, updateArea.x, updateArea.y, updateArea.z, updateArea.w);
 }
 
 bool VisualProperties::PrepareProperties()
 {
   bool rendererUpdated = mCoefficient.IsUpdated();
   mCoefficient.ResetFlag();
+  return rendererUpdated;
+}
 
-  if(mExtendedProperties)
+void DecoratedVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept
+{
+  auto& decoratedCoefficient = mCoefficient;
+
+  // Recalculate only if coefficient need to be updated.
+  if(!decoratedCoefficient.IsCoefficientCalculated())
   {
-    rendererUpdated |= mExtendedProperties->PrepareProperties();
+    // DecoratedVisualProperty
+    const float borderlineWidth  = mBorderlineWidth.Get(updateBufferIndex);
+    const float borderlineOffset = mBorderlineOffset.Get(updateBufferIndex);
+    const float blurRadius       = mBlurRadius.Get(updateBufferIndex);
+
+    // Extra padding information for anti-alias
+    const float extraPadding = 2.0f;
+
+    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline width  %5.3f\n", borderlineWidth);
+    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "borderline offset %5.3f\n", borderlineOffset);
+    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "blur radius       %5.3f\n", blurRadius);
+
+    // D coefficients be used only decoratedVisual.
+    // It can be calculated parallely with visual transform.
+    decoratedCoefficient.coefD = (1.0f + Dali::Clamp(borderlineOffset, -1.0f, 1.0f)) * borderlineWidth + (2.0f * blurRadius) + extraPadding;
+
+    decoratedCoefficient.MarkCoefficientCalculated();
   }
 
-  return rendererUpdated;
+  DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "%f %f %f %f--> %f %f %f %f\n", updateArea.x, updateArea.y, updateArea.z, updateArea.w, updateArea.x, updateArea.y, updateArea.z + decoratedCoefficient.coefD, updateArea.w + decoratedCoefficient.coefD);
+
+  updateArea.z += decoratedCoefficient.coefD;
+  updateArea.w += decoratedCoefficient.coefD;
 }
 
 bool DecoratedVisualProperties::PrepareProperties()
