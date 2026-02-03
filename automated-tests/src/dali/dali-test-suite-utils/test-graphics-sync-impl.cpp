@@ -72,7 +72,7 @@ void TestGraphicsSyncImplementation::Initialize()
   mSyncObjects.clear();
 }
 
-Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::CreateSyncObject()
+Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::CreateSyncObject(SyncObject::SyncType type)
 {
   mTrace.PushCall("CreateSyncObject", ""); // Trace the method
 
