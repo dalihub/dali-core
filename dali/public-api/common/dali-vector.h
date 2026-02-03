@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <algorithm>
 #include <cstddef>
 #include <cstdint> // uint32_t
 #include <utility> // std::move, std::swap
@@ -891,38 +890,6 @@ public: // API
     }
   }
 };
-
-/**
- * @brief Erases all elements that compare equal to value from the vector.
- *
- * @SINCE_1_9.33
- * @param[in] vector The vector
- * @param[in] value The value to be removed.
- */
-template<class T, class U>
-inline void Erase(Dali::Vector<T>& vector, const U& value)
-{
-  auto begin = vector.Begin();
-  auto end   = vector.End();
-
-  vector.Erase(std::remove(begin, end, value), end);
-}
-
-/**
- * @brief Erases all elements that satisfy the predicate from the vector.
- *
- * @SINCE_1_9.33
- * @param[in] vector The vector
- * @param[in] predicate The predicate
- */
-template<class T, class Predicate>
-inline void EraseIf(Dali::Vector<T>& vector, Predicate predicate)
-{
-  auto begin = vector.Begin();
-  auto end   = vector.End();
-
-  vector.Erase(std::remove_if(begin, end, predicate), end);
-}
 
 /**
  * @}
