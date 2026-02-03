@@ -509,14 +509,11 @@ public:
   void TerminateRenderCallback(bool invokeCallback);
 
   /**
-   * Returns currently set RenderCallback pointer
+   * Returns currently set RenderCallback pointer or not.
    *
-   * @return RenderCallback pointer or nullptr
+   * @return True if RenderCallback applied
    */
-  RenderCallback* GetRenderCallback()
-  {
-    return mRenderCallback;
-  }
+  [[nodiscard]] bool HasRenderCallback() const;
 
   /**
    * Merge shader uniform map into renderer uniform map if any of the
@@ -541,10 +538,7 @@ public:
   /**
    * @brief True if this renderer could be renderable. False otherwise.
    */
-  bool IsRenderable() const
-  {
-    return (mGeometry && mShader) || mRenderCallback;
-  }
+  [[nodiscard]] bool IsRenderable() const;
 
   /**
    * Update the result of Query of IsDirty() + IsUpdated() result.
@@ -630,39 +624,27 @@ private:
 
   Render::RendererKey mRenderer;   ///< Key to the renderer (that's owned by RenderManager)
   TextureSet*         mTextureSet; ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*   mGeometry;   ///< The geometry this renderer uses. (Not owned)
   Shader*             mShader;     ///< The shader this renderer uses. (Not owned)
 
   OwnerPointer<VisualRenderer::VisualProperties> mVisualProperties; ///< VisualProperties (optional/owned)
-  OwnerPointer<Vector4>                          mBlendColor;       ///< The blend color for blending operation
 
-  Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
-
-  uint32_t             mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
-  uint32_t             mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
   uint32_t             mInstanceCount{0};            ///< The number of instances to be drawn
-  uint32_t             mBlendBitmask;                ///< The bitmask of blending options
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
   UniformMap::SizeType mShaderMapChangeCounter{0u};  ///< Value to check if uniform data should be updated
 
   Dali::Extents mUpdateAreaExtents;
 
-  DepthFunction::Type            mDepthFunction : 4;              ///< Local copy of the depth function
-  FaceCullingMode::Type          mFaceCullingMode : 3;            ///< Local copy of the mode of face culling
   BlendMode::Type                mBlendMode : 3;                  ///< Local copy of the mode of blending
-  DepthWriteMode::Type           mDepthWriteMode : 3;             ///< Local copy of the depth write mode
-  DepthTestMode::Type            mDepthTestMode : 3;              ///< Local copy of the depth test mode
   DevelRenderer::Rendering::Type mRenderingBehavior : 2;          ///< The rendering behavior
   Decay                          mUpdateDecay : 2;                ///< Update decay (aging)
   uint8_t                        mVisualPropertiesDirtyFlags : 2; ///< Update decay for visual properties (aging)
 
-  bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
-  bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool mUseSharedUniformBlock : 1;
+  bool mRegenerateUniformMap : 1;         ///< true if the map should be regenerated
+  bool mAdvancedBlendEquationApplied : 1; ///< true if advanced blend equation applied.
+
+  uint8_t mIsRenderableFlag : 3;
 
   mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
-
-  Dali::RenderCallback* mRenderCallback{nullptr};
 
 public:
   AnimatableProperty<Vector4> mMixColor;   ///< The mix color value

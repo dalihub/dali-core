@@ -140,26 +140,8 @@ public:
   /**
    * Create a new renderer instance
    * @param[in] dataProviders The data providers for the renderer
-   * @param[in] geometry The geometry for the renderer
-   * @param[in] blendingBitmask A bitmask of blending options.
-   * @param[in] blendColor The blend color
-   * @param[in] faceCullingMode The face-culling mode.
-   * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
-   * @param[in] depthWriteMode Depth buffer write mode
-   * @param[in] depthTestMode Depth buffer test mode
-   * @param[in] depthFunction Depth function
-   * @param[in] stencilParameters Struct containing all stencil related options
    */
-  static RendererKey NewKey(SceneGraph::RenderDataProvider* dataProviders,
-                            Render::Geometry*               geometry,
-                            uint32_t                        blendingBitmask,
-                            const Vector4&                  blendColor,
-                            FaceCullingMode::Type           faceCullingMode,
-                            bool                            preMultipliedAlphaEnabled,
-                            DepthWriteMode::Type            depthWriteMode,
-                            DepthTestMode::Type             depthTestMode,
-                            DepthFunction::Type             depthFunction,
-                            StencilParameters&              stencilParameters);
+  static RendererKey NewKey(SceneGraph::RenderDataProvider* dataProviders);
 
   /**
    * Register memory pool of render renderer.
@@ -176,26 +158,8 @@ public:
   /**
    * Constructor.
    * @param[in] dataProviders The data providers for the renderer
-   * @param[in] geometry The geometry for the renderer
-   * @param[in] blendingBitmask A bitmask of blending options.
-   * @param[in] blendColor The blend color
-   * @param[in] faceCullingMode The face-culling mode.
-   * @param[in] preMultipliedAlphaEnabled whether alpha is pre-multiplied.
-   * @param[in] depthWriteMode Depth buffer write mode
-   * @param[in] depthTestMode Depth buffer test mode
-   * @param[in] depthFunction Depth function
-   * @param[in] stencilParameters Struct containing all stencil related options
    */
-  Renderer(SceneGraph::RenderDataProvider* dataProviders,
-           Render::Geometry*               geometry,
-           uint32_t                        blendingBitmask,
-           const Vector4&                  blendColor,
-           FaceCullingMode::Type           faceCullingMode,
-           bool                            preMultipliedAlphaEnabled,
-           DepthWriteMode::Type            depthWriteMode,
-           DepthTestMode::Type             depthTestMode,
-           DepthFunction::Type             depthFunction,
-           StencilParameters&              stencilParameters);
+  Renderer(SceneGraph::RenderDataProvider* dataProviders);
 
   /**
    * Second-phase construction.
@@ -253,11 +217,21 @@ public:
    */
   void SetFaceCullingMode(FaceCullingMode::Type mode);
 
+  [[nodiscard]] FaceCullingMode::Type GetFaceCullingMode() const
+  {
+    return mFaceCullingMode;
+  }
+
   /**
    * Set the bitmask for blending options
    * @param[in] bitmask A bitmask of blending options.
    */
   void SetBlendingBitMask(uint32_t bitmask);
+
+  [[nodiscard]] uint32_t GetBlendingBitMask() const
+  {
+    return mBlendingOptions.GetBitmask();
+  }
 
   /**
    * Set the blend color for blending options
@@ -265,11 +239,21 @@ public:
    */
   void SetBlendColor(const Vector4& color);
 
+  [[nodiscard]] const Vector4& GetBlendColor() const
+  {
+    return mBlendingOptions.GetBlendColor() ? *mBlendingOptions.GetBlendColor() : Color::TRANSPARENT;
+  }
+
   /**
    * Set the first element index to draw by the indexed draw
    * @param[in] firstElement index of first element to draw
    */
   void SetIndexedDrawFirstElement(uint32_t firstElement);
+
+  [[nodiscard]] uint32_t GetIndexedDrawFirstElement() const
+  {
+    return mIndexedDrawFirstElement;
+  }
 
   /**
    * Set the number of elements to draw by the indexed draw
@@ -277,12 +261,22 @@ public:
    */
   void SetIndexedDrawElementsCount(uint32_t elementsCount);
 
+  [[nodiscard]] uint32_t GetIndexedDrawElementsCount() const
+  {
+    return mIndexedDrawElementsCount;
+  }
+
   /**
    * @brief Set whether the Pre-multiplied Alpha Blending is required
    *
    * @param[in] preMultipled whether alpha is pre-multiplied.
    */
   void EnablePreMultipliedAlpha(bool preMultipled);
+
+  [[nodiscard]] bool IsPreMultipliedAlphaEnabled() const
+  {
+    return mPremultipliedAlphaEnabled;
+  }
 
   /**
    * Sets the depth write mode
@@ -319,6 +313,11 @@ public:
    * @return The renderer depth function
    */
   [[nodiscard]] DepthFunction::Type GetDepthFunction() const;
+
+  [[nodiscard]] const StencilParameters& GetStencilParameters() const
+  {
+    return mStencilParameters;
+  }
 
   /**
    * Sets the render mode

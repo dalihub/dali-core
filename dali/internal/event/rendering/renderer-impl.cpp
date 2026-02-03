@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -319,7 +319,7 @@ void Renderer::SetBlendEquation(DevelBlendEquation::Type equationRgba)
 void Renderer::SetBlendEquation(DevelBlendEquation::Type equationRgb,
                                 DevelBlendEquation::Type equationAlpha)
 {
-  if(mBlendingOptions.IsAdvancedBlendEquation(equationRgb) || mBlendingOptions.IsAdvancedBlendEquation(equationAlpha))
+  if(BlendingOptions::IsAdvancedBlendEquation(equationRgb) || BlendingOptions::IsAdvancedBlendEquation(equationAlpha))
   {
     DALI_LOG_ERROR("Advanced blend equation requires to be set by using SetBlendEquation( DevelBlendEquation::Type equationRgba ).");
     return;
@@ -356,7 +356,7 @@ void Renderer::SetIndexedDrawElementsCount(uint32_t elementsCount)
 
 void Renderer::EnablePreMultipliedAlpha(bool preMultipled)
 {
-  if(mPremultipledAlphaEnabled != preMultipled)
+  if(mPremultipliedAlphaEnabled != preMultipled)
   {
     if(preMultipled)
     {
@@ -366,14 +366,14 @@ void Renderer::EnablePreMultipliedAlpha(bool preMultipled)
     {
       SetBlendFunc(BlendFactor::SRC_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA);
     }
-    mPremultipledAlphaEnabled = preMultipled;
-    SetEnablePreMultipliedAlphaMessage(GetEventThreadServices(), GetRendererSceneObject(), mPremultipledAlphaEnabled);
+    mPremultipliedAlphaEnabled = preMultipled;
+    SetEnablePreMultipliedAlphaMessage(GetEventThreadServices(), GetRendererSceneObject(), mPremultipliedAlphaEnabled);
   }
 }
 
 bool Renderer::IsPreMultipliedAlphaEnabled() const
 {
-  return mPremultipledAlphaEnabled;
+  return mPremultipliedAlphaEnabled;
 }
 
 bool Renderer::IsAdvancedBlendEquationApplied() const
@@ -386,7 +386,7 @@ bool Renderer::IsAdvancedBlendEquationApplied() const
     return false;
   }
 
-  return mBlendingOptions.IsAdvancedBlendEquation(equationRgb);
+  return BlendingOptions::IsAdvancedBlendEquation(equationRgb);
 }
 
 const SceneGraph::Renderer& Renderer::GetRendererSceneObject() const
@@ -911,7 +911,7 @@ Renderer::Renderer(const SceneGraph::Renderer* sceneObject)
   mDepthWriteMode(DepthWriteMode::AUTO),
   mDepthTestMode(DepthTestMode::AUTO),
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
-  mPremultipledAlphaEnabled(false)
+  mPremultipliedAlphaEnabled(false)
 {
 }
 

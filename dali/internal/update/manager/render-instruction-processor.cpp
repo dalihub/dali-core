@@ -180,7 +180,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
   const bool rendererExist(renderable.mRenderer && DALI_LIKELY(renderable.mRenderer->IsRenderable()));
 
   // Don't cull items which have render callback
-  bool hasRenderCallback = (rendererExist && renderable.mRenderer->GetRenderCallback());
+  bool hasRenderCallback = (rendererExist && renderable.mRenderer->HasRenderCallback());
 
   auto requiredInsideCheck = [&]()
   {

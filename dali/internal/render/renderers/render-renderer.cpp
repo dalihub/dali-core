@@ -147,23 +147,14 @@ void Renderer::FinishedCommandBuffer()
   GetUboViewList().Clear();
 }
 
-RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider,
-                             Render::Geometry*               geometry,
-                             uint32_t                        blendingBitmask,
-                             const Vector4&                  blendColor,
-                             FaceCullingMode::Type           faceCullingMode,
-                             bool                            preMultipliedAlphaEnabled,
-                             DepthWriteMode::Type            depthWriteMode,
-                             DepthTestMode::Type             depthTestMode,
-                             DepthFunction::Type             depthFunction,
-                             StencilParameters&              stencilParameters)
+RendererKey Renderer::NewKey(SceneGraph::RenderDataProvider* dataProvider)
 {
   DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Renderer::RegisterMemoryPoolCollection not called!");
   void* ptr = gMemoryPoolCollection->AllocateRawThreadSafe(gMemoryPoolType);
   auto  key = gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, ptr);
 
   // Use placement new to construct renderer.
-  new(ptr) Renderer(dataProvider, geometry, blendingBitmask, blendColor, faceCullingMode, preMultipliedAlphaEnabled, depthWriteMode, depthTestMode, depthFunction, stencilParameters);
+  new(ptr) Renderer(dataProvider);
   return RendererKey(key);
 }
 
@@ -177,41 +168,26 @@ void Renderer::UnregisterMemoryPoolCollection()
   gMemoryPoolCollection = nullptr;
 }
 
-Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider,
-                   Render::Geometry*               geometry,
-                   uint32_t                        blendingBitmask,
-                   const Vector4&                  blendColor,
-                   FaceCullingMode::Type           faceCullingMode,
-                   bool                            preMultipliedAlphaEnabled,
-                   DepthWriteMode::Type            depthWriteMode,
-                   DepthTestMode::Type             depthTestMode,
-                   DepthFunction::Type             depthFunction,
-                   StencilParameters&              stencilParameters)
+Renderer::Renderer(SceneGraph::RenderDataProvider* dataProvider)
 : mGraphicsController(nullptr),
   mRenderDataProvider(dataProvider),
-  mGeometry(geometry),
+  mGeometry(nullptr),
   mProgramCache(nullptr),
   mSharedUniformBufferViewContainer(nullptr),
-  mStencilParameters(stencilParameters),
+  mStencilParameters(RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP),
   mBlendingOptions(),
   mIndexedDrawFirstElement(0),
   mIndexedDrawElementsCount(0),
-  mDepthFunction(depthFunction),
-  mFaceCullingMode(faceCullingMode),
-  mDepthWriteMode(depthWriteMode),
-  mDepthTestMode(depthTestMode),
-  mPremultipliedAlphaEnabled(preMultipliedAlphaEnabled),
+  mDepthFunction(DepthFunction::LESS),
+  mFaceCullingMode(FaceCullingMode::NONE),
+  mDepthWriteMode(DepthWriteMode::AUTO),
+  mDepthTestMode(DepthTestMode::AUTO),
+  mPremultipliedAlphaEnabled(false),
   mShaderChanged(false),
   mPipelineCached(false),
   mPipelineNotifierCached(false),
   mUseSharedUniformBlock(true)
 {
-  if(blendingBitmask != 0u)
-  {
-    mBlendingOptions.SetBitmask(blendingBitmask);
-  }
-
-  mBlendingOptions.SetBlendColor(blendColor);
 }
 
 void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache& programCache, Render::UniformBufferManager& uniformBufferManager, Render::PipelineCache& pipelineCache, Render::TerminatedNativeDrawManager& terminatedNativeDrawManager, SharedUniformBufferViewContainer& sharedUniformBufferViewContainer)
