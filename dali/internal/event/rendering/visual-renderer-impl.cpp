@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,14 @@
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/common/owner-key-type.h>
+#include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/animatable-property-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer-messages.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
+#include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
 #include <dali/public-api/object/type-registry.h>
 
 namespace Dali
@@ -64,6 +66,39 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::VisualRenderer), typeid(Dali::Renderer), Create, VisualRendererDefaultProperties);
 
+/**
+ * Sets both the cached value of a property and sends a message to set the animatable property in the Update thread.
+ * @tparam T The property type
+ * @param[in] eventThreadServices The event thread services
+ * @param[in] propertyValue The new property value given
+ * @param[in,out] cachedValue The local cached value of the property
+ * @param[in] animatableProperty The animatable property to set on the update-thread
+ */
+template<typename T>
+void SetValue(EventThreadServices& eventThreadServices, const SceneGraph::PropertyOwner& propertyOwner, const Property::Value& propertyValue, T& cachedValue, const SceneGraph::AnimatableProperty<T>& animatableProperty)
+{
+  if(propertyValue.Get(cachedValue))
+  {
+    BakeMessage<T>(eventThreadServices, propertyOwner, animatableProperty, cachedValue);
+  }
+}
+
+/**
+ * Sets the cached value of a property only.
+ * @tparam T The property type
+ * @param[in] propertyValue The new property value given
+ * @param[in,out] cachedValue The local cached value of the property
+ * @param[in,out] updated True if cache value updated
+ */
+template<typename T>
+void SetCacheValue(const Property::Value& propertyValue, T& cachedValue, bool& updated)
+{
+  if(propertyValue.Get(cachedValue))
+  {
+    updated = true;
+  }
+}
+
 } // unnamed namespace
 
 VisualRendererPtr VisualRenderer::New()
@@ -72,7 +107,7 @@ VisualRendererPtr VisualRenderer::New()
   auto                               sceneObjectKey = SceneGraph::Renderer::NewKey();
   OwnerKeyType<SceneGraph::Renderer> transferKeyOwnership(sceneObjectKey);
 
-  sceneObjectKey->SetVisualProperties(new SceneGraph::VisualRenderer::VisualProperties(*sceneObjectKey.Get()));
+  sceneObjectKey->SetDummyVisualProperties();
 
   // pass the pointer to base for message passing
   VisualRendererPtr rendererPtr(new VisualRenderer(sceneObjectKey.Get()));
@@ -89,7 +124,9 @@ VisualRendererPtr VisualRenderer::New()
 VisualRenderer::VisualRenderer(const SceneGraph::Renderer* sceneObject)
 : Renderer(sceneObject),
   mPropertyCache(),
-  mUniformMapped(false)
+  mVisualProperties(nullptr),
+  mUniformMapped(false),
+  mPropertyCacheChanged(false)
 {
 }
 
@@ -112,106 +149,120 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
   }
   else
   {
-    switch(index)
+    bool sceneGraphVisualPropertyUpdated = false;
+    if(DALI_LIKELY(mVisualProperties))
     {
-      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET:
+      EventThreadServices& eventThreadServices = GetEventThreadServices();
+      switch(index)
       {
-        if(propertyValue.Get(mPropertyCache.mTransformOffset))
+        case Dali::VisualRenderer::Property::TRANSFORM_OFFSET:
         {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-          if(visualProperties)
-          {
-            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformOffset, mPropertyCache.mTransformOffset);
-          }
+          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mPropertyCache.mTransformOffset, mVisualProperties->mTransformOffset);
+          sceneGraphVisualPropertyUpdated = true;
+          break;
         }
-        break;
+
+        case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
+        {
+          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mPropertyCache.mTransformSize, mVisualProperties->mTransformSize);
+          sceneGraphVisualPropertyUpdated = true;
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
+        {
+          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mPropertyCache.mTransformOrigin, mVisualProperties->mTransformOrigin);
+          sceneGraphVisualPropertyUpdated = true;
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+        {
+          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mPropertyCache.mTransformAnchorPoint, mVisualProperties->mTransformAnchorPoint);
+          sceneGraphVisualPropertyUpdated = true;
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
+        {
+          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mPropertyCache.mTransformOffsetSizeMode, mVisualProperties->mTransformOffsetSizeMode);
+          sceneGraphVisualPropertyUpdated = true;
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::EXTRA_SIZE:
+        {
+          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mPropertyCache.mExtraSize, mVisualProperties->mExtraSize);
+          sceneGraphVisualPropertyUpdated = true;
+          break;
+        }
+      }
+    }
+
+    if(!sceneGraphVisualPropertyUpdated)
+    {
+      bool propertyCacheChanged = false;
+      switch(index)
+      {
+        case Dali::VisualRenderer::Property::TRANSFORM_OFFSET:
+        {
+          SetCacheValue(propertyValue, mPropertyCache.mTransformOffset, propertyCacheChanged);
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
+        {
+          SetCacheValue(propertyValue, mPropertyCache.mTransformSize, propertyCacheChanged);
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
+        {
+          SetCacheValue(propertyValue, mPropertyCache.mTransformOrigin, propertyCacheChanged);
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+        {
+          SetCacheValue(propertyValue, mPropertyCache.mTransformAnchorPoint, propertyCacheChanged);
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
+        {
+          SetCacheValue(propertyValue, mPropertyCache.mTransformOffsetSizeMode, propertyCacheChanged);
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::EXTRA_SIZE:
+        {
+          SetCacheValue(propertyValue, mPropertyCache.mExtraSize, propertyCacheChanged);
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
+        {
+          Vector3 mixColorVec3;
+          if(propertyValue.Get(mixColorVec3))
+          {
+            float opacity = Renderer::GetDefaultProperty(Dali::Renderer::Property::OPACITY).Get<float>();
+            Renderer::SetDefaultProperty(Dali::Renderer::Property::MIX_COLOR, Vector4(mixColorVec3.r, mixColorVec3.g, mixColorVec3.b, opacity));
+          }
+          break;
+        }
+
+        case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
+        {
+          float preMultipliedAlpha = 0.0f;
+          if(propertyValue.Get(preMultipliedAlpha))
+          {
+            Renderer::SetDefaultProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, !Dali::EqualsZero(preMultipliedAlpha));
+          }
+          break;
+        }
       }
 
-      case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
-      {
-        if(propertyValue.Get(mPropertyCache.mTransformSize))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-          if(visualProperties)
-          {
-            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformSize, mPropertyCache.mTransformSize);
-          }
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
-      {
-        if(propertyValue.Get(mPropertyCache.mTransformOrigin))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-          if(visualProperties)
-          {
-            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformOrigin, mPropertyCache.mTransformOrigin);
-          }
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
-      {
-        if(propertyValue.Get(mPropertyCache.mTransformAnchorPoint))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-          if(visualProperties)
-          {
-            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformAnchorPoint, mPropertyCache.mTransformAnchorPoint);
-          }
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
-      {
-        if(propertyValue.Get(mPropertyCache.mTransformOffsetSizeMode))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-          if(visualProperties)
-          {
-            BakeMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, visualProperties->mTransformOffsetSizeMode, mPropertyCache.mTransformOffsetSizeMode);
-          }
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::EXTRA_SIZE:
-      {
-        if(propertyValue.Get(mPropertyCache.mExtraSize))
-        {
-          const SceneGraph::Renderer& sceneObject      = GetVisualRendererSceneObject();
-          auto                        visualProperties = sceneObject.GetVisualProperties();
-          if(visualProperties)
-          {
-            BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, visualProperties->mExtraSize, mPropertyCache.mExtraSize);
-          }
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
-      {
-        Vector3 mixColorVec3;
-        if(propertyValue.Get(mixColorVec3))
-        {
-          float opacity = Renderer::GetDefaultProperty(Dali::Renderer::Property::OPACITY).Get<float>();
-          Renderer::SetDefaultProperty(Dali::Renderer::Property::MIX_COLOR, Vector4(mixColorVec3.r, mixColorVec3.g, mixColorVec3.b, opacity));
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
-      {
-        float preMultipliedAlpha = 0.0f;
-        if(propertyValue.Get(preMultipliedAlpha))
-        {
-          Renderer::SetDefaultProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, !Dali::EqualsZero(preMultipliedAlpha));
-        }
-        break;
-      }
+      mPropertyCacheChanged |= propertyCacheChanged;
     }
   }
 }
@@ -291,61 +342,53 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
   }
   else
   {
-    const SceneGraph::Renderer& sceneObject = GetVisualRendererSceneObject();
-
     switch(index)
     {
       case Dali::VisualRenderer::Property::TRANSFORM_OFFSET:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
+        if(DALI_LIKELY(mVisualProperties))
         {
-          value = visualProperties->mTransformOffset[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformOffset[GetEventThreadServices().GetEventBufferIndex()];
         }
         break;
       }
       case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
+        if(DALI_LIKELY(mVisualProperties))
         {
-          value = visualProperties->mTransformSize[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformSize[GetEventThreadServices().GetEventBufferIndex()];
         }
         break;
       }
       case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
+        if(DALI_LIKELY(mVisualProperties))
         {
-          value = visualProperties->mTransformOrigin[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformOrigin[GetEventThreadServices().GetEventBufferIndex()];
         }
         break;
       }
       case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
+        if(DALI_LIKELY(mVisualProperties))
         {
-          value = visualProperties->mTransformAnchorPoint[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformAnchorPoint[GetEventThreadServices().GetEventBufferIndex()];
         }
         break;
       }
       case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
+        if(DALI_LIKELY(mVisualProperties))
         {
-          value = visualProperties->mTransformOffsetSizeMode[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformOffsetSizeMode[GetEventThreadServices().GetEventBufferIndex()];
         }
         break;
       }
       case Dali::VisualRenderer::Property::EXTRA_SIZE:
       {
-        auto visualProperties = sceneObject.GetVisualProperties();
-        if(visualProperties)
+        if(DALI_LIKELY(mVisualProperties))
         {
-          value = visualProperties->mExtraSize[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mExtraSize[GetEventThreadServices().GetEventBufferIndex()];
         }
         break;
       }
@@ -435,28 +478,25 @@ const SceneGraph::PropertyBase* VisualRenderer::GetSceneObjectAnimatableProperty
   {
     case Dali::VisualRenderer::Property::TRANSFORM_OFFSET:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
+      if(DALI_LIKELY(mVisualProperties))
       {
-        property = &visualProperties->mTransformOffset;
+        property = &mVisualProperties->mTransformOffset;
       }
       break;
     }
     case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
+      if(DALI_LIKELY(mVisualProperties))
       {
-        property = &visualProperties->mTransformSize;
+        property = &mVisualProperties->mTransformSize;
       }
       break;
     }
     case Dali::VisualRenderer::Property::EXTRA_SIZE:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
+      if(DALI_LIKELY(mVisualProperties))
       {
-        property = &visualProperties->mExtraSize;
+        property = &mVisualProperties->mExtraSize;
       }
       break;
     }
@@ -483,28 +523,25 @@ const PropertyInputImpl* VisualRenderer::GetSceneObjectInputProperty(Property::I
   {
     case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
+      if(DALI_LIKELY(mVisualProperties))
       {
-        return &visualProperties->mTransformOrigin;
+        return &mVisualProperties->mTransformOrigin;
       }
       break;
     }
     case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
+      if(DALI_LIKELY(mVisualProperties))
       {
-        return &visualProperties->mTransformAnchorPoint;
+        return &mVisualProperties->mTransformAnchorPoint;
       }
       break;
     }
     case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
     {
-      auto visualProperties = GetVisualRendererSceneObject().GetVisualProperties();
-      if(visualProperties)
+      if(DALI_LIKELY(mVisualProperties))
       {
-        return &visualProperties->mTransformOffsetSizeMode;
+        return &mVisualProperties->mTransformOffsetSizeMode;
       }
       break;
     }
@@ -528,6 +565,23 @@ void VisualRenderer::RegisterVisualTransformUniform()
     // Mark as we will not use shared uniform block.
     // TODO : Currently, we ignore whole shared uniform blocks. We should specify the name of UBO in future.
     EnableSharedUniformBlockMessage(GetEventThreadServices(), GetRendererSceneObject(), false);
+
+    if(mVisualProperties == nullptr)
+    {
+      mVisualProperties = new SceneGraph::VisualRenderer::VisualProperties(const_cast<SceneGraph::Renderer&>(GetVisualRendererSceneObject()));
+      OwnerPointer<SceneGraph::VisualRenderer::VisualProperties> transferOwnership(mVisualProperties);
+      SetVisualPropertiesMessage(GetEventThreadServices(), GetRendererSceneObject(), transferOwnership);
+
+      if(DALI_UNLIKELY(mPropertyCacheChanged))
+      {
+        BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, mVisualProperties->mTransformOffset, mPropertyCache.mTransformOffset);
+        BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, mVisualProperties->mTransformSize, mPropertyCache.mTransformSize);
+        BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, mVisualProperties->mTransformOrigin, mPropertyCache.mTransformOrigin);
+        BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, mVisualProperties->mTransformAnchorPoint, mPropertyCache.mTransformAnchorPoint);
+        BakeMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, mVisualProperties->mTransformOffsetSizeMode, mPropertyCache.mTransformOffsetSizeMode);
+        BakeMessage<Vector2>(GetEventThreadServices(), *mUpdateObject, mVisualProperties->mExtraSize, mPropertyCache.mExtraSize);
+      }
+    }
 
     mUniformMapped = true;
     AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_OFFSET, ConstString("offset"));

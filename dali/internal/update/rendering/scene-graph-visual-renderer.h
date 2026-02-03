@@ -47,6 +47,14 @@ struct DecoratedVisualProperties
   {
   }
 
+public: // Public API
+  /**
+   * @brief Get the update area after visual properties applied.
+   * @param[in] bufferIndex The current buffer index.
+   * @param[in, out] updateArea The original update area before apply the visual properties. Stored into this value after calculated
+   */
+  void GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept;
+
 public:
   /**
    * @brief Prepare properties and ready to render sequence
@@ -100,26 +108,21 @@ struct VisualProperties
     mTransformOrigin(Vector2::ZERO),
     mTransformAnchorPoint(Vector2::ZERO),
     mTransformOffsetSizeMode(Vector4::ZERO),
-    mExtraSize(Vector2::ZERO),
-    mPreMultipliedAlpha(0.0f),
-    mAttachedNode(nullptr),
-    mExtendedProperties(nullptr)
+    mExtraSize(Vector2::ZERO)
   {
   }
 
   ~VisualProperties()
   {
-    if(mExtendedProperties)
-    {
-      delete mExtendedProperties;
-    }
   }
 
 public: // Public API
   /**
-   * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
+   * @brief Get the update area after visual properties applied.
+   * @param[in] bufferIndex The current buffer index.
+   * @param[in, out] updateArea The original update area before apply the visual properties. Stored into this value after calculated
    */
-  Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept;
+  void GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept;
 
 public:
   /**
@@ -168,12 +171,6 @@ public: // Default properties
   PROPERTY_WRAPPER(mTransformOffsetSizeMode, VisualRendererProperty, Vector2, mExtraSize);
 
   // Properties that don't give any effort to coefficient.
-  AnimatableProperty<float> mPreMultipliedAlpha;
-
-  const Node* mAttachedNode{nullptr}; ///< Node attached to this visual renderer (not owned)
-
-public: // Extended properties for decorated visual properties
-  DecoratedVisualProperties* mExtendedProperties{nullptr};
 };
 } // namespace VisualRenderer
 } // namespace Dali::Internal::SceneGraph
