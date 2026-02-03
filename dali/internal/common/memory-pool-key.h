@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_KEY_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ public:
    * @param[in] np nullptr
    * @return true if the key is invalid
    */
-  bool operator==(std::nullptr_t np) const
+  bool operator==(decltype(nullptr) np) const
   {
     return key == INVALID;
   }
@@ -165,7 +165,7 @@ public:
    * @param[in] np nullptr
    * @return true if the keys is valid
    */
-  bool operator!=(std::nullptr_t np) const
+  bool operator!=(decltype(nullptr) np) const
   {
     return key != INVALID;
   }

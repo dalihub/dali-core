@@ -707,7 +707,6 @@ uint32_t Camera::UpdateViewMatrix(BufferIndex updateBufferIndex)
   }
   else
   {
-    mViewMatrix.CleanDirty();
     mUpdateViewFlag = 0u;
   }
 
@@ -923,7 +922,6 @@ uint32_t Camera::UpdateProjection(BufferIndex updateBufferIndex)
   }
   else
   {
-    mProjectionMatrix.CleanDirty();
     mUpdateProjectionFlag = 0u;
   }
 

@@ -73,16 +73,6 @@ public:
   }
 
   /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   * @note A constraint can only receive the inherited property from the previous frame.
-   */
-  bool InputChanged() const override
-  {
-    // We don't need it in this class.
-    return true;
-  }
-
-  /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetVector4()
    */
   const Vector4& GetVector4(BufferIndex bufferIndex) const override
@@ -177,8 +167,7 @@ public:
    */
   InheritedMatrix()
   : mValue(),
-    mInheritedFlag(false),
-    mReinheritedFlag(true)
+    mInheritedFlag(false)
   {
   }
 
@@ -202,15 +191,6 @@ public:
   {
     // A constraint cannot use the property until it has been inherited (at least once).
     return mInheritedFlag;
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   * @note A constraint can only receive the inherited property from the previous frame.
-   */
-  bool InputChanged() const override
-  {
-    return mReinheritedFlag;
   }
 
   /**
@@ -255,8 +235,7 @@ public:
     mValue = value;
 
     // The value has been inherited for the first time
-    mInheritedFlag   = true;
-    mReinheritedFlag = true;
+    mInheritedFlag = true;
   }
 
   /**
@@ -280,18 +259,8 @@ public:
    */
   void SetDirty()
   {
-    mReinheritedFlag = true;
-
     // The value has been inherited for the first time
     mInheritedFlag = true;
-  }
-
-  /**
-   * @brief Clean dirty flags.
-   */
-  void CleanDirty()
-  {
-    mReinheritedFlag = false;
   }
 
 private:
@@ -304,8 +273,7 @@ private:
 private:
   Matrix mValue;
 
-  bool mInheritedFlag : 1;   ///< Flag whether the value has ever been inherited
-  bool mReinheritedFlag : 1; ///< Flag whether value was re-inherited in previous frame
+  bool mInheritedFlag : 1; ///< Flag whether the value has ever been inherited
 };
 
 } // namespace SceneGraph

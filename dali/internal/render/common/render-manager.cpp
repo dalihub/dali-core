@@ -1303,6 +1303,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
       // Note, don't set the viewport/scissor on primary command buffer.
       mImpl->renderAlgorithms.ProcessRenderInstruction(instruction,
+                                                       *currentCommandBuffer,
                                                        mImpl->renderBufferIndex,
                                                        depthBufferAvailable,
                                                        stencilBufferAvailable,
@@ -1311,8 +1312,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
                                                        surfaceOrientation,
                                                        Uint16Pair(surfaceRect.width, surfaceRect.height),
                                                        currentRenderPass,
-                                                       *currentRenderTargetGraphicsObjects,
-                                                       currentCommandBuffer);
+                                                       *currentRenderTargetGraphicsObjects);
 
       Graphics::SyncObject* syncObject{nullptr};
 

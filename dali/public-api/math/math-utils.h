@@ -2,7 +2,7 @@
 #define DALI_MATH_UTILS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,34 @@ constexpr void ClampInPlace(T& value, const T& min, const T& max)
   const T& constrainedUpper         = value < max ? value : max;
   const T& constrainedUpperAndLower = constrainedUpper > min ? constrainedUpper : min;
   value                             = constrainedUpperAndLower;
+}
+
+/**
+ * @brief Get the smaller value.
+ *
+ * @SINCE_2_5.8
+ * @param[in] lhs The first value.
+ * @param[in] rhs The second value.
+ * @return T the smaller value.
+ */
+template<typename T>
+constexpr const T& Min(const T& lhs, const T& rhs)
+{
+  return lhs < rhs ? lhs : rhs;
+}
+
+/**
+ * @brief Get the bigger value.
+ *
+ * @SINCE_2_5.8
+ * @param[in] lhs The first value.
+ * @param[in] rhs The second value.
+ * @return T the bigger value.
+ */
+template<typename T>
+constexpr const T& Max(const T& lhs, const T& rhs)
+{
+  return lhs > rhs ? lhs : rhs;
 }
 
 /**

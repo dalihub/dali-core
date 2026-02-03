@@ -64,13 +64,11 @@ int UtcDaliInternalPropertyGetValueAddress(void)
   properties.emplace_back(new AnimatableProperty<Matrix3>(Matrix3::IDENTITY), Matrix3::IDENTITY, sizeof(Matrix3));
 
   properties.emplace_back(new InheritedColor(Color::SIENNA), Color::SIENNA, sizeof(Vector4));
-  DALI_TEST_EQUALS(static_cast<InheritedColor*>(properties.back().property.get())->InputChanged(), true, TEST_LOCATION);
   DALI_TEST_VALUE_EQUALS(static_cast<InheritedColor*>(properties.back().property.get())->GetVector4(0), Color::SIENNA, 0.001f, TEST_LOCATION);
   DALI_TEST_VALUE_EQUALS(static_cast<InheritedColor*>(properties.back().property.get())->GetConstraintInputVector4(0), Color::SIENNA, 0.001f, TEST_LOCATION);
 
   properties.emplace_back(new InheritedMatrix(), Matrix::IDENTITY, sizeof(Matrix));
   static_cast<InheritedMatrix*>(properties.back().property.get())->Set(properties.back().value.Get<Matrix>());
-  DALI_TEST_EQUALS(static_cast<InheritedMatrix*>(properties.back().property.get())->InputChanged(), true, TEST_LOCATION);
   DALI_TEST_VALUE_EQUALS(static_cast<InheritedMatrix*>(properties.back().property.get())->GetMatrix(0), Matrix::IDENTITY, 0.001f, TEST_LOCATION);
 
   properties.emplace_back(new GesturePropertyBool(), true, sizeof(bool));

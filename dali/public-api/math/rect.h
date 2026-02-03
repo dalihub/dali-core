@@ -2,7 +2,7 @@
 #define DALI_RECT_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <math.h>
 #include <ostream>
 
 // INTERNAL INCLUDES
@@ -252,10 +251,10 @@ struct Rect
    */
   bool Intersect(const Rect<T>& rect)
   {
-    const T left   = std::max(rect.x, x);
-    const T top    = std::max(rect.y, y);
-    const T right  = std::min(rect.x + rect.width, x + width);
-    const T bottom = std::min(rect.y + rect.height, y + height);
+    const T left   = Dali::Max(rect.x, x);
+    const T top    = Dali::Max(rect.y, y);
+    const T right  = Dali::Min(rect.x + rect.width, x + width);
+    const T bottom = Dali::Min(rect.y + rect.height, y + height);
 
     const T width  = right - left;
     const T height = bottom - top;
@@ -280,10 +279,10 @@ struct Rect
    */
   void Merge(const Rect<T>& rect)
   {
-    const T left   = std::min(rect.x, x);
-    const T top    = std::min(rect.y, y);
-    const T right  = std::max(rect.x + rect.width, x + width);
-    const T bottom = std::max(rect.y + rect.height, y + height);
+    const T left   = Dali::Min(rect.x, x);
+    const T top    = Dali::Min(rect.y, y);
+    const T right  = Dali::Max(rect.x + rect.width, x + width);
+    const T bottom = Dali::Max(rect.y + rect.height, y + height);
     x              = left;
     y              = top;
     width          = right - left;

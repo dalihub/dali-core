@@ -2,7 +2,7 @@
 #define DALI_INTRUSIVE_PTR_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstddef> // for std::nullptr_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -389,7 +388,7 @@ inline bool operator!=(T* lhs, IntrusivePtr<U> const& rhs)
  * @return True if the pointers is nullptr
  */
 template<typename T>
-inline bool operator==(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
+inline bool operator==(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
 {
   return lhs.Get() == nullptr;
 }
@@ -403,7 +402,7 @@ inline bool operator==(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
  * @return True if the pointers is not nullptr
  */
 template<typename T>
-inline bool operator!=(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
+inline bool operator!=(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
 {
   return lhs.Get() != nullptr;
 }
@@ -417,7 +416,7 @@ inline bool operator!=(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
  * @return True if the pointers is nullptr
  */
 template<typename T>
-inline bool operator==(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
+inline bool operator==(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
 {
   return nullptr == rhs.Get();
 }
@@ -431,7 +430,7 @@ inline bool operator==(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
  * @return True if the pointers is not nullptr
  */
 template<typename T>
-inline bool operator!=(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
+inline bool operator!=(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
 {
   return nullptr != rhs.Get();
 }
@@ -487,7 +486,7 @@ inline bool operator<(IntrusivePtr<T> const& lhs, U* rhs)
  * @return True if the pointers point of rhs is bigger than lhs
  */
 template<typename T>
-inline bool operator<(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
+inline bool operator<(decltype(nullptr) lhs, IntrusivePtr<T> const& rhs)
 {
   // Do not use less operator with nullptr. It will make compile error over gcc-14.
   return nullptr != rhs.Get();
@@ -502,7 +501,7 @@ inline bool operator<(std::nullptr_t lhs, IntrusivePtr<T> const& rhs)
  * @return True if the pointers point of rhs is bigger than lhs
  */
 template<typename T>
-inline bool operator<(IntrusivePtr<T> const& lhs, std::nullptr_t rhs)
+inline bool operator<(IntrusivePtr<T> const& lhs, decltype(nullptr) rhs)
 {
   // Do not use less operator with nullptr. It will make compile error over gcc-14.
   return false;

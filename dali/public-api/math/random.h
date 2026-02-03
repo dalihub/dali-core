@@ -2,7 +2,7 @@
 #define DALI_RANDOM_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
 #include <dali/public-api/math/vector4.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
-#include <ctime> ///< for time(nullptr)
+#include <cstdlib> ///< for srand() and rand()
+#include <ctime>   ///< for time(nullptr)
 
 namespace Dali
 {
@@ -49,8 +49,8 @@ namespace Random
  */
 inline float Range(float f0, float f1)
 {
-  float min = std::min(f0, f1);
-  float max = std::max(f0, f1);
+  float minf = f0 < f1 ? f0 : f1;
+  float maxf = f0 > f1 ? f0 : f1;
 
   // Ensure we initialize only once. As it's inlined, this static variable will exist in the code-block using it, thus,
   // will be created and then initialized again when another code-block uses this.
@@ -63,7 +63,7 @@ inline float Range(float f0, float f1)
   }
 
   int32_t randValue = rand();
-  return static_cast<float>(randValue & 0xfff) * (1.0f / 4095.0f) * (max - min) + min;
+  return static_cast<float>(randValue & 0xfff) * (1.0f / 4095.0f) * (maxf - minf) + minf;
 }
 
 /**

@@ -835,7 +835,12 @@ void UpdateManager::AddRenderer(OwnerKeyType<Renderer>& rendererKeyPointer)
 
   renderer->ConnectToSceneGraph(mImpl->renderManagerDispatcher);
 
-  // DevNote : First created renderer is deactivated. We dont need to reorder renderers.
+  // DevNote : If first created renderer is deactivated, We dont need to reorder renderers.
+  if(!mImpl->renderersReorderRequired && !rendererKey->IsObservingNodeDeactivated())
+  {
+    mImpl->renderersReorderRequired = true;
+  }
+
   mImpl->renderers.PushBack(rendererKey);
 }
 
@@ -847,6 +852,10 @@ void UpdateManager::RemoveRenderer(const RendererKey& rendererKey)
   EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
 
   // DevNote : EraseUsingDiscardQueue keep renderer's order. We dont need to reorder renderers.
+  if(!mImpl->renderersReorderRequired && !rendererKey->IsObservingNodeDeactivated())
+  {
+    --mImpl->activatedRendererCount;
+  }
 
   // Need to remove the render object as well
   rendererKey->DisconnectFromSceneGraph(mImpl->renderManagerDispatcher);
@@ -987,7 +996,6 @@ bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncT
   if(mImpl->panGestureProcessor)
   {
     // gesture processor only supports default properties
-    mImpl->panGestureProcessor->ResetDefaultProperties(bufferIndex); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
     gestureUpdated |= mImpl->panGestureProcessor->UpdateProperties(lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds);
   }
 

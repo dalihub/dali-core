@@ -2,7 +2,7 @@
 #define DALI_INT_PAIR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,34 +45,17 @@ namespace Dali
  * common architectures.
  *
  * @SINCE_2_1.45
- * @tparam Bits The number of bits. It should be 8, 16, or 32.
- * @tparam IsSigned Determine whether we use signed integer or not.
+ * @tparam tIntType The signed/unsigned integer type for get/set access.
+ * @tparam tUintType The unsigned integer type that will be stored.
+ * @tparam tDataType The 2-tuple stored integer type.
  */
-template<unsigned Bits, bool IsSigned, typename = std::enable_if_t<(Bits == 8 || Bits == 16 || Bits == 32)>>
+template<typename tIntType, typename tUintType, typename tDataType>
 class IntPair
 {
 public:
-  // Type definition.
-
-  /**
-   * @brief Integer type for get/set access.
-   * @SINCE_2_1.45
-   */
-  using IntType = typename std::conditional<Bits == 8, typename std::conditional<IsSigned, int8_t, uint8_t>::type, typename std::conditional<Bits == 16, typename std::conditional<IsSigned, int16_t, uint16_t>::type, typename std::conditional<IsSigned, int32_t, uint32_t>::type>::type>::type;
-
-  /**
-   * @brief Unsigned integer type that will be stored.
-   * Signed integer bit shift is implementation-defined behaviour.
-   * To more safty works, we need to cast from IntType to UintType before store data.
-   * @SINCE_2_1.45
-   */
-  using UintType = typename std::conditional<Bits == 8, uint8_t, typename std::conditional<Bits == 16, uint16_t, uint32_t>::type>::type;
-
-  /**
-   * @brief 2-tuple stored integer type.
-   * @SINCE_2_1.45
-   */
-  using DataType = typename std::conditional<Bits == 8, uint16_t, typename std::conditional<Bits == 16, uint32_t, uint64_t>::type>::type;
+  using IntType  = tIntType;
+  using UintType = tUintType;
+  using DataType = tDataType;
 
 public:
   /**
@@ -82,6 +65,8 @@ public:
   constexpr IntPair()
   : mData(0)
   {
+    static_assert(sizeof(tIntType) == sizeof(tUintType));
+    static_assert(sizeof(tIntType) * 2 == sizeof(tDataType));
   }
 
   /**
@@ -90,14 +75,16 @@ public:
    * @param[in] width The width or X dimension of the tuple.
    * @param[in] height The height or Y dimension of the tuple.
    */
-  constexpr IntPair(IntType width, IntType height)
+  constexpr IntPair(tIntType width, tIntType height)
   {
-    /* Do equivalent of the code below with one aligned memory access:
+    /**
+     * Do equivalent of the code below with one aligned memory access:
      * mComponents[0] = width;
      * mComponents[1] = height;
      * Unit tests make sure this is equivalent.
      **/
-    mData = (static_cast<DataType>(static_cast<UintType>(height)) << Bits) | static_cast<DataType>(static_cast<UintType>(width));
+    constexpr uint32_t Bits = sizeof(tIntType) * 8u;
+    mData                   = (static_cast<tDataType>(static_cast<tUintType>(height)) << Bits) | static_cast<tDataType>(static_cast<tUintType>(width));
   }
 
   /**
@@ -105,7 +92,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] width The x dimension to be stored in this 2-tuple
    */
-  void SetWidth(IntType width)
+  void SetWidth(tIntType width)
   {
     mComponents[0] = width;
   }
@@ -115,7 +102,7 @@ public:
    * @SINCE_2_1.45
    * @return the x dimension stored in this 2-tuple
    */
-  IntType GetWidth() const
+  tIntType GetWidth() const
   {
     return mComponents[0];
   }
@@ -125,7 +112,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] height The y dimension to be stored in this 2-tuple
    */
-  void SetHeight(IntType height)
+  void SetHeight(tIntType height)
   {
     mComponents[1] = height;
   }
@@ -135,7 +122,7 @@ public:
    * @SINCE_2_1.45
    * @return Height
    */
-  IntType GetHeight() const
+  tIntType GetHeight() const
   {
     return mComponents[1];
   }
@@ -145,7 +132,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] x The x dimension to be stored in this 2-tuple
    */
-  void SetX(IntType x)
+  void SetX(tIntType x)
   {
     mComponents[0] = x;
   }
@@ -155,7 +142,7 @@ public:
    * @SINCE_2_1.45
    * @return X
    */
-  IntType GetX() const
+  tIntType GetX() const
   {
     return mComponents[0];
   }
@@ -165,7 +152,7 @@ public:
    * @SINCE_2_1.45
    * @param[in] y The y dimension to be stored in this 2-tuple
    */
-  void SetY(IntType y)
+  void SetY(tIntType y)
   {
     mComponents[1] = y;
   }
@@ -175,7 +162,7 @@ public:
    * @SINCE_2_1.45
    * @return Y
    */
-  IntType GetY() const
+  tIntType GetY() const
   {
     return mComponents[1];
   }
@@ -236,9 +223,9 @@ private:
   union
   {
     // Addressable view of X and Y:
-    IntType mComponents[2];
+    tIntType mComponents[2];
     // Packed view of X and Y to force alignment and allow a faster copy:
-    DataType mData;
+    tDataType mData;
   };
 };
 
@@ -251,7 +238,7 @@ private:
  * One of these can be passed in a single 64 bit integer.
  * @SINCE_2_1.45
  */
-class Int32Pair : public IntPair<32, true>
+class Int32Pair : public IntPair<int32_t, uint32_t, uint64_t>
 {
 public:
   /**

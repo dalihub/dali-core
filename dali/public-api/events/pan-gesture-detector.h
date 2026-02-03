@@ -2,7 +2,7 @@
 #define DALI_PAN_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,12 +89,50 @@ public:
     };
   };
 
+  /**
+   * @brief Range of angles for a direction.
+   * @SINCE_1_0.0
+   */
+  struct AngleThresholdPair
+  {
+  public:
+    /**
+     * @brief Default constructor.
+     * @SINCE_2_5.8
+     */
+    AngleThresholdPair()
+    : AngleThresholdPair(Radian(0), Radian(0))
+    {
+    }
+
+    /**
+     * @brief Constructor with angle and threshold.
+     * @SINCE_2_5.8
+     * @param[in] angleValue The angle value
+     * @param[in] thresholdValue The threshold value
+     */
+    AngleThresholdPair(Radian angleValue, Radian thresholdValue)
+    : angle(angleValue),
+      threshold(thresholdValue)
+    {
+    }
+
+  public:
+    // Use default copy & move operation
+    AngleThresholdPair(const AngleThresholdPair&)                = default;
+    AngleThresholdPair(AngleThresholdPair&&) noexcept            = default;
+    AngleThresholdPair& operator=(const AngleThresholdPair&)     = default;
+    AngleThresholdPair& operator=(AngleThresholdPair&&) noexcept = default;
+
+  public:
+    Radian angle;     ///< The angle that pan should be allowed. @SINCE_2_5.8
+    Radian threshold; ///< The threshold around that angle. @SINCE_2_5.8
+  };
+
   // Typedefs
   using DetectedSignalType = Signal<void(Actor, const PanGesture&)>; ///< Pan gesture detected signal type @SINCE_1_0.0
 
   // Directional Pan
-  using AngleThresholdPair = std::pair<Radian, Radian>; ///< Range of angles for a direction @SINCE_1_0.0
-
   static const Radian DIRECTION_LEFT;       ///< For a left pan (-PI Radians).
   static const Radian DIRECTION_RIGHT;      ///< For a right pan (0 Radians).
   static const Radian DIRECTION_UP;         ///< For an up pan (-0.5 * PI Radians).

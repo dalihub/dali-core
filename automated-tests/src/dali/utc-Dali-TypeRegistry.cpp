@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1117,7 +1117,7 @@ int UtcDaliTypeRegistryPropertyRegistrationN(void)
   END_TEST;
 }
 
-int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
+int UtcDaliTypeRegistryAnimatablePropertyRegistrationP01(void)
 {
   TestApplication application;
   TypeRegistry    typeRegistry = TypeRegistry::Get();
@@ -1177,6 +1177,86 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   // check that the property is animatable
   Animation animation = Animation::New(0.2f);
   animation.AnimateTo(Property(customActor, animatablePropertyIndex), 15.f, AlphaFunction::LINEAR);
+  animation.Play();
+
+  // Target value should change straight away
+  DALI_TEST_EQUALS(customActor.GetProperty<float>(animatablePropertyIndex), 15.0f, TEST_LOCATION);
+
+  // Render and notify, animation play for 0.05 seconds
+  application.SendNotification();
+  application.Render(50);
+  DALI_TEST_EQUALS(0.25f, animation.GetCurrentProgress(), TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetCurrentProperty<float>(animatablePropertyIndex), 22.5f, TEST_LOCATION);
+
+  // Render and notify, animation play for another 0.1 seconds
+  application.SendNotification();
+  application.Render(100);
+  DALI_TEST_EQUALS(0.75f, animation.GetCurrentProgress(), TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetCurrentProperty<float>(animatablePropertyIndex), 17.5f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyRegistrationP02(void)
+{
+  TestApplication application;
+  TypeRegistry    typeRegistry = TypeRegistry::Get();
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo(typeid(MyTestCustomActor));
+  DALI_TEST_CHECK(typeInfo);
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK(handle);
+  Actor customActor = Actor::DownCast(handle);
+  DALI_TEST_CHECK(customActor);
+  application.GetScene().Add(customActor);
+
+  unsigned int customPropertyCount(customActor.GetPropertyCount());
+
+  // Register animatable property
+  std::string                    animatablePropertyName("animatableProp1");
+  int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
+  Property::Type                 animatablePropertyType(Property::FLOAT);
+  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType);
+
+  // Check property count after registration
+  DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
+
+  // Set the animatable property value with integer type
+  customActor.SetProperty(animatablePropertyIndex, 25);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the animatable property value is float
+  DALI_TEST_EQUALS(customActor.GetProperty<float>(animatablePropertyIndex), 25.f, TEST_LOCATION);
+
+  // Check the animatable property name
+  DALI_TEST_EQUALS(customActor.GetPropertyName(animatablePropertyIndex), animatablePropertyName, TEST_LOCATION);
+
+  // Check the animatable property index
+  DALI_TEST_EQUALS(customActor.GetPropertyIndex(animatablePropertyName), animatablePropertyIndex, TEST_LOCATION);
+
+  // Check the animatable property type
+  DALI_TEST_EQUALS(customActor.GetPropertyType(animatablePropertyIndex), animatablePropertyType, TEST_LOCATION);
+
+  // Check property count of type-info is 1
+  Property::IndexContainer indices;
+  typeInfo.GetPropertyIndices(indices);
+  DALI_TEST_EQUALS(indices.Size(), customActor.GetPropertyCount(), TEST_LOCATION);
+
+  // Ensure indices returned from actor and customActor differ by one
+  Actor actor = Actor::New();
+  actor.GetPropertyIndices(indices);
+  unsigned int actorIndices = indices.Size();
+  customActor.GetPropertyIndices(indices);
+  unsigned int customActorIndices = indices.Size();
+  DALI_TEST_EQUALS(actorIndices + 1u, customActorIndices, TEST_LOCATION); // Custom property + registered property
+
+  // check that the property is animatable
+  Animation animation = Animation::New(0.2f);
+  animation.AnimateTo(Property(customActor, animatablePropertyIndex), 15, AlphaFunction::LINEAR);
   animation.Play();
 
   // Target value should change straight away

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PAN_GESTURE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -377,12 +377,6 @@ public:
    * Called to provide pan-gesture profiling information.
    */
   void EnableProfiling();
-
-  /**
-   * Reset default properties, custom ones not supported due to this being the only object in scene side
-   * @param updateBufferIndex index to use
-   */
-  void ResetDefaultProperties(BufferIndex updateBufferIndex);
 
 private:
   /**

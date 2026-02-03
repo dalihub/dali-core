@@ -48,7 +48,7 @@ public:
    * @brief Virtual destructor.
    * @SINCE_1_0.0
    */
-  virtual ~PropertyInput() = 0;
+  virtual ~PropertyInput();
 
   /**
    * @brief Queries the type of property input.

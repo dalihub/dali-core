@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_GESTURE_PROPERTIES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,7 @@ public:
    * @param [in] initialValue The initial value of the property.
    */
   GestureProperty(const T& initialValue)
-  : mValue(initialValue),
-    mInputChanged(false)
+  : mValue(initialValue)
   {
   }
 
@@ -50,8 +49,7 @@ public:
    * Create a read-only gesture property.
    */
   GestureProperty()
-  : mValue(),
-    mInputChanged(false)
+  : mValue()
   {
   }
 
@@ -69,14 +67,6 @@ public:
   }
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::IsClean()
-   */
-  virtual bool IsClean() const
-  {
-    return !InputChanged();
-  }
-
-  /**
    * @copydoc Dali::Internal::PropertyInputImpl::InputInitialized()
    */
   bool InputInitialized() const override
@@ -86,30 +76,12 @@ public:
   }
 
   /**
-   * @copydoc Dali::Internal::PropertyInputImpl::InputChanged()
-   * @note A constraint can only receive the inherited property from the previous frame.
-   */
-  bool InputChanged() const override
-  {
-    return mInputChanged;
-  }
-
-  /**
-   * @brief Resets mInputChanged back to false
-   */
-  void Reset()
-  {
-    mInputChanged = false;
-  }
-
-  /**
    * Set the property value.
    * @param[in] value The new property value.
    */
   void Set(const T& value)
   {
-    mValue        = value;
-    mInputChanged = true;
+    mValue = value;
   }
 
   /**
@@ -129,8 +101,7 @@ private:
   GestureProperty& operator=(const GestureProperty& rhs);
 
 protected:
-  T    mValue;            ///< The property value
-  bool mInputChanged : 1; ///< Whether the property has been modified
+  T mValue; ///< The property value
 };
 
 /**
