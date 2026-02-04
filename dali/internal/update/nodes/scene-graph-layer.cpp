@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,7 @@ Layer::Layer()
   mIsLayer = true;
 
   // layer starts off dirty
-  mAllChildTransformsClean[0] = false;
-  mAllChildTransformsClean[1] = false;
+  mAllChildTransformsClean = false;
 }
 
 Layer::~Layer() = default;
@@ -70,9 +69,8 @@ void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
     }
 
     // changing the sort function makes the layer dirty
-    mAllChildTransformsClean[0] = false;
-    mAllChildTransformsClean[1] = false;
-    mSortFunction               = function;
+    mAllChildTransformsClean = false;
+    mSortFunction            = function;
   }
 }
 

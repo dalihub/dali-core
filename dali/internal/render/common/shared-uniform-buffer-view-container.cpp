@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ uint32_t SharedUniformBufferViewContainer::GetTotalAlignedBlockSize() const
   return mImpl->mTotalAlignedBlockSize;
 }
 
-void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex, Render::UniformBufferManager& uniformBufferManager)
+void SharedUniformBufferViewContainer::Initialize(Render::UniformBufferManager& uniformBufferManager)
 {
 #if defined(DEBUG_ENABLED)
   uint32_t totalSize                   = 0u;
@@ -164,7 +164,7 @@ void SharedUniformBufferViewContainer::Initialize(BufferIndex renderBufferIndex,
     auto& ubo = *(item.second.get());
 
     // Write to the buffer view here, by value at sharedUniformBlock.
-    sharedUniformBlock.WriteUniforms(renderBufferIndex, programIndex, ubo);
+    sharedUniformBlock.WriteUniforms(programIndex, ubo);
   }
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Registered : %zu, SharedUniformBufferView count : %u, total block size:%u %u\n", mImpl->mSharedUniformBlockBufferViews.size(), totalUniformBufferViewCount, totalSize, mImpl->mTotalAlignedBlockSize);
 }

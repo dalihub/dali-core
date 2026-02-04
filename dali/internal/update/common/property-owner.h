@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/animation/scene-graph-constraint-container.h>
 #include <dali/internal/update/common/property-base.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/public-api/common/dali-vector.h>
 
@@ -73,12 +72,11 @@ public:
 
     /**
      * Called when the observable object is disconnected from the scene graph.
-     * @param[in] currentBufferIndex The buffer to reset.
      * @param[in] owner A reference to the disconnected PropertyOwner
      * @return NotifyReturnType::STOP_OBSERVING if we will not observe this object after this called
      *         NotifyReturnType::KEEP_OBSERVING if we will observe this object after this called.
      */
-    virtual NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) = 0;
+    virtual NotifyReturnType PropertyOwnerDisconnected(PropertyOwner& owner) = 0;
 
     /**
      * Called shortly before the observable object is destroyed.
@@ -154,9 +152,8 @@ public:
   /**
    * Notify all observers that the object has been disconnected and remove constraints.
    * This occurs when the object is disconnected from the scene-graph during UpdateManager::Update().
-   * @param[in] currentBufferIndex The current update buffer.
    */
-  void DisconnectFromSceneGraph(BufferIndex updateBufferIndex);
+  void DisconnectFromSceneGraph();
 
   /**
    * Reserve the given number of properties

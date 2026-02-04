@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,12 +94,11 @@ public:
 
   /**
    * Called from the update-thread after the scene has been updated, and is ready to render.
-   * @param[in]  bufferIndex           The bufferIndex to use
    * @param[in]  elapsedSeconds        Time elapsed time since the last frame (in seconds)
    * @param[in]  nodeHierarchyChanged  Whether the node hierarchy has changed
    * @return The requests from this FrameCallback.
    */
-  RequestFlags Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged);
+  RequestFlags Update(float elapsedSeconds, bool nodeHierarchyChanged);
 
   /**
    * Called from the update thread when there's a sync point to insert.
@@ -136,7 +135,7 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(PropertyOwner& owner) override
   { /* Nothing to do */
     return NotifyReturnType::KEEP_OBSERVING;
   }

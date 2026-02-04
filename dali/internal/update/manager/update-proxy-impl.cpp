@@ -29,7 +29,6 @@ namespace Internal
 UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraphTravelerInterfacePtr traveler)
 : mLastCachedIdNodePair({0u, nullptr}),
   mDirtyNodes(),
-  mCurrentBufferIndex(0u),
   mUpdateManager(updateManager),
   mTransformManager(transformManager),
   mSceneGraphTraveler(traveler),

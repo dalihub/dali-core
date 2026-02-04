@@ -60,19 +60,19 @@
 // #define NODE_TREE_LOGGING 1
 
 #if (defined(DEBUG_ENABLED) && defined(NODE_TREE_LOGGING))
-#define SNAPSHOT_NODE_LOGGING                                                   \
-  const uint32_t FRAME_COUNT_TRIGGER = 16;                                      \
-  if(mImpl->frameCounter >= FRAME_COUNT_TRIGGER)                                \
-  {                                                                             \
-    for(auto&& scene : mImpl->scenes)                                           \
-    {                                                                           \
-      if(scene && scene->root)                                                  \
-      {                                                                         \
-        mImpl->frameCounter = 0;                                                \
-        PrintNodes(*scene->root, mSceneGraphBuffers.GetUpdateBufferIndex(), 0); \
-      }                                                                         \
-    }                                                                           \
-  }                                                                             \
+#define SNAPSHOT_NODE_LOGGING                    \
+  const uint32_t FRAME_COUNT_TRIGGER = 16;       \
+  if(mImpl->frameCounter >= FRAME_COUNT_TRIGGER) \
+  {                                              \
+    for(auto&& scene : mImpl->scenes)            \
+    {                                            \
+      if(scene && scene->root)                   \
+      {                                          \
+        mImpl->frameCounter = 0;                 \
+        PrintNodes(*scene->root, 0);             \
+      }                                          \
+    }                                            \
+  }                                              \
   mImpl->frameCounter++;
 #else
 #define SNAPSHOT_NODE_LOGGING
@@ -128,10 +128,9 @@ using ContainerRemovedFlags = uint8_t;
  * @param container to remove from
  * @param object to remove
  * @param discardQueue to put the object to
- * @param updateBufferIndex to use
  */
 template<class Type>
-inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* object, DiscardQueue<Type*, OwnerContainer<Type*>>& discardQueue, BufferIndex updateBufferIndex)
+inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* object, DiscardQueue<Type*, OwnerContainer<Type*>>& discardQueue)
 {
   DALI_ASSERT_DEBUG(object && "NULL object not allowed");
 
@@ -141,8 +140,8 @@ inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* objec
     if(iter == object)
     {
       // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
-      discardQueue.Add(updateBufferIndex, container.Release(&iter)); // take the address of the reference to a pointer (iter)
-      return;                                                        // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
+      discardQueue.Add(container.Release(&iter)); // take the address of the reference to a pointer (iter)
+      return;                                     // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
     }
   }
 }
@@ -152,10 +151,9 @@ inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* objec
  * @param container to remove from
  * @param object to remove
  * @param discardQueue to put the object to
- * @param updateBufferIndex to use
  */
 template<class Type>
-inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const MemoryPoolKey<Type>& key, DiscardQueue<MemoryPoolKey<Type>, OwnerKeyContainer<Type>>& discardQueue, BufferIndex updateBufferIndex)
+inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const MemoryPoolKey<Type>& key, DiscardQueue<MemoryPoolKey<Type>, OwnerKeyContainer<Type>>& discardQueue)
 {
   DALI_ASSERT_DEBUG(key && "INVALID Key not allowed");
 
@@ -164,7 +162,7 @@ inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const Mem
     if(*iter == key)
     {
       // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
-      discardQueue.Add(updateBufferIndex, container.Release(iter));
+      discardQueue.Add(container.Release(iter));
       return; // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
     }
   }
@@ -202,7 +200,6 @@ struct UpdateManager::Impl
        PropertyNotifier&              propertyNotifier,
        RenderController&              renderController,
        RenderManager&                 renderManager,
-       SceneGraphBuffers&             sceneGraphBuffers,
        RenderTaskProcessor&           renderTaskProcessor)
   : renderManagerDispatcher(renderManager),
     notificationManager(notificationManager),
@@ -219,7 +216,7 @@ struct UpdateManager::Impl
     shaders(),
     uniformBlocks(),
     panGestureProcessor(nullptr),
-    messageQueue(renderController, sceneGraphBuffers),
+    messageQueue(renderController),
     frameCallbackProcessor(nullptr),
     nodeDirtyFlags(NodePropertyFlags::TRANSFORM), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter(0),
@@ -322,7 +319,6 @@ struct UpdateManager::Impl
     }
   }
 
-  SceneGraphBuffers              sceneGraphBuffers;       ///< Used to keep track of which buffers are being written or read
   RenderManagerDispatcher        renderManagerDispatcher; ///< Used for passing functions to the render-manager
   NotificationManager&           notificationManager;     ///< Queues notification messages for the event-thread.
   TransformManager               transformManager;        ///< Used to update the transformation matrices of the nodes
@@ -441,7 +437,6 @@ UpdateManager::UpdateManager(NotificationManager&           notificationManager,
                    propertyNotifier,
                    renderController,
                    renderManager,
-                   mSceneGraphBuffers,
                    renderTaskProcessor);
 }
 
@@ -508,7 +503,7 @@ void UpdateManager::UninstallRoot(Layer* layer)
 
   mImpl->nodeIdMap.erase(layer->GetId());
 
-  mImpl->nodeDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), layer);
+  mImpl->nodeDiscardQueue.Add(layer);
 
   // Notify the layer about impending destruction
   layer->OnDestroy();
@@ -566,7 +561,7 @@ void UpdateManager::DisconnectNode(Node* node)
   DALI_ASSERT_ALWAYS(nullptr != parent);
   parent->SetDirtyFlag(NodePropertyFlags::CHILD_DELETED | NodePropertyFlags::DESCENDENT_HIERARCHY_CHANGED); // make parent dirty so that render items dont get reused
 
-  parent->DisconnectChild(mSceneGraphBuffers.GetUpdateBufferIndex(), *node);
+  parent->DisconnectChild(*node);
 
   // Inform the frame-callback-processor, if set, about the node-hierarchy changing
   if(mImpl->frameCallbackProcessor)
@@ -604,7 +599,7 @@ void UpdateManager::DestroyNode(Node* node)
 
   mImpl->nodeIdMap.erase(node->GetId());
 
-  mImpl->nodeDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), node);
+  mImpl->nodeDiscardQueue.Add(node);
 
   // Notify the Node about impending destruction
   node->OnDestroy();
@@ -641,7 +636,7 @@ void UpdateManager::AddObject(OwnerPointer<PropertyOwner>& object)
 
 void UpdateManager::RemoveObject(PropertyOwner* object)
 {
-  EraseUsingDiscardQueue(mImpl->customObjects, object, mImpl->customObjectDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  EraseUsingDiscardQueue(mImpl->customObjects, object, mImpl->customObjectDiscardQueue);
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::CUSTOM_OBJECT;
 #endif
@@ -690,7 +685,7 @@ void UpdateManager::RemoveScene(Scene* scene)
   {
     if(sceneInfo && sceneInfo->scene && sceneInfo->scene.Get() == scene)
     {
-      mImpl->sceneDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), sceneInfo->scene.Release()); // take the address of the reference to a pointer
+      mImpl->sceneDiscardQueue.Add(sceneInfo->scene.Release()); // take the address of the reference to a pointer
       break;
     }
   }
@@ -705,7 +700,7 @@ void UpdateManager::StopAnimation(Animation* animation)
 {
   DALI_ASSERT_DEBUG(animation && "NULL animation called to stop");
 
-  bool animationFinished = animation->Stop(mSceneGraphBuffers.GetUpdateBufferIndex());
+  bool animationFinished = animation->Stop();
 
   mImpl->animationFinishedDuringUpdate = mImpl->animationFinishedDuringUpdate || animationFinished;
 }
@@ -714,14 +709,14 @@ void UpdateManager::ClearAnimation(Animation* animation)
 {
   DALI_ASSERT_DEBUG(animation && "NULL animation called to clear");
 
-  animation->ClearAnimator(mSceneGraphBuffers.GetUpdateBufferIndex());
+  animation->ClearAnimator();
 }
 
 void UpdateManager::RemoveAnimation(Animation* animation)
 {
   DALI_ASSERT_DEBUG(animation && "NULL animation called to remove");
 
-  animation->OnDestroy(mSceneGraphBuffers.GetUpdateBufferIndex());
+  animation->OnDestroy();
 
   DALI_ASSERT_DEBUG(animation->GetState() == Animation::Destroyed);
 
@@ -753,7 +748,7 @@ void UpdateManager::RequestResetUpdated(const PropertyOwner& owner)
 void UpdateManager::DiscardPropertyOwner(PropertyOwner* discardedOwner)
 {
   // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
-  mImpl->customObjectDiscardQueue.Add(mSceneGraphBuffers.GetUpdateBufferIndex(), discardedOwner);
+  mImpl->customObjectDiscardQueue.Add(discardedOwner);
 }
 
 void UpdateManager::AddPropertyResetter(OwnerPointer<PropertyResetterBase>& propertyResetter)
@@ -805,7 +800,7 @@ void UpdateManager::AddShader(OwnerPointer<Shader>& shader)
 void UpdateManager::RemoveShader(Shader* shader)
 {
   // Find the shader and destroy it
-  EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->shaderDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->shaderDiscardQueue);
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::SHADER;
 #endif
@@ -850,7 +845,7 @@ void UpdateManager::RemoveRenderer(const RendererKey& rendererKey)
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] RemoveRenderer\n", rendererKey.Get());
 
   // Find the renderer and destroy it
-  EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue);
 
   // DevNote : EraseUsingDiscardQueue keep renderer's order. We dont need to reorder renderers.
   if(!mImpl->renderersReorderRequired && !rendererKey->IsObservingNodeDeactivated())
@@ -920,7 +915,7 @@ void UpdateManager::AddUniformBlock(OwnerPointer<Render::UniformBlock>& uniformB
 
 void UpdateManager::RemoveUniformBlock(Render::UniformBlock* uniformBlock)
 {
-  EraseUsingDiscardQueue(mImpl->uniformBlocks, uniformBlock, mImpl->uniformBlockDiscardQueue, mSceneGraphBuffers.GetUpdateBufferIndex());
+  EraseUsingDiscardQueue(mImpl->uniformBlocks, uniformBlock, mImpl->uniformBlockDiscardQueue);
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::UNIFORM_BLOCKS;
 #endif
@@ -956,7 +951,7 @@ bool UpdateManager::FlushQueue()
   return mImpl->messageQueue.FlushQueue();
 }
 
-void UpdateManager::ResetProperties(BufferIndex bufferIndex)
+void UpdateManager::ResetProperties()
 {
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
@@ -985,12 +980,12 @@ void UpdateManager::ResetProperties(BufferIndex bufferIndex)
 
     for(auto&& propertyBase : propertyBaseList)
     {
-      propertyBase->ResetToBaseValue(bufferIndex);
+      propertyBase->ResetToBaseValue();
     }
   }
 }
 
-bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds)
+bool UpdateManager::ProcessGestures(uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds)
 {
   bool gestureUpdated(false);
 
@@ -1003,7 +998,7 @@ bool UpdateManager::ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncT
   return gestureUpdated;
 }
 
-bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
+bool UpdateManager::Animate(float elapsedSeconds)
 {
   bool animationActive = false;
 
@@ -1023,7 +1018,7 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
     bool       finished              = false;
     bool       stopped               = false;
     bool       progressMarkerReached = false;
-    animation->Update(bufferIndex, elapsedSeconds, stopped, finished, progressMarkerReached);
+    animation->Update(elapsedSeconds, stopped, finished, progressMarkerReached);
 
     animationActive = animationActive || animation->IsActive();
 
@@ -1072,16 +1067,16 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   return animationActive;
 }
 
-void UpdateManager::ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
+void UpdateManager::ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners)
 {
   // Constrain custom objects (in construction order)
   for(auto&& object : mImpl->customObjects)
   {
-    ConstrainPropertyOwner(*object, bufferIndex, true, postPropertyOwners);
+    ConstrainPropertyOwner(*object, true, postPropertyOwners);
   }
 }
 
-void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
+void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners)
 {
   // Constrain render-tasks
   for(auto&& scene : mImpl->scenes)
@@ -1091,30 +1086,30 @@ void UpdateManager::ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwn
       RenderTaskList::RenderTaskContainer& tasks = scene->taskList->GetTasks();
       for(auto&& task : tasks)
       {
-        ConstrainPropertyOwner(*task, bufferIndex, true, postPropertyOwners);
+        ConstrainPropertyOwner(*task, true, postPropertyOwners);
       }
     }
   }
 }
 
-void UpdateManager::ConstrainShaders(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
+void UpdateManager::ConstrainShaders(PropertyOwnerContainer& postPropertyOwners)
 {
   // constrain shaders... (in construction order)
   for(auto&& shader : mImpl->shaders)
   {
-    ConstrainPropertyOwner(*shader, bufferIndex, true, postPropertyOwners);
+    ConstrainPropertyOwner(*shader, true, postPropertyOwners);
   }
   for(auto&& uniformBlock : mImpl->uniformBlocks)
   {
-    ConstrainPropertyOwner(*uniformBlock, bufferIndex, true, postPropertyOwners);
+    ConstrainPropertyOwner(*uniformBlock, true, postPropertyOwners);
   }
 }
 
-void UpdateManager::ProcessPropertyNotifications(BufferIndex bufferIndex)
+void UpdateManager::ProcessPropertyNotifications()
 {
   for(auto&& notification : mImpl->propertyNotifications)
   {
-    bool valid = notification->Check(bufferIndex);
+    bool valid = notification->Check();
     if(valid)
     {
       mImpl->notificationManager.QueueMessage(PropertyChangedMessage(mImpl->propertyNotifier, notification->GetNotifyId(), notification->GetValidity()));
@@ -1147,7 +1142,7 @@ void UpdateManager::ForwardCompiledShadersToEventThread()
   }
 }
 
-void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
+void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners)
 {
   if(mImpl->renderers.Empty())
   {
@@ -1169,9 +1164,9 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
     {
       // Apply constraints
       auto renderer = rendererKey.Get();
-      ConstrainPropertyOwner(*renderer, bufferIndex, true, postPropertyOwners);
+      ConstrainPropertyOwner(*renderer, true, postPropertyOwners);
 
-      mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
+      mImpl->renderingRequired = renderer->PrepareRender() || mImpl->renderingRequired;
     }
 
     DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_RENDERERS");
@@ -1216,9 +1211,9 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
       {
         // Apply constraints
         auto renderer = rendererKey.Get();
-        ConstrainPropertyOwner(*renderer, bufferIndex, true, postPropertyOwners);
+        ConstrainPropertyOwner(*renderer, true, postPropertyOwners);
 
-        mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
+        mImpl->renderingRequired = renderer->PrepareRender() || mImpl->renderingRequired;
         if(--count == 0)
         {
           break;
@@ -1230,7 +1225,7 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
   }
 }
 
-void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
+void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners)
 {
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
 
@@ -1241,19 +1236,18 @@ void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, Buff
       // Prepare resources, update shaders, for each node
       // And add the renderers to the sorted layers. Start from root, which is also a layer
       mImpl->nodeDirtyFlags |= UpdateNodeTree(*scene->root,
-                                              bufferIndex,
                                               postPropertyOwners);
     }
   }
 }
 
-void UpdateManager::UpdateLayers(BufferIndex bufferIndex)
+void UpdateManager::UpdateLayers()
 {
   for(auto&& scene : mImpl->scenes)
   {
     if(scene && scene->root)
     {
-      SceneGraph::UpdateLayerTree(*scene->root, bufferIndex);
+      SceneGraph::UpdateLayerTree(*scene->root);
     }
   }
 }
@@ -1266,19 +1260,17 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
                                bool     uploadOnly,
                                bool&    rendererAdded)
 {
-  const BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
-
   // Clear nodes/resources which were previously discarded
-  mImpl->nodeDiscardQueue.Clear(bufferIndex);
-  mImpl->shaderDiscardQueue.Clear(bufferIndex);
-  mImpl->rendererDiscardQueue.Clear(bufferIndex);
-  mImpl->sceneDiscardQueue.Clear(bufferIndex);
-  mImpl->customObjectDiscardQueue.Clear(bufferIndex);
+  mImpl->nodeDiscardQueue.Clear();
+  mImpl->shaderDiscardQueue.Clear();
+  mImpl->rendererDiscardQueue.Clear();
+  mImpl->sceneDiscardQueue.Clear();
+  mImpl->customObjectDiscardQueue.Clear();
 
   bool isAnimationRunning = IsAnimationRunning();
 
   // Process Touches & Gestures
-  const bool gestureUpdated = ProcessGestures(bufferIndex, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds);
+  const bool gestureUpdated = ProcessGestures(lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds);
 
   bool updateScene =                                   // The scene-graph requires an update if..
     (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || // ..nodes were dirty in previous frame OR
@@ -1296,14 +1288,14 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   if(updateScene || mImpl->previousUpdateScene)
   {
     // Reset properties from the previous update
-    ResetProperties(bufferIndex);
+    ResetProperties();
     mImpl->transformManager.ResetToBaseValue();
   }
 
   // Process the queued scene messages. Note, MessageQueue::FlushQueue may be called
   // between calling IsSceneUpdateRequired() above and here, so updateScene should
   // be set again
-  updateScene |= mImpl->messageQueue.ProcessMessages(bufferIndex);
+  updateScene |= mImpl->messageQueue.ProcessMessages();
 
   // Forward compiled shader programs to event thread for saving
   ForwardCompiledShadersToEventThread();
@@ -1323,11 +1315,11 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
       oss << "s:" << mImpl->shaders.Size() << "]"; });
 
     // Animate
-    bool animationActive = Animate(bufferIndex, elapsedSeconds);
+    bool animationActive = Animate(elapsedSeconds);
 
     PropertyOwnerContainer postPropertyOwners;
     // Constraint custom objects
-    ConstrainCustomObjects(postPropertyOwners, bufferIndex);
+    ConstrainCustomObjects(postPropertyOwners);
 
     // Clear the lists of renderers from the previous update
     for(auto&& scene : mImpl->scenes)
@@ -1347,21 +1339,21 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // Call the frame-callback-processor if set
     if(mImpl->frameCallbackProcessor)
     {
-      if(mImpl->frameCallbackProcessor->Update(bufferIndex, elapsedSeconds))
+      if(mImpl->frameCallbackProcessor->Update(elapsedSeconds))
       {
         keepUpdating |= KeepUpdating::FRAME_UPDATE_CALLBACK;
       }
     }
 
     // Update node hierarchy, apply constraints,
-    UpdateNodes(postPropertyOwners, bufferIndex);
+    UpdateNodes(postPropertyOwners);
 
     // Apply constraints to RenderTasks, shaders
-    ConstrainRenderTasks(postPropertyOwners, bufferIndex);
-    ConstrainShaders(postPropertyOwners, bufferIndex); // shaders & uniform blocks
+    ConstrainRenderTasks(postPropertyOwners);
+    ConstrainShaders(postPropertyOwners); // shaders & uniform blocks
 
     // Update renderers and apply constraints
-    UpdateRenderers(postPropertyOwners, bufferIndex);
+    UpdateRenderers(postPropertyOwners);
 
     // Update the transformations of all the nodes
     if(mImpl->transformManager.Update())
@@ -1372,23 +1364,23 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     // Constraint applied after transform manager updated. Only required property owner processed.
     for(auto&& propertyOwner : postPropertyOwners)
     {
-      ConstrainPropertyOwner(*propertyOwner, bufferIndex, false, postPropertyOwners);
+      ConstrainPropertyOwner(*propertyOwner, false, postPropertyOwners);
     }
 
     // Initialise layer renderable reuse
-    UpdateLayers(bufferIndex);
+    UpdateLayers();
 
     // Process Property Notifications
-    ProcessPropertyNotifications(bufferIndex);
+    ProcessPropertyNotifications();
 
     // Update cameras
     for(auto&& cameraIterator : mImpl->cameras)
     {
-      cameraIterator->Update(bufferIndex);
+      cameraIterator->Update();
     }
 
     // Process the RenderTasks if renderers exist. This creates the instructions for rendering the next frame.
-    // reset the update buffer index and make sure there is enough room in the instruction container
+    // make sure there is enough room in the instruction container
     if(mImpl->renderersAdded)
     {
       rendererAdded = true;
@@ -1410,8 +1402,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
         if(scene && scene->root && scene->taskList && scene->scene)
         {
           DALI_TRACE_BEGIN(gTraceFilter, "DALI_PROCESS_RENDER_TASK");
-          scene->scene->GetRenderInstructions().ResetAndReserve(bufferIndex,
-                                                                static_cast<uint32_t>(scene->taskList->GetTasks().Count()));
+          scene->scene->GetRenderInstructions().ResetAndReserve(static_cast<uint32_t>(scene->taskList->GetTasks().Count()));
 
           bool sceneKeepUpdating = scene->scene->KeepRenderingCheck(elapsedSeconds);
           if(sceneKeepUpdating)
@@ -1424,8 +1415,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           // or keep rendering is requested
           if(!isAnimationRunning || animationActive || mImpl->renderingRequired || (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || sceneKeepUpdating)
           {
-            renderContinuously |= mImpl->renderTaskProcessor.Process(bufferIndex,
-                                                                     *scene->taskList,
+            renderContinuously |= mImpl->renderTaskProcessor.Process(*scene->taskList,
                                                                      scene->sortedLayerList,
                                                                      scene->scene->GetRenderInstructions(),
                                                                      renderToFboEnabled,
@@ -1441,7 +1431,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROCESS_RENDER_TASK", [&](std::ostringstream& oss)
           { oss << "[render instruction capacity : " << mImpl->renderInstructionCapacity << "]\n"; });
 
-          numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count(bufferIndex);
+          numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count();
         }
       }
 
@@ -1474,7 +1464,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           renderTask->UpdateState();
 
           if(renderTask->IsWaitingToRender() &&
-             renderTask->ReadyToRender(bufferIndex) /*avoid updating forever when source actor is off-stage*/)
+             renderTask->ReadyToRender() /*avoid updating forever when source actor is off-stage*/)
           {
             mImpl->renderTaskWaiting = true; // keep update/render threads alive
           }
@@ -1550,9 +1540,6 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
 
   // tell the update manager that we're done so the queue can be given to event thread
   mImpl->notificationManager.UpdateCompleted();
-
-  // The update has finished; swap the double-buffering indices
-  mSceneGraphBuffers.Swap();
 
   return keepUpdating;
 }

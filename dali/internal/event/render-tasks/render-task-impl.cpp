@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -343,7 +343,7 @@ void RenderTask::SetViewportPosition(const Vector2& value)
 
 Vector2 RenderTask::GetCurrentViewportPosition() const
 {
-  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportPosition(GetEventThreadServices().GetEventBufferIndex()) : Vector2::ZERO;
+  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportPosition() : Vector2::ZERO;
 }
 
 void RenderTask::SetViewportSize(const Vector2& value)
@@ -361,7 +361,7 @@ void RenderTask::SetViewportSize(const Vector2& value)
 
 Vector2 RenderTask::GetCurrentViewportSize() const
 {
-  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportSize(GetEventThreadServices().GetEventBufferIndex()) : Vector2::ZERO;
+  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetViewportSize() : Vector2::ZERO;
 }
 
 void RenderTask::SetViewport(const Viewport& viewport)
@@ -374,9 +374,7 @@ void RenderTask::GetViewport(Viewport& viewPort) const
 {
   if(GetRenderTaskSceneObject())
   {
-    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
-
-    if(!GetRenderTaskSceneObject()->GetViewportEnabled(bufferIndex))
+    if(!GetRenderTaskSceneObject()->GetViewportEnabled())
     {
       Internal::Stage* stage = Internal::Stage::GetCurrent();
       if(stage)
@@ -396,8 +394,8 @@ void RenderTask::GetViewport(Viewport& viewPort) const
     }
     else
     {
-      const Vector2& position = GetRenderTaskSceneObject()->GetViewportPosition(bufferIndex);
-      const Vector2& size     = GetRenderTaskSceneObject()->GetViewportSize(bufferIndex);
+      const Vector2& position = GetRenderTaskSceneObject()->GetViewportPosition();
+      const Vector2& size     = GetRenderTaskSceneObject()->GetViewportSize();
       viewPort.x              = static_cast<int32_t>(position.x);  // truncated
       viewPort.y              = static_cast<int32_t>(position.y);  // truncated
       viewPort.width          = static_cast<int32_t>(size.width);  // truncated
@@ -425,7 +423,7 @@ void RenderTask::SetClearColor(const Vector4& color)
 
 const Vector4& RenderTask::GetClearColor() const
 {
-  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetClearColor(GetEventThreadServices().GetEventBufferIndex()) : Vector4::ZERO;
+  return GetRenderTaskSceneObject() ? GetRenderTaskSceneObject()->GetClearColor() : Vector4::ZERO;
 }
 
 void RenderTask::SetSyncRequired(bool requiresSync)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ void FrameCallbackProcessor::NotifyFrameCallback(FrameCallbackInterface* frameCa
   }
 }
 
-bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSeconds)
+bool FrameCallbackProcessor::Update(float elapsedSeconds)
 {
   bool keepRendering = false;
 
@@ -162,7 +162,7 @@ bool FrameCallbackProcessor::Update(BufferIndex bufferIndex, float elapsedSecond
         start = GetNanoseconds();
       }
 #endif
-      FrameCallback::RequestFlags requests = frameCallback->Update(bufferIndex, elapsedSeconds, mNodeHierarchyChanged);
+      FrameCallback::RequestFlags requests = frameCallback->Update(elapsedSeconds, mNodeHierarchyChanged);
 #ifdef TRACE_ENABLED
       if(gTraceFilter && gTraceFilter->IsTraceEnabled())
       {

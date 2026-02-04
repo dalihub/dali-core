@@ -369,7 +369,7 @@ float CameraActor::GetFieldOfView() const
 float CameraActor::GetCurrentFieldOfView() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetCameraSceneObject().GetFieldOfView(GetEventThreadServices().GetEventBufferIndex());
+  return GetCameraSceneObject().GetFieldOfView();
 }
 
 void CameraActor::SetOrthographicSize(float orthographicSize)
@@ -392,7 +392,7 @@ float CameraActor::GetOrthographicSize() const
 float CameraActor::GetCurrentOrthographicSize() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetCameraSceneObject().GetOrthographicSize(GetEventThreadServices().GetEventBufferIndex());
+  return GetCameraSceneObject().GetOrthographicSize();
 }
 
 void CameraActor::SetAspectRatio(float aspectRatio)
@@ -415,7 +415,7 @@ float CameraActor::GetAspectRatio() const
 float CameraActor::GetCurrentAspectRatio() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetCameraSceneObject().GetAspectRatio(GetEventThreadServices().GetEventBufferIndex());
+  return GetCameraSceneObject().GetAspectRatio();
 }
 
 void CameraActor::SetNearClippingPlane(float nearClippingPlane)
@@ -437,7 +437,7 @@ float CameraActor::GetNearClippingPlane() const
 
 float CameraActor::GetCurrentNearClippingPlane() const
 {
-  return GetCameraSceneObject().GetNearClippingPlane(GetEventThreadServices().GetEventBufferIndex());
+  return GetCameraSceneObject().GetNearClippingPlane();
 }
 
 void CameraActor::SetFarClippingPlane(float farClippingPlane)
@@ -459,7 +459,7 @@ float CameraActor::GetFarClippingPlane() const
 
 float CameraActor::GetCurrentFarClippingPlane() const
 {
-  return GetCameraSceneObject().GetFarClippingPlane(GetEventThreadServices().GetEventBufferIndex());
+  return GetCameraSceneObject().GetFarClippingPlane();
 }
 
 void CameraActor::SetInvertYAxis(bool invertYAxis)
@@ -571,7 +571,7 @@ bool CameraActor::BuildPickingRay(const Vector2&  screenCoordinates,
   {
     // Build a picking ray in the world reference system.
     // ray starts from the camera world position
-    rayOrigin   = GetNode().GetWorldMatrix(0).GetTranslation();
+    rayOrigin   = GetNode().GetWorldMatrix().GetTranslation();
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.

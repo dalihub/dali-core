@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ void PropertyNotification::SetNotifyMode(NotifyMode notifyMode)
   mNotifyMode = notifyMode;
 }
 
-bool PropertyNotification::Check(BufferIndex bufferIndex)
+bool PropertyNotification::Check()
 {
   bool notifyRequired = false;
   bool currentValid   = false;
@@ -130,13 +130,13 @@ bool PropertyNotification::Check(BufferIndex bufferIndex)
   {
     // Evaluate Condition
     const PropertyInputAccessor                       component(mProperty, mComponentIndex);
-    const PropertyInputIndexer<PropertyInputAccessor> input(bufferIndex, &component);
+    const PropertyInputIndexer<PropertyInputAccessor> input(&component);
     currentValid = mConditionFunction(input, mArguments);
   }
   else
   {
     // Evaluate Condition
-    const PropertyInputIndexer<PropertyInputImpl> input(bufferIndex, mProperty);
+    const PropertyInputIndexer<PropertyInputImpl> input(mProperty);
     currentValid = mConditionFunction(input, mArguments);
   }
 

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_CONTAINER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/internal/common/buffer-index.h>
 
 namespace Dali::Internal::SceneGraph
 {
@@ -58,7 +57,7 @@ public:
     return mActiveConstraints.Count();
   }
 
-  void Apply(BufferIndex updateBufferIndex);
+  void Apply();
 
 private:
   ConstraintContainer(const ConstraintContainer&)            = delete;

@@ -154,7 +154,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -167,7 +167,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetBoolean()
    */
-  const bool& GetBoolean(BufferIndex bufferIndex) const override
+  const bool& GetBoolean() const override
   {
     return mValue;
   }
@@ -175,7 +175,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -311,7 +311,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -324,7 +324,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetInteger()
    */
-  const int& GetInteger(BufferIndex bufferIndex) const override
+  const int& GetInteger() const override
   {
     return mValue;
   }
@@ -332,7 +332,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -487,7 +487,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -500,7 +500,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetFloat()
    */
-  const float& GetFloat(BufferIndex bufferIndex) const override
+  const float& GetFloat() const override
   {
     return mValue;
   }
@@ -508,7 +508,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -665,7 +665,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -686,7 +686,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
-  const Vector2& GetVector2(BufferIndex bufferIndex) const override
+  const Vector2& GetVector2() const override
   {
     return mValue;
   }
@@ -694,7 +694,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -952,7 +952,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -973,7 +973,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector3()
    */
-  const Vector3& GetVector3(BufferIndex bufferIndex) const override
+  const Vector3& GetVector3() const override
   {
     return mValue;
   }
@@ -981,7 +981,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -1291,7 +1291,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -1312,7 +1312,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector4()
    */
-  const Vector4& GetVector4(BufferIndex bufferIndex) const override
+  const Vector4& GetVector4() const override
   {
     return mValue;
   }
@@ -1320,7 +1320,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -1696,7 +1696,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -1709,7 +1709,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetQuaternion()
    */
-  const Quaternion& GetQuaternion(BufferIndex bufferIndex) const override
+  const Quaternion& GetQuaternion() const override
   {
     return mValue;
   }
@@ -1717,7 +1717,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -1840,7 +1840,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -1853,7 +1853,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix()
    */
-  const Matrix& GetMatrix(BufferIndex bufferIndex) const override
+  const Matrix& GetMatrix() const override
   {
     return mValue;
   }
@@ -1861,7 +1861,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -1987,7 +1987,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::PropertyBase::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
@@ -2000,7 +2000,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix3()
    */
-  const Matrix3& GetMatrix3(BufferIndex bufferIndex) const override
+  const Matrix3& GetMatrix3() const override
   {
     return mValue;
   }
@@ -2008,7 +2008,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }

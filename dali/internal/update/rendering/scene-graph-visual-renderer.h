@@ -50,10 +50,9 @@ struct DecoratedVisualProperties
 public: // Public API
   /**
    * @brief Get the update area after visual properties applied.
-   * @param[in] bufferIndex The current buffer index.
    * @param[in, out] updateArea The original update area before apply the visual properties. Stored into this value after calculated
    */
-  void GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept;
+  void GetVisualTransformedUpdateArea(Vector4& updateArea) noexcept;
 
 public:
   /**
@@ -119,10 +118,9 @@ struct VisualProperties
 public: // Public API
   /**
    * @brief Get the update area after visual properties applied.
-   * @param[in] bufferIndex The current buffer index.
    * @param[in, out] updateArea The original update area before apply the visual properties. Stored into this value after calculated
    */
-  void GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept;
+  void GetVisualTransformedUpdateArea(Vector4& updateArea) noexcept;
 
 public:
   /**

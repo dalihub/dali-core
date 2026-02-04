@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_INSTRUCTION_PROCESSOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/render/common/render-item-key.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 
@@ -95,15 +94,13 @@ public:
    * lists simultaneously, working through opaque then transparent
    * items at each depth index, resetting the flags appropriately.
    *
-   * @param[in]  updateBufferIndex The current update buffer index.
    * @param[in]  sortedLayers      The layers containing lists of opaque/transparent renderables.
    * @param[in]  renderTask        The rendering task information.
    * @param[in]  cull              Whether frustum culling is enabled or not
    * @param[in]  hasClippingNodes  Whether any clipping nodes exist within this layer, to optimize sorting if not
    * @param[out] instructions      The rendering instructions for the next frame.
    */
-  void Prepare(BufferIndex                 updateBufferIndex,
-               SortedLayerPointers&        sortedLayers,
+  void Prepare(SortedLayerPointers&        sortedLayers,
                RenderTask&                 renderTask,
                bool                        cull,
                bool                        hasClippingNodes,
@@ -119,13 +116,12 @@ private:
 private:
   /**
    * @brief Sort render items
-   * @param bufferIndex The buffer to read from
    * @param renderList to sort
    * @param layer where the Renderers are from
    * @param respectClippingOrder Sort with the correct clipping hierarchy.
    * @param isOrthographicCamera Whether the camera is orthographic or not.
    */
-  inline void SortRenderItems(BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder, bool isOrthographicCamera);
+  inline void SortRenderItems(RenderList& renderList, Layer& layer, bool respectClippingOrder, bool isOrthographicCamera);
 
   /// Sort comparitor function pointer type.
   using ComparitorPointer = bool (*)(const SortAttributes&, const SortAttributes&);

@@ -556,13 +556,13 @@ void Actor::TranslateBy(const Vector3& distance)
 const Vector3& Actor::GetCurrentPosition() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetPosition(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetPosition();
 }
 
 const Vector3& Actor::GetCurrentWorldPosition() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetWorldPosition(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetWorldPosition();
 }
 
 const Vector2 Actor::CalculateScreenPosition() const
@@ -586,15 +586,14 @@ const Vector2 Actor::GetCurrentScreenPosition() const
 {
   if(mScene)
   {
-    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
     if(mLayer3DParentsCount == 0)
     {
       // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-      return CalculateCurrentActorScreenPosition(*this, bufferIndex);
+      return CalculateCurrentActorScreenPosition(*this);
     }
     else
     {
-      return CalculateCurrentActorScreenPositionRenderTaskList(*this, bufferIndex);
+      return CalculateCurrentActorScreenPositionRenderTaskList(*this);
     }
   }
   return Vector2::ZERO;
@@ -644,13 +643,13 @@ void Actor::RotateBy(const Quaternion& relativeRotation)
 const Quaternion& Actor::GetCurrentOrientation() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetOrientation(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetOrientation();
 }
 
 const Quaternion& Actor::GetCurrentWorldOrientation() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetWorldOrientation(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetWorldOrientation();
 }
 
 void Actor::SetScale(const Vector3& scale)
@@ -696,13 +695,13 @@ void Actor::ScaleBy(const Vector3& relativeScale)
 const Vector3& Actor::GetCurrentScale() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetScale(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetScale();
 }
 
 const Vector3& Actor::GetCurrentWorldScale() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetWorldScale(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetWorldScale();
 }
 
 void Actor::SetInheritScale(bool inherit)
@@ -718,7 +717,7 @@ void Actor::SetInheritScale(bool inherit)
 
 Matrix Actor::GetCurrentWorldMatrix() const
 {
-  return GetNode().GetWorldMatrix(0);
+  return GetNode().GetWorldMatrix();
 }
 
 ActorPtr Actor::GetVisiblityChangedActor()
@@ -738,7 +737,7 @@ void Actor::SetVisible(bool visible)
 bool Actor::IsVisible() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().IsVisible(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().IsVisible();
 }
 
 void Actor::SetOpacity(float opacity)
@@ -754,7 +753,7 @@ void Actor::SetOpacity(float opacity)
 float Actor::GetCurrentOpacity() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetOpacity(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetOpacity();
 }
 
 const Vector4& Actor::GetCurrentWorldColor() const
@@ -805,7 +804,7 @@ void Actor::SetColorBlue(float blue)
 const Vector4& Actor::GetCurrentColor() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetColor(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetColor();
 }
 
 void Actor::SetInheritOrientation(bool inherit)
@@ -892,7 +891,7 @@ Vector3 Actor::GetTargetSize() const
 const Vector3& Actor::GetCurrentSize() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetSize(GetEventThreadServices().GetEventBufferIndex());
+  return GetNode().GetSize();
 }
 
 Vector3 Actor::GetNaturalSize() const
@@ -1043,17 +1042,17 @@ void Actor::SetDrawMode(DrawMode::Type drawMode)
 
 bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const
 {
-  return mScene && OnScene() && ConvertScreenToLocalRenderTaskList(mScene->GetRenderTaskList(), GetNode().GetWorldMatrix(0), GetCurrentSize(), localX, localY, screenX, screenY);
+  return mScene && OnScene() && ConvertScreenToLocalRenderTaskList(mScene->GetRenderTaskList(), GetNode().GetWorldMatrix(), GetCurrentSize(), localX, localY, screenX, screenY);
 }
 
 bool Actor::ScreenToLocal(const RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY) const
 {
-  return OnScene() && ConvertScreenToLocalRenderTask(renderTask, GetNode().GetWorldMatrix(0), GetCurrentSize(), localX, localY, screenX, screenY);
+  return OnScene() && ConvertScreenToLocalRenderTask(renderTask, GetNode().GetWorldMatrix(), GetCurrentSize(), localX, localY, screenX, screenY);
 }
 
 bool Actor::ScreenToLocal(const Matrix& viewMatrix, const Matrix& projectionMatrix, const Viewport& viewport, float& localX, float& localY, float screenX, float screenY) const
 {
-  return OnScene() && ConvertScreenToLocal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(0), GetCurrentSize(), viewport, localX, localY, screenX, screenY);
+  return OnScene() && ConvertScreenToLocal(viewMatrix, projectionMatrix, GetNode().GetWorldMatrix(), GetCurrentSize(), viewport, localX, localY, screenX, screenY);
 }
 
 ActorGestureData& Actor::GetGestureData()
@@ -1746,15 +1745,14 @@ Rect<> Actor::CalculateScreenExtents() const
 
 Rect<> Actor::CalculateCurrentScreenExtents() const
 {
-  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
   if(mLayer3DParentsCount == 0)
   {
     // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-    return CalculateCurrentActorScreenExtents(*this, bufferIndex);
+    return CalculateCurrentActorScreenExtents(*this);
   }
   else
   {
-    return CalculateCurrentActorScreenExtentsRenderTaskList(*this, bufferIndex);
+    return CalculateCurrentActorScreenExtentsRenderTaskList(*this);
   }
 }
 

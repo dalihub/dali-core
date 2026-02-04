@@ -28,7 +28,7 @@ extern Debug::Filter* gSceneGraphRendererLogFilter; ///< Defined at scene-graph-
 #endif
 namespace VisualRenderer
 {
-void VisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept
+void VisualProperties::GetVisualTransformedUpdateArea(Vector4& updateArea) noexcept
 {
   auto& coefficient = mCoefficient;
 
@@ -126,7 +126,7 @@ bool VisualProperties::PrepareProperties()
   return rendererUpdated;
 }
 
-void DecoratedVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept
+void DecoratedVisualProperties::GetVisualTransformedUpdateArea(Vector4& updateArea) noexcept
 {
   auto& decoratedCoefficient = mCoefficient;
 

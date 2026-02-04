@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@
 using std::vector;
 
 using Dali::Integration::RenderController;
-using Dali::Internal::SceneGraph::SceneGraphBuffers;
 
 namespace Dali
 {
@@ -68,9 +67,8 @@ namespace Update
  */
 struct MessageQueue::Impl
 {
-  Impl(RenderController& controller, const SceneGraphBuffers& buffers)
+  Impl(RenderController& controller)
   : renderController(controller),
-    sceneGraphBuffers(buffers),
     processingEvents(false),
     queueWasEmpty(true),
     sceneUpdateFlag(false),
@@ -126,8 +124,7 @@ struct MessageQueue::Impl
     }
   }
 
-  RenderController&        renderController;  ///< render controller
-  const SceneGraphBuffers& sceneGraphBuffers; ///< Used to keep track of which buffers are being written or read.
+  RenderController& renderController; ///< render controller
 
   bool processingEvents; ///< Whether messages queued will be flushed by core
   bool queueWasEmpty;    ///< Flag whether the queue was empty during the Update()
@@ -145,10 +142,10 @@ struct MessageQueue::Impl
   MessageBufferQueue freeQueue;            ///< buffers from the recycleQueue; can be used without locking
 };
 
-MessageQueue::MessageQueue(Integration::RenderController& controller, const SceneGraph::SceneGraphBuffers& buffers)
+MessageQueue::MessageQueue(Integration::RenderController& controller)
 : mImpl(nullptr)
 {
-  mImpl = new Impl(controller, buffers);
+  mImpl = new Impl(controller);
 }
 
 MessageQueue::~MessageQueue()
@@ -284,7 +281,7 @@ bool MessageQueue::FlushQueue()
   return messagesToProcess;
 }
 
-bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
+bool MessageQueue::ProcessMessages()
 {
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
 
@@ -313,7 +310,7 @@ bool MessageQueue::ProcessMessages(BufferIndex updateBufferIndex)
     {
       MessageBase* message = reinterpret_cast<MessageBase*>(bufferIter.Get());
 
-      message->Process(updateBufferIndex);
+      message->Process();
 
       // Call virtual destructor explictly; since delete will not be called after placement new
       message->~MessageBase();

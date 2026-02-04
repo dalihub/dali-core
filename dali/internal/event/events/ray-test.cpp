@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,12 +123,11 @@ bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin,
     return false;
   }
 
-  const Node&       node            = actor.GetNode();
-  const BufferIndex bufferIndex     = EventThreadServices::Get().GetEventBufferIndex();
-  const Vector3&    translation     = node.GetWorldPosition(bufferIndex);
-  const Vector3&    size            = node.GetSize(bufferIndex);
-  const Vector3&    scale           = node.GetWorldScale(bufferIndex);
-  const Rect<int>&  touchAreaOffset = actor.GetTouchAreaOffset(); // (left, right, bottom, top)
+  const Node&      node            = actor.GetNode();
+  const Vector3&   translation     = node.GetWorldPosition();
+  const Vector3&   size            = node.GetSize();
+  const Vector3&   scale           = node.GetWorldScale();
+  const Rect<int>& touchAreaOffset = actor.GetTouchAreaOffset(); // (left, right, bottom, top)
 
   // Transforms the ray to the local reference system. As the test is against a sphere, only the translation and scale are needed.
   const Vector3 rayOriginLocal(rayOrigin.x - translation.x - (touchAreaOffset.left + touchAreaOffset.right) * 0.5, rayOrigin.y - translation.y - (touchAreaOffset.top + touchAreaOffset.bottom) * 0.5, rayOrigin.z - translation.z);
@@ -160,7 +159,7 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
     // Transforms the ray to the local reference system.
     // Calculate the inverse of Model matrix
     Matrix invModelMatrix(false /*don't init*/);
-    invModelMatrix = node.GetWorldMatrix(0);
+    invModelMatrix = node.GetWorldMatrix();
     invModelMatrix.Invert();
 
     Vector4 rayOriginLocal(invModelMatrix * rayOrigin);
@@ -175,7 +174,7 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
       // Ray travels distance * rayDirLocal to intersect with plane.
       distance = a / b;
 
-      const Vector2&   size            = Vector2(node.GetSize(EventThreadServices::Get().GetEventBufferIndex()));
+      const Vector2&   size            = Vector2(node.GetSize());
       const Rect<int>& touchAreaOffset = actor.GetTouchAreaOffset(); // (left, right, bottom, top)
       hitPointLocal.x                  = rayOriginLocal.x + rayDirLocal.x * distance + size.x * 0.5f;
       hitPointLocal.y                  = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
@@ -202,7 +201,7 @@ bool RayTest::ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& 
     // Transforms the ray to the local reference system.
     // Calculate the inverse of Model matrix
     Matrix modelMatrix(false /*don't init*/);
-    modelMatrix           = node.GetWorldMatrix(0);
+    modelMatrix           = node.GetWorldMatrix();
     Matrix invModelMatrix = modelMatrix;
     invModelMatrix.Invert();
 
@@ -212,7 +211,7 @@ bool RayTest::ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& 
     Vector4 rayDirLocal(invModelMatrix * rayDirVector);
     rayDirLocal.Normalize3();
 
-    Vector3 currentSize = node.GetSize(EventThreadServices::Get().GetEventBufferIndex());
+    Vector3 currentSize = node.GetSize();
     Vector3 AABBMin     = Vector3(-currentSize.width * 0.5f, -currentSize.height * 0.5f, -currentSize.depth * 0.5f);
     Vector3 AABBMax     = Vector3(currentSize.width * 0.5f, currentSize.height * 0.5f, currentSize.depth * 0.5f);
 

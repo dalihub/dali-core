@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ UniformBlock::~UniformBlock()
   ProgramDestroyed(nullptr);
 }
 
-void UniformBlock::WriteUniforms(BufferIndex renderBufferIndex, ProgramIndex programIndex, Render::UniformBufferView& ubo)
+void UniformBlock::WriteUniforms(ProgramIndex programIndex, Render::UniformBufferView& ubo)
 {
   for(auto& uniform : mUniformIndexMaps[programIndex])
   {
@@ -41,7 +41,7 @@ void UniformBlock::WriteUniforms(BufferIndex renderBufferIndex, ProgramIndex pro
     {
       case UniformIndexMap::State::INITIALIZED:
       {
-        WriteDynUniform(uniform.propertyValue, uniform, ubo, renderBufferIndex);
+        WriteDynUniform(uniform.propertyValue, uniform, ubo);
         break;
       }
       case UniformIndexMap::State::INITIALIZE_REQUIRED:
@@ -191,12 +191,11 @@ UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)
 void UniformBlock::WriteDynUniform(
   const PropertyInputImpl* propertyValue,
   UniformIndexMap&         uniform,
-  UniformBufferView&       ubo,
-  BufferIndex              renderBufferIndex)
+  UniformBufferView&       ubo)
 {
   const auto dest = uniform.uniformOffset + uniform.arrayElementStride * uniform.arrayIndex;
 
-  const auto valueAddress = propertyValue->GetValueAddress(renderBufferIndex);
+  const auto valueAddress = propertyValue->GetValueAddress();
 
   if((propertyValue->GetType() == Property::MATRIX3 || propertyValue->GetType() == Property::VECTOR4) &&
      uniform.matrixStride != uint32_t(-1) &&

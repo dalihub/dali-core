@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/property-base.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h> // Clamp
 #include <dali/public-api/object/property-input.h>
@@ -74,7 +73,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetVector4()
    */
-  const Vector4& GetVector4(BufferIndex bufferIndex) const override
+  const Vector4& GetVector4() const override
   {
     return mValue;
   }
@@ -82,7 +81,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -98,7 +97,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputVector4()
    */
-  const Vector4& GetConstraintInputVector4(BufferIndex bufferIndex) const override
+  const Vector4& GetConstraintInputVector4() const override
   {
     return mValue;
   }
@@ -195,7 +194,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetMatrix()
    */
-  const Matrix& GetMatrix(BufferIndex bufferIndex) const override
+  const Matrix& GetMatrix() const override
   {
     return mValue;
   }
@@ -203,7 +202,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -219,7 +218,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputMatrix()
    */
-  const Matrix& GetConstraintInputMatrix(BufferIndex bufferIndex) const override
+  const Matrix& GetConstraintInputMatrix() const override
   {
     return mValue;
   }

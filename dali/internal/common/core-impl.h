@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CORE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -264,11 +264,6 @@ public: // Implementation of EventThreadServices
    * @copydoc EventThreadServices::ReserveMessageSlot
    */
   uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene) override;
-
-  /**
-   * @copydoc EventThreadServices::GetEventBufferIndex
-   */
-  BufferIndex GetEventBufferIndex() const override;
 
 private:
   using SceneContainer = std::vector<ScenePtr>;

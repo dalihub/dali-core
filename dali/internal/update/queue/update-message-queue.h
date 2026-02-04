@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_MESSAGE_QUEUE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,9 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
-
 // EXTERNAL INCLUDES
 #include <cstddef>
+#include <cstdint>
 
 namespace Dali
 {
@@ -36,11 +33,6 @@ namespace Internal
 {
 class MessageBase;
 
-namespace SceneGraph
-{
-class SceneGraphBuffers;
-}
-
 namespace Update
 {
 /**
@@ -52,10 +44,8 @@ public:
   /**
    * Create a new UpdateMessageQueue.
    * @param[in] renderController After messages are flushed, we request a render from the RenderController.
-   * @param[in] sceneGraphBuffers Used to keep track of which buffers are being written or read.
    */
-  MessageQueue(Integration::RenderController&       renderController,
-               const SceneGraph::SceneGraphBuffers& sceneGraphBuffers);
+  MessageQueue(Integration::RenderController& renderController);
 
   /**
    * Destructor
@@ -99,10 +89,9 @@ public:
 
   /**
    * Called once per update; process the previously flushed messages.
-   * @param updateBufferIndex to use
    * @return true if the scene graph node tree is updated
    */
-  bool ProcessMessages(BufferIndex updateBufferIndex);
+  bool ProcessMessages();
 
   /**
    * Query whether the queue was empty this frame.

@@ -50,12 +50,11 @@ Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UP
 /**
  * Constrain the local properties of the PropertyOwner.
  * @param propertyOwner to constrain
- * @param updateBufferIndex buffer index to use
  */
-void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint, PropertyOwnerContainer& postPropertyOwners)
+void ConstrainPropertyOwner(PropertyOwner& propertyOwner, bool isPreConstraint, PropertyOwnerContainer& postPropertyOwners)
 {
   ConstraintContainer& constraints = (isPreConstraint) ? propertyOwner.GetConstraints() : propertyOwner.GetPostConstraints();
-  constraints.Apply(updateBufferIndex);
+  constraints.Apply();
   if(isPreConstraint && propertyOwner.GetPostConstraintsActivatedCount() > 0u)
   {
     postPropertyOwners.PushBack(&propertyOwner);
@@ -66,20 +65,20 @@ void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBuff
  ************************** Update node hierarchy *****************************
  ******************************************************************************/
 
-inline void UpdateRootNodeOpacity(Layer& rootNode, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex)
+inline void UpdateRootNodeOpacity(Layer& rootNode, NodePropertyFlags nodeDirtyFlags)
 {
   if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
-    rootNode.SetWorldColor(rootNode.GetColor(updateBufferIndex));
+    rootNode.SetWorldColor(rootNode.GetColor());
   }
 }
 
-inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags, BufferIndex updateBufferIndex)
+inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags)
 {
   // If opacity needs to be recalculated
   if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
-    node.InheritWorldColor(updateBufferIndex);
+    node.InheritWorldColor();
   }
 }
 
@@ -88,7 +87,6 @@ inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags, Buff
  */
 inline NodePropertyFlags UpdateNodes(Node&                   node,
                                      NodePropertyFlags       parentFlags,
-                                     BufferIndex             updateBufferIndex,
                                      PropertyOwnerContainer& postPropertyOwners,
                                      bool                    updated)
 {
@@ -98,14 +96,14 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
   }
 
   // Apply constraints to the node
-  ConstrainPropertyOwner(node, updateBufferIndex, true, postPropertyOwners);
+  ConstrainPropertyOwner(node, true, postPropertyOwners);
 
   // Some dirty flags are inherited from parent
   NodePropertyFlags nodeDirtyFlags = node.GetDirtyFlags() | node.GetInheritedDirtyFlags(parentFlags);
 
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
-  UpdateNodeOpacity(node, nodeDirtyFlags, updateBufferIndex);
+  UpdateNodeOpacity(node, nodeDirtyFlags);
 
   // Age down partial update data
   node.GetPartialRenderingData().Aging();
@@ -128,7 +126,6 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
     Node& child = **iter;
     cumulativeDirtyFlags |= UpdateNodes(child,
                                         nodeDirtyFlags,
-                                        updateBufferIndex,
                                         postPropertyOwners,
                                         updated);
   }
@@ -140,20 +137,18 @@ inline NodePropertyFlags UpdateNodes(Node&                   node,
  * The root node is treated separately; it cannot inherit values since it has no parent
  */
 NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
-                                 BufferIndex             updateBufferIndex,
                                  PropertyOwnerContainer& postPropertyOwners)
 {
   DALI_ASSERT_DEBUG(rootNode.IsRoot());
 
   // Short-circuit for invisible nodes
-  if(DALI_UNLIKELY(!(rootNode.IsVisible(updateBufferIndex) && !rootNode.IsIgnored()))) // almost never ever true
+  if(DALI_UNLIKELY(!(rootNode.IsVisible() && !rootNode.IsIgnored()))) // almost never ever true
   {
     return NodePropertyFlags::NOTHING;
   }
 
   // If the root node was not previously visible
-  BufferIndex previousBuffer = updateBufferIndex ? 0u : 1u;
-  if(DALI_UNLIKELY(!(rootNode.IsVisible(previousBuffer) && !rootNode.IsIgnored()))) // almost never ever true
+  if(DALI_UNLIKELY(!(rootNode.IsVisible() && !rootNode.IsIgnored()))) // almost never ever true
   {
     // The node was skipped in the previous update; it must recalculate everything
     rootNode.SetAllDirtyFlags();
@@ -163,7 +158,7 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
 
   NodePropertyFlags cumulativeDirtyFlags = nodeDirtyFlags;
 
-  UpdateRootNodeOpacity(rootNode, nodeDirtyFlags, updateBufferIndex);
+  UpdateRootNodeOpacity(rootNode, nodeDirtyFlags);
 
   // Age down partial update data
   rootNode.GetPartialRenderingData().Aging();
@@ -178,7 +173,6 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
     Node& child = **iter;
     cumulativeDirtyFlags |= UpdateNodes(child,
                                         nodeDirtyFlags,
-                                        updateBufferIndex,
                                         postPropertyOwners,
                                         updated);
   }
@@ -188,7 +182,6 @@ NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
 
 inline void UpdateLayers(Node&             node,
                          NodePropertyFlags parentFlags,
-                         BufferIndex       updateBufferIndex,
                          Layer&            currentLayer)
 {
   if(node.IsIgnored()) // Do nothing if ignored.
@@ -204,17 +197,17 @@ inline void UpdateLayers(Node&             node,
   Layer* layer = nodeIsLayer ? nodeIsLayer : &currentLayer;
   if(nodeIsLayer)
   {
-    layer->SetReuseRenderers(updateBufferIndex, true);
+    layer->SetReuseRenderers(true);
   }
   DALI_ASSERT_DEBUG(nullptr != layer);
 
   // if any child node has moved or had its sort modifier changed, layer is not clean and old frame cannot be reused
   // also if node has been deleted, dont reuse old render items
-  if(layer->GetReuseRenderers(updateBufferIndex))
+  if(layer->GetReuseRenderers())
   {
     if(nodeDirtyFlags != NodePropertyFlags::NOTHING)
     {
-      layer->SetReuseRenderers(updateBufferIndex, false);
+      layer->SetReuseRenderers(false);
     }
     else
     {
@@ -225,7 +218,7 @@ inline void UpdateLayers(Node&             node,
         SceneGraph::RendererKey renderer = node.GetRendererAt(i);
         if(renderer->IsDirty())
         {
-          layer->SetReuseRenderers(updateBufferIndex, false);
+          layer->SetReuseRenderers(false);
           break;
         }
       }
@@ -238,12 +231,11 @@ inline void UpdateLayers(Node&             node,
   for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
   {
     Node& child = **iter;
-    UpdateLayers(child, nodeDirtyFlags, updateBufferIndex, *layer);
+    UpdateLayers(child, nodeDirtyFlags, *layer);
   }
 }
 
-void UpdateLayerTree(Layer&      layer,
-                     BufferIndex updateBufferIndex)
+void UpdateLayerTree(Layer& layer)
 {
   if(DALI_UNLIKELY(layer.IsIgnored())) // almost never ever true
   {
@@ -253,7 +245,7 @@ void UpdateLayerTree(Layer&      layer,
   NodePropertyFlags nodeDirtyFlags = layer.GetDirtyFlags();
   nodeDirtyFlags |= (layer.IsWorldMatrixDirty() ? NodePropertyFlags::TRANSFORM : NodePropertyFlags::NOTHING);
 
-  layer.SetReuseRenderers(updateBufferIndex, nodeDirtyFlags == NodePropertyFlags::NOTHING);
+  layer.SetReuseRenderers(nodeDirtyFlags == NodePropertyFlags::NOTHING);
 
   // recurse children
   NodeContainer& children = layer.GetChildren();
@@ -261,7 +253,7 @@ void UpdateLayerTree(Layer&      layer,
   for(NodeIter iter = children.Begin(); iter != endIter; ++iter)
   {
     Node& child = **iter;
-    UpdateLayers(child, nodeDirtyFlags, updateBufferIndex, layer);
+    UpdateLayers(child, nodeDirtyFlags, layer);
   }
 }
 

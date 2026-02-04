@@ -524,7 +524,6 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
 }
 
 bool Renderer::Render(Graphics::CommandBuffer&                             commandBuffer,
-                      BufferIndex                                          bufferIndex,
                       const SceneGraph::NodeDataProvider&                  node,
                       const Matrix&                                        modelMatrix,
                       const Matrix&                                        modelViewMatrix,
@@ -694,8 +693,8 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     if(queueIndex == 0)
     {
-      std::size_t nodeIndex = BuildUniformIndexMap(bufferIndex, node, *program);
-      WriteUniformBuffer(bufferIndex, commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColor, scale, size, nodeIndex);
+      std::size_t nodeIndex = BuildUniformIndexMap(node, *program);
+      WriteUniformBuffer(commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColor, scale, size, nodeIndex);
     }
 
     // @todo We should detect this case much earlier to prevent unnecessary work
@@ -726,7 +725,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
   return drawn;
 }
 
-std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, Program& program)
+std::size_t Renderer::BuildUniformIndexMap(const SceneGraph::NodeDataProvider& node, Program& program)
 {
   // Check if the map has changed
   DALI_ASSERT_DEBUG(mRenderDataProvider && "No Uniform map data provider available");
@@ -833,7 +832,6 @@ std::size_t Renderer::BuildUniformIndexMap(BufferIndex bufferIndex, const SceneG
 }
 
 void Renderer::WriteUniformBuffer(
-  BufferIndex                          bufferIndex,
   Graphics::CommandBuffer&             commandBuffer,
   Program*                             program,
   const SceneGraph::RenderInstruction& instruction,
@@ -955,8 +953,8 @@ void Renderer::WriteUniformBuffer(
 
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
 
-    const Vector4& mixColor   = mRenderDataProvider->GetMixColor(bufferIndex); ///< Renderer's mix color
-    Vector4        finalColor = worldColor * mixColor;                         ///< Applied Actor's original color to renderer's mix color
+    const Vector4& mixColor   = mRenderDataProvider->GetMixColor(); ///< Renderer's mix color
+    Vector4        finalColor = worldColor * mixColor;              ///< Applied Actor's original color to renderer's mix color
     if(mPremultipliedAlphaEnabled)
     {
       const float alpha = finalColor.a;
@@ -969,7 +967,7 @@ void Renderer::WriteUniformBuffer(
 
     // Write uniforms from the uniform map
     // Uniforms for the Shared UniformBlock should not be in this map. If they are, they should be ignored.
-    FillUniformBuffer(*program, instruction, uboViews, bufferIndex, nodeIndex);
+    FillUniformBuffer(*program, instruction, uboViews, nodeIndex);
 
     // Write uSize in the end, as it shouldn't be overridable by dynamic properties.
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SIZE), uboViews, size);
@@ -1039,7 +1037,6 @@ void Renderer::WriteUniform(Render::UniformBufferView& ubo, const Graphics::Unif
 void Renderer::FillUniformBuffer(Program&                             program,
                                  const SceneGraph::RenderInstruction& instruction,
                                  const Render::UboViewContainer&      uboViews,
-                                 BufferIndex                          updateBufferIndex,
                                  std::size_t                          nodeIndex)
 {
   for(auto& iter : mUniformIndexMaps[nodeIndex])
@@ -1079,7 +1076,7 @@ void Renderer::FillUniformBuffer(Program&                             program,
         {
           continue;
         }
-        WriteDynUniform(iter.propertyValue, uniform, *ubo, updateBufferIndex);
+        WriteDynUniform(iter.propertyValue, uniform, *ubo);
         break;
       }
       default:
@@ -1093,12 +1090,11 @@ void Renderer::FillUniformBuffer(Program&                             program,
 void Renderer::WriteDynUniform(
   const PropertyInputImpl*   propertyValue,
   UniformIndexMap&           uniform,
-  Render::UniformBufferView& ubo,
-  BufferIndex                updateBufferIndex)
+  Render::UniformBufferView& ubo)
 {
   const auto dest = uniform.uniformOffset + uniform.arrayElementStride * uniform.arrayIndex;
 
-  const auto valueAddress = propertyValue->GetValueAddress(updateBufferIndex);
+  const auto valueAddress = propertyValue->GetValueAddress();
 
   if((propertyValue->GetType() == Property::MATRIX3 || propertyValue->GetType() == Property::VECTOR4) &&
      uniform.matrixStride != uint32_t(-1) &&
@@ -1148,9 +1144,9 @@ bool Renderer::Updated()
   return false;
 }
 
-Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const Vector4& originalUpdateArea) const noexcept
+Vector4 Renderer::GetVisualTransformedUpdateArea(const Vector4& originalUpdateArea) const noexcept
 {
-  return mRenderDataProvider->GetVisualTransformedUpdateArea(bufferIndex, originalUpdateArea);
+  return mRenderDataProvider->GetVisualTransformedUpdateArea(originalUpdateArea);
 }
 
 void Renderer::DetachFromNodeDataProvider(const SceneGraph::NodeDataProvider& node)

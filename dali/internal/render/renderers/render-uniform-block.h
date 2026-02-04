@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_RENDER_UNIFORM_BLOCK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public:
     return mNameHash;
   }
 
-  void WriteUniforms(BufferIndex renderBufferIndex, ProgramIndex programIndex, UniformBufferView& ubo);
+  void WriteUniforms(ProgramIndex programIndex, UniformBufferView& ubo);
 
   ProgramIndex GetProgramIndex(const Program& program);
 
@@ -72,7 +72,7 @@ public: // From Program::LifecycleObserver
   /**
    * @copydoc Dali::Internal::Program::LifecycleObserver::ProgramDestroyed()
    */
-  void ProgramDestroyed(const Program* program);
+  void ProgramDestroyed(const Program* program) override;
 
 private:
   // Copy of Render::Renderer::UniformIndexMap;
@@ -100,8 +100,7 @@ private:
 
   void WriteDynUniform(const PropertyInputImpl* propertyValue,
                        UniformIndexMap&         uniform,
-                       UniformBufferView&       ubo,
-                       BufferIndex              renderBufferIndex);
+                       UniformBufferView&       ubo);
 
 private:
   std::string mName;

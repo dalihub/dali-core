@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ RenderInstructionContainer::RenderInstructionContainer()
 
 RenderInstructionContainer::~RenderInstructionContainer() = default;
 
-void RenderInstructionContainer::ResetAndReserve(BufferIndex bufferIndex, uint32_t capacityRequired)
+void RenderInstructionContainer::ResetAndReserve(uint32_t capacityRequired)
 {
   // Only re-allocate if necessary.
   if(mInstructions.size() < capacityRequired)
@@ -45,19 +45,19 @@ void RenderInstructionContainer::ResetAndReserve(BufferIndex bufferIndex, uint32
   mInstructions.clear();
 }
 
-uint32_t RenderInstructionContainer::Count(BufferIndex bufferIndex)
+uint32_t RenderInstructionContainer::Count()
 {
   return static_cast<uint32_t>(mInstructions.size());
 }
 
-RenderInstruction& RenderInstructionContainer::At(BufferIndex bufferIndex, uint32_t index)
+RenderInstruction& RenderInstructionContainer::At(uint32_t index)
 {
   DALI_ASSERT_DEBUG(index < mInstructions.size());
 
   return *mInstructions[index];
 }
 
-void RenderInstructionContainer::PushBack(BufferIndex bufferIndex, RenderInstruction* renderInstruction)
+void RenderInstructionContainer::PushBack(RenderInstruction* renderInstruction)
 {
   mInstructions.push_back(renderInstruction);
 }

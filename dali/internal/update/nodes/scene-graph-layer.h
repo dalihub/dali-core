@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_LAYER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -187,22 +187,20 @@ public:
 
   /**
    * Enables the reuse of the model view matrices of all renderers for this layer
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value to set
    */
-  void SetReuseRenderers(BufferIndex updateBufferIndex, bool value)
+  void SetReuseRenderers(bool value)
   {
-    mAllChildTransformsClean[updateBufferIndex] = value;
+    mAllChildTransformsClean = value;
   }
 
   /**
    * Get the reuse of the model view matrices of all renderers for this layer is enabled.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return Whether all child transform was clean or not.
    */
-  bool GetReuseRenderers(BufferIndex updateBufferIndex) const
+  bool GetReuseRenderers() const
   {
-    return mAllChildTransformsClean[updateBufferIndex];
+    return mAllChildTransformsClean;
   }
 
   /**
@@ -215,7 +213,7 @@ public:
    */
   bool CanReuseRenderers(const Camera* camera)
   {
-    bool bReturn(mAllChildTransformsClean[0] && mAllChildTransformsClean[1] && camera == mLastCamera);
+    bool bReturn(mAllChildTransformsClean && camera == mLastCamera);
     mLastCamera = camera;
 
     return bReturn;
@@ -259,12 +257,11 @@ private:
 
   Dali::Layer::Behavior mBehavior; ///< The behavior of the layer
 
-  bool mAllChildTransformsClean[2]; ///< True if all child nodes transforms are clean,
-                                    ///  double buffered as we need two clean frames before we can reuse N-1 for N+1
-                                    ///  this allows us to cache render items when layer is "static"
-  bool mIsClipping : 1;             ///< True when clipping is enabled
-  bool mDepthTestDisabled : 1;      ///< Whether depth test is disabled.
-  bool mIsDefaultSortFunction : 1;  ///< whether the default depth sort function is used
+  bool mAllChildTransformsClean : 1; ///< True if all child nodes transforms are clean,
+                                     ///  this allows us to cache render items when layer is "static"
+  bool mIsClipping : 1;              ///< True when clipping is enabled
+  bool mDepthTestDisabled : 1;       ///< Whether depth test is disabled.
+  bool mIsDefaultSortFunction : 1;   ///< whether the default depth sort function is used
 };
 
 // Messages for Layer

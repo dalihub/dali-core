@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,6 @@ Layer* FindLayer(Node& node)
  * Rebuild the Layer::colorRenderables and overlayRenderables members,
  * including only renderers which are included in the current render-task.
  *
- * @param[in]  updateBufferIndex The current update buffer index.
  * @param[in]  node The current node of the scene-graph.
  * @param[in]  parentVisibilityChanged The parent node's visibility might be changed at current frame. (Due to visibility property, or ancient's clipping mode change)
  * @param[in]  currentLayer The current layer containing lists of opaque/transparent renderables. If node is layer, currentLayer is node itself.
@@ -77,8 +76,7 @@ Layer* FindLayer(Node& node)
  * @param[out] clippingUsed  Gets set to true if any clipping nodes have been found
  * @param[out] keepRendering Gets set to true if rendering should be kept.
  */
-void AddRenderablesForTask(BufferIndex updateBufferIndex,
-                           Node&       node,
+void AddRenderablesForTask(Node&       node,
                            bool        parentVisibilityChanged,
                            Layer&      currentLayer,
                            RenderTask& renderTask,
@@ -90,7 +88,7 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
                            bool&       keepRendering)
 {
   // Short-circuit for invisible nodes
-  if(!node.IsVisible(updateBufferIndex) || node.IsIgnored())
+  if(!node.IsVisible() || node.IsIgnored())
   {
     node.GetPartialRenderingData().mVisible = false;
     return;
@@ -184,8 +182,7 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
     Node&      child        = **iter;
     const bool childIsLayer = child.IsLayer();
 
-    AddRenderablesForTask(updateBufferIndex,
-                          child,
+    AddRenderablesForTask(child,
                           parentVisibilityChanged,
                           DALI_UNLIKELY(childIsLayer) ? *child.GetLayer() : currentLayer,
                           renderTask,
@@ -202,7 +199,6 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
  * Process the list of render-tasks; the output is a series of render instructions.
  * @note When ProcessRenderTasks is called, the layers should already the transparent/opaque renderers which are ready to render.
  * If there is only one default render-task, then no further processing is required.
- * @param[in]  updateBufferIndex          The current update buffer index.
  * @param[in]  taskContainer              The container of render-tasks.
  * @param[in]  sortedLayers               The layers containing lists of opaque / transparent renderables.
  * @param[out] instructions               The instructions for rendering the next frame.
@@ -212,8 +208,7 @@ void AddRenderablesForTask(BufferIndex updateBufferIndex,
  * @param[in]  isRenderingToFbo           Whether this frame is being rendered into the Frame Buffer Object (used to measure FPS above 60)
  * @param[in]  processOffscreen           Whether the offscreen render tasks are the ones processed. Otherwise it processes the onscreen tasks.
  */
-void ProcessTasks(BufferIndex                          updateBufferIndex,
-                  RenderTaskList::RenderTaskContainer& taskContainer,
+void ProcessTasks(RenderTaskList::RenderTaskContainer& taskContainer,
                   SortedLayerPointers&                 sortedLayers,
                   RenderInstructionContainer&          instructions,
                   RenderInstructionProcessor&          renderInstructionProcessor,
@@ -236,8 +231,8 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
   Vector2                                       sceneSize             = Vector2::ZERO;
   if(defaultRootNode)
   {
-    defaultCameraPosition = defaultCamera.GetWorldPosition(updateBufferIndex);
-    sceneSize             = Vector2(defaultRootNode->GetSize(updateBufferIndex) * defaultRootNode->GetWorldScale(updateBufferIndex));
+    defaultCameraPosition = defaultCamera.GetWorldPosition();
+    sceneSize             = Vector2(defaultRootNode->GetSize() * defaultRootNode->GetWorldScale());
   }
 
   for(RenderTaskList::RenderTaskContainer::Iterator iter = taskContainer.Begin(), endIter = taskContainer.End(); endIter != iter; ++iter)
@@ -253,7 +248,7 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
        (renderToFboEnabled && ((processOffscreen && !hasFrameBuffer) ||
                                (isDefaultRenderTask && processOffscreen) ||
                                (!isDefaultRenderTask && !processOffscreen && hasFrameBuffer))) ||
-       !renderTask.ReadyToRender(updateBufferIndex))
+       !renderTask.ReadyToRender())
     {
       // Skip to next task.
       DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "  Skip to next task\n");
@@ -270,9 +265,9 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
       continue;
     }
 
-    renderTask.UpdateViewport(updateBufferIndex, sceneSize, defaultCameraPosition);
+    renderTask.UpdateViewport(sceneSize, defaultCameraPosition);
 
-    const uint32_t currentNumberOfInstructions = instructions.Count(updateBufferIndex);
+    const uint32_t currentNumberOfInstructions = instructions.Count();
 
     if(renderTask.IsRenderRequired())
     {
@@ -281,8 +276,7 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
         sortedLayer->ClearRenderables();
       }
 
-      AddRenderablesForTask(updateBufferIndex,
-                            *sourceNode,
+      AddRenderablesForTask(*sourceNode,
                             false,
                             *layer,
                             renderTask,
@@ -293,8 +287,7 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
                             hasClippingNodes,
                             keepRendering);
 
-      renderInstructionProcessor.Prepare(updateBufferIndex,
-                                         sortedLayers,
+      renderInstructionProcessor.Prepare(sortedLayers,
                                          renderTask,
                                          renderTask.GetCullMode(),
                                          hasClippingNodes,
@@ -304,10 +297,10 @@ void ProcessTasks(BufferIndex                          updateBufferIndex,
     if(!processOffscreen && isDefaultRenderTask && renderToFboEnabled && !isRenderingToFbo && hasFrameBuffer)
     {
       // Traverse the instructions of the default render task and mark them to be rendered into the frame buffer.
-      const uint32_t count = instructions.Count(updateBufferIndex);
+      const uint32_t count = instructions.Count();
       for(uint32_t index = currentNumberOfInstructions; index < count; ++index)
       {
-        RenderInstruction& instruction = instructions.At(updateBufferIndex, index);
+        RenderInstruction& instruction = instructions.At(index);
         instruction.mIgnoreRenderToFbo = true;
       }
     }
@@ -320,8 +313,7 @@ RenderTaskProcessor::RenderTaskProcessor() = default;
 
 RenderTaskProcessor::~RenderTaskProcessor() = default;
 
-bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
-                                  RenderTaskList&             renderTasks,
+bool RenderTaskProcessor::Process(RenderTaskList&             renderTasks,
                                   SortedLayerPointers&        sortedLayers,
                                   RenderInstructionContainer& instructions,
                                   bool                        renderToFboEnabled,
@@ -346,8 +338,7 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
 
   // First process off screen render tasks - we may need the results of these for the on screen renders
 
-  ProcessTasks(updateBufferIndex,
-               taskContainer,
+  ProcessTasks(taskContainer,
                sortedLayers,
                instructions,
                mRenderInstructionProcessor,
@@ -361,8 +352,7 @@ bool RenderTaskProcessor::Process(BufferIndex                 updateBufferIndex,
   // Now that the off screen renders are done we can process on screen render tasks.
   // Reset the clipping Id for the OnScreen render tasks.
 
-  ProcessTasks(updateBufferIndex,
-               taskContainer,
+  ProcessTasks(taskContainer,
                sortedLayers,
                instructions,
                mRenderInstructionProcessor,

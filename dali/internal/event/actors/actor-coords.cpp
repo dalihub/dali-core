@@ -349,7 +349,7 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor)
   return result;
 }
 
-const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferIndex bufferIndex)
+const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor)
 {
   Vector2 result;
   if(actor.OnScene())
@@ -359,7 +359,7 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor, BufferInde
     actor.GetNode().GetWorldMatrixAndSize(worldTransformMatrix, actorSize);
 
     Scene&  scene          = actor.GetScene();
-    Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition(bufferIndex);
+    Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition();
     Vector2 anchor         = actor.GetAnchorPointForPosition().GetVectorXY();
 
     const auto& sceneSize = scene.GetCurrentSurfaceRect();
@@ -386,7 +386,7 @@ Rect<> CalculateActorScreenExtents(const Actor& actor)
   return {position2.x, position2.y, size2.x, size2.y};
 }
 
-Rect<> CalculateCurrentActorScreenExtents(const Actor& actor, BufferIndex bufferIndex)
+Rect<> CalculateCurrentActorScreenExtents(const Actor& actor)
 {
   Vector2 position2;
   Vector2 size2;
@@ -397,7 +397,7 @@ Rect<> CalculateCurrentActorScreenExtents(const Actor& actor, BufferIndex buffer
     actor.GetNode().GetWorldMatrixAndSize(worldTransformMatrix, actorSize);
 
     Scene&  scene          = actor.GetScene();
-    Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition(bufferIndex);
+    Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition();
 
     const auto& sceneSize = scene.GetCurrentSurfaceRect();
     CalculateScreenExtents(position2, size2, sceneSize, worldTransformMatrix, actorSize, cameraPosition);
@@ -517,16 +517,16 @@ const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor)
   return result;
 }
 
-const Vector2 CalculateCurrentActorScreenPositionRenderTaskList(const Actor& actor, BufferIndex bufferIndex)
+const Vector2 CalculateCurrentActorScreenPositionRenderTaskList(const Actor& actor)
 {
   Vector2 result;
   if(actor.OnScene())
   {
     const auto& node           = actor.GetNode();
-    const auto& worldMatrix    = node.GetWorldMatrix(bufferIndex);
+    const auto& worldMatrix    = node.GetWorldMatrix();
     const auto& renderTaskList = actor.GetScene().GetRenderTaskList();
 
-    ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize(bufferIndex) * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
+    ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize() * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
   }
   return result;
 }
@@ -659,17 +659,17 @@ Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor)
   return result;
 }
 
-Rect<> CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor, BufferIndex bufferIndex)
+Rect<> CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor)
 {
   Rect<> result = {0.0f, 0.0f, 0.0f, 0.0f};
 
   if(actor.OnScene())
   {
     const auto& node           = actor.GetNode();
-    const auto& worldMatrix    = node.GetWorldMatrix(bufferIndex);
+    const auto& worldMatrix    = node.GetWorldMatrix();
     const auto& renderTaskList = actor.GetScene().GetRenderTaskList();
 
-    ConvertLocalToScreenExtentRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize(bufferIndex), result);
+    ConvertLocalToScreenExtentRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize(), result);
   }
   return result;
 }

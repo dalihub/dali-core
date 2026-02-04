@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
@@ -103,7 +102,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
     (mProperty->*mMemberFunction)(mParam);
   }
@@ -188,7 +187,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
     (mProperty->*mMemberFunction)(mParam);
   }
@@ -261,7 +260,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
     (mProperty->*mMemberFunction)(mParam);
   }
@@ -334,7 +333,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
     (mProperty->*mMemberFunction)(mParam);
   }

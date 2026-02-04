@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_THREAD_SERVICES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef>
-
-// INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
+#include <cstdint>
 
 namespace Dali
 {
@@ -96,11 +94,6 @@ public:
    * @return A pointer to the first char allocated for the message.
    */
   virtual uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene = true) = 0;
-
-  /**
-   * @return the current event-buffer index.
-   */
-  virtual BufferIndex GetEventBufferIndex() const = 0;
 
   /**
    * @return true if core is still running and we can send messages

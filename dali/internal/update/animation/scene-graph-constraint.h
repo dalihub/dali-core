@@ -76,7 +76,7 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::ConstraintBase::Apply()
    */
-  void Apply(BufferIndex updateBufferIndex) override
+  void Apply() override
   {
     if(!mDisconnected)
     {
@@ -101,7 +101,7 @@ public:
           PropertyType current = mTargetProperty.Get();
           PropertyType old     = mTargetProperty.Get();
 
-          mFunc->Apply(updateBufferIndex, current);
+          mFunc->Apply(current);
 
           // Compare with value of the previous frame
           if constexpr(std::is_same_v<PropertyType, float>)

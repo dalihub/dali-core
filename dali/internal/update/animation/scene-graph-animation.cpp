@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ Animation::Animation(float durationSeconds, float speedFactor, const Vector2& pl
   mProgressReachedSignalRequired(false),
   mAutoReverseEnabled(false),
   mAnimatorSortRequired(false),
-  mIsActive{false, false},
+  mIsActive(false),
   mIsFirstLoop{true},
   mIsStopped{false}
 {
@@ -274,7 +274,7 @@ void Animation::Pause()
   }
 }
 
-void Animation::Bake(BufferIndex bufferIndex, EndAction action)
+void Animation::Bake(EndAction action)
 {
   if(action == Dali::Animation::BAKE_FINAL)
   {
@@ -288,7 +288,7 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
     }
   }
 
-  UpdateAnimators(bufferIndex, true /*bake the final result*/, true /*animation finished*/);
+  UpdateAnimators(true /*bake the final result*/, true /*animation finished*/);
 }
 
 void Animation::SetAnimatorsActive(bool active)
@@ -300,7 +300,7 @@ void Animation::SetAnimatorsActive(bool active)
   }
 }
 
-bool Animation::Stop(BufferIndex bufferIndex)
+bool Animation::Stop()
 {
   bool animationFinished(false);
 
@@ -311,7 +311,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
 
     if(mEndAction != Dali::Animation::DISCARD)
     {
-      Bake(bufferIndex, mEndAction);
+      Bake(mEndAction);
       DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms Stop (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 
       // Animators are automatically set to inactive in Bake
@@ -334,10 +334,10 @@ bool Animation::Stop(BufferIndex bufferIndex)
   return animationFinished;
 }
 
-void Animation::ClearAnimator(BufferIndex bufferIndex)
+void Animation::ClearAnimator()
 {
   // Stop animation immediatly.
-  Stop(bufferIndex);
+  Stop();
 
   // Remove all animator.
   mAnimators.Clear();
@@ -351,13 +351,13 @@ void Animation::ClearAnimator(BufferIndex bufferIndex)
   DALI_LOG_ANIMATION_INFO("Animation[%u] with duration %f ms Clear (before state : %c)\n", GetNotifyId(), mDurationSeconds * 1000.0f, "SRPD"[mState]);
 }
 
-void Animation::OnDestroy(BufferIndex bufferIndex)
+void Animation::OnDestroy()
 {
   if(mState == Playing || mState == Paused)
   {
     if(mEndAction != Dali::Animation::DISCARD)
     {
-      Bake(bufferIndex, mEndAction);
+      Bake(mEndAction);
 
       // Animators are automatically set to inactive in Bake
     }
@@ -396,7 +396,7 @@ void Animation::AddAnimator(OwnerPointer<AnimatorBase>& animator)
   mAnimators.PushBack(animator.Release());
 }
 
-void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stopped, bool& finished, bool& progressReached)
+void Animation::Update(float elapsedSeconds, bool& stopped, bool& finished, bool& progressReached)
 {
   // Reset mIsStopped flag now.
   stopped    = mIsStopped;
@@ -478,7 +478,7 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stop
 
           // Make elapsed second as edge of range forcely.
           mElapsedSeconds = edgeRangeSeconds + signSpeedFactor * Math::MACHINE_EPSILON_10;
-          UpdateAnimators(bufferIndex, finished && (mEndAction != Dali::Animation::DISCARD), finished);
+          UpdateAnimators(finished && (mEndAction != Dali::Animation::DISCARD), finished);
 
           // After update animation, mElapsedSeconds must be begin of value
           mElapsedSeconds = playRangeStartSeconds + playRangeEndSeconds - edgeRangeSeconds;
@@ -521,13 +521,13 @@ void Animation::Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stop
   // Already updated when finished. So skip.
   if(!finished)
   {
-    UpdateAnimators(bufferIndex, false, false);
+    UpdateAnimators(false, false);
   }
 }
 
-void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animationFinished)
+void Animation::UpdateAnimators(bool bake, bool animationFinished)
 {
-  mIsActive[bufferIndex] = false;
+  mIsActive = false;
 
   const Vector2 playRange(mPlayRange * mDurationSeconds);
   float         elapsedSecondsClamped = Clamp(mElapsedSeconds, playRange.x, playRange.y);
@@ -569,11 +569,11 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animati
             progress = 2.0f * std::abs(progress - 0.5f);
           }
         }
-        animator->Update(bufferIndex, progress, mIsFirstLoop ? mBlendPoint : 0.0f, bake);
+        animator->Update(progress, mIsFirstLoop ? mBlendPoint : 0.0f, bake);
 
         if(animatorDuration > 0.0f && (elapsedSecondsClamped - intervalDelay) <= animatorDuration)
         {
-          mIsActive[bufferIndex] = true;
+          mIsActive = true;
         }
       }
       else

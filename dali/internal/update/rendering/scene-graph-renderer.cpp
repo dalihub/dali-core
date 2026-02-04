@@ -213,7 +213,7 @@ RendererKey Renderer::GetKey(Renderer* renderer)
   return RendererKey(gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, static_cast<void*>(renderer)));
 }
 
-bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
+bool Renderer::PrepareRender()
 {
   bool rendererUpdated        = Updated() || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
   auto shaderMapChangeCounter = mShader ? mShader->GetUniformMap().GetChangeCounter() : 0u;
@@ -259,7 +259,7 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
   }
 
   // Ensure collected map is up to date
-  UpdateUniformMap(updateBufferIndex);
+  UpdateUniformMap();
 
   return rendererUpdated;
 }
@@ -519,14 +519,14 @@ const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() cons
   return GetRenderFunction(mRenderer, &Render::Renderer::GetStencilParameters);
 }
 
-void Renderer::BakeMixColor(BufferIndex updateBufferIndex, const Vector4& mixColor)
+void Renderer::BakeMixColor(const Vector4& mixColor)
 {
   mMixColor.Bake(mixColor);
 
   SetUpdated(true);
 }
 
-void Renderer::BakeMixColorComponent(BufferIndex updateBufferIndex, float componentValue, uint8_t componentIndex)
+void Renderer::BakeMixColorComponent(float componentValue, uint8_t componentIndex)
 {
   switch(componentIndex)
   {
@@ -560,7 +560,7 @@ void Renderer::BakeMixColorComponent(BufferIndex updateBufferIndex, float compon
   SetUpdated(true);
 }
 
-Vector4 Renderer::GetMixColor(BufferIndex updateBufferIndex) const
+Vector4 Renderer::GetMixColor() const
 {
   return mMixColor.Get();
 }
@@ -631,7 +631,7 @@ Render::RendererKey Renderer::GetRenderer() const
   return mRenderer;
 }
 
-Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, uint32_t renderPass, const Node& node) const
+Renderer::OpacityType Renderer::GetOpacityType(uint32_t renderPass, const Node& node) const
 {
   Renderer::OpacityType opacityType = Renderer::OPAQUE;
 
@@ -723,7 +723,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
   return opacityType;
 }
 
-void Renderer::UpdateUniformMap(BufferIndex updateBufferIndex)
+void Renderer::UpdateUniformMap()
 {
   if(mRegenerateUniformMap)
   {
@@ -815,16 +815,16 @@ void Renderer::ResetUpdated()
   PropertyOwner::ResetUpdated();
 }
 
-Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
+Vector4 Renderer::GetVisualTransformedUpdateArea(const Vector4& originalUpdateArea) noexcept
 {
   Vector4 updateArea = originalUpdateArea;
   if(mVisualProperties)
   {
-    mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
+    mVisualProperties->GetVisualTransformedUpdateArea(updateArea);
   }
   if(mDecoratedVisualProperties)
   {
-    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
+    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateArea);
   }
   return AdjustExtents(updateArea, mUpdateAreaExtents);
 }

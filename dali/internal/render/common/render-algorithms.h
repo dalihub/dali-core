@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_ALGORITHMS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/core-enumerations.h>
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/render/common/render-list.h>
 
 namespace Dali
@@ -55,7 +54,6 @@ public:
   /**
    * Process a render-instruction.
    * @param[in] instruction                 The render-instruction to process.
-   * @param[in] bufferIndex                 The current render buffer index (previous update buffer)
    * @param[in] depthBufferAvailable        Whether the depth buffer is available
    * @param[in] stencilBufferAvailable      Whether the stencil buffer is available
    * @param[in] viewport                    The viewport for drawing
@@ -68,7 +66,6 @@ public:
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction&     instruction,
                                 Graphics::CommandBuffer&                 commandBuffer,
-                                BufferIndex                              bufferIndex,
                                 Integration::DepthBufferAvailable        depthBufferAvailable,
                                 Integration::StencilBufferAvailable      stencilBufferAvailable,
                                 const Rect<int32_t>&                     viewport,
@@ -121,7 +118,6 @@ private:
   /**
    * @brief Process a render-list.
    * @param[in] renderList                  The render-list to process.
-   * @param[in] buffer                      The current render buffer index (previous update buffer)
    * @param[in] viewMatrix                  The view matrix from the appropriate camera.
    * @param[in] projectionMatrix            The projection matrix from the appropriate camera.
    * @param[in] depthBufferAvailable        Whether the depth buffer is available
@@ -134,7 +130,6 @@ private:
    */
   inline void ProcessRenderList(const Dali::Internal::SceneGraph::RenderList&        renderList,
                                 Graphics::CommandBuffer&                             commandBuffer,
-                                BufferIndex                                          bufferIndex,
                                 const Matrix&                                        viewMatrix,
                                 const Matrix&                                        projectionMatrix,
                                 Integration::DepthBufferAvailable                    depthBufferAvailable,

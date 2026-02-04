@@ -967,11 +967,6 @@ uint32_t* Core::ReserveMessageSlot(uint32_t size, bool updateScene)
   return mUpdateManager->ReserveMessageSlot(size, updateScene);
 }
 
-BufferIndex Core::GetEventBufferIndex() const
-{
-  return mUpdateManager->GetEventBufferIndex();
-}
-
 } // namespace Internal
 
 } // namespace Dali

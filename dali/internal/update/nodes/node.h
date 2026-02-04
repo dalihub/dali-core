@@ -29,7 +29,6 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/inherited-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/manager/transform-manager-property.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node-declarations.h>
@@ -366,10 +365,9 @@ public:
   /**
    * Disconnect a child (& its children) from the scene-graph.
    * @pre childNode is a child of this Node.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] childNode The node to disconnect.
    */
-  void DisconnectChild(BufferIndex updateBufferIndex, Node& childNode);
+  void DisconnectChild(Node& childNode);
 
   /**
    * Retrieve the children a Node.
@@ -478,10 +476,9 @@ public:
 
   /**
    * Retrieve the local position of the node, relative to its parent.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The local position.
    */
-  const Vector3& GetPosition(BufferIndex bufferIndex) const
+  const Vector3& GetPosition() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -495,7 +492,7 @@ public:
    * Retrieve the position of the node derived from the position of all its parents.
    * @return The world position.
    */
-  const Vector3& GetWorldPosition(BufferIndex bufferIndex) const
+  const Vector3& GetWorldPosition() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -518,10 +515,9 @@ public:
 
   /**
    * Retrieve the local orientation of the node, relative to its parent.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The local orientation.
    */
-  const Quaternion& GetOrientation(BufferIndex bufferIndex) const
+  const Quaternion& GetOrientation() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -533,10 +529,9 @@ public:
 
   /**
    * Retrieve the orientation of the node derived from the rotation of all its parents.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The world rotation.
    */
-  const Quaternion& GetWorldOrientation(BufferIndex bufferIndex) const
+  const Quaternion& GetWorldOrientation() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -559,10 +554,9 @@ public:
 
   /**
    * Retrieve the local scale of the node, relative to its parent.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The local scale.
    */
-  const Vector3& GetScale(BufferIndex bufferIndex) const
+  const Vector3& GetScale() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -574,10 +568,9 @@ public:
 
   /**
    * Retrieve the scale of the node derived from the scale of all its parents.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The world scale.
    */
-  const Vector3& GetWorldScale(BufferIndex bufferIndex) const
+  const Vector3& GetWorldScale() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -600,20 +593,18 @@ public:
 
   /**
    * Retrieve the visibility of the node.
-   * @param[in] bufferIndex The buffer to read from.
    * @return True if the node is visible.
    */
-  bool IsVisible(BufferIndex bufferIndex) const
+  bool IsVisible() const
   {
     return mVisible.Get();
   }
 
   /**
    * Retrieve the opacity of the node.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The opacity.
    */
-  float GetOpacity(BufferIndex bufferIndex) const
+  float GetOpacity() const
   {
     auto& color = mColor.Get();
     return color.a;
@@ -621,10 +612,9 @@ public:
 
   /**
    * Retrieve the color of the node.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The color.
    */
-  const Vector4& GetColor(BufferIndex bufferIndex) const
+  const Vector4& GetColor() const
   {
     return mColor.Get();
   }
@@ -642,9 +632,8 @@ public:
    * Sets the color of the node derived from the color of all its parents.
    * This method should only be called when the parents world color is up-to-date.
    * @pre The node has a parent.
-   * @param[in] updateBufferIndex The current update buffer index.
    */
-  void InheritWorldColor(BufferIndex updateBufferIndex)
+  void InheritWorldColor()
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
@@ -703,10 +692,9 @@ public:
 
   /**
    * Retrieve the size of the node.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The size.
    */
-  const Vector3& GetSize(BufferIndex bufferIndex) const
+  const Vector3& GetSize() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -800,10 +788,9 @@ public:
 
   /**
    * Retrieve the cached world-matrix of a node.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The world-matrix.
    */
-  const Matrix& GetWorldMatrix(BufferIndex bufferIndex) const
+  const Matrix& GetWorldMatrix() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
@@ -1033,20 +1020,18 @@ public:
 
   /**
    * @brief Sets whether the node is culled or not.
-   * @param[in] bufferIndex The buffer to read from.
    * @param[in] culled True if the node is culled.
    */
-  void SetCulled(BufferIndex bufferIndex, bool culled)
+  void SetCulled(bool culled)
   {
     mCulled.Set(culled);
   }
 
   /**
    * @brief Retrieves whether the node is culled or not.
-   * @param[in] bufferIndex The buffer to read from.
    * @return True if the node is culled.
    */
-  bool IsCulled(BufferIndex bufferIndex) const
+  bool IsCulled() const
   {
     return mCulled.Get();
   }
@@ -1054,7 +1039,7 @@ public:
   /**
    * @brief Update partial rendering data from the latest node infomations.
    */
-  void UpdatePartialRenderingData(BufferIndex bufferIndex, bool isLayer3d, bool canSkipInfomationUpdate);
+  void UpdatePartialRenderingData(bool isLayer3d, bool canSkipInfomationUpdate);
 
   /**
    * @brief Returns partial rendering data associated with the node.
@@ -1126,14 +1111,6 @@ protected:
 
 private: // from NodeDataProvider
   /**
-   * @copydoc NodeDataProvider::GetRenderColor
-   */
-  const Vector4& GetRenderColor() const override
-  {
-    return GetWorldColor();
-  }
-
-  /**
    * @copydoc NodeDataProvider::GetNodeUniformMap
    */
   const UniformMap& GetNodeUniformMap() const override
@@ -1151,9 +1128,8 @@ private:
   /**
    * Recursive helper to disconnect a Node and its children.
    * Disconnected Nodes have no parent or children.
-   * @param[in] updateBufferIndex The current update buffer index.
    */
-  void RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex);
+  void RecursiveDisconnectFromSceneGraph();
 
   /**
    * @brief Calculates the update area of the node. Or Vector4::ZERO if partial update area is not 2D scale.

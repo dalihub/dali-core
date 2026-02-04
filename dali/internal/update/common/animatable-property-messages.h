@@ -72,7 +72,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex bufferIndex) override
+  void Process() override
   {
     // Bake/set the property
     (object->*memberFunction)(param);

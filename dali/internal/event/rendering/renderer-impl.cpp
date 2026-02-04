@@ -1314,7 +1314,7 @@ bool Renderer::GetCurrentPropertyValue(Property::Index index, Property::Value& v
     }
     case Dali::Renderer::Property::MIX_COLOR:
     {
-      value = sceneObject.GetMixColor(GetEventThreadServices().GetEventBufferIndex());
+      value = sceneObject.GetMixColor();
       break;
     }
     case Dali::Renderer::Property::MIX_COLOR_RED:
@@ -1322,7 +1322,7 @@ bool Renderer::GetCurrentPropertyValue(Property::Index index, Property::Value& v
     case Dali::Renderer::Property::MIX_COLOR_BLUE:
     case Dali::Renderer::Property::OPACITY:
     {
-      value = sceneObject.GetMixColor(GetEventThreadServices().GetEventBufferIndex())[static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED)];
+      value = sceneObject.GetMixColor()[static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::Renderer::Property::MIX_COLOR_RED)];
       break;
     }
     case Dali::DevelRenderer::Property::RENDERING_BEHAVIOR:

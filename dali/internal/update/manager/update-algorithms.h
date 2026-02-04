@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_ALGORITHMS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 
 namespace Dali
@@ -36,31 +35,27 @@ using PropertyOwnerContainer = Dali::Vector<PropertyOwner*>;
 /**
  * Constrain the local properties of the PropertyOwner.
  * @param[in] propertyOwner The PropertyOwner to constrain
- * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] isPreConstraint True if the constraint is performed before transform.
  * @param[in,out] postPropertyOwners Collected property owner list if property owner has post constraint. Only be used if isPreConstraint is true.
  */
-void ConstrainPropertyOwner(PropertyOwner& propertyOwner, BufferIndex updateBufferIndex, bool isPreConstraint, PropertyOwnerContainer& postPropertyOwners);
+void ConstrainPropertyOwner(PropertyOwner& propertyOwner, bool isPreConstraint, PropertyOwnerContainer& postPropertyOwners);
 
 /**
  * Update a tree of nodes
  * The inherited properties of each node are recalculated if necessary.
  * @param[in] rootNode The root of a tree of nodes.
- * @param[in] updateBufferIndex The current update buffer index.
  * @param[out] postPropertyOwner property owners those have post constraint.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
 NodePropertyFlags UpdateNodeTree(Layer&                  rootNode,
-                                 BufferIndex             updateBufferIndex,
                                  PropertyOwnerContainer& postPropertyOwners);
 /**
  * This updates all the sub-layer's reusability flags without affecting
  * the root layer.
  *
  * @param layer The root layer
- * @param updateBufferIndex The current buffer index
  */
-void UpdateLayerTree(Layer& layer, BufferIndex updateBufferIndex);
+void UpdateLayerTree(Layer& layer);
 
 } // namespace SceneGraph
 

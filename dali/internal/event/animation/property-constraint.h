@@ -140,10 +140,9 @@ public:
 
   /**
    * Apply the constraint.
-   * @param [in] bufferIndex The current update buffer index.
    * @param [in,out] current The current property value, will be set to the constrained value upon return.
    */
-  void Apply(BufferIndex bufferIndex, PropertyType& current)
+  void Apply(PropertyType& current)
   {
     InputIndexerContainer  inputIndices;
     PropertyInputContainer indices;
@@ -157,7 +156,7 @@ public:
     for(auto&& iter = mInputs.begin(); iter != endIter; ++iter, ++index)
     {
       DALI_ASSERT_DEBUG(nullptr != iter->GetInput());
-      inputIndices.push_back(PropertyInputIndexer<PropertyInputAccessor>(bufferIndex, &*iter));
+      inputIndices.push_back(PropertyInputIndexer<PropertyInputAccessor>(&*iter));
       indices.PushBack(&inputIndices[index]);
     }
 
