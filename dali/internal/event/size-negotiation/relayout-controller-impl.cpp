@@ -108,7 +108,7 @@ void PrintHierarchy()
 
 RelayoutController::RelayoutController(Integration::RenderController& controller)
 : mRenderController(controller),
-  mRelayoutInfoAllocator(true /* Forcibly use memory pool */),
+  mRelayoutInfoAllocator(MemoryPoolObjectAllocator<MemoryPoolRelayoutContainer::RelayoutInfo>::DEFAULT_INITIAL_BLOCK_CAPACITY, MemoryPoolObjectAllocator<MemoryPoolRelayoutContainer::RelayoutInfo>::DEFAULT_MAXIMUM_BLOCK_CAPACITY, true /* Forcibly use memory pool */),
   mSlotDelegate(this),
   mRelayoutStack(new MemoryPoolRelayoutContainer(mRelayoutInfoAllocator)),
   mRelayoutConnection(false),
@@ -526,9 +526,9 @@ void RelayoutController::SetProcessingCoreEvents(bool processingEvents)
   mProcessingCoreEvents = processingEvents;
 }
 
-uint32_t RelayoutController::GetMemoryPoolCapacity()
+void RelayoutController::GetMemoryPoolCapacity(uint32_t& cap, uint32_t& size)
 {
-  return mRelayoutInfoAllocator.GetCapacity();
+  mRelayoutInfoAllocator.GetCapacity(cap, size);
 }
 
 } // namespace Internal

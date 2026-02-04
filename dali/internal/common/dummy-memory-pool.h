@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_DUMMY_MEMORY_POOL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ public:
   /**
    * @copydoc Dali::Internal::MemoryPoolInterface::GetCapacity
    */
-  uint32_t GetCapacity() const override;
+  void GetCapacity(uint32_t& capacity, uint32_t& filledSize) const override;
 
   /**
    * @copydoc Dali::Internal::MemoryPoolInterface::ResetMemoryPool
