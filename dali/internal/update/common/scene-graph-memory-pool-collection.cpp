@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,54 +259,64 @@ MemoryPoolInterface::KeyType MemoryPoolCollection::GetKeyFromPtr(MemoryPoolColle
   }
 }
 
-uint32_t MemoryPoolCollection::GetCapacity(MemoryPoolCollection::MemoryPoolType type) const
+void MemoryPoolCollection::GetCapacity(MemoryPoolCollection::MemoryPoolType type, uint32_t& cap, uint32_t& size) const
 {
   switch(type)
   {
     case MemoryPoolCollection::MemoryPoolType::ANIMATION:
     {
-      return mImpl->mAnimationMemoryPool.GetCapacity();
+      mImpl->mAnimationMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::CAMERA:
     {
-      return mImpl->mCameraMemoryPool.GetCapacity();
+      mImpl->mCameraMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::NODE:
     {
-      return mImpl->mNodeMemoryPool.GetCapacity();
+      mImpl->mNodeMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDERER:
     {
-      return mImpl->mRendererMemoryPool.GetCapacity();
+      mImpl->mRendererMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_ITEM:
     {
-      return mImpl->mRenderItemMemoryPool.GetCapacity();
+      mImpl->mRenderItemMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_TASK_LIST:
     {
-      return mImpl->mRenderTaskListMemoryPool.GetCapacity();
+      mImpl->mRenderTaskListMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::TEXTURE_SET:
     {
-      return mImpl->mTextureSetMemoryPool.GetCapacity();
+      mImpl->mTextureSetMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_RENDERER:
     {
-      return mImpl->mRenderRendererMemoryPool.GetCapacity();
+      mImpl->mRenderRendererMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_TEXTURE:
     {
-      return mImpl->mRenderTextureMemoryPool.GetCapacity();
+      mImpl->mRenderTextureMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_UBO_VIEW:
     {
-      return mImpl->mRenderUboViewMemoryPool.GetCapacity();
+      mImpl->mRenderUboViewMemoryPool.GetCapacity(cap, size);
+      return;
     }
     default:
     {
       DALI_ASSERT_ALWAYS(0 && "Invalid memory pool type capacity");
-      return 0u;
+      return;
     }
   }
 }

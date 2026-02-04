@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_INTERFACE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,11 +114,14 @@ public:
   virtual KeyType GetKeyFromPtr(void* ptr) = 0;
 
   /**
-   * @brief Get the current capacity of the memory pool
+   * @brief Get the current total block capacity of the memory pool, and the
+   * number of active filled slots.
    *
    * @note in release mode, this returns 0, as the block size isn't defined.
+   * @param[out] capacity The total block capacity
+   * @param[out] filledSize The total size of active allocated data
    */
-  virtual uint32_t GetCapacity() const = 0;
+  virtual void GetCapacity(uint32_t& capacity, uint32_t& filledSize) const = 0;
 
   /**
    * @brief Reset the memory pool

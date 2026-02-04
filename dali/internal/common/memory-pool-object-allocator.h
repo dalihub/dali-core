@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,9 +193,9 @@ public:
   /**
    * @brief Get the capacity of the memory pool
    */
-  uint32_t GetCapacity() const
+  void GetCapacity(uint32_t& cap, uint32_t& size) const
   {
-    return mPool->GetCapacity();
+    mPool->GetCapacity(cap, size);
   }
 
 private:

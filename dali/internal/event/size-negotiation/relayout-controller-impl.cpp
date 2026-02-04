@@ -527,9 +527,9 @@ void RelayoutController::SetProcessingCoreEvents(bool processingEvents)
   mProcessingCoreEvents = processingEvents;
 }
 
-uint32_t RelayoutController::GetMemoryPoolCapacity()
+void RelayoutController::GetMemoryPoolCapacity(uint32_t& cap, uint32_t& size)
 {
-  return mRelayoutInfoAllocator.GetCapacity();
+  mRelayoutInfoAllocator.GetCapacity(cap, size);
 }
 
 } // namespace Internal
