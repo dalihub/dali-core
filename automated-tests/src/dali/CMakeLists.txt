@@ -106,6 +106,7 @@ SET(TC_SOURCES
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
+        utc-Dali-VectorComplexTypes.cpp
         utc-Dali-VertexBuffer.cpp
         utc-Dali-VisualRenderer.cpp
         utc-Dali-WeakHandle.cpp
