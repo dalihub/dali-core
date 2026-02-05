@@ -5016,7 +5016,7 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(16, 768, 32, 32);
+  clippingRect = Rect<int>(0, 752, 48, 48);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
@@ -5051,7 +5051,7 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
     application.SendNotification();
     application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-    clippingRect = Rect<int>(16, 768, 32, 32);
+    clippingRect = Rect<int>(0, 752, 48, 48);
     DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
     DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
     DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
@@ -5072,7 +5072,7 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(16, 768, 32, 32);
+  clippingRect = Rect<int>(0, 752, 48, 48);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
