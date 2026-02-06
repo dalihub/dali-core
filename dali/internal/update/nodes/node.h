@@ -1053,7 +1053,7 @@ public:
   /**
    * @brief Update partial rendering data from the latest node infomations.
    */
-  void UpdatePartialRenderingData(BufferIndex bufferIndex, bool isLayer3d);
+  void UpdatePartialRenderingData(BufferIndex bufferIndex, bool isLayer3d, bool canSkipInfomationUpdate);
 
   /**
    * @brief Returns partial rendering data associated with the node.
