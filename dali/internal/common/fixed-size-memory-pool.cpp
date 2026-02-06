@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -432,7 +432,7 @@ uint32_t FixedSizeMemoryPool::GetCapacity() const
 {
   // Ignores deleted objects list, just returns currently allocated size
   uint32_t totalAllocation = 0;
-#ifdef DEBUG_ENABLED
+
   Mutex::ScopedLock lock(mImpl->mMutex);
   Impl::Block*      block = &mImpl->mMemoryBlocks;
   while(block)
@@ -440,7 +440,7 @@ uint32_t FixedSizeMemoryPool::GetCapacity() const
     totalAllocation += block->mBlockSize;
     block = block->nextBlock;
   }
-#endif
+
   return totalAllocation;
 }
 
