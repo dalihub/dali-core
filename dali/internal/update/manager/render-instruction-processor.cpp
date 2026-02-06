@@ -205,7 +205,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
     if(inside && !isLayer3d && viewportSet)
     {
-      node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d);
+      node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d, false);
 
       const Vector4& nodeUpdateArea = nodePartialRenderingData.mNodeInfomations.updatedPositionSize;
       const Vector2& nodeScaleXY    = nodePartialRenderingData.mNodeInfomations.modelMatrix.GetScaleXY();
@@ -280,7 +280,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(!nodePartialRenderingDataUpdateChecked)
       {
-        node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d);
+        node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d, false);
       }
 
       if(!nodeModelViewMatrixSet)
@@ -407,6 +407,30 @@ inline bool SetupRenderList(RenderableContainer& renderables,
 
   // Try to reuse cached RenderItems from last time around.
   return (tryReuseRenderList && TryReuseCachedRenderers(layer, **renderList, renderables));
+}
+
+inline void UpdateReusedRenderListPartialUpdateData(BufferIndex updateBufferIndex,
+                                                    RenderList& renderList,
+                                                    bool        isLayer3D)
+{
+  // Only need to check non-3d layer cases.
+  if(!isLayer3D)
+  {
+    // Update partial rendering data for reused nodes.
+    const uint32_t renderableCount = static_cast<uint32_t>(renderList.Count());
+    for(uint32_t index = 0; index < renderableCount; ++index)
+    {
+      RenderItemKey itemKey = renderList.GetItemKey(index);
+      RenderItem&   item    = *itemKey.Get();
+
+      Node& node = *(const_cast<Node*>(item.mNode));
+
+      // Skip transform / color variables calculation if possible
+      node.UpdatePartialRenderingData(updateBufferIndex, isLayer3D, true);
+
+      item.mIsUpdated = node.GetPartialRenderingData().mUpdated;
+    }
+  }
 }
 
 } // Anonymous namespace.
@@ -627,6 +651,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       else
       {
         renderList->SetHasColorRenderItems(true);
+        UpdateReusedRenderListPartialUpdateData(updateBufferIndex, *renderList, isLayer3D);
       }
 
       isRenderListAdded = true;
@@ -663,6 +688,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       else
       {
         renderList->SetHasColorRenderItems(false);
+        UpdateReusedRenderListPartialUpdateData(updateBufferIndex, *renderList, isLayer3D);
       }
 
       isRenderListAdded = true;
