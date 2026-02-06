@@ -336,7 +336,7 @@ void RenderTaskList::ReorderTasks(Dali::Internal::LayerList& layerList)
       auto subTree = renderableData[i];
       for(auto&& actor : subTree.second)
       {
-        std::vector<Dali::RenderTask> tasks;
+        Dali::Vector<Dali::RenderTask> tasks;
         actor->GetOffScreenRenderTasks(tasks, false);
         for(auto&& task : tasks)
         {
@@ -346,7 +346,7 @@ void RenderTaskList::ReorderTasks(Dali::Internal::LayerList& layerList)
 
       if(subTree.first && !!(subTree.first->GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD))
       {
-        std::vector<Dali::RenderTask> tasks;
+        Dali::Vector<Dali::RenderTask> tasks;
         subTree.first->GetOffScreenRenderTasks(tasks, true);
         for(auto&& task : tasks)
         {

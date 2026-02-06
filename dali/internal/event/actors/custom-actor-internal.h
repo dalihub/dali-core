@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_CUSTOM_ACTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,7 @@ private:
     mImpl->OnConstraintAnimatableProperty(constraintHandle, index, applied);
   }
 
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
     mImpl->GetOffScreenRenderTasks(tasks, isForward);
   }

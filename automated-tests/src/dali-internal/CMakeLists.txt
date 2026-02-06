@@ -7,6 +7,7 @@ SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
   utc-Dali-Internal-AnimatableProperty.cpp
+  utc-Dali-Internal-ActorImpl.cpp
   utc-Dali-Internal-ActorObserver.cpp
   utc-Dali-Internal-ActorRelayout.cpp
   utc-Dali-Internal-Constraint.cpp

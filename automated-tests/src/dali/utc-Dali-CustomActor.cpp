@@ -1470,7 +1470,7 @@ struct UnregisteredCustomActor : public Dali::CustomActorImpl
   {
   }
 
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
   }
 };
@@ -1811,16 +1811,16 @@ public:
     mScene.Reset();
   }
 
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
-    tasks.clear();
+    tasks.Clear();
     if(isForward && !!(GetOffScreenRenderableType() & OffScreenRenderable::Type::FORWARD) && mForwardRenderTask)
     {
-      tasks.push_back(mForwardRenderTask);
+      tasks.PushBack(mForwardRenderTask);
     }
     if(!isForward && !!(GetOffScreenRenderableType() & OffScreenRenderable::Type::BACKWARD) && mBackwardRenderTask)
     {
-      tasks.push_back(mBackwardRenderTask);
+      tasks.PushBack(mBackwardRenderTask);
     }
   }
 

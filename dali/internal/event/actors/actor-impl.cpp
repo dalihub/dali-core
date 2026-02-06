@@ -1150,7 +1150,7 @@ DevelActor::ChildOrderChangedSignalType& Actor::ChildOrderChangedSignal()
   return mParentImpl.ChildOrderChangedSignal();
 }
 
-void Actor::GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward)
+void Actor::GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward)
 {
 }
 

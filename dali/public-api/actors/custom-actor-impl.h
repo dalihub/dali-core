@@ -2,7 +2,7 @@
 #define DALI_CUSTOM_ACTOR_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
@@ -212,7 +212,7 @@ public:
    * @param[in] isForward Indicates whether to retrieve forward (true) or backward (false)
    * RenderTasks.
    */
-  virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) = 0;
+  virtual void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) = 0;
 
   /**
    * @brief Sets OffScreenRenderableType of this Actor.
