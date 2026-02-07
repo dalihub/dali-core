@@ -382,7 +382,7 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   }
 }
 
-void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLayer3d)
+void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLayer3d, bool canSkipInfomationUpdate)
 {
   if(mPartialRenderingData.mUpdateDecay == PartialRenderingData::Decay::UPDATED_CURRENT_FRAME)
   {
@@ -395,6 +395,12 @@ void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLaye
     // If the node was updated, then mark the partial rendering data as expired
     // So we can skip data comparision.
     mPartialRenderingData.MakeExpired();
+  }
+
+  // If we can ensure to skip node info update, just change decay
+  if(canSkipInfomationUpdate && mPartialRenderingData.MakeUpdatedCurrentFrame())
+  {
+    return;
   }
 
   const Vector4& worldColor = GetWorldColor();
