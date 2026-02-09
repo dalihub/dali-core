@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/public-api/common/dali-common.h>
 
 #if defined(DEBUG_ENABLED)
@@ -151,6 +152,11 @@ RelayoutController& ThreadLocalStorage::GetRelayoutController()
 ObjectRegistry& ThreadLocalStorage::GetObjectRegistry()
 {
   return mCore->GetObjectRegistry();
+}
+
+const SceneGraph::MemoryPoolCollection& ThreadLocalStorage::GetMemoryPools() const
+{
+  return mCore->GetMemoryPools();
 }
 
 EventThreadServices& ThreadLocalStorage::GetEventThreadServices()

@@ -64,6 +64,11 @@ public:
 
   void GetCapacity(MemoryPoolType type, uint32_t& cap, uint32_t& size) const;
 
+  /**
+   * Generate a structured log for all the pool data
+   */
+  std::string LogPools() const;
+
 private:
   struct Impl;
   std::unique_ptr<Impl> mImpl{nullptr};

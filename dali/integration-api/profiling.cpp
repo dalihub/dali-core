@@ -116,6 +116,12 @@ const std::size_t SHADER_MEMORY_SIZE(
   sizeof(Internal::Shader) +
   sizeof(Internal::SceneGraph::Shader));
 
+std::string LogMemoryPools()
+{
+  const auto& pools = ThreadLocalStorage::Get().GetMemoryPools();
+  return pools.LogPools();
+}
+
 } // namespace Profiling
 
 } // namespace Integration
