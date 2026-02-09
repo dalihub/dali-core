@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
-#include <utility> // std::move, std::swap
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h> ///< Dali::Swap
 #include <dali/public-api/common/dali-vector-base.h>
 #include <dali/public-api/common/dali-vector-complex-types.h>
 #include <dali/public-api/common/dali-vector-trivial-types.h>
@@ -109,7 +109,7 @@ public: // API
   Vector(Vector&& vector) noexcept
   {
     // reuse move assignment
-    operator=(std::move(vector));
+    operator=(static_cast<Vector&&>(vector));
   }
 
   /**
@@ -473,7 +473,7 @@ public: // API
     Iterator last = End() - 1u;
     if(last > iterator)
     {
-      std::swap(*iterator, *last);
+      Dali::Swap(*iterator, *last);
     }
 
     if constexpr(IsTrivialType)
