@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,14 +48,14 @@ int UtcDaliTextureUploadByResourceId(void)
   {
     uint32_t expectResourceId = 11u + tc;
 
-    Texture texture = Integration::NewTextureWithResourceId(TextureType::TEXTURE_2D, expectResourceId);
+    Texture texture = Dali::Integration::NewTextureWithResourceId(TextureType::TEXTURE_2D, expectResourceId);
     Actor   actor   = CreateRenderableActor(texture);
 
     application.GetScene().Add(actor);
 
     DALI_TEST_CHECK(texture);
 
-    uint32_t currentResourceId = Integration::GetTextureResourceId(texture);
+    uint32_t currentResourceId = Dali::Integration::GetTextureResourceId(texture);
 
     DALI_TEST_EQUALS(currentResourceId, expectResourceId, TEST_LOCATION);
 

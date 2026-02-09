@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,7 +245,7 @@ int UtcDaliHandleGetPropertyIndex02(void)
   tet_infoline("Positive Test Dali::Handle::GetPropertyIndex() int key");
   TestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add(actor);
@@ -693,7 +693,7 @@ int UtcDaliHandleRegisterProperty01(void)
   tet_infoline("Positive Test Dali::Handle::RegisterProperty()");
   TestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add(actor);
@@ -729,7 +729,7 @@ int UtcDaliHandleRegisterProperty02(void)
   tet_infoline("Positive Test Dali::Handle::RegisterProperty() int key");
   TestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add(actor);
@@ -777,7 +777,7 @@ int UtcDaliHandleRegisterProperty03(void)
   tet_infoline("Test Dali::Handle::RegisterUniqueProperty() int key against default property");
   TestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add(actor);
@@ -824,7 +824,7 @@ int UtcDaliHandleRegisterProperty04(void)
   tet_infoline("Negative Test Dali::Handle::RegisterUniqueProperty() same int key against custom property");
   TestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add(actor);
@@ -877,7 +877,7 @@ int UtcDaliHandleRegisterProperty05(void)
   tet_infoline("Positive Test Dali::Handle::RegisterUniqueProperty() different int key against custom property");
   TestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   stage.Add(actor);

@@ -50,7 +50,7 @@ int UtcDaliTouchEventConstructorP(void)
 
 int UtcDaliTouchEventCopyConstructorP(void)
 {
-  TouchEvent touchEvent = Integration::NewTouchEvent(123u, GenerateTouchPoint());
+  TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, GenerateTouchPoint());
   DALI_TEST_CHECK(touchEvent);
 
   const auto refCount = touchEvent.GetBaseObject().ReferenceCount();
@@ -66,7 +66,7 @@ int UtcDaliTouchEventCopyConstructorP(void)
 
 int UtcDaliTouchEventMoveConstructorP(void)
 {
-  TouchEvent touchEvent = Integration::NewTouchEvent(123u, GenerateTouchPoint());
+  TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, GenerateTouchPoint());
   DALI_TEST_CHECK(touchEvent);
 
   const auto refCount = touchEvent.GetBaseObject().ReferenceCount();
@@ -81,7 +81,7 @@ int UtcDaliTouchEventMoveConstructorP(void)
 
 int UtcDaliTouchEventCopyAssignmentP(void)
 {
-  TouchEvent touchEvent = Integration::NewTouchEvent(123u, GenerateTouchPoint());
+  TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, GenerateTouchPoint());
   DALI_TEST_CHECK(touchEvent);
 
   const auto refCount = touchEvent.GetBaseObject().ReferenceCount();
@@ -100,7 +100,7 @@ int UtcDaliTouchEventCopyAssignmentP(void)
 
 int UtcDaliTouchEventMoveAssignmentP(void)
 {
-  TouchEvent touchEvent = Integration::NewTouchEvent(123u, GenerateTouchPoint());
+  TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, GenerateTouchPoint());
   DALI_TEST_CHECK(touchEvent);
 
   const auto refCount = touchEvent.GetBaseObject().ReferenceCount();
@@ -125,7 +125,7 @@ int UtcDaliTouchEventCopyConstructorWithPointP(void)
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(touchPoint.x, touchPoint.y));
 
-  TouchEvent touchEvent = Integration::NewTouchEvent(123u, point);
+  TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, point);
   DALI_TEST_CHECK(touchEvent);
 
   const auto refCount = touchEvent.GetBaseObject().ReferenceCount();
@@ -148,7 +148,7 @@ int UtcDaliTouchEventMoveConstructorWithPointP(void)
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(touchPoint.x, touchPoint.y));
 
-  TouchEvent touchEvent = Integration::NewTouchEvent(123u, point);
+  TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, point);
   DALI_TEST_CHECK(touchEvent);
 
   const auto refCount = touchEvent.GetBaseObject().ReferenceCount();
@@ -165,7 +165,7 @@ int UtcDaliTouchEventSetTime(void)
 {
   TestApplication application;
 
-  TouchEvent touchEvent = Integration::NewTouchEvent(123u, GenerateTouchPoint());
+  TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, GenerateTouchPoint());
   DALI_TEST_CHECK(touchEvent);
 
   DALI_TEST_EQUALS(123lu, touchEvent.GetTime(), TEST_LOCATION);

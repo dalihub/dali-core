@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ int UtcDaliGeoHitTestAlgorithmWithFunctor(void)
 
   // Perform a hit-test at the given screen coordinates
   Dali::HitTestAlgorithm::Results results;
-  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor != actor);
 
   actor.SetProperty(Actor::Property::NAME, "HittableActor");
@@ -139,7 +139,7 @@ int UtcDaliGeoHitTestAlgorithmWithFunctor(void)
   results.actorCoordinates = Vector2::ZERO;
 
   // Perform a hit-test at the given screen coordinates
-  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == actor);
   DALI_TEST_EQUALS(localCoordinates, results.actorCoordinates, 0.1f, TEST_LOCATION);
   END_TEST;
@@ -186,15 +186,15 @@ int UtcDaliGeoHitTestAlgorithmOrtho01(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 1.0f / 6.0f, TEST_LOCATION);
 
-  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
-  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
   END_TEST;
@@ -246,21 +246,21 @@ int UtcDaliGeoHitTestAlgorithmOrtho02(void)
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2(240.0f, 400.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(stage, Vector2(240.0f, 400.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(results.actor == green);
     DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.6f, 0.01f, TEST_LOCATION);
   }
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2(0.001f, 0.001f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(stage, Vector2(0.001f, 0.001f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(results.actor == blue);
     DALI_TEST_EQUALS(results.actorCoordinates, Vector2(0.001f, 0.001f), 0.001f, TEST_LOCATION);
   }
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, stageSize, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(stage, stageSize, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(!results.actor);
     DALI_TEST_EQUALS(results.actorCoordinates, Vector2::ZERO, TEST_LOCATION);
   }
@@ -268,7 +268,7 @@ int UtcDaliGeoHitTestAlgorithmOrtho02(void)
   // Just inside green
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, stageSize * 0.69f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(stage, stageSize * 0.69f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(results.actor == green);
     DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.98f, 0.01f, TEST_LOCATION);
   }
@@ -317,12 +317,12 @@ int UtcDaliGeoHitTestAlgorithmClippingActor(void)
 
   // Hit within clippingActor and childActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == childActor);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
-  HitTest(stage, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == rootLayer);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
 
@@ -383,12 +383,12 @@ int UtcDaliGeoHitTestAlgorithmClippingActorStress(void)
 
   // Hit within clippingActor and latestActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
   DALI_TEST_CHECK(results.actor == latestActor);
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
-  HitTest(stage, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
   DALI_TEST_CHECK(results.actor == rootLayer);
 
@@ -439,17 +439,17 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   HitTestAlgorithm::Results results;
 
   //Hit in the intersection. Should pick the blue actor since it is an overlay.
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 5.0f / 6.0f, TEST_LOCATION);
 
   //Hit in the blue actor
-  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
   //Hit in the green actor
-  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
@@ -469,25 +469,25 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   application.Render(10);
 
   //Hit in the intersection red, green, blue. Should pick the red actor since it is an child of overlay.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, green. Should pick the red actor since it is an child of overlay.
-  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the blue actor since it is an overlay.
-  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 9.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
@@ -501,25 +501,25 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   application.Render(10);
 
   //Hit in the intersection red, green, blue. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, green. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 3.0f / 12.0f), TEST_LOCATION);
@@ -578,7 +578,7 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
 
   // Because the offRenderTask is set to exclusive, the green will not be rendered and it cannot be touched as a MappingActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -643,7 +643,7 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;

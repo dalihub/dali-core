@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,10 +116,10 @@ struct RemoveActorFunctor : public HoverEventFunctor
   }
 };
 
-Integration::HoverEvent GenerateSingleHover(PointState::Type state, const Vector2& screenPosition)
+Dali::Integration::HoverEvent GenerateSingleHover(PointState::Type state, const Vector2& screenPosition)
 {
-  Integration::HoverEvent hoverEvent;
-  Integration::Point      point;
+  Dali::Integration::HoverEvent hoverEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   hoverEvent.points.push_back(point);
@@ -222,8 +222,8 @@ int UtcDaliGeoHoverOutsideCameraNearFarPlanes(void)
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Integration::Scene stage     = application.GetScene();
-  Vector2            stageSize = stage.GetSize();
+  Dali::Integration::Scene stage     = application.GetScene();
+  Vector2                  stageSize = stage.GetSize();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -316,7 +316,7 @@ int UtcDaliGeoHoverEmitEmpty(void)
   try
   {
     // Emit an empty HoverEvent
-    Integration::HoverEvent event;
+    Dali::Integration::HoverEvent event;
     application.ProcessEvent(event);
     tet_result(TET_FAIL);
   }
@@ -1009,8 +1009,8 @@ int UtcDaliGeoHoverMultipleRenderTasks(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1055,8 +1055,8 @@ int UtcDaliGeoHoverMultipleRenderTasksWithChildLayer(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1108,8 +1108,8 @@ int UtcDaliGeoHoverOffscreenRenderTasks(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   // FrameBufferImage for offscreen RenderTask
   FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height);
@@ -1159,8 +1159,8 @@ int UtcDaliGeoHoverMultipleRenderableActors(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   Actor parent = CreateRenderableActor();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1331,7 +1331,7 @@ int UtcDaliGeoHoverLeaveActorReadded(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1378,7 +1378,7 @@ int UtcDaliGeoHoverClippingActor(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1431,7 +1431,7 @@ int UtcDaliGeoHoverActorHide(void)
 {
   TestApplication application;
   application.GetScene().SetGeometryHittestEnabled(true);
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1470,8 +1470,8 @@ int UtcDaliGeoHoverEnsureDifferentConsumerReceivesInterrupted(void)
 {
   // Interrupted event with a different consumer to previous event
 
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
   scene.SetGeometryHittestEnabled(true);
 
   Actor parent = Actor::New();

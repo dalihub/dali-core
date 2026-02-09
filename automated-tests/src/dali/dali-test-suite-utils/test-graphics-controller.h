@@ -103,12 +103,12 @@ public:
     mGl.Initialize();
   }
 
-  Integration::GlAbstraction& GetGlAbstraction()
+  Dali::Integration::GlAbstraction& GetGlAbstraction()
   {
     return mGl;
   }
 
-  Integration::GraphicsConfig& GetGraphicsConfig()
+  Dali::Integration::GraphicsConfig& GetGraphicsConfig()
   {
     return mGl;
   }

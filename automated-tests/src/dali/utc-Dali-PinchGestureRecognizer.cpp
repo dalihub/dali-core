@@ -77,10 +77,10 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -90,10 +90,10 @@ Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
+Dali::Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(stateA);
   point.SetScreenPosition(screenPositionA);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -439,7 +439,7 @@ int UtcDaliPinchGestureRecognizerShortDistance01(void)
 {
   TestApplication application;
 
-  Integration::SetPinchGestureMinimumDistance(7.0f);
+  Dali::Integration::SetPinchGestureMinimumDistance(7.0f);
 
   PinchGestureDetector detector = PinchGestureDetector::New();
 
@@ -492,7 +492,7 @@ int UtcDaliPinchGestureRecognizerShortDistance02(void)
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  Integration::SetPinchGestureMinimumDistance(7.0f);
+  Dali::Integration::SetPinchGestureMinimumDistance(7.0f);
 
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 28.0f), PointState::MOTION, Vector2(20.0f, 82.0f), 160));
@@ -511,7 +511,7 @@ int UtcDaliPinchGestureRecognizerLongDistance01(void)
 {
   TestApplication application;
 
-  Integration::SetPinchGestureMinimumDistance(14.0f);
+  Dali::Integration::SetPinchGestureMinimumDistance(14.0f);
 
   PinchGestureDetector detector = PinchGestureDetector::New();
 
@@ -546,7 +546,7 @@ int UtcDaliPinchGestureRecognizerLongDistance02(void)
 {
   TestApplication application;
 
-  Integration::SetPinchGestureMinimumDistance(14.0f);
+  Dali::Integration::SetPinchGestureMinimumDistance(14.0f);
 
   PinchGestureDetector detector = PinchGestureDetector::New();
 
@@ -599,7 +599,7 @@ int UtcDaliPinchGestureRecognizerLongDistance03(void)
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  Integration::SetPinchGestureMinimumDistance(14.0f);
+  Dali::Integration::SetPinchGestureMinimumDistance(14.0f);
 
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 22.0f), PointState::MOTION, Vector2(20.0f, 88.0f), 160));
@@ -634,7 +634,7 @@ int UtcDaliPinchGestureRecognizerLongDistance04(void)
   GestureReceivedFunctor functor(data);
   detector.DetectedSignal().Connect(&application, functor);
 
-  Integration::SetPinchGestureMinimumDistance(14.0f);
+  Dali::Integration::SetPinchGestureMinimumDistance(14.0f);
 
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 38.0f), PointState::MOTION, Vector2(20.0f, 72.0f), 160));
@@ -672,7 +672,7 @@ int UtcDaliPinchGestureRecognizerMinimumTouchEvents(void)
 
   // Case 1
   // 2 touch events make a gesture begin
-  Integration::SetPinchGestureMinimumTouchEvents(2);
+  Dali::Integration::SetPinchGestureMinimumTouchEvents(2);
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), PointState::MOTION, Vector2(90.0f, 90.0f), 160));
 
@@ -682,7 +682,7 @@ int UtcDaliPinchGestureRecognizerMinimumTouchEvents(void)
 
   // Case 2
   // 4 touch events make a gesture begin
-  Integration::SetPinchGestureMinimumTouchEvents(4);
+  Dali::Integration::SetPinchGestureMinimumTouchEvents(4);
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), PointState::MOTION, Vector2(90.0f, 90.0f), 160));
 
@@ -716,8 +716,8 @@ int UtcDaliPinchGestureRecognizerMinimumTouchEventsAfterStart(void)
   // Case 1
   // > 2 touch events make a gesture begin
   // > 4 touch events generate gestures after begin
-  Integration::SetPinchGestureMinimumTouchEvents(2);
-  Integration::SetPinchGestureMinimumTouchEventsAfterStart(6);
+  Dali::Integration::SetPinchGestureMinimumTouchEvents(2);
+  Dali::Integration::SetPinchGestureMinimumTouchEventsAfterStart(6);
 
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), PointState::MOTION, Vector2(90.0f, 90.0f), 160));

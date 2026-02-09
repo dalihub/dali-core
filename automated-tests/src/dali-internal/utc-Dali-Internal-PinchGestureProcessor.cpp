@@ -43,7 +43,7 @@ void TestAbortWithState(GestureState state)
   TestApplication application;
 
   Internal::PinchGestureProcessor processor;
-  Integration::Scene              scene(application.GetScene());
+  Dali::Integration::Scene        scene(application.GetScene());
   Internal::Scene&                sceneImpl = GetImplementation(scene);
   Internal::PinchGestureEvent     event(state);
 

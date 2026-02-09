@@ -2,7 +2,7 @@
 #define DALI_TEST_PLATFORM_ABSTRACTION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,21 +61,21 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetClosestImageSize()
    */
-  ImageDimensions GetClosestImageSize(Integration::ResourcePointer resourceBuffer,
-                                      ImageDimensions              size,
-                                      FittingMode::Type            fittingMode,
-                                      SamplingMode::Type           samplingMode,
-                                      bool                         orientationCorrection) override;
+  ImageDimensions GetClosestImageSize(Dali::Integration::ResourcePointer resourceBuffer,
+                                      ImageDimensions                    size,
+                                      FittingMode::Type                  fittingMode,
+                                      SamplingMode::Type                 samplingMode,
+                                      bool                               orientationCorrection) override;
 
   /**
    * @copydoc PlatformAbstraction::LoadResourceSynchronously()
    */
-  Integration::ResourcePointer LoadImageSynchronously(const Integration::BitmapResourceType& resourceType, const std::string& resourcePath) override;
+  Dali::Integration::ResourcePointer LoadImageSynchronously(const Dali::Integration::BitmapResourceType& resourceType, const std::string& resourcePath) override;
 
   /**
    * @copydoc PlatformAbstraction::DecodeBuffer()
    */
-  Integration::BitmapPtr DecodeBuffer(const Dali::Integration::BitmapResourceType& resourceType, uint8_t* buffer, size_t size) override;
+  Dali::Integration::BitmapPtr DecodeBuffer(const Dali::Integration::BitmapResourceType& resourceType, uint8_t* buffer, size_t size) override;
 
   /**
    * @copydoc PlatformAbstraction::LoadShaderBinaryFile()
@@ -163,13 +163,13 @@ public: // TEST FUNCTIONS
    * @brief Sets the resource loaded by LoadResourceSynchronously
    * @param[in] resource The loaded resource
    */
-  void SetSynchronouslyLoadedResource(Integration::ResourcePointer resource);
+  void SetSynchronouslyLoadedResource(Dali::Integration::ResourcePointer resource);
 
   /**
    * @brief Sets the bitmap returned by DecodeBuffer()
    * @param[in] bitmap The decoded bitmap
    */
-  void SetDecodedBitmap(Integration::BitmapPtr bitmap);
+  void SetDecodedBitmap(Dali::Integration::BitmapPtr bitmap);
 
   /**
    * @brief Triggers the previously stored callback function
@@ -199,8 +199,8 @@ private:
   LoadFileResult mLoadFileResult;
   bool           mSaveFileResult;
 
-  Integration::ResourcePointer mSynchronouslyLoadedResource;
-  Integration::BitmapPtr       mDecodedBitmap;
+  Dali::Integration::ResourcePointer mSynchronouslyLoadedResource;
+  Dali::Integration::BitmapPtr       mDecodedBitmap;
 
   uint32_t                                                        mTimerId;
   std::vector<std::pair<uint32_t, std::unique_ptr<CallbackBase>>> mTimerPairsWaiting;

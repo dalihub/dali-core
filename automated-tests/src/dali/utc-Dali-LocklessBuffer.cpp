@@ -26,7 +26,7 @@ using namespace Dali;
 
 namespace
 {
-static bool ReadTest(Integration::LocklessBuffer& buf, const unsigned char exp[], size_t size)
+static bool ReadTest(Dali::Integration::LocklessBuffer& buf, const unsigned char exp[], size_t size)
 {
   const unsigned char* res = buf.Read();
   for(size_t i = 0; i < size; ++i, ++res)
@@ -44,8 +44,8 @@ static bool ReadTest(Integration::LocklessBuffer& buf, const unsigned char exp[]
 // Simple write - read test
 int UtcDaliLocklessBufferWriteRead01(void)
 {
-  Integration::LocklessBuffer buf(10);
-  unsigned char               data[10];
+  Dali::Integration::LocklessBuffer buf(10);
+  unsigned char                     data[10];
 
   for(unsigned char i = 0; i < 10; ++i)
   {
@@ -68,8 +68,8 @@ int UtcDaliLocklessBufferWriteRead01(void)
 // test multiple writes, one read
 int UtcDaliLocklessBufferMultipleWrites01(void)
 {
-  Integration::LocklessBuffer buf(10);
-  unsigned char               data[10];
+  Dali::Integration::LocklessBuffer buf(10);
+  unsigned char                     data[10];
 
   for(unsigned char i = 0; i < 10; ++i)
   {
@@ -101,8 +101,8 @@ int UtcDaliLocklessBufferMultipleWrites01(void)
 // test one writes, multiple read
 int UtcDaliLocklessBufferMultipleWrites02(void)
 {
-  Integration::LocklessBuffer buf(10);
-  unsigned char               data[10];
+  Dali::Integration::LocklessBuffer buf(10);
+  unsigned char                     data[10];
 
   for(unsigned char i = 0; i < 10; ++i)
   {
@@ -164,8 +164,8 @@ int UtcDaliLocklessBufferMultipleWrites02(void)
 // Simple API test
 int UtcDaliLocklessBufferGetSize01(void)
 {
-  Integration::LocklessBuffer buf(10);
-  unsigned int                size = buf.GetSize();
+  Dali::Integration::LocklessBuffer buf(10);
+  unsigned int                      size = buf.GetSize();
   if(size == 10)
   {
     tet_result(TET_PASS);

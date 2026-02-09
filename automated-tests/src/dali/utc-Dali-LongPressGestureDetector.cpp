@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor(SignalData& data, GestureState& stateToUnstage, Integration::Scene scene)
+  UnstageActorFunctor(SignalData& data, GestureState& stateToUnstage, Dali::Integration::Scene scene)
   : GestureReceivedFunctor(data),
     stateToUnstage(stateToUnstage),
     scene(scene)
@@ -121,8 +121,8 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
     }
   }
 
-  GestureState&      stateToUnstage;
-  Integration::Scene scene;
+  GestureState&            stateToUnstage;
+  Dali::Integration::Scene scene;
 };
 
 // Functor for receiving a touch event
@@ -140,10 +140,10 @@ struct TouchEventFunctor
   }
 };
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetDeviceId(4);
   point.SetScreenPosition(screenPosition);
@@ -261,8 +261,8 @@ int UtcDaliLongPressGestureDetectorNew(void)
   TouchEventFunctor touchFunctor;
   actor.TouchedSignal().Connect(&application, touchFunctor);
 
-  Integration::TouchEvent touchEvent(1);
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent(1);
+  Dali::Integration::Point      point;
   point.SetDeviceId(1);
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(20.0f, 20.0f));
@@ -1016,7 +1016,7 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
   const uint32_t kMinumumHolding1 = 5000;
   const uint32_t kMinumumHolding2 = 3000;
 
-  Integration::SetLongPressMinimumHoldingTime(kMinumumHolding1);
+  Dali::Integration::SetLongPressMinimumHoldingTime(kMinumumHolding1);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1036,7 +1036,7 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
 
   DALI_TEST_EQUALS(DevelLongPressGestureDetector::GetMinimumHoldingTime(detector), kMinumumHolding1, TEST_LOCATION);
 
-  Integration::SetLongPressMinimumHoldingTime(kMinumumHolding2);
+  Dali::Integration::SetLongPressMinimumHoldingTime(kMinumumHolding2);
   DALI_TEST_EQUALS(DevelLongPressGestureDetector::GetMinimumHoldingTime(detector), kMinumumHolding2, TEST_LOCATION);
 
   END_TEST;
@@ -1187,10 +1187,10 @@ int UtcDaliLongPressGestureSignalWithGeometryHittest(void)
 
 int UtcDaliLongPressGestureHandleEvent(void)
 {
-  TestApplication    application;
-  Integration::Scene scene    = application.GetScene();
-  RenderTaskList     taskList = scene.GetRenderTaskList();
-  Dali::RenderTask   task     = taskList.GetTask(0);
+  TestApplication          application;
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
+  Dali::RenderTask         task     = taskList.GetTask(0);
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1213,8 +1213,8 @@ int UtcDaliLongPressGestureHandleEvent(void)
   LongPressGestureDetector parentDetector = LongPressGestureDetector::New();
   parentDetector.DetectedSignal().Connect(&application, pFunctor);
 
-  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
-  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  Dali::Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
+  Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(100));
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());

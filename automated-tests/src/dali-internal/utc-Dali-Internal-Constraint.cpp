@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,7 +247,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
   DALI_TEST_EQUALS(result3, 3u, TEST_LOCATION);
   DALI_TEST_EQUALS(result4, 4u, TEST_LOCATION);
 
-  tet_printf("Test 2 : Integration::HandleRemoveConstraints(tag) to remove internal constraints\n");
+  tet_printf("Test 2 : Dali::Integration::HandleRemoveConstraints(tag) to remove internal constraints\n");
 
   result1 = result2 = result3 = result4 = 0u;
 
@@ -293,7 +293,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
   DALI_TEST_EQUALS(result3, 3u, TEST_LOCATION);
   DALI_TEST_EQUALS(result4, 4u, TEST_LOCATION);
 
-  tet_printf("Test 3 : Integration::HandleRemoveConstraints(tagBegin, tagEnd) to remove multiple internal constraints\n");
+  tet_printf("Test 3 : Dali::Integration::HandleRemoveConstraints(tagBegin, tagEnd) to remove multiple internal constraints\n");
 
   result1 = result2 = result3 = result4 = 0u;
 
@@ -325,7 +325,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
   DALI_TEST_EQUALS(result3, 3u, TEST_LOCATION);
   DALI_TEST_EQUALS(result4, 4u, TEST_LOCATION);
 
-  tet_printf("Test 4 : Integration::HandleRemoveAllConstraints() to remove every constraints both custom and internal\n");
+  tet_printf("Test 4 : Dali::Integration::HandleRemoveAllConstraints() to remove every constraints both custom and internal\n");
 
   result1 = result2 = result3 = result4 = 0u;
 

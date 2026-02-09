@@ -55,9 +55,9 @@ const char* FRAGMENT_SHADER = MAKE_SHADER(
 
 Actor CreateMeshActorToScene(TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE)
 {
-  Integration::PixelBuffer* pixelBuffer = new Integration::PixelBuffer[4];
-  PixelData                 pixelData   = PixelData::New(pixelBuffer, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
-  Texture                   image       = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
+  Dali::Integration::PixelBuffer* pixelBuffer = new Dali::Integration::PixelBuffer[4];
+  PixelData                       pixelData   = PixelData::New(pixelBuffer, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
+  Texture                         image       = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   image.Upload(pixelData);
 
   Geometry   geometry   = CreateQuadGeometry();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,12 +55,12 @@ void TestApplication::Initialize()
 void TestApplication::CreateCore()
 {
   // We always need the first update!
-  mStatus.keepUpdating = Integration::KeepUpdating::STAGE_KEEP_RENDERING;
+  mStatus.keepUpdating = Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING;
 
-  Integration::CorePolicyFlags corePolicyFlags = Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE;
+  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE;
   if(mPartialUpdateEnabled)
   {
-    corePolicyFlags |= Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
+    corePolicyFlags |= Dali::Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
   }
 
   mCore = Dali::Integration::Core::New(mRenderController,
@@ -179,7 +179,7 @@ TestGraphicsSyncImplementation& TestApplication::GetGraphicsSyncImpl()
   return static_cast<TestGraphicsSyncImplementation&>(mGraphicsController.GetGraphicsSyncImpl());
 }
 
-void TestApplication::ProcessEvent(const Integration::Event& event)
+void TestApplication::ProcessEvent(const Dali::Integration::Event& event)
 {
   mCore->QueueEvent(event);
   mCore->ProcessEvents();
@@ -358,12 +358,12 @@ uint32_t TestApplication::Wait(uint32_t durationToWait)
   return time;
 }
 
-void TestApplication::AddScene(Integration::Scene scene)
+void TestApplication::AddScene(Dali::Integration::Scene scene)
 {
   mScenes.push_back(scene);
 }
 
-void TestApplication::RemoveScene(Integration::Scene scene)
+void TestApplication::RemoveScene(Dali::Integration::Scene scene)
 {
   mScenes.erase(std::remove(mScenes.begin(), mScenes.end(), scene), mScenes.end());
 }

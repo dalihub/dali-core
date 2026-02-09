@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -385,7 +385,7 @@ int UtcDaliRenderTaskSetSourceActorN(void)
 {
   TestApplication application;
   tet_infoline("Testing RenderTask::SetSourceActor() Negative - try with empty actor handle");
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor srcActor;
 
@@ -406,9 +406,9 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that setting a non-renderable actor stops existing source actor being rendered ");
 
-  Integration::Scene stage    = application.GetScene();
-  RenderTaskList     taskList = stage.GetRenderTaskList();
-  RenderTask         task     = taskList.GetTask(0u);
+  Dali::Integration::Scene stage    = application.GetScene();
+  RenderTaskList           taskList = stage.GetRenderTaskList();
+  RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
@@ -448,7 +448,7 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that switching source from a non-renderable to a renderable actor causes the texture to be drawn");
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   RenderTaskList taskList = stage.GetRenderTaskList();
 
@@ -505,9 +505,9 @@ int UtcDaliRenderTaskSetSourceActorOffScene(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor (on/off stage testing)");
 
-  Integration::Scene stage    = application.GetScene();
-  RenderTaskList     taskList = stage.GetRenderTaskList();
-  RenderTask         task     = taskList.GetTask(0u);
+  Dali::Integration::Scene stage    = application.GetScene();
+  RenderTaskList           taskList = stage.GetRenderTaskList();
+  RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
@@ -558,9 +558,9 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor (empty handle case)");
 
-  Integration::Scene stage    = application.GetScene();
-  RenderTaskList     taskList = stage.GetRenderTaskList();
-  RenderTask         task     = taskList.GetTask(0u);
+  Dali::Integration::Scene stage    = application.GetScene();
+  RenderTaskList           taskList = stage.GetRenderTaskList();
+  RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
@@ -608,9 +608,9 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor - Set a source actor and destroy the source actor");
 
-  Integration::Scene stage    = application.GetScene();
-  RenderTaskList     taskList = stage.GetRenderTaskList();
-  RenderTask         task     = taskList.GetTask(0u);
+  Dali::Integration::Scene stage    = application.GetScene();
+  RenderTaskList           taskList = stage.GetRenderTaskList();
+  RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
   DALI_TEST_CHECK(actor);
@@ -746,7 +746,7 @@ int UtcDaliRenderTaskRenderUntil01(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor secondChild;
   for(int i = 0; i < 5; i++)
@@ -791,7 +791,7 @@ int UtcDaliRenderTaskRenderUntil02(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor secondChild;
   for(int i = 0; i < 5; i++)
@@ -836,7 +836,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -951,7 +951,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -1182,7 +1182,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -1298,7 +1298,7 @@ int UtcDaliRenderTaskRenderUntil06(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -1826,9 +1826,9 @@ int UtcDaliRenderTaskSetCameraActorDestroyed(void)
 
   tet_infoline("Testing RenderTask::SetCameraActor - Set a camera actor and destroy the camera actor");
 
-  Integration::Scene stage    = application.GetScene();
-  RenderTaskList     taskList = stage.GetRenderTaskList();
-  RenderTask         task     = taskList.GetTask(0u);
+  Dali::Integration::Scene stage    = application.GetScene();
+  RenderTaskList           taskList = stage.GetRenderTaskList();
+  RenderTask               task     = taskList.GetTask(0u);
 
   CameraActor newCameraActor = CameraActor::New();
   task.SetCameraActor(newCameraActor);
@@ -2666,16 +2666,16 @@ int UtcDaliRenderTaskSignalFinished(void)
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
 
   application.Render();
-  DALI_TEST_EQUALS((Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
+  DALI_TEST_EQUALS((Dali::Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Dali::Integration::KeepUpdating::RENDER_TASK_SYNC), Dali::Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
   application.Render();
-  DALI_TEST_EQUALS((Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
+  DALI_TEST_EQUALS((Dali::Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Dali::Integration::KeepUpdating::RENDER_TASK_SYNC), Dali::Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
@@ -2866,7 +2866,7 @@ int UtcDaliRenderTaskOnce01(void)
 
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -2913,7 +2913,7 @@ int UtcDaliRenderTaskOnce02(void)
 
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -2956,7 +2956,7 @@ int UtcDaliRenderTaskOnce03(void)
   //                                                   drawn   sig    finished  Keep updating
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -3010,7 +3010,7 @@ int UtcDaliRenderTaskOnce04(void)
   //   FAILS                                          drawn   sig    finished  Keep updating
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -3170,8 +3170,8 @@ int UtcDaliRenderTaskOnceNoSync04(void)
   application.SendNotification();
 
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, false, __LINE__));
-  auto&                                             sync        = application.GetGraphicsSyncImpl();
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  auto&                                                   sync        = application.GetGraphicsSyncImpl();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj == NULL);
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -3346,16 +3346,16 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
 
   application.Render();
-  DALI_TEST_EQUALS((Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
+  DALI_TEST_EQUALS((Dali::Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Dali::Integration::KeepUpdating::RENDER_TASK_SYNC), Dali::Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
   application.Render();
-  DALI_TEST_EQUALS((Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
+  DALI_TEST_EQUALS((Dali::Integration::KeepUpdating::Reasons)(application.GetUpdateStatus() & Dali::Integration::KeepUpdating::RENDER_TASK_SYNC), Dali::Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION);
   application.SendNotification();
   DALI_TEST_CHECK(!finished);
 
@@ -3384,7 +3384,7 @@ int UtcDaliRenderTaskFinishMissingImage(void)
   // Previously we had bugs where not having a resource ID would cause render-tasks to wait forever
   tet_infoline("Testing RenderTask::SignalFinished() when an Actor has no Image set");
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
   Actor   rootActor = CreateRenderableActor(image);
@@ -4467,7 +4467,7 @@ int UtcDaliRenderTaskUploadOnly(void)
 
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, true, finished, false, true, __LINE__));
 
-  Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  Dali::Integration::GraphicsSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK(lastSyncObj != NULL);
   sync.SetObjectSynced(lastSyncObj, true);
 
@@ -5641,8 +5641,8 @@ int UtcDaliRenderTaskExclusiveAddCacheRenderer(void)
   drawTrace.Enable(true);
 
   // Create scene and actors
-  Integration::Scene stage    = application.GetScene();
-  RenderTaskList     taskList = stage.GetRenderTaskList();
+  Dali::Integration::Scene stage    = application.GetScene();
+  RenderTaskList           taskList = stage.GetRenderTaskList();
 
   // Create a renderable actor
   Texture image           = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);

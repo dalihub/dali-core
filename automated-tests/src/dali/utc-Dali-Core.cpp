@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ int UtcDaliCoreChangeCorePolicy(void)
 {
   TestApplication application;
 
-  Integration::CorePolicyFlags corePolicyFlags = Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
+  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
 
   // Note that we should not call this method after ContextCreated() has been called.
   // But here is UTC, so we can call it after context creation at TestApplication initialized.
@@ -88,7 +88,7 @@ int UtcDaliCoreChangeCorePolicyN(void)
 {
   TestApplication application;
 
-  Integration::CorePolicyFlags corePolicyFlags = Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
+  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
 
   // Render something.
   Actor actor = CreateRenderableActor();

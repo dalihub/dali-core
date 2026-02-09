@@ -108,7 +108,7 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor(SignalData& data, GestureState& stateToUnstage, Integration::Scene scene)
+  UnstageActorFunctor(SignalData& data, GestureState& stateToUnstage, Dali::Integration::Scene scene)
   : GestureReceivedFunctor(data),
     stateToUnstage(stateToUnstage),
     scene(scene)
@@ -125,8 +125,8 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
     }
   }
 
-  GestureState&      stateToUnstage;
-  Integration::Scene scene;
+  GestureState&            stateToUnstage;
+  Dali::Integration::Scene scene;
 };
 
 // Functor that removes the gestured actor from stage
@@ -226,10 +226,10 @@ PanGesture GeneratePan(unsigned int time,
   return pan;
 }
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetDeviceId(4);
   point.SetScreenPosition(screenPosition);
@@ -1994,8 +1994,8 @@ int UtcDaliPanGestureDirectionProcessing(void)
 int UtcDaliPanGestureNoPredictionNoSmoothing(void)
 {
   TestApplication application;
-  Integration::SetPanGesturePredictionMode(0);
-  Integration::SetPanGestureSmoothingMode(0);
+  Dali::Integration::SetPanGesturePredictionMode(0);
+  Dali::Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2057,8 +2057,8 @@ int UtcDaliPanGestureNoPredictionNoSmoothing(void)
 int UtcDaliPanGestureNoPredictionSmoothing(void)
 {
   TestApplication application;
-  Integration::SetPanGesturePredictionMode(0);
-  Integration::SetPanGestureSmoothingMode(1);
+  Dali::Integration::SetPanGesturePredictionMode(0);
+  Dali::Integration::SetPanGestureSmoothingMode(1);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2121,8 +2121,8 @@ int UtcDaliPanGestureNoPredictionSmoothing(void)
 int UtcDaliPanGesturePredictionNoSmoothing(void)
 {
   TestApplication application;
-  Integration::SetPanGesturePredictionMode(1);
-  Integration::SetPanGestureSmoothingMode(0);
+  Dali::Integration::SetPanGesturePredictionMode(1);
+  Dali::Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2184,8 +2184,8 @@ int UtcDaliPanGesturePredictionNoSmoothing(void)
 int UtcDaliPanGesturePredictionSmoothing01(void)
 {
   TestApplication application;
-  Integration::SetPanGesturePredictionMode(1);
-  Integration::SetPanGestureSmoothingMode(1);
+  Dali::Integration::SetPanGesturePredictionMode(1);
+  Dali::Integration::SetPanGestureSmoothingMode(1);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2247,11 +2247,11 @@ int UtcDaliPanGesturePredictionSmoothing01(void)
 int UtcDaliPanGesturePredictionSmoothing02(void)
 {
   TestApplication application;
-  Integration::SetPanGesturePredictionMode(1);
-  Integration::SetPanGestureMaximumPredictionAmount(1);
-  Integration::SetPanGesturePredictionAmountAdjustment(2);
-  Integration::SetPanGestureSmoothingMode(1);
-  Integration::SetPanGestureSmoothingAmount(0.25f);
+  Dali::Integration::SetPanGesturePredictionMode(1);
+  Dali::Integration::SetPanGestureMaximumPredictionAmount(1);
+  Dali::Integration::SetPanGesturePredictionAmountAdjustment(2);
+  Dali::Integration::SetPanGestureSmoothingMode(1);
+  Dali::Integration::SetPanGestureSmoothingAmount(0.25f);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2348,17 +2348,17 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap01(void)
 {
   TestApplication application;
 
-  Integration::SetPanGesturePredictionMode(2);
-  Integration::SetPanGesturePredictionAmount(57);
-  Integration::SetPanGestureSmoothingMode(2);
-  Integration::SetPanGestureUseActualTimes(false);
-  Integration::SetPanGestureInterpolationTimeRange(10);
-  Integration::SetPanGestureScalarOnlyPredictionEnabled(false);
-  Integration::SetPanGestureTwoPointPredictionEnabled(true);
-  Integration::SetPanGestureTwoPointInterpolatePastTime(42);
-  Integration::SetPanGestureTwoPointVelocityBias(0.35f);
-  Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
-  Integration::SetPanGestureMultitapSmoothingRange(34);
+  Dali::Integration::SetPanGesturePredictionMode(2);
+  Dali::Integration::SetPanGesturePredictionAmount(57);
+  Dali::Integration::SetPanGestureSmoothingMode(2);
+  Dali::Integration::SetPanGestureUseActualTimes(false);
+  Dali::Integration::SetPanGestureInterpolationTimeRange(10);
+  Dali::Integration::SetPanGestureScalarOnlyPredictionEnabled(false);
+  Dali::Integration::SetPanGestureTwoPointPredictionEnabled(true);
+  Dali::Integration::SetPanGestureTwoPointInterpolatePastTime(42);
+  Dali::Integration::SetPanGestureTwoPointVelocityBias(0.35f);
+  Dali::Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
+  Dali::Integration::SetPanGestureMultitapSmoothingRange(34);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2421,18 +2421,18 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap02(void)
 {
   TestApplication application;
 
-  Integration::SetPanGesturePredictionMode(2);
-  Integration::SetPanGestureSmoothingMode(2);
-  Integration::SetPanGestureUseActualTimes(true);
-  Integration::SetPanGestureInterpolationTimeRange(10);
-  Integration::SetPanGestureScalarOnlyPredictionEnabled(true);
-  Integration::SetPanGestureTwoPointPredictionEnabled(true);
-  Integration::SetPanGestureTwoPointInterpolatePastTime(42);
-  Integration::SetPanGestureTwoPointVelocityBias(0.35f);
-  Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
-  Integration::SetPanGestureMultitapSmoothingRange(34);
+  Dali::Integration::SetPanGesturePredictionMode(2);
+  Dali::Integration::SetPanGestureSmoothingMode(2);
+  Dali::Integration::SetPanGestureUseActualTimes(true);
+  Dali::Integration::SetPanGestureInterpolationTimeRange(10);
+  Dali::Integration::SetPanGestureScalarOnlyPredictionEnabled(true);
+  Dali::Integration::SetPanGestureTwoPointPredictionEnabled(true);
+  Dali::Integration::SetPanGestureTwoPointInterpolatePastTime(42);
+  Dali::Integration::SetPanGestureTwoPointVelocityBias(0.35f);
+  Dali::Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
+  Dali::Integration::SetPanGestureMultitapSmoothingRange(34);
 
-  Integration::EnableProfiling(Integration::PROFILING_TYPE_PAN_GESTURE);
+  Dali::Integration::EnableProfiling(Dali::Integration::PROFILING_TYPE_PAN_GESTURE);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2527,17 +2527,17 @@ int UtcDaliPanGesturePrediction2Smoothing(void)
 {
   TestApplication application;
 
-  Integration::SetPanGesturePredictionMode(2);
-  Integration::SetPanGesturePredictionAmount(57);
-  Integration::SetPanGestureSmoothingMode(1);
-  Integration::SetPanGestureUseActualTimes(false);
-  Integration::SetPanGestureInterpolationTimeRange(10);
-  Integration::SetPanGestureScalarOnlyPredictionEnabled(true);
-  Integration::SetPanGestureTwoPointPredictionEnabled(true);
-  Integration::SetPanGestureTwoPointInterpolatePastTime(42);
-  Integration::SetPanGestureTwoPointVelocityBias(0.35f);
-  Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
-  Integration::SetPanGestureMultitapSmoothingRange(34);
+  Dali::Integration::SetPanGesturePredictionMode(2);
+  Dali::Integration::SetPanGesturePredictionAmount(57);
+  Dali::Integration::SetPanGestureSmoothingMode(1);
+  Dali::Integration::SetPanGestureUseActualTimes(false);
+  Dali::Integration::SetPanGestureInterpolationTimeRange(10);
+  Dali::Integration::SetPanGestureScalarOnlyPredictionEnabled(true);
+  Dali::Integration::SetPanGestureTwoPointPredictionEnabled(true);
+  Dali::Integration::SetPanGestureTwoPointInterpolatePastTime(42);
+  Dali::Integration::SetPanGestureTwoPointVelocityBias(0.35f);
+  Dali::Integration::SetPanGestureTwoPointAccelerationBias(0.10f);
+  Dali::Integration::SetPanGestureMultitapSmoothingRange(34);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2630,8 +2630,8 @@ int UtcDaliPanGestureSetProperties(void)
 {
   TestApplication       application;
   TestRenderController& renderController(application.GetRenderController());
-  Integration::SetPanGesturePredictionMode(0);
-  Integration::SetPanGestureSmoothingMode(0);
+  Dali::Integration::SetPanGesturePredictionMode(0);
+  Dali::Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -2693,7 +2693,7 @@ int UtcDaliPanGestureSetProperties(void)
 int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
 {
   TestApplication application;
-  Integration::SetPanGesturePredictionMode(0);
+  Dali::Integration::SetPanGesturePredictionMode(0);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -3084,10 +3084,10 @@ int UtcDaliPanGestureWhenGesturePropargation(void)
 
 int UtcDaliPanGestureHandleEvent(void)
 {
-  TestApplication    application;
-  Integration::Scene scene    = application.GetScene();
-  RenderTaskList     taskList = scene.GetRenderTaskList();
-  Dali::RenderTask   task     = taskList.GetTask(0);
+  TestApplication          application;
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
+  Dali::RenderTask         task     = taskList.GetTask(0);
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -3110,8 +3110,8 @@ int UtcDaliPanGestureHandleEvent(void)
   PanGestureDetector parentDetector = PanGestureDetector::New();
   parentDetector.DetectedSignal().Connect(&application, pFunctor);
 
-  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
-  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  Dali::Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
+  Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(100));
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
@@ -3203,10 +3203,10 @@ int UtcDaliPanGestureSignalReceptionWithGeometryHittest(void)
 
 int UtcDaliPanGestureFeedTouchWhenGesturePropagation(void)
 {
-  TestApplication    application;
-  Integration::Scene scene    = application.GetScene();
-  RenderTaskList     taskList = scene.GetRenderTaskList();
-  Dali::RenderTask   task     = taskList.GetTask(0);
+  TestApplication          application;
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
+  Dali::RenderTask         task     = taskList.GetTask(0);
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -3236,8 +3236,8 @@ int UtcDaliPanGestureFeedTouchWhenGesturePropagation(void)
   childDetector.DetectedSignal().Connect(&application, cFunctor);
 
   // Start gesture within the actor's area, we receive the gesture not parent actor but child actor.
-  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
-  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  Dali::Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 100);
+  Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(100));
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());
@@ -3363,7 +3363,7 @@ int UtcDaliPanGestureSignalGetLastGestureState(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
   scene.Add(actor);
 
   // Render and notify

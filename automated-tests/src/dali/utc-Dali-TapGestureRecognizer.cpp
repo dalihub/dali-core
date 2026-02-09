@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,10 +77,10 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -90,10 +90,10 @@ Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch(PointState::Type state, const Vector2& screenPositionA, const Vector2& screenPositionB, uint32_t time)
+Dali::Integration::TouchEvent GenerateDoubleTouch(PointState::Type state, const Vector2& screenPositionA, const Vector2& screenPositionB, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPositionA);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -592,7 +592,7 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
 
   try
   {
-    Integration::SetTapMaximumAllowedTime(0);
+    Dali::Integration::SetTapMaximumAllowedTime(0);
   }
   catch(...)
   {
@@ -600,7 +600,7 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
   }
 
   // Reduce the maximum allowable time. 500 -> 100
-  Integration::SetTapMaximumAllowedTime(100);
+  Dali::Integration::SetTapMaximumAllowedTime(100);
 
   SignalData             data;
   GestureReceivedFunctor functor(data);
@@ -624,7 +624,7 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // reset maximum allowed time
-  Integration::SetTapMaximumAllowedTime(500);
+  Dali::Integration::SetTapMaximumAllowedTime(500);
 
   END_TEST;
 }
@@ -648,7 +648,7 @@ int UtcDaliTapGestureSetRecognizerTime(void)
 
   try
   {
-    Integration::SetTapRecognizerTime(0);
+    Dali::Integration::SetTapRecognizerTime(0);
   }
   catch(...)
   {
@@ -656,7 +656,7 @@ int UtcDaliTapGestureSetRecognizerTime(void)
   }
 
   // Reduce the recognizer time. 500 -> 100
-  Integration::SetTapRecognizerTime(100);
+  Dali::Integration::SetTapRecognizerTime(100);
 
   SignalData             data;
   GestureReceivedFunctor functor(data);
@@ -681,7 +681,7 @@ int UtcDaliTapGestureSetRecognizerTime(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // reset recognizer time
-  Integration::SetTapRecognizerTime(500);
+  Dali::Integration::SetTapRecognizerTime(500);
 
   END_TEST;
 }
@@ -705,7 +705,7 @@ int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
 
   try
   {
-    Integration::SetTapMaximumMotionAllowedDistance(-1.0f);
+    Dali::Integration::SetTapMaximumMotionAllowedDistance(-1.0f);
   }
   catch(...)
   {
@@ -713,7 +713,7 @@ int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
   }
 
   // increase the distance. 20 -> 50
-  Integration::SetTapMaximumMotionAllowedDistance(50);
+  Dali::Integration::SetTapMaximumMotionAllowedDistance(50);
 
   SignalData             data;
   GestureReceivedFunctor functor(data);
@@ -738,7 +738,7 @@ int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // reset distance
-  Integration::SetTapMaximumMotionAllowedDistance(20);
+  Dali::Integration::SetTapMaximumMotionAllowedDistance(20);
 
   END_TEST;
 }

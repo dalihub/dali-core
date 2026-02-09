@@ -72,7 +72,7 @@ void TestGraphicsSyncImplementation::Initialize()
   mSyncObjects.clear();
 }
 
-Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::CreateSyncObject(SyncObject::SyncType type)
+Dali::Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::CreateSyncObject(SyncObject::SyncType type)
 {
   mTrace.PushCall("CreateSyncObject", ""); // Trace the method
 
@@ -85,7 +85,7 @@ Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation
  * Destroy a sync object
  * @param[in] syncObject The object to destroy
  */
-void TestGraphicsSyncImplementation::DestroySyncObject(Integration::GraphicsSyncAbstraction::SyncObject* syncObject)
+void TestGraphicsSyncImplementation::DestroySyncObject(Dali::Integration::GraphicsSyncAbstraction::SyncObject* syncObject)
 {
   std::stringstream out;
   out << syncObject;
@@ -102,7 +102,7 @@ void TestGraphicsSyncImplementation::DestroySyncObject(Integration::GraphicsSync
   }
 }
 
-Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::GetLastSyncObject()
+Dali::Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation::GetLastSyncObject()
 {
   if(!mSyncObjects.empty())
   {
@@ -116,7 +116,7 @@ Integration::GraphicsSyncAbstraction::SyncObject* TestGraphicsSyncImplementation
  * @param[in]
  * @param[in] sync The sync value to set
  */
-void TestGraphicsSyncImplementation::SetObjectSynced(Integration::GraphicsSyncAbstraction::SyncObject* syncObject, bool sync)
+void TestGraphicsSyncImplementation::SetObjectSynced(Dali::Integration::GraphicsSyncAbstraction::SyncObject* syncObject, bool sync)
 {
   TestSyncObject* testSyncObject = static_cast<TestSyncObject*>(syncObject);
   testSyncObject->synced         = sync;

@@ -255,10 +255,10 @@ struct OutOfBoundsFunctor
   bool             returnValue;
 };
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -414,8 +414,8 @@ int UtcDaliGeoTouchEventOutsideCameraNearFarPlanes(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Integration::Scene scene     = application.GetScene();
-  Vector2            sceneSize = scene.GetSize();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Vector2                  sceneSize = scene.GetSize();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -510,7 +510,7 @@ int UtcDaliGeoTouchEventEmitEmpty(void)
   try
   {
     // Emit an empty TouchEvent
-    Integration::TouchEvent touchEvent;
+    Dali::Integration::TouchEvent touchEvent;
     application.ProcessEvent(touchEvent);
     tet_result(TET_FAIL);
   }
@@ -1037,8 +1037,8 @@ int UtcDaliGeoTouchEventMultipleRenderTasks(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Integration::Scene scene(application.GetScene());
-  Vector2            sceneSize(scene.GetSize());
+  Dali::Integration::Scene scene(application.GetScene());
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1087,8 +1087,8 @@ int UtcDaliGeoTouchEventMultipleRenderTasksWithChildLayer(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Integration::Scene scene(application.GetScene());
-  Vector2            sceneSize(scene.GetSize());
+  Dali::Integration::Scene scene(application.GetScene());
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1144,8 +1144,8 @@ int UtcDaliGeoTouchEventOffscreenRenderTasks(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Integration::Scene scene(application.GetScene());
-  Vector2            sceneSize(scene.GetSize());
+  Dali::Integration::Scene scene(application.GetScene());
+  Vector2                  sceneSize(scene.GetSize());
 
   // FrameBufferImage for offscreen RenderTask
   FrameBuffer frameBuffer = FrameBuffer::New(sceneSize.width, sceneSize.height);
@@ -1197,8 +1197,8 @@ int UtcDaliGeoTouchEventMultipleRenderableActors(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Integration::Scene scene(application.GetScene());
-  Vector2            sceneSize(scene.GetSize());
+  Dali::Integration::Scene scene(application.GetScene());
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor parent = CreateRenderableActor();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1514,8 +1514,8 @@ int UtcDaliGeoTouchEventTrackingActorLists(void)
 
 int UtcDaliGeoTouchEventClippedActor(void)
 {
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   scene.SetGeometryHittestEnabled(true);
 
@@ -1932,7 +1932,7 @@ int UtcDaliGeoTouchEventGetRadius(void)
   actor.TouchedSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
-  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
   touchEvent.points[0].SetRadius(100.0f);
   application.ProcessEvent(touchEvent);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1965,7 +1965,7 @@ int UtcDaliGeoTouchEventGetEllipseRadius(void)
   actor.TouchedSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
-  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
   touchEvent.points[0].SetRadius(100.0f, Vector2(20.0f, 10.0f));
   application.ProcessEvent(touchEvent);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1998,7 +1998,7 @@ int UtcDaliGeoTouchEventGetAngle(void)
   actor.TouchedSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
-  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
   touchEvent.points[0].SetAngle(Degree(90.0f));
   application.ProcessEvent(touchEvent);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -2029,7 +2029,7 @@ int UtcDaliGeoTouchEventGetPressure(void)
   actor.TouchedSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
-  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
   touchEvent.points[0].SetPressure(10.0f);
   application.ProcessEvent(touchEvent);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -2120,7 +2120,7 @@ int UtcDaliGeoTouchEventGetMouseButtonPositive(void)
   actor.TouchedSignal().Connect(&application, functor);
 
   // Emit a down signal with MouseButton
-  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
   touchEvent.points[0].SetMouseButton(static_cast<MouseButton::Type>(3));
   application.ProcessEvent(touchEvent);
 
@@ -2151,7 +2151,7 @@ int UtcDaliGeoTouchEventGetMouseButtonNagative(void)
   actor.TouchedSignal().Connect(&application, functor);
 
   // Emit a down signal with MouseButton
-  Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
+  Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
   touchEvent.points[0].SetMouseButton(static_cast<MouseButton::Type>(2));
   application.ProcessEvent(touchEvent);
 
@@ -2206,7 +2206,7 @@ int UtcDaliGeoTouchEventIntegNewTouchEvent(void)
   application.GetScene().SetGeometryHittestEnabled(true);
   uint32_t         timestamp = 92858u;
   TouchPoint       tp(1, PointState::STARTED, 34.4f, 123.89f, 5.0f, 7.0f);
-  Dali::TouchEvent touchEvent = Integration::NewTouchEvent(timestamp, tp);
+  Dali::TouchEvent touchEvent = Dali::Integration::NewTouchEvent(timestamp, tp);
 
   DALI_TEST_EQUALS(touchEvent.GetPointCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(touchEvent.GetState(0), PointState::STARTED, TEST_LOCATION);

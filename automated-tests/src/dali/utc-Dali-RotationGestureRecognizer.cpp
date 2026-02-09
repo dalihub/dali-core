@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,10 +86,10 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -99,10 +99,10 @@ Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
+Dali::Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(stateA);
   point.SetScreenPosition(screenPositionA);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -209,7 +209,7 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEvents(void)
 
   // Case 1
   // 2 touch events make a gesture begin
-  Integration::SetRotationGestureMinimumTouchEvents(2);
+  Dali::Integration::SetRotationGestureMinimumTouchEvents(2);
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), PointState::MOTION, Vector2(90.0f, 90.0f), 160));
 
@@ -219,7 +219,7 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEvents(void)
 
   // Case 2
   // 4 touch events make a gesture begin
-  Integration::SetRotationGestureMinimumTouchEvents(4);
+  Dali::Integration::SetRotationGestureMinimumTouchEvents(4);
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), PointState::MOTION, Vector2(90.0f, 90.0f), 160));
 
@@ -251,8 +251,8 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEventsAfterStart(void)
   // Case 1
   // > 2 touch events make a gesture begin
   // > 4 touch events generate gestures after begin
-  Integration::SetRotationGestureMinimumTouchEvents(2);
-  Integration::SetRotationGestureMinimumTouchEventsAfterStart(6);
+  Dali::Integration::SetRotationGestureMinimumTouchEvents(2);
+  Dali::Integration::SetRotationGestureMinimumTouchEventsAfterStart(6);
 
   application.ProcessEvent(GenerateDoubleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), PointState::DOWN, Vector2(20.0f, 90.0f), 150));
   application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(20.0f, 20.0f), PointState::MOTION, Vector2(90.0f, 90.0f), 160));

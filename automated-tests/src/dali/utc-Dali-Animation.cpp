@@ -989,7 +989,7 @@ int UtcDaliAnimationSetEndActionP01(void)
   application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
 
   // Check whether we need to keep update at least 2 frames after discard-animation finished.
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   tet_printf("EndAction::Discard Animation finished\n");
   // We did expect the animation to finish
@@ -1002,17 +1002,17 @@ int UtcDaliAnimationSetEndActionP01(void)
   tet_printf("Check current value return well\n");
   application.Render(0);
   DALI_TEST_EQUALS(Vector3::ZERO /*discarded*/, actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   // Check that nothing has changed after a couple of buffer swaps
   // After 2 frames rendered, UpdateStatus will not mark as animation runing.
   application.Render(0);
   DALI_TEST_EQUALS(Vector3::ZERO, actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
 
   application.Render(0);
   DALI_TEST_EQUALS(Vector3::ZERO, actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
   END_TEST;
 }
 
@@ -1109,7 +1109,7 @@ int UtcDaliAnimationSetEndActionP02(void)
   application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
 
   // Check whether we need to keep update at least 2 frames after discard-animation finished.
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   tet_printf("EndAction::Discard Animation finished\n");
   // We did expect the animation to finish
@@ -1122,17 +1122,17 @@ int UtcDaliAnimationSetEndActionP02(void)
   tet_printf("Check current value return well\n");
   application.Render(0);
   DALI_TEST_EQUALS(initialColor /*discarded*/, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   // Check that nothing has changed after a couple of buffer swaps
   // After 2 frames rendered, UpdateStatus will not mark as animation runing.
   application.Render(0);
   DALI_TEST_EQUALS(initialColor, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
 
   application.Render(0);
   DALI_TEST_EQUALS(initialColor, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
   END_TEST;
 }
 
@@ -1231,7 +1231,7 @@ int UtcDaliAnimationSetEndActionP03(void)
   application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
 
   // Check whether we need to keep update at least 2 frames after discard-animation finished.
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   tet_printf("EndAction::Discard Animation finished\n");
   // We did expect the animation to finish
@@ -1244,17 +1244,17 @@ int UtcDaliAnimationSetEndActionP03(void)
   tet_printf("Check current value return well\n");
   application.Render(0);
   DALI_TEST_EQUALS(initialValue /*discarded*/, actor.GetCurrentProperty<Vector3>(customPropertyIndex), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   // Check that nothing has changed after a couple of buffer swaps
   // After 2 frames rendered, UpdateStatus will not mark as animation runing.
   application.Render(0);
   DALI_TEST_EQUALS(initialValue, actor.GetCurrentProperty<Vector3>(customPropertyIndex), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
 
   application.Render(0);
   DALI_TEST_EQUALS(initialValue, actor.GetCurrentProperty<Vector3>(customPropertyIndex), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
 
   tet_printf("Set EndAction::Discard and play another animation with EndAction::Bake\n");
   // Test EndAction::Discard, animate again, but don't bake this time
@@ -1368,7 +1368,7 @@ int UtcDaliAnimationSetEndActionP04(void)
   application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) + 1u /*just beyond the animation duration*/);
 
   // Check whether we need to keep update at least 2 frames after discard-animation finished.
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   tet_printf("EndAction::Discard Animation finished\n");
   // We did expect the animation to finish
@@ -1381,17 +1381,17 @@ int UtcDaliAnimationSetEndActionP04(void)
   tet_printf("Check current value return well\n");
   application.Render(0);
   DALI_TEST_EQUALS(initialValue /*discarded*/, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) != 0u);
 
   // Check that nothing has changed after a couple of buffer swaps
   // After 2 frames rendered, UpdateStatus will not mark as animation runing.
   application.Render(0);
   DALI_TEST_EQUALS(initialValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
 
   application.Render(0);
   DALI_TEST_EQUALS(initialValue, visualRenderer.GetCurrentProperty<Vector2>(Dali::VisualRenderer::Property::TRANSFORM_SIZE), TEST_LOCATION);
-  DALI_TEST_CHECK((application.GetUpdateStatus() & Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
+  DALI_TEST_CHECK((application.GetUpdateStatus() & Dali::Integration::KeepUpdating::ANIMATIONS_RUNNING) == 0u);
 
   tet_printf("Set EndAction::Discard and play another animation with EndAction::Bake\n");
   // Test EndAction::Discard, animate again, but don't bake this time
@@ -1418,8 +1418,8 @@ int UtcDaliAnimationGetEndActionP(void)
 
 int UtcDaliAnimationSetDisconnectActionP(void)
 {
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
 
   // Default: BakeFinal
   {
@@ -13114,8 +13114,8 @@ int UtcDaliAnimationPlayAfterP4(void)
 int UtcDaliAnimationSetLoopingModeP(void)
 {
   // Test Loop forever and Loop mode being set
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
 
   // Default: LoopingMode::RESTART
   {
@@ -13259,8 +13259,8 @@ int UtcDaliAnimationSetLoopingModeP(void)
 int UtcDaliAnimationSetLoopingModeP2(void)
 {
   // Test Loop Count and Loop mode being set
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
 
   // LoopingMode::AUTO_REVERSE
   {
@@ -13396,8 +13396,8 @@ int UtcDaliAnimationSetLoopingModeP2(void)
 int UtcDaliAnimationSetLoopingModeP3(void)
 {
   // Test Loop Count is 1 (== default) and Loop mode being set
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
 
   // LoopingMode::AUTO_REVERSE
   {
@@ -13515,8 +13515,8 @@ int UtcDaliAnimationSetLoopingModeP3(void)
 int UtcDaliAnimationSetLoopingModeP4(void)
 {
   // Test Loop Count is 1 (== default) and Loop mode being set 'before' Animators connected
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
 
   // LoopingMode::AUTO_REVERSE
   {

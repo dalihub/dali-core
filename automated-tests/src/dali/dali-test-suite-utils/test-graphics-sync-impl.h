@@ -35,7 +35,7 @@ namespace Dali
 {
 class TestGraphicsSyncImplementation;
 
-class TestSyncObject : public Integration::GraphicsSyncAbstraction::SyncObject
+class TestSyncObject : public Dali::Integration::GraphicsSyncAbstraction::SyncObject
 {
 public:
   TestSyncObject(TraceCallStack& trace);
@@ -51,7 +51,7 @@ public:
 /**
  * Class to emulate the gpu sync functions with tracing
  */
-class TestGraphicsSyncImplementation : public Integration::GraphicsSyncAbstraction
+class TestGraphicsSyncImplementation : public Dali::Integration::GraphicsSyncAbstraction
 {
 public:
   /**

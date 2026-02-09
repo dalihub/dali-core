@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -451,15 +451,15 @@ int UtcDaliIntegrationKeyEvent(void)
   TestApplication application;
 
   {
-    Integration::KeyEvent keyEvent;
-    DALI_TEST_EQUALS(keyEvent.type, Integration::Event::Key, TEST_LOCATION);
+    Dali::Integration::KeyEvent keyEvent;
+    DALI_TEST_EQUALS(keyEvent.type, Dali::Integration::Event::Key, TEST_LOCATION);
     DALI_TEST_CHECK(keyEvent.keyName == std::string());
     DALI_TEST_CHECK(keyEvent.logicalKey == std::string());
     DALI_TEST_CHECK(keyEvent.keyString == std::string());
     DALI_TEST_EQUALS(keyEvent.keyCode, -1, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.keyModifier, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.time, 0lu, TEST_LOCATION);
-    DALI_TEST_EQUALS(keyEvent.state, Integration::KeyEvent::DOWN, TEST_LOCATION);
+    DALI_TEST_EQUALS(keyEvent.state, Dali::Integration::KeyEvent::DOWN, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.compose, std::string(), TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.deviceName, std::string(), TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.deviceClass, Device::Class::NONE, TEST_LOCATION);
@@ -467,20 +467,20 @@ int UtcDaliIntegrationKeyEvent(void)
   }
 
   {
-    const std::string                  keyName("keyName");
-    const std::string                  logicalKey("logicalKey");
-    const std::string                  keyString("keyString");
-    const int                          keyCode(333);
-    const int                          keyModifier(312);
-    const unsigned long                timeStamp(132);
-    const Integration::KeyEvent::State keyState(Integration::KeyEvent::UP);
-    const std::string                  compose("compose");
-    const std::string                  deviceName("hwKeyboard");
-    const Device::Class::Type          deviceClass    = Device::Class::KEYBOARD;
-    const Device::Subclass::Type       deviceSubclass = Device::Subclass::NONE;
+    const std::string                        keyName("keyName");
+    const std::string                        logicalKey("logicalKey");
+    const std::string                        keyString("keyString");
+    const int                                keyCode(333);
+    const int                                keyModifier(312);
+    const unsigned long                      timeStamp(132);
+    const Dali::Integration::KeyEvent::State keyState(Dali::Integration::KeyEvent::UP);
+    const std::string                        compose("compose");
+    const std::string                        deviceName("hwKeyboard");
+    const Device::Class::Type                deviceClass    = Device::Class::KEYBOARD;
+    const Device::Subclass::Type             deviceSubclass = Device::Subclass::NONE;
 
-    Integration::KeyEvent keyEvent(keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
-    DALI_TEST_EQUALS(keyEvent.type, Integration::Event::Key, TEST_LOCATION);
+    Dali::Integration::KeyEvent keyEvent(keyName, logicalKey, keyString, keyCode, keyModifier, timeStamp, keyState, compose, deviceName, deviceClass, deviceSubclass);
+    DALI_TEST_EQUALS(keyEvent.type, Dali::Integration::Event::Key, TEST_LOCATION);
     DALI_TEST_CHECK(keyEvent.keyName == keyName);
     DALI_TEST_CHECK(keyEvent.logicalKey == logicalKey);
     DALI_TEST_CHECK(keyEvent.keyString == keyString);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 using namespace Dali;
 
-class TestProcessor : public Integration::Processor
+class TestProcessor : public Dali::Integration::Processor
 {
 public:
   TestProcessor()
@@ -47,7 +47,7 @@ public:
 class NewTestProcessor : public TestProcessor
 {
 public:
-  NewTestProcessor(Integration::Core& core)
+  NewTestProcessor(Dali::Integration::Core& core)
   : core(core)
   {
   }
@@ -66,19 +66,19 @@ public:
     return "NewTestProcessor";
   }
 
-  void SetProcessorToUnregister(Integration::Processor* processor)
+  void SetProcessorToUnregister(Dali::Integration::Processor* processor)
   {
     unregisterProcessor = processor;
   }
 
-  Integration::Processor* unregisterProcessor{nullptr};
-  Integration::Core&      core;
+  Dali::Integration::Processor* unregisterProcessor{nullptr};
+  Dali::Integration::Core&      core;
 };
 
 class NewTestProcessorOnce : public NewTestProcessor
 {
 public:
-  NewTestProcessorOnce(Integration::Core& core)
+  NewTestProcessorOnce(Dali::Integration::Core& core)
   : NewTestProcessor(core)
   {
   }
@@ -102,8 +102,8 @@ int UtcDaliCoreProcessorP(void)
 {
   TestApplication application;
 
-  TestProcessor      testProcessor;
-  Integration::Core& core = application.GetCore();
+  TestProcessor            testProcessor;
+  Dali::Integration::Core& core = application.GetCore();
   core.RegisterProcessor(testProcessor);
 
   tet_infoline("Test that the processor has not been executed yet:");
@@ -129,8 +129,8 @@ int UtcDaliCoreProcessorOnceP(void)
 {
   TestApplication application;
 
-  TestProcessor      testProcessor;
-  Integration::Core& core = application.GetCore();
+  TestProcessor            testProcessor;
+  Dali::Integration::Core& core = application.GetCore();
   core.RegisterProcessorOnce(testProcessor);
 
   tet_infoline("Test that the processor has not been executed yet:");
@@ -165,7 +165,7 @@ int UtcDaliCoreProcessorMultipleP(void)
   TestProcessor testProcessor2;
   TestProcessor testProcessor3;
 
-  Integration::Core& core = application.GetCore();
+  Dali::Integration::Core& core = application.GetCore();
   core.RegisterProcessor(testProcessor1);
 
   tet_infoline("Test that the processor has not been executed yet:");
@@ -215,7 +215,7 @@ int UtcDaliCoreProcessorOnceMultipleP(void)
   TestProcessor testProcessor2;
   TestProcessor testProcessor3;
 
-  Integration::Core& core = application.GetCore();
+  Dali::Integration::Core& core = application.GetCore();
   core.RegisterProcessorOnce(testProcessor1);
 
   tet_infoline("Test that the processor has not been executed yet:");
@@ -268,8 +268,8 @@ int UtcDaliCorePostProcessorP(void)
 {
   TestApplication application;
 
-  TestProcessor      testProcessor;
-  Integration::Core& core = application.GetCore();
+  TestProcessor            testProcessor;
+  Dali::Integration::Core& core = application.GetCore();
   core.RegisterProcessor(testProcessor, true);
 
   tet_infoline("Test that the processor has not been executed yet:");
@@ -303,8 +303,8 @@ int UtcDaliCorePostProcessorOnceP(void)
 {
   TestApplication application;
 
-  TestProcessor      testProcessor;
-  Integration::Core& core = application.GetCore();
+  TestProcessor            testProcessor;
+  Dali::Integration::Core& core = application.GetCore();
   core.RegisterProcessorOnce(testProcessor, true);
 
   tet_infoline("Test that the processor has not been executed yet:");
@@ -334,8 +334,8 @@ int UtcDaliCorePostProcessorOnceP(void)
 int UtcDaliCoreProcessorUnregisterDuringCallback01(void)
 {
   // Test pre-processor
-  TestApplication    application;
-  Integration::Core& core = application.GetCore();
+  TestApplication          application;
+  Dali::Integration::Core& core = application.GetCore();
 
   NewTestProcessor testProcessor1(core);
   TestProcessor    testProcessor2;
@@ -376,8 +376,8 @@ int UtcDaliCoreProcessorUnregisterDuringCallback01(void)
 int UtcDaliCoreProcessorUnregisterDuringCallback02(void)
 {
   // Test post-processor
-  TestApplication    application;
-  Integration::Core& core = application.GetCore();
+  TestApplication          application;
+  Dali::Integration::Core& core = application.GetCore();
 
   NewTestProcessor testProcessor1(core);
   TestProcessor    testProcessor2;
@@ -418,8 +418,8 @@ int UtcDaliCoreProcessorUnregisterDuringCallback02(void)
 int UtcDaliCoreProcessorOnceUnregisterDuringCallback01(void)
 {
   // Test post-processor
-  TestApplication    application;
-  Integration::Core& core = application.GetCore();
+  TestApplication          application;
+  Dali::Integration::Core& core = application.GetCore();
 
   NewTestProcessorOnce testProcessor1(core);
   TestProcessor        testProcessor2;
@@ -471,8 +471,8 @@ int UtcDaliCoreProcessorOnceUnregisterDuringCallback01(void)
 int UtcDaliCoreProcessorOnceUnregisterDuringCallback02(void)
 {
   // Test post-processor
-  TestApplication    application;
-  Integration::Core& core = application.GetCore();
+  TestApplication          application;
+  Dali::Integration::Core& core = application.GetCore();
 
   NewTestProcessorOnce testProcessor1(core);
   TestProcessor        testProcessor2;
@@ -524,8 +524,8 @@ int UtcDaliCoreProcessorOnceUnregisterDuringCallback02(void)
 int UtcDaliCoreProcessorGetProcessorName(void)
 {
   // Test post-processor
-  TestApplication    application;
-  Integration::Core& core = application.GetCore();
+  TestApplication          application;
+  Dali::Integration::Core& core = application.GetCore();
 
   NewTestProcessor testProcessor1(core);
   TestProcessor    testProcessor2;
@@ -546,7 +546,7 @@ int UtcDaliCoreProcessorUnregisterProcessorsWhenSceneDestroyed(void)
   TestProcessor testProcessor4;
   TestProcessor testProcessor5;
 
-  Integration::Core& core = application.GetCore();
+  Dali::Integration::Core& core = application.GetCore();
   core.RegisterProcessor(testProcessor1);
 
   tet_infoline("Test that the processor has not been executed yet:");

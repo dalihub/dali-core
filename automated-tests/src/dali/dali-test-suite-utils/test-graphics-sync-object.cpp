@@ -32,7 +32,7 @@ TestGraphicsSyncObject::~TestGraphicsSyncObject()
 
 void TestGraphicsSyncObject::InitializeResource()
 {
-  mSyncObject = static_cast<TestSyncObject*>(mSyncImplementation.CreateSyncObject(Integration::GraphicsSyncAbstraction::SyncObject::SyncType::FENCE_SYNC));
+  mSyncObject = static_cast<TestSyncObject*>(mSyncImplementation.CreateSyncObject(Dali::Integration::GraphicsSyncAbstraction::SyncObject::SyncType::FENCE_SYNC));
 }
 
 bool TestGraphicsSyncObject::IsSynced()

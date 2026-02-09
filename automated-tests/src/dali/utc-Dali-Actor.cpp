@@ -1782,8 +1782,8 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
 
 int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
 {
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   // Make 3D Layer
   Layer layer = Layer::New();
@@ -1860,9 +1860,9 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
 
 int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
 {
-  TestApplication    application;
-  Integration::Scene scene     = application.GetScene();
-  Vector2            sceneSize = scene.GetSize();
+  TestApplication          application;
+  Dali::Integration::Scene scene     = application.GetScene();
+  Vector2                  sceneSize = scene.GetSize();
 
   // Make 3D Layer
   Layer layer = Layer::New();
@@ -4695,7 +4695,7 @@ int UtcDaliActorGetHierachyDepth(void)
    *
    * GetHierarchyDepth should return 1 for A, 2 for B and C, and 3 for D, E and F.
    */
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -6223,7 +6223,7 @@ int UtcDaliActorRaiseLower(void)
   Debug::Filter::SetGlobalLogLevel(Debug::Verbose);
   Debug::Filter::EnableGlobalTrace();
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -6358,7 +6358,7 @@ int UtcDaliActorGeoTouchRaiseLower(void)
   Debug::Filter::SetGlobalLogLevel(Debug::Verbose);
   Debug::Filter::EnableGlobalTrace();
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -6491,7 +6491,7 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -6722,7 +6722,7 @@ int UtcDaliActorGeoTouchRaiseToTopLowerToBottom(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -6954,7 +6954,7 @@ int UtcDaliActorRaiseAbove(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -7063,7 +7063,7 @@ int UtcDaliActorGeoTouchRaiseAbove(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -7173,7 +7173,7 @@ int UtcDaliActorRaiseAbove2(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -7284,7 +7284,7 @@ int UtcDaliActorGeoTouchRaiseAbove2(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -7396,7 +7396,7 @@ int UtcDaliActorLowerBelow(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   // Set up renderers to add to Actors, float value 1, 2, 3 assigned to each
   // enables checking of which actor the uniform is assigned too
@@ -7616,7 +7616,7 @@ int UtcDaliActorGeoTouchLowerBelow(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   // Set up renderers to add to Actors, float value 1, 2, 3 assigned to each
   // enables checking of which actor the uniform is assigned too
@@ -7842,7 +7842,7 @@ int UtcDaliActorLowerBelow2(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   // Set up renderers to add to Actors, float value 1, 2, 3 assigned to each
   // enables checking of which actor the uniform is assigned too
@@ -8062,7 +8062,7 @@ int UtcDaliActorGeoTouchLowerBelow2(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   // Set up renderers to add to Actors, float value 1, 2, 3 assigned to each
   // enables checking of which actor the uniform is assigned too
@@ -8283,7 +8283,7 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor parentA = Actor::New();
   Actor parentB = Actor::New();
@@ -8391,7 +8391,7 @@ int UtcDaliActorGeoTouchRaiseAboveDifferentParentsN(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor parentA = Actor::New();
   Actor parentB = Actor::New();
@@ -8500,7 +8500,7 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -8668,7 +8668,7 @@ int UtcDaliActorGeoTouchRaiseLowerWhenUnparentedTargetN(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -8837,7 +8837,7 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -8997,7 +8997,7 @@ int UtcDaliActorGeoTouchTestAllAPIwhenActorNotParented(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -9158,7 +9158,7 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -9264,7 +9264,7 @@ int UtcDaliActorGeoTouchRaiseAboveActorAndTargetTheSameN(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   Actor actorB = Actor::New();
@@ -9371,7 +9371,7 @@ int UtcDaliActorGetScreenPosition(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -9491,7 +9491,7 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
@@ -9542,7 +9542,7 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
   actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
@@ -9594,7 +9594,7 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   tet_infoline("Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n");
 
@@ -9659,7 +9659,7 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   tet_infoline("Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n");
 
@@ -9718,7 +9718,7 @@ int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
 
   TestApplication application;
 
-  Integration::Scene stage(application.GetScene());
+  Dali::Integration::Scene stage(application.GetScene());
 
   tet_infoline("Create an actor with AnchorPoint::TOP_LEFT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false");
 
@@ -9780,8 +9780,8 @@ int UtcDaliActorGetScreenPositionResizeScene(void)
 {
   tet_infoline("UtcDaliActorGetScreenPositionResizeScene Check screen position after resizing the scene size");
 
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor actorA = Actor::New();
   actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
@@ -9825,8 +9825,8 @@ int UtcDaliActorGetScreenPositionInCustomCameraAndLayer3D(void)
 {
   tet_infoline("UtcDaliActorGetScreenPositionInCustomCameraAndLayer3D Check screen position under LAYER_3D and custom camera");
 
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   // Make 3D Layer
   Layer layer = scene.GetRootLayer();

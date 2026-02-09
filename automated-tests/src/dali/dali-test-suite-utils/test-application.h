@@ -2,7 +2,7 @@
 #define DALI_TEST_APPLICATION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ public:
   TestGlAbstraction&              GetGlAbstraction();
   TestGraphicsSyncImplementation& GetGraphicsSyncImpl();
 
-  void        ProcessEvent(const Integration::Event& event);
+  void        ProcessEvent(const Dali::Integration::Event& event);
   void        SendNotification();
   bool        Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL, bool uploadOnly = false);
   bool        PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
@@ -89,13 +89,13 @@ public:
     mLoggingEnabled = enabled;
   }
 
-  Integration::Scene GetScene() const
+  Dali::Integration::Scene GetScene() const
   {
     return mScene;
   }
 
-  void AddScene(Integration::Scene scene);
-  void RemoveScene(Integration::Scene scene);
+  void AddScene(Dali::Integration::Scene scene);
+  void RemoveScene(Dali::Integration::Scene scene);
 
 private:
   void DoUpdate(uint32_t intervalMilliseconds, const char* location = NULL, bool uploadOnly = false);
@@ -106,13 +106,13 @@ protected:
   TestGraphicsController  mGraphicsController;
   TestRenderSurface*      mRenderSurface;
 
-  Integration::UpdateStatus         mStatus;
-  Integration::RenderStatus         mRenderStatus;
-  Integration::ScenePreRenderStatus mScenePreRenderStatus;
+  Dali::Integration::UpdateStatus         mStatus;
+  Dali::Integration::RenderStatus         mRenderStatus;
+  Dali::Integration::ScenePreRenderStatus mScenePreRenderStatus;
 
-  Integration::Core*              mCore;
-  Dali::Integration::Scene        mScene;
-  std::vector<Integration::Scene> mScenes;
+  Dali::Integration::Core*              mCore;
+  Dali::Integration::Scene              mScene;
+  std::vector<Dali::Integration::Scene> mScenes;
 
   uint32_t mSurfaceWidth;
   uint32_t mSurfaceHeight;

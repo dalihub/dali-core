@@ -226,8 +226,8 @@ int UtcDaliWheelEventSignalling(void)
   WheelEventReceivedFunctor functor(data);
   actor.WheelEventSignal().Connect(&application, functor);
 
-  Vector2                 screenCoordinates(10.0f, 10.0f);
-  Integration::WheelEvent event(Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+  Vector2                       screenCoordinates(10.0f, 10.0f);
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
 
   // Emit a wheel signal
   application.ProcessEvent(event);
@@ -250,7 +250,7 @@ int UtcDaliWheelEventSignalling(void)
   rootActor.WheelEventSignal().Connect(&application, rootFunctor);
 
   screenCoordinates.x = screenCoordinates.y = 300.0f;
-  Integration::WheelEvent newEvent(Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+  Dali::Integration::WheelEvent newEvent(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
   application.ProcessEvent(newEvent);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
@@ -294,8 +294,8 @@ int UtcDaliWheelEventIntercept(void)
   WheelEventReceivedFunctor functor(data);
   actor.WheelEventSignal().Connect(&application, functor);
 
-  Vector2                 screenCoordinates(10.0f, 10.0f);
-  Integration::WheelEvent event(Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+  Vector2                       screenCoordinates(10.0f, 10.0f);
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
 
   // Emit a wheel signal
   application.ProcessEvent(event);
@@ -317,7 +317,7 @@ int UtcDaliWheelEventIntercept(void)
   WheelEventReceivedFunctor rootFunctor(rootData); // Consumes signal
   Dali::DevelActor::InterceptWheelSignal(rootActor).Connect(&application, rootFunctor);
 
-  Integration::WheelEvent newEvent(Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+  Dali::Integration::WheelEvent newEvent(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
   application.ProcessEvent(newEvent);
 
   // It should be able to receive wheel events to root actor by registering only InterceptWheelEvent.
