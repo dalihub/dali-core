@@ -2,7 +2,7 @@
 #define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-utility.h> ///< Dali::Swap
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/math-utils.h>
 
@@ -490,7 +491,7 @@ public: // API
   Vector(Vector&& vector) noexcept
   {
     // reuse move assignment
-    operator=(std::move(vector));
+    operator=(static_cast<Vector&&>(vector));
   }
 
   /**
@@ -830,7 +831,7 @@ public: // API
     Iterator last = End() - 1u;
     if(last > iterator)
     {
-      std::swap(*iterator, *last);
+      Dali::Swap(*iterator, *last);
     }
     VectorBase::SetCount(VectorBase::Count() - 1u);
   }

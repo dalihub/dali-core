@@ -2,7 +2,7 @@
 #define DALI_RECT_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h> ///< Dali::Min , Dali::Max
 #include <dali/public-api/math/math-utils.h>
 
 namespace Dali
