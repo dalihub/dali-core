@@ -41,6 +41,7 @@
 
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/common/dali-vector-base.h>
 #include <dali/public-api/common/dali-vector-complex-types.h>
