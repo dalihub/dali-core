@@ -23,7 +23,7 @@
 #include <memory>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/manager/transform-manager.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
@@ -205,6 +205,16 @@ public:
    * @copydoc Dali::UpdateProxy::GetIgnored()
    */
   bool GetIgnored(uint32_t id, bool& ignored) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetCustomProperty()
+   */
+  bool GetCustomProperty(uint32_t id, ConstString propertyName, Property::Value& value) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakeCustomProperty()
+   */
+  bool BakeCustomProperty(uint32_t id, ConstString propertyName, const Property::Value& value);
 
 private:
   /**

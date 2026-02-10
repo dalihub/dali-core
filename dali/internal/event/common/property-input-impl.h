@@ -30,6 +30,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
@@ -347,6 +348,65 @@ public:
   }
 
   /**
+   * Get the property value.
+   */
+  Property::Value GetPropertyValue() const
+  {
+    switch(GetType())
+    {
+      case Property::BOOLEAN:
+      {
+        return Property::Value(GetBoolean());
+      }
+
+      case Property::INTEGER:
+      {
+        return Property::Value(GetInteger());
+      }
+
+      case Property::FLOAT:
+      {
+        return Property::Value(GetFloat());
+      }
+
+      case Property::VECTOR2:
+      {
+        return Property::Value(GetVector2());
+      }
+
+      case Property::VECTOR3:
+      {
+        return Property::Value(GetVector3());
+      }
+
+      case Property::VECTOR4:
+      {
+        return Property::Value(GetVector4());
+      }
+
+      case Property::ROTATION:
+      {
+        return Property::Value(GetQuaternion());
+      }
+
+      case Property::MATRIX:
+      {
+        return Property::Value(GetMatrix());
+      }
+
+      case Property::MATRIX3:
+      {
+        return Property::Value(GetMatrix3());
+      }
+
+      default:
+      {
+        return Property::Value();
+      }
+    }
+  }
+
+  /**
    * Print the property value using a stream.
    * @param[in] debugStream The output stream.
    * @todo Place this far-too-large-to-be-inlined function in a cpp and remove <iostream> header dependency from this file.
@@ -356,56 +416,16 @@ public:
     switch(GetType())
     {
       case Property::BOOLEAN:
-      {
-        debugStream << GetBoolean();
-        break;
-      }
-
       case Property::INTEGER:
-      {
-        debugStream << GetInteger();
-        break;
-      }
-
       case Property::FLOAT:
-      {
-        debugStream << GetFloat();
-        break;
-      }
-
       case Property::VECTOR2:
-      {
-        debugStream << GetVector2();
-        break;
-      }
-
       case Property::VECTOR3:
-      {
-        debugStream << GetVector3();
-        break;
-      }
-
       case Property::VECTOR4:
-      {
-        debugStream << GetVector4();
-        break;
-      }
-
       case Property::ROTATION:
-      {
-        debugStream << GetQuaternion();
-        break;
-      }
-
       case Property::MATRIX:
-      {
-        debugStream << GetMatrix();
-        break;
-      }
-
       case Property::MATRIX3:
       {
-        debugStream << GetMatrix3();
+        debugStream << GetPropertyValue();
         break;
       }
 

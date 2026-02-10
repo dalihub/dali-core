@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/devel-api/update/update-proxy.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
 namespace Dali
@@ -136,6 +137,16 @@ bool UpdateProxy::SetIgnored(uint32_t id, bool ignored)
 bool UpdateProxy::GetIgnored(uint32_t id, bool& ignored) const
 {
   return mImpl.GetIgnored(id, ignored);
+}
+
+bool UpdateProxy::GetCustomProperty(uint32_t id, const std::string& propertyName, Property::Value& value) const
+{
+  return mImpl.GetCustomProperty(id, Dali::Internal::ConstString(propertyName), value);
+}
+
+bool UpdateProxy::BakeCustomProperty(uint32_t id, const std::string& propertyName, const Property::Value& value)
+{
+  return mImpl.BakeCustomProperty(id, Dali::Internal::ConstString(propertyName), value);
 }
 
 UpdateProxy::UpdateProxy(Internal::UpdateProxy& impl)
