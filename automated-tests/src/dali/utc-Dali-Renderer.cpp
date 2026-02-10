@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2633,7 +2633,7 @@ int UtcDaliRendererSetIndexRange(void)
   Renderer renderer = Renderer::New(geometry, shader);
   actor.AddRenderer(renderer);
 
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
   scene.Add(actor);
 
   char buffer[128];
@@ -2725,7 +2725,7 @@ int UtcDaliRendererSetDepthFunction(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
   scene.GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
   scene.Add(actor);
 
@@ -2951,7 +2951,7 @@ Renderer RendererTestFixture(TestApplication& application)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
   scene.GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
   scene.Add(actor);
 
@@ -3116,7 +3116,7 @@ int UtcDaliRendererBlendModeUseActorOpacity(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  Integration::Scene scene = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
   scene.GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
   scene.Add(actor);
 
@@ -4043,7 +4043,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
   uint32_t updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Integration::KeepUpdating::STAGE_KEEP_RENDERING | Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack&    drawTrace     = glAbstraction.GetDrawTrace();
@@ -4062,7 +4062,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
   updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(updateStatus & Integration::KeepUpdating::RENDERER_CONTINUOUSLY);
+  DALI_TEST_CHECK(updateStatus & Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY);
 
   value = renderer.GetCurrentProperty(DevelRenderer::Property::RENDERING_BEHAVIOR);
   DALI_TEST_CHECK(value.Get(renderingBehavior));
@@ -4078,7 +4078,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
   updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(updateStatus & Integration::KeepUpdating::RENDERER_CONTINUOUSLY);
+  DALI_TEST_CHECK(updateStatus & Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY);
 
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
 
@@ -4102,7 +4102,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
     updateStatus = application.GetUpdateStatus();
 
-    DALI_TEST_CHECK(updateStatus & Integration::KeepUpdating::RENDERER_CONTINUOUSLY);
+    DALI_TEST_CHECK(updateStatus & Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY);
 
     DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
   }
@@ -4116,7 +4116,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
   updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Integration::KeepUpdating::STAGE_KEEP_RENDERING | Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   END_TEST;
 }
@@ -4164,7 +4164,7 @@ int UtcDaliRendererRegenerateUniformMap(void)
 
   // Nothing to test here, the test must not crash
   auto updateStatus = application.GetUpdateStatus();
-  DALI_TEST_CHECK(updateStatus & Integration::KeepUpdating::STAGE_KEEP_RENDERING);
+  DALI_TEST_CHECK(updateStatus & Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING);
 
   END_TEST;
 }
@@ -4206,7 +4206,7 @@ int UtcDaliRendererRenderAfterAddShader(void)
 
   uint32_t updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Integration::KeepUpdating::STAGE_KEEP_RENDERING | Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   // Update for several frames
   application.SendNotification();
@@ -4237,7 +4237,7 @@ int UtcDaliRendererRenderAfterAddShader(void)
 
   updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Integration::KeepUpdating::STAGE_KEEP_RENDERING | Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
 

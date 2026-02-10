@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,10 +78,10 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -91,10 +91,10 @@ Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
+Dali::Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(stateA);
   point.SetScreenPosition(screenPositionA);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -663,7 +663,7 @@ int UtcDaliPanGestureRecognizerNewParamsMinNum(void)
 {
   TestApplication application;
 
-  Integration::SetPanGestureMinimumPanEvents(8);
+  Dali::Integration::SetPanGestureMinimumPanEvents(8);
 
   PanGestureDetector detector = PanGestureDetector::New();
 
@@ -700,7 +700,7 @@ int UtcDaliPanGestureRecognizerUpdateParamsMinNum(void)
 {
   TestApplication application;
 
-  Integration::SetPanGestureMinimumPanEvents(8);
+  Dali::Integration::SetPanGestureMinimumPanEvents(8);
 
   PanGestureDetector detector = PanGestureDetector::New();
 
@@ -733,7 +733,7 @@ int UtcDaliPanGestureRecognizerUpdateParamsMinNum(void)
   application.SendNotification();
   data.Reset();
 
-  Integration::SetPanGestureMinimumPanEvents(10);
+  Dali::Integration::SetPanGestureMinimumPanEvents(10);
 
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));
@@ -755,7 +755,7 @@ int UtcDaliPanGestureRecognizerNewParamsMinDistance(void)
 {
   TestApplication application;
 
-  Integration::SetPanGestureMinimumDistance(100);
+  Dali::Integration::SetPanGestureMinimumDistance(100);
 
   PanGestureDetector detector = PanGestureDetector::New();
 
@@ -792,7 +792,7 @@ int UtcDaliPanGestureRecognizerUpdateParamsMinDistance(void)
 {
   TestApplication application;
 
-  Integration::SetPanGestureMinimumDistance(100);
+  Dali::Integration::SetPanGestureMinimumDistance(100);
 
   PanGestureDetector detector = PanGestureDetector::New();
 
@@ -825,7 +825,7 @@ int UtcDaliPanGestureRecognizerUpdateParamsMinDistance(void)
   application.SendNotification();
   data.Reset();
 
-  Integration::SetPanGestureMinimumDistance(130);
+  Dali::Integration::SetPanGestureMinimumDistance(130);
 
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(20.0f, 20.0f), 150));
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(20.0f, 40.0f), 251));

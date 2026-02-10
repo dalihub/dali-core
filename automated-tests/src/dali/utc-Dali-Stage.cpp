@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -311,8 +311,8 @@ struct ActorCreatedFunctor
 
 void GenerateTouch(TestApplication& application, PointState::Type state, const Vector2& screenPosition)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   touchEvent.points.push_back(point);
@@ -1013,47 +1013,47 @@ int UtcDaliStageKeyEventGeneratedSignalP(void)
   KeyEventGeneratedReceivedFunctor functor2(data2);
   GetImplementation(stage).ConnectSignal(&application, "keyEventGenerated", functor2);
 
-  Integration::KeyEvent event("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event2);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event2.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event2.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event2.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event2.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event2.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event3);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event3.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event3.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event3.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event3.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event3.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event4("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event4("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event4);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event4.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event4.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event4.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event4.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event4.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
   END_TEST;
 }
 
@@ -1066,47 +1066,47 @@ int UtcDaliStageSignalKeyEventP(void)
   KeyEventReceivedFunctor functor(data);
   stage.KeyEventSignal().Connect(&application, functor);
 
-  Integration::KeyEvent event("i", "", "i", 0, 0, 0, Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::UP, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event2);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event2.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event2.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event2.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event2.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event2.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event3);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event3.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event3.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event3.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event3.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event3.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
 
   data.Reset();
 
-  Integration::KeyEvent event4("a", "", "a", 0, 0, 0, Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  Dali::Integration::KeyEvent event4("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::UP, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event4);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_CHECK(event4.keyModifier == data.receivedKeyEvent.GetKeyModifier());
   DALI_TEST_CHECK(event4.keyName == data.receivedKeyEvent.GetKeyName());
   DALI_TEST_CHECK(event4.keyString == data.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event4.state == static_cast<Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
+  DALI_TEST_CHECK(event4.state == static_cast<Dali::Integration::KeyEvent::State>(data.receivedKeyEvent.GetState()));
   END_TEST;
 }
 
@@ -1192,8 +1192,8 @@ int UtcDaliStageTouchedSignalP(void)
 
   // Multiple touch. Should only receive a touch on first down and last up.
   {
-    Integration::TouchEvent touchEvent;
-    Integration::Point      point;
+    Dali::Integration::TouchEvent touchEvent;
+    Dali::Integration::Point      point;
 
     // 1st point
     point.SetState(PointState::DOWN);
@@ -1366,7 +1366,7 @@ int UtcDaliStageSignalWheelEventP(void)
   WheelEventReceivedFunctor functor(data);
   stage.WheelEventSignal().Connect(&application, functor);
 
-  Integration::WheelEvent event(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
   application.ProcessEvent(event);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1379,7 +1379,7 @@ int UtcDaliStageSignalWheelEventP(void)
 
   data.Reset();
 
-  Integration::WheelEvent event2(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1000u);
+  Dali::Integration::WheelEvent event2(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1000u);
   application.ProcessEvent(event2);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1402,7 +1402,7 @@ int UtcDaliStageSignalWheelEventP2(void)
   WheelEventReceivedVoidFunctor functor(data);
   GetImplementation(stage).ConnectSignal(&application, "wheelEvent", functor);
 
-  Integration::WheelEvent event(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
   application.ProcessEvent(event);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1410,7 +1410,7 @@ int UtcDaliStageSignalWheelEventP2(void)
 
   data.Reset();
 
-  Integration::WheelEvent event2(Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1000u);
+  Dali::Integration::WheelEvent event2(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), -1, 1000u);
   application.ProcessEvent(event2);
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
@@ -1426,7 +1426,7 @@ int UtcDaliStageContextLostSignalP(void)
   ContextStatusFunctor contextLostFunctor(contextLost);
   stage.ContextLostSignal().Connect(&application, contextLostFunctor);
 
-  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
+  Dali::Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
   notifier->NotifyContextLost();
   DALI_TEST_EQUALS(contextLost, true, TEST_LOCATION);
 
@@ -1443,7 +1443,7 @@ int UtcDaliStageContextLostSignalP2(void)
   ContextStatusFunctor contextLostFunctor(contextLost);
   GetImplementation(stage).ConnectSignal(&application, "contextLost", contextLostFunctor);
 
-  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
+  Dali::Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
   notifier->NotifyContextLost();
   DALI_TEST_EQUALS(contextLost, true, TEST_LOCATION);
 
@@ -1483,7 +1483,7 @@ int UtcDaliStageContextRegainedSignalP(void)
   ContextStatusFunctor contextRegainedFunctor(contextRegained);
   stage.ContextRegainedSignal().Connect(&application, contextRegainedFunctor);
 
-  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
+  Dali::Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
   notifier->NotifyContextLost();
   notifier->NotifyContextRegained();
   DALI_TEST_EQUALS(contextRegained, true, TEST_LOCATION);
@@ -1501,7 +1501,7 @@ int UtcDaliStageContextRegainedSignalP2(void)
   ContextStatusFunctor contextRegainedFunctor(contextRegained);
   GetImplementation(stage).ConnectSignal(&application, "contextRegained", contextRegainedFunctor);
 
-  Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
+  Dali::Integration::ContextNotifierInterface* notifier = application.GetCore().GetContextNotifier();
   notifier->NotifyContextLost();
   notifier->NotifyContextRegained();
   DALI_TEST_EQUALS(contextRegained, true, TEST_LOCATION);
@@ -1542,7 +1542,7 @@ int UtcDaliStageSceneCreatedSignalP(void)
   SceneCreatedStatusFunctor sceneCreatedFunctor(signalCalled);
   stage.SceneCreatedSignal().Connect(&application, sceneCreatedFunctor);
 
-  Integration::Core& core = application.GetCore();
+  Dali::Integration::Core& core = application.GetCore();
   core.SceneCreated();
   DALI_TEST_EQUALS(signalCalled, true, TEST_LOCATION);
 
@@ -1558,7 +1558,7 @@ int UtcDaliStageSceneCreatedSignalP2(void)
   SceneCreatedStatusFunctor sceneCreatedFunctor(signalCalled);
   GetImplementation(stage).ConnectSignal(&application, "sceneCreated", sceneCreatedFunctor);
 
-  Integration::Core& core = application.GetCore();
+  Dali::Integration::Core& core = application.GetCore();
   core.SceneCreated();
   DALI_TEST_EQUALS(signalCalled, true, TEST_LOCATION);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ const int DEFAULT_WAIT_PERIOD(100);  ///< Default waiting period for check.
 class TestClass : public ConnectionTracker
 {
 public:
-  TestClass(Integration::Scene scene)
+  TestClass(Dali::Integration::Scene scene)
   : mScene(scene)
   {
   }
@@ -88,9 +88,9 @@ public:
     gCallBackCalled = true;
   }
 
-  Actor                mActor;
-  PropertyNotification mNotification;
-  Integration::Scene   mScene;
+  Actor                    mActor;
+  PropertyNotification     mNotification;
+  Dali::Integration::Scene mScene;
 };
 
 /*

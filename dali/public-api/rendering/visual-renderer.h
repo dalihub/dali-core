@@ -2,7 +2,7 @@
 #define DALI_VISUAL_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,6 +220,7 @@ public:
 public:
   /**
    * @brief Register visual transform uniforms so we can use it as uniform properties.
+   * @note Before register the uniforms, visual properties could not be animated.
    *
    * @SINCE_2_4.14
    */

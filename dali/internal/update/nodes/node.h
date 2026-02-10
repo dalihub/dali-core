@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <algorithm>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>
@@ -1050,7 +1053,7 @@ public:
   /**
    * @brief Update partial rendering data from the latest node infomations.
    */
-  void UpdatePartialRenderingData(BufferIndex bufferIndex, bool isLayer3d);
+  void UpdatePartialRenderingData(BufferIndex bufferIndex, bool isLayer3d, bool canSkipInfomationUpdate);
 
   /**
    * @brief Returns partial rendering data associated with the node.

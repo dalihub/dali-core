@@ -2,7 +2,7 @@
 #define TEST_SYNC_IMPLEMENTATION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace Dali
 {
 class TestGraphicsSyncImplementation;
 
-class TestSyncObject : public Integration::GraphicsSyncAbstraction::SyncObject
+class TestSyncObject : public Dali::Integration::GraphicsSyncAbstraction::SyncObject
 {
 public:
   TestSyncObject(TraceCallStack& trace);
@@ -51,7 +51,7 @@ public:
 /**
  * Class to emulate the gpu sync functions with tracing
  */
-class TestGraphicsSyncImplementation : public Integration::GraphicsSyncAbstraction
+class TestGraphicsSyncImplementation : public Dali::Integration::GraphicsSyncAbstraction
 {
 public:
   /**
@@ -72,7 +72,7 @@ public:
   /**
    * Create a sync object that can be polled
    */
-  GraphicsSyncAbstraction::SyncObject* CreateSyncObject() override;
+  GraphicsSyncAbstraction::SyncObject* CreateSyncObject(SyncObject::SyncType type) override;
 
   /**
    * Destroy a sync object

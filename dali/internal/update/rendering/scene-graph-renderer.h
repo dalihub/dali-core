@@ -509,14 +509,11 @@ public:
   void TerminateRenderCallback(bool invokeCallback);
 
   /**
-   * Returns currently set RenderCallback pointer
+   * Returns currently set RenderCallback pointer or not.
    *
-   * @return RenderCallback pointer or nullptr
+   * @return True if RenderCallback applied
    */
-  RenderCallback* GetRenderCallback()
-  {
-    return mRenderCallback;
-  }
+  [[nodiscard]] bool HasRenderCallback() const;
 
   /**
    * Merge shader uniform map into renderer uniform map if any of the
@@ -541,10 +538,7 @@ public:
   /**
    * @brief True if this renderer could be renderable. False otherwise.
    */
-  bool IsRenderable() const
-  {
-    return (mGeometry && mShader) || mRenderCallback;
-  }
+  [[nodiscard]] bool IsRenderable() const;
 
   /**
    * Update the result of Query of IsDirty() + IsUpdated() result.
@@ -584,9 +578,20 @@ public: // For VisualProperties
   /**
    * To be used only for 1st stage initialization in event thread.
    */
-  void SetVisualProperties(VisualRenderer::VisualProperties* visualProperties)
+  void SetDummyVisualProperties();
+
+  /**
+   * Set the visual propertiess at render thread.
+   * @param[in] visualProperties The visual properties to set
+   */
+  void SetVisualProperties(OwnerPointer<VisualRenderer::VisualProperties>& visualProperties)
   {
-    mVisualProperties = visualProperties;
+    if(DALI_UNLIKELY(mOwnsVisualProperties))
+    {
+      delete mVisualProperties;
+    }
+    mVisualProperties     = visualProperties.Release();
+    mOwnsVisualProperties = true;
 
     // Initialize visual dirty flags.
     mVisualPropertiesDirtyFlags = BAKED_FLAG;
@@ -597,7 +602,38 @@ public: // For VisualProperties
    */
   const VisualRenderer::VisualProperties* GetVisualProperties() const
   {
-    return mVisualProperties.Get();
+    return mVisualProperties;
+  }
+
+public: // For DecoratedVisualProperties
+  /**
+   * To be used only for 1st stage initialization in event thread.
+   */
+  void SetDummyDecoratedVisualProperties();
+
+  /**
+   * Set the decorated visual propertiess at render thread.
+   * @param[in] decoratedVisualProperties The decorated visual properties to set
+   */
+  void SetDecoratedVisualProperties(OwnerPointer<VisualRenderer::DecoratedVisualProperties>& decoratedVisualProperties)
+  {
+    if(DALI_UNLIKELY(mOwnsDecoratedVisualProperties))
+    {
+      delete mDecoratedVisualProperties;
+    }
+    mDecoratedVisualProperties     = decoratedVisualProperties.Release();
+    mOwnsDecoratedVisualProperties = true;
+
+    // Initialize visual dirty flags.
+    mVisualPropertiesDirtyFlags = BAKED_FLAG;
+  }
+
+  /**
+   * May be accessed from event thread
+   */
+  const VisualRenderer::DecoratedVisualProperties* GetDecoratedVisualProperties() const
+  {
+    return mDecoratedVisualProperties;
   }
 
 public: // From VisualRenderer::VisualRendererPropertyObserver
@@ -630,39 +666,31 @@ private:
 
   Render::RendererKey mRenderer;   ///< Key to the renderer (that's owned by RenderManager)
   TextureSet*         mTextureSet; ///< The texture set this renderer uses. (Not owned)
-  Render::Geometry*   mGeometry;   ///< The geometry this renderer uses. (Not owned)
   Shader*             mShader;     ///< The shader this renderer uses. (Not owned)
 
-  OwnerPointer<VisualRenderer::VisualProperties> mVisualProperties; ///< VisualProperties (optional/owned)
-  OwnerPointer<Vector4>                          mBlendColor;       ///< The blend color for blending operation
+  const Node* mAttachedNode{nullptr}; ///< Node attached to this visual renderer (not owned)
 
-  Dali::Internal::Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
+  VisualRenderer::VisualProperties*          mVisualProperties;          ///< VisualProperties (optional/owned if flagged)
+  VisualRenderer::DecoratedVisualProperties* mDecoratedVisualProperties; ///< DecoratedVisualProperties (optional/owned if flagged)
 
-  uint32_t             mIndexedDrawFirstElement;     ///< first element index to be drawn using indexed draw
-  uint32_t             mIndexedDrawElementsCount;    ///< number of elements to be drawn using indexed draw
   uint32_t             mInstanceCount{0};            ///< The number of instances to be drawn
-  uint32_t             mBlendBitmask;                ///< The bitmask of blending options
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
   UniformMap::SizeType mShaderMapChangeCounter{0u};  ///< Value to check if uniform data should be updated
 
   Dali::Extents mUpdateAreaExtents;
 
-  DepthFunction::Type            mDepthFunction : 4;              ///< Local copy of the depth function
-  FaceCullingMode::Type          mFaceCullingMode : 3;            ///< Local copy of the mode of face culling
-  BlendMode::Type                mBlendMode : 3;                  ///< Local copy of the mode of blending
-  DepthWriteMode::Type           mDepthWriteMode : 3;             ///< Local copy of the depth write mode
-  DepthTestMode::Type            mDepthTestMode : 3;              ///< Local copy of the depth test mode
-  DevelRenderer::Rendering::Type mRenderingBehavior : 2;          ///< The rendering behavior
-  Decay                          mUpdateDecay : 2;                ///< Update decay (aging)
-  uint8_t                        mVisualPropertiesDirtyFlags : 2; ///< Update decay for visual properties (aging)
+  BlendMode::Type                mBlendMode : 3;            ///< Local copy of the mode of blending
+  DevelRenderer::Rendering::Type mRenderingBehavior : 2;    ///< The rendering behavior
+  Decay                          mUpdateDecay : 2;          ///< Update decay (aging)
+  bool                           mRegenerateUniformMap : 1; ///< true if the map should be regenerated
 
-  bool mRegenerateUniformMap : 1;     ///< true if the map should be regenerated
-  bool mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
-  bool mUseSharedUniformBlock : 1;
+  uint8_t mVisualPropertiesDirtyFlags : 2; ///< Update decay for visual properties (aging)
+  uint8_t mIsRenderableFlag : 3;
+  bool    mAdvancedBlendEquationApplied : 1;  ///< true if advanced blend equation applied.
+  bool    mOwnsVisualProperties : 1;          ///< Whether this renderer owns the VisualProperties
+  bool    mOwnsDecoratedVisualProperties : 1; ///< Whether this renderer owns the DecoratedVisualProperties
 
   mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
-
-  Dali::RenderCallback* mRenderCallback{nullptr};
 
 public:
   AnimatableProperty<Vector4> mMixColor;   ///< The mix color value

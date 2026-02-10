@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 // CLASS HEADER
 #include <dali/internal/event/events/gesture-event-processor.h>
 
+// EXTERNAL INCLUDES
+#include <algorithm> // for std::remove
 #if defined(DEBUG_ENABLED)
 #include <sstream>
 #endif

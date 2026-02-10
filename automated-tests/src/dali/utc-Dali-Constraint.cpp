@@ -385,7 +385,7 @@ int UtcDaliConstraintCloneP(void)
   Actor actor = Actor::New();
   Actor clone = Actor::New();
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(actor);
   stage.Add(clone);
 
@@ -482,7 +482,7 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
   Actor actor = Actor::New();
   Actor clone = Actor::New();
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(actor);
   stage.Add(clone);
 
@@ -1680,8 +1680,8 @@ int UtcDaliConstraintApplyActorStagedUnstaged(void)
   bool            functorCalled = false;
 
   // Create an actor and add to stage
-  Actor              actor = Actor::New();
-  Integration::Scene stage = application.GetScene();
+  Actor                    actor = Actor::New();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(actor);
 
   // Create a constraint and apply
@@ -1727,8 +1727,8 @@ int UtcDaliConstraintApplySeveralTimes(void)
   int             count = 0;
 
   // Create an actor and add to stage
-  Actor              actor = Actor::New();
-  Integration::Scene stage = application.GetScene();
+  Actor                    actor = Actor::New();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(actor);
 
   // Create a constraint and apply

@@ -19,7 +19,8 @@
 #include <dali/internal/render/common/render-manager.h>
 
 // EXTERNAL INCLUDES
-#include <memory.h>
+#include <algorithm>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/core.h>
@@ -50,8 +51,6 @@
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program-controller.h>
-
-#include <memory>
 
 namespace Dali
 {

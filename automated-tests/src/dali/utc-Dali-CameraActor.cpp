@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1282,8 +1282,8 @@ int UtcDaliCameraActorDefaultProperties(void)
   TestApplication application;
   tet_infoline("Testing Dali::CameraActor DefaultProperties");
 
-  CameraActor        actor = CameraActor::New();
-  Integration::Scene stage = application.GetScene();
+  CameraActor              actor = CameraActor::New();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(actor);
   stage.GetRenderTaskList().GetTask(0).SetCameraActor(actor);
 
@@ -1372,8 +1372,8 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
 {
   TestApplication application;
 
-  CameraActor        actor = CameraActor::New();
-  Integration::Scene stage = application.GetScene();
+  CameraActor              actor = CameraActor::New();
+  Dali::Integration::Scene stage = application.GetScene();
   stage.Add(actor);
   stage.GetRenderTaskList().GetTask(0).SetCameraActor(actor);
 
@@ -2152,9 +2152,9 @@ int UtcDaliCameraActorPropertyIndices(void)
 
 int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
 {
-  TestApplication    application;
-  Integration::Scene stage     = application.GetScene();
-  Vector2            stageSize = stage.GetSize();
+  TestApplication          application;
+  Dali::Integration::Scene stage     = application.GetScene();
+  Vector2                  stageSize = stage.GetSize();
 
   CameraActor freeLookCameraActor = CameraActor::New(stageSize);
   freeLookCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -2212,9 +2212,9 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
 
 int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
 {
-  TestApplication    application;
-  Integration::Scene stage     = application.GetScene();
-  Vector2            stageSize = stage.GetSize();
+  TestApplication          application;
+  Dali::Integration::Scene stage     = application.GetScene();
+  Vector2                  stageSize = stage.GetSize();
 
   CameraActor freeLookCameraActor = CameraActor::New(stageSize);
   freeLookCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
@@ -2276,9 +2276,9 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
 
 int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
 {
-  TestApplication    application;
-  Integration::Scene stage     = application.GetScene();
-  Vector2            stageSize = stage.GetSize();
+  TestApplication          application;
+  Dali::Integration::Scene stage     = application.GetScene();
+  Vector2                  stageSize = stage.GetSize();
 
   Vector3 targetPosition(Vector3::ZERO);
   Vector3 cameraOffset(0.0f, 0.0f, 100.0f);
@@ -2324,7 +2324,7 @@ int UtcDaliCameraActorReflectionByPlane(void)
 {
   TestApplication application;
 
-  Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene stage = application.GetScene();
 
   Vector3 targetPosition(Vector3::ZERO);
   Vector3 cameraOffset(0.0f, 100.0f, 100.0f);
@@ -2413,8 +2413,8 @@ int UtcDaliCameraActorProjectionDirection(void)
 {
   TestApplication application;
 
-  Integration::Scene stage     = application.GetScene();
-  Vector2            stageSize = stage.GetSize();
+  Dali::Integration::Scene stage     = application.GetScene();
+  Vector2                  stageSize = stage.GetSize();
 
   CameraActor defaultCameraActor = stage.GetRenderTaskList().GetTask(0).GetCameraActor();
   CameraActor expectCameraActor1 = CameraActor::New(stageSize);

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -291,13 +291,13 @@ protected:
   Render::Renderer::StencilParameters mStencilParameters; ///< Struct containing all stencil related options
   BlendingOptions                     mBlendingOptions;   ///< Local copy of blending options bitmask
 
-  DepthFunction::Type            mDepthFunction : 4;            ///< Local copy of the depth function
-  FaceCullingMode::Type          mFaceCullingMode : 3;          ///< Local copy of the mode of face culling
-  BlendMode::Type                mBlendMode : 3;                ///< Local copy of the mode of blending
-  DepthWriteMode::Type           mDepthWriteMode : 3;           ///< Local copy of the depth write mode
-  DepthTestMode::Type            mDepthTestMode : 3;            ///< Local copy of the depth test mode
-  DevelRenderer::Rendering::Type mRenderingBehavior : 2;        ///< The rendering behavior
-  bool                           mPremultipledAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
+  DepthFunction::Type            mDepthFunction : 4;             ///< Local copy of the depth function
+  FaceCullingMode::Type          mFaceCullingMode : 3;           ///< Local copy of the mode of face culling
+  BlendMode::Type                mBlendMode : 3;                 ///< Local copy of the mode of blending
+  DepthWriteMode::Type           mDepthWriteMode : 3;            ///< Local copy of the depth write mode
+  DepthTestMode::Type            mDepthTestMode : 3;             ///< Local copy of the depth test mode
+  DevelRenderer::Rendering::Type mRenderingBehavior : 2;         ///< The rendering behavior
+  bool                           mPremultipliedAlphaEnabled : 1; ///< Flag indicating whether the Pre-multiplied Alpha Blending is required
 
 private:
   std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; ///< list of draw commands

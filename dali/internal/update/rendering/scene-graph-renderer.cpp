@@ -77,6 +77,15 @@ enum DirtyUpdateFlags
   IS_UPDATED_MASK = (1 << UPDATED_FLAG_SHIFT) | IS_DIRTY_MASK,
 };
 
+enum RenderableFlag
+{
+  HAS_GEOMETRY  = 1u << 0,
+  HAS_SHADER    = 1u << 1,
+  IS_RENDERABLE = HAS_GEOMETRY | HAS_SHADER,
+
+  HAS_RENDER_CALLBACK = 1u << 2,
+};
+
 template<typename... ParameterType>
 void CallRenderFunction(Render::RendererKey& rendererKey, void (Render::Renderer::*member)(ParameterType...), ParameterType... parameter)
 {
@@ -94,6 +103,33 @@ void CallRenderFunction(Render::RendererKey& rendererKey, void (Render::Renderer
     ((*rendererKey.Get()).*member)(parameter);
   }
 }
+
+template<typename ReturnType>
+ReturnType GetRenderFunction(const Render::RendererKey& rendererKey, ReturnType (Render::Renderer::*member)() const)
+{
+  DALI_ASSERT_DEBUG(rendererKey);
+  return ((*rendererKey.Get()).*member)();
+}
+
+class DummyVisualRendererPropertyObserver : public SceneGraph::VisualRenderer::VisualRendererPropertyObserver
+{
+public:
+  ~DummyVisualRendererPropertyObserver() override = default;
+
+  void OnVisualRendererPropertyUpdated(bool /*updated*/) override
+  {
+    // Do nothing
+  }
+
+  uint8_t GetUpdatedFlag() const override
+  {
+    return 0;
+  }
+};
+
+DummyVisualRendererPropertyObserver                   gDummyVisualRendererPropertyObserver;
+SceneGraph::VisualRenderer::VisualProperties          gDummyVisualRendererVisualProperties(gDummyVisualRendererPropertyObserver);
+SceneGraph::VisualRenderer::DecoratedVisualProperties gDummyVisualRendererDecoratedVisualProperties(gDummyVisualRendererPropertyObserver);
 
 } // Anonymous namespace
 
@@ -119,34 +155,38 @@ void Renderer::UnregisterMemoryPoolCollection()
 Renderer::Renderer()
 : mRenderer{},
   mTextureSet(nullptr),
-  mGeometry(nullptr),
   mShader(nullptr),
+  mAttachedNode(nullptr),
   mVisualProperties(nullptr),
-  mBlendColor(nullptr),
-  mStencilParameters(RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP),
-  mIndexedDrawFirstElement(0u),
-  mIndexedDrawElementsCount(0u),
-  mBlendBitmask(0u),
+  mDecoratedVisualProperties(nullptr),
   mUpdateAreaExtents(),
-  mDepthFunction(DepthFunction::LESS),
-  mFaceCullingMode(FaceCullingMode::NONE),
   mBlendMode(BlendMode::AUTO),
-  mDepthWriteMode(DepthWriteMode::AUTO),
-  mDepthTestMode(DepthTestMode::AUTO),
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
   mUpdateDecay(Renderer::Decay::INITIAL),
-  mVisualPropertiesDirtyFlags(CLEAN_FLAG),
   mRegenerateUniformMap(false),
-  mPremultipledAlphaEnabled(false),
-  mUseSharedUniformBlock(true),
+  mVisualPropertiesDirtyFlags(CLEAN_FLAG),
+  mIsRenderableFlag(0u),
+  mAdvancedBlendEquationApplied(false),
+  mOwnsVisualProperties(false),
+  mOwnsDecoratedVisualProperties(false),
   mDirtyUpdated(NOT_CHECKED),
   mMixColor(Color::WHITE),
   mDepthIndex(0)
 {
+  // Allocate Render::Renderer at event thread allowed for now.
+  mRenderer = Render::Renderer::NewKey(this);
 }
 
 Renderer::~Renderer()
 {
+  if(mOwnsVisualProperties)
+  {
+    delete mVisualProperties;
+  }
+  if(mOwnsDecoratedVisualProperties)
+  {
+    delete mDecoratedVisualProperties;
+  }
 }
 
 void Renderer::operator delete(void* ptr)
@@ -202,9 +242,14 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
   // Age down visual properties dirty flag
   if(mVisualPropertiesDirtyFlags != CLEAN_FLAG)
   {
-    DALI_ASSERT_DEBUG(mVisualProperties && "Visual Property not created yet! something wrong (maybe event message flush ordering issue)");
-
-    rendererUpdated |= mVisualProperties->PrepareProperties();
+    if(mVisualProperties)
+    {
+      rendererUpdated |= mVisualProperties->PrepareProperties();
+    }
+    if(mDecoratedVisualProperties)
+    {
+      rendererUpdated |= mDecoratedVisualProperties->PrepareProperties();
+    }
     mVisualPropertiesDirtyFlags >>= 1;
   }
 
@@ -245,6 +290,7 @@ void Renderer::SetShader(Shader* shader)
 {
   DALI_ASSERT_DEBUG(shader != NULL && "Shader pointer is NULL");
 
+  mIsRenderableFlag |= RenderableFlag::HAS_SHADER;
   if(mShader != shader)
   {
     mShader                 = shader;
@@ -259,13 +305,9 @@ void Renderer::SetShader(Shader* shader)
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
   DALI_ASSERT_DEBUG(geometry != NULL && "Geometry pointer is NULL");
-  if(mGeometry != geometry)
-  {
-    mGeometry = geometry;
-
-    CallRenderFunction(mRenderer, &Render::Renderer::SetGeometry, mGeometry);
-    SetUpdated(true);
-  }
+  mIsRenderableFlag |= RenderableFlag::HAS_GEOMETRY;
+  CallRenderFunction(mRenderer, &Render::Renderer::SetGeometry, geometry);
+  SetUpdated(true);
 }
 
 void Renderer::SetDepthIndex(int depthIndex)
@@ -280,18 +322,13 @@ void Renderer::SetDepthIndex(int depthIndex)
 
 void Renderer::SetFaceCullingMode(FaceCullingMode::Type faceCullingMode)
 {
-  if(mFaceCullingMode != faceCullingMode)
-  {
-    mFaceCullingMode = faceCullingMode;
-
-    CallRenderFunction(mRenderer, &Render::Renderer::SetFaceCullingMode, mFaceCullingMode);
-    SetUpdated(true);
-  }
+  CallRenderFunction(mRenderer, &Render::Renderer::SetFaceCullingMode, faceCullingMode);
+  SetUpdated(true);
 }
 
 FaceCullingMode::Type Renderer::GetFaceCullingMode() const
 {
-  return mFaceCullingMode;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetFaceCullingMode);
 }
 
 void Renderer::SetBlendMode(BlendMode::Type blendingMode)
@@ -311,189 +348,128 @@ BlendMode::Type Renderer::GetBlendMode() const
 
 void Renderer::SetBlendingOptions(uint32_t options)
 {
-  if(mBlendBitmask != options)
-  {
-    mBlendBitmask = options;
-
-    CallRenderFunction(mRenderer, &Render::Renderer::SetBlendingBitMask, mBlendBitmask);
-    SetUpdated(true);
-  }
+  mAdvancedBlendEquationApplied = BlendingOptions::IsAdvancedBlendEquationIncluded(options);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetBlendingBitMask, options);
+  SetUpdated(true);
 }
 
 uint32_t Renderer::GetBlendingOptions() const
 {
-  return mBlendBitmask;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetBlendingBitMask);
 }
 
 void Renderer::SetBlendColor(const Vector4& blendColor)
 {
-  if(blendColor == Color::TRANSPARENT)
-  {
-    mBlendColor = nullptr;
-  }
-  else
-  {
-    if(!mBlendColor)
-    {
-      mBlendColor = new Vector4(blendColor);
-    }
-    else
-    {
-      *mBlendColor = blendColor;
-    }
-  }
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetBlendColor, GetBlendColor());
+  CallRenderFunction(mRenderer, &Render::Renderer::SetBlendColor, blendColor);
   SetUpdated(true);
 }
 
 Vector4 Renderer::GetBlendColor() const
 {
-  if(mBlendColor)
-  {
-    return *mBlendColor;
-  }
-  return Color::TRANSPARENT;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetBlendColor);
 }
 
 void Renderer::SetIndexedDrawFirstElement(uint32_t firstElement)
 {
-  if(mIndexedDrawFirstElement != firstElement)
-  {
-    mIndexedDrawFirstElement = firstElement;
-
-    CallRenderFunction(mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, mIndexedDrawFirstElement);
-    SetUpdated(true);
-  }
+  CallRenderFunction(mRenderer, &Render::Renderer::SetIndexedDrawFirstElement, firstElement);
+  SetUpdated(true);
 }
 
 uint32_t Renderer::GetIndexedDrawFirstElement() const
 {
-  return mIndexedDrawFirstElement;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetIndexedDrawFirstElement);
 }
 
 void Renderer::SetIndexedDrawElementsCount(uint32_t elementsCount)
 {
-  if(mIndexedDrawElementsCount != elementsCount)
-  {
-    mIndexedDrawElementsCount = elementsCount;
-
-    CallRenderFunction(mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, mIndexedDrawElementsCount);
-    SetUpdated(true);
-  }
+  CallRenderFunction(mRenderer, &Render::Renderer::SetIndexedDrawElementsCount, elementsCount);
+  SetUpdated(true);
 }
 
 uint32_t Renderer::GetIndexedDrawElementsCount() const
 {
-  return mIndexedDrawElementsCount;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetIndexedDrawElementsCount);
 }
 
 void Renderer::EnablePreMultipliedAlpha(bool preMultipled)
 {
-  if(mPremultipledAlphaEnabled != preMultipled)
-  {
-    mPremultipledAlphaEnabled = preMultipled;
-
-    CallRenderFunction(mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, mPremultipledAlphaEnabled);
-    SetUpdated(true);
-  }
+  CallRenderFunction(mRenderer, &Render::Renderer::EnablePreMultipliedAlpha, preMultipled);
+  SetUpdated(true);
 }
 
 bool Renderer::IsPreMultipliedAlphaEnabled() const
 {
-  return mPremultipledAlphaEnabled;
+  return GetRenderFunction(mRenderer, &Render::Renderer::IsPreMultipliedAlphaEnabled);
 }
 
 void Renderer::SetDepthWriteMode(DepthWriteMode::Type depthWriteMode)
 {
-  mDepthWriteMode = depthWriteMode;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetDepthWriteMode, mDepthWriteMode);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetDepthWriteMode, depthWriteMode);
 }
 
 DepthWriteMode::Type Renderer::GetDepthWriteMode() const
 {
-  return mDepthWriteMode;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetDepthWriteMode);
 }
 
 void Renderer::SetDepthTestMode(DepthTestMode::Type depthTestMode)
 {
-  mDepthTestMode = depthTestMode;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetDepthTestMode, mDepthTestMode);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetDepthTestMode, depthTestMode);
 }
 
 DepthTestMode::Type Renderer::GetDepthTestMode() const
 {
-  return mDepthTestMode;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetDepthTestMode);
 }
 
 void Renderer::SetDepthFunction(DepthFunction::Type depthFunction)
 {
-  mDepthFunction = depthFunction;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetDepthFunction, mDepthFunction);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetDepthFunction, depthFunction);
 }
 
 DepthFunction::Type Renderer::GetDepthFunction() const
 {
-  return mDepthFunction;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetDepthFunction);
 }
 
 void Renderer::SetRenderMode(RenderMode::Type mode)
 {
-  mStencilParameters.renderMode = mode;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetRenderMode, mStencilParameters.renderMode);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetRenderMode, mode);
 }
 
 void Renderer::SetStencilFunction(StencilFunction::Type stencilFunction)
 {
-  mStencilParameters.stencilFunction = stencilFunction;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilFunction, mStencilParameters.stencilFunction);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilFunction, stencilFunction);
 }
 
 void Renderer::SetStencilFunctionMask(int stencilFunctionMask)
 {
-  mStencilParameters.stencilFunctionMask = stencilFunctionMask;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilFunctionMask, mStencilParameters.stencilFunctionMask);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilFunctionMask, stencilFunctionMask);
 }
 
 void Renderer::SetStencilFunctionReference(int stencilFunctionReference)
 {
-  mStencilParameters.stencilFunctionReference = stencilFunctionReference;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilFunctionReference, mStencilParameters.stencilFunctionReference);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilFunctionReference, stencilFunctionReference);
 }
 
 void Renderer::SetStencilMask(int stencilMask)
 {
-  mStencilParameters.stencilMask = stencilMask;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilMask, mStencilParameters.stencilMask);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilMask, stencilMask);
 }
 
 void Renderer::SetStencilOperationOnFail(StencilOperation::Type stencilOperationOnFail)
 {
-  mStencilParameters.stencilOperationOnFail = stencilOperationOnFail;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilOperationOnFail, mStencilParameters.stencilOperationOnFail);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilOperationOnFail, stencilOperationOnFail);
 }
 
 void Renderer::SetStencilOperationOnZFail(StencilOperation::Type stencilOperationOnZFail)
 {
-  mStencilParameters.stencilOperationOnZFail = stencilOperationOnZFail;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilOperationOnZFail, mStencilParameters.stencilOperationOnZFail);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilOperationOnZFail, stencilOperationOnZFail);
 }
 
 void Renderer::SetStencilOperationOnZPass(StencilOperation::Type stencilOperationOnZPass)
 {
-  mStencilParameters.stencilOperationOnZPass = stencilOperationOnZPass;
-
-  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilOperationOnZPass, mStencilParameters.stencilOperationOnZPass);
+  CallRenderFunction(mRenderer, &Render::Renderer::SetStencilOperationOnZPass, stencilOperationOnZPass);
 }
 
 void Renderer::SetUpdateAreaExtents(const Dali::Extents& updateAreaExtents)
@@ -507,13 +483,13 @@ void Renderer::SetUpdateAreaExtents(const Dali::Extents& updateAreaExtents)
 
 void Renderer::SetRenderCallback(RenderCallback* callback)
 {
-  if(mRenderCallback != callback)
+  mIsRenderableFlag &= ~RenderableFlag::HAS_RENDER_CALLBACK;
+  if(callback)
   {
-    mRenderCallback = callback;
-
-    CallRenderFunction(mRenderer, &Render::Renderer::SetRenderCallback, mRenderCallback);
-    SetUpdated(true);
+    mIsRenderableFlag |= RenderableFlag::HAS_RENDER_CALLBACK;
   }
+  CallRenderFunction(mRenderer, &Render::Renderer::SetRenderCallback, callback);
+  SetUpdated(true);
 }
 
 void Renderer::TerminateRenderCallback(bool invokeCallback)
@@ -522,9 +498,14 @@ void Renderer::TerminateRenderCallback(bool invokeCallback)
   SetRenderCallback(nullptr);
 }
 
+bool Renderer::HasRenderCallback() const
+{
+  return mIsRenderableFlag & RenderableFlag::HAS_RENDER_CALLBACK;
+}
+
 const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() const
 {
-  return mStencilParameters;
+  return GetRenderFunction(mRenderer, &Render::Renderer::GetStencilParameters);
 }
 
 void Renderer::BakeMixColor(BufferIndex updateBufferIndex, const Vector4& mixColor)
@@ -590,10 +571,11 @@ DevelRenderer::Rendering::Type Renderer::GetRenderingBehavior() const
 
 void Renderer::AttachToNode(const Node& node)
 {
+  // TODO : Could we use this feature for general renderer?
   if(mVisualProperties)
   {
-    DALI_ASSERT_ALWAYS(mVisualProperties->mAttachedNode == nullptr && "VisualRenderer don't allow to attach multiple nodes!");
-    mVisualProperties->mAttachedNode = &node;
+    DALI_ASSERT_ALWAYS(mAttachedNode == nullptr && "VisualRenderer don't allow to attach multiple nodes!");
+    mAttachedNode = &node;
   }
 }
 
@@ -605,10 +587,11 @@ void Renderer::DetachFromNode(const Node& node)
     rendererPtr->DetachFromNodeDataProvider(static_cast<const NodeDataProvider&>(node));
   }
 
+  // TODO : Could we use this feature for general renderer?
   if(mVisualProperties)
   {
-    DALI_ASSERT_ALWAYS((mVisualProperties->mAttachedNode == &node) && "Detaching node which was not attached!");
-    mVisualProperties->mAttachedNode = nullptr;
+    DALI_ASSERT_ALWAYS((mAttachedNode == &node) && "Detaching node which was not attached!");
+    mAttachedNode = nullptr;
   }
 }
 
@@ -616,8 +599,6 @@ void Renderer::DetachFromNode(const Node& node)
 void Renderer::ConnectToSceneGraph(RenderManagerDispatcher& renderManagerDispacher)
 {
   mRegenerateUniformMap = true;
-
-  mRenderer = Render::Renderer::NewKey(this, mGeometry, mBlendBitmask, GetBlendColor(), static_cast<FaceCullingMode::Type>(mFaceCullingMode), mPremultipledAlphaEnabled, mDepthWriteMode, mDepthTestMode, mDepthFunction, mStencilParameters);
 
   OwnerKeyType<Render::Renderer> transferKeyOwnership(mRenderer);
   renderManagerDispacher.AddRenderer(transferKeyOwnership);
@@ -670,7 +651,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
     }
     case BlendMode::AUTO:
     {
-      if(BlendingOptions::IsAdvancedBlendEquationIncluded(mBlendBitmask))
+      if(mAdvancedBlendEquationApplied)
       {
         opacityType = Renderer::TRANSLUCENT;
         break;
@@ -771,6 +752,11 @@ bool Renderer::IsDirty() const
   return mDirtyUpdated & IS_DIRTY_MASK;
 }
 
+bool Renderer::IsRenderable() const
+{
+  return DALI_LIKELY((mIsRenderableFlag & RenderableFlag::IS_RENDERABLE) == RenderableFlag::IS_RENDERABLE) || HasRenderCallback();
+}
+
 void Renderer::OnMappingChanged()
 {
   // Properties have been registered on the base class.
@@ -784,12 +770,8 @@ const CollectedUniformMap& Renderer::GetCollectedUniformMap() const
 
 void Renderer::EnableSharedUniformBlock(bool enabled)
 {
-  if(mUseSharedUniformBlock != enabled)
-  {
-    mUseSharedUniformBlock = enabled;
-    CallRenderFunction(mRenderer, &Render::Renderer::EnableSharedUniformBlock, mUseSharedUniformBlock);
-    SetUpdated(true);
-  }
+  CallRenderFunction(mRenderer, &Render::Renderer::EnableSharedUniformBlock, enabled);
+  SetUpdated(true);
 }
 
 bool Renderer::IsUpdated() const
@@ -824,11 +806,16 @@ void Renderer::ResetUpdated()
 
 Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
 {
+  Vector4 updateArea = originalUpdateArea;
   if(mVisualProperties)
   {
-    return AdjustExtents(mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, originalUpdateArea), mUpdateAreaExtents);
+    mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
   }
-  return AdjustExtents(originalUpdateArea, mUpdateAreaExtents);
+  if(mDecoratedVisualProperties)
+  {
+    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
+  }
+  return AdjustExtents(updateArea, mUpdateAreaExtents);
 }
 
 bool Renderer::IsObservingNodeDeactivated() const
@@ -836,10 +823,34 @@ bool Renderer::IsObservingNodeDeactivated() const
   // TODO : Could we use this feature for general renderer?
   if(mVisualProperties)
   {
-    return !mVisualProperties->mAttachedNode || mVisualProperties->mAttachedNode->IsWorldIgnored();
+    return !mAttachedNode || mAttachedNode->IsWorldIgnored();
   }
   return false;
 }
+
+// For VisualRenderer and DecoratedVisualRenderer
+
+void Renderer::SetDummyVisualProperties()
+{
+  DALI_ASSERT_ALWAYS(!mVisualProperties && "Visual Properties already set!");
+  mVisualProperties     = &gDummyVisualRendererVisualProperties;
+  mOwnsVisualProperties = false;
+
+  // Initialize visual dirty flags.
+  mVisualPropertiesDirtyFlags = BAKED_FLAG;
+}
+
+void Renderer::SetDummyDecoratedVisualProperties()
+{
+  DALI_ASSERT_ALWAYS(!mDecoratedVisualProperties && "Decorated Visual Properties already set!");
+  mDecoratedVisualProperties     = &gDummyVisualRendererDecoratedVisualProperties;
+  mOwnsDecoratedVisualProperties = false;
+
+  // Initialize visual dirty flags.
+  mVisualPropertiesDirtyFlags = BAKED_FLAG;
+}
+
+// From VisualRenderer::VisualRendererPropertyObserver
 
 void Renderer::OnVisualRendererPropertyUpdated(bool bake)
 {

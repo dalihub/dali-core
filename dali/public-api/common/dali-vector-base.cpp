@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/dali-vector-base.h>
 
 // EXTERNAL INCLUDES
 #include <cstring> // for memcpy & memmove
+#include <utility> // std::swap
 
 namespace Dali
 {
@@ -126,6 +127,11 @@ void VectorBase::SetCount(SizeType count)
 
 void VectorBase::Reserve(SizeType capacity, SizeType elementSize)
 {
+  ReserveWithCustomMoveFunction(capacity, elementSize, memcpy);
+}
+
+void VectorBase::ReserveWithCustomMoveFunction(SizeType capacity, SizeType elementSize, MemMoveFunctionType memMoveFunction)
+{
   SizeType oldCapacity = Capacity();
   SizeType oldCount    = Count();
   if(capacity > oldCapacity)
@@ -144,7 +150,7 @@ void VectorBase::Reserve(SizeType capacity, SizeType elementSize)
     if(mData)
     {
       // copy over the old data
-      memcpy(metaData, mData, oldCount * elementSize);
+      memMoveFunction(metaData, mData, oldCount * elementSize);
     }
     // release old buffer and set new data as mData
     Replace(reinterpret_cast<void*>(metaData));
@@ -174,7 +180,7 @@ void VectorBase::Swap(VectorBase& vector)
   std::swap(mData, vector.mData);
 }
 
-void VectorBase::Erase(char* address, SizeType elementSize)
+void VectorBase::Erase(uint8_t* address, SizeType elementSize)
 {
   // erase can be called on an unallocated vector
   if(mData)
@@ -188,9 +194,9 @@ void VectorBase::Erase(char* address, SizeType elementSize)
   }
 }
 
-char* VectorBase::Erase(char* first, char* last, SizeType elementSize)
+uint8_t* VectorBase::Erase(uint8_t* first, uint8_t* last, SizeType elementSize)
 {
-  char* next = nullptr;
+  uint8_t* next = nullptr;
 
   if(mData)
   {
@@ -207,7 +213,7 @@ char* VectorBase::Erase(char* first, char* last, SizeType elementSize)
   return next;
 }
 
-void VectorBase::CopyMemory(char* destination, const char* source, size_t numberOfBytes)
+void VectorBase::CopyMemory(uint8_t* destination, const uint8_t* source, size_t numberOfBytes)
 {
   if(((source < destination) && (source + numberOfBytes > destination)) ||
      ((destination < source) && (destination + numberOfBytes > source)))

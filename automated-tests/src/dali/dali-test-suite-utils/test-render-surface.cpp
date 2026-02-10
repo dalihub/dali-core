@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,14 +111,14 @@ void TestRenderSurface::MakeContextCurrent()
 {
 }
 
-Integration::DepthBufferAvailable TestRenderSurface::GetDepthBufferRequired()
+Dali::Integration::DepthBufferAvailable TestRenderSurface::GetDepthBufferRequired()
 {
-  return Integration::DepthBufferAvailable::TRUE;
+  return Dali::Integration::DepthBufferAvailable::TRUE;
 }
 
-Integration::StencilBufferAvailable TestRenderSurface::GetStencilBufferRequired()
+Dali::Integration::StencilBufferAvailable TestRenderSurface::GetStencilBufferRequired()
 {
-  return Integration::StencilBufferAvailable::TRUE;
+  return Dali::Integration::StencilBufferAvailable::TRUE;
 }
 
 } // namespace Dali

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,10 +93,10 @@ struct GestureReceivedFunctor
   SignalData& signalData;
 };
 
-Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, int source, uint32_t time)
+Dali::Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector2& screenPosition, int source, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetDeviceId(4);
   point.SetScreenPosition(screenPosition);
@@ -108,10 +108,10 @@ Integration::TouchEvent GenerateSingleTouch(PointState::Type state, const Vector
   return touchEvent;
 }
 
-Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
+Dali::Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(stateA);
   point.SetDeviceId(4);
   point.SetScreenPosition(screenPositionA);
@@ -598,10 +598,10 @@ int UtcDaliGestureDetectorRegisterProperty(void)
 
 int UtcDaliGestureDetectorCancelProcessing(void)
 {
-  TestApplication    application;
-  Integration::Scene scene    = application.GetScene();
-  RenderTaskList     taskList = scene.GetRenderTaskList();
-  Dali::RenderTask   task     = taskList.GetTask(0);
+  TestApplication          application;
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
+  Dali::RenderTask         task     = taskList.GetTask(0);
 
   LongPressGestureDetector longDetector     = LongPressGestureDetector::New();
   TapGestureDetector       tapDetector      = TapGestureDetector::New();
@@ -632,8 +632,8 @@ int UtcDaliGestureDetectorCancelProcessing(void)
   tapDetector.DetectedSignal().Connect(&application, tFunctor);
   pinchDetector.DetectedSignal().Connect(&application, pFunctor);
 
-  Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1, 100);
-  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  Dali::Integration::TouchEvent tp = GenerateSingleTouch(PointState::DOWN, Vector2(50.0f, 50.0f), 1, 100);
+  Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(100));
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->SetRenderTask(task);
   Dali::TouchEvent touchEventHandle(touchEventImpl.Get());

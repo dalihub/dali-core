@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,6 +226,10 @@ int UtcDaliVisualRendererAnimatedProperty01(void)
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(colorIndex), Vector3(1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
 
+  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
+  // Before, transform could not be animated.
+  renderer.RegisterVisualTransformUniform();
+
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, Vector3(1.0f, 0.0f, 1.0f));
@@ -268,6 +272,10 @@ int UtcDaliVisualRendererAnimatedProperty02(void)
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(1.0f, 0.0f), 0.001f, TEST_LOCATION);
+
+  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
+  // Before, transform could not be animated.
+  renderer.RegisterVisualTransformUniform();
 
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
@@ -745,6 +753,9 @@ int UtcDaliVisualRendererPartialUpdate01(void)
   // Set clippingRect as full surface now. TODO : Set valid rect if we can.
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
 
+  // We must call RegisterVisualTransformUniform() before change visual renderer properties at update thread side.
+  renderer.RegisterVisualTransformUniform();
+
   Property::Index index = VisualRenderer::Property::TRANSFORM_SIZE;
   renderer.SetProperty(index, Vector2(2.0f, 0.5f));
 
@@ -979,6 +990,10 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
+  // We must call RegisterVisualTransformUniform() before change visual renderer properties at update thread side.
+  renderer1.RegisterVisualTransformUniform();
+  renderer2.RegisterVisualTransformUniform();
+
   // Change the renderer1 and renderer2 transform property.
   // To avoid useless float point error, make renderer size as 30x30
   renderer1.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(0.5f - 2.0f / 64.0f, 0.5f - 2.0f / 64.0f));
@@ -1188,6 +1203,10 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
 
   Property::Index index = VisualRenderer::Property::TRANSFORM_OFFSET;
+
+  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
+  // Before, transform could not be animated.
+  renderer.RegisterVisualTransformUniform();
 
   uint32_t  durationMilliseconds = 1000u;
   Animation animation            = Animation::New(durationMilliseconds / 1000.0f);

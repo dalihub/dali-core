@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PARTIAL_RENDERING_DATA_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,20 @@ struct PartialRenderingData
   void MakeExpired()
   {
     mUpdateDecay = Decay::EXPIRED;
+  }
+
+  /**
+   * @brief Make this data updated.
+   * @return True if update decay changed as current frame updated. False otherwise (Expired case)
+   */
+  bool MakeUpdatedCurrentFrame()
+  {
+    if(mUpdateDecay == PartialRenderingData::Decay::UPDATED_PREVIOUS_FRAME)
+    {
+      mUpdateDecay = PartialRenderingData::Decay::UPDATED_CURRENT_FRAME;
+      mUpdated     = false;
+    }
+    return mUpdateDecay == PartialRenderingData::Decay::UPDATED_CURRENT_FRAME;
   }
 };
 

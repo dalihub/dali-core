@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,7 @@ public:
 
   SizeType mFixedSize; ///< The size of each allocation in bytes
 
-#if defined(DEBUG_ENABLED)
   SizeType mTotalAllocatedSize{0u}; ///< Total size of the allocated memory in bytes
-#endif
 };
 
 DummyMemoryPool::DummyMemoryPool(SizeType fixedSize)
@@ -60,9 +58,7 @@ DummyMemoryPool::~DummyMemoryPool() = default;
 
 void* DummyMemoryPool::Allocate()
 {
-#ifdef DEBUG_ENABLED
   mImpl->mTotalAllocatedSize += mImpl->mFixedSize;
-#endif
   return ::operator new(mImpl->mFixedSize);
 }
 
@@ -70,9 +66,7 @@ void DummyMemoryPool::Free(void* memory)
 {
   if(memory)
   {
-#ifdef DEBUG_ENABLED
     mImpl->mTotalAllocatedSize -= mImpl->mFixedSize;
-#endif
     ::operator delete(memory);
   }
 }
@@ -117,17 +111,13 @@ uint32_t DummyMemoryPool::GetCapacity() const
 {
   // Ignores deleted objects list, just returns currently allocated size
   uint32_t totalAllocation = 0;
-#ifdef DEBUG_ENABLED
-  totalAllocation = mImpl->mTotalAllocatedSize;
-#endif
+  totalAllocation          = mImpl->mTotalAllocatedSize;
   return totalAllocation;
 }
 
 void DummyMemoryPool::ResetMemoryPool()
 {
-#ifdef DEBUG_ENABLED
   mImpl->mTotalAllocatedSize = 0;
-#endif
 }
 
 } // namespace Internal

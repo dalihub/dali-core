@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "test-platform-abstraction.h"
 
 #include <dali/integration-api/bitmap.h>
+#include <algorithm>
 
 #include "dali-test-suite-utils.h"
 
@@ -50,24 +51,24 @@ ImageDimensions TestPlatformAbstraction::GetClosestImageSize(const std::string& 
   return closestSize;
 }
 
-ImageDimensions TestPlatformAbstraction::GetClosestImageSize(Integration::ResourcePointer resourceBuffer,
-                                                             ImageDimensions              size,
-                                                             FittingMode::Type            fittingMode,
-                                                             SamplingMode::Type           samplingMode,
-                                                             bool                         orientationCorrection)
+ImageDimensions TestPlatformAbstraction::GetClosestImageSize(Dali::Integration::ResourcePointer resourceBuffer,
+                                                             ImageDimensions                    size,
+                                                             FittingMode::Type                  fittingMode,
+                                                             SamplingMode::Type                 samplingMode,
+                                                             bool                               orientationCorrection)
 {
   ImageDimensions closestSize = ImageDimensions(mClosestSize);
   mTrace.PushCall("GetClosestImageSize", "");
   return closestSize;
 }
 
-Integration::ResourcePointer TestPlatformAbstraction::LoadImageSynchronously(const Integration::BitmapResourceType& resourceType, const std::string& resourcePath)
+Dali::Integration::ResourcePointer TestPlatformAbstraction::LoadImageSynchronously(const Dali::Integration::BitmapResourceType& resourceType, const std::string& resourcePath)
 {
   mTrace.PushCall("LoadResourceSynchronously", "");
   return mSynchronouslyLoadedResource;
 }
 
-Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer(const Integration::BitmapResourceType& resourceType, uint8_t* buffer, size_t size)
+Dali::Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer(const Dali::Integration::BitmapResourceType& resourceType, uint8_t* buffer, size_t size)
 {
   mTrace.PushCall("DecodeBuffer", "");
   return mDecodedBitmap;
@@ -148,12 +149,12 @@ void TestPlatformAbstraction::SetSaveFileResult(bool result)
   mSaveFileResult = result;
 }
 
-void TestPlatformAbstraction::SetSynchronouslyLoadedResource(Integration::ResourcePointer resource)
+void TestPlatformAbstraction::SetSynchronouslyLoadedResource(Dali::Integration::ResourcePointer resource)
 {
   mSynchronouslyLoadedResource = resource;
 }
 
-void TestPlatformAbstraction::SetDecodedBitmap(Integration::BitmapPtr bitmap)
+void TestPlatformAbstraction::SetDecodedBitmap(Dali::Integration::BitmapPtr bitmap)
 {
   mDecodedBitmap = bitmap;
 }

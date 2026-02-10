@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,15 +19,13 @@
 #include <dali/internal/event/common/type-info-impl.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm> // std::find_if
+#include <algorithm> ///< std::find_if
 #include <string>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
-
-using std::find_if;
 
 namespace Dali
 {
@@ -539,7 +537,7 @@ void TypeInfo::AddAnimatablePropertyComponent(std::string name, Property::Index 
 
   if(DALI_LIKELY(mRegisteredProperties.Get(static_cast<std::uint32_t>(index)) == mRegisteredProperties.end()))
   {
-    const auto& iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyComponentFinder<RegisteredPropertyPair>(baseIndex, componentIndex));
+    const auto& iter = std::find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyComponentFinder<RegisteredPropertyPair>(baseIndex, componentIndex));
 
     if(DALI_LIKELY(iter == mRegisteredProperties.end()))
     {
@@ -599,7 +597,7 @@ Property::Index TypeInfo::GetPropertyIndex(ConstString name) const
   if(!found)
   {
     // Slow but should not be done that often
-    RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(name));
+    RegisteredPropertyContainer::const_iterator iter = std::find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(name));
     if(iter != mRegisteredProperties.end())
     {
       index = iter->first;
@@ -655,7 +653,7 @@ Property::Index TypeInfo::GetChildPropertyIndex(ConstString name) const
   Property::Index index = Property::INVALID_INDEX;
 
   // Slow but should not be done that often
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(name));
+  RegisteredPropertyContainer::const_iterator iter = std::find_if(mRegisteredChildProperties.begin(), mRegisteredChildProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(name));
 
   if(iter != mRegisteredChildProperties.end())
   {
@@ -954,7 +952,7 @@ void TypeInfo::SetProperty(BaseObject* object, Property::Index index, Property::
 void TypeInfo::SetProperty(BaseObject* object, const std::string& name, Property::Value value) const
 {
   // Slow but should not be done that often
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(ConstString(name)));
+  RegisteredPropertyContainer::const_iterator iter = std::find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(ConstString(name)));
   if(iter != mRegisteredProperties.end())
   {
     if(mCSharpType)
@@ -1041,7 +1039,7 @@ Property::Value TypeInfo::GetProperty(const BaseObject* object, Property::Index 
 
 Property::Value TypeInfo::GetProperty(const BaseObject* object, const std::string& name) const
 {
-  RegisteredPropertyContainer::const_iterator iter = find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(ConstString(name)));
+  RegisteredPropertyContainer::const_iterator iter = std::find_if(mRegisteredProperties.begin(), mRegisteredProperties.end(), PropertyNameFinder<RegisteredPropertyPair>(ConstString(name)));
 
   if(iter != mRegisteredProperties.end())
   {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,10 +116,10 @@ struct RemoveActorFunctor : public HoverEventFunctor
   }
 };
 
-Integration::HoverEvent GenerateSingleHover(PointState::Type state, const Vector2& screenPosition)
+Dali::Integration::HoverEvent GenerateSingleHover(PointState::Type state, const Vector2& screenPosition)
 {
-  Integration::HoverEvent hoverEvent;
-  Integration::Point      point;
+  Dali::Integration::HoverEvent hoverEvent;
+  Dali::Integration::Point      point;
   point.SetState(state);
   point.SetScreenPosition(screenPosition);
   point.SetDeviceClass(Device::Class::MOUSE);
@@ -222,8 +222,8 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
 {
   TestApplication application;
 
-  Integration::Scene stage     = application.GetScene();
-  Vector2            stageSize = stage.GetSize();
+  Dali::Integration::Scene stage     = application.GetScene();
+  Vector2                  stageSize = stage.GetSize();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -311,7 +311,7 @@ int UtcDaliHoverEmitEmpty(void)
   try
   {
     // Emit an empty HoverEvent
-    Integration::HoverEvent event;
+    Dali::Integration::HoverEvent event;
     application.ProcessEvent(event);
     tet_result(TET_FAIL);
   }
@@ -543,8 +543,8 @@ int UtcDaliHoverDeliverInterruptedEventToHoverStartedActor(void)
   // Test DeliverInterruptedEventToHoverStartedActor function
   // Start hover on one actor, move to another, then finish
   // The first actor should receive an interrupted event
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor1 = Actor::New();
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -564,7 +564,7 @@ int UtcDaliHoverDeliverInterruptedEventToHoverStartedActor(void)
   application.Render();
 
   // Connect to actors' hovered signals
-  SignalData data1, data2;
+  SignalData        data1, data2;
   HoverEventFunctor functor1(data1);
   HoverEventFunctor functor2(data2, false); // Don't consume to allow propagation
   actor1.HoveredSignal().Connect(&application, functor1);
@@ -604,8 +604,8 @@ int UtcDaliHoverDeliverInterruptedEventToHoverStartedActor(void)
 
 int UtcDaliHoverDeliverInterruptedEventToHoverStartedActorNoInterrupt(void)
 {
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor1 = Actor::New();
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -625,8 +625,8 @@ int UtcDaliHoverDeliverInterruptedEventToHoverStartedActorNoInterrupt(void)
   application.Render();
 
   // Connect to actors' hovered signals
-  SignalData data1, data2;
-  HoverEventFunctor functor1(data1); // Consume events
+  SignalData        data1, data2;
+  HoverEventFunctor functor1(data1);        // Consume events
   HoverEventFunctor functor2(data2, false); // Don't consume
   actor1.HoveredSignal().Connect(&application, functor1);
   actor2.HoveredSignal().Connect(&application, functor2);
@@ -1137,9 +1137,9 @@ int UtcDaliHoverMultipleLayers(void)
 
 int UtcDaliHoverMultipleRenderTasks(void)
 {
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1181,9 +1181,9 @@ int UtcDaliHoverMultipleRenderTasks(void)
 
 int UtcDaliHoverMultipleRenderTasksWithChildLayer(void)
 {
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1232,9 +1232,9 @@ int UtcDaliHoverMultipleRenderTasksWithChildLayer(void)
 
 int UtcDaliHoverOffscreenRenderTasks(void)
 {
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   // FrameBufferImage for offscreen RenderTask
   FrameBuffer frameBuffer = FrameBuffer::New(stageSize.width, stageSize.height);
@@ -1282,9 +1282,9 @@ int UtcDaliHoverOffscreenRenderTasks(void)
 
 int UtcDaliHoverMultipleRenderableActors(void)
 {
-  TestApplication    application;
-  Integration::Scene stage(application.GetScene());
-  Vector2            stageSize(stage.GetSize());
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
+  Vector2                  stageSize(stage.GetSize());
 
   Actor parent = CreateRenderableActor();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1450,8 +1450,8 @@ int UtcDaliHoverActorUnStaged(void)
 
 int UtcDaliHoverLeaveActorReadded(void)
 {
-  TestApplication    application;
-  Integration::Scene stage = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1496,8 +1496,8 @@ int UtcDaliHoverLeaveActorReadded(void)
 
 int UtcDaliHoverClippingActor(void)
 {
-  TestApplication    application;
-  Integration::Scene stage = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1564,7 +1564,7 @@ int UtcDaliHoverEventIntegNewHoverEvent(void)
 {
   uint32_t         timestamp = 92858u;
   TouchPoint       tp(1, PointState::STARTED, 34.4f, 123.89f, 5.0f, 7.0f);
-  Dali::HoverEvent hoverEvent = Integration::NewHoverEvent(timestamp, tp);
+  Dali::HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(timestamp, tp);
 
   DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(hoverEvent.GetState(0), PointState::STARTED, TEST_LOCATION);
@@ -1576,8 +1576,8 @@ int UtcDaliHoverEventIntegNewHoverEvent(void)
 
 int UtcDaliHoverActorHide(void)
 {
-  TestApplication    application;
-  Integration::Scene stage = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene stage = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1617,8 +1617,8 @@ int UtcDaliHoverStartConsumerDifferentAtEnd(void)
   // Start a hover in one actor, continue it in another actor
   // End hover in the second actor
   // First actor should still get a hover finished call
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1694,8 +1694,8 @@ int UtcDaliHoverEnsureDifferentConsumerReceivesInterrupted(void)
 {
   // Interrupted event with a different consumer to previous event
 
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1754,8 +1754,8 @@ int UtcDaliHoverEnsureDifferentConsumerReceivesLeave(void)
   // This event is consumed by a different actor
   // The previous consumer's listener should still get called
 
-  TestApplication    application;
-  Integration::Scene scene = application.GetScene();
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1903,7 +1903,7 @@ int UtcDaliHoverEventGetDeviceNamePositive(void)
   actor.ScreenToLocal(localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y);
 
   // Emit a down signal with deviceName
-  Integration::HoverEvent hoverEvent = GenerateSingleHover(PointState::STARTED, screenCoordinates);
+  Dali::Integration::HoverEvent hoverEvent = GenerateSingleHover(PointState::STARTED, screenCoordinates);
   hoverEvent.points[0].SetDeviceName(deviceName);
 
   application.ProcessEvent(hoverEvent);
@@ -1938,7 +1938,7 @@ int UtcDaliHoverEventGetDeviceNameNagative(void)
   actor.ScreenToLocal(localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y);
 
   // Emit a down signal with deviceName
-  Integration::HoverEvent hoverEvent = GenerateSingleHover(PointState::STARTED, screenCoordinates);
+  Dali::Integration::HoverEvent hoverEvent = GenerateSingleHover(PointState::STARTED, screenCoordinates);
 
   application.ProcessEvent(hoverEvent);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);

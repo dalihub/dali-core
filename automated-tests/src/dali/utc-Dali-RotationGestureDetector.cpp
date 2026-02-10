@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ struct GestureReceivedFunctor
 // Functor that removes the gestured actor from stage
 struct UnstageActorFunctor : public GestureReceivedFunctor
 {
-  UnstageActorFunctor(SignalData& data, GestureState& stateToUnstage, Integration::Scene scene)
+  UnstageActorFunctor(SignalData& data, GestureState& stateToUnstage, Dali::Integration::Scene scene)
   : GestureReceivedFunctor(data),
     stateToUnstage(stateToUnstage),
     scene(scene)
@@ -118,14 +118,14 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
     }
   }
 
-  GestureState&      stateToUnstage;
-  Integration::Scene scene;
+  GestureState&            stateToUnstage;
+  Dali::Integration::Scene scene;
 };
 
-Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
+Dali::Integration::TouchEvent GenerateDoubleTouch(PointState::Type stateA, const Vector2& screenPositionA, PointState::Type stateB, const Vector2& screenPositionB, uint32_t time)
 {
-  Integration::TouchEvent touchEvent;
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent;
+  Dali::Integration::Point      point;
   point.SetState(stateA);
   point.SetScreenPosition(screenPositionA);
   point.SetDeviceClass(Device::Class::TOUCH);
@@ -223,15 +223,15 @@ int UtcDaliRotationGestureDetectorNew(void)
 
   detector.Attach(actor);
 
-  Integration::TouchEvent touchEvent(1);
-  Integration::Point      point;
+  Dali::Integration::TouchEvent touchEvent(1);
+  Dali::Integration::Point      point;
   point.SetDeviceId(1);
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(20.0f, 20.0f));
   touchEvent.AddPoint(point);
   application.ProcessEvent(touchEvent);
 
-  Integration::Point point2;
+  Dali::Integration::Point point2;
   point.SetDeviceId(1);
   point.SetState(PointState::DOWN);
   point.SetScreenPosition(Vector2(20.0f, 20.0f));
@@ -1248,10 +1248,10 @@ int UtcDaliRotationGestureSignalReceptionWithGeometryHittest(void)
 
 int UtcDaliRotationGestureHandleEvent(void)
 {
-  TestApplication    application;
-  Integration::Scene scene    = application.GetScene();
-  RenderTaskList     taskList = scene.GetRenderTaskList();
-  Dali::RenderTask   task     = taskList.GetTask(0);
+  TestApplication          application;
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
+  Dali::RenderTask         task     = taskList.GetTask(0);
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1274,8 +1274,8 @@ int UtcDaliRotationGestureHandleEvent(void)
   RotationGestureDetector parentDetector = RotationGestureDetector::New();
   parentDetector.DetectedSignal().Connect(&application, pFunctor);
 
-  Integration::TouchEvent tp = GenerateDoubleTouch(PointState::DOWN, Vector2(2.0f, 20.0f), PointState::DOWN, Vector2(38.0f, 20.0f), 100);
-  Internal::TouchEventPtr touchEventImpl(new Internal::TouchEvent(100));
+  Dali::Integration::TouchEvent tp = GenerateDoubleTouch(PointState::DOWN, Vector2(2.0f, 20.0f), PointState::DOWN, Vector2(38.0f, 20.0f), 100);
+  Internal::TouchEventPtr       touchEventImpl(new Internal::TouchEvent(100));
   touchEventImpl->AddPoint(tp.GetPoint(0));
   touchEventImpl->AddPoint(tp.GetPoint(1));
   touchEventImpl->SetRenderTask(task);

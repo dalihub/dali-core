@@ -73,7 +73,7 @@ TestCustomActor TestCustomActor::NewVariant4()
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant5(Integration::Scene scene)
+TestCustomActor TestCustomActor::NewVariant5(Dali::Integration::Scene scene)
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant5(scene);
   TestCustomActor        custom(*impl); // takes ownership
@@ -83,7 +83,7 @@ TestCustomActor TestCustomActor::NewVariant5(Integration::Scene scene)
   return custom;
 }
 
-TestCustomActor TestCustomActor::NewVariant6(Integration::Scene scene)
+TestCustomActor TestCustomActor::NewVariant6(Dali::Integration::Scene scene)
 {
   Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant6(scene);
   TestCustomActor        custom(*impl); // takes ownership

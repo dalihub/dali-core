@@ -2,7 +2,7 @@
 #define DALI_VECTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,30 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
-#include <algorithm>
-#include <cstddef>
-#include <cstdint> // uint32_t
+#include <utility> // std::move, std::swap
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/type-traits.h>
-#include <dali/public-api/math/math-utils.h>
-
-/**
- * @brief For DALi internal use, asserts are enabled in debug builds.
- *
- * For Application use, asserts can be enabled manually.
- * @SINCE_2_1.23
- */
-#if defined(DEBUG_ENABLED)
-#define ENABLE_VECTOR_ASSERTS
-#endif
-
-#if defined(ENABLE_VECTOR_ASSERTS)
-#define DALI_ASSERT_VECTOR(cond) DALI_ASSERT_ALWAYS(cond)
-#else
-#define DALI_ASSERT_VECTOR(cond)
-#endif
+#include <dali/public-api/common/dali-vector-base.h>
+#include <dali/public-api/common/dali-vector-complex-types.h>
+#include <dali/public-api/common/dali-vector-trivial-types.h>
 
 namespace Dali
 {
@@ -52,377 +34,13 @@ namespace Dali
  */
 
 /**
- * @brief Base class to handle the memory of simple vector.
- *
- * Memory layout is such that it has two std::size_t to hold the count
- * and capacity of the vector. VectorBase::mData is adjusted so that it points to the
- * beginning of the first real item so that iterating the items is quick.
- * @SINCE_1_0.0
- */
-class DALI_CORE_API VectorBase
-{
-public: // Typedefs
-  using SizeType = std::size_t;
-
-  constexpr static uint32_t SHRINK_REQUIRED_RATIO = 4; ///< The ratio of auto shrink to fit calling. @SINCE_2_3.22
-
-protected: // Construction
-  /**
-   * @brief Default constructor. Does not allocate space.
-   * @SINCE_1_0.0
-   */
-  VectorBase();
-
-  /**
-   * @brief Destructor.
-   *
-   * Does not release the space. Derived class needs to call Release.
-   * Not virtual as this should not be called directly and we do not want
-   * a vtable for this class as it would unnecessarily increase size.
-   * @SINCE_1_0.0
-   */
-  ~VectorBase();
-
-public: // API
-  /**
-   * @brief This method is inlined as it's needed frequently for Vector::End() iterator.
-   *
-   * @SINCE_1_0.0
-   * @return The count of elements in this vector
-   */
-  SizeType Count() const
-  {
-    SizeType items = 0u;
-    if(mData)
-    {
-      SizeType* metadata = reinterpret_cast<SizeType*>(mData);
-      items              = *(metadata - 1u);
-    }
-    return items;
-  }
-
-  /**
-   * @brief Gets the count of elements in this vector.
-   * @SINCE_1_0.0
-   * @return The count of elements in this vector
-   */
-  SizeType Size() const
-  {
-    return Count();
-  }
-
-  /**
-   * @brief @ return if the vector is empty.
-   * @SINCE_1_0.0
-   * @return True if the count of elements is empty
-   */
-  bool Empty() const
-  {
-    return Count() == 0u;
-  }
-
-  /**
-   * @brief Gets the capacity of this vector.
-   * @SINCE_1_0.0
-   * @return The capacity of this vector
-   */
-  SizeType Capacity() const;
-
-  /**
-   * @brief Releases the data.
-   *
-   * Does not call destructors on objects held.
-   * @SINCE_1_0.0
-   */
-  void Release();
-
-protected: // for Derived classes
-  /**
-   * @brief Helper to set the count.
-   *
-   * @SINCE_1_0.0
-   * @param[in] count Number of elements in the vector
-   */
-  void SetCount(SizeType count);
-
-  /**
-   * @brief Reserves space in the vector.
-   *
-   * @SINCE_1_0.0
-   * @param[in] count Count of elements to reserve
-   * @param[in] elementSize Size of a single element
-   */
-  void Reserve(SizeType count, SizeType elementSize);
-
-  /**
-   * @brief Copy a vector.
-   *
-   * @SINCE_1_0.0
-   * @param[in] vector Vector to copy from
-   * @param[in] elementSize Size of a single element
-   */
-  void Copy(const VectorBase& vector, SizeType elementSize);
-
-  /**
-   * @brief Swaps the contents of two vectors.
-   *
-   * @SINCE_1_0.0
-   * @param[in] vector Vector to swap with
-   */
-  void Swap(VectorBase& vector);
-
-  /**
-   * @brief Erases an element.
-   *
-   * Does not change capacity.
-   * @SINCE_1_0.0
-   * @param[in] address Address to erase from
-   * @param[in] elementSize Size to erase
-   * @pre Last element cannot be erased as there is nothing to move.
-   */
-  void Erase(char* address, SizeType elementSize);
-
-  /**
-   * @brief Erases a range of elements.
-   *
-   * Does not change capacity.
-   * @SINCE_1_0.0
-   * @param[in] first Address to the first element to be erased
-   * @param[in] last Address to the last element to be erased
-   * @param[in] elementSize Size of one of the elements to be erased
-   * @return Address pointing to the next element of the last one
-   */
-  char* Erase(char* first, char* last, SizeType elementSize);
-
-  /**
-   * @brief Copies a number of bytes from \e source to \e destination.
-   *
-   * \e source and \e destination must not overlap.
-   *
-   * @SINCE_1_0.0
-   * @param[in] destination Pointer to the destination address
-   * @param[in] source Pointer to the source address
-   * @param[in] numberOfBytes The number of bytes to be copied
-   */
-  void CopyMemory(char* destination, const char* source, size_t numberOfBytes);
-
-  /**
-   * @brief Replace the data as new data address.
-   * After replace, release the old data.
-   *
-   * It will be used when we want to keep the mData integrity.
-   *
-   * Does not call destructors on objects held.
-   * @param[in] newData new data address to be replaced
-   */
-  void Replace(void* newData) noexcept;
-
-  /**
-   * @brief Fit the capacity of vector as item counts.
-   * It will be used when we want to remove unused memory.
-   *
-   * @SINCE_2_3.22
-   * @param[in] elementSize Size of a single element
-   */
-  void ShrinkToFit(SizeType elementSize);
-
-private:
-  // not copyable as it does not know the size of elements
-  VectorBase(const VectorBase&)            = delete; ///< Deleted copy constructor. @SINCE_1_0.0
-  VectorBase& operator=(const VectorBase&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
-
-  // not movable as this is handled by deriving classes
-  VectorBase(VectorBase&&)            = delete; ///< Deleted move constructor. @SINCE_1_9.25
-  VectorBase& operator=(VectorBase&&) = delete; ///< Deleted copy assignment operator. @SINCE_1_9.25
-
-protected:     // Data
-  void* mData; ///< Pointer to the data.
-};
-
-/// @cond internal
-/**
- * @brief Vector algorithm variant for trivial types.
- *
- * Trivial types do not need destructor or copy constructor called.
- * @SINCE_1_0.0
- */
-template<bool IsTrivial>
-class VectorAlgorithms : public VectorBase
-{
-protected: // API for deriving classes
-  using SizeType = VectorBase::SizeType;
-
-  /**
-   * @brief Empty constructor.
-   * @SINCE_1_0.0
-   */
-  VectorAlgorithms() = default;
-
-  /**
-   * @brief Empty destructor.
-   * @SINCE_1_0.0
-   */
-  ~VectorAlgorithms() = default;
-
-  /**
-   * @brief Copy vector contents.
-   *
-   * @SINCE_1_0.0
-   * @param[in] rhs VectorBase object to copy from
-   * @param[in] elementSize Size of the content
-   */
-  void Copy(const VectorBase& rhs, SizeType elementSize)
-  {
-    if(rhs.Capacity() > 0u)
-    {
-      VectorBase::Copy(rhs, elementSize);
-    }
-    else
-    {
-      VectorBase::Release();
-    }
-  }
-
-  /**
-   * @brief Reserves space in the vector.
-   *
-   * @SINCE_1_0.0
-   * @param[in] count Count of elements to reserve
-   * @param[in] elementSize Size of a single element
-   */
-  void Reserve(SizeType count, SizeType elementSize)
-  {
-    VectorBase::Reserve(count, elementSize);
-  }
-
-  /**
-   * @brief Resizes the vector. Does not change capacity.
-   *
-   * @SINCE_1_0.0
-   * @param[in] count Count to resize to
-   * @param[in] elementSize Size of a single element
-   */
-  void Resize(SizeType count, SizeType elementSize)
-  {
-    // reserve will copy old elements as well
-    Reserve(count, elementSize);
-  }
-
-  /**
-   * @brief Clears the contents.
-   *
-   * For simple types, nothing to do.
-   * @SINCE_1_0.0
-   */
-  void Clear()
-  {
-    if(mData)
-    {
-      VectorBase::SetCount(0u);
-    }
-  }
-
-  /**
-   * @brief Releases the vector.
-   * @SINCE_1_0.0
-   */
-  void Release()
-  {
-    VectorBase::Release();
-  }
-
-  /**
-   * @brief Erases an element. Does not change capacity.
-   *
-   * @SINCE_1_0.0
-   * @param[in] address Address to erase from
-   * @param[in] elementSize Size to erase
-   */
-  void Erase(uint8_t* address, SizeType elementSize)
-  {
-    VectorBase::Erase(reinterpret_cast<char*>(address), elementSize);
-  }
-
-  /**
-   * @brief Erases a range of elements. Does not change capacity.
-   *
-   * @SINCE_1_0.0
-   * @param[in] first Address to the first element to be erased
-   * @param[in] last Address to the last element to be erased
-   * @param[in] elementSize Size of one of the elements to be erased
-   * @return Address pointing to the next element of the last one
-   */
-  uint8_t* Erase(uint8_t* first, uint8_t* last, SizeType elementSize)
-  {
-    return reinterpret_cast<uint8_t*>(VectorBase::Erase(reinterpret_cast<char*>(first), reinterpret_cast<char*>(last), elementSize));
-  }
-
-  /**
-   * @brief Inserts the given elements into the vector.
-   *
-   * @SINCE_1_0.0
-   * @param[in] at Address where to insert the elements into the vector
-   * @param[in] from Address to the first element to be inserted
-   * @param[in] to Address to the last element to be inserted
-   * @param[in] elementSize Size of one of the elements to be inserted
-   */
-  void Insert(uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize)
-  {
-    const SizeType size     = to - from;
-    const SizeType count    = Count();
-    const SizeType newCount = count + size / elementSize;
-
-    if(newCount > Capacity())
-    {
-      // Calculate the at offset as the pointer is invalid after the Reserve() call.
-      std::size_t offset = at - reinterpret_cast<uint8_t*>(mData);
-
-      // need more space
-      Reserve(NextPowerOfTwo(static_cast<uint32_t>(newCount)), elementSize); // reserve enough space to store at least the next power of two elements of the new required size.
-
-      // Set the new at pointer.
-      at = reinterpret_cast<uint8_t*>(mData) + offset;
-    }
-    // set new count first as otherwise the debug assert will hit us
-    SetCount(newCount);
-
-    // Move current items to a new position inside the vector.
-    CopyMemory(reinterpret_cast<char*>(at + size),
-               reinterpret_cast<const char*>(at),
-               (reinterpret_cast<uint8_t*>(mData) + count * elementSize) - at);
-
-    // Copy the given items.
-    CopyMemory(reinterpret_cast<char*>(at), reinterpret_cast<const char*>(from), size);
-  }
-};
-/// @endcond
-
-/// @cond internal
-/**
- * @brief Vector algorithm variant for complex types.
- *
- * Not yet supported so will lead to compile error
- * as constructor and destructor are private.
- * TODO add support for this variant.
- * @SINCE_1_0.0
- */
-template<>
-class VectorAlgorithms<false> : public VectorBase
-{
-private:
-  VectorAlgorithms()  = default;
-  ~VectorAlgorithms() = default;
-};
-/// @endcond
-
-/**
  * @brief Vector class with minimum space allocation when it's empty.
  *
  * @SINCE_1_0.0
  * @param type The type of the data that the vector holds
  */
 template<class T, bool IsTrivialType = TypeTraits<T>::IS_TRIVIAL_TYPE == true>
-class Vector : public VectorAlgorithms<IsTrivialType>
+class Vector : public VectorAlgorithms<IsTrivialType, T>
 {
 public: // API
   /**
@@ -451,6 +69,7 @@ public: // API
 
   /**
    * @brief Create vector with count, without initialize value.
+   * @note Only able for trivial types.
    *
    * @SINCE_2_3.22
    * @param[in] count The count of vector.
@@ -504,7 +123,7 @@ public: // API
   {
     if(this != &vector)
     {
-      VectorAlgorithms<BaseType>::Copy(vector, sizeof(ItemType));
+      VectorAlgorithms<BaseType, ItemType>::Copy(vector, sizeof(ItemType));
     }
     return *this;
   }
@@ -519,7 +138,7 @@ public: // API
   {
     if(this != &vector)
     {
-      VectorAlgorithms<BaseType>::Replace(vector.mData);
+      VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData);
       vector.mData = nullptr;
     }
     return *this;
@@ -617,9 +236,17 @@ public: // API
       // need more space
       Reserve(newCount << 1u); // reserve double the current count
     }
-    // set new count first as otherwise the debug assert will hit us
-    VectorBase::SetCount(newCount);
-    operator[](count) = element;
+
+    if constexpr(IsTrivialType)
+    {
+      // set new count first as otherwise the debug assert will hit us
+      VectorBase::SetCount(newCount);
+      operator[](count) = element;
+    }
+    else
+    {
+      Insert(End(), element);
+    }
   }
 
   /**
@@ -639,12 +266,14 @@ public: // API
   void Insert(Iterator at, const ItemType& element)
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
+
     const SizeType size    = sizeof(ItemType);
     uint8_t*       address = const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(&element));
-    VectorAlgorithms<BaseType>::Insert(reinterpret_cast<uint8_t*>(at),
-                                       address,
-                                       address + size,
-                                       size);
+
+    VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
+                                                 address,
+                                                 address + size,
+                                                 size);
   }
 
   /**
@@ -676,10 +305,10 @@ public: // API
       return;
     }
 
-    VectorAlgorithms<BaseType>::Insert(reinterpret_cast<uint8_t*>(at),
-                                       reinterpret_cast<uint8_t*>(from),
-                                       reinterpret_cast<uint8_t*>(to),
-                                       sizeof(ItemType));
+    VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
+                                                 reinterpret_cast<uint8_t*>(from),
+                                                 reinterpret_cast<uint8_t*>(to),
+                                                 sizeof(ItemType));
   }
 
   /**
@@ -691,7 +320,7 @@ public: // API
    */
   void Reserve(SizeType count)
   {
-    VectorAlgorithms<BaseType>::Reserve(count, sizeof(ItemType));
+    VectorAlgorithms<BaseType, ItemType>::Reserve(count, sizeof(ItemType));
   }
 
   /**
@@ -710,11 +339,14 @@ public: // API
    * @brief Resizes the vector without initializing the data.
    *
    * Can be used as a data container for reading whole file content.
+   * @note Only able for trivial types.
+   *
    * @SINCE_1_9.27
    * @param[in] count Count to resize to
    */
   void ResizeUninitialized(SizeType count)
   {
+    static_assert(IsTrivialType && "Should be called Dali::Vector::ResizeUninitialized() only for trivial types");
     Reserve(count);
     VectorBase::SetCount(count);
   }
@@ -762,7 +394,7 @@ public: // API
     DALI_ASSERT_VECTOR((iterator < End()) && (iterator >= Begin()) && "Iterator not inside vector");
     if(iterator < (End() - 1u))
     {
-      VectorAlgorithms<BaseType>::Erase(reinterpret_cast<uint8_t*>(iterator), sizeof(ItemType));
+      VectorAlgorithms<BaseType, ItemType>::Erase(reinterpret_cast<uint8_t*>(iterator), sizeof(ItemType));
     }
     else
     {
@@ -795,7 +427,18 @@ public: // API
 
     Iterator nextElement;
 
-    if(last == End())
+    bool trivialCase = false;
+
+    if constexpr(IsTrivialType)
+    {
+      if(last == End())
+      {
+        trivialCase = true;
+      }
+    }
+
+    // early-out for trival cases.
+    if(trivialCase)
     {
       // Erase up to the end.
       VectorBase::SetCount(VectorBase::Count() - (last - first));
@@ -803,9 +446,9 @@ public: // API
     }
     else
     {
-      nextElement = reinterpret_cast<Iterator>(VectorAlgorithms<BaseType>::Erase(reinterpret_cast<uint8_t*>(first),
-                                                                                 reinterpret_cast<uint8_t*>(last),
-                                                                                 sizeof(ItemType)));
+      nextElement = reinterpret_cast<Iterator>(VectorAlgorithms<BaseType, ItemType>::Erase(reinterpret_cast<uint8_t*>(first),
+                                                                                           reinterpret_cast<uint8_t*>(last),
+                                                                                           sizeof(ItemType)));
     }
 
     return nextElement;
@@ -832,7 +475,15 @@ public: // API
     {
       std::swap(*iterator, *last);
     }
-    VectorBase::SetCount(VectorBase::Count() - 1u);
+
+    if constexpr(IsTrivialType)
+    {
+      VectorBase::SetCount(VectorBase::Count() - 1u);
+    }
+    else
+    {
+      Erase(last, End());
+    }
   }
 
   /**
@@ -852,7 +503,7 @@ public: // API
    */
   void Clear()
   {
-    VectorAlgorithms<BaseType>::Clear();
+    VectorAlgorithms<BaseType, ItemType>::Clear(sizeof(ItemType));
   }
 
   /**
@@ -861,7 +512,7 @@ public: // API
    */
   void Release()
   {
-    VectorAlgorithms<BaseType>::Release();
+    VectorAlgorithms<BaseType, ItemType>::Release(sizeof(ItemType));
   }
 
   /**
@@ -890,38 +541,6 @@ public: // API
     }
   }
 };
-
-/**
- * @brief Erases all elements that compare equal to value from the vector.
- *
- * @SINCE_1_9.33
- * @param[in] vector The vector
- * @param[in] value The value to be removed.
- */
-template<class T, class U>
-inline void Erase(Dali::Vector<T>& vector, const U& value)
-{
-  auto begin = vector.Begin();
-  auto end   = vector.End();
-
-  vector.Erase(std::remove(begin, end, value), end);
-}
-
-/**
- * @brief Erases all elements that satisfy the predicate from the vector.
- *
- * @SINCE_1_9.33
- * @param[in] vector The vector
- * @param[in] predicate The predicate
- */
-template<class T, class Predicate>
-inline void EraseIf(Dali::Vector<T>& vector, Predicate predicate)
-{
-  auto begin = vector.Begin();
-  auto end   = vector.End();
-
-  vector.Erase(std::remove_if(begin, end, predicate), end);
-}
 
 /**
  * @}

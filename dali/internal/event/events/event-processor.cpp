@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,7 @@ void EventProcessor::ProcessEvents()
           DALI_ASSERT_ALWAYS(!touchEvent.points.empty() && "Empty TouchEvent sent from Integration\n");
 
           mActorTouchPoints.clear();
-          for(uint i = 0; i < touchEvent.GetPointCount(); i++)
+          for(uint32_t i = 0; i < touchEvent.GetPointCount(); i++)
           {
             // Perform hittest only for downloads and save points. This is to remember the actor that was first hit for each point.
             // So, even if you leave the actor or move and climb on top of another actor, you can only proceed with the touch event process for the actor that was first down.
