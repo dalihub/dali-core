@@ -22,6 +22,7 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-utility.h> ///< Dali::Min , Dali::Max
 #include <dali/public-api/math/math-utils.h>
 
 namespace Dali
