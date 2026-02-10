@@ -30,6 +30,8 @@ namespace Dali
  * @{
  */
 
+class StringView;
+
 /**
  * A wrapper around the standard string object, to ensure future
  * binary compatibility.
@@ -61,7 +63,15 @@ public:
    * @SINCE_2_5.15
    * @param[in] str A null-terminated string
    */
-  explicit String(const char* str);
+  String(const char* str);
+
+  /**
+   * @brief Constructor from a StringView.
+   *
+   * @SINCE_2_5.14
+   * @param[in] view The string view to copy from
+   */
+  String(const StringView& view);
 
   /**
    * @brief Destructor.
@@ -86,6 +96,15 @@ public:
   String& operator=(const String& other);
 
   /**
+   * @brief Assignment operator.
+   *
+   * @SINCE_2_5.14
+   * @param[in] other The string to copy
+   * @return A reference to this string
+   */
+  String& operator=(const char* other);
+
+  /**
    * @brief Move constructor
    *
    * @SINCE_2_5.15
@@ -101,6 +120,15 @@ public:
    * @return A reference to this string
    */
   String& operator=(String&& other) noexcept;
+
+  /**
+   * @brief Assignment operator from a StringView.
+   *
+   * @SINCE_2_5.14
+   * @param[in] view The string view to copy from
+   * @return A reference to this string
+   */
+  String& operator=(const StringView& view);
 
   /**
    * @brief Get the number of bytes in the string.
@@ -173,6 +201,15 @@ public:
   bool operator==(const String& other) const;
 
   /**
+   * @brief Comparison equality operator.
+   *
+   * @SINCE_2_5.14
+   * @param[in] other The string to compare
+   * @return True if both strings are equal
+   */
+  bool operator==(const char* other) const;
+
+  /**
    * @brief Comparison inequality operator.
    *
    * @SINCE_2_5.15
@@ -216,6 +253,34 @@ public:
    * @return True if this is lexically greater than or equal to the other string
    */
   bool operator>=(const String& other) const;
+
+  /**
+   * @brief Concatenation operator.
+   *
+   * @note Use of friend enables infix notation on free function, whilst retaining
+   * documentation inside the class scope.
+   * @SINCE_2_5.14
+   * @param[in] lhs The left operand string
+   * @param[in] rhs The right operand string
+   * @return A new String containing the concatenation of lhs and rhs
+   */
+  friend String operator+(const String& lhs, const String& rhs);
+
+public: // Not intended for Application Developers
+  /**
+   * @cond internal
+   * @brief Get the raw storage pointer (internal use only).
+   *
+   * This method provides access to the internal storage for internal
+   * use within Dali
+   *
+   * @return Pointer to the internal storage
+   */
+  DALI_INTERNAL void* GetRawStorage()
+  {
+    return mStorage;
+  }
+  /// @endcond
 
 private:
   static constexpr size_t StorageSize  = 32; ///< Opaque storage sized for std::string

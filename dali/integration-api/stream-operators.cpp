@@ -1,5 +1,3 @@
-#pragma once
-
 /*
  * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
@@ -16,12 +14,15 @@
  * limitations under the License.
  */
 
-#include <dali/public-api/common/dali-string.h>
-#include <iostream>
+#include <dali/integration-api/stream-operators.h>
 
 namespace Dali
 {
-class String;
 
-std::ostream& operator<<(std::ostream& outStream, const String& string);
+std::ostream& operator<<(std::ostream& outStream, const String& string)
+{
+  outStream << string.CStr();
+  return outStream;
+}
+
 } //namespace Dali

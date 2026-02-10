@@ -92,6 +92,7 @@ SET(TC_SOURCES
         utc-Dali-SpringData.cpp
         utc-Dali-Stage.cpp
         utc-Dali-String.cpp
+        utc-Dali-String-Comprehensive.cpp
         utc-Dali-TapGestureDetector.cpp
         utc-Dali-TapGestureRecognizer.cpp
         utc-Dali-Texture.cpp

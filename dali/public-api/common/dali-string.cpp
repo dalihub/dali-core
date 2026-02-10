@@ -15,6 +15,7 @@
  */
 
 // CLASS INCLUDE
+#include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
 
 // EXTERNAL INCLUDES
@@ -63,6 +64,19 @@ String::String(const char* str)
   }
 }
 
+String::String(const StringView& view)
+{
+  const char* data = view.Data();
+  if(data && view.Size() > 0)
+  {
+    new(mStorage) std::string(data, view.Size());
+  }
+  else
+  {
+    new(mStorage) std::string();
+  }
+}
+
 String::~String()
 {
   GetString(mStorage).~basic_string();
@@ -87,6 +101,33 @@ String::String(String&& other) noexcept
 String& String::operator=(String&& other) noexcept
 {
   GetString(mStorage) = std::move(GetString(other.mStorage));
+  return *this;
+}
+
+String& String::operator=(const StringView& view)
+{
+  const char* data = view.Data();
+  if(data)
+  {
+    GetString(mStorage).assign(data, view.Size());
+  }
+  else
+  {
+    GetString(mStorage).clear();
+  }
+  return *this;
+}
+
+String& String::operator=(const char* other)
+{
+  if(other && other[0] != '\0')
+  {
+    GetString(mStorage).assign(other);
+  }
+  else
+  {
+    GetString(mStorage).clear();
+  }
   return *this;
 }
 
@@ -134,6 +175,11 @@ bool String::operator==(const String& rhs) const
   return GetString(mStorage) == GetString(rhs.mStorage);
 }
 
+bool String::operator==(const char* rhs) const
+{
+  return (rhs && GetString(mStorage) == rhs) || (!rhs && Empty());
+}
+
 bool String::operator!=(const String& rhs) const
 {
   return GetString(mStorage) != GetString(rhs.mStorage);
@@ -157,6 +203,13 @@ bool String::operator<=(const String& rhs) const
 bool String::operator>=(const String& rhs) const
 {
   return GetString(mStorage) >= GetString(rhs.mStorage);
+}
+
+String operator+(const String& lhs, const String& rhs)
+{
+  String result(lhs);
+  result += rhs;
+  return result;
 }
 
 } // namespace Dali
