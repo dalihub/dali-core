@@ -427,14 +427,14 @@ void Texture::PrintTotalMemory()
     auto url = iter->mUrl;
     if(url.length() > 100)
     {
-      url = url.substr(0, 97) + "...";
+      url = std::string("...") + url.substr(url.length() - 97, 97);
     }
-    DALI_LOG_ERROR_NOFN("| %-100s | %4d x %4d |%8.2f \n", url.c_str(), iter->mWidth, iter->mHeight, static_cast<double>(iter->mMemorySize) / (1024.0 * 1024.0));
+    DALI_LOG_ERROR_NOFN("| %100s | %4d x %4d |%8.3f \n", url.c_str(), iter->mWidth, iter->mHeight, static_cast<double>(iter->mMemorySize) / (1024.0 * 1024.0));
   }
 
   DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
   DALI_LOG_ERROR_NOFN(" >> textureCount    : %8d                 \n", gTextureMemoryInfoQueue.size());
-  DALI_LOG_ERROR_NOFN(" >> Total Memory(MB): %8.2f            \n", static_cast<double>(gTotalTextureMemory) / (1024.0 * 1024.0));
+  DALI_LOG_ERROR_NOFN(" >> Total Memory(MB): %8.3f            \n", static_cast<double>(gTotalTextureMemory) / (1024.0 * 1024.0));
   DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
   DALI_LOG_ERROR_NOFN("\n\n");
 }
