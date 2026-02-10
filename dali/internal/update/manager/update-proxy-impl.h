@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_UPDATE_PROXY_IMPL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/common/const-string.h>
 #include <dali/internal/update/manager/transform-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/list-wrapper.h>
@@ -215,6 +216,16 @@ public:
    * @copydoc Dali::UpdateProxy::GetIgnored()
    */
   bool GetIgnored(uint32_t id, bool& ignored) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::GetCustomProperty()
+   */
+  bool GetCustomProperty(uint32_t id, ConstString propertyName, Property::Value& value) const;
+
+  /**
+   * @copydoc Dali::UpdateProxy::BakeCustomProperty()
+   */
+  bool BakeCustomProperty(uint32_t id, ConstString propertyName, const Property::Value& value);
 
 private:
   /**

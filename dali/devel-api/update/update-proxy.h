@@ -2,7 +2,7 @@
 #define DALI_UPDATE_PROXY_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
@@ -253,6 +254,25 @@ public:
    * @return Whether the method call was successful or not.
    */
   bool GetIgnored(uint32_t id, bool& ignored) const;
+
+  /**
+   * @brief Gets an Actor's custom animatable property value from the Frame callback function.
+   * @param[in]  id           The Actor ID
+   * @param[in]  propertyName The name of custom property.
+   * @param[out] value        Get to the Actor's current custom property value.
+   * @return Whether the method call was successful or not.
+   */
+  bool GetCustomProperty(uint32_t id, const std::string& propertyName, Property::Value& value) const;
+
+  /**
+   * @brief Bake an Actor's custom animatable property value from the Frame callback function.
+   *        The type of propety and value should be matched.
+   * @param[in]  id           The Actor ID
+   * @param[in]  propertyName The name of custom property.
+   * @param[in] value         Set to the Actor's current custom property value, if Actor ID and Property is valid.
+   * @return Whether the method call was successful or not.
+   */
+  bool BakeCustomProperty(uint32_t id, const std::string& propertyName, const Property::Value& value);
 
 public: // Not intended for application developers
   /// @cond internal

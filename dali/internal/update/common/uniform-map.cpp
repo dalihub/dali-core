@@ -65,7 +65,7 @@ void UniformMap::Remove(ConstString uniformName)
   }
 }
 
-const PropertyInputImpl* UniformMap::Find(ConstString uniformName)
+const PropertyInputImpl* UniformMap::Find(ConstString uniformName) const
 {
   auto iter = std::find_if(mUniformMaps.Begin(),
                            mUniformMaps.End(),

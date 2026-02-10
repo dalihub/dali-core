@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ public:
    * Find a property given the uniform name.
    * @return The address of the property if it's in the map, or NULL otherwise.
    */
-  const PropertyInputImpl* Find(ConstString uniformName);
+  const PropertyInputImpl* Find(ConstString uniformName) const;
 
   /**
    * Get the count of uniforms in the map

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -387,6 +387,150 @@ bool UpdateProxy::GetIgnored(uint32_t id, bool& ignored) const
   {
     ignored = node->IsIgnored();
     success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetCustomProperty(uint32_t id, ConstString propertyName, Property::Value& value) const
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    const auto& uniformMap = node->GetUniformMap();
+
+    const PropertyInputImpl* propertyInputImpl = uniformMap.Find(propertyName);
+    if(propertyInputImpl)
+    {
+      auto propertyValue = propertyInputImpl->GetPropertyValue(mCurrentBufferIndex);
+      if(propertyValue.GetType() != Property::Type::NONE)
+      {
+        value   = std::move(propertyValue);
+        success = true;
+      }
+    }
+  }
+  return success;
+}
+
+bool UpdateProxy::BakeCustomProperty(uint32_t id, ConstString propertyName, const Property::Value& value)
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    const auto& uniformMap = node->GetUniformMap();
+
+    const PropertyInputImpl* propertyInputImpl = uniformMap.Find(propertyName);
+    if(propertyInputImpl)
+    {
+      SceneGraph::PropertyBase* propertyBase = dynamic_cast<SceneGraph::PropertyBase*>(const_cast<PropertyInputImpl*>(propertyInputImpl));
+      if(propertyBase)
+      {
+        Property::Value convertedValue = value;
+        if(DALI_UNLIKELY(value.GetType() != propertyBase->GetType()))
+        {
+          if(!convertedValue.ConvertType(propertyBase->GetType()))
+          {
+            return false;
+          }
+        }
+        switch(propertyBase->GetType())
+        {
+          case Property::BOOLEAN:
+          {
+            if(SceneGraph::AnimatableProperty<bool>* property = dynamic_cast<SceneGraph::AnimatableProperty<bool>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<bool>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::INTEGER:
+          {
+            if(SceneGraph::AnimatableProperty<int32_t>* property = dynamic_cast<SceneGraph::AnimatableProperty<int32_t>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<int32_t>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::FLOAT:
+          {
+            if(SceneGraph::AnimatableProperty<float>* property = dynamic_cast<SceneGraph::AnimatableProperty<float>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<float>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::VECTOR2:
+          {
+            if(SceneGraph::AnimatableProperty<Vector2>* property = dynamic_cast<SceneGraph::AnimatableProperty<Vector2>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<Vector2>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::VECTOR3:
+          {
+            if(SceneGraph::AnimatableProperty<Vector3>* property = dynamic_cast<SceneGraph::AnimatableProperty<Vector3>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<Vector3>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::VECTOR4:
+          {
+            if(SceneGraph::AnimatableProperty<Vector4>* property = dynamic_cast<SceneGraph::AnimatableProperty<Vector4>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<Vector4>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::ROTATION:
+          {
+            if(SceneGraph::AnimatableProperty<Quaternion>* property = dynamic_cast<SceneGraph::AnimatableProperty<Quaternion>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<Quaternion>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::MATRIX:
+          {
+            if(SceneGraph::AnimatableProperty<Matrix>* property = dynamic_cast<SceneGraph::AnimatableProperty<Matrix>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<Matrix>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::MATRIX3:
+          {
+            if(SceneGraph::AnimatableProperty<Matrix3>* property = dynamic_cast<SceneGraph::AnimatableProperty<Matrix3>*>(propertyBase))
+            {
+              property->Bake(mCurrentBufferIndex, convertedValue.Get<Matrix3>());
+              success = true;
+            }
+            break;
+          }
+          default:
+            break;
+        }
+      }
+    }
   }
   return success;
 }

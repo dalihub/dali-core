@@ -31,6 +31,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
@@ -372,6 +373,66 @@ public:
   }
 
   /**
+   * Get the property value.
+   * @param[in] bufferIndex The buffer to read from.
+   */
+  Property::Value GetPropertyValue(BufferIndex bufferIndex) const
+  {
+    switch(GetType())
+    {
+      case Property::BOOLEAN:
+      {
+        return Property::Value(GetBoolean(bufferIndex));
+      }
+
+      case Property::INTEGER:
+      {
+        return Property::Value(GetInteger(bufferIndex));
+      }
+
+      case Property::FLOAT:
+      {
+        return Property::Value(GetFloat(bufferIndex));
+      }
+
+      case Property::VECTOR2:
+      {
+        return Property::Value(GetVector2(bufferIndex));
+      }
+
+      case Property::VECTOR3:
+      {
+        return Property::Value(GetVector3(bufferIndex));
+      }
+
+      case Property::VECTOR4:
+      {
+        return Property::Value(GetVector4(bufferIndex));
+      }
+
+      case Property::ROTATION:
+      {
+        return Property::Value(GetQuaternion(bufferIndex));
+      }
+
+      case Property::MATRIX:
+      {
+        return Property::Value(GetMatrix(bufferIndex));
+      }
+
+      case Property::MATRIX3:
+      {
+        return Property::Value(GetMatrix3(bufferIndex));
+      }
+
+      default:
+      {
+        return Property::Value();
+      }
+    }
+  }
+
+  /**
    * Print the property value using a stream.
    * @param[in] debugStream The output stream.
    * @param[in] bufferIndex The buffer to read from.
@@ -382,56 +443,16 @@ public:
     switch(GetType())
     {
       case Property::BOOLEAN:
-      {
-        debugStream << GetBoolean(bufferIndex);
-        break;
-      }
-
       case Property::INTEGER:
-      {
-        debugStream << GetInteger(bufferIndex);
-        break;
-      }
-
       case Property::FLOAT:
-      {
-        debugStream << GetFloat(bufferIndex);
-        break;
-      }
-
       case Property::VECTOR2:
-      {
-        debugStream << GetVector2(bufferIndex);
-        break;
-      }
-
       case Property::VECTOR3:
-      {
-        debugStream << GetVector3(bufferIndex);
-        break;
-      }
-
       case Property::VECTOR4:
-      {
-        debugStream << GetVector4(bufferIndex);
-        break;
-      }
-
       case Property::ROTATION:
-      {
-        debugStream << GetQuaternion(bufferIndex);
-        break;
-      }
-
       case Property::MATRIX:
-      {
-        debugStream << GetMatrix(bufferIndex);
-        break;
-      }
-
       case Property::MATRIX3:
       {
-        debugStream << GetMatrix3(bufferIndex);
+        debugStream << GetPropertyValue(bufferIndex);
         break;
       }
 
