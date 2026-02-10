@@ -354,7 +354,7 @@ int UtcDaliRendererDefaultProperties(void)
 int UtcDaliRendererSetGetGeometry(void)
 {
   TestApplication application;
-  tet_infoline("Test SetGeometry, GetGeometry");
+  tet_infoline("Test SetGeometry, GetGeometry, RemoveGeometry");
 
   Geometry geometry1 = CreateQuadGeometry();
   Geometry geometry2 = CreateQuadGeometry();
@@ -377,13 +377,21 @@ int UtcDaliRendererSetGetGeometry(void)
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetGeometry(), geometry2, TEST_LOCATION);
 
+  // Remove geometry2 from the renderer
+  renderer.RemoveGeometry();
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(!!renderer.GetGeometry(), false, TEST_LOCATION);
+
   END_TEST;
 }
 
 int UtcDaliRendererSetGetShader(void)
 {
   TestApplication application;
-  tet_infoline("Test SetShader, GetShader");
+  tet_infoline("Test SetShader, GetShader, RemoveShader");
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableCullFaceCallTrace(true);
@@ -401,9 +409,18 @@ int UtcDaliRendererSetGetShader(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
   application.GetScene().Add(actor);
 
-  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+
+  drawTrace.Enable(true);
+  drawTrace.Reset();
+
   application.SendNotification();
   application.Render(0);
+
+  // Something rendered!
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
 
   // Expect that the first shaders's fade color property is accessed
   Vector4 actualValue(Vector4::ZERO);
@@ -418,11 +435,27 @@ int UtcDaliRendererSetGetShader(void)
   application.SendNotification();
   application.Render(0);
 
+  // Something rendered!
+  DALI_TEST_CHECK(drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
   // Expect that the second shader's fade color property is accessed
   DALI_TEST_CHECK(gl.GetUniformValue<Vector4>("uFadeColor", actualValue));
   DALI_TEST_EQUALS(actualValue, Color::GREEN, TEST_LOCATION);
 
   DALI_TEST_EQUALS(renderer.GetShader(), shader2, TEST_LOCATION);
+
+  // remove the second shader from the renderer
+  renderer.RemoveShader();
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  // Nothing rendered!
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
 
   END_TEST;
 }
@@ -564,6 +597,50 @@ int UtcDaliRendererSetGetGeometryAndShader02(void)
   application.Render(0);
 
   DALI_TEST_CHECK(drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Remove shader after rendering.
+  renderer.RemoveShader();
+  DALI_TEST_EQUALS(renderer.GetGeometry(), geometry, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Remove shader again - for line coverage.
+  renderer.RemoveShader();
+  DALI_TEST_EQUALS(renderer.GetGeometry(), geometry, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Remove geometry.
+  renderer.RemoveGeometry();
+  DALI_TEST_EQUALS(!!renderer.GetGeometry(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
+  drawTrace.Reset();
+
+  // Remove geometry again - for line coverage.
+  renderer.RemoveGeometry();
+  DALI_TEST_EQUALS(!!renderer.GetGeometry(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(!!renderer.GetShader(), false, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK(!drawTrace.FindMethod("DrawElements"));
 
   END_TEST;
 }
@@ -4444,6 +4521,15 @@ int UtcDaliRendererCheckTextureBindingP(void)
   application.Render();
 
   DALI_TEST_CHECK(cmdBufCallstack.FindMethod("BindTextures"));
+  cmdBufCallstack.Reset();
+
+  renderer.RemoveTextures();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(!cmdBufCallstack.FindMethod("BindTextures"));
+
   END_TEST;
 }
 

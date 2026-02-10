@@ -223,7 +223,7 @@ void Renderer::SetGeometry(Geometry& geometry)
   mGeometry = &geometry;
 
   const Render::Geometry* geometrySceneObject = geometry.GetRenderObject();
-  SetGeometryMessage(GetEventThreadServices(), GetRendererSceneObject(), *geometrySceneObject);
+  SceneGraph::SetGeometryMessage(GetEventThreadServices(), GetRendererSceneObject(), geometrySceneObject);
 }
 
 GeometryPtr Renderer::GetGeometry() const
@@ -231,11 +231,21 @@ GeometryPtr Renderer::GetGeometry() const
   return mGeometry;
 }
 
+void Renderer::RemoveGeometry()
+{
+  if(mGeometry)
+  {
+    mGeometry = nullptr;
+    SceneGraph::SetGeometryMessage(GetEventThreadServices(), GetRendererSceneObject(), nullptr);
+  }
+}
+
 void Renderer::SetTextures(TextureSet& textureSet)
 {
-  mTextureSet                                         = &textureSet;
+  mTextureSet = &textureSet;
+
   const SceneGraph::TextureSet* textureSetSceneObject = textureSet.GetTextureSetSceneObject();
-  SetTexturesMessage(GetEventThreadServices(), GetRendererSceneObject(), *textureSetSceneObject);
+  SceneGraph::SetTexturesMessage(GetEventThreadServices(), GetRendererSceneObject(), textureSetSceneObject);
 }
 
 TextureSetPtr Renderer::GetTextures() const
@@ -243,16 +253,35 @@ TextureSetPtr Renderer::GetTextures() const
   return mTextureSet;
 }
 
+void Renderer::RemoveTextures()
+{
+  if(mTextureSet)
+  {
+    mTextureSet = nullptr;
+    SceneGraph::SetTexturesMessage(GetEventThreadServices(), GetRendererSceneObject(), nullptr);
+  }
+}
+
 void Renderer::SetShader(Shader& shader)
 {
-  mShader                                    = &shader;
+  mShader = &shader;
+
   const SceneGraph::Shader& sceneGraphShader = shader.GetShaderSceneObject();
-  SceneGraph::SetShaderMessage(GetEventThreadServices(), GetRendererSceneObject(), sceneGraphShader);
+  SceneGraph::SetShaderMessage(GetEventThreadServices(), GetRendererSceneObject(), &sceneGraphShader);
 }
 
 ShaderPtr Renderer::GetShader() const
 {
   return mShader;
+}
+
+void Renderer::RemoveShader()
+{
+  if(mShader)
+  {
+    mShader = nullptr;
+    SceneGraph::SetShaderMessage(GetEventThreadServices(), GetRendererSceneObject(), nullptr);
+  }
 }
 
 void Renderer::SetDepthIndex(int32_t depthIndex)

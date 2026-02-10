@@ -31,7 +31,7 @@ namespace Dali::Internal::SceneGraph
 class TextureSet;
 
 /// Messages
-inline void SetTexturesMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const TextureSet& textureSet)
+inline void SetTexturesMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const TextureSet* textureSet)
 {
   using LocalType = MessageValue1<Renderer, TextureSet*>;
 
@@ -39,10 +39,10 @@ inline void SetTexturesMessage(EventThreadServices& eventThreadServices, const R
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&renderer, &Renderer::SetTextures, const_cast<TextureSet*>(&textureSet));
+  new(slot) LocalType(&renderer, &Renderer::SetTextures, const_cast<TextureSet*>(textureSet));
 }
 
-inline void SetGeometryMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Render::Geometry& geometry)
+inline void SetGeometryMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Render::Geometry* geometry)
 {
   using LocalType = MessageValue1<Renderer, Render::Geometry*>;
 
@@ -50,10 +50,10 @@ inline void SetGeometryMessage(EventThreadServices& eventThreadServices, const R
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&renderer, &Renderer::SetGeometry, const_cast<Render::Geometry*>(&geometry));
+  new(slot) LocalType(&renderer, &Renderer::SetGeometry, const_cast<Render::Geometry*>(geometry));
 }
 
-inline void SetShaderMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Shader& shader)
+inline void SetShaderMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, const Shader* shader)
 {
   using LocalType = MessageValue1<Renderer, Shader*>;
 
@@ -61,7 +61,7 @@ inline void SetShaderMessage(EventThreadServices& eventThreadServices, const Ren
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&renderer, &Renderer::SetShader, const_cast<Shader*>(&shader));
+  new(slot) LocalType(&renderer, &Renderer::SetShader, const_cast<Shader*>(shader));
 }
 
 inline void SetDepthIndexMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, int depthIndex)
