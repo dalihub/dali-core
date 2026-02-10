@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,11 @@ Geometry Renderer::GetGeometry() const
   return Dali::Geometry(GetImplementation(*this).GetGeometry().Get());
 }
 
+void Renderer::RemoveGeometry()
+{
+  GetImplementation(*this).RemoveGeometry();
+}
+
 void Renderer::SetTextures(TextureSet& textureSet)
 {
   DALI_ASSERT_ALWAYS(textureSet && "TextureSet handle not initialized");
@@ -83,10 +88,25 @@ TextureSet Renderer::GetTextures() const
   return Dali::TextureSet(GetImplementation(*this).GetTextures().Get());
 }
 
+void Renderer::RemoveTextures()
+{
+  GetImplementation(*this).RemoveTextures();
+}
+
 void Renderer::SetShader(Shader& shader)
 {
   DALI_ASSERT_ALWAYS(shader && "Shader handle not initialized");
   GetImplementation(*this).SetShader(GetImplementation(shader));
+}
+
+Shader Renderer::GetShader() const
+{
+  return Dali::Shader(GetImplementation(*this).GetShader().Get());
+}
+
+void Renderer::RemoveShader()
+{
+  GetImplementation(*this).RemoveShader();
 }
 
 void Renderer::SetRenderCallback(RenderCallback* callback)
@@ -97,11 +117,6 @@ void Renderer::SetRenderCallback(RenderCallback* callback)
 void Renderer::TerminateRenderCallback(bool invokeCallback)
 {
   GetImplementation(*this).TerminateRenderCallback(invokeCallback);
-}
-
-Shader Renderer::GetShader() const
-{
-  return Dali::Shader(GetImplementation(*this).GetShader().Get());
 }
 
 Renderer::Renderer(Internal::Renderer* pointer)

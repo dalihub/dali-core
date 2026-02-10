@@ -67,6 +67,11 @@ public:
   GeometryPtr GetGeometry() const;
 
   /**
+   * @copydoc Dali::Renderer::RemoveGeometry()
+   */
+  void RemoveGeometry();
+
+  /**
    * @copydoc Dali::Renderer::SetTextures()
    */
   void SetTextures(TextureSet& textureSet);
@@ -77,6 +82,11 @@ public:
   TextureSetPtr GetTextures() const;
 
   /**
+   * @copydoc Dali::Renderer::RemoveTextures()
+   */
+  void RemoveTextures();
+
+  /**
    * @copydoc Dali::Renderer::SetShader()
    */
   void SetShader(Shader& shader);
@@ -85,6 +95,11 @@ public:
    * @copydoc Dali::Renderer::GetShader()
    */
   ShaderPtr GetShader() const;
+
+  /**
+   * @copydoc Dali::Renderer::RemoveShader()
+   */
+  void RemoveShader();
 
   /**
    * @copydoc Dali::Renderer::SetDepthIndex()

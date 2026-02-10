@@ -401,8 +401,6 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
 
 void Renderer::SetTextures(TextureSet* textureSet)
 {
-  DALI_ASSERT_DEBUG(textureSet != NULL && "Texture set pointer is NULL");
-
   if(mTextureSet != textureSet)
   {
     mTextureSet = textureSet;
@@ -423,8 +421,6 @@ const Vector<Render::Sampler*>* Renderer::GetSamplers() const
 
 void Renderer::SetShader(Shader* shader)
 {
-  DALI_ASSERT_DEBUG(shader != NULL && "Shader pointer is NULL");
-
   if(mShader != shader)
   {
     mShader                 = shader;
@@ -438,7 +434,6 @@ void Renderer::SetShader(Shader* shader)
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  DALI_ASSERT_DEBUG(geometry != NULL && "Geometry pointer is NULL");
   if(mGeometry != geometry)
   {
     mGeometry = geometry;

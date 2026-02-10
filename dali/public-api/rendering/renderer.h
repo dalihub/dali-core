@@ -2,7 +2,7 @@
 #define DALI_RENDERER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -557,6 +557,13 @@ public:
   Geometry GetGeometry() const;
 
   /**
+   * @brief Remove the geometry used by this renderer.
+   *
+   * @SINCE_2_5.10
+   */
+  void RemoveGeometry();
+
+  /**
    * @brief Sets effective range of indices to draw from bound index buffer.
    *
    * @SINCE_1_1.43
@@ -586,6 +593,13 @@ public:
   TextureSet GetTextures() const;
 
   /**
+   * @brief Remove the texture set used by this renderer.
+   *
+   * @SINCE_2_5.10
+   */
+  void RemoveTextures();
+
+  /**
    * @brief Sets the shader used by this renderer.
    *
    * @SINCE_1_1.43
@@ -600,6 +614,13 @@ public:
    * @return The shader used by the renderer
    */
   Shader GetShader() const;
+
+  /**
+   * @brief Remove the shader used by this renderer.
+   *
+   * @SINCE_2_5.10
+   */
+  void RemoveShader();
 
   /**
    * @brief Sets RenderCallback to be used for native rendering
