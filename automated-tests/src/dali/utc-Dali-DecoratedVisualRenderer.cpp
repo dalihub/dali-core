@@ -217,6 +217,41 @@ int UtcDaliDecoratedVisualRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "blurRadius", Property::FLOAT, true, true, true, DecoratedVisualRenderer::Property::BLUR_RADIUS, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "cornerSquareness", Property::VECTOR4, true, true, true, DecoratedVisualRenderer::Property::CORNER_SQUARENESS, TEST_LOCATION);
 
+  // Get default variables for each properties.
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY), static_cast<float>(VisualRenderer::TransformPolicy::ABSOLUTE), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Color::BLACK, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4::ZERO, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE), Vector2::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA), 0.0f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY), static_cast<float>(VisualRenderer::TransformPolicy::ABSOLUTE), TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::BORDERLINE_COLOR), Color::BLACK, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4::ZERO, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE), Vector2::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA), 0.0f, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -241,10 +276,6 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty01(void)
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(cornerRadiusIndex), Vector4(1.0f, 10.0f, 5.0f, 0.0f), 0.001f, TEST_LOCATION);
-
-  // We must call RegisterXXXUniform() before animate decorated visual renderer properties.
-  // Before, corner radius could not be animated.
-  renderer.RegisterCornerRadiusUniform();
 
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
@@ -300,13 +331,6 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty02(void)
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BORDERLINE_OFFSET), -1.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<float>(DecoratedVisualRenderer::Property::BLUR_RADIUS), 0.0f, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(DecoratedVisualRenderer::Property::CORNER_SQUARENESS), Vector4(0.0f, 0.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
-
-  // We must call RegisterXXXUniform() before animate decorated visual renderer properties.
-  // Before, corner radius could not be animated.
-  renderer.RegisterCornerRadiusUniform();
-  renderer.RegisterCornerSquarenessUniform();
-  renderer.RegisterBorderlineUniform();
-  renderer.RegisterBlurRadiusUniform();
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateBy(Property(renderer, DecoratedVisualRenderer::Property::CORNER_RADIUS), Vector4(10.0f, 100.0f, 100.0f, 10.0f));
@@ -698,13 +722,6 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty03(void)
   Geometry                geometry = CreateQuadGeometry();
   DecoratedVisualRenderer renderer = DecoratedVisualRenderer::New(geometry, shader);
 
-  // Add all uniform mappings
-  renderer.RegisterVisualTransformUniform();
-  renderer.RegisterCornerRadiusUniform();
-  renderer.RegisterCornerSquarenessUniform();
-  renderer.RegisterBorderlineUniform();
-  renderer.RegisterBlurRadiusUniform();
-
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
@@ -820,10 +837,6 @@ int UtcDaliDecoratedVisualRendererAnimatedProperty05(void)
   Property::Index index = VisualRenderer::Property::TRANSFORM_SIZE;
   renderer.SetProperty(index, Vector2(1.0f, 0.5f));
 
-  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
-  // Before, transform could not be animated.
-  renderer.RegisterVisualTransformUniform();
-
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(1.0f, 0.5f), 0.001f, TEST_LOCATION);
@@ -913,7 +926,6 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
 
   // Set decoration with borderline as 32 units.
-  renderer.RegisterBorderlineUniform();
   renderer.SetProperty(DecoratedVisualRenderer::Property::BORDERLINE_WIDTH, 32.0f);
 
   Property::Index index = DecoratedVisualRenderer::Property::BORDERLINE_OFFSET;

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,6 +130,12 @@ public:
    */
   void DisconnectUniformBlock(UniformBlock& uniformBlock);
 
+  /**
+   * @brief Get the number of connected uniform blocks for this shader.
+   * @return The number of connected uniform blocks.
+   */
+  uint32_t GetConnectedUniformBlockCount() const;
+
 protected: ///< From Dali::Internal::Object::Observer
   /**
    * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded()
@@ -164,6 +170,7 @@ private: // unimplemented methods
 private:
   std::vector<Internal::ShaderDataPtr> mShaderDataList;
   std::vector<Dali::UniformBlock>      mStrongConnectedUniformBlockList;
+  uint32_t                             mConnectedUniformBlockCount;
 
 public:
   /**

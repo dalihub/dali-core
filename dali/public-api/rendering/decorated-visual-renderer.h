@@ -202,39 +202,6 @@ public:
   DecoratedVisualRenderer& operator=(DecoratedVisualRenderer&& rhs) noexcept;
 
 public:
-  /**
-   * @brief Register relate with corner radius uniforms so we can use it as uniform properties.
-   * @note Before register the uniforms, decorated visual properties could not be animated.
-   *
-   * @SINCE_2_1.21
-   */
-  void RegisterCornerRadiusUniform();
-
-  /**
-   * @brief Register relate with corner squareness uniforms so we can use it as uniform properties.
-   * @note Before register the uniforms, decorated visual properties could not be animated.
-   *
-   * @SINCE_2_3.48
-   */
-  void RegisterCornerSquarenessUniform();
-
-  /**
-   * @brief Register relate with borderline uniforms so we can use it as uniform properties.
-   * @note Before register the uniforms, decorated visual properties could not be animated.
-   *
-   * @SINCE_2_1.21
-   */
-  void RegisterBorderlineUniform();
-
-  /**
-   * @brief Register relate with blur radius uniforms so we can use it as uniform properties.
-   * @note Before register the uniforms, decorated visual properties could not be animated.
-   *
-   * @SINCE_2_1.21
-   */
-  void RegisterBlurRadiusUniform();
-
-public:
   /// @cond internal
   /**
    * @brief The constructor.

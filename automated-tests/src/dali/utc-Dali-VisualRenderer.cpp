@@ -201,6 +201,25 @@ int UtcDaliVisualRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "visualMixColor", Property::VECTOR3, true, false, true, VisualRenderer::Property::VISUAL_MIX_COLOR, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "visualPreMultipliedAlpha", Property::FLOAT, true, false, false, VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA, TEST_LOCATION);
 
+  // Get default variables for each properties.
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE), Vector2::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA), 0.0f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE), Vector2::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE), Vector4::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR), Vector3::ONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA), 0.0f, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -225,10 +244,6 @@ int UtcDaliVisualRendererAnimatedProperty01(void)
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(colorIndex), Vector3(1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
-
-  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
-  // Before, transform could not be animated.
-  renderer.RegisterVisualTransformUniform();
 
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
@@ -272,10 +287,6 @@ int UtcDaliVisualRendererAnimatedProperty02(void)
   application.SendNotification();
   application.Render(0);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(1.0f, 0.0f), 0.001f, TEST_LOCATION);
-
-  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
-  // Before, transform could not be animated.
-  renderer.RegisterVisualTransformUniform();
 
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
@@ -511,9 +522,6 @@ int UtcDaliVisualRendererAnimatedProperty03(void)
   Shader         shader   = Shader::New("VertexSource", "FragmentSource");
   Geometry       geometry = CreateQuadGeometry();
   VisualRenderer renderer = VisualRenderer::New(geometry, shader);
-
-  // Add all uniform mappings
-  renderer.RegisterVisualTransformUniform();
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
@@ -753,9 +761,6 @@ int UtcDaliVisualRendererPartialUpdate01(void)
   // Set clippingRect as full surface now. TODO : Set valid rect if we can.
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
 
-  // We must call RegisterVisualTransformUniform() before change visual renderer properties at update thread side.
-  renderer.RegisterVisualTransformUniform();
-
   Property::Index index = VisualRenderer::Property::TRANSFORM_SIZE;
   renderer.SetProperty(index, Vector2(2.0f, 0.5f));
 
@@ -990,10 +995,6 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   // Ensure the damaged rect is empty
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  // We must call RegisterVisualTransformUniform() before change visual renderer properties at update thread side.
-  renderer1.RegisterVisualTransformUniform();
-  renderer2.RegisterVisualTransformUniform();
-
   // Change the renderer1 and renderer2 transform property.
   // To avoid useless float point error, make renderer size as 30x30
   renderer1.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, Vector2(0.5f - 2.0f / 64.0f, 0.5f - 2.0f / 64.0f));
@@ -1203,10 +1204,6 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
 
   Property::Index index = VisualRenderer::Property::TRANSFORM_OFFSET;
-
-  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
-  // Before, transform could not be animated.
-  renderer.RegisterVisualTransformUniform();
 
   uint32_t  durationMilliseconds = 1000u;
   Animation animation            = Animation::New(durationMilliseconds / 1000.0f);

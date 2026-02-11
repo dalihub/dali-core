@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,26 +47,6 @@ DecoratedVisualRenderer& DecoratedVisualRenderer::operator=(const DecoratedVisua
 DecoratedVisualRenderer::DecoratedVisualRenderer(DecoratedVisualRenderer&& rhs) noexcept = default;
 
 DecoratedVisualRenderer& DecoratedVisualRenderer::operator=(DecoratedVisualRenderer&& rhs) noexcept = default;
-
-void DecoratedVisualRenderer::RegisterCornerRadiusUniform()
-{
-  GetImplementation(*this).RegisterCornerRadiusUniform();
-}
-
-void DecoratedVisualRenderer::RegisterCornerSquarenessUniform()
-{
-  GetImplementation(*this).RegisterCornerSquarenessUniform();
-}
-
-void DecoratedVisualRenderer::RegisterBorderlineUniform()
-{
-  GetImplementation(*this).RegisterBorderlineUniform();
-}
-
-void DecoratedVisualRenderer::RegisterBlurRadiusUniform()
-{
-  GetImplementation(*this).RegisterBlurRadiusUniform();
-}
 
 DecoratedVisualRenderer::DecoratedVisualRenderer(Internal::DecoratedVisualRenderer* pointer)
 : Dali::VisualRenderer(pointer)
