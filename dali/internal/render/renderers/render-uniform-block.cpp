@@ -98,49 +98,55 @@ UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)
 
   ProgramIndex programIndex = mUniformIndexMaps.size();
 
-  auto& uniformMap = GetUniformMap();
-
-  const uint32_t mapCount = uniformMap.Count();
-
   // Create index map for program from uniform map
   UniformIndexMappings currentUniformIndexMap;
-  currentUniformIndexMap.resize(mapCount);
 
-  // Copy uniform map into uniformIndexMap
-  uint32_t mapIndex = 0;
-  for(; mapIndex < mapCount; ++mapIndex)
+  const auto mapCount = static_cast<uint32_t>(GetUniformMap().Count());
+  if(mapCount > 0u)
   {
-    currentUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
-    currentUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
-    currentUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
-    currentUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
-    currentUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
-  }
+    auto& uniformMapContainer = GetUniformMap().GetUniformMapContainer();
+    currentUniformIndexMap.resize(mapCount);
 
-  // Initialize uniforms by current program.
-  for(auto& uniform : currentUniformIndexMap)
-  {
-    DALI_ASSERT_ALWAYS(uniform.state == UniformIndexMap::State::INITIALIZE_REQUIRED && "Something wrong!");
-
-    auto uniformInfo  = Graphics::UniformInfo{};
-    auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
-                                           uniform.uniformNameHash,
-                                           uniform.uniformNameHashNoArray,
-                                           uniformInfo);
-
-    if(!uniformFound)
+    // Copy uniform map into uniformIndexMap
+    uint32_t mapIndex = 0;
+    for(const auto& uniformMap : uniformMapContainer)
     {
-      uniform.state = UniformIndexMap::State::NOT_USED;
-      continue;
+      const auto& uniformName      = uniformMap.first;
+      const auto& propertyMappings = uniformMap.second;
+
+      currentUniformIndexMap[mapIndex].propertyValue          = propertyMappings.propertyPtr;
+      currentUniformIndexMap[mapIndex].uniformName            = uniformName;
+      currentUniformIndexMap[mapIndex].uniformNameHash        = propertyMappings.uniformNameHash;
+      currentUniformIndexMap[mapIndex].uniformNameHashNoArray = propertyMappings.uniformNameHashNoArray;
+      currentUniformIndexMap[mapIndex].arrayIndex             = propertyMappings.arrayIndex;
+      ++mapIndex;
     }
 
-    uniform.uniformOffset = uniformInfo.offset;
+    // Initialize uniforms by current program.
+    for(auto& uniform : currentUniformIndexMap)
+    {
+      DALI_ASSERT_ALWAYS(uniform.state == UniformIndexMap::State::INITIALIZE_REQUIRED && "Something wrong!");
 
-    const auto typeSize        = uniform.propertyValue->GetValueSize();
-    uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
-    uniform.matrixStride       = uniformInfo.matrixStride;
+      auto uniformInfo  = Graphics::UniformInfo{};
+      auto uniformFound = program.GetUniform(uniform.uniformName.GetStringView(),
+                                             uniform.uniformNameHash,
+                                             uniform.uniformNameHashNoArray,
+                                             uniformInfo);
 
-    uniform.state = UniformIndexMap::State::INITIALIZED;
+      if(!uniformFound)
+      {
+        uniform.state = UniformIndexMap::State::NOT_USED;
+        continue;
+      }
+
+      uniform.uniformOffset = uniformInfo.offset;
+
+      const auto typeSize        = uniform.propertyValue->GetValueSize();
+      uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+      uniform.matrixStride       = uniformInfo.matrixStride;
+
+      uniform.state = UniformIndexMap::State::INITIALIZED;
+    }
   }
 
   for(ProgramIndex cachedUniformIndexMap = 0; cachedUniformIndexMap < mUniformIndexMaps.size(); ++cachedUniformIndexMap)

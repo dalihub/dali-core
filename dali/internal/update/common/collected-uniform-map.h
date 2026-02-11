@@ -69,7 +69,7 @@ struct CollectedUniformMap
    * Reserve space for mappings
    * @param[in] size The number of mappings to reserve
    */
-  inline void Reserve(std::size_t size)
+  inline void Reserve(UniformMap::SizeType size)
   {
     mUniformMap.Reserve(size);
   }
@@ -77,9 +77,9 @@ struct CollectedUniformMap
   /**
    * @return the count of the number of mappings
    */
-  inline std::size_t Count() const
+  inline UniformMap::SizeType Count() const
   {
-    return mUniformMap.Size();
+    return static_cast<UniformMap::SizeType>(mUniformMap.Size());
   }
 
   /**
@@ -93,13 +93,13 @@ struct CollectedUniformMap
   /**
    * Return the currently calculated hash.
    */
-  inline std::size_t GetChangeCounter() const
+  inline UniformMap::SizeType GetChangeCounter() const
   {
     return mChangeCounter;
   }
 
   Dali::Vector<UniformPropertyMapping> mUniformMap;        ///< The mappings
-  std::size_t                          mChangeCounter{0u}; ///< The change counter
+  UniformMap::SizeType                 mChangeCounter{0u}; ///< The change counter
 };
 
 } // namespace SceneGraph

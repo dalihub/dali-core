@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,31 +42,40 @@ void CollectedUniformMap::AddMappings(const UniformMap& uniformMap)
 
   newUniformMappings.Clear();
 
-  for(UniformMap::SizeType i = 0, iCount = uniformMap.Count(); i < iCount; ++i)
+  if(uniformMap.Count() > 0u)
   {
-    bool found = false;
+    auto& uniformMapContainer = uniformMap.GetUniformMapContainer();
 
-    for(UniformMap::SizeType j = 0, jCount = mUniformMap.Count(); j < jCount; ++j)
+    for(const auto& uniformMap : uniformMapContainer)
     {
-      if(mUniformMap[j].uniformName == uniformMap[i].uniformName)
+      const auto& uniformName      = uniformMap.first;
+      const auto& propertyMappings = uniformMap.second;
+
+      bool found = false;
+
+      for(UniformMap::SizeType j = 0, jCount = mUniformMap.Count(); j < jCount; ++j)
       {
-        found = true;
-        break;
+        if(mUniformMap[j].uniformName == uniformName)
+        {
+          found = true;
+          break;
+        }
+      }
+
+      if(!found)
+      {
+        newUniformMappings.PushBack(propertyMappings);
       }
     }
-    if(!found)
-    {
-      newUniformMappings.PushBack(uniformMap[i]);
-    }
-  }
 
-  if(newUniformMappings.Count() > 0)
-  {
-    mUniformMap.Reserve(mUniformMap.Count() + newUniformMappings.Count());
-
-    for(UniformMap::SizeType i = 0, iCount = newUniformMappings.Count(); i < iCount; ++i)
+    if(newUniformMappings.Count() > 0)
     {
-      mUniformMap.PushBack(newUniformMappings[i]);
+      mUniformMap.Reserve(mUniformMap.Count() + newUniformMappings.Count());
+
+      for(UniformMap::SizeType i = 0, iCount = newUniformMappings.Count(); i < iCount; ++i)
+      {
+        mUniformMap.PushBack(newUniformMappings[i]);
+      }
     }
   }
 }
