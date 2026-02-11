@@ -36,12 +36,12 @@ void VisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIn
   if(!coefficient.IsCoefficientCalculated())
   {
     // VisualProperty
-    const Vector2 transformOffset         = mTransformOffset.Get(updateBufferIndex);
-    const Vector4 transformOffsetSizeMode = mTransformOffsetSizeMode.Get(updateBufferIndex);
-    const Vector2 transformSize           = mTransformSize.Get(updateBufferIndex);
-    const Vector2 transformOrigin         = mTransformOrigin.Get(updateBufferIndex);
-    const Vector2 transformAnchorPoint    = mTransformAnchorPoint.Get(updateBufferIndex);
-    const Vector2 extraSize               = mExtraSize.Get(updateBufferIndex);
+    const Vector2 transformOffset         = mTransformOffset.Get();
+    const Vector4 transformOffsetSizeMode = mTransformOffsetSizeMode.Get();
+    const Vector2 transformSize           = mTransformSize.Get();
+    const Vector2 transformOrigin         = mTransformOrigin.Get();
+    const Vector2 transformAnchorPoint    = mTransformAnchorPoint.Get();
+    const Vector2 extraSize               = mExtraSize.Get();
 
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform size   %5.3f %5.3f\n", transformSize.x, transformSize.y);
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform offset %5.3f %5.3f\n", transformOffset.x, transformOffset.y);
@@ -134,9 +134,9 @@ void DecoratedVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updat
   if(!decoratedCoefficient.IsCoefficientCalculated())
   {
     // DecoratedVisualProperty
-    const float borderlineWidth  = mBorderlineWidth.Get(updateBufferIndex);
-    const float borderlineOffset = mBorderlineOffset.Get(updateBufferIndex);
-    const float blurRadius       = mBlurRadius.Get(updateBufferIndex);
+    const float borderlineWidth  = mBorderlineWidth.Get();
+    const float borderlineOffset = mBorderlineOffset.Get();
+    const float blurRadius       = mBlurRadius.Get();
 
     // Extra padding information for anti-alias
     const float extraPadding = 2.0f;

@@ -138,7 +138,7 @@ public:
    */
   bool IsYAxisInverted() const
   {
-    return mInvertYAxis[0];
+    return mInvertYAxis.Get();
   }
 
   /**
@@ -195,7 +195,7 @@ public:
    */
   float GetFieldOfView(BufferIndex bufferIndex) const
   {
-    return mFieldOfView[bufferIndex];
+    return mFieldOfView.Get();
   }
 
   /**
@@ -212,7 +212,7 @@ public:
    */
   float GetOrthographicSize(BufferIndex bufferIndex) const
   {
-    return mOrthographicSize[bufferIndex];
+    return mOrthographicSize.Get();
   }
 
   /**
@@ -229,7 +229,7 @@ public:
    */
   float GetAspectRatio(BufferIndex bufferIndex) const
   {
-    return mAspectRatio[bufferIndex];
+    return mAspectRatio.Get();
   }
 
   /**
@@ -246,7 +246,7 @@ public:
    */
   float GetNearClippingPlane(BufferIndex bufferIndex) const
   {
-    return mNearClippingPlane[bufferIndex];
+    return mNearClippingPlane.Get();
   }
 
   /**
@@ -263,7 +263,7 @@ public:
    */
   float GetFarClippingPlane(BufferIndex bufferIndex) const
   {
-    return mFarClippingPlane[bufferIndex];
+    return mFarClippingPlane.Get();
   }
 
   /**
@@ -342,14 +342,14 @@ public:
    * @pre The camera is on-stage.
    * @return The field of view property querying interface.
    */
-  const PropertyBase* GetFieldOfView() const;
+  const PropertyBase* GetFieldOfViewProperty() const;
 
   /**
    * Retrieve the aspect ratio property querying interface.
    * @pre The camera is on-stage.
    * @return The aspect ratio property querying interface.
    */
-  const PropertyBase* GetAspectRatio() const;
+  const PropertyBase* GetAspectRatioProperty() const;
 
   /**
    * Retrieve the near clipping plane distance property querying interface.
@@ -391,7 +391,7 @@ public:
    * @pre The camera is on-stage.
    * @return The orthographic size property querying interface.
    */
-  const PropertyBase* GetOrthographicSize() const;
+  const PropertyBase* GetOrthographicSizeProperty() const;
 
   /**
    * Retrieve the value of Projection Direction property querying interface.

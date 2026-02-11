@@ -407,8 +407,8 @@ void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLaye
 
   // TODO : Can't we get modelMatrix and size as const l-value at onces?
   const auto&    transformId = mTransformManagerData.Id();
-  const Matrix&  modelMatrix = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mWorldMatrix.Get(0) : Matrix::IDENTITY;
-  const Vector3& size        = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mSize.Get(0) : Vector3::ZERO;
+  const Matrix&  modelMatrix = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mWorldMatrix.Get() : Matrix::IDENTITY;
+  const Vector3& size        = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mSize.Get() : Vector3::ZERO;
 
   const Vector4& updatedPositionSize = CalculateNodeUpdateArea(isLayer3d, modelMatrix, size);
 

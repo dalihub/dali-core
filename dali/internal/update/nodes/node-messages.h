@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_MESSAGES_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ template<typename P>
 class NodePropertyMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, typename ParameterType<P>::PassingType);
+  using MemberFunction = void (AnimatableProperty<P>::*)(typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -105,7 +105,7 @@ public:
    */
   void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:
@@ -146,7 +146,7 @@ template<typename P>
 class NodePropertyComponentMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, float);
+  using MemberFunction = void (AnimatableProperty<P>::*)(float);
 
   /**
    * Send a message.
@@ -190,7 +190,7 @@ public:
    */
   void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:
@@ -228,7 +228,7 @@ template<typename P>
 class NodeTransformPropertyMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(BufferIndex, const P&);
+  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(const P&);
 
   /**
    * Create a message.
@@ -263,7 +263,7 @@ public:
    */
   void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:
@@ -301,7 +301,7 @@ template<typename P>
 class NodeTransformComponentMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(BufferIndex, float);
+  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(float);
 
   /**
    * Send a message.
@@ -336,7 +336,7 @@ public:
    */
   void Process(BufferIndex updateBufferIndex) override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:

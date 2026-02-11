@@ -521,7 +521,7 @@ const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() cons
 
 void Renderer::BakeMixColor(BufferIndex updateBufferIndex, const Vector4& mixColor)
 {
-  mMixColor.Bake(updateBufferIndex, mixColor);
+  mMixColor.Bake(mixColor);
 
   SetUpdated(true);
 }
@@ -532,22 +532,22 @@ void Renderer::BakeMixColorComponent(BufferIndex updateBufferIndex, float compon
   {
     case 0:
     {
-      mMixColor.BakeX(updateBufferIndex, componentValue);
+      mMixColor.BakeX(componentValue);
       break;
     }
     case 1:
     {
-      mMixColor.BakeY(updateBufferIndex, componentValue);
+      mMixColor.BakeY(componentValue);
       break;
     }
     case 2:
     {
-      mMixColor.BakeZ(updateBufferIndex, componentValue);
+      mMixColor.BakeZ(componentValue);
       break;
     }
     case 3:
     {
-      mMixColor.BakeW(updateBufferIndex, componentValue);
+      mMixColor.BakeW(componentValue);
       break;
     }
     default:
@@ -562,7 +562,7 @@ void Renderer::BakeMixColorComponent(BufferIndex updateBufferIndex, float compon
 
 Vector4 Renderer::GetMixColor(BufferIndex updateBufferIndex) const
 {
-  return mMixColor[updateBufferIndex];
+  return mMixColor.Get();
 }
 
 void Renderer::SetRenderingBehavior(DevelRenderer::Rendering::Type renderingBehavior)
@@ -649,7 +649,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
     }
     case BlendMode::ON: // If the renderer should always be use blending
     {
-      float alpha = node.GetWorldColor().a * mMixColor[updateBufferIndex].a;
+      float alpha = node.GetWorldColor().a * mMixColor.Get().a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;
@@ -682,7 +682,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
       }
 
       // renderer should determine opacity using the actor color
-      float alpha = node.GetWorldColor().a * mMixColor[updateBufferIndex].a;
+      float alpha = node.GetWorldColor().a * mMixColor.Get().a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;

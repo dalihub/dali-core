@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_CONSTRAINT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,8 +98,8 @@ public:
 
         if(applyRequired)
         {
-          PropertyType current = mTargetProperty.Get(updateBufferIndex);
-          PropertyType old     = mTargetProperty.Get(!updateBufferIndex);
+          PropertyType current = mTargetProperty.Get();
+          PropertyType old     = mTargetProperty.Get();
 
           mFunc->Apply(updateBufferIndex, current);
 
@@ -116,7 +116,7 @@ public:
               // Optionally bake the final value
               if(Dali::Constraint::BAKE == mRemoveAction)
               {
-                mTargetProperty.Bake(updateBufferIndex, current);
+                mTargetProperty.Bake(current);
               }
             }
           }
@@ -132,14 +132,14 @@ public:
               // Optionally bake the final value
               if(Dali::Constraint::BAKE == mRemoveAction)
               {
-                mTargetProperty.Bake(updateBufferIndex, current);
+                mTargetProperty.Bake(current);
               }
             }
           }
 
           if(Dali::Constraint::DISCARD == mRemoveAction)
           {
-            mTargetProperty.Set(updateBufferIndex, current);
+            mTargetProperty.Set(current);
           }
 
           INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_APPLIED);

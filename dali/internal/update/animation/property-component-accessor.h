@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_COMPONENT_ACCESSOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,30 +76,29 @@ public:
 
   /**
    * Read access to the property.
-   * @param [in] bufferIndex The current update buffer index.
    */
-  float Get(BufferIndex bufferIndex) const
+  float Get() const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorX::Get() mProperty was nullptr");
-    return mProperty->Get(bufferIndex).x; // X Component only!
+    return mProperty->Get().x; // X Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set(BufferIndex bufferIndex, float value) const
+  void Set(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorX::Set() mProperty was nullptr");
-    mProperty->SetX(bufferIndex, value);
+    mProperty->SetX(value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake(BufferIndex bufferIndex, float value) const
+  void Bake(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorX::Bake() mProperty was nullptr");
-    mProperty->BakeX(bufferIndex, value);
+    mProperty->BakeX(value);
   }
 
 private:
@@ -162,30 +161,29 @@ public:
 
   /**
    * Read access to the property.
-   * @param [in] bufferIndex The current update buffer index.
    */
-  float Get(BufferIndex bufferIndex) const
+  float Get() const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorY::Get() mProperty was nullptr");
-    return mProperty->Get(bufferIndex).y; // Y Component only!
+    return mProperty->Get().y; // Y Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set(BufferIndex bufferIndex, float value) const
+  void Set(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorY::Set() mProperty was nullptr");
-    mProperty->SetY(bufferIndex, value);
+    mProperty->SetY(value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake(BufferIndex bufferIndex, float value) const
+  void Bake(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorY::Bake() mProperty was nullptr");
-    mProperty->BakeY(bufferIndex, value);
+    mProperty->BakeY(value);
   }
 
 private:
@@ -248,30 +246,29 @@ public:
 
   /**
    * Read access to the property.
-   * @param [in] bufferIndex The current update buffer index.
    */
-  float Get(BufferIndex bufferIndex) const
+  float Get() const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorZ::Get() mProperty was nullptr");
-    return mProperty->Get(bufferIndex).z; // Z Component only!
+    return mProperty->Get().z; // Z Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set(BufferIndex bufferIndex, float value) const
+  void Set(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorZ::Set() mProperty was nullptr");
-    mProperty->SetZ(bufferIndex, value);
+    mProperty->SetZ(value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake(BufferIndex bufferIndex, float value) const
+  void Bake(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorZ::Bake() mProperty was nullptr");
-    mProperty->BakeZ(bufferIndex, value);
+    mProperty->BakeZ(value);
   }
 
 private:
@@ -334,30 +331,29 @@ public:
 
   /**
    * Read access to the property.
-   * @param [in] bufferIndex The current update buffer index.
    */
-  float Get(BufferIndex bufferIndex) const
+  float Get() const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorW::Get() mProperty was nullptr");
-    return mProperty->Get(bufferIndex).w; // W Component only!
+    return mProperty->Get().w; // W Component only!
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Set()
    */
-  void Set(BufferIndex bufferIndex, float value) const
+  void Set(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorW::Set() mProperty was nullptr");
-    mProperty->SetW(bufferIndex, value);
+    mProperty->SetW(value);
   }
 
   /**
    * @copydoc SceneGraph::AnimatableProperty<float>::Bake()
    */
-  void Bake(BufferIndex bufferIndex, float value) const
+  void Bake(float value) const
   {
     DALI_ASSERT_DEBUG(nullptr != mProperty && "PropertyComponentAccessorW::Bake() mProperty was nullptr");
-    mProperty->BakeW(bufferIndex, value);
+    mProperty->BakeW(value);
   }
 
 private:

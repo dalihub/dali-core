@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ bool UpdateProxy::GetColor(uint32_t id, Vector4& color) const
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    color   = node->mColor.Get(mCurrentBufferIndex);
+    color   = node->mColor.Get();
     success = true;
   }
 
@@ -256,7 +256,7 @@ bool UpdateProxy::SetColor(uint32_t id, const Vector4& color)
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    node->mColor.Set(mCurrentBufferIndex, color);
+    node->mColor.Set(color);
     node->SetDirtyFlag(SceneGraph::NodePropertyFlags::COLOR);
     mDirtyNodes.push_back(id);
     AddResetter(*node, node->mColor);
@@ -271,7 +271,7 @@ bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    node->mColor.Bake(mCurrentBufferIndex, color);
+    node->mColor.Bake(color);
     success = true;
   }
   return success;

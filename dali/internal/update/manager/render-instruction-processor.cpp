@@ -604,7 +604,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
 
   const Matrix&             viewMatrix           = renderTask.GetViewMatrix(updateBufferIndex);
   const SceneGraph::Camera& camera               = renderTask.GetCamera();
-  const bool                isOrthographicCamera = camera.mProjectionMode[0] == Dali::Camera::ProjectionMode::ORTHOGRAPHIC_PROJECTION;
+  const bool                isOrthographicCamera = camera.mProjectionMode.Get() == Dali::Camera::ProjectionMode::ORTHOGRAPHIC_PROJECTION;
 
   Viewport viewport;
   bool     viewportSet = renderTask.QueryViewport(updateBufferIndex, viewport);

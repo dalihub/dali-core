@@ -438,7 +438,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mParentOrigin.Get(0);
+      return mParentOrigin.Get();
     }
 
     return Vector3::ZERO;
@@ -450,7 +450,7 @@ public:
    */
   void SetParentOrigin(const Vector3& origin)
   {
-    mParentOrigin.Set(0, origin);
+    mParentOrigin.Set(origin);
   }
 
   /**
@@ -461,7 +461,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mAnchorPoint.Get(0);
+      return mAnchorPoint.Get();
     }
 
     return Vector3::ZERO;
@@ -473,7 +473,7 @@ public:
    */
   void SetAnchorPoint(const Vector3& anchor)
   {
-    mAnchorPoint.Set(0, anchor);
+    mAnchorPoint.Set(anchor);
   }
 
   /**
@@ -485,7 +485,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mPosition.Get(bufferIndex);
+      return mPosition.Get();
     }
 
     return Vector3::ZERO;
@@ -499,7 +499,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mWorldPosition.Get(bufferIndex);
+      return mWorldPosition.Get();
     }
     return Vector3::ZERO;
   }
@@ -525,7 +525,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mOrientation.Get(0);
+      return mOrientation.Get();
     }
 
     return Quaternion::IDENTITY;
@@ -540,7 +540,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mWorldOrientation.Get(0);
+      return mWorldOrientation.Get();
     }
     return Quaternion::IDENTITY;
   }
@@ -566,7 +566,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mScale.Get(0);
+      return mScale.Get();
     }
 
     return Vector3::ONE;
@@ -581,7 +581,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mWorldScale.Get(0);
+      return mWorldScale.Get();
     }
     return Vector3::ONE;
   }
@@ -605,7 +605,7 @@ public:
    */
   bool IsVisible(BufferIndex bufferIndex) const
   {
-    return mVisible[bufferIndex];
+    return mVisible.Get();
   }
 
   /**
@@ -615,7 +615,8 @@ public:
    */
   float GetOpacity(BufferIndex bufferIndex) const
   {
-    return mColor[bufferIndex].a;
+    auto& color = mColor.Get();
+    return color.a;
   }
 
   /**
@@ -625,7 +626,7 @@ public:
    */
   const Vector4& GetColor(BufferIndex bufferIndex) const
   {
-    return mColor[bufferIndex];
+    return mColor.Get();
   }
 
   /**
@@ -652,16 +653,16 @@ public:
     bool shouldAvoidRepetitiveInheritance = mParent->GetCacheRendererCount() > 0u;
     if(shouldAvoidRepetitiveInheritance || mColorMode == USE_OWN_COLOR)
     {
-      mWorldColor.Set(mColor[updateBufferIndex]);
+      mWorldColor.Set(mColor.Get());
     }
     else if(mColorMode == USE_OWN_MULTIPLY_PARENT_ALPHA) // default
     {
-      const Vector4& ownColor = mColor[updateBufferIndex];
+      const Vector4& ownColor = mColor.Get();
       mWorldColor.Set(ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColor().a);
     }
     else if(mColorMode == USE_OWN_MULTIPLY_PARENT_COLOR)
     {
-      mWorldColor.Set(mParent->GetWorldColor() * mColor[updateBufferIndex]);
+      mWorldColor.Set(mParent->GetWorldColor() * mColor.Get());
     }
     else if(mColorMode == USE_PARENT_COLOR)
     {
@@ -709,7 +710,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mSize.Get(0);
+      return mSize.Get();
     }
 
     return Vector3::ZERO;
@@ -806,7 +807,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mWorldMatrix.Get(bufferIndex);
+      return mWorldMatrix.Get();
     }
 
     return Matrix::IDENTITY;
@@ -834,7 +835,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mIgnored.Get(0);
+      return mIgnored.Get();
     }
     return false;
   }
@@ -847,7 +848,7 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mWorldIgnored.Get(0);
+      return mWorldIgnored.Get();
     }
     return true;
   }
@@ -1037,7 +1038,7 @@ public:
    */
   void SetCulled(BufferIndex bufferIndex, bool culled)
   {
-    mCulled[bufferIndex] = culled;
+    mCulled.Set(culled);
   }
 
   /**
@@ -1047,7 +1048,7 @@ public:
    */
   bool IsCulled(BufferIndex bufferIndex) const
   {
-    return mCulled[bufferIndex];
+    return mCulled.Get();
   }
 
   /**

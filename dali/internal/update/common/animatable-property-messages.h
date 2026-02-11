@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_COMMON_ANIMATABLE_PROPERTY_MESSAGES_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ template<class T, typename P>
 class MessageBakeReset : public MessageBase
 {
 public:
-  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P>::PassingType);
+  using MemberFunction = void (T::*)(typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -75,7 +75,7 @@ public:
   void Process(BufferIndex bufferIndex) override
   {
     // Bake/set the property
-    (object->*memberFunction)(bufferIndex, param);
+    (object->*memberFunction)(param);
 
     // Create the resetter in the Update thread.
     OwnerPointer<SceneGraph::PropertyResetterBase> resetter(

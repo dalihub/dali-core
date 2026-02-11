@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATABLE_PROPERTY_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/matrix-utils.h>
 
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/property-input.h>
@@ -41,7 +40,7 @@ namespace SceneGraph
  * Dirty flags record whether an animatable property has changed.
  * In the frame following a change, the property is reset to a base value.
  *
- * If the property was "Baked", then the base value matches the (double-buffered) value from the previous frame.
+ * If the property was "Baked", then the base value matches the property value.
  * Therefore when reset, the property is flagged as "clean".
  *
  * However if the property was only "Set" (and not "Baked"), then typically the base value and previous value will not match.
@@ -50,7 +49,7 @@ namespace SceneGraph
 static const uint32_t CLEAN_FLAG = 0x00; ///< Indicates that the value did not change in this, or the previous frame
 static const uint32_t BAKED_FLAG = 0x01; ///< Indicates that the value was Baked during the previous frame
 static const uint32_t SET_FLAG   = 0x02; ///< Indicates that the value was Set during the previous frame
-static const uint32_t RESET_FLAG = 0x02; ///< Indicates that the value should be reset to the base value in the next two frames
+static const uint32_t RESET_FLAG = 0x02; ///< Indicates that the value should be reset to the base value in the next frame
 
 template<class T>
 class AnimatableProperty;
@@ -159,7 +158,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -170,7 +169,7 @@ public:
    */
   const bool& GetBoolean(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -178,7 +177,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -192,15 +191,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, bool value)
+  void Set(bool value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(mValue[bufferIndex] != value)
+    if(mValue != value)
     {
-      mValue[bufferIndex] = value;
+      mValue = value;
 
       OnSet();
     }
@@ -208,16 +206,15 @@ public:
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, bool delta)
+  void SetRelative(bool delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     // false + false does not change value, true + false does not either
-    if(delta && !mValue[bufferIndex])
+    if(delta && !mValue)
     {
-      mValue[bufferIndex] = delta;
+      mValue = delta;
 
       OnSet();
     }
@@ -226,45 +223,24 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  bool& Get(BufferIndex bufferIndex)
+  bool& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const bool& Get(BufferIndex bufferIndex) const
+  const bool& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  bool& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const bool& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, bool value)
+  void Bake(bool value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(mBaseValue != value)
@@ -272,8 +248,7 @@ public:
       mBaseValue = value;
       // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
       // has never been atomically safe.
-      mValue[bufferIndex]     = value;
-      mValue[1 - bufferIndex] = value;
+      mValue = value;
 
       OnBake();
     }
@@ -281,13 +256,12 @@ public:
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, bool delta)
+  void BakeRelative(bool delta)
   {
-    mValue[bufferIndex] = mValue[bufferIndex] || delta;
-    mBaseValue          = mValue[bufferIndex];
+    mValue     = mValue || delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
@@ -300,8 +274,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<bool> mValue;     ///< The double-buffered property value
-  bool                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  bool mValue;     ///< The property value
+  bool mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
@@ -341,7 +315,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -352,7 +326,7 @@ public:
    */
   const int& GetInteger(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -360,7 +334,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -374,15 +348,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, int value)
+  void Set(int value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(mValue[bufferIndex] != value)
+    if(mValue != value)
     {
-      mValue[bufferIndex] = value;
+      mValue = value;
 
       OnSet();
     }
@@ -390,15 +363,14 @@ public:
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, int delta)
+  void SetRelative(int delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(delta)
     {
-      mValue[bufferIndex] = mValue[bufferIndex] + delta;
+      mValue = mValue + delta;
 
       OnSet();
     }
@@ -407,52 +379,30 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  int& Get(BufferIndex bufferIndex)
+  int& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const int& Get(BufferIndex bufferIndex) const
+  const int& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  int& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const int& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, int value)
+  void Bake(int value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(mBaseValue != value)
     {
-      mValue[bufferIndex]     = value;
-      mValue[1 - bufferIndex] = value;
-      mBaseValue              = mValue[bufferIndex];
+      mValue     = value;
+      mBaseValue = mValue;
 
       OnBake();
     }
@@ -460,39 +410,36 @@ public:
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, int delta)
+  void BakeRelative(int delta)
   {
-    mValue[bufferIndex] = mValue[bufferIndex] + delta;
-    mBaseValue          = mValue[bufferIndex];
+    mValue     = mValue + delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
-   * Sets both double-buffered values & the base value.
+   * Sets both the property value & the base value.
    * This should only be used when the owning object has not been connected to the scene-graph.
    * @param[in] value The new property value.
    */
   void SetInitial(const int& value)
   {
-    mValue[0]  = value;
-    mValue[1]  = mValue[0];
-    mBaseValue = mValue[0];
+    mValue     = value;
+    mBaseValue = mValue;
   }
 
   /**
-   * Change both double-buffered values & the base value by a relative amount.
+   * Change both the property value & the base value by a relative amount.
    * This should only be used when the owning object has not been connected to the scene-graph.
    * @param[in] delta The property will change by this amount.
    */
   void SetInitialRelative(const int& delta)
   {
-    mValue[0]  = mValue[0] + delta;
-    mValue[1]  = mValue[0];
-    mBaseValue = mValue[0];
+    mValue     = mValue + delta;
+    mBaseValue = mValue;
   }
 
 private:
@@ -503,8 +450,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<int> mValue;     ///< The double-buffered property value
-  int                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  int mValue;     ///< The property value
+  int mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
@@ -544,7 +491,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -555,7 +502,7 @@ public:
    */
   const float& GetFloat(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -563,7 +510,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -577,15 +524,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, float value)
+  void Set(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex], value))
+    if(!Dali::Equals(mValue, value))
     {
-      mValue[bufferIndex] = value;
+      mValue = value;
 
       OnSet();
     }
@@ -593,15 +539,14 @@ public:
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, float delta)
+  void SetRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex] = mValue[bufferIndex] + delta;
+      mValue = mValue + delta;
 
       OnSet();
     }
@@ -610,54 +555,32 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  float& Get(BufferIndex bufferIndex)
+  float& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const float& Get(BufferIndex bufferIndex) const
+  const float& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  float& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const float& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, float value)
+  void Bake(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue, value))
     {
       // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
       // has never been atomically safe.
-      mValue[bufferIndex]     = value;
-      mValue[1 - bufferIndex] = value;
-      mBaseValue              = mValue[bufferIndex];
+      mValue     = value;
+      mBaseValue = mValue;
 
       OnBake();
     }
@@ -665,39 +588,36 @@ public:
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, float delta)
+  void BakeRelative(float delta)
   {
-    mValue[bufferIndex] = mValue[bufferIndex] + delta;
-    mBaseValue          = mValue[bufferIndex];
+    mValue     = mValue + delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
-   * Sets both double-buffered values & the base value.
+   * Sets both the property value & the base value.
    * This should only be used when the owning object has not been connected to the scene-graph.
    * @param[in] value The new property value.
    */
   void SetInitial(const float& value)
   {
-    mValue[0]  = value;
-    mValue[1]  = mValue[0];
-    mBaseValue = mValue[0];
+    mValue     = value;
+    mBaseValue = mValue;
   }
 
   /**
-   * Change both double-buffered values & the base value by a relative amount.
+   * Change both the property value & the base value by a relative amount.
    * This should only be used when the owning object has not been connected to the scene-graph.
    * @param[in] delta The property will change by this amount.
    */
   void SetInitialRelative(const float& delta)
   {
-    mValue[0]  = mValue[0] + delta;
-    mValue[1]  = mValue[0];
-    mBaseValue = mValue[0];
+    mValue     = mValue + delta;
+    mBaseValue = mValue;
   }
 
 private:
@@ -708,8 +628,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<float> mValue;     ///< The double-buffered property value
-  float                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  float mValue;     ///< The property value
+  float mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
@@ -749,7 +669,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -768,7 +688,7 @@ public:
    */
   const Vector2& GetVector2(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -776,7 +696,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -790,12 +710,11 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, const Vector2& value)
+  void Set(const Vector2& value)
   {
-    mValue[bufferIndex] = value;
+    mValue = value;
 
     OnSet();
   }
@@ -803,15 +722,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new X value.
    */
-  void SetX(BufferIndex bufferIndex, float value)
+  void SetX(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].x, value))
+    if(!Dali::Equals(mValue.x, value))
     {
-      mValue[bufferIndex].x = value;
+      mValue.x = value;
 
       OnSet();
     }
@@ -820,15 +738,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new Y value.
    */
-  void SetY(BufferIndex bufferIndex, float value)
+  void SetY(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].y, value))
+    if(!Dali::Equals(mValue.y, value))
     {
-      mValue[bufferIndex].y = value;
+      mValue.y = value;
 
       OnSet();
     }
@@ -836,27 +753,25 @@ public:
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, const Vector2& delta)
+  void SetRelative(const Vector2& delta)
   {
-    mValue[bufferIndex] += delta;
+    mValue += delta;
 
     OnSet();
   }
 
   /**
    * Change the X value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The X value will change by this amount.
    */
-  void SetXRelative(BufferIndex bufferIndex, float delta)
+  void SetXRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].x += delta;
+      mValue.x += delta;
 
       OnSet();
     }
@@ -864,15 +779,14 @@ public:
 
   /**
    * Change the Y value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The Y value will change by this amount.
    */
-  void SetYRelative(BufferIndex bufferIndex, float delta)
+  void SetYRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].y += delta;
+      mValue.y += delta;
 
       OnSet();
     }
@@ -881,68 +795,44 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector2& Get(BufferIndex bufferIndex)
+  Vector2& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector2& Get(BufferIndex bufferIndex) const
+  const Vector2& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  Vector2& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Vector2& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, const Vector2& value)
+  void Bake(const Vector2& value)
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = value;
+    mValue     = value;
+    mBaseValue = value;
 
     OnBake();
   }
 
   /**
    * Set both the X value & base X value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeX(BufferIndex bufferIndex, float value)
+  void BakeX(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.x, value))
     {
-      mValue[bufferIndex].x     = value;
-      mValue[1 - bufferIndex].x = value;
-      mBaseValue.x              = value;
+      mValue.x     = value;
+      mBaseValue.x = value;
 
       OnBake();
     }
@@ -950,17 +840,15 @@ public:
 
   /**
    * Set both the Y value & base Y value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeY(BufferIndex bufferIndex, float value)
+  void BakeY(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.y, value))
     {
-      mValue[bufferIndex].y     = value;
-      mValue[1 - bufferIndex].y = value;
-      mBaseValue.y              = value;
+      mValue.y     = value;
+      mBaseValue.y = value;
 
       OnBake();
     }
@@ -968,39 +856,36 @@ public:
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, const Vector2& delta)
+  void BakeRelative(const Vector2& delta)
   {
-    mValue[bufferIndex] += delta;
-    mBaseValue = mValue[bufferIndex];
+    mValue += delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
    * Change the X value & base X value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The X value will change by this amount.
    */
-  void BakeXRelative(BufferIndex bufferIndex, float delta)
+  void BakeXRelative(float delta)
   {
-    mValue[bufferIndex].x += delta;
-    mBaseValue.x = mValue[bufferIndex].x;
+    mValue.x += delta;
+    mBaseValue.x = mValue.x;
 
     OnBake();
   }
 
   /**
    * Change the Y value & base Y value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The Y value will change by this amount.
    */
-  void BakeYRelative(BufferIndex bufferIndex, float delta)
+  void BakeYRelative(float delta)
   {
-    mValue[bufferIndex].y += delta;
-    mBaseValue.y = mValue[bufferIndex].y;
+    mValue.y += delta;
+    mBaseValue.y = mValue.y;
 
     OnBake();
   }
@@ -1008,9 +893,9 @@ public:
   /**
    * @brief Reset to base value without dirty flag check.
    */
-  void ResetToBaseValueInternal(BufferIndex updateBufferIndex)
+  void ResetToBaseValueInternal()
   {
-    mValue[updateBufferIndex] = mBaseValue;
+    mValue = mBaseValue;
   }
 
 private:
@@ -1021,8 +906,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<Vector2> mValue;     ///< The double-buffered property value
-  Vector2                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  Vector2 mValue;     ///< The property value
+  Vector2 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
@@ -1071,7 +956,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -1090,7 +975,7 @@ public:
    */
   const Vector3& GetVector3(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -1098,7 +983,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -1112,12 +997,11 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, const Vector3& value)
+  void Set(const Vector3& value)
   {
-    mValue[bufferIndex] = value;
+    mValue = value;
 
     OnSet();
   }
@@ -1125,15 +1009,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new X value.
    */
-  void SetX(BufferIndex bufferIndex, float value)
+  void SetX(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].x, value))
+    if(!Dali::Equals(mValue.x, value))
     {
-      mValue[bufferIndex].x = value;
+      mValue.x = value;
 
       OnSet();
     }
@@ -1142,15 +1025,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new Y value.
    */
-  void SetY(BufferIndex bufferIndex, float value)
+  void SetY(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].y, value))
+    if(!Dali::Equals(mValue.y, value))
     {
-      mValue[bufferIndex].y = value;
+      mValue.y = value;
 
       OnSet();
     }
@@ -1159,15 +1041,14 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new Z value.
    */
-  void SetZ(BufferIndex bufferIndex, float value)
+  void SetZ(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].z, value))
+    if(!Dali::Equals(mValue.z, value))
     {
-      mValue[bufferIndex].z = value;
+      mValue.z = value;
 
       OnSet();
     }
@@ -1175,27 +1056,25 @@ public:
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, const Vector3& delta)
+  void SetRelative(const Vector3& delta)
   {
-    mValue[bufferIndex] += delta;
+    mValue += delta;
 
     OnSet();
   }
 
   /**
    * Change the X value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The X value will change by this amount.
    */
-  void SetXRelative(BufferIndex bufferIndex, float delta)
+  void SetXRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].x += delta;
+      mValue.x += delta;
 
       OnSet();
     }
@@ -1203,15 +1082,14 @@ public:
 
   /**
    * Change the Y value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The Y value will change by this amount.
    */
-  void SetYRelative(BufferIndex bufferIndex, float delta)
+  void SetYRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].y += delta;
+      mValue.y += delta;
 
       OnSet();
     }
@@ -1219,15 +1097,14 @@ public:
 
   /**
    * Change the Z value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The Z value will change by this amount.
    */
-  void SetZRelative(BufferIndex bufferIndex, float delta)
+  void SetZRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].z += delta;
+      mValue.z += delta;
 
       OnSet();
     }
@@ -1236,66 +1113,42 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector3& Get(BufferIndex bufferIndex)
+  Vector3& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector3& Get(BufferIndex bufferIndex) const
+  const Vector3& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  Vector3& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Vector3& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, const Vector3& value)
+  void Bake(const Vector3& value)
   {
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = value;
+    mValue     = value;
+    mBaseValue = value;
 
     OnBake();
   }
 
   /**
    * Set both the X value & base X value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeX(BufferIndex bufferIndex, float value)
+  void BakeX(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.x, value))
     {
-      mValue[bufferIndex].x     = value;
-      mValue[1 - bufferIndex].x = value;
-      mBaseValue.x              = value;
+      mValue.x     = value;
+      mBaseValue.x = value;
 
       OnBake();
     }
@@ -1303,17 +1156,15 @@ public:
 
   /**
    * Set both the Y value & base Y value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeY(BufferIndex bufferIndex, float value)
+  void BakeY(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.y, value))
     {
-      mValue[bufferIndex].y     = value;
-      mValue[1 - bufferIndex].y = value;
-      mBaseValue.y              = value;
+      mValue.y     = value;
+      mBaseValue.y = value;
 
       OnBake();
     }
@@ -1321,17 +1172,15 @@ public:
 
   /**
    * Set both the Z value & base Z value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeZ(BufferIndex bufferIndex, float value)
+  void BakeZ(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.z, value))
     {
-      mValue[bufferIndex].z     = value;
-      mValue[1 - bufferIndex].z = value;
-      mBaseValue.z              = value;
+      mValue.z     = value;
+      mBaseValue.z = value;
 
       OnBake();
     }
@@ -1339,65 +1188,60 @@ public:
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, const Vector3& delta)
+  void BakeRelative(const Vector3& delta)
   {
-    mValue[bufferIndex] += delta;
-    mBaseValue = mValue[bufferIndex];
+    mValue += delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelativeMultiply(BufferIndex bufferIndex, const Vector3& delta)
+  void BakeRelativeMultiply(const Vector3& delta)
   {
-    mValue[bufferIndex] *= delta;
-    mBaseValue = mValue[bufferIndex];
+    mValue *= delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
    * Change the X value & base X value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The X value will change by this amount.
    */
-  void BakeXRelative(BufferIndex bufferIndex, float delta)
+  void BakeXRelative(float delta)
   {
-    mValue[bufferIndex].x += delta;
-    mBaseValue.x = mValue[bufferIndex].x;
+    mValue.x += delta;
+    mBaseValue.x = mValue.x;
 
     OnBake();
   }
 
   /**
    * Change the Y value & base Y value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The Y value will change by this amount.
    */
-  void BakeYRelative(BufferIndex bufferIndex, float delta)
+  void BakeYRelative(float delta)
   {
-    mValue[bufferIndex].y += delta;
-    mBaseValue.y = mValue[bufferIndex].y;
+    mValue.y += delta;
+    mBaseValue.y = mValue.y;
 
     OnBake();
   }
 
   /**
    * Change the Z value & base Z value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The Z value will change by this amount.
    */
-  void BakeZRelative(BufferIndex bufferIndex, float delta)
+  void BakeZRelative(float delta)
   {
-    mValue[bufferIndex].z += delta;
-    mBaseValue.z = mValue[bufferIndex].z;
+    mValue.z += delta;
+    mBaseValue.z = mValue.z;
 
     OnBake();
   }
@@ -1410,8 +1254,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<Vector3> mValue;     ///< The double-buffered property value
-  Vector3                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  Vector3 mValue;     ///< The property value
+  Vector3 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
@@ -1451,7 +1295,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -1470,7 +1314,7 @@ public:
    */
   const Vector4& GetVector4(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -1478,7 +1322,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -1492,12 +1336,11 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, const Vector4& value)
+  void Set(const Vector4& value)
   {
-    mValue[bufferIndex] = value;
+    mValue = value;
 
     OnSet();
   }
@@ -1505,15 +1348,14 @@ public:
   /**
    * Set the X value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new X value.
    */
-  void SetX(BufferIndex bufferIndex, float value)
+  void SetX(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].x, value))
+    if(!Dali::Equals(mValue.x, value))
     {
-      mValue[bufferIndex].x = value;
+      mValue.x = value;
 
       OnSet();
     }
@@ -1522,15 +1364,14 @@ public:
   /**
    * Set the Y value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new Y value.
    */
-  void SetY(BufferIndex bufferIndex, float value)
+  void SetY(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].y, value))
+    if(!Dali::Equals(mValue.y, value))
     {
-      mValue[bufferIndex].y = value;
+      mValue.y = value;
 
       OnSet();
     }
@@ -1539,15 +1380,14 @@ public:
   /**
    * Set the Z value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new Z value.
    */
-  void SetZ(BufferIndex bufferIndex, float value)
+  void SetZ(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].z, value))
+    if(!Dali::Equals(mValue.z, value))
     {
-      mValue[bufferIndex].z = value;
+      mValue.z = value;
 
       OnSet();
     }
@@ -1556,15 +1396,14 @@ public:
   /**
    * Set the W value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new W value.
    */
-  void SetW(BufferIndex bufferIndex, float value)
+  void SetW(float value)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if(!Dali::Equals(mValue[bufferIndex].w, value))
+    if(!Dali::Equals(mValue.w, value))
     {
-      mValue[bufferIndex].w = value;
+      mValue.w = value;
 
       OnSet();
     }
@@ -1572,27 +1411,25 @@ public:
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, const Vector4& delta)
+  void SetRelative(const Vector4& delta)
   {
-    mValue[bufferIndex] = mValue[bufferIndex] + delta;
+    mValue = mValue + delta;
 
     OnSet();
   }
 
   /**
    * Change the X value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The X value will change by this amount.
    */
-  void SetXRelative(BufferIndex bufferIndex, float delta)
+  void SetXRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].x = mValue[bufferIndex].x + delta;
+      mValue.x = mValue.x + delta;
 
       OnSet();
     }
@@ -1600,15 +1437,14 @@ public:
 
   /**
    * Change the Y value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The Y value will change by this amount.
    */
-  void SetYRelative(BufferIndex bufferIndex, float delta)
+  void SetYRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].y = mValue[bufferIndex].y + delta;
+      mValue.y = mValue.y + delta;
 
       OnSet();
     }
@@ -1616,15 +1452,14 @@ public:
 
   /**
    * Change the Z value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The Z value will change by this amount.
    */
-  void SetZRelative(BufferIndex bufferIndex, float delta)
+  void SetZRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].z = mValue[bufferIndex].z + delta;
+      mValue.z = mValue.z + delta;
 
       OnSet();
     }
@@ -1632,15 +1467,14 @@ public:
 
   /**
    * Change the W value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The W value will change by this amount.
    */
-  void SetWRelative(BufferIndex bufferIndex, float delta)
+  void SetWRelative(float delta)
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if(!Dali::EqualsZero(delta))
     {
-      mValue[bufferIndex].w = mValue[bufferIndex].w + delta;
+      mValue.w = mValue.w + delta;
 
       OnSet();
     }
@@ -1649,66 +1483,42 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Vector4& Get(BufferIndex bufferIndex)
+  Vector4& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Vector4& Get(BufferIndex bufferIndex) const
+  const Vector4& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  Vector4& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Vector4& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, const Vector4& value)
+  void Bake(const Vector4& value)
   {
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = mValue[bufferIndex];
+    mValue     = value;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
    * Set both the X value & base X value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeX(BufferIndex bufferIndex, float value)
+  void BakeX(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.x, value))
     {
-      mValue[bufferIndex].x     = value;
-      mValue[1 - bufferIndex].x = value;
-      mBaseValue.x              = mValue[bufferIndex].x;
+      mValue.x     = value;
+      mBaseValue.x = mValue.x;
 
       OnBake();
     }
@@ -1716,17 +1526,15 @@ public:
 
   /**
    * Set both the Y value & base Y value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeY(BufferIndex bufferIndex, float value)
+  void BakeY(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.y, value))
     {
-      mValue[bufferIndex].y     = value;
-      mValue[1 - bufferIndex].y = value;
-      mBaseValue.y              = mValue[bufferIndex].y;
+      mValue.y     = value;
+      mBaseValue.y = mValue.y;
 
       OnBake();
     }
@@ -1734,17 +1542,15 @@ public:
 
   /**
    * Set both the Z value & base Z value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeZ(BufferIndex bufferIndex, float value)
+  void BakeZ(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.z, value))
     {
-      mValue[bufferIndex].z     = value;
-      mValue[1 - bufferIndex].z = value;
-      mBaseValue.z              = mValue[bufferIndex].z;
+      mValue.z     = value;
+      mBaseValue.z = mValue.z;
 
       OnBake();
     }
@@ -1752,17 +1558,15 @@ public:
 
   /**
    * Set both the W value & base W value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void BakeW(BufferIndex bufferIndex, float value)
+  void BakeW(float value)
   {
     // bake has to check the base value as current buffer value can be correct by constraint or something else
     if(!Dali::Equals(mBaseValue.w, value))
     {
-      mValue[bufferIndex].w     = value;
-      mValue[1 - bufferIndex].w = value;
-      mBaseValue.w              = mValue[bufferIndex].w;
+      mValue.w     = value;
+      mBaseValue.w = mValue.w;
 
       OnBake();
     }
@@ -1770,79 +1574,73 @@ public:
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, const Vector4& delta)
+  void BakeRelative(const Vector4& delta)
   {
-    mValue[bufferIndex] = mValue[bufferIndex] + delta;
-    mBaseValue          = mValue[bufferIndex];
+    mValue     = mValue + delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
    * Change the X value & base X value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The X value will change by this amount.
    */
-  void BakeXRelative(BufferIndex bufferIndex, float delta)
+  void BakeXRelative(float delta)
   {
-    mValue[bufferIndex].x = mValue[bufferIndex].x + delta;
-    mBaseValue.x          = mValue[bufferIndex].x;
+    mValue.x     = mValue.x + delta;
+    mBaseValue.x = mValue.x;
 
     OnBake();
   }
 
   /**
    * Change the Y value & base Y value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The Y value will change by this amount.
    */
-  void BakeYRelative(BufferIndex bufferIndex, float delta)
+  void BakeYRelative(float delta)
   {
-    mValue[bufferIndex].y = mValue[bufferIndex].y + delta;
-    mBaseValue.y          = mValue[bufferIndex].y;
+    mValue.y     = mValue.y + delta;
+    mBaseValue.y = mValue.y;
 
     OnBake();
   }
 
   /**
    * Change the Z value & base Z value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The Z value will change by this amount.
    */
-  void BakeZRelative(BufferIndex bufferIndex, float delta)
+  void BakeZRelative(float delta)
   {
-    mValue[bufferIndex].z = mValue[bufferIndex].z + delta;
-    mBaseValue.z          = mValue[bufferIndex].z;
+    mValue.z     = mValue.z + delta;
+    mBaseValue.z = mValue.z;
 
     OnBake();
   }
 
   /**
    * Change the W value & base W value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The W value will change by this amount.
    */
-  void BakeWRelative(BufferIndex bufferIndex, float delta)
+  void BakeWRelative(float delta)
   {
-    mValue[bufferIndex].w = mValue[bufferIndex].w + delta;
-    mBaseValue.w          = mValue[bufferIndex].w;
+    mValue.w     = mValue.w + delta;
+    mBaseValue.w = mValue.w;
 
     OnBake();
   }
 
   /**
-   * Sets both double-buffered W values & the base W value.
+   * Sets both the property W value & the base W value.
    * This should only be used when the owning object has not been connected to the scene-graph.
    * @param[in] value The new W value.
    */
   void SetWInitial(float value)
   {
-    mValue[0].w  = value;
-    mValue[1].w  = mValue[0].w;
-    mBaseValue.w = mValue[0].w;
+    mValue.w     = value;
+    mBaseValue.w = mValue.w;
   }
 
 private:
@@ -1853,8 +1651,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<Vector4> mValue;     ///< The double-buffered property value
-  Vector4                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  Vector4 mValue;     ///< The property value
+  Vector4 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 /**
  * An Quaternion animatable property of a scene-graph object.
@@ -1902,7 +1700,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -1913,20 +1711,7 @@ public:
    */
   const Quaternion& GetQuaternion(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Set the property value. This will only persist for the current frame; the property
-   * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
-   * @param[in] value The new property value.
-   */
-  void Set(BufferIndex bufferIndex, const Quaternion& value)
-  {
-    mValue[bufferIndex] = value;
-
-    OnSet();
+    return mValue;
   }
 
   /**
@@ -1934,7 +1719,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -1946,13 +1731,24 @@ public:
   }
 
   /**
+   * Set the property value. This will only persist for the current frame; the property
+   * will be reset with the base value, at the beginning of the next frame.
+   * @param[in] value The new property value.
+   */
+  void Set(const Quaternion& value)
+  {
+    mValue = value;
+
+    OnSet();
+  }
+
+  /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, const Quaternion& delta)
+  void SetRelative(const Quaternion& delta)
   {
-    mValue[bufferIndex] *= delta;
+    mValue *= delta;
 
     OnSet();
   }
@@ -1960,64 +1756,41 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Quaternion& Get(BufferIndex bufferIndex)
+  Quaternion& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Quaternion& Get(BufferIndex bufferIndex) const
+  const Quaternion& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  Quaternion& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Quaternion& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, const Quaternion& value)
+  void Bake(const Quaternion& value)
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = value;
+    mValue     = value;
+    mBaseValue = value;
 
     OnBake();
   }
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, const Quaternion& delta)
+  void BakeRelative(const Quaternion& delta)
   {
-    mValue[bufferIndex] *= delta;
-    mBaseValue = mValue[bufferIndex];
+    mValue *= delta;
+    mBaseValue = mValue;
 
     OnBake();
   }
@@ -2030,8 +1803,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<Quaternion> mValue;     ///< The double-buffered property value
-  Quaternion                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  Quaternion mValue;     ///< The property value
+  Quaternion mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
@@ -2071,7 +1844,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -2082,7 +1855,7 @@ public:
    */
   const Matrix& GetMatrix(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -2090,7 +1863,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -2104,25 +1877,23 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, const Matrix& value)
+  void Set(const Matrix& value)
   {
-    mValue[bufferIndex] = value;
+    mValue = value;
     OnSet();
   }
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, const Matrix& delta)
+  void SetRelative(const Matrix& delta)
   {
     Matrix temp;
-    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
-    mValue[bufferIndex] = temp;
+    MatrixUtils::Multiply(temp, mValue, delta);
+    mValue = temp;
 
     OnSet();
   }
@@ -2130,66 +1901,43 @@ public:
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Matrix& Get(BufferIndex bufferIndex)
+  Matrix& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Matrix& Get(BufferIndex bufferIndex) const
+  const Matrix& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  Matrix& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Matrix& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, const Matrix& value)
+  void Bake(const Matrix& value)
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = mValue[bufferIndex];
+    mValue     = value;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, const Matrix& delta)
+  void BakeRelative(const Matrix& delta)
   {
     Matrix temp;
-    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
-    mValue[bufferIndex] = temp;
-    mBaseValue          = temp;
+    MatrixUtils::Multiply(temp, mValue, delta);
+    mValue     = temp;
+    mBaseValue = temp;
 
     OnBake();
   }
@@ -2202,8 +1950,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<Matrix> mValue;     ///< The double-buffered property value
-  Matrix                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  Matrix mValue;     ///< The property value
+  Matrix mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 /**
@@ -2243,7 +1991,7 @@ public:
   {
     if(CLEAN_FLAG != mDirtyFlags)
     {
-      mValue[updateBufferIndex] = mBaseValue;
+      mValue = mBaseValue;
 
       mDirtyFlags = (mDirtyFlags >> 1);
     }
@@ -2254,7 +2002,7 @@ public:
    */
   const Matrix3& GetMatrix3(BufferIndex bufferIndex) const override
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
@@ -2262,7 +2010,7 @@ public:
    */
   const void* GetValueAddress(BufferIndex bufferIndex) const override
   {
-    return &mValue[bufferIndex];
+    return &mValue;
   }
 
   /**
@@ -2276,91 +2024,66 @@ public:
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, const Matrix3& value)
+  void Set(const Matrix3& value)
   {
-    mValue[bufferIndex] = value;
+    mValue = value;
     OnSet();
   }
 
   /**
    * Change the property value by a relative amount.
-   * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
    */
-  void SetRelative(BufferIndex bufferIndex, const Matrix3& delta)
+  void SetRelative(const Matrix3& delta)
   {
     Matrix3 temp;
-    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
-    mValue[bufferIndex] = temp;
+    MatrixUtils::Multiply(temp, mValue, delta);
+    mValue = temp;
     OnSet();
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  Matrix3& Get(BufferIndex bufferIndex)
+  Matrix3& Get()
   {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  const Matrix3& Get(BufferIndex bufferIndex) const
+  const Matrix3& Get() const
   {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  Matrix3& operator[](BufferIndex bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Matrix3& operator[](BufferIndex bufferIndex) const
-  {
-    return mValue[bufferIndex];
+    return mValue;
   }
 
   /**
    * Set both the property value & base value.
-   * @param[in] bufferIndex The buffer to write for the property value.
    * @param[in] value The new property value.
    */
-  void Bake(BufferIndex bufferIndex, const Matrix3& value)
+  void Bake(const Matrix3& value)
   {
     // It's ok to bake both buffers as render is performed in same thread as update. Reading from event side
     // has never been atomically safe.
-    mValue[bufferIndex]     = value;
-    mValue[1 - bufferIndex] = value;
-    mBaseValue              = mValue[bufferIndex];
+    mValue     = value;
+    mBaseValue = mValue;
 
     OnBake();
   }
 
   /**
    * Change the property value & base value by a relative amount.
-   * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
    */
-  void BakeRelative(BufferIndex bufferIndex, const Matrix3& delta)
+  void BakeRelative(const Matrix3& delta)
   {
     Matrix3 temp;
-    MatrixUtils::Multiply(temp, mValue[bufferIndex], delta);
-    mValue[bufferIndex] = temp;
-    mBaseValue          = temp;
+    MatrixUtils::Multiply(temp, mValue, delta);
+    mValue     = temp;
+    mBaseValue = temp;
 
     OnBake();
   }
@@ -2373,8 +2096,8 @@ private:
   AnimatableProperty& operator=(const AnimatableProperty& rhs);
 
 private:
-  DoubleBuffered<Matrix3> mValue;     ///< The double-buffered property value
-  Matrix3                 mBaseValue; ///< Reset to this base value at the beginning of each frame
+  Matrix3 mValue;     ///< The property value
+  Matrix3 mBaseValue; ///< Reset to this base value at the beginning of each frame
 };
 
 } // namespace SceneGraph

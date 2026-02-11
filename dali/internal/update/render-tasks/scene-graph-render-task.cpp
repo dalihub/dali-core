@@ -184,17 +184,17 @@ bool RenderTask::QueryViewport(BufferIndex bufferIndex, Viewport& viewport) cons
     return false;
   }
 
-  viewport.x      = static_cast<int>(mViewportPosition[bufferIndex].x);  // truncated
-  viewport.y      = static_cast<int>(mViewportPosition[bufferIndex].y);  // truncated
-  viewport.width  = static_cast<int>(mViewportSize[bufferIndex].width);  // truncated
-  viewport.height = static_cast<int>(mViewportSize[bufferIndex].height); // truncated
+  viewport.x      = static_cast<int>(mViewportPosition.Get().x);  // truncated
+  viewport.y      = static_cast<int>(mViewportPosition.Get().y);  // truncated
+  viewport.width  = static_cast<int>(mViewportSize.Get().width);  // truncated
+  viewport.height = static_cast<int>(mViewportSize.Get().height); // truncated
 
   return true;
 }
 
 const Vector4& RenderTask::GetClearColor(BufferIndex bufferIndex) const
 {
-  return mClearColor[bufferIndex];
+  return mClearColor.Get();
 }
 
 void RenderTask::SetClearEnabled(bool enabled)
@@ -458,27 +458,27 @@ void RenderTask::UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize
      *
      * TODO : Need to make Resseter for these properties.
      */
-    mViewportPosition.Set(updateBufferIndex, screenPosition);
-    mViewportSize.Set(updateBufferIndex, Vector2(nodeSize));
+    mViewportPosition.Set(screenPosition);
+    mViewportSize.Set(Vector2(nodeSize));
   }
 }
 
 const Vector2& RenderTask::GetViewportPosition(BufferIndex bufferIndex) const
 {
-  return mViewportPosition[bufferIndex];
+  return mViewportPosition.Get();
 }
 
 const Vector2& RenderTask::GetViewportSize(BufferIndex bufferIndex) const
 {
-  return mViewportSize[bufferIndex];
+  return mViewportSize.Get();
 }
 
 bool RenderTask::GetViewportEnabled(BufferIndex bufferIndex) const
 {
-  if(fabsf(mViewportPosition[bufferIndex].x) > Math::MACHINE_EPSILON_1 ||
-     fabsf(mViewportPosition[bufferIndex].y) > Math::MACHINE_EPSILON_1 ||
-     fabsf(mViewportSize[bufferIndex].width) > Math::MACHINE_EPSILON_1 ||
-     fabsf(mViewportSize[bufferIndex].height) > Math::MACHINE_EPSILON_1)
+  if(fabsf(mViewportPosition.Get().x) > Math::MACHINE_EPSILON_1 ||
+     fabsf(mViewportPosition.Get().y) > Math::MACHINE_EPSILON_1 ||
+     fabsf(mViewportSize.Get().width) > Math::MACHINE_EPSILON_1 ||
+     fabsf(mViewportSize.Get().height) > Math::MACHINE_EPSILON_1)
   {
     return true;
   }
@@ -588,10 +588,8 @@ void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)
     if(DALI_LIKELY(!Dali::Stage::IsShuttingDown()))
     {
       // TODO : Until SG::RenderTask Resseter preopared, just call this internal API without dirty flag down.
-      mViewportPosition.ResetToBaseValueInternal(0);
-      mViewportPosition.ResetToBaseValueInternal(1);
-      mViewportSize.ResetToBaseValueInternal(0);
-      mViewportSize.ResetToBaseValueInternal(1);
+      mViewportPosition.ResetToBaseValueInternal();
+      mViewportSize.ResetToBaseValueInternal();
     }
   }
 }

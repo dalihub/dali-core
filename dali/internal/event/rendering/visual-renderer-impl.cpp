@@ -348,7 +348,7 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
       {
         if(DALI_LIKELY(mVisualProperties))
         {
-          value = mVisualProperties->mTransformOffset[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformOffset.Get();
         }
         break;
       }
@@ -356,7 +356,7 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
       {
         if(DALI_LIKELY(mVisualProperties))
         {
-          value = mVisualProperties->mTransformSize[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformSize.Get();
         }
         break;
       }
@@ -364,7 +364,7 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
       {
         if(DALI_LIKELY(mVisualProperties))
         {
-          value = mVisualProperties->mTransformOrigin[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformOrigin.Get();
         }
         break;
       }
@@ -372,7 +372,7 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
       {
         if(DALI_LIKELY(mVisualProperties))
         {
-          value = mVisualProperties->mTransformAnchorPoint[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformAnchorPoint.Get();
         }
         break;
       }
@@ -380,7 +380,7 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
       {
         if(DALI_LIKELY(mVisualProperties))
         {
-          value = mVisualProperties->mTransformOffsetSizeMode[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mTransformOffsetSizeMode.Get();
         }
         break;
       }
@@ -388,7 +388,7 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
       {
         if(DALI_LIKELY(mVisualProperties))
         {
-          value = mVisualProperties->mExtraSize[GetEventThreadServices().GetEventBufferIndex()];
+          value = mVisualProperties->mExtraSize.Get();
         }
         break;
       }

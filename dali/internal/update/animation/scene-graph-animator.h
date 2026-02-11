@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -552,18 +552,18 @@ public:
    */
   void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) final
   {
-    const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
+    const PropertyType& current = mPropertyAccessor.Get();
 
     // need to cast the return value in case property is integer
     const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, blendPoint, current));
 
     if(bake)
     {
-      mPropertyAccessor.Bake(bufferIndex, result);
+      mPropertyAccessor.Bake(result);
     }
     else
     {
-      mPropertyAccessor.Set(bufferIndex, result);
+      mPropertyAccessor.Set(result);
     }
   }
 
@@ -632,18 +632,18 @@ public:
    */
   void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) final
   {
-    const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
+    const PropertyType& current = mPropertyAccessor.Get();
 
     // need to cast the return value in case property is integer
     const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, blendPoint, current));
 
     if(bake)
     {
-      mPropertyAccessor.Bake(bufferIndex, result);
+      mPropertyAccessor.Bake(result);
     }
     else
     {
-      mPropertyAccessor.Set(bufferIndex, result);
+      mPropertyAccessor.Set(result);
     }
   }
 

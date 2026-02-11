@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-input-impl.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/public-api/common/dali-common.h>

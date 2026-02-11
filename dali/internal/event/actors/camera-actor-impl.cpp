@@ -1008,17 +1008,17 @@ const SceneGraph::PropertyBase* CameraActor::GetSceneObjectAnimatableProperty(Pr
   {
     case Dali::CameraActor::Property::FIELD_OF_VIEW:
     {
-      property = GetCameraSceneObject().GetFieldOfView();
+      property = GetCameraSceneObject().GetFieldOfViewProperty();
       break;
     }
     case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
     {
-      property = GetCameraSceneObject().GetOrthographicSize();
+      property = GetCameraSceneObject().GetOrthographicSizeProperty();
       break;
     }
     case Dali::CameraActor::Property::ASPECT_RATIO:
     {
-      property = GetCameraSceneObject().GetAspectRatio();
+      property = GetCameraSceneObject().GetAspectRatioProperty();
       break;
     }
     case Dali::CameraActor::Property::NEAR_PLANE_DISTANCE:
@@ -1055,12 +1055,12 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Inde
     }
     case Dali::CameraActor::Property::FIELD_OF_VIEW:
     {
-      property = GetCameraSceneObject().GetFieldOfView();
+      property = GetCameraSceneObject().GetFieldOfViewProperty();
       break;
     }
     case Dali::CameraActor::Property::ASPECT_RATIO:
     {
-      property = GetCameraSceneObject().GetAspectRatio();
+      property = GetCameraSceneObject().GetAspectRatioProperty();
       break;
     }
     case Dali::CameraActor::Property::NEAR_PLANE_DISTANCE:
@@ -1090,7 +1090,7 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty(Property::Inde
     }
     case Dali::DevelCameraActor::Property::ORTHOGRAPHIC_SIZE:
     {
-      property = GetCameraSceneObject().GetOrthographicSize();
+      property = GetCameraSceneObject().GetOrthographicSizeProperty();
       break;
     }
     case Dali::DevelCameraActor::Property::PROJECTION_DIRECTION:
