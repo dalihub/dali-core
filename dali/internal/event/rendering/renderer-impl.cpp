@@ -268,6 +268,9 @@ void Renderer::SetShader(Shader& shader)
 
   const SceneGraph::Shader& sceneGraphShader = shader.GetShaderSceneObject();
   SceneGraph::SetShaderMessage(GetEventThreadServices(), GetRendererSceneObject(), &sceneGraphShader);
+
+  // For derived class.
+  OnShaderChanged();
 }
 
 ShaderPtr Renderer::GetShader() const
@@ -281,6 +284,9 @@ void Renderer::RemoveShader()
   {
     mShader = nullptr;
     SceneGraph::SetShaderMessage(GetEventThreadServices(), GetRendererSceneObject(), nullptr);
+
+    // For derived class.
+    OnShaderChanged();
   }
 }
 

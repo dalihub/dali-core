@@ -1287,10 +1287,6 @@ int UtcDaliAnimationSetEndActionP04(void)
   Animation animation = Animation::New(durationSeconds);
   DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE);
 
-  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
-  // Before, transform could not be animated.
-  visualRenderer.RegisterVisualTransformUniform();
-
   Vector2 targetValue(1.0f, 1.0f);
   animation.AnimateTo(Property(visualRenderer, Dali::VisualRenderer::Property::TRANSFORM_SIZE), targetValue, AlphaFunction::LINEAR);
 
