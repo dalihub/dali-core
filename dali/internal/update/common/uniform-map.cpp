@@ -17,9 +17,6 @@
 // CLASS HEADER
 #include <dali/internal/update/common/uniform-map.h>
 
-// EXTERNAL INCLUDES
-#include <algorithm>
-
 namespace Dali
 {
 namespace Internal
@@ -33,57 +30,38 @@ void UniformMap::MappingChanged()
 
 void UniformMap::Add(UniformPropertyMapping newMap)
 {
-  auto iter = std::find_if(mUniformMaps.Begin(),
-                           mUniformMaps.End(),
-                           [&](auto& element)
-  { return element.uniformName == newMap.uniformName; });
-
-  if(iter != mUniformMaps.End())
+  auto iter = mUniformMaps.lower_bound(newMap.uniformName);
+  if(iter == mUniformMaps.end() || ConstStringComparator()(newMap.uniformName, iter->first))
   {
-    // Mapping already exists - update it.
-    (*iter).propertyPtr = newMap.propertyPtr;
+    mUniformMaps.insert(iter, {newMap.uniformName, newMap});
   }
   else
   {
-    // add the new map.
-    mUniformMaps.PushBack(newMap);
+    // element already present, update the property pointer in place
+    iter->second.propertyPtr = newMap.propertyPtr;
   }
-
   MappingChanged();
 }
 
 void UniformMap::Remove(ConstString uniformName)
 {
-  auto iter = std::find_if(mUniformMaps.Begin(),
-                           mUniformMaps.End(),
-                           [&](auto& element)
-  { return element.uniformName == uniformName; });
-
-  if(iter != mUniformMaps.End())
+  auto iter = mUniformMaps.find(uniformName);
+  if(iter != mUniformMaps.end())
   {
-    mUniformMaps.Erase(iter);
+    mUniformMaps.erase(iter);
     MappingChanged();
   }
 }
 
 const PropertyInputImpl* UniformMap::Find(ConstString uniformName) const
 {
-  auto iter = std::find_if(mUniformMaps.Begin(),
-                           mUniformMaps.End(),
-                           [&](auto& element)
-  { return element.uniformName == uniformName; });
-
-  return (iter != mUniformMaps.End()) ? (*iter).propertyPtr : nullptr;
+  auto iter = mUniformMaps.find(uniformName);
+  return (iter != mUniformMaps.end()) ? iter->second.propertyPtr : nullptr;
 }
 
 UniformMap::SizeType UniformMap::Count() const
 {
-  return static_cast<UniformMap::SizeType>(mUniformMaps.Count());
-}
-
-const UniformPropertyMapping& UniformMap::operator[](UniformMap::SizeType index) const
-{
-  return mUniformMaps[index];
+  return static_cast<UniformMap::SizeType>(mUniformMaps.size());
 }
 
 } // namespace SceneGraph

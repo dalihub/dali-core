@@ -98,9 +98,9 @@ UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)
 
   ProgramIndex programIndex = mUniformIndexMaps.size();
 
-  auto& uniformMap = GetUniformMap();
+  auto& uniformMapContainer = GetUniformMap().GetUniformMapContainer();
 
-  const uint32_t mapCount = uniformMap.Count();
+  const uint32_t mapCount = static_cast<uint32_t>(uniformMapContainer.size());
 
   // Create index map for program from uniform map
   UniformIndexMappings currentUniformIndexMap;
@@ -108,13 +108,17 @@ UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)
 
   // Copy uniform map into uniformIndexMap
   uint32_t mapIndex = 0;
-  for(; mapIndex < mapCount; ++mapIndex)
+  for(const auto& uniformMap : uniformMapContainer)
   {
-    currentUniformIndexMap[mapIndex].propertyValue          = uniformMap[mapIndex].propertyPtr;
-    currentUniformIndexMap[mapIndex].uniformName            = uniformMap[mapIndex].uniformName;
-    currentUniformIndexMap[mapIndex].uniformNameHash        = uniformMap[mapIndex].uniformNameHash;
-    currentUniformIndexMap[mapIndex].uniformNameHashNoArray = uniformMap[mapIndex].uniformNameHashNoArray;
-    currentUniformIndexMap[mapIndex].arrayIndex             = uniformMap[mapIndex].arrayIndex;
+    const auto& uniformName      = uniformMap.first;
+    const auto& propertyMappings = uniformMap.second;
+
+    currentUniformIndexMap[mapIndex].propertyValue          = propertyMappings.propertyPtr;
+    currentUniformIndexMap[mapIndex].uniformName            = uniformName;
+    currentUniformIndexMap[mapIndex].uniformNameHash        = propertyMappings.uniformNameHash;
+    currentUniformIndexMap[mapIndex].uniformNameHashNoArray = propertyMappings.uniformNameHashNoArray;
+    currentUniformIndexMap[mapIndex].arrayIndex             = propertyMappings.arrayIndex;
+    ++mapIndex;
   }
 
   // Initialize uniforms by current program.
