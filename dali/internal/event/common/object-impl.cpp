@@ -1493,8 +1493,6 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
   }
   else
   {
-    BufferIndex bufferIndex(GetEventThreadServices().GetEventBufferIndex());
-
     switch(entry.GetType())
     {
       case Property::BOOLEAN:
@@ -1502,7 +1500,7 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
         const AnimatableProperty<bool>* property = static_cast<const AnimatableProperty<bool>*>(entry.GetSceneGraphProperty());
         DALI_ASSERT_DEBUG(property);
 
-        value = (*property)[bufferIndex];
+        value = property->Get();
         break;
       }
 
@@ -1511,7 +1509,7 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
         const AnimatableProperty<int32_t>* property = static_cast<const AnimatableProperty<int32_t>*>(entry.GetSceneGraphProperty());
         DALI_ASSERT_DEBUG(property);
 
-        value = (*property)[bufferIndex];
+        value = property->Get();
         break;
       }
 
@@ -1520,7 +1518,7 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
         const AnimatableProperty<float>* property = static_cast<const AnimatableProperty<float>*>(entry.GetSceneGraphProperty());
         DALI_ASSERT_DEBUG(property);
 
-        value = (*property)[bufferIndex];
+        value = property->Get();
         break;
       }
 
@@ -1531,15 +1529,15 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
 
         if(entry.componentIndex == 0)
         {
-          value = (*property)[bufferIndex].x;
+          value = property->Get().x;
         }
         else if(entry.componentIndex == 1)
         {
-          value = (*property)[bufferIndex].y;
+          value = property->Get().y;
         }
         else
         {
-          value = (*property)[bufferIndex];
+          value = property->Get();
         }
         break;
       }
@@ -1551,19 +1549,19 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
 
         if(entry.componentIndex == 0)
         {
-          value = (*property)[bufferIndex].x;
+          value = property->Get().x;
         }
         else if(entry.componentIndex == 1)
         {
-          value = (*property)[bufferIndex].y;
+          value = property->Get().y;
         }
         else if(entry.componentIndex == 2)
         {
-          value = (*property)[bufferIndex].z;
+          value = property->Get().z;
         }
         else
         {
-          value = (*property)[bufferIndex];
+          value = property->Get();
         }
         break;
       }
@@ -1575,23 +1573,23 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
 
         if(entry.componentIndex == 0)
         {
-          value = (*property)[bufferIndex].x;
+          value = property->Get().x;
         }
         else if(entry.componentIndex == 1)
         {
-          value = (*property)[bufferIndex].y;
+          value = property->Get().y;
         }
         else if(entry.componentIndex == 2)
         {
-          value = (*property)[bufferIndex].z;
+          value = property->Get().z;
         }
         else if(entry.componentIndex == 3)
         {
-          value = (*property)[bufferIndex].w;
+          value = property->Get().w;
         }
         else
         {
-          value = (*property)[bufferIndex];
+          value = property->Get();
         }
         break;
       }
@@ -1601,7 +1599,7 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
         const AnimatableProperty<Matrix>* property = static_cast<const AnimatableProperty<Matrix>*>(entry.GetSceneGraphProperty());
         DALI_ASSERT_DEBUG(property);
 
-        value = (*property)[bufferIndex];
+        value = property->Get();
         break;
       }
 
@@ -1610,7 +1608,7 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
         const AnimatableProperty<Matrix3>* property = static_cast<const AnimatableProperty<Matrix3>*>(entry.GetSceneGraphProperty());
         DALI_ASSERT_DEBUG(property);
 
-        value = (*property)[bufferIndex];
+        value = property->Get();
         break;
       }
 
@@ -1619,7 +1617,7 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
         const AnimatableProperty<Quaternion>* property = static_cast<const AnimatableProperty<Quaternion>*>(entry.GetSceneGraphProperty());
         DALI_ASSERT_DEBUG(property);
 
-        value = (*property)[bufferIndex];
+        value = property->Get();
         break;
       }
 

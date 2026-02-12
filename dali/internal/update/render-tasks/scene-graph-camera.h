@@ -138,7 +138,7 @@ public:
    */
   bool IsYAxisInverted() const
   {
-    return mInvertYAxis[0];
+    return mInvertYAxis.Get();
   }
 
   /**
@@ -183,87 +183,77 @@ public:
 
   /**
    * @brief Bakes the field of view.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] fieldOfView The field of view.
    */
-  void BakeFieldOfView(BufferIndex updateBufferIndex, float fieldOfView);
+  void BakeFieldOfView(float fieldOfView);
 
   /**
    * @brief Retrieve the field of view.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The field of view.
    */
-  float GetFieldOfView(BufferIndex bufferIndex) const
+  float GetFieldOfView() const
   {
-    return mFieldOfView[bufferIndex];
+    return mFieldOfView.Get();
   }
 
   /**
    * @brief Bakes the orthographic size.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] orthographicSize The orthographic size.
    */
-  void BakeOrthographicSize(BufferIndex updateBufferIndex, float orthographicSize);
+  void BakeOrthographicSize(float orthographicSize);
 
   /**
    * @brief Retrieve the orthographic size.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The orthographic size.
    */
-  float GetOrthographicSize(BufferIndex bufferIndex) const
+  float GetOrthographicSize() const
   {
-    return mOrthographicSize[bufferIndex];
+    return mOrthographicSize.Get();
   }
 
   /**
    * @brief Bakes the aspect ratio.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] aspectRatio The aspect ratio.
    */
-  void BakeAspectRatio(BufferIndex updateBufferIndex, float aspectRatio);
+  void BakeAspectRatio(float aspectRatio);
 
   /**
    * @brief Retrieve the aspect ratio.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The aspect ratio.
    */
-  float GetAspectRatio(BufferIndex bufferIndex) const
+  float GetAspectRatio() const
   {
-    return mAspectRatio[bufferIndex];
+    return mAspectRatio.Get();
   }
 
   /**
    * @brief Bakes the near clipping plane distance.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] nearClippingPlane The near clipping plane distance.
    */
-  void BakeNearClippingPlane(BufferIndex updateBufferIndex, float nearClippingPlane);
+  void BakeNearClippingPlane(float nearClippingPlane);
 
   /**
    * @brief Retrieve the near clipping plane distance.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The near clipping plane distance.
    */
-  float GetNearClippingPlane(BufferIndex bufferIndex) const
+  float GetNearClippingPlane() const
   {
-    return mNearClippingPlane[bufferIndex];
+    return mNearClippingPlane.Get();
   }
 
   /**
    * @brief Bakes the far clipping plane distance.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] farClippingPlane The far clipping plane distance.
    */
-  void BakeFarClippingPlane(BufferIndex updateBufferIndex, float farClippingPlane);
+  void BakeFarClippingPlane(float farClippingPlane);
 
   /**
    * @brief Retrieve the far clipping plane distance.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The far clipping plane distance.
    */
-  float GetFarClippingPlane(BufferIndex bufferIndex) const
+  float GetFarClippingPlane() const
   {
-    return mFarClippingPlane[bufferIndex];
+    return mFarClippingPlane.Get();
   }
 
   /**
@@ -310,7 +300,7 @@ public:
   /**
    * @brief Calculate orthographic clipping box by this camera's orthographic size.
    */
-  Dali::Rect<int32_t> GetOrthographicClippingBox(BufferIndex bufferIndex) const;
+  Dali::Rect<int32_t> GetOrthographicClippingBox() const;
 
   /**
    * Retrieve the projection-matrix.
@@ -342,14 +332,14 @@ public:
    * @pre The camera is on-stage.
    * @return The field of view property querying interface.
    */
-  const PropertyBase* GetFieldOfView() const;
+  const PropertyBase* GetFieldOfViewProperty() const;
 
   /**
    * Retrieve the aspect ratio property querying interface.
    * @pre The camera is on-stage.
    * @return The aspect ratio property querying interface.
    */
-  const PropertyBase* GetAspectRatio() const;
+  const PropertyBase* GetAspectRatioProperty() const;
 
   /**
    * Retrieve the near clipping plane distance property querying interface.
@@ -391,7 +381,7 @@ public:
    * @pre The camera is on-stage.
    * @return The orthographic size property querying interface.
    */
-  const PropertyBase* GetOrthographicSize() const;
+  const PropertyBase* GetOrthographicSizeProperty() const;
 
   /**
    * Retrieve the value of Projection Direction property querying interface.
@@ -403,9 +393,8 @@ public:
   /**
    * Updates view and projection matrices.
    * Called by the render task using the camera
-   * @param[in] updateBufferIndex The buffer to read from.
    */
-  void Update(BufferIndex updateBufferIndex);
+  void Update();
 
   /**
    * @return true if the view matrix of camera is updated this or the previous frame
@@ -437,17 +426,15 @@ private:
 
   /**
    * Recalculates the view matrix.
-   * @param[in] bufferIndex The current update buffer index.
    * @return count how many frames ago the matrix was changed.
    */
-  uint32_t UpdateViewMatrix(BufferIndex updateBufferIndex);
+  uint32_t UpdateViewMatrix();
 
   /**
    * Recalculates the projection matrix.
-   * @param[in] bufferIndex The current update buffer index.
    * @return count how many frames ago the matrix was changed.
    */
-  uint32_t UpdateProjection(BufferIndex updateBufferIndex);
+  uint32_t UpdateProjection();
 
 private:
   /**

@@ -128,6 +128,7 @@ SET( public_api_core_animation_header_files
 SET( public_api_core_common_header_files
   ${public_api_src_dir}/common/constants.h
   ${public_api_src_dir}/common/dali-common.h
+  ${public_api_src_dir}/common/dali-utility.h
   ${public_api_src_dir}/common/dali-vector-base.h
   ${public_api_src_dir}/common/dali-vector-complex-types.h
   ${public_api_src_dir}/common/dali-vector-trivial-types.h

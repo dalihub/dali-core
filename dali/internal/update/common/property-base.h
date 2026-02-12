@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/type-abstraction.h>
 #include <dali/internal/event/common/property-input-impl.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/public-api/object/property.h>
 
 namespace Dali
@@ -70,9 +69,8 @@ public:
 
   /**
    * Reset the property to a base value; only required if the property is animated.
-   * @param [in] currentBufferIndex The current buffer index.
    */
-  virtual void ResetToBaseValue(BufferIndex updateBufferIndex) = 0;
+  virtual void ResetToBaseValue() = 0;
 
   /**
    * Query whether the property has changed.

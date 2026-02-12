@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_DEBUG_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
-
 // define this to print information about the items rendered each frame
 #undef DALI_PRINT_RENDER_INFO
 
@@ -28,7 +25,7 @@
 
 #define DALI_PRINT_RENDER_START(x) Render::PrintFrameStart(x);
 #define DALI_PRINT_RENDER_END() Render::PrintFrameEnd();
-#define DALI_PRINT_RENDER_INSTRUCTION(x, index) Render::PrintRenderInstruction(x, index);
+#define DALI_PRINT_RENDER_INSTRUCTION(x) Render::PrintRenderInstruction(x);
 #define DALI_PRINT_RENDER_LIST(x) Render::PrintRenderList(x);
 #define DALI_PRINT_RENDER_ITEM(x) Render::PrintRenderItem(x);
 
@@ -36,7 +33,7 @@
 
 #define DALI_PRINT_RENDER_START(x)
 #define DALI_PRINT_RENDER_END()
-#define DALI_PRINT_RENDER_INSTRUCTION(x, index)
+#define DALI_PRINT_RENDER_INSTRUCTION(x)
 #define DALI_PRINT_RENDER_LIST(x)
 #define DALI_PRINT_RENDER_ITEM(x)
 
@@ -71,9 +68,8 @@ namespace Render
 {
 /**
  * Print a debug message at the start of the render-thread.
- * @param[in] buffer The current render buffer index (previous update buffer)
  */
-void PrintFrameStart(BufferIndex bufferIndex);
+void PrintFrameStart();
 
 /**
  * Print a debug message at the end of the render-thread.
@@ -83,9 +79,8 @@ void PrintFrameEnd();
 /**
  * Print some information about a render-instruction.
  * @param[in] instruction The render-instruction.
- * @param[in] index to use
  */
-void PrintRenderInstruction(const SceneGraph::RenderInstruction& instruction, BufferIndex index);
+void PrintRenderInstruction(const SceneGraph::RenderInstruction& instruction);
 
 /**
  * Print some information about a render-list.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,9 @@ namespace Render
 // Otherwise they will contribute negatively to code coverage.
 #ifdef DALI_PRINT_RENDER_INFO
 
-void PrintFrameStart(BufferIndex bufferIndex)
+void PrintFrameStart()
 {
-  DALI_LOG_RENDER_INFO("RENDER START - bufferIndex: %d\n", bufferIndex);
+  DALI_LOG_RENDER_INFO("RENDER START\n");
 }
 
 void PrintFrameEnd()
@@ -51,12 +51,12 @@ void PrintFrameEnd()
   DALI_LOG_RENDER_INFO("RENDER END\n\n");
 }
 
-void PrintRenderInstruction(const SceneGraph::RenderInstruction& instruction, BufferIndex index)
+void PrintRenderInstruction(const SceneGraph::RenderInstruction& instruction)
 {
   const char* target = (nullptr != instruction.mFrameBuffer) ? "FrameBuffer" : "Screen";
 
   std::stringstream debugStream;
-  debugStream << "Rendering to " << target << ", View: " << *(instruction.GetViewMatrix(index)) << " Projection: " << *(instruction.GetProjectionMatrix(index));
+  debugStream << "Rendering to " << target << ", View: " << *(instruction.GetViewMatrix()) << " Projection: " << *(instruction.GetProjectionMatrix());
 
   if(instruction.mIsViewportSet)
   {

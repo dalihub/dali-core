@@ -418,7 +418,6 @@ public:
   /**
    * Called to render during RenderManager::Render().
    * @param[in,out] commandBuffer The command buffer to write into
-   * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using this renderer
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
@@ -434,7 +433,6 @@ public:
    * @return True if commands have been added to the command buffer
    */
   bool Render(Graphics::CommandBuffer&                             commandBuffer,
-              BufferIndex                                          bufferIndex,
               const SceneGraph::NodeDataProvider&                  node,
               const Matrix&                                        modelMatrix,
               const Matrix&                                        modelViewMatrix,
@@ -560,12 +558,11 @@ public:
   /**
    * @brief Gets update area after visual properties applied.
    *
-   * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] originalUpdateArea The original update area before apply the visual properties.
    *
    * @return The recalculated update area after visual properties applied.
    */
-  Vector4 GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const Vector4& originalUpdateArea) const noexcept;
+  Vector4 GetVisualTransformedUpdateArea(const Vector4& originalUpdateArea) const noexcept;
 
   /**
    * Detach a Renderer from the node provider.
@@ -625,13 +622,12 @@ private:
 
   /**
    * Builds a uniform map based on the index of the cached location in the Program.
-   * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] node The node using the renderer
    * @param[in] program The shader program on which to set the uniforms.
    *
    * @return the index of the node in change counters store / uniform maps store.
    */
-  std::size_t BuildUniformIndexMap(BufferIndex bufferIndex, const SceneGraph::NodeDataProvider& node, Program& program);
+  std::size_t BuildUniformIndexMap(const SceneGraph::NodeDataProvider& node, Program& program);
 
   /**
    * Bind the textures and setup the samplers
@@ -659,7 +655,6 @@ private:
   /**
    * Setup and write data to the uniform buffer
    *
-   * @param[in] bufferIndex The current buffer index
    * @param[in] commandBuffer The command buffer to bind the uniform buffer to
    * @param[in] node The node using this renderer
    * @param[in] modelViewMatrix The model-view matrix.
@@ -672,8 +667,7 @@ private:
    * @param[in] instruction The render instruction
    * @param[in] The node index
    */
-  void WriteUniformBuffer(BufferIndex                          bufferIndex,
-                          Graphics::CommandBuffer&             commandBuffer,
+  void WriteUniformBuffer(Graphics::CommandBuffer&             commandBuffer,
                           Program*                             program,
                           const SceneGraph::RenderInstruction& instruction,
                           const Matrix&                        modelMatrix,
@@ -690,13 +684,11 @@ private:
    *
    * @param[in] instruction The render instruction
    * @param[in] uboViews Target uniform buffer object
-   * @param[in] updateBufferIndex update buffer index
    * @param[in] nodeIndex Index of node/renderer pair in mUniformIndexMaps
    */
   void FillUniformBuffer(Program&                             program,
                          const SceneGraph::RenderInstruction& instruction,
                          const Render::UboViewContainer&      uboViews,
-                         BufferIndex                          updateBufferIndex,
                          std::size_t                          nodeIndex);
 
   /**
@@ -705,12 +697,10 @@ private:
    * @param[in] propertyValue The property value to write
    * @param[in] uniform The map describing the uniform
    * @param[in] ubo Target uniform buffer view
-   * @param[in] updateBufferIndex update buffer index
    */
   void WriteDynUniform(const PropertyInputImpl*   propertyValue,
                        UniformIndexMap&           uniform,
-                       Render::UniformBufferView& ubo,
-                       BufferIndex                updateBufferIndex);
+                       Render::UniformBufferView& ubo);
 
   /**
    * @brief Clear the pipeline cache.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,15 +62,13 @@ void FrameCallback::ConnectToSceneGraph(UpdateManager& updateManager, TransformM
   mUpdateProxy = std::unique_ptr<UpdateProxy>(new UpdateProxy(updateManager, transformManager, traveler));
 }
 
-FrameCallback::RequestFlags FrameCallback::Update(BufferIndex bufferIndex, float elapsedSeconds, bool nodeHierarchyChanged)
+FrameCallback::RequestFlags FrameCallback::Update(float elapsedSeconds, bool nodeHierarchyChanged)
 {
   bool continueCalling = false;
   bool keepRendering   = false;
 
   if(mUpdateProxy)
   {
-    mUpdateProxy->SetCurrentBufferIndex(bufferIndex);
-
     while(!mSyncPoints.empty())
     {
       mUpdateProxy->Notify(mSyncPoints.front());

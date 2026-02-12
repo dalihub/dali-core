@@ -177,13 +177,6 @@ public:
    */
   bool ApplyNativeFragmentShader(std::string& shader, int mask);
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  /**
-   * @brief Print TotalMemory
-   */
-  void PrintTotalMemory();
-#endif
-
 private: // implementation
   /**
    * Constructor
@@ -210,6 +203,13 @@ private: // implementation
    * Second stage initialization of the Texture
    */
   void Initialize();
+
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+  /**
+   * @brief Print TotalMemory
+   */
+  static void PrintTotalMemory();
+#endif
 
 protected:
   /**

@@ -141,7 +141,6 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
 
 /**
  * Add a renderer to the list
- * @param updateBufferIndex to read the model matrix from
  * @param renderPass render pass for this render instruction
  * @param renderList to add the item to
  * @param renderable Node-Renderer pair
@@ -154,8 +153,7 @@ bool CompareItems3DWithClipping(const RenderInstructionProcessor::SortAttributes
  * @param cullingEnabled Whether frustum culling is enabled or not
  * @param stopperNode Marker node that stops rendering(must be rendered)
  */
-inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
-                                    uint32_t                  renderPass,
+inline void AddRendererToRenderList(uint32_t                  renderPass,
                                     RenderList&               renderList,
                                     Renderable&               renderable,
                                     const Matrix&             viewMatrix,
@@ -205,7 +203,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
     if(inside && !isLayer3d && viewportSet)
     {
-      node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d, false);
+      node->UpdatePartialRenderingData(isLayer3d, false);
 
       const Vector4& nodeUpdateArea = nodePartialRenderingData.mNodeInfomations.updatedPositionSize;
       const Vector2& nodeScaleXY    = nodePartialRenderingData.mNodeInfomations.modelMatrix.GetScaleXY();
@@ -227,7 +225,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
         // If camera is Perspective, we need to calculate clipping box by FoV. Currently, we just believe default camera setup OrthographicSize well.
         //  - If then, It must use math calculate like tan(fov) internally. So, we might need calculate it only one times, and cache.
         ClippingBox boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, Vector3(nodeUpdateArea.x, nodeUpdateArea.y, 0.0f), Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f));
-        ClippingBox clippingBox = camera.GetOrthographicClippingBox(updateBufferIndex);
+        ClippingBox clippingBox = camera.GetOrthographicClippingBox();
 
         inside = clippingBox.Intersects(boundingBox);
       }
@@ -245,7 +243,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
     {
       const bool isVisualRendererUnder3D = (isLayer3d && !!(renderable.mRenderer && renderable.mRenderer->GetVisualProperties()));
 
-      const Renderer::OpacityType opacityType = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(updateBufferIndex, renderPass, *node)) : Renderer::OPAQUE;
+      const Renderer::OpacityType opacityType = rendererExist ? (isVisualRendererUnder3D ? Renderer::TRANSLUCENT : renderable.mRenderer->GetOpacityType(renderPass, *node)) : Renderer::OPAQUE;
 
       // We can skip render when node is not clipping and transparent
       // We must not skip when node is a stopper
@@ -280,7 +278,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
 
       if(!nodePartialRenderingDataUpdateChecked)
       {
-        node->UpdatePartialRenderingData(updateBufferIndex, isLayer3d, false);
+        node->UpdatePartialRenderingData(isLayer3d, false);
       }
 
       if(!nodeModelViewMatrixSet)
@@ -293,17 +291,16 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
       item.mIsUpdated = item.mIsUpdated || nodePartialRenderingData.mUpdated;
     }
 
-    node->SetCulled(updateBufferIndex, false);
+    node->SetCulled(false);
   }
   else
   {
-    node->SetCulled(updateBufferIndex, true);
+    node->SetCulled(true);
   }
 }
 
 /**
  * Add all renderers to the list
- * @param updateBufferIndex to read the model matrix from
  * @param renderPass render pass for this render instruction
  * @param renderList to add the items to
  * @param renderers to render NodeRendererContainer Node-Renderer pairs
@@ -316,8 +313,7 @@ inline void AddRendererToRenderList(BufferIndex               updateBufferIndex,
  * @param cullingEnabled Whether frustum culling is enabled or not
  * @param stopperNode Marker node that stops rendering(must be rendered)
  */
-inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex,
-                                     uint32_t                  renderPass,
+inline void AddRenderersToRenderList(uint32_t                  renderPass,
                                      RenderList&               renderList,
                                      RenderableContainer&      renderers,
                                      const Matrix&             viewMatrix,
@@ -333,8 +329,7 @@ inline void AddRenderersToRenderList(BufferIndex               updateBufferIndex
 
   for(auto&& renderer : renderers)
   {
-    AddRendererToRenderList(updateBufferIndex,
-                            renderPass,
+    AddRendererToRenderList(renderPass,
                             renderList,
                             renderer,
                             viewMatrix,
@@ -409,8 +404,7 @@ inline bool SetupRenderList(RenderableContainer& renderables,
   return (tryReuseRenderList && TryReuseCachedRenderers(layer, **renderList, renderables));
 }
 
-inline void UpdateReusedRenderListPartialUpdateData(BufferIndex updateBufferIndex,
-                                                    RenderList& renderList,
+inline void UpdateReusedRenderListPartialUpdateData(RenderList& renderList,
                                                     bool        isLayer3D)
 {
   // Only need to check non-3d layer cases.
@@ -426,7 +420,7 @@ inline void UpdateReusedRenderListPartialUpdateData(BufferIndex updateBufferInde
       Node& node = *(const_cast<Node*>(item.mNode));
 
       // Skip transform / color variables calculation if possible
-      node.UpdatePartialRenderingData(updateBufferIndex, isLayer3D, true);
+      node.UpdatePartialRenderingData(isLayer3D, true);
 
       item.mIsUpdated = node.GetPartialRenderingData().mUpdated;
     }
@@ -448,7 +442,7 @@ RenderInstructionProcessor::RenderInstructionProcessor()
 
 RenderInstructionProcessor::~RenderInstructionProcessor() = default;
 
-inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex, RenderList& renderList, Layer& layer, bool respectClippingOrder, bool isOrthographicCamera)
+inline void RenderInstructionProcessor::SortRenderItems(RenderList& renderList, Layer& layer, bool respectClippingOrder, bool isOrthographicCamera)
 {
   const uint32_t renderableCount = static_cast<uint32_t>(renderList.Count());
   // Reserve space if needed.
@@ -588,8 +582,7 @@ inline void RenderInstructionProcessor::SortRenderItems(BufferIndex bufferIndex,
   }
 }
 
-void RenderInstructionProcessor::Prepare(BufferIndex                 updateBufferIndex,
-                                         SortedLayerPointers&        sortedLayers,
+void RenderInstructionProcessor::Prepare(SortedLayerPointers&        sortedLayers,
                                          RenderTask&                 renderTask,
                                          bool                        cull,
                                          bool                        hasClippingNodes,
@@ -597,17 +590,17 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
 {
   // Retrieve the RenderInstruction buffer from the RenderInstructionContainer
   // then populate with instructions.
-  RenderInstruction& instruction             = renderTask.PrepareRenderInstruction(updateBufferIndex);
+  RenderInstruction& instruction             = renderTask.PrepareRenderInstruction();
   bool               viewMatrixHasNotChanged = !renderTask.ViewMatrixUpdated();
   bool               isRenderListAdded       = false;
   bool               isRootLayerDirty        = false;
 
-  const Matrix&             viewMatrix           = renderTask.GetViewMatrix(updateBufferIndex);
+  const Matrix&             viewMatrix           = renderTask.GetViewMatrix();
   const SceneGraph::Camera& camera               = renderTask.GetCamera();
-  const bool                isOrthographicCamera = camera.mProjectionMode[0] == Dali::Camera::ProjectionMode::ORTHOGRAPHIC_PROJECTION;
+  const bool                isOrthographicCamera = camera.mProjectionMode.Get() == Dali::Camera::ProjectionMode::ORTHOGRAPHIC_PROJECTION;
 
   Viewport viewport;
-  bool     viewportSet = renderTask.QueryViewport(updateBufferIndex, viewport);
+  bool     viewportSet = renderTask.QueryViewport(viewport);
 
   Node* stopperNode = renderTask.GetStopperNode();
 
@@ -632,8 +625,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       if(!SetupRenderList(renderables, layer, instruction, tryReuseRenderList, &renderList))
       {
         renderList->SetHasColorRenderItems(true);
-        AddRenderersToRenderList(updateBufferIndex,
-                                 instruction.mRenderPassTag,
+        AddRenderersToRenderList(instruction.mRenderPassTag,
                                  *renderList,
                                  renderables,
                                  viewMatrix,
@@ -646,12 +638,12 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  stopperNode);
 
         // We only use the clipping version of the sort comparitor if any clipping nodes exist within the RenderList.
-        SortRenderItems(updateBufferIndex, *renderList, layer, hasClippingNodes, isOrthographicCamera);
+        SortRenderItems(*renderList, layer, hasClippingNodes, isOrthographicCamera);
       }
       else
       {
         renderList->SetHasColorRenderItems(true);
-        UpdateReusedRenderListPartialUpdateData(updateBufferIndex, *renderList, isLayer3D);
+        UpdateReusedRenderListPartialUpdateData(*renderList, isLayer3D);
       }
 
       isRenderListAdded = true;
@@ -669,8 +661,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
       if(!SetupRenderList(renderables, layer, instruction, tryReuseRenderList, &renderList))
       {
         renderList->SetHasColorRenderItems(false);
-        AddRenderersToRenderList(updateBufferIndex,
-                                 instruction.mRenderPassTag,
+        AddRenderersToRenderList(instruction.mRenderPassTag,
                                  *renderList,
                                  renderables,
                                  viewMatrix,
@@ -683,12 +674,12 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
                                  stopperNode);
 
         // Clipping hierarchy is irrelevant when sorting overlay items, so we specify using the non-clipping version of the sort comparitor.
-        SortRenderItems(updateBufferIndex, *renderList, layer, false, isOrthographicCamera);
+        SortRenderItems(*renderList, layer, false, isOrthographicCamera);
       }
       else
       {
         renderList->SetHasColorRenderItems(false);
-        UpdateReusedRenderListPartialUpdateData(updateBufferIndex, *renderList, isLayer3D);
+        UpdateReusedRenderListPartialUpdateData(*renderList, isLayer3D);
       }
 
       isRenderListAdded = true;
@@ -705,7 +696,7 @@ void RenderInstructionProcessor::Prepare(BufferIndex                 updateBuffe
 
   if(isRenderListAdded || instruction.mIsClearColorSet || isRootLayerDirty)
   {
-    instructions.PushBack(updateBufferIndex, &instruction);
+    instructions.PushBack(&instruction);
   }
 }
 

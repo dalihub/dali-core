@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_FRAME_CALLBACK_PROCESSOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@
 #endif
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/manager/scene-graph-traveler.h>
@@ -93,11 +92,10 @@ public:
 
   /**
    * Called on Update by the UpdateManager.
-   * @param[in]  bufferIndex     The bufferIndex to use
    * @param[in]  elapsedSeconds  Time elapsed time since the last frame (in seconds)
    * @return Whether we should keep rendering.
    */
-  bool Update(BufferIndex bufferIndex, float elapsedSeconds);
+  bool Update(float elapsedSeconds);
 
   /**
    * Called by the UpdateManager when the node hierarchy changes.

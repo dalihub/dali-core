@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHARED_UNIFORM_BUFFER_VIEW_CONTAINER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>
-#include <dali/internal/common/buffer-index.h>
 #include <dali/public-api/math/compile-time-math.h>
 
 namespace Dali::Internal
@@ -97,10 +96,9 @@ public:
    * @brief Create UniformBufferView for each pair of program and shared uniform blocks.
    * It will also write uniforms now.
    *
-   * @param[in] renderBufferIndex Buffer index of current frame
    * @param[in] uniformBufferManager UBO manager to handle the GPU memories.
    */
-  void Initialize(BufferIndex renderBufferIndex, Render::UniformBufferManager& uniformBufferManager);
+  void Initialize(Render::UniformBufferManager& uniformBufferManager);
 
   /**
    * @brief Get UniformBufferView for pair of program and shared uniform blocks.

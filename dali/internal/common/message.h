@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MESSAGE_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/type-abstraction.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 
 namespace Dali
 {
@@ -47,9 +45,8 @@ public:
 
   /**
    * Called to process the message.
-   * @param [in] bufferIndex The current update/render buffer index (depending on which thread processes the message).
    */
-  virtual void Process(BufferIndex bufferIndex) = 0;
+  virtual void Process() = 0;
 
 private:
 };
@@ -88,7 +85,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     (object->*memberFunction)();
   }
@@ -137,7 +134,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     (object->*memberFunction)(param1);
   }
@@ -191,7 +188,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     (object->*memberFunction)(param1, param2);
   }
@@ -248,7 +245,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     (object->*memberFunction)(param1, param2, param3);
   }
@@ -309,7 +306,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     (object->*memberFunction)(param1, param2, param3, param4);
   }
@@ -374,7 +371,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     (object->*memberFunction)(param1, param2, param3, param4, param5);
   }
@@ -443,7 +440,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     (object->*memberFunction)(param1, param2, param3, param4, param5, param6);
   }
@@ -461,13 +458,13 @@ private:
 
 /**
  * Templated message which calls a member function of an object.
- * This overload passes just the buffer index to the method, no parameters.
+ * This overload passes no parameters.
  */
 template<typename T>
 class MessageDoubleBuffered0 : public MessageBase
 {
 public:
-  using MemberFunction = void (T::*)(BufferIndex);
+  using MemberFunction = void (T::*)();
 
   /**
    * Create a message.
@@ -492,9 +489,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex bufferIndex) override
+  void Process() override
   {
-    (object->*memberFunction)(bufferIndex);
+    (object->*memberFunction)();
   }
 
 private:
@@ -512,7 +509,7 @@ template<typename T, typename P>
 class MessageDoubleBuffered1 : public MessageBase
 {
 public:
-  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P>::PassingType);
+  using MemberFunction = void (T::*)(typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -541,9 +538,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex bufferIndex) override
+  void Process() override
   {
-    (object->*memberFunction)(bufferIndex, param);
+    (object->*memberFunction)(param);
   }
 
 private:
@@ -562,7 +559,7 @@ template<typename T, typename P2, typename P3>
 class MessageDoubleBuffered2 : public MessageBase
 {
 public:
-  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType);
+  using MemberFunction = void (T::*)(typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType);
 
   /**
    * Create a message.
@@ -594,9 +591,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex bufferIndex) override
+  void Process() override
   {
-    (object->*memberFunction)(bufferIndex, param2, param3);
+    (object->*memberFunction)(param2, param3);
   }
 
 private:
@@ -616,7 +613,7 @@ template<typename T, typename P2, typename P3, typename P4>
 class MessageDoubleBuffered3 : public MessageBase
 {
 public:
-  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType);
+  using MemberFunction = void (T::*)(typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType);
 
   /**
    * Create a message.
@@ -651,9 +648,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex bufferIndex) override
+  void Process() override
   {
-    (object->*memberFunction)(bufferIndex, param2, param3, param4);
+    (object->*memberFunction)(param2, param3, param4);
   }
 
 private:
@@ -674,7 +671,7 @@ template<typename T, typename P2, typename P3, typename P4, typename P5>
 class MessageDoubleBuffered4 : public MessageBase
 {
 public:
-  using MemberFunction = void (T::*)(BufferIndex, typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType);
+  using MemberFunction = void (T::*)(typename ParameterType<P2>::PassingType, typename ParameterType<P3>::PassingType, typename ParameterType<P4>::PassingType, typename ParameterType<P5>::PassingType);
 
   /**
    * Create a message.
@@ -712,9 +709,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex bufferIndex) override
+  void Process() override
   {
-    (object->*memberFunction)(bufferIndex, param2, param3, param4, param5);
+    (object->*memberFunction)(param2, param3, param4, param5);
   }
 
 private:

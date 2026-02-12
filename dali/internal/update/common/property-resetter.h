@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_PROPERTY_RESETTER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ public:
    * @param[in] bufferIndex the current buffer index
    * @param[in] owner The property owner
    */
-  NotifyReturnType PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(PropertyOwner& owner) override
   {
     mDisconnected = true;
     return NotifyReturnType::KEEP_OBSERVING;

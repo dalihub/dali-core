@@ -376,23 +376,21 @@ public:
 
   /**
    * Bakes the mixColor
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] mixColor The mix color
    */
-  void BakeMixColor(BufferIndex updateBufferIndex, const Vector4& mixColor);
+  void BakeMixColor(const Vector4& mixColor);
 
   /**
    * Bakes the component of mixColor
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] componentValue The value of mix colorcomponent.
    * @param[in] componentIndex The index of mix color component.
    */
-  void BakeMixColorComponent(BufferIndex updateBufferIndex, float componentValue, uint8_t componentIndex);
+  void BakeMixColorComponent(float componentValue, uint8_t componentIndex);
 
   /**
    * @copydoc RenderDataProvider::GetMixColor()
    */
-  Vector4 GetMixColor(BufferIndex updateBufferIndex) const override;
+  Vector4 GetMixColor() const override;
 
   /**
    * Sets the rendering behavior
@@ -409,10 +407,9 @@ public:
   /**
    * Prepare the object for rendering.
    * This is called by the UpdateManager when an object is due to be rendered in the current frame.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return Whether this renderer has been updated in the current frame
    */
-  bool PrepareRender(BufferIndex updateBufferIndex);
+  bool PrepareRender();
 
   /**
    * Retrieve the Render thread renderer
@@ -422,11 +419,10 @@ public:
 
   /**
    * Query whether the renderer is fully opaque, fully transparent or transparent.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] renderPass render pass for this render instruction
    * @return OPAQUE if fully opaque, TRANSPARENT if fully transparent and TRANSLUCENT if in between
    */
-  OpacityType GetOpacityType(BufferIndex updateBufferIndex, uint32_t renderPass, const Node& node) const;
+  OpacityType GetOpacityType(uint32_t renderPass, const Node& node) const;
 
   /**
    * Connect the object to the scene graph
@@ -469,7 +465,7 @@ public:
   /**
    * @copydoc RenderDataProvider::GetVisualTransformedUpdateArea()
    */
-  Vector4 GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept override;
+  Vector4 GetVisualTransformedUpdateArea(const Vector4& originalUpdateArea) noexcept override;
 
   uint32_t GetInstanceCount() const override
   {
@@ -519,9 +515,8 @@ public:
    * Merge shader uniform map into renderer uniform map if any of the
    * maps have changed.  Only update uniform map if added to render
    * instructions.
-   * @param[in] updateBufferIndex The current update buffer index.
    */
-  void UpdateUniformMap(BufferIndex updateBufferIndex);
+  void UpdateUniformMap();
 
   /**
    * Set the given external draw commands on this renderer.

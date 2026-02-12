@@ -18,7 +18,6 @@
  *
  */
 
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/public-api/math/vector4.h>
 
@@ -38,11 +37,6 @@ public:
    * Constructor. Nothing to do as a pure interface.
    */
   NodeDataProvider() = default;
-
-  /**
-   * @return a reference to the color
-   */
-  virtual const Vector4& GetRenderColor() const = 0;
 
   /**
    * Get the map of uniforms to property value addresses (for node only)

@@ -22,7 +22,6 @@
 #include <iostream>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/hash-utils.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
@@ -31,6 +30,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-value.h>
 
 namespace Dali
 {
@@ -63,10 +63,9 @@ public:
   /**
    * Retrieve a boolean value.
    * @pre GetType() returns Property::BOOLEAN.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The boolean value.
    */
-  virtual const bool& GetBoolean(BufferIndex bufferIndex) const
+  virtual const bool& GetBoolean() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const bool&>(*this);
@@ -75,10 +74,9 @@ public:
   /**
    * Retrieve an integer value.
    * @pre GetType() returns Property::INTEGER.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The integer value.
    */
-  virtual const int& GetInteger(BufferIndex bufferIndex) const
+  virtual const int& GetInteger() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const int&>(*this);
@@ -87,10 +85,9 @@ public:
   /**
    * Retrieve a float value.
    * @pre GetType() returns Property::FLOAT.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The float value.
    */
-  virtual const float& GetFloat(BufferIndex bufferIndex) const
+  virtual const float& GetFloat() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const float&>(*this);
@@ -99,10 +96,9 @@ public:
   /**
    * Retrieve a Vector2 value.
    * @pre GetType() returns Property::VECTOR2.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The Vector2 value.
    */
-  virtual const Vector2& GetVector2(BufferIndex bufferIndex) const
+  virtual const Vector2& GetVector2() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector2&>(*this);
@@ -111,10 +107,9 @@ public:
   /**
    * Retrieve a Vector3 value.
    * @pre GetType() returns Property::VECTOR3.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The Vector3 value.
    */
-  virtual const Vector3& GetVector3(BufferIndex bufferIndex) const
+  virtual const Vector3& GetVector3() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector3&>(*this);
@@ -123,10 +118,9 @@ public:
   /**
    * Retrieve a Vector4 value.
    * @pre GetType() returns Property::VECTOR4.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The Vector4 value.
    */
-  virtual const Vector4& GetVector4(BufferIndex bufferIndex) const
+  virtual const Vector4& GetVector4() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Vector4&>(*this);
@@ -135,10 +129,9 @@ public:
   /**
    * Retrieve a Quaternion value.
    * @pre GetType() returns Property::Quaternion.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The Quaternion value.
    */
-  virtual const Quaternion& GetQuaternion(BufferIndex bufferIndex) const
+  virtual const Quaternion& GetQuaternion() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Quaternion&>(*this);
@@ -147,10 +140,9 @@ public:
   /**
    * Retrieve a Matrix value.
    * @pre GetType() returns Property::Matrix.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix3& GetMatrix3(BufferIndex bufferIndex) const
+  virtual const Matrix3& GetMatrix3() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix3&>(*this);
@@ -159,10 +151,9 @@ public:
   /**
    * Retrieve a Matrix value.
    * @pre GetType() returns Property::Matrix.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix& GetMatrix(BufferIndex bufferIndex) const
+  virtual const Matrix& GetMatrix() const
   {
     // the return will never be executed, it's just to keep the compiler happy
     return reinterpret_cast<const Matrix&>(*this);
@@ -172,7 +163,7 @@ public:
    * Retrieve the address of the property value. Only for use
    * when writing uniforms.
    */
-  virtual const void* GetValueAddress(BufferIndex bufferIndex) const = 0;
+  virtual const void* GetValueAddress() const = 0;
 
   /**
    * Retrieve the size of the property value for use in copying.
@@ -187,12 +178,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::BOOLEAN.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return The boolean value.
    */
-  virtual const bool& GetConstraintInputBoolean(BufferIndex updateBufferIndex) const
+  virtual const bool& GetConstraintInputBoolean() const
   {
-    return GetBoolean(updateBufferIndex);
+    return GetBoolean();
   }
 
   /**
@@ -200,12 +190,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::INTEGER.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return The integer value.
    */
-  virtual const int& GetConstraintInputInteger(BufferIndex updateBufferIndex) const
+  virtual const int& GetConstraintInputInteger() const
   {
-    return GetInteger(updateBufferIndex);
+    return GetInteger();
   }
 
   /**
@@ -213,12 +202,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::FLOAT.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return The float value.
    */
-  virtual const float& GetConstraintInputFloat(BufferIndex updateBufferIndex) const
+  virtual const float& GetConstraintInputFloat() const
   {
-    return GetFloat(updateBufferIndex);
+    return GetFloat();
   }
 
   /**
@@ -226,12 +214,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::VECTOR2.
-   * @param[in] updateBufferIndex The buffer to read from.
    * @return The Vector2 value.
    */
-  virtual const Vector2& GetConstraintInputVector2(BufferIndex updateBufferIndex) const
+  virtual const Vector2& GetConstraintInputVector2() const
   {
-    return GetVector2(updateBufferIndex);
+    return GetVector2();
   }
 
   /**
@@ -239,12 +226,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::VECTOR3.
-   * @param[in] updateBufferIndex The buffer to read from.
    * @return The Vector3 value.
    */
-  virtual const Vector3& GetConstraintInputVector3(BufferIndex updateBufferIndex) const
+  virtual const Vector3& GetConstraintInputVector3() const
   {
-    return GetVector3(updateBufferIndex);
+    return GetVector3();
   }
 
   /**
@@ -252,12 +238,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::VECTOR4.
-   * @param[in] updateBufferIndex The buffer to read from.
    * @return The Vector4 value.
    */
-  virtual const Vector4& GetConstraintInputVector4(BufferIndex updateBufferIndex) const
+  virtual const Vector4& GetConstraintInputVector4() const
   {
-    return GetVector4(updateBufferIndex);
+    return GetVector4();
   }
 
   /**
@@ -265,12 +250,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::Quaternion.
-   * @param[in] updateBufferIndex The buffer to read from.
    * @return The Quaternion value.
    */
-  virtual const Quaternion& GetConstraintInputQuaternion(BufferIndex updateBufferIndex) const
+  virtual const Quaternion& GetConstraintInputQuaternion() const
   {
-    return GetQuaternion(updateBufferIndex);
+    return GetQuaternion();
   }
 
   /**
@@ -278,12 +262,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::Matrix.
-   * @param[in] updateBufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix3& GetConstraintInputMatrix3(BufferIndex updateBufferIndex) const
+  virtual const Matrix3& GetConstraintInputMatrix3() const
   {
-    return GetMatrix3(updateBufferIndex);
+    return GetMatrix3();
   }
 
   /**
@@ -291,12 +274,11 @@ public:
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
    * @pre GetType() returns Property::Matrix.
-   * @param[in] updateBufferIndex The buffer to read from.
    * @return The Matrix value.
    */
-  virtual const Matrix& GetConstraintInputMatrix(BufferIndex updateBufferIndex) const
+  virtual const Matrix& GetConstraintInputMatrix() const
   {
-    return GetMatrix(updateBufferIndex);
+    return GetMatrix();
   }
 
   /**
@@ -309,53 +291,53 @@ public:
     return false;
   }
 
-  std::size_t Hash(BufferIndex bufferIndex, std::size_t seed) const
+  std::size_t Hash(std::size_t seed) const
   {
     switch(GetType())
     {
       case Property::BOOLEAN:
       {
-        return Dali::Internal::HashUtils::HashRawValue(GetBoolean(bufferIndex), seed);
+        return Dali::Internal::HashUtils::HashRawValue(GetBoolean(), seed);
       }
 
       case Property::INTEGER:
       {
-        return Dali::Internal::HashUtils::HashRawValue(GetInteger(bufferIndex), seed);
+        return Dali::Internal::HashUtils::HashRawValue(GetInteger(), seed);
       }
 
       case Property::FLOAT:
       {
-        return Dali::Internal::HashUtils::HashRawValue(GetFloat(bufferIndex), seed);
+        return Dali::Internal::HashUtils::HashRawValue(GetFloat(), seed);
       }
 
       case Property::VECTOR2:
       {
-        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector2(bufferIndex).AsFloat(), 2, seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector2().AsFloat(), 2, seed);
       }
 
       case Property::VECTOR3:
       {
-        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector3(bufferIndex).AsFloat(), 3, seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector3().AsFloat(), 3, seed);
       }
 
       case Property::VECTOR4:
       {
-        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector4(bufferIndex).AsFloat(), 4, seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetVector4().AsFloat(), 4, seed);
       }
 
       case Property::ROTATION:
       {
-        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetQuaternion(bufferIndex).AsVector().AsFloat(), 4, seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetQuaternion().AsVector().AsFloat(), 4, seed);
       }
 
       case Property::MATRIX:
       {
-        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetMatrix(bufferIndex).AsFloat(), 16, seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetMatrix().AsFloat(), 16, seed);
       }
 
       case Property::MATRIX3:
       {
-        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetMatrix3(bufferIndex).AsFloat(), 9, seed);
+        return Dali::Internal::HashUtils::HashRawBuffer<float>(GetMatrix3().AsFloat(), 9, seed);
       }
 
       default:
@@ -366,66 +348,84 @@ public:
   }
 
   /**
-   * Print the property value using a stream.
-   * @param[in] debugStream The output stream.
-   * @param[in] bufferIndex The buffer to read from.
-   * @todo Place this far-too-large-to-be-inlined function in a cpp and remove <iostream> header dependency from this file.
+   * Get the property value.
    */
-  void DebugPrint(std::ostream& debugStream, BufferIndex bufferIndex) const
+  Property::Value GetPropertyValue() const
   {
     switch(GetType())
     {
       case Property::BOOLEAN:
       {
-        debugStream << GetBoolean(bufferIndex);
-        break;
+        return Property::Value(GetBoolean());
       }
 
       case Property::INTEGER:
       {
-        debugStream << GetInteger(bufferIndex);
-        break;
+        return Property::Value(GetInteger());
       }
 
       case Property::FLOAT:
       {
-        debugStream << GetFloat(bufferIndex);
-        break;
+        return Property::Value(GetFloat());
       }
 
       case Property::VECTOR2:
       {
-        debugStream << GetVector2(bufferIndex);
-        break;
+        return Property::Value(GetVector2());
       }
 
       case Property::VECTOR3:
       {
-        debugStream << GetVector3(bufferIndex);
-        break;
+        return Property::Value(GetVector3());
       }
 
       case Property::VECTOR4:
       {
-        debugStream << GetVector4(bufferIndex);
-        break;
+        return Property::Value(GetVector4());
       }
 
       case Property::ROTATION:
       {
-        debugStream << GetQuaternion(bufferIndex);
-        break;
+        return Property::Value(GetQuaternion());
       }
 
       case Property::MATRIX:
       {
-        debugStream << GetMatrix(bufferIndex);
-        break;
+        return Property::Value(GetMatrix());
       }
 
       case Property::MATRIX3:
       {
-        debugStream << GetMatrix3(bufferIndex);
+        return Property::Value(GetMatrix3());
+      }
+
+      default:
+      {
+        return Property::Value();
+      }
+    }
+  }
+
+  /**
+   * Print the property value using a stream.
+   * @param[in] debugStream The output stream.
+   * @todo Place this far-too-large-to-be-inlined function in a cpp and remove <iostream> header dependency from this file.
+   */
+  void DebugPrint(std::ostream& debugStream) const
+  {
+    switch(GetType())
+    {
+      case Property::BOOLEAN:
+      case Property::INTEGER:
+      case Property::FLOAT:
+      case Property::VECTOR2:
+      case Property::VECTOR3:
+      case Property::VECTOR4:
+      case Property::ROTATION:
+      case Property::MATRIX:
+      case Property::MATRIX3:
+      {
+        debugStream << GetPropertyValue();
         break;
       }
 

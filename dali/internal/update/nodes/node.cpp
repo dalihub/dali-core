@@ -209,7 +209,7 @@ void Node::ConnectChild(Node* childNode)
   childNode->ConnectToSceneGraph();
 }
 
-void Node::DisconnectChild(BufferIndex updateBufferIndex, Node& childNode)
+void Node::DisconnectChild(Node& childNode)
 {
   DALI_ASSERT_ALWAYS(this != &childNode);
   DALI_ASSERT_ALWAYS(childNode.GetParent() == this);
@@ -230,7 +230,7 @@ void Node::DisconnectChild(BufferIndex updateBufferIndex, Node& childNode)
   }
   DALI_ASSERT_ALWAYS(nullptr != found);
 
-  found->RecursiveDisconnectFromSceneGraph(updateBufferIndex);
+  found->RecursiveDisconnectFromSceneGraph();
 }
 
 void Node::AddRenderer(const RendererKey& renderer)
@@ -356,7 +356,7 @@ void Node::SetParent(Node& parentNode)
   }
 }
 
-void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
+void Node::RecursiveDisconnectFromSceneGraph()
 {
   DALI_ASSERT_ALWAYS(!mIsRoot);
   DALI_ASSERT_ALWAYS(mParent != nullptr);
@@ -364,11 +364,11 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   const NodeIter endIter = mChildren.End();
   for(NodeIter iter = mChildren.Begin(); iter != endIter; ++iter)
   {
-    (*iter)->RecursiveDisconnectFromSceneGraph(updateBufferIndex);
+    (*iter)->RecursiveDisconnectFromSceneGraph();
   }
 
   // Animators, Constraints etc. should be disconnected from the child's properties.
-  PropertyOwner::DisconnectFromSceneGraph(updateBufferIndex);
+  PropertyOwner::DisconnectFromSceneGraph();
 
   // Remove back-pointer to parent
   mParent = nullptr;
@@ -382,7 +382,7 @@ void Node::RecursiveDisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   }
 }
 
-void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLayer3d, bool canSkipInfomationUpdate)
+void Node::UpdatePartialRenderingData(bool isLayer3d, bool canSkipInfomationUpdate)
 {
   if(mPartialRenderingData.mUpdateDecay == PartialRenderingData::Decay::UPDATED_CURRENT_FRAME)
   {
@@ -407,8 +407,8 @@ void Node::UpdatePartialRenderingData(BufferIndex updateBufferIndex, bool isLaye
 
   // TODO : Can't we get modelMatrix and size as const l-value at onces?
   const auto&    transformId = mTransformManagerData.Id();
-  const Matrix&  modelMatrix = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mWorldMatrix.Get(0) : Matrix::IDENTITY;
-  const Vector3& size        = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mSize.Get(0) : Vector3::ZERO;
+  const Matrix&  modelMatrix = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mWorldMatrix.Get() : Matrix::IDENTITY;
+  const Vector3& size        = DALI_LIKELY(TransformManager::IsValidTransformId(transformId)) ? mSize.Get() : Vector3::ZERO;
 
   const Vector4& updatedPositionSize = CalculateNodeUpdateArea(isLayer3d, modelMatrix, size);
 

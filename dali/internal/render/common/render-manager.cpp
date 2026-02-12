@@ -131,7 +131,7 @@ inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorAr
   return newScissorArea;
 }
 
-inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& updatedPositionSize, BufferIndex renderBufferIndex, const Rect<int32_t>& viewportRect)
+inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& updatedPositionSize, const Rect<int32_t>& viewportRect)
 {
   Vector4 updateArea;
   if(item.mNode && item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
@@ -140,7 +140,7 @@ inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& 
   }
   else
   {
-    updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(renderBufferIndex, updatedPositionSize) : updatedPositionSize;
+    updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(updatedPositionSize) : updatedPositionSize;
   }
 
   return RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height, Vector2::ONE);
@@ -357,9 +357,7 @@ struct RenderManager::Impl
 
   Vector<Render::TextureKey> updatedTextures{}; ///< The updated texture list
 
-  uint32_t    frameCount{0u};                                                    ///< The current frame count
-  BufferIndex renderBufferIndex{SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX}; ///< The index of the buffer to read from;
-
+  uint32_t frameCount{0u};                                                            ///< The current frame count
   uint32_t programCacheCleanRequiredThreshold{INITIAL_PROGRAM_CACHE_CLEAN_THRESHOLD}; ///< The threshold to request program cache clean up operation.
                                                                                       ///< It will be automatically increased after we request cache clean.
 
@@ -615,7 +613,7 @@ void RenderManager::ClearProgramCache()
 
 void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear)
 {
-  DALI_PRINT_RENDER_START(mImpl->renderBufferIndex);
+  DALI_PRINT_RENDER_START();
   DALI_LOG_INFO(gLogFilter, Debug::Verbose, "\n\nNewFrame %d\n", mImpl->frameCount);
 
   // Increment the frame count at the beginning of each frame
@@ -624,7 +622,7 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   uint32_t totalInstructionCount = 0u;
   for(auto& i : mImpl->sceneContainer)
   {
-    totalInstructionCount += i->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+    totalInstructionCount += i->GetRenderInstructions().Count();
   }
 
   const bool haveInstructions = totalInstructionCount > 0u;
@@ -665,10 +663,10 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   }
 
   bool           renderToScene    = false;
-  const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+  const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count();
   for(uint32_t i = instructionCount; i > 0; --i)
   {
-    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i - 1);
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(i - 1);
     if(instruction.mFrameBuffer)
     {
       // TODO : For now, let we just always dirty the target of FBO texture
@@ -773,7 +771,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
 
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
-    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(i);
 
     if(instruction.mFrameBuffer)
     {
@@ -786,7 +784,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
       Vector3    position;
       Vector3    scale;
       Quaternion orientation;
-      camera->GetWorldMatrix(mImpl->renderBufferIndex).GetTransformComponents(position, orientation, scale);
+      camera->GetWorldMatrix().GetTransformComponents(position, orientation, scale);
 
       Vector3 orientationAxis;
       Radian  orientationAngle;
@@ -858,7 +856,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
               {
                 item.mIsUpdated = false; /// DevNote : Reset flag here, since RenderItem could be reused by renderList.ReuseCachedItems().
 
-                rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, mImpl->renderBufferIndex, viewportRect);
+                rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, viewportRect);
                 if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                 {
                   AlignDamagedRect(rect);
@@ -897,7 +895,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
                 else
                 {
                   // The item is not in the list for some reason. Add the current rect!
-                  rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, mImpl->renderBufferIndex, viewportRect);
+                  rect = CalculateUpdateArea(item, nodeInfo.updatedPositionSize, viewportRect);
                   if(rect.IsValid() && rect.Intersect(viewportRect) && !rect.IsEmpty())
                   {
                     AlignDamagedRect(rect);
@@ -978,7 +976,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   const Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
   const Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
 
-  uint32_t instructionCount = sceneObject->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+  uint32_t instructionCount = sceneObject->GetRenderInstructions().Count();
 
   Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
   if(clippingRect == surfaceRect)
@@ -1002,7 +1000,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   DALI_LOG_INFO(gLogFilter, Debug::General, "Instruction count: %d\n", instructionCount);
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
-    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(i);
 
     if((instruction.mFrameBuffer != nullptr && renderToFbo) ||
        (instruction.mFrameBuffer == nullptr && !renderToFbo))
@@ -1120,13 +1118,13 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 #endif
 
   // Create UniformBufferView and Write shared UBO value here.
-  mImpl->sharedUniformBufferViewContainer.Initialize(mImpl->renderBufferIndex, *uboManager);
+  mImpl->sharedUniformBufferViewContainer.Initialize(*uboManager);
 
   if(renderToFbo)
   {
     for(uint32_t i = 0; i < instructionCount; ++i)
     {
-      RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
+      RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(i);
       if(instruction.mFrameBuffer)
       {
         // If ready, ensure framebuffer graphics objects are created, bind attachments and
@@ -1143,7 +1141,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   for(uint32_t i = 0; i < instructionCount; ++i)
   {
-    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(mImpl->renderBufferIndex, i);
+    RenderInstruction& instruction = sceneObject->GetRenderInstructions().At(i);
 
     if((renderToFbo && !instruction.mFrameBuffer) || (!renderToFbo && instruction.mFrameBuffer))
     {
@@ -1303,7 +1301,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       // Note, don't set the viewport/scissor on primary command buffer.
       mImpl->renderAlgorithms.ProcessRenderInstruction(instruction,
                                                        *currentCommandBuffer,
-                                                       mImpl->renderBufferIndex,
                                                        depthBufferAvailable,
                                                        stencilBufferAvailable,
                                                        viewportRect,
@@ -1466,7 +1463,7 @@ void RenderManager::PostRender()
   uint32_t count = 0u;
   for(auto& scene : mImpl->sceneContainer)
   {
-    count += scene->GetRenderInstructions().Count(mImpl->renderBufferIndex);
+    count += scene->GetRenderInstructions().Count();
   }
 
   mImpl->ClearUnusedProgramCacheIfNeed();
@@ -1504,13 +1501,6 @@ void RenderManager::PostRender()
 
   // If this frame was rendered due to instructions existing, we mark this so we know to clear the next frame.
   mImpl->lastFrameWasRendered = haveInstructions;
-
-  /**
-   * The rendering has finished; swap to the next buffer.
-   * Ideally the update has just finished using this buffer; otherwise the render thread
-   * should block until the update has finished.
-   */
-  mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
 }

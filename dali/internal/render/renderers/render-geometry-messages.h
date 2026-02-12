@@ -71,7 +71,7 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex /*bufferIndex*/) override
+  void Process() override
   {
     DALI_ASSERT_DEBUG(mRenderGeometry && "Message does not have an object");
     mRenderGeometry->SetIndexBuffer(mIndices);

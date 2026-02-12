@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_NOTIFICATION_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,10 +86,9 @@ public:
   /**
    * Check this property notification condition,
    * and if true then dispatch notification.
-   * @param[in] bufferIndex The current update buffer index.
    * @return Whether the validity of this notification has changed.
    */
-  bool Check(BufferIndex bufferIndex);
+  bool Check();
 
   /**
    * Returns the validity of the last condition check

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_NODE_MESSAGES_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
@@ -61,7 +60,7 @@ template<typename P>
 class NodePropertyMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, typename ParameterType<P>::PassingType);
+  using MemberFunction = void (AnimatableProperty<P>::*)(typename ParameterType<P>::PassingType);
 
   /**
    * Create a message.
@@ -103,9 +102,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:
@@ -146,7 +145,7 @@ template<typename P>
 class NodePropertyComponentMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (AnimatableProperty<P>::*)(BufferIndex, float);
+  using MemberFunction = void (AnimatableProperty<P>::*)(float);
 
   /**
    * Send a message.
@@ -188,9 +187,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:
@@ -228,7 +227,7 @@ template<typename P>
 class NodeTransformPropertyMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(BufferIndex, const P&);
+  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(const P&);
 
   /**
    * Create a message.
@@ -261,9 +260,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:
@@ -301,7 +300,7 @@ template<typename P>
 class NodeTransformComponentMessage : public NodePropertyMessageBase
 {
 public:
-  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(BufferIndex, float);
+  using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(float);
 
   /**
    * Send a message.
@@ -334,9 +333,9 @@ public:
   /**
    * @copydoc MessageBase::Process
    */
-  void Process(BufferIndex updateBufferIndex) override
+  void Process() override
   {
-    (mProperty->*mMemberFunction)(updateBufferIndex, mParam);
+    (mProperty->*mMemberFunction)(mParam);
   }
 
 private:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ namespace Internal
 UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraphTravelerInterfacePtr traveler)
 : mLastCachedIdNodePair({0u, nullptr}),
   mDirtyNodes(),
-  mCurrentBufferIndex(0u),
   mUpdateManager(updateManager),
   mTransformManager(transformManager),
   mSceneGraphTraveler(traveler),
@@ -243,7 +242,7 @@ bool UpdateProxy::GetColor(uint32_t id, Vector4& color) const
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    color   = node->mColor.Get(mCurrentBufferIndex);
+    color   = node->mColor.Get();
     success = true;
   }
 
@@ -256,7 +255,7 @@ bool UpdateProxy::SetColor(uint32_t id, const Vector4& color)
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    node->mColor.Set(mCurrentBufferIndex, color);
+    node->mColor.Set(color);
     node->SetDirtyFlag(SceneGraph::NodePropertyFlags::COLOR);
     mDirtyNodes.push_back(id);
     AddResetter(*node, node->mColor);
@@ -271,7 +270,7 @@ bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    node->mColor.Bake(mCurrentBufferIndex, color);
+    node->mColor.Bake(color);
     success = true;
   }
   return success;
@@ -387,6 +386,150 @@ bool UpdateProxy::GetIgnored(uint32_t id, bool& ignored) const
   {
     ignored = node->IsIgnored();
     success = true;
+  }
+  return success;
+}
+
+bool UpdateProxy::GetCustomProperty(uint32_t id, ConstString propertyName, Property::Value& value) const
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    const auto& uniformMap = node->GetUniformMap();
+
+    const PropertyInputImpl* propertyInputImpl = uniformMap.Find(propertyName);
+    if(propertyInputImpl)
+    {
+      auto propertyValue = propertyInputImpl->GetPropertyValue();
+      if(propertyValue.GetType() != Property::Type::NONE)
+      {
+        value   = std::move(propertyValue);
+        success = true;
+      }
+    }
+  }
+  return success;
+}
+
+bool UpdateProxy::BakeCustomProperty(uint32_t id, ConstString propertyName, const Property::Value& value)
+{
+  bool              success = false;
+  SceneGraph::Node* node    = GetNodeWithId(id);
+  if(node)
+  {
+    const auto& uniformMap = node->GetUniformMap();
+
+    const PropertyInputImpl* propertyInputImpl = uniformMap.Find(propertyName);
+    if(propertyInputImpl)
+    {
+      SceneGraph::PropertyBase* propertyBase = dynamic_cast<SceneGraph::PropertyBase*>(const_cast<PropertyInputImpl*>(propertyInputImpl));
+      if(propertyBase)
+      {
+        Property::Value convertedValue = value;
+        if(DALI_UNLIKELY(value.GetType() != propertyBase->GetType()))
+        {
+          if(!convertedValue.ConvertType(propertyBase->GetType()))
+          {
+            return false;
+          }
+        }
+        switch(propertyBase->GetType())
+        {
+          case Property::BOOLEAN:
+          {
+            if(SceneGraph::AnimatableProperty<bool>* property = dynamic_cast<SceneGraph::AnimatableProperty<bool>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<bool>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::INTEGER:
+          {
+            if(SceneGraph::AnimatableProperty<int32_t>* property = dynamic_cast<SceneGraph::AnimatableProperty<int32_t>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<int32_t>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::FLOAT:
+          {
+            if(SceneGraph::AnimatableProperty<float>* property = dynamic_cast<SceneGraph::AnimatableProperty<float>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<float>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::VECTOR2:
+          {
+            if(SceneGraph::AnimatableProperty<Vector2>* property = dynamic_cast<SceneGraph::AnimatableProperty<Vector2>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<Vector2>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::VECTOR3:
+          {
+            if(SceneGraph::AnimatableProperty<Vector3>* property = dynamic_cast<SceneGraph::AnimatableProperty<Vector3>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<Vector3>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::VECTOR4:
+          {
+            if(SceneGraph::AnimatableProperty<Vector4>* property = dynamic_cast<SceneGraph::AnimatableProperty<Vector4>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<Vector4>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::ROTATION:
+          {
+            if(SceneGraph::AnimatableProperty<Quaternion>* property = dynamic_cast<SceneGraph::AnimatableProperty<Quaternion>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<Quaternion>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::MATRIX:
+          {
+            if(SceneGraph::AnimatableProperty<Matrix>* property = dynamic_cast<SceneGraph::AnimatableProperty<Matrix>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<Matrix>());
+              success = true;
+            }
+            break;
+          }
+
+          case Property::MATRIX3:
+          {
+            if(SceneGraph::AnimatableProperty<Matrix3>* property = dynamic_cast<SceneGraph::AnimatableProperty<Matrix3>*>(propertyBase))
+            {
+              property->Bake(convertedValue.Get<Matrix3>());
+              success = true;
+            }
+            break;
+          }
+          default:
+            break;
+        }
+      }
+    }
   }
   return success;
 }

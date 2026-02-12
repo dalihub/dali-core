@@ -1761,7 +1761,7 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
 
     case Dali::Actor::Property::CULLED:
     {
-      value = actor.GetNode().IsCulled(actor.GetEventThreadServices().GetEventBufferIndex());
+      value = actor.GetNode().IsCulled();
       break;
     }
 

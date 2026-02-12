@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_TRAVELER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ private: // From SceneGraph::PropertyOwner::Observer
   /**
    * @copydoc SceneGraph::PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, SceneGraph::PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(SceneGraph::PropertyOwner& owner) override
   { /* Nothing to do */
     return NotifyReturnType::KEEP_OBSERVING;
   }

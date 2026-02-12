@@ -177,24 +177,24 @@ Render::FrameBuffer* RenderTask::GetFrameBuffer()
   return mFrameBuffer;
 }
 
-bool RenderTask::QueryViewport(BufferIndex bufferIndex, Viewport& viewport) const
+bool RenderTask::QueryViewport(Viewport& viewport) const
 {
-  if(!GetViewportEnabled(bufferIndex))
+  if(!GetViewportEnabled())
   {
     return false;
   }
 
-  viewport.x      = static_cast<int>(mViewportPosition[bufferIndex].x);  // truncated
-  viewport.y      = static_cast<int>(mViewportPosition[bufferIndex].y);  // truncated
-  viewport.width  = static_cast<int>(mViewportSize[bufferIndex].width);  // truncated
-  viewport.height = static_cast<int>(mViewportSize[bufferIndex].height); // truncated
+  viewport.x      = static_cast<int>(mViewportPosition.Get().x);  // truncated
+  viewport.y      = static_cast<int>(mViewportPosition.Get().y);  // truncated
+  viewport.width  = static_cast<int>(mViewportSize.Get().width);  // truncated
+  viewport.height = static_cast<int>(mViewportSize.Get().height); // truncated
 
   return true;
 }
 
-const Vector4& RenderTask::GetClearColor(BufferIndex bufferIndex) const
+const Vector4& RenderTask::GetClearColor() const
 {
-  return mClearColor[bufferIndex];
+  return mClearColor.Get();
 }
 
 void RenderTask::SetClearEnabled(bool enabled)
@@ -242,7 +242,7 @@ uint32_t RenderTask::GetRefreshRate() const
   return mRefreshRate;
 }
 
-bool RenderTask::ReadyToRender(BufferIndex updateBufferIndex)
+bool RenderTask::ReadyToRender()
 {
   TASK_LOG_FMT(Debug::General, " Active(ReadyToRender):%s\n", mActive ? "T" : "F");
   return mActive;
@@ -365,7 +365,7 @@ uint32_t RenderTask::GetRenderedOnceCounter() const
   return mRenderedOnceCounter;
 }
 
-const Matrix& RenderTask::GetViewMatrix(BufferIndex bufferIndex) const
+const Matrix& RenderTask::GetViewMatrix() const
 {
   DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
@@ -378,32 +378,32 @@ const SceneGraph::Camera& RenderTask::GetCamera() const
   return *mCameraNode;
 }
 
-const Matrix& RenderTask::GetProjectionMatrix(BufferIndex bufferIndex) const
+const Matrix& RenderTask::GetProjectionMatrix() const
 {
   DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
   return mCameraNode->GetProjectionMatrix();
 }
 
-RenderInstruction& RenderTask::GetRenderInstruction(BufferIndex updateBufferIndex)
+RenderInstruction& RenderTask::GetRenderInstruction()
 {
   return mRenderInstruction;
 }
 
-RenderInstruction& RenderTask::PrepareRenderInstruction(BufferIndex updateBufferIndex)
+RenderInstruction& RenderTask::PrepareRenderInstruction()
 {
   DALI_ASSERT_DEBUG(nullptr != mCameraNode);
 
   TASK_LOG(Debug::General);
 
   Viewport viewport;
-  bool     viewportSet = QueryViewport(updateBufferIndex, viewport);
+  bool     viewportSet = QueryViewport(viewport);
 
-  auto& renderInstruction = GetRenderInstruction(updateBufferIndex);
+  auto& renderInstruction = GetRenderInstruction();
   renderInstruction.Reset(mCameraNode,
                           GetFrameBuffer(),
                           viewportSet ? &viewport : nullptr,
-                          mClearEnabled ? &GetClearColor(updateBufferIndex) : nullptr,
+                          mClearEnabled ? &GetClearColor() : nullptr,
                           mRenderedScaleFactor);
 
   if(mRequiresSync &&
@@ -439,14 +439,14 @@ bool RenderTask::ViewMatrixUpdated()
   return retval;
 }
 
-void RenderTask::UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize, Vector3 cameraPosition)
+void RenderTask::UpdateViewport(Vector2 sceneSize, Vector3 cameraPosition)
 {
   if(GetViewportGuideNode() && GetViewportGuideNode()->ConnectedToScene())
   {
-    Vector3 worldPosition = GetViewportGuideNode()->GetWorldPosition(updateBufferIndex);
+    Vector3 worldPosition = GetViewportGuideNode()->GetWorldPosition();
     worldPosition -= cameraPosition;
 
-    Vector3 nodeSize = GetViewportGuideNode()->GetSize(updateBufferIndex) * GetViewportGuideNode()->GetWorldScale(updateBufferIndex);
+    Vector3 nodeSize = GetViewportGuideNode()->GetSize() * GetViewportGuideNode()->GetWorldScale();
     Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f); // World position origin is center of scene
     Vector3 halfNodeSize(nodeSize * 0.5f);
     Vector2 screenPosition(halfSceneSize.width + worldPosition.x - halfNodeSize.x,
@@ -458,27 +458,27 @@ void RenderTask::UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize
      *
      * TODO : Need to make Resseter for these properties.
      */
-    mViewportPosition.Set(updateBufferIndex, screenPosition);
-    mViewportSize.Set(updateBufferIndex, Vector2(nodeSize));
+    mViewportPosition.Set(screenPosition);
+    mViewportSize.Set(Vector2(nodeSize));
   }
 }
 
-const Vector2& RenderTask::GetViewportPosition(BufferIndex bufferIndex) const
+const Vector2& RenderTask::GetViewportPosition() const
 {
-  return mViewportPosition[bufferIndex];
+  return mViewportPosition.Get();
 }
 
-const Vector2& RenderTask::GetViewportSize(BufferIndex bufferIndex) const
+const Vector2& RenderTask::GetViewportSize() const
 {
-  return mViewportSize[bufferIndex];
+  return mViewportSize.Get();
 }
 
-bool RenderTask::GetViewportEnabled(BufferIndex bufferIndex) const
+bool RenderTask::GetViewportEnabled() const
 {
-  if(fabsf(mViewportPosition[bufferIndex].x) > Math::MACHINE_EPSILON_1 ||
-     fabsf(mViewportPosition[bufferIndex].y) > Math::MACHINE_EPSILON_1 ||
-     fabsf(mViewportSize[bufferIndex].width) > Math::MACHINE_EPSILON_1 ||
-     fabsf(mViewportSize[bufferIndex].height) > Math::MACHINE_EPSILON_1)
+  if(fabsf(mViewportPosition.Get().x) > Math::MACHINE_EPSILON_1 ||
+     fabsf(mViewportPosition.Get().y) > Math::MACHINE_EPSILON_1 ||
+     fabsf(mViewportSize.Get().width) > Math::MACHINE_EPSILON_1 ||
+     fabsf(mViewportSize.Get().height) > Math::MACHINE_EPSILON_1)
   {
     return true;
   }
@@ -554,7 +554,7 @@ void RenderTask::PropertyOwnerConnected(PropertyOwner& owner)
   }
 }
 
-PropertyOwner::Observer::NotifyReturnType RenderTask::PropertyOwnerDisconnected(BufferIndex /*updateBufferIndex*/, PropertyOwner& owner)
+PropertyOwner::Observer::NotifyReturnType RenderTask::PropertyOwnerDisconnected(PropertyOwner& owner)
 {
   if(&owner == static_cast<PropertyOwner*>(mSourceNode) || &owner == static_cast<PropertyOwner*>(mCameraNode))
   {
@@ -588,10 +588,8 @@ void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)
     if(DALI_LIKELY(!Dali::Stage::IsShuttingDown()))
     {
       // TODO : Until SG::RenderTask Resseter preopared, just call this internal API without dirty flag down.
-      mViewportPosition.ResetToBaseValueInternal(0);
-      mViewportPosition.ResetToBaseValueInternal(1);
-      mViewportSize.ResetToBaseValueInternal(0);
-      mViewportSize.ResetToBaseValueInternal(1);
+      mViewportPosition.ResetToBaseValueInternal();
+      mViewportSize.ResetToBaseValueInternal();
     }
   }
 }

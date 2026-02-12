@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_INPUT_ACCESSOR_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,121 +93,121 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputBoolean()
    */
-  const bool& GetConstraintInputBoolean(BufferIndex updateBufferIndex) const
+  const bool& GetConstraintInputBoolean() const
   {
-    return mInput->GetConstraintInputBoolean(updateBufferIndex);
+    return mInput->GetConstraintInputBoolean();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputInteger() const
    */
-  const int& GetConstraintInputInteger(BufferIndex updateBufferIndex) const
+  const int& GetConstraintInputInteger() const
   {
     DALI_ASSERT_DEBUG(mComponentIndex < 0 && "Did not expect valid component index");
 
-    return mInput->GetConstraintInputInteger(updateBufferIndex);
+    return mInput->GetConstraintInputInteger();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputFloat()
    */
-  const float& GetConstraintInputFloat(BufferIndex updateBufferIndex) const
+  const float& GetConstraintInputFloat() const
   {
     // Invalid index is ok
     if(mComponentIndex < 0)
     {
       // Not a Vector2, Vector3 or Vector4 component, expecting float type
-      return mInput->GetConstraintInputFloat(updateBufferIndex);
+      return mInput->GetConstraintInputFloat();
     }
     else if(PropertyTypes::Get<Vector2>() == mInput->GetType())
     {
       if(0 == mComponentIndex)
       {
-        return mInput->GetConstraintInputVector2(updateBufferIndex).x;
+        return mInput->GetConstraintInputVector2().x;
       }
 
       DALI_ASSERT_DEBUG(1 == mComponentIndex && "Invalid Vector2 component index");
-      return mInput->GetConstraintInputVector2(updateBufferIndex).y;
+      return mInput->GetConstraintInputVector2().y;
     }
     else if(PropertyTypes::Get<Vector3>() == mInput->GetType())
     {
       if(0 == mComponentIndex)
       {
-        return mInput->GetConstraintInputVector3(updateBufferIndex).x;
+        return mInput->GetConstraintInputVector3().x;
       }
       else if(1 == mComponentIndex)
       {
-        return mInput->GetConstraintInputVector3(updateBufferIndex).y;
+        return mInput->GetConstraintInputVector3().y;
       }
 
       DALI_ASSERT_DEBUG(2 == mComponentIndex && "Invalid Vector3 component index");
-      return mInput->GetConstraintInputVector3(updateBufferIndex).z;
+      return mInput->GetConstraintInputVector3().z;
     }
 
     // Expecting Vector4
     if(0 == mComponentIndex)
     {
-      return mInput->GetConstraintInputVector4(updateBufferIndex).x;
+      return mInput->GetConstraintInputVector4().x;
     }
     else if(1 == mComponentIndex)
     {
-      return mInput->GetConstraintInputVector4(updateBufferIndex).y;
+      return mInput->GetConstraintInputVector4().y;
     }
     else if(2 == mComponentIndex)
     {
-      return mInput->GetConstraintInputVector4(updateBufferIndex).z;
+      return mInput->GetConstraintInputVector4().z;
     }
 
     DALI_ASSERT_DEBUG(3 == mComponentIndex && "Invalid Vector4 component index");
-    return mInput->GetConstraintInputVector4(updateBufferIndex).w;
+    return mInput->GetConstraintInputVector4().w;
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputVector2()
    */
-  const Vector2& GetConstraintInputVector2(BufferIndex updateBufferIndex) const
+  const Vector2& GetConstraintInputVector2() const
   {
-    return mInput->GetConstraintInputVector2(updateBufferIndex);
+    return mInput->GetConstraintInputVector2();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputVector3()
    */
-  const Vector3& GetConstraintInputVector3(BufferIndex updateBufferIndex) const
+  const Vector3& GetConstraintInputVector3() const
   {
-    return mInput->GetConstraintInputVector3(updateBufferIndex);
+    return mInput->GetConstraintInputVector3();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputVector4()
    */
-  const Vector4& GetConstraintInputVector4(BufferIndex updateBufferIndex) const
+  const Vector4& GetConstraintInputVector4() const
   {
-    return mInput->GetConstraintInputVector4(updateBufferIndex);
+    return mInput->GetConstraintInputVector4();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputQuaternion()
    */
-  const Quaternion& GetConstraintInputQuaternion(BufferIndex updateBufferIndex) const
+  const Quaternion& GetConstraintInputQuaternion() const
   {
-    return mInput->GetConstraintInputQuaternion(updateBufferIndex);
+    return mInput->GetConstraintInputQuaternion();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputMatrix3()
    */
-  const Matrix3& GetConstraintInputMatrix3(BufferIndex updateBufferIndex) const
+  const Matrix3& GetConstraintInputMatrix3() const
   {
-    return mInput->GetConstraintInputMatrix3(updateBufferIndex);
+    return mInput->GetConstraintInputMatrix3();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputMatrix()
    */
-  const Matrix& GetConstraintInputMatrix(BufferIndex updateBufferIndex) const
+  const Matrix& GetConstraintInputMatrix() const
   {
-    return mInput->GetConstraintInputMatrix(updateBufferIndex);
+    return mInput->GetConstraintInputMatrix();
   }
 
 public:

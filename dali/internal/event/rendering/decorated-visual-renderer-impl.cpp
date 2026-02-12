@@ -315,7 +315,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
       {
         if(DALI_LIKELY(mDecoratedVisualProperties))
         {
-          value = mDecoratedVisualProperties->mCornerRadius[GetEventThreadServices().GetEventBufferIndex()];
+          value = mDecoratedVisualProperties->mCornerRadius.Get();
         }
         break;
       }
@@ -323,7 +323,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
       {
         if(DALI_LIKELY(mDecoratedVisualProperties))
         {
-          value = mDecoratedVisualProperties->mCornerSquareness[GetEventThreadServices().GetEventBufferIndex()];
+          value = mDecoratedVisualProperties->mCornerSquareness.Get();
         }
         break;
       }
@@ -331,7 +331,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
       {
         if(DALI_LIKELY(mDecoratedVisualProperties))
         {
-          value = mDecoratedVisualProperties->mCornerRadiusPolicy[GetEventThreadServices().GetEventBufferIndex()];
+          value = mDecoratedVisualProperties->mCornerRadiusPolicy.Get();
         }
         break;
       }
@@ -339,7 +339,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
       {
         if(DALI_LIKELY(mDecoratedVisualProperties))
         {
-          value = mDecoratedVisualProperties->mBorderlineWidth[GetEventThreadServices().GetEventBufferIndex()];
+          value = mDecoratedVisualProperties->mBorderlineWidth.Get();
         }
         break;
       }
@@ -347,7 +347,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
       {
         if(DALI_LIKELY(mDecoratedVisualProperties))
         {
-          value = mDecoratedVisualProperties->mBorderlineColor[GetEventThreadServices().GetEventBufferIndex()];
+          value = mDecoratedVisualProperties->mBorderlineColor.Get();
         }
         break;
       }
@@ -355,7 +355,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
       {
         if(DALI_LIKELY(mDecoratedVisualProperties))
         {
-          value = mDecoratedVisualProperties->mBorderlineOffset[GetEventThreadServices().GetEventBufferIndex()];
+          value = mDecoratedVisualProperties->mBorderlineOffset.Get();
         }
         break;
       }
@@ -363,7 +363,7 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
       {
         if(DALI_LIKELY(mDecoratedVisualProperties))
         {
-          value = mDecoratedVisualProperties->mBlurRadius[GetEventThreadServices().GetEventBufferIndex()];
+          value = mDecoratedVisualProperties->mBlurRadius.Get();
         }
         break;
       }

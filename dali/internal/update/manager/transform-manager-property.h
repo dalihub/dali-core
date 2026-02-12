@@ -43,17 +43,17 @@ struct TransformManagerPropertyHandler : public AnimatablePropertyBase
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  virtual T& Get(BufferIndex bufferIndex) = 0;
+  virtual T& Get() = 0;
 
   /**
    * @copydoc Dali::SceneGraph::AnimatableProperty::Get()
    */
-  virtual const T& Get(BufferIndex bufferIndex) const = 0;
+  virtual const T& Get() const = 0;
 
   /**
    * @copydoc Dali::PropertyInput::GetVector3()
    */
-  const Vector3& GetVector3(BufferIndex bufferIndex) const override
+  const Vector3& GetVector3() const override
   {
     return Vector3::ZERO;
   }
@@ -73,10 +73,9 @@ struct TransformManagerPropertyHandler : public AnimatablePropertyBase
   /**
    * Set the property value. This will only persist for the current frame; the property
    * will be reset with the base value, at the beginning of the next frame.
-   * @param[in] bufferIndex Not used
    * @param[in] value The new property value.
    */
-  virtual void Set(BufferIndex bufferIndex, const T& value) = 0;
+  virtual void Set(const T& value) = 0;
 
   /**
    * Change a component of property
@@ -90,7 +89,7 @@ struct TransformManagerPropertyHandler : public AnimatablePropertyBase
   /**
    * @copydoc Dali::AnimatableProperty::Bake()
    */
-  virtual void Bake(BufferIndex bufferIndex, const T& value) = 0;
+  virtual void Bake(const T& value) = 0;
 
   /**
    * Bake a component of a property
@@ -104,38 +103,38 @@ struct TransformManagerPropertyHandler : public AnimatablePropertyBase
   /**
    * @copydoc Dali::AnimatableProperty::BakeX()
    */
-  virtual void BakeX(BufferIndex bufferIndex, float value)
+  virtual void BakeX(float value)
   {
   }
 
   /**
    * @copydoc Dali::AnimatableProperty::BakeY()
    */
-  virtual void BakeY(BufferIndex bufferIndex, float value)
+  virtual void BakeY(float value)
   {
   }
 
   /**
    * @copydoc Dali::AnimatableProperty::BakeZ()
    */
-  virtual void BakeZ(BufferIndex bufferIndex, float value)
+  virtual void BakeZ(float value)
   {
   }
 
   /**
    * @copydoc Dali::AnimatableProperty::BakeRelative()
    */
-  virtual void BakeRelative(BufferIndex bufferIndex, const T& value) = 0;
+  virtual void BakeRelative(const T& value) = 0;
 
   /**
    * @copydoc Dali::AnimatableProperty::BakeRelativeMultiply()
    */
-  virtual void BakeRelativeMultiply(BufferIndex bufferIndex, const T& value) {};
+  virtual void BakeRelativeMultiply(const T& value) {};
 
   /**
    * @copydoc Dali::AnimatableProperty::ResetToBaseValue()
    */
-  void ResetToBaseValue(BufferIndex updateBufferIndex) override
+  void ResetToBaseValue() override
   {
   }
 
@@ -181,27 +180,27 @@ struct TransformManagerPropertyVector3 final : public TransformManagerPropertyHa
     return Dali::PropertyTypes::Get<Vector3>();
   }
 
-  Vector3& Get(BufferIndex bufferIndex) override
+  Vector3& Get() override
   {
     return GetTxManagerData()->Manager()->GetVector3PropertyValue(GetTxManagerData()->Id(), PropertyT);
   }
 
-  const Vector3& Get(BufferIndex bufferIndex) const override
+  const Vector3& Get() const override
   {
     return GetTxManagerData()->Manager()->GetVector3PropertyValue(GetTxManagerData()->Id(), PropertyT);
   }
 
-  const Vector3& GetVector3(BufferIndex bufferIndex) const override
+  const Vector3& GetVector3() const override
   {
-    return Get(bufferIndex);
+    return Get();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
-    return &GetVector3(bufferIndex);
+    return &GetVector3();
   }
 
   /**
@@ -217,27 +216,27 @@ struct TransformManagerPropertyVector3 final : public TransformManagerPropertyHa
     return GetTxManagerData()->Manager()->GetVector3PropertyComponentValue(GetTxManagerData()->Id(), PropertyT, component);
   }
 
-  void Set(BufferIndex bufferIndex, const Vector3& value) override
+  void Set(const Vector3& value) override
   {
     GetTxManagerData()->Manager()->SetVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
   }
 
-  void Bake(BufferIndex bufferIndex, const Vector3& value) override
+  void Bake(const Vector3& value) override
   {
     GetTxManagerData()->Manager()->BakeVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
   }
 
-  void BakeX(BufferIndex bufferIndex, float value) override
+  void BakeX(float value) override
   {
     GetTxManagerData()->Manager()->BakeXVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
   }
 
-  void BakeY(BufferIndex bufferIndex, float value) override
+  void BakeY(float value) override
   {
     GetTxManagerData()->Manager()->BakeYVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
   }
 
-  void BakeZ(BufferIndex bufferIndex, float value) override
+  void BakeZ(float value) override
   {
     GetTxManagerData()->Manager()->BakeZVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
   }
@@ -252,12 +251,12 @@ struct TransformManagerPropertyVector3 final : public TransformManagerPropertyHa
     GetTxManagerData()->Manager()->BakeVector3PropertyComponentValue(GetTxManagerData()->Id(), PropertyT, value, component);
   }
 
-  void BakeRelative(BufferIndex bufferIndex, const Vector3& value) override
+  void BakeRelative(const Vector3& value) override
   {
     GetTxManagerData()->Manager()->BakeRelativeVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
   }
 
-  void BakeRelativeMultiply(BufferIndex bufferIndex, const Vector3& value) override
+  void BakeRelativeMultiply(const Vector3& value) override
   {
     GetTxManagerData()->Manager()->BakeMultiplyVector3PropertyValue(GetTxManagerData()->Id(), PropertyT, value);
   }
@@ -289,42 +288,42 @@ public:
     return Dali::PropertyTypes::Get<Quaternion>();
   }
 
-  Quaternion& Get(BufferIndex bufferIndex) override
+  Quaternion& Get() override
   {
     return GetTxManagerData()->Manager()->GetQuaternionPropertyValue(GetTxManagerData()->Id());
   }
 
-  const Quaternion& Get(BufferIndex bufferIndex) const override
+  const Quaternion& Get() const override
   {
     return GetTxManagerData()->Manager()->GetQuaternionPropertyValue(GetTxManagerData()->Id());
   }
 
-  void Set(BufferIndex bufferIndex, const Quaternion& value) override
+  void Set(const Quaternion& value) override
   {
     return GetTxManagerData()->Manager()->SetQuaternionPropertyValue(GetTxManagerData()->Id(), value);
   }
 
-  void Bake(BufferIndex bufferIndex, const Quaternion& value) override
+  void Bake(const Quaternion& value) override
   {
     return GetTxManagerData()->Manager()->BakeQuaternionPropertyValue(GetTxManagerData()->Id(), value);
   }
 
-  void BakeRelative(BufferIndex bufferIndex, const Quaternion& value) override
+  void BakeRelative(const Quaternion& value) override
   {
     return GetTxManagerData()->Manager()->BakeRelativeQuaternionPropertyValue(GetTxManagerData()->Id(), value);
   }
 
-  const Quaternion& GetQuaternion(BufferIndex bufferIndex) const override
+  const Quaternion& GetQuaternion() const override
   {
-    return Get(bufferIndex);
+    return Get();
   }
 
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
-    return &Get(bufferIndex);
+    return &Get();
   }
 
   /**
@@ -438,7 +437,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector3()
    */
-  const Vector3& GetVector3(BufferIndex bufferIndex) const override
+  const Vector3& GetVector3() const override
   {
     ComputeTransformComponent();
     return mValue;
@@ -447,15 +446,15 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
-    return &GetVector3(bufferIndex);
+    return &GetVector3();
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputVector3()
    */
-  const Vector3& GetConstraintInputVector3(BufferIndex bufferIndex) const override
+  const Vector3& GetConstraintInputVector3() const override
   {
     ComputeTransformComponent();
     return mValue;
@@ -464,7 +463,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Vector3& Get(BufferIndex bufferIndex)
+  Vector3& Get()
   {
     ComputeTransformComponent();
     return mValue;
@@ -473,18 +472,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Vector3& Get(BufferIndex bufferIndex) const
-  {
-    ComputeTransformComponent();
-    return mValue;
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Vector3& operator[](BufferIndex bufferIndex) const
+  const Vector3& Get() const
   {
     ComputeTransformComponent();
     return mValue;
@@ -545,7 +533,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetQuaternion()
    */
-  const Quaternion& GetQuaternion(BufferIndex bufferIndex) const override
+  const Quaternion& GetQuaternion() const override
   {
     ComputeTransformComponent();
     return mValue;
@@ -554,15 +542,15 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
-    return &GetQuaternion(bufferIndex);
+    return &GetQuaternion();
   }
 
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputQuaternion()
    */
-  const Quaternion& GetConstraintInputQuaternion(BufferIndex bufferIndex) const override
+  const Quaternion& GetConstraintInputQuaternion() const override
   {
     ComputeTransformComponent();
     return mValue;
@@ -571,7 +559,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Quaternion& Get(BufferIndex bufferIndex)
+  Quaternion& Get()
   {
     ComputeTransformComponent();
     return mValue;
@@ -580,18 +568,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Quaternion& Get(BufferIndex bufferIndex) const
-  {
-    ComputeTransformComponent();
-    return mValue;
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Quaternion& operator[](BufferIndex bufferIndex) const
+  const Quaternion& Get() const
   {
     ComputeTransformComponent();
     return mValue;
@@ -635,7 +612,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetMatrix()
    */
-  const Matrix& GetMatrix(BufferIndex bufferIndex) const override
+  const Matrix& GetMatrix() const override
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
@@ -649,7 +626,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     static const Matrix identityMatrix(Matrix::IDENTITY);
     auto                transformManagerData = GetTxManagerData();
@@ -664,7 +641,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputMatrix()
    */
-  const Matrix& GetConstraintInputMatrix(BufferIndex bufferIndex) const override
+  const Matrix& GetConstraintInputMatrix() const override
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
@@ -678,7 +655,7 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  Matrix& Get(BufferIndex bufferIndex)
+  Matrix& Get()
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
@@ -689,19 +666,9 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const Matrix& Get(BufferIndex bufferIndex) const
+  const Matrix& Get() const
   {
-    return GetMatrix(bufferIndex);
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const Matrix& operator[](BufferIndex bufferIndex) const
-  {
-    return GetMatrix(bufferIndex);
+    return GetMatrix();
   }
 
 private:
@@ -739,7 +706,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetMatrix()
    */
-  const bool& GetBoolean(BufferIndex bufferIndex) const override
+  const bool& GetBoolean() const override
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
@@ -756,7 +723,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     DALI_ASSERT_ALWAYS(0 && "TransformManagerBooleanIgnoredInput should not be animation");
     return nullptr;
@@ -765,15 +732,15 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetConstraintInputMatrix()
    */
-  const bool& GetConstraintInputBoolean(BufferIndex bufferIndex) const override
+  const bool& GetConstraintInputBoolean() const override
   {
-    return GetBoolean(bufferIndex);
+    return GetBoolean();
   }
 
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  bool& Get(BufferIndex bufferIndex)
+  bool& Get()
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
@@ -791,19 +758,9 @@ public:
   /**
    * @copydoc Dali::SceneGraph::PropertyInterface::Get()
    */
-  const bool& Get(BufferIndex bufferIndex) const
+  const bool& Get() const
   {
-    return GetBoolean(bufferIndex);
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const bool& operator[](BufferIndex bufferIndex) const
-  {
-    return GetBoolean(bufferIndex);
+    return GetBoolean();
   }
 
 private:

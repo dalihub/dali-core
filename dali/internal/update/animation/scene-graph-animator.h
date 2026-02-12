@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,15 +127,15 @@ private: // From PropertyOwner::Observer
   }
 
   /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected(PropertyOwner& owner )
    */
-  NotifyReturnType PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) final
+  NotifyReturnType PropertyOwnerDisconnected(PropertyOwner& owner) final
   {
     // If we are active, then bake the value if required
     if(mAnimationPlaying && mDisconnectAction != Dali::Animation::DISCARD)
     {
       // Bake to target-value if BakeFinal, otherwise bake current value
-      Update(bufferIndex, (mDisconnectAction == Dali::Animation::BAKE ? mCurrentProgress : 1.0f), 0.0f, true);
+      Update((mDisconnectAction == Dali::Animation::BAKE ? mCurrentProgress : 1.0f), 0.0f, true);
     }
 
     mEnabled = false;
@@ -454,12 +454,11 @@ public:
 
   /**
    * Update the scene object attached to the animator.
-   * @param[in] bufferIndex The buffer to animate.
    * @param[in] progress A value from 0 to 1, where 0 is the start of the animation, and 1 is the end point.
    * @param[in] blendPoint A value between [0,1], The Animated property is animated as it blends until the progress reaches the blendPoint.
    * @param[in] bake Bake.
    */
-  void Update(BufferIndex bufferIndex, float progress, float blendPoint, bool bake)
+  void Update(float progress, float blendPoint, bool bake)
   {
     if(mPropertyOwner)
     {
@@ -469,7 +468,7 @@ public:
     float alpha = ApplyAlphaFunction(progress);
 
     // PropertyType specific part
-    DoUpdate(bufferIndex, bake, alpha, blendPoint);
+    DoUpdate(bake, alpha, blendPoint);
 
     mCurrentProgress = progress;
     mDelayed         = false;
@@ -477,12 +476,11 @@ public:
 
   /**
    * Type specific part of the animator
-   * @param bufferIndex index to use
    * @param bake whether to bake or not
    * @param alpha value from alpha based on progress
    * @param blendPoint A value between [0,1], The Animated property is animated as it blends until the progress reaches the blendPoint.
    */
-  virtual void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) = 0;
+  virtual void DoUpdate(bool bake, float alpha, float blendPoint) = 0;
 
 protected:
   /**
@@ -548,22 +546,22 @@ public:
   }
 
   /**
-   * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
+   * @copydoc AnimatorBase::DoUpdate(bool bake, float alpha )
    */
-  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) final
+  void DoUpdate(bool bake, float alpha, float blendPoint) final
   {
-    const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
+    const PropertyType& current = mPropertyAccessor.Get();
 
     // need to cast the return value in case property is integer
     const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, blendPoint, current));
 
     if(bake)
     {
-      mPropertyAccessor.Bake(bufferIndex, result);
+      mPropertyAccessor.Bake(result);
     }
     else
     {
-      mPropertyAccessor.Set(bufferIndex, result);
+      mPropertyAccessor.Set(result);
     }
   }
 
@@ -628,22 +626,22 @@ public:
   }
 
   /**
-   * @copydoc AnimatorBase::DoUpdate( BufferIndex bufferIndex, bool bake, float alpha )
+   * @copydoc AnimatorBase::DoUpdate(bool bake, float alpha )
    */
-  void DoUpdate(BufferIndex bufferIndex, bool bake, float alpha, float blendPoint) final
+  void DoUpdate(bool bake, float alpha, float blendPoint) final
   {
-    const PropertyType& current = mPropertyAccessor.Get(bufferIndex);
+    const PropertyType& current = mPropertyAccessor.Get();
 
     // need to cast the return value in case property is integer
     const PropertyType result = static_cast<PropertyType>(mAnimatorFunction(alpha, blendPoint, current));
 
     if(bake)
     {
-      mPropertyAccessor.Bake(bufferIndex, result);
+      mPropertyAccessor.Bake(result);
     }
     else
     {
-      mPropertyAccessor.Set(bufferIndex, result);
+      mPropertyAccessor.Set(result);
     }
   }
 

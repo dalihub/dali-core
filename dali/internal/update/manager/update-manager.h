@@ -40,7 +40,6 @@
 #include <dali/internal/update/common/property-owner-flag-manager.h>
 #include <dali/internal/update/common/property-resetter.h>
 #include <dali/internal/update/common/resetter-manager.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/common/scene-graph-scene.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
@@ -451,15 +450,6 @@ public:
   uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene = true);
 
   /**
-   * @return the current event-buffer index.
-   */
-  BufferIndex GetEventBufferIndex() const
-  {
-    // inlined as its called often from event thread
-    return mSceneGraphBuffers.GetEventBufferIndex();
-  }
-
-  /**
    * Called by the event-thread to signal that FlushQueue will be called
    * e.g. when it has finished event processing.
    */
@@ -701,53 +691,46 @@ private:
 
   /**
    * Helper to reset all Node properties
-   * @param[in] bufferIndex to use
    */
-  void ResetProperties(BufferIndex bufferIndex);
+  void ResetProperties();
 
   /**
    * Perform gesture updates.
-   * @param[in] bufferIndex to use
    * @param[in] lastVSyncTime  The last VSync time in milliseconds.
    * @param[in] nextVSyncTime  The estimated time of the next VSync in milliseconds.
    * @return true, if any properties were updated.
    */
-  bool ProcessGestures(BufferIndex bufferIndex, uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds);
+  bool ProcessGestures(uint32_t lastVSyncTimeMilliseconds, uint32_t nextVSyncTimeMilliseconds);
 
   /**
    * Perform animation updates
-   * @param[in] bufferIndex to use
    * @param[in] elapsedSeconds time since last frame
    * @return true if at least one animations is currently active or false otherwise
    */
-  bool Animate(BufferIndex bufferIndex, float elapsedSeconds);
+  bool Animate(float elapsedSeconds);
 
   /**
    * Applies constraints to CustomObjects
    * @param[out] postPropertyOwner property owners those have post constraint.
-   * @param[in] bufferIndex to use
    */
-  void ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
+  void ConstrainCustomObjects(PropertyOwnerContainer& postPropertyOwners);
 
   /**
    * Applies constraints to RenderTasks
    * @param[out] postPropertyOwner property owners those have post constraint.
-   * @param[in] bufferIndex to use
    */
-  void ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
+  void ConstrainRenderTasks(PropertyOwnerContainer& postPropertyOwners);
 
   /**
    * Applies constraints to Shaders
    * @param[out] postPropertyOwner property owners those have post constraint.
-   * @param[in] bufferIndex to use
    */
-  void ConstrainShaders(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
+  void ConstrainShaders(PropertyOwnerContainer& postPropertyOwners);
 
   /**
    * Perform property notification updates
-   * @param[in] bufferIndex to use
    */
-  void ProcessPropertyNotifications(BufferIndex bufferIndex);
+  void ProcessPropertyNotifications();
 
   /**
    * Pass shader binaries queued here on to event thread.
@@ -757,27 +740,21 @@ private:
   /**
    * Update node shaders, opacity, geometry etc.
    * @param[out] postPropertyOwner property owners those have post constraint.
-   * @param[in] bufferIndex to use
    */
-  void UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
+  void UpdateNodes(PropertyOwnerContainer& postPropertyOwners);
 
   /**
    * initialize layer renderables
-   * @param[in] bufferIndex
    */
-  void UpdateLayers(BufferIndex bufferIndex);
+  void UpdateLayers();
 
   /**
    * Update Renderers
    * @param[out] postPropertyOwner property owners those have post constraint.
-   * @param[in] bufferIndex to use
    */
-  void UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex);
+  void UpdateRenderers(PropertyOwnerContainer& postPropertyOwners);
 
 private:
-  // needs to be direct member so that getter for event buffer can be inlined
-  SceneGraphBuffers mSceneGraphBuffers;
-
   struct Impl;
   Impl* mImpl;
 };

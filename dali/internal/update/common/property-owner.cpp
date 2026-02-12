@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,7 +133,7 @@ void PropertyOwner::ConnectToSceneGraph()
   mObserverNotifying = false;
 }
 
-void PropertyOwner::DisconnectFromSceneGraph(BufferIndex updateBufferIndex)
+void PropertyOwner::DisconnectFromSceneGraph()
 {
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Should not be call DisconnectFromSceneGraph while notifying PropertyOwner::Observers");
 
@@ -145,7 +145,7 @@ void PropertyOwner::DisconnectFromSceneGraph(BufferIndex updateBufferIndex)
   // Notification for observers
   for(auto iter = mObservers.begin(); iter != mObservers.end();)
   {
-    auto returnValue = (*iter).first->PropertyOwnerDisconnected(updateBufferIndex, *this);
+    auto returnValue = (*iter).first->PropertyOwnerDisconnected(*this);
     if(returnValue == Observer::KEEP_OBSERVING)
     {
       ++iter;

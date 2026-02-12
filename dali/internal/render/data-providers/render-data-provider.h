@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,10 +83,9 @@ public:
 
   /**
    * Get the mix color
-   * @param[in] bufferIndex The current buffer index.
    * @return The mix color
    */
-  virtual Vector4 GetMixColor(BufferIndex bufferIndex) const = 0;
+  virtual Vector4 GetMixColor() const = 0;
 
   /**
    * @brief Retrieve if the render data is updated
@@ -96,11 +95,10 @@ public:
 
   /**
    * @brief Get the update area after visual properties applied.
-   * @param[in] bufferIndex The current buffer index.
    * @param[in] originalUpdateArea The original update area before apply the visual properties.
    * @return The recalculated size after visual properties applied.
    */
-  virtual Vector4 GetVisualTransformedUpdateArea(BufferIndex bufferIndex, const Vector4& originalUpdateArea) noexcept = 0;
+  virtual Vector4 GetVisualTransformedUpdateArea(const Vector4& originalUpdateArea) noexcept = 0;
 
   virtual uint32_t GetInstanceCount() const = 0;
 };

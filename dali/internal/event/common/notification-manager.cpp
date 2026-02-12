@@ -163,7 +163,7 @@ void NotificationManager::ProcessMessages()
     });
     for(; iter != end; ++iter)
     {
-      (*iter)->Process(0u /*ignored*/);
+      (*iter)->Process();
     }
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
     {

@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/public-api/object/property-types.h>
 
@@ -118,7 +117,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetVector2()
    */
-  const Vector2& GetVector2(BufferIndex bufferIndex) const override
+  const Vector2& GetVector2() const override
   {
     return mValue;
   }
@@ -126,7 +125,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }
@@ -154,7 +153,7 @@ public:
   /**
    * @copydoc Dali::PropertyInput::GetBoolean()
    */
-  const bool& GetBoolean(BufferIndex bufferIndex) const override
+  const bool& GetBoolean() const override
   {
     return mValue;
   }
@@ -162,7 +161,7 @@ public:
   /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetValueAddress()
    */
-  const void* GetValueAddress(BufferIndex bufferIndex) const override
+  const void* GetValueAddress() const override
   {
     return &mValue;
   }

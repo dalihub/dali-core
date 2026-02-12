@@ -88,7 +88,7 @@ void ConstraintContainer::ApplyRateChanged(ConstraintBase* constraint)
   DALI_LOG_CONSTRAINT_INFO("[%p] Activate SG[%p](r:%d, c:%d). act[%zu] deact[%zu]\n", this, constraint, constraint->GetApplyRate(), constraint->GetAppliedCount(), mActiveConstraints.Count(), mDeactiveConstraints.Count());
 }
 
-void ConstraintContainer::Apply(BufferIndex updateBufferIndex)
+void ConstraintContainer::Apply()
 {
   if(mActiveConstraints.Empty())
   {
@@ -100,7 +100,7 @@ void ConstraintContainer::Apply(BufferIndex updateBufferIndex)
   {
     ConstraintBase& constraint = **iter;
     DALI_LOG_CONSTRAINT_INFO("[%p] Apply SG[%p](r:%d, c:%d).\n", this, &constraint, constraint.GetApplyRate(), constraint.GetAppliedCount());
-    constraint.Apply(updateBufferIndex);
+    constraint.Apply();
 
     if(constraint.GetApplyRate() == Dali::Constraint::ApplyRate::APPLY_ONCE && constraint.GetAppliedCount() > 0u)
     {
@@ -108,7 +108,7 @@ void ConstraintContainer::Apply(BufferIndex updateBufferIndex)
     }
   }
 
-  DALI_LOG_CONSTRAINT_INFO("[%p] Apply(%d) act[%zu] deact[%zu] deact now[%zu]\n", this, updateBufferIndex, mActiveConstraints.Count(), mDeactiveConstraints.Count(), deactivatedIters.size());
+  DALI_LOG_CONSTRAINT_INFO("[%p] Apply act[%zu] deact[%zu] deact now[%zu]\n", this, mActiveConstraints.Count(), mDeactiveConstraints.Count(), deactivatedIters.size());
 
   // FILO ordered iterator release.
   // Since OwnerContainer is linear container, we could keep iter.

@@ -105,34 +105,6 @@ constexpr void ClampInPlace(T& value, const T& min, const T& max)
 }
 
 /**
- * @brief Get the smaller value.
- *
- * @SINCE_2_5.8
- * @param[in] lhs The first value.
- * @param[in] rhs The second value.
- * @return T the smaller value.
- */
-template<typename T>
-constexpr const T& Min(const T& lhs, const T& rhs)
-{
-  return lhs < rhs ? lhs : rhs;
-}
-
-/**
- * @brief Get the bigger value.
- *
- * @SINCE_2_5.8
- * @param[in] lhs The first value.
- * @param[in] rhs The second value.
- * @return T the bigger value.
- */
-template<typename T>
-constexpr const T& Max(const T& lhs, const T& rhs)
-{
-  return lhs > rhs ? lhs : rhs;
-}
-
-/**
  * @brief Linear interpolation between two values.
  *
  * @SINCE_1_0.0

@@ -27,7 +27,6 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
 
@@ -169,9 +168,8 @@ public:
 
   /**
    * Constrain the associated scene object.
-   * @param[in] updateBufferIndex The current update buffer index.
    */
-  virtual void Apply(BufferIndex updateBufferIndex) = 0;
+  virtual void Apply() = 0;
 
   /**
    * Helper for internal test cases; only available for debug builds.
@@ -222,7 +220,7 @@ private:
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
-  NotifyReturnType PropertyOwnerDisconnected(BufferIndex bufferIndex, PropertyOwner& owner) override
+  NotifyReturnType PropertyOwnerDisconnected(PropertyOwner& owner) override
   {
     if(!mDisconnected)
     {

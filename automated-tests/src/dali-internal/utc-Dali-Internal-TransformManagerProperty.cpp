@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ int UtcTransformManagerPropertyUninitializedMgrData(void)
     Dali::Internal::SceneGraph::TransformManagerVector3Input<sizeof(txMgrData)> property{Dali::Internal::SceneGraph::TRANSFORM_PROPERTY_POSITION, input};
   } testNode;
 
-  Vector3 output = testNode.property.GetVector3(0);
+  Vector3 output = testNode.property.GetVector3();
 
   tet_infoline("Test that if input property's transform manager data is not initialized, that getting a value returns the initial value of the property.");
 
@@ -152,14 +152,14 @@ int UtcDaliInternalTransformPropertyGetValueAddress(void)
   node.mTransformManagerData.mManager = &testManager;
   node.mTransformManagerData.mId      = testManager.CreateTransform();
 
-  const void* addr = node.mScale.GetValueAddress(0);
-  node.mScale.Set(0, Vector3(1.2f, 1.2f, 1.2f));
+  const void* addr = node.mScale.GetValueAddress();
+  node.mScale.Set(Vector3(1.2f, 1.2f, 1.2f));
 
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(1.2f, 1.2f, 1.2f), TEST_LOCATION);
 
   // Test anchor point, for coverage.
-  addr = node.mAnchorPoint.GetValueAddress(0);
-  node.mAnchorPoint.Set(0, Vector3(0.5f, 0.1f, 0.0f));
+  addr = node.mAnchorPoint.GetValueAddress();
+  node.mAnchorPoint.Set(Vector3(0.5f, 0.1f, 0.0f));
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.1f, 0.0f), TEST_LOCATION);
 
   node.mAnchorPoint.SetFloatComponent(0.9f, 1);
@@ -168,18 +168,18 @@ int UtcDaliInternalTransformPropertyGetValueAddress(void)
   node.mAnchorPoint.BakeFloatComponent(0.4f, 2);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.4f), TEST_LOCATION);
 
-  node.mAnchorPoint.BakeX(0, 0.0f);
+  node.mAnchorPoint.BakeX(0.0f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.9f, 0.4f), TEST_LOCATION);
 
-  node.mAnchorPoint.BakeY(0, 0.1f);
+  node.mAnchorPoint.BakeY(0.1f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.4f), TEST_LOCATION);
 
-  node.mAnchorPoint.BakeZ(0, 0.2f);
+  node.mAnchorPoint.BakeZ(0.2f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.2f), TEST_LOCATION);
 
   // Test parent origin, for coverage.
-  addr = node.mParentOrigin.GetValueAddress(0);
-  node.mParentOrigin.Set(0, Vector3(0.5f, 0.1f, 0.0f));
+  addr = node.mParentOrigin.GetValueAddress();
+  node.mParentOrigin.Set(Vector3(0.5f, 0.1f, 0.0f));
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.1f, 0.0f), TEST_LOCATION);
 
   node.mParentOrigin.SetFloatComponent(0.9f, 1);
@@ -188,29 +188,29 @@ int UtcDaliInternalTransformPropertyGetValueAddress(void)
   node.mParentOrigin.BakeFloatComponent(0.4f, 2);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.4f), TEST_LOCATION);
 
-  node.mParentOrigin.BakeX(0, 0.0f);
+  node.mParentOrigin.BakeX(0.0f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.9f, 0.4f), TEST_LOCATION);
 
-  node.mParentOrigin.BakeY(0, 0.1f);
+  node.mParentOrigin.BakeY(0.1f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.4f), TEST_LOCATION);
 
-  node.mParentOrigin.BakeZ(0, 0.2f);
+  node.mParentOrigin.BakeZ(0.2f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.2f), TEST_LOCATION);
 
-  node.mOrientation.Set(0, Quaternion(Radian(1.619f), Vector3::ZAXIS));
-  addr = node.mOrientation.GetValueAddress(0);
+  node.mOrientation.Set(Quaternion(Radian(1.619f), Vector3::ZAXIS));
+  addr = node.mOrientation.GetValueAddress();
   DALI_TEST_EQUALS(*reinterpret_cast<const Quaternion*>(addr), Quaternion(Radian(1.619f), Vector3::ZAXIS), TEST_LOCATION);
 
-  Matrix& worldMatrix = node.mWorldMatrix.Get(0);
+  Matrix& worldMatrix = node.mWorldMatrix.Get();
   worldMatrix         = Matrix::IDENTITY;
 
-  addr = node.mWorldPosition.GetValueAddress(0);
+  addr = node.mWorldPosition.GetValueAddress();
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.f, 0.f, 0.f), TEST_LOCATION);
 
-  addr = node.mWorldOrientation.GetValueAddress(0);
+  addr = node.mWorldOrientation.GetValueAddress();
   DALI_TEST_EQUALS(*reinterpret_cast<const Quaternion*>(addr), Quaternion(Radian(0), Vector3::ZAXIS), TEST_LOCATION);
 
-  addr = node.mWorldMatrix.GetValueAddress(0);
+  addr = node.mWorldMatrix.GetValueAddress();
   DALI_TEST_EQUALS(*reinterpret_cast<const Matrix*>(addr), Matrix::IDENTITY, TEST_LOCATION);
 
   END_TEST;

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 
-#include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/notifier-interface.h>
@@ -239,22 +238,19 @@ public:
 
   /**
    * Stop the animation.
-   * @param[in] bufferIndex The buffer to update when mEndAction == Bake.
    * @return True if the animation has finished (otherwise it wasn't playing)
    */
-  bool Stop(BufferIndex bufferIndex);
+  bool Stop();
 
   /**
    * Clear the animator. It will stop animation, clear all animators, and make this animation never played before.
-   * @param[in] bufferIndex The buffer to update when mEndAction == Bake.
    */
-  void ClearAnimator(BufferIndex bufferIndex);
+  void ClearAnimator();
 
   /**
    * Called shortly before the animation is destroyed.
-   * @param[in] bufferIndex The buffer to update when mEndAction == Bake.
    */
-  void OnDestroy(BufferIndex bufferIndex);
+  void OnDestroy();
 
   /**
    * Query whether the animation is playing, paused or stopped.
@@ -289,8 +285,7 @@ public:
    */
   bool IsActive() const
   {
-    // As we have double buffering, if animator is updated in either frame, it needs to be rendered.
-    return mIsActive[0] || mIsActive[1];
+    return mIsActive;
   }
 
   /**
@@ -313,13 +308,12 @@ public:
   /**
    * This causes the animators to change the properties of objects in the scene graph.
    * @pre The animation is playing or paused.
-   * @param[in] bufferIndex The buffer to update.
    * @param[in] elapsedSeconds The time elapsed since the previous frame.
    * @param[out] stopped True if the animation stopped this loop
    * @param[out] finished True if the animation has finished.
    * @param[out] progressReached True if progress marker reached
    */
-  void Update(BufferIndex bufferIndex, float elapsedSeconds, bool& stopped, bool& finished, bool& progressReached);
+  void Update(float elapsedSeconds, bool& stopped, bool& finished, bool& progressReached);
 
 protected:
   /**
@@ -330,19 +324,17 @@ protected:
 private:
   /**
    * Helper for Update, also used to bake when the animation is stopped or destroyed.
-   * @param[in] bufferIndex The buffer to update.
    * @param[in] bake True if the final result should be baked.
    * @param[in] animationFinished True if the animation has finished.
    */
-  void UpdateAnimators(BufferIndex bufferIndex, bool bake, bool animationFinished);
+  void UpdateAnimators(bool bake, bool animationFinished);
 
   /**
    * Helper function to bake the result of the animation when it is stopped or
    * destroyed.
-   * @param[in] bufferIndex The buffer to update.
    * @param[in] action The end action specified.
    */
-  void Bake(BufferIndex bufferIndex, EndAction action);
+  void Bake(EndAction action);
 
   /**
    * Helper function to set active state of animators.
@@ -381,7 +373,7 @@ protected:
   bool mProgressReachedSignalRequired; // Flag to indicate the progress marker was hit
   bool mAutoReverseEnabled;            // Flag to identify that the looping mode is auto reverse.
   bool mAnimatorSortRequired;          // Flag to whether we need to sort animator or not.
-  bool mIsActive[2];                   // Flag to indicate whether the animation is active in the current frame (which is double buffered)
+  bool mIsActive;                      // Flag to indicate whether the animation is active in the current frame
   bool mIsFirstLoop;
   bool mIsStopped; // Flag to whether this animation call stoped by user at this frame.
 };

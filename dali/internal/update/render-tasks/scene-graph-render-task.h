@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -156,99 +156,87 @@ public:
 
   /**
    * Update viewport by using viewport guide node
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] sceneSize The size of scene.
    * @param[in] cameraPosition The position of default camera of the scene.
    */
-  void UpdateViewport(BufferIndex updateBufferIndex, Vector2 sceneSize, Vector3 cameraPosition);
+  void UpdateViewport(Vector2 sceneSize, Vector3 cameraPosition);
 
   /**
    * Set the value of property viewportPosition
    * This value will persist only for the current frame.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
    */
-  void SetViewportPosition(BufferIndex updateBufferIndex, const Vector2& value);
+  void SetViewportPosition(const Vector2& value);
 
   /**
    * Get the value of property viewportPosition
    * @warning Should only be called from the Update thread
-   * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  const Vector2& GetViewportPosition(BufferIndex bufferIndex) const;
+  const Vector2& GetViewportPosition() const;
 
   /**
    * Bake the value of the property viewportPosition
    * This will also set the base value
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
    */
-  void BakeViewportPosition(BufferIndex updateBufferIndex, const Vector2& value);
+  void BakeViewportPosition(const Vector2& value);
 
   /**
    * Set the value of property viewportSize
    * This value will persist only for the current frame.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
    */
-  void SetViewportSize(BufferIndex updateBufferIndex, const Vector2& value);
+  void SetViewportSize(const Vector2& value);
 
   /**
    * Get the value of property viewportSize
    * @warning Should only be called from the Update thread
-   * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  const Vector2& GetViewportSize(BufferIndex bufferIndex) const;
+  const Vector2& GetViewportSize() const;
 
   /**
    * Bake the value of the property viewportSize
    * This will also set the base value
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
    */
-  void BakeViewportSize(BufferIndex updateBufferIndex, const Vector2& value);
+  void BakeViewportSize(const Vector2& value);
 
   /**
    * Get the value of property viewportEnabled
    * @warning Should only be called from the Update thread
-   * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  bool GetViewportEnabled(BufferIndex bufferIndex) const;
+  bool GetViewportEnabled() const;
 
   /**
    * Query whether the optional viewport is set.
-   * @param[in] bufferIndex The buffer to read from.
    * @param[out] viewport The viewport position and size is populated.
    * @return true if the viewport has been set
    */
-  bool QueryViewport(BufferIndex bufferIndex, Viewport& viewport) const;
+  bool QueryViewport(Viewport& viewport) const;
 
   /**
    * Set the value of property clearColor
    * This value will persist only for the current frame.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The value of the property
    */
-  void SetClearColor(BufferIndex updateBufferIndex, const Vector4& value);
+  void SetClearColor(const Vector4& value);
 
   /**
    * Get the value of property clearColor
    * @warning Should only be called from the Update thread
-   * @param[in] bufferIndex The buffer to read from.
    * @return the value of the property.
    */
-  const Vector4& GetClearColor(BufferIndex bufferIndex) const;
+  const Vector4& GetClearColor() const;
 
   /**
    * Bake the value of the property clearColor
    * This will also set the base value
-   * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] value The new value for property.
    */
-  void BakeClearColor(BufferIndex updateBufferIndex, const Vector4& value);
+  void BakeClearColor(const Vector4& value);
 
   /**
    * @copydoc Dali::RenderTask::SetClearEnabled()
@@ -284,10 +272,9 @@ public:
 
   /**
    * Check if the render task is ready for rendering.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return True if the render-task is ready for rendering.
    */
-  bool ReadyToRender(BufferIndex updateBufferIndex);
+  bool ReadyToRender();
 
   /**
    * True if a render is required. If the current state is RENDER_CONTINUOUSLY, then
@@ -324,10 +311,9 @@ public:
   /**
    * Retrieve the view-matrix; this is double buffered for input handling.
    * @pre GetCameraNode() returns a node with valid Camera.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The view-matrix.
    */
-  const Matrix& GetViewMatrix(BufferIndex bufferIndex) const;
+  const Matrix& GetViewMatrix() const;
 
   /**
    * @brief Retrieve the camera.
@@ -340,10 +326,9 @@ public:
   /**
    * Retrieve the projection-matrix; this is double buffered for input handling.
    * @pre GetCameraNode() returns a node with valid Camera.
-   * @param[in] bufferIndex The buffer to read from.
    * @return The projection-matrix.
    */
-  const Matrix& GetProjectionMatrix(BufferIndex bufferIndex) const;
+  const Matrix& GetProjectionMatrix() const;
 
   /**
    * Prepares the render-instruction buffer to be populated with instructions.
@@ -352,10 +337,9 @@ public:
    * then this method will ensure that a GL sync object is created to track
    * when the rendering has finished.
    *
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return instruction to prepare
    */
-  RenderInstruction& PrepareRenderInstruction(BufferIndex updateBufferIndex);
+  RenderInstruction& PrepareRenderInstruction();
 
   /**
    * @return true if the view matrix has been updated during this or last frame
@@ -370,10 +354,9 @@ public:
 
   /**
    * Retrieve the render instruction.
-   * @param[in] updateBufferIndex The current update buffer index.
    * @return The render instruction
    */
-  RenderInstruction& GetRenderInstruction(BufferIndex updateBufferIndex);
+  RenderInstruction& GetRenderInstruction();
 
   /**
    * Sets Render Pass key for this RenderTask.
@@ -401,9 +384,9 @@ private: // from PropertyOwner::Observer
   void PropertyOwnerConnected(PropertyOwner& owner) override;
 
   /**
-   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected( BufferIndex updateBufferIndex, PropertyOwner& owner )
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected(PropertyOwner& owner )
    */
-  PropertyOwner::Observer::NotifyReturnType PropertyOwnerDisconnected(BufferIndex updateBufferIndex, PropertyOwner& owner) override;
+  PropertyOwner::Observer::NotifyReturnType PropertyOwnerDisconnected(PropertyOwner& owner) override;
 
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed( PropertyOwner& owner )

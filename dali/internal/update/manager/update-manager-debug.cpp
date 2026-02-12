@@ -45,7 +45,7 @@ static Debug::Filter* gNodeLogFilter = Debug::Filter::New(Debug::Verbose, false,
 /**
  * Debug helper function.
  */
-void PrintNodes(const Node& node, BufferIndex updateBufferIndex, int level)
+void PrintNodes(const Node& node, int level)
 {
   std::string nodeName = DALI_LOG_GET_OBJECT_STRING((&node));
 
@@ -58,10 +58,10 @@ void PrintNodes(const Node& node, BufferIndex updateBufferIndex, int level)
         << std::setw(level * 2) << std::setfill(' ') << "";
 
     oss << "Node " << nodeName << " " << &node
-        << " Position: " << node.GetPosition(updateBufferIndex)
-        << " WorldPosition: " << node.GetWorldPosition(updateBufferIndex)
-        << " Size: " << node.GetSize(updateBufferIndex)
-        << " Visible: " << node.IsVisible(updateBufferIndex)
+        << " Position: " << node.GetPosition()
+        << " WorldPosition: " << node.GetWorldPosition()
+        << " Size: " << node.GetSize()
+        << " Visible: " << node.IsVisible()
         << std::endl;
 
     DALI_LOG_INFO(gNodeLogFilter, Debug::Verbose, "%s", oss.str().c_str());
@@ -71,27 +71,27 @@ void PrintNodes(const Node& node, BufferIndex updateBufferIndex, int level)
 
   for(NodeConstIter iter = node.GetChildren().Begin(); iter != node.GetChildren().End(); ++iter)
   {
-    PrintNodes(**iter, updateBufferIndex, level);
+    PrintNodes(**iter, level);
   }
 }
 
-void PrintNodeTree(const Node& node, BufferIndex bufferIndex, std::string indentation)
+void PrintNodeTree(const Node& node, std::string indentation)
 {
   std::cout << "Node " << &node
             << " \"" << node.mDebugString << "\""
             << " Origin: " << node.GetParentOrigin()
             << " Anchor: " << node.GetAnchorPoint()
-            << " Size: " << node.GetSize(bufferIndex)
-            << " Pos: " << node.GetPosition(bufferIndex)
-            << " Ori: " << node.GetOrientation(bufferIndex)
-            << " Scale: " << node.GetScale(bufferIndex)
-            << " Color: " << node.GetColor(bufferIndex)
-            << " Visible: " << node.IsVisible(bufferIndex)
-            << " World Pos: " << node.GetWorldPosition(bufferIndex)
-            << " World Ori: " << node.GetWorldOrientation(bufferIndex)
-            << " World Scale: " << node.GetWorldScale(bufferIndex)
+            << " Size: " << node.GetSize()
+            << " Pos: " << node.GetPosition()
+            << " Ori: " << node.GetOrientation()
+            << " Scale: " << node.GetScale()
+            << " Color: " << node.GetColor()
+            << " Visible: " << node.IsVisible()
+            << " World Pos: " << node.GetWorldPosition()
+            << " World Ori: " << node.GetWorldOrientation()
+            << " World Scale: " << node.GetWorldScale()
             << " World Color: " << node.GetWorldColor()
-            << " World Matrix: " << node.GetWorldMatrix(bufferIndex)
+            << " World Matrix: " << node.GetWorldMatrix()
             << std::endl;
 
   for(NodeConstIter iter = node.GetChildren().Begin(); iter != node.GetChildren().End(); ++iter)
@@ -109,7 +109,7 @@ void PrintNodeTree(const Node& node, BufferIndex bufferIndex, std::string indent
       nextIndent += "     ";
     }
 
-    PrintNodeTree(**iter, bufferIndex, nextIndent);
+    PrintNodeTree(**iter, nextIndent);
   }
 }
 

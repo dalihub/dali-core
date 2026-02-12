@@ -599,7 +599,6 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
 
 inline void RenderAlgorithms::ProcessRenderList(const RenderList&                        renderList,
                                                 Graphics::CommandBuffer&                 commandBuffer,
-                                                BufferIndex                              bufferIndex,
                                                 const Matrix&                            viewMatrix,
                                                 const Matrix&                            projectionMatrix,
                                                 Integration::DepthBufferAvailable        depthBufferAvailable,
@@ -685,7 +684,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     bool skip = true;
     if(!rootClippingRect.IsEmpty())
     {
-      Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(bufferIndex, nodeInfo.updatedPositionSize) : nodeInfo.updatedPositionSize;
+      Vector4 updateArea = item.mRenderer ? item.mRenderer->GetVisualTransformedUpdateArea(nodeInfo.updatedPositionSize) : nodeInfo.updatedPositionSize;
       auto    rect       = RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), mViewportRectangle.width, mViewportRectangle.height, instruction.mRenderedScaleFactor);
 
       if(rect.Intersect(rootClippingRect))
@@ -739,7 +738,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
-          item.mRenderer->Render(commandBuffer, bufferIndex, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTargetGraphicsObjects, queue);
+          item.mRenderer->Render(commandBuffer, *item.mNode, nodeInfo.modelMatrix, item.mModelViewMatrix, viewMatrix, clippedProjectionMatrix, worldColor, nodeScale, nodeInfo.size, !item.mIsOpaque, instruction, renderTargetGraphicsObjects, queue);
         }
       }
     }
@@ -758,7 +757,6 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&                 instruction,
                                                 Graphics::CommandBuffer&                 commandBuffer,
-                                                BufferIndex                              bufferIndex,
                                                 Integration::DepthBufferAvailable        depthBufferAvailable,
                                                 Integration::StencilBufferAvailable      stencilBufferAvailable,
                                                 const Rect<int32_t>&                     viewport,
@@ -771,7 +769,7 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RENDER_INSTRUCTION_PROCESS", [&](std::ostringstream& oss)
   { oss << "[" << instruction.RenderListCount() << "]"; });
 
-  DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
+  DALI_PRINT_RENDER_INSTRUCTION(instruction);
 
   const Matrix* viewMatrix       = instruction.GetViewMatrix();
   const Matrix* projectionMatrix = instruction.GetProjectionMatrix();
@@ -793,7 +791,6 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
       {
         ProcessRenderList(*renderList,
                           commandBuffer,
-                          bufferIndex,
                           *viewMatrix,
                           *projectionMatrix,
                           depthBufferAvailable,

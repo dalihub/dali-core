@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_DEBUG_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ namespace Internal
 {
 namespace SceneGraph
 {
-void PrintNodes(const Node& node, BufferIndex updateBufferIndex, int level);
+void PrintNodes(const Node& node, int level);
 
-void PrintNodeTree(const Node& node, BufferIndex bufferIndex, std::string indentation = "");
+void PrintNodeTree(const Node& node, std::string indentation = "");
 
 } // namespace SceneGraph
 

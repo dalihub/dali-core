@@ -213,7 +213,7 @@ RendererKey Renderer::GetKey(Renderer* renderer)
   return RendererKey(gMemoryPoolCollection->GetKeyFromPtr(gMemoryPoolType, static_cast<void*>(renderer)));
 }
 
-bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
+bool Renderer::PrepareRender()
 {
   bool rendererUpdated        = Updated() || mRenderingBehavior == DevelRenderer::Rendering::CONTINUOUSLY || mUpdateDecay > 0;
   auto shaderMapChangeCounter = mShader ? mShader->GetUniformMap().GetChangeCounter() : 0u;
@@ -259,15 +259,13 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
   }
 
   // Ensure collected map is up to date
-  UpdateUniformMap(updateBufferIndex);
+  UpdateUniformMap();
 
   return rendererUpdated;
 }
 
 void Renderer::SetTextures(TextureSet* textureSet)
 {
-  DALI_ASSERT_DEBUG(textureSet != NULL && "Texture set pointer is NULL");
-
   if(mTextureSet != textureSet)
   {
     mTextureSet = textureSet;
@@ -288,9 +286,15 @@ const Vector<Render::Sampler*>* Renderer::GetSamplers() const
 
 void Renderer::SetShader(Shader* shader)
 {
-  DALI_ASSERT_DEBUG(shader != NULL && "Shader pointer is NULL");
+  if(shader)
+  {
+    mIsRenderableFlag |= RenderableFlag::HAS_SHADER;
+  }
+  else
+  {
+    mIsRenderableFlag &= ~RenderableFlag::HAS_SHADER;
+  }
 
-  mIsRenderableFlag |= RenderableFlag::HAS_SHADER;
   if(mShader != shader)
   {
     mShader                 = shader;
@@ -304,8 +308,15 @@ void Renderer::SetShader(Shader* shader)
 
 void Renderer::SetGeometry(Render::Geometry* geometry)
 {
-  DALI_ASSERT_DEBUG(geometry != NULL && "Geometry pointer is NULL");
-  mIsRenderableFlag |= RenderableFlag::HAS_GEOMETRY;
+  if(geometry)
+  {
+    mIsRenderableFlag |= RenderableFlag::HAS_GEOMETRY;
+  }
+  else
+  {
+    mIsRenderableFlag &= ~RenderableFlag::HAS_GEOMETRY;
+  }
+
   CallRenderFunction(mRenderer, &Render::Renderer::SetGeometry, geometry);
   SetUpdated(true);
 }
@@ -508,35 +519,35 @@ const Render::Renderer::StencilParameters& Renderer::GetStencilParameters() cons
   return GetRenderFunction(mRenderer, &Render::Renderer::GetStencilParameters);
 }
 
-void Renderer::BakeMixColor(BufferIndex updateBufferIndex, const Vector4& mixColor)
+void Renderer::BakeMixColor(const Vector4& mixColor)
 {
-  mMixColor.Bake(updateBufferIndex, mixColor);
+  mMixColor.Bake(mixColor);
 
   SetUpdated(true);
 }
 
-void Renderer::BakeMixColorComponent(BufferIndex updateBufferIndex, float componentValue, uint8_t componentIndex)
+void Renderer::BakeMixColorComponent(float componentValue, uint8_t componentIndex)
 {
   switch(componentIndex)
   {
     case 0:
     {
-      mMixColor.BakeX(updateBufferIndex, componentValue);
+      mMixColor.BakeX(componentValue);
       break;
     }
     case 1:
     {
-      mMixColor.BakeY(updateBufferIndex, componentValue);
+      mMixColor.BakeY(componentValue);
       break;
     }
     case 2:
     {
-      mMixColor.BakeZ(updateBufferIndex, componentValue);
+      mMixColor.BakeZ(componentValue);
       break;
     }
     case 3:
     {
-      mMixColor.BakeW(updateBufferIndex, componentValue);
+      mMixColor.BakeW(componentValue);
       break;
     }
     default:
@@ -549,9 +560,9 @@ void Renderer::BakeMixColorComponent(BufferIndex updateBufferIndex, float compon
   SetUpdated(true);
 }
 
-Vector4 Renderer::GetMixColor(BufferIndex updateBufferIndex) const
+Vector4 Renderer::GetMixColor() const
 {
-  return mMixColor[updateBufferIndex];
+  return mMixColor.Get();
 }
 
 void Renderer::SetRenderingBehavior(DevelRenderer::Rendering::Type renderingBehavior)
@@ -620,7 +631,7 @@ Render::RendererKey Renderer::GetRenderer() const
   return mRenderer;
 }
 
-Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, uint32_t renderPass, const Node& node) const
+Renderer::OpacityType Renderer::GetOpacityType(uint32_t renderPass, const Node& node) const
 {
   Renderer::OpacityType opacityType = Renderer::OPAQUE;
 
@@ -638,7 +649,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
     }
     case BlendMode::ON: // If the renderer should always be use blending
     {
-      float alpha = node.GetWorldColor().a * mMixColor[updateBufferIndex].a;
+      float alpha = node.GetWorldColor().a * mMixColor.Get().a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;
@@ -671,7 +682,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
       }
 
       // renderer should determine opacity using the actor color
-      float alpha = node.GetWorldColor().a * mMixColor[updateBufferIndex].a;
+      float alpha = node.GetWorldColor().a * mMixColor.Get().a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;
@@ -712,7 +723,7 @@ Renderer::OpacityType Renderer::GetOpacityType(BufferIndex updateBufferIndex, ui
   return opacityType;
 }
 
-void Renderer::UpdateUniformMap(BufferIndex updateBufferIndex)
+void Renderer::UpdateUniformMap()
 {
   if(mRegenerateUniformMap)
   {
@@ -804,16 +815,16 @@ void Renderer::ResetUpdated()
   PropertyOwner::ResetUpdated();
 }
 
-Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, const Vector4& originalUpdateArea) noexcept
+Vector4 Renderer::GetVisualTransformedUpdateArea(const Vector4& originalUpdateArea) noexcept
 {
   Vector4 updateArea = originalUpdateArea;
   if(mVisualProperties)
   {
-    mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
+    mVisualProperties->GetVisualTransformedUpdateArea(updateArea);
   }
   if(mDecoratedVisualProperties)
   {
-    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
+    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateArea);
   }
   return AdjustExtents(updateArea, mUpdateAreaExtents);
 }
