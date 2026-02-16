@@ -29,10 +29,9 @@ namespace Dali
 /**
  * @brief Templated unique pointer class with function pointer deleters.
  *
+ * @SINCE_2_5.11
  * @tparam Type The type of the pointer stored
  * @tparam Deleter The function to delete the object
- *
- * @SINCE_2_5.11
  */
 template<typename Type, typename Deleter = void (*)(Type*), typename = void>
 class UniquePtr
@@ -123,6 +122,7 @@ public:
    *
    * Constructs a UniquePtr<Base> from a UniquePtr<Derived>.
    *
+   * @SINCE_2_5.11
    * @tparam U The derived type
    * @tparam E The deleter type of the source
    * @param[in] other The derived UniquePtr to move from
@@ -140,6 +140,7 @@ public:
    *
    * Assigns a UniquePtr<Base> from a UniquePtr<Derived>.
    *
+   * @SINCE_2_5.11
    * @tparam U The derived type
    * @tparam E The deleter type of the source
    * @param[in] other The derived UniquePtr to move from
@@ -269,12 +270,10 @@ private:
 /**
  * @brief Templated unique pointer partial specialization with functor deleters (non-function-pointer types).
  *
+ * @SINCE_2_5.11
  * @tparam Type The type of the pointer stored
  * @tparam Deleter The functor to delete the object
- *
- * @SINCE_2_5.11
  */
-// Partial specialization for functor deleters (non-function-pointer types)
 template<typename Type, typename Deleter>
 class UniquePtr<Type, Deleter, typename EnableIf<!IsFunctionPointer<Deleter>::value>::type>
 {
@@ -349,6 +348,7 @@ public:
    *
    * Constructs a UniquePtr<Base> from a UniquePtr<Derived>.
    *
+   * @SINCE_2_5.11
    * @tparam U The derived type
    * @tparam E The deleter type of the source
    * @param[in] other The derived UniquePtr to move from
@@ -366,6 +366,7 @@ public:
    *
    * Assigns a UniquePtr<Base> from a UniquePtr<Derived>.
    *
+   * @SINCE_2_5.11
    * @tparam U The derived type
    * @tparam E The deleter type of the source
    * @param[in] other The derived UniquePtr to move from
@@ -495,18 +496,115 @@ private:
 
 /**
  * @brief Creates a UniquePtr that manages a new object.
- *
+ * @SINCE_2_5.11
  * @tparam Type The type of the object to construct
  * @tparam Args The types of arguments to forward to the constructor
  * @param[in] args The arguments to forward to the constructor of Type
  * @return UniquePtr<Type> managing the newly created object
- *
- * @SINCE_2_5.11
  */
 template<typename Type, typename... Args>
 UniquePtr<Type> MakeUnique(Args&&... args)
 {
   return UniquePtr<Type>(new Type(Forward<Args>(args)...));
+}
+
+/**
+ * @brief Equality comparison operator for UniquePtr objects.
+ *
+ * @SINCE_2_5.11
+ * @tparam Type The type of object managed by the UniquePtr
+ * @tparam Deleter The deleter type
+ * @param lhs The left-hand side UniquePtr to compare
+ * @param rhs The right-hand side UniquePtr to compare
+ * @return true if both UniquePtr objects are null or own the same pointer, false otherwise
+ * @note This comparison is based on pointer address equality, not value equality of the managed objects.
+ */
+template<typename Type, typename Deleter>
+bool operator==(const UniquePtr<Type, Deleter>& lhs, const UniquePtr<Type, Deleter>& rhs) noexcept
+{
+  return lhs.Get() == rhs.Get();
+}
+
+/**
+ * @brief Inequality comparison operator for UniquePtr objects.
+ *
+ * @SINCE_2_5.11
+ * @tparam Type The type of object managed by the UniquePtr
+ * @tparam Deleter The deleter type
+ * @param lhs The left-hand side UniquePtr to compare
+ * @param rhs The right-hand side UniquePtr to compare
+ * @return true if the UniquePtr objects manage different pointers, false otherwise
+ */
+template<typename Type, typename Deleter>
+bool operator!=(const UniquePtr<Type, Deleter>& lhs, const UniquePtr<Type, Deleter>& rhs) noexcept
+{
+  return lhs.Get() != rhs.Get();
+}
+
+/**
+ * @brief Less-than comparison operator for UniquePtr objects.
+ *
+ * Enables use of UniquePtr in ordered containers (e.g., map, set).
+ *
+ * @SINCE_2_5.11
+ * @tparam Type The type of object managed by the UniquePtr
+ * @tparam Deleter The deleter type
+ * @param lhs The left-hand side UniquePtr to compare
+ * @param rhs The right-hand side UniquePtr to compare
+ * @return true if lhs.Get() < rhs.Get(), false otherwise
+ */
+template<typename Type, typename Deleter>
+bool operator<(const UniquePtr<Type, Deleter>& lhs, const UniquePtr<Type, Deleter>& rhs) noexcept
+{
+  return lhs.Get() < rhs.Get();
+}
+
+/**
+ * @brief Less-than-or-equal comparison operator for UniquePtr objects.
+ *
+ * @SINCE_2_5.11
+ * @tparam Type The type of object managed by the UniquePtr
+ * @tparam Deleter The deleter type
+ * @param lhs The left-hand side UniquePtr to compare
+ * @param rhs The right-hand side UniquePtr to compare
+ * @return true if lhs.Get() <= rhs.Get(), false otherwise
+ */
+template<typename Type, typename Deleter>
+bool operator<=(const UniquePtr<Type, Deleter>& lhs, const UniquePtr<Type, Deleter>& rhs) noexcept
+{
+  return lhs.Get() <= rhs.Get();
+}
+
+/**
+ * @brief Greater-than comparison operator for UniquePtr objects
+ *
+ * @SINCE_2_5.11
+ * @tparam Type The type of object managed by the UniquePtr.
+ * @tparam Deleter The deleter type.
+ * @param lhs The left-hand side UniquePtr to compare.
+ * @param rhs The right-hand side UniquePtr to compare.
+ * @return true if lhs.Get() > rhs.Get(), false otherwise.
+ */
+template<typename Type, typename Deleter>
+bool operator>(const UniquePtr<Type, Deleter>& lhs, const UniquePtr<Type, Deleter>& rhs) noexcept
+{
+  return lhs.Get() > rhs.Get();
+}
+
+/**
+ * @brief Greater-than-or-equal comparison operator for UniquePtr objects.
+ *
+ * @SINCE_2_5.11
+ * @tparam Type The type of object managed by the UniquePtr.
+ * @tparam Deleter The deleter type.
+ * @param lhs The left-hand side UniquePtr to compare.
+ * @param rhs The right-hand side UniquePtr to compare.
+ * @return true if lhs.Get() >= rhs.Get(), false otherwise.
+ */
+template<typename Type, typename Deleter>
+bool operator>=(const UniquePtr<Type, Deleter>& lhs, const UniquePtr<Type, Deleter>& rhs) noexcept
+{
+  return lhs.Get() >= rhs.Get();
 }
 
 /**
