@@ -15,6 +15,7 @@
  *
  */
 
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <stdlib.h>
 
@@ -349,10 +350,18 @@ int UtcDaliUniquePtrMoveAssignmentSelf(void)
     UniquePtr<TestClass> ptr(new TestClass(destructorCalled));
     DALI_TEST_CHECK(ptr);
 
+    // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
     ptr = std::move(ptr);
 
     DALI_TEST_CHECK(ptr);
     DALI_TEST_CHECK(!destructorCalled);
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
   }
   DALI_TEST_CHECK(destructorCalled);
   END_TEST;
