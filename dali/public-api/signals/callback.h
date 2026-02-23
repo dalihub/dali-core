@@ -2,7 +2,7 @@
 #define DALI_CALLBACK_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ public:
    * @brief Destructor.
    * @SINCE_1_0.0
    */
-  ~CallbackBase();
+  virtual ~CallbackBase();
 
   /**
    * @brief Resets the object pointer so that we know not to call methods of this object any more.
@@ -206,6 +206,8 @@ public: // Data for deriving classes & Dispatchers
 
   union
   {
+    void* mFunctionToVoidPointer{nullptr}; ///< Converter to function pointer to void ponter. It will make ensure the align of callback as sizeof(ptrdiff_t)
+
     MemberFunction mMemberFunction; ///< Pointer to member function
     Function       mFunction;       ///< Static function
   };

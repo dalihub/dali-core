@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ struct CallbackBasePtrCompare
 {
   bool operator()(const Dali::CallbackBase* lhs, const Dali::CallbackBase* rhs) const noexcept
   {
-    const void* lhsFunctionPtr = reinterpret_cast<void*>(lhs->mFunction);
-    const void* rhsFunctionPtr = reinterpret_cast<void*>(rhs->mFunction);
+    const void* lhsFunctionPtr = lhs->mFunctionToVoidPointer;
+    const void* rhsFunctionPtr = rhs->mFunctionToVoidPointer;
     if(lhsFunctionPtr < rhsFunctionPtr)
     {
       return true;
