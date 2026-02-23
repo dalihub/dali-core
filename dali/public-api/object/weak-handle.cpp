@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,17 +90,17 @@ WeakHandleBase::WeakHandleBase(const WeakHandleBase& handle)
 : mImpl(nullptr)
 {
   BaseHandle object = handle.GetBaseHandle();
-  mImpl             = std::make_unique<Impl>(object);
+  mImpl             = MakeUnique<Impl>(object);
 }
 
 WeakHandleBase& WeakHandleBase::operator=(const WeakHandleBase& rhs)
 {
   if(this != &rhs)
   {
-    mImpl.reset();
+    mImpl.Reset();
 
     BaseHandle handle = rhs.GetBaseHandle();
-    mImpl             = std::make_unique<Impl>(handle);
+    mImpl             = MakeUnique<Impl>(handle);
   }
 
   return *this;

@@ -313,32 +313,34 @@ INSTALL_HEADERS_WITH_DIRECTORY(PACKAGE_DOXY_HEADERS ${PACKAGE_DOXY_SRC_DIR} "dal
 # from the top-level CMake script using ADD_SUBDIRECTORY() to avoid
 # target names duplication with other DALi modules.
 IF( ENABLE_COVERAGE )
-  FIND_PROGRAM( LCOV_BIN "lcov" )
-  IF( LCOV_BIN )
+  SET(FASTCOV_BIN "${PREFIX}/bin/fastcov.py")
+
+  IF( EXISTS ${FASTCOV_BIN} )
 
     # Define custom rules for coverage
     SET(COVERAGE_DIR .cov)
     SET(COVERAGE_OUTPUT_DIR doc/coverage)
 
-    # lcov prior to 1.10 doesn't have -rc option; this and subsequent version don't output
-    # branch coverage. Determine the lcov version, and enable branch coverage accordingly.
-    # Additionally, lcov version 2.0 and later have different options for branch coverage, and need to ignore some errors
-    EXECUTE_PROCESS( COMMAND bash -c "${LCOV_BIN} --version | cut -d' ' -f4" OUTPUT_VARIABLE LCOV_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE )
-    IF( NOT LCOV_VERSION VERSION_LESS "2.0" )
-      SET(LCOV_OPTS --rc branch_coverage=1 --rc geninfo_unexecuted_blocks=1 --rc no_exception_branch=1 --ignore-errors unused --ignore-errors empty --ignore-errors negative --ignore-errors mismatch)
-    ELSEIF( NOT LCOV_VERSION VERSION_LESS "1.10" )
-      SET(LCOV_OPTS --rc lcov_branch_coverage=1)
-    ENDIF()
+    # fastcov.py doesn't need version detection or complex rc options
+    SET(FASTCOV_OPTS "--branch-coverage" "--lcov")
 
     ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}rename_cov_data ./rename-cov-data )
 
-    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}cov_data ${LCOV_BIN} ${LCOV_OPTS} --base-directory . --directory . -c -o dali.info
-      COMMAND ${LCOV_BIN} ${LCOV_OPTS} --remove dali.info \"*/dali-env/*\" \"/usr/include/*\" \"public-api/shader-effects/*\" \"*/image-actor*\" -o dali.info )
+    # fastcov.py combines capture and exclude into a single operation
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}cov_data
+      COMMAND ${FASTCOV_BIN} ${FASTCOV_OPTS}
+        -d .
+        --exclude /usr/include automated-tests dali-env
+        -o dali.info )
 
-    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}coverage genhtml ${LCOV_OPTS} -o ${COVERAGE_OUTPUT_DIR} dali.info
+    # genhtml works with fastcov.py output (lcov-compatible format)
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}coverage
+      COMMAND genhtml --branch-coverage -o ${COVERAGE_OUTPUT_DIR} dali.info
       DEPENDS cov_data )
 
-    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}reset_coverage @${LCOV_BIN} -z --directory `pwd` )
+    # Reset coverage using fastcov.py's zerocounters option
+    ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}reset_coverage
+      COMMAND ${FASTCOV_BIN} -z -d . )
 
     # Define custom rule for distclean
     ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}distclean @echo cleaning for source distribution )
@@ -373,7 +375,9 @@ IF( ENABLE_COVERAGE )
 VERBATIM
           )
 
-  ENDIF( LCOV_BIN )
+  ELSE()
+    MESSAGE( WARNING "fastcov.py not found at ${FASTCOV_BIN}, coverage targets will not be available" )
+  ENDIF()
 ENDIF()
 
 IF( ENABLE_LINK_TEST )

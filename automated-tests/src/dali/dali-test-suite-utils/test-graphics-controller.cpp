@@ -766,7 +766,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
 
         if(info->glesNativeInfo.eglSharedContextStoragePointer)
         {
-          auto* anyContext = reinterpret_cast<std::any*>(info->glesNativeInfo.eglSharedContextStoragePointer);
+          auto* anyContext = reinterpret_cast<Dali::Any*>(info->glesNativeInfo.eglSharedContextStoragePointer);
           *anyContext      = reinterpret_cast<void*>(0x12345678u);
         }
 

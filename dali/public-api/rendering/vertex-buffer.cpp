@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,25 +31,25 @@ struct VertexBufferUpdateCallback::Impl
   {
   }
 
-  uint32_t Invoke(void* data, size_t size) const
+  uint32_t Invoke(void* data, size_t size)
   {
     return CallbackBase::ExecuteReturn<uint32_t>(*mCallback, data, size);
   }
 
-  std::unique_ptr<CallbackBase> mCallback;
+  UniquePtr<CallbackBase> mCallback;
 };
 
 VertexBufferUpdateCallback::~VertexBufferUpdateCallback() = default;
 
-std::unique_ptr<VertexBufferUpdateCallback> VertexBufferUpdateCallback::New(CallbackBase* callbackBase)
+UniquePtr<VertexBufferUpdateCallback> VertexBufferUpdateCallback::New(CallbackBase* callbackBase)
 {
-  std::unique_ptr<VertexBufferUpdateCallback> retval;
-  auto                                        impl = std::make_unique<Impl>(callbackBase);
-  retval.reset(new VertexBufferUpdateCallback(std::move(impl)));
+  UniquePtr<VertexBufferUpdateCallback> retval;
+  auto                                  impl = MakeUnique<Impl>(callbackBase);
+  retval.Reset(new VertexBufferUpdateCallback(std::move(impl)));
   return retval;
 }
 
-VertexBufferUpdateCallback::VertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback::Impl>&& impl)
+VertexBufferUpdateCallback::VertexBufferUpdateCallback(UniquePtr<VertexBufferUpdateCallback::Impl>&& impl)
 : mImpl(std::move(impl))
 {
 }
@@ -107,9 +107,9 @@ uint32_t VertexBuffer::GetDivisor() const
   return GetImplementation(*this).GetDivisor();
 }
 
-void VertexBuffer::SetVertexBufferUpdateCallback(std::unique_ptr<VertexBufferUpdateCallback>&& updateCallback)
+void VertexBuffer::SetVertexBufferUpdateCallback(UniquePtr<VertexBufferUpdateCallback>&& updateCallback)
 {
-  GetImplementation(*this).SetVertexBufferUpdateCallback(*updateCallback.release());
+  GetImplementation(*this).SetVertexBufferUpdateCallback(*updateCallback.Release());
 }
 
 void VertexBuffer::ClearVertexBufferUpdateCallback()

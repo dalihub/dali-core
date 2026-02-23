@@ -565,10 +565,10 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     auto& textureResources = mRenderCallback->GetTextureResources();
 
-    if(!textureResources.empty())
+    if(!textureResources.Empty())
     {
       mRenderCallbackTextureBindings.clear();
-      renderCallbackInput.textureBindings.resize(textureResources.size());
+      renderCallbackInput.textureBindings.ResizeUninitialized(textureResources.Count());
       auto i = 0u;
       for(auto& texture : textureResources)
       {

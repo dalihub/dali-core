@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ struct DrawableObject
     clippingBox = inputData.clippingBox;
     worldColor  = inputData.worldColor;
 
-    auto count = inputData.textureBindings.size();
+    auto count = inputData.textureBindings.Count();
 
     // test whether number of textures matches 1
     DALI_TEST_EQUALS(count, 1, TEST_LOCATION);
@@ -315,9 +315,10 @@ int UtcRenderCallbackTextureBindingP(void)
   PixelData pixelData = PixelData::New(data, 512 * 512 * 4, 512, 512, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
   texture.Upload(pixelData);
 
-  std::vector<Texture> texturesToBind;
-  texturesToBind.push_back(texture);
+  Dali::Vector<Texture> texturesToBind;
+  texturesToBind.PushBack(texture);
   callback->BindTextureResources(texturesToBind);
+  DALI_TEST_EQUALS(callback->GetTextureResources().Count(), texturesToBind.Count(), TEST_LOCATION);
 
   DrawableActor drawableActor = DrawableActor::New(*callback);
   application.GetScene().Add(drawableActor);

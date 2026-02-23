@@ -2,7 +2,7 @@
 #define TEST_CUSTOM_ACTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,7 +169,7 @@ public:
   float TestCalculateChildSizeBase(const Dali::Actor& child, Dali::Dimension::Type dimension);
   bool  TestRelayoutDependentOnChildrenBase(Dali::Dimension::Type dimension);
 
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
   }
 
@@ -520,7 +520,7 @@ public:
     return false;
   }
 
-  void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward) override
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
   }
 };

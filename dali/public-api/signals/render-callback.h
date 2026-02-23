@@ -2,7 +2,7 @@
 #define DALI_RENDER_CALLBACK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
@@ -26,10 +28,7 @@
 #include <dali/public-api/signals/callback.h>
 
 // EXTERNAL INCLUDES
-#include <any>
-#include <memory>
 #include <utility>
-#include <vector>
 
 namespace Dali
 {
@@ -43,18 +42,18 @@ namespace Dali
  */
 struct DALI_CORE_API RenderCallbackInput
 {
-  Matrix                mvp;
-  Matrix                projection;
-  Size                  size;
-  Rect<int32_t>         clippingBox; ///< in screen coordinates
-  std::vector<uint32_t> textureBindings;
+  Dali::Matrix           mvp;
+  Dali::Matrix           projection;
+  Dali::Size             size;
+  Dali::Rect<int32_t>    clippingBox; ///< in screen coordinates
+  Dali::Vector<uint32_t> textureBindings;
 
-  std::any eglContext;         ///< Storage for EGL Context
-  bool     usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
+  Dali::Any eglContext;         ///< Storage for EGL Context
+  bool      usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
 
-  Matrix  view; // Added at end to avoid abi break.
-  Vector4 worldColor;
-  bool    isTerminated; ///< Whether this callback is for terminate case, or not. @SINCE_2_4.35
+  Dali::Matrix  view; // Added at end to avoid abi break.
+  Dali::Vector4 worldColor;
+  bool          isTerminated; ///< Whether this callback is for terminate case, or not. @SINCE_2_4.35
 };
 
 /**
@@ -115,7 +114,7 @@ public:
    * Templated member function type
    */
   template<class T>
-  using FuncType = bool (T::*)(const RenderCallbackInput&);
+  using FuncType = bool (T::*)(const Dali::RenderCallbackInput&);
 
   /**
    * @brief Constructor of RenderCallback
@@ -142,9 +141,9 @@ public:
    * @return Unique pointer to the RenderCallback instance
    */
   template<class T>
-  static std::unique_ptr<RenderCallback> New(T* object, FuncType<T> func)
+  static UniquePtr<Dali::RenderCallback> New(T* object, FuncType<T> func)
   {
-    return std::make_unique<RenderCallback>(object, func, ExecutionMode::DEFAULT);
+    return MakeUnique<Dali::RenderCallback>(object, func, ExecutionMode::DEFAULT);
   }
 
   /**
@@ -157,9 +156,9 @@ public:
    * @return Unique pointer to the RenderCallback instance
    */
   template<class T>
-  static std::unique_ptr<RenderCallback> New(T* object, FuncType<T> func, ExecutionMode executionMode)
+  static UniquePtr<Dali::RenderCallback> New(T* object, FuncType<T> func, ExecutionMode executionMode)
   {
-    return std::make_unique<RenderCallback>(object, func, executionMode);
+    return MakeUnique<Dali::RenderCallback>(object, func, executionMode);
   }
 
   /**
@@ -168,9 +167,9 @@ public:
    * @SINCE_2_1.14
    * @return casts RenderCallback to CallbackBase object
    */
-  explicit operator CallbackBase*()
+  explicit operator Dali::CallbackBase*()
   {
-    return mCallback.get();
+    return mCallback.Get();
   }
 
   /**
@@ -186,7 +185,7 @@ public:
    * @param[in] textures List of DALi textures to be bound to the callback
    * @SINCE_2_1.30
    */
-  void BindTextureResources(std::vector<Dali::Texture> textures)
+  void BindTextureResources(Dali::Vector<Dali::Texture> textures)
   {
     mTextureResources = std::move(textures);
   }
@@ -196,7 +195,7 @@ public:
    *
    * @return list of textures
    */
-  [[nodiscard]] const std::vector<Dali::Texture>& GetTextureResources() const
+  [[nodiscard]] const Dali::Vector<Dali::Texture>& GetTextureResources() const
   {
     return mTextureResources;
   }
@@ -206,7 +205,7 @@ public:
    * @SINCE_2_1.14
    * @return casts RenderCallback to CallbackBase object
    */
-  explicit operator CallbackBase&()
+  explicit operator Dali::CallbackBase&()
   {
     return *mCallback;
   }
@@ -221,7 +220,7 @@ public:
    * @SINCE_2_1.30
    * @return Valid RenderCallbackInput structure
    */
-  RenderCallbackInput& GetRenderCallbackInput()
+  Dali::RenderCallbackInput& GetRenderCallbackInput()
   {
     return mRenderCallbackInput;
   }
@@ -238,10 +237,10 @@ public:
   }
 
 private:
-  std::unique_ptr<CallbackBase> mCallback; //< Callback base object
-  RenderCallbackInput           mRenderCallbackInput;
+  UniquePtr<Dali::CallbackBase> mCallback; //< Callback base object
+  Dali::RenderCallbackInput     mRenderCallbackInput;
   ExecutionMode                 mExecutionMode{ExecutionMode::DEFAULT};
-  std::vector<Dali::Texture>    mTextureResources{};
+  Dali::Vector<Dali::Texture>   mTextureResources{};
 };
 } // namespace Dali
 

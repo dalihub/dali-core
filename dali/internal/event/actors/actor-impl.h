@@ -38,7 +38,7 @@
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
@@ -1683,7 +1683,7 @@ public:
    * @param[in] isForward Indicates whether to retrieve forward (true) or backward (false)
    * RenderTasks.
    */
-  virtual void GetOffScreenRenderTasks(std::vector<Dali::RenderTask>& tasks, bool isForward);
+  virtual void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward);
 
   /**
    * @brief Register OffScreenRenderableType of this Actor.
