@@ -19,6 +19,7 @@
 #include <dali/public-api/signals/base-signal.h>
 
 // EXTERNAL INCLUDES
+#include <functional> ///< for std::less
 #include <map>
 
 // INTERNAL INCLUDES
@@ -30,25 +31,21 @@ struct CallbackBasePtrCompare
 {
   bool operator()(const Dali::CallbackBase* lhs, const Dali::CallbackBase* rhs) const noexcept
   {
-    const void* lhsFunctionPtr = lhs->mFunctionToVoidPointer;
-    const void* rhsFunctionPtr = rhs->mFunctionToVoidPointer;
-    if(lhsFunctionPtr < rhsFunctionPtr)
+    // Compare function pointers first.
+    // Note that std::less is safe way to ordering the function pointers.
+    const Dali::CallbackBase::Function& lhsFunctionPtr = lhs->mFunction;
+    const Dali::CallbackBase::Function& rhsFunctionPtr = rhs->mFunction;
+    if(std::less<Dali::CallbackBase::Function>()(lhsFunctionPtr, rhsFunctionPtr))
     {
       return true;
     }
-    else if(lhsFunctionPtr > rhsFunctionPtr)
+    else if(std::less<Dali::CallbackBase::Function>()(rhsFunctionPtr, lhsFunctionPtr))
     {
       return false;
     }
 
-    if(lhs->mImpl.mObjectPointer < rhs->mImpl.mObjectPointer)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    // If function pointers are equal, compare object pointers.
+    return std::less<decltype(lhs->mImpl.mObjectPointer)>()(lhs->mImpl.mObjectPointer, rhs->mImpl.mObjectPointer);
   }
 };
 } // unnamed namespace

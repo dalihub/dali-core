@@ -206,8 +206,6 @@ public: // Data for deriving classes & Dispatchers
 
   union
   {
-    void* mFunctionToVoidPointer{nullptr}; ///< Converter to function pointer to void ponter. It will make ensure the align of callback as sizeof(ptrdiff_t)
-
     MemberFunction mMemberFunction; ///< Pointer to member function
     Function       mFunction;       ///< Static function
   };
