@@ -362,53 +362,6 @@ int UtcDaliLayerLowerToBottom2(void)
   END_TEST;
 }
 
-int UtcDaliLayerSetClipping(void)
-{
-  tet_infoline("Testing Dali::Layer::SetClipping()");
-  TestApplication application;
-
-  Layer layer = Layer::New();
-  DALI_TEST_CHECK(!layer.GetProperty<bool>(Layer::Property::CLIPPING_ENABLE));
-
-  layer.SetProperty(Layer::Property::CLIPPING_ENABLE, true);
-  DALI_TEST_CHECK(layer.GetProperty<bool>(Layer::Property::CLIPPING_ENABLE));
-  END_TEST;
-}
-
-int UtcDaliLayerIsClipping(void)
-{
-  tet_infoline("Testing Dali::Layer::IsClipping()");
-  TestApplication application;
-
-  Layer layer = Layer::New();
-  DALI_TEST_CHECK(!layer.GetProperty<bool>(Layer::Property::CLIPPING_ENABLE));
-  END_TEST;
-}
-
-int UtcDaliLayerSetClippingBox(void)
-{
-  tet_infoline("Testing Dali::Layer::SetClippingBox()");
-  TestApplication application;
-
-  ClippingBox testBox(5, 6, 77, 83);
-
-  Layer layer = Layer::New();
-  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) != testBox);
-  layer.SetProperty(Layer::Property::CLIPPING_BOX, testBox);
-  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) == testBox);
-  END_TEST;
-}
-
-int UtcDaliLayerGetClippingBox(void)
-{
-  tet_infoline("Testing Dali::Layer::GetClippingBox()");
-  TestApplication application;
-
-  Layer layer = Layer::New();
-  DALI_TEST_CHECK(layer.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) == ClippingBox(0, 0, 0, 0));
-  END_TEST;
-}
-
 int UtcDaliLayerSetSortFunction(void)
 {
   tet_infoline("Testing Dali::Layer::SetSortFunction()");
@@ -630,8 +583,6 @@ int UtcDaliLayerDefaultProperties(void)
   Layer actor = Layer::New();
 
   std::vector<Property::Index> indices;
-  indices.push_back(Layer::Property::CLIPPING_ENABLE);
-  indices.push_back(Layer::Property::CLIPPING_BOX);
   indices.push_back(Layer::Property::BEHAVIOR);
   indices.push_back(Layer::Property::DEPTH);
   indices.push_back(Layer::Property::DEPTH_TEST);
@@ -649,24 +600,6 @@ int UtcDaliLayerDefaultProperties(void)
   }
 
   // set/get one of them
-  actor.SetProperty(Layer::Property::CLIPPING_BOX, ClippingBox(0, 0, 0, 0));
-
-  ClippingBox testBox(10, 20, 30, 40);
-  DALI_TEST_CHECK(actor.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) != testBox);
-
-  actor.SetProperty(Layer::Property::CLIPPING_BOX, Property::Value(Rect<int>(testBox)));
-
-  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::CLIPPING_BOX));
-
-  Property::Value v = actor.GetProperty(Layer::Property::CLIPPING_BOX);
-  DALI_TEST_CHECK(v.Get<Rect<int>>() == testBox);
-
-  v = actor.GetCurrentProperty(Layer::Property::CLIPPING_BOX);
-  DALI_TEST_CHECK(v.Get<Rect<int>>() == testBox);
-
-  // set the same boundaries, but through a clipping box object
-  actor.SetProperty(Layer::Property::CLIPPING_BOX, testBox);
-  DALI_TEST_CHECK(actor.GetProperty<Rect<int32_t>>(Layer::Property::CLIPPING_BOX) == testBox);
 
   actor.SetProperty(Layer::Property::BEHAVIOR, Property::Value(Layer::LAYER_UI));
   DALI_TEST_CHECK(Property::INTEGER == actor.GetPropertyType(Layer::Property::BEHAVIOR));
@@ -741,33 +674,6 @@ int UtcDaliLayerHoverConsumed(void)
   DALI_TEST_EQUALS(layer.GetProperty<bool>(Layer::Property::CONSUMES_HOVER), false, TEST_LOCATION);
   layer.SetProperty(Layer::Property::CONSUMES_HOVER, true);
   DALI_TEST_EQUALS(layer.GetProperty<bool>(Layer::Property::CONSUMES_HOVER), true, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliLayerClippingGLCalls(void)
-{
-  TestApplication                         application;
-  const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
-  Dali::Integration::Scene                scene(application.GetScene());
-
-  ClippingBox testBox(5, 6, 77, 83);
-  Layer       layer = application.GetScene().GetRootLayer();
-  layer.SetProperty(Layer::Property::CLIPPING_ENABLE, true);
-  layer.SetProperty(Layer::Property::CLIPPING_BOX, testBox);
-
-  // Add at least one renderable actor so the GL calls are actually made
-  Texture img   = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
-  Actor   actor = CreateRenderableActor(img);
-  scene.Add(actor);
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(testBox.x, glScissorParams.x, TEST_LOCATION);
-  DALI_TEST_EQUALS(testBox.y, (int)(scene.GetSize().height - glScissorParams.y - testBox.height), TEST_LOCATION); // GL Coordinates are from bottom left
-  DALI_TEST_EQUALS(testBox.width, glScissorParams.width, TEST_LOCATION);
-  DALI_TEST_EQUALS(testBox.height, glScissorParams.height, TEST_LOCATION);
   END_TEST;
 }
 

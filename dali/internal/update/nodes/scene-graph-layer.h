@@ -91,7 +91,6 @@ class Layer : public Node
 {
 public:
   using SortFunctionType = Dali::Layer::SortFunctionType;
-  using ClippingBox      = Dali::Rect<int32_t>;
 
   // Creation methods
 
@@ -128,38 +127,6 @@ public:
   Dali::Layer::SortFunctionType GetSortFunction() const
   {
     return mSortFunction;
-  }
-
-  /**
-   * Sets whether clipping is enabled for a layer.
-   * @param [in] enabled True if clipping is enabled.
-   */
-  void SetClipping(bool enabled);
-
-  /**
-   * Query whether clipping is enabled for a layer.
-   * @return True if clipping is enabled.
-   */
-  bool IsClipping() const
-  {
-    return mIsClipping;
-  }
-
-  /**
-   * Sets the clipping box of a layer, in window coordinates.
-   * The contents of the layer will not be visible outside this box, when clipping is
-   * enabled. The default clipping box is empty (0,0,0,0).
-   * @param [in] box The clipping box
-   */
-  void SetClippingBox(const ClippingBox& box);
-
-  /**
-   * Retrieves the clipping box of a layer, in window coordinates.
-   * @return The clipping box
-   */
-  const ClippingBox& GetClippingBox() const
-  {
-    return mClippingBox;
   }
 
   /**
@@ -254,14 +221,12 @@ public: // For update-algorithms
 private:
   SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
 
-  ClippingBox   mClippingBox; ///< The clipping box, in window coordinates
-  const Camera* mLastCamera;  ///< Pointer to the last camera that has rendered the layer
+  const Camera* mLastCamera; ///< Pointer to the last camera that has rendered the layer
 
   Dali::Layer::Behavior mBehavior; ///< The behavior of the layer
 
   bool mAllChildTransformsClean : 1; ///< True if all child nodes transforms are clean,
                                      ///  this allows us to cache render items when layer is "static"
-  bool mIsClipping : 1;              ///< True when clipping is enabled
   bool mDepthTestDisabled : 1;       ///< Whether depth test is disabled.
   bool mIsDefaultSortFunction : 1;   ///< whether the default depth sort function is used
 };
@@ -282,38 +247,6 @@ inline void SetSortFunctionMessage(EventThreadServices& eventThreadServices, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&layer, &Layer::SetSortFunction, function);
-}
-
-/**
- * Create a message for enabling/disabling layer clipping
- * @param[in] layer The layer
- * @param[in] enabled True if clipping is enabled
- */
-inline void SetClippingMessage(EventThreadServices& eventThreadServices, const Layer& layer, bool enabled)
-{
-  using LocalType = MessageValue1<Layer, bool>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&layer, &Layer::SetClipping, enabled);
-}
-
-/**
- * Create a message to set the clipping box of a layer
- * @param[in] layer The layer
- * @param[in] clippingbox The clipping box
- */
-inline void SetClippingBoxMessage(EventThreadServices& eventThreadServices, const Layer& layer, const Dali::Rect<int32_t>& clippingbox)
-{
-  using LocalType = MessageValue1<Layer, Dali::Rect<int32_t>>;
-
-  // Reserve some memory inside the message queue
-  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&layer, &Layer::SetClippingBox, clippingbox);
 }
 
 /**
