@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,15 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
+
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -89,9 +92,9 @@ Actor Actor::GetChildAt(uint32_t index) const
   return Actor(child.Get());
 }
 
-Actor Actor::FindChildByName(std::string_view actorName)
+Actor Actor::FindChildByName(Dali::StringView actorName)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(actorName);
+  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(ToStdStringView(actorName));
   return Actor(child.Get());
 }
 

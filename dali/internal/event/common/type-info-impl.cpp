@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 
@@ -216,7 +217,7 @@ bool TypeInfo::DoActionTo(BaseObject* object, const std::string& actionName, con
   auto iter = mActions.Get(ConstString(actionName));
   if(iter != mActions.end())
   {
-    done = (iter->second)(object, actionName, properties);
+    done = (iter->second)(object, Integration::ToDaliStringView(actionName), properties);
   }
 
   if(!done)
@@ -238,7 +239,7 @@ bool TypeInfo::ConnectSignal(BaseObject* object, ConnectionTrackerInterface* con
   auto iter = mSignalConnectors.Get(ConstString(signalName));
   if(iter != mSignalConnectors.end())
   {
-    connected = (iter->second)(object, connectionTracker, signalName, functor);
+    connected = (iter->second)(object, connectionTracker, Integration::ToDaliStringView(signalName), functor);
   }
 
   if(!connected)

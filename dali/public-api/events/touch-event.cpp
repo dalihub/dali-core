@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/public-api/events/touch-event.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 #include <dali/public-api/actors/actor.h>
 
@@ -113,9 +114,9 @@ RenderTask TouchEvent::GetRenderTask() const
   return GetImplementation(*this).GetRenderTask();
 }
 
-const std::string& TouchEvent::GetDeviceName(std::size_t point) const
+Dali::String TouchEvent::GetDeviceName(std::size_t point) const
 {
-  return GetImplementation(*this).GetDeviceName(point);
+  return Integration::ToDaliString(GetImplementation(*this).GetDeviceName(point));
 }
 
 TouchEvent::TouchEvent(Internal::TouchEvent* internal)

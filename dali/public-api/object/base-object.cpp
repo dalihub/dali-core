@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/base-object-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -64,19 +65,19 @@ void BaseObject::UnregisterObject()
   }
 }
 
-bool BaseObject::DoAction(const std::string& actionName, const Property::Map& attributes)
+bool BaseObject::DoAction(const Dali::StringView& actionName, const Property::Map& attributes)
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
   if(registry)
   {
-    return registry->DoActionTo(this, actionName, attributes);
+    return registry->DoActionTo(this, Integration::ToStdString(actionName), attributes);
   }
 
   return false;
 }
 
-const std::string& BaseObject::GetTypeName() const
+Dali::String BaseObject::GetTypeName() const
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
@@ -85,14 +86,13 @@ const std::string& BaseObject::GetTypeName() const
     Internal::TypeRegistry::TypeInfoPointer typeInfo = registry->GetTypeInfo(this);
     if(typeInfo)
     {
-      return typeInfo->GetName();
+      return Integration::ToDaliString(typeInfo->GetName());
     }
   }
 
   // Return an empty string if type-name not found.
   DALI_LOG_ERROR("TypeName Not Found\n");
-  static std::string empty;
-  return empty;
+  return Dali::String();
 }
 
 bool BaseObject::GetTypeInfo(Dali::TypeInfo& typeInfo) const
@@ -111,13 +111,13 @@ bool BaseObject::GetTypeInfo(Dali::TypeInfo& typeInfo) const
   }
 }
 
-bool BaseObject::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor)
+bool BaseObject::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const Dali::StringView& signalName, FunctorDelegate* functorDelegate)
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
   if(registry)
   {
-    return registry->ConnectSignal(this, connectionTracker, signalName, functor);
+    return registry->ConnectSignal(this, connectionTracker, Integration::ToStdString(signalName), functorDelegate);
   }
 
   return false;

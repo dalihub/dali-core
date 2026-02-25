@@ -20,10 +20,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/type-registry.h>
+
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -109,7 +113,9 @@ Actor NewActor(const Property::Map& map)
   Property::Value* typeValue = map.Find("type");
   if(typeValue)
   {
-    TypeInfo type = TypeRegistry::Get().GetTypeInfo(typeValue->Get<std::string>());
+    String info;
+    typeValue->Get(info);
+    TypeInfo type = TypeRegistry::Get().GetTypeInfo(StringView(info));
     if(type)
     {
       handle = type.CreateInstance();
@@ -134,7 +140,7 @@ Actor NewActor(const Property::Map& map)
       {
         continue;
       }
-      const std::string& key(pair.first.stringKey);
+      StringView key(pair.first.stringKey);
       if(key == "type")
       {
         continue;
@@ -153,7 +159,7 @@ Actor NewActor(const Property::Map& map)
       }
       else
       {
-        Property::Index index(actor.GetPropertyIndex(key));
+        Property::Index index(actor.GetPropertyIndex(pair.first));
 
         if(index != Property::INVALID_INDEX)
         {
@@ -181,7 +187,7 @@ void CreatePropertyMap(Actor actor, Property::Map& map)
 
     for(Property::IndexContainer::Iterator iter = indices.Begin(); iter != endIter; ++iter)
     {
-      map[actor.GetPropertyName(*iter)] = actor.GetProperty(*iter);
+      map[StringView(actor.GetPropertyName(*iter))] = actor.GetProperty(*iter);
     }
 
     // Children
@@ -217,17 +223,17 @@ void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimation
     {
       continue; // We don't consider index keys.
     }
-    const std::string& key(pair.first.stringKey);
+    StringView key(pair.first.stringKey);
 
     const Property::Value& value(pair.second);
 
     if(key == "actor")
     {
-      element->actor = value.Get<std::string>();
+      element->actor = ToStdString(value);
     }
     else if(key == "property")
     {
-      element->property = value.Get<std::string>();
+      element->property = ToStdString(value);
     }
     else if(key == "value")
     {
@@ -235,7 +241,8 @@ void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimation
     }
     else if(key == "alphaFunction")
     {
-      std::string alphaFunctionValue = value.Get<std::string>();
+      String alphaFunctionValue;
+      value.Get(alphaFunctionValue);
 
       if(alphaFunctionValue == "LINEAR")
       {
@@ -300,7 +307,7 @@ void NewAnimation(const Property::Map& map, Dali::AnimationData& outputAnimation
         {
           continue;
         }
-        const std::string& key(timePair.first.stringKey);
+        StringView key(timePair.first.stringKey);
 
         if(key == "delay")
         {

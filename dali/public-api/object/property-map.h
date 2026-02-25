@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/property-key.h>
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property.h>
@@ -39,7 +40,7 @@ namespace Dali
  */
 
 using KeyValuePair    = std::pair<Property::Key, Property::Value>;
-using StringValuePair = std::pair<std::string, Property::Value>;
+using StringValuePair = std::pair<Dali::String, Property::Value>;
 
 /**
  * @brief A Map of property values, the key type could be String or Property::Index.
@@ -111,7 +112,7 @@ public:
    * @param[in] key The key to insert
    * @param[in] value The value to insert
    */
-  void Insert(std::string key, Value value);
+  void Insert(Dali::String key, Value value);
 
   /**
    * @brief Inserts the key-value pair in the Map, with the key type as index.
@@ -132,7 +133,7 @@ public:
    * @param value to insert
    * @return a reference to this object
    */
-  Property::Map& Add(std::string key, Value value)
+  Property::Map& Add(Dali::String key, Value value)
   {
     Insert(std::move(key), std::move(value));
     return *this;
@@ -175,7 +176,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  const std::string& GetKey(SizeType position) const DALI_DEPRECATED_API;
+  Dali::String GetKey(SizeType position) const DALI_DEPRECATED_API;
 
   /**
    * @brief Retrieve the key at the specified position.
@@ -220,7 +221,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find(std::string_view key) const;
+  Value* Find(Dali::StringView key) const;
 
   /**
    * @brief Finds the value for the specified key if it exists.
@@ -243,7 +244,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find(Property::Index indexKey, std::string_view stringKey) const;
+  Value* Find(Property::Index indexKey, Dali::StringView stringKey) const;
 
   /**
    * @brief Finds the value for the specified key if it exists and its type is type.
@@ -254,7 +255,7 @@ public:
    *
    * @return A const pointer to the value if it exists, NULL otherwise
    */
-  Value* Find(std::string_view key, Property::Type type) const;
+  Value* Find(Dali::StringView key, Property::Type type) const;
 
   /**
    * @brief Finds the value for the specified key if it exists and its type is type.
@@ -289,7 +290,7 @@ public:
    * @param[in] key  The key to remove
    * @return @c true if succeeded, @c false otherwise
    */
-  bool Remove(std::string_view key);
+  bool Remove(Dali::StringView key);
 
   /**
    * @brief Merges values from the map 'from' to the current.
@@ -311,7 +312,7 @@ public:
    *
    * @note Will assert if invalid-key is given.
    */
-  const Value& operator[](std::string_view key) const;
+  const Value& operator[](Dali::StringView key) const;
 
   /**
    * @brief Operator to access the element with the specified string key.
@@ -323,7 +324,7 @@ public:
    *
    * @note If an element with the key does not exist, then it is created.
    */
-  Value& operator[](std::string_view key);
+  Value& operator[](Dali::StringView key);
 
   /**
    * @brief Const operator to access element with the specified index key.

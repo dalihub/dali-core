@@ -19,6 +19,7 @@
 #include <dali/internal/event/actors/actor-property-handler.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 
@@ -125,10 +126,10 @@ bool GetVector3Value(const Property::Value& property, Vector3& vector3)
   }
   else
   {
-    std::string stringConstant;
+    Dali::String stringConstant;
     if(property.Get(stringConstant))
     {
-      return GetAnchorPointParentOriginConstant(stringConstant, vector3);
+      return GetAnchorPointParentOriginConstant(Dali::Integration::ToStdString(stringConstant), vector3);
     }
     else
     {
@@ -363,7 +364,8 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::NAME:
     {
-      actor.SetName(property.Get<std::string>());
+      Dali::String name = property.Get<Dali::String>();
+      actor.SetName(Dali::Integration::ToStdStringView(name));
       break;
     }
 
@@ -1325,7 +1327,7 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
 
     case Dali::Actor::Property::NAME:
     {
-      value = std::string(actor.GetName());
+      value = Property::Value(actor.GetName().data());
       break;
     }
 

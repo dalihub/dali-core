@@ -25,6 +25,8 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
 
+#include <dali/integration-api/string-utils.h>
+
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
@@ -33,6 +35,7 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
+using Dali::Integration::ToStdStringView;
 using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace Dali
@@ -77,10 +80,10 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::Layer), typeid(Dali::Actor), Create, LayerDefaultProperties);
 
-TypeAction a1(mType, std::string(ACTION_RAISE), &Layer::DoAction);
-TypeAction a2(mType, std::string(ACTION_LOWER), &Layer::DoAction);
-TypeAction a3(mType, std::string(ACTION_RAISE_TO_TOP), &Layer::DoAction);
-TypeAction a4(mType, std::string(ACTION_LOWER_TO_BOTTOM), &Layer::DoAction);
+TypeAction a1(mType, ACTION_RAISE.data(), &Layer::DoAction);
+TypeAction a2(mType, ACTION_LOWER.data(), &Layer::DoAction);
+TypeAction a3(mType, ACTION_RAISE_TO_TOP.data(), &Layer::DoAction);
+TypeAction a4(mType, ACTION_LOWER_TO_BOTTOM.data(), &Layer::DoAction);
 
 } // unnamed namespace
 
@@ -369,7 +372,7 @@ void Layer::SetDefaultProperty(Property::Index index, const Property::Value& pro
         Property::Type type = propertyValue.GetType();
         if(type == Property::STRING)
         {
-          if(Scripting::GetEnumeration<Behavior>(propertyValue.Get<std::string>().c_str(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior))
+          if(Scripting::GetEnumeration<Behavior>(propertyValue.Get<Dali::String>().CStr(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior))
           {
             SetBehavior(behavior);
           }
@@ -467,14 +470,14 @@ Property::Value Layer::GetDefaultPropertyCurrentValue(Property::Index index) con
   return ret;
 }
 
-bool Layer::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& /*attributes*/)
+bool Layer::DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& /*attributes*/)
 {
   bool   done  = false;
   Layer* layer = dynamic_cast<Layer*>(object);
 
   if(layer)
   {
-    std::string_view name(actionName);
+    std::string_view name = ToStdStringView(actionName);
 
     if(name == ACTION_RAISE)
     {

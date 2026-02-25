@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_KEY_EVENT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ namespace Dali
 {
 namespace Integration
 {
+
 /**
  * An instance of this class should be used by the adaptor to send a key event to
  * the Dali core.
@@ -63,15 +64,15 @@ struct DALI_CORE_API KeyEvent : public Event
    * @param[in]  deviceClass     The class of device KeyEvent originated from
    * @param[in]  deviceSubclass  The subclass of device KeyEvent originated from
    */
-  KeyEvent(const std::string&           keyName,
-           const std::string&           logicalKey,
-           const std::string&           keyString,
+  KeyEvent(const Dali::String&          keyName,
+           const Dali::String&          logicalKey,
+           const Dali::String&          keyString,
            int                          keyCode,
            int                          keyModifier,
            unsigned long                timeStamp,
            const State&                 keyState,
-           const std::string&           compose,
-           const std::string&           deviceName,
+           const Dali::String&          compose,
+           const Dali::String&          deviceName,
            const Device::Class::Type    deviceClass,
            const Device::Subclass::Type deviceSubclass);
 
@@ -90,17 +91,17 @@ struct DALI_CORE_API KeyEvent : public Event
   /**
    * The name of the key pressed or command from the IMF
    */
-  std::string keyName;
+  Dali::String keyName;
 
   /**
    * The logical key symbol
    */
-  std::string logicalKey;
+  Dali::String logicalKey;
 
   /**
    * The string of input characters or key pressed
    */
-  std::string keyString;
+  Dali::String keyString;
 
   /**
    * The unique key code for the key pressed.
@@ -126,12 +127,12 @@ struct DALI_CORE_API KeyEvent : public Event
   /**
    * If this keystroke has modified a string in the middle of being composed - this string replaces the previous one.
    */
-  std::string compose;
+  Dali::String compose;
 
   /**
    * The name of device KeyEvent originated from
    */
-  std::string deviceName;
+  Dali::String deviceName;
 
   /**
    * The class of device KeyEvent originated from

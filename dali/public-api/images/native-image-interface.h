@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <cstddef>
 #include <cstdint> // uint32_t
-#include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/ref-object.h>
@@ -144,7 +144,7 @@ public:
    * @DEPRECATED_2_4.33
    * @return True if the shader is changed.
    */
-  virtual bool ApplyNativeFragmentShader(std::string& shader) = 0;
+  virtual bool ApplyNativeFragmentShader(Dali::String& shader) = 0;
 
   /**
    * @brief Apply custom fragment prefix for rendering native image.
@@ -155,7 +155,7 @@ public:
    * @SINCE_2_4.33
    * @return True if the shader is changed.
    */
-  virtual bool ApplyNativeFragmentShader(std::string& shader, int mask) = 0;
+  virtual bool ApplyNativeFragmentShader(Dali::String& shader, int mask) = 0;
 
   /**
    * @brief Get custom sampler type name for rendering native image.

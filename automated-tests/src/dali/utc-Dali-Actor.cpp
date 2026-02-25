@@ -152,19 +152,19 @@ static bool TestCallback3(Actor actor, const HoverEvent& event)
 }
 
 // validation stuff for onstage & offstage signals
-static std::vector<std::string> gActorNamesOnOffScene;
-static int                      gOnSceneCallBackCalled;
-void                            OnSceneCallback(Actor actor)
+static std::vector<String> gActorNamesOnOffScene;
+static int                 gOnSceneCallBackCalled;
+void                       OnSceneCallback(Actor actor)
 {
   ++gOnSceneCallBackCalled;
-  gActorNamesOnOffScene.push_back(actor.GetProperty<std::string>(Actor::Property::NAME));
+  gActorNamesOnOffScene.push_back(actor.GetProperty<String>(Actor::Property::NAME));
   DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) == true);
 }
 static int gOffSceneCallBackCalled;
 void       OffSceneCallback(Actor actor)
 {
   ++gOffSceneCallBackCalled;
-  gActorNamesOnOffScene.push_back(actor.GetProperty<std::string>(Actor::Property::NAME));
+  gActorNamesOnOffScene.push_back(actor.GetProperty<String>(Actor::Property::NAME));
   DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE) == false);
 }
 
@@ -222,13 +222,13 @@ struct TestConstraintIgnored
 };
 // OnRelayout
 
-static bool                     gOnRelayoutCallBackCalled = false;
-static std::vector<std::string> gActorNamesRelayout;
+static bool                gOnRelayoutCallBackCalled = false;
+static std::vector<String> gActorNamesRelayout;
 
 void OnRelayoutCallback(Actor actor)
 {
   gOnRelayoutCallBackCalled = true;
-  gActorNamesRelayout.push_back(actor.GetProperty<std::string>(Actor::Property::NAME));
+  gActorNamesRelayout.push_back(actor.GetProperty<String>(Actor::Property::NAME));
 }
 
 struct VisibilityChangedFunctorData
@@ -264,7 +264,7 @@ struct VisibilityChangedFunctorData
     DALI_TEST_EQUALS((int)type, (int)compareType, TEST_INNER_LOCATION(location));
   }
 
-  void Check(bool compareCalled, const std::string& location)
+  void Check(bool compareCalled, const char* location)
   {
     DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
   }
@@ -356,7 +356,7 @@ struct InheritedVisibilityChangedFunctorData
     DALI_TEST_EQUALS(visible, compareVisible, TEST_INNER_LOCATION(location));
   }
 
-  void Check(bool compareCalled, const std::string& location)
+  void Check(bool compareCalled, const char* location)
   {
     DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
   }
@@ -549,7 +549,7 @@ int UtcDaliActorGetName(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.GetProperty<std::string>(Actor::Property::NAME).empty());
+  DALI_TEST_CHECK(actor.GetProperty<String>(Actor::Property::NAME).Empty());
   END_TEST;
 }
 
@@ -558,11 +558,11 @@ int UtcDaliActorSetName(void)
 {
   TestApplication application;
 
-  string str("ActorName");
+  String str("ActorName");
   Actor  actor = Actor::New();
 
-  actor.SetProperty(Actor::Property::NAME, str);
-  DALI_TEST_CHECK(actor.GetProperty<std::string>(Actor::Property::NAME) == str);
+  actor.SetProperty(Actor::Property::NAME, str.CStr());
+  DALI_TEST_CHECK(actor.GetProperty<String>(Actor::Property::NAME) == str);
   END_TEST;
 }
 
@@ -4393,8 +4393,8 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   Actor actor = Actor::New();
 
   // Defaults
-  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::WIDTH_RESIZE_POLICY).Get<std::string>(), "USE_NATURAL_SIZE", TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::HEIGHT_RESIZE_POLICY).Get<std::string>(), "USE_NATURAL_SIZE", TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::WIDTH_RESIZE_POLICY).Get<String>(), "USE_NATURAL_SIZE", TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::HEIGHT_RESIZE_POLICY).Get<String>(), "USE_NATURAL_SIZE", TEST_LOCATION);
 
   // Set resize policy for all dimensions
   actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
@@ -4410,8 +4410,8 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   actor.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, widthPolicy);
   actor.SetProperty(Actor::Property::HEIGHT_RESIZE_POLICY, heightPolicy);
 
-  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::WIDTH_RESIZE_POLICY).Get<std::string>(), widthPolicy, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::HEIGHT_RESIZE_POLICY).Get<std::string>(), heightPolicy, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::WIDTH_RESIZE_POLICY).Get<String>(), widthPolicy, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::HEIGHT_RESIZE_POLICY).Get<String>(), heightPolicy, TEST_LOCATION);
 
   // Set individual dimensions using enums
   ResizePolicy::Type widthPolicyEnum  = ResizePolicy::USE_ASSIGNED_SIZE;
@@ -12111,9 +12111,9 @@ void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
   }
 }
 
-const std::string SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME("uLightCameraProjectionMatrix");
-const std::string SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME("uLightCameraViewMatrix");
-const std::string SHADER_SHADOW_COLOR_PROPERTY_NAME("uShadowColor");
+const String      SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME("uLightCameraProjectionMatrix");
+const String      SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME("uLightCameraViewMatrix");
+const String      SHADER_SHADOW_COLOR_PROPERTY_NAME("uShadowColor");
 const char* const RENDER_SHADOW_VERTEX_SOURCE =
   " uniform mediump mat4 uLightCameraProjectionMatrix;\n"
   " uniform mediump mat4 uLightCameraViewMatrix;\n"
@@ -12184,7 +12184,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
   DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
-  Property::Index shadowColorPropertyIndex = actor.GetPropertyIndex(SHADER_SHADOW_COLOR_PROPERTY_NAME);
+  Property::Index shadowColorPropertyIndex = actor.GetPropertyIndex(SHADER_SHADOW_COLOR_PROPERTY_NAME.CStr());
   actor.SetProperty(shadowColorPropertyIndex, Vector4(1.0f, 1.0f, 0.0f, 1.0f));
 
   damagedRects.clear();
@@ -14324,7 +14324,7 @@ int UtcDaliActorFindChildByNameNegative(void)
   Dali::Actor     instance;
   try
   {
-    std::string arg1;
+    String arg1;
     instance.FindChildByName(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }

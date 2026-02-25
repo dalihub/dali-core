@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-string.h>
 #include <iostream>
 
@@ -23,5 +24,5 @@ namespace Dali
 {
 class String;
 
-std::ostream& operator<<(std::ostream& outStream, const String& string);
+DALI_CORE_API std::ostream& operator<<(std::ostream& outStream, const String& string);
 } //namespace Dali

@@ -25,6 +25,7 @@
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <cstdio>
 #include <string>
@@ -37,6 +38,9 @@
 #include "test-graphics-command-buffer.h"
 
 using namespace Dali;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
 
 namespace // unnamed namespace
 {
@@ -2706,7 +2710,7 @@ int UtcDaliRendererSetIndexRange(void)
   geometry.AddVertexBuffer(vertexBuffer);
 
   // create shader
-  Shader   shader   = Shader::New(vertexShader, fragmentShader);
+  Shader   shader   = Shader::New(ToDaliStringView(vertexShader), ToDaliStringView(fragmentShader));
   Renderer renderer = Renderer::New(geometry, shader);
   actor.AddRenderer(renderer);
 
@@ -2954,7 +2958,7 @@ void CheckEnumerationProperty(TestApplication& application, Renderer& renderer, 
   DALI_TEST_CHECK(renderer.GetProperty<int>(propertyIndex) == static_cast<int>(firstCheckEnumeration));
   DALI_TEST_CHECK(renderer.GetCurrentProperty<int>(propertyIndex) == static_cast<int>(firstCheckEnumeration));
 
-  renderer.SetProperty(propertyIndex, secondCheckString);
+  renderer.SetProperty(propertyIndex, ToPropertyValue(secondCheckString));
   DALI_TEST_CHECK(renderer.GetProperty<int>(propertyIndex) == static_cast<int>(secondCheckEnumeration));
   DALI_TEST_CHECK(renderer.GetCurrentProperty<int>(propertyIndex) != static_cast<int>(secondCheckEnumeration));
 
@@ -4695,21 +4699,21 @@ int UtcDaliRendererUniformArrayOfStruct(void)
     oss << "arrayof[" << i << "].color";
     Vector4 color = Color::WHITE;
     color.r       = 25.5f * i;
-    index         = renderer.RegisterProperty(oss.str(), color);
+    index         = renderer.RegisterProperty(ToDaliString(oss.str()), color);
     uniformIndices.emplace_back(index, oss.str());
 
     oss.str("");
     oss.clear();
     oss << "arrayof[" << i << "].position";
     Vector2 pos(i, 10 + i * 5);
-    index = renderer.RegisterProperty(oss.str(), pos);
+    index = renderer.RegisterProperty(ToDaliString(oss.str()), pos);
     uniformIndices.emplace_back(index, oss.str());
 
     oss.str("");
     oss.clear();
     oss << "arrayof[" << i << "].normal";
     Vector3 normal(i, i * 10, i * 100);
-    index = renderer.RegisterProperty(oss.str(), normal);
+    index = renderer.RegisterProperty(ToDaliString(oss.str()), normal);
     uniformIndices.emplace_back(index, oss.str());
     oss.str("");
     oss.clear();
@@ -5365,9 +5369,9 @@ void CreateRendererProperties(Renderer renderer, const Matrix& m, const Matrix& 
     std::ostringstream property;
     property << "uBone[" << i << "]";
     if(i < 299)
-      renderer.RegisterProperty(property.str(), m);
+      renderer.RegisterProperty(ToDaliString(property.str()), m);
     else
-      renderer.RegisterProperty(property.str(), n);
+      renderer.RegisterProperty(ToDaliString(property.str()), n);
   }
   renderer.RegisterProperty("uNumberOfBlendShapes", 55.0f);
   float weight = 0.5f;
@@ -5375,7 +5379,7 @@ void CreateRendererProperties(Renderer renderer, const Matrix& m, const Matrix& 
   {
     std::ostringstream property;
     property << "uBlendShapeWeight[" << i << "]";
-    renderer.RegisterProperty(property.str(), weight);
+    renderer.RegisterProperty(ToDaliString(property.str()), weight);
   }
   float w1                           = 0.01f;
   float w2                           = 0.5f;
@@ -5758,7 +5762,7 @@ int UtcDaliRendererUniformBlocks04Mat3Stride(void)
     }
     std::ostringstream property;
     property << "uAlign[" << i << "]";
-    renderer.RegisterProperty(property.str(), align);
+    renderer.RegisterProperty(ToDaliString(property.str()), align);
   }
 
   TraceCallStack& graphicsTrace = graphics.mCallStack;
@@ -5888,7 +5892,7 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   {
     std::ostringstream property;
     property << "uBone[" << i << "]";
-    renderer.RegisterProperty(property.str(), m);
+    renderer.RegisterProperty(ToDaliString(property.str()), m);
   }
   tet_infoline("--Expect new scene's buffers to be created here");
   application.SendNotification();
@@ -5958,7 +5962,7 @@ int UtcDaliRendererUniformNameCrop(void)
     Property::Index index;
     oss << "uArray[" << i + 1 << "]";
     auto value = float(i);
-    index      = renderer.RegisterProperty(oss.str(), value);
+    index      = renderer.RegisterProperty(ToDaliString(oss.str()), value);
     uniformIndices.emplace_back(index, oss.str());
     oss.str("");
     oss.clear();
@@ -6025,7 +6029,7 @@ int UtcDaliRendererUniformArrayOverflow(void)
     Property::Index index;
     oss << "uArray[" << i << "]";
     auto value = float(i);
-    index      = renderer.RegisterProperty(oss.str(), value);
+    index      = renderer.RegisterProperty(ToDaliString(oss.str()), value);
     uniformIndices.emplace_back(index, oss.str());
     oss.str("");
     oss.clear();

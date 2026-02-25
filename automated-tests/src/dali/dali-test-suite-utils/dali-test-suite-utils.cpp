@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -262,9 +262,9 @@ void DALI_TEST_EQUALS(Property::Value& str1, const char* str2, const char* locat
 
   if(str1.GetType() == Property::STRING)
   {
-    std::string string;
+    String string;
     str1.Get(string);
-    result = !string.compare(str2);
+    result = (string == str2);
   }
 
   if(result)

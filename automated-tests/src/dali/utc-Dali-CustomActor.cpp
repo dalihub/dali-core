@@ -782,7 +782,7 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
   DALI_TEST_CHECK(container);
   if(container)
   {
-    DALI_TEST_EQUALS("Container", container.GetProperty<std::string>(Actor::Property::NAME), TEST_LOCATION);
+    DALI_TEST_EQUALS("Container", container.GetProperty<String>(Actor::Property::NAME), TEST_LOCATION);
     DALI_TEST_EQUALS(1, (int)(container.GetChildCount()), TEST_LOCATION);
     containerChild = container.GetChildAt(0);
   }
@@ -790,7 +790,7 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
   DALI_TEST_CHECK(containerChild);
   if(containerChild)
   {
-    DALI_TEST_EQUALS("ActorB", containerChild.GetProperty<std::string>(Actor::Property::NAME), TEST_LOCATION);
+    DALI_TEST_EQUALS("ActorB", containerChild.GetProperty<String>(Actor::Property::NAME), TEST_LOCATION);
     DALI_TEST_EQUALS(0, (int)(containerChild.GetChildCount()), TEST_LOCATION);
   }
 
@@ -876,7 +876,7 @@ int UtcDaliCustomActorRemoveDuringOnChildRemove(void)
   DALI_TEST_CHECK(child);
   if(child)
   {
-    DALI_TEST_EQUALS("Child", child.GetProperty<std::string>(Actor::Property::NAME), TEST_LOCATION);
+    DALI_TEST_EQUALS("Child", child.GetProperty<String>(Actor::Property::NAME), TEST_LOCATION);
   }
 
   // Check callback sequence
@@ -1265,7 +1265,7 @@ int UtcDaliCustomActorTypeRegistry(void)
 
   try
   {
-    name = handle.GetTypeName();
+    name = Integration::ToStdString(handle.GetTypeName());
     tet_result(TET_FAIL);
   }
   catch(DaliException& e)
@@ -1616,7 +1616,7 @@ int UtcDaliCustomActorPropertyRegistrationDefaultValue(void)
   DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount(), TEST_LOCATION);
 
   // add a property in base class
-  AnimatablePropertyRegistration(typeRegistration, "Foobar", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX, 10.f);
+  AnimatablePropertyRegistration(typeRegistration, String("Foobar"), ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX, 10.f);
 
   // should be one more property now
   DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount() + 1, TEST_LOCATION);
@@ -1626,7 +1626,7 @@ int UtcDaliCustomActorPropertyRegistrationDefaultValue(void)
   DALI_TEST_EQUALS(derived.GetProperty(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX).Get<float>(), 10.f, TEST_LOCATION);
 
   // add a property in base class
-  AnimatablePropertyRegistration(typeRegistration, "Foobar2", ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX, 30.f);
+  AnimatablePropertyRegistration(typeRegistration, String("Foobar2"), ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX, 30.f);
 
   // should be one more property now
   DALI_TEST_EQUALS(derived.GetPropertyCount(), actorHandle.GetPropertyCount() + 2, TEST_LOCATION);
@@ -1657,7 +1657,7 @@ int UtcDaliCustomActorComponentPropertyConstraintsP(void)
   const Property::Index fooIndex    = foobarIndex + 1;
   const Property::Index barIndex    = foobarIndex + 2;
 
-  AnimatablePropertyRegistration(typeRegistration, "Foobar", foobarIndex, Vector2(10.0f, 20.0f));
+  AnimatablePropertyRegistration(typeRegistration, StringView("Foobar"), foobarIndex, Vector2(10.0f, 20.0f));
   AnimatablePropertyComponentRegistration(typeRegistration, "Foobar.x", fooIndex, foobarIndex, 0);
   AnimatablePropertyComponentRegistration(typeRegistration, "Foobar.y", barIndex, foobarIndex, 1);
 
@@ -1693,7 +1693,7 @@ int UtcDaliCustomActorComponentPropertyConstraintsP(void)
   const Property::Index vec3yPropIndex = vec3PropIndex + 2;
   const Property::Index vec3zPropIndex = vec3PropIndex + 3;
 
-  AnimatablePropertyRegistration(typeRegistration, "vec3Prop", vec3PropIndex, Vector3(10.0f, 20.0f, 30.0f));
+  AnimatablePropertyRegistration(typeRegistration, StringView("vec3Prop"), vec3PropIndex, Vector3(10.0f, 20.0f, 30.0f));
   AnimatablePropertyComponentRegistration(typeRegistration, "vec3Prop.x", vec3xPropIndex, vec3PropIndex, 0);
   AnimatablePropertyComponentRegistration(typeRegistration, "vec3Prop.y", vec3yPropIndex, vec3PropIndex, 1);
   AnimatablePropertyComponentRegistration(typeRegistration, "vec3Prop.z", vec3zPropIndex, vec3PropIndex, 2);
@@ -1734,11 +1734,11 @@ int UtcDaliCustomActorComponentPropertyConstraintsP(void)
   const Property::Index vec4zPropIndex = vec4PropIndex + 3;
   const Property::Index vec4wPropIndex = vec4PropIndex + 4;
 
-  AnimatablePropertyRegistration(typeRegistration, "vec4Prop", vec4PropIndex, Vector4(10.0f, 20.0f, 30.0f, 40.0f));
-  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.x", vec4xPropIndex, vec4PropIndex, 0);
-  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.y", vec4yPropIndex, vec4PropIndex, 1);
-  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.z", vec4zPropIndex, vec4PropIndex, 2);
-  AnimatablePropertyComponentRegistration(typeRegistration, "vec4Prop.w", vec4wPropIndex, vec4PropIndex, 3);
+  AnimatablePropertyRegistration(typeRegistration, StringView("vec4Prop"), vec4PropIndex, Vector4(10.0f, 20.0f, 30.0f, 40.0f));
+  AnimatablePropertyComponentRegistration(typeRegistration, StringView("vec4Prop.x"), vec4xPropIndex, vec4PropIndex, 0);
+  AnimatablePropertyComponentRegistration(typeRegistration, StringView("vec4Prop.y"), vec4yPropIndex, vec4PropIndex, 1);
+  AnimatablePropertyComponentRegistration(typeRegistration, StringView("vec4Prop.z"), vec4zPropIndex, vec4PropIndex, 2);
+  AnimatablePropertyComponentRegistration(typeRegistration, StringView("vec4Prop.w"), vec4wPropIndex, vec4PropIndex, 3);
 
   tet_infoline("Test the default values of the registered vec4 property");
   // should be more properties now

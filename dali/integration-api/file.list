@@ -16,6 +16,7 @@ SET( platform_abstraction_src_files
    ${platform_abstraction_src_dir}/scene.cpp
    ${platform_abstraction_src_dir}/shader-integ.cpp
    ${platform_abstraction_src_dir}/stream-operators.cpp
+   ${platform_abstraction_src_dir}/string-utils.cpp
    ${platform_abstraction_src_dir}/testing.cpp
    ${platform_abstraction_src_dir}/texture-integ.cpp
    ${platform_abstraction_src_dir}/trace.cpp

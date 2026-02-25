@@ -18,9 +18,20 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-key.h>
 
+// INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
+
 namespace Dali
 {
-Property::Key::Key(const std::string& key)
+
+Property::Key::Key(const Dali::String& key)
+: type(Key::STRING),
+  indexKey(Property::INVALID_INDEX),
+  stringKey(key)
+{
+}
+
+Property::Key::Key(const Dali::StringView& key)
 : type(Key::STRING),
   indexKey(Property::INVALID_INDEX),
   stringKey(key)
@@ -40,19 +51,19 @@ Property::Key::Key(const char* key)
 {
 }
 
-bool Property::Key::operator==(const std::string& rhs)
+bool Property::Key::operator==(const Dali::StringView& rhs)
 {
   bool result = false;
   if(type == Key::STRING)
   {
-    result = (stringKey == rhs);
+    result = (stringKey == Dali::StringView(rhs.Data(), rhs.Size()));
   }
   return result;
 }
 
 bool Property::Key::operator==(const char* rhs)
 {
-  return operator==(std::string(rhs));
+  return operator==(Dali::StringView(rhs));
 }
 
 bool Property::Key::operator==(Property::Index rhs)
@@ -79,7 +90,7 @@ bool Property::Key::operator==(const Key& rhs)
   return result;
 }
 
-bool Property::Key::operator!=(const std::string& rhs)
+bool Property::Key::operator!=(const Dali::StringView& rhs)
 {
   return !operator==(rhs);
 }
@@ -107,7 +118,7 @@ std::ostream& operator<<(std::ostream& stream, const Property::Key& key)
   }
   else
   {
-    stream << key.stringKey;
+    stream << Integration::ToStdString(key.stringKey);
   }
   return stream;
 }

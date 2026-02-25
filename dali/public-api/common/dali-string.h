@@ -264,7 +264,7 @@ public:
    * @param[in] rhs The right operand string
    * @return A new String containing the concatenation of lhs and rhs
    */
-  friend String operator+(const String& lhs, const String& rhs);
+  friend DALI_CORE_API String operator+(const String& lhs, const String& rhs);
 
 public: // Not intended for Application Developers
   /**

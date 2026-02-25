@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ void TestEnumStrings(
 
     DALI_TEST_CHECK(0 < map.Count());
     DALI_TEST_CHECK(NULL != map.Find(keyName));
-    DALI_TEST_EQUALS(map.Find(keyName)->Get<std::string>(), values[i].string, TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Find(keyName)->Get<String>(), values[i].string, TEST_LOCATION);
 
     application.GetScene().Remove(actor);
   }
@@ -200,7 +200,7 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::SCALE), Vector3::ONE, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetCurrentProperty<bool>(Actor::Property::VISIBLE), false, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::MAGENTA, TEST_LOCATION);
-    DALI_TEST_EQUALS(handle.GetProperty<std::string>(Actor::Property::NAME), "MyActor", TEST_LOCATION);
+    DALI_TEST_EQUALS(handle.GetProperty<String>(Actor::Property::NAME), "MyActor", TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetProperty<ColorMode>(Actor::Property::COLOR_MODE), USE_PARENT_COLOR, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetProperty<bool>(Actor::Property::SENSITIVE), false, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetProperty<bool>(Actor::Property::LEAVE_REQUIRED), true, TEST_LOCATION);
@@ -336,7 +336,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     CreatePropertyMap(actor, map);
     DALI_TEST_CHECK(!map.Empty());
     DALI_TEST_CHECK(NULL != map.Find("type"));
-    DALI_TEST_EQUALS(map.Find("type")->Get<std::string>(), "Actor", TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Find("type")->Get<String>(), "Actor", TEST_LOCATION);
 
     application.GetScene().Remove(actor);
   }
@@ -349,7 +349,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     CreatePropertyMap(actor, map);
     DALI_TEST_CHECK(!map.Empty());
     DALI_TEST_CHECK(NULL != map.Find("type"));
-    DALI_TEST_EQUALS(map.Find("type")->Get<std::string>(), "Layer", TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Find("type")->Get<String>(), "Layer", TEST_LOCATION);
 
     application.GetScene().Remove(actor);
   }
@@ -390,7 +390,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK(NULL != map.Find("color"));
     DALI_TEST_EQUALS(map.Find("color")->Get<Vector4>(), Color::MAGENTA, TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("name"));
-    DALI_TEST_EQUALS(map.Find("name")->Get<std::string>(), "MyActor", TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Find("name")->Get<String>(), "MyActor", TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("anchorPoint"));
     DALI_TEST_EQUALS(map.Find("anchorPoint")->Get<Vector3>(), AnchorPoint::CENTER_LEFT, TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("parentOrigin"));
@@ -424,7 +424,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK(!map.Empty());
 
     DALI_TEST_CHECK(NULL != map.Find("type"));
-    DALI_TEST_EQUALS(map.Find("type")->Get<std::string>(), "Actor", TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Find("type")->Get<String>(), "Actor", TEST_LOCATION);
 
     DALI_TEST_CHECK(NULL != map.Find("actors"));
     Property::Array children(map.Find("actors")->Get<Property::Array>());
@@ -432,7 +432,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     Property::Map childMap(children[0].Get<Property::Map>());
     DALI_TEST_CHECK(!childMap.Empty());
     DALI_TEST_CHECK(childMap.Find("type"));
-    DALI_TEST_EQUALS(childMap.Find("type")->Get<std::string>(), "Layer", TEST_LOCATION);
+    DALI_TEST_EQUALS(childMap.Find("type")->Get<String>(), "Layer", TEST_LOCATION);
 
     application.GetScene().Remove(actor);
   }

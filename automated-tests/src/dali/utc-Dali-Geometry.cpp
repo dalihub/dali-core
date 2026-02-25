@@ -17,7 +17,11 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/threading/thread.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
 
 using namespace Dali;
 
@@ -51,8 +55,8 @@ VertexBuffer CreateVertexBuffer(const std::string& aPosition, const std::string&
     {Vector2(halfQuadSize, halfQuadSize), Vector2(1.f, 1.f)}};
 
   Property::Map vertexFormat;
-  vertexFormat[aPosition] = Property::VECTOR2;
-  vertexFormat[aTexCoord] = Property::VECTOR2;
+  vertexFormat[ToDaliStringView(aPosition)] = Property::VECTOR2;
+  vertexFormat[ToDaliStringView(aTexCoord)] = Property::VECTOR2;
 
   VertexBuffer vertexData = VertexBuffer::New(vertexFormat);
   vertexData.SetData(texturedQuadVertexData, 4);

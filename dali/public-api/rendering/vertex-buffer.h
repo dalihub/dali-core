@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef> // std::size_t
-#include <string>  // std::string
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/unique-ptr.h>

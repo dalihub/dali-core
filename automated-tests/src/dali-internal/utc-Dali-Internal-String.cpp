@@ -28,6 +28,10 @@
 #include <dali/internal/event/events/actor-observer.h>
 
 using namespace Dali;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
 
 int UtcDaliStringImplMove(void)
 {
@@ -37,7 +41,7 @@ int UtcDaliStringImplMove(void)
   {
     tet_printf("Test 1: Move conversion...\n");
     String      daliStr("Hello, World!");
-    std::string stdStr = Dali::Integration::ToStdString(std::move(daliStr));
+    std::string stdStr = ToStdString(std::move(daliStr));
 
     DALI_TEST_CHECK(stdStr == "Hello, World!");
     DALI_TEST_CHECK(daliStr.Empty());
@@ -49,7 +53,7 @@ int UtcDaliStringImplMove(void)
   {
     tet_printf("Test 2: Copy conversion...\n");
     String      daliStr("Original string");
-    std::string stdStr = Dali::Integration::ToStdString(daliStr);
+    std::string stdStr = ToStdString(daliStr);
 
     DALI_TEST_CHECK(stdStr == "Original string");
     DALI_TEST_CHECK(!daliStr.Empty());
@@ -63,7 +67,7 @@ int UtcDaliStringImplMove(void)
     std::string largeContent(1000, 'X');
     String      daliStr(StringView(largeContent.data(), largeContent.size()));
 
-    std::string moved = Dali::Integration::ToStdString(std::move(daliStr));
+    std::string moved = ToStdString(std::move(daliStr));
 
     DALI_TEST_CHECK(moved == largeContent);
     DALI_TEST_CHECK(daliStr.Empty());
@@ -74,7 +78,7 @@ int UtcDaliStringImplMove(void)
   {
     tet_printf("Test 4: Empty string move...\n");
     String      daliStr;
-    std::string stdStr = Dali::Integration::ToStdString(std::move(daliStr));
+    std::string stdStr = ToStdString(std::move(daliStr));
 
     DALI_TEST_CHECK(stdStr.empty());
     DALI_TEST_CHECK(daliStr.Empty());
@@ -87,7 +91,7 @@ int UtcDaliStringImplMove(void)
     std::string content("Hello\0World", 11);
     String      daliStr(StringView(content.data(), content.size()));
 
-    std::string moved = Dali::Integration::ToStdString(std::move(daliStr));
+    std::string moved = ToStdString(std::move(daliStr));
 
     DALI_TEST_CHECK(moved == content);
     DALI_TEST_CHECK(moved.size() == 11);
@@ -101,8 +105,8 @@ int UtcDaliStringImplMove(void)
     String daliStr1("First");
     String daliStr2("Second");
 
-    std::string stdStr1 = Dali::Integration::ToStdString(std::move(daliStr1));
-    std::string stdStr2 = Dali::Integration::ToStdString(std::move(daliStr2));
+    std::string stdStr1 = ToStdString(std::move(daliStr1));
+    std::string stdStr2 = ToStdString(std::move(daliStr2));
 
     DALI_TEST_CHECK(stdStr1 == "First");
     DALI_TEST_CHECK(stdStr2 == "Second");
@@ -116,7 +120,7 @@ int UtcDaliStringImplMove(void)
     tet_printf("Test 7: Move and reuse...\n");
     String daliStr("Original");
 
-    std::string stdStr = Dali::Integration::ToStdString(std::move(daliStr));
+    std::string stdStr = ToStdString(std::move(daliStr));
     DALI_TEST_CHECK(stdStr == "Original");
     DALI_TEST_CHECK(daliStr.Empty());
 
@@ -139,7 +143,7 @@ int UtcDaliStringViewConversions(void)
     tet_printf("Test 1: ToStdStringView from StringView...\n");
     String           daliStr("Hello, World!");
     StringView       daliView(daliStr.CStr(), daliStr.Size());
-    std::string_view stdView = Dali::Integration::ToStdStringView(daliView);
+    std::string_view stdView = ToStdStringView(daliView);
 
     DALI_TEST_CHECK(stdView.size() == 13);
     DALI_TEST_CHECK(stdView == std::string_view("Hello, World!"));
@@ -151,7 +155,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 2: ToStdStringView from String...\n");
     String           daliStr("Test content");
-    std::string_view stdView = Dali::Integration::ToStdStringView(daliStr);
+    std::string_view stdView = ToStdStringView(daliStr);
 
     DALI_TEST_CHECK(stdView.size() == 12);
     DALI_TEST_CHECK(stdView == std::string_view("Test content"));
@@ -163,7 +167,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 3: ToStdStringView with empty StringView...\n");
     StringView       emptyView;
-    std::string_view stdView = Dali::Integration::ToStdStringView(emptyView);
+    std::string_view stdView = ToStdStringView(emptyView);
 
     DALI_TEST_CHECK(stdView.empty());
     DALI_TEST_CHECK(stdView.size() == 0);
@@ -175,7 +179,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 4: ToStdStringView with empty String...\n");
     String           emptyStr;
-    std::string_view stdView = Dali::Integration::ToStdStringView(emptyStr);
+    std::string_view stdView = ToStdStringView(emptyStr);
 
     DALI_TEST_CHECK(stdView.empty());
     DALI_TEST_CHECK(stdView.size() == 0);
@@ -186,7 +190,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 5: ToDaliStringView from std::string...\n");
     std::string stdStr("Content test");
-    StringView  daliView = Dali::Integration::ToDaliStringView(stdStr);
+    StringView  daliView = ToDaliStringView(stdStr);
 
     DALI_TEST_CHECK(daliView.Size() == 12);
     DALI_TEST_CHECK(daliView.Data() == stdStr.data());
@@ -198,7 +202,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 6: ToDaliStringView from std::string_view...\n");
     std::string_view stdView("Another test");
-    StringView       daliView = Dali::Integration::ToDaliStringView(stdView);
+    StringView       daliView = ToDaliStringView(stdView);
 
     DALI_TEST_CHECK(daliView.Size() == 12);
     DALI_TEST_CHECK(daliView.Data() == stdView.data());
@@ -210,7 +214,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 7: ToDaliStringView with empty std::string...\n");
     std::string emptyStr;
-    StringView  daliView = Dali::Integration::ToDaliStringView(emptyStr);
+    StringView  daliView = ToDaliStringView(emptyStr);
 
     DALI_TEST_CHECK(daliView.Empty());
     DALI_TEST_CHECK(daliView.Size() == 0);
@@ -221,7 +225,7 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 8: ToDaliStringView with empty std::string_view...\n");
     std::string_view emptyView;
-    StringView       daliView = Dali::Integration::ToDaliStringView(emptyView);
+    StringView       daliView = ToDaliStringView(emptyView);
 
     DALI_TEST_CHECK(daliView.Empty());
     DALI_TEST_CHECK(daliView.Size() == 0);
@@ -233,7 +237,7 @@ int UtcDaliStringViewConversions(void)
     tet_printf("Test 9: ToStdStringView with String containing null characters...\n");
     std::string      content("Hello\0World", 11);
     String           daliStr(StringView(content.data(), content.size()));
-    std::string_view stdView = Dali::Integration::ToStdStringView(daliStr);
+    std::string_view stdView = ToStdStringView(daliStr);
 
     DALI_TEST_CHECK(stdView.size() == 11);
     DALI_TEST_CHECK(stdView[0] == 'H');
@@ -247,7 +251,7 @@ int UtcDaliStringViewConversions(void)
     tet_printf("Test 10: ToDaliStringView with std::string_view containing null characters...\n");
     std::string      content("Test\0Data", 9);
     std::string_view stdView(content.data(), content.size());
-    StringView       daliView = Dali::Integration::ToDaliStringView(stdView);
+    StringView       daliView = ToDaliStringView(stdView);
 
     DALI_TEST_CHECK(daliView.Size() == 9);
     DALI_TEST_CHECK(daliView.Data()[0] == 'T');
@@ -260,8 +264,8 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 11: ToStdStringView reference semantics...\n");
     String           daliStr("Reference test");
-    std::string_view stdView1 = Dali::Integration::ToStdStringView(daliStr);
-    std::string_view stdView2 = Dali::Integration::ToStdStringView(daliStr);
+    std::string_view stdView1 = ToStdStringView(daliStr);
+    std::string_view stdView2 = ToStdStringView(daliStr);
 
     // Both views should point to the same data
     DALI_TEST_CHECK(stdView1.data() == stdView2.data());
@@ -273,8 +277,8 @@ int UtcDaliStringViewConversions(void)
   {
     tet_printf("Test 12: ToDaliStringView reference semantics...\n");
     std::string stdStr("Original content");
-    StringView  daliView1 = Dali::Integration::ToDaliStringView(stdStr);
-    StringView  daliView2 = Dali::Integration::ToDaliStringView(stdStr);
+    StringView  daliView1 = ToDaliStringView(stdStr);
+    StringView  daliView2 = ToDaliStringView(stdStr);
 
     // Both views should point to the same data
     DALI_TEST_CHECK(daliView1.Data() == daliView2.Data());
@@ -457,7 +461,7 @@ int UtcDaliStringImplCopyVsMove(void)
   {
     tet_printf("Test 1: Copy preserves source...\n");
     String      daliStr("Copy test");
-    std::string stdStr = Dali::Integration::ToStdString(daliStr);
+    std::string stdStr = ToStdString(daliStr);
 
     DALI_TEST_CHECK(stdStr == "Copy test");
     DALI_TEST_CHECK(!daliStr.Empty());
@@ -469,7 +473,7 @@ int UtcDaliStringImplCopyVsMove(void)
   {
     tet_printf("Test 2: Move empties source...\n");
     String      daliStr("Move test");
-    std::string stdStr = Dali::Integration::ToStdString(std::move(daliStr));
+    std::string stdStr = ToStdString(std::move(daliStr));
 
     DALI_TEST_CHECK(stdStr == "Move test");
     DALI_TEST_CHECK(daliStr.Empty());
@@ -480,9 +484,9 @@ int UtcDaliStringImplCopyVsMove(void)
   {
     tet_printf("Test 3: Verify no data loss in move...\n");
     String      daliStr("Data integrity test");
-    std::string originalCopy = Dali::Integration::ToStdString(daliStr);
+    std::string originalCopy = ToStdString(daliStr);
 
-    std::string movedStr = Dali::Integration::ToStdString(std::move(daliStr));
+    std::string movedStr = ToStdString(std::move(daliStr));
 
     DALI_TEST_CHECK(originalCopy == movedStr);
     DALI_TEST_CHECK(originalCopy == "Data integrity test");
@@ -537,7 +541,7 @@ int UtcDaliStringImplToDaliStringP(void)
     tet_printf("Test 4: Round-trip conversion...\n");
     String original("Round trip test");
 
-    std::string stdStr    = Dali::Integration::ToStdString(std::move(original));
+    std::string stdStr    = ToStdString(std::move(original));
     String      roundTrip = Internal::StringImpl::ToDaliString(std::move(stdStr));
 
     DALI_TEST_EQUALS(roundTrip.CStr(), "Round trip test", TEST_LOCATION);
@@ -579,7 +583,7 @@ int UtcDaliStringUtilsToDaliStringMoveP(void)
   {
     tet_printf("Test 1: Basic move via ToDaliString(std::string&&)...\n");
     std::string stdStr("Moved via utils");
-    String      daliStr = Dali::Integration::ToDaliString(std::move(stdStr));
+    String      daliStr = ToDaliString(std::move(stdStr));
 
     DALI_TEST_EQUALS(daliStr.CStr(), "Moved via utils", TEST_LOCATION);
     DALI_TEST_CHECK(stdStr.empty());
@@ -590,7 +594,7 @@ int UtcDaliStringUtilsToDaliStringMoveP(void)
   {
     tet_printf("Test 2: Move empty string via ToDaliString...\n");
     std::string stdStr;
-    String      daliStr = Dali::Integration::ToDaliString(std::move(stdStr));
+    String      daliStr = ToDaliString(std::move(stdStr));
 
     DALI_TEST_CHECK(daliStr.Empty());
     tet_printf("  Done\n");
@@ -600,7 +604,7 @@ int UtcDaliStringUtilsToDaliStringMoveP(void)
   {
     tet_printf("Test 3: Move large string via ToDaliString...\n");
     std::string large(2000, 'B');
-    String      daliStr = Dali::Integration::ToDaliString(std::move(large));
+    String      daliStr = ToDaliString(std::move(large));
 
     DALI_TEST_EQUALS(daliStr.Size(), 2000u, TEST_LOCATION);
     DALI_TEST_CHECK(daliStr[0] == 'B');
@@ -613,8 +617,8 @@ int UtcDaliStringUtilsToDaliStringMoveP(void)
   {
     tet_printf("Test 4: Round-trip via convenience API...\n");
     std::string original("Full round trip");
-    String      daliStr = Dali::Integration::ToDaliString(std::move(original));
-    std::string back    = Dali::Integration::ToStdString(std::move(daliStr));
+    String      daliStr = ToDaliString(std::move(original));
+    std::string back    = ToStdString(std::move(daliStr));
 
     DALI_TEST_EQUALS(back.c_str(), "Full round trip", TEST_LOCATION);
     DALI_TEST_CHECK(original.empty());
@@ -626,7 +630,7 @@ int UtcDaliStringUtilsToDaliStringMoveP(void)
   {
     tet_printf("Test 5: Copy overload preserves source...\n");
     std::string stdStr("Keep me");
-    String      daliStr = Dali::Integration::ToDaliString(stdStr);
+    String      daliStr = ToDaliString(stdStr);
 
     DALI_TEST_EQUALS(daliStr.CStr(), "Keep me", TEST_LOCATION);
     DALI_TEST_CHECK(!stdStr.empty());

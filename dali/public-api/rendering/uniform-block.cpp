@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,18 @@
 #include <dali/public-api/rendering/uniform-block.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/rendering/shader-impl.h>
 #include <dali/internal/event/rendering/uniform-block-impl.h>
 
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
+
 namespace Dali
 {
-UniformBlock UniformBlock::New(std::string blockName)
+UniformBlock UniformBlock::New(Dali::String blockName)
 {
-  Internal::UniformBlockPtr object = Internal::UniformBlock::New(std::move(blockName));
+  Internal::UniformBlockPtr object = Internal::UniformBlock::New(ToStdString(std::move(blockName)));
   return UniformBlock(object.Get());
 }
 
@@ -46,9 +50,9 @@ UniformBlock UniformBlock::DownCast(BaseHandle handle)
   return UniformBlock(dynamic_cast<Dali::Internal::UniformBlock*>(handle.GetObjectPtr()));
 }
 
-std::string_view UniformBlock::GetUniformBlockName() const
+Dali::StringView UniformBlock::GetUniformBlockName() const
 {
-  return GetImplementation(*this).GetUniformBlockName();
+  return ToDaliStringView(GetImplementation(*this).GetUniformBlockName());
 }
 
 bool UniformBlock::ConnectToShader(Shader shader, bool strongConnection)

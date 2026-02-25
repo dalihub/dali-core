@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -34,6 +35,8 @@
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
+
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -66,7 +69,7 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::PanGestureDetector), typeid(Dali::GestureDetector), Create, PanGestureDetectorDefaultProperties);
 
-SignalConnectorType signalConnector1(mType, SIGNAL_PAN_DETECTED, &PanGestureDetector::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, Dali::String(SIGNAL_PAN_DETECTED), &PanGestureDetector::DoConnectSignal);
 
 #if defined(DEBUG_ENABLED)
 Integration::Log::Filter* gLogFilter = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_PAN_GESTURE_DETECTOR");
@@ -291,12 +294,13 @@ void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const Dali::Pan
   }
 }
 
-bool PanGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool PanGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool                connected(true);
   PanGestureDetector* gesture = static_cast<PanGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_PAN_DETECTED))
+  std::string_view name = ToStdStringView(signalName);
+  if(name == SIGNAL_PAN_DETECTED)
   {
     gesture->DetectedSignal().Connect(tracker, functor);
   }

@@ -177,7 +177,7 @@ public:
   /**
    * @copydoc Dali::Internal::Actor::DoAction()
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
+  static bool DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes);
 
 public: // Default property extensions from Object
   /**

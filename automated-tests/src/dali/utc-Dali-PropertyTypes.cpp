@@ -105,7 +105,7 @@ int UtcDaliPropertyTypesGet12P(void)
 
 int UtcDaliPropertyTypesGet13P(void)
 {
-  DALI_TEST_CHECK(Dali::PropertyTypes::Get<std::string>() == Property::STRING);
+  DALI_TEST_CHECK(Dali::PropertyTypes::Get<String>() == Property::STRING);
   END_TEST;
 }
 

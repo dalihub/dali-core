@@ -453,29 +453,29 @@ int UtcDaliIntegrationKeyEvent(void)
   {
     Dali::Integration::KeyEvent keyEvent;
     DALI_TEST_EQUALS(keyEvent.type, Dali::Integration::Event::Key, TEST_LOCATION);
-    DALI_TEST_CHECK(keyEvent.keyName == std::string());
-    DALI_TEST_CHECK(keyEvent.logicalKey == std::string());
-    DALI_TEST_CHECK(keyEvent.keyString == std::string());
+    DALI_TEST_CHECK(keyEvent.keyName == "");
+    DALI_TEST_CHECK(keyEvent.logicalKey == "");
+    DALI_TEST_CHECK(keyEvent.keyString == "");
     DALI_TEST_EQUALS(keyEvent.keyCode, -1, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.keyModifier, 0, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.time, 0lu, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.state, Dali::Integration::KeyEvent::DOWN, TEST_LOCATION);
-    DALI_TEST_EQUALS(keyEvent.compose, std::string(), TEST_LOCATION);
-    DALI_TEST_EQUALS(keyEvent.deviceName, std::string(), TEST_LOCATION);
+    DALI_TEST_EQUALS(keyEvent.compose, "", TEST_LOCATION);
+    DALI_TEST_EQUALS(keyEvent.deviceName, "", TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.deviceClass, Device::Class::NONE, TEST_LOCATION);
     DALI_TEST_EQUALS(keyEvent.deviceSubclass, Device::Subclass::NONE, TEST_LOCATION);
   }
 
   {
-    const std::string                        keyName("keyName");
-    const std::string                        logicalKey("logicalKey");
-    const std::string                        keyString("keyString");
+    const Dali::String                       keyName("keyName");
+    const Dali::String                       logicalKey("logicalKey");
+    const Dali::String                       keyString("keyString");
     const int                                keyCode(333);
     const int                                keyModifier(312);
     const unsigned long                      timeStamp(132);
     const Dali::Integration::KeyEvent::State keyState(Dali::Integration::KeyEvent::UP);
-    const std::string                        compose("compose");
-    const std::string                        deviceName("hwKeyboard");
+    const Dali::String                       compose("compose");
+    const Dali::String                       deviceName("hwKeyboard");
     const Device::Class::Type                deviceClass    = Device::Class::KEYBOARD;
     const Device::Subclass::Type             deviceSubclass = Device::Subclass::NONE;
 

@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/pixel-data.h>
 #include <dali/public-api/images/pixel.h>
@@ -174,7 +175,7 @@ public:
    * @param[in] textureId Specifies the texture id to upload to (optional)
    * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
    */
-  bool Upload(PixelData pixelData, std::string url, int32_t textureId = -1);
+  bool Upload(PixelData pixelData, Dali::String url, int32_t textureId = -1);
 
   /**
    * @brief Uploads data to the texture from a PixelData object.

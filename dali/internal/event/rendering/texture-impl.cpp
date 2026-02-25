@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/render/renderers/render-texture-messages.h>
@@ -407,7 +408,9 @@ bool Texture::ApplyNativeFragmentShader(std::string& shader, int mask)
   bool modified = false;
   if(mNativeImage && !shader.empty())
   {
-    modified = mNativeImage->ApplyNativeFragmentShader(shader, mask);
+    Dali::String daliShader = Dali::Integration::ToDaliString(shader);
+    modified                = mNativeImage->ApplyNativeFragmentShader(daliShader, mask);
+    shader                  = Dali::Integration::ToStdString(daliShader);
   }
 
   return modified;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,9 @@ namespace
 const int32_t MAX_NUM_STACK_FRAMES = 25;
 }
 
-std::string Demangle(const char* symbol)
+Dali::String Demangle(const char* symbol)
 {
-  std::string result;
+  Dali::String result;
 
   // backtrace ::=  <filename>'('['_'<mangled-symbol>'_']['+'<offset>]')'
   // Only want <mangled-symbol>:
@@ -118,8 +118,8 @@ DALI_CORE_API DaliException::DaliException(const char* location, const char* con
   char**  symbols = backtrace_symbols(frameArray, nSize);
   for(int32_t i = 1; i < nSize; i++)
   {
-    std::string demangled_symbol = Demangle(symbols[i]);
-    DALI_LOG_ERROR_NOFN("[%02d]   %s\n", i, demangled_symbol.c_str());
+    Dali::String demangled_symbol = Demangle(symbols[i]);
+    DALI_LOG_ERROR_NOFN("[%02d]   %s\n", i, demangled_symbol.CStr());
   }
   free(symbols);
 }
@@ -133,8 +133,8 @@ DALI_CORE_API void DaliPrintBackTrace()
   char**  symbols = backtrace_symbols(frameArray, nSize);
   for(int32_t i = 1; i < nSize; i++)
   {
-    std::string demangled_symbol = Demangle(symbols[i]);
-    DALI_LOG_ERROR_NOFN("[%02d]   %s\n", i, demangled_symbol.c_str());
+    Dali::String demangled_symbol = Demangle(symbols[i]);
+    DALI_LOG_ERROR_NOFN("[%02d]   %s\n", i, demangled_symbol.CStr());
   }
   free(symbols);
 }

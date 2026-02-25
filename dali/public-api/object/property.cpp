@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/public-api/object/property.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/handle.h>
 
 namespace Dali
@@ -35,12 +36,12 @@ Property::Property(Handle& obj, Property::Index propIndex, int32_t compIndex)
 {
 }
 
-Property::Property(Handle& obj, const std::string& propertyName)
+Property::Property(Handle& obj, Dali::String propertyName)
 : Property(obj, propertyName, Property::INVALID_COMPONENT_INDEX)
 {
 }
 
-Property::Property(Handle& obj, const std::string& propertyName, int32_t compIndex)
+Property::Property(Handle& obj, Dali::String propertyName, int32_t compIndex)
 : object(obj),
   propertyIndex(Property::INVALID_INDEX),
   componentIndex(compIndex)

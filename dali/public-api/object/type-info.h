@@ -22,6 +22,8 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-handle.h>
 
@@ -52,7 +54,7 @@ class DALI_CORE_API TypeInfo : public BaseHandle
 public:
   using CreateFunction = BaseHandle (*)(); ///< Function signature for creating an instance of the associated object type. @SINCE_1_0.0
 
-  using ActionFunction = bool (*)(BaseObject*, const std::string&, const Property::Map&); ///< Function signature for creating scriptable actions @SINCE_1_0.0
+  using ActionFunction = bool (*)(BaseObject*, const Dali::String&, const Property::Map&); ///< Function signature for creating scriptable actions @SINCE_1_0.0
 
   /**
    * @brief Connects a callback function with the object's signals.
@@ -65,7 +67,7 @@ public:
    * @return True if the signal was connected
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  using SignalConnectorFunction = bool (*)(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
+  using SignalConnectorFunction = bool (*)(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor);
 
   /**
    * @brief Callback to set an event-thread only property.
@@ -143,7 +145,7 @@ public:
    * @SINCE_1_0.0
    * @return String name
    */
-  const std::string& GetName() const;
+  Dali::String GetName() const;
 
   /**
    * @brief Retrieves the base type name for this type.
@@ -151,7 +153,7 @@ public:
    * @SINCE_1_0.0
    * @return String of base name
    */
-  const std::string& GetBaseName() const;
+  Dali::String GetBaseName() const;
 
   /**
    * @brief Creates an object from this type.
@@ -184,7 +186,7 @@ public:
    * @param[in] index Index to lookup
    * @return Action name or empty string where index is invalid
    */
-  std::string GetActionName(size_t index);
+  Dali::String GetActionName(size_t index);
 
   /**
    * @brief Retrieves the number of signals for this type.
@@ -201,7 +203,7 @@ public:
    * @param[in] index Index to lookup
    * @return Signal name or empty string where index is invalid
    */
-  std::string GetSignalName(size_t index);
+  Dali::String GetSignalName(size_t index);
 
   /**
    * @brief Retrieves the number of event side type registered properties for this type.
@@ -240,7 +242,7 @@ public:
    * @exception DaliException If index is not valid.
    * @note this method only works for custom registered properties
    */
-  std::string_view GetPropertyName(Property::Index index) const;
+  Dali::StringView GetPropertyName(Property::Index index) const;
 
   /**
    * @brief Given a child property name, retrieve the property index associated with it,
@@ -249,7 +251,7 @@ public:
    * @param[in] name The name of the property at the given index,
    * @return The property index or Property::INVALID_INDEX
    */
-  Property::Index GetChildPropertyIndex(const std::string& name) const;
+  Property::Index GetChildPropertyIndex(const Dali::String& name) const;
 
   /**
    * @brief Given a child property index, retrieve the property name associated with it.
@@ -258,7 +260,7 @@ public:
    * @param[in] index The property index
    * @return The name of the property at the given index, or empty string if it does not exist
    */
-  std::string_view GetChildPropertyName(Property::Index index) const;
+  Dali::StringView GetChildPropertyName(Property::Index index) const;
 
   /**
    * @brief Given a child property index, retrieve the property name associated with it.

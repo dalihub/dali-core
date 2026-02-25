@@ -33,7 +33,7 @@
 
 namespace
 {
-const std::string DEFAULT_DEVICE_NAME("hwKeyboard");
+const Dali::String DEFAULT_DEVICE_NAME("hwKeyboard");
 
 // Functor for EventProcessingFinished signal
 struct EventProcessingFinishedFunctor
@@ -108,6 +108,7 @@ struct TouchedSignalData
     createNewScene  = false;
     newSceneCreated = false;
     receivedTouchEvent.Reset();
+    functorCalled = false;
   }
 
   bool       functorCalled;

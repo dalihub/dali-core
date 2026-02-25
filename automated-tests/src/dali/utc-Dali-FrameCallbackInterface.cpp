@@ -395,21 +395,21 @@ class FrameCallbackCustomProperty : public FrameCallbackBasic
 {
 public:
   // Property Names
-  inline static const std::string CUSTOM_PROPERTY_BOOL      = "fCustomPropertyBool";
-  inline static const std::string CUSTOM_PROPERTY_INTEGER   = "fCustomPropertyInteger";
-  inline static const std::string CUSTOM_PROPERTY_FLOAT     = "fCustomPropertyFloat";
-  inline static const std::string CUSTOM_PROPERTY_VECTOR2   = "fCustomPropertyVector2";
-  inline static const std::string CUSTOM_PROPERTY_VECTOR3   = "fCustomPropertyVector3";
-  inline static const std::string CUSTOM_PROPERTY_VECTOR4   = "fCustomPropertyVector4";
-  inline static const std::string CUSTOM_PROPERTY_MATRIX3   = "fCustomPropertyMatrix3";
-  inline static const std::string CUSTOM_PROPERTY_MATRIX    = "fCustomPropertyMatrix";
-  inline static const std::string CUSTOM_PROPERTY_ROTATION  = "fCustomPropertyRotation";
-  inline static const std::string CUSTOM_PROPERTY_STRING    = "fCustomPropertyString";
-  inline static const std::string CUSTOM_PROPERTY_RECTANGLE = "fCustomPropertyRectangle";
-  inline static const std::string CUSTOM_PROPERTY_EXTENTS   = "fCustomPropertyExtents";
+  static constexpr const char* CUSTOM_PROPERTY_INTEGER   = "fCustomPropertyInteger";
+  static constexpr const char* CUSTOM_PROPERTY_FLOAT     = "fCustomPropertyFloat";
+  static constexpr const char* CUSTOM_PROPERTY_VECTOR2   = "fCustomPropertyVector2";
+  static constexpr const char* CUSTOM_PROPERTY_VECTOR3   = "fCustomPropertyVector3";
+  static constexpr const char* CUSTOM_PROPERTY_VECTOR4   = "fCustomPropertyVector4";
+  static constexpr const char* CUSTOM_PROPERTY_MATRIX3   = "fCustomPropertyMatrix3";
+  static constexpr const char* CUSTOM_PROPERTY_MATRIX    = "fCustomPropertyMatrix";
+  static constexpr const char* CUSTOM_PROPERTY_ROTATION  = "fCustomPropertyRotation";
+  static constexpr const char* CUSTOM_PROPERTY_STRING    = "fCustomPropertyString";
+  static constexpr const char* CUSTOM_PROPERTY_RECTANGLE = "fCustomPropertyRectangle";
+  static constexpr const char* CUSTOM_PROPERTY_EXTENTS   = "fCustomPropertyExtents";
+  static constexpr const char* CUSTOM_PROPERTY_BOOL      = "fCustomPropertyBool";
 
   // Property Name for invalid
-  inline static const std::string CUSTOM_PROPERTY_INVALID = "fCustomPropertyInvalid";
+  static constexpr const char* CUSTOM_PROPERTY_INVALID = "fCustomPropertyInvalid";
 
   // PropertyValue before
   inline static const Property::Value CUSTOM_PROPERTY_BOOL_BEFORE     = Property::Value(false);

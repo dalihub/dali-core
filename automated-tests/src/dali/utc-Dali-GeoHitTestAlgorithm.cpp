@@ -44,7 +44,7 @@ bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType t
       if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) && actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f) // not FULLY_TRANSPARENT
       {
         // Check whether the actor has the specific name "HittableActor"
-        if(actor.GetProperty<std::string>(Actor::Property::NAME) == "HittableActor")
+        if(actor.GetProperty<String>(Actor::Property::NAME) == "HittableActor")
         {
           hittable = true;
         }
@@ -319,12 +319,12 @@ int UtcDaliGeoHitTestAlgorithmClippingActor(void)
   HitTestAlgorithm::Results results;
   HitTest(stage, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == childActor);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
   HitTest(stage, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == rootLayer);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
   END_TEST;
 }
@@ -384,12 +384,12 @@ int UtcDaliGeoHitTestAlgorithmClippingActorStress(void)
   // Hit within clippingActor and latestActor.
   HitTestAlgorithm::Results results;
   HitTest(stage, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == latestActor);
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
   HitTest(stage, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == rootLayer);
 
   END_TEST;

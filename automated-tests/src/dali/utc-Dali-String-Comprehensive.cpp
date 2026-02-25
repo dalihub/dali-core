@@ -1038,15 +1038,30 @@ int UtcDaliStringToStdStringFromPropertyValueP(void)
   std::string     result = Integration::ToStdString(strValue);
   DALI_TEST_EQUALS(result, std::string("Property String"), TEST_LOCATION);
 
-  // Empty string value
-  Property::Value emptyValue(String(""));
-  std::string     emptyResult = Integration::ToStdString(emptyValue);
-  DALI_TEST_CHECK(emptyResult.empty());
+  END_TEST;
+}
+
+int UtcDaliStringToStdStringFromPropertyValueN(void)
+{
+  tet_printf("Test ToStdString(Property::Value)");
+  TestApplication application;
 
   // Non-STRING type value (should return empty string)
-  Property::Value intValue(42);
-  std::string     intResult = Integration::ToStdString(intValue);
-  DALI_TEST_CHECK(intResult.empty());
+  try
+  {
+    Property::Value intValue(42);
+    std::string     intResult = Integration::ToStdString(intValue);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "value.GetType() == Property::STRING", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong exception\n");
+    tet_result(TET_FAIL);
+  }
 
   END_TEST;
 }

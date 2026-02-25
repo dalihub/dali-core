@@ -24,6 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/property.h>
 
 namespace Dali
@@ -34,7 +36,7 @@ namespace Dali
  */
 
 /**
- * @brief A key type which can be either a std::string or a Property::Index
+ * @brief A key type which can be either a Dali::String or a Property::Index
  * @SINCE_1_2.7
  */
 struct DALI_CORE_API Property::Key
@@ -50,7 +52,15 @@ struct DALI_CORE_API Property::Key
   } type;  ///< The type of the key
 
   Property::Index indexKey;  ///< The index key.
-  std::string     stringKey; ///< The string key.
+  Dali::String    stringKey; ///< The string key.
+
+  /**
+   * @brief Constructor
+   * @SINCE_1_2.7
+   *
+   * @param[in] key The string key to copy
+   */
+  Key(const Dali::String& key);
 
   /**
    * @brief Constructor
@@ -58,7 +68,7 @@ struct DALI_CORE_API Property::Key
    *
    * @param[in] key The string key
    */
-  Key(const std::string& key);
+  Key(const Dali::StringView& key);
 
   /**
    * @brief Constructor
@@ -83,7 +93,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A string key to compare against.
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
-  bool operator==(const std::string& rhs);
+  bool operator==(const Dali::StringView& rhs);
 
   /**
    * @brief Constructor
@@ -119,7 +129,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A string key to compare against.
    * @return true if the key is not equal or not a string key
    */
-  bool operator!=(const std::string& rhs);
+  bool operator!=(const Dali::StringView& rhs);
 
   /**
    * @brief The inequality operator

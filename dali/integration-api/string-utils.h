@@ -22,7 +22,6 @@
 #include <string_view>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/dali-string-impl.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
@@ -58,10 +57,7 @@ inline std::string ToStdString(const String& string)
  * @param[in] string The Dali::String to move from
  * @return A std::string containing the moved data
  */
-inline std::string ToStdString(String&& string)
-{
-  return Internal::StringImpl(std::move(string)).Extract();
-}
+DALI_CORE_API std::string ToStdString(String&& string);
 
 /**
  * @brief Convert a Dali::StringView to a std::string.
@@ -88,16 +84,7 @@ inline std::string ToStdString(const StringView& view)
  * @param[in] value The Property::Value (must be of type STRING)
  * @return A std::string containing the same data
  */
-inline std::string ToStdString(const Property::Value& value)
-{
-  DALI_ASSERT_DEBUG(value.GetType() == Property::STRING);
-  Dali::String str;
-  if(value.Get(str))
-  {
-    return Internal::StringImpl(std::move(str)).Extract();
-  }
-  return "";
-}
+DALI_CORE_API std::string ToStdString(const Property::Value& value);
 
 /**
  * @brief Convert a std::string to a Dali::Property::Value of type STRING.
@@ -126,16 +113,7 @@ inline Property::Value ToPropertyValue(std::string str)
  * @param[out] out The std::string to write to on success
  * @return true if the value was a string and was extracted
  */
-inline bool GetStdString(const Property::Value& value, std::string& out)
-{
-  Dali::String str;
-  if(value.Get(str))
-  {
-    out = Internal::StringImpl(std::move(str)).Extract();
-    return true;
-  }
-  return false;
-}
+DALI_CORE_API bool GetStdString(const Property::Value& value, std::string& out);
 
 /**
  * @brief Add a std::string to a Property::Array.
@@ -316,10 +294,7 @@ inline String ToDaliString(std::string_view view)
  * @param[in] string The std::string to move from
  * @return A Dali::String containing the moved data
  */
-inline String ToDaliString(std::string&& string)
-{
-  return Internal::StringImpl::ToDaliString(std::move(string));
-}
+DALI_CORE_API String ToDaliString(std::string&& string);
 
 /**
  * @brief Copy a Dali::String (no-op conversion for convenience).

@@ -25,6 +25,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/stream-operators.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/matrix.h>
@@ -144,10 +146,10 @@ struct Property::Value::Impl
     ConstructInplace(mData.mArray.member, std::move(arrayValue));
   }
 
-  Impl(std::string stringValue)
+  Impl(Dali::String stringValue)
   {
     SetType(Property::STRING);
-    mData.mString.member = new std::string(std::move(stringValue));
+    mData.mString.member = new Dali::String(std::move(stringValue));
   }
 
   Impl(Rect<int32_t> rectValue)
@@ -245,7 +247,7 @@ struct Property::Value::Impl
     return *(mData.mAngleAxis.member);
   }
 
-  const std::string& GetString() const
+  const Dali::String& GetString() const
   {
     return *(mData.mString.member);
   }
@@ -418,7 +420,7 @@ struct Property::Value::Impl
         }
         else
         {
-          mData.mString.member = new std::string(other.GetString());
+          mData.mString.member = new Dali::String(other.GetString());
         }
         break;
       }
@@ -679,7 +681,7 @@ struct Property::Value::Impl
         }
         case Property::STRING:
         {
-          Dali::Internal::HashUtils::HashStringView(std::string_view(*mData.mString.member), hash);
+          Dali::Internal::HashUtils::HashStringView(Dali::Integration::ToStdStringView(*mData.mString.member), hash);
           break;
         }
         case Property::EXTENTS:
@@ -865,7 +867,7 @@ private:
     UnionMember<Matrix3*>        mMatrix3;
     UnionMember<Matrix*>         mMatrix;
     UnionMember<AngleAxis*>      mAngleAxis;
-    UnionMember<std::string*>    mString;
+    UnionMember<Dali::String*>   mString;
     UnionMember<Rect<int32_t>*>  mRect;
 
     Metadata mMetadata;
@@ -957,7 +959,7 @@ Property::Value::Value(const Quaternion& quaternionValue)
   Impl::New(mStorage, std::move(angleAxisValue));
 }
 
-Property::Value::Value(std::string stringValue)
+Property::Value::Value(Dali::String stringValue)
 {
   Impl::New(mStorage, std::move(stringValue));
 }
@@ -966,11 +968,11 @@ Property::Value::Value(const char* stringValue)
 {
   if(stringValue) // string constructor is undefined with nullptr
   {
-    Impl::New(mStorage, std::string(stringValue));
+    Impl::New(mStorage, Dali::String(stringValue));
   }
   else
   {
-    Impl::New(mStorage, std::string());
+    Impl::New(mStorage, Dali::String());
   }
 }
 
@@ -1040,7 +1042,7 @@ Property::Value::Value(Type type)
     }
     case Property::STRING:
     {
-      Impl::New(mStorage, std::string());
+      Impl::New(mStorage, Dali::String());
       break;
     }
     case Property::MATRIX:
@@ -1361,7 +1363,7 @@ bool Property::Value::Get(Quaternion& quaternionValue) const
   return converted;
 }
 
-bool Property::Value::Get(std::string& stringValue) const
+bool Property::Value::Get(Dali::String& stringValue) const
 {
   bool converted = false;
 
@@ -1369,8 +1371,8 @@ bool Property::Value::Get(std::string& stringValue) const
 
   if(obj.GetType() == STRING)
   {
-    stringValue.assign(obj.GetString());
-    converted = true;
+    stringValue = obj.GetString();
+    converted   = true;
   }
   return converted;
 }

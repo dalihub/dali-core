@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,15 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-notification.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -65,9 +69,9 @@ uint32_t Handle::GetPropertyCount() const
   return GetImplementation(*this).GetPropertyCount();
 }
 
-std::string Handle::GetPropertyName(Property::Index index) const
+Dali::String Handle::GetPropertyName(Property::Index index) const
 {
-  return std::string(GetImplementation(*this).GetPropertyName(index));
+  return ToDaliString(GetImplementation(*this).GetPropertyName(index));
 }
 
 Property::Index Handle::GetPropertyIndex(Property::Key key) const
@@ -105,29 +109,29 @@ void Handle::ReserveCustomProperties(int propertyCount)
   GetImplementation(*this).ReserveCustomProperties(propertyCount);
 }
 
-Property::Index Handle::RegisterProperty(std::string_view name, Property::Value propertyValue)
+Property::Index Handle::RegisterProperty(Dali::String name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(name, std::move(propertyValue));
+  return GetImplementation(*this).RegisterProperty(ToStdStringView(name), std::move(propertyValue));
 }
 
-Property::Index Handle::RegisterProperty(Property::Index key, std::string_view name, Property::Value propertyValue)
+Property::Index Handle::RegisterProperty(Property::Index key, Dali::String name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(name, key, std::move(propertyValue), true);
+  return GetImplementation(*this).RegisterProperty(ToStdStringView(name), key, std::move(propertyValue), true);
 }
 
-Property::Index Handle::RegisterProperty(std::string_view name, Property::Value propertyValue, Property::AccessMode accessMode)
+Property::Index Handle::RegisterProperty(Dali::String name, Property::Value propertyValue, Property::AccessMode accessMode)
 {
-  return GetImplementation(*this).RegisterProperty(name, std::move(propertyValue), accessMode);
+  return GetImplementation(*this).RegisterProperty(ToStdStringView(name), std::move(propertyValue), accessMode);
 }
 
-Property::Index Handle::RegisterUniqueProperty(std::string_view name, Property::Value propertyValue)
+Property::Index Handle::RegisterUniqueProperty(Dali::String name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(name, Property::INVALID_KEY, std::move(propertyValue), false);
+  return GetImplementation(*this).RegisterProperty(ToStdStringView(name), Property::INVALID_KEY, std::move(propertyValue), false);
 }
 
-Property::Index Handle::RegisterUniqueProperty(Property::Index key, std::string_view name, Property::Value propertyValue)
+Property::Index Handle::RegisterUniqueProperty(Property::Index key, Dali::String name, Property::Value propertyValue)
 {
-  return GetImplementation(*this).RegisterProperty(name, key, std::move(propertyValue), false);
+  return GetImplementation(*this).RegisterProperty(ToStdStringView(name), key, std::move(propertyValue), false);
 }
 
 Property::Value Handle::GetProperty(Property::Index index) const
@@ -206,10 +210,10 @@ IndirectValue Handle::operator[](Property::Index index)
   return IndirectValue(*this, index);
 }
 
-IndirectValue Handle::operator[](const std::string& name)
+IndirectValue Handle::operator[](Dali::String name)
 {
   // Will assert immediately when GetPropertyIndex is called if handle is empty
-  return IndirectValue(*this, GetPropertyIndex(name));
+  return IndirectValue(*this, GetPropertyIndex(Property::Key(name)));
 }
 
 Handle::PropertySetSignalType& Handle::PropertySetSignal()
