@@ -34,7 +34,6 @@ DALi 3D Engine
 Summary:    Development components for DALi 3D Engine
 Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
-Requires:   %{name}-integration-devel = %{version}-%{release}
 
 %description devel
 Development components for DALi 3D Engine - public headers and package config
@@ -46,6 +45,7 @@ Development components for DALi 3D Engine - public headers and package config
 Summary:    Integration development package for DALi 3D Engine
 Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-devel = %{version}-%{release}
 
 %description integration-devel
 Integration development package for DALi 3D Engine - headers for integrating with an adaptor/platform abstraction library.
@@ -151,10 +151,10 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/dali2-core.pc
 %{dev_include_path}/dali/public-api/*
-%{dev_include_path}/dali/devel-api/*
 %{dev_include_path}/dali/doc/*
 
 %files integration-devel
 %defattr(-,root,root,-)
+%{dev_include_path}/dali/devel-api/*
 %{_includedir}/dali/integration-api/*
 %{_includedir}/dali/graphics-api/*
