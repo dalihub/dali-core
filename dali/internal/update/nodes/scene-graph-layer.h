@@ -22,6 +22,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -90,6 +91,7 @@ class Layer : public Node
 {
 public:
   using SortFunctionType = Dali::Layer::SortFunctionType;
+  using ClippingBox      = Dali::Rect<int32_t>;
 
   // Creation methods
 
@@ -303,9 +305,9 @@ inline void SetClippingMessage(EventThreadServices& eventThreadServices, const L
  * @param[in] layer The layer
  * @param[in] clippingbox The clipping box
  */
-inline void SetClippingBoxMessage(EventThreadServices& eventThreadServices, const Layer& layer, const Dali::ClippingBox& clippingbox)
+inline void SetClippingBoxMessage(EventThreadServices& eventThreadServices, const Layer& layer, const Dali::Rect<int32_t>& clippingbox)
 {
-  using LocalType = MessageValue1<Layer, Dali::ClippingBox>;
+  using LocalType = MessageValue1<Layer, Dali::Rect<int32_t>>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));

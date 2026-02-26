@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_LIST_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@
 
 namespace Dali
 {
-using ClippingBox = Rect<int>;
-
 namespace Internal
 {
 namespace Render
@@ -55,6 +53,9 @@ using RenderListContainer = OwnerContainer<RenderList*>;
  */
 struct RenderList
 {
+public:
+  using ClippingBox = Dali::Rect<int32_t>;
+
 public:
   /**
    * Constructor

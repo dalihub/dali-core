@@ -44,6 +44,8 @@ Actor CreateActor(bool withAlpha)
   return actor;
 }
 
+using ClippingBox = Dali::Rect<int32_t>;
+
 } // namespace
 
 void layer_test_startup(void)

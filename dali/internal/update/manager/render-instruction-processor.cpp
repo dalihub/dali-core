@@ -224,8 +224,8 @@ inline void AddRendererToRenderList(uint32_t                  renderPass,
         // TODO : Below logic might need to refactor it.
         // If camera is Perspective, we need to calculate clipping box by FoV. Currently, we just believe default camera setup OrthographicSize well.
         //  - If then, It must use math calculate like tan(fov) internally. So, we might need calculate it only one times, and cache.
-        ClippingBox boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, Vector3(nodeUpdateArea.x, nodeUpdateArea.y, 0.0f), Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f));
-        ClippingBox clippingBox = camera.GetOrthographicClippingBox();
+        Dali::Rect<int32_t> boundingBox = RenderItem::CalculateTransformSpaceAABB(nodeModelViewMatrix, Vector3(nodeUpdateArea.x, nodeUpdateArea.y, 0.0f), Vector3(nodeUpdateArea.z, nodeUpdateArea.w, 0.0f));
+        Dali::Rect<int32_t> clippingBox = camera.GetOrthographicClippingBox();
 
         inside = clippingBox.Intersects(boundingBox);
       }
