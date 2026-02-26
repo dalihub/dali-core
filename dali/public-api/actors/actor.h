@@ -2,7 +2,7 @@
 #define DALI_ACTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1357,7 +1357,7 @@ public: // Signals
    * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
    * @note For reference, an actor is only shown if it and it's parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
    */
-  DALI_CORE_API InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal();
+  InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal();
 
 public: // Not intended for application developers
   /// @cond internal
