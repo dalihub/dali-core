@@ -1351,17 +1351,7 @@ void Actor::Remove(Actor& child, bool notify)
 
 void Actor::SwitchParent(Actor& newParent)
 {
-  if(this == &newParent)
-  {
-    DALI_LOG_ERROR("Cannot add actor to itself");
-    return;
-  }
-
-  if(!this->OnScene() || !newParent.OnScene())
-  {
-    DALI_LOG_ERROR("Both of current parent and new parent must be on Scene");
-    return;
-  }
+  DALI_ASSERT_ALWAYS(((this->OnScene()) == (newParent.OnScene())) && "Both of current parent and new parent must have same SceneOn state");
 
   newParent.Add(*this, false);
 }
