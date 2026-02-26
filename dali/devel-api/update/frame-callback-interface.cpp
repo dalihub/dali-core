@@ -26,7 +26,7 @@
 namespace Dali
 {
 FrameCallbackInterface::FrameCallbackInterface()
-: mImpl(std::unique_ptr<Impl>(new Impl))
+: mImpl(new Impl)
 {
 }
 
@@ -41,6 +41,8 @@ FrameCallbackInterface::~FrameCallbackInterface()
       stage->RemoveFrameCallback(*this);
     }
   }
+
+  delete mImpl;
 }
 
 } // namespace Dali

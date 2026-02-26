@@ -2,7 +2,7 @@
 #define DALI_FRAME_CALLBACK_INTERFACE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
  * limitations under the License.
  *
  */
-
-// EXTERNAL INCLUDES
-#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -99,7 +96,7 @@ public:
   class Impl;
 
 private:
-  std::unique_ptr<Impl> mImpl;
+  Impl* mImpl;
   /// @endcond
 };
 
