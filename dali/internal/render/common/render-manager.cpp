@@ -461,10 +461,6 @@ void RenderManager::ContextDestroyed()
   mImpl->ContextDestroyed();
 }
 
-void RenderManager::SetShaderSaver(ShaderSaver& upstream)
-{
-}
-
 void RenderManager::AddRenderer(OwnerKeyType<Render::Renderer>& rendererKeyPointer)
 {
   Render::RendererKey renderer = rendererKeyPointer.Release();

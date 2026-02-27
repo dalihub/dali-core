@@ -206,7 +206,6 @@ struct UpdateManager::Impl
     transformManager(),
     animationPlaylist(animationPlaylist),
     propertyNotifier(propertyNotifier),
-    shaderSaver(nullptr),
     renderController(renderController),
     renderManager(renderManager),
     renderTaskProcessor(renderTaskProcessor),
@@ -324,7 +323,6 @@ struct UpdateManager::Impl
   TransformManager               transformManager;        ///< Used to update the transformation matrices of the nodes
   CompleteNotificationInterface& animationPlaylist;       ///< Holds handles to all the animations
   PropertyNotifier&              propertyNotifier;        ///< Provides notification to applications when properties are modified.
-  ShaderSaver*                   shaderSaver;             ///< Saves shader binaries.
   RenderController&              renderController;        ///< render controller
   RenderManager&                 renderManager;           ///< This is responsible for rendering the results of each "update"
   RenderTaskProcessor&           renderTaskProcessor;     ///< Handles RenderTasks and RenderInstrucitons
@@ -376,10 +374,7 @@ struct UpdateManager::Impl
 
   OwnerPointer<PanGesture> panGestureProcessor; ///< Owned pan gesture processor; it lives for the lifecycle of UpdateManager
 
-  MessageQueue                         messageQueue;          ///< The messages queued from the event-thread
-  std::vector<Internal::ShaderDataPtr> renderCompiledShaders; ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
-  std::vector<Internal::ShaderDataPtr> updateCompiledShaders; ///< Shaders to be sent from Update to Event
-  Mutex                                compiledShaderMutex;   ///< lock to ensure no corruption on the renderCompiledShaders
+  MessageQueue messageQueue; ///< The messages queued from the event-thread
 
   OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor; ///< Owned FrameCallbackProcessor, only created if required.
 
@@ -806,22 +801,6 @@ void UpdateManager::RemoveShader(Shader* shader)
 #endif
 }
 
-void UpdateManager::SaveBinary(Internal::ShaderDataPtr shaderData)
-{
-  DALI_ASSERT_DEBUG(shaderData && "No NULL shader data pointers please.");
-  DALI_ASSERT_DEBUG(shaderData->GetBufferSize() > 0 && "Shader binary empty so nothing to save.");
-  {
-    // lock as update might be sending previously compiled shaders to event thread
-    Mutex::ScopedLock lock(mImpl->compiledShaderMutex);
-    mImpl->renderCompiledShaders.push_back(shaderData);
-  }
-}
-
-void UpdateManager::SetShaderSaver(ShaderSaver& upstream)
-{
-  mImpl->shaderSaver = &upstream;
-}
-
 void UpdateManager::AddRenderer(OwnerKeyType<Renderer>& rendererKeyPointer)
 {
   RendererKey           rendererKey = rendererKeyPointer.Release();
@@ -1117,31 +1096,6 @@ void UpdateManager::ProcessPropertyNotifications()
   }
 }
 
-void UpdateManager::ForwardCompiledShadersToEventThread()
-{
-  DALI_ASSERT_DEBUG((mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup.");
-  if(mImpl->shaderSaver)
-  {
-    // lock and swap the queues
-    {
-      // render might be attempting to send us more binaries at the same time
-      Mutex::ScopedLock lock(mImpl->compiledShaderMutex);
-      mImpl->renderCompiledShaders.swap(mImpl->updateCompiledShaders);
-    }
-
-    if(mImpl->updateCompiledShaders.size() > 0)
-    {
-      ShaderSaver& factory = *mImpl->shaderSaver;
-      for(auto&& shader : mImpl->updateCompiledShaders)
-      {
-        mImpl->notificationManager.QueueMessage(ShaderCompiledMessage(factory, shader));
-      }
-      // we don't need them in update anymore
-      mImpl->updateCompiledShaders.clear();
-    }
-  }
-}
-
 void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners)
 {
   if(mImpl->renderers.Empty())
@@ -1296,9 +1250,6 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // between calling IsSceneUpdateRequired() above and here, so updateScene should
   // be set again
   updateScene |= mImpl->messageQueue.ProcessMessages();
-
-  // Forward compiled shader programs to event thread for saving
-  ForwardCompiledShadersToEventThread();
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // renderer lists if the scene was updated in the previous frame.
