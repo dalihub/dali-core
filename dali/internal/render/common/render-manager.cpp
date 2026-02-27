@@ -152,10 +152,12 @@ inline void AlignDamagedRect(Rect<int32_t>& rect)
   const int top    = rect.y;
   const int right  = rect.x + rect.width;
   const int bottom = rect.y + rect.height;
-  rect.x           = (left / 16) * 16;
-  rect.y           = (top / 16) * 16;
-  rect.width       = ((right + 16) / 16) * 16 - rect.x;
-  rect.height      = ((bottom + 16) / 16) * 16 - rect.y;
+
+  // Include 1 pixel margin
+  rect.x      = ((left - 1) / 16) * 16;
+  rect.y      = ((top - 1) / 16) * 16;
+  rect.width  = ((right + 17) / 16) * 16 - rect.x;
+  rect.height = ((bottom + 17) / 16) * 16 - rect.y;
 }
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
