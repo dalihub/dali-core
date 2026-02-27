@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -456,38 +456,6 @@ int UtcDaliPixelGetAlphaOffsetAndMaskP(void)
   DALI_TEST_CHECK(byteOffset == 0 && bitMask == 0);
   Pixel::GetAlphaOffsetAndMask(Pixel::CHROMINANCE_V, byteOffset, bitMask);
   DALI_TEST_CHECK(byteOffset == 0 && bitMask == 0);
-
-  END_TEST;
-}
-
-int UtcDaliPixelConvertGlFormat(void)
-{
-  tet_infoline("UtcDaliPixelConvertGlFormat");
-
-  unsigned int pixelDataType, internalFormat;
-  Dali::Integration::ConvertToGlFormat(Pixel::Format::DEPTH_UNSIGNED_INT, pixelDataType, internalFormat);
-  DALI_TEST_CHECK(pixelDataType == GL_UNSIGNED_INT);
-  DALI_TEST_CHECK(internalFormat == GL_DEPTH_COMPONENT);
-
-  Dali::Integration::ConvertToGlFormat(Pixel::Format::DEPTH_FLOAT, pixelDataType, internalFormat);
-  DALI_TEST_CHECK(pixelDataType == GL_FLOAT);
-  DALI_TEST_CHECK(internalFormat == GL_DEPTH_COMPONENT);
-
-  Dali::Integration::ConvertToGlFormat(Pixel::Format::DEPTH_STENCIL, pixelDataType, internalFormat);
-  DALI_TEST_CHECK(pixelDataType == GL_UNSIGNED_INT_24_8);
-  DALI_TEST_CHECK(internalFormat == GL_DEPTH_STENCIL);
-
-  Dali::Integration::ConvertToGlFormat(Pixel::Format::R11G11B10F, pixelDataType, internalFormat);
-  DALI_TEST_CHECK(pixelDataType == GL_FLOAT);
-  DALI_TEST_CHECK(internalFormat == GL_R11F_G11F_B10F);
-
-  Dali::Integration::ConvertToGlFormat(Pixel::Format::CHROMINANCE_U, pixelDataType, internalFormat);
-  DALI_TEST_CHECK(pixelDataType == GL_UNSIGNED_BYTE);
-  DALI_TEST_CHECK(internalFormat == GL_LUMINANCE);
-
-  Dali::Integration::ConvertToGlFormat(Pixel::Format::CHROMINANCE_V, pixelDataType, internalFormat);
-  DALI_TEST_CHECK(pixelDataType == GL_UNSIGNED_BYTE);
-  DALI_TEST_CHECK(internalFormat == GL_LUMINANCE);
 
   END_TEST;
 }

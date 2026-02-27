@@ -17,7 +17,6 @@
 
 #include "test-platform-abstraction.h"
 
-#include <dali/integration-api/bitmap.h>
 #include <algorithm>
 
 #include "dali-test-suite-utils.h"
@@ -25,12 +24,7 @@
 namespace Dali
 {
 TestPlatformAbstraction::TestPlatformAbstraction()
-: mIsLoadingResult(false),
-  mClosestSize(),
-  mLoadFileResult(),
-  mSaveFileResult(false),
-  mSynchronouslyLoadedResource(),
-  mTimerId(0),
+: mTimerId(0),
   mTimerPairsWaiting()
 {
   Initialize();
@@ -40,123 +34,14 @@ TestPlatformAbstraction::~TestPlatformAbstraction()
 {
 }
 
-ImageDimensions TestPlatformAbstraction::GetClosestImageSize(const std::string& filename,
-                                                             ImageDimensions    size,
-                                                             FittingMode::Type  fittingMode,
-                                                             SamplingMode::Type samplingMode,
-                                                             bool               orientationCorrection)
-{
-  ImageDimensions closestSize = ImageDimensions(mClosestSize);
-  mTrace.PushCall("GetClosestImageSize", "");
-  return closestSize;
-}
-
-ImageDimensions TestPlatformAbstraction::GetClosestImageSize(Dali::Integration::ResourcePointer resourceBuffer,
-                                                             ImageDimensions                    size,
-                                                             FittingMode::Type                  fittingMode,
-                                                             SamplingMode::Type                 samplingMode,
-                                                             bool                               orientationCorrection)
-{
-  ImageDimensions closestSize = ImageDimensions(mClosestSize);
-  mTrace.PushCall("GetClosestImageSize", "");
-  return closestSize;
-}
-
-Dali::Integration::ResourcePointer TestPlatformAbstraction::LoadImageSynchronously(const Dali::Integration::BitmapResourceType& resourceType, const std::string& resourcePath)
-{
-  mTrace.PushCall("LoadResourceSynchronously", "");
-  return mSynchronouslyLoadedResource;
-}
-
-Dali::Integration::BitmapPtr TestPlatformAbstraction::DecodeBuffer(const Dali::Integration::BitmapResourceType& resourceType, uint8_t* buffer, size_t size)
-{
-  mTrace.PushCall("DecodeBuffer", "");
-  return mDecodedBitmap;
-}
-
-bool TestPlatformAbstraction::LoadShaderBinaryFile(const std::string& filename, Dali::Vector<unsigned char>& buffer) const
-{
-  mTrace.PushCall("LoadShaderBinaryFile", "");
-  if(mLoadFileResult.loadResult)
-  {
-    buffer = mLoadFileResult.buffer;
-  }
-
-  return mLoadFileResult.loadResult;
-}
-
-bool TestPlatformAbstraction::SaveShaderBinaryFile(const std::string& filename, const unsigned char* buffer, unsigned int numBytes) const
-{
-  mTrace.PushCall("SaveShaderBinaryFile", "");
-
-  return mSaveFileResult;
-}
-
 /** Call this every test */
 void TestPlatformAbstraction::Initialize()
 {
   mTrace.Reset();
   mTrace.Enable(true);
-  mIsLoadingResult = false;
-  mSynchronouslyLoadedResource.Reset();
-  mDecodedBitmap.Reset();
 
   mTimerId = 0;
   mTimerPairsWaiting.clear();
-}
-
-bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
-{
-  switch(func)
-  {
-    case LoadResourceSynchronouslyFunc:
-      return mTrace.FindMethod("LoadResourceSynchronously");
-    case LoadShaderBinaryFileFunc:
-      return mTrace.FindMethod("LoadShaderBinaryFile");
-    case SaveShaderBinaryFileFunc:
-      return mTrace.FindMethod("SaveShaderBinaryFile");
-  }
-  return false;
-}
-
-void TestPlatformAbstraction::SetIsLoadingResult(bool result)
-{
-  mIsLoadingResult = result;
-}
-
-void TestPlatformAbstraction::ClearReadyResources()
-{
-  mSynchronouslyLoadedResource.Reset();
-  mDecodedBitmap.Reset();
-}
-
-void TestPlatformAbstraction::SetClosestImageSize(const Vector2& size)
-{
-  mClosestSize = ImageDimensions(static_cast<uint32_t>(size.x), static_cast<uint32_t>(size.y));
-}
-
-void TestPlatformAbstraction::SetLoadFileResult(bool result, Dali::Vector<unsigned char>& buffer)
-{
-  mLoadFileResult.loadResult = result;
-  if(result)
-  {
-    mLoadFileResult.buffer = buffer;
-  }
-}
-
-void TestPlatformAbstraction::SetSaveFileResult(bool result)
-{
-  mSaveFileResult = result;
-}
-
-void TestPlatformAbstraction::SetSynchronouslyLoadedResource(Dali::Integration::ResourcePointer resource)
-{
-  mSynchronouslyLoadedResource = resource;
-}
-
-void TestPlatformAbstraction::SetDecodedBitmap(Dali::Integration::BitmapPtr bitmap)
-{
-  mDecodedBitmap = bitmap;
 }
 
 uint32_t TestPlatformAbstraction::StartTimer(uint32_t milliseconds, CallbackBase* callback)

@@ -19,6 +19,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/property-array.h>
