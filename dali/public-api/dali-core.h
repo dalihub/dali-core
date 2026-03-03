@@ -26,7 +26,6 @@
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/actors/drawable-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/sampling.h>
 
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
@@ -43,12 +42,18 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-utility.h>
+#include <dali/public-api/common/dali-vector-base.h>
+#include <dali/public-api/common/dali-vector-complex-types.h>
+#include <dali/public-api/common/dali-vector-trivial-types.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/common/list-wrapper.h>
+#include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
+#include <dali/public-api/events/device.h>
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/events/gesture.h>
@@ -56,6 +61,7 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/public-api/events/long-press-gesture.h>
+#include <dali/public-api/events/mouse-button.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>
@@ -75,7 +81,10 @@
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/math-utils.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/random.h>
@@ -84,16 +93,19 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/math/viewport.h>
 
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/indirect-value.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-key.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/property-notification.h>
@@ -114,6 +126,7 @@
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/sampling.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/texture-set.h>
 #include <dali/public-api/rendering/texture.h>

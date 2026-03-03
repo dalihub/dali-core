@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/object/handle.h> // Dali::Handle
+#include <dali/public-api/rendering/sampling.h>
 
 namespace Dali
 {

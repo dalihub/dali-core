@@ -106,7 +106,6 @@ SET( public_api_core_actors_header_files
   ${public_api_src_dir}/actors/drawable-actor.h
   ${public_api_src_dir}/actors/draw-mode.h
   ${public_api_src_dir}/actors/layer.h
-  ${public_api_src_dir}/actors/sampling.h
 )
 
 
@@ -231,6 +230,7 @@ SET( public_api_core_rendering_header_files
   ${public_api_src_dir}/rendering/geometry.h
   ${public_api_src_dir}/rendering/renderer.h
   ${public_api_src_dir}/rendering/sampler.h
+  ${public_api_src_dir}/rendering/sampling.h
   ${public_api_src_dir}/rendering/shader.h
   ${public_api_src_dir}/rendering/texture.h
   ${public_api_src_dir}/rendering/texture-set.h
