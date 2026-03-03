@@ -48,10 +48,10 @@ struct DrawableObject
     return false;
   }
 
-  Size        size{};
-  ClippingBox clippingBox{};
-  Vector4     worldColor{};
-  bool        terminate{};
+  Size          size{};
+  Rect<int32_t> clippingBox{};
+  Vector4       worldColor{};
+  bool          terminate{};
 };
 } // namespace
 

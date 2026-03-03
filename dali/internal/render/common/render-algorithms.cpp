@@ -40,6 +40,8 @@ namespace Render
 {
 namespace
 {
+using ClippingBox = Dali::Internal::Render::RenderAlgorithms::ClippingBox;
+
 struct GraphicsDepthCompareOp
 {
   constexpr explicit GraphicsDepthCompareOp(DepthFunction::Type compareOp)

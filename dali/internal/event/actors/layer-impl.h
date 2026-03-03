@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_LAYER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/public-api/actors/layer.h>
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -35,10 +36,11 @@ class UpdateManager;
 class Layer;
 } // namespace SceneGraph
 
-using ClippingBox = Dali::ClippingBox;
-
 class Layer : public Actor, public ConnectionTracker
 {
+public:
+  using ClippingBox = Dali::Rect<int32_t>;
+
 public:
   /**
    * @copydoc Dali::Layer::ZValue(const Vector3&, float)
@@ -141,7 +143,7 @@ public:
   /**
    * @copydoc Dali::Layer::GetClippingBox()
    */
-  const Dali::ClippingBox& GetClippingBox() const
+  const ClippingBox& GetClippingBox() const
   {
     return mClippingBox; // Actor-side has most up-to-date value
   }

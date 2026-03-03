@@ -2,7 +2,7 @@
 #define DALI_LAYER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
-#include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/ref-object.h>
 
@@ -38,14 +37,6 @@ namespace Internal DALI_INTERNAL
 {
 class Layer;
 }
-
-/**
- * @brief Rectangle describing area on screen that a layer can draw to.
- *
- * @SINCE_1_0.0
- * @see Dali::Layer::SetClippingBox()
- */
-using ClippingBox = Rect<int32_t>;
 
 /**
  * @brief Layers provide a mechanism for overlaying groups of actors on top of each other.

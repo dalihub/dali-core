@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_ITEM_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 
 #include <dali/internal/render/common/render-item-key.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -88,7 +88,7 @@ struct RenderItem
    * @param[in]    position          The center position of the render item
    * @param[in]    size              The size of the render item
    */
-  static ClippingBox CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size);
+  static Dali::Rect<int32_t> CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size);
 
   /**
    * @brief This method is an optimized calculation of a viewport-space AABB (Axis-Aligned-Bounding-Box).
@@ -109,7 +109,7 @@ struct RenderItem
    * @param[in]    scaleFactor       The scale factor between viewport and object.
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  static ClippingBox CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor);
+  static Dali::Rect<int32_t> CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor);
 
   /**
    * @brief Returns true if this node/renderer uses the depth buffer (read or write)
