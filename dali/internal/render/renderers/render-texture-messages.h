@@ -20,7 +20,6 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-texture-upload-helper.h> ///< for Graphics::UploadParams
 #include <dali/internal/event/images/pixel-data-impl.h>       ///< for PixelDataPtr
-#include <dali/public-api/images/image-operations.h>          ///< for Dali::ImageDimensions
 #include <dali/public-api/images/pixel.h>                     ///< for Dali::Pixel::Format
 
 #include <dali/internal/common/message.h>
@@ -52,9 +51,9 @@ inline void GenerateMipmapsMessage(EventThreadServices& eventThreadServices, Ren
   new(slot) LocalType(texture.Get(), &Render::Texture::GenerateMipmaps);
 }
 
-inline void SetTextureSizeMessage(EventThreadServices& eventThreadServices, Render::TextureKey texture, const Dali::ImageDimensions& size)
+inline void SetTextureSizeMessage(EventThreadServices& eventThreadServices, Render::TextureKey texture, const ImageDimensions& size)
 {
-  using LocalType = MessageValue1<Render::Texture, Dali::ImageDimensions>;
+  using LocalType = MessageValue1<Render::Texture, ImageDimensions>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));

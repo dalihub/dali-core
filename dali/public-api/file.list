@@ -167,7 +167,6 @@ SET( public_api_core_events_header_files
 
 
 SET( public_api_core_images_header_files
-  ${public_api_src_dir}/images/image-operations.h
   ${public_api_src_dir}/images/pixel.h
   ${public_api_src_dir}/images/pixel-data.h
   ${public_api_src_dir}/images/native-image-interface.h

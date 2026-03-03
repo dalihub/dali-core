@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,9 +39,9 @@ Dali::TextureType::Type GetTextureType(Dali::Texture texture)
   return GetImplementation(texture).GetTextureType();
 }
 
-void SetTextureSize(Dali::Texture texture, const Dali::ImageDimensions& size)
+void SetTextureSize(Dali::Texture texture, uint16_t width, uint16_t height)
 {
-  GetImplementation(texture).SetSize(size);
+  GetImplementation(texture).SetSize(Dali::Internal::ImageDimensions(width, height));
 }
 
 void SetTexturePixelFormat(Dali::Texture texture, Dali::Pixel::Format format)

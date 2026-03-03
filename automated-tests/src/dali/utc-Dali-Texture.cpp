@@ -1250,7 +1250,7 @@ int UtcDaliTextureSetSize(void)
   width += 11u;
   height += 22u;
 
-  Dali::Integration::SetTextureSize(texture, ImageDimensions(width, height));
+  Dali::Integration::SetTextureSize(texture, width, height);
   DALI_TEST_EQUALS(texture.GetWidth(), width, TEST_LOCATION);
   DALI_TEST_EQUALS(texture.GetHeight(), height, TEST_LOCATION);
   DALI_TEST_EQUALS(texture.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION);

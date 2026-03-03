@@ -51,8 +51,6 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/processor-interface.h
    ${platform_abstraction_src_dir}/render-controller.h
    ${platform_abstraction_src_dir}/render-task-list-integ.h
-   ${platform_abstraction_src_dir}/resource-policies.h
-   ${platform_abstraction_src_dir}/resource-types.h
    ${platform_abstraction_src_dir}/scene.h
    ${platform_abstraction_src_dir}/scene-pre-render-status.h
    ${platform_abstraction_src_dir}/shader-integ.h
