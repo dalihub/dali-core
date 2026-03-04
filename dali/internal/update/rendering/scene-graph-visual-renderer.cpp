@@ -126,7 +126,7 @@ bool VisualProperties::PrepareProperties()
   return rendererUpdated;
 }
 
-void DecoratedVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept
+void DecoratedVisualBorderlineProperties::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, Vector4& updateArea) noexcept
 {
   auto& decoratedCoefficient = mCoefficient;
 
@@ -158,7 +158,7 @@ void DecoratedVisualProperties::GetVisualTransformedUpdateArea(BufferIndex updat
   updateArea.w += decoratedCoefficient.coefD;
 }
 
-bool DecoratedVisualProperties::PrepareProperties()
+bool DecoratedVisualBorderlineProperties::PrepareProperties()
 {
   bool rendererUpdated = mCoefficient.IsUpdated();
   mCoefficient.ResetFlag();

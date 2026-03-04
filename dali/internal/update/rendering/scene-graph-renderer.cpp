@@ -123,9 +123,10 @@ public:
   }
 };
 
-DummyVisualRendererPropertyObserver                   gDummyVisualRendererPropertyObserver;
-SceneGraph::VisualRenderer::VisualProperties          gDummyVisualRendererVisualProperties(gDummyVisualRendererPropertyObserver);
-SceneGraph::VisualRenderer::DecoratedVisualProperties gDummyVisualRendererDecoratedVisualProperties(gDummyVisualRendererPropertyObserver);
+DummyVisualRendererPropertyObserver                               gDummyVisualRendererPropertyObserver;
+SceneGraph::VisualRenderer::VisualProperties                      gDummyVisualRendererVisualProperties(gDummyVisualRendererPropertyObserver);
+SceneGraph::VisualRenderer::DecoratedVisualCornerRadiusProperties gDummyVisualRendererDecoratedVisualCornerRadiusProperties{};
+SceneGraph::VisualRenderer::DecoratedVisualBorderlineProperties   gDummyVisualRendererDecoratedVisualBorderlineProperties(gDummyVisualRendererPropertyObserver);
 
 } // Anonymous namespace
 
@@ -156,7 +157,8 @@ Renderer::Renderer()
   mShader(nullptr),
   mBlendColor(nullptr),
   mVisualProperties(nullptr),
-  mDecoratedVisualProperties(nullptr),
+  mDecoratedVisualCornerRadiusProperties(nullptr),
+  mDecoratedVisualBorderlineProperties(nullptr),
   mStencilParameters(RenderMode::AUTO, StencilFunction::ALWAYS, 0xFF, 0x00, 0xFF, StencilOperation::KEEP, StencilOperation::KEEP, StencilOperation::KEEP),
   mIndexedDrawFirstElement(0u),
   mIndexedDrawElementsCount(0u),
@@ -176,7 +178,8 @@ Renderer::Renderer()
   mUseSharedUniformBlock(true),
   mInvokeTerminateCallback(false),
   mOwnsVisualProperties(false),
-  mOwnsDecoratedVisualProperties(false),
+  mOwnsDecoratedVisualCornerRadiusProperties(false),
+  mOwnsDecoratedVisualBorderlineProperties(false),
   mDirtyUpdated(NOT_CHECKED),
   mMixColor(Color::WHITE),
   mDepthIndex(0)
@@ -189,9 +192,13 @@ Renderer::~Renderer()
   {
     delete mVisualProperties;
   }
-  if(mOwnsDecoratedVisualProperties)
+  if(mOwnsDecoratedVisualCornerRadiusProperties)
   {
-    delete mDecoratedVisualProperties;
+    delete mDecoratedVisualCornerRadiusProperties;
+  }
+  if(mOwnsDecoratedVisualBorderlineProperties)
+  {
+    delete mDecoratedVisualBorderlineProperties;
   }
 }
 
@@ -252,9 +259,9 @@ bool Renderer::PrepareRender(BufferIndex updateBufferIndex)
     {
       rendererUpdated |= mVisualProperties->PrepareProperties();
     }
-    if(mDecoratedVisualProperties)
+    if(mDecoratedVisualBorderlineProperties)
     {
-      rendererUpdated |= mDecoratedVisualProperties->PrepareProperties();
+      rendererUpdated |= mDecoratedVisualBorderlineProperties->PrepareProperties();
     }
     mVisualPropertiesDirtyFlags >>= 1;
   }
@@ -1029,9 +1036,9 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(BufferIndex updateBufferIndex, 
   {
     mVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
   }
-  if(mDecoratedVisualProperties)
+  if(mDecoratedVisualBorderlineProperties)
   {
-    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
+    mDecoratedVisualBorderlineProperties->GetVisualTransformedUpdateArea(updateBufferIndex, updateArea);
   }
   return AdjustExtents(updateArea, mUpdateAreaExtents);
 }
@@ -1050,9 +1057,11 @@ void Renderer::SetDummyVisualProperties()
 
 void Renderer::SetDummyDecoratedVisualProperties()
 {
-  DALI_ASSERT_ALWAYS(!mDecoratedVisualProperties && "Decorated Visual Properties already set!");
-  mDecoratedVisualProperties     = &gDummyVisualRendererDecoratedVisualProperties;
-  mOwnsDecoratedVisualProperties = false;
+  DALI_ASSERT_ALWAYS(!mDecoratedVisualCornerRadiusProperties && !mDecoratedVisualBorderlineProperties && "Decorated Visual Properties already set!");
+  mDecoratedVisualCornerRadiusProperties     = &gDummyVisualRendererDecoratedVisualCornerRadiusProperties;
+  mDecoratedVisualBorderlineProperties       = &gDummyVisualRendererDecoratedVisualBorderlineProperties;
+  mOwnsDecoratedVisualCornerRadiusProperties = false;
+  mOwnsDecoratedVisualBorderlineProperties   = false;
 
   // Initialize visual dirty flags.
   mVisualPropertiesDirtyFlags = BAKED_FLAG;

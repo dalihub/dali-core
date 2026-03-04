@@ -26,21 +26,51 @@
 
 namespace Dali::Internal::SceneGraph::VisualRenderer
 {
-struct DecoratedVisualProperties
+struct DecoratedVisualCornerRadiusProperties
 {
-  DecoratedVisualProperties(VisualRendererPropertyObserver& owner)
-  : mCoefficient(owner),
-    mBorderlineWidth(0.0f),
-    mBorderlineOffset(0.0f),
-    mBlurRadius(0.0f),
-    mBorderlineColor(Color::BLACK),
-    mCornerRadius(Vector4::ZERO),
+  DecoratedVisualCornerRadiusProperties()
+  : mCornerRadius(Vector4::ZERO),
     mCornerSquareness(Vector4::ZERO),
     mCornerRadiusPolicy(1.0f)
   {
   }
 
-  ~DecoratedVisualProperties()
+  ~DecoratedVisualCornerRadiusProperties()
+  {
+  }
+
+public: // Public API
+  /**
+   * @brief Get the update area after visual properties applied.
+   * @param[in, out] updateArea The original update area before apply the visual properties. Stored into this value after calculated
+   */
+  void GetVisualTransformedUpdateArea(Vector4& updateArea) noexcept
+  {
+    // Extra padding information for anti-alias
+    const float extraPadding = 2.0f;
+
+    updateArea.z += extraPadding;
+    updateArea.w += extraPadding;
+  }
+
+public: // Default properties
+  AnimatableProperty<Vector4> mCornerRadius;
+  AnimatableProperty<Vector4> mCornerSquareness;
+  AnimatableProperty<float>   mCornerRadiusPolicy;
+};
+
+struct DecoratedVisualBorderlineProperties
+{
+  DecoratedVisualBorderlineProperties(VisualRendererPropertyObserver& owner)
+  : mCoefficient(owner),
+    mBorderlineWidth(0.0f),
+    mBorderlineOffset(0.0f),
+    mBlurRadius(0.0f),
+    mBorderlineColor(Color::BLACK)
+  {
+  }
+
+  ~DecoratedVisualBorderlineProperties()
   {
   }
 
@@ -91,9 +121,6 @@ public: // Default properties
 
   // Properties that don't give any effort to coefficient.
   AnimatableProperty<Vector4> mBorderlineColor;
-  AnimatableProperty<Vector4> mCornerRadius;
-  AnimatableProperty<Vector4> mCornerSquareness;
-  AnimatableProperty<float>   mCornerRadiusPolicy;
 };
 
 struct VisualProperties

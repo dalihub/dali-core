@@ -31,7 +31,8 @@ namespace SceneGraph
 class Renderer;
 namespace VisualRenderer
 {
-class DecoratedVisualProperties;
+class DecoratedVisualCornerRadiusProperties;
+class DecoratedVisualBorderlineProperties;
 } // namespace VisualRenderer
 } // namespace SceneGraph
 
@@ -126,24 +127,31 @@ public:
     DECORATED_VISUAL_RENDERER_USE_BLUR_RADIUS       = 1 << 3,
   };
 
-  struct DecoratedVisualPropertyCache
+  struct DecoratedVisualCornerRadiusPropertyCache
   {
     Vector4 mCornerRadius{Vector4::ZERO};
     Vector4 mCornerSquareness{Vector4::ZERO};
     float   mCornerRadiusPolicy{1.0f};
-    float   mBorderlineWidth{0.0f};
+  };
+
+  struct DecoratedVisualBorderlinePropertyCache
+  {
     Vector4 mBorderlineColor{Color::BLACK};
+    float   mBorderlineWidth{0.0f};
     float   mBorderlineOffset{0.0f};
-    float   mBlurRadius{0.0f};
+    float   mBlurRadius{0.0f}; ///< Keep it as borderline property, for inner shadow case.
   };
 
 private:
-  mutable DecoratedVisualPropertyCache* mDecoratedPropertyCache; ///< Cache of DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Owned if decorated visual properties created.
+  mutable DecoratedVisualCornerRadiusPropertyCache* mDecoratedCornerRadiusPropertyCache; ///< Cache of DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Owned if decorated visual properties created.
+  mutable DecoratedVisualBorderlinePropertyCache*   mDecoratedBorderlinePropertyCache;   ///< Cache of DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Owned if decorated visual properties created.
 
-  mutable SceneGraph::VisualRenderer::DecoratedVisualProperties* mDecoratedVisualProperties{nullptr}; ///< DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Not owned
+  mutable SceneGraph::VisualRenderer::DecoratedVisualCornerRadiusProperties* mDecoratedVisualCornerRadiusProperties{nullptr}; ///< DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Not owned
+  mutable SceneGraph::VisualRenderer::DecoratedVisualBorderlineProperties*   mDecoratedVisualBorderlineProperties{nullptr};   ///< DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Not owned
 
   mutable uint8_t mAddUniformFlag : 5;
-  mutable bool    mDecoratedVisualPropertiesCreated : 1;
+  mutable bool    mDecoratedVisualCornerRadiusPropertiesCreated : 1;
+  mutable bool    mDecoratedVisualBorderlinePropertiesCreated : 1;
 };
 
 } // namespace Internal
