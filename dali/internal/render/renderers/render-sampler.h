@@ -18,8 +18,8 @@
  */
 
 #include <dali/graphics-api/graphics-controller.h>
-#include <dali/public-api/actors/sampling.h>
 #include <dali/public-api/rendering/sampler.h>
+#include <dali/public-api/rendering/sampling.h>
 
 namespace Dali
 {

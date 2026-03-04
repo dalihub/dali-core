@@ -22,7 +22,6 @@
 #include <dali/devel-api/common/owner-container.h>
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
-#include <dali/integration-api/resource-policies.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/scene-impl.h>

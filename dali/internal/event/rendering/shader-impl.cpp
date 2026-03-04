@@ -430,6 +430,17 @@ Shader::~Shader()
     // }
     RemoveShaderMessage(updateManager, &GetShaderSceneObject());
 
+    // Remove shader data from factory cache
+    for(auto&& shaderData : mShaderDataList)
+    {
+      if(shaderData)
+      {
+        ThreadLocalStorage& tls           = ThreadLocalStorage::Get();
+        ShaderFactory&      shaderFactory = tls.GetShaderFactory();
+        shaderFactory.Remove(*shaderData);
+      }
+    }
+
     eventThreadServices.UnregisterObject(this);
   }
 }

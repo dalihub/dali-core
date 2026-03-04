@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/render/common/render-list.h>
+#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -39,6 +40,12 @@ namespace Render
  */
 class RenderAlgorithms
 {
+public:
+  /**
+   * @brief Rectangle describing area on screen.
+   */
+  using ClippingBox = Dali::Rect<int32_t>;
+
 public:
   /**
    * Constructor.
@@ -144,13 +151,13 @@ private:
 
   // Member variables:
 
-  using ScissorStackType = std::vector<Dali::ClippingBox>; ///< The container type used to maintain the applied scissor hierarchy
+  using ScissorStackType = std::vector<ClippingBox>; ///< The container type used to maintain the applied scissor hierarchy
 
   Graphics::Controller& mGraphicsController;
 
-  ScissorStackType  mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
-  Dali::ClippingBox mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
-  bool              mHasLayerScissor : 1; ///< Marks if the currently process render instruction has a layer-based clipping region
+  ScissorStackType mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
+  ClippingBox      mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
+  bool             mHasLayerScissor : 1; ///< Marks if the currently process render instruction has a layer-based clipping region
 };
 
 } // namespace Render

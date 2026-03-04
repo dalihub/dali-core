@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
-#include <dali/internal/common/image-sampler.h>
 #include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -461,7 +460,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
   {
     Graphics::ShaderCreateInfo vertexShaderCreateInfo;
     vertexShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-    vertexShaderCreateInfo.SetSourceMode(shaderData->GetSourceMode());
+    vertexShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::TEXT);
     const std::vector<char>& vertexShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
     vertexShaderCreateInfo.SetSourceSize(vertexShaderSrc.size());
     vertexShaderCreateInfo.SetSourceData(static_cast<const void*>(vertexShaderSrc.data()));
@@ -470,7 +469,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
 
     Graphics::ShaderCreateInfo fragmentShaderCreateInfo;
     fragmentShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-    fragmentShaderCreateInfo.SetSourceMode(shaderData->GetSourceMode());
+    fragmentShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::TEXT);
     const std::vector<char>& fragmentShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
     fragmentShaderCreateInfo.SetSourceSize(fragmentShaderSrc.size());
     fragmentShaderCreateInfo.SetSourceData(static_cast<const void*>(fragmentShaderSrc.data()));

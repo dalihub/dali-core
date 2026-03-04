@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/public-api/signals/base-signal.h>
 
 // EXTERNAL INCLUDES
+#include <functional> ///< for std::less
 #include <map>
 
 // INTERNAL INCLUDES
@@ -30,25 +31,21 @@ struct CallbackBasePtrCompare
 {
   bool operator()(const Dali::CallbackBase* lhs, const Dali::CallbackBase* rhs) const noexcept
   {
-    const void* lhsFunctionPtr = reinterpret_cast<void*>(lhs->mFunction);
-    const void* rhsFunctionPtr = reinterpret_cast<void*>(rhs->mFunction);
-    if(lhsFunctionPtr < rhsFunctionPtr)
+    // Compare function pointers first.
+    // Note that std::less is safe way to ordering the function pointers.
+    const Dali::CallbackBase::Function& lhsFunctionPtr = lhs->mFunction;
+    const Dali::CallbackBase::Function& rhsFunctionPtr = rhs->mFunction;
+    if(std::less<Dali::CallbackBase::Function>()(lhsFunctionPtr, rhsFunctionPtr))
     {
       return true;
     }
-    else if(lhsFunctionPtr > rhsFunctionPtr)
+    else if(std::less<Dali::CallbackBase::Function>()(rhsFunctionPtr, lhsFunctionPtr))
     {
       return false;
     }
 
-    if(lhs->mImpl.mObjectPointer < rhs->mImpl.mObjectPointer)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
+    // If function pointers are equal, compare object pointers.
+    return std::less<decltype(lhs->mImpl.mObjectPointer)>()(lhs->mImpl.mObjectPointer, rhs->mImpl.mObjectPointer);
   }
 };
 } // unnamed namespace

@@ -10,8 +10,6 @@ SET( internal_src_files
   ${internal_src_dir}/common/matrix-utils.cpp
   ${internal_src_dir}/common/message-buffer.cpp
   ${internal_src_dir}/common/mutex-trace.cpp
-  ${internal_src_dir}/common/image-sampler.cpp
-  ${internal_src_dir}/common/image-attributes.cpp
   ${internal_src_dir}/common/fixed-size-memory-pool.cpp
   ${internal_src_dir}/common/const-string.cpp
   ${internal_src_dir}/event/actors/actor-impl.cpp
@@ -89,8 +87,6 @@ SET( internal_src_files
   ${internal_src_dir}/event/events/tap-gesture/tap-gesture-event.cpp
   ${internal_src_dir}/event/events/tap-gesture/tap-gesture-processor.cpp
   ${internal_src_dir}/event/events/tap-gesture/tap-gesture-recognizer.cpp
-  ${internal_src_dir}/event/images/bitmap-packed-pixel.cpp
-  ${internal_src_dir}/event/images/bitmap-compressed.cpp
   ${internal_src_dir}/event/images/pixel-data-impl.cpp
   ${internal_src_dir}/event/render-tasks/render-task-impl.cpp
   ${internal_src_dir}/event/render-tasks/render-task-list-impl.cpp

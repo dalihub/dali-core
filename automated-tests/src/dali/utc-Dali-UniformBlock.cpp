@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -950,6 +950,24 @@ int UtcDaliUniformBlockDestructWorkerThreadN(void)
   END_TEST;
 }
 
+namespace
+{
+void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
+{
+  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<Rect<int>> damagedRects;
+
+  // Try render several frames as full surface.
+  for(int i = 0; i < 3; i++)
+  {
+    application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+    application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+    DALI_TEST_EQUALS(damagedRects.size(), 0, location);
+  }
+}
+} // namespace
+
 int utcDaliUniformBlockPartialUpdate(void)
 {
   TestApplication application(
@@ -993,7 +1011,7 @@ int utcDaliUniformBlockPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
 
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -1004,13 +1022,10 @@ int utcDaliUniformBlockPartialUpdate(void)
 
   // Check dirty rect empty
   application.SendNotification();
-
   damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  // Ensure the damaged rect is empty
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   // Change uniform block property
   uniformBlock.SetProperty(colorIndex, Color::RED);
@@ -1021,10 +1036,14 @@ int utcDaliUniformBlockPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
 
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  damagedRects.clear();
+
+  // Ensure the damaged rect is empty
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   END_TEST;
 }

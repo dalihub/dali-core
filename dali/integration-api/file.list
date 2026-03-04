@@ -4,7 +4,6 @@ SET( platform_abstraction_src_dir ${ROOT_SRC_DIR}/dali/integration-api )
 # Add platform abstraction source files here
 SET( platform_abstraction_src_files
    ${platform_abstraction_src_dir}/addon-manager.cpp
-   ${platform_abstraction_src_dir}/bitmap.cpp
    ${platform_abstraction_src_dir}/constraint-integ.cpp
    ${platform_abstraction_src_dir}/core.cpp
    ${platform_abstraction_src_dir}/debug.cpp
@@ -34,7 +33,6 @@ SET( platform_abstraction_events_src_files
 
 SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/addon-manager.h
-   ${platform_abstraction_src_dir}/bitmap.h
    ${platform_abstraction_src_dir}/constraint-integ.h
    ${platform_abstraction_src_dir}/context-notifier.h
    ${platform_abstraction_src_dir}/core.h
@@ -53,8 +51,6 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/processor-interface.h
    ${platform_abstraction_src_dir}/render-controller.h
    ${platform_abstraction_src_dir}/render-task-list-integ.h
-   ${platform_abstraction_src_dir}/resource-policies.h
-   ${platform_abstraction_src_dir}/resource-types.h
    ${platform_abstraction_src_dir}/scene.h
    ${platform_abstraction_src_dir}/scene-pre-render-status.h
    ${platform_abstraction_src_dir}/shader-integ.h

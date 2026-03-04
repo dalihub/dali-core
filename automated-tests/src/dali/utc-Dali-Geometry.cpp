@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -815,6 +815,24 @@ int UtcDaliGeometryDestructWorkerThreadN(void)
   END_TEST;
 }
 
+namespace
+{
+void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
+{
+  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<Rect<int>> damagedRects;
+
+  // Try render several frames as full surface.
+  for(int i = 0; i < 3; i++)
+  {
+    application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+    application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+    DALI_TEST_EQUALS(damagedRects.size(), 0, location);
+  }
+}
+} // namespace
+
 int utcDaliGeometryPartialUpdateChangeIndicies(void)
 {
   TestApplication application(
@@ -879,7 +897,7 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -888,11 +906,9 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Ensure the damaged rect is empty
-  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   // 2. Change the index buffer
   geometry.SetIndexBuffer(indexData, sizeof(indexData) / sizeof(indexData[0]) - 1u);
@@ -903,7 +919,7 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -912,11 +928,9 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Ensure the damaged rect is empty
-  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   // 3. Change vertex buffer data
   vertexData.SetData(texturedQuadVertexData, 5);
@@ -927,7 +941,7 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -936,11 +950,9 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Ensure the damaged rect is empty
-  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   // 4. Change geometry type
   geometry.SetType(Geometry::LINES);
@@ -951,7 +963,7 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -960,11 +972,9 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Ensure the damaged rect is empty
-  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   // 5. Add vertex data
   VertexBuffer vertexData2 = CreateVertexBuffer();
@@ -977,7 +987,7 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -986,11 +996,9 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Ensure the damaged rect is empty
-  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   // 5. Remove vertex data
   geometry.RemoveVertexBuffer(0);
@@ -1001,7 +1009,7 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(16, 768, 32, 32); // in screen coordinates
+  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -1010,11 +1018,9 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
 
   damagedRects.clear();
-  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-  application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Ensure the damaged rect is empty
-  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   END_TEST;
 }

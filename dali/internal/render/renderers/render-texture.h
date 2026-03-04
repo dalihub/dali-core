@@ -22,7 +22,6 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
 #include <dali/public-api/rendering/sampler.h>
 #include <dali/public-api/rendering/texture.h>
 
@@ -228,7 +227,7 @@ public:
    * Set the width and heightof the texture
    * @param[in] width The width of the texture
    */
-  void SetSize(const Dali::ImageDimensions& size)
+  void SetSize(const ImageDimensions& size)
   {
     mWidth  = size.GetWidth();
     mHeight = size.GetHeight();

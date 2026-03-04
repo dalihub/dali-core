@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ RenderItem* RenderItem::Get(RenderItemKey::KeyType key)
   return static_cast<RenderItem*>(gMemoryPoolCollection->GetPtrFromKey(gMemoryPoolType, key));
 }
 
-ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size)
+Dali::Rect<int32_t> RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size)
 {
   // Calculate extent vector of the AABB:
   const float halfActorX = size.x * 0.5f;
@@ -128,10 +128,10 @@ ClippingBox RenderItem::CalculateTransformSpaceAABB(const Matrix& transformMatri
   int z = static_cast<int>(ceilf(aabb.z));
   int w = static_cast<int>(ceilf(aabb.w));
 
-  return ClippingBox(x, y, z - x, fabsf(w - y));
+  return Dali::Rect<int32_t>(x, y, z - x, fabsf(w - y));
 }
 
-ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor)
+Dali::Rect<int32_t> RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor)
 {
   // Calculate extent vector of the AABB:
   const float halfActorX = size.x * 0.5f;
@@ -184,7 +184,7 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
   int z = static_cast<int>(roundf(aabbInScreen.z));
   int w = static_cast<int>(roundf(aabbInScreen.w));
 
-  return ClippingBox(x, y, z - x, w - y);
+  return Dali::Rect<int32_t>(x, y, z - x, w - y);
 }
 
 bool RenderItem::UsesDepthBuffer(bool depthTestEnabled)

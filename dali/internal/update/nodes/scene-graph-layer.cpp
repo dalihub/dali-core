@@ -79,7 +79,7 @@ void Layer::SetClipping(bool enabled)
   mIsClipping = enabled;
 }
 
-void Layer::SetClippingBox(const Dali::ClippingBox& box)
+void Layer::SetClippingBox(const Layer::ClippingBox& box)
 {
   mClippingBox.Set(box.x, box.y, box.width, box.height);
 }
