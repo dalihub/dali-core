@@ -123,8 +123,6 @@ Core::Core(RenderController&            renderController,
                                      *mRenderTaskProcessor,
                                      *mMemoryPoolCollection);
 
-  mRenderManager->SetShaderSaver(*mUpdateManager);
-
   mObjectRegistry = ObjectRegistry::New();
 
   mStage = IntrusivePtr<Stage>(Stage::New(*mUpdateManager));
@@ -135,7 +133,6 @@ Core::Core(RenderController&            renderController,
   mGestureEventProcessor = new GestureEventProcessor(*mUpdateManager, mRenderController);
 
   mShaderFactory = new ShaderFactory();
-  mUpdateManager->SetShaderSaver(*mShaderFactory);
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 

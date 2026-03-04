@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SHADER_DATA_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,6 @@ public:
     mVertexShader(StringToVector(vertexSource)),
     mFragmentShader(StringToVector(fragmentSource)),
     mHints(hints),
-    mSourceMode(Graphics::ShaderSourceMode::TEXT),
     mRenderPassTag(renderPassTag),
     mName(name)
   {
@@ -89,7 +88,6 @@ public:
     mVertexShader(StringToVector(vertexSource)),
     mFragmentShader(StringToVector(fragmentSource)),
     mHints(hints),
-    mSourceMode(Graphics::ShaderSourceMode::TEXT),
     mRenderPassTag(renderPassTag),
     mName(name)
   {
@@ -110,7 +108,6 @@ public:
     mVertexShader(vertexSource),
     mFragmentShader(fragmentSource),
     mHints(hints),
-    mSourceMode(Graphics::ShaderSourceMode::BINARY),
     mRenderPassTag(renderPassTag),
     mName(name)
   {
@@ -209,60 +206,6 @@ public: // API
   {
     return mHints;
   }
-  /**
-   * Check whether there is a compiled binary available
-   * @return true if this objects contains a compiled binary
-   */
-  bool HasBinary() const
-  {
-    return 0 != mBuffer.Size();
-  }
-
-  /**
-   * Allocate a buffer for the compiled binary bytecode
-   * @param[in] size  The size of the buffer in bytes
-   */
-  void AllocateBuffer(std::size_t size)
-  {
-    mBuffer.Resize(size);
-  }
-
-  /**
-   * Get the program buffer
-   * @return reference to the buffer
-   */
-  std::size_t GetBufferSize() const
-  {
-    return mBuffer.Size();
-  }
-
-  /**
-   * Get the data that the buffer points to
-   * @return raw pointer to the buffer data
-   */
-  uint8_t* GetBufferData()
-  {
-    DALI_ASSERT_DEBUG(mBuffer.Size() > 0);
-    return &mBuffer[0];
-  }
-
-  /**
-   * Get the data that the buffer points to
-   * @return raw pointer to the buffer data
-   */
-  Dali::Vector<uint8_t>& GetBuffer()
-  {
-    return mBuffer;
-  }
-
-  /**
-   * Get the source mode of shader data
-   * @return the source mode of shader data ( text or binary )
-   */
-  Graphics::ShaderSourceMode GetSourceMode() const
-  {
-    return mSourceMode;
-  }
 
   /**
    * Get Render Pass of shader data
@@ -331,17 +274,15 @@ private:
     }
   }
 
-private:                                             // Data
-  std::size_t                mShaderHash;            ///< hash key created with vertex and fragment shader code
-  std::vector<char>          mVertexShader;          ///< source code for vertex program
-  std::vector<char>          mFragmentShader;        ///< source code for fragment program
-  Dali::Shader::Hint::Value  mHints;                 ///< take a hint
-  Dali::Vector<uint8_t>      mBuffer;                ///< buffer containing compiled binary bytecode
-  Graphics::ShaderSourceMode mSourceMode;            ///< Source mode of shader data ( text or binary )
-  uint32_t                   mRenderPassTag{0u};     ///< Render Pass Tag for this shader
-  std::string                mName{""};              ///< Name for this shader
-  uint32_t                   mVertexShaderVersion;   ///< Vertex shader version
-  uint32_t                   mFragmentShaderVersion; ///< Fragment shader version
+private:                                            // Data
+  std::size_t               mShaderHash;            ///< hash key created with vertex and fragment shader code
+  std::vector<char>         mVertexShader;          ///< source code for vertex program
+  std::vector<char>         mFragmentShader;        ///< source code for fragment program
+  Dali::Shader::Hint::Value mHints;                 ///< take a hint
+  uint32_t                  mRenderPassTag{0u};     ///< Render Pass Tag for this shader
+  std::string               mName{""};              ///< Name for this shader
+  uint32_t                  mVertexShaderVersion;   ///< Vertex shader version
+  uint32_t                  mFragmentShaderVersion; ///< Fragment shader version
 };
 
 } // namespace Internal

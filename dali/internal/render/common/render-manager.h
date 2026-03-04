@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_RENDER_MANAGER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/owner-key-type.h>
-#include <dali/internal/common/shader-saver.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
@@ -43,7 +42,6 @@ struct Vector4;
 
 namespace Internal
 {
-class ShaderSaver;
 
 namespace Render
 {
@@ -109,14 +107,6 @@ public:
    * The graphics context is being shutdown. Clean down any outstanding graphics resources.
    */
   void ContextDestroyed();
-
-  /**
-   * Set the upstream interface for compiled shader binaries to be sent back to for eventual
-   * caching and saving.
-   * @param[in] upstream The abstract interface to send any received ShaderDatas onwards to..
-   * @note This should be called during core initialisation if shader binaries are to be used.
-   */
-  void SetShaderSaver(ShaderSaver& upstream);
 
   // The foltlowing methods should be called from UpdateManager message.
 

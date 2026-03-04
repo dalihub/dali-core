@@ -26,7 +26,6 @@
 
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-key-type.h>
-#include <dali/internal/common/shader-saver.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/rendering/texture-impl.h>
@@ -100,7 +99,7 @@ class VertexBuffer;
  * It also maintains the lifecycle of nodes and other property owners that are
  * disconnected from the scene graph.
  */
-class UpdateManager : public ShaderSaver, public ResetterManager, public PropertyOwnerFlagManager
+class UpdateManager : public ResetterManager, public PropertyOwnerFlagManager
 {
 public:
   /**
@@ -330,19 +329,6 @@ public:
    * @param[in] shaderData    Source code, hash over source, and optional compiled binary for the shader program
    */
   void SetShaderData(Shader* shader, Internal::ShaderDataPtr shaderData);
-
-  /**
-   * @brief Accept compiled shaders passed back on render thread for saving.
-   * @param[in] shaderData Source code, hash over source, and corresponding compiled binary to be saved.
-   */
-  void SaveBinary(Internal::ShaderDataPtr shaderData) override;
-
-  /**
-   * @brief Set the destination for compiled shader binaries to be passed on to.
-   * The dispatcher passed in will be called from the update thread.
-   * @param[in] upstream A sink for ShaderDatas to be passed into.
-   */
-  void SetShaderSaver(ShaderSaver& upstream);
 
   // Renderers
 
@@ -731,11 +717,6 @@ private:
    * Perform property notification updates
    */
   void ProcessPropertyNotifications();
-
-  /**
-   * Pass shader binaries queued here on to event thread.
-   */
-  void ForwardCompiledShadersToEventThread();
 
   /**
    * Update node shaders, opacity, geometry etc.
