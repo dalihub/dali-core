@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/common/const-string.h>
@@ -564,12 +565,12 @@ int UtcDaliTypeRegistryMoveConstructor(void)
 
   TypeRegistry registry = TypeRegistry::Get();
   DALI_TEST_CHECK(registry);
-  DALI_TEST_EQUALS(16, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(17, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(registry.GetTypeInfo("Actor").GetName() == "Actor");
 
   TypeRegistry movedRegistry = std::move(registry);
   DALI_TEST_CHECK(movedRegistry);
-  DALI_TEST_EQUALS(16, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(17, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(movedRegistry.GetTypeInfo("Actor").GetName() == "Actor");
   DALI_TEST_CHECK(!registry);
 
@@ -593,13 +594,13 @@ int UtcDaliTypeRegistryMoveAssignment(void)
 
   TypeRegistry registry = TypeRegistry::Get();
   DALI_TEST_CHECK(registry);
-  DALI_TEST_EQUALS(16, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(17, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(registry.GetTypeInfo("Actor").GetName() == "Actor");
 
   TypeRegistry movedRegistry;
   movedRegistry = std::move(registry);
   DALI_TEST_CHECK(movedRegistry);
-  DALI_TEST_EQUALS(16, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(17, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(movedRegistry.GetTypeInfo("Actor").GetName() == "Actor");
   DALI_TEST_CHECK(!registry);
 
@@ -3766,5 +3767,461 @@ int UtcDaliTypeRegistryGetTypeNameCountNegative(void)
   {
     DALI_TEST_CHECK(true); // We expect an assert
   }
+  END_TEST;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Different Handle/Control Name Tests
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace TypeRegistryTest
+{
+
+class TestObject;
+
+class TestHandle : public CustomActor
+{
+public:
+  enum PropertyRange
+  {
+    PROPERTY_START_INDEX            = PROPERTY_REGISTRATION_START_INDEX + 1,
+    PROPERTY_END_INDEX              = PROPERTY_START_INDEX + 1000,
+    ANIMATABLE_PROPERTY_START_INDEX = ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX,
+    ANIMATABLE_PROPERTY_END_INDEX   = ANIMATABLE_PROPERTY_START_INDEX + 1000
+  };
+
+  struct Property
+  {
+    enum
+    {
+      PROPERTY_STRING = PROPERTY_START_INDEX,
+      PROPERTY_FLOAT,
+      PROPERTY_FLOAT_READ_ONLY,
+
+      PROPERTY_ANIMATABLE = ANIMATABLE_PROPERTY_START_INDEX,
+      PROPERTY_ANIMATABLE_X,
+      PROPERTY_ANIMATABLE_Y,
+      PROPERTY_ANIMATABLE_WITH_DEFAULT,
+    };
+  };
+
+public: // Construction / Destruction
+  TestHandle() = default;
+  static TestHandle New();
+  ~TestHandle()                                  = default;
+  TestHandle(const TestHandle& testHandle)       = default;
+  TestHandle&       operator=(const TestHandle&) = default;
+  static TestHandle DownCast(BaseHandle handle);
+
+public:
+  TestHandle(TestObject& implementation);
+  explicit TestHandle(Dali::Internal::CustomActor* internal)
+  : CustomActor(internal)
+  {
+  }
+};
+
+class TestObject : public CustomActorImpl
+{
+public: // Construction / Destruction
+  TestObject()
+  : CustomActorImpl(ACTOR_BEHAVIOUR_DEFAULT)
+  {
+  }
+  ~TestObject()                            = default;
+  TestObject(const TestObject&)            = delete;
+  TestObject& operator=(const TestObject&) = delete;
+
+public: // Properties, Signals & Actions
+  static void                  SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value);
+  static Dali::Property::Value GetProperty(Dali::BaseObject* object, Dali::Property::Index propertyIndex);
+  static bool                  DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrackerInterface* tracker, const std::string& signalName, Dali::FunctorDelegate* functor);
+  static bool                  DoAction(Dali::BaseObject* object, const std::string& actionName, const Dali::Property::Map& attributes);
+
+private: // Overrides
+  void OnSceneConnection(int32_t depth) override
+  {
+  }
+  void OnSceneDisconnection() override
+  {
+  }
+  void OnChildAdd(Actor& child) override
+  {
+  }
+  void OnChildRemove(Actor& child) override
+  {
+  }
+  void OnSizeSet(const Vector3& targetSize) override
+  {
+  }
+  void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override
+  {
+  }
+  void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
+  {
+  }
+  void OnRelayout(const Vector2& size, RelayoutContainer& container) override
+  {
+  }
+  void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
+  {
+  }
+  Vector3 GetNaturalSize() override
+  {
+    return Vector3::ONE;
+  }
+  float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
+  {
+    return 100.0f;
+  }
+  float GetHeightForWidth(float width) override
+  {
+    return 100.0f;
+  }
+  float GetWidthForHeight(float height) override
+  {
+    return 100.0f;
+  }
+  bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
+  {
+    return false;
+  }
+  void OnCalculateRelayoutSize(Dimension::Type dimension) override
+  {
+  }
+  void OnLayoutNegotiated(float size, Dimension::Type dimension) override
+  {
+  }
+
+private: // Implementation details
+  std::string mString;
+  float       mFloat{0.0f};
+};
+
+inline TestObject& GetImpl(TestHandle& handle)
+{
+  DALI_ASSERT_ALWAYS(handle);
+  Dali::RefObject& object = handle.GetImplementation();
+  return static_cast<TestObject&>(object);
+}
+
+inline const TestObject& GetImpl(const TestHandle& handle)
+{
+  DALI_ASSERT_ALWAYS(handle);
+  const Dali::RefObject& object = handle.GetImplementation();
+  return static_cast<const TestObject&>(object);
+}
+
+TestHandle TestHandle::New()
+{
+  IntrusivePtr<TestObject> impl   = new TestObject();
+  TestHandle               handle = TestHandle(*impl);
+  return handle;
+}
+
+TestHandle TestHandle::DownCast(BaseHandle handle)
+{
+  TestHandle  result;
+  CustomActor custom = Dali::CustomActor::DownCast(handle);
+  if(custom)
+  {
+    CustomActorImpl& customImpl = custom.GetImplementation();
+    TestObject*      impl       = dynamic_cast<TestObject*>(&customImpl);
+    if(impl)
+    {
+      result = TestHandle(customImpl.GetOwner());
+    }
+  }
+  return result;
+}
+
+TestHandle::TestHandle(TestObject& implementation)
+: CustomActor(implementation)
+{
+}
+
+namespace
+{
+Dali::BaseHandle Create()
+{
+  return TestHandle::New();
+}
+
+DALI_TYPE_REGISTRATION_BEGIN_FULL(TestHandle, TestObject, CustomActor, Create);
+DALI_PROPERTY_REGISTRATION_FULL(TypeRegistryTest, TestHandle, TypeRegistryTest, TestObject, "propertyString", STRING, PROPERTY_STRING);
+DALI_PROPERTY_REGISTRATION_FULL(TypeRegistryTest, TestHandle, TypeRegistryTest, TestObject, "propertyFloat", FLOAT, PROPERTY_FLOAT);
+DALI_PROPERTY_REGISTRATION_READ_ONLY_FULL(TypeRegistryTest, TestHandle, TypeRegistryTest, TestObject, "propertyFloatReadOnly", FLOAT, PROPERTY_FLOAT_READ_ONLY)
+
+DALI_ANIMATABLE_PROPERTY_REGISTRATION(TypeRegistryTest, TestHandle, "propertyAnimatable", VECTOR2, PROPERTY_ANIMATABLE);
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(TypeRegistryTest, TestHandle, "propertyAnimatableX", PROPERTY_ANIMATABLE_X, PROPERTY_ANIMATABLE, 0)
+DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION(TypeRegistryTest, TestHandle, "propertyAnimatableY", PROPERTY_ANIMATABLE_Y, PROPERTY_ANIMATABLE, 1)
+DALI_ANIMATABLE_PROPERTY_REGISTRATION_WITH_DEFAULT(TypeRegistryTest, TestHandle, "propertyAnimatableWithDefault", Vector2(10.5f, 20.5f), PROPERTY_ANIMATABLE_WITH_DEFAULT);
+
+DALI_SIGNAL_REGISTRATION_FULL(TypeRegistryTest, TestHandle, TypeRegistryTest, TestObject, "my-signal", SIGNAL_MY);
+DALI_ACTION_REGISTRATION_FULL(TypeRegistryTest, TestHandle, TypeRegistryTest, TestObject, "my-action", ACTION_MY);
+
+DALI_TYPE_REGISTRATION_END();
+
+} // unnamed namespace
+
+void TestObject::SetProperty(BaseObject* object, Property::Index index, const Property::Value& value)
+{
+  TestHandle testHandle = TestHandle::DownCast(Dali::BaseHandle(object));
+
+  if(testHandle)
+  {
+    TestObject& impl = GetImpl(testHandle);
+    Actor       self = impl.Self();
+    switch(index)
+    {
+      case TestHandle::Property::PROPERTY_STRING:
+      {
+        impl.mString = value.Get<std::string>();
+        break;
+      }
+      case TestHandle::Property::PROPERTY_FLOAT:
+      {
+        impl.mFloat = value.Get<float>();
+        break;
+      }
+      default:
+        break;
+    }
+  }
+}
+
+Property::Value TestObject::GetProperty(BaseObject* object, Property::Index propertyIndex)
+{
+  Property::Value value;
+  TestHandle      testHandle = TestHandle::DownCast(Dali::BaseHandle(object));
+
+  if(testHandle)
+  {
+    TestObject& impl = GetImpl(testHandle);
+    switch(propertyIndex)
+    {
+      case TestHandle::Property::PROPERTY_STRING:
+      {
+        value = impl.mString;
+        break;
+      }
+      case TestHandle::Property::PROPERTY_FLOAT:
+      {
+        value = impl.mFloat;
+        break;
+      }
+      case TestHandle::Property::PROPERTY_FLOAT_READ_ONLY:
+      {
+        value = 10.0f;
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
+  return value;
+}
+
+bool TestObject::DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrackerInterface* tracker, const std::string& signalName, Dali::FunctorDelegate* functor)
+{
+  BaseHandle handle(object);
+  TestHandle testHandle = TestHandle::DownCast(handle);
+  if(0 == strcmp(signalName.c_str(), SIGNAL_MY))
+  {
+    return true;
+  }
+  return false;
+}
+
+bool TestObject::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+{
+  Dali::BaseHandle handle(object);
+  TestHandle       testHandle = TestHandle::DownCast(handle);
+  DALI_ASSERT_DEBUG(testHandle);
+
+  if(0 == strcmp(actionName.c_str(), ACTION_MY))
+  {
+    return true;
+  }
+
+  return false;
+}
+
+} // namespace TypeRegistryTest
+
+int UtcDaliTypeRegistryDifferentHandleObjectNameTestProperties(void)
+{
+  using TestHandle = TypeRegistryTest::TestHandle;
+  using THProp     = TestHandle::Property;
+
+  TestApplication application;
+  TestHandle      handle = TestHandle::New();
+
+  DALI_TEST_EQUALS(handle.GetProperty<std::string>(THProp::PROPERTY_STRING), "", TEST_LOCATION);
+  handle.SetProperty(THProp::PROPERTY_STRING, "Hello World");
+  DALI_TEST_EQUALS(handle.GetProperty<std::string>(THProp::PROPERTY_STRING), "Hello World", TEST_LOCATION);
+
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT), 0.0f, TEST_LOCATION);
+  handle.SetProperty(THProp::PROPERTY_FLOAT, 5.6f);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT), 5.6f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT_READ_ONLY), 10.0f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_ANIMATABLE_X), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_ANIMATABLE_Y), 0.0f, TEST_LOCATION);
+  handle.SetProperty(THProp::PROPERTY_ANIMATABLE, Vector2(4.56f, 7.34f));
+  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE), Vector2(4.56f, 7.34f), TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_ANIMATABLE_X), 4.56f, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_ANIMATABLE_Y), 7.34f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT), Vector2(10.5f, 20.5f), TEST_LOCATION);
+  handle.SetProperty(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT, Vector2(9.865, 1.34f));
+  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT), Vector2(9.865, 1.34f), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryDifferentHandleObjectNameTestSignal(void)
+{
+  using TestHandle = TypeRegistryTest::TestHandle;
+
+  TestApplication application;
+  TestHandle      handle = TestHandle::New();
+  SlotDelegate    slotDelegate(&handle);
+
+  DALI_TEST_CHECK(handle.ConnectSignal(slotDelegate.GetConnectionTracker(), TypeRegistryTest::SIGNAL_MY, [&]() {}));
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryDifferentHandleObjectNameTestAction(void)
+{
+  using TestHandle = TypeRegistryTest::TestHandle;
+
+  TestApplication application;
+  TestHandle      handle = TestHandle::New();
+
+  DALI_TEST_CHECK(handle.DoAction(TypeRegistryTest::ACTION_MY, {}));
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryDifferentHandleObjectNameTestFromScript(void)
+{
+  using TestHandle = TypeRegistryTest::TestHandle;
+  using THProp     = TestHandle::Property;
+
+  TestApplication application;
+  Property::Map   map{
+      {"type", "TestHandle"},
+      {"propertyString", "Hello Script"},
+      {"propertyFloat", 8.5f},
+      {"propertyFloatReadOnly", 7.5f}, // Attempt to write a read-only property
+      {"propertyAnimatableX", 80.5f}};
+  Actor handle = Scripting::NewActor(map);
+  DALI_TEST_EQUALS(handle.GetProperty<std::string>(THProp::PROPERTY_STRING), "Hello Script", TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT), 8.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT_READ_ONLY), 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE), Vector2(80.5, 0.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_ANIMATABLE_X), 80.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_ANIMATABLE_Y), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE_WITH_DEFAULT), Vector2(10.5f, 20.5f), TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+struct TestClassTypeReg
+{
+};
+struct TestClassTypeRegImpl
+{
+};
+} //namespace
+
+int UtcDaliTypeRegistryRegistrationHandleObject(void)
+{
+  TestApplication application;
+
+  TypeRegistration typeRegistration(typeid(TestClassTypeReg), typeid(TestClassTypeRegImpl), typeid(Actor), TypeRegistryTest::Create);
+  DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryRegistrationHandleObjectN(void)
+{
+  TestApplication application;
+
+  // Already registered
+  try
+  {
+    TypeRegistration typeRegistration(typeid(TestClassTypeReg), typeid(TestClassTypeReg), typeid(Actor), TypeRegistryTest::Create);
+    DALI_TEST_CHECK(false);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryRegistrationHandleObjectWithCallOnCreate(void)
+{
+  TestApplication application;
+
+  TypeRegistration typeRegistration(typeid(TestClassTypeReg), typeid(TestClassTypeRegImpl), typeid(Actor), nullptr, false);
+  DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryRegistrationHandleObjectWithCallOnCreateN(void)
+{
+  TestApplication application;
+
+  // Already registered
+  try
+  {
+    TypeRegistration typeRegistration(typeid(TestClassTypeReg), typeid(TestClassTypeReg), typeid(Actor), nullptr, false);
+    DALI_TEST_CHECK(false);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryRegistrationHandleObjectWithPropertyMetadata(void)
+{
+  TestApplication application;
+
+  TypeRegistration typeRegistration(typeid(TestClassTypeReg), typeid(TestClassTypeRegImpl), typeid(Actor), nullptr, {nullptr, 0u});
+  DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryRegistrationHandleObjectWithPropertyMetadataN(void)
+{
+  TestApplication application;
+
+  // Already registered
+  try
+  {
+    TypeRegistration typeRegistration(typeid(TestClassTypeReg), typeid(TestClassTypeReg), typeid(Actor), nullptr, {nullptr, 0u});
+    DALI_TEST_CHECK(false);
+  }
+  catch(...)
+  {
+    DALI_TEST_CHECK(true);
+  }
+
   END_TEST;
 }

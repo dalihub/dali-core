@@ -34,9 +34,17 @@
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty); \
   static_assert((objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
 
-#define DALI_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex)                                                              \
+#define DALI_PROPERTY_REGISTRATION_FULL_INTERNAL(count, typeRegistrationObject, handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex)                                                                           \
+  Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, handleNamespace::handleType::Property::enumIndex, Dali::Property::valueType, &objectNamespace::objectType::SetProperty, &objectType::GetProperty); \
+  static_assert((handleNamespace::handleType::Property::enumIndex - handleNamespace::handleType::PROPERTY_START_INDEX) == count);
+
+#define DALI_PROPERTY_REGISTRATION_READ_ONLY_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex)                                                              \
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty); \
   static_assert((objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
+
+#define DALI_PROPERTY_REGISTRATION_READ_ONLY_FULL_INTERNAL(count, typeRegistrationObject, handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex)                                             \
+  Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, handleNamespace::handleType::Property::enumIndex, Dali::Property::valueType, NULL, &objectNamespace::objectType::GetProperty); \
+  static_assert((handleNamespace::handleType::Property::enumIndex - handleNamespace::handleType::PROPERTY_START_INDEX) == count);
 
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
   Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType);
@@ -54,9 +62,17 @@
   const char* const         textVariable = text;                                                                          \
   Dali::SignalConnectorType DALI_TOKEN_PASTE(signalConnector, count)(typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoConnectSignal);
 
+#define DALI_SIGNAL_REGISTRATION_FULL_INTERNAL(count, typeRegistrationObject, handleNamespace, handleType, objectNamespace, objectType, text, textVariable) \
+  const char* const         textVariable = text;                                                                                                            \
+  Dali::SignalConnectorType DALI_TOKEN_PASTE(signalConnector, count)(typeRegistrationObject, text, &objectNamespace::objectType::DoConnectSignal);
+
 #define DALI_ACTION_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, textVariable) \
   const char* const textVariable = text;                                                                                  \
   Dali::TypeAction  DALI_TOKEN_PASTE(signalConnector, count)(typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoAction);
+
+#define DALI_ACTION_REGISTRATION_FULL_INTERNAL(count, typeRegistrationObject, handleNamespace, handleType, objectNamespace, objectType, text, textVariable) \
+  const char* const textVariable = text;                                                                                                                    \
+  Dali::TypeAction  DALI_TOKEN_PASTE(signalConnector, count)(typeRegistrationObject, text, &objectNamespace::objectType::DoAction);
 
 /**
  * @brief These macros are used to define properties for implementations of CustomActor.
@@ -108,6 +124,17 @@
  *
  * Using these macros have certain prerequisites on how the property enumeration is defined.
  * Please see the Programming Guide (within the generated Doxygen) for full details.
+ *
+ * Macros with the suffix FULL can be used to create controls with different handle and object names, e.g.
+ *
+ * @code
+ * DALI_TYPE_REGISTRATION_BEGIN_FULL(BasicControl, BasicControlImpl, Dali::Toolkit::Control, Create);
+ * DALI_PROPERTY_REGISTRATION_FULL(Demo, BasicControl, Demo, BasicControlImpl, "propertyString", STRING, PROPERTY_STRING);
+ * DALI_PROPERTY_REGISTRATION_FULL(Demo, BasicControl, Demo, BasicControlImpl, "propertyFloat", FLOAT, PROPERTY_FLOAT);
+ * DALI_PROPERTY_REGISTRATION_READ_ONLY_FULL(Demo, BasicControl, Demo, BasicControlImpl, "propertyFloatReadOnly", FLOAT, PROPERTY_FLOAT_READ_ONLY)
+ * DALI_SIGNAL_REGISTRATION_FULL(Demo, BasicControl, Demo, BasicControlImpl, "click-signal", SIGNAL_CLICK);
+ * DALI_ACTION_REGISTRATION_FULL(Demo, BasicControl, Demo, BasicControlImpl, "click-action", ACTION_CLICK);
+ * @endcode
  */
 #define DALI_TYPE_REGISTRATION_BEGIN(thisType, baseType, createFunction) \
   Dali::TypeRegistration typeRegistration(typeid(thisType), typeid(baseType), createFunction);
@@ -115,11 +142,20 @@
 #define DALI_TYPE_REGISTRATION_BEGIN_CREATE(thisType, baseType, createFunction, createAtStartup) \
   Dali::TypeRegistration typeRegistration(typeid(thisType), typeid(baseType), createFunction, createAtStartup);
 
+#define DALI_TYPE_REGISTRATION_BEGIN_FULL(handleType, objectType, baseHandleType, createFunction) \
+  Dali::TypeRegistration typeRegistration(typeid(handleType), typeid(objectType), typeid(baseHandleType), createFunction);
+
 #define DALI_PROPERTY_REGISTRATION(objectNamespace, objectType, text, valueType, enumIndex) \
   DALI_PROPERTY_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
 
+#define DALI_PROPERTY_REGISTRATION_FULL(handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex) \
+  DALI_PROPERTY_REGISTRATION_FULL_INTERNAL(__COUNTER__, typeRegistration, handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex)
+
 #define DALI_PROPERTY_REGISTRATION_READ_ONLY(objectNamespace, objectType, text, valueType, enumIndex) \
-  DALI_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
+  DALI_PROPERTY_REGISTRATION_READ_ONLY_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
+
+#define DALI_PROPERTY_REGISTRATION_READ_ONLY_FULL(handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex) \
+  DALI_PROPERTY_REGISTRATION_READ_ONLY_FULL_INTERNAL(__COUNTER__, typeRegistration, handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex)
 
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION(objectNamespace, objectType, text, valueType, enumIndex) \
   DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex)
@@ -136,8 +172,14 @@
 #define DALI_SIGNAL_REGISTRATION(objectNamespace, objectType, text, textVariable) \
   DALI_SIGNAL_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable)
 
+#define DALI_SIGNAL_REGISTRATION_FULL(handleNamespace, handleType, objectNamespace, objectType, text, textVariable) \
+  DALI_SIGNAL_REGISTRATION_FULL_INTERNAL(__COUNTER__, typeRegistration, handleNamespace, handleType, objectNamespace, objectType, text, textVariable)
+
 #define DALI_ACTION_REGISTRATION(objectNamespace, objectType, text, textVariable) \
   DALI_ACTION_REGISTRATION_INTERNAL(__COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable)
+
+#define DALI_ACTION_REGISTRATION_FULL(handleNamespace, handleType, objectNamespace, objectType, text, textVariable) \
+  DALI_ACTION_REGISTRATION_FULL_INTERNAL(__COUNTER__, typeRegistration, handleNamespace, handleType, objectNamespace, objectType, text, textVariable)
 
 #define DALI_TYPE_REGISTRATION_END() // This macro exists for consistency and readability.
 

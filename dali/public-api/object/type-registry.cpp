@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,6 +77,14 @@ TypeRegistration::TypeRegistration(const std::type_info& registerType, const std
   mName = impl->Register(registerType, baseType, f, false);
 }
 
+TypeRegistration::TypeRegistration(const std::type_info& registerType, const std::type_info& registerObjectType, const std::type_info& baseType, TypeInfo::CreateFunction f)
+: mReference(Internal::TypeRegistry::Get())
+{
+  Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
+
+  mName = impl->Register(registerType, registerObjectType, baseType, f, false);
+}
+
 TypeRegistration::TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f, bool callCreateOnInit)
 : mReference(Internal::TypeRegistry::Get())
 {
@@ -85,11 +93,26 @@ TypeRegistration::TypeRegistration(const std::type_info& registerType, const std
   mName = impl->Register(registerType, baseType, f, callCreateOnInit);
 }
 
+TypeRegistration::TypeRegistration(const std::type_info& registerType, const std::type_info& registerObjectType, const std::type_info& baseType, TypeInfo::CreateFunction f, bool callCreateOnInit)
+: mReference(Internal::TypeRegistry::Get())
+{
+  Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
+
+  mName = impl->Register(registerType, registerObjectType, baseType, f, callCreateOnInit);
+}
+
 TypeRegistration::TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties)
 {
   Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
 
   mName = impl->Register(registerType, baseType, f, false, defaultProperties.propertyTable, defaultProperties.propertyCount);
+}
+
+TypeRegistration::TypeRegistration(const std::type_info& registerType, const std::type_info& registerObjectType, const std::type_info& baseType, TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties)
+{
+  Internal::TypeRegistry* impl = Internal::TypeRegistry::Get();
+
+  mName = impl->Register(registerType, registerObjectType, baseType, f, false, defaultProperties.propertyTable, defaultProperties.propertyCount);
 }
 
 TypeRegistration::TypeRegistration(std::string name, const std::type_info& baseType, TypeInfo::CreateFunction f)
