@@ -23,12 +23,12 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/images/pixel-data-impl.h>
 #include <dali/internal/render/renderers/render-texture-key.h>
-#include <dali/public-api/common/dali-common.h>      // DALI_ASSERT_ALWAYS
-#include <dali/public-api/common/intrusive-ptr.h>    // Dali::IntrusivePtr
-#include <dali/public-api/images/image-operations.h> // Dali::ImageDimensions
+#include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
+#include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
 #include <dali/public-api/images/pixel.h>
+#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/rendering/texture.h> // Dali::Internal::Render::Texture
+#include <dali/public-api/rendering/texture.h>
 
 namespace Dali
 {
@@ -36,6 +36,8 @@ namespace Internal
 {
 class Texture;
 using TexturePtr = IntrusivePtr<Texture>;
+
+using ImageDimensions = Dali::Uint16Pair;
 
 class Texture : public BaseObject, public EventThreadServicesHolder
 {

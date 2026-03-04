@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/scene-pre-render-status.h>
 #include <dali/integration-api/scene.h>
 #include <dali/integration-api/trace.h>

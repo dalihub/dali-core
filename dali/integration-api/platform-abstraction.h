@@ -19,9 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/resource-types.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/signals/callback.h>
 
 namespace Dali
