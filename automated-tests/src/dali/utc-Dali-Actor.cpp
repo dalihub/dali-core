@@ -819,11 +819,13 @@ int UtcDaliActorRemoveP(void)
 
 int UtcDaliActorSwitchParentN(void)
 {
-  tet_infoline("Testing Actor::UtcDaliActorSwitchParentN");
+  tet_infoline("Testing Actor::UtcDaliActorSwitchParentN01");
   TestApplication application;
 
   Actor parent1 = Actor::New();
   Actor child   = Actor::New();
+
+  application.GetScene().Add(parent1);
 
   DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
 
@@ -835,11 +837,57 @@ int UtcDaliActorSwitchParentN(void)
 
   DALI_TEST_EQUALS(parent2.GetChildCount(), 0u, TEST_LOCATION);
 
-  // Try switch parent with that both of parent1 and parent2 are off scene.
-  DevelActor::SwitchParent(child, parent2);
+  DALI_TEST_EQUALS(true, child.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, parent2.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), TEST_LOCATION);
 
-  DALI_TEST_EQUALS(parent1.GetChildCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(parent2.GetChildCount(), 0u, TEST_LOCATION);
+  // Try switch parent when child is on scene and parent2 is off scene.
+  try
+  {
+    DevelActor::SwitchParent(child, parent2);
+    tet_printf("Assertion test failed - no Exception\n");
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Both of current parent and new parent must have same SceneOn state", TEST_LOCATION);
+    DALI_TEST_EQUALS(parent1.GetChildCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(parent2.GetChildCount(), 0u, TEST_LOCATION);
+    DALI_TEST_CHECK(parent1 == child.GetParent());
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  parent1.Unparent();
+  application.GetScene().Add(parent2);
+
+  DALI_TEST_EQUALS(false, child.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, parent2.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), TEST_LOCATION);
+
+  // Try switch parent when child is off scene and parent2 is on scene.
+  try
+  {
+    DevelActor::SwitchParent(child, parent2);
+    tet_printf("Assertion test failed - no Exception\n");
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "Both of current parent and new parent must have same SceneOn state", TEST_LOCATION);
+    DALI_TEST_EQUALS(parent1.GetChildCount(), 1u, TEST_LOCATION);
+    DALI_TEST_EQUALS(parent2.GetChildCount(), 0u, TEST_LOCATION);
+    DALI_TEST_CHECK(parent1 == child.GetParent());
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
   END_TEST;
 }
 
@@ -11245,9 +11293,9 @@ int UtcDaliChildMovedSignalP(void)
   END_TEST;
 }
 
-int UtcDaliActorSwitchParentP(void)
+int UtcDaliActorSwitchParentP01(void)
 {
-  tet_infoline("Testing Actor::UtcDaliActorSwitchParentP");
+  tet_infoline("Testing Actor::UtcDaliActorSwitchParentP01 - both scene-on case");
   TestApplication application;
 
   Actor parent1 = Actor::New();
@@ -11295,6 +11343,63 @@ int UtcDaliActorSwitchParentP(void)
   DALI_TEST_CHECK(gOnSceneCallBackCalled == 1);
   DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
   DALI_TEST_CHECK(child.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE));
+  DALI_TEST_CHECK(child.GetParent() == parent2);
+
+  END_TEST;
+}
+
+int UtcDaliActorSwitchParentP02(void)
+{
+  tet_infoline("Testing Actor::UtcDaliActorSwitchParentP02 - both scene-off case");
+  TestApplication application;
+
+  Actor root = Actor::New();
+
+  Actor parent1 = Actor::New();
+  Actor child   = Actor::New();
+
+  root.Add(parent1);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
+
+  child.OnSceneSignal().Connect(OnSceneCallback);
+  child.OffSceneSignal().Connect(OffSceneCallback);
+
+  // sanity check
+  DALI_TEST_CHECK(gOnSceneCallBackCalled == 0);
+  DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
+
+  parent1.Add(child);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 1u, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gOnSceneCallBackCalled == 0);
+  DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
+
+  Actor parent2 = Actor::New();
+  root.Add(parent2);
+
+  bool                  addSignalReceived = false;
+  ChildAddedSignalCheck addedSignal(addSignalReceived, child);
+  DevelActor::ChildAddedSignal(root).Connect(&application, addedSignal);
+  DALI_TEST_EQUALS(addSignalReceived, false, TEST_LOCATION);
+
+  bool                    removedSignalReceived = false;
+  ChildRemovedSignalCheck removedSignal(removedSignalReceived, child);
+  DevelActor::ChildRemovedSignal(root).Connect(&application, removedSignal);
+  DALI_TEST_EQUALS(removedSignalReceived, false, TEST_LOCATION);
+
+  DevelActor::SwitchParent(child, parent2);
+
+  DALI_TEST_EQUALS(addSignalReceived, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(removedSignalReceived, false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent2.GetChildCount(), 1u, TEST_LOCATION);
+
+  DALI_TEST_CHECK(gOnSceneCallBackCalled == 0);
+  DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
+  DALI_TEST_CHECK(!child.GetProperty<bool>(Dali::Actor::Property::CONNECTED_TO_SCENE));
   DALI_TEST_CHECK(child.GetParent() == parent2);
 
   END_TEST;
