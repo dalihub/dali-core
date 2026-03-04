@@ -607,28 +607,37 @@ public: // For DecoratedVisualProperties
   void SetDummyDecoratedVisualProperties();
 
   /**
-   * Set the decorated visual propertiess at render thread.
-   * @param[in] decoratedVisualProperties The decorated visual properties to set
+   * Set the decorated visual propertiess relative with corner radius at render thread.
+   * @param[in] decoratedVisualCornerRadiusProperties The decorated visual properties with corner radius to set
    */
-  void SetDecoratedVisualProperties(OwnerPointer<VisualRenderer::DecoratedVisualProperties>& decoratedVisualProperties)
+  void SetDecoratedVisualCornerRadiusProperties(OwnerPointer<VisualRenderer::DecoratedVisualCornerRadiusProperties>& decoratedVisualCornerRadiusProperties)
   {
-    if(DALI_UNLIKELY(mOwnsDecoratedVisualProperties))
+    if(DALI_UNLIKELY(mOwnsDecoratedVisualCornerRadiusProperties))
     {
-      delete mDecoratedVisualProperties;
+      delete mDecoratedVisualCornerRadiusProperties;
     }
-    mDecoratedVisualProperties     = decoratedVisualProperties.Release();
-    mOwnsDecoratedVisualProperties = true;
+    mDecoratedVisualCornerRadiusProperties     = decoratedVisualCornerRadiusProperties.Release();
+    mOwnsDecoratedVisualCornerRadiusProperties = true;
 
     // Initialize visual dirty flags.
     mVisualPropertiesDirtyFlags = BAKED_FLAG;
   }
 
   /**
-   * May be accessed from event thread
+   * Set the decorated visual propertiess relative with borderline at render thread.
+   * @param[in] decoratedVisualBorderlineProperties The decorated visual properties with borderline to set
    */
-  const VisualRenderer::DecoratedVisualProperties* GetDecoratedVisualProperties() const
+  void SetDecoratedVisualBorderlineProperties(OwnerPointer<VisualRenderer::DecoratedVisualBorderlineProperties>& decoratedVisualBorderlineProperties)
   {
-    return mDecoratedVisualProperties;
+    if(DALI_UNLIKELY(mOwnsDecoratedVisualBorderlineProperties))
+    {
+      delete mDecoratedVisualBorderlineProperties;
+    }
+    mDecoratedVisualBorderlineProperties     = decoratedVisualBorderlineProperties.Release();
+    mOwnsDecoratedVisualBorderlineProperties = true;
+
+    // Initialize visual dirty flags.
+    mVisualPropertiesDirtyFlags = BAKED_FLAG;
   }
 
 public: // From VisualRenderer::VisualRendererPropertyObserver
@@ -665,8 +674,9 @@ private:
 
   const Node* mAttachedNode{nullptr}; ///< Node attached to this visual renderer (not owned)
 
-  VisualRenderer::VisualProperties*          mVisualProperties;          ///< VisualProperties (optional/owned if flagged)
-  VisualRenderer::DecoratedVisualProperties* mDecoratedVisualProperties; ///< DecoratedVisualProperties (optional/owned if flagged)
+  VisualRenderer::VisualProperties*                      mVisualProperties;                      ///< VisualProperties (optional/owned if flagged)
+  VisualRenderer::DecoratedVisualCornerRadiusProperties* mDecoratedVisualCornerRadiusProperties; ///< DecoratedVisualCornerRadiusProperties (optional/owned if flagged)
+  VisualRenderer::DecoratedVisualBorderlineProperties*   mDecoratedVisualBorderlineProperties;   ///< DecoratedVisualBorderlineProperties (optional/owned if flagged)
 
   uint32_t             mInstanceCount{0};            ///< The number of instances to be drawn
   UniformMap::SizeType mUniformMapChangeCounter{0u}; ///< Value to check if uniform data should be updated
@@ -681,9 +691,11 @@ private:
 
   uint8_t mVisualPropertiesDirtyFlags : 2; ///< Update decay for visual properties (aging)
   uint8_t mIsRenderableFlag : 3;
-  bool    mAdvancedBlendEquationApplied : 1;  ///< true if advanced blend equation applied.
-  bool    mOwnsVisualProperties : 1;          ///< Whether this renderer owns the VisualProperties
-  bool    mOwnsDecoratedVisualProperties : 1; ///< Whether this renderer owns the DecoratedVisualProperties
+  bool    mAdvancedBlendEquationApplied : 1; ///< true if advanced blend equation applied.
+
+  bool mOwnsVisualProperties : 1;                      ///< Whether this renderer owns the VisualProperties
+  bool mOwnsDecoratedVisualCornerRadiusProperties : 1; ///< Whether this renderer owns the DecoratedVisualCornerRadiusProperties
+  bool mOwnsDecoratedVisualBorderlineProperties : 1;   ///< Whether this renderer owns the DecoratedVisualBorderlineProperties
 
   mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
 
