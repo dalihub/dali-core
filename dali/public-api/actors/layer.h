@@ -92,9 +92,9 @@ public:
      */
     enum
     {
-      CLIPPING_ENABLE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clippingEnable",   type bool @SINCE_1_0.0
-      CLIPPING_BOX,                                                 ///< name "clippingBox",      type Rect<int32_t> @SINCE_1_0.0
-      BEHAVIOR,                                                     ///< name "behavior",         type integer or string @SINCE_1_0.0
+      NOT_IN_USE_1 = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX,
+      NOT_IN_USE_2,
+      BEHAVIOR, ///< name "behavior", type integer or string @SINCE_1_0.0
 
       /**
        * @brief The current depth of the layer.

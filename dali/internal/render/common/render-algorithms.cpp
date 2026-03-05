@@ -471,7 +471,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
 
     // The scissor test is enabled if we have any children on the stack, OR, if there are none but it is a user specified layer scissor box.
     // IE. It is not enabled if we are at the top of the stack and the layer does not have a specified clipping box.
-    const bool scissorEnabled = (!mScissorStack.empty()) || mHasLayerScissor;
+    const bool scissorEnabled = (!mScissorStack.empty());
 
     // Enable the scissor test based on the above calculation
     if(scissorEnabled)
@@ -629,7 +629,6 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   mViewportRectangle = viewport;
 
   commandBuffer.SetViewport(ViewportFromClippingBox(sceneSize, mViewportRectangle, orientation));
-  mHasLayerScissor = false;
 
   // Setup Scissor testing (for both viewport and per-node scissor)
   mScissorStack.clear();
@@ -643,22 +642,13 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
     commandBuffer.SetScissor(Rect2DFromRect(rootClippingRect, orientation, graphicsViewport));
     mScissorStack.push_back(rootClippingRect);
   }
-  // We are not performing a layer clip and no clipping rect set. Add the viewport as the root scissor rectangle.
-  else if(!renderList.IsClipping() || instruction.mFrameBuffer != nullptr)
+  // Add the viewport as the root scissor rectangle.
+  else
   {
     commandBuffer.SetScissorTestEnable(false);
     //@todo Vk requires a scissor to be set, as we have turned on dynamic state scissor in the pipelines.
     commandBuffer.SetScissor(Rect2DFromClippingBox(mViewportRectangle, orientation, graphicsViewport));
     mScissorStack.push_back(mViewportRectangle);
-  }
-
-  if(renderList.IsClipping())
-  {
-    commandBuffer.SetScissorTestEnable(true);
-    const ClippingBox& layerScissorBox = renderList.GetClippingBox();
-    commandBuffer.SetScissor(Rect2DFromClippingBox(layerScissorBox, orientation, graphicsViewport));
-    mScissorStack.push_back(layerScissorBox);
-    mHasLayerScissor = true;
   }
 
   // Prepare Render::Renderer Render
@@ -752,8 +742,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
 RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 : mGraphicsController(graphicsController),
-  mViewportRectangle(),
-  mHasLayerScissor(false)
+  mViewportRectangle()
 {
 }
 

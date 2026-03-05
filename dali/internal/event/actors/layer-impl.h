@@ -39,9 +39,6 @@ class Layer;
 class Layer : public Actor, public ConnectionTracker
 {
 public:
-  using ClippingBox = Dali::Rect<int32_t>;
-
-public:
   /**
    * @copydoc Dali::Layer::ZValue(const Vector3&, float)
    *
@@ -121,32 +118,6 @@ public:
    * @copydoc Dali::Layer::MoveAbove
    */
   void MoveBelow(const Internal::Layer& target);
-
-  /**
-   * @copydoc Dali::Layer::SetClipping()
-   */
-  void SetClipping(bool enabled);
-
-  /**
-   * @copydoc Dali::Layer::IsClipping()
-   */
-  bool IsClipping() const
-  {
-    return mIsClipping; // Actor-side has most up-to-date value
-  }
-
-  /**
-   * @copydoc Dali::Layer::SetClippingBox()
-   */
-  void SetClippingBox(int x, int y, int width, int height);
-
-  /**
-   * @copydoc Dali::Layer::GetClippingBox()
-   */
-  const ClippingBox& GetClippingBox() const
-  {
-    return mClippingBox; // Actor-side has most up-to-date value
-  }
 
   /**
    * @copydoc Dali::Layer::SetBehavior()
@@ -261,12 +232,10 @@ private:
   LayerList* mLayerList; ///< Only valid when layer is on-scene
 
   // These properties not animatable; the actor side has the most up-to-date values
-  ClippingBox                   mClippingBox;  ///< The clipping box, in window coordinates
   Dali::Layer::SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
 
   Dali::Layer::Behavior mBehavior; ///< Behavior of the layer
 
-  bool mIsClipping : 1;        ///< True when clipping is enabled
   bool mDepthTestDisabled : 1; ///< Whether depth test is disabled.
   bool mTouchConsumed : 1;     ///< Whether we should consume touch (including gesture).
   bool mHoverConsumed : 1;     ///< Whether we should consume hover.

@@ -38,10 +38,8 @@ SceneGraph::Layer* Layer::New()
 Layer::Layer()
 : Node(),
   mSortFunction(Internal::Layer::ZValue),
-  mClippingBox(0, 0, 0, 0),
   mLastCamera(nullptr),
   mBehavior(Dali::Layer::LAYER_UI),
-  mIsClipping(false),
   mDepthTestDisabled(true),
   mIsDefaultSortFunction(true)
 {
@@ -72,16 +70,6 @@ void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
     mAllChildTransformsClean = false;
     mSortFunction            = function;
   }
-}
-
-void Layer::SetClipping(bool enabled)
-{
-  mIsClipping = enabled;
-}
-
-void Layer::SetClippingBox(const Layer::ClippingBox& box)
-{
-  mClippingBox.Set(box.x, box.y, box.width, box.height);
 }
 
 void Layer::SetBehavior(Dali::Layer::Behavior behavior)
