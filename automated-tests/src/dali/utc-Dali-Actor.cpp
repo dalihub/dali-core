@@ -12204,6 +12204,26 @@ int utcDaliActorPartialUpdateSetProperty(void)
 
   EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
+  // Change draw mode
+  actor.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
+
+  damagedRects.clear();
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+
+  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
+  application.RenderWithPartialUpdate(damagedRects, clippingRect);
+  DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.width, glScissorParams.width, TEST_LOCATION);
+  DALI_TEST_EQUALS(clippingRect.height, glScissorParams.height, TEST_LOCATION);
+
+  // Should be no damage rects, nothing changed
+  damagedRects.clear();
+
+  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
+
   // Should be 1 damage rect due to change in size
   damagedRects.clear();
   actor.SetProperty(Actor::Property::SIZE, Vector3(40.0f, 40.0f, 0.0f));
