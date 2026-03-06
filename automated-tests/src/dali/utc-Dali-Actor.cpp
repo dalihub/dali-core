@@ -13768,7 +13768,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea01(void)
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
-  // Create a native image source.
+  // Create a native image.
   TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
   Texture                texture         = Texture::New(*testNativeImage);
   TextureSet             textureSet      = TextureSet::New();
@@ -13841,7 +13841,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea02(void)
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
-  // Create a native image source.
+  // Create a native image.
   TestNativeImagePointer testNativeImage1 = TestNativeImage::New(64u, 64u);
   Texture                texture1         = Texture::New(*testNativeImage1);
   TestNativeImagePointer testNativeImage2 = TestNativeImage::New(64u, 64u);

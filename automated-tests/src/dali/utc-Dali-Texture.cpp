@@ -61,10 +61,10 @@ int UtcDaliTextureNew03(void)
 {
   TestApplication application;
 
-  // Create a native image source.
+  // Create a native image.
   TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
 
-  // Create a texture from the native image source.
+  // Create a texture from the native image.
   Texture nativeTexture = Texture::New(*testNativeImage);
 
   // Check the texture was created OK.
