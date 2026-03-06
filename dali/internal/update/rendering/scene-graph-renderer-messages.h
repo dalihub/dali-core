@@ -358,14 +358,24 @@ inline void SetVisualPropertiesMessage(EventThreadServices& eventThreadServices,
   new(slot) LocalType(&renderer, &Renderer::SetVisualProperties, visualProperties);
 }
 
-inline void SetDecoratedVisualPropertiesMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, OwnerPointer<VisualRenderer::DecoratedVisualProperties>& decoratedVisualProperties)
+inline void SetDecoratedVisualCornerRadiusPropertiesMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, OwnerPointer<VisualRenderer::DecoratedVisualCornerRadiusProperties>& decoratedVisualCornerRadiusProperties)
 {
-  using LocalType = MessageValue1<Renderer, OwnerPointer<VisualRenderer::DecoratedVisualProperties>>;
+  using LocalType = MessageValue1<Renderer, OwnerPointer<VisualRenderer::DecoratedVisualCornerRadiusProperties>>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
-  new(slot) LocalType(&renderer, &Renderer::SetDecoratedVisualProperties, decoratedVisualProperties);
+  new(slot) LocalType(&renderer, &Renderer::SetDecoratedVisualCornerRadiusProperties, decoratedVisualCornerRadiusProperties);
+}
+
+inline void SetDecoratedVisualBorderlinePropertiesMessage(EventThreadServices& eventThreadServices, const Renderer& renderer, OwnerPointer<VisualRenderer::DecoratedVisualBorderlineProperties>& decoratedVisualBorderlineProperties)
+{
+  using LocalType = MessageValue1<Renderer, OwnerPointer<VisualRenderer::DecoratedVisualBorderlineProperties>>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  new(slot) LocalType(&renderer, &Renderer::SetDecoratedVisualBorderlineProperties, decoratedVisualBorderlineProperties);
 }
 
 } // namespace Dali::Internal::SceneGraph

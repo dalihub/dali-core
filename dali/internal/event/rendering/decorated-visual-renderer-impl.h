@@ -31,7 +31,8 @@ namespace SceneGraph
 class Renderer;
 namespace VisualRenderer
 {
-class DecoratedVisualProperties;
+class DecoratedVisualCornerRadiusProperties;
+class DecoratedVisualBorderlineProperties;
 } // namespace VisualRenderer
 } // namespace SceneGraph
 
@@ -81,27 +82,6 @@ public: // Default property extensions from Object
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
-public:
-  /**
-   * @copydoc Dali::DecoratedVisualRenderer::RegisterCornerRadiusUniform()
-   */
-  void RegisterCornerRadiusUniform();
-
-  /**
-   * @copydoc Dali::DecoratedVisualRenderer::RegisterCornerSquarenessUniform()
-   */
-  void RegisterCornerSquarenessUniform();
-
-  /**
-   * @copydoc Dali::DecoratedVisualRenderer::RegisterBorderlineUniform()
-   */
-  void RegisterBorderlineUniform();
-
-  /**
-   * @copydoc Dali::DecoratedVisualRenderer::RegisterBlurRadiusUniform()
-   */
-  void RegisterBlurRadiusUniform();
-
 protected: // implementation
   /**
    * @brief Constructor.
@@ -118,13 +98,15 @@ protected: // implementation
    */
   bool GetCurrentPropertyValue(Property::Index index, Property::Value& value) const;
 
+private:
   /**
-   * @brief Add the uniforms for DecoratedVisualRendererUseType.
-   * If that flag didn't appended yet, It will add the uniforms map
+   * @brief Ensure to create decorated visual properties and cache for control animatable properties.
+   *        Also, register decorated visual transform uniforms so we can use it as uniform properties.
    *
+   * @note Keep it as const so we can create animatable properties at GetSceneObjectAnimatableProperty() or GetSceneObjectInputProperty().
    * @param[in] newFlag one of DecoratedVisualRendererUseType
    */
-  void AddUniformFlag(uint8_t newAddFlag);
+  void EnsureDecoratedVisualPropertiesAndCache(uint8_t newAddFlag) const;
 
 protected:
   /**
@@ -145,24 +127,31 @@ public:
     DECORATED_VISUAL_RENDERER_USE_BLUR_RADIUS       = 1 << 3,
   };
 
-  struct DecoratedVisualPropertyCache
+  struct DecoratedVisualCornerRadiusPropertyCache
   {
     Vector4 mCornerRadius{Vector4::ZERO};
     Vector4 mCornerSquareness{Vector4::ZERO};
     float   mCornerRadiusPolicy{1.0f};
-    float   mBorderlineWidth{0.0f};
+  };
+
+  struct DecoratedVisualBorderlinePropertyCache
+  {
     Vector4 mBorderlineColor{Color::BLACK};
+    float   mBorderlineWidth{0.0f};
     float   mBorderlineOffset{0.0f};
-    float   mBlurRadius{0.0f};
+    float   mBlurRadius{0.0f}; ///< Keep it as borderline property, for inner shadow case.
   };
 
 private:
-  DecoratedVisualPropertyCache mDecoratedPropertyCache;
+  mutable DecoratedVisualCornerRadiusPropertyCache* mDecoratedCornerRadiusPropertyCache; ///< Cache of DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Owned if decorated visual properties created.
+  mutable DecoratedVisualBorderlinePropertyCache*   mDecoratedBorderlinePropertyCache;   ///< Cache of DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Owned if decorated visual properties created.
 
-  SceneGraph::VisualRenderer::DecoratedVisualProperties* mDecoratedVisualProperties{nullptr}; ///< DecoratedVisualProperties. Generated at first time of Register~~~Uniform(). Not owned
+  mutable SceneGraph::VisualRenderer::DecoratedVisualCornerRadiusProperties* mDecoratedVisualCornerRadiusProperties{nullptr}; ///< DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Not owned
+  mutable SceneGraph::VisualRenderer::DecoratedVisualBorderlineProperties*   mDecoratedVisualBorderlineProperties{nullptr};   ///< DecoratedVisualProperties. Generated at first time of EnsureDecoratedVisualPropertiesAndCache(). Not owned
 
-  uint8_t mAddUniformFlag : 5;
-  bool    mPropertyCacheChanged : 1;
+  mutable uint8_t mAddUniformFlag : 5;
+  mutable bool    mDecoratedVisualCornerRadiusPropertiesCreated : 1;
+  mutable bool    mDecoratedVisualBorderlinePropertiesCreated : 1;
 };
 
 } // namespace Internal

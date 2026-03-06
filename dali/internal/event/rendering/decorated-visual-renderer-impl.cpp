@@ -76,21 +76,74 @@ void SetValue(EventThreadServices& eventThreadServices, const SceneGraph::Proper
   }
 }
 
-/**
- * Sets the cached value of a property only.
- * @tparam T The property type
- * @param[in] propertyValue The new property value given
- * @param[in,out] cachedValue The local cached value of the property
- * @param[in,out] updated True if cache value updated
- */
-template<typename T>
-void SetCacheValue(const Property::Value& propertyValue, T& cachedValue, bool& updated)
+inline constexpr bool IsCornerRadiusPropertyIndex(Property::Index index)
 {
-  if(propertyValue.Get(cachedValue))
-  {
-    updated = true;
-  }
+  return (index == Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS) ||
+         (index == Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY);
 }
+
+inline constexpr bool IsCornerSquarenessPropertyIndex(Property::Index index)
+{
+  return IsCornerRadiusPropertyIndex(index) ||
+         (index == Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS);
+}
+
+inline constexpr bool IsBorderlinePropertyIndex(Property::Index index)
+{
+  return (index == Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH) ||
+         (index == Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR) ||
+         (index == Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET);
+}
+
+inline constexpr bool IsBlurPropertyIndex(Property::Index index)
+{
+  return (index == Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS);
+}
+
+inline constexpr bool IsDecoratedVisualPropertyIndex(Property::Index index)
+{
+  return IsCornerSquarenessPropertyIndex(index) ||
+         IsBorderlinePropertyIndex(index) ||
+         IsBlurPropertyIndex(index);
+}
+
+inline constexpr uint8_t GetDecoratedVisualRendererUseType(Property::Index index)
+{
+  if(IsCornerRadiusPropertyIndex(index))
+  {
+    return DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS;
+  }
+  if(IsCornerSquarenessPropertyIndex(index))
+  {
+    return DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS | DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_CORNER_SQUARENESS;
+  }
+  if(IsBorderlinePropertyIndex(index))
+  {
+    return DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_BORDERLINE;
+  }
+  if(IsBlurPropertyIndex(index))
+  {
+    return DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_BLUR_RADIUS;
+  }
+  return 0u;
+}
+
+inline constexpr bool IsDecoratedVisualCornerRadiusPropertyRequred(uint8_t useFlag)
+{
+  constexpr uint8_t cornerRadiusFlag = DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS |
+                                       DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_CORNER_SQUARENESS;
+  return useFlag & cornerRadiusFlag;
+}
+
+inline constexpr bool IsDecoratedVisualBorderlinePropertyRequred(uint8_t useFlag)
+{
+  constexpr uint8_t borderlineFlag = DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_BORDERLINE |
+                                     DecoratedVisualRenderer::DECORATED_VISUAL_RENDERER_USE_BLUR_RADIUS;
+  return useFlag & borderlineFlag;
+}
+
+DecoratedVisualRenderer::DecoratedVisualCornerRadiusPropertyCache gDummyDecoratedVisualCornerRadiusPropertyCache; // dummy cache for get default variables.
+DecoratedVisualRenderer::DecoratedVisualBorderlinePropertyCache   gDummyDecoratedVisualBorderlinePropertyCache;   // dummy cache for get default variables.
 
 } // unnamed namespace
 
@@ -116,14 +169,28 @@ DecoratedVisualRendererPtr DecoratedVisualRenderer::New()
 
 DecoratedVisualRenderer::DecoratedVisualRenderer(const SceneGraph::Renderer* sceneObject)
 : VisualRenderer(sceneObject),
-  mDecoratedPropertyCache(),
-  mDecoratedVisualProperties(nullptr),
+  mDecoratedCornerRadiusPropertyCache(&gDummyDecoratedVisualCornerRadiusPropertyCache),
+  mDecoratedBorderlinePropertyCache(&gDummyDecoratedVisualBorderlinePropertyCache),
+  mDecoratedVisualCornerRadiusProperties(nullptr),
+  mDecoratedVisualBorderlineProperties(nullptr),
   mAddUniformFlag(0u),
-  mPropertyCacheChanged(false)
+  mDecoratedVisualCornerRadiusPropertiesCreated(false),
+  mDecoratedVisualBorderlinePropertiesCreated(false)
 {
 }
 
-DecoratedVisualRenderer::~DecoratedVisualRenderer() = default; // The scene object will be deleted by ~VisualRenderer
+DecoratedVisualRenderer::~DecoratedVisualRenderer()
+{
+  if(mDecoratedVisualCornerRadiusPropertiesCreated)
+  {
+    delete mDecoratedCornerRadiusPropertyCache;
+  }
+  if(mDecoratedVisualBorderlinePropertiesCreated)
+  {
+    delete mDecoratedBorderlinePropertyCache;
+  }
+  // The scene object will be deleted by ~VisualRenderer
+}
 
 void DecoratedVisualRenderer::SetDefaultProperty(Property::Index        index,
                                                  const Property::Value& propertyValue)
@@ -134,110 +201,55 @@ void DecoratedVisualRenderer::SetDefaultProperty(Property::Index        index,
   }
   else
   {
-    bool sceneGraphVisualPropertyUpdated = false;
-    if(DALI_LIKELY(mDecoratedVisualProperties))
+    const uint8_t addFlags = GetDecoratedVisualRendererUseType(index);
+    if(addFlags != 0u)
     {
-      EventThreadServices& eventThreadServices = GetEventThreadServices();
-      switch(index)
-      {
-        case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
-        {
-          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mCornerRadius, mDecoratedVisualProperties->mCornerRadius);
-          sceneGraphVisualPropertyUpdated = true;
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
-        {
-          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mCornerSquareness, mDecoratedVisualProperties->mCornerSquareness);
-          sceneGraphVisualPropertyUpdated = true;
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
-        {
-          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mCornerRadiusPolicy, mDecoratedVisualProperties->mCornerRadiusPolicy);
-          sceneGraphVisualPropertyUpdated = true;
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
-        {
-          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBorderlineWidth, mDecoratedVisualProperties->mBorderlineWidth);
-          sceneGraphVisualPropertyUpdated = true;
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
-        {
-          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBorderlineColor, mDecoratedVisualProperties->mBorderlineColor);
-          sceneGraphVisualPropertyUpdated = true;
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
-        {
-          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBorderlineOffset, mDecoratedVisualProperties->mBorderlineOffset);
-          sceneGraphVisualPropertyUpdated = true;
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
-        {
-          SetValue(eventThreadServices, *mUpdateObject, propertyValue, mDecoratedPropertyCache.mBlurRadius, mDecoratedVisualProperties->mBlurRadius);
-          sceneGraphVisualPropertyUpdated = true;
-          break;
-        }
-      }
+      EnsureDecoratedVisualPropertiesAndCache(addFlags);
     }
-    if(!sceneGraphVisualPropertyUpdated)
+
+    switch(index)
     {
-      bool propertyCacheChanged = false;
-      switch(index)
+      case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
       {
-        case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
-        {
-          SetCacheValue(propertyValue, mDecoratedPropertyCache.mCornerRadius, propertyCacheChanged);
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
-        {
-          SetCacheValue(propertyValue, mDecoratedPropertyCache.mCornerSquareness, propertyCacheChanged);
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
-        {
-          SetCacheValue(propertyValue, mDecoratedPropertyCache.mCornerRadiusPolicy, propertyCacheChanged);
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
-        {
-          SetCacheValue(propertyValue, mDecoratedPropertyCache.mBorderlineWidth, propertyCacheChanged);
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
-        {
-          SetCacheValue(propertyValue, mDecoratedPropertyCache.mBorderlineColor, propertyCacheChanged);
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
-        {
-          SetCacheValue(propertyValue, mDecoratedPropertyCache.mBorderlineOffset, propertyCacheChanged);
-          break;
-        }
-
-        case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
-        {
-          SetCacheValue(propertyValue, mDecoratedPropertyCache.mBlurRadius, propertyCacheChanged);
-          break;
-        }
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mDecoratedCornerRadiusPropertyCache->mCornerRadius, mDecoratedVisualCornerRadiusProperties->mCornerRadius);
+        break;
       }
-      mPropertyCacheChanged |= propertyCacheChanged;
+
+      case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mDecoratedCornerRadiusPropertyCache->mCornerSquareness, mDecoratedVisualCornerRadiusProperties->mCornerSquareness);
+        break;
+      }
+
+      case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mDecoratedCornerRadiusPropertyCache->mCornerRadiusPolicy, mDecoratedVisualCornerRadiusProperties->mCornerRadiusPolicy);
+        break;
+      }
+
+      case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mDecoratedBorderlinePropertyCache->mBorderlineWidth, mDecoratedVisualBorderlineProperties->mBorderlineWidth);
+        break;
+      }
+
+      case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mDecoratedBorderlinePropertyCache->mBorderlineColor, mDecoratedVisualBorderlineProperties->mBorderlineColor);
+        break;
+      }
+
+      case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mDecoratedBorderlinePropertyCache->mBorderlineOffset, mDecoratedVisualBorderlineProperties->mBorderlineOffset);
+        break;
+      }
+
+      case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mDecoratedBorderlinePropertyCache->mBlurRadius, mDecoratedVisualBorderlineProperties->mBlurRadius);
+        break;
+      }
     }
   }
 }
@@ -256,37 +268,37 @@ Property::Value DecoratedVisualRenderer::GetDefaultProperty(Property::Index inde
     {
       case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
       {
-        value = mDecoratedPropertyCache.mCornerRadius;
+        value = mDecoratedCornerRadiusPropertyCache->mCornerRadius;
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
       {
-        value = mDecoratedPropertyCache.mCornerSquareness;
+        value = mDecoratedCornerRadiusPropertyCache->mCornerSquareness;
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
       {
-        value = mDecoratedPropertyCache.mCornerRadiusPolicy;
+        value = mDecoratedCornerRadiusPropertyCache->mCornerRadiusPolicy;
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
       {
-        value = mDecoratedPropertyCache.mBorderlineWidth;
+        value = mDecoratedBorderlinePropertyCache->mBorderlineWidth;
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
       {
-        value = mDecoratedPropertyCache.mBorderlineColor;
+        value = mDecoratedBorderlinePropertyCache->mBorderlineColor;
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
       {
-        value = mDecoratedPropertyCache.mBorderlineOffset;
+        value = mDecoratedBorderlinePropertyCache->mBorderlineOffset;
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
       {
-        value = mDecoratedPropertyCache.mBlurRadius;
+        value = mDecoratedBorderlinePropertyCache->mBlurRadius;
         break;
       }
       default:
@@ -313,57 +325,85 @@ Property::Value DecoratedVisualRenderer::GetDefaultPropertyCurrentValue(Property
     {
       case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
       {
-        if(DALI_LIKELY(mDecoratedVisualProperties))
+        if(mDecoratedVisualCornerRadiusProperties)
         {
-          value = mDecoratedVisualProperties->mCornerRadius.Get();
+          value = mDecoratedVisualCornerRadiusProperties->mCornerRadius.Get();
+        }
+        else
+        {
+          value = mDecoratedCornerRadiusPropertyCache->mCornerRadius;
         }
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
       {
-        if(DALI_LIKELY(mDecoratedVisualProperties))
+        if(mDecoratedVisualCornerRadiusProperties)
         {
-          value = mDecoratedVisualProperties->mCornerSquareness.Get();
+          value = mDecoratedVisualCornerRadiusProperties->mCornerSquareness.Get();
+        }
+        else
+        {
+          value = mDecoratedCornerRadiusPropertyCache->mCornerSquareness;
         }
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
       {
-        if(DALI_LIKELY(mDecoratedVisualProperties))
+        if(mDecoratedVisualCornerRadiusProperties)
         {
-          value = mDecoratedVisualProperties->mCornerRadiusPolicy.Get();
+          value = mDecoratedVisualCornerRadiusProperties->mCornerRadiusPolicy.Get();
+        }
+        else
+        {
+          value = mDecoratedCornerRadiusPropertyCache->mCornerRadiusPolicy;
         }
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
       {
-        if(DALI_LIKELY(mDecoratedVisualProperties))
+        if(mDecoratedVisualBorderlineProperties)
         {
-          value = mDecoratedVisualProperties->mBorderlineWidth.Get();
+          value = mDecoratedVisualBorderlineProperties->mBorderlineWidth.Get();
+        }
+        else
+        {
+          value = mDecoratedBorderlinePropertyCache->mBorderlineWidth;
         }
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
       {
-        if(DALI_LIKELY(mDecoratedVisualProperties))
+        if(mDecoratedVisualBorderlineProperties)
         {
-          value = mDecoratedVisualProperties->mBorderlineColor.Get();
+          value = mDecoratedVisualBorderlineProperties->mBorderlineColor.Get();
+        }
+        else
+        {
+          value = mDecoratedBorderlinePropertyCache->mBorderlineColor;
         }
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
       {
-        if(DALI_LIKELY(mDecoratedVisualProperties))
+        if(mDecoratedVisualBorderlineProperties)
         {
-          value = mDecoratedVisualProperties->mBorderlineOffset.Get();
+          value = mDecoratedVisualBorderlineProperties->mBorderlineOffset.Get();
+        }
+        else
+        {
+          value = mDecoratedBorderlinePropertyCache->mBorderlineOffset;
         }
         break;
       }
       case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
       {
-        if(DALI_LIKELY(mDecoratedVisualProperties))
+        if(mDecoratedVisualBorderlineProperties)
         {
-          value = mDecoratedVisualProperties->mBlurRadius.Get();
+          value = mDecoratedVisualBorderlineProperties->mBlurRadius.Get();
+        }
+        else
+        {
+          value = mDecoratedBorderlinePropertyCache->mBlurRadius;
         }
         break;
       }
@@ -380,6 +420,12 @@ void DecoratedVisualRenderer::OnNotifyDefaultPropertyAnimation(Animation& animat
   }
   else
   {
+    const uint8_t addFlags = GetDecoratedVisualRendererUseType(index);
+    if(addFlags != 0u)
+    {
+      EnsureDecoratedVisualPropertiesAndCache(addFlags);
+    }
+
     switch(animationType)
     {
       case Animation::TO:
@@ -389,32 +435,32 @@ void DecoratedVisualRenderer::OnNotifyDefaultPropertyAnimation(Animation& animat
         {
           case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
           {
-            value.Get(mDecoratedPropertyCache.mCornerRadius);
+            value.Get(mDecoratedCornerRadiusPropertyCache->mCornerRadius);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
           {
-            value.Get(mDecoratedPropertyCache.mCornerSquareness);
+            value.Get(mDecoratedCornerRadiusPropertyCache->mCornerSquareness);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
           {
-            value.Get(mDecoratedPropertyCache.mBorderlineWidth);
+            value.Get(mDecoratedBorderlinePropertyCache->mBorderlineWidth);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
           {
-            value.Get(mDecoratedPropertyCache.mBorderlineColor);
+            value.Get(mDecoratedBorderlinePropertyCache->mBorderlineColor);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
           {
-            value.Get(mDecoratedPropertyCache.mBorderlineOffset);
+            value.Get(mDecoratedBorderlinePropertyCache->mBorderlineOffset);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
           {
-            value.Get(mDecoratedPropertyCache.mBlurRadius);
+            value.Get(mDecoratedBorderlinePropertyCache->mBlurRadius);
             break;
           }
         }
@@ -427,32 +473,32 @@ void DecoratedVisualRenderer::OnNotifyDefaultPropertyAnimation(Animation& animat
         {
           case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
           {
-            AdjustValue<Vector4>(mDecoratedPropertyCache.mCornerRadius, value);
+            AdjustValue<Vector4>(mDecoratedCornerRadiusPropertyCache->mCornerRadius, value);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
           {
-            AdjustValue<Vector4>(mDecoratedPropertyCache.mCornerSquareness, value);
+            AdjustValue<Vector4>(mDecoratedCornerRadiusPropertyCache->mCornerSquareness, value);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
           {
-            AdjustValue<float>(mDecoratedPropertyCache.mBorderlineWidth, value);
+            AdjustValue<float>(mDecoratedBorderlinePropertyCache->mBorderlineWidth, value);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
           {
-            AdjustValue<Vector4>(mDecoratedPropertyCache.mBorderlineColor, value);
+            AdjustValue<Vector4>(mDecoratedBorderlinePropertyCache->mBorderlineColor, value);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
           {
-            AdjustValue<float>(mDecoratedPropertyCache.mBorderlineOffset, value);
+            AdjustValue<float>(mDecoratedBorderlinePropertyCache->mBorderlineOffset, value);
             break;
           }
           case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
           {
-            AdjustValue<float>(mDecoratedPropertyCache.mBlurRadius, value);
+            AdjustValue<float>(mDecoratedBorderlinePropertyCache->mBlurRadius, value);
             break;
           }
         }
@@ -466,54 +512,42 @@ const SceneGraph::PropertyBase* DecoratedVisualRenderer::GetSceneObjectAnimatabl
 {
   const SceneGraph::PropertyBase* property = nullptr;
 
+  const uint8_t addFlags = GetDecoratedVisualRendererUseType(index);
+  if(addFlags != 0u)
+  {
+    EnsureDecoratedVisualPropertiesAndCache(addFlags);
+  }
+
   switch(index)
   {
     case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS:
     {
-      if(DALI_LIKELY(mDecoratedVisualProperties))
-      {
-        property = &mDecoratedVisualProperties->mCornerRadius;
-      }
+      property = &mDecoratedVisualCornerRadiusProperties->mCornerRadius;
       break;
     }
     case Dali::DecoratedVisualRenderer::Property::CORNER_SQUARENESS:
     {
-      if(DALI_LIKELY(mDecoratedVisualProperties))
-      {
-        property = &mDecoratedVisualProperties->mCornerSquareness;
-      }
+      property = &mDecoratedVisualCornerRadiusProperties->mCornerSquareness;
       break;
     }
     case Dali::DecoratedVisualRenderer::Property::BORDERLINE_WIDTH:
     {
-      if(DALI_LIKELY(mDecoratedVisualProperties))
-      {
-        property = &mDecoratedVisualProperties->mBorderlineWidth;
-      }
+      property = &mDecoratedVisualBorderlineProperties->mBorderlineWidth;
       break;
     }
     case Dali::DecoratedVisualRenderer::Property::BORDERLINE_COLOR:
     {
-      if(DALI_LIKELY(mDecoratedVisualProperties))
-      {
-        property = &mDecoratedVisualProperties->mBorderlineColor;
-      }
+      property = &mDecoratedVisualBorderlineProperties->mBorderlineColor;
       break;
     }
     case Dali::DecoratedVisualRenderer::Property::BORDERLINE_OFFSET:
     {
-      if(DALI_LIKELY(mDecoratedVisualProperties))
-      {
-        property = &mDecoratedVisualProperties->mBorderlineOffset;
-      }
+      property = &mDecoratedVisualBorderlineProperties->mBorderlineOffset;
       break;
     }
     case Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS:
     {
-      if(DALI_LIKELY(mDecoratedVisualProperties))
-      {
-        property = &mDecoratedVisualProperties->mBlurRadius;
-      }
+      property = &mDecoratedVisualBorderlineProperties->mBlurRadius;
       break;
     }
   }
@@ -533,15 +567,18 @@ const PropertyInputImpl* DecoratedVisualRenderer::GetSceneObjectInputProperty(Pr
   {
     return VisualRenderer::GetSceneObjectInputProperty(index);
   }
+
+  const uint8_t addFlags = GetDecoratedVisualRendererUseType(index);
+  if(addFlags != 0u)
+  {
+    EnsureDecoratedVisualPropertiesAndCache(addFlags);
+  }
+
   switch(index)
   {
     case Dali::DecoratedVisualRenderer::Property::CORNER_RADIUS_POLICY:
     {
-      if(DALI_LIKELY(mDecoratedVisualProperties))
-      {
-        return &mDecoratedVisualProperties->mCornerRadiusPolicy;
-      }
-      break;
+      return &mDecoratedVisualCornerRadiusProperties->mCornerRadiusPolicy;
     }
     default:
     {
@@ -551,48 +588,49 @@ const PropertyInputImpl* DecoratedVisualRenderer::GetSceneObjectInputProperty(Pr
   return nullptr;
 }
 
-void DecoratedVisualRenderer::RegisterCornerRadiusUniform()
-{
-  AddUniformFlag(DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS);
-}
-
-void DecoratedVisualRenderer::RegisterCornerSquarenessUniform()
-{
-  AddUniformFlag(DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS | DECORATED_VISUAL_RENDERER_USE_CORNER_SQUARENESS);
-}
-
-void DecoratedVisualRenderer::RegisterBorderlineUniform()
-{
-  AddUniformFlag(DECORATED_VISUAL_RENDERER_USE_BORDERLINE);
-}
-
-void DecoratedVisualRenderer::RegisterBlurRadiusUniform()
-{
-  AddUniformFlag(DECORATED_VISUAL_RENDERER_USE_BLUR_RADIUS);
-}
-
-void DecoratedVisualRenderer::AddUniformFlag(uint8_t newAddFlag)
+void DecoratedVisualRenderer::EnsureDecoratedVisualPropertiesAndCache(uint8_t newAddFlag) const
 {
   const uint8_t diffUniformFlag = (~mAddUniformFlag) & newAddFlag;
   if(diffUniformFlag)
   {
-    if(mDecoratedVisualProperties == nullptr)
+    if(DALI_UNLIKELY(IsDecoratedVisualCornerRadiusPropertyRequred(diffUniformFlag) && !mDecoratedVisualCornerRadiusPropertiesCreated))
     {
-      mDecoratedVisualProperties = new SceneGraph::VisualRenderer::DecoratedVisualProperties(const_cast<SceneGraph::Renderer&>(GetVisualRendererSceneObject()));
-      OwnerPointer<SceneGraph::VisualRenderer::DecoratedVisualProperties> transferOwnership(mDecoratedVisualProperties);
-      SetDecoratedVisualPropertiesMessage(GetEventThreadServices(), GetRendererSceneObject(), transferOwnership);
-
-      if(DALI_UNLIKELY(mPropertyCacheChanged))
+      if(DALI_LIKELY(mDecoratedVisualCornerRadiusProperties == nullptr))
       {
-        BakeMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, mDecoratedVisualProperties->mCornerRadius, mDecoratedPropertyCache.mCornerRadius);
-        BakeMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, mDecoratedVisualProperties->mCornerSquareness, mDecoratedPropertyCache.mCornerSquareness);
-        BakeMessage<float>(GetEventThreadServices(), *mUpdateObject, mDecoratedVisualProperties->mCornerRadiusPolicy, mDecoratedPropertyCache.mCornerRadiusPolicy);
-        BakeMessage<float>(GetEventThreadServices(), *mUpdateObject, mDecoratedVisualProperties->mBorderlineWidth, mDecoratedPropertyCache.mBorderlineWidth);
-        BakeMessage<Vector4>(GetEventThreadServices(), *mUpdateObject, mDecoratedVisualProperties->mBorderlineColor, mDecoratedPropertyCache.mBorderlineColor);
-        BakeMessage<float>(GetEventThreadServices(), *mUpdateObject, mDecoratedVisualProperties->mBorderlineOffset, mDecoratedPropertyCache.mBorderlineOffset);
-        BakeMessage<float>(GetEventThreadServices(), *mUpdateObject, mDecoratedVisualProperties->mBlurRadius, mDecoratedPropertyCache.mBlurRadius);
+        EventThreadServices& eventThreadServices = const_cast<EventThreadServices&>(GetEventThreadServices());
+        mDecoratedVisualCornerRadiusProperties   = new SceneGraph::VisualRenderer::DecoratedVisualCornerRadiusProperties();
+        OwnerPointer<SceneGraph::VisualRenderer::DecoratedVisualCornerRadiusProperties> transferOwnership(mDecoratedVisualCornerRadiusProperties);
+        SetDecoratedVisualCornerRadiusPropertiesMessage(eventThreadServices, GetRendererSceneObject(), transferOwnership);
       }
+
+      if(DALI_LIKELY(mDecoratedCornerRadiusPropertyCache == &gDummyDecoratedVisualCornerRadiusPropertyCache))
+      {
+        mDecoratedCornerRadiusPropertyCache = new DecoratedVisualCornerRadiusPropertyCache();
+      }
+
+      mDecoratedVisualCornerRadiusPropertiesCreated = true;
     }
+
+    if(DALI_UNLIKELY(IsDecoratedVisualBorderlinePropertyRequred(diffUniformFlag) && !mDecoratedVisualBorderlinePropertiesCreated))
+    {
+      if(DALI_LIKELY(mDecoratedVisualBorderlineProperties == nullptr))
+      {
+        EventThreadServices& eventThreadServices = const_cast<EventThreadServices&>(GetEventThreadServices());
+        mDecoratedVisualBorderlineProperties     = new SceneGraph::VisualRenderer::DecoratedVisualBorderlineProperties(const_cast<SceneGraph::Renderer&>(GetVisualRendererSceneObject()));
+        OwnerPointer<SceneGraph::VisualRenderer::DecoratedVisualBorderlineProperties> transferOwnership(mDecoratedVisualBorderlineProperties);
+        SetDecoratedVisualBorderlinePropertiesMessage(eventThreadServices, GetRendererSceneObject(), transferOwnership);
+      }
+
+      if(DALI_LIKELY(mDecoratedBorderlinePropertyCache == &gDummyDecoratedVisualBorderlinePropertyCache))
+      {
+        mDecoratedBorderlinePropertyCache = new DecoratedVisualBorderlinePropertyCache();
+      }
+
+      mDecoratedVisualBorderlinePropertiesCreated = true;
+    }
+
+    // Note. Let we don't remove UniformMapping due to the performane issue.
+    mAddUniformFlag |= newAddFlag;
 
     if(diffUniformFlag & DECORATED_VISUAL_RENDERER_USE_CORNER_RADIUS)
     {
@@ -613,9 +651,6 @@ void DecoratedVisualRenderer::AddUniformFlag(uint8_t newAddFlag)
     {
       AddUniformMapping(Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS, ConstString("blurRadius"));
     }
-
-    // Note. Let we don't remove UniformMapping due to the performane issue.
-    mAddUniformFlag |= newAddFlag;
   }
 }
 
