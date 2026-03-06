@@ -396,6 +396,7 @@ public:
   {
     if(!(mDirtyFlags & flag))
     {
+      SetUpdated(true);
       RequestResetUpdated();
     }
     mDirtyFlags |= flag;
@@ -408,6 +409,7 @@ public:
   {
     if(mDirtyFlags != NodePropertyFlags::ALL)
     {
+      SetUpdated(true);
       RequestResetUpdated();
     }
     mDirtyFlags = NodePropertyFlags::ALL;
@@ -830,7 +832,6 @@ public:
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      SetUpdated(true);
       SetAllDirtyFlags(); // TODO : Should we reset dirty flag more good way?
       mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), ignored);
     }
@@ -872,6 +873,7 @@ public:
     if(found == mExclusiveRenderTasks.end())
     {
       mExclusiveRenderTasks.push_back(renderTask);
+      SetUpdated(true);
     }
   }
 
@@ -886,6 +888,7 @@ public:
     if(found != mExclusiveRenderTasks.end())
     {
       mExclusiveRenderTasks.erase(found);
+      SetUpdated(true);
     }
   }
 
@@ -919,6 +922,8 @@ public:
   void SetDrawMode(const DrawMode::Type& drawMode)
   {
     mDrawMode = drawMode;
+
+    SetDirtyFlag(NodePropertyFlags::TRANSFORM | NodePropertyFlags::COLOR);
   }
 
   /**
@@ -933,6 +938,8 @@ public:
   void SetTransparent(bool transparent)
   {
     mTransparent = transparent;
+
+    SetDirtyFlag(NodePropertyFlags::COLOR);
   }
 
   bool IsTransparent() const
