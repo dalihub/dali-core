@@ -251,3 +251,104 @@ int UtcDaliAlphaFunctionBezier(void)
 
   END_TEST;
 }
+
+int UtcDaliAlphaFunctionCopyConstructorP(void)
+{
+  TestApplication application;
+
+  // Create alpha function using a built-in function
+  AlphaFunction alphaBuiltin(AlphaFunction::EASE_IN);
+  AlphaFunction alphaCopy(alphaBuiltin);
+
+  // Check if the copy has the same values
+  DALI_TEST_EQUALS(alphaCopy.GetBuiltinFunction(), alphaBuiltin.GetBuiltinFunction(), TEST_LOCATION);
+  DALI_TEST_EQUALS(alphaCopy.GetMode(), alphaBuiltin.GetMode(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAlphaFunctionMoveConstructorP(void)
+{
+  TestApplication application;
+
+  // Create alpha function using a built-in function
+  AlphaFunction alphaBuiltin(AlphaFunction::EASE_OUT);
+  AlphaFunction alphaMoved(std::move(alphaBuiltin));
+
+  // Check if the moved object has the correct values
+  DALI_TEST_EQUALS(alphaMoved.GetBuiltinFunction(), AlphaFunction::EASE_OUT, TEST_LOCATION);
+  DALI_TEST_EQUALS(alphaMoved.GetMode(), AlphaFunction::BUILTIN_FUNCTION, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAlphaFunctionCopyAssignmentP(void)
+{
+  TestApplication application;
+
+  AlphaFunction alpha1(AlphaFunction::EASE_IN);
+  AlphaFunction alpha2(AlphaFunction::EASE_OUT);
+
+  alpha2 = alpha1;
+
+  // Check if the assignment copied the values correctly
+  DALI_TEST_EQUALS(alpha2.GetBuiltinFunction(), alpha1.GetBuiltinFunction(), TEST_LOCATION);
+  DALI_TEST_EQUALS(alpha2.GetMode(), alpha1.GetMode(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAlphaFunctionMoveAssignmentP(void)
+{
+  TestApplication application;
+
+  AlphaFunction alpha1(AlphaFunction::EASE_IN);
+  AlphaFunction alpha2(AlphaFunction::EASE_OUT);
+
+  alpha2 = std::move(alpha1);
+
+  // Check if the assignment moved the values correctly
+  DALI_TEST_EQUALS(alpha2.GetBuiltinFunction(), AlphaFunction::EASE_IN, TEST_LOCATION);
+  DALI_TEST_EQUALS(alpha2.GetMode(), AlphaFunction::BUILTIN_FUNCTION, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAlphaFunctionSelfAssignmentP(void)
+{
+  TestApplication application;
+
+  AlphaFunction alpha(AlphaFunction::EASE_IN_OUT);
+
+  // Self assignment should not cause issues
+  alpha = alpha;
+
+  // Check that values remain unchanged
+  DALI_TEST_EQUALS(alpha.GetBuiltinFunction(), AlphaFunction::EASE_IN_OUT, TEST_LOCATION);
+  DALI_TEST_EQUALS(alpha.GetMode(), AlphaFunction::BUILTIN_FUNCTION, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAlphaFunctionGetN(void)
+{
+  TestApplication application;
+
+  //Create alpha function using a built-in function
+  AlphaFunction alphaBuiltin(AlphaFunction::EASE_IN);
+
+  DALI_TEST_EQUALS(alphaBuiltin.GetBezierControlPoints(), Vector4::ZERO, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(alphaBuiltin.GetCustomFunction(), static_cast<AlphaFunctionPrototype>(nullptr), TEST_LOCATION);
+
+  //Construct the alpha function with two control points
+  Vector2       controlPoint0 = Vector2(0.0f, 1.0f);
+  Vector2       controlPoint1 = Vector2(1.0f, 0.0f);
+  AlphaFunction alphaBezier(controlPoint0, controlPoint1);
+
+  SpringData springData{};
+  DALI_TEST_EQUALS(alphaBezier.GetSpringData().GetMass(), springData.GetMass(), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(alphaBezier.GetSpringData().GetDamping(), springData.GetDamping(), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(alphaBezier.GetSpringData().GetStiffness(), springData.GetStiffness(), 0.0001f, TEST_LOCATION);
+
+  END_TEST;
+}

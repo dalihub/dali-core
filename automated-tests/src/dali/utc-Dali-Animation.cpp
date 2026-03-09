@@ -17349,34 +17349,34 @@ int UtcDaliAnimationSpringSetGet(void)
   tet_infoline("UtcDaliAnimation spring test finished in expected time.");
 
   AlphaFunction springGentle(AlphaFunction::SpringType::GENTLE);
-  DALI_TEST_EQUALS(100.0f, springGentle.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(15.0f, springGentle.GetSpringData().damping, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(1.0f, springGentle.GetSpringData().mass, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(100.0f, springGentle.GetSpringData().GetStiffness(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(15.0f, springGentle.GetSpringData().GetDamping(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springGentle.GetSpringData().GetMass(), 0.01f, TEST_LOCATION);
 
   AlphaFunction springQuick(AlphaFunction::SpringType::QUICK);
-  DALI_TEST_EQUALS(300.0f, springQuick.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(20.0f, springQuick.GetSpringData().damping, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(1.0f, springQuick.GetSpringData().mass, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(300.0f, springQuick.GetSpringData().GetStiffness(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(20.0f, springQuick.GetSpringData().GetDamping(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springQuick.GetSpringData().GetMass(), 0.01f, TEST_LOCATION);
 
   AlphaFunction springBouncy(AlphaFunction::SpringType::BOUNCY);
-  DALI_TEST_EQUALS(600.0f, springBouncy.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(15.0f, springBouncy.GetSpringData().damping, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(1.0f, springBouncy.GetSpringData().mass, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(600.0f, springBouncy.GetSpringData().GetStiffness(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(15.0f, springBouncy.GetSpringData().GetDamping(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springBouncy.GetSpringData().GetMass(), 0.01f, TEST_LOCATION);
 
   AlphaFunction springSlow(AlphaFunction::SpringType::SLOW);
-  DALI_TEST_EQUALS(94.0f, springSlow.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(18.5f, springSlow.GetSpringData().damping, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(1.0f, springSlow.GetSpringData().mass, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(94.0f, springSlow.GetSpringData().GetStiffness(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(18.5f, springSlow.GetSpringData().GetDamping(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(1.0f, springSlow.GetSpringData().GetMass(), 0.01f, TEST_LOCATION);
 
   AlphaFunction springCustom1({-10.0f, -9.0f, -8.0f});
-  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().damping, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().mass, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().GetStiffness(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().GetDamping(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.1f, springCustom1.GetSpringData().GetMass(), 0.01f, TEST_LOCATION);
 
   AlphaFunction springCustom2({10.0f, 9.0f, 8.0f});
-  DALI_TEST_EQUALS(10.0f, springCustom2.GetSpringData().stiffness, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(9.0f, springCustom2.GetSpringData().damping, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(8.0f, springCustom2.GetSpringData().mass, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(10.0f, springCustom2.GetSpringData().GetStiffness(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(9.0f, springCustom2.GetSpringData().GetDamping(), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(8.0f, springCustom2.GetSpringData().GetMass(), 0.01f, TEST_LOCATION);
 
   END_TEST;
 }

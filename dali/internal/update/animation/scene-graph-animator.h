@@ -335,9 +335,9 @@ public:
     }
     else if(alphaFunctionMode == AlphaFunction::SPRING || alphaFunctionMode == AlphaFunction::CUSTOM_SPRING)
     {
-      double stiffness = mAlphaFunction.GetSpringData().stiffness;
-      double damping   = mAlphaFunction.GetSpringData().damping;
-      double mass      = mAlphaFunction.GetSpringData().mass;
+      double stiffness = mAlphaFunction.GetSpringData().GetStiffness();
+      double damping   = mAlphaFunction.GetSpringData().GetDamping();
+      double mass      = mAlphaFunction.GetSpringData().GetMass();
 
       double omega0 = std::sqrt(stiffness / mass);
       double zeta   = damping / (2.0f * std::sqrt(stiffness * mass));
