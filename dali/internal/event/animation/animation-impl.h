@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,9 +74,9 @@ public:
     PAUSED  = Dali::Animation::State::PAUSED,  ///< @copydoc Dali::Animation::State::PAUSED
 
     CLEARED,                 ///< Animation is cleared.
-    STOPPING,                ///< Stopping animation. It will be STOPPED when animation finisehd signal called.
-    PLAYING_DURING_STOPPING, ///< Play called during stopping. It will be PLAYING when animation finisehd signal called.
-    PAUSED_DURING_STOPPING,  ///< Pause called during stopping. It will be PAUSED when animation finisehd signal called.
+    STOPPING,                ///< Stopping animation. It will be STOPPED when animation finished signal called.
+    PLAYING_DURING_STOPPING, ///< Play called during stopping. It will be PLAYING when animation finished signal called.
+    PAUSED_DURING_STOPPING,  ///< Pause called during stopping. It will be PAUSED when animation finished signal called.
   };
 
   using EndAction     = Dali::Animation::EndAction;
@@ -499,17 +499,24 @@ private:
   {
     ConnectorTargetValues() = default;
 
-    ConnectorTargetValues(Property::Value value, TimePeriod time, std::size_t index, Animation::Type type)
-    : targetValue(std::move(value)),
+    ConnectorTargetValues(Property::Value initial, Property::Value target, TimePeriod time, std::size_t index, Animation::Type type)
+    : initialValue(std::move(initial)),
+      targetValue(std::move(target)),
       timePeriod(time),
       connectorIndex(index),
       animatorType(type)
     {
     }
 
+    ConnectorTargetValues(Property::Value value, TimePeriod time, std::size_t index, Animation::Type type)
+    : ConnectorTargetValues(Property::Value(), std::move(value), time, index, type)
+    {
+    }
+
     // Move operations
     ConnectorTargetValues(ConnectorTargetValues&& rhs) noexcept
-    : targetValue(std::move(rhs.targetValue)),
+    : initialValue(std::move(rhs.initialValue)),
+      targetValue(std::move(rhs.targetValue)),
       timePeriod(std::move(rhs.timePeriod)),
       connectorIndex(rhs.connectorIndex),
       animatorType(rhs.animatorType)
@@ -518,6 +525,7 @@ private:
 
     ConnectorTargetValues& operator=(ConnectorTargetValues&& rhs) noexcept
     {
+      initialValue   = std::move(rhs.initialValue);
       targetValue    = std::move(rhs.targetValue);
       timePeriod     = std::move(rhs.timePeriod);
       connectorIndex = rhs.connectorIndex;
@@ -525,6 +533,7 @@ private:
       return *this;
     }
 
+    Property::Value initialValue;
     Property::Value targetValue;
     TimePeriod      timePeriod{0.f};
     std::size_t     connectorIndex{0};
@@ -603,11 +612,12 @@ private:
   int32_t       mLoopCount{1};
   float         mProgressReachedMarker{0.0f};
   float         mDelaySeconds{0.0f};
-  EndAction     mEndAction;
-  EndAction     mDisconnectAction;
-  InternalState mState{InternalState::CLEARED};
-  bool          mAutoReverseEnabled{false};                ///< Flag to identify that the looping mode is auto reverse.
-  bool          mConnectorTargetValuesSortRequired{false}; ///< Flag to whether we need to sort mConnectorTargetValues or not
+  InternalState mState;
+
+  EndAction mEndAction : 3;
+  EndAction mDisconnectAction : 3;
+  bool      mAutoReverseEnabled : 1;                ///< Flag to identify that the looping mode is auto reverse.
+  bool      mConnectorTargetValuesSortRequired : 1; ///< Flag to whether we need to sort mConnectorTargetValues or not
 };
 
 } // namespace Internal
