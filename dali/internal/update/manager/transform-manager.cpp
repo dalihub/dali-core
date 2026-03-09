@@ -256,7 +256,6 @@ TransformId TransformManager::CreateTransform()
     mSize.PushBack(Vector3(0.0f, 0.0f, 0.0f));
     mParent.PushBack(PARENT_OF_OFF_SCENE_TRANSFORM_ID);
     mWorld.PushBack(Matrix::IDENTITY);
-    mLocal.PushBack(Matrix::IDENTITY);
     mBoundingSpheres.PushBack(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
     mSizeBase.PushBack(Vector3(0.0f, 0.0f, 0.0f));
   }
@@ -270,7 +269,6 @@ TransformId TransformManager::CreateTransform()
     mComponentId[mComponentCount]         = id;
     mSize[mComponentCount]                = Vector3(0.0f, 0.0f, 0.0f);
     mParent[mComponentCount]              = PARENT_OF_OFF_SCENE_TRANSFORM_ID;
-    mLocal[mComponentCount].SetIdentity();
     mWorld[mComponentCount].SetIdentity();
     mBoundingSpheres[mComponentCount] = Vector4(0.0f, 0.0f, 0.0f, 0.0f);
     mSizeBase[mComponentCount]        = Vector3(0.0f, 0.0f, 0.0f);
@@ -292,7 +290,6 @@ void TransformManager::RemoveTransform(TransformId id)
   mSize[index]                           = mSize[mComponentCount];
   mParent[index]                         = mParent[mComponentCount];
   mWorld[index]                          = mWorld[mComponentCount];
-  mLocal[index]                          = mLocal[mComponentCount];
   mTxComponentAnimatableBaseValue[index] = mTxComponentAnimatableBaseValue[mComponentCount];
   mSizeBase[index]                       = mSizeBase[mComponentCount];
   mBoundingSpheres[index]                = mBoundingSpheres[mComponentCount];
@@ -384,6 +381,7 @@ bool TransformManager::Update()
   // Iterate through all components to compute its world matrix
   Vector3 centerPosition;
   Vector3 localPosition;
+  Matrix  localMatrix(false); ///< Temporal local matrix for apply transforms.
   for(uint32_t i = 0; i < mValidComponentCount; ++i)
   {
     TransformComponentBitField::SetWorldMatrixDirtyBitField(mTxComponentBitField[i], false);
@@ -407,10 +405,11 @@ bool TransformManager::Update()
           // Full transform inherited
           CalculateCenterPosition(centerPosition, positionUsesAnchorPoint, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
           localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - CENTER) * mSize[parentIndex];
-          mLocal[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
+
+          localMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
 
           // Update the world matrix
-          MatrixUtils::MultiplyTransformMatrix(mWorld[i], mLocal[i], mWorld[parentIndex]);
+          MatrixUtils::MultiplyTransformMatrix(mWorld[i], localMatrix, mWorld[parentIndex]);
         }
       }
       else
@@ -427,16 +426,14 @@ bool TransformManager::Update()
         // Compute intermediate Local information
         CalculateCenterPosition(centerPosition, positionUsesAnchorPoint, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
         Vector3 intermediateLocalPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - CENTER) * mSize[parentIndex];
-        Matrix  intermediateLocalMatrix;
-        intermediateLocalMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, intermediateLocalPosition);
+        localMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, intermediateLocalPosition);
 
         // Compute intermediate world information
-        Matrix intermediateWorldMatrix;
-        MatrixUtils::MultiplyTransformMatrix(intermediateWorldMatrix, intermediateLocalMatrix, mWorld[parentIndex]);
+        MatrixUtils::MultiplyTransformMatrix(mWorld[i], localMatrix, mWorld[parentIndex]);
 
         Vector3    intermediateWorldPosition, intermediateWorldScale;
         Quaternion intermediateWorldOrientation;
-        intermediateWorldMatrix.GetTransformComponents(intermediateWorldPosition, intermediateWorldOrientation, intermediateWorldScale);
+        mWorld[i].GetTransformComponents(intermediateWorldPosition, intermediateWorldOrientation, intermediateWorldScale);
 
         // Compute final world information
         Vector3    finalWorldPosition    = intermediateWorldPosition;
@@ -474,10 +471,6 @@ bool TransformManager::Update()
 
         mWorld[i].SetTransformComponents(finalWorldScale, finalWorldOrientation, finalWorldPosition);
 
-        Matrix inverseParentMatrix;
-        inverseParentMatrix.SetInverseTransformComponents(parentScale, parentOrientation, parentPosition);
-        mLocal[i] = inverseParentMatrix * mWorld[i];
-
         // TODO : We need to check componentWasDirty since we have to check the size changeness.
         //        Could we check size changeness only?
         worldMatrixDirty = (componentWasDirty || (previousWorldMatrix != mWorld[i]));
@@ -493,8 +486,8 @@ bool TransformManager::Update()
 
         CalculateCenterPosition(centerPosition, positionUsesAnchorPoint, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
         localPosition = mTxComponentAnimatable[i].mPosition + centerPosition;
-        mLocal[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
-        mWorld[i] = mLocal[i];
+
+        mWorld[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
       }
     }
 
@@ -533,7 +526,6 @@ void TransformManager::SwapComponents(unsigned int i, unsigned int j)
   std::swap(mComponentId[i], mComponentId[j]);
   std::swap(mTxComponentAnimatableBaseValue[i], mTxComponentAnimatableBaseValue[j]);
   std::swap(mSizeBase[i], mSizeBase[j]);
-  std::swap(mLocal[i], mLocal[j]);
   std::swap(mBoundingSpheres[i], mBoundingSpheres[j]);
   std::swap(mWorld[i], mWorld[j]);
 
@@ -644,7 +636,6 @@ void TransformManager::ReorderComponents()
     mSize.Resize(mComponentCount);
     mParent.Resize(mComponentCount);
     mWorld.Resize(mComponentCount);
-    mLocal.Resize(mComponentCount);
     mBoundingSpheres.Resize(mComponentCount);
     mTxComponentAnimatableBaseValue.Resize(mComponentCount);
     mSizeBase.Resize(mComponentCount);
@@ -657,7 +648,6 @@ void TransformManager::ReorderComponents()
     mSize.ShrinkToFit();
     mParent.ShrinkToFit();
     mWorld.ShrinkToFit();
-    mLocal.ShrinkToFit();
     mBoundingSpheres.ShrinkToFit();
     mTxComponentAnimatableBaseValue.ShrinkToFit();
     mSizeBase.ShrinkToFit();
