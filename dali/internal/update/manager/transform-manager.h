@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TRANSFORM_MANAGER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,9 +49,6 @@ struct TransformComponentStatic
 {
   Vector3 mAnchorPoint;
   Vector3 mParentOrigin;
-  bool    mPositionUsesAnchorPoint;
-  bool    mIgnored;
-  bool    mWorldIgnored;
 };
 
 enum InheritanceMode
@@ -62,6 +59,130 @@ enum InheritanceMode
   INHERIT_ORIENTATION    = 4,
   INHERIT_ALL            = INHERIT_POSITION | INHERIT_SCALE | INHERIT_ORIENTATION,
 };
+
+namespace TransformComponentBitField
+{
+/**
+ * Struct to store the non-animatable bit-field part of a component (InheritMode, DirtyFlags)
+ *
+ * 0xabcccdee
+ * ..a....... = PositionUsesAnhorPoint : 1 bit
+ * ...b...... = Ignored : 1 bit
+ * ....ccc... = InheritanceMode : 3 bits
+ * .......d.. = World matrix dirty flag : 1 bit
+ *              1u if the world matrix has been updated in this frame, 0 otherwise
+ * ........ee = Component property dirty flag : 2 bit
+ *              Follow as animatable property's dirty flag.
+ *              Or If we change static component changed, flag become non-zero. Age down at Update time.
+ *              Note that we don't replace dirty flag as BAKE even if we call Bake operation.
+ *              (Since single dirty flag controls multiple animatable properties ; Position, Size, Scale, Orientation.)
+ */
+using FlagType = uint8_t;
+
+static constexpr uint32_t COMPONENT_DIRTY_BITS_COUNT            = 2u;
+static constexpr uint32_t WORLD_MATRIX_DIRTY_BITS_COUNT         = 1u;
+static constexpr uint32_t INHERITANCE_MODE_BITS_COUNT           = 3u;
+static constexpr uint32_t IGNORED_BITS_COUNT                    = 1u;
+static constexpr uint32_t POSITION_USES_ANCHOR_POINT_BITS_COUNT = 1u;
+
+static_assert(COMPONENT_DIRTY_BITS_COUNT + WORLD_MATRIX_DIRTY_BITS_COUNT + INHERITANCE_MODE_BITS_COUNT + IGNORED_BITS_COUNT + POSITION_USES_ANCHOR_POINT_BITS_COUNT <= 8 * sizeof(FlagType));
+
+static constexpr uint32_t WORLD_MATRIX_DIRTY_SHIFT         = COMPONENT_DIRTY_BITS_COUNT;
+static constexpr uint32_t INHERITANCE_MODE_SHIFT           = WORLD_MATRIX_DIRTY_SHIFT + WORLD_MATRIX_DIRTY_BITS_COUNT;
+static constexpr uint32_t IGNORED_SHIFT                    = INHERITANCE_MODE_SHIFT + INHERITANCE_MODE_BITS_COUNT;
+static constexpr uint32_t POSITION_USES_ANCHOR_POINT_SHIFT = IGNORED_SHIFT + IGNORED_BITS_COUNT;
+
+static constexpr uint32_t COMPONENT_DIRTY_MASK            = ((1u << COMPONENT_DIRTY_BITS_COUNT) - 1u);
+static constexpr uint32_t WORLD_MATRIX_DIRTY_MASK         = ((1u << WORLD_MATRIX_DIRTY_BITS_COUNT) - 1u);
+static constexpr uint32_t INHERITANCE_MODE_MASK           = ((1u << INHERITANCE_MODE_BITS_COUNT) - 1u);
+static constexpr uint32_t IGNORED_MASK                    = ((1u << IGNORED_BITS_COUNT) - 1u);
+static constexpr uint32_t POSITION_USES_ANCHOR_POINT_MASK = ((1u << POSITION_USES_ANCHOR_POINT_BITS_COUNT) - 1u);
+
+/**
+ * @brief Helper codes to set / get variables from TransformBitField::FlagType
+ */
+
+inline void SetComponentDirtyBitField(TransformComponentBitField::FlagType& flags, uint8_t dirtyFlags)
+{
+  flags |= (static_cast<TransformComponentBitField::FlagType>(dirtyFlags) & TransformComponentBitField::COMPONENT_DIRTY_MASK);
+}
+
+inline void SetWorldMatrixDirtyBitField(TransformComponentBitField::FlagType& flags, bool dirty)
+{
+  if(dirty)
+  {
+    flags |= (TransformComponentBitField::WORLD_MATRIX_DIRTY_MASK << TransformComponentBitField::WORLD_MATRIX_DIRTY_SHIFT);
+  }
+  else
+  {
+    flags &= ~(TransformComponentBitField::WORLD_MATRIX_DIRTY_MASK << TransformComponentBitField::WORLD_MATRIX_DIRTY_SHIFT);
+  }
+}
+
+inline void SetInheritanceModeBitField(TransformComponentBitField::FlagType& flags, InheritanceMode inheritMode)
+{
+  flags &= ~(TransformComponentBitField::INHERITANCE_MODE_MASK << TransformComponentBitField::INHERITANCE_MODE_SHIFT);
+  flags |= (static_cast<TransformComponentBitField::FlagType>(inheritMode) & TransformComponentBitField::INHERITANCE_MODE_MASK) << TransformComponentBitField::INHERITANCE_MODE_SHIFT;
+}
+
+inline void SetIgnoredBitField(TransformComponentBitField::FlagType& flags, bool ignored)
+{
+  if(ignored)
+  {
+    flags |= (TransformComponentBitField::IGNORED_MASK << TransformComponentBitField::IGNORED_SHIFT);
+  }
+  else
+  {
+    flags &= ~(TransformComponentBitField::IGNORED_MASK << TransformComponentBitField::IGNORED_SHIFT);
+  }
+}
+
+inline void SetPositionUsesAnchorPointBitField(TransformComponentBitField::FlagType& flags, bool used)
+{
+  if(used)
+  {
+    flags |= (TransformComponentBitField::POSITION_USES_ANCHOR_POINT_MASK << TransformComponentBitField::POSITION_USES_ANCHOR_POINT_SHIFT);
+  }
+  else
+  {
+    flags &= ~(TransformComponentBitField::POSITION_USES_ANCHOR_POINT_MASK << TransformComponentBitField::POSITION_USES_ANCHOR_POINT_SHIFT);
+  }
+}
+
+inline bool IsComponentDirtyBitField(const TransformComponentBitField::FlagType& flags)
+{
+  return flags & (TransformComponentBitField::COMPONENT_DIRTY_MASK | (TransformComponentBitField::WORLD_MATRIX_DIRTY_MASK << TransformComponentBitField::WORLD_MATRIX_DIRTY_SHIFT));
+}
+
+inline bool IsWorldMatrixDirtyBitField(const TransformComponentBitField::FlagType& flags)
+{
+  return flags & (TransformComponentBitField::WORLD_MATRIX_DIRTY_MASK << TransformComponentBitField::WORLD_MATRIX_DIRTY_SHIFT);
+}
+
+inline InheritanceMode GetInheritanceModeBitField(const TransformComponentBitField::FlagType& flags)
+{
+  return static_cast<InheritanceMode>((flags >> TransformComponentBitField::INHERITANCE_MODE_SHIFT) & TransformComponentBitField::INHERITANCE_MODE_MASK);
+}
+
+inline bool IsIgnoredBitField(const TransformComponentBitField::FlagType& flags)
+{
+  return flags & (TransformComponentBitField::IGNORED_MASK << TransformComponentBitField::IGNORED_SHIFT);
+}
+
+inline bool IsPositionUsesAnchorPointBitField(const TransformComponentBitField::FlagType& flags)
+{
+  return flags & (TransformComponentBitField::POSITION_USES_ANCHOR_POINT_MASK << TransformComponentBitField::POSITION_USES_ANCHOR_POINT_SHIFT);
+}
+
+inline void ComponentDirtyAging(TransformComponentBitField::FlagType& flags)
+{
+  // Shift down last 2 bits only.
+  auto dirty = (flags & TransformComponentBitField::COMPONENT_DIRTY_MASK);
+  flags &= ~(TransformComponentBitField::COMPONENT_DIRTY_MASK);
+  flags |= (dirty >> 1);
+}
+
+} // namespace TransformComponentBitField
 
 enum TransformManagerProperty
 {
@@ -182,12 +303,13 @@ public:
 
   /**
    * Checks if the world transform was updated in the last Update
+   * @note It will return valid value only after Transform::Update() called.
    * @param[in] id Id of the transform
    * @return true if world matrix changed in the last update, false otherwise
    */
   bool IsWorldMatrixDirty(TransformId id) const
   {
-    return mWorldMatrixDirty[mIds[id]];
+    return TransformComponentBitField::IsWorldMatrixDirtyBitField(mTxComponentBitField[mIds[id]]);
   }
 
   /**
@@ -384,14 +506,20 @@ public:
    * @param[in] id Id of the transform component.
    * @return True if the component is ignored.
    */
-  const bool& IsIgnored(TransformId id) const;
+  bool IsIgnored(TransformId id) const
+  {
+    return TransformComponentBitField::IsIgnoredBitField(mTxComponentBitField[mIds[id]]);
+  }
 
   /**
    * @brief Gets world ignored value.
    * @param[in] id Id of the transform component.
    * @return True if the component is world ignored.
    */
-  const bool& IsWorldIgnored(TransformId id) const;
+  bool IsWorldIgnored(TransformId id) const
+  {
+    return mIds[id] >= mValidComponentCount;
+  }
 
 private:
   // Helper struct to order components
@@ -428,27 +556,21 @@ private:
    */
   void ReorderComponents();
 
-  uint32_t mComponentCount;        ///< Total number of components
-  uint32_t mIgnoredComponentCount; ///< Total number of ignored components
+  uint32_t mComponentCount;      ///< Total number of components
+  uint32_t mValidComponentCount; ///< Total number of valid components
 
-  FreeList                             mIds;                            ///< FreeList of Ids
-  Vector<TransformComponentAnimatable> mTxComponentAnimatable;          ///< Animatable part of the components
-  Vector<TransformComponentStatic>     mTxComponentStatic;              ///< Static part of the components
-  Vector<uint32_t>                     mInheritanceMode;                ///< Inheritance mode of the components
-  Vector<TransformId>                  mComponentId;                    ///< Ids of the components
-  Vector<Vector3>                      mSize;                           ///< Size of the components
-  Vector<TransformId>                  mParent;                         ///< Parent of the components
-  Vector<Matrix>                       mWorld;                          ///< Local to world transform of the components
-  Vector<Matrix>                       mLocal;                          ///< Local to parent space transform of the components
-  Vector<Vector4>                      mBoundingSpheres;                ///< Bounding spheres. xyz is the center and w is the radius
-  Vector<TransformComponentAnimatable> mTxComponentAnimatableBaseValue; ///< Base values for the animatable part of the components
-  Vector<Vector3>                      mSizeBase;                       ///< Base value for the size of the components
-
-  Vector<uint8_t> mComponentDirty; ///< Dirty flags for each component. Follow as animatable property's dirty flag.
-                                   ///< Or If we change static component changed, flag become non-zero. Age down at Update time.
-                                   ///< Note that we don't replace dirty flag as BAKE even if we call Bake operation.
-                                   ///< (Since single dirty flag controls multiple animatable properties ; Position, Size, Scale, Orientation.)
-  Vector<bool> mWorldMatrixDirty;  ///< 1u if the world matrix has been updated in this frame, 0 otherwise
+  FreeList                                     mIds;                            ///< FreeList of Ids
+  Vector<TransformComponentAnimatable>         mTxComponentAnimatable;          ///< Animatable part of the components
+  Vector<TransformComponentStatic>             mTxComponentStatic;              ///< Static part of the components
+  Vector<TransformComponentBitField::FlagType> mTxComponentBitField;            ///< Bit-field part of the components
+  Vector<TransformId>                          mComponentId;                    ///< Ids of the components
+  Vector<Vector3>                              mSize;                           ///< Size of the components
+  Vector<TransformId>                          mParent;                         ///< Parent of the components
+  Vector<Matrix>                               mWorld;                          ///< Local to world transform of the components
+  Vector<Matrix>                               mLocal;                          ///< Local to parent space transform of the components
+  Vector<Vector4>                              mBoundingSpheres;                ///< Bounding spheres. xyz is the center and w is the radius
+  Vector<TransformComponentAnimatable>         mTxComponentAnimatableBaseValue; ///< Base values for the animatable part of the components
+  Vector<Vector3>                              mSizeBase;                       ///< Base value for the size of the components
 
   Vector<SOrderItem> mOrderedComponents; ///< Used to reorder components when hierarchy changes
 
