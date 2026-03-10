@@ -33,13 +33,13 @@ struct CallbackBasePtrCompare
   {
     // Compare function pointers first.
     // Note that std::less is safe way to ordering the function pointers.
-    const Dali::CallbackBase::Function& lhsFunctionPtr = lhs->mFunction;
-    const Dali::CallbackBase::Function& rhsFunctionPtr = rhs->mFunction;
-    if(std::less<Dali::CallbackBase::Function>()(lhsFunctionPtr, rhsFunctionPtr))
+    const Dali::CallbackBase::StaticFunction& lhsFunctionPtr = lhs->mStaticFunction;
+    const Dali::CallbackBase::StaticFunction& rhsFunctionPtr = rhs->mStaticFunction;
+    if(std::less<Dali::CallbackBase::StaticFunction>()(lhsFunctionPtr, rhsFunctionPtr))
     {
       return true;
     }
-    else if(std::less<Dali::CallbackBase::Function>()(rhsFunctionPtr, lhsFunctionPtr))
+    else if(std::less<Dali::CallbackBase::StaticFunction>()(rhsFunctionPtr, lhsFunctionPtr))
     {
       return false;
     }
