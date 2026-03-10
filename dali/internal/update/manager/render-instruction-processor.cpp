@@ -397,7 +397,6 @@ inline bool SetupRenderList(RenderableContainer& renderables,
                             RenderList**         renderList)
 {
   *renderList = &(instruction.GetNextFreeRenderList(renderables.Size()));
-  (*renderList)->SetClipping(layer.IsClipping(), layer.GetClippingBox());
   (*renderList)->SetSourceLayer(&layer);
 
   // Try to reuse cached RenderItems from last time around.

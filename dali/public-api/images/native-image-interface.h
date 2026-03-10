@@ -169,7 +169,7 @@ public:
    * @brief Retrieves the internal native image.
    *
    * @SINCE_1_9.23
-   * @return Any object containing the internal native image source
+   * @return Any object containing the internal native image handle
    */
   virtual Any GetNativeImageHandle() const = 0;
 

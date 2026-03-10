@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATOR_CONNECTOR_BASE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,6 +146,11 @@ public:
   Property::Index GetPropertyIndex() const
   {
     return mPropertyIndex;
+  }
+
+  const AlphaFunction& GetAlphaFunction() const
+  {
+    return mAlphaFunction;
   }
 
 private:

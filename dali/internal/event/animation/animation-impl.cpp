@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -297,8 +297,11 @@ Animation::Animation(EventThreadServices& eventThreadServices, AnimationPlaylist
   mPlaylist(playlist),
   mDefaultAlpha(defaultAlpha),
   mDurationSeconds(durationSeconds),
+  mState(InternalState::CLEARED),
   mEndAction(endAction),
-  mDisconnectAction(disconnectAction)
+  mDisconnectAction(disconnectAction),
+  mAutoReverseEnabled(false),
+  mConnectorTargetValuesSortRequired(false)
 {
 }
 
@@ -908,6 +911,9 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
 
   const Property::Type propertyType = object.GetPropertyType(target.propertyIndex);
 
+  auto firstKeyFrameValue = keyFramesImpl.GetFirstKeyFrameValue();
+  ValidateAndConvertParameters(propertyType, period, firstKeyFrameValue);
+
   auto lastKeyFrameValue = keyFramesImpl.GetLastKeyFrameValue();
   ValidateAndConvertParameters(propertyType, period, lastKeyFrameValue);
 
@@ -933,7 +939,7 @@ void Animation::AnimateBetween(Property target, Dali::KeyFrames keyFrames, Alpha
 
   ExtendDuration(period);
 
-  AppendConnectorTargetValues({lastKeyFrameValue, period, mConnectors.Count(), BETWEEN});
+  AppendConnectorTargetValues({firstKeyFrameValue, lastKeyFrameValue, period, mConnectors.Count(), BETWEEN});
 
   switch(propertyType)
   {
@@ -1339,7 +1345,7 @@ bool Animation::CompareConnectorEndTimes(const Animation::ConnectorTargetValues&
 
 void Animation::NotifyObjects(Animation::Notify notifyValueType)
 {
-  // If the animation is discarded, then we do not want to change the target values unless we want to force the current values
+  // If the animation is discarded then we do not want to change the target values unless we want to force the current values
   if(mEndAction != EndAction::DISCARD || notifyValueType == Notify::FORCE_CURRENT_VALUE)
   {
     // Sort according to end time with earlier end times coming first, if the end time is the same, then the connectors are not moved
@@ -1363,11 +1369,85 @@ void Animation::NotifyObjects(Animation::Notify notifyValueType)
       if(object && object->IsAnimationPossible())
       {
         const auto propertyIndex = connector->GetPropertyIndex();
-        object->NotifyPropertyAnimation(
-          *this,
-          propertyIndex,
-          (notifyValueType == Notify::USE_TARGET_VALUE) ? iter->targetValue : object->GetCurrentProperty(propertyIndex),
-          (notifyValueType == Notify::USE_TARGET_VALUE) ? iter->animatorType : Animation::TO); // If we're setting the current value, then use TO as we want to set, not adjust, the current value
+
+        if(notifyValueType == Notify::USE_TARGET_VALUE)
+        {
+          const bool  negativeSpeedFactor    = (mSpeedFactor < 0.0f);
+          const auto& alphaFunction          = connector->GetAlphaFunction();
+          bool        finishedAtInitialState = false;
+
+          if(alphaFunction.GetMode() == AlphaFunction::BUILTIN_FUNCTION)
+          {
+            switch(alphaFunction.GetBuiltinFunction())
+            {
+              case AlphaFunction::BuiltinFunction::REVERSE:
+              {
+                // Reversed 1.0f -> 0.0f progress alpha functions.
+                //  - Normal : 1.0f -> 0.0f
+                //  - Negative speed factor : 0.0f -> 1.0f
+                //  - Auto reverse enabled : 1.0f -> 1.0f
+                //  - Negative speed factor + Auto reverse enabled : 0.0f -> 0.0f
+                finishedAtInitialState = !(mAutoReverseEnabled ^ negativeSpeedFactor);
+                break;
+              }
+              case AlphaFunction::BuiltinFunction::BOUNCE:
+              case AlphaFunction::BuiltinFunction::SIN:
+              {
+                // Automatically reversed 0.0f -> 0.0f progress alpha functions.
+                //  - Normal : 0.0f -> 0.0f
+                //  - Negative speed factor : 0.0f -> 0.0f
+                //  - Auto reverse enabled : 0.0f -> 0.0f
+                //  - Negative speed factor + Auto reverse enabled : 0.0f -> 0.0f
+                finishedAtInitialState = true;
+                break;
+              }
+              default:
+              {
+                // Standard 0.0f -> 1.0f progress alpha functions.
+                //  - Normal : 0.0f -> 1.0f
+                //  - Negative speed factor : 1.0f -> 0.0f
+                //  - Auto reverse enabled : 0.0f -> 0.0f
+                //  - Negative speed factor + Auto reverse enabled : 1.0f -> 1.0f
+                finishedAtInitialState = (mAutoReverseEnabled ^ negativeSpeedFactor);
+                break;
+              }
+            }
+          }
+          else
+          {
+            // Standard 0.0f -> 1.0f progress alpha functions.
+            //  - Normal : 0.0f -> 1.0f
+            //  - Negative speed factor : 1.0f -> 0.0f
+            //  - Auto reverse enabled : 0.0f -> 0.0f
+            //  - Negative speed factor + Auto reverse enabled : 1.0f -> 1.0f
+            finishedAtInitialState = (mAutoReverseEnabled ^ negativeSpeedFactor);
+          }
+
+          if(!finishedAtInitialState)
+          {
+            object->NotifyPropertyAnimation(
+              *this,
+              propertyIndex,
+              iter->targetValue,
+              iter->animatorType);
+          }
+          else
+          {
+            object->NotifyPropertyAnimation(
+              *this,
+              propertyIndex,
+              iter->initialValue, ///< Note : initialValue could be empty value if we cannot determine it.
+              iter->animatorType);
+          }
+        }
+        else
+        {
+          object->NotifyPropertyAnimation(
+            *this,
+            propertyIndex,
+            object->GetCurrentProperty(propertyIndex),
+            Animation::TO); // If we're setting the current value, then use TO as we want to set, not adjust, the current value
+        }
       }
     }
   }

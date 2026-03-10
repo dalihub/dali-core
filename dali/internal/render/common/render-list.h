@@ -54,15 +54,11 @@ using RenderListContainer = OwnerContainer<RenderList*>;
 struct RenderList
 {
 public:
-  using ClippingBox = Dali::Rect<int32_t>;
-
-public:
   /**
    * Constructor
    */
   RenderList()
   : mNextFree(0),
-    mClippingBox(nullptr),
     mSourceLayer(nullptr),
     mHasColorRenderItems(false)
   {
@@ -73,8 +69,6 @@ public:
    */
   ~RenderList()
   {
-    // Pointer container deletes the render items
-    delete mClippingBox;
   }
 
   /*
@@ -90,9 +84,6 @@ public:
   {
     // We don't want to delete and re-create the render items every frame
     mNextFree = 0;
-
-    delete mClippingBox;
-    mClippingBox = nullptr;
   }
 
   /**
@@ -189,36 +180,6 @@ public:
   }
 
   /**
-   * Set clipping
-   * @param clipping on/off
-   * @param box for clipping
-   */
-  void SetClipping(bool clipping, const ClippingBox& box)
-  {
-    if(clipping)
-    {
-      delete mClippingBox;
-      mClippingBox = new ClippingBox(box);
-    }
-  }
-
-  /**
-   * @return true if clipping is on
-   */
-  bool IsClipping() const
-  {
-    return (nullptr != mClippingBox);
-  }
-
-  /**
-   * @return the clipping box
-   */
-  const ClippingBox& GetClippingBox() const
-  {
-    return *mClippingBox;
-  }
-
-  /**
    * @return the container (for sorting)
    */
   RenderItemContainer& GetContainer()
@@ -297,9 +258,8 @@ private:
   RenderItemContainer mItems;    ///< Container of render items
   uint32_t            mNextFree; ///< index for the next free item to use
 
-  ClippingBox* mClippingBox;             ///< The clipping box, in window coordinates, when clipping is enabled
-  Layer*       mSourceLayer;             ///< The originating layer where the renderers are from
-  bool         mHasColorRenderItems : 1; ///< True if list contains color render items
+  Layer* mSourceLayer;             ///< The originating layer where the renderers are from
+  bool   mHasColorRenderItems : 1; ///< True if list contains color render items
 };
 
 } // namespace SceneGraph

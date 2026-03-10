@@ -1287,10 +1287,6 @@ int UtcDaliAnimationSetEndActionP04(void)
   Animation animation = Animation::New(durationSeconds);
   DALI_TEST_CHECK(animation.GetEndAction() == Animation::BAKE);
 
-  // We must call RegisterVisualTransformUniform() before animate visual renderer properties.
-  // Before, transform could not be animated.
-  visualRenderer.RegisterVisualTransformUniform();
-
   Vector2 targetValue(1.0f, 1.0f);
   animation.AnimateTo(Property(visualRenderer, Dali::VisualRenderer::Property::TRANSFORM_SIZE), targetValue, AlphaFunction::LINEAR);
 
@@ -13126,11 +13122,22 @@ int UtcDaliAnimationSetLoopingModeP(void)
     Animation animation = Animation::New(durationSeconds);
     DALI_TEST_CHECK(animation.GetLoopingMode() == Animation::RESTART);
 
+    Vector3 initialPosition(0.0f, 0.0f, 0.0f);
     Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
     animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition);
+
+    // Event and Update thread side value still initial value.
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
 
     // Start the animation
     animation.Play();
+
+    // Event thread side value will be target value.
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 0.5f * 1000.0f) /*Only half the animation*/);
 
@@ -13138,6 +13145,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
 
     application.SendNotification();
     application.Render();
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
   }
 
@@ -13155,14 +13163,25 @@ int UtcDaliAnimationSetLoopingModeP(void)
     animation.FinishedSignal().Connect(&application, finishCheck);
     application.SendNotification();
 
+    Vector3 initialPosition(0.0f, 0.0f, 0.0f);
     Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
     animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition);
+
+    // Event and Update thread side value still initial value.
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
 
     animation.SetLoopingMode(Animation::LoopingMode::AUTO_REVERSE);
     DALI_TEST_CHECK(animation.GetLoopingMode() == Animation::AUTO_REVERSE);
 
     // Start the animation
     animation.Play();
+
+    // Event thread side value still initial value.
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
     application.SendNotification();
     application.Render(0);
 
@@ -13182,7 +13201,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
       // We did expect the animation to finish
       application.SendNotification();
       finishCheck.CheckSignalNotReceived();
-      DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION);
+      DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
     }
 
     animation.SetLooping(false);
@@ -13192,7 +13211,8 @@ int UtcDaliAnimationSetLoopingModeP(void)
     application.SendNotification();
     finishCheck.CheckSignalReceived();
 
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
   }
 
   // LoopingMode::AUTO_REVERSE in Reverse mode, which begin from the end
@@ -13212,14 +13232,25 @@ int UtcDaliAnimationSetLoopingModeP(void)
     // Specify a negative multiplier to play the animation in reverse
     animation.SetSpeedFactor(-1.0f);
 
+    Vector3 initialPosition(0.0f, 0.0f, 0.0f);
     Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
     animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition);
+
+    // Event and Update thread side value still initial value.
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
 
     animation.SetLoopingMode(Animation::AUTO_REVERSE);
     DALI_TEST_CHECK(animation.GetLoopingMode() == Animation::AUTO_REVERSE);
 
     // Start the animation
     animation.Play();
+
+    // Event thread side value will be target value.
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
     application.SendNotification();
     application.Render(0);
 
@@ -13232,7 +13263,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
       // Setting a negative speed factor is to play the animation in reverse.
       // So, when LoopingMode::AUTO_REVERSE and SetSpeedFactor( -1.0f ) is, for Animation duration time,
       // the actor starts from the targetPosition, passes the beginning, and arrives at the targetPosition.
-      DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION);
+      DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
 
       application.SendNotification();
       application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) /* 100% time progress */);
@@ -13250,6 +13281,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
     application.SendNotification();
     finishCheck.CheckSignalReceived();
 
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
   }
 
@@ -17504,6 +17536,202 @@ int UtcDaliAnimationSpringUnderdamped(void)
   application.Render(150); // 1000ms
   float position1000 = actor.GetCurrentProperty<float>(Actor::Property::POSITION_X);
   DALI_TEST_EQUALS(position1000, 100.0f, 0.01f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+namespace
+{
+float customAlphaFunction(float progress)
+{
+  return progress;
+}
+} //namespace
+int UtcDaliAnimationGetEventThreadVariablesForVariousCase(void)
+{
+  // Test Loop forever and Loop mode being set
+  TestApplication          application;
+  Dali::Integration::Scene stage(application.GetScene());
+
+  enum TestAlphaFunctionType
+  {
+    DEFAULT,
+    BUILT_IN_REVERSE,
+    BUILT_IN_BOUNCE,
+    CUSTOM_FUNCTION,
+    BEZIER,
+    BUILT_IN_SPRING,
+    CUSTOM_SPRING
+  };
+
+  for(int testCase = 0; testCase < 2 * 2 * 7; ++testCase)
+  {
+    const bool useReverseMode   = (testCase & 0x01);
+    const bool useNegativeSpeed = (testCase & 0x02);
+
+    const TestAlphaFunctionType alphaFunctionType = static_cast<TestAlphaFunctionType>(testCase >> 2);
+
+    tet_printf("Test for reverse mode : %d, negative speed : %d, alpha function type : %d\n", useReverseMode, useNegativeSpeed, alphaFunctionType);
+
+    Vector3 initialPosition(0.0f, 0.0f, 0.0f);
+    Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+
+    bool    halfProgressCheck;
+    Vector3 halfProgressPosition;
+    Vector3 finalPosition;
+
+    AlphaFunction alphaFuncion;
+    switch(alphaFunctionType)
+    {
+      case TestAlphaFunctionType::DEFAULT:
+      {
+        // Default
+        alphaFuncion      = AlphaFunction(AlphaFunction::BuiltinFunction::DEFAULT);
+        halfProgressCheck = true;
+        finalPosition     = (useReverseMode ^ useNegativeSpeed) ? initialPosition : targetPosition;
+
+        if(useReverseMode)
+        {
+          halfProgressPosition = useNegativeSpeed ? initialPosition : targetPosition;
+        }
+        else
+        {
+          halfProgressPosition = (initialPosition + targetPosition) * 0.5f;
+        }
+        break;
+      }
+      case TestAlphaFunctionType::BUILT_IN_REVERSE:
+      {
+        // BuiltIn : Reverse
+        alphaFuncion      = AlphaFunction(AlphaFunction::BuiltinFunction::REVERSE);
+        halfProgressCheck = true;
+        finalPosition     = (useReverseMode ^ useNegativeSpeed) ? targetPosition : initialPosition;
+
+        if(useReverseMode)
+        {
+          halfProgressPosition = useNegativeSpeed ? targetPosition : initialPosition;
+        }
+        else
+        {
+          halfProgressPosition = (initialPosition + targetPosition) * 0.5f;
+        }
+        break;
+      }
+      case TestAlphaFunctionType::BUILT_IN_BOUNCE:
+      {
+        // BuiltIn : Bounce
+        alphaFuncion      = AlphaFunction(AlphaFunction::BuiltinFunction::BOUNCE);
+        halfProgressCheck = true;
+        finalPosition     = initialPosition;
+
+        halfProgressPosition = useReverseMode ? initialPosition : targetPosition;
+        break;
+      }
+      case TestAlphaFunctionType::CUSTOM_FUNCTION:
+      {
+        // Custom function
+        alphaFuncion      = AlphaFunction(&customAlphaFunction);
+        halfProgressCheck = false;
+        finalPosition     = (useReverseMode ^ useNegativeSpeed) ? initialPosition : targetPosition;
+        break;
+      }
+      case TestAlphaFunctionType::BEZIER:
+      {
+        // Bezier
+        alphaFuncion      = AlphaFunction(Vector2::ZERO, Vector2::ONE);
+        halfProgressCheck = false;
+        finalPosition     = (useReverseMode ^ useNegativeSpeed) ? initialPosition : targetPosition;
+        break;
+      }
+      case TestAlphaFunctionType::BUILT_IN_SPRING:
+      {
+        // BuiltIn-Spring
+        alphaFuncion      = AlphaFunction(AlphaFunction::SpringType::SLOW);
+        halfProgressCheck = false;
+        finalPosition     = (useReverseMode ^ useNegativeSpeed) ? initialPosition : targetPosition;
+        break;
+      }
+      case TestAlphaFunctionType::CUSTOM_SPRING:
+      {
+        // Custom-Spring
+        alphaFuncion      = AlphaFunction(SpringData{100.0f, 10.0f, 1.0f});
+        halfProgressCheck = false;
+        finalPosition     = (useReverseMode ^ useNegativeSpeed) ? initialPosition : targetPosition;
+        break;
+      }
+    }
+
+    if(halfProgressCheck)
+    {
+      tet_printf("Target : %f, 50% : %f, Final : %f\n", targetPosition.x, halfProgressPosition.x, finalPosition.x);
+    }
+    else
+    {
+      tet_printf("Target : %f, Final : %f\n", targetPosition.x, finalPosition.x);
+    }
+
+    Actor actor = Actor::New();
+    stage.Add(actor);
+
+    float     durationSeconds(2.0f);
+    Animation animation = Animation::New(durationSeconds);
+    animation.SetLooping(true);
+
+    bool                 signalReceived(false);
+    AnimationFinishCheck finishCheck(signalReceived);
+    animation.FinishedSignal().Connect(&application, finishCheck);
+    application.SendNotification();
+
+    // Specify a negative multiplier to play the animation in reverse
+    animation.SetSpeedFactor(useNegativeSpeed ? -1.0f : 1.0f);
+    animation.SetLoopingMode(useReverseMode ? Animation::AUTO_REVERSE : Animation::RESTART);
+    actor.SetProperty(Actor::Property::POSITION, initialPosition);
+    animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, alphaFuncion);
+
+    // Event and Update thread side value still initial value.
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    // Start the animation
+    animation.Play();
+
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), finalPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
+
+    application.SendNotification();
+    application.Render(0);
+
+    for(int iterations = 0; iterations < 3; ++iterations)
+    {
+      application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) /* 50% time progress */);
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+
+      // Check current variables only if we can know it.
+      if(halfProgressCheck)
+      {
+        DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), halfProgressPosition, TEST_LOCATION);
+      }
+
+      application.SendNotification();
+      application.Render(static_cast<unsigned int>(durationSeconds * 500.0f) /* 100% time progress */);
+
+      // We did expect the animation to finish
+      application.SendNotification();
+      finishCheck.CheckSignalNotReceived();
+      DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), finalPosition, TEST_LOCATION);
+    }
+
+    animation.SetLooping(false);
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
+
+    application.SendNotification();
+    finishCheck.CheckSignalReceived();
+
+    DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::POSITION), finalPosition, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), finalPosition, TEST_LOCATION);
+  }
 
   END_TEST;
 }

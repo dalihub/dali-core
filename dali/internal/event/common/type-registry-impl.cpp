@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,12 +51,21 @@ TypeRegistry::TypeRegistry() = default;
 TypeRegistry::~TypeRegistry()
 {
   mRegistryLut.clear();
+  mRegistryAlternativeObjectNameLut.clear();
 }
 
 TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const std::string& uniqueTypeName)
 {
-  auto iter = mRegistryLut.Get(ConstString(uniqueTypeName));
+  ConstString typeName(uniqueTypeName);
+  auto        iter = mRegistryLut.Get(typeName);
   if(iter != mRegistryLut.end())
+  {
+    return iter->second;
+  }
+
+  // Check if the type-info is registered with an alternative object name.
+  iter = mRegistryAlternativeObjectNameLut.Get(typeName);
+  if(iter != mRegistryAlternativeObjectNameLut.end())
   {
     return iter->second;
   }
@@ -101,6 +110,18 @@ std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
 }
 
 std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
+                                   const std::type_info&          objectTypeInfo,
+                                   const std::type_info&          baseTypeInfo,
+                                   Dali::TypeInfo::CreateFunction createInstance,
+                                   bool                           callCreateOnInit)
+{
+  std::string uniqueTypeName       = DemangleClassName(theTypeInfo.name());
+  std::string uniqueObjectTypeName = DemangleClassName(objectTypeInfo.name());
+
+  return Register(std::move(uniqueTypeName), std::move(uniqueObjectTypeName), baseTypeInfo, createInstance, callCreateOnInit);
+}
+
+std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
                                    const std::type_info&          baseTypeInfo,
                                    Dali::TypeInfo::CreateFunction createInstance,
                                    bool                           callCreateOnInit,
@@ -112,7 +133,32 @@ std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
   return Register(std::move(uniqueTypeName), baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount);
 }
 
+std::string TypeRegistry::Register(const std::type_info&          theTypeInfo,
+                                   const std::type_info&          objectTypeInfo,
+                                   const std::type_info&          baseTypeInfo,
+                                   Dali::TypeInfo::CreateFunction createInstance,
+                                   bool                           callCreateOnInit,
+                                   const Dali::PropertyDetails*   defaultProperties,
+                                   Property::Index                defaultPropertyCount)
+{
+  std::string uniqueTypeName       = DemangleClassName(theTypeInfo.name());
+  std::string uniqueObjectTypeName = DemangleClassName(objectTypeInfo.name());
+
+  return Register(std::move(uniqueTypeName), std::move(uniqueObjectTypeName), baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount);
+}
+
 std::string TypeRegistry::Register(std::string                    uniqueTypeName,
+                                   const std::type_info&          baseTypeInfo,
+                                   Dali::TypeInfo::CreateFunction createInstance,
+                                   bool                           callCreateOnInit,
+                                   const Dali::PropertyDetails*   defaultProperties,
+                                   Property::Index                defaultPropertyCount)
+{
+  return Register(std::move(uniqueTypeName), {}, baseTypeInfo, createInstance, callCreateOnInit, defaultProperties, defaultPropertyCount);
+}
+
+std::string TypeRegistry::Register(std::string                    uniqueTypeName,
+                                   std::string                    uniqueObjectTypeName,
                                    const std::type_info&          baseTypeInfo,
                                    Dali::TypeInfo::CreateFunction createInstance,
                                    bool                           callCreateOnInit,
@@ -121,13 +167,27 @@ std::string TypeRegistry::Register(std::string                    uniqueTypeName
 {
   std::string baseTypeName = DemangleClassName(baseTypeInfo.name());
 
-  if(!mRegistryLut.Register(ConstString(uniqueTypeName), new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount)))
+  Internal::TypeInfo* typeInfo(new Internal::TypeInfo(uniqueTypeName, baseTypeName, createInstance, defaultProperties, defaultPropertyCount));
+
+  if(!mRegistryLut.Register(ConstString(uniqueTypeName), TypeInfoPointer(typeInfo)))
   {
     DALI_LOG_ERROR("Duplicate name in TypeRegistry for '%s'\n", +uniqueTypeName.c_str());
     DALI_ASSERT_ALWAYS(!"Duplicate type name in Type Registration");
     return uniqueTypeName; // never actually happening due to the assert
   }
   DALI_LOG_INFO(gLogFilter, Debug::Concise, "Type Registration %s(%s)\n", uniqueTypeName.c_str(), baseTypeName.c_str());
+
+  if(!uniqueObjectTypeName.empty())
+  {
+    ConstString objectTypeName(uniqueObjectTypeName);
+    if(mRegistryLut.Get(objectTypeName) != mRegistryLut.end() ||
+       !mRegistryAlternativeObjectNameLut.Register(objectTypeName, TypeInfoPointer(typeInfo)))
+    {
+      DALI_LOG_ERROR("Duplicate object name in TypeRegistry for '%s'\n", uniqueObjectTypeName.c_str());
+      DALI_ASSERT_ALWAYS(!"Duplicate type name in Type Registration");
+      return uniqueTypeName; // never actually happening due to the assert
+    }
+  }
 
   if(callCreateOnInit)
   {

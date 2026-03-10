@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,14 +56,12 @@ namespace
 
 //              Name                Type      writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY("clippingEnable", BOOLEAN, true, false, true, Dali::Layer::Property::CLIPPING_ENABLE)
-DALI_PROPERTY("clippingBox", RECTANGLE, true, false, true, Dali::Layer::Property::CLIPPING_BOX)
 DALI_PROPERTY("behavior", INTEGER, true, false, false, Dali::Layer::Property::BEHAVIOR)
 DALI_PROPERTY("depth", INTEGER, false, false, false, Dali::Layer::Property::DEPTH)
 DALI_PROPERTY("depthTest", BOOLEAN, true, false, false, Dali::Layer::Property::DEPTH_TEST)
 DALI_PROPERTY("consumesTouch", BOOLEAN, true, false, false, Dali::Layer::Property::CONSUMES_TOUCH)
 DALI_PROPERTY("consumesHover", BOOLEAN, true, false, false, Dali::Layer::Property::CONSUMES_HOVER)
-DALI_PROPERTY_TABLE_END(DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, LayerDefaultProperties)
+DALI_PROPERTY_TABLE_END(Dali::Layer::Property::BEHAVIOR, LayerDefaultProperties)
 
 // Actions
 
@@ -126,10 +124,8 @@ LayerPtr Layer::NewRoot(LayerList& layerList)
 Layer::Layer(Actor::DerivedType type, const SceneGraph::Layer& layer)
 : Actor(type, layer),
   mLayerList(nullptr),
-  mClippingBox(0, 0, 0, 0),
   mSortFunction(Layer::ZValue),
   mBehavior(Dali::Layer::LAYER_UI),
-  mIsClipping(false),
   mDepthTestDisabled(true),
   mTouchConsumed(false),
   mHoverConsumed(false)
@@ -257,40 +253,6 @@ void Layer::SetBehavior(Dali::Layer::Behavior behavior)
   }
 }
 
-void Layer::SetClipping(bool enabled)
-{
-  if(enabled != mIsClipping)
-  {
-    mIsClipping = enabled;
-
-    // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingMessage(GetEventThreadServices(), GetSceneGraphLayer(), mIsClipping);
-  }
-}
-
-void Layer::SetClippingBox(int x, int y, int width, int height)
-{
-  if((x != mClippingBox.x) ||
-     (y != mClippingBox.y) ||
-     (width != mClippingBox.width) ||
-     (height != mClippingBox.height))
-  {
-    // Clipping box is not animatable; this is the most up-to-date value
-    mClippingBox.Set(x, y, width, height);
-
-    // Convert mClippingBox to GL based coordinates (from bottom-left)
-    ClippingBox clippingBox(mClippingBox);
-
-    if(mScene)
-    {
-      clippingBox.y = static_cast<int32_t>(mScene->GetSize().height) - clippingBox.y - clippingBox.height;
-
-      // layerNode is being used in a separate thread; queue a message to set the value
-      SetClippingBoxMessage(GetEventThreadServices(), GetSceneGraphLayer(), clippingBox);
-    }
-  }
-}
-
 void Layer::SetDepthTestDisabled(bool disable)
 {
   if(disable != mDepthTestDisabled)
@@ -400,17 +362,6 @@ void Layer::SetDefaultProperty(Property::Index index, const Property::Value& pro
   {
     switch(index)
     {
-      case Dali::Layer::Property::CLIPPING_ENABLE:
-      {
-        SetClipping(propertyValue.Get<bool>());
-        break;
-      }
-      case Dali::Layer::Property::CLIPPING_BOX:
-      {
-        Rect<int32_t> clippingBox(propertyValue.Get<Rect<int32_t> >());
-        SetClippingBox(clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height);
-        break;
-      }
       case Dali::Layer::Property::BEHAVIOR:
       {
         Behavior behavior = mBehavior;
@@ -465,16 +416,6 @@ Property::Value Layer::GetDefaultProperty(Property::Index index) const
   {
     switch(index)
     {
-      case Dali::Layer::Property::CLIPPING_ENABLE:
-      {
-        ret = mIsClipping;
-        break;
-      }
-      case Dali::Layer::Property::CLIPPING_BOX:
-      {
-        ret = mClippingBox;
-        break;
-      }
       case Dali::Layer::Property::BEHAVIOR:
       {
         ret = mBehavior;

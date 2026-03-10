@@ -88,11 +88,11 @@ public: // Default property extensions from Object
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
-public:
+protected: // From Renderer
   /**
-   * @copydoc Dali::VisualRenderer::RegisterVisualTransformUniform()
+   * @copydoc Dali::Internal::Renderer::OnShaderChanged()
    */
-  void RegisterVisualTransformUniform();
+  void OnShaderChanged() override;
 
 protected: // implementation
   /**
@@ -109,6 +109,15 @@ protected: // implementation
    * @return True if value set, false otherwise.
    */
   bool GetCurrentPropertyValue(Property::Index index, Property::Value& value) const;
+
+private:
+  /**
+   * @brief Ensure to create visual properties and cache for control animatable properties.
+   *        Also, register visual transform uniforms so we can use it as uniform properties.
+   *
+   * @note Keep it as const so we can create animatable properties at GetSceneObjectAnimatableProperty() or GetSceneObjectInputProperty().
+   */
+  void EnsureVisualPropertiesAndCache() const;
 
 protected:
   /**
@@ -127,17 +136,16 @@ public:
     Vector2 mTransformSize{Vector2::ONE};
     Vector2 mTransformOrigin{Vector2::ZERO};
     Vector2 mTransformAnchorPoint{Vector2::ZERO};
-    Vector4 mTransformOffsetSizeMode{Vector2::ZERO};
+    Vector4 mTransformOffsetSizeMode{Vector4::ZERO};
     Vector2 mExtraSize{Vector2::ZERO};
   };
 
 private:
-  VisualPropertyCache mPropertyCache;
+  mutable VisualPropertyCache* mPropertyCache; ///< Cache of VisualProperties. Generated at first time of EnsureVisualPropertiesAndCache(). Owned if visual properties created.
 
-  SceneGraph::VisualRenderer::VisualProperties* mVisualProperties; ///< VisualProperties. Generated at first time of RegisterVisualTransformUniform(). Not owned
+  mutable SceneGraph::VisualRenderer::VisualProperties* mVisualProperties; ///< VisualProperties. Generated at first time of EnsureVisualPropertiesAndCache(). Not owned
 
-  bool mUniformMapped : 1;
-  bool mPropertyCacheChanged : 1;
+  mutable bool mVisualPropertiesCreated : 1;
 };
 
 } // namespace Internal

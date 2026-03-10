@@ -77,11 +77,6 @@ void PrintRenderList(const RenderList& list)
   std::stringstream debugStream;
   debugStream << "Rendering items";
 
-  if(list.IsClipping())
-  {
-    debugStream << ", ClippingBox: " << list.GetClippingBox().x << "," << list.GetClippingBox().y << " " << list.GetClippingBox().width << "x" << list.GetClippingBox().height;
-  }
-
   std::string debugString(debugStream.str());
   DALI_LOG_RENDER_INFO("      %s\n", debugString.c_str());
 }

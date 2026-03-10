@@ -155,9 +155,8 @@ private:
 
   Graphics::Controller& mGraphicsController;
 
-  ScissorStackType mScissorStack;        ///< Contains the currently applied scissor hierarchy (so we can undo clips)
-  ClippingBox      mViewportRectangle;   ///< The viewport dimensions, used to translate AABBs to scissor coordinates
-  bool             mHasLayerScissor : 1; ///< Marks if the currently process render instruction has a layer-based clipping region
+  ScissorStackType mScissorStack;      ///< Contains the currently applied scissor hierarchy (so we can undo clips)
+  ClippingBox      mViewportRectangle; ///< The viewport dimensions, used to translate AABBs to scissor coordinates
 };
 
 } // namespace Render

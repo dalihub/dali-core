@@ -23,10 +23,13 @@
 
 using namespace Dali;
 
+namespace
+{
 float customAlphaFunction(float progress)
 {
   return progress;
 }
+} //namespace
 
 void utc_dali_alpha_function_startup(void)
 {

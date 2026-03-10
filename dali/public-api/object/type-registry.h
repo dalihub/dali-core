@@ -2,7 +2,7 @@
 #define DALI_TYPE_REGISTRY_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,6 +216,17 @@ public:
   TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f);
 
   /**
+   * @brief Constructor registers the type creation function with a differently named object type.
+   *
+   * @SINCE_2_5.13
+   * @param[in] registerType The type info for the type to be registered
+   * @param[in] registerObjectType The type info for the object of the type to be registered
+   * @param[in] baseType The base type info of registerType
+   * @param[in] f registerType Instance creation function
+   */
+  TypeRegistration(const std::type_info& registerType, const std::type_info& registerObjectType, const std::type_info& baseType, TypeInfo::CreateFunction f);
+
+  /**
    * @brief Constructor registers the type creation function.
    *
    * @SINCE_1_0.0
@@ -227,6 +238,18 @@ public:
   TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f, bool callCreateOnInit);
 
   /**
+   * @brief Constructor registers the type creation function with a differently named object type.
+   *
+   * @SINCE_2_5.13
+   * @param[in] registerType the type info for the type to be registered
+   * @param[in] registerObjectType The type info for the object of the type to be registered
+   * @param[in] baseType the base type info of registerType
+   * @param[in] f registerType instance creation function
+   * @param[in] callCreateOnInit If true the creation function is called as part of Dali initialization
+   */
+  TypeRegistration(const std::type_info& registerType, const std::type_info& registerObjectType, const std::type_info& baseType, TypeInfo::CreateFunction f, bool callCreateOnInit);
+
+  /**
    * @brief Constructor registers the type creation function.
    *
    * @SINCE_1_4.0
@@ -236,6 +259,18 @@ public:
    * @param[in] defaultProperties the default property meta-data
    */
   TypeRegistration(const std::type_info& registerType, const std::type_info& baseType, TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties);
+
+  /**
+   * @brief Constructor registers the type creation function with a differently named object type.
+   *
+   * @SINCE_2_5.13
+   * @param[in] registerType the type info for the type to be registered
+   * @param[in] registerObjectType The type info for the object of the type to be registered
+   * @param[in] baseType the base type info of registerType
+   * @param[in] f registerType instance creation function
+   * @param[in] defaultProperties the default property meta-data
+   */
+  TypeRegistration(const std::type_info& registerType, const std::type_info& registerObjectType, const std::type_info& baseType, TypeInfo::CreateFunction f, const DefaultPropertyMetadata& defaultProperties);
 
   /**
    * @brief Constructor registers the type creation function for a named class or type.

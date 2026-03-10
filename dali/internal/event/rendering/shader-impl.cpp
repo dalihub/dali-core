@@ -266,7 +266,8 @@ Property::Value Shader::GetDefaultPropertyCurrentValue(Property::Index index) co
 }
 
 Shader::Shader(const SceneGraph::Shader* sceneObject)
-: Object(sceneObject)
+: Object(sceneObject),
+  mConnectedUniformBlockCount(0u)
 {
 }
 
@@ -345,6 +346,7 @@ void Shader::SetShaderProperty(const Dali::Property::Value& shaderMap)
 
 void Shader::ConnectUniformBlock(UniformBlock& uniformBlock, bool strongConnection, bool programCacheCleanRequired)
 {
+  ++mConnectedUniformBlockCount;
   if(strongConnection)
   {
     mStrongConnectedUniformBlockList.push_back(Dali::UniformBlock(&uniformBlock));
@@ -373,6 +375,7 @@ void Shader::ConnectUniformBlock(UniformBlock& uniformBlock, bool strongConnecti
 
 void Shader::DisconnectUniformBlock(UniformBlock& uniformBlock)
 {
+  --mConnectedUniformBlockCount;
   RemoveObserver(uniformBlock);
   for(auto iter = mStrongConnectedUniformBlockList.begin(); iter != mStrongConnectedUniformBlockList.end();)
   {
@@ -398,6 +401,11 @@ void Shader::DisconnectUniformBlock(UniformBlock& uniformBlock)
     }
     RequestClearProgramCacheMessage(eventThreadServices.GetUpdateManager());
   }
+}
+
+uint32_t Shader::GetConnectedUniformBlockCount() const
+{
+  return mConnectedUniformBlockCount;
 }
 
 void Shader::ObjectDestroyed(Object& object)

@@ -256,6 +256,14 @@ protected: // implementation
    */
   ~Renderer() override;
 
+  /**
+   * @brief Deliever to Subclass of Renderer that shader was changed.
+   */
+  virtual void OnShaderChanged()
+  {
+    // Do nothing for standard renderer.
+  }
+
 private:
   Renderer(const Renderer&)            = delete; ///< Deleted copy constructor
   Renderer& operator=(const Renderer&) = delete; ///< Deleted assignment operator

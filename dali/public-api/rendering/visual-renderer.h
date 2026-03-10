@@ -218,15 +218,6 @@ public:
   VisualRenderer& operator=(VisualRenderer&& rhs) noexcept;
 
 public:
-  /**
-   * @brief Register visual transform uniforms so we can use it as uniform properties.
-   * @note Before register the uniforms, visual properties could not be animated.
-   *
-   * @SINCE_2_4.14
-   */
-  void RegisterVisualTransformUniform();
-
-public:
   /// @cond internal
   /**
    * @brief The constructor.

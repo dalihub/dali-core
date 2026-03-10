@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -148,6 +148,20 @@ void KeyFrames::Add(float time, const Property::Value& value)
 KeyFrameSpec* KeyFrames::GetKeyFramesBase() const
 {
   return mKeyFrames.get();
+}
+
+Property::Value KeyFrames::GetFirstKeyFrameValue() const
+{
+  Property::Value value;
+
+  std::size_t noOfKeyFrames = mKeyFrames->GetNumberOfKeyFrames();
+  if(noOfKeyFrames)
+  {
+    float time;
+    mKeyFrames->GetKeyFrameAsValue(0, time, value);
+  }
+
+  return value;
 }
 
 Property::Value KeyFrames::GetLastKeyFrameValue() const

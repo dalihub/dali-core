@@ -127,9 +127,10 @@ public:
   }
 };
 
-DummyVisualRendererPropertyObserver                   gDummyVisualRendererPropertyObserver;
-SceneGraph::VisualRenderer::VisualProperties          gDummyVisualRendererVisualProperties(gDummyVisualRendererPropertyObserver);
-SceneGraph::VisualRenderer::DecoratedVisualProperties gDummyVisualRendererDecoratedVisualProperties(gDummyVisualRendererPropertyObserver);
+DummyVisualRendererPropertyObserver                               gDummyVisualRendererPropertyObserver;
+SceneGraph::VisualRenderer::VisualProperties                      gDummyVisualRendererVisualProperties(gDummyVisualRendererPropertyObserver);
+SceneGraph::VisualRenderer::DecoratedVisualCornerRadiusProperties gDummyVisualRendererDecoratedVisualCornerRadiusProperties{};
+SceneGraph::VisualRenderer::DecoratedVisualBorderlineProperties   gDummyVisualRendererDecoratedVisualBorderlineProperties(gDummyVisualRendererPropertyObserver);
 
 } // Anonymous namespace
 
@@ -158,7 +159,8 @@ Renderer::Renderer()
   mShader(nullptr),
   mAttachedNode(nullptr),
   mVisualProperties(nullptr),
-  mDecoratedVisualProperties(nullptr),
+  mDecoratedVisualCornerRadiusProperties(nullptr),
+  mDecoratedVisualBorderlineProperties(nullptr),
   mUpdateAreaExtents(),
   mBlendMode(BlendMode::AUTO),
   mRenderingBehavior(DevelRenderer::Rendering::IF_REQUIRED),
@@ -168,7 +170,8 @@ Renderer::Renderer()
   mIsRenderableFlag(0u),
   mAdvancedBlendEquationApplied(false),
   mOwnsVisualProperties(false),
-  mOwnsDecoratedVisualProperties(false),
+  mOwnsDecoratedVisualCornerRadiusProperties(false),
+  mOwnsDecoratedVisualBorderlineProperties(false),
   mDirtyUpdated(NOT_CHECKED),
   mMixColor(Color::WHITE),
   mDepthIndex(0)
@@ -183,9 +186,13 @@ Renderer::~Renderer()
   {
     delete mVisualProperties;
   }
-  if(mOwnsDecoratedVisualProperties)
+  if(mOwnsDecoratedVisualCornerRadiusProperties)
   {
-    delete mDecoratedVisualProperties;
+    delete mDecoratedVisualCornerRadiusProperties;
+  }
+  if(mOwnsDecoratedVisualBorderlineProperties)
+  {
+    delete mDecoratedVisualBorderlineProperties;
   }
 }
 
@@ -246,9 +253,9 @@ bool Renderer::PrepareRender()
     {
       rendererUpdated |= mVisualProperties->PrepareProperties();
     }
-    if(mDecoratedVisualProperties)
+    if(mDecoratedVisualBorderlineProperties)
     {
-      rendererUpdated |= mDecoratedVisualProperties->PrepareProperties();
+      rendererUpdated |= mDecoratedVisualBorderlineProperties->PrepareProperties();
     }
     mVisualPropertiesDirtyFlags >>= 1;
   }
@@ -822,9 +829,9 @@ Vector4 Renderer::GetVisualTransformedUpdateArea(const Vector4& originalUpdateAr
   {
     mVisualProperties->GetVisualTransformedUpdateArea(updateArea);
   }
-  if(mDecoratedVisualProperties)
+  if(mDecoratedVisualBorderlineProperties)
   {
-    mDecoratedVisualProperties->GetVisualTransformedUpdateArea(updateArea);
+    mDecoratedVisualBorderlineProperties->GetVisualTransformedUpdateArea(updateArea);
   }
   return AdjustExtents(updateArea, mUpdateAreaExtents);
 }
@@ -853,9 +860,11 @@ void Renderer::SetDummyVisualProperties()
 
 void Renderer::SetDummyDecoratedVisualProperties()
 {
-  DALI_ASSERT_ALWAYS(!mDecoratedVisualProperties && "Decorated Visual Properties already set!");
-  mDecoratedVisualProperties     = &gDummyVisualRendererDecoratedVisualProperties;
-  mOwnsDecoratedVisualProperties = false;
+  DALI_ASSERT_ALWAYS(!mDecoratedVisualCornerRadiusProperties && !mDecoratedVisualBorderlineProperties && "Decorated Visual Properties already set!");
+  mDecoratedVisualCornerRadiusProperties     = &gDummyVisualRendererDecoratedVisualCornerRadiusProperties;
+  mDecoratedVisualBorderlineProperties       = &gDummyVisualRendererDecoratedVisualBorderlineProperties;
+  mOwnsDecoratedVisualCornerRadiusProperties = false;
+  mOwnsDecoratedVisualBorderlineProperties   = false;
 
   // Initialize visual dirty flags.
   mVisualPropertiesDirtyFlags = BAKED_FLAG;

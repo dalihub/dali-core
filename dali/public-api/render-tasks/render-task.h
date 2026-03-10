@@ -2,7 +2,7 @@
 #define DALI_RENDER_TASK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ public:
       /**
        * @brief name "requiresSync", type BOOLEAN
        * @details By default, the sync object is not created.
-       *  When native image source is used as render target, in order to track when the render to pixmap is completed, the GL sync should be enabled.
+       *  When native image is used as render target, in order to track when the render to pixmap is completed, the GL sync should be enabled.
        *  Thus the RENDER_ONCE finished signal can be emit at the correct timing.
        * @SINCE_1_1.29
        * @note The use of GL sync might cause deadlock with multiple access to the single pixmap happening in the same time.

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ANIMATION_PLAYLIST_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public:
   void OnClear(Animation& animation, bool ignoreRequired);
 
   /**
-   * Notify from core that current event loop finisehd.
+   * Notify from core that current event loop finished.
    * It will clear all ignored animations at OnClear.
    */
   void EventLoopFinished();
