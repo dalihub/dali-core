@@ -1313,6 +1313,18 @@ public:
 };
 
 // Callback creation thin templates
+/**
+ * @brief Creates a callback from a free function with parameter pack.
+ *
+ * @SINCE_2_5.14
+ * @param[in] function The function to call
+ * @return A newly allocated Callback object, ownership transferred to caller
+ */
+template<typename... Args>
+inline CallbackBase* MakeCallback(void (*function)(Args... args))
+{
+  return new CallbackBase(reinterpret_cast<CallbackBase::StaticFunction>(function));
+}
 
 /**
  * @brief Creates a callback from a free function with parameter pack.
