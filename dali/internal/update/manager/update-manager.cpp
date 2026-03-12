@@ -128,9 +128,10 @@ using ContainerRemovedFlags = uint8_t;
  * @param container to remove from
  * @param object to remove
  * @param discardQueue to put the object to
+ * @return True if object moved to discard queue. False if container didn't hold object.
  */
 template<class Type>
-inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* object, DiscardQueue<Type*, OwnerContainer<Type*>>& discardQueue)
+inline bool EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* object, DiscardQueue<Type*, OwnerContainer<Type*>>& discardQueue)
 {
   DALI_ASSERT_DEBUG(object && "NULL object not allowed");
 
@@ -141,9 +142,10 @@ inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* objec
     {
       // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
       discardQueue.Add(container.Release(&iter)); // take the address of the reference to a pointer (iter)
-      return;                                     // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
+      return true;                                // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
     }
   }
+  return false;
 }
 
 /**
@@ -151,9 +153,10 @@ inline void EraseUsingDiscardQueue(OwnerContainer<Type*>& container, Type* objec
  * @param container to remove from
  * @param object to remove
  * @param discardQueue to put the object to
+ * @return True if object moved to discard queue. False if container didn't hold object.
  */
 template<class Type>
-inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const MemoryPoolKey<Type>& key, DiscardQueue<MemoryPoolKey<Type>, OwnerKeyContainer<Type>>& discardQueue)
+inline bool EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const MemoryPoolKey<Type>& key, DiscardQueue<MemoryPoolKey<Type>, OwnerKeyContainer<Type>>& discardQueue)
 {
   DALI_ASSERT_DEBUG(key && "INVALID Key not allowed");
 
@@ -163,9 +166,10 @@ inline void EraseUsingDiscardQueue(OwnerKeyContainer<Type>& container, const Mem
     {
       // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
       discardQueue.Add(container.Release(iter));
-      return; // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
+      return true; // return as we only ever remove one object. Iterators to container are now invalidated as well so cannot continue
     }
   }
+  return false;
 }
 
 } // unnamed namespace
@@ -230,7 +234,8 @@ struct UpdateManager::Impl
     renderTaskWaiting(false),
     renderersAdded(false),
     renderingRequired(false),
-    renderersReorderRequired(false)
+    renderersReorderRequired(false),
+    discardQueueHasItem(false)
   {
     // create first 'dummy' node
     nodes.PushBack(nullptr);
@@ -400,6 +405,7 @@ struct UpdateManager::Impl
   bool renderersAdded : 1;                ///< Flag to keep track when renderers have been added to avoid unnecessary processing
   bool renderingRequired : 1;             ///< True if required to render the current frame
   bool renderersReorderRequired : 1;      ///< True if we need to count activated / deactivaed renderers.
+  bool discardQueueHasItem : 1;           ///< True if discard queue has at least 1 items.
 
 private:
   Impl(const Impl&);            ///< Undefined
@@ -499,6 +505,7 @@ void UpdateManager::UninstallRoot(Layer* layer)
   mImpl->nodeIdMap.erase(layer->GetId());
 
   mImpl->nodeDiscardQueue.Add(layer);
+  mImpl->discardQueueHasItem = true;
 
   // Notify the layer about impending destruction
   layer->OnDestroy();
@@ -595,6 +602,7 @@ void UpdateManager::DestroyNode(Node* node)
   mImpl->nodeIdMap.erase(node->GetId());
 
   mImpl->nodeDiscardQueue.Add(node);
+  mImpl->discardQueueHasItem = true;
 
   // Notify the Node about impending destruction
   node->OnDestroy();
@@ -631,7 +639,7 @@ void UpdateManager::AddObject(OwnerPointer<PropertyOwner>& object)
 
 void UpdateManager::RemoveObject(PropertyOwner* object)
 {
-  EraseUsingDiscardQueue(mImpl->customObjects, object, mImpl->customObjectDiscardQueue);
+  mImpl->discardQueueHasItem |= EraseUsingDiscardQueue(mImpl->customObjects, object, mImpl->customObjectDiscardQueue);
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::CUSTOM_OBJECT;
 #endif
@@ -681,6 +689,7 @@ void UpdateManager::RemoveScene(Scene* scene)
     if(sceneInfo && sceneInfo->scene && sceneInfo->scene.Get() == scene)
     {
       mImpl->sceneDiscardQueue.Add(sceneInfo->scene.Release()); // take the address of the reference to a pointer
+      mImpl->discardQueueHasItem = true;
       break;
     }
   }
@@ -744,6 +753,7 @@ void UpdateManager::DiscardPropertyOwner(PropertyOwner* discardedOwner)
 {
   // Transfer ownership to the discard queue, this keeps the object alive, until the render-thread has finished with it
   mImpl->customObjectDiscardQueue.Add(discardedOwner);
+  mImpl->discardQueueHasItem = true;
 }
 
 void UpdateManager::AddPropertyResetter(OwnerPointer<PropertyResetterBase>& propertyResetter)
@@ -795,7 +805,7 @@ void UpdateManager::AddShader(OwnerPointer<Shader>& shader)
 void UpdateManager::RemoveShader(Shader* shader)
 {
   // Find the shader and destroy it
-  EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->shaderDiscardQueue);
+  mImpl->discardQueueHasItem |= EraseUsingDiscardQueue(mImpl->shaders, shader, mImpl->shaderDiscardQueue);
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::SHADER;
 #endif
@@ -824,7 +834,7 @@ void UpdateManager::RemoveRenderer(const RendererKey& rendererKey)
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] RemoveRenderer\n", rendererKey.Get());
 
   // Find the renderer and destroy it
-  EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue);
+  mImpl->discardQueueHasItem |= EraseUsingDiscardQueue(mImpl->renderers, rendererKey, mImpl->rendererDiscardQueue);
 
   // DevNote : EraseUsingDiscardQueue keep renderer's order. We dont need to reorder renderers.
   if(!mImpl->renderersReorderRequired && !rendererKey->IsObservingNodeDeactivated())
@@ -894,7 +904,7 @@ void UpdateManager::AddUniformBlock(OwnerPointer<Render::UniformBlock>& uniformB
 
 void UpdateManager::RemoveUniformBlock(Render::UniformBlock* uniformBlock)
 {
-  EraseUsingDiscardQueue(mImpl->uniformBlocks, uniformBlock, mImpl->uniformBlockDiscardQueue);
+  mImpl->discardQueueHasItem |= EraseUsingDiscardQueue(mImpl->uniformBlocks, uniformBlock, mImpl->uniformBlockDiscardQueue);
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
   mImpl->containerRemovedFlags |= ContainerRemovedFlagBits::UNIFORM_BLOCKS;
 #endif
@@ -1221,6 +1231,8 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   mImpl->sceneDiscardQueue.Clear();
   mImpl->customObjectDiscardQueue.Clear();
 
+  mImpl->discardQueueHasItem = false;
+
   bool isAnimationRunning = IsAnimationRunning();
 
   // Process Touches & Gestures
@@ -1487,6 +1499,11 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   {
     // Set dirty flags for next frame to continue rendering
     mImpl->nodeDirtyFlags |= RenderableUpdateFlags;
+  }
+
+  if(mImpl->discardQueueHasItem)
+  {
+    keepUpdating |= KeepUpdating::OBJECT_DISCARDED;
   }
 
   // tell the update manager that we're done so the queue can be given to event thread
