@@ -533,8 +533,8 @@ private:
       return *this;
     }
 
-    Property::Value initialValue;
-    Property::Value targetValue;
+    Property::Value initialValue{};
+    Property::Value targetValue{};
     TimePeriod      timePeriod{0.f};
     std::size_t     connectorIndex{0};
     Animation::Type animatorType{TO};
