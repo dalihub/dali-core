@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_CORE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,8 @@ enum Reasons
   MONITORING_PERFORMANCE = 1 << 3, ///< - The --enable-performance-monitor option is being used
   RENDER_TASK_SYNC       = 1 << 4, ///< - A render task is waiting for render sync
   FRAME_UPDATE_CALLBACK  = 1 << 5, ///< - Some FrameUpdateCallback return true
-  RENDERER_CONTINUOUSLY  = 1 << 6  ///< - Some Renderer renderinb behaviour is continuously
+  RENDERER_CONTINUOUSLY  = 1 << 6, ///< - Some Renderer rendering behaviour is continuously
+  OBJECT_DISCARDED       = 1 << 7  ///< - Some SceneGraph object be discarded so need to be deleted next frame.
 };
 }
 

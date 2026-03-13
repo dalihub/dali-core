@@ -103,6 +103,7 @@ SET(TC_SOURCES
         utc-Dali-TypeRegistry.cpp
         utc-Dali-CSharp-TypeRegistry.cpp
         utc-Dali-UniformBlock.cpp
+        utc-Dali-UpdateStatusObjectDiscarded.cpp
         utc-Dali-Utility.cpp
         utc-Dali-UniquePtr.cpp
         utc-Dali-Vector.cpp
