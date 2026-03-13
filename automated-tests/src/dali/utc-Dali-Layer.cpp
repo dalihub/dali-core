@@ -1160,3 +1160,105 @@ int utcDaliLayerPartialUpdate(void)
 
   END_TEST;
 }
+
+int utcDaliLayerUnderClippingNode(void)
+{
+  TestApplication application;
+
+  tet_infoline("Check the layer under clipping node");
+
+  /* Build tree of actors:
+   *
+   *     layer1
+   *       |
+   *  parentClipper
+   *       |
+   *     layer2
+   *      / \
+   *     A   C
+   *     |   |
+   *     B   D
+   *
+   * All actors are CLIP_TO_BOUNDING_BOX instead of C.
+   * B is supper big render items.
+   *
+   * Check whether glScissor for D was called.
+   */
+
+  Layer layer1 = Layer::New();
+  Layer layer2 = Layer::New();
+
+  // get root
+  Layer root = application.GetScene().GetLayer(0);
+
+  // TODO : We don't decide policy that layer2 should be clipped by parentClipper.
+  // Before that policy fixed, let we use full-size clipper.
+  Actor parentClipper = CreateRenderableActor();
+  parentClipper.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentClipper.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  parentClipper.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+
+  application.GetScene().Add(layer1);
+  layer1.Add(parentClipper);
+
+  parentClipper.Add(layer2);
+
+  DALI_TEST_EQUALS(root.GetProperty<int>(Layer::Property::DEPTH), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer1.GetProperty<int>(Layer::Property::DEPTH), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
+
+  Actor actorA = CreateRenderableActor();
+  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
+  actorA.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actorA.SetProperty(Actor::Property::NAME, "ActorA");
+  actorA.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  actorA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  layer2.Add(actorA);
+
+  Actor actorB = CreateRenderableActor();
+  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::POSITION, Vector3(-160.0f, -160.0f, 0.0f));
+  actorB.SetProperty(Actor::Property::SIZE, Vector3(480.0f, 480.0f, 0.0f));
+  actorB.SetProperty(Actor::Property::NAME, "ActorB");
+  actorB.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorB.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  actorB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actorA.Add(actorB);
+
+  Actor actorC = CreateRenderableActor();
+  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorC.SetProperty(Actor::Property::POSITION, Vector3(48.0f, 16.0f, 0.0f));
+  actorC.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actorC.SetProperty(Actor::Property::NAME, "ActorC");
+  actorC.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorC.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  layer2.Add(actorC);
+
+  Actor actorD = CreateRenderableActor();
+  actorD.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorD.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
+  actorD.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
+  actorD.SetProperty(Actor::Property::NAME, "ActorD");
+  actorD.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorD.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
+  actorD.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actorC.Add(actorD);
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Check that glScissor was called for actorD with its screen area
+  const TestGlAbstraction::ScissorParams& glScissorParams = application.GetGlAbstraction().GetScissorParams();
+
+  // actorD is at position (48, 16) with size (16, 16)
+  // By screen coordinate, it is (48, 768) with size (16, 16).
+  // Check latest glScissor parameters.
+  DALI_TEST_EQUALS(glScissorParams.x, 48, TEST_LOCATION);
+  DALI_TEST_EQUALS(glScissorParams.y, 768, TEST_LOCATION);
+  DALI_TEST_EQUALS(glScissorParams.width, 16, TEST_LOCATION);
+  DALI_TEST_EQUALS(glScissorParams.height, 16, TEST_LOCATION);
+
+  END_TEST;
+}
