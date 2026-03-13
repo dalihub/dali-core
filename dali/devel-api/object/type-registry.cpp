@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/object/type-registry.h>
 
 // EXTERNAL INCLUDES
 

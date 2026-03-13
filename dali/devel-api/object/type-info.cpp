@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/object/type-info.h>
+#include <dali/devel-api/object/type-info.h>
 
 // EXTERNAL INCLUDES
 

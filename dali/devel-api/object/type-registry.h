@@ -23,10 +23,10 @@
 #include <typeinfo>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-info.h>
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {

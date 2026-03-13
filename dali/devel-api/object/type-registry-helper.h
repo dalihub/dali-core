@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/object/type-registry.h>
 
 /**
  * @brief Definition for macros that are used internally by the property macros.
@@ -92,7 +92,7 @@
  *
  * Within the your object's implementation cpp:
  * @code
- * #include <dali/public-api/object/type-registry-helper.h>
+ * #include <dali/devel-api/object/type-registry-helper.h>
  * ...
  * DALI_TYPE_REGISTRATION_BEGIN( MyApp::MyCustomActor, Dali::CustomActor, Create )
  * DALI_PROPERTY_REGISTRATION( MyApp, MyCustomActor, "myProperty", INTEGER, MY_PROPERTY )

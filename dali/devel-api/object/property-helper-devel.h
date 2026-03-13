@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 
 /**
  * @brief These macros are used internally by the property macros.

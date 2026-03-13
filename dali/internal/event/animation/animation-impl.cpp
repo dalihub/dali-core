@@ -22,6 +22,7 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
@@ -40,7 +41,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Integration::ToStdStringView;
 using Dali::Internal::SceneGraph::AnimatorBase;

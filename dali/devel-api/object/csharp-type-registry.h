@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/csharp-type-info.h>
-#include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/object/type-registry.h>
 
 namespace Dali
 {

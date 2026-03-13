@@ -17,9 +17,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/custom-actor-devel.h>
+#include <dali/devel-api/object/type-info.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
-#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {

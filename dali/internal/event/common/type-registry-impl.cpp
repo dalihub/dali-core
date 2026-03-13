@@ -19,13 +19,13 @@
 #include <dali/internal/event/common/type-registry-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
 #include <dali/internal/event/common/demangler.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Integration::ToStdString;
 using Dali::Integration::ToStdStringView;

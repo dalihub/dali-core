@@ -22,6 +22,7 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -29,7 +30,6 @@
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
 #include <dali/public-api/events/rotation-gesture.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Integration::ToStdStringView;
 

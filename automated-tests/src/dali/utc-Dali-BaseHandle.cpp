@@ -15,6 +15,7 @@
  *
  */
 
+#include <dali/devel-api/object/type-info.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
