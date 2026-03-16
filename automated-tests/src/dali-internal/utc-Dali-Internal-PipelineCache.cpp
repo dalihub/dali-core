@@ -61,7 +61,7 @@ namespace Render
 // Store internal PipelineCache as singleton
 
 PipelineCache::PipelineCache(Dali::Graphics::Controller& controller)
-: mPipelineUseRenderTarget(controller.HasClipMatrix()) ///< TODO : Need to implement more clever way to determine whether render target is used or not.
+: mPipelineUseRenderTarget(controller.GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_GRAPHICS_FEATURE_FLAGS) & Graphics::GraphicsFeatureFlagBits::PIPELINE_USE_RENDER_TARGET_BIT)
 {
   gPipelineCache = this;
   InvokeNext(this, &controller);
