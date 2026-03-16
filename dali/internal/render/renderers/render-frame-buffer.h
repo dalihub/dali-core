@@ -150,6 +150,24 @@ public:
   void SetRenderResultDrawn();
 
   /**
+   * @brief Checks whether the buffer usage can be changed at runtime.
+   * @return True if the buffer usage is changeable at runtime, false otherwise.
+   */
+  bool IsBufferUsageChangeableAtRuntime() const;
+
+  /**
+   * @brief Change depth and stencil buffers enableness for current instruction.
+   * @param[in] depthEnabled Depth buffer used
+   * @param[in] stencilEnabled Stencil buffer used
+   */
+  void ChangeDepthStencilEnabled(bool depthEnabled, bool stencilEnabled);
+
+  /**
+   * @brief Send depth and stencil buffers enableness for current instruction to GraphicsController.
+   */
+  void UpdateFramebufferRenderbufferUsage();
+
+  /**
    * @brief Mark all textures updated.
    * @param[in] renderManager The render manager who will mark updated textures.
    */
@@ -179,6 +197,12 @@ public:
    */
   FrameBuffer& operator=(const FrameBuffer& rhs) = delete;
 
+protected:
+  /**
+   * @copydoc Dali::Internal::SceneGraph::RenderTargetGraphicsObjects::OnInitialize()
+   */
+  void OnInitialize() override;
+
 private:
   Graphics::UniquePtr<Graphics::Framebuffer> mGraphicsObject{nullptr};
 
@@ -198,8 +222,12 @@ private:
   uint32_t mWidth;
   uint32_t mHeight;
 
-  bool mDepthBuffer;
-  bool mStencilBuffer;
+  bool mDepthBuffer : 1;
+  bool mStencilBuffer : 1;
+
+  bool mIsBufferUsageChangeableAtRuntime : 1;
+  bool mRuntimeDepthEnabled : 1;
+  bool mRuntimeStencilEnabled : 1;
 };
 
 } // namespace Render

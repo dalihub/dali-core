@@ -226,6 +226,14 @@ public:
   }
 
   /**
+   * @return the container (for get render items)
+   */
+  const RenderItemContainer& GetContainer() const
+  {
+    return mItems;
+  }
+
+  /**
    * Do some housekeeping to keep memory consumption low
    */
   void ReleaseUnusedItems()

@@ -2,7 +2,7 @@
 #define TEST_GRAPHICS_FRAMEBUFFER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,14 +34,26 @@ public:
   void Initialize();
   void AttachTexture(Graphics::Texture* texture, uint32_t attachmentId, uint32_t layerId, uint32_t levelId);
   void Bind();
+  void UpdateDepthStencilState(const Graphics::DepthStencilState& depthStencilState);
+
+  void PrepareRenderBuffer();
 
   TestGlAbstraction&              mGl;
   Graphics::FramebufferCreateInfo mCreateInfo;
   TraceCallStack&                 mCallStack;
 
   GLuint mId{0};
-  GLuint mDepthBuffer{0};
-  GLuint mStencilBuffer{0};
+  GLuint mDepthBufferId{0};
+  GLuint mStencilBufferId{0};
+
+  bool mDepthBufferUsed;
+  bool mStencilBufferUsed;
+
+  // Attached renderbuffer state
+  bool   mAttachedDepthWrite;
+  bool   mAttachedStencilWrite;
+  GLenum mAttachedAttachment;
+  GLenum mAttachedInternalFormat;
 };
 
 } // namespace Dali

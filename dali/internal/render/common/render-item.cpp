@@ -187,7 +187,7 @@ ClippingBox RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix
   return ClippingBox(x, y, z - x, w - y);
 }
 
-bool RenderItem::UsesDepthBuffer(bool depthTestEnabled)
+bool RenderItem::UsesDepthBuffer(bool depthTestEnabled) const
 {
   const DepthWriteMode::Type depthWriteMode = mRenderer->GetDepthWriteMode();
   const DepthTestMode::Type  depthTestMode  = mRenderer->GetDepthTestMode();

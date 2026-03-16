@@ -678,7 +678,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // Modify by the clip matrix if necessary (transforms from GL clip space to alternative clip space)
   Matrix clippedProjectionMatrix(projectionMatrix);
-  if(mGraphicsController.HasClipMatrix())
+  if(mGraphicsController.GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_GRAPHICS_FEATURE_FLAGS) & Graphics::GraphicsFeatureFlagBits::HAS_CLIP_MATRIX_BIT)
   {
     Matrix::Multiply(clippedProjectionMatrix, projectionMatrix, mGraphicsController.GetClipMatrix());
   }

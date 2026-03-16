@@ -18,6 +18,7 @@
 #include <dali/internal/render/renderers/render-frame-buffer.h>
 
 // INTERNAL INCLUDES
+#include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/common/render-manager.h> ///< TODO : Could we remove it?
 #include <dali/internal/render/renderers/render-texture.h>
@@ -34,8 +35,11 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, Mask attachments)
   mRenderResult(nullptr),
   mWidth(width),
   mHeight(height),
-  mDepthBuffer(attachments & Dali::FrameBuffer::Attachment::DEPTH),
-  mStencilBuffer(attachments & Dali::FrameBuffer::Attachment::STENCIL)
+  mDepthBuffer((attachments & Dali::FrameBuffer::Attachment::DEPTH) || (attachments == Dali::FrameBuffer::Attachment::AUTO)),
+  mStencilBuffer((attachments & Dali::FrameBuffer::Attachment::STENCIL) || (attachments == Dali::FrameBuffer::Attachment::AUTO)),
+  mIsBufferUsageChangeableAtRuntime(attachments == Dali::FrameBuffer::Attachment::AUTO),
+  mRuntimeDepthEnabled(mDepthBuffer),
+  mRuntimeStencilEnabled(mStencilBuffer)
 {
   mCreateInfo.size.width  = width;
   mCreateInfo.size.height = height;
@@ -57,6 +61,14 @@ FrameBuffer::~FrameBuffer()
 void FrameBuffer::Destroy()
 {
   mGraphicsObject.reset();
+}
+
+void FrameBuffer::OnInitialize()
+{
+  if(!(mGraphicsController->GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_GRAPHICS_FEATURE_FLAGS) & Graphics::GraphicsFeatureFlagBits::RUNTIME_RENDERBUFFER_ATTACHMENT_CHANGE_BIT))
+  {
+    mIsBufferUsageChangeableAtRuntime = false;
+  }
 }
 
 void FrameBuffer::AttachColorTexture(Render::Texture* texture, uint32_t mipmapLevel, uint32_t layer)
@@ -228,7 +240,7 @@ bool FrameBuffer::CreateGraphicsObjects()
       }
 
       if(mCreateInfo.depthStencilAttachment.depthTexture || mCreateInfo.depthStencilAttachment.stencilTexture ||
-         mDepthBuffer || mStencilBuffer)
+         mDepthBuffer || mStencilBuffer || mIsBufferUsageChangeableAtRuntime)
       {
         Graphics::AttachmentDescription depthStencilDesc{};
         depthStencilDesc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR)
@@ -271,6 +283,11 @@ bool FrameBuffer::CreateGraphicsObjects()
 
       RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, rtInfo);
 
+      if(mIsBufferUsageChangeableAtRuntime && (mRuntimeDepthEnabled != mDepthBuffer || mRuntimeStencilEnabled != mStencilBuffer))
+      {
+        UpdateFramebufferRenderbufferUsage();
+      }
+
       created = true;
     }
   }
@@ -285,6 +302,45 @@ uint32_t FrameBuffer::GetWidth() const
 uint32_t FrameBuffer::GetHeight() const
 {
   return mHeight;
+}
+
+bool FrameBuffer::IsBufferUsageChangeableAtRuntime() const
+{
+  return mIsBufferUsageChangeableAtRuntime;
+}
+
+void FrameBuffer::ChangeDepthStencilEnabled(bool depthEnabled, bool stencilEnabled)
+{
+  if(DALI_LIKELY(mIsBufferUsageChangeableAtRuntime))
+  {
+    bool runtimeChanged = false;
+    if(mDepthBuffer && mRuntimeDepthEnabled != depthEnabled)
+    {
+      mRuntimeDepthEnabled = depthEnabled;
+      runtimeChanged       = true;
+    }
+    if(mStencilBuffer && mRuntimeStencilEnabled != stencilEnabled)
+    {
+      mRuntimeStencilEnabled = stencilEnabled;
+      runtimeChanged         = true;
+    }
+
+    if(DALI_UNLIKELY(runtimeChanged) && DALI_LIKELY(mGraphicsObject))
+    {
+      UpdateFramebufferRenderbufferUsage();
+    }
+  }
+}
+
+void FrameBuffer::UpdateFramebufferRenderbufferUsage()
+{
+  if(DALI_LIKELY(mIsBufferUsageChangeableAtRuntime))
+  {
+    Dali::Graphics::DepthStencilState runtimeChangedState; // only be used for enabled infomations.
+    runtimeChangedState.SetDepthTestEnable(mRuntimeDepthEnabled);
+    runtimeChangedState.SetStencilTestEnable(mRuntimeStencilEnabled);
+    mGraphicsController->UpdateFramebufferRenderbufferUsage(*mGraphicsObject, runtimeChangedState);
+  }
 }
 
 } // namespace Render

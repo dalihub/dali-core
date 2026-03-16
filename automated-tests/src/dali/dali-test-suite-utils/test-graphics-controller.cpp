@@ -50,6 +50,9 @@ struct TestGraphicsDeleter
   }
 };
 
+constexpr Graphics::GraphicsFeatureFlags DEFAULT_GRAPHICS_FEATURE_FLAGS = Graphics::GraphicsFeatureFlagBits::HAS_CLIP_MATRIX_BIT |
+                                                                          Graphics::GraphicsFeatureFlagBits::RUNTIME_RENDERBUFFER_ATTACHMENT_CHANGE_BIT;
+
 } // namespace
 
 std::ostream& operator<<(std::ostream& o, const Graphics::BufferCreateInfo& bufferCreateInfo)
@@ -1530,9 +1533,12 @@ Graphics::UniquePtr<Graphics::Texture> TestGraphicsController::ReleaseTextureFro
   return texture;
 }
 
-bool TestGraphicsController::HasClipMatrix() const
+void TestGraphicsController::UpdateFramebufferRenderbufferUsage(Graphics::Framebuffer& framebuffer, const Graphics::DepthStencilState& depthStencilState)
 {
-  return true;
+  mCallStack.PushCall("UpdateFramebufferRenderbufferUsage", "");
+
+  auto testFramebuffer = Uncast<TestGraphicsFramebuffer>(&framebuffer);
+  testFramebuffer->UpdateDepthStencilState(depthStencilState);
 }
 
 const Matrix& TestGraphicsController::GetClipMatrix() const
@@ -1556,6 +1562,11 @@ uint32_t TestGraphicsController::GetDeviceLimitation(Graphics::DeviceCapability 
     GLint uniformAlign = 0;
     gl.GetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformAlign);
     return uniformAlign; // Default for testing
+  }
+
+  if(capability == Graphics::DeviceCapability::SUPPORTED_GRAPHICS_FEATURE_FLAGS)
+  {
+    return static_cast<uint32_t>(DEFAULT_GRAPHICS_FEATURE_FLAGS);
   }
   return 0;
 }

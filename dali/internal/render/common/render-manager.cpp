@@ -1123,14 +1123,15 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     if((instruction.mFrameBuffer != nullptr && renderToFbo) ||
        (instruction.mFrameBuffer == nullptr && !renderToFbo))
     {
+      bool usesDepthBuffer   = false;
+      bool usesStencilBuffer = false;
+
       for(auto j = 0u; j < instruction.RenderListCount(); ++j)
       {
         const auto& renderList = instruction.GetRenderList(j);
         bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
                                       !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
                                       renderList->HasColorRenderItems());
-        bool        usesDepthBuffer   = false;
-        bool        usesStencilBuffer = false;
         for(auto k = 0u; k < renderList->Count(); ++k)
         {
           auto& item        = renderList->GetItem(k);
@@ -1169,11 +1170,16 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
             }
           }
         }
-        if(!instruction.mFrameBuffer)
-        {
-          sceneNeedsDepthBuffer |= usesDepthBuffer;
-          sceneNeedsStencilBuffer |= usesStencilBuffer;
-        }
+      }
+
+      if(!instruction.mFrameBuffer)
+      {
+        sceneNeedsDepthBuffer |= usesDepthBuffer;
+        sceneNeedsStencilBuffer |= usesStencilBuffer;
+      }
+      else if(instruction.mFrameBuffer->IsBufferUsageChangeableAtRuntime())
+      {
+        instruction.mFrameBuffer->ChangeDepthStencilEnabled(usesDepthBuffer, usesStencilBuffer);
       }
     }
   }
