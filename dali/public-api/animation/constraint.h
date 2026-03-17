@@ -110,7 +110,7 @@ public:
      * @param[in] function The function to call
      */
     Function(void (*function)(P&, const PropertyInputContainer&))
-    : CallbackBase(reinterpret_cast<CallbackBase::Function>(function)),
+    : CallbackBase(reinterpret_cast<CallbackBase::StaticFunction>(function)),
       mCopyConstructorDispatcher(NULL)
     {
     }
@@ -181,7 +181,7 @@ public:
       }
       else
       {
-        callback = new Function(mFunction);
+        callback = new Function(mStaticFunction);
       }
       return callback;
     }
@@ -254,7 +254,7 @@ public:
      * @SINCE_1_0.0
      * @param[in] function The function to call
      */
-    Function(CallbackBase::Function function)
+    Function(CallbackBase::StaticFunction function)
     : CallbackBase(function),
       mCopyConstructorDispatcher(nullptr)
     {

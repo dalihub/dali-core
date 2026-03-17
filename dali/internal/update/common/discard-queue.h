@@ -34,12 +34,18 @@ public:
   {
     mDiscardQueue.PushBack(object);
   }
+
   void Clear()
   {
     mDiscardQueue.Clear();
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     mDiscardQueue.ShrinkToFit();
 #endif
+  }
+
+  bool IsEmpty() const
+  {
+    return mDiscardQueue.IsEmpty();
   }
 
 private:

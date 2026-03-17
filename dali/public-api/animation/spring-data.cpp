@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,22 +37,120 @@ static constexpr double MINIMUM_DIFFERENCE = static_cast<double>(Dali::Math::MAC
 
 namespace Dali
 {
-SpringData::SpringData(float stiffness, float damping, float mass)
-: stiffness(std::max(stiffness, MIN_STIFFNESS)),
-  damping(std::max(damping, MIN_DAMPING)),
-  mass(std::max(mass, MIN_MASS))
+
+struct SpringData::Impl
+{
+  float stiffness; ///< Spring stiffness(Hooke's constant). Higher values make the spring snap back faster. Minimum value is 0.1.
+  float damping;   ///< Damping coefficient. Controls oscillation and settling. Minimum value is 0.1.
+  float mass;      ///< Mass of the object. Affects inertia and the duration of the motion. Minimum value is 0.1.
+
+  /**
+   * @brief Default constructor.
+   */
+  Impl()
+  : stiffness(MIN_STIFFNESS),
+    damping(MIN_DAMPING),
+    mass(MIN_MASS)
+  {
+  }
+
+  /**
+   * @brief Constructor with parameters.
+   */
+  Impl(float stiffnessParam, float dampingParam, float massParam)
+  : stiffness(std::max(stiffnessParam, MIN_STIFFNESS)),
+    damping(std::max(dampingParam, MIN_DAMPING)),
+    mass(std::max(massParam, MIN_MASS))
+  {
+  }
+};
+
+SpringData::SpringData()
+: mImpl(new Impl())
 {
 }
 
-float SpringData::GetDuration()
+SpringData::SpringData(float stiffness, float damping, float mass)
+: mImpl(new Impl(stiffness, damping, mass))
 {
-  if(stiffness < MIN_STIFFNESS || damping < MIN_DAMPING || mass < MIN_MASS)
+}
+
+SpringData::~SpringData()
+{
+  delete mImpl;
+}
+
+SpringData::SpringData(const SpringData& rhs)
+: mImpl(new Impl(*rhs.mImpl))
+{
+}
+
+SpringData::SpringData(SpringData&& rhs) noexcept
+: mImpl(rhs.mImpl)
+{
+  rhs.mImpl = nullptr;
+}
+
+SpringData& SpringData::operator=(const SpringData& rhs)
+{
+  if(this != &rhs)
+  {
+    delete mImpl;
+    mImpl = new Impl(*rhs.mImpl);
+  }
+  return *this;
+}
+
+SpringData& SpringData::operator=(SpringData&& rhs) noexcept
+{
+  if(this != &rhs)
+  {
+    delete mImpl;
+    mImpl     = rhs.mImpl;
+    rhs.mImpl = nullptr;
+  }
+  return *this;
+}
+
+void SpringData::SetStiffness(float stiffness)
+{
+  mImpl->stiffness = std::max(stiffness, MIN_STIFFNESS);
+}
+
+float SpringData::GetStiffness() const
+{
+  return mImpl->stiffness;
+}
+
+void SpringData::SetDamping(float damping)
+{
+  mImpl->damping = std::max(damping, MIN_DAMPING);
+}
+
+float SpringData::GetDamping() const
+{
+  return mImpl->damping;
+}
+
+void SpringData::SetMass(float mass)
+{
+  mImpl->mass = std::max(mass, MIN_MASS);
+}
+
+float SpringData::GetMass() const
+{
+  return mImpl->mass;
+}
+
+float SpringData::GetDuration() const
+{
+  if(mImpl->stiffness < MIN_STIFFNESS || mImpl->damping < MIN_DAMPING || mImpl->mass < MIN_MASS)
   {
     return 0.0f;
   }
 
-  double omega0 = std::sqrt(static_cast<double>(stiffness) / static_cast<double>(mass));
-  double zeta   = static_cast<double>(damping) / (2.0 * std::sqrt(static_cast<double>(stiffness) * static_cast<double>(mass)));
+  double omega0 = std::sqrt(static_cast<double>(mImpl->stiffness) / static_cast<double>(mImpl->mass));
+  double zeta   = static_cast<double>(mImpl->damping) / (2.0 * std::sqrt(static_cast<double>(mImpl->stiffness) * static_cast<double>(mImpl->mass)));
   double time   = 0.0;
 
   if(zeta < 1.0)

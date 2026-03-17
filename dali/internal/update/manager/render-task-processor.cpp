@@ -188,8 +188,8 @@ void AddRenderablesForTask(Node&       node,
                           renderTask,
                           (DALI_UNLIKELY(childIsLayer) ? DrawMode::NORMAL : inheritedDrawMode) | child.GetDrawMode(), // Layers do not inherit the DrawMode from their parents
                           currentClippingId,
-                          clippingDepth,
-                          scissorDepth,
+                          DALI_UNLIKELY(childIsLayer) ? 0 : clippingDepth,
+                          DALI_UNLIKELY(childIsLayer) ? 0 : scissorDepth,
                           clippingUsed,
                           keepRendering);
   }

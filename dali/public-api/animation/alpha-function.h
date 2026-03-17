@@ -2,7 +2,7 @@
 #define DALI_ALPHA_FUNCTION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -176,6 +176,46 @@ public:
   AlphaFunction(const Dali::SpringData& springData);
 
   /**
+   * @brief Destructor.
+   * @SINCE_2_5.14
+   */
+  ~AlphaFunction();
+
+  /**
+   * @brief Copy constructor.
+   * Creates a new AlphaFunction object by copying the contents of another.
+   * @SINCE_2_5.14
+   * @param[in] rhs The AlphaFunction object to copy from.
+   */
+  AlphaFunction(const AlphaFunction& rhs);
+
+  /**
+   * @brief Move constructor.
+   * Creates a new AlphaFunction object by moving the contents of another.
+   * @SINCE_2_5.14
+   * @param[in] rhs The AlphaFunction object to move from.
+   */
+  AlphaFunction(AlphaFunction&& rhs) noexcept;
+
+  /**
+   * @brief Copy assignment operator.
+   * Copies the contents of another AlphaFunction object to this one.
+   * @SINCE_2_5.14
+   * @param[in] rhs The AlphaFunction object to copy from.
+   * @return A reference to this object.
+   */
+  AlphaFunction& operator=(const AlphaFunction& rhs);
+
+  /**
+   * @brief Move assignment operator.
+   * Moves the contents of another AlphaFunction object to this one.
+   * @SINCE_2_5.14
+   * @param[in] rhs The AlphaFunction object to move from.
+   * @return A reference to this object.
+   */
+  AlphaFunction& operator=(AlphaFunction&& rhs) noexcept;
+
+  /**
    * @brief Returns the control points of the alpha function.
    * @SINCE_1_0.0
    * @return Vector4 containing the two control points of the curve
@@ -213,15 +253,12 @@ public:
   const Dali::SpringData& GetSpringData() const;
 
 private:
-  Mode            mMode;    //< Enum indicating the functioning mode of the AlphaFunction
-  BuiltinFunction mBuiltin; //< Enum indicating the built-in alpha function
+  /**
+   * @brief Internal implementation structure.
+   */
+  struct Impl;
 
-  union
-  {
-    Vector4                mBezierControlPoints; //< Control points for the bezier alpha function
-    AlphaFunctionPrototype mCustom;              //< Pointer to an alpha function
-    Dali::SpringData       mSpringData;
-  };
+  Impl* mImpl; ///< Pointer to the implementation
 };
 
 /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 // CLASS HEADER
 #include <dali/public-api/animation/alpha-function.h>
 
-// INTERNAL INCLUDES
+// EXTERNAL INCLUDES
+#include <variant>
 
 namespace
 {
@@ -53,75 +54,192 @@ Dali::SpringData GetSpringDefaultData(Dali::AlphaFunction::SpringType springType
 
 namespace Dali
 {
+
+struct AlphaFunction::Impl
+{
+  /**
+   * @brief Default constructor.
+   */
+  Impl()
+  : mMode(BUILTIN_FUNCTION),
+    mBuiltin(DEFAULT),
+    mVariantData(SpringData{100.0f, 15.0f, 1.0f})
+  {
+  }
+
+  /**
+   * @brief Constructor for built-in function.
+   */
+  Impl(BuiltinFunction builtin)
+  : mMode(BUILTIN_FUNCTION),
+    mBuiltin(builtin),
+    mVariantData(SpringData{100.0f, 15.0f, 1.0f})
+  {
+  }
+
+  /**
+   * @brief Constructor for custom function.
+   */
+  Impl(AlphaFunctionPrototype customFunction)
+  : mMode(CUSTOM_FUNCTION),
+    mBuiltin(DEFAULT),
+    mVariantData(customFunction)
+  {
+  }
+
+  /**
+   * @brief Constructor for bezier function.
+   */
+  Impl(const Vector2& controlPoint0, const Vector2& controlPoint1)
+  : mMode(BEZIER),
+    mBuiltin(DEFAULT),
+    mVariantData(
+      Vector4(Clamp(controlPoint0.x, 0.0f, 1.0f),
+              controlPoint0.y,
+              Clamp(controlPoint1.x, 0.0f, 1.0f),
+              controlPoint1.y))
+  {
+  }
+
+  /**
+   * @brief Constructor for spring type.
+   */
+  Impl(SpringType springType)
+  : mMode(SPRING),
+    mBuiltin(DEFAULT),
+    mVariantData(GetSpringDefaultData(springType))
+  {
+  }
+
+  /**
+   * @brief Constructor for custom spring data.
+   */
+  Impl(const SpringData& springData)
+  : mMode(CUSTOM_SPRING),
+    mBuiltin(DEFAULT),
+    mVariantData(springData)
+  {
+  }
+
+  /**
+   * @brief Copy constructor.
+   */
+  Impl(const Impl& rhs)
+  : mMode(rhs.mMode),
+    mBuiltin(rhs.mBuiltin),
+    mVariantData(rhs.mVariantData)
+  {
+  }
+
+  ~Impl()
+  {
+  }
+
+  AlphaFunction::Mode            mMode;    ///< Enum indicating the functioning mode of the AlphaFunction
+  AlphaFunction::BuiltinFunction mBuiltin; ///< Enum indicating the built-in alpha function
+
+  std::variant<Vector4, AlphaFunctionPrototype, SpringData> mVariantData;
+};
+
 AlphaFunction::AlphaFunction()
-: mMode(BUILTIN_FUNCTION),
-  mBuiltin(DEFAULT),
-  mSpringData({100.0f, 15.0f, 1.0f})
+: mImpl(new Impl())
 {
 }
 
 AlphaFunction::AlphaFunction(BuiltinFunction function)
-: mMode(BUILTIN_FUNCTION),
-  mBuiltin(function),
-  mSpringData({100.0f, 15.0f, 1.0f})
+: mImpl(new Impl(function))
 {
 }
 
 AlphaFunction::AlphaFunction(AlphaFunctionPrototype function)
-: mMode(CUSTOM_FUNCTION),
-  mBuiltin(DEFAULT),
-  mCustom(function)
+: mImpl(new Impl(function))
 {
 }
 
 AlphaFunction::AlphaFunction(const Vector2& controlPoint0, const Vector2& controlPoint1)
-: mMode(BEZIER),
-  mBuiltin(DEFAULT),
-  mBezierControlPoints(
-    Vector4(Clamp(controlPoint0.x, 0.0f, 1.0f),
-            controlPoint0.y,
-            Clamp(controlPoint1.x, 0.0f, 1.0f),
-            controlPoint1.y))
+: mImpl(new Impl(controlPoint0, controlPoint1))
 {
 }
 
 AlphaFunction::AlphaFunction(SpringType springType)
-: mMode(SPRING),
-  mBuiltin(DEFAULT),
-  mSpringData(GetSpringDefaultData(springType))
+: mImpl(new Impl(springType))
 {
 }
 
 AlphaFunction::AlphaFunction(const Dali::SpringData& springData)
-: mMode(CUSTOM_SPRING),
-  mBuiltin(DEFAULT),
-  mSpringData(springData)
+: mImpl(new Impl(springData))
 {
+}
+
+AlphaFunction::~AlphaFunction()
+{
+  delete mImpl;
+}
+
+AlphaFunction::AlphaFunction(const AlphaFunction& rhs)
+: mImpl(new Impl(*rhs.mImpl))
+{
+}
+
+AlphaFunction::AlphaFunction(AlphaFunction&& rhs) noexcept
+: mImpl(rhs.mImpl)
+{
+  rhs.mImpl = nullptr;
+}
+
+AlphaFunction& AlphaFunction::operator=(const AlphaFunction& rhs)
+{
+  if(this != &rhs)
+  {
+    delete mImpl;
+    mImpl = new Impl(*rhs.mImpl);
+  }
+  return *this;
+}
+
+AlphaFunction& AlphaFunction::operator=(AlphaFunction&& rhs) noexcept
+{
+  if(this != &rhs)
+  {
+    delete mImpl;
+    mImpl     = rhs.mImpl;
+    rhs.mImpl = nullptr;
+  }
+  return *this;
 }
 
 Vector4 AlphaFunction::GetBezierControlPoints() const
 {
-  return (mMode == BEZIER) ? mBezierControlPoints : Vector4::ZERO;
+  auto* value = std::get_if<Vector4>(&mImpl->mVariantData);
+  return value ? *value : Vector4::ZERO;
 }
 
 AlphaFunctionPrototype AlphaFunction::GetCustomFunction() const
 {
-  return (mMode == CUSTOM_FUNCTION) ? mCustom : nullptr;
+  auto* value = std::get_if<AlphaFunctionPrototype>(&mImpl->mVariantData);
+  return value ? *value : nullptr;
 }
 
 AlphaFunction::BuiltinFunction AlphaFunction::GetBuiltinFunction() const
 {
-  return mBuiltin;
+  return mImpl->mBuiltin;
 }
 
 AlphaFunction::Mode AlphaFunction::GetMode() const
 {
-  return mMode;
+  return mImpl->mMode;
 }
 
 const Dali::SpringData& AlphaFunction::GetSpringData() const
 {
-  return mSpringData;
+  auto* value = std::get_if<SpringData>(&mImpl->mVariantData);
+  if(value)
+  {
+    return *value;
+  }
+
+  static const SpringData defaultSpringData{};
+  return defaultSpringData;
 }
 
 } // namespace Dali

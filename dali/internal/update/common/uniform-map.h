@@ -19,11 +19,10 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // uint32_t
+#include <map>
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
-
 #include <dali/devel-api/common/hash.h>
 
 #include <dali/internal/common/const-string.h>
@@ -43,7 +42,6 @@ class UniformPropertyMapping
 {
 public:
   using Hash = unsigned long;
-
   /**
    * Constructor
    */
@@ -87,11 +85,28 @@ public:
  * in the following rendering classes: Node, Renderer, Shader.
  *
  * They can test the ChangeCounter to see if the mapping has been updated.
+ *
+ * UniformMapContainer is a map that stores uniform name to property value mappings.
+ * It uses ConstString as the key for efficient string comparison and UniformPropertyMapping
+ * as the value containing the property pointer and uniform name information.
  */
 class UniformMap
 {
 public:
   using SizeType = uint32_t;
+
+  struct ConstStringComparator
+  {
+    bool operator()(const ConstString& lhs, const ConstString& rhs) const noexcept
+    {
+      // We don't need to keep alphabetic ordering here.
+      // Just check raw-pointer and check pointer variables order.
+      return lhs.GetCString() < rhs.GetCString();
+    }
+  };
+
+  using UniformMapContainer = std::map<ConstString, UniformPropertyMapping, ConstStringComparator>;
+  using UniformMapIter      = UniformMapContainer::iterator;
 
   /**
    * Add a map to the mappings table.
@@ -116,18 +131,20 @@ public:
   SizeType Count() const;
 
   /**
-   * @pre index must be in the range 0 :: Count()-1
-   * @param[in] index The index of the element to fetch
-   * @return reference to the element in the map
-   */
-  const UniformPropertyMapping& operator[](SizeType index) const;
-
-  /**
    * Return the change counter
    */
   inline std::size_t GetChangeCounter() const
   {
     return mChangeCounter;
+  }
+
+  /**
+   * Get the raw container of uniform mappings table
+   * @return Container of uniform maps
+   */
+  inline const UniformMapContainer& GetUniformMapContainer() const
+  {
+    return mUniformMaps;
   }
 
 private:
@@ -137,9 +154,6 @@ private:
   void MappingChanged();
 
 private:
-  using UniformMapContainer = Dali::Vector<UniformPropertyMapping>;
-  using UniformMapIter      = UniformMapContainer::Iterator;
-
   UniformMapContainer mUniformMaps;       ///< container of uniform maps
   std::size_t         mChangeCounter{0u}; ///< Counter that is incremented when the map changes
 };

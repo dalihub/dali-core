@@ -2,7 +2,7 @@
 #define DALI_CALLBACK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,11 +82,11 @@ public:
       Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       returnVal             = (*dispatcher)(callback, args...);
     }
-    else if(callback.mFunction)
+    else if(callback.mStaticFunction)
     {
       // convert function type
-      using Function = R (*)(Args...);
-      returnVal      = (*(reinterpret_cast<Function>(callback.mFunction)))(args...);
+      using StaticFunction = R (*)(Args...);
+      returnVal            = (*(reinterpret_cast<StaticFunction>(callback.mStaticFunction)))(args...);
     }
 
     return returnVal;
@@ -113,11 +113,11 @@ public:
       Dispatcher dispatcher = reinterpret_cast<Dispatcher>(callback.mImpl.mMemberFunctionDispatcher);
       (*dispatcher)(callback, args...);
     }
-    else if(callback.mFunction)
+    else if(callback.mStaticFunction)
     {
       // convert function type
-      using Function = void (*)(Args...);
-      (*(reinterpret_cast<Function>(callback.mFunction)))(args...);
+      using StaticFunction = void (*)(Args...);
+      (*(reinterpret_cast<StaticFunction>(callback.mStaticFunction)))(args...);
     }
   }
 
@@ -126,7 +126,7 @@ public:
    * @brief Function with static linkage.
    * @SINCE_1_0.0
    */
-  using Function = void (*)();
+  using StaticFunction = void (*)();
 
   /**
    * @brief Constructor for function with static linkage.
@@ -134,7 +134,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] function The function to call
    */
-  CallbackBase(Function function);
+  CallbackBase(StaticFunction function);
 
 protected: // Constructors for deriving classes
   /**
@@ -207,7 +207,7 @@ public: // Data for deriving classes & Dispatchers
   union
   {
     MemberFunction mMemberFunction; ///< Pointer to member function
-    Function       mFunction;       ///< Static function
+    StaticFunction mStaticFunction; ///< Static function
   };
 };
 
@@ -220,7 +220,7 @@ public: // Data for deriving classes & Dispatchers
  */
 inline bool operator==(const CallbackBase& lhs, const CallbackBase& rhs)
 {
-  if(lhs.mFunction == rhs.mFunction &&
+  if(lhs.mStaticFunction == rhs.mStaticFunction &&
      lhs.mImpl.mObjectPointer == rhs.mImpl.mObjectPointer)
   {
     return true;
@@ -1313,6 +1313,18 @@ public:
 };
 
 // Callback creation thin templates
+/**
+ * @brief Creates a callback from a free function with parameter pack.
+ *
+ * @SINCE_2_5.14
+ * @param[in] function The function to call
+ * @return A newly allocated Callback object, ownership transferred to caller
+ */
+template<typename... Args>
+inline CallbackBase* MakeCallback(void (*function)(Args... args))
+{
+  return new CallbackBase(reinterpret_cast<CallbackBase::StaticFunction>(function));
+}
 
 /**
  * @brief Creates a callback from a free function with parameter pack.
@@ -1324,7 +1336,7 @@ public:
 template<typename R, typename... Args>
 inline CallbackBase* MakeCallback(R (*function)(Args... args))
 {
-  return new CallbackBase(reinterpret_cast<CallbackBase::Function>(function));
+  return new CallbackBase(reinterpret_cast<CallbackBase::StaticFunction>(function));
 }
 
 /**

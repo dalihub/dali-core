@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,21 +42,27 @@ void CollectedUniformMap::AddMappings(const UniformMap& uniformMap)
 
   newUniformMappings.Clear();
 
-  for(UniformMap::SizeType i = 0, iCount = uniformMap.Count(); i < iCount; ++i)
+  auto& uniformMapContainer = uniformMap.GetUniformMapContainer();
+
+  for(const auto& uniformMap : uniformMapContainer)
   {
+    const auto& uniformName      = uniformMap.first;
+    const auto& propertyMappings = uniformMap.second;
+
     bool found = false;
 
     for(UniformMap::SizeType j = 0, jCount = mUniformMap.Count(); j < jCount; ++j)
     {
-      if(mUniformMap[j].uniformName == uniformMap[i].uniformName)
+      if(mUniformMap[j].uniformName == uniformName)
       {
         found = true;
         break;
       }
     }
+
     if(!found)
     {
-      newUniformMappings.PushBack(uniformMap[i]);
+      newUniformMappings.PushBack(propertyMappings);
     }
   }
 
