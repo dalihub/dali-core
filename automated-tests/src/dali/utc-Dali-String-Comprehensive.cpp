@@ -268,7 +268,17 @@ int UtcDaliStringAssignMoveOperator_SelfAssignment(void)
   tet_printf("Test self-move-assignment (should leave string in valid state)");
   TestApplication application;
   String          str("Test");
+
+  // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
   str = std::move(str); // Self-move-assignment
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
+
   // After self-move, object should be in valid but unspecified state
   // Just verify it doesn't crash
   DALI_TEST_CHECK(str.Size() >= 0);
