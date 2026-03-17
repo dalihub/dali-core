@@ -35,6 +35,7 @@
 
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/touch-integ.h>
+#include <dali/integration-api/string-utils.h>
 
 #include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-parent.h>
@@ -52,6 +53,7 @@
 #include <dali/internal/update/nodes/node-messages.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
+using Dali::Integration::ToStdStringView;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::PropertyBase;
@@ -191,19 +193,19 @@ BaseHandle CreateActor()
  */
 static bool DoConnectSignal(BaseObject*                 object,
                             ConnectionTrackerInterface* tracker,
-                            const std::string&          signalName,
+                            const Dali::String&         signalName,
                             FunctorDelegate*            functor)
 {
   bool   connected(true);
   Actor* actor = static_cast<Actor*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  std::string_view name(signalName);
+  std::string_view name = ToStdStringView(signalName);
 
   if(name == SIGNAL_HOVERED)
   {
     actor->HoveredSignal().Connect(tracker, functor);
   }
-  else if(signalName == SIGNAL_WHEEL_EVENT)
+  else if(name == SIGNAL_WHEEL_EVENT)
   {
     actor->WheelEventSignal().Connect(tracker, functor);
   }
@@ -260,7 +262,7 @@ static bool DoConnectSignal(BaseObject*                 object,
  * @return true if the action was done.
  */
 bool DoAction(BaseObject*          object,
-              const std::string&   actionName,
+              const Dali::String&  actionName,
               const Property::Map& attributes)
 {
   bool   done  = false;
@@ -268,7 +270,7 @@ bool DoAction(BaseObject*          object,
 
   if(actor)
   {
-    std::string_view name(actionName);
+    std::string_view name = ToStdStringView(actionName);
     if(name == ACTION_SHOW)
     {
       actor->SetVisible(true);
@@ -286,20 +288,20 @@ bool DoAction(BaseObject*          object,
 
 TypeRegistration mType(typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties);
 
-SignalConnectorType signalConnector2(mType, std::string(SIGNAL_HOVERED), &DoConnectSignal);
-SignalConnectorType signalConnector3(mType, std::string(SIGNAL_WHEEL_EVENT), &DoConnectSignal);
-SignalConnectorType signalConnector4(mType, std::string(SIGNAL_ON_SCENE), &DoConnectSignal);
-SignalConnectorType signalConnector5(mType, std::string(SIGNAL_OFF_SCENE), &DoConnectSignal);
-SignalConnectorType signalConnector6(mType, std::string(SIGNAL_ON_RELAYOUT), &DoConnectSignal);
-SignalConnectorType signalConnector7(mType, std::string(SIGNAL_TOUCHED), &DoConnectSignal);
-SignalConnectorType signalConnector8(mType, std::string(SIGNAL_VISIBILITY_CHANGED), &DoConnectSignal);
-SignalConnectorType signalConnector9(mType, std::string(SIGNAL_INHERITED_VISIBILITY_CHANGED), &DoConnectSignal);
-SignalConnectorType signalConnector10(mType, std::string(SIGNAL_LAYOUT_DIRECTION_CHANGED), &DoConnectSignal);
-SignalConnectorType signalConnector11(mType, std::string(SIGNAL_CHILD_ADDED), &DoConnectSignal);
-SignalConnectorType signalConnector12(mType, std::string(SIGNAL_CHILD_REMOVED), &DoConnectSignal);
+SignalConnectorType signalConnector2(mType, SIGNAL_HOVERED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector3(mType, SIGNAL_WHEEL_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector4(mType, SIGNAL_ON_SCENE.data(), &DoConnectSignal);
+SignalConnectorType signalConnector5(mType, SIGNAL_OFF_SCENE.data(), &DoConnectSignal);
+SignalConnectorType signalConnector6(mType, SIGNAL_ON_RELAYOUT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector7(mType, SIGNAL_TOUCHED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector8(mType, SIGNAL_VISIBILITY_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector9(mType, SIGNAL_INHERITED_VISIBILITY_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector10(mType, SIGNAL_LAYOUT_DIRECTION_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector11(mType, SIGNAL_CHILD_ADDED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector12(mType, SIGNAL_CHILD_REMOVED.data(), &DoConnectSignal);
 
-TypeAction a1(mType, std::string(ACTION_SHOW), &DoAction);
-TypeAction a2(mType, std::string(ACTION_HIDE), &DoAction);
+TypeAction a1(mType, ACTION_SHOW.data(), &DoAction);
+TypeAction a2(mType, ACTION_HIDE.data(), &DoAction);
 
 /// Helper for emitting a signal
 template<typename Signal, typename Event>

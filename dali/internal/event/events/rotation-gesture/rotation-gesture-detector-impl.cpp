@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,15 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-impl.h>
 #include <dali/internal/event/events/rotation-gesture/rotation-gesture-recognizer.h>
 #include <dali/public-api/events/rotation-gesture.h>
 #include <dali/public-api/object/type-registry.h>
+
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -51,7 +54,7 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::RotationGestureDetector), typeid(Dali::GestureDetector), Create);
 
-SignalConnectorType signalConnector1(mType, SIGNAL_ROTATION_DETECTED, &RotationGestureDetector::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, Dali::String(SIGNAL_ROTATION_DETECTED), &RotationGestureDetector::DoConnectSignal);
 
 } // namespace
 
@@ -76,12 +79,13 @@ void RotationGestureDetector::EmitRotationGestureSignal(Dali::Actor actor, const
   mDetectedSignal.Emit(actor, rotation);
 }
 
-bool RotationGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool RotationGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool                     connected(true);
   RotationGestureDetector* gesture = static_cast<RotationGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_ROTATION_DETECTED))
+  std::string_view name = ToStdStringView(signalName);
+  if(name == SIGNAL_ROTATION_DETECTED)
   {
     gesture->DetectedSignal().Connect(tracker, functor);
   }

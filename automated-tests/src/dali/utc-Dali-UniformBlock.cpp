@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/threading/thread.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <stdlib.h>
@@ -26,6 +27,8 @@
 #include <test-platform-abstraction.h>
 
 using namespace Dali;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
 
 void utc_dali_uniform_block_startup(void)
 {
@@ -168,13 +171,13 @@ int UtcDaliUniformBlockGetUniformBlockNameP(void)
   UniformBlock uniformBlock1 = UniformBlock::New("testBlock");
   UniformBlock uniformBlock2 = UniformBlock::New("testBlock2");
 
-  DALI_TEST_EQUALS(uniformBlock1.GetUniformBlockName(), std::string_view("testBlock"), TEST_LOCATION);
-  DALI_TEST_EQUALS(uniformBlock2.GetUniformBlockName(), std::string_view("testBlock2"), TEST_LOCATION);
+  DALI_TEST_EQUALS(uniformBlock1.GetUniformBlockName().Data(), "testBlock", TEST_LOCATION);
+  DALI_TEST_EQUALS(uniformBlock2.GetUniformBlockName().Data(), "testBlock2", TEST_LOCATION);
 
   UniformBlock move;
   move = std::move(uniformBlock1);
   DALI_TEST_CHECK(move);
-  DALI_TEST_EQUALS(move.GetUniformBlockName(), std::string_view("testBlock"), TEST_LOCATION);
+  DALI_TEST_EQUALS(move.GetUniformBlockName().Data(), "testBlock", TEST_LOCATION);
 
   END_TEST;
 }
@@ -186,7 +189,8 @@ int UtcDaliUniformBlockGetUniformBlockNameN(void)
   UniformBlock uniformBlock;
   try
   {
-    std::string name = std::string(uniformBlock.GetUniformBlockName());
+    auto        sv   = uniformBlock.GetUniformBlockName();
+    std::string name = std::string(sv.Data(), sv.Size());
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -380,16 +384,16 @@ int UtcDaliUniformBlockGetPropertyFromGraphics01(void)
   application.GetScene().Add(actor);
 
   // Register a custom property
-  actor.RegisterProperty(uniformValue1Name, value1ForActor);
-  actor.RegisterProperty(uniformValue2Name, value2ForActor);
+  actor.RegisterProperty(ToDaliString(uniformValue1Name), value1ForActor);
+  actor.RegisterProperty(ToDaliString(uniformValue2Name), value2ForActor);
 
   UniformBlock uniformBlock = UniformBlock::New("testBlock");
   DALI_TEST_CHECK(uniformBlock);
   DALI_TEST_EQUALS(uniformBlock.ConnectToShader(shader), true, TEST_LOCATION);
 
   // Register a custom property
-  uniformBlock.RegisterProperty(uniformValue1Name, value1ForUniformBlock);
-  uniformBlock.RegisterProperty(uniformValue2Name, value2ForUniformBlock);
+  uniformBlock.RegisterProperty(ToDaliString(uniformValue1Name), value1ForUniformBlock);
+  uniformBlock.RegisterProperty(ToDaliString(uniformValue2Name), value2ForUniformBlock);
 
   // TODO : For now, we should connect to shader before first rendering.
   // We should resolve this bug in future.
@@ -454,8 +458,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics01(void)
     tet_printf("The result after connected again\n");
     TestRawBuffer(value1ForUniformBlock, value2ForUniformBlock);
   }
-  actor.RegisterProperty(uniformValue1Name, value1ForActor * 3.0f);
-  actor.RegisterProperty(uniformValue2Name, value2ForActor * 3.0f);
+  actor.RegisterProperty(ToDaliString(uniformValue1Name), value1ForActor * 3.0f);
+  actor.RegisterProperty(ToDaliString(uniformValue2Name), value2ForActor * 3.0f);
 
   application.SendNotification();
   application.Render(0);
@@ -555,8 +559,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics02(void)
   application.GetScene().Add(actor1);
 
   // Register a custom property
-  actor1.RegisterProperty(uniformValue1Name, value1ForActor1);
-  actor1.RegisterProperty(uniformValue2Name, value2ForActor1);
+  actor1.RegisterProperty(ToDaliString(uniformValue1Name), value1ForActor1);
+  actor1.RegisterProperty(ToDaliString(uniformValue2Name), value2ForActor1);
 
   // Create actor2
   Shader   shader2   = Shader::New(FragmentSource, VertexSource);
@@ -569,8 +573,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics02(void)
   application.GetScene().Add(actor2);
 
   // Register a custom property
-  actor2.RegisterProperty(uniformValue1Name, value1ForActor2);
-  actor2.RegisterProperty(uniformValue2Name, value2ForActor2);
+  actor2.RegisterProperty(ToDaliString(uniformValue1Name), value1ForActor2);
+  actor2.RegisterProperty(ToDaliString(uniformValue2Name), value2ForActor2);
 
   // Connect 2 shader.
   UniformBlock uniformBlock = UniformBlock::New("testBlock");
@@ -579,8 +583,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics02(void)
   DALI_TEST_EQUALS(uniformBlock.ConnectToShader(shader2), true, TEST_LOCATION);
 
   // Register a custom property
-  uniformBlock.RegisterProperty(uniformValue1Name, value1ForUniformBlock);
-  uniformBlock.RegisterProperty(uniformValue2Name, value2ForUniformBlock);
+  uniformBlock.RegisterProperty(ToDaliString(uniformValue1Name), value1ForUniformBlock);
+  uniformBlock.RegisterProperty(ToDaliString(uniformValue2Name), value2ForUniformBlock);
 
   TraceCallStack& graphicsTrace = graphics.mCallStack;
   TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
@@ -742,8 +746,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics03(void)
   DALI_TEST_EQUALS(uniformBlock1.ConnectToShader(shader1), true, TEST_LOCATION);
 
   // Register a custom property
-  uniformBlock1.RegisterProperty(uniformValue1Name, value1ForUniformBlock1);
-  uniformBlock1.RegisterProperty(uniformValue2Name, value2ForUniformBlock1);
+  uniformBlock1.RegisterProperty(ToDaliString(uniformValue1Name), value1ForUniformBlock1);
+  uniformBlock1.RegisterProperty(ToDaliString(uniformValue2Name), value2ForUniformBlock1);
 
   tet_printf("Create UBO for actor2.\n");
   UniformBlock uniformBlock2 = UniformBlock::New("testBlock");
@@ -751,8 +755,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics03(void)
   DALI_TEST_EQUALS(uniformBlock2.ConnectToShader(shader2), true, TEST_LOCATION);
 
   // Register a custom property
-  uniformBlock2.RegisterProperty(uniformValue1Name, value1ForUniformBlock2);
-  uniformBlock2.RegisterProperty(uniformValue2Name, value2ForUniformBlock2);
+  uniformBlock2.RegisterProperty(ToDaliString(uniformValue1Name), value1ForUniformBlock2);
+  uniformBlock2.RegisterProperty(ToDaliString(uniformValue2Name), value2ForUniformBlock2);
 
   TraceCallStack& graphicsTrace = graphics.mCallStack;
   TraceCallStack& cmdTrace      = graphics.mCommandBufferCallStack;
@@ -805,8 +809,8 @@ int UtcDaliUniformBlockGetPropertyFromGraphics03(void)
 
   const float   changedValue1ForUniformBlock1 = -value1ForUniformBlock1;
   const Vector2 changedValue2ForUniformBlock1 = -value2ForUniformBlock1;
-  uniformBlock1.RegisterProperty(uniformValue1Name, changedValue1ForUniformBlock1);
-  uniformBlock1.RegisterProperty(uniformValue2Name, changedValue2ForUniformBlock1);
+  uniformBlock1.RegisterProperty(ToDaliString(uniformValue1Name), changedValue1ForUniformBlock1);
+  uniformBlock1.RegisterProperty(ToDaliString(uniformValue2Name), changedValue2ForUniformBlock1);
 
   application.SendNotification();
   application.Render(0);

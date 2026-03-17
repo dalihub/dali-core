@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "test-graphics-controller.h"
 #include "test-graphics-shader.h"
 
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/object/property-map.h>
 #include <string>
 #include <vector>
@@ -26,6 +27,8 @@ extern "C" {
 void tet_infoline(const char* str);
 void tet_printf(const char* format, ...);
 }
+
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -126,7 +129,7 @@ TestGraphicsReflection::TestGraphicsReflection(TestGraphicsController& controlle
         auto key = vertexFormat->GetKeyAt(j);
         if(key.type == Property::Key::STRING)
         {
-          mAttributes.push_back(key.stringKey);
+          mAttributes.push_back(ToStdString(key.stringKey));
         }
       }
     }

@@ -19,10 +19,9 @@
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
-#include "render-task-impl.h"
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -37,6 +36,8 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
+
+using Dali::Integration::ToStdStringView;
 
 #if defined(DEBUG_ENABLED)
 namespace
@@ -67,7 +68,7 @@ const char* const SIGNAL_FINISHED = "finished";
 
 TypeRegistration mType(typeid(Dali::RenderTask), typeid(Dali::BaseHandle), nullptr, RenderTaskDefaultProperties);
 
-SignalConnectorType signalConnector1(mType, SIGNAL_FINISHED, &RenderTask::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, Dali::String(SIGNAL_FINISHED), &RenderTask::DoConnectSignal);
 
 } // Unnamed namespace
 
@@ -1068,12 +1069,13 @@ Dali::RenderTask::RenderTaskSignalType& RenderTask::FinishedSignal()
   return mSignalFinished;
 }
 
-bool RenderTask::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool RenderTask::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool        connected(true);
   RenderTask* renderTask = static_cast<RenderTask*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_FINISHED))
+  std::string_view name = ToStdStringView(signalName);
+  if(name == SIGNAL_FINISHED)
   {
     renderTask->FinishedSignal().Connect(tracker, functor);
   }

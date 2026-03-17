@@ -23,6 +23,8 @@
 #include <typeinfo>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/type-info.h>
 
@@ -158,7 +160,7 @@ public:
    * @param[in] uniqueTypeName A unique type name
    * @return TypeInfo if the type exists, otherwise an empty handle
    */
-  TypeInfo GetTypeInfo(const std::string& uniqueTypeName);
+  TypeInfo GetTypeInfo(const Dali::StringView& uniqueTypeName);
 
   /**
    * @brief Gets TypeInfo for a registered type.
@@ -184,7 +186,7 @@ public:
    * @param[in] index The index to get the type name
    * @return The type name or an empty string when index is not valid
    */
-  std::string GetTypeName(size_t index) const;
+  Dali::String GetTypeName(size_t index) const;
 
 public: // Not intended for application developers
   /// @cond internal
@@ -282,7 +284,7 @@ public:
    * @param[in] baseType the base type info of registerType
    * @param[in] f registerType instance creation function
    */
-  TypeRegistration(std::string name, const std::type_info& baseType, TypeInfo::CreateFunction f);
+  TypeRegistration(Dali::String name, const std::type_info& baseType, TypeInfo::CreateFunction f);
 
   /**
    * @brief The name the type is registered under (derived from type_info).
@@ -290,11 +292,11 @@ public:
    * @SINCE_1_0.0
    * @return The registered name or empty if unregistered
    */
-  const std::string& RegisteredName() const;
+  Dali::String RegisteredName() const;
 
 private:
   TypeRegistry mReference; ///< Reference to the type registry
-  std::string  mName;      ///< Name of the type
+  Dali::String mName;      ///< Name of the type
 };
 
 /**
@@ -312,7 +314,7 @@ public:
    * @param[in] name The signal name
    * @param[in] func The signal connector function
    */
-  SignalConnectorType(TypeRegistration& typeRegistration, std::string name, TypeInfo::SignalConnectorFunction func);
+  SignalConnectorType(TypeRegistration& typeRegistration, Dali::String name, TypeInfo::SignalConnectorFunction func);
 };
 
 /**
@@ -330,7 +332,7 @@ public:
    * @param[in] name The action name
    * @param[in] f The action function
    */
-  TypeAction(TypeRegistration& registered, std::string name, TypeInfo::ActionFunction f);
+  TypeAction(TypeRegistration& registered, Dali::String name, TypeInfo::ActionFunction f);
 };
 
 /**
@@ -367,7 +369,7 @@ public:
    *
    */
   PropertyRegistration(TypeRegistration&             registered,
-                       std::string                   name,
+                       Dali::String                  name,
                        Property::Index               index,
                        Property::Type                type,
                        TypeInfo::SetPropertyFunction setFunc,
@@ -398,7 +400,7 @@ public:
    * @pre "registered" must be registered with the TypeRegistry.
    */
   explicit AnimatablePropertyRegistration(TypeRegistration&             registered,
-                                          std::string                   name,
+                                          Dali::String                  name,
                                           Property::Index               index,
                                           Property::Type                type,
                                           TypeInfo::SetPropertyFunction setFunc = nullptr,
@@ -421,7 +423,7 @@ public:
    * @pre "registered" must be registered with the TypeRegistry.
    */
   explicit AnimatablePropertyRegistration(TypeRegistration&             registered,
-                                          std::string                   name,
+                                          Dali::String                  name,
                                           Property::Index               index,
                                           const Property::Value&        value,
                                           TypeInfo::SetPropertyFunction setFunc = nullptr,
@@ -452,7 +454,7 @@ public:
    * @param[in] componentIndex The index of the component (e.g. 0 for the x component of a Vector2 property and 1 for the y component of a Vector2 property)
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  AnimatablePropertyComponentRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex);
+  AnimatablePropertyComponentRegistration(TypeRegistration& registered, Dali::String name, Property::Index index, Property::Index baseIndex, uint32_t componentIndex);
 };
 
 /**
@@ -473,7 +475,7 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  ChildPropertyRegistration(TypeRegistration& registered, std::string name, Property::Index index, Property::Type type);
+  ChildPropertyRegistration(TypeRegistration& registered, Dali::String name, Property::Index index, Property::Type type);
 
   /**
    * @brief This constructor registers an event-thread only child property (i.e. a property
@@ -486,7 +488,7 @@ public:
    * @param[in] type The property value type
    * @pre "registered" must be registered with the TypeRegistry.
    */
-  ChildPropertyRegistration(std::string registered, std::string name, Property::Index index, Property::Type type);
+  ChildPropertyRegistration(Dali::String registered, Dali::String name, Property::Index index, Property::Type type);
 };
 
 /**

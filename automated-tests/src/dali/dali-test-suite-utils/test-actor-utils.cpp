@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@
 #include "test-actor-utils.h"
 
 // EXTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
+
+using Dali::Integration::ToDaliStringView;
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
@@ -69,7 +72,7 @@ Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, co
   Geometry geometry = CreateQuadGeometry();
 
   // Create Shader
-  Shader shader = Shader::New(vertexShader, fragmentShader);
+  Shader shader = Shader::New(ToDaliStringView(vertexShader), ToDaliStringView(fragmentShader));
 
   // Create renderer from geometry and material
   Renderer renderer = Renderer::New(geometry, shader);
@@ -98,7 +101,7 @@ Actor CreateRenderableActor2(TextureSet textures, const std::string& vertexShade
   Geometry geometry = CreateQuadGeometry();
 
   // Create Shader
-  Shader shader = Shader::New(vertexShader, fragmentShader);
+  Shader shader = Shader::New(ToDaliStringView(vertexShader), ToDaliStringView(fragmentShader));
 
   // Create renderer from geometry and material
   Renderer renderer = Renderer::New(geometry, shader);

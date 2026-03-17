@@ -593,7 +593,7 @@ int UtcDaliLayerDefaultProperties(void)
 
   for(std::vector<Property::Index>::iterator iter = indices.begin(); iter != indices.end(); ++iter)
   {
-    DALI_TEST_CHECK(*iter == actor.GetPropertyIndex(actor.GetPropertyName(*iter)));
+    DALI_TEST_CHECK(*iter == actor.GetPropertyIndex(actor.GetPropertyName(*iter).CStr()));
     DALI_TEST_CHECK(*iter == Layer::Property::DEPTH ? !actor.IsPropertyWritable(*iter) : actor.IsPropertyWritable(*iter));
     DALI_TEST_CHECK(!actor.IsPropertyAnimatable(*iter));
     DALI_TEST_CHECK(actor.GetPropertyType(*iter) == actor.GetPropertyType(*iter)); // just checking call succeeds

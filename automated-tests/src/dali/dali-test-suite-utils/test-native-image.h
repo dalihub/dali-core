@@ -22,6 +22,10 @@
 #include <dali/public-api/images/native-image-interface.h>
 
 #include <dali/integration-api/gl-defines.h>
+#include <dali/integration-api/string-utils.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -79,13 +83,15 @@ public:
     mCallStack.PushCall("GetTextureTarget", "");
     return GL_TEXTURE_EXTERNAL_OES;
   };
-  inline virtual bool ApplyNativeFragmentShader(std::string& shader) override
+  inline virtual bool ApplyNativeFragmentShader(Dali::String& shader) override
   {
     return ApplyNativeFragmentShader(shader, 1);
   }
-  inline virtual bool ApplyNativeFragmentShader(std::string& shader, int mask) override
+  inline virtual bool ApplyNativeFragmentShader(Dali::String& shaderStr, int mask) override
   {
     mCallStack.PushCall("ApplyNativeFragmentShader", "");
+    std::string shader = ToStdString(shaderStr);
+
     shader = "#extension GL_OES_EGL_image_external:require\n" + shader;
 
     // Get custom sampler type name
@@ -108,6 +114,7 @@ public:
         mask >>= 1;
       }
     }
+    shaderStr = ToDaliString(shader);
     return true;
   };
   inline const char* GetCustomSamplerTypename() const override

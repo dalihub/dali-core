@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/key-event-integ.h>
+#include <dali/integration-api/stream-operators.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/events/key-event-impl.h>
 #include <dali/public-api/events/key-event.h>
+
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -58,7 +62,7 @@ KeyEventProcessor::~KeyEventProcessor() = default;
 
 void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
-  KeyEventPtr keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
+  KeyEventPtr keyEvent(new KeyEvent(ToStdString(event.keyName), ToStdString(event.logicalKey), ToStdString(event.keyString), event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), ToStdString(event.compose), ToStdString(event.deviceName), event.deviceClass, event.deviceSubclass));
   keyEvent->SetRepeat(event.isRepeat);
   keyEvent->SetWindowId(event.windowId);
   keyEvent->SetReceiveTime(event.receiveTime);

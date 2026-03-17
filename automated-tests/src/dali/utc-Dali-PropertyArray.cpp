@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -189,7 +189,7 @@ int UtcDaliPropertyArrayIndexOperatorP(void)
   array.PushBack(3);
 
   DALI_TEST_CHECK(array[0].Get<int>() == 1);
-  DALI_TEST_CHECK(array[1].Get<std::string>() == "world");
+  DALI_TEST_CHECK(array[1].Get<String>() == "world");
   DALI_TEST_CHECK(array[2].Get<int>() == 3);
 
   END_TEST;
@@ -207,7 +207,7 @@ int UtcDaliPropertyArrayConstIndexOperatorP(void)
   const Property::Array array(anArray);
 
   DALI_TEST_CHECK(array[0].Get<int>() == 1);
-  DALI_TEST_CHECK(array[1].Get<std::string>() == "world");
+  DALI_TEST_CHECK(array[1].Get<String>() == "world");
   DALI_TEST_CHECK(array[2].Get<int>() == 3);
 
   END_TEST;
@@ -225,7 +225,7 @@ int UtcDaliPropertyArrayAssignmentOperatorP(void)
   Property::Array array = anArray;
 
   DALI_TEST_CHECK(array[0].Get<int>() == 1);
-  DALI_TEST_CHECK(array[1].Get<std::string>() == "world");
+  DALI_TEST_CHECK(array[1].Get<String>() == "world");
   DALI_TEST_CHECK(array[2].Get<int>() == 3);
 
   END_TEST;

@@ -25,13 +25,20 @@
 #include <unordered_map>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/stream-operators.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/common/hash-utils.h>
 #include <dali/public-api/common/vector-wrapper.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
 namespace
 {
+
 typedef std::vector<StringValuePair> StringValueContainer;
 
 using IndexValuePair      = std::pair<Property::Index, Property::Value>;
@@ -57,7 +64,7 @@ public:
         // Use unordered hash operation.
         auto valueHash = iter.second.GetHash();
         valueHash *= valueHash;
-        hash += Dali::Internal::HashUtils::HashStringView(std::string_view(iter.first), valueHash);
+        hash += Dali::Internal::HashUtils::HashStringView(ToStdStringView(iter.first), valueHash);
       }
       for(const auto& iter : mIndexValueContainer)
       {
@@ -102,7 +109,7 @@ Property::Map::Map(const std::initializer_list<KeyValuePair>& values)
       }
       case Property::Key::STRING:
       {
-        Property::Map::Insert(key.stringKey, value.second);
+        Property::Map::Insert(ToDaliString(key.stringKey), value.second);
         break;
       }
     }
@@ -149,19 +156,20 @@ bool Property::Map::Empty() const
   return true;
 }
 
-void Property::Map::Insert(std::string key, Value value)
+void Property::Map::Insert(Dali::String key, Value value)
 {
   if(DALI_UNLIKELY(!mImpl))
   {
     mImpl = new Impl();
   }
 
+  // Store Dali::String directly, convert to std::string_view only for hashing
   if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
   {
-    // Use unordered hash operation.
+    // Use unordered hash operation - convert to std::string_view for hashing
     auto valueHash = value.GetHash();
     valueHash *= valueHash;
-    mImpl->mHash += Dali::Internal::HashUtils::HashStringView(std::string_view(key), valueHash);
+    mImpl->mHash += Dali::Internal::HashUtils::HashStringView(ToStdStringView(key), valueHash);
   }
   mImpl->mStringValueContainer.push_back(std::make_pair(std::move(key), std::move(value)));
 }
@@ -201,7 +209,7 @@ Property::Value& Property::Map::GetValue(SizeType position) const
   }
 }
 
-const std::string& Property::Map::GetKey(SizeType position) const
+Dali::String Property::Map::GetKey(SizeType position) const
 {
   DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetKey() is deprecated and will be removed from next release.\n");
 
@@ -210,7 +218,8 @@ const std::string& Property::Map::GetKey(SizeType position) const
   SizeType numStringKeys = mImpl->mStringValueContainer.size();
   DALI_ASSERT_ALWAYS(position < numStringKeys && "position out-of-bounds");
 
-  return mImpl->mStringValueContainer[position].first;
+  // Return copy of Dali::String directly
+  return Dali::String(mImpl->mStringValueContainer[position].first);
 }
 
 Property::Key Property::Map::GetKeyAt(SizeType position) const
@@ -223,7 +232,7 @@ Property::Key Property::Map::GetKeyAt(SizeType position) const
 
   if(position < numStringKeys)
   {
-    Key key(mImpl->mStringValueContainer[position].first);
+    Key key(mImpl->mStringValueContainer[position].first.CStr());
     return key;
   }
   else
@@ -256,7 +265,7 @@ KeyValuePair Property::Map::GetKeyValue(SizeType position) const
 
   if(position < numStringKeys)
   {
-    Key          key(mImpl->mStringValueContainer[position].first);
+    Key          key(mImpl->mStringValueContainer[position].first.CStr());
     KeyValuePair keyValue(key, mImpl->mStringValueContainer[position].second);
     return keyValue;
   }
@@ -266,7 +275,7 @@ KeyValuePair Property::Map::GetKeyValue(SizeType position) const
   }
 }
 
-Property::Value* Property::Map::Find(std::string_view key) const
+Property::Value* Property::Map::Find(Dali::StringView key) const
 {
   if(DALI_LIKELY(mImpl))
   {
@@ -308,7 +317,7 @@ Property::Value* Property::Map::Find(Property::Index key) const
   return nullptr; // Not found
 }
 
-Property::Value* Property::Map::Find(Property::Index indexKey, std::string_view stringKey) const
+Property::Value* Property::Map::Find(Property::Index indexKey, Dali::StringView stringKey) const
 {
   Property::Value* valuePtr = Find(indexKey);
   if(!valuePtr)
@@ -318,7 +327,7 @@ Property::Value* Property::Map::Find(Property::Index indexKey, std::string_view 
   return valuePtr;
 }
 
-Property::Value* Property::Map::Find(std::string_view key, Property::Type type) const
+Property::Value* Property::Map::Find(Dali::StringView key, Property::Type type) const
 {
   if(DALI_LIKELY(mImpl))
   {
@@ -392,7 +401,7 @@ bool Property::Map::Remove(Property::Index key)
   return false;
 }
 
-bool Property::Map::Remove(std::string_view key)
+bool Property::Map::Remove(Dali::StringView key)
 {
   if(DALI_LIKELY(mImpl))
   {
@@ -402,10 +411,10 @@ bool Property::Map::Remove(std::string_view key)
     {
       if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
       {
-        // Use unordered hash operation.
+        // Use unordered hash operation - convert to std::string_view
         auto valueHash = iter->second.GetHash();
         valueHash *= valueHash;
-        mImpl->mHash -= Dali::Internal::HashUtils::HashStringView(key, valueHash);
+        mImpl->mHash -= Dali::Internal::HashUtils::HashStringView(ToStdStringView(key), valueHash);
       }
       mImpl->mStringValueContainer.erase(iter);
       return true;
@@ -450,7 +459,7 @@ void Property::Map::Merge(const Property::Map& from)
   }
 }
 
-const Property::Value& Property::Map::operator[](std::string_view key) const
+const Property::Value& Property::Map::operator[](Dali::StringView key) const
 {
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
@@ -465,7 +474,7 @@ const Property::Value& Property::Map::operator[](std::string_view key) const
   DALI_ASSERT_ALWAYS(!"Invalid Key");
 }
 
-Property::Value& Property::Map::operator[](std::string_view key)
+Property::Value& Property::Map::operator[](Dali::StringView key)
 {
   if(DALI_UNLIKELY(!mImpl))
   {
@@ -488,7 +497,7 @@ Property::Value& Property::Map::operator[](std::string_view key)
   }
 
   // Create and return reference to new value
-  mImpl->mStringValueContainer.push_back(std::make_pair(std::string(key), Property::Value()));
+  mImpl->mStringValueContainer.push_back(std::make_pair(Dali::String(key), Property::Value()));
   return mImpl->mStringValueContainer.back().second;
 }
 
@@ -590,14 +599,14 @@ bool Property::Map::operator==(const Property::Map& rhs) const
 
   // TODO : Should we support duplication key comparision?
   {
-    std::unordered_map<std::string_view, const Property::Value*> stringValueMap;
+    std::unordered_map<Dali::StringView, const Property::Value*> stringValueMap;
     for(auto&& iter : mImpl->mStringValueContainer)
     {
-      stringValueMap[std::string_view(iter.first)] = &iter.second;
+      stringValueMap[Dali::StringView(iter.first)] = &iter.second;
     }
     for(auto&& iter : rhs.mImpl->mStringValueContainer)
     {
-      auto mapIter = stringValueMap.find(std::string_view(iter.first));
+      auto mapIter = stringValueMap.find(Dali::StringView(iter.first));
       if(mapIter == stringValueMap.end())
       {
         return false;

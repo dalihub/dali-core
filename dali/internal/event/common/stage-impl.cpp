@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/platform-abstraction.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
@@ -41,6 +42,7 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 
+using Dali::Integration::ToStdStringView;
 using Dali::Internal::SceneGraph::Node;
 
 namespace
@@ -69,14 +71,14 @@ static constexpr std::string_view SIGNAL_SCENE_CREATED             = "sceneCreat
 
 TypeRegistration mType(typeid(Dali::Stage), typeid(Dali::BaseHandle), nullptr);
 
-SignalConnectorType signalConnector1(mType, std::string(SIGNAL_KEY_EVENT), &Stage::DoConnectSignal);
-SignalConnectorType signalConnector2(mType, std::string(SIGNAL_EVENT_PROCESSING_FINISHED), &Stage::DoConnectSignal);
-SignalConnectorType signalConnector4(mType, std::string(SIGNAL_WHEEL_EVENT), &Stage::DoConnectSignal);
-SignalConnectorType signalConnector5(mType, std::string(SIGNAL_CONTEXT_LOST), &Stage::DoConnectSignal);
-SignalConnectorType signalConnector6(mType, std::string(SIGNAL_CONTEXT_REGAINED), &Stage::DoConnectSignal);
-SignalConnectorType signalConnector7(mType, std::string(SIGNAL_SCENE_CREATED), &Stage::DoConnectSignal);
-SignalConnectorType signalConnector8(mType, std::string(SIGNAL_KEY_EVENT_GENERATED), &Stage::DoConnectSignal);
-SignalConnectorType signalConnector9(mType, std::string(SIGNAL_TOUCHED), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, SIGNAL_KEY_EVENT.data(), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector2(mType, SIGNAL_EVENT_PROCESSING_FINISHED.data(), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector4(mType, SIGNAL_WHEEL_EVENT.data(), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector5(mType, SIGNAL_CONTEXT_LOST.data(), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector6(mType, SIGNAL_CONTEXT_REGAINED.data(), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector7(mType, SIGNAL_SCENE_CREATED.data(), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector8(mType, SIGNAL_KEY_EVENT_GENERATED.data(), &Stage::DoConnectSignal);
+SignalConnectorType signalConnector9(mType, SIGNAL_TOUCHED.data(), &Stage::DoConnectSignal);
 
 } // unnamed namespace
 
@@ -224,11 +226,11 @@ Dali::UpdateProxy::NotifySyncPoint Stage::NotifyFrameCallback(FrameCallbackInter
   return sSyncPoint;
 }
 
-bool Stage::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool Stage::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool             connected(true);
   Stage*           stage = static_cast<Stage*>(object); // TypeRegistry guarantees that this is the correct type.
-  std::string_view name(signalName);
+  std::string_view name  = ToStdStringView(signalName);
 
   if(name == SIGNAL_KEY_EVENT)
   {

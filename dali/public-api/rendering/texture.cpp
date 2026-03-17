@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use *this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #include <dali/public-api/rendering/texture.h> // Dali::Texture
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/images/pixel-data-impl.h> // Dali::Internal::PixelData
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 
@@ -59,11 +60,11 @@ Texture::Texture(Texture&& rhs) noexcept = default;
 
 Texture& Texture::operator=(Texture&& rhs) noexcept = default;
 
-bool Texture::Upload(PixelData pixelData, std::string url, int32_t textureId)
+bool Texture::Upload(PixelData pixelData, Dali::String url, int32_t textureId)
 {
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
   Internal::PixelData& internalPixelData = GetImplementation(pixelData);
-  return GetImplementation(*this).Upload(&internalPixelData, url, textureId);
+  return GetImplementation(*this).Upload(&internalPixelData, Integration::ToStdString(std::move(url)), textureId);
 #endif
   return Upload(pixelData);
 }

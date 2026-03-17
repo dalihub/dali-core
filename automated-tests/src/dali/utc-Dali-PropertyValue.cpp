@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,11 +295,10 @@ int UtcDaliPropertyValueConstructorsRotationTypeP(void)
 
 int UtcDaliPropertyValueConstructorsStringP(void)
 {
-  std::string     v("1");
-  Property::Value value(v);
+  Property::Value value("1");
 
   DALI_TEST_CHECK(value.GetType() == Property::STRING);
-  DALI_TEST_CHECK(value.Get<std::string>() == v);
+  DALI_TEST_CHECK(value.Get<String>() == "1");
 
   END_TEST;
 }
@@ -309,7 +308,7 @@ int UtcDaliPropertyValueConstructorsStringTypeP(void)
   Property::Value value(Property::STRING);
 
   DALI_TEST_CHECK(value.GetType() == Property::STRING);
-  DALI_TEST_CHECK(value.Get<std::string>() == std::string());
+  DALI_TEST_CHECK(value.Get<String>() == String());
 
   END_TEST;
 }
@@ -478,7 +477,7 @@ int UtcDaliPropertyValueCopyConstructorQuaternionP(void)
 
 int UtcDaliPropertyValueCopyConstructorStringP(void)
 {
-  CheckCopyCtorP<std::string> check(std::string("1"));
+  CheckCopyCtorP<String> check(Property::Value("1"));
   END_TEST;
 }
 
@@ -500,8 +499,8 @@ int UtcDaliPropertyValueCopyAssignStringDifferentTypeP(void)
   value3 = value4;
 
   DALI_TEST_EQUALS(value3.GetType(), value4.GetType(), TEST_LOCATION);
-  DALI_TEST_EQUALS(value3.Get<std::string>(), "very very long string ...................", TEST_LOCATION);
-  DALI_TEST_EQUALS(value3.Get<std::string>(), value4.Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS(value3.Get<String>(), "very very long string ...................", TEST_LOCATION);
+  DALI_TEST_EQUALS(value3.Get<String>(), value4.Get<String>(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -743,10 +742,10 @@ int UtcDaliPropertyValueAssignmentOperatorStringP(void)
 {
   Property::Value value;
   value = Property::Value("yes"); // mismatch
-  DALI_TEST_CHECK("yes" == value.Get<std::string>());
+  DALI_TEST_CHECK(value.Get<String>() == "yes");
   Property::Value copy("no");
   copy = value; // match
-  DALI_TEST_CHECK("yes" == copy.Get<std::string>());
+  DALI_TEST_CHECK(copy.Get<String>() == "yes");
   END_TEST;
 }
 
@@ -775,7 +774,7 @@ int UtcDaliPropertyValueAssignmentOperatorMapP(void)
   copy = value;
   Property::Map map;
   copy.Get(map);
-  DALI_TEST_CHECK(map.GetKey(0) == "key");
+  DALI_TEST_CHECK(std::string(map.GetKey(0).CStr()) == "key");
   END_TEST;
 }
 
@@ -845,7 +844,7 @@ int UtcDaliPropertyValueGetBoolP(void)
   bool            boolean(false);
   DALI_TEST_CHECK(value.Get(boolean) == true);
   DALI_TEST_CHECK(value.Get<bool>() == true);
-  std::string string;
+  String string;
   DALI_TEST_CHECK(value.Get(string) == false);
   value = Property::Value(1.f);
   DALI_TEST_CHECK(value.Get<float>() == 1.f);
@@ -1182,14 +1181,14 @@ int UtcDaliPropertyValueGetQuaternionN(void)
 
 int UtcDaliPropertyValueGetStringP(void)
 {
-  Property::Value value(std::string("hello"));
-  std::string     result;
-  DALI_TEST_EQUALS(std::string("hello"), value.Get<std::string>(), TEST_LOCATION);
+  Property::Value value("hello");
+  String          result;
+  DALI_TEST_EQUALS(std::string("hello"), value.Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, value.Get(result), TEST_LOCATION);
   DALI_TEST_EQUALS(std::string("hello"), result, TEST_LOCATION);
 
   Property::Value value2("C hi!");
-  DALI_TEST_EQUALS("C hi!", value2.Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("C hi!", value2.Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, value2.Get(result), TEST_LOCATION);
   DALI_TEST_EQUALS("C hi!", result, TEST_LOCATION);
   END_TEST;
@@ -1198,8 +1197,8 @@ int UtcDaliPropertyValueGetStringP(void)
 int UtcDaliPropertyValueGetStringN(void)
 {
   Property::Value value;
-  std::string     result("doesn't change");
-  DALI_TEST_EQUALS(std::string(), value.Get<std::string>(), TEST_LOCATION);
+  String          result("doesn't change");
+  DALI_TEST_EQUALS(std::string(), value.Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(false, value.Get(result), TEST_LOCATION);
   DALI_TEST_EQUALS("doesn't change", result, TEST_LOCATION);
 
@@ -1315,7 +1314,7 @@ int UtcDaliPropertyValueEqualSameType(void)
       Property::Value(Matrix(a)),
       Property::Value(Rect<int32_t>(3, 2, 5, 4)),
       Property::Value(AngleAxis(Radian(2.0f), Vector3(0.0f, 1.0f, 0.0f))),
-      Property::Value(std::string("Hello, World!")),
+      Property::Value("Hello, World!"),
       Property::Value(Extents(8, 4, 2, 5)),
     };
   Property::Value otherValueList[] =
@@ -1330,7 +1329,7 @@ int UtcDaliPropertyValueEqualSameType(void)
       Property::Value(Matrix(b)),
       Property::Value(Rect<int32_t>(2, 3, 4, 5)),
       Property::Value(AngleAxis(Radian(20.0f), Vector3(0.0f, 1.0f, 0.0f))),
-      Property::Value(std::string("Hell, o, World!")),
+      Property::Value("Hell, o, World!"),
       Property::Value(Extents(4, 8, 5, 2)),
     };
   const int valueCount = sizeof(valueList) / sizeof(valueList[0]);
@@ -1580,7 +1579,7 @@ int UtcDaliPropertyValueConvertFailed(void)
 
     Property::Value(Rect<int32_t>(2, 3, 4, 5)),
     Property::Value(AngleAxis(Radian(20.0f), Vector3(0.0f, 1.0f, 0.0f))),
-    Property::Value(std::string("Hell, o, World!")),
+    Property::Value("Hell, o, World!"),
     Property::Value(Extents(4, 8, 5, 2)),
 
     Property::Value(array),
@@ -1707,7 +1706,7 @@ int UtcDaliPropertyValueOutputStream(void)
   }
 
   {
-    value = Property::Value(std::string("Foo"));
+    value = Property::Value("Foo");
     std::ostringstream stream;
     stream << value;
     DALI_TEST_CHECK(stream.str() == "Foo");
@@ -1789,10 +1788,10 @@ int UtcDaliPropertyValueGetHashP01(void)
       Property::Value(Matrix(a)),
       Property::Value(Rect<int32_t>(3, 2, 5, 4)),
       Property::Value(AngleAxis(Radian(2.0f), Vector3(0.0f, 1.0f, 0.0f))),
-      Property::Value(std::string("Hello, World!")),
+      Property::Value("Hello, World!"),
       Property::Value(Extents(8, 4, 2, 5)),
-      Property::Value(Property::Array({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), std::string("Five"), Matrix(a)})),
-      Property::Value(Property::Map({{1, 1.0f}, {"2", Vector4(2.0f, 3.0f, 4.0f, 5.0f)}, {3, static_cast<int32_t>(6)}, {4, std::string("Lucky")}})),
+      Property::Value(Property::Array({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), Property::Value("Five"), Matrix(a)})),
+      Property::Value(Property::Map({{1, 1.0f}, {"2", Vector4(2.0f, 3.0f, 4.0f, 5.0f)}, {3, static_cast<int32_t>(6)}, {4, Property::Value("Lucky")}})),
     };
   Property::Value otherValueList[] =
     {
@@ -1806,10 +1805,10 @@ int UtcDaliPropertyValueGetHashP01(void)
       Property::Value(Matrix(b)),
       Property::Value(Rect<int32_t>(2, 3, 4, 5)),
       Property::Value(AngleAxis(Radian(20.0f), Vector3(0.0f, 1.0f, 0.0f))),
-      Property::Value(std::string("Hell, o, World!")),
+      Property::Value("Hell, o, World!"),
       Property::Value(Extents(4, 8, 5, 2)),
-      Property::Value(Property::Array({5.0f, Vector2(4.0f, 3.0f), static_cast<int32_t>(2), std::string("ONE"), Matrix(b)})),
-      Property::Value(Property::Map({{"1", 5.0f}, {2, Vector4(4.0f, 3.0f, 2.0f, 1.0f)}, {"three", static_cast<int32_t>(0)}, {1, std::string("-1")}})),
+      Property::Value(Property::Array({5.0f, Vector2(4.0f, 3.0f), static_cast<int32_t>(2), Property::Value("ONE"), Matrix(b)})),
+      Property::Value(Property::Map({{"1", 5.0f}, {2, Vector4(4.0f, 3.0f, 2.0f, 1.0f)}, {"three", static_cast<int32_t>(0)}, {1, Property::Value("-1")}})),
     };
   const int valueCount = sizeof(valueList) / sizeof(valueList[0]);
 
@@ -1841,7 +1840,7 @@ int UtcDaliPropertyValueGetHashP02(void)
   tet_infoline("Check Property::Value::GetHash() equality for Property::Array.");
 
   const float     a[]   = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
-  Property::Value value = Property::Value(Property::Array({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), std::string("Five"), Matrix(a)}));
+  Property::Value value = Property::Value(Property::Array({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), Property::Value("Five"), Matrix(a)}));
 
   const auto originHash = value.GetHash();
 
@@ -1879,7 +1878,7 @@ int UtcDaliPropertyValueGetHashP03(void)
   tet_infoline("Check Property::Value::GetHash() equality for Property::Map.");
 
   const float     a[]   = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
-  Property::Value value = Property::Value(Property::Map({{0, 1.0f}, {1, Vector2(2.0f, 3.0f)}, {"2", static_cast<int32_t>(4)}, {"3", std::string("Five")}, {4, Matrix(a)}}));
+  Property::Value value = Property::Value(Property::Map({{0, 1.0f}, {1, Vector2(2.0f, 3.0f)}, {"2", static_cast<int32_t>(4)}, {"3", Property::Value("Five")}, {4, Matrix(a)}}));
 
   const auto originHash = value.GetHash();
 
@@ -1896,17 +1895,17 @@ int UtcDaliPropertyValueGetHashP03(void)
   DALI_TEST_EQUALS(originHash, copiedValue.GetHash(), TEST_LOCATION);
 
   mapPtr->Insert(5, Property::Value(5));
-  mapPtr->Insert(6, Property::Value(std::string("6")));
+  mapPtr->Insert(6, Property::Value("6"));
   mapPtr->Insert("7", Property::Value(7));
-  mapPtr->Insert("8", Property::Value(std::string("8")));
+  mapPtr->Insert("8", Property::Value("8"));
 
   const auto newHash = value.GetHash();
 
   DALI_TEST_NOT_EQUALS(originHash, newHash, Math::MACHINE_EPSILON_100, TEST_LOCATION);
 
   // Add same property value to copied map, seperated order
-  copiedMap.Insert(6, Property::Value(std::string("6")));
-  copiedMap.Insert("8", Property::Value(std::string("8")));
+  copiedMap.Insert(6, Property::Value("6"));
+  copiedMap.Insert("8", Property::Value("8"));
   copiedMap.Insert(5, Property::Value(5));
   copiedMap.Insert("7", Property::Value(7));
   Property::Value copiedValue2 = Property::Value(copiedMap);

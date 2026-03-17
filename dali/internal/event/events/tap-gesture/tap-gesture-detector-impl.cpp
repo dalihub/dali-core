@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/events/gesture-requests.h>
@@ -31,6 +32,8 @@
 #include <dali/internal/event/events/tap-gesture/tap-gesture-recognizer.h>
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/type-registry.h>
+
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -56,7 +59,7 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::TapGestureDetector), typeid(Dali::GestureDetector), Create);
 
-SignalConnectorType signalConnector1(mType, SIGNAL_TAP_DETECTED, &TapGestureDetector::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, Dali::String(SIGNAL_TAP_DETECTED), &TapGestureDetector::DoConnectSignal);
 
 } // namespace
 
@@ -224,12 +227,13 @@ bool TapGestureDetector::TimerCallback()
   return false;
 }
 
-bool TapGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool TapGestureDetector::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool                connected(true);
   TapGestureDetector* gesture = static_cast<TapGestureDetector*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_TAP_DETECTED))
+  std::string_view name = ToStdStringView(signalName);
+  if(name == SIGNAL_TAP_DETECTED)
   {
     gesture->DetectedSignal().Connect(tracker, functor);
   }

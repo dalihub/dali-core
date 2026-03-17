@@ -2,7 +2,7 @@
 #define DALI_HANDLE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/indirect-value.h>
 #include <dali/public-api/object/property-key.h>
@@ -204,7 +206,7 @@ public:
    * @param[in] index The index of the property
    * @return The name of the property
    */
-  std::string GetPropertyName(Property::Index index) const;
+  Dali::String GetPropertyName(Property::Index index) const;
 
   /**
    * @brief Query the index of a property using the given key.
@@ -299,7 +301,7 @@ public:
    *       - Property::ROTATION
    * @note If a property with the desired name already exists, then the value given is just set.
    */
-  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue);
+  Property::Index RegisterProperty(Dali::String name, Property::Value propertyValue);
 
   /**
    * @brief Registers a new animatable property.
@@ -329,7 +331,7 @@ public:
    * entry to a different scene graph property; Access by index works as expected, but uniform
    * values will use the last registered version, not the existing version, so things may break.
    */
-  Property::Index RegisterUniqueProperty(std::string_view name, Property::Value propertyValue);
+  Property::Index RegisterUniqueProperty(Dali::String name, Property::Value propertyValue);
 
   /**
    * @brief Register a new animatable property with an integer key.
@@ -370,9 +372,9 @@ public:
    *       - Property::ROTATION
    * @note If a property with the desired name already exists, then the value given is just set.
    */
-  Property::Index RegisterProperty(Property::Index  key,
-                                   std::string_view name,
-                                   Property::Value  propertyValue);
+  Property::Index RegisterProperty(Property::Index key,
+                                   Dali::String    name,
+                                   Property::Value propertyValue);
 
   /**
    * @brief Register a new animatable property with an integer key.
@@ -419,9 +421,9 @@ public:
    * uniform value to shader will use the second, not the first;
    * Using the returned Property::Index for future reference will always access the correct property.
    */
-  Property::Index RegisterUniqueProperty(Property::Index  key,
-                                         std::string_view name,
-                                         Property::Value  propertyValue);
+  Property::Index RegisterUniqueProperty(Property::Index key,
+                                         Dali::String    name,
+                                         Property::Value propertyValue);
 
   /**
    * @brief Registers a new property.
@@ -446,7 +448,7 @@ public:
    *       - Property::ROTATION
    * @note If a property with the desired name already exists, then the value given is just set.
    */
-  Property::Index RegisterProperty(std::string_view name, Property::Value propertyValue, Property::AccessMode accessMode);
+  Property::Index RegisterProperty(Dali::String name, Property::Value propertyValue, Property::AccessMode accessMode);
 
   /**
    * @brief Retrieves a property value.
@@ -632,7 +634,7 @@ public:
    * @param[in] name The name of the property to access.
    * @return indirect value. Should have shorter scope than the handle
    */
-  IndirectValue operator[](const std::string& name);
+  IndirectValue operator[](Dali::String name);
 
 public: // Signals
   /**

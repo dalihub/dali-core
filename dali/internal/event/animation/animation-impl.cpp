@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/animation/animator-connector.h>
@@ -41,6 +42,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/type-registry.h>
 
+using Dali::Integration::ToStdStringView;
 using Dali::Internal::SceneGraph::AnimatorBase;
 using Dali::Internal::SceneGraph::Shader;
 using Dali::Internal::SceneGraph::UpdateManager;
@@ -120,11 +122,11 @@ BaseHandle Create()
 
 TypeRegistration mType(typeid(Dali::Animation), typeid(Dali::BaseHandle), Create);
 
-SignalConnectorType signalConnector1(mType, std::string(SIGNAL_FINISHED), &Animation::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, SIGNAL_FINISHED.data(), &Animation::DoConnectSignal);
 
-TypeAction action1(mType, std::string(ACTION_PLAY), &Animation::DoAction);
-TypeAction action2(mType, std::string(ACTION_STOP), &Animation::DoAction);
-TypeAction action3(mType, std::string(ACTION_PAUSE), &Animation::DoAction);
+TypeAction action1(mType, ACTION_PLAY.data(), &Animation::DoAction);
+TypeAction action2(mType, ACTION_STOP.data(), &Animation::DoAction);
+TypeAction action3(mType, ACTION_PAUSE.data(), &Animation::DoAction);
 
 const Dali::Animation::EndAction     DEFAULT_END_ACTION(Dali::Animation::BAKE);
 const Dali::Animation::EndAction     DEFAULT_DISCONNECT_ACTION(Dali::Animation::BAKE_FINAL);
@@ -1108,12 +1110,13 @@ void Animation::EmitSignalProgressReached()
   }
 }
 
-bool Animation::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool Animation::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool       connected(false);
   Animation* animation = static_cast<Animation*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if(SIGNAL_FINISHED == signalName)
+  std::string_view name = ToStdStringView(signalName);
+  if(name == SIGNAL_FINISHED)
   {
     animation->FinishedSignal().Connect(tracker, functor);
     connected = true;
@@ -1199,14 +1202,14 @@ void Animation::Hide(Actor& actor, float delaySeconds)
                                                     TimePeriod(delaySeconds, 0.0f /*immediate*/)));
 }
 
-bool Animation::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool Animation::DoAction(BaseObject* object, const Dali::String& actionName, const Property::Map& attributes)
 {
   bool       done      = false;
   Animation* animation = dynamic_cast<Animation*>(object);
 
   if(animation)
   {
-    std::string_view name(actionName);
+    std::string_view name = ToStdStringView(actionName);
 
     if(name == ACTION_PLAY)
     {

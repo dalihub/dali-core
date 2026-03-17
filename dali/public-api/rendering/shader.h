@@ -2,7 +2,7 @@
 #define DALI_SHADER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string> // std::string
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/handle.h>                // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
 #include <dali/public-api/object/property-value.h>
@@ -129,10 +130,10 @@ public:
    * @param[in] shaderName The name of this shader. (optional)
    * @return A handle to a shader effect
    */
-  static Shader New(std::string_view vertexShader,
-                    std::string_view fragmentShader,
+  static Shader New(Dali::StringView vertexShader,
+                    Dali::StringView fragmentShader,
                     Hint::Value      hints      = Hint::NONE,
-                    std::string_view shaderName = "");
+                    Dali::StringView shaderName = "");
 
   /**
    * @brief Creates Shader.
@@ -220,7 +221,7 @@ public:
    * @SINCE_1_9.36
    * @return shader preprocessor string.
    */
-  static std::string GetShaderVersionPrefix();
+  static Dali::String GetShaderVersionPrefix();
 
   /**
    * @brief Get vertex shader preprocessor that includes shading language version.
@@ -229,7 +230,7 @@ public:
    * @SINCE_1_9.36
    * @return Vertex shader preprocessor string.
    */
-  static std::string GetVertexShaderPrefix();
+  static Dali::String GetVertexShaderPrefix();
 
   /**
    * @brief Get fragment shader preprocessor that includes shading language version.
@@ -238,7 +239,7 @@ public:
    * @SINCE_1_9.36
    * @return Fragment shader preprocessor string.
    */
-  static std::string GetFragmentShaderPrefix();
+  static Dali::String GetFragmentShaderPrefix();
 
 public:
   /**

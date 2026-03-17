@@ -19,6 +19,7 @@
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/public-api/dali-core.h>
@@ -28,6 +29,10 @@
 #include <limits>
 
 using namespace Dali;
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
 
 namespace
 {
@@ -99,7 +104,7 @@ BaseHandle  CreateCustomNamedInit(void)
 }
 
 const std::string       scriptedName("PopupStyle");
-static TypeRegistration scriptedType(scriptedName, typeid(Dali::CustomActor), CreateCustomNamedInit);
+static TypeRegistration scriptedType(Integration::ToDaliString(scriptedName), typeid(Dali::CustomActor), CreateCustomNamedInit);
 
 // Property Registration
 bool setPropertyCalled = false;
@@ -337,8 +342,8 @@ private:
 
 static TypeRegistration customTypeInit(typeid(MyTestCustomActor2), typeid(Dali::CustomActor), CreateCustomInit, true);
 
-PropertyRegistration P1(customTypeInit, "propertyOne", MyTestCustomActor2::Property::P1, Property::INTEGER, &SetProperty, &GetProperty);
-PropertyRegistration P2(customTypeInit, "propertyTwo", MyTestCustomActor2::Property::P2, Property::STRING, &SetProperty, &GetProperty);
+PropertyRegistration P1(customTypeInit, String("propertyOne"), MyTestCustomActor2::Property::P1, Property::INTEGER, &SetProperty, &GetProperty);
+PropertyRegistration P2(customTypeInit, String("propertyTwo"), MyTestCustomActor2::Property::P2, Property::STRING, &SetProperty, &GetProperty);
 
 class MyTestCustomActor3 : public CustomActor
 {
@@ -395,9 +400,9 @@ BaseHandle CreateCustom(void)
   return MyTestCustomActor::New();
 }
 
-static std::string lastSignalConnectionCustom;
+static String lastSignalConnectionCustom;
 
-bool DoConnectSignalCustom(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool DoConnectSignalCustom(BaseObject* object, ConnectionTrackerInterface* tracker, const String& signalName, FunctorDelegate* functor)
 {
   lastSignalConnectionCustom = signalName;
 
@@ -406,7 +411,7 @@ bool DoConnectSignalCustom(BaseObject* object, ConnectionTrackerInterface* track
   Dali::BaseHandle  handle(object);
   MyTestCustomActor customActor = MyTestCustomActor::DownCast(handle);
 
-  if("sig1" == signalName)
+  if(signalName == "sig1")
   {
     customActor.GetCustomSignal().Connect(tracker, functor);
   }
@@ -419,7 +424,7 @@ bool DoConnectSignalCustom(BaseObject* object, ConnectionTrackerInterface* track
   return connected;
 }
 
-bool DoConnectSignalCustomFailure(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool DoConnectSignalCustomFailure(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   lastSignalConnectionCustom = "failed";
 
@@ -466,8 +471,8 @@ static void ResetFunctorCounts()
   CustomTestFunctor::mCallbackCount        = 0;
 }
 
-static std::string lastActionCustom;
-bool               DoActionCustom(BaseObject* object, const std::string& actionName, const Property::Map& /*attributes*/)
+static String lastActionCustom;
+bool          DoActionCustom(BaseObject* object, const String& actionName, const Property::Map& /*attributes*/)
 {
   lastActionCustom = actionName;
   return true;
@@ -501,7 +506,7 @@ BaseHandle CreateNamedActorType()
 }
 
 TypeRegistration     namedActorType("MyNamedActor", typeid(Dali::Actor), CreateNamedActorType);
-PropertyRegistration namedActorPropertyOne(namedActorType, "propName", PROPERTY_REGISTRATION_START_INDEX, Property::BOOLEAN, &SetProperty, &GetProperty);
+PropertyRegistration namedActorPropertyOne(namedActorType, String("propName"), PROPERTY_REGISTRATION_START_INDEX, Property::BOOLEAN, &SetProperty, &GetProperty);
 
 } // Anonymous namespace
 
@@ -792,7 +797,7 @@ int UtcDaliTypeRegistryTypeRegistrationCallingCreateOnInitP(void)
 {
   TestApplication application;
 
-  DALI_TEST_CHECK("MyTestCustomActor2" == customTypeInit.RegisteredName());
+  DALI_TEST_CHECK(customTypeInit.RegisteredName() == "MyTestCustomActor2");
 
   DALI_TEST_CHECK(true == CreateCustomInitCalled);
   TypeInfo type = TypeRegistry::Get().GetTypeInfo("MyTestCustomActor2");
@@ -814,7 +819,7 @@ int UtcDaliTypeRegistryTypeRegistrationForNamedTypeP(void)
   Actor namedActor(Actor::DownCast(namedHandle));
   DALI_TEST_CHECK(namedActor);
 
-  DALI_TEST_CHECK(namedActor.GetProperty<std::string>(Actor::Property::NAME) == "NamedActor");
+  DALI_TEST_CHECK(namedActor.GetProperty<String>(Actor::Property::NAME) == "NamedActor");
   DALI_TEST_CHECK(type.GetName() == "MyNamedActor");
   DALI_TEST_CHECK(type.GetBaseName() == "Actor");
 
@@ -825,15 +830,15 @@ int UtcDaliTypeRegistryRegisteredNameP(void)
 {
   TestApplication application;
 
-  DALI_TEST_CHECK(scriptedName == scriptedType.RegisteredName());
+  DALI_TEST_CHECK(scriptedName == Integration::ToStdString(scriptedType.RegisteredName()));
 
-  TypeInfo baseType = TypeRegistry::Get().GetTypeInfo(scriptedName);
+  TypeInfo baseType = TypeRegistry::Get().GetTypeInfo(ToDaliStringView(scriptedName));
   DALI_TEST_CHECK(baseType);
 
   BaseHandle handle = baseType.CreateInstance();
 
   DALI_TEST_CHECK(true == CreateCustomNamedInitCalled);
-  TypeInfo type = TypeRegistry::Get().GetTypeInfo(scriptedName);
+  TypeInfo type = TypeRegistry::Get().GetTypeInfo(ToDaliStringView(scriptedName));
   DALI_TEST_CHECK(type);
   END_TEST;
 }
@@ -842,16 +847,16 @@ int UtcDaliTypeRegistryRegisteredNameN(void)
 {
   TestApplication application;
 
-  DALI_TEST_CHECK(scriptedName == scriptedType.RegisteredName());
+  DALI_TEST_CHECK(scriptedName == Integration::ToStdString(scriptedType.RegisteredName()));
 
-  TypeInfo baseType = TypeRegistry::Get().GetTypeInfo(scriptedName);
+  TypeInfo baseType = TypeRegistry::Get().GetTypeInfo(ToDaliStringView(scriptedName));
   DALI_TEST_CHECK(baseType);
 
   // should cause an assert because we're registering same type twice
   // once statically at the start of this file, then again now
   try
   {
-    TypeRegistration scriptedType(scriptedName, typeid(Dali::CustomActor), CreateCustomNamedInit);
+    TypeRegistration scriptedType(Integration::ToDaliString(scriptedName), typeid(Dali::CustomActor), CreateCustomNamedInit);
     tet_result(TET_FAIL);
   }
   catch(DaliException& e)
@@ -1033,7 +1038,7 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   std::string          propertyName("prop1");
   int                  propertyIndex(PROPERTY_REGISTRATION_START_INDEX);
   Property::Type       propertyType(Property::BOOLEAN);
-  PropertyRegistration property1(customType1, propertyName, propertyIndex, propertyType, &SetProperty, &GetProperty);
+  PropertyRegistration property1(customType1, ToDaliString(propertyName), propertyIndex, propertyType, &SetProperty, &GetProperty);
 
   // Check property count after registration
   unsigned int postRegistrationPropertyCount(customActor.GetPropertyCount());
@@ -1065,7 +1070,7 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   DALI_TEST_EQUALS(typeInfo.GetPropertyName(propertyIndex), propertyName, TEST_LOCATION);
 
   // Check the property index
-  DALI_TEST_EQUALS(customActor.GetPropertyIndex(propertyName), propertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetPropertyIndex(ToDaliStringView(propertyName)), propertyIndex, TEST_LOCATION);
 
   // Check the property type
   DALI_TEST_EQUALS(customActor.GetPropertyType(propertyIndex), propertyType, TEST_LOCATION);
@@ -1138,7 +1143,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP01(void)
   std::string                    animatablePropertyName("animatableProp1");
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
   Property::Type                 animatablePropertyType(Property::FLOAT);
-  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType);
+  AnimatablePropertyRegistration animatableProperty(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, animatablePropertyType);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -1157,7 +1162,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP01(void)
   DALI_TEST_EQUALS(customActor.GetPropertyName(animatablePropertyIndex), animatablePropertyName, TEST_LOCATION);
 
   // Check the animatable property index
-  DALI_TEST_EQUALS(customActor.GetPropertyIndex(animatablePropertyName), animatablePropertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetPropertyIndex(ToDaliStringView(animatablePropertyName)), animatablePropertyIndex, TEST_LOCATION);
 
   // Check the animatable property type
   DALI_TEST_EQUALS(customActor.GetPropertyType(animatablePropertyIndex), animatablePropertyType, TEST_LOCATION);
@@ -1218,7 +1223,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP02(void)
   std::string                    animatablePropertyName("animatableProp1");
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
   Property::Type                 animatablePropertyType(Property::FLOAT);
-  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType);
+  AnimatablePropertyRegistration animatableProperty(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, animatablePropertyType);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -1237,7 +1242,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP02(void)
   DALI_TEST_EQUALS(customActor.GetPropertyName(animatablePropertyIndex), animatablePropertyName, TEST_LOCATION);
 
   // Check the animatable property index
-  DALI_TEST_EQUALS(customActor.GetPropertyIndex(animatablePropertyName), animatablePropertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetPropertyIndex(ToDaliStringView(animatablePropertyName)), animatablePropertyIndex, TEST_LOCATION);
 
   // Check the animatable property type
   DALI_TEST_EQUALS(customActor.GetPropertyType(animatablePropertyIndex), animatablePropertyType, TEST_LOCATION);
@@ -1348,7 +1353,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   // Register animatable property
   std::string                    animatablePropertyName("animatableProp1");
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
-  AnimatablePropertyRegistration animatableProperty1(customType1, animatablePropertyName, animatablePropertyIndex, 10.f);
+  AnimatablePropertyRegistration animatableProperty1(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, 10.f);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -1364,7 +1369,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultP(void)
   DALI_TEST_EQUALS(customActor.GetPropertyName(animatablePropertyIndex), animatablePropertyName, TEST_LOCATION);
 
   // Check the animatable property index
-  DALI_TEST_EQUALS(customActor.GetPropertyIndex(animatablePropertyName), animatablePropertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetPropertyIndex(ToDaliStringView(animatablePropertyName)), animatablePropertyIndex, TEST_LOCATION);
 
   // Check the animatable property type
   DALI_TEST_EQUALS(customActor.GetPropertyType(animatablePropertyIndex), Property::FLOAT, TEST_LOCATION);
@@ -1475,7 +1480,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   std::string                    animatablePropertyName("animatableProp1");
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
   Property::Type                 animatablePropertyType(Property::VECTOR2);
-  AnimatablePropertyRegistration animatableProperty1(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType);
+  AnimatablePropertyRegistration animatableProperty1(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, animatablePropertyType);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -1494,7 +1499,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   DALI_TEST_EQUALS(customActor.GetPropertyName(animatablePropertyIndex), animatablePropertyName, TEST_LOCATION);
 
   // Check the animatable property index
-  DALI_TEST_EQUALS(customActor.GetPropertyIndex(animatablePropertyName), animatablePropertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(customActor.GetPropertyIndex(ToDaliStringView(animatablePropertyName)), animatablePropertyIndex, TEST_LOCATION);
 
   // Check the animatable property type
   DALI_TEST_EQUALS(customActor.GetPropertyType(animatablePropertyIndex), animatablePropertyType, TEST_LOCATION);
@@ -1507,11 +1512,11 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   // Register animatable property components
   std::string                             animatablePropertyComponentName1("animatableProp1X");
   int                                     animatablePropertyComponentIndex1(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1);
-  AnimatablePropertyComponentRegistration animatablePropertyComponent1(customType1, animatablePropertyComponentName1, animatablePropertyComponentIndex1, animatablePropertyIndex, 0);
+  AnimatablePropertyComponentRegistration animatablePropertyComponent1(customType1, ToDaliString(animatablePropertyComponentName1), animatablePropertyComponentIndex1, animatablePropertyIndex, 0);
 
   std::string                             animatablePropertyComponentName2("animatableProp1Y");
   int                                     animatablePropertyComponentIndex2(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2);
-  AnimatablePropertyComponentRegistration animatablePropertyComponent2(customType1, animatablePropertyComponentName2, animatablePropertyComponentIndex2, animatablePropertyIndex, 1);
+  AnimatablePropertyComponentRegistration animatablePropertyComponent2(customType1, ToDaliString(animatablePropertyComponentName2), animatablePropertyComponentIndex2, animatablePropertyIndex, 1);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 3u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -1830,7 +1835,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithSetGetFunctionP(void)
   std::string                    animatablePropertyName("animatableProp1");
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
   Property::Type                 animatablePropertyType(Property::FLOAT);
-  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType, &SetProperty, &GetPropertyWithEmptyValueReturn);
+  AnimatablePropertyRegistration animatableProperty(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, animatablePropertyType, &SetProperty, &GetPropertyWithEmptyValueReturn);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -1956,7 +1961,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultSetGetFunctionP0
   std::string                    animatablePropertyName("animatableProp1");
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
   Property::Value                animatablePropertyDefaultValue(1.0f);
-  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyDefaultValue, &SetProperty, &GetPropertyWithEmptyValueReturn);
+  AnimatablePropertyRegistration animatableProperty(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, animatablePropertyDefaultValue, &SetProperty, &GetPropertyWithEmptyValueReturn);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -2037,7 +2042,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationWithDefaultSetGetFunctionP0
   std::string                    animatablePropertyName("animatableProp1");
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
   Property::Value                animatablePropertyDefaultValue(10.0f);
-  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyDefaultValue, &SetProperty, &GetPropertyWithEmptyValueReturn);
+  AnimatablePropertyRegistration animatableProperty(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, animatablePropertyDefaultValue, &SetProperty, &GetPropertyWithEmptyValueReturn);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -2165,12 +2170,12 @@ int UtcDaliTypeRegistryAnimatablePropertyWithoutUniformRegistrationP(void)
   // Register animatable property
   int                            animatablePropertyIndex(ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX);
   Property::Type                 animatablePropertyType(Property::FLOAT);
-  AnimatablePropertyRegistration animatableProperty(customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType, &SetProperty, &GetPropertyWithEmptyValueReturn);
+  AnimatablePropertyRegistration animatableProperty(customType1, ToDaliString(animatablePropertyName), animatablePropertyIndex, animatablePropertyType, &SetProperty, &GetPropertyWithEmptyValueReturn);
 
   // Register animatable property without uniform mapping
   int                            animatablePropertyWithoutUniformIndex(ANIMATABLE_PROPERTY_WITHOUT_UNIFORM_REGISTRATION_START_INDEX);
   Property::Type                 animatablePropertyWithoutUniformType(Property::FLOAT);
-  AnimatablePropertyRegistration animatablePropertyWithoutUniform(customType1, animatablePropertyWithoutUniformName, animatablePropertyWithoutUniformIndex, animatablePropertyWithoutUniformType, &SetProperty, &GetPropertyWithEmptyValueReturn);
+  AnimatablePropertyRegistration animatablePropertyWithoutUniform(customType1, ToDaliString(animatablePropertyWithoutUniformName), animatablePropertyWithoutUniformIndex, animatablePropertyWithoutUniformType, &SetProperty, &GetPropertyWithEmptyValueReturn);
 
   // Check property count after registration
   DALI_TEST_EQUALS(customPropertyCount + 2u, customActor.GetPropertyCount(), TEST_LOCATION);
@@ -2189,8 +2194,8 @@ int UtcDaliTypeRegistryAnimatablePropertyWithoutUniformRegistrationP(void)
   Renderer renderer        = renderableActor.GetRendererAt(0u);
   customActor.AddRenderer(renderer);
 
-  renderer.RegisterProperty(animatablePropertyName, 65.0f);
-  renderer.RegisterProperty(animatablePropertyWithoutUniformName, 85.0f);
+  renderer.RegisterProperty(ToDaliString(animatablePropertyName), 65.0f);
+  renderer.RegisterProperty(ToDaliString(animatablePropertyWithoutUniformName), 85.0f);
 
   customActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
@@ -2235,29 +2240,29 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   std::string               propertyName("childProp1");
   int                       propertyIndex(CHILD_PROPERTY_REGISTRATION_START_INDEX);
   Property::Type            propertyType(Property::BOOLEAN);
-  ChildPropertyRegistration childProperty1(customType1, propertyName, propertyIndex, propertyType);
+  ChildPropertyRegistration childProperty1(customType1, ToDaliString(propertyName), propertyIndex, propertyType);
 
   std::string               propertyName2("childProp2");
   int                       propertyIndex2(CHILD_PROPERTY_REGISTRATION_START_INDEX + 1);
   Property::Type            propertyType2(Property::INTEGER);
-  ChildPropertyRegistration childProperty2(customType1, propertyName2, propertyIndex2, propertyType2);
+  ChildPropertyRegistration childProperty2(customType1, ToDaliString(propertyName2), propertyIndex2, propertyType2);
 
   std::string               propertyName3("childProp3");
   int                       propertyIndex3(CHILD_PROPERTY_REGISTRATION_START_INDEX + 2);
   Property::Type            propertyType3(Property::FLOAT);
-  ChildPropertyRegistration childProperty3(customType1, propertyName3, propertyIndex3, propertyType3);
+  ChildPropertyRegistration childProperty3(customType1, ToDaliString(propertyName3), propertyIndex3, propertyType3);
 
   std::string               propertyName4("childProp4");
   int                       propertyIndex4(CHILD_PROPERTY_REGISTRATION_START_INDEX + 3);
   Property::Type            propertyType4(Property::INTEGER);
-  ChildPropertyRegistration childProperty4(customType1, propertyName4, propertyIndex4, propertyType4);
+  ChildPropertyRegistration childProperty4(customType1, ToDaliString(propertyName4), propertyIndex4, propertyType4);
 
   // Check property count are not changed because the child properties will not be created for the parent
   DALI_TEST_EQUALS(initialPropertyCount, customActor.GetPropertyCount(), TEST_LOCATION);
 
   // check the child property type
   Internal::TypeInfo& typeInfoImpl = GetImplementation(typeInfo);
-  Property::Type      type         = typeInfoImpl.GetChildPropertyType(typeInfoImpl.GetChildPropertyIndex(Dali::Internal::ConstString("childProp4")));
+  Property::Type      type         = typeInfoImpl.GetChildPropertyType(typeInfoImpl.GetChildPropertyIndex(Dali::Internal::ConstString(std::string_view("childProp4"))));
   DALI_TEST_EQUALS(type, Property::INTEGER, TEST_LOCATION);
 
   std::string unRegisteredChildName(typeInfoImpl.GetChildPropertyName(CHILD_PROPERTY_REGISTRATION_START_INDEX + 4));
@@ -2290,10 +2295,10 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_EQUALS(childActor.GetPropertyName(propertyIndex), "", TEST_LOCATION);
 
   // Check that the first property can't be accessed through its name, as it doesn't have a parent yet.
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(propertyName), Property::INVALID_INDEX, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(propertyName)), Property::INVALID_INDEX, TEST_LOCATION);
 
   // Create a custom property for the child with the same name as the second child property registered to the parent
-  Property::Index customPropertyIndex = childActor.RegisterProperty(propertyName2, 100, Property::READ_WRITE);
+  Property::Index customPropertyIndex = childActor.RegisterProperty(ToDaliString(propertyName2), 100, Property::READ_WRITE);
 
   // Check that the custom property is created
   DALI_TEST_EQUALS(initialChildActorPropertyCount + 2u, childActor.GetPropertyCount(), TEST_LOCATION);
@@ -2302,7 +2307,7 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_EQUALS(childActor.GetProperty<int>(customPropertyIndex), 100, TEST_LOCATION);
 
   // Check the property index
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(propertyName2), customPropertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(propertyName2)), customPropertyIndex, TEST_LOCATION);
 
   // Check the property type
   DALI_TEST_EQUALS(childActor.GetPropertyType(customPropertyIndex), propertyType2, TEST_LOCATION);
@@ -2317,7 +2322,7 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_EQUALS(childActor.GetPropertyName(propertyIndex), propertyName, TEST_LOCATION);
 
   // Check that the child property index for the first child property can now be retrieved through its child property name
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(propertyName), propertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(propertyName)), propertyIndex, TEST_LOCATION);
 
   // Check that the second child property now has the correct index as previously registered to the parent
   DALI_TEST_EQUALS(childActor.GetPropertyName(propertyIndex2), propertyName2, TEST_LOCATION);
@@ -2329,7 +2334,7 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_EQUALS(childActor.GetPropertyType(propertyIndex2), propertyType2, TEST_LOCATION);
 
   // Check that the child property index for the second child property can now be retrieved through its child property name
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(propertyName2), propertyIndex2, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(propertyName2)), propertyIndex2, TEST_LOCATION);
 
   // Set the value for the third child property when the child actor is already added to the parent
   childActor.SetProperty(propertyIndex3, 0.15f);
@@ -2347,10 +2352,10 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_EQUALS(childActor.GetPropertyName(propertyIndex3), propertyName3, TEST_LOCATION);
 
   // Check the third child property index.
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(propertyName3), propertyIndex3, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(propertyName3)), propertyIndex3, TEST_LOCATION);
 
   // Create a custom property for the child with the same name as the fourth child property registered to the parent
-  Property::Index customPropertyIndex2 = childActor.RegisterProperty(propertyName4, 20, Property::READ_WRITE);
+  Property::Index customPropertyIndex2 = childActor.RegisterProperty(ToDaliString(propertyName4), 20, Property::READ_WRITE);
 
   // Check that the custom property is created
   DALI_TEST_EQUALS(initialChildActorPropertyCount + 4u, childActor.GetPropertyCount(), TEST_LOCATION);
@@ -2368,7 +2373,7 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_EQUALS(childActor.GetPropertyName(customPropertyIndex2), propertyName4, TEST_LOCATION);
 
   // Check the fourth child property index.
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(propertyName4), propertyIndex4, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(propertyName4)), propertyIndex4, TEST_LOCATION);
 
   // Now create another parent actor with different child properties registered
   TypeInfo typeInfo2 = typeRegistry.GetTypeInfo("MyNamedActor");
@@ -2382,12 +2387,12 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   std::string               newPropertyName("newChildProp");
   int                       newPropertyIndex(CHILD_PROPERTY_REGISTRATION_START_INDEX); // The same index as the first child property "childProp1" in the old parent
   Property::Type            newPropertyType(Property::VECTOR2);
-  ChildPropertyRegistration newChildProperty(namedActorType, newPropertyName, newPropertyIndex, newPropertyType);
+  ChildPropertyRegistration newChildProperty(namedActorType, ToDaliString(newPropertyName), newPropertyIndex, newPropertyType);
 
   std::string               newPropertyName2("childProp3");                                 // The same name as the third child property in the old parent
   int                       newPropertyIndex2(CHILD_PROPERTY_REGISTRATION_START_INDEX + 1); // The same index as the second child property "childProp2" in the old parent
   Property::Type            newPropertyType2(Property::FLOAT);                              // The same type as the third child property in the old parent
-  ChildPropertyRegistration newChildProperty2(namedActorType, newPropertyName2, newPropertyIndex2, newPropertyType2);
+  ChildPropertyRegistration newChildProperty2(namedActorType, ToDaliString(newPropertyName2), newPropertyIndex2, newPropertyType2);
 
   // Now move the child actor to the new parent
   customActor2.Add(childActor);
@@ -2395,13 +2400,13 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   // "childProp1" is not a valid child property supported by the new parent, so nothing changed
   DALI_TEST_EQUALS(childActor.GetPropertyType(propertyIndex), propertyType, TEST_LOCATION);
   DALI_TEST_EQUALS(childActor.GetPropertyName(propertyIndex), propertyName, TEST_LOCATION);
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(propertyName), propertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(propertyName)), propertyIndex, TEST_LOCATION);
 
   // "childProp3" is a valid child property supported by the new parent
   // So it should get its new child property index and should just work
   DALI_TEST_EQUALS(childActor.GetPropertyType(newPropertyIndex2), newPropertyType2, TEST_LOCATION);
   DALI_TEST_EQUALS(childActor.GetPropertyName(newPropertyIndex2), newPropertyName2, TEST_LOCATION);
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(newPropertyName2), newPropertyIndex2, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(newPropertyName2)), newPropertyIndex2, TEST_LOCATION);
   DALI_TEST_EQUALS(childActor.GetProperty<float>(newPropertyIndex2), 0.15f, TEST_LOCATION);
 
   // Now register a custom property called "newChildProp"
@@ -2420,7 +2425,7 @@ int UtcDaliTypeRegistryChildPropertyRegistrationP(void)
   DALI_TEST_EQUALS(childActor.GetProperty<Vector2>(customPropertyIndex3), Vector2(10.0f, 10.0f), TEST_LOCATION);
 
   // Should return the child property index by given its name
-  DALI_TEST_EQUALS(childActor.GetPropertyIndex(newPropertyName), newPropertyIndex, TEST_LOCATION);
+  DALI_TEST_EQUALS(childActor.GetPropertyIndex(ToDaliStringView(newPropertyName)), newPropertyIndex, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2907,7 +2912,7 @@ int UtcDaliTypeInfoGetActionNameP(void)
 
   DALI_TEST_CHECK(0 != typeInfo.GetActionCount());
 
-  std::string name = typeInfo.GetActionName(0);
+  std::string name = Integration::ToStdString(typeInfo.GetActionName(0));
 
   DALI_TEST_EQUALS(name, "show", TEST_LOCATION);
 
@@ -2917,7 +2922,7 @@ int UtcDaliTypeInfoGetActionNameP(void)
   bool foundChildAction = false;
   for(std::size_t i = 0; i < typeInfo2.GetActionCount(); i++)
   {
-    std::string name = typeInfo2.GetActionName(i);
+    std::string name = Integration::ToStdString(typeInfo2.GetActionName(i));
     if(name == "show")
     {
       foundChildAction = true;
@@ -2939,7 +2944,7 @@ int UtcDaliTypeInfoGetActionNameN(void)
 
   DALI_TEST_CHECK(0 != typeInfo.GetActionCount());
 
-  std::string name = typeInfo.GetActionName(std::numeric_limits<size_t>::max());
+  std::string name = Integration::ToStdString(typeInfo.GetActionName(std::numeric_limits<size_t>::max()));
 
   DALI_TEST_EQUALS(0u, name.size(), TEST_LOCATION);
 
@@ -2956,7 +2961,7 @@ int UtcDaliTypeInfoGetSignalNameP(void)
 
   DALI_TEST_CHECK(0 != typeInfo.GetSignalCount());
 
-  std::string name = typeInfo.GetSignalName(0);
+  std::string name = Integration::ToStdString(typeInfo.GetSignalName(0));
 
   DALI_TEST_EQUALS(name, "hovered", TEST_LOCATION);
 
@@ -2966,7 +2971,7 @@ int UtcDaliTypeInfoGetSignalNameP(void)
   bool foundSignal = false;
   for(std::size_t i = 0; i < typeInfo2.GetSignalCount(); i++)
   {
-    std::string name = typeInfo2.GetSignalName(i);
+    std::string name = Integration::ToStdString(typeInfo2.GetSignalName(i));
     if(name == "hovered")
     {
       foundSignal = true;
@@ -2988,7 +2993,7 @@ int UtcDaliTypeInfoGetSignalNameN(void)
 
   DALI_TEST_CHECK(0 != typeInfo.GetSignalCount());
 
-  std::string name = typeInfo.GetSignalName(std::numeric_limits<size_t>::max());
+  std::string name = Integration::ToStdString(typeInfo.GetSignalName(std::numeric_limits<size_t>::max()));
 
   DALI_TEST_EQUALS(0u, name.size(), TEST_LOCATION);
 
@@ -3660,7 +3665,7 @@ int UtcDaliTypeInfoGetChildPropertyIndexNegative(void)
   Dali::TypeInfo  instance;
   try
   {
-    std::string arg1;
+    String arg1;
     instance.GetChildPropertyIndex(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -3711,7 +3716,7 @@ int UtcDaliTypeRegistryGetTypeInfoNegative01(void)
   try
   {
     std::string arg1;
-    instance.GetTypeInfo(arg1);
+    instance.GetTypeInfo(ToDaliStringView(arg1));
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -3835,8 +3840,8 @@ public: // Construction / Destruction
 public: // Properties, Signals & Actions
   static void                  SetProperty(Dali::BaseObject* object, Dali::Property::Index index, const Dali::Property::Value& value);
   static Dali::Property::Value GetProperty(Dali::BaseObject* object, Dali::Property::Index propertyIndex);
-  static bool                  DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrackerInterface* tracker, const std::string& signalName, Dali::FunctorDelegate* functor);
-  static bool                  DoAction(Dali::BaseObject* object, const std::string& actionName, const Dali::Property::Map& attributes);
+  static bool                  DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrackerInterface* tracker, const Dali::String& signalName, Dali::FunctorDelegate* functor);
+  static bool                  DoAction(Dali::BaseObject* object, const String& actionName, const Dali::Property::Map& attributes);
 
 private: // Overrides
   void OnSceneConnection(int32_t depth) override
@@ -3894,8 +3899,8 @@ private: // Overrides
   }
 
 private: // Implementation details
-  std::string mString;
-  float       mFloat{0.0f};
+  String mString;
+  float  mFloat{0.0f};
 };
 
 inline TestObject& GetImpl(TestHandle& handle)
@@ -3976,7 +3981,7 @@ void TestObject::SetProperty(BaseObject* object, Property::Index index, const Pr
     {
       case TestHandle::Property::PROPERTY_STRING:
       {
-        impl.mString = value.Get<std::string>();
+        impl.mString = value.Get<String>();
         break;
       }
       case TestHandle::Property::PROPERTY_FLOAT:
@@ -4023,24 +4028,24 @@ Property::Value TestObject::GetProperty(BaseObject* object, Property::Index prop
   return value;
 }
 
-bool TestObject::DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrackerInterface* tracker, const std::string& signalName, Dali::FunctorDelegate* functor)
+bool TestObject::DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrackerInterface* tracker, const String& signalName, Dali::FunctorDelegate* functor)
 {
   BaseHandle handle(object);
   TestHandle testHandle = TestHandle::DownCast(handle);
-  if(0 == strcmp(signalName.c_str(), SIGNAL_MY))
+  if(signalName == SIGNAL_MY)
   {
     return true;
   }
   return false;
 }
 
-bool TestObject::DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes)
+bool TestObject::DoAction(BaseObject* object, const String& actionName, const Property::Map& attributes)
 {
   Dali::BaseHandle handle(object);
   TestHandle       testHandle = TestHandle::DownCast(handle);
   DALI_ASSERT_DEBUG(testHandle);
 
-  if(0 == strcmp(actionName.c_str(), ACTION_MY))
+  if(actionName == ACTION_MY)
   {
     return true;
   }
@@ -4058,9 +4063,9 @@ int UtcDaliTypeRegistryDifferentHandleObjectNameTestProperties(void)
   TestApplication application;
   TestHandle      handle = TestHandle::New();
 
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(THProp::PROPERTY_STRING), "", TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<String>(THProp::PROPERTY_STRING), "", TEST_LOCATION);
   handle.SetProperty(THProp::PROPERTY_STRING, "Hello World");
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(THProp::PROPERTY_STRING), "Hello World", TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<String>(THProp::PROPERTY_STRING), "Hello World", TEST_LOCATION);
 
   DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT), 0.0f, TEST_LOCATION);
   handle.SetProperty(THProp::PROPERTY_FLOAT, 5.6f);
@@ -4121,7 +4126,7 @@ int UtcDaliTypeRegistryDifferentHandleObjectNameTestFromScript(void)
       {"propertyFloatReadOnly", 7.5f}, // Attempt to write a read-only property
       {"propertyAnimatableX", 80.5f}};
   Actor handle = Scripting::NewActor(map);
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(THProp::PROPERTY_STRING), "Hello Script", TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<String>(THProp::PROPERTY_STRING), "Hello Script", TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT), 8.5f, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT_READ_ONLY), 10.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty<Vector2>(THProp::PROPERTY_ANIMATABLE), Vector2(80.5, 0.0f), TEST_LOCATION);

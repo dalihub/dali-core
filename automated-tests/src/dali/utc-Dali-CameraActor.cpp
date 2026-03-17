@@ -19,6 +19,7 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/integration-api/string-utils.h>
 #include <stdlib.h>
 
 #include <cmath>
@@ -27,6 +28,7 @@
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
 using namespace Dali;
+using Dali::Integration::ToDaliStringView;
 
 void camera_actor_test_startup(void)
 {
@@ -46,8 +48,8 @@ const float TEST_FIELD_OF_VIEW       = Radian(Degree(40.0f));
 const float TEST_NEAR_PLANE_DISTANCE = 0.23f;
 const float TEST_FAR_PLANE_DISTANCE  = 0.973f;
 
-const std::string SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME("uLightCameraProjectionMatrix");
-const std::string SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME("uLightCameraViewMatrix");
+const String      SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME("uLightCameraProjectionMatrix");
+const String      SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME("uLightCameraViewMatrix");
 const char* const RENDER_SHADOW_VERTEX_SOURCE =
   " uniform mediump mat4 uLightCameraProjectionMatrix;\n"
   " uniform mediump mat4 uLightCameraViewMatrix;\n"
@@ -1317,7 +1319,7 @@ int UtcDaliCameraActorDefaultProperties(void)
 
   for(std::vector<Property::Index>::iterator iter = indices.begin(); iter != indices.end(); ++iter)
   {
-    DALI_TEST_EQUALS(*iter, actor.GetPropertyIndex(actor.GetPropertyName(*iter)), TEST_LOCATION);
+    DALI_TEST_EQUALS(*iter, actor.GetPropertyIndex(actor.GetPropertyName(*iter).CStr()), TEST_LOCATION);
 
     if(*iter == CameraActor::Property::FIELD_OF_VIEW || *iter == CameraActor::Property::ASPECT_RATIO || *iter == DevelCameraActor::Property::ORTHOGRAPHIC_SIZE || *iter == CameraActor::Property::NEAR_PLANE_DISTANCE || *iter == CameraActor::Property::FAR_PLANE_DISTANCE)
     {
@@ -1362,7 +1364,7 @@ template<typename P1, typename P2, typename P3, typename P4, typename P5, typena
 void TEST_CAMERA_PROPERTY(P1 camera, P2 stringName, P3 type, P4 isWriteable, P5 isAnimateable, P6 isConstraintInput, P7 enumName, P8 LOCATION)
 {
   DALI_TEST_EQUALS(camera.GetPropertyName(enumName), stringName, LOCATION);
-  DALI_TEST_EQUALS(camera.GetPropertyIndex(stringName), static_cast<Property::Index>(enumName), LOCATION);
+  DALI_TEST_EQUALS(camera.GetPropertyIndex(ToDaliStringView(stringName)), static_cast<Property::Index>(enumName), LOCATION);
   DALI_TEST_EQUALS(camera.GetPropertyType(enumName), type, LOCATION);
   DALI_TEST_EQUALS(camera.IsPropertyWritable(enumName), isWriteable, LOCATION);
   DALI_TEST_EQUALS(camera.IsPropertyAnimatable(enumName), isAnimateable, LOCATION);
@@ -1536,8 +1538,8 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   actor.RegisterProperty(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME, Matrix::IDENTITY);
   actor.RegisterProperty(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME, Matrix::IDENTITY);
 
-  Property::Index projectionMatrixPropertyIndex = actor.GetPropertyIndex(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME);
-  Property::Index viewMatrixPropertyIndex       = actor.GetPropertyIndex(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME);
+  Property::Index projectionMatrixPropertyIndex = actor.GetPropertyIndex(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME.CStr());
+  Property::Index viewMatrixPropertyIndex       = actor.GetPropertyIndex(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME.CStr());
 
   Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>(actor, projectionMatrixPropertyIndex, EqualToConstraint());
   projectionMatrixConstraint.AddSource(Source(camera, CameraActor::Property::PROJECTION_MATRIX));
@@ -1551,9 +1553,9 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   application.Render();
 
   // Test effects of Constraint.
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME.c_str(), projectionMatrix));
+  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME.CStr(), projectionMatrix));
 
-  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME.c_str(), viewMatrix));
+  DALI_TEST_CHECK(application.GetGlAbstraction().CheckUniformValue(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME.CStr(), viewMatrix));
   END_TEST;
 }
 

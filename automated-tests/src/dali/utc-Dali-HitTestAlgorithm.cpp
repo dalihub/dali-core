@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType t
       if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) && actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f) // not FULLY_TRANSPARENT
       {
         // Check whether the actor has the specific name "HittableActor"
-        if(actor.GetProperty<std::string>(Actor::Property::NAME) == "HittableActor")
+        if(actor.GetProperty<String>(Actor::Property::NAME) == "HittableActor")
         {
           hittable = true;
         }
@@ -401,12 +401,12 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   HitTestAlgorithm::Results results;
   HitTest(stage, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == childActor);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
   HitTest(stage, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == rootLayer);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
   END_TEST;
 }
@@ -464,12 +464,12 @@ int UtcDaliHitTestAlgorithmClippingActorStress(void)
   // Hit within clippingActor and latestActor.
   HitTestAlgorithm::Results results;
   HitTest(stage, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == latestActor);
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
   HitTest(stage, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction);
-  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL"));
+  tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == rootLayer);
 
   END_TEST;
@@ -1757,9 +1757,9 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   // as the source actor of the FBO task, the functor returns false.
   // This causes HitTestFbo to fail, triggering the fallback logic in HitTestActorOnce
   // which correctly returns mappingActor as the hit result.
-  tet_printf("hit name : %s\n", results.actor.GetProperty(Dali::Actor::Property::NAME).Get<std::string>().c_str());
+  tet_printf("hit name : %s\n", results.actor.GetProperty(Dali::Actor::Property::NAME).Get<String>().CStr());
   DALI_TEST_CHECK(results.actor == mappingActor);
-  //  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+  //  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL");
   END_TEST;
 }
 
@@ -1837,7 +1837,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
   // 6. HitTestFbo is called, but it FAILS.
   // 7. The patch ensures that mappingActor is returned as the hit.
   DALI_TEST_CHECK(results.actor == mappingActor);
-  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL");
   END_TEST;
 }
 
@@ -1917,7 +1917,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   // 6. HitTestFbo is called. It tries to hit childActor but fails because it's not sensitive.
   // 7. The patch ensures that mappingActor is returned as the hit.
   DALI_TEST_CHECK(results.actor == mappingActor);
-  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+  tet_printf("Hit actor: %s\n", results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL");
 
   // Now, make the child actor hittable to ensure the normal path works
   sourceLayer.SetProperty(Actor::Property::SENSITIVE, true);
@@ -1929,6 +1929,6 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   HitTest(stage, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
 
   DALI_TEST_CHECK(results.actor == childActor);
-  tet_printf("Hit actor (child sensitive): %s\n", results.actor ? results.actor.GetProperty<std::string>(Actor::Property::NAME).c_str() : "NULL");
+  tet_printf("Hit actor (child sensitive): %s\n", results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL");
   END_TEST;
 }
