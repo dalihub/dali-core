@@ -16,12 +16,12 @@
  */
 
 #include <dali/devel-api/actors/custom-actor-devel.h>
+#include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/public-api/object/type-registry-helper.h>
 #include <stdlib.h>
 
 #include <iostream>

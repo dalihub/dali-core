@@ -26,12 +26,12 @@
 #include <dali/internal/common/indexed-integer-map.h>
 
 #include <dali/devel-api/object/csharp-type-info.h>
+#include <dali/devel-api/object/type-info.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/event/object/default-property-metadata.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property.h>
-#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {

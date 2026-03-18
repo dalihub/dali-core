@@ -22,9 +22,9 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

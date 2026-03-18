@@ -16,6 +16,8 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/type-registry-helper.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -3781,7 +3783,6 @@ int UtcDaliTypeRegistryGetTypeNameCountNegative(void)
 
 namespace TypeRegistryTest
 {
-
 class TestObject;
 
 class TestHandle : public CustomActor
@@ -3813,8 +3814,8 @@ public:
 public: // Construction / Destruction
   TestHandle() = default;
   static TestHandle New();
-  ~TestHandle()                                  = default;
-  TestHandle(const TestHandle& testHandle)       = default;
+  ~TestHandle()                            = default;
+  TestHandle(const TestHandle& testHandle) = default;
   TestHandle&       operator=(const TestHandle&) = default;
   static TestHandle DownCast(BaseHandle handle);
 
@@ -3833,8 +3834,8 @@ public: // Construction / Destruction
   : CustomActorImpl(ACTOR_BEHAVIOUR_DEFAULT)
   {
   }
-  ~TestObject()                            = default;
-  TestObject(const TestObject&)            = delete;
+  ~TestObject()                 = default;
+  TestObject(const TestObject&) = delete;
   TestObject& operator=(const TestObject&) = delete;
 
 public: // Properties, Signals & Actions
@@ -4120,11 +4121,11 @@ int UtcDaliTypeRegistryDifferentHandleObjectNameTestFromScript(void)
 
   TestApplication application;
   Property::Map   map{
-      {"type", "TestHandle"},
-      {"propertyString", "Hello Script"},
-      {"propertyFloat", 8.5f},
-      {"propertyFloatReadOnly", 7.5f}, // Attempt to write a read-only property
-      {"propertyAnimatableX", 80.5f}};
+    {"type", "TestHandle"},
+    {"propertyString", "Hello Script"},
+    {"propertyFloat", 8.5f},
+    {"propertyFloatReadOnly", 7.5f}, // Attempt to write a read-only property
+    {"propertyAnimatableX", 80.5f}};
   Actor handle = Scripting::NewActor(map);
   DALI_TEST_EQUALS(handle.GetProperty<String>(THProp::PROPERTY_STRING), "Hello Script", TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT), 8.5f, TEST_LOCATION);

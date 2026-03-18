@@ -19,12 +19,12 @@
 #include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/object/property-array.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Integration::ToStdString;
 using Dali::Integration::ToStdStringView;

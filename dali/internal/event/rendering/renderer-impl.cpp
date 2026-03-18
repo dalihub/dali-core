@@ -19,6 +19,7 @@
 #include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
@@ -29,7 +30,6 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-renderer-messages.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

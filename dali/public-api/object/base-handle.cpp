@@ -19,8 +19,8 @@
 #include <typeinfo>
 
 // CLASS HEADER
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>

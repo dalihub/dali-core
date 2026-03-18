@@ -24,6 +24,7 @@
 #endif // defined(DEBUG_ENABLED)
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/integration-api/stream-operators.h>
@@ -32,7 +33,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/object-registry.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

@@ -24,11 +24,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/camera-actor-devel.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/internal/common/matrix-utils.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/public-api/object/type-registry.h>
 
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/manager/update-manager.h>

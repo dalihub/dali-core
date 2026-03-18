@@ -22,6 +22,7 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
@@ -30,7 +31,6 @@
 #include <dali/internal/event/rendering/uniform-block-impl.h>
 #include <dali/internal/render/renderers/render-uniform-block.h>
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Integration::ToStdStringView;
 

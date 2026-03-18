@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
@@ -35,7 +36,6 @@
 #include <dali/internal/update/render-tasks/scene-graph-render-task-messages.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Integration::ToStdStringView;
 

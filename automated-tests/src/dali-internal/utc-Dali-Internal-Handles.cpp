@@ -16,11 +16,12 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 
-#include <stdlib.h>
 #include <iostream>
+#include <stdlib.h>
 
 // Internal headers are allowed here
 #include <dali/internal/common/owner-key-type.h>

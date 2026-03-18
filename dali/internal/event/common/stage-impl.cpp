@@ -24,6 +24,7 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
@@ -38,7 +39,6 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/events/touch-event.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 

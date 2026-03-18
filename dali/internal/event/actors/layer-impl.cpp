@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-registry.h>
 
 #include <dali/integration-api/string-utils.h>
 

@@ -23,10 +23,10 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/object-registry.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Integration::ToStdStringView;
 
