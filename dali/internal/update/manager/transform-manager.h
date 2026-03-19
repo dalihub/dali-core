@@ -567,7 +567,6 @@ private:
   Vector<Vector3>                              mSize;                           ///< Size of the components
   Vector<TransformId>                          mParent;                         ///< Parent of the components
   Vector<Matrix>                               mWorld;                          ///< Local to world transform of the components
-  Vector<Matrix>                               mLocal;                          ///< Local to parent space transform of the components
   Vector<Vector4>                              mBoundingSpheres;                ///< Bounding spheres. xyz is the center and w is the radius
   Vector<TransformComponentAnimatable>         mTxComponentAnimatableBaseValue; ///< Base values for the animatable part of the components
   Vector<Vector3>                              mSizeBase;                       ///< Base value for the size of the components
