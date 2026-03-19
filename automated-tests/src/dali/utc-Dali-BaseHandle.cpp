@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
  *
  */
 
+#include <dali/devel-api/object/type-info.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -24,6 +26,8 @@
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
 using namespace Dali;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
 
 void utc_base_handle_startup(void)
 {
@@ -347,18 +351,18 @@ int UtcDaliBaseHandleStlVector(void)
 
     std::stringstream stream;
     stream << "Actor " << i + 1;
-    actor.SetProperty(Actor::Property::NAME, stream.str());
+    actor.SetProperty(Actor::Property::NAME, ToPropertyValue(stream.str()));
 
     myVector.push_back(actor);
   }
 
   DALI_TEST_EQUALS(TargetVectorSize, static_cast<int>(myVector.size()), TEST_LOCATION);
 
-  DALI_TEST_CHECK(myVector[0].GetProperty<std::string>(Actor::Property::NAME) == "Actor 1");
-  DALI_TEST_CHECK(myVector[1].GetProperty<std::string>(Actor::Property::NAME) == "Actor 2");
-  DALI_TEST_CHECK(myVector[2].GetProperty<std::string>(Actor::Property::NAME) == "Actor 3");
-  DALI_TEST_CHECK(myVector[3].GetProperty<std::string>(Actor::Property::NAME) == "Actor 4");
-  DALI_TEST_CHECK(myVector[4].GetProperty<std::string>(Actor::Property::NAME) == "Actor 5");
+  DALI_TEST_CHECK(myVector[0].GetProperty<String>(Actor::Property::NAME) == "Actor 1");
+  DALI_TEST_CHECK(myVector[1].GetProperty<String>(Actor::Property::NAME) == "Actor 2");
+  DALI_TEST_CHECK(myVector[2].GetProperty<String>(Actor::Property::NAME) == "Actor 3");
+  DALI_TEST_CHECK(myVector[3].GetProperty<String>(Actor::Property::NAME) == "Actor 4");
+  DALI_TEST_CHECK(myVector[4].GetProperty<String>(Actor::Property::NAME) == "Actor 5");
   END_TEST;
 }
 
@@ -527,7 +531,7 @@ int UtcDaliBaseHandleGetTypeNameP(void)
   // get the root layer
   Actor actor = Actor::New();
 
-  std::string typeName = actor.GetTypeName();
+  std::string typeName = Integration::ToStdString(actor.GetTypeName());
 
   DALI_TEST_CHECK(typeName.size());
   DALI_TEST_CHECK(typeName == std::string("Actor"));
@@ -539,7 +543,7 @@ int UtcDaliBaseHandleGetTypeNameN(void)
   TestApplication application;
   tet_infoline("Testing Dali::BaseObject::GetTypeName");
   FakeObject  object;
-  std::string typeName = object.GetTypeName();
+  std::string typeName = Integration::ToStdString(object.GetTypeName());
 
   DALI_TEST_CHECK(typeName.empty());
   END_TEST;
@@ -614,7 +618,7 @@ int UtcDaliBaseHandleDoActionNegative(void)
   Dali::BaseHandle instance;
   try
   {
-    std::string         arg1;
+    Dali::StringView    arg1;
     Dali::Property::Map arg2;
     instance.DoAction(arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here

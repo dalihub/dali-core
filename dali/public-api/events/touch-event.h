@@ -22,6 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/events/device.h>
 #include <dali/public-api/events/mouse-button.h>
 #include <dali/public-api/events/point-state.h>
@@ -280,7 +281,7 @@ public:
    * @SINCE_2_4.34
    * @return The device name string
    */
-  const std::string& GetDeviceName(std::size_t point) const;
+  Dali::String GetDeviceName(std::size_t point) const;
 
 public: // Not intended for application developers
   /// @cond internal

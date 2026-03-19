@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #endif
 
 // CLASS HEADER
+#include <dali/integration-api/stream-operators.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 
@@ -46,7 +47,7 @@ void PrintChildren(Debug::Filter* logFilter, Dali::Actor actor, int level)
     output << " | ";
   }
 
-  output << actor.GetProperty<std::string>(Dali::Actor::Property::NAME) << "(" << actor.GetTypeName() << ", " << actor.GetObjectPtr() << ")";
+  output << actor.GetProperty<Dali::String>(Dali::Actor::Property::NAME) << "(" << actor.GetTypeName() << ", " << actor.GetObjectPtr() << ")";
 
   if(HIERARCHY_GEOMETRY)
   {

@@ -2,7 +2,7 @@
 #define DALI_SIGNAL_DELEGATE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
 namespace Dali
@@ -63,7 +64,7 @@ public:
     if(!mIsConnected)
     {
       CallbackBaseFunctor callbackFunctor(new CallbackFunctorDelegate0(functorDelegate));
-      mConnectActor.ConnectSignal(connectionTracker, mSignalName, std::move(callbackFunctor));
+      mConnectActor.ConnectSignal(connectionTracker, Dali::StringView(mSignalName.c_str()), std::move(callbackFunctor));
       mIsConnected = true;
       return true;
     }
@@ -85,7 +86,7 @@ public:
     if(!mIsConnected)
     {
       CallbackBaseFunctor callbackFunctor(MakeCallback(object, memberFunction));
-      mConnectActor.ConnectSignal(object, mSignalName, std::move(callbackFunctor));
+      mConnectActor.ConnectSignal(object, Dali::StringView(mSignalName.c_str()), std::move(callbackFunctor));
       mIsConnected = true;
       return true;
     }

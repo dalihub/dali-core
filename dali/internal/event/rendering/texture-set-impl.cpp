@@ -19,9 +19,9 @@
 #include <dali/internal/event/rendering/texture-set-impl.h> // Dali::Internal::TextureSet
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/rendering/scene-graph-texture-set.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

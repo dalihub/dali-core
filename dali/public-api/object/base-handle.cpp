@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@
 #include <typeinfo>
 
 // CLASS HEADER
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/object-impl.h>
 
 namespace Dali
@@ -45,12 +46,12 @@ BaseHandle::BaseHandle(BaseHandle&& rhs) noexcept = default;
 
 BaseHandle& BaseHandle::operator=(BaseHandle&& rhs) noexcept = default;
 
-bool BaseHandle::DoAction(const std::string& command, const Property::Map& attributes)
+bool BaseHandle::DoAction(const Dali::StringView& actionName, const Property::Map& attributes)
 {
-  return GetImplementation(*this).DoAction(command, attributes);
+  return GetImplementation(*this).DoAction(actionName, attributes);
 }
 
-const std::string& BaseHandle::GetTypeName() const
+Dali::String BaseHandle::GetTypeName() const
 {
   return GetImplementation(*this).GetTypeName();
 }
@@ -95,9 +96,9 @@ Dali::RefObject* BaseHandle::GetObjectPtr() const
   return mObjectHandle.Get();
 }
 
-bool BaseHandle::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor)
+bool BaseHandle::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const Dali::StringView& signalName, FunctorDelegate* functorDelegate)
 {
-  return GetImplementation(*this).DoConnectSignal(connectionTracker, signalName, functor);
+  return GetImplementation(*this).DoConnectSignal(connectionTracker, signalName, functorDelegate);
 }
 
 } // namespace Dali

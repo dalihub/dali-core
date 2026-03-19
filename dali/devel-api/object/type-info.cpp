@@ -16,12 +16,17 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/object/type-info.h>
+#include <dali/devel-api/object/type-info.h>
 
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/type-info-impl.h>
+
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToStdString;
 
 namespace Dali
 {
@@ -37,14 +42,14 @@ TypeInfo::TypeInfo(TypeInfo&& rhs) noexcept = default;
 
 TypeInfo& TypeInfo::operator=(TypeInfo&& rhs) noexcept = default;
 
-const std::string& TypeInfo::GetName() const
+Dali::String TypeInfo::GetName() const
 {
-  return GetImplementation(*this).GetName();
+  return ToDaliString(GetImplementation(*this).GetName());
 }
 
-const std::string& TypeInfo::GetBaseName() const
+Dali::String TypeInfo::GetBaseName() const
 {
-  return GetImplementation(*this).GetBaseName();
+  return ToDaliString(GetImplementation(*this).GetBaseName());
 }
 
 BaseHandle TypeInfo::CreateInstance() const
@@ -62,9 +67,9 @@ size_t TypeInfo::GetActionCount() const
   return GetImplementation(*this).GetActionCount();
 }
 
-std::string TypeInfo::GetActionName(size_t index)
+Dali::String TypeInfo::GetActionName(size_t index)
 {
-  return GetImplementation(*this).GetActionName(static_cast<uint32_t>(index));
+  return ToDaliString(GetImplementation(*this).GetActionName(static_cast<uint32_t>(index)));
 }
 
 size_t TypeInfo::GetSignalCount() const
@@ -72,9 +77,9 @@ size_t TypeInfo::GetSignalCount() const
   return GetImplementation(*this).GetSignalCount();
 }
 
-std::string TypeInfo::GetSignalName(size_t index)
+Dali::String TypeInfo::GetSignalName(size_t index)
 {
-  return GetImplementation(*this).GetSignalName(static_cast<uint32_t>(index));
+  return ToDaliString(GetImplementation(*this).GetSignalName(static_cast<uint32_t>(index)));
 }
 
 size_t TypeInfo::GetPropertyCount() const
@@ -88,19 +93,19 @@ void TypeInfo::GetPropertyIndices(Property::IndexContainer& indices) const
   GetImplementation(*this).GetPropertyIndices(indices);
 }
 
-std::string_view TypeInfo::GetPropertyName(Property::Index index) const
+Dali::StringView TypeInfo::GetPropertyName(Property::Index index) const
 {
-  return GetImplementation(*this).GetRegisteredPropertyName(index);
+  return ToDaliStringView(GetImplementation(*this).GetRegisteredPropertyName(index));
 }
 
-Property::Index TypeInfo::GetChildPropertyIndex(const std::string& name) const
+Property::Index TypeInfo::GetChildPropertyIndex(const Dali::String& name) const
 {
-  return GetImplementation(*this).GetChildPropertyIndex(Internal::ConstString(name));
+  return GetImplementation(*this).GetChildPropertyIndex(Internal::ConstString(ToStdString(name)));
 }
 
-std::string_view TypeInfo::GetChildPropertyName(Property::Index index) const
+Dali::StringView TypeInfo::GetChildPropertyName(Property::Index index) const
 {
-  return GetImplementation(*this).GetChildPropertyName(index);
+  return ToDaliStringView(GetImplementation(*this).GetChildPropertyName(index));
 }
 
 Property::Type TypeInfo::GetChildPropertyType(Property::Index index) const

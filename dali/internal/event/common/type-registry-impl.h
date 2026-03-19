@@ -20,12 +20,12 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/csharp-type-info.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/internal/common/indexed-const-string-map.h>
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/object/default-property-metadata.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

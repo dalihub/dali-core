@@ -16,16 +16,21 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/shader-integ.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/rendering/shader-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/public-api/object/type-registry.h>
 
 using namespace Dali;
+using Dali::Integration::ToDaliStringView;
+using Dali::Integration::ToPropertyValue;
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
 
 int UtcDaliShaderTestVersion(void)
 {
@@ -38,13 +43,13 @@ int UtcDaliShaderTestVersion(void)
     "//@version 101\n"
     "some code\n";
 
-  Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader);
+  Dali::Shader shader = Dali::Shader::New(ToDaliStringView(vertexShader), ToDaliStringView(fragmentShader));
   {
     auto vertexPrefix   = Dali::Shader::GetVertexShaderPrefix();
     auto fragmentPrefix = Dali::Shader::GetFragmentShaderPrefix();
 
-    DALI_TEST_EQUALS(vertexPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
-    DALI_TEST_EQUALS(fragmentPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
+    DALI_TEST_EQUALS(ToStdString(vertexPrefix).substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
+    DALI_TEST_EQUALS(ToStdString(fragmentPrefix).substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
   }
 
   // Test version number in the shader data
@@ -77,11 +82,11 @@ int UtcDaliShaderWithPrefixTestVersion(void)
   auto fragmentPrefix = Dali::Shader::GetFragmentShaderPrefix();
 
   Dali::Shader shader = Dali::Shader::New(
-    vertexPrefix + vertexShader,
-    fragmentPrefix + fragmentShader);
+    ToDaliStringView(ToStdString(vertexPrefix) + vertexShader),
+    ToDaliStringView(ToStdString(fragmentPrefix) + fragmentShader));
 
-  DALI_TEST_EQUALS(vertexPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
-  DALI_TEST_EQUALS(fragmentPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
+  DALI_TEST_EQUALS(ToStdString(vertexPrefix).substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
+  DALI_TEST_EQUALS(ToStdString(fragmentPrefix).substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
 
   // Test version number in the shader data
   Dali::Internal::ThreadLocalStorage& tls           = Dali::Internal::ThreadLocalStorage::Get();
@@ -120,8 +125,8 @@ int UtcDaliShaderWithPrefixTestVersion2(void)
   fragmentPrefix = Dali::Integration::GenerateTaggedShaderPrefix(fragmentPrefix);
 
   Dali::Shader shader = Dali::Shader::New(
-    vertexPrefix + vertexShader,
-    fragmentPrefix + fragmentShader);
+    ToDaliStringView(vertexPrefix + vertexShader),
+    ToDaliStringView(fragmentPrefix + fragmentShader));
 
   DALI_TEST_EQUALS(vertexPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
   DALI_TEST_EQUALS(fragmentPrefix.substr(0, 20), "//@legacy-prefix-end", TEST_LOCATION);
@@ -155,11 +160,11 @@ int UtcDaliInternalShaderNewWithUniformBlock01(void)
   UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
   UniformBlock sharedUniformBlock3 = UniformBlock::New("ubo3");
 
-  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1}, false);
-  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2, sharedUniformBlock3}, true);
-  Shader shader3 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {}, false);
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader1), ToDaliStringView(fragmentShader1), Shader::Hint::NONE, "", {sharedUniformBlock1}, false);
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader1), ToDaliStringView(fragmentShader1), Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2, sharedUniformBlock3}, true);
+  Shader shader3 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader1), ToDaliStringView(fragmentShader1), Shader::Hint::NONE, "", {}, false);
 
-  Shader shader4 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader2, fragmentShader2, Shader::Hint::NONE, "", {sharedUniformBlock1}, false);
+  Shader shader4 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader2), ToDaliStringView(fragmentShader2), Shader::Hint::NONE, "", {sharedUniformBlock1}, false);
 
   DALI_TEST_CHECK(shader1);
   DALI_TEST_CHECK(shader2);
@@ -195,17 +200,17 @@ int UtcDaliInternalShaderNewWithUniformBlock02(void)
 
   std::string   hintSet = "MODIFIES_GEOMETRY";
   Property::Map map[2];
-  map[0]["vertex"]        = vertexShader1;
-  map[0]["fragment"]      = fragmentShader1;
+  map[0]["vertex"]        = ToPropertyValue(vertexShader1);
+  map[0]["fragment"]      = ToPropertyValue(fragmentShader1);
   map[0]["renderPassTag"] = 0;
-  map[0]["hints"]         = hintSet;
-  map[0]["name"]          = "Test0";
+  map[0]["hints"]         = ToPropertyValue(hintSet);
+  map[0]["name"]          = Property::Value("Test0");
 
-  map[1]["vertex"]        = vertexShader2;
-  map[1]["fragment"]      = fragmentShader2;
+  map[1]["vertex"]        = ToPropertyValue(vertexShader2);
+  map[1]["fragment"]      = ToPropertyValue(fragmentShader2);
   map[1]["renderPassTag"] = 1;
-  map[1]["hints"]         = hintSet;
-  map[1]["name"]          = "Test1";
+  map[1]["hints"]         = ToPropertyValue(hintSet);
+  map[1]["name"]          = Property::Value("Test1");
 
   Property::Array array;
   array.PushBack(map[0]);
@@ -251,8 +256,8 @@ int UtcDaliInternalShaderNewWithStrongConnectedUniformBlock01(void)
   UniformBlock sharedUniformBlock1 = UniformBlock::New("ubo1");
   UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
 
-  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2}, false);
-  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1}, true);
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader1), ToDaliStringView(fragmentShader1), Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2}, false);
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader1), ToDaliStringView(fragmentShader1), Shader::Hint::NONE, "", {sharedUniformBlock1}, true);
 
   DALI_TEST_CHECK(shader1);
   DALI_TEST_CHECK(shader2);
@@ -319,8 +324,8 @@ int UtcDaliInternalShaderNewWithStrongConnectedUniformBlock02(void)
   UniformBlock sharedUniformBlock1 = UniformBlock::New("ubo1");
   UniformBlock sharedUniformBlock2 = UniformBlock::New("ubo2");
 
-  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2}, false);
-  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(vertexShader1, fragmentShader1, Shader::Hint::NONE, "", {sharedUniformBlock1}, true);
+  Shader shader1 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader1), ToDaliStringView(fragmentShader1), Shader::Hint::NONE, "", {sharedUniformBlock1, sharedUniformBlock2}, false);
+  Shader shader2 = Dali::Integration::ShaderNewWithUniformBlock(ToDaliStringView(vertexShader1), ToDaliStringView(fragmentShader1), Shader::Hint::NONE, "", {sharedUniformBlock1}, true);
 
   DALI_TEST_CHECK(shader1);
   DALI_TEST_CHECK(shader2);
@@ -421,8 +426,8 @@ int UtcDaliInternalShaderFactoryCacheRemove(void)
 {
   TestApplication application;
 
-  std::string vertexShader   = "some vertex code\n";
-  std::string fragmentShader = "some fragment code\n";
+  String vertexShader   = "some vertex code\n";
+  String fragmentShader = "some fragment code\n";
 
   // Create shader which will cache the data
   Dali::Shader shader = Dali::Shader::New(vertexShader, fragmentShader, Dali::Shader::Hint::NONE, "Test");
@@ -434,7 +439,7 @@ int UtcDaliInternalShaderFactoryCacheRemove(void)
   size_t                              shaderHash;
 
   // Verify shader data is cached
-  Internal::ShaderDataPtr shaderData1 = shaderFactory.Load(vertexShader, fragmentShader, Dali::Shader::Hint::NONE, 0, "Test", shaderHash);
+  Internal::ShaderDataPtr shaderData1 = shaderFactory.Load(ToStdStringView(vertexShader), ToStdStringView(fragmentShader), Dali::Shader::Hint::NONE, 0, "Test", shaderHash);
 
   DALI_TEST_CHECK(shaderData1);
 
@@ -446,7 +451,7 @@ int UtcDaliInternalShaderFactoryCacheRemove(void)
   application.Render();
 
   // Load shader data again - should create new instance (cache was removed)
-  Internal::ShaderDataPtr shaderData2 = shaderFactory.Load(vertexShader, fragmentShader, Dali::Shader::Hint::NONE, 0, "Test", shaderHash);
+  Internal::ShaderDataPtr shaderData2 = shaderFactory.Load(ToStdStringView(vertexShader), ToStdStringView(fragmentShader), Dali::Shader::Hint::NONE, 0, "Test", shaderHash);
 
   DALI_TEST_CHECK(shaderData2);
   DALI_TEST_EQUALS(shaderData1.Get() != shaderData2.Get(), true, TEST_LOCATION);

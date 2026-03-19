@@ -117,7 +117,7 @@ inline Property::Type Get<Quaternion>()
   return Property::ROTATION;
 } // Rotation has two representations
 template<>
-inline Property::Type Get<std::string>()
+inline Property::Type Get<Dali::String>()
 {
   return Property::STRING;
 }

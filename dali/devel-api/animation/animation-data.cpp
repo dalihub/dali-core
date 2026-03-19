@@ -45,7 +45,7 @@ Dali::Animation AnimationData::CreateAnimation(Dali::Actor targetActor, float du
     for(AnimationData::AnimationDataList::Iterator iter = mAnimationDataList.Begin(); iter != end; ++iter)
     {
       // Override the actor in the animation.
-      animation.AnimateTo(Property(targetActor, (*iter)->property),
+      animation.AnimateTo(Property(targetActor, Dali::StringView((*iter)->property.c_str())),
                           (*iter)->value,
                           (*iter)->alphaFunction,
                           TimePeriod((*iter)->timePeriodDelay, (*iter)->timePeriodDuration));

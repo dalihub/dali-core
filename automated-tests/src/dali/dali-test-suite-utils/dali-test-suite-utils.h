@@ -2,7 +2,7 @@
 #define DALI_TEST_SUITE_UTILS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/stream-operators.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <test-compare-types.h>
 
@@ -257,6 +259,18 @@ void DALI_TEST_EQUALS(const Matrix& matrix1, const Matrix& matrix2, float epsilo
 template<>
 inline void DALI_TEST_EQUALS<const char*>(const char* str1, const char* str2, const char* location)
 {
+  if(str1 == nullptr && str2 == nullptr)
+  {
+    tet_result(TET_PASS);
+    return;
+  }
+
+  if(str1 == nullptr || str2 == nullptr)
+  {
+    tet_result(TET_FAIL);
+    return;
+  }
+
   if(strcmp(str1, str2))
   {
     fprintf(stderr, "Test failed in %s, checking '%s' == '%s'\n", location, str1, str2);
@@ -335,6 +349,26 @@ inline void DALI_TEST_EQUALS(const std::string& str2, std::string_view str1, con
 inline void DALI_TEST_EQUALS(const char* str1, std::string_view str2, const char* location)
 {
   DALI_TEST_EQUALS(str1, str2.data(), location);
+}
+
+inline void DALI_TEST_EQUALS(const Dali::String& str1, const char* str2, const char* location)
+{
+  DALI_TEST_EQUALS(Integration::ToStdString(str1), str2, location);
+}
+
+inline void DALI_TEST_EQUALS(const char* str1, const Dali::String& str2, const char* location)
+{
+  DALI_TEST_EQUALS(str1, Integration::ToStdString(str2), location);
+}
+
+inline void DALI_TEST_EQUALS(const Dali::String& str1, const std::string& str2, const char* location)
+{
+  DALI_TEST_EQUALS(Integration::ToStdString(str1), str2, location);
+}
+
+inline void DALI_TEST_EQUALS(const std::string& str1, const Dali::String& str2, const char* location)
+{
+  DALI_TEST_EQUALS(str1, Integration::ToStdString(str2), location);
 }
 
 /**

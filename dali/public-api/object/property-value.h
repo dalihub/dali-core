@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_VALUE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <utility>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/property.h>
 
@@ -163,7 +164,7 @@ public:
    * @SINCE_1_0.0
    * @param[in] stringValue A string
    */
-  Value(std::string stringValue);
+  Value(Dali::String stringValue);
 
   /**
    * @brief Creates a string property value.
@@ -471,14 +472,14 @@ public:
   bool Get(Quaternion& quaternionValue) const;
 
   /**
-   * @brief Retrieves an string property value.
+   * @brief Retrieves a string property value.
    *
    * @SINCE_1_0.0
    * @param[out] stringValue A string
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to string.
    */
-  bool Get(std::string& stringValue) const;
+  bool Get(Dali::String& stringValue) const;
 
   /**
    * @brief Retrieves an array property value.

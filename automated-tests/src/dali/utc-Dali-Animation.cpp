@@ -20,6 +20,7 @@
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/devel-api/threading/thread.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <stdlib.h>
@@ -32,6 +33,7 @@
 
 using std::max;
 using namespace Dali;
+using Dali::Integration::ToPropertyValue;
 
 void utc_dali_animation_startuP(void)
 {
@@ -12094,7 +12096,7 @@ int UtcDaliAnimationAnimateByNonAnimateableTypeN(void)
       // Build the animation
       Animation   animation     = Animation::New(2.0f);
       std::string relativeValue = "relative string";
-      animation.AnimateBy(Property(actor, index), relativeValue);
+      animation.AnimateBy(Property(actor, index), ToPropertyValue(relativeValue));
       tet_result(TET_FAIL);
     },
     "Target value is not animatable");
@@ -12119,7 +12121,7 @@ int UtcDaliAnimationAnimateToNonAnimateableTypeN(void)
       // Build the animation
       Animation   animation     = Animation::New(2.0f);
       std::string relativeValue = "relative string";
-      animation.AnimateTo(Property(actor, index), relativeValue);
+      animation.AnimateTo(Property(actor, index), ToPropertyValue(relativeValue));
     },
     "Target value is not animatable");
 
@@ -12142,8 +12144,8 @@ int UtcDaliAnimationAnimateBetweenNonAnimateableTypeN(void)
     {
       // Build the animation
       KeyFrames keyFrames = KeyFrames::New();
-      keyFrames.Add(0.0f, std::string("relative string1"));
-      keyFrames.Add(1.0f, std::string("relative string2"));
+      keyFrames.Add(0.0f, Property::Value("relative string1"));
+      keyFrames.Add(1.0f, Property::Value("relative string2"));
       // no need to really create the animation as keyframes do the check
     },
     "Property type is not animatable");

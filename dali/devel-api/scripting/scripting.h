@@ -2,7 +2,7 @@
 #define DALI_SCRIPTING_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,8 +123,8 @@ bool GetEnumerationProperty(const Property::Value& propertyValue, const StringEn
   else if(type == Property::STRING)
   {
     // Attempt to fetch the property as an STRING type, and convert it from string to enumeration value.
-    std::string propertyString;
-    if(table && propertyValue.Get(propertyString) && EnumStringToInteger(propertyString.c_str(), table, tableCount, newValue))
+    Dali::String daliString;
+    if(table && propertyValue.Get(daliString) && EnumStringToInteger(daliString.CStr(), table, tableCount, newValue))
     {
       // Success.
       set = true;

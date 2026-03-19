@@ -1,5 +1,7 @@
 #include "test-custom-actor.h"
 
+#include <dali/integration-api/string-utils.h>
+
 using namespace Dali;
 
 std::vector<std::string> MasterCallStack;
@@ -276,7 +278,7 @@ TestCustomActor::~TestCustomActor()
 
 void TestCustomActor::Initialize(const char* name)
 {
-  mDaliProperty = Self().RegisterProperty("Dali", std::string("no"), Property::READ_WRITE);
+  mDaliProperty = Self().RegisterProperty("Dali", Property::Value("no"), Property::READ_WRITE);
 
   OnInitialize(name);
 }
@@ -300,8 +302,8 @@ void TestCustomActor::AddToCallStacks(const char* method)
   mMethodsCalled.push_back(method);
 
   // Combine Actor name with method string
-  std::string nameAndMethod(Self().GetProperty<std::string>(Dali::Actor::Property::NAME));
-  if(0 == nameAndMethod.size())
+  std::string nameAndMethod(Integration::ToStdString(Self().GetProperty<String>(Dali::Actor::Property::NAME)));
+  if(nameAndMethod.empty())
   {
     nameAndMethod = "Unknown: ";
   }
@@ -412,7 +414,7 @@ bool TestCustomActor::IsTransparent() const
 
 void TestCustomActor::SetDaliProperty(std::string s)
 {
-  Self().SetProperty(mDaliProperty, s);
+  Self().SetProperty(mDaliProperty, Integration::ToPropertyValue(s));
 }
 void TestCustomActor::TestRelayoutRequest()
 {

@@ -19,6 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property.h>
@@ -52,7 +54,7 @@ public:
    * @pre The signal must be available in this object.
    */
   template<class T>
-  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, T&& functor)
+  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const Dali::StringView& signalName, T&& functor)
   {
     return DoConnectSignal(connectionTracker, signalName, FunctorDelegate::New(std::move(functor)));
   }
@@ -60,12 +62,12 @@ public:
   /**
    * @copydoc Dali::BaseHandle::DoAction
    */
-  bool DoAction(const std::string& actionName, const Property::Map& attributes);
+  bool DoAction(const Dali::StringView& actionName, const Property::Map& attributes);
 
   /**
    * @copydoc Dali::BaseHandle::GetTypeName
    */
-  const std::string& GetTypeName() const;
+  Dali::String GetTypeName() const;
 
   /**
    * @copydoc Dali::BaseHandle::GetTypeInfo
@@ -82,7 +84,7 @@ public: // Not intended for application developers
    * @param[in] functorDelegate A newly allocated functor delegate (takes ownership)
    * @return True if the signal was available
    */
-  bool DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate);
+  bool DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const Dali::StringView& signalName, FunctorDelegate* functorDelegate);
 
 protected:
   /**

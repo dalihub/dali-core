@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@
 #include <dali/public-api/events/key-event.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/events/key-event-impl.h>
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -58,14 +61,14 @@ bool KeyEvent::IsNoInterceptModifier() const
   return GetImplementation(*this).IsNoInterceptModifier();
 }
 
-const std::string& KeyEvent::GetCompose() const
+Dali::String KeyEvent::GetCompose() const
 {
-  return GetImplementation(*this).GetCompose();
+  return ToDaliString(GetImplementation(*this).GetCompose());
 }
 
-const std::string& KeyEvent::GetDeviceName() const
+Dali::String KeyEvent::GetDeviceName() const
 {
-  return GetImplementation(*this).GetDeviceName();
+  return ToDaliString(GetImplementation(*this).GetDeviceName());
 }
 
 Device::Class::Type KeyEvent::GetDeviceClass() const
@@ -78,19 +81,19 @@ Device::Subclass::Type KeyEvent::GetDeviceSubclass() const
   return GetImplementation(*this).GetDeviceSubclass();
 }
 
-const std::string& KeyEvent::GetKeyName() const
+Dali::String KeyEvent::GetKeyName() const
 {
-  return GetImplementation(*this).GetKeyName();
+  return ToDaliString(GetImplementation(*this).GetKeyName());
 }
 
-const std::string& KeyEvent::GetKeyString() const
+Dali::String KeyEvent::GetKeyString() const
 {
-  return GetImplementation(*this).GetKeyString();
+  return ToDaliString(GetImplementation(*this).GetKeyString());
 }
 
-const std::string& KeyEvent::GetLogicalKey() const
+Dali::String KeyEvent::GetLogicalKey() const
 {
-  return GetImplementation(*this).GetLogicalKey();
+  return ToDaliString(GetImplementation(*this).GetLogicalKey());
 }
 
 int32_t KeyEvent::GetKeyCode() const

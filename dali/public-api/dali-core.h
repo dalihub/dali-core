@@ -41,6 +41,8 @@
 
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/common/dali-vector-base.h>
 #include <dali/public-api/common/dali-vector-complex-types.h>
@@ -113,9 +115,6 @@
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/object/type-info.h>
-#include <dali/public-api/object/type-registry-helper.h>
-#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/weak-handle.h>
 
 #include <dali/public-api/render-tasks/render-task-list.h>

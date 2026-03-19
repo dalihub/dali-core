@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ int UtcDaliPropertyMapPopulate(void)
   DALI_TEST_CHECK(map.Count() == 4); // Should only have four items, not five!!
   DALI_TEST_CHECK(map["hello"].Get<int>() == 1);
   DALI_TEST_CHECK(map["world"].Get<int>() == 3);
-  DALI_TEST_EQUALS("DALi", map[10].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map[10].Get<String>(), TEST_LOCATION);
   DALI_TEST_CHECK(map[100].Get<int>() == 9);
 
   map.Clear();
@@ -196,7 +196,7 @@ int UtcDaliPropertyMapMovedMapP1(void)
   map1.Insert("world", 2);
   map1[10] = "DALi";
   DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
-  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
 
   map2 = std::move(map1);
@@ -207,7 +207,7 @@ int UtcDaliPropertyMapMovedMapP1(void)
   map1["hello"] = 1;
   map1.Insert("world", 2);
   DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
-  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
 
   map2 = std::move(map1);
@@ -218,7 +218,7 @@ int UtcDaliPropertyMapMovedMapP1(void)
   map1[10]      = "DALi";
   map1["hello"] = 1;
   DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
-  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
 
   map2 = std::move(map1);
@@ -229,7 +229,7 @@ int UtcDaliPropertyMapMovedMapP1(void)
   map1[10]      = "DALi";
   map1["hello"] = 1;
   DALI_TEST_EQUALS(3u, map1.Count(), TEST_LOCATION);
-  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map1.Find(10)->Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(1, map1.Find("hello")->Get<int32_t>(), TEST_LOCATION);
 
   map2 = std::move(map1);
@@ -292,7 +292,7 @@ int UtcDaliPropertyMapConstOperator(void)
   DALI_TEST_CHECK(constMap["world"].Get<int>() == 2);
   DALI_TEST_CHECK(constMap.Count() == 3); // Ensure count hasn't gone up
 
-  DALI_TEST_EQUALS("DALi", map[10].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", map[10].Get<String>(), TEST_LOCATION);
   DALI_TEST_CHECK(constMap.Count() == 3); // Ensure count hasn't gone up
 
   // Invalid Key
@@ -348,8 +348,8 @@ int UtcDaliPropertyMapGetKey(void)
   map["world"]                = 2;
   map[Actor::Property::COLOR] = Color::MAGENTA;
 
-  DALI_TEST_CHECK(map.GetKey(0) == "hello");
-  DALI_TEST_CHECK(map.GetKey(1) == "world");
+  DALI_TEST_CHECK(std::string(map.GetKey(0).CStr()) == "hello");
+  DALI_TEST_CHECK(std::string(map.GetKey(1).CStr()) == "world");
 
   // Wrong type
   try
@@ -480,7 +480,7 @@ int UtcDaliPropertyMapFind(void)
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == 1);
 
-  const std::string world("world");
+  const String world("world");
   value = map.Find(world);
   DALI_TEST_CHECK(value);
   DALI_TEST_CHECK(value->Get<int>() == 2);
@@ -491,7 +491,7 @@ int UtcDaliPropertyMapFind(void)
 
   value = map.Find(10, Property::STRING);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("DALi", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", value->Get<String>(), TEST_LOCATION);
 
   value = map.Find(10, Property::INTEGER);
   DALI_TEST_CHECK(value == NULL);
@@ -505,20 +505,20 @@ int UtcDaliPropertyMapFind(void)
 int UtcDaliPropertyMapFindIndexThenString(void)
 {
   // Define the valid keys and values to test with.
-  std::string stringKeyValid   = "bar";
-  std::string stringKeyInvalid = "aardvark";
-  int         indexKeyValid    = 100;
-  int         indexKeyInvalid  = 101;
+  String stringKeyValid("bar");
+  String stringKeyInvalid("aardvark");
+  int    indexKeyValid   = 100;
+  int    indexKeyInvalid = 101;
 
   // Define invalid key and value to test with.
-  std::string stringValueValid = "DALi";
-  int         indexValueValid  = 3;
+  String stringValueValid("DALi");
+  int    indexValueValid = 3;
 
   // Set up a property map containing the valid keys and values defined above.
   Property::Map map;
   map["foo"]          = 1;
   map[10]             = "string";
-  map[stringKeyValid] = stringValueValid;
+  map[stringKeyValid] = Property::Value(stringValueValid.CStr());
   map[indexKeyValid]  = indexValueValid;
 
   Property::Value* value = NULL;
@@ -536,7 +536,7 @@ int UtcDaliPropertyMapFindIndexThenString(void)
   // TEST: If only the string is valid, the Property::Value of the string is returned.
   value = map.Find(indexKeyInvalid, stringKeyValid);
 
-  DALI_TEST_EQUALS(value->Get<std::string>(), stringValueValid, TEST_LOCATION);
+  DALI_TEST_EQUALS(value->Get<String>(), stringValueValid, TEST_LOCATION);
 
   // TEST: If neither the index or string are valid, then a NULL pointer is returned.
   value = map.Find(indexKeyInvalid, stringKeyInvalid);
@@ -556,7 +556,7 @@ int UtcDaliPropertyMapOperatorIndex(void)
 
   const Property::Map    map2    = map;
   const Property::Value& value10 = map2[10];
-  DALI_TEST_EQUALS(value10.Get<std::string>(), "DALi", TEST_LOCATION);
+  DALI_TEST_EQUALS(value10.Get<String>(), "DALi", TEST_LOCATION);
 
   const Property::Value& value100 = map2[100];
   DALI_TEST_EQUALS(value100.Get<int>(), 9, TEST_LOCATION);
@@ -575,19 +575,19 @@ int UtcDaliPropertyMapInsertP(void)
   DALI_TEST_EQUALS(1u, map.Count(), TEST_LOCATION);
   Property::Value* value = map.Find("foo");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("bar", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("bar", value->Get<String>(), TEST_LOCATION);
 
-  map.Insert(std::string("foo2"), "testing");
+  map.Insert("foo2", "testing");
   DALI_TEST_EQUALS(2u, map.Count(), TEST_LOCATION);
   value = map.Find("foo2");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("testing", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("testing", value->Get<String>(), TEST_LOCATION);
 
   map.Insert(10, "DALi");
   DALI_TEST_EQUALS(3u, map.Count(), TEST_LOCATION);
   value = map.Find(10);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("DALi", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", value->Get<String>(), TEST_LOCATION);
 
   map.Insert(100, 9);
   DALI_TEST_EQUALS(4u, map.Count(), TEST_LOCATION);
@@ -606,19 +606,19 @@ int UtcDaliPropertyMapAddP(void)
   DALI_TEST_EQUALS(1u, map.Count(), TEST_LOCATION);
   Property::Value* value = map.Find("foo");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("bar", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("bar", value->Get<String>(), TEST_LOCATION);
 
-  map.Add(std::string("foo2"), "testing");
+  map.Add("foo2", "testing");
   DALI_TEST_EQUALS(2u, map.Count(), TEST_LOCATION);
   value = map.Find("foo2");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("testing", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("testing", value->Get<String>(), TEST_LOCATION);
 
   map.Add(10, "DALi");
   DALI_TEST_EQUALS(3u, map.Count(), TEST_LOCATION);
   value = map.Find(10);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("DALi", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", value->Get<String>(), TEST_LOCATION);
 
   map.Add(100, 9);
   DALI_TEST_EQUALS(4u, map.Count(), TEST_LOCATION);
@@ -635,7 +635,7 @@ int UtcDaliPropertyMapAddChainP(void)
   DALI_TEST_EQUALS(0u, map.Count(), TEST_LOCATION);
   map
     .Add("foo", "bar")
-    .Add(std::string("foo2"), "testing")
+    .Add("foo2", "testing")
     .Add(10, "DALi")
     .Add(100, 9);
 
@@ -643,15 +643,15 @@ int UtcDaliPropertyMapAddChainP(void)
 
   Property::Value* value = map.Find("foo");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("bar", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("bar", value->Get<String>(), TEST_LOCATION);
 
   value = map.Find("foo2");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("testing", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("testing", value->Get<String>(), TEST_LOCATION);
 
   value = map.Find(10);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("DALi", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", value->Get<String>(), TEST_LOCATION);
 
   value = map.Find(100);
   DALI_TEST_CHECK(value);
@@ -672,19 +672,19 @@ int UtcDaliPropertyMapAnonymousAddChainP(void)
     Property::Map mMap;
   };
 
-  TestMap mapTest(Property::Map().Add("foo", "bar").Add(std::string("foo2"), "testing").Add(10, "DALi").Add(100, 9));
+  TestMap mapTest(Property::Map().Add("foo", "bar").Add("foo2", "testing").Add(10, "DALi").Add(100, 9));
 
   Property::Value* value = mapTest.mMap.Find("foo");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("bar", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("bar", value->Get<String>(), TEST_LOCATION);
 
   value = mapTest.mMap.Find("foo2");
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("testing", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("testing", value->Get<String>(), TEST_LOCATION);
 
   value = mapTest.mMap.Find(10);
   DALI_TEST_CHECK(value);
-  DALI_TEST_EQUALS("DALi", value->Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("DALi", value->Get<String>(), TEST_LOCATION);
 
   value = mapTest.mMap.Find(100);
   DALI_TEST_CHECK(value);
@@ -735,7 +735,7 @@ int UtcDaliPropertyMapMerge(void)
   DALI_TEST_CHECK(map.Count() == 3);
   DALI_TEST_CHECK(map["hello"].Get<int>() == 3);
   DALI_TEST_CHECK(map["world"].Get<int>() == 4);
-  DALI_TEST_EQUALS("3DEngine", map[10].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("3DEngine", map[10].Get<String>(), TEST_LOCATION);
 
   // Create another map with different keys
   Property::Map map3;
@@ -748,7 +748,7 @@ int UtcDaliPropertyMapMerge(void)
   DALI_TEST_CHECK(map["hello"].Get<int>() == 3);
   DALI_TEST_CHECK(map["world"].Get<int>() == 4);
   DALI_TEST_CHECK(map["foo"].Get<int>() == 5);
-  DALI_TEST_EQUALS("3DEngine", map[10].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("3DEngine", map[10].Get<String>(), TEST_LOCATION);
   DALI_TEST_CHECK(map[100].Get<int>() == 6);
 
   // Create an empty map and attempt to merge, should be successful, nothing should change
@@ -760,7 +760,7 @@ int UtcDaliPropertyMapMerge(void)
   DALI_TEST_CHECK(map["hello"].Get<int>() == 3);
   DALI_TEST_CHECK(map["world"].Get<int>() == 4);
   DALI_TEST_CHECK(map["foo"].Get<int>() == 5);
-  DALI_TEST_EQUALS("3DEngine", map[10].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("3DEngine", map[10].Get<String>(), TEST_LOCATION);
   DALI_TEST_CHECK(map[100].Get<int>() == 6);
 
   // Merge map into map4, map4 should be the same as map now.
@@ -769,7 +769,7 @@ int UtcDaliPropertyMapMerge(void)
   DALI_TEST_CHECK(map4["hello"].Get<int>() == 3);
   DALI_TEST_CHECK(map4["world"].Get<int>() == 4);
   DALI_TEST_CHECK(map4["foo"].Get<int>() == 5);
-  DALI_TEST_EQUALS("3DEngine", map[10].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("3DEngine", map[10].Get<String>(), TEST_LOCATION);
   DALI_TEST_CHECK(map4[100].Get<int>() == 6);
 
   // Attempt to merge into itself, should be successful, nothing should change
@@ -778,7 +778,7 @@ int UtcDaliPropertyMapMerge(void)
   DALI_TEST_CHECK(map["hello"].Get<int>() == 3);
   DALI_TEST_CHECK(map["world"].Get<int>() == 4);
   DALI_TEST_CHECK(map["foo"].Get<int>() == 5);
-  DALI_TEST_EQUALS("3DEngine", map[10].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("3DEngine", map[10].Get<String>(), TEST_LOCATION);
   DALI_TEST_CHECK(map[100].Get<int>() == 6);
 
   END_TEST;
@@ -925,8 +925,8 @@ int UtcDaliPropertyMapInitializerListConstructor(void)
   DALI_TEST_EQUALS(4, map.Count(), TEST_LOCATION); // Should have four items
 
   DALI_TEST_EQUALS(1, map["number mapped to string"].Get<int>(), TEST_LOCATION);
-  DALI_TEST_EQUALS("string mapped to number", map[10].Get<std::string>(), TEST_LOCATION);
-  DALI_TEST_EQUALS("to string", map["string mapped"].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("string mapped to number", map[10].Get<String>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("to string", map["string mapped"].Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(3, map[100].Get<int>(), TEST_LOCATION);
 
   END_TEST;

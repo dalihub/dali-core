@@ -19,6 +19,7 @@
 #include <dali/internal/event/rendering/decorated-visual-renderer-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/common/owner-key-type.h>
@@ -31,7 +32,6 @@
 #include <dali/internal/update/rendering/scene-graph-renderer-messages.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/internal/update/rendering/scene-graph-visual-renderer.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {

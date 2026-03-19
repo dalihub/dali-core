@@ -22,6 +22,7 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
@@ -30,7 +31,6 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/public-api/object/handle.h>
-#include <dali/public-api/object/type-registry.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
 

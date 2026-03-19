@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,17 @@
 #include <dali/public-api/rendering/shader.h> // Dali::Shader
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
+
+using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
-Shader Shader::New(std::string_view vertexShader,
-                   std::string_view fragmentShader,
+Shader Shader::New(Dali::StringView vertexShader,
+                   Dali::StringView fragmentShader,
                    Hint::Value      hints,
-                   std::string_view shaderName)
+                   Dali::StringView shaderName)
 {
   Internal::ShaderPtr shader = Internal::Shader::New(vertexShader, fragmentShader, hints, shaderName, {}, false);
   return Shader(shader.Get());
@@ -65,19 +68,19 @@ uint32_t Shader::GetShaderLanguageVersion()
   return Dali::Internal::Shader::GetShaderLanguageVersion();
 }
 
-std::string Shader::GetShaderVersionPrefix()
+Dali::String Shader::GetShaderVersionPrefix()
 {
-  return Dali::Internal::Shader::GetShaderVersionPrefix();
+  return ToDaliString(Dali::Internal::Shader::GetShaderVersionPrefix());
 }
 
-std::string Shader::GetVertexShaderPrefix()
+Dali::String Shader::GetVertexShaderPrefix()
 {
-  return Dali::Internal::Shader::GetVertexShaderPrefix();
+  return ToDaliString(Dali::Internal::Shader::GetVertexShaderPrefix());
 }
 
-std::string Shader::GetFragmentShaderPrefix()
+Dali::String Shader::GetFragmentShaderPrefix()
 {
-  return Dali::Internal::Shader::GetFragmentShaderPrefix();
+  return ToDaliString(Dali::Internal::Shader::GetFragmentShaderPrefix());
 }
 
 } // namespace Dali

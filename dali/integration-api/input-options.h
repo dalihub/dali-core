@@ -21,8 +21,8 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-info.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/object/type-info.h>
 
 namespace Dali
 {

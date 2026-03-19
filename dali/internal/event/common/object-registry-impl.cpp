@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,12 @@
 #include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/object-registry.h>
-#include <dali/public-api/object/type-registry.h>
+
+using Dali::Integration::ToStdStringView;
 
 namespace Dali
 {
@@ -40,8 +43,8 @@ const char* const SIGNAL_OBJECT_DESTROYED = "objectDestroyed";
 
 TypeRegistration mType(typeid(Dali::ObjectRegistry), typeid(Dali::BaseHandle), nullptr);
 
-SignalConnectorType signalConnector1(mType, SIGNAL_OBJECT_CREATED, &ObjectRegistry::DoConnectSignal);
-SignalConnectorType signalConnector2(mType, SIGNAL_OBJECT_DESTROYED, &ObjectRegistry::DoConnectSignal);
+SignalConnectorType signalConnector1(mType, Dali::String(SIGNAL_OBJECT_CREATED), &ObjectRegistry::DoConnectSignal);
+SignalConnectorType signalConnector2(mType, Dali::String(SIGNAL_OBJECT_DESTROYED), &ObjectRegistry::DoConnectSignal);
 
 } // namespace
 
@@ -68,16 +71,17 @@ void ObjectRegistry::UnregisterObject(Dali::BaseObject* object)
   mObjectDestroyedSignal.Emit(object);
 }
 
-bool ObjectRegistry::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor)
+bool ObjectRegistry::DoConnectSignal(BaseObject* object, ConnectionTrackerInterface* tracker, const Dali::String& signalName, FunctorDelegate* functor)
 {
   bool            connected(true);
   ObjectRegistry* objectRegistry = static_cast<ObjectRegistry*>(object); // TypeRegistry guarantees that this is the correct type.
 
-  if(0 == strcmp(signalName.c_str(), SIGNAL_OBJECT_CREATED))
+  std::string_view name = ToStdStringView(signalName);
+  if(name == SIGNAL_OBJECT_CREATED)
   {
     objectRegistry->ObjectCreatedSignal().Connect(tracker, functor);
   }
-  else if(0 == strcmp(signalName.c_str(), SIGNAL_OBJECT_DESTROYED))
+  else if(name == SIGNAL_OBJECT_DESTROYED)
   {
     objectRegistry->ObjectDestroyedSignal().Connect(tracker, functor);
   }

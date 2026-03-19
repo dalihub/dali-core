@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,15 +44,15 @@ KeyEvent::KeyEvent()
 {
 }
 
-KeyEvent::KeyEvent(const std::string&           keyName,
-                   const std::string&           logicalKey,
-                   const std::string&           keyString,
+KeyEvent::KeyEvent(const Dali::String&          keyName,
+                   const Dali::String&          logicalKey,
+                   const Dali::String&          keyString,
                    int                          keyCode,
                    int                          keyModifier,
                    unsigned long                timeStamp,
                    const State&                 keyState,
-                   const std::string&           compose,
-                   const std::string&           deviceName,
+                   const Dali::String&          compose,
+                   const Dali::String&          deviceName,
                    const Device::Class::Type    deviceClass,
                    const Device::Subclass::Type deviceSubclass)
 : Event(Key),

@@ -18,6 +18,8 @@
  *
  */
 
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <string_view>
 
 namespace Dali
@@ -47,7 +49,22 @@ public:
    */
   ConstString() = default;
 
+  explicit ConstString(const char* str)
+  : ConstString(std::string_view(str ? str : ""))
+  {
+  }
+
   explicit ConstString(std::string_view str);
+
+  explicit ConstString(Dali::StringView str)
+  : ConstString(std::string_view(str.Data(), str.Size()))
+  {
+  }
+
+  explicit ConstString(const Dali::String& str)
+  : ConstString(std::string_view(str.CStr(), str.Size()))
+  {
+  }
 
   /**
    * Convert to bool operator.
@@ -226,6 +243,21 @@ public:
    *     A string_view to add to the string pool.
    */
   void SetString(std::string_view str);
+
+  void SetString(const char* str)
+  {
+    SetString(std::string_view(str ? str : ""));
+  }
+
+  void SetString(Dali::StringView str)
+  {
+    SetString(std::string_view(str.Data(), str.Size()));
+  }
+
+  void SetString(const Dali::String& str)
+  {
+    SetString(std::string_view(str.CStr(), str.Size()));
+  }
 
 private:
   const char* mString{nullptr};

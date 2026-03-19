@@ -19,13 +19,16 @@
 #include <dali/internal/event/common/type-registry-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
 #include <dali/internal/event/common/demangler.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/object/type-registry.h>
 
-#include <dali/integration-api/debug.h>
+using Dali::Integration::ToStdString;
+using Dali::Integration::ToStdStringView;
 
 namespace
 {
@@ -225,7 +228,7 @@ std::string TypeRegistry::RegistrationName(const std::type_info& registerType)
 
 void TypeRegistry::RegisterSignal(TypeRegistration& typeRegistration, std::string name, Dali::TypeInfo::SignalConnectorFunction func)
 {
-  auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
+  auto iter = mRegistryLut.Get(ConstString(ToStdStringView(typeRegistration.RegisteredName())));
   if(iter != mRegistryLut.end())
   {
     iter->second->AddConnectorFunction(std::move(name), func);
@@ -234,7 +237,7 @@ void TypeRegistry::RegisterSignal(TypeRegistration& typeRegistration, std::strin
 
 bool TypeRegistry::RegisterAction(TypeRegistration& typeRegistration, std::string name, Dali::TypeInfo::ActionFunction f)
 {
-  auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
+  auto iter = mRegistryLut.Get(ConstString(ToStdStringView(typeRegistration.RegisteredName())));
   if(iter != mRegistryLut.end())
   {
     iter->second->AddActionFunction(std::move(name), f);
@@ -245,7 +248,7 @@ bool TypeRegistry::RegisterAction(TypeRegistration& typeRegistration, std::strin
 
 bool TypeRegistry::RegisterProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
-  auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
+  auto iter = mRegistryLut.Get(ConstString(ToStdStringView(typeRegistration.RegisteredName())));
   if(iter != mRegistryLut.end())
   {
     iter->second->AddProperty(std::move(name), index, type, setFunc, getFunc);
@@ -268,7 +271,7 @@ bool TypeRegistry::RegisterProperty(const std::string& objectName, std::string n
 
 bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
-  auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
+  auto iter = mRegistryLut.Get(ConstString(ToStdStringView(typeRegistration.RegisteredName())));
   if(iter != mRegistryLut.end())
   {
     iter->second->AddAnimatableProperty(std::move(name), index, type, setFunc, getFunc);
@@ -280,7 +283,7 @@ bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration
 
 bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Value defaultValue, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
-  auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
+  auto iter = mRegistryLut.Get(ConstString(ToStdStringView(typeRegistration.RegisteredName())));
   if(iter != mRegistryLut.end())
   {
     iter->second->AddAnimatableProperty(std::move(name), index, std::move(defaultValue), setFunc, getFunc);
@@ -292,7 +295,7 @@ bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration
 
 bool TypeRegistry::RegisterAnimatablePropertyComponent(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex)
 {
-  auto iter = mRegistryLut.Get(ConstString(typeRegistration.RegisteredName()));
+  auto iter = mRegistryLut.Get(ConstString(ToStdStringView(typeRegistration.RegisteredName())));
   if(iter != mRegistryLut.end())
   {
     iter->second->AddAnimatablePropertyComponent(std::move(name), index, baseIndex, componentIndex);
@@ -316,7 +319,7 @@ bool TypeRegistry::RegisterChildProperty(const std::string& registeredType, std:
 
 bool TypeRegistry::RegisterChildProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type)
 {
-  return RegisterChildProperty(typeRegistration.RegisteredName(), std::move(name), index, type);
+  return RegisterChildProperty(ToStdString(typeRegistration.RegisteredName()), std::move(name), index, type);
 }
 
 bool TypeRegistry::DoActionTo(BaseObject* const object, const std::string& actionName, const Property::Map& properties)

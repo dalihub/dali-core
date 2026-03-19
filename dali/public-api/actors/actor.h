@@ -904,7 +904,7 @@ public:
    * @return A handle to the actor if found, or an empty handle if not
    * @pre The Actor has been initialized.
    */
-  Actor FindChildByName(std::string_view actorName);
+  Actor FindChildByName(Dali::StringView actorName);
 
   /**
    * @brief Search through this actor's hierarchy for an actor with the given unique ID.

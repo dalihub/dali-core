@@ -2,7 +2,7 @@
 #define DALI_BASE_HANDLE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/property-types.h>
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/ref-object.h>
@@ -137,7 +139,7 @@ public:
    * @pre The signal must be available in this object.
    */
   template<class T>
-  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, T&& functor)
+  bool ConnectSignal(ConnectionTrackerInterface* connectionTracker, const Dali::StringView& signalName, T&& functor)
   {
     return DoConnectSignal(connectionTracker, signalName, FunctorDelegate::New(std::move(functor)));
   }
@@ -157,7 +159,7 @@ public:
    * @param[in] attributes The list of attributes for the action
    * @return The action is performed by the object or not
    */
-  bool DoAction(const std::string& actionName, const Property::Map& attributes);
+  bool DoAction(const Dali::StringView& actionName, const Property::Map& attributes);
 
   /**
    * @brief Returns the type name for the Handle.
@@ -168,7 +170,7 @@ public:
    * @SINCE_1_0.0
    * @return The type name. Empty string if the typename does not exist
    */
-  const std::string& GetTypeName() const;
+  Dali::String GetTypeName() const;
 
   /**
    * @brief Returns the type info for the Handle.
@@ -257,7 +259,7 @@ private:
    * @param[in] functorDelegate A newly allocated functor delegate (takes ownership)
    * @return True if the signal was available
    */
-  bool DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate);
+  bool DoConnectSignal(ConnectionTrackerInterface* connectionTracker, const Dali::StringView& signalName, FunctorDelegate* functorDelegate);
 
 private:
   IntrusivePtr<Dali::RefObject> mObjectHandle; ///< Object this handle points at.

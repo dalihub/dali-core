@@ -669,7 +669,7 @@ struct TouchEventProcessor::Impl
                       "PrimaryHitActor: (%p) id(%d), name(%s), state(%s), screenPosition(%f, %f), isGeo : %d \n",
                       localVars.primaryHitActor ? reinterpret_cast<void*>(&localVars.primaryHitActor.GetBaseObject()) : NULL,
                       localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1,
-                      localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "",
+                      localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : "",
                       TOUCH_POINT_STATE[localVars.primaryPointState],
                       localVars.primaryPoint->GetScreenPosition().x,
                       localVars.primaryPoint->GetScreenPosition().y,
@@ -679,7 +679,7 @@ struct TouchEventProcessor::Impl
                       "ConsumedActor:   (%p) id(%d), name(%s), state(%s), isGeo : %d \n",
                       localVars.consumedActor ? reinterpret_cast<void*>(&localVars.consumedActor.GetBaseObject()) : NULL,
                       localVars.consumedActor ? localVars.consumedActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1,
-                      localVars.consumedActor ? localVars.consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "",
+                      localVars.consumedActor ? localVars.consumedActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : "",
                       TOUCH_POINT_STATE[localVars.primaryPointState],
                       localVars.isGeometry);
       }
@@ -688,7 +688,7 @@ struct TouchEventProcessor::Impl
         DALI_LOG_RELEASE_INFO("PrimaryHitActor:(%p), id(%d), name(%s), state(%s), screenPosition(%f, %f), isGeo : %d \n",
                               localVars.primaryHitActor ? reinterpret_cast<void*>(&localVars.primaryHitActor.GetBaseObject()) : NULL,
                               localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1,
-                              localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "",
+                              localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : "",
                               TOUCH_POINT_STATE[localVars.primaryPointState],
                               localVars.primaryPoint->GetScreenPosition().x,
                               localVars.primaryPoint->GetScreenPosition().y,
@@ -696,7 +696,7 @@ struct TouchEventProcessor::Impl
         DALI_LOG_RELEASE_INFO("ConsumedActor:  (%p), id(%d), name(%s), state(%s), isGeo : %d \n",
                               localVars.consumedActor ? reinterpret_cast<void*>(&localVars.consumedActor.GetBaseObject()) : NULL,
                               localVars.consumedActor ? localVars.consumedActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1,
-                              localVars.consumedActor ? localVars.consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "",
+                              localVars.consumedActor ? localVars.consumedActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : "",
                               TOUCH_POINT_STATE[localVars.primaryPointState],
                               localVars.isGeometry);
       }
@@ -1046,7 +1046,7 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
                   currentPoint.GetScreenPosition().x,
                   currentPoint.GetScreenPosition().y,
                   (hitTestResults.actor ? reinterpret_cast<void*>(&hitTestResults.actor.GetBaseObject()) : NULL),
-                  (hitTestResults.actor ? hitTestResults.actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : ""),
+                  (hitTestResults.actor ? hitTestResults.actor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : ""),
                   hitTestResults.actorCoordinates.x,
                   hitTestResults.actorCoordinates.y);
   }

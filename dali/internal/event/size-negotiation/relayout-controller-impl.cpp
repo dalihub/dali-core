@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,15 @@
 #endif // defined(DEBUG_ENABLED)
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/object-registry.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
@@ -62,7 +63,7 @@ void PrintChildren(Dali::Actor actor, int level)
 
   output << actor.GetTypeName();
 
-  output << ", " << actor.GetProperty<std::string>(Dali::Actor::Property::NAME);
+  output << ", " << actor.GetProperty<Dali::String>(Dali::Actor::Property::NAME);
 
   output << " - Pos: " << actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION) << " Size: " << actor.GetTargetSize();
 
@@ -480,7 +481,7 @@ void RelayoutController::Relayout()
 #ifdef TRACE_ENABLED
           ++negotiatedActorCount;
 #endif
-          DALI_LOG_INFO(gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actorImpl.GetTypeName().c_str(), std::string(actorImpl.GetName()).c_str(), size.width, size.height);
+          DALI_LOG_INFO(gLogFilter, Debug::General, "[Internal::RelayoutController::Relayout] Negotiating %p %s %s (%.2f, %.2f)\n", &actorImpl, actorImpl.GetTypeName().CStr(), std::string(actorImpl.GetName()).c_str(), size.width, size.height);
 
           // 3. Negotiate the size with the current actor. Pass it an empty container which the actor
           //    has to fill with all the actors it has not done any size negotiation for.

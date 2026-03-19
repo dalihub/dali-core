@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -388,7 +388,7 @@ struct HoverEventProcessor::Impl
                     currentPoint.GetScreenPosition().x,
                     currentPoint.GetScreenPosition().y,
                     (hitTestResults.actor ? reinterpret_cast<void*>(&hitTestResults.actor.GetBaseObject()) : NULL),
-                    (hitTestResults.actor ? hitTestResults.actor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : ""),
+                    (hitTestResults.actor ? hitTestResults.actor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : ""),
                     hitTestResults.actorCoordinates.x,
                     hitTestResults.actorCoordinates.y);
 
@@ -452,12 +452,12 @@ struct HoverEventProcessor::Impl
         DALI_LOG_RELEASE_INFO("PrimaryHitActor:(%p), id(%d), name(%s), state(%s)\n",
                               localVars.primaryHitActor ? reinterpret_cast<void*>(&localVars.primaryHitActor.GetBaseObject()) : NULL,
                               localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1,
-                              localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "",
+                              localVars.primaryHitActor ? localVars.primaryHitActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : "",
                               TOUCH_POINT_STATE[localVars.hoverEvent->GetPoint(0).GetState()]);
         DALI_LOG_RELEASE_INFO("ConsumedActor:  (%p), id(%d), name(%s), state(%s)\n",
                               localVars.consumedActor ? reinterpret_cast<void*>(&localVars.consumedActor.GetBaseObject()) : NULL,
                               localVars.consumedActor ? localVars.consumedActor.GetProperty<int32_t>(Dali::Actor::Property::ID) : -1,
-                              localVars.consumedActor ? localVars.consumedActor.GetProperty<std::string>(Dali::Actor::Property::NAME).c_str() : "",
+                              localVars.consumedActor ? localVars.consumedActor.GetProperty<Dali::String>(Dali::Actor::Property::NAME).CStr() : "",
                               TOUCH_POINT_STATE[localVars.hoverEvent->GetPoint(0).GetState()]);
       }
     }
@@ -504,8 +504,8 @@ struct HoverEventProcessor::Impl
                 bool foundInCandidates = std::any_of(
                   processor.mCandidateActorLists.rbegin(),
                   processor.mCandidateActorLists.rend(),
-                  [rLastIter](Actor* candidate) { return candidate == *rLastIter; }
-                );
+                  [rLastIter](Actor* candidate)
+                { return candidate == *rLastIter; });
 
                 if(!foundInCandidates)
                 {

@@ -17,6 +17,7 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <stdlib.h>
@@ -28,6 +29,7 @@
 #include "dali-test-suite-utils/test-custom-actor.h"
 
 using namespace Dali;
+using Dali::Integration::ToPropertyValue;
 
 void handle_test_startup(void)
 {
@@ -215,10 +217,10 @@ int UtcDaliHandleGetPropertyName(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK("parentOrigin" == actor.GetPropertyName(Actor::Property::PARENT_ORIGIN));
+  DALI_TEST_CHECK(actor.GetPropertyName(Actor::Property::PARENT_ORIGIN).CStr() == std::string("parentOrigin"));
 
   // Register a dynamic property
-  std::string     name("thisNameShouldMatch");
+  String          name("thisNameShouldMatch");
   Property::Index index = actor.RegisterProperty(name, float(123.0f));
   DALI_TEST_CHECK(name == actor.GetPropertyName(index));
 
@@ -234,7 +236,7 @@ int UtcDaliHandleGetPropertyIndex01(void)
   DALI_TEST_CHECK(Actor::Property::PARENT_ORIGIN == actor.GetPropertyIndex("parentOrigin"));
 
   // Register a dynamic property
-  std::string     name("thisNameShouldMatch");
+  String          name("thisNameShouldMatch");
   Property::Index index = actor.RegisterProperty(name, float(123.0f));
   DALI_TEST_CHECK(index == actor.GetPropertyIndex(name));
   END_TEST;
@@ -299,7 +301,7 @@ int UtcDaliHandleGetPropertyIndex03(void)
 
   Actor actor = Actor::New();
 
-  std::string     myName("croydon");
+  String          myName("croydon");
   Property::Index intKey = CORE_PROPERTY_MAX_INDEX + 1;
   Property::Value value(Color::GREEN);
   Property::Index myIndex = actor.RegisterProperty(intKey, myName, value);
@@ -501,7 +503,7 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK(Property::ROTATION == actor.GetPropertyType(rotationIndex));
 
   // Non animatable properties
-  Property::Index nonAnimStringIndex  = actor.RegisterProperty("manFromDelmonte", std::string("yes"), Property::READ_WRITE);
+  Property::Index nonAnimStringIndex  = actor.RegisterProperty("manFromDelmonte", Property::Value("yes"), Property::READ_WRITE);
   Property::Index nonAnimV2Index      = actor.RegisterProperty("v2", Vector2(1.f, 2.f), Property::READ_WRITE);
   Property::Index nonAnimV3Index      = actor.RegisterProperty("v3", Vector3(1.f, 2.f, 3.f), Property::READ_WRITE);
   Property::Index nonAnimV4Index      = actor.RegisterProperty("v4", Vector4(1.f, 2.f, 3.f, 4.f), Property::READ_WRITE);
@@ -533,7 +535,7 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK(!actor.IsPropertyAnimatable(nonAnimFloatIndex));
   DALI_TEST_CHECK(!actor.IsPropertyAnimatable(nonAnimIntegerIndex));
 
-  DALI_TEST_EQUALS("yes", actor.GetProperty(nonAnimStringIndex).Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("yes", actor.GetProperty(nonAnimStringIndex).Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(1.f, 2.f), actor.GetProperty(nonAnimV2Index).Get<Vector2>(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector3(1.f, 2.f, 3.f), actor.GetProperty(nonAnimV3Index).Get<Vector3>(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector4(1.f, 2.f, 3.f, 4.f), actor.GetProperty(nonAnimV4Index).Get<Vector4>(), TEST_LOCATION);
@@ -551,12 +553,12 @@ int UtcDaliHandleNonAnimatableProperties(void)
 
   Actor actor = Actor::New();
 
-  Property::Index nonAnimStringIndex = actor.RegisterProperty("manFromDelmonte", std::string("no"), Property::READ_WRITE);
+  Property::Index nonAnimStringIndex = actor.RegisterProperty("manFromDelmonte", Property::Value("no"), Property::READ_WRITE);
 
   //// modify writable?
   actor.SetProperty(nonAnimStringIndex, Property::Value("yes"));
 
-  DALI_TEST_CHECK("yes" == actor.GetProperty(nonAnimStringIndex).Get<std::string>());
+  DALI_TEST_CHECK(String("yes") == actor.GetProperty(nonAnimStringIndex).Get<String>());
 
   //// cannot modify read only?
   Property::Index readonly = actor.RegisterProperty("float", 0.f, Property::READ_ONLY);
@@ -590,7 +592,7 @@ int UtcDaliHandleNonAnimatableProperties(void)
     DALI_TEST_ASSERT(e, "Property type is not animatable", TEST_LOCATION);
   }
 
-  DALI_TEST_EQUALS("yes", actor.GetProperty(nonAnimStringIndex).Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("yes", actor.GetProperty(nonAnimStringIndex).Get<String>(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -623,7 +625,7 @@ int UtcDaliHandleNonAnimtableCompositeProperties(void)
   DALI_TEST_CHECK(Property::VECTOR3 == outArray->GetElementAt(2).GetType());
 
   DALI_TEST_EQUALS(0.1f, outArray->GetElementAt(0).Get<float>(), TEST_LOCATION);
-  DALI_TEST_EQUALS("a string", outArray->GetElementAt(1).Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("a string", outArray->GetElementAt(1).Get<String>(), TEST_LOCATION);
   DALI_TEST_EQUALS(Vector3(1, 2, 3), outArray->GetElementAt(2).Get<Vector3>(), TEST_LOCATION);
 
   // composite types not animatable
@@ -647,7 +649,7 @@ int UtcDaliHandleNonAnimtableCompositeProperties(void)
   map->Insert("key", Property::Value(Property::MAP));
   map->Insert("2key", "a string");
 
-  DALI_TEST_EQUALS("a string", (*map)["2key"].Get<std::string>(), TEST_LOCATION);
+  DALI_TEST_EQUALS("a string", (*map)["2key"].Get<String>(), TEST_LOCATION);
 
   Property::Map* innerMap = map->Find("key")->GetMap();
   innerMap->Insert("subkey", 5.f);
@@ -1044,7 +1046,7 @@ int UtcDaliHandleRegisterPropertyTypes(void)
       {"Property::MATRIX", Matrix::IDENTITY, true},
       {"Property::RECTANGLE", Rect<int>(), false},
       {"Property::ROTATION", AngleAxis(), true},
-      {"Property::STRING", std::string("Me"), false},
+      {"Property::STRING", Property::Value("Me"), false},
       {"Property::ARRAY", array, false},
       {"Property::MAP", map, false},
     };
@@ -1198,28 +1200,28 @@ int UtcDaliHandleCustomPropertyInvalidToString(void)
   Handle handle = Handle::New();
 
   std::string     startValue("Libraries gave us power");
-  Property::Index index = handle.RegisterProperty("testProperty", startValue, Property::READ_WRITE);
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(index), startValue, TEST_LOCATION);
+  Property::Index index = handle.RegisterProperty("testProperty", ToPropertyValue(startValue), Property::READ_WRITE);
+  DALI_TEST_EQUALS(handle.GetProperty<String>(index), startValue, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(index), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<String>(index), startValue, TEST_LOCATION);
 
   // No conversion from Vector3 to std::string, therefore this should be a NOOP
   handle.SetProperty(index, Vector3(1, 2, 3));
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(index), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<String>(index), startValue, TEST_LOCATION);
 
   // Positive test (sanity check)
   std::string endValue("Then work came and made us free");
-  handle.SetProperty(index, endValue);
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(index), endValue, TEST_LOCATION);
+  handle.SetProperty(index, ToPropertyValue(endValue));
+  DALI_TEST_EQUALS(handle.GetProperty<String>(index), endValue, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(handle.GetProperty<std::string>(index), endValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty<String>(index), endValue, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1231,17 +1233,17 @@ int UtcDaliHandleCustomPropertyInvalidToArray(void)
   Handle handle = Handle::New();
 
   Property::Value value(Property::ARRAY);
-  std::string     startValue("The future teaches you to be alone");
-  value.GetArray()->PushBack(startValue);
+  String          startValue("The future teaches you to be alone");
+  value.GetArray()->PushBack(Property::Value(startValue));
 
   Property::Index index  = handle.RegisterProperty("testProperty", value, Property::READ_WRITE);
   Property::Array check1 = handle.GetProperty<Property::Array>(index);
-  DALI_TEST_EQUALS(check1.GetElementAt(0).Get<std::string>(), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(check1.GetElementAt(0).Get<String>(), startValue, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
   Property::Array check2 = handle.GetProperty<Property::Array>(index);
-  DALI_TEST_EQUALS(check2.GetElementAt(0).Get<std::string>(), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(check2.GetElementAt(0).Get<String>(), startValue, TEST_LOCATION);
 
   // No conversion from int to ARRAY, therefore this should be a NOOP
   handle.SetProperty(index, int(2));
@@ -1249,21 +1251,21 @@ int UtcDaliHandleCustomPropertyInvalidToArray(void)
   application.SendNotification();
   application.Render(0);
   Property::Array check3 = handle.GetProperty<Property::Array>(index);
-  DALI_TEST_EQUALS(check3.GetElementAt(0).Get<std::string>(), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(check3.GetElementAt(0).Get<String>(), startValue, TEST_LOCATION);
 
   // Positive test (sanity check)
   Property::Value value2(Property::ARRAY);
-  std::string     endValue("The present to be afraid and cold");
-  value2.GetArray()->PushBack(endValue);
+  String          endValue("The present to be afraid and cold");
+  value2.GetArray()->PushBack(Property::Value(endValue));
   handle.SetProperty(index, value2);
 
   Property::Array check4 = handle.GetProperty<Property::Array>(index);
-  DALI_TEST_EQUALS(check4.GetElementAt(0).Get<std::string>(), endValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(check4.GetElementAt(0).Get<String>(), endValue, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
   Property::Array check5 = handle.GetProperty<Property::Array>(index);
-  DALI_TEST_EQUALS(check5.GetElementAt(0).Get<std::string>(), endValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(check5.GetElementAt(0).Get<String>(), endValue, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1275,8 +1277,8 @@ int UtcDaliHandleCustomPropertyInvalidToMap(void)
   Handle handle = Handle::New();
 
   Property::Value value(Property::MAP);
-  std::string     startValue("Culture sucks down words");
-  value.GetMap()->Insert("1", startValue);
+  String          startValue("Culture sucks down words");
+  value.GetMap()->Insert("1", Property::Value(startValue));
 
   Property::Index  index  = handle.RegisterProperty("testProperty", value, Property::READ_WRITE);
   Property::Value* check1 = handle.GetProperty<Property::Map>(index).Find("1");
@@ -1287,8 +1289,8 @@ int UtcDaliHandleCustomPropertyInvalidToMap(void)
 
   // Positive test (sanity check)
   Property::Value value2(Property::MAP);
-  std::string     endValue("Itemise loathing and feed yourself smiles");
-  value.GetMap()->Insert("1", endValue);
+  String          endValue("Itemise loathing and feed yourself smiles");
+  value.GetMap()->Insert("1", Property::Value(endValue));
   handle.SetProperty(index, value2);
 
   END_TEST;
@@ -1877,7 +1879,7 @@ int UtcDaliHandlePropertySetSignal04(void)
   tet_infoline("Test that setting a property on a vanilla Object triggers a signal");
 
   constexpr Property::Index TEST_PROPERTY_KEY_INDEX = 1;
-  const std::string         TEST_PROPERTY_KEY_NAME  = "testProperty";
+  const String              TEST_PROPERTY_KEY_NAME("testProperty");
 
   Handle vanillaObject = Handle::New();
   auto   propertyIndex = vanillaObject.RegisterProperty(
@@ -1890,7 +1892,7 @@ int UtcDaliHandlePropertySetSignal04(void)
   DALI_TEST_EQUALS(vanillaObject.DoesCustomPropertyExist(propertyIndex), true, TEST_LOCATION);
   DALI_TEST_EQUALS(vanillaObject.GetProperty<Vector4>(propertyIndex), Color::WHITE, 0.001f, TEST_LOCATION);
 
-  vanillaObject[TEST_PROPERTY_KEY_NAME] = Color::RED;
+  vanillaObject[TEST_PROPERTY_KEY_NAME.CStr()] = Color::RED;
 
   propertySetCheck.CheckSignalReceived();
   DALI_TEST_EQUALS(propertySetCheck.mValue, Property::Value(Color::RED), 0.001f, TEST_LOCATION);
@@ -2007,7 +2009,7 @@ int UtcDaliHandleGetProperties(void)
         DALI_TEST_EQUALS(value.Get<Quaternion>(), handleValue.Get<Quaternion>(), TEST_LOCATION);
         break;
       case Property::STRING:
-        DALI_TEST_EQUALS(value.Get<std::string>(), handleValue.Get<std::string>(), TEST_LOCATION);
+        DALI_TEST_EQUALS(value.Get<String>(), handleValue.Get<String>(), TEST_LOCATION);
         break;
       case Property::ARRAY:
         DALI_TEST_EQUALS(value.GetArray()->Count(), handleValue.GetArray()->Count(), TEST_LOCATION);
@@ -2094,7 +2096,7 @@ int UtcDaliHandleRegisterPropertyNegative01(void)
   Dali::Handle    instance;
   try
   {
-    std::string           arg1;
+    String                arg1;
     Dali::Property::Value arg2;
     instance.RegisterProperty(arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here
@@ -2112,7 +2114,7 @@ int UtcDaliHandleRegisterPropertyNegative02(void)
   Dali::Handle    instance;
   try
   {
-    std::string                arg1;
+    String                     arg1;
     Dali::Property::Value      arg2;
     Dali::Property::AccessMode arg3(Property::READ_ONLY);
     instance.RegisterProperty(arg1, arg2, arg3);
@@ -2337,7 +2339,7 @@ int UtcDaliHandleGetPropertyIndexNegative(void)
   Dali::Handle    instance;
   try
   {
-    std::string arg1;
+    Dali::StringView arg1;
     instance.GetPropertyIndex(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }

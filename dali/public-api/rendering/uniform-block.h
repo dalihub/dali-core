@@ -2,7 +2,7 @@
 #define DALI_RENDERING_UNIFORM_BLOCK_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/rendering/shader.h>
 
@@ -64,7 +65,7 @@ public:
    * @SINCE_2_4.14
    * @param[in] blockName The block name must match a named structure in the shader
    */
-  static UniformBlock New(std::string blockName);
+  static UniformBlock New(Dali::String blockName);
 
   /**
    * @brief Constructor
@@ -129,7 +130,7 @@ public:
    * @SINCE_2_4.14
    * @return The block name.
    */
-  std::string_view GetUniformBlockName() const;
+  Dali::StringView GetUniformBlockName() const;
 
   /**
    * @brief Connect to a shader.

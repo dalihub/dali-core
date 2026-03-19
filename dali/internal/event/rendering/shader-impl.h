@@ -23,6 +23,7 @@
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h>      // Dali::Internal::Object
 #include <dali/public-api/common/dali-common.h>          // DALI_ASSERT_ALWAYS
+#include <dali/public-api/common/dali-string-view.h>     // Dali::StringView
 #include <dali/public-api/common/intrusive-ptr.h>        // Dali::IntrusivePtr
 #include <dali/public-api/common/vector-wrapper.h>       // std::vector<>
 #include <dali/public-api/rendering/shader.h>            // Dali::Shader
@@ -51,10 +52,10 @@ public:
   /**
    * @copydoc Dali::Shader::New()
    */
-  static ShaderPtr New(std::string_view                vertexShader,
-                       std::string_view                fragmentShader,
+  static ShaderPtr New(Dali::StringView                vertexShader,
+                       Dali::StringView                fragmentShader,
                        Dali::Shader::Hint::Value       hints,
-                       std::string_view                shaderName,
+                       Dali::StringView                shaderName,
                        std::vector<Dali::UniformBlock> uniformBlocks,
                        bool                            strongConnection);
 
@@ -103,7 +104,7 @@ private: // implementation
    * @param[in] hints Hints to define the geometry of the rendered object
    * @param[in] name The name of shader data.
    */
-  void UpdateShaderData(std::string_view vertexShader, std::string_view fragmentShader, uint32_t renderPassTag, Dali::Shader::Hint::Value hints, std::string_view name);
+  void UpdateShaderData(Dali::StringView vertexShader, Dali::StringView fragmentShader, uint32_t renderPassTag, Dali::Shader::Hint::Value hints, Dali::StringView name);
 
   /**
    * @brief Sets shader data from shaderMap.
