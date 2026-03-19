@@ -29,6 +29,7 @@
 #include "test-graphics-texture.h"
 
 #include <dali/integration-api/gl-defines.h>
+#include <dali/integration-api/stream-operators.h>
 #include <any>
 #include <cstdio>
 #include <iostream>

@@ -417,26 +417,18 @@ public:
    */
   std::size_t GetHash() const;
 
+public:                      // Not for use by application developer
+  struct DALI_INTERNAL Impl; ///< Private data
+
   /**
-   * @brief Output to stream.
-   * @SINCE_1_1.28
+   * @brief Retrieves the Impl object.
+   * @
    */
-  friend DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Map& map);
+  DALI_INTERNAL const Impl* Read() const;
 
 private:
-  struct DALI_INTERNAL Impl;  ///< Private data
-  Impl*                mImpl; ///< Pointer to private data
+  Impl* mImpl; ///< Pointer to private data
 };
-
-/**
- * @brief Converts the key/value pairs of the property map into a string and append to an output stream.
- *
- * @SINCE_1_1.28
- * @param[in] stream The output stream operator
- * @param[in] map The map to insert
- * @return The output stream operator
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Map& map);
 
 /**
  * @}

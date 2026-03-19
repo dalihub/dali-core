@@ -655,15 +655,22 @@ std::size_t Property::Map::GetHash() const
   return DALI_LIKELY(mImpl) ? mImpl->GetHash() : Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
 }
 
+const Property::Map::Impl* Property::Map::Read() const
+{
+  return mImpl;
+}
+
 std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
 {
   stream << "Map(" << map.Count() << ") = {";
 
-  if(DALI_LIKELY(map.mImpl))
+  auto impl = map.Read();
+  if(impl != nullptr)
   {
     int32_t count = 0;
+
     // Output the String-Value pairs
-    for(auto&& iter : map.mImpl->mStringValueContainer)
+    for(auto&& iter : impl->mStringValueContainer)
     {
       if(count++ > 0)
       {
@@ -673,7 +680,7 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
     }
 
     // Output the Index-Value pairs
-    for(auto&& iter : map.mImpl->mIndexValueContainer)
+    for(auto&& iter : impl->mIndexValueContainer)
     {
       if(count++ > 0)
       {
@@ -682,12 +689,11 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
       stream << iter.first << ":" << iter.second;
     }
 
-    if(map.mImpl->mHash != NOT_HASHED)
+    if(impl->mHash != NOT_HASHED)
     {
-      stream << "(hash=" << map.mImpl->mHash << ")";
+      stream << "(hash=" << impl->mHash << ")";
     }
   }
-
   stream << "}";
 
   return stream;

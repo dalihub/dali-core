@@ -25,4 +25,57 @@ std::ostream& operator<<(std::ostream& outStream, const String& string)
   return outStream;
 }
 
+std::ostream& operator<<(std::ostream& o, const Vector2& vector)
+{
+  return o << "[" << vector.x << ", " << vector.y << "]";
+}
+
+std::ostream& operator<<(std::ostream& o, const Vector3& vector)
+{
+  return o << "[" << vector.x << ", " << vector.y << ", " << vector.z << "]";
+}
+
+std::ostream& operator<<(std::ostream& o, const Vector4& vector)
+{
+  return o << "[" << vector.x << ", " << vector.y << ", " << vector.z << ", " << vector.w << "]";
+}
+
+std::ostream& operator<<(std::ostream& o, const Quaternion& quaternion)
+{
+  Vector3 axis;
+  Radian  angleRadians;
+
+  quaternion.ToAxisAngle(axis, angleRadians);
+  Degree degrees(angleRadians);
+
+  return o << "[ Axis: [" << axis.x << ", " << axis.y << ", " << axis.z << "], Angle: " << degrees.degree << " degrees ]";
+}
+
+std::ostream& operator<<(std::ostream& o, const Matrix3& matrix)
+{
+  const float* elements = matrix.AsFloat();
+  return o << "[ " << elements[0] << ", " << elements[1] << ", " << elements[2] << ", "
+           << elements[3] << ", " << elements[4] << ", " << elements[5] << ", "
+           << elements[6] << ", " << elements[7] << ", " << elements[8] << " ]";
+}
+
+std::ostream& operator<<(std::ostream& o, const Matrix& matrix)
+{
+  const float* elements = matrix.AsFloat();
+  return o << "[ " << elements[0] << ", " << elements[1] << ", " << elements[2] << ", " << elements[3] << ", "
+           << elements[4] << ", " << elements[5] << ", " << elements[6] << ", " << elements[7] << ", "
+           << elements[8] << ", " << elements[9] << ", " << elements[10] << ", " << elements[11] << ", "
+           << elements[12] << ", " << elements[13] << ", " << elements[14] << ", " << elements[15] << " ]";
+}
+
+std::ostream& operator<<(std::ostream& o, const Dali::AngleAxis& angleAxis)
+{
+  return o << "[ Axis: [" << angleAxis.axis.x << ", " << angleAxis.axis.y << ", " << angleAxis.axis.z << "], Angle: " << Degree(angleAxis.angle).degree << " degrees ]";
+}
+
+std::ostream& operator<<(std::ostream& stream, const Extents& extents)
+{
+  return stream << "[" << extents.start << ", " << extents.end << ", " << extents.top << ", " << extents.bottom << "]";
+}
+
 } //namespace Dali
