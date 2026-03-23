@@ -24,6 +24,7 @@
 #include <utility>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/property.h>
@@ -44,7 +45,7 @@ class Matrix3;
 class Matrix;
 struct Extents;
 
-using KeyValuePair = std::pair<Property::Key, Property::Value>;
+using KeyValuePair = Pair<Property::Key, Property::Value>;
 
 /**
  * @brief A value-type representing a property value.

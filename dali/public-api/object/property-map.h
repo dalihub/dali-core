@@ -27,6 +27,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/property-key.h>
 #include <dali/public-api/object/property-value.h>
@@ -39,8 +40,8 @@ namespace Dali
  * @{
  */
 
-using KeyValuePair    = std::pair<Property::Key, Property::Value>;
-using StringValuePair = std::pair<Dali::String, Property::Value>;
+using KeyValuePair    = Pair<Property::Key, Property::Value>;
+using StringValuePair = Pair<Dali::String, Property::Value>;
 
 /**
  * @brief A Map of property values, the key type could be String or Property::Index.

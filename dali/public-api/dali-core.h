@@ -41,6 +41,7 @@
 
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-utility.h>
