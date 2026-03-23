@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_KEY_EVENT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,15 +55,15 @@ public:
    * @param[in]  deviceClass     The class of device the key event originated from
    * @param[in]  deviceSubclass  The subclass of device the key event originated from
    */
-  KeyEvent(const std::string&           keyName,
-           const std::string&           logicalKey,
-           const std::string&           keyString,
+  KeyEvent(const Dali::String&          keyName,
+           const Dali::String&          logicalKey,
+           const Dali::String&          keyString,
            int                          keyCode,
            int                          keyModifier,
            unsigned long                timeStamp,
            const Dali::KeyEvent::State& keyState,
-           const std::string&           compose,
-           const std::string&           deviceName,
+           const Dali::String&          compose,
+           const Dali::String&          deviceName,
            const Device::Class::Type    deviceClass,
            const Device::Subclass::Type deviceSubclass);
 
@@ -89,15 +89,15 @@ public:
    * @param[in]  deviceSubclass  The subclass of device the key event originated from
    * @return A smart-pointer to the newly allocated KeyEvent.
    */
-  static KeyEventPtr New(const std::string&           keyName,
-                         const std::string&           logicalKey,
-                         const std::string&           keyString,
+  static KeyEventPtr New(const Dali::String&          keyName,
+                         const Dali::String&          logicalKey,
+                         const Dali::String&          keyString,
                          int                          keyCode,
                          int                          keyModifier,
                          unsigned long                timeStamp,
                          const Dali::KeyEvent::State& keyState,
-                         const std::string&           compose,
-                         const std::string&           deviceName,
+                         const Dali::String&          compose,
+                         const Dali::String&          deviceName,
                          const Device::Class::Type    deviceClass,
                          const Device::Subclass::Type deviceSubclass);
 
@@ -124,12 +124,12 @@ public:
   /**
    * @copydoc Dali::KeyEvent::GetCompose()
    */
-  const std::string& GetCompose() const;
+  const Dali::String& GetCompose() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetDeviceName()
    */
-  const std::string& GetDeviceName() const;
+  const Dali::String& GetDeviceName() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetDeviceClass()
@@ -144,17 +144,17 @@ public:
   /**
    * @copydoc Dali::KeyEvent::GetKeyName()
    */
-  const std::string& GetKeyName() const;
+  const Dali::String& GetKeyName() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetKeyString()
    */
-  const std::string& GetKeyString() const;
+  const Dali::String& GetKeyString() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetLogicalKey()
    */
-  const std::string& GetLogicalKey() const;
+  const Dali::String& GetLogicalKey() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetKeyCode()
@@ -196,14 +196,14 @@ public:
    *
    * @param[in] keyName The name given to the key pressed.
    */
-  void SetKeyName(const std::string& keyName);
+  void SetKeyName(const Dali::String& keyName);
 
   /**
    * @brief Set the actual string of input characters that should be used for input editors.
    *
    * @param[in] The actual string of input characters
    */
-  void SetKeyString(const std::string& keyString);
+  void SetKeyString(const Dali::String& keyString);
 
   /**
    * @brief Set the unique key code for the key pressed.
@@ -277,15 +277,15 @@ private:
   KeyEvent& operator=(KeyEvent&& rhs)      = delete; ///< Deleted move assignment operator
 
 private:
-  std::string            mKeyName;        ///< The name of the key pressed
-  std::string            mLogicalKey;     ///< The logical key symbol
-  std::string            mKeyString;      ///< The string of input characters
+  Dali::String           mKeyName;        ///< The name of the key pressed
+  Dali::String           mLogicalKey;     ///< The logical key symbol
+  Dali::String           mKeyString;      ///< The string of input characters
   int                    mKeyCode;        ///< TThe unique key code
   int                    mKeyModifier;    ///< The key modifier
   unsigned long          mTime;           ///< The time that the key event occurred.
   Dali::KeyEvent::State  mState;          ///< The state of the key event.
-  std::string            mCompose;        ///< The key compose
-  std::string            mDeviceName;     ///< The name of device the key event originated from
+  Dali::String           mCompose;        ///< The key compose
+  Dali::String           mDeviceName;     ///< The name of device the key event originated from
   Device::Class::Type    mDeviceClass;    ///< The class of device the key event originated from
   Device::Subclass::Type mDeviceSubclass; ///< The subclass of device the key event originated from
   bool                   mIsRepeat;       ///< Whether the key referenced by the event is a repeating key.

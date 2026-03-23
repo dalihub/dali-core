@@ -27,6 +27,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/base-handle.h>
 
+using Dali::Integration::ToDaliStringView;
 using Dali::Integration::ToStdString;
 using Dali::Integration::ToStdStringView;
 
@@ -57,7 +58,7 @@ TypeRegistry::~TypeRegistry()
   mRegistryAlternativeObjectNameLut.clear();
 }
 
-TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const std::string& uniqueTypeName)
+TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const Dali::StringView& uniqueTypeName)
 {
   ConstString typeName(uniqueTypeName);
   auto        iter = mRegistryLut.Get(typeName);
@@ -73,7 +74,7 @@ TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const std::string& uniqu
     return iter->second;
   }
 
-  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Cannot find requested type '%s'\n", uniqueTypeName.c_str());
+  DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Cannot find requested type '%s'\n", typeName.GetCString());
 
   return TypeRegistry::TypeInfoPointer();
 }
@@ -82,7 +83,7 @@ TypeRegistry::TypeInfoPointer TypeRegistry::GetTypeInfo(const std::type_info& re
 {
   std::string typeName = DemangleClassName(registerType.name());
 
-  return GetTypeInfo(typeName);
+  return GetTypeInfo(ToDaliStringView(typeName));
 }
 
 uint32_t TypeRegistry::GetTypeNameCount() const
@@ -90,9 +91,9 @@ uint32_t TypeRegistry::GetTypeNameCount() const
   return static_cast<uint32_t>(mRegistryLut.size());
 }
 
-const std::string& TypeRegistry::GetTypeName(uint32_t index) const
+const Dali::String& TypeRegistry::GetTypeName(uint32_t index) const
 {
-  static std::string EMPTY_STRING{};
+  static Dali::String EMPTY_STRING{};
 
   if(index < mRegistryLut.size())
   {
@@ -333,7 +334,7 @@ bool TypeRegistry::DoActionTo(BaseObject* const object, const std::string& actio
 
   if(!done)
   {
-    DALI_LOG_ERROR("Type '%s' cannot do action '%s'\n", type->GetName().c_str(), actionName.c_str());
+    DALI_LOG_ERROR("Type '%s' cannot do action '%s'\n", type->GetName().CStr(), actionName.c_str());
   }
 
   return done;
@@ -350,7 +351,7 @@ bool TypeRegistry::ConnectSignal(BaseObject* object, ConnectionTrackerInterface*
 
   if(!connected)
   {
-    DALI_LOG_ERROR("Type '%s' signal '%s' connection failed \n", type->GetName().c_str(), signalName.c_str());
+    DALI_LOG_ERROR("Type '%s' signal '%s' connection failed \n", type->GetName().CStr(), signalName.c_str());
     // Ownership of functor was not passed to Dali::CallbackBase, so clean-up now
     delete functor;
   }

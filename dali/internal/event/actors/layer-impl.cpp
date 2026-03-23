@@ -369,17 +369,9 @@ void Layer::SetDefaultProperty(Property::Index index, const Property::Value& pro
       {
         Behavior behavior = mBehavior;
 
-        Property::Type type = propertyValue.GetType();
-        if(type == Property::STRING)
+        if(DALI_LIKELY(Scripting::GetEnumerationProperty(propertyValue, BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior)))
         {
-          if(Scripting::GetEnumeration<Behavior>(propertyValue.Get<Dali::String>().CStr(), BEHAVIOR_TABLE, BEHAVIOR_TABLE_COUNT, behavior))
-          {
-            SetBehavior(behavior);
-          }
-        }
-        else if(type == Property::INTEGER)
-        {
-          SetBehavior(propertyValue.Get<Dali::Layer::Behavior>());
+          SetBehavior(behavior);
         }
         break;
       }

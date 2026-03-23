@@ -134,10 +134,7 @@ void GetShaderData(const Property::Map& shaderMap, Dali::String& vertexShader, D
     else
     {
       static_cast<void>( // ignore return
-        Scripting::GetEnumeration<Dali::Shader::Hint::Value>(value->Get<String>().CStr(),
-                                                             ShaderHintsTable,
-                                                             ShaderHintsTableSize,
-                                                             hints));
+        Scripting::GetEnumerationProperty(*value, ShaderHintsTable, ShaderHintsTableSize, hints));
     }
   }
 }

@@ -186,7 +186,7 @@ public:
    * @param[in] index The index to get the type name
    * @return The type name or an empty string when index is not valid
    */
-  Dali::String GetTypeName(size_t index) const;
+  const Dali::String& GetTypeName(size_t index) const;
 
 public: // Not intended for application developers
   /// @cond internal
@@ -292,7 +292,7 @@ public:
    * @SINCE_1_0.0
    * @return The registered name or empty if unregistered
    */
-  Dali::String RegisteredName() const;
+  const Dali::String& RegisteredName() const;
 
 private:
   TypeRegistry mReference; ///< Reference to the type registry

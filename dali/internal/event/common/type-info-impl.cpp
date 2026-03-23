@@ -28,6 +28,9 @@
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 
+using Dali::Integration::ToDaliString;
+using Dali::Integration::ToDaliStringView;
+
 namespace Dali
 {
 namespace Internal
@@ -127,7 +130,7 @@ Internal::TypeInfo* const UNRESOLVED = reinterpret_cast<Internal::TypeInfo*>(0x1
  * @param[in] baseTypeName string name of the base type
  * @return true is base type exists
  */
-inline bool GetBaseType(Internal::TypeInfo*& baseType, TypeRegistry& typeRegistry, const std::string& baseTypeName)
+inline bool GetBaseType(Internal::TypeInfo*& baseType, TypeRegistry& typeRegistry, const Dali::String& baseTypeName)
 {
   // if greater than unresolved means we have a base type, null means no base
   bool baseExists = (baseType > UNRESOLVED);
@@ -154,8 +157,8 @@ inline bool GetBaseType(Internal::TypeInfo*& baseType, TypeRegistry& typeRegistr
 TypeInfo::TypeInfo(const std::string& name, const std::string& baseTypeName, Dali::TypeInfo::CreateFunction creator, const Dali::PropertyDetails* defaultProperties, Property::Index defaultPropertyCount)
 : mTypeRegistry(*TypeRegistry::Get()),
   mBaseType(UNRESOLVED),
-  mTypeName(name),
-  mBaseTypeName(baseTypeName),
+  mTypeName(ToDaliString(name)),
+  mBaseTypeName(ToDaliString(baseTypeName)),
   mCreate(creator),
   mDefaultProperties(defaultProperties),
   mDefaultPropertyCount(defaultPropertyCount),
@@ -168,8 +171,8 @@ TypeInfo::TypeInfo(const std::string& name, const std::string& baseTypeName, Dal
 TypeInfo::TypeInfo(const std::string& name, const std::string& baseTypeName, Dali::CSharpTypeInfo::CreateFunction creator)
 : mTypeRegistry(*TypeRegistry::Get()),
   mBaseType(UNRESOLVED),
-  mTypeName(name),
-  mBaseTypeName(baseTypeName),
+  mTypeName(ToDaliString(name)),
+  mBaseTypeName(ToDaliString(baseTypeName)),
   mCSharpCreate(creator),
   mCSharpType(true)
 {
@@ -189,7 +192,7 @@ BaseHandle TypeInfo::CreateInstance() const
     {
       // CSharp currently only registers one create function for all custom controls
       // it uses the type name to decide which one to create
-      ret = *mCSharpCreate(mTypeName.c_str());
+      ret = *mCSharpCreate(mTypeName.CStr());
     }
     else
     {
@@ -254,12 +257,12 @@ bool TypeInfo::ConnectSignal(BaseObject* object, ConnectionTrackerInterface* con
   return connected;
 }
 
-const std::string& TypeInfo::GetName() const
+const Dali::String& TypeInfo::GetName() const
 {
   return mTypeName;
 }
 
-const std::string& TypeInfo::GetBaseName() const
+const Dali::String& TypeInfo::GetBaseName() const
 {
   return mBaseTypeName;
 }
@@ -282,14 +285,14 @@ uint32_t TypeInfo::GetActionCount() const
   return count;
 }
 
-std::string TypeInfo::GetActionName(uint32_t index) const
+Dali::String TypeInfo::GetActionName(uint32_t index) const
 {
-  std::string    name;
+  Dali::String   name;
   const uint32_t count = static_cast<uint32_t>(mActions.size());
 
   if(index < count)
   {
-    name = std::string(mActions.GetKeyByIndex(index).GetStringView());
+    name = ToDaliString(mActions.GetKeyByIndex(index).GetStringView());
   }
   else
   {
@@ -316,14 +319,14 @@ uint32_t TypeInfo::GetSignalCount() const
   return count;
 }
 
-std::string TypeInfo::GetSignalName(uint32_t index) const
+Dali::String TypeInfo::GetSignalName(uint32_t index) const
 {
-  std::string    name;
+  Dali::String   name;
   const uint32_t count = static_cast<uint32_t>(mSignalConnectors.size());
 
   if(index < count)
   {
-    name = std::string(mSignalConnectors.GetKeyByIndex(index).GetStringView());
+    name = ToDaliString(mSignalConnectors.GetKeyByIndex(index).GetStringView());
   }
   else
   {

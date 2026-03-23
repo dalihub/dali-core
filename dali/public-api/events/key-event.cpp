@@ -19,10 +19,7 @@
 #include <dali/public-api/events/key-event.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/events/key-event-impl.h>
-
-using Dali::Integration::ToDaliString;
 
 namespace Dali
 {
@@ -61,14 +58,14 @@ bool KeyEvent::IsNoInterceptModifier() const
   return GetImplementation(*this).IsNoInterceptModifier();
 }
 
-Dali::String KeyEvent::GetCompose() const
+const Dali::String& KeyEvent::GetCompose() const
 {
-  return ToDaliString(GetImplementation(*this).GetCompose());
+  return GetImplementation(*this).GetCompose();
 }
 
-Dali::String KeyEvent::GetDeviceName() const
+const Dali::String& KeyEvent::GetDeviceName() const
 {
-  return ToDaliString(GetImplementation(*this).GetDeviceName());
+  return GetImplementation(*this).GetDeviceName();
 }
 
 Device::Class::Type KeyEvent::GetDeviceClass() const
@@ -81,19 +78,19 @@ Device::Subclass::Type KeyEvent::GetDeviceSubclass() const
   return GetImplementation(*this).GetDeviceSubclass();
 }
 
-Dali::String KeyEvent::GetKeyName() const
+const Dali::String& KeyEvent::GetKeyName() const
 {
-  return ToDaliString(GetImplementation(*this).GetKeyName());
+  return GetImplementation(*this).GetKeyName();
 }
 
-Dali::String KeyEvent::GetKeyString() const
+const Dali::String& KeyEvent::GetKeyString() const
 {
-  return ToDaliString(GetImplementation(*this).GetKeyString());
+  return GetImplementation(*this).GetKeyString();
 }
 
-Dali::String KeyEvent::GetLogicalKey() const
+const Dali::String& KeyEvent::GetLogicalKey() const
 {
-  return ToDaliString(GetImplementation(*this).GetLogicalKey());
+  return GetImplementation(*this).GetLogicalKey();
 }
 
 int32_t KeyEvent::GetKeyCode() const

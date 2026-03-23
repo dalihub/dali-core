@@ -42,14 +42,14 @@ TypeInfo::TypeInfo(TypeInfo&& rhs) noexcept = default;
 
 TypeInfo& TypeInfo::operator=(TypeInfo&& rhs) noexcept = default;
 
-Dali::String TypeInfo::GetName() const
+const Dali::String& TypeInfo::GetName() const
 {
-  return ToDaliString(GetImplementation(*this).GetName());
+  return GetImplementation(*this).GetName();
 }
 
-Dali::String TypeInfo::GetBaseName() const
+const Dali::String& TypeInfo::GetBaseName() const
 {
-  return ToDaliString(GetImplementation(*this).GetBaseName());
+  return GetImplementation(*this).GetBaseName();
 }
 
 BaseHandle TypeInfo::CreateInstance() const
@@ -69,7 +69,7 @@ size_t TypeInfo::GetActionCount() const
 
 Dali::String TypeInfo::GetActionName(size_t index)
 {
-  return ToDaliString(GetImplementation(*this).GetActionName(static_cast<uint32_t>(index)));
+  return GetImplementation(*this).GetActionName(static_cast<uint32_t>(index));
 }
 
 size_t TypeInfo::GetSignalCount() const
@@ -79,7 +79,7 @@ size_t TypeInfo::GetSignalCount() const
 
 Dali::String TypeInfo::GetSignalName(size_t index)
 {
-  return ToDaliString(GetImplementation(*this).GetSignalName(static_cast<uint32_t>(index)));
+  return GetImplementation(*this).GetSignalName(static_cast<uint32_t>(index));
 }
 
 size_t TypeInfo::GetPropertyCount() const

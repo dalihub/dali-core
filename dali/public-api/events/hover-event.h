@@ -210,7 +210,7 @@ public:
    * @SINCE_2_4.34
    * @return The device name string
    */
-  Dali::String GetDeviceName(std::size_t point) const;
+  const Dali::String& GetDeviceName(std::size_t point) const;
 
 public: // Not intended for application developers
   /// @cond internal

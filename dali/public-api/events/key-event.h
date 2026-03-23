@@ -154,7 +154,7 @@ public:
    * @SINCE_1_9.27
    * @return The compose string
    */
-  Dali::String GetCompose() const;
+  const Dali::String& GetCompose() const;
 
   /**
    * @brief Get the device name the key event originated from.
@@ -162,7 +162,7 @@ public:
    * @SINCE_1_9.27
    * @return The device name
    */
-  Dali::String GetDeviceName() const;
+  const Dali::String& GetDeviceName() const;
 
   /**
    * @brief Get the device class the key event originated from.
@@ -188,7 +188,7 @@ public:
    * @SINCE_1_9.27
    * @return The name given to the key pressed.
    */
-  Dali::String GetKeyName() const;
+  const Dali::String& GetKeyName() const;
 
   /**
    * @brief Get the actual string of input characters that should be used for input editors.
@@ -196,7 +196,7 @@ public:
    * @SINCE_1_9.27
    * @return The actual string of input characters
    */
-  Dali::String GetKeyString() const;
+  const Dali::String& GetKeyString() const;
 
   /**
    * @brief Gets the logical key string.
@@ -207,7 +207,7 @@ public:
    * @SINCE_1_9.27
    * @return The logical key symbol
    */
-  Dali::String GetLogicalKey() const;
+  const Dali::String& GetLogicalKey() const;
 
   /**
    * @brief Get the unique key code for the key pressed.
