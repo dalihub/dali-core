@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_TYPE_INFO_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,12 +74,12 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetName
    */
-  const std::string& GetName() const;
+  const Dali::String& GetName() const;
 
   /**
    * @copydoc Dali::TypeInfo::GetBaseName
    */
-  const std::string& GetBaseName() const;
+  const Dali::String& GetBaseName() const;
 
   /**
    * @copydoc TypeInfo::CreateFunction
@@ -99,7 +99,7 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetActionName
    */
-  std::string GetActionName(uint32_t index) const;
+  Dali::String GetActionName(uint32_t index) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetSignalCount
@@ -109,7 +109,7 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetSignalName
    */
-  std::string GetSignalName(uint32_t index) const;
+  Dali::String GetSignalName(uint32_t index) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetPropertyCount
@@ -424,8 +424,8 @@ private:
 private:
   TypeRegistry&               mTypeRegistry;
   mutable Internal::TypeInfo* mBaseType; // allow changing from const methods, initialised inside constructor
-  std::string                 mTypeName;
-  std::string                 mBaseTypeName;
+  Dali::String                mTypeName;
+  Dali::String                mBaseTypeName;
   union
   {
     Dali::TypeInfo::CreateFunction       mCreate = nullptr;

@@ -2610,7 +2610,7 @@ int UtcDaliTouchEventGetDeviceNamePositive(void)
   HandleData              handleData;
   TouchEventHandleFunctor functor(handleData);
   actor.TouchedSignal().Connect(&application, functor);
-  std::string deviceName("hwKeyboard");
+  Dali::String deviceName("hwKeyboard");
 
   // Emit a down signal with deviceName
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));

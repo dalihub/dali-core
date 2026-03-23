@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,15 +52,15 @@ KeyEvent::KeyEvent()
 {
 }
 
-KeyEvent::KeyEvent(const std::string&           keyName,
-                   const std::string&           logicalKey,
-                   const std::string&           keyString,
+KeyEvent::KeyEvent(const Dali::String&          keyName,
+                   const Dali::String&          logicalKey,
+                   const Dali::String&          keyString,
                    int                          keyCode,
                    int                          keyModifier,
                    unsigned long                timeStamp,
                    const Dali::KeyEvent::State& keyState,
-                   const std::string&           compose,
-                   const std::string&           deviceName,
+                   const Dali::String&          compose,
+                   const Dali::String&          deviceName,
                    const Device::Class::Type    deviceClass,
                    const Device::Subclass::Type deviceSubclass)
 : mKeyName(keyName),
@@ -86,15 +86,15 @@ KeyEventPtr KeyEvent::New()
   return keyEvent;
 }
 
-KeyEventPtr KeyEvent::New(const std::string&           keyName,
-                          const std::string&           logicalKey,
-                          const std::string&           keyString,
+KeyEventPtr KeyEvent::New(const Dali::String&          keyName,
+                          const Dali::String&          logicalKey,
+                          const Dali::String&          keyString,
                           int                          keyCode,
                           int                          keyModifier,
                           unsigned long                timeStamp,
                           const Dali::KeyEvent::State& keyState,
-                          const std::string&           compose,
-                          const std::string&           deviceName,
+                          const Dali::String&          compose,
+                          const Dali::String&          deviceName,
                           const Device::Class::Type    deviceClass,
                           const Device::Subclass::Type deviceSubclass)
 {
@@ -122,12 +122,12 @@ bool KeyEvent::IsNoInterceptModifier() const
   return ((MODIFIER_NO_INTERCEPT & mKeyModifier) == MODIFIER_NO_INTERCEPT);
 }
 
-const std::string& KeyEvent::GetCompose() const
+const Dali::String& KeyEvent::GetCompose() const
 {
   return mCompose;
 }
 
-const std::string& KeyEvent::GetDeviceName() const
+const Dali::String& KeyEvent::GetDeviceName() const
 {
   return mDeviceName;
 }
@@ -142,17 +142,17 @@ Device::Subclass::Type KeyEvent::GetDeviceSubclass() const
   return mDeviceSubclass;
 }
 
-const std::string& KeyEvent::GetKeyName() const
+const Dali::String& KeyEvent::GetKeyName() const
 {
   return mKeyName;
 }
 
-const std::string& KeyEvent::GetKeyString() const
+const Dali::String& KeyEvent::GetKeyString() const
 {
   return mKeyString;
 }
 
-const std::string& KeyEvent::GetLogicalKey() const
+const Dali::String& KeyEvent::GetLogicalKey() const
 {
   return mLogicalKey;
 }
@@ -192,12 +192,12 @@ uint32_t KeyEvent::GetReceiveTime() const
   return mReceiveTime;
 }
 
-void KeyEvent::SetKeyName(const std::string& keyName)
+void KeyEvent::SetKeyName(const Dali::String& keyName)
 {
   mKeyName = keyName;
 }
 
-void KeyEvent::SetKeyString(const std::string& keyString)
+void KeyEvent::SetKeyString(const Dali::String& keyString)
 {
   mKeyString = keyString;
 }

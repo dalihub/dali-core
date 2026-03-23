@@ -192,12 +192,12 @@ struct DALI_CORE_API Point
    * @brief Gets the device name the event originated from.
    * @return The device name.
    */
-  const std::string& GetDeviceName() const;
+  const Dali::String& GetDeviceName() const;
 
   /**
    * @brief Sets the device name the event originated from.
    */
-  void SetDeviceName(std::string& deviceName);
+  void SetDeviceName(Dali::String& deviceName);
 
 public: // Not intended for Integration API developers
   /**
@@ -241,7 +241,7 @@ private:
   float                  mPressure;    ///< The touch pressure.
   float                  mRadius;      ///< Radius of the press point, an average of the ellipse radius.
   MouseButton::Type      mMouseButton; ///< mouse button value.
-  std::string            mDeviceName;  ///< device name string.
+  Dali::String           mDeviceName;  ///< device name string.
 };
 
 } // namespace Integration

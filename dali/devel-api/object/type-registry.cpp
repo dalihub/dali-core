@@ -50,7 +50,7 @@ TypeRegistry TypeRegistry::Get()
 
 Dali::TypeInfo TypeRegistry::GetTypeInfo(const Dali::StringView& uniqueTypeName)
 {
-  return Dali::TypeInfo(GetImplementation(*this).GetTypeInfo(ToStdString(uniqueTypeName)).Get());
+  return Dali::TypeInfo(GetImplementation(*this).GetTypeInfo(uniqueTypeName).Get());
 }
 
 Dali::TypeInfo TypeRegistry::GetTypeInfo(const std::type_info& registerType)
@@ -63,9 +63,9 @@ size_t TypeRegistry::GetTypeNameCount() const
   return GetImplementation(*this).GetTypeNameCount();
 }
 
-Dali::String TypeRegistry::GetTypeName(size_t index) const
+const Dali::String& TypeRegistry::GetTypeName(size_t index) const
 {
-  return ToDaliString(GetImplementation(*this).GetTypeName(static_cast<uint32_t>(index)));
+  return GetImplementation(*this).GetTypeName(static_cast<uint32_t>(index));
 }
 
 TypeRegistry::TypeRegistry(Internal::TypeRegistry* internal)
@@ -127,7 +127,7 @@ TypeRegistration::TypeRegistration(Dali::String name, const std::type_info& base
   mName = ToDaliString(impl->Register(ToStdString(std::move(name)), baseType, f, false));
 }
 
-Dali::String TypeRegistration::RegisteredName() const
+const Dali::String& TypeRegistration::RegisteredName() const
 {
   return mName;
 }

@@ -86,7 +86,7 @@ Dali::String BaseObject::GetTypeName() const
     Internal::TypeRegistry::TypeInfoPointer typeInfo = registry->GetTypeInfo(this);
     if(typeInfo)
     {
-      return Integration::ToDaliString(typeInfo->GetName());
+      return typeInfo->GetName();
     }
   }
 
