@@ -825,55 +825,70 @@ ObjectRegistry& Core::GetObjectRegistry() const
 
 void Core::LogMemoryPools() const
 {
-  uint32_t animationPoolCapacity    = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::ANIMATION);
-  uint32_t renderItemPoolCapacity   = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_ITEM);
-  uint32_t relayoutItemPoolCapacity = mRelayoutController->GetMemoryPoolCapacity();
-  uint32_t rendererPoolCapacity     = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDERER);
-  uint32_t textureSetPoolCapacity   = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::TEXTURE_SET);
-  uint32_t renderTaskPoolCapacity   = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TASK_LIST);
-  uint32_t nodePoolCapacity         = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::NODE);
-  uint32_t cameraPoolCapacity       = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::CAMERA);
+  uint32_t animationPoolCapacity, animationPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::ANIMATION, animationPoolCapacity, animationPoolSize);
+  uint32_t renderItemPoolCapacity, renderItemPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_ITEM, renderItemPoolCapacity, renderItemPoolSize);
+  uint32_t rendererPoolCapacity, rendererPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDERER, rendererPoolCapacity, rendererPoolSize);
+  uint32_t textureSetPoolCapacity, textureSetPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::TEXTURE_SET, textureSetPoolCapacity, textureSetPoolSize);
+  uint32_t renderTaskPoolCapacity, renderTaskPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TASK_LIST, renderTaskPoolCapacity, renderTaskPoolSize);
+  uint32_t nodePoolCapacity, nodePoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::NODE, nodePoolCapacity, nodePoolSize);
+  uint32_t cameraPoolCapacity, cameraPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::CAMERA, cameraPoolCapacity, cameraPoolSize);
+  uint32_t renderRendererPoolCapacity, renderRendererPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_RENDERER, renderRendererPoolCapacity, renderRendererPoolSize);
+  uint32_t renderTexturePoolCapacity, renderTexturePoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TEXTURE, renderTexturePoolCapacity, renderTexturePoolSize);
+  uint32_t renderUboViewPoolCapacity, renderUboViewPoolSize;
+  mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_UBO_VIEW, renderUboViewPoolCapacity, renderUboViewPoolSize);
+  uint32_t relayoutItemPoolCapacity, relayoutItemPoolSize;
+  mRelayoutController->GetMemoryPoolCapacity(relayoutItemPoolCapacity, relayoutItemPoolSize);
 
-  uint32_t renderRendererPoolCapacity = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_RENDERER);
-  uint32_t renderTexturePoolCapacity  = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_TEXTURE);
-  uint32_t renderUboViewPoolCapacity  = mMemoryPoolCollection->GetCapacity(SceneGraph::MemoryPoolCollection::MemoryPoolType::RENDER_UBO_VIEW);
+#define SIZE_CONV(cap, type, sz) \
+  cap, (cap >> 10), (cap >> 20), TypeSizeWithAlignment<type>::size, cap / TypeSizeWithAlignment<type>::size, sz * 100 / cap
 
-  // clang-format off
-  DALI_LOG_RELEASE_INFO( "\n"
-    "Memory Pool capacities:\n"
-    "  Animations:        %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  RenderItems:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  RelayoutItems:     %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  Renderers:         %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  TextureSets:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  RenderTasks:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  Nodes:             %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  Cameras:           %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  Render::Renderers: %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  Render::Textures:  %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n"
-    "  Render::UBOViews:  %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items]\n",
-    animationPoolCapacity,    (animationPoolCapacity >> 10),    (animationPoolCapacity >> 20),    TypeSizeWithAlignment<Dali::Internal::SceneGraph::Animation>::size,      animationPoolCapacity    / TypeSizeWithAlignment<Dali::Internal::SceneGraph::Animation>::size,
-    renderItemPoolCapacity,   (renderItemPoolCapacity >> 10),   (renderItemPoolCapacity >> 20),   TypeSizeWithAlignment<Dali::Internal::SceneGraph::RenderItem>::size,     renderItemPoolCapacity   / TypeSizeWithAlignment<Dali::Internal::SceneGraph::RenderItem>::size,
-    relayoutItemPoolCapacity, (relayoutItemPoolCapacity >> 10), (relayoutItemPoolCapacity >> 20), TypeSizeWithAlignment<MemoryPoolRelayoutContainer::RelayoutInfo>::size,  relayoutItemPoolCapacity / TypeSizeWithAlignment<MemoryPoolRelayoutContainer::RelayoutInfo>::size,
-    rendererPoolCapacity,     (rendererPoolCapacity >> 10),     (rendererPoolCapacity >> 20),     TypeSizeWithAlignment<Dali::Internal::SceneGraph::Renderer>::size,       rendererPoolCapacity     / TypeSizeWithAlignment<Dali::Internal::SceneGraph::Renderer>::size,
-    textureSetPoolCapacity,   (textureSetPoolCapacity >> 10),   (textureSetPoolCapacity >> 20),   TypeSizeWithAlignment<Dali::Internal::SceneGraph::TextureSet>::size,     textureSetPoolCapacity   / TypeSizeWithAlignment<Dali::Internal::SceneGraph::TextureSet>::size,
-    renderTaskPoolCapacity,   (renderTaskPoolCapacity >> 10),   (renderTaskPoolCapacity >> 20),   TypeSizeWithAlignment<Dali::Internal::SceneGraph::RenderTaskList>::size, renderTaskPoolCapacity   / TypeSizeWithAlignment<Dali::Internal::SceneGraph::RenderTaskList>::size,
-    nodePoolCapacity,         (nodePoolCapacity >> 10),         (nodePoolCapacity >> 20),         TypeSizeWithAlignment<Dali::Internal::SceneGraph::Node>::size,           nodePoolCapacity         / TypeSizeWithAlignment<Dali::Internal::SceneGraph::Node>::size,
-    cameraPoolCapacity,       (cameraPoolCapacity >> 10),       (cameraPoolCapacity >> 20),       TypeSizeWithAlignment<Dali::Internal::SceneGraph::Camera>::size,         cameraPoolCapacity       / TypeSizeWithAlignment<Dali::Internal::SceneGraph::Camera>::size,
+  DALI_LOG_RELEASE_INFO(
+    "\n"
+    "Memory Pool capacities and fill%:\n"
+    "  Animations:        %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  RenderItems:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  Renderers:         %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  TextureSets:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  RenderTasks:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  Nodes:             %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  Cameras:           %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  Render::Renderers: %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  Render::Textures:  %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
+    "  Render::UBOViews:  %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n",
 
-
-    renderRendererPoolCapacity, (renderRendererPoolCapacity >> 10), (renderRendererPoolCapacity >> 20), TypeSizeWithAlignment<Dali::Internal::Render::Renderer>::size,          renderRendererPoolCapacity / TypeSizeWithAlignment<Dali::Internal::Render::Renderer>::size,
-    renderTexturePoolCapacity,  (renderTexturePoolCapacity >> 10),  (renderTexturePoolCapacity >> 20),  TypeSizeWithAlignment<Dali::Internal::Render::Texture>::size,           renderTexturePoolCapacity  / TypeSizeWithAlignment<Dali::Internal::Render::Texture>::size,
-    renderUboViewPoolCapacity,  (renderUboViewPoolCapacity >> 10),  (renderUboViewPoolCapacity >> 20),  TypeSizeWithAlignment<Dali::Internal::Render::UniformBufferView>::size, renderUboViewPoolCapacity  / TypeSizeWithAlignment<Dali::Internal::Render::UniformBufferView>::size);
+    SIZE_CONV(animationPoolCapacity, Dali::Internal::SceneGraph::Animation, animationPoolSize),
+    SIZE_CONV(renderItemPoolCapacity, Dali::Internal::SceneGraph::RenderItem, renderItemPoolSize),
+    SIZE_CONV(rendererPoolCapacity, Dali::Internal::SceneGraph::Renderer, rendererPoolSize),
+    SIZE_CONV(textureSetPoolCapacity, Dali::Internal::SceneGraph::TextureSet, textureSetPoolSize),
+    SIZE_CONV(renderTaskPoolCapacity, Dali::Internal::SceneGraph::RenderTaskList, renderTaskPoolSize),
+    SIZE_CONV(nodePoolCapacity, Dali::Internal::SceneGraph::Node, nodePoolSize),
+    SIZE_CONV(cameraPoolCapacity, Dali::Internal::SceneGraph::Camera, cameraPoolSize),
+    SIZE_CONV(renderRendererPoolCapacity, Dali::Internal::Render::Renderer, renderRendererPoolSize),
+    SIZE_CONV(renderTexturePoolCapacity, Dali::Internal::Render::Texture, renderTexturePoolSize),
+    SIZE_CONV(renderUboViewPoolCapacity, Dali::Internal::Render::UniformBufferView, renderUboViewPoolSize));
+  DALI_LOG_RELEASE_INFO(
+    "  RelayoutItems:     %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n",
+    SIZE_CONV(relayoutItemPoolCapacity, Dali::Internal::SceneGraph::RenderItem, relayoutItemPoolSize));
 
   uint32_t updateQCapacity = mUpdateManager->GetUpdateMessageQueueCapacity();
 
-  DALI_LOG_RELEASE_INFO( "\n"
+  DALI_LOG_RELEASE_INFO(
+    "\n"
     "Message Queue:       %12u byte (%9u KB) (%6u MB)\n",
     updateQCapacity, (updateQCapacity >> 10), (updateQCapacity >> 20));
 
   size_t renderInstructionCapacity = mUpdateManager->GetRenderInstructionCapacity();
-  DALI_LOG_RELEASE_INFO( "\n"
+  DALI_LOG_RELEASE_INFO(
+    "\n"
     "RenderInstruction:   %12zu byte (%9zu KB) (%6zu MB)\n",
     renderInstructionCapacity, (renderInstructionCapacity >> 10), (renderInstructionCapacity >> 20));
 
@@ -894,10 +909,10 @@ void Core::LogMemoryPools() const
     updateQCapacity +
     renderInstructionCapacity;
 
-  DALI_LOG_RELEASE_INFO( "\n"
+  DALI_LOG_RELEASE_INFO(
+    "\n"
     "Total pool capacity: %12zu byte (%9zu KB) (%6zu MB)",
     totalPoolCapacity, (totalPoolCapacity >> 10), (totalPoolCapacity >> 20));
-  // clang-format on
 }
 
 EventThreadServices& Core::GetEventThreadServices()
