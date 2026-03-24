@@ -38,6 +38,12 @@
 
 namespace Dali::Internal::SceneGraph
 {
+namespace
+{
+constexpr uint32_t INITIAL_CAMERA_BLOCK_CAPACITY           = 4u;
+constexpr uint32_t INITIAL_RENDER_TASK_LIST_BLOCK_CAPACITY = 4u;
+constexpr uint32_t INITIAL_UBO_BLOCK_CAPACITY              = 4u;
+} //namespace
 /**
  * Structure to contain MemoryPoolCollection internal data
  */
@@ -48,17 +54,17 @@ struct MemoryPoolCollection::Impl
 
   // UpdateManager
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation>      mAnimationMemoryPool;
-  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Camera>         mCameraMemoryPool;
+  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Camera>         mCameraMemoryPool{INITIAL_CAMERA_BLOCK_CAPACITY};
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node>           mNodeMemoryPool;
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Renderer>       mRendererMemoryPool;
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem>     mRenderItemMemoryPool;
-  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> mRenderTaskListMemoryPool;
+  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> mRenderTaskListMemoryPool{INITIAL_RENDER_TASK_LIST_BLOCK_CAPACITY};
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet>     mTextureSetMemoryPool;
 
   // RenderManager
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::Renderer>          mRenderRendererMemoryPool;
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::Texture>           mRenderTextureMemoryPool;
-  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::UniformBufferView> mRenderUboViewMemoryPool;
+  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::UniformBufferView> mRenderUboViewMemoryPool{INITIAL_UBO_BLOCK_CAPACITY};
 };
 
 MemoryPoolCollection::MemoryPoolCollection()

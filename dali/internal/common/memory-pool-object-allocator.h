@@ -46,12 +46,14 @@ public:
    * to 1M entries per block, but maxing the blocks at 27 allows for many millions of
    * elements to be quickly indexed using a 32 bit key.
    */
-  const uint32_t POOL_MAX_BLOCK_COUNT = 27;
+  constexpr static uint32_t POOL_MAX_BLOCK_COUNT           = 27;
+  constexpr static uint32_t DEFAULT_INITIAL_BLOCK_CAPACITY = 32;
+  constexpr static uint32_t DEFAULT_MAXIMUM_BLOCK_CAPACITY = 1024 * 1024;
 
   /**
    * @brief Constructor
    */
-  MemoryPoolObjectAllocator(bool forceUseMemoryPool = false)
+  MemoryPoolObjectAllocator(uint32_t initialBlockCapacity = DEFAULT_INITIAL_BLOCK_CAPACITY, uint32_t maximumBlockCapacity = DEFAULT_MAXIMUM_BLOCK_CAPACITY, bool forceUseMemoryPool = false)
   : mPool(nullptr),
     mMemoryPoolEnabled(true)
   {
@@ -61,7 +63,7 @@ public:
       mMemoryPoolEnabled = false;
     }
 #endif
-    ResetMemoryPool();
+    ResetMemoryPoolInternal(initialBlockCapacity, maximumBlockCapacity);
   }
 
   /**
@@ -145,21 +147,7 @@ public:
    */
   void ResetMemoryPool()
   {
-    if(DALI_LIKELY(mPool))
-    {
-      mPool->ResetMemoryPool();
-    }
-    else
-    {
-      if(mMemoryPoolEnabled)
-      {
-        mPool.reset(new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size, 32, 1024 * 1024, POOL_MAX_BLOCK_COUNT));
-      }
-      else
-      {
-        mPool.reset(new DummyMemoryPool(TypeSizeWithAlignment<T>::size));
-      }
-    }
+    ResetMemoryPoolInternal(DEFAULT_INITIAL_BLOCK_CAPACITY, DEFAULT_MAXIMUM_BLOCK_CAPACITY);
   }
 
   /**
@@ -204,6 +192,32 @@ private:
 
   // Undefined
   MemoryPoolObjectAllocator& operator=(const MemoryPoolObjectAllocator& memoryPoolObjectAllocator);
+
+private:
+  /**
+   * @brief Reset the memory pool, unloading all block memory previously allocated
+   *
+   * @param[in] initialBlockCapacity The number of items for initial block.
+   * @param[in] maximumBlockCapacity The maximum number of items for block.
+   */
+  void ResetMemoryPoolInternal(uint32_t initialBlockCapacity, uint32_t maximumBlockCapacity)
+  {
+    if(DALI_LIKELY(mPool))
+    {
+      mPool->ResetMemoryPool();
+    }
+    else
+    {
+      if(mMemoryPoolEnabled)
+      {
+        mPool.reset(new FixedSizeMemoryPool(TypeSizeWithAlignment<T>::size, initialBlockCapacity, maximumBlockCapacity, POOL_MAX_BLOCK_COUNT));
+      }
+      else
+      {
+        mPool.reset(new DummyMemoryPool(TypeSizeWithAlignment<T>::size));
+      }
+    }
+  }
 
 private:
   std::unique_ptr<MemoryPoolInterface> mPool; ///< Memory pool from which allocations are made
