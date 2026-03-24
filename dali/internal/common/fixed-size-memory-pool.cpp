@@ -443,7 +443,9 @@ void FixedSizeMemoryPool::GetCapacity(uint32_t& capacity, uint32_t& filledSize) 
     capacity += block->mBlockSize;
     block = block->nextBlock;
   }
-  filledSize = capacity - (mImpl->mCurrentBlockCapacity - mImpl->mCurrentBlockSize - mImpl->mFreeCount) * mImpl->mFixedSize;
+  filledSize = capacity - mImpl->mFixedSize *                                          // Total capacity of pool - byte per item * (
+                            ((mImpl->mCurrentBlockCapacity - mImpl->mCurrentBlockSize) // (The number of items not be allocated yet
+                             + mImpl->mFreeCount);                                     //  + The number of freed items)
 }
 
 void FixedSizeMemoryPool::ResetMemoryPool()

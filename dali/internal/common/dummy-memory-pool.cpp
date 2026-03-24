@@ -107,12 +107,10 @@ DummyMemoryPool::KeyType DummyMemoryPool::GetKeyFromPtr(void* ptr)
 #endif
 }
 
-void DummyMemoryPool::GetCapacity(uint32_t& cap, uint32_t& size) const
+void DummyMemoryPool::GetCapacity(uint32_t& capacity, uint32_t& filledSize) const
 {
   // Ignores deleted objects list, just returns currently allocated size
-  cap  = 0;
-  size = 0;
-  size = cap = mImpl->mTotalAllocatedSize;
+  filledSize = capacity = mImpl->mTotalAllocatedSize;
 }
 
 void DummyMemoryPool::ResetMemoryPool()
