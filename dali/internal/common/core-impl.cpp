@@ -44,6 +44,7 @@
 #include <dali/internal/event/events/event-processor.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 #include <dali/internal/update/common/discard-queue.h>
@@ -849,21 +850,21 @@ void Core::LogMemoryPools() const
   mRelayoutController->GetMemoryPoolCapacity(relayoutItemPoolCapacity, relayoutItemPoolSize);
 
 #define SIZE_CONV(cap, type, sz) \
-  cap, (cap >> 10), (cap >> 20), TypeSizeWithAlignment<type>::size, cap / TypeSizeWithAlignment<type>::size, sz * 100 / cap
+  cap, ((cap + (1 << 9)) >> 10), TypeSizeWithAlignment<type>::size, cap / TypeSizeWithAlignment<type>::size, sz * 100 / cap
 
   DALI_LOG_RELEASE_INFO(
     "\n"
     "Memory Pool capacities and fill%:\n"
-    "  Animations:        %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  RenderItems:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  Renderers:         %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  TextureSets:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  RenderTasks:       %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  Nodes:             %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  Cameras:           %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  Render::Renderers: %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  Render::Textures:  %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n"
-    "  Render::UBOViews:  %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n",
+    "  Animations:          %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  RenderItems:         %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  Renderers:           %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  TextureSets:         %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  RenderTasks:         %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  Nodes:               %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  Cameras:             %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  Render::Renderers:   %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  Render::Textures:    %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
+    "  Render::UBOViews:    %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n",
 
     SIZE_CONV(animationPoolCapacity, Dali::Internal::SceneGraph::Animation, animationPoolSize),
     SIZE_CONV(renderItemPoolCapacity, Dali::Internal::SceneGraph::RenderItem, renderItemPoolSize),
@@ -876,21 +877,22 @@ void Core::LogMemoryPools() const
     SIZE_CONV(renderTexturePoolCapacity, Dali::Internal::Render::Texture, renderTexturePoolSize),
     SIZE_CONV(renderUboViewPoolCapacity, Dali::Internal::Render::UniformBufferView, renderUboViewPoolSize));
   DALI_LOG_RELEASE_INFO(
-    "  RelayoutItems:     %12u byte (%9u KB) (%6u MB) [%4zu byte * %8zu items] %3u%%\n",
-    SIZE_CONV(relayoutItemPoolCapacity, Dali::Internal::SceneGraph::RenderItem, relayoutItemPoolSize));
+    "\n"
+    "  RelayoutItems:       %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n",
+    SIZE_CONV(relayoutItemPoolCapacity, Dali::Internal::MemoryPoolRelayoutContainer::RelayoutInfo, relayoutItemPoolSize));
 
   uint32_t updateQCapacity = mUpdateManager->GetUpdateMessageQueueCapacity();
 
   DALI_LOG_RELEASE_INFO(
     "\n"
-    "Message Queue:       %12u byte (%9u KB) (%6u MB)\n",
-    updateQCapacity, (updateQCapacity >> 10), (updateQCapacity >> 20));
+    "  Message Queue:       %10u byte (%9u KB) \n",
+    updateQCapacity, ((updateQCapacity + (1 << 9)) >> 10));
 
   size_t renderInstructionCapacity = mUpdateManager->GetRenderInstructionCapacity();
   DALI_LOG_RELEASE_INFO(
     "\n"
-    "RenderInstruction:   %12zu byte (%9zu KB) (%6zu MB)\n",
-    renderInstructionCapacity, (renderInstructionCapacity >> 10), (renderInstructionCapacity >> 20));
+    "  RenderInstruction:   %10zu byte (%9zu KB)\n",
+    renderInstructionCapacity, ((renderInstructionCapacity + (1 << 9)) >> 10));
 
   size_t totalPoolCapacity =
     animationPoolCapacity +
@@ -911,8 +913,8 @@ void Core::LogMemoryPools() const
 
   DALI_LOG_RELEASE_INFO(
     "\n"
-    "Total pool capacity: %12zu byte (%9zu KB) (%6zu MB)",
-    totalPoolCapacity, (totalPoolCapacity >> 10), (totalPoolCapacity >> 20));
+    "  Total pool capacity: %10zu byte (%9zu KB) (%6zu MB)",
+    totalPoolCapacity, ((totalPoolCapacity + (1 << 9)) >> 10), ((totalPoolCapacity + (1 << 19)) >> 20));
 }
 
 EventThreadServices& Core::GetEventThreadServices()

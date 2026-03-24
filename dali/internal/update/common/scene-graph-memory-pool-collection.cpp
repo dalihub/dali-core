@@ -330,9 +330,7 @@ std::string SizeConvertor(const Dali::Internal::MemoryPoolObjectAllocator<T>& po
   oss.width(12);
   oss << std::right << cap << " byte (";
   oss.width(9);
-  oss << (cap >> 10) << " KB) (";
-  oss.width(6);
-  oss << (cap >> 20) << " MB) [";
+  oss << ((cap + (1 << 9)) >> 10) << " KB) (";
   oss.width(4);
   oss << TypeSizeWithAlignment<T>::size << " byte * " << (cap / TypeSizeWithAlignment<T>::size) << " items] ";
   oss.width(3);
