@@ -30,6 +30,11 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/texture.h>
 
+#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#include <memory> ///< for std::unique_ptr
+#include <string>
+#endif
+
 namespace Dali
 {
 namespace Internal
@@ -206,13 +211,6 @@ private: // implementation
    */
   void Initialize();
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  /**
-   * @brief Print TotalMemory
-   */
-  static void PrintTotalMemory();
-#endif
-
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -234,10 +232,12 @@ private:                                    // data
   bool                    mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
 
 #if defined(ENABLE_GPU_MEMORY_PROFILE)
-  // For memory profiling
-  int32_t     mTextureId;
-  uint32_t    mDataSize;
-  std::string mUrl;
+public:
+  struct TextureMemoryInfo; // Keep it as public, to allow to access at unnamed namespace
+private:
+  std::string                        mUrl;
+  int32_t                            mTextureId;
+  std::unique_ptr<TextureMemoryInfo> mMemoryInfo;
 #endif
 };
 
