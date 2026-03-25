@@ -143,7 +143,7 @@ vcpkg-script folder in the windows-dependencies repository.
     - CMAKE_INSTALL_PREFIX       ---> Were DALi is installed.
     - INSTALL_CMAKE_MODULES      ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
     - ENABLE_DEBUG               ---> Whether to build with debug enabled.
-    - ENABLE_GPU_MEMORY_PROFILER ---> Whether to build with GPU memory profiler enabled.
+    - ENABLE_GPU_MEMORY_PROFILE  ---> Whether to build with GPU memory profiler enabled.
 
 ## 4. Building for macOS
 

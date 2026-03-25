@@ -839,7 +839,7 @@ int UtcDaliTextureUpload10(void)
   DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
   DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
 
-  texture.Upload(pixelData, "testTexture", 1);
+  texture.Upload(pixelData);
 
   application.SendNotification();
   application.Render();
@@ -855,6 +855,171 @@ int UtcDaliTextureUpload10(void)
   pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
 
   DALI_TEST_CHECK(pixelDataBuffer.buffer == nullptr);
+
+  END_TEST;
+}
+
+int UtcDaliTextureUploadWithContext01(void)
+{
+  TestApplication application;
+
+  // Create the texture
+  uint32_t width(64u);
+  uint32_t height(64u);
+  Texture  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  // Upload data to the texture
+  callStack.Reset();
+
+  uint32_t bufferSize(width * height * 4u);
+  uint8_t* buffer = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  buffer[0]       = 'a';
+
+  PixelData pixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, width, height, 0u, Pixel::RGBA8888, PixelData::FREE);
+  DALI_TEST_CHECK(pixelData);
+
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  Dali::Integration::TextureUploadWithContent(texture, pixelData, "testTexture", Integration::TextureContextTypeHint::STANDARD_IMAGE);
+
+  application.SendNotification();
+  application.Render();
+
+  // TexImage2D should be called to upload the data
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Check whether the buffer become nullptr after texture uploaded.
+  pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_CHECK(pixelDataBuffer.buffer == nullptr);
+
+  END_TEST;
+}
+
+int UtcDaliTextureUploadWithContext02(void)
+{
+  TestApplication application;
+
+  // Create the texture with resource id.
+  uint32_t expectResourceId = 22u;
+  Texture  texture          = Dali::Integration::NewTextureWithResourceId(TextureType::TEXTURE_2D, expectResourceId);
+
+  DALI_TEST_CHECK(texture);
+
+  uint32_t currentResourceId = Dali::Integration::GetTextureResourceId(texture);
+
+  DALI_TEST_EQUALS(currentResourceId, expectResourceId, TEST_LOCATION);
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  // Upload data to the texture
+  callStack.Reset();
+
+  uint32_t width(64u);
+  uint32_t height(64u);
+  uint32_t bufferSize(width * height * 4u);
+  uint8_t* buffer = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  buffer[0]       = 'a';
+
+  PixelData pixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, width, height, 0u, Pixel::RGBA8888, PixelData::FREE);
+  DALI_TEST_CHECK(pixelData);
+
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(false, Dali::Integration::TextureUploadWithContent(texture, pixelData, "fastTrackImage", Integration::TextureContextTypeHint::FAST_TRACK_IMAGE), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // TexImage2D should not be called to upload the data
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(!callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Check whether the buffer still exist due to texture not be uploaded.
+  pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_CHECK(pixelDataBuffer.buffer != nullptr);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextureUploadWithContext03(void)
+{
+  TestApplication application;
+
+  // Create the texture with native image.
+  TestNativeImagePointer imageInterface = TestNativeImage::New(16, 16);
+  Texture                texture        = Texture::New(*(imageInterface.Get()));
+
+  DALI_TEST_CHECK(texture);
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  // Upload data to the texture
+  callStack.Reset();
+
+  uint32_t width(64u);
+  uint32_t height(64u);
+  uint32_t bufferSize(width * height * 4u);
+  uint8_t* buffer = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  buffer[0]       = 'a';
+
+  PixelData pixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, width, height, 0u, Pixel::RGBA8888, PixelData::FREE);
+  DALI_TEST_CHECK(pixelData);
+
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(false, Dali::Integration::TextureUploadWithContent(texture, pixelData, "nativeImage", Integration::TextureContextTypeHint::NATIVE_IMAGE), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // TexImage2D should not be called to upload the data
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(!callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Check whether the buffer become nullptr after texture uploaded.
+  pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_CHECK(pixelDataBuffer.buffer != nullptr);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
 
   END_TEST;
 }

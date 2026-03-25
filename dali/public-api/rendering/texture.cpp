@@ -19,7 +19,6 @@
 #include <dali/public-api/rendering/texture.h> // Dali::Texture
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/images/pixel-data-impl.h> // Dali::Internal::PixelData
 #include <dali/internal/event/rendering/texture-impl.h> // Dali::Internal::Texture
 
@@ -59,15 +58,6 @@ Texture& Texture::operator=(const Texture& handle) = default;
 Texture::Texture(Texture&& rhs) noexcept = default;
 
 Texture& Texture::operator=(Texture&& rhs) noexcept = default;
-
-bool Texture::Upload(PixelData pixelData, Dali::String url, int32_t textureId)
-{
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
-  return GetImplementation(*this).Upload(&internalPixelData, Integration::ToStdString(std::move(url)), textureId);
-#endif
-  return Upload(pixelData);
-}
 
 bool Texture::Upload(PixelData pixelData)
 {
