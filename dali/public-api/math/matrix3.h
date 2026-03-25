@@ -2,7 +2,7 @@
 #define DALI_MATRIX3_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,6 @@ struct Vector2;
 class DALI_CORE_API Matrix3
 {
 public:
-  friend DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Matrix3& matrix);
-
   /**
    * @brief The identity matrix.
    */
@@ -301,16 +299,6 @@ public:
 private:
   float mElements[9]; ///< The elements of the matrix
 };
-
-/**
- * @brief Prints a 3x3 matrix.
- *
- * @SINCE_1_0.0
- * @param[in] o The output stream operator
- * @param[in] matrix The matrix to print
- * @return The output stream operator
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Matrix3& matrix);
 
 // Allow Matrix3 to be treated as a POD type
 template<>

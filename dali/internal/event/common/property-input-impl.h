@@ -22,6 +22,7 @@
 #include <iostream>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/stream-operators.h>
 #include <dali/internal/common/hash-utils.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>

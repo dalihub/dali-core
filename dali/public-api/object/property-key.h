@@ -160,16 +160,6 @@ struct DALI_CORE_API Property::Key
 };
 
 /**
- * @brief Convert the key into a string and append to an output stream.
- *
- * @SINCE_1_2.7
- * @param [in] stream The output stream operator.
- * @param [in] key the key to convert
- * @return The output stream operator.
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Key& key);
-
-/**
  * @}
  */
 } // namespace Dali

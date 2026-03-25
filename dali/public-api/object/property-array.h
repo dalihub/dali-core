@@ -2,7 +2,7 @@
 #define DALI_PROPERTY_ARRAY_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -275,22 +275,18 @@ public:
    * @brief Output to stream.
    * @SINCE_1_1.28
    */
-  friend DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Array& array);
+public:                      // Not intended for application developer
+  struct DALI_INTERNAL Impl; ///< Private data
+
+  /**
+   * @brief Retrieves the Impl object.
+   * @
+   */
+  DALI_INTERNAL const Impl* Read() const;
 
 private:
-  struct DALI_INTERNAL Impl;  ///< Private data
-  Impl*                mImpl; ///< Pointer to private data
+  Impl* mImpl; ///< Pointer to private data
 };
-
-/**
- * @brief Converts the values of the property array into a string and append to an output stream.
- *
- * @SINCE_1_1.28
- * @param[in] stream The output stream operator
- * @param[in] array The array to insert
- * @return The output stream operator
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Property::Array& array);
 
 /**
  * @}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <math.h>
-#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
@@ -207,11 +206,6 @@ void Vector4::Clamp(const Vector4& min, const Vector4& max)
   Dali::ClampInPlace<float>(y, min.y, max.y);
   Dali::ClampInPlace<float>(z, min.z, max.z);
   Dali::ClampInPlace<float>(w, min.w, max.w);
-}
-
-std::ostream& operator<<(std::ostream& o, const Vector4& vector)
-{
-  return o << "[" << vector.x << ", " << vector.y << ", " << vector.z << ", " << vector.w << "]";
 }
 
 Vector4 Clamp(const Vector4& v, const float& min, const float& max)

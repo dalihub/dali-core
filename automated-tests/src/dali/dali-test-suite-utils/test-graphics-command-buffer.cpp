@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,218 @@
 
 namespace Dali
 {
+
+std::ostream& operator<<(std::ostream& os, Graphics::BlendFactor op)
+{
+  switch(op)
+  {
+    case Graphics::BlendFactor::ZERO:
+    {
+      os << "ZERO";
+      break;
+    }
+    case Graphics::BlendFactor::ONE:
+    {
+      os << "ONE";
+      break;
+    }
+    case Graphics::BlendFactor::SRC_COLOR:
+    {
+      os << "SRC_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_SRC_COLOR:
+    {
+      os << "ONE_MINUS_SRC_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::DST_COLOR:
+    {
+      os << "DST_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_DST_COLOR:
+    {
+      os << "ONE_MINUS_DST_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::SRC_ALPHA:
+    {
+      os << "SRC_ALPHA";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_SRC_ALPHA:
+    {
+      os << "ONE_MINUS_SRC_ALPHA";
+      break;
+    }
+    case Graphics::BlendFactor::DST_ALPHA:
+    {
+      os << "DST_ALPHA";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_DST_ALPHA:
+    {
+      os << "ONE_MINUS_DST_ALPHA";
+      break;
+    }
+    case Graphics::BlendFactor::CONSTANT_COLOR:
+    {
+      os << "CONSTANT_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+    {
+      os << "ONE_MINUS_CONSTANT_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::CONSTANT_ALPHA:
+    {
+      os << "CONSTANT_ALPHA";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+    {
+      os << "ONE_MINUS_CONSTANT_ALPHA";
+      break;
+    }
+    case Graphics::BlendFactor::SRC_ALPHA_SATURATE:
+    {
+      os << "SRC_ALPHA_SATURATE";
+      break;
+    }
+    case Graphics::BlendFactor::SRC1_COLOR:
+    {
+      os << "SRC1_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_SRC1_COLOR:
+    {
+      os << "ONE_MINUS_SRC1_COLOR";
+      break;
+    }
+    case Graphics::BlendFactor::SRC1_ALPHA:
+    {
+      os << "SRC1_ALPHA";
+      break;
+    }
+    case Graphics::BlendFactor::ONE_MINUS_SRC1_ALPHA:
+    {
+      os << "ONE_MINUS_SRC1_ALPHA";
+      break;
+    }
+  }
+  return os;
+};
+
+std::ostream& operator<<(std::ostream& os, Graphics::BlendOp op)
+{
+  switch(op)
+  {
+    case Graphics::BlendOp::ADD:
+    {
+      os << "ADD";
+      break;
+    }
+    case Graphics::BlendOp::SUBTRACT:
+    {
+      os << "SUBTRACT";
+      break;
+    }
+    case Graphics::BlendOp::REVERSE_SUBTRACT:
+    {
+      os << "REVERSE_SUBTRACT";
+      break;
+    }
+    case Graphics::BlendOp::MIN:
+    {
+      os << "MIN";
+      break;
+    }
+    case Graphics::BlendOp::MAX:
+    {
+      os << "MAX";
+      break;
+    }
+    case Graphics::BlendOp::MULTIPLY:
+    {
+      os << "MULTIPLY";
+      break;
+    }
+    case Graphics::BlendOp::SCREEN:
+    {
+      os << "SCREEN";
+      break;
+    }
+    case Graphics::BlendOp::OVERLAY:
+    {
+      os << "OVERLAY";
+      break;
+    }
+    case Graphics::BlendOp::DARKEN:
+    {
+      os << "DARKEN";
+      break;
+    }
+    case Graphics::BlendOp::LIGHTEN:
+    {
+      os << "LIGHTEN";
+      break;
+    }
+    case Graphics::BlendOp::COLOR_DODGE:
+    {
+      os << "COLOR_DODGE";
+      break;
+    }
+    case Graphics::BlendOp::COLOR_BURN:
+    {
+      os << "COLOR_BURN";
+      break;
+    }
+    case Graphics::BlendOp::HARD_LIGHT:
+    {
+      os << "HARD_LIGHT";
+      break;
+    }
+    case Graphics::BlendOp::SOFT_LIGHT:
+    {
+      os << "SOFT_LIGHT";
+      break;
+    }
+    case Graphics::BlendOp::DIFFERENCE:
+    {
+      os << "DIFFERENCE";
+      break;
+    }
+    case Graphics::BlendOp::EXCLUSION:
+    {
+      os << "EXCLUSION";
+      break;
+    }
+    case Graphics::BlendOp::HUE:
+    {
+      os << "HUE";
+      break;
+    }
+    case Graphics::BlendOp::SATURATION:
+    {
+      os << "SATURATION";
+      break;
+    }
+    case Graphics::BlendOp::COLOR:
+    {
+      os << "COLOR";
+      break;
+    }
+    case Graphics::BlendOp::LUMINOSITY:
+    {
+      os << "LUMINOSITY";
+      break;
+    }
+  }
+  return os;
+}
+
 std::ostream& operator<<(std::ostream& os, Graphics::StencilOp op)
 {
   switch(op)

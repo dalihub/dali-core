@@ -59,9 +59,4 @@ bool Extents::operator!=(const Extents& rhs) const
   return !(*this == rhs);
 }
 
-std::ostream& operator<<(std::ostream& stream, const Extents& extents)
-{
-  return stream << "[" << extents.start << ", " << extents.end << ", " << extents.top << ", " << extents.bottom << "]";
-}
-
 } // namespace Dali

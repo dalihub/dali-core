@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <limits>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/stream-operators.h>
 #include <dali/internal/common/hash-utils.h>
 #include <dali/public-api/common/vector-wrapper.h>
 
@@ -254,11 +255,17 @@ std::size_t Property::Array::GetHash() const
   return DALI_LIKELY(mImpl) ? mImpl->GetHash() : Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
 }
 
+const Property::Array::Impl* Property::Array::Read() const
+{
+  return mImpl;
+}
+
 std::ostream& operator<<(std::ostream& stream, const Property::Array& array)
 {
   stream << "Array(" << array.Count() << ") = [";
 
-  if(DALI_LIKELY(array.mImpl))
+  auto impl = array.Read();
+  if(impl != nullptr)
   {
     for(Property::Array::SizeType i = 0; i < array.Count(); ++i)
     {
@@ -269,14 +276,12 @@ std::ostream& operator<<(std::ostream& stream, const Property::Array& array)
       stream << array.GetElementAt(i);
     }
 
-    if(array.mImpl->mHash != NOT_HASHED)
+    if(impl->mHash != NOT_HASHED)
     {
-      stream << "(hash=" << array.mImpl->mHash << ")";
+      stream << "(hash=" << impl->mHash << ")";
     }
   }
-
   stream << "]";
-
   return stream;
 }
 

@@ -2,7 +2,7 @@
 #define DALI_VECTOR_2_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // uint32_t
-#include <iosfwd>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -480,16 +479,6 @@ public: // Data
  * @SINCE_1_0.0
  */
 using Size = Vector2;
-
-/**
- * @brief Print a Vector2.
- *
- * @SINCE_1_0.0
- * @param[in] o The output stream operator
- * @param[in] vector The vector to print
- * @return The output stream operator
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Vector2& vector);
 
 /**
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.

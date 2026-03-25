@@ -2,7 +2,7 @@
 #define DALI_QUATERNION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
  * limitations under the License.
  *
  */
-
-// EXTERNAL INCLUDES
-#include <iosfwd>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
@@ -477,16 +474,6 @@ public:
 public:
   Vector4 mVector; ///< w component is s ( = cos(theta/2.0) )
 };
-
-/**
- * @brief Prints a Quaternion.
- *
- * @SINCE_1_0.0
- * @param[in] o The output stream operator
- * @param[in] quaternion The quaternion to print
- * @return The output stream operator
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Quaternion& quaternion);
 
 // Allow Quaternion to be treated as a POD type
 template<>
