@@ -86,6 +86,7 @@ SET(TC_SOURCES
         utc-Dali-Scene.cpp
         utc-Dali-Scripting.cpp
         utc-Dali-Shader.cpp
+        utc-Dali-SharedPtr.cpp
         utc-Dali-SignalDelegate.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
