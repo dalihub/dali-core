@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,9 @@ int UtcDaliDummyMemoryPoolCreate(void)
   DALI_TEST_EQUALS(gTestObjectConstructed, 1U, TEST_LOCATION);
 
   // Dummy memory pool depend on real count of objects
-  DALI_TEST_EQUALS(memoryPool.GetCapacity(), Internal::TypeSizeWithAlignment<TestObject>::size, TEST_LOCATION);
+  uint32_t capacity, filledSize;
+  memoryPool.GetCapacity(capacity, filledSize);
+  DALI_TEST_EQUALS(capacity, Internal::TypeSizeWithAlignment<TestObject>::size, TEST_LOCATION);
 
   testObject1->Method();
   DALI_TEST_EQUALS(gTestObjectMethod, 1U, TEST_LOCATION);
@@ -102,7 +104,8 @@ int UtcDaliDummyMemoryPoolCreate(void)
   DALI_TEST_EQUALS(gTestObjectDestructed, 1U, TEST_LOCATION);
 
   // Dummy memory pool depend on real count of objects
-  DALI_TEST_EQUALS(memoryPool.GetCapacity(), 0U, TEST_LOCATION);
+  memoryPool.GetCapacity(capacity, filledSize);
+  DALI_TEST_EQUALS(capacity, 0U, TEST_LOCATION);
 
   END_TEST;
 }

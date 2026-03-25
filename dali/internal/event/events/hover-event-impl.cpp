@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,9 +115,9 @@ Device::Subclass::Type HoverEvent::GetDeviceSubclass(std::size_t point) const
   return Device::Subclass::NONE;
 }
 
-const std::string& HoverEvent::GetDeviceName(std::size_t point) const
+const Dali::String& HoverEvent::GetDeviceName(std::size_t point) const
 {
-  static const std::string emptyString;
+  static const Dali::String emptyString;
   if(point < mPoints.size())
   {
     return mPoints[point].GetDeviceName();

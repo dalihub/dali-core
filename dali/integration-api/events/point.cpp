@@ -177,12 +177,12 @@ void Point::SetMouseButton(MouseButton::Type button)
   mMouseButton = button;
 }
 
-const std::string& Point::GetDeviceName() const
+const Dali::String& Point::GetDeviceName() const
 {
   return mDeviceName;
 }
 
-void Point::SetDeviceName(std::string& deviceName)
+void Point::SetDeviceName(Dali::String& deviceName)
 {
   mDeviceName = deviceName;
 }

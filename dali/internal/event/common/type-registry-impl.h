@@ -50,7 +50,7 @@ public:
   /**
    * @copydoc Dali::TypeRegistry::GetTypeInfo
    */
-  TypeInfoPointer GetTypeInfo(const std::string& uniqueTypeName);
+  TypeInfoPointer GetTypeInfo(const Dali::StringView& uniqueTypeName);
 
   /**
    * @copydoc Dali::TypeRegistry::GetTypeInfo
@@ -65,7 +65,7 @@ public:
   /**
    * @copydoc Dali::TypeRegistry::GetTypeName
    */
-  const std::string& GetTypeName(uint32_t index) const;
+  const Dali::String& GetTypeName(uint32_t index) const;
 
   /**
    * Register a type

@@ -1896,7 +1896,7 @@ int UtcDaliHoverEventGetDeviceNamePositive(void)
   SignalData        data;
   HoverEventFunctor functor(data);
   actor.HoveredSignal().Connect(&application, functor);
-  std::string deviceName("hwKeyboard");
+  Dali::String deviceName("hwKeyboard");
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 localCoordinates;

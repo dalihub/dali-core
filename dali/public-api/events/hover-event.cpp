@@ -19,7 +19,6 @@
 #include <dali/public-api/events/hover-event.h>
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/events/hover-event-impl.h>
 #include <dali/public-api/actors/actor.h>
 
@@ -85,9 +84,9 @@ Device::Subclass::Type HoverEvent::GetDeviceSubclass(std::size_t point) const
   return GetImplementation(*this).GetDeviceSubclass(point);
 }
 
-Dali::String HoverEvent::GetDeviceName(std::size_t point) const
+const Dali::String& HoverEvent::GetDeviceName(std::size_t point) const
 {
-  return Integration::ToDaliString(GetImplementation(*this).GetDeviceName(point));
+  return GetImplementation(*this).GetDeviceName(point);
 }
 
 HoverEvent::HoverEvent(Internal::HoverEvent* internal)

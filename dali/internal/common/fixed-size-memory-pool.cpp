@@ -194,6 +194,7 @@ public:
 
     mMemoryBlocks.nextBlock = nullptr;
     mDeletedObjects         = nullptr;
+    mFreeCount              = 0;
 
 #if defined(__LP64__)
     mMemoryBlocks.mIndexOffset = 0;
@@ -258,10 +259,10 @@ public:
   std::vector<Block*> mBlocks; ///< Address of each allocated block
 #endif
 
-  Block*   mCurrentBlock;         ///< Pointer to the active block
-  SizeType mCurrentBlockCapacity; ///< The maximum number of allocations that can be allocated for the current block
-  SizeType mCurrentBlockSize;     ///< The number of allocations allocated to the current block
-
+  Block*   mCurrentBlock;                  ///< Pointer to the active block
+  SizeType mCurrentBlockCapacity;          ///< The maximum number of allocations that can be allocated for the current block
+  SizeType mCurrentBlockSize;              ///< The number of allocations allocated to the current block
+  SizeType mFreeCount{0};                  ///< Total size of the delete list
   SizeType mMaximumBlockCount{0xffffffff}; ///< Maximum number of blocks (or unlimited)
 #if defined(__LP64__)
   SizeType mBlockShift{0x0};       ///< number of bits to shift block id in key
@@ -290,6 +291,7 @@ void* FixedSizeMemoryPool::Allocate()
   {
     void* recycled         = mImpl->mDeletedObjects;
     mImpl->mDeletedObjects = *(reinterpret_cast<void**>(mImpl->mDeletedObjects)); // Pop head off front of deleted objects list
+    mImpl->mFreeCount--;
     return recycled;
   }
 
@@ -318,6 +320,7 @@ void FixedSizeMemoryPool::Free(void* memory)
     // Add memory to head of deleted objects list. Store next address in the same memory space as the old object.
     *(reinterpret_cast<void**>(memory)) = mImpl->mDeletedObjects;
     mImpl->mDeletedObjects              = memory;
+    mImpl->mFreeCount++;
   }
 }
 
@@ -428,20 +431,21 @@ FixedSizeMemoryPool::KeyType FixedSizeMemoryPool::GetKeyFromPtr(void* ptr)
 #endif
 }
 
-uint32_t FixedSizeMemoryPool::GetCapacity() const
+void FixedSizeMemoryPool::GetCapacity(uint32_t& capacity, uint32_t& filledSize) const
 {
-  // Ignores deleted objects list, just returns currently allocated size
-  uint32_t totalAllocation = 0;
+  capacity   = 0;
+  filledSize = 0;
 
   Mutex::ScopedLock lock(mImpl->mMutex);
   Impl::Block*      block = &mImpl->mMemoryBlocks;
   while(block)
   {
-    totalAllocation += block->mBlockSize;
+    capacity += block->mBlockSize;
     block = block->nextBlock;
   }
-
-  return totalAllocation;
+  filledSize = capacity - mImpl->mFixedSize *                                          // Total capacity of pool - byte per item * (
+                            ((mImpl->mCurrentBlockCapacity - mImpl->mCurrentBlockSize) // (The number of items not be allocated yet
+                             + mImpl->mFreeCount);                                     //  + The number of freed items)
 }
 
 void FixedSizeMemoryPool::ResetMemoryPool()

@@ -429,9 +429,9 @@ using ChildOrderChangedSignalType = Signal<void(Actor)>; ///< Used when the acto
  *
  * A callback of the following type may be connected:
  * @code
- *   void MyCallbackName( Actor parent );
+ *   void MyCallbackName( Actor child );
  * @endcode
- * parent The parent actor of the moved children
+ * child The child actor that changed order
  *
  * @return The signal to connect to
  * @pre The Actor has been initialized

@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENEGRAPH_MEMORY_POOL_COLLECTION_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,12 @@ public:
   void*                        GetPtrFromKey(MemoryPoolType type, MemoryPoolInterface::KeyType key);
   MemoryPoolInterface::KeyType GetKeyFromPtr(MemoryPoolType type, void* ptr);
 
-  uint32_t GetCapacity(MemoryPoolType type) const;
+  void GetCapacity(MemoryPoolType type, uint32_t& cap, uint32_t& size) const;
+
+  /**
+   * Generate a structured log for all the pool data
+   */
+  std::string LogPools() const;
 
 private:
   struct Impl;

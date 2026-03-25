@@ -145,7 +145,7 @@ public:
    * @SINCE_1_0.0
    * @return String name
    */
-  Dali::String GetName() const;
+  const Dali::String& GetName() const;
 
   /**
    * @brief Retrieves the base type name for this type.
@@ -153,7 +153,7 @@ public:
    * @SINCE_1_0.0
    * @return String of base name
    */
-  Dali::String GetBaseName() const;
+  const Dali::String& GetBaseName() const;
 
   /**
    * @brief Creates an object from this type.

@@ -2,7 +2,7 @@
 #define DALI_KEY_EVENT_DEVEL_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,15 +50,15 @@ DALI_CORE_API KeyEvent New();
  * @param[in]  deviceSubclass  The subclass of device the key event originated from
  * @return A handle to a newly allocated Dali resource
  */
-DALI_CORE_API KeyEvent New(const std::string&           keyName,
-                           const std::string&           logicalKey,
-                           const std::string&           keyString,
+DALI_CORE_API KeyEvent New(const Dali::String&          keyName,
+                           const Dali::String&          logicalKey,
+                           const Dali::String&          keyString,
                            int                          keyCode,
                            int                          keyModifier,
                            unsigned long                timeStamp,
                            const Dali::KeyEvent::State& keyState,
-                           const std::string&           compose,
-                           const std::string&           deviceName,
+                           const Dali::String&          compose,
+                           const Dali::String&          deviceName,
                            const Device::Class::Type    deviceClass,
                            const Device::Subclass::Type deviceSubclass);
 
@@ -69,7 +69,7 @@ DALI_CORE_API KeyEvent New(const std::string&           keyName,
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyName The name given to the key pressed.
  */
-DALI_CORE_API void SetKeyName(KeyEvent keyEvent, const std::string& keyName);
+DALI_CORE_API void SetKeyName(KeyEvent keyEvent, const Dali::String& keyName);
 
 /**
  * @brief Set the actual string of input characters that should be used for input editors.
@@ -78,7 +78,7 @@ DALI_CORE_API void SetKeyName(KeyEvent keyEvent, const std::string& keyName);
  * @param[in] keyEvent The instance of KeyEvent.
  * @param[in] keyString The actual string of input characters
  */
-DALI_CORE_API void SetKeyString(KeyEvent keyEvent, const std::string& keyString);
+DALI_CORE_API void SetKeyString(KeyEvent keyEvent, const Dali::String& keyString);
 
 /**
  * @brief Set the unique key code for the key pressed.
