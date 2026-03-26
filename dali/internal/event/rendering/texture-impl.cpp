@@ -26,19 +26,22 @@
 #include <dali/internal/render/renderers/render-texture-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+#include <dali/public-api/common/vector-wrapper.h>
 #include <unordered_set>
 
 struct Dali::Internal::Texture::TextureMemoryInfo
 {
-  TextureMemoryInfo(const int32_t textureId, const std::string url, const int32_t width, const int32_t height, const uint32_t bytesPerPixel);
+  TextureMemoryInfo(const Dali::Integration::TextureContextTypeHint::Type typeHint, const std::string context, const int32_t width, const int32_t height, const uint32_t bytesPerPixel, const uint32_t memorySize = 0);
 
   ~TextureMemoryInfo();
 
   void Destroy(bool printLog);
 
-  int32_t     mTextureId; ///< The TextureId associated with this ExternalTexture
-  std::string mUrl;
+  Dali::Integration::TextureContextTypeHint::Type mTypeHint;
+
+  std::string mContext;
+  uint32_t    mBytesPerPixel;
   int32_t     mWidth;
   int32_t     mHeight;
   uint32_t    mMemorySize; //< The memory size of texture
@@ -49,38 +52,151 @@ namespace
 std::unordered_set<Dali::Internal::Texture::TextureMemoryInfo*> gTextureMemoryInfoQueue;
 uint32_t                                                        gTotalTextureMemory; ///< Total memory used by textures
 
+struct MemoryInfoCollector
+{
+  MemoryInfoCollector()
+  : mTypeName("Unknown")
+  {
+  }
+
+  MemoryInfoCollector(const char* typeName)
+  : mTypeName(typeName)
+  {
+  }
+
+  void Insert(const Dali::Internal::Texture::TextureMemoryInfo* data)
+  {
+    mData.push_back(data);
+  }
+
+  void PrintAndClear()
+  {
+    if(mData.empty())
+    {
+      return;
+    }
+
+    // Reorder data
+    std::sort(mData.begin(), mData.end(), [](const Dali::Internal::Texture::TextureMemoryInfo*& lhs, const Dali::Internal::Texture::TextureMemoryInfo*& rhs)
+    {
+      if(lhs->mMemorySize != rhs->mMemorySize)
+      {
+        return lhs->mMemorySize > rhs->mMemorySize;
+      }
+      if(lhs->mTypeHint != rhs->mTypeHint)
+      {
+        return lhs->mTypeHint < rhs->mTypeHint;
+      }
+      return lhs->mContext < rhs->mContext;
+    });
+
+    uint32_t totalTextureMemory = 0u;
+
+    DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
+    DALI_LOG_ERROR_NOFN("| Type hint | Content of [ %-20s ]                                                |    size     | bpp | memory(MB) +\n", mTypeName.c_str());
+    DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
+    for(auto iter = mData.begin(); iter != mData.end(); iter++)
+    {
+      auto context = (*iter)->mContext;
+      if(context.length() > 82)
+      {
+        context = std::string("...") + context.substr(context.length() - 79, 79);
+      }
+      DALI_LOG_ERROR_NOFN("| %9d | %82s | %4d x %4d | %3d | %10.3f | \n", static_cast<int32_t>((*iter)->mTypeHint), context.c_str(), (*iter)->mWidth, (*iter)->mHeight, (*iter)->mBytesPerPixel, static_cast<double>((*iter)->mMemorySize) / (1024.0 * 1024.0));
+
+      totalTextureMemory += (*iter)->mMemorySize;
+    }
+    DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
+    DALI_LOG_ERROR_NOFN(" >> Count            : %8d                 \n", mData.size());
+    DALI_LOG_ERROR_NOFN(" >> Memory(MB)       : %8.3f            \n", static_cast<double>(totalTextureMemory) / (1024.0 * 1024.0));
+
+    Clear();
+  }
+
+  void Clear()
+  {
+    mData.clear();
+  }
+
+private:
+  const std::string mTypeName;
+
+  // List of memory info pointer collected for print.
+  std::vector<const Dali::Internal::Texture::TextureMemoryInfo*> mData;
+};
+
 inline void PrintTotalMemory()
 {
-  DALI_LOG_ERROR_NOFN("\n\n"); // For beauty
-  DALI_LOG_ERROR_NOFN("## DALI_TEXTURE_MEMORY_PROFILER\n");
-  DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
-  DALI_LOG_ERROR_NOFN("| Image Url                                                                                            |    size     | memory(MB) +\n");
-  DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
+  // Collect the result first.
+  static MemoryInfoCollector sImageCollector("Image");
+  static MemoryInfoCollector sTextCollector("Text");
+  static MemoryInfoCollector sDaliEtcCollector("ETC (DALi)");
+  static MemoryInfoCollector sOuterEtcCollector("ETC");
+  static MemoryInfoCollector sUnknownCollector{};
 
   for(auto iter = gTextureMemoryInfoQueue.begin(); iter != gTextureMemoryInfoQueue.end(); iter++)
   {
-    auto url = (*iter)->mUrl;
-    if(url.length() > 100)
+    int32_t collectorType = static_cast<int32_t>((*iter)->mTypeHint) / 1000;
+    switch(collectorType)
     {
-      url = std::string("...") + url.substr(url.length() - 97, 97);
+      case 0: // Unknown/Error (0xxx)
+      {
+        sUnknownCollector.Insert(*iter);
+        break;
+      }
+      case 1: // Image resources (1xxx)
+      {
+        sImageCollector.Insert(*iter);
+        break;
+      }
+      case 2: // Text (2xxx)
+      {
+        sTextCollector.Insert(*iter);
+        break;
+      }
+      case 3: // ETC (3xxx) ~ End of dali(9999)
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      {
+        sDaliEtcCollector.Insert(*iter);
+        break;
+      }
+      // Some value inserted. Respect as it is not unknown type.
+      default:
+      {
+        sOuterEtcCollector.Insert(*iter);
+        break;
+      }
     }
-    DALI_LOG_ERROR_NOFN("| %100s | %4d x %4d |%8.3f \n", url.c_str(), (*iter)->mWidth, (*iter)->mHeight, static_cast<double>((*iter)->mMemorySize) / (1024.0 * 1024.0));
   }
+  DALI_LOG_ERROR_NOFN("\n\n"); // For beauty
+  DALI_LOG_ERROR_NOFN("## DALI_TEXTURE_MEMORY_PROFILER\n");
 
-  DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
-  DALI_LOG_ERROR_NOFN(" >> textureCount    : %8d                 \n", gTextureMemoryInfoQueue.size());
-  DALI_LOG_ERROR_NOFN(" >> Total Memory(MB): %8.3f            \n", static_cast<double>(gTotalTextureMemory) / (1024.0 * 1024.0));
+  sImageCollector.PrintAndClear();
+  sTextCollector.PrintAndClear();
+  sDaliEtcCollector.PrintAndClear();
+  sOuterEtcCollector.PrintAndClear();
+  sUnknownCollector.PrintAndClear();
+
+  DALI_LOG_ERROR_NOFN("+=================================================================================================================================+\n");
+  DALI_LOG_ERROR_NOFN(" >> textureCount     : %8d                 \n", gTextureMemoryInfoQueue.size());
+  DALI_LOG_ERROR_NOFN(" >> Total Memory(MB) : %8.3f            \n", static_cast<double>(gTotalTextureMemory) / (1024.0 * 1024.0));
   DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
   DALI_LOG_ERROR_NOFN("\n\n");
 }
 } // namespace
 
-Dali::Internal::Texture::TextureMemoryInfo::TextureMemoryInfo(const int32_t textureId, const std::string url, const int32_t width, const int32_t height, const uint32_t bytesPerPixel)
-: mTextureId(textureId),
-  mUrl(url),
+Dali::Internal::Texture::TextureMemoryInfo::TextureMemoryInfo(const Dali::Integration::TextureContextTypeHint::Type typeHint, const std::string context, const int32_t width, const int32_t height, const uint32_t bytesPerPixel, const uint32_t memorySize)
+: mTypeHint(typeHint),
+  mContext(context),
+  mBytesPerPixel(bytesPerPixel),
   mWidth(width),
   mHeight(height),
-  mMemorySize(static_cast<uint32_t>(width) * static_cast<uint32_t>(height) * bytesPerPixel)
+  mMemorySize(memorySize ? memorySize : static_cast<uint32_t>(width) * static_cast<uint32_t>(height) * bytesPerPixel)
 {
   gTotalTextureMemory += mMemorySize;
   gTextureMemoryInfoQueue.insert(this);
@@ -145,10 +261,8 @@ Texture::Texture(TextureType::Type type, Pixel::Format format, ImageDimensions s
   mFormat(format),
   mResourceId(0u),
   mUseUploadedParameter(mSize.GetWidth() == 0u && mSize.GetHeight() == 0u && mFormat == Pixel::INVALID)
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
   ,
-  mUrl(""),
-  mTextureId(-1),
   mMemoryInfo()
 #endif
 {
@@ -163,11 +277,9 @@ Texture::Texture(NativeImageInterfacePtr nativeImageInterface)
   mFormat(Pixel::RGB888),
   mResourceId(0u),
   mUseUploadedParameter(false)
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
   ,
-  mUrl("(NativeImage)"),
-  mTextureId(-1),
-  mMemoryInfo(new TextureMemoryInfo(-1, "(NativeImage)", mSize.GetWidth(), mSize.GetHeight(), 4)) // Most of NativeImage texture use 4 byte per pixels. Let we assume the data size maximize.
+  mMemoryInfo(new TextureMemoryInfo(static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::UNKNOWN + 1), "(NativeImage. Size could be changed)", mSize.GetWidth(), mSize.GetHeight(), 4)) // Most of NativeImage texture use 4 byte per pixels. Let we assume the data size maximize.
 #endif
 {
 }
@@ -181,11 +293,9 @@ Texture::Texture(TextureType::Type type, uint32_t resourceId)
   mFormat(Pixel::INVALID),
   mResourceId(resourceId),
   mUseUploadedParameter(true)
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
   ,
-  mUrl("(FastTrack)"),
-  mTextureId(-1),
-  mMemoryInfo(new TextureMemoryInfo(-1, "(FastTrack)", 0, 0, 0)) // We cannot know the size of reouceId using case. But just insert info to the queue.
+  mMemoryInfo(new TextureMemoryInfo(static_cast<Dali::Integration::TextureContextTypeHint::Type>(Dali::Integration::TextureContextTypeHint::UNKNOWN + 2), "(FastTrack)", 0, 0, 0)) // We cannot know the size of reouceId using case. But just insert info to the queue.
 #endif
 {
 }
@@ -227,7 +337,7 @@ Texture::~Texture()
     SceneGraph::RemoveTextureMessage(GetEventThreadServices().GetUpdateManager(), mTextureKey);
   }
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     if(mMemoryInfo)
@@ -239,25 +349,44 @@ Texture::~Texture()
 #endif
 }
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-bool Texture::Upload(PixelDataPtr pixelData, std::string url, int32_t textureId)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+namespace
+{
+// Temporal data to be used at UploadSubPixelData().
+// Note that we can assume that Upload API called only for event thread. So don't be afraid of race condition.
+Dali::Integration::TextureContextTypeHint::Type gTypeHint = Dali::Integration::TextureContextTypeHint::UNKNOWN;
+std::string                                     gContext{};
+} //namespace
+#endif
+
+bool Texture::Upload(PixelDataPtr pixelData, std::string context, Dali::Integration::TextureContextTypeHint::Type typeHint)
 {
   if(mNativeImage || mResourceId != 0u)
   {
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
     // Change stored memory data and memory info here, To change newest data of native / resouces.
     // PixelData only be used for get hint of pixel format.
     if(mMemoryInfo)
     {
       mMemoryInfo->Destroy(false);
     }
-    mMemoryInfo.reset(new TextureMemoryInfo(textureId, url, mSize.GetWidth(), mSize.GetHeight(), Pixel::GetBytesPerPixel(pixelData->GetPixelFormat())));
+    mMemoryInfo.reset(new TextureMemoryInfo(typeHint, context, mSize.GetWidth(), mSize.GetHeight(), Pixel::GetBytesPerPixel(pixelData->GetPixelFormat())));
+#endif
     return false;
   }
-  mUrl       = (url == "") ? "UNDEFINED_URL" : url;
-  mTextureId = textureId;
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+  gTypeHint   = typeHint;
+  gContext    = std::move(context);
+  bool result = Upload(pixelData);
+  gTypeHint   = Dali::Integration::TextureContextTypeHint::UNKNOWN;
+  gContext.clear();
+  return result;
+#else
+  // When GPU_MEMORY_PROFILE_ENABLED is not defined, fall back to basic Upload
   return Upload(pixelData);
-}
 #endif
+}
 
 bool Texture::Upload(PixelDataPtr pixelData)
 {
@@ -359,13 +488,18 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
               mFormat = pixelDataFormat;
             }
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
             if(mMemoryInfo)
             {
               mMemoryInfo->Destroy(false);
             }
-            // Set size of this texture as mSize. (For partial upload cases.)
-            mMemoryInfo.reset(new TextureMemoryInfo(mTextureId, mUrl, mSize.GetWidth(), mSize.GetHeight(), Pixel::GetBytesPerPixel(mFormat)));
+            {
+              auto bpp = Pixel::GetBytesPerPixel(mFormat);
+
+              // Set size of this texture as mSize. (For partial upload cases.)
+              // Send size of buffer only if bpp is zero, mean compressed type, or something error.
+              mMemoryInfo.reset(new TextureMemoryInfo(gTypeHint, gContext, mSize.GetWidth(), mSize.GetHeight(), bpp, bpp ? 0 : pixelData.Get()->GetBufferSize()));
+            }
 #endif
 
             //Parameters are correct. Send message to upload data to the texture
@@ -471,9 +605,6 @@ bool Texture::ApplyNativeFragmentShader(std::string& shader, int mask)
 
   return modified;
 }
-
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-#endif
 
 } // namespace Internal
 } // namespace Dali
