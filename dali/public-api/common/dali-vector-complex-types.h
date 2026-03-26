@@ -34,8 +34,6 @@ namespace Dali
  * (types with non-trivial constructors/destructors) by using copy/move constructors
  * and destructors instead of memcpy.
  *
- * TODO : We only support that item type has copy constructor, and move constructor noexcept.
- *        Must check the validation at type-traits soon.
  * @SINCE_2_5.10
  */
 template<typename T>
@@ -208,6 +206,52 @@ protected: // API for deriving classes
     while(from != to)
     {
       new(at) ItemType(static_cast<const ItemType&>(*(reinterpret_cast<const ItemType*>(from))));
+      from += elementSize;
+      at += elementSize;
+    }
+  }
+
+  /**
+   * @brief Inserts the given elements into the vector using move construction.
+   *
+   * Same as Insert but move-constructs new elements instead of copy-constructing.
+   * This allows inserting move-only types.
+   *
+   * @SINCE_2_5.16
+   * @param[in] at Address where to insert the elements into the vector
+   * @param[in] from Address to the first element to be inserted
+   * @param[in] to Address to the last element to be inserted
+   * @param[in] elementSize Size of one of the elements to be inserted
+   */
+  void InsertMove(uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize)
+  {
+    const SizeType size     = to - from;
+    const SizeType count    = Count();
+    const SizeType newCount = count + size / elementSize;
+
+    if(newCount > Capacity())
+    {
+      const SizeType offset = at - reinterpret_cast<uint8_t*>(mData);
+
+      Reserve(NextPowerOfTwo(static_cast<uint32_t>(newCount)), elementSize);
+
+      at = reinterpret_cast<uint8_t*>(mData) + offset;
+    }
+
+    VectorBase::SetCount(newCount);
+
+    if(size != 0u)
+    {
+      uint8_t*       currentEnd = (reinterpret_cast<uint8_t*>(mData) + count * elementSize);
+      uint8_t*       newEnd     = currentEnd + size;
+      const SizeType moveByte   = (currentEnd - at);
+
+      MoveItemInternal<true>(newEnd, currentEnd, moveByte, elementSize);
+    }
+    // Move new elements from source range
+    while(from != to)
+    {
+      new(at) ItemType(static_cast<ItemType&&>(*(reinterpret_cast<ItemType*>(from))));
       from += elementSize;
       at += elementSize;
     }

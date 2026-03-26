@@ -250,6 +250,39 @@ public: // API
   }
 
   /**
+   * @brief Pushes back an element to the vector using move semantics.
+   *
+   * The underlying storage may be reallocated to provide space.
+   * If this occurs, all pre-existing pointers into the vector will
+   * become invalid.
+   *
+   * @SINCE_2_5.16
+   * @param[in] element Element to be moved and added
+   */
+  void PushBack(ItemType&& element)
+  {
+    const SizeType count    = VectorBase::Count();
+    const SizeType newCount = count + 1u;
+    const SizeType capacity = VectorBase::Capacity();
+    if(newCount > capacity)
+    {
+      // need more space
+      Reserve(newCount << 1u); // reserve double the current count
+    }
+
+    if constexpr(IsTrivialType)
+    {
+      // set new count first as otherwise the debug assert will hit us
+      VectorBase::SetCount(newCount);
+      operator[](count) = static_cast<ItemType&&>(element);
+    }
+    else
+    {
+      Insert(End(), static_cast<ItemType&&>(element));
+    }
+  }
+
+  /**
    * @brief Inserts an element to the vector.
    *
    * Elements after \e at are moved one position to the right.
@@ -274,6 +307,46 @@ public: // API
                                                  address,
                                                  address + size,
                                                  size);
+  }
+
+  /**
+   * @brief Inserts an element to the vector using move semantics.
+   *
+   * Elements after \e at are moved one position to the right.
+   *
+   * The underlying storage may be reallocated to provide space.
+   * If this occurs, all pre-existing pointers into the vector will
+   * become invalid.
+   *
+   * @SINCE_2_5.16
+   * @param[in] at Iterator where to insert the element into the vector
+   * @param[in] element An element to be moved and added
+   * @pre Iterator at must be in the vector's range ( Vector::Begin(), Vector::End() ).
+   */
+  void Insert(Iterator at, ItemType&& element)
+  {
+    DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
+
+    if constexpr(IsTrivialType)
+    {
+      const SizeType size    = sizeof(ItemType);
+      uint8_t*       address = reinterpret_cast<uint8_t*>(&element);
+
+      VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
+                                                   address,
+                                                   address + size,
+                                                   size);
+    }
+    else
+    {
+      const SizeType size    = sizeof(ItemType);
+      uint8_t*       address = reinterpret_cast<uint8_t*>(&element);
+
+      VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
+                                                       address,
+                                                       address + size,
+                                                       size);
+    }
   }
 
   /**

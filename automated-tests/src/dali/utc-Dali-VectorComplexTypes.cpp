@@ -289,3 +289,377 @@ int UtcDaliVectorBaseHandle(void)
 
   END_TEST;
 }
+
+namespace
+{
+/// A move-only type for testing Dali::Vector with types that have deleted copy constructors.
+struct MoveOnlyType
+{
+  explicit MoveOnlyType(int v = 0)
+  : value(v)
+  {
+    ++sConstructCount;
+  }
+
+  ~MoveOnlyType()
+  {
+    ++sDestructCount;
+  }
+
+  MoveOnlyType(const MoveOnlyType&)            = delete;
+  MoveOnlyType& operator=(const MoveOnlyType&) = delete;
+
+  MoveOnlyType(MoveOnlyType&& rhs) noexcept
+  : value(rhs.value)
+  {
+    rhs.value = -1;
+    ++sConstructCount;
+  }
+
+  MoveOnlyType& operator=(MoveOnlyType&& rhs) noexcept
+  {
+    if(this != &rhs)
+    {
+      value     = rhs.value;
+      rhs.value = -1;
+    }
+    return *this;
+  }
+
+  explicit operator bool() const noexcept
+  {
+    return value >= 0;
+  }
+
+  int value;
+
+  static int sConstructCount;
+  static int sDestructCount;
+
+  static void ResetCounts()
+  {
+    sConstructCount = 0;
+    sDestructCount  = 0;
+  }
+};
+
+int MoveOnlyType::sConstructCount = 0;
+int MoveOnlyType::sDestructCount  = 0;
+
+} // anonymous namespace
+
+int UtcDaliVectorMoveOnlyPushBack(void)
+{
+  tet_infoline("Testing Dali::Vector PushBack with move-only type");
+
+  MoveOnlyType::ResetCounts();
+
+  Vector<MoveOnlyType> vector;
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+
+  vector.PushBack(MoveOnlyType(10));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+
+  vector.PushBack(MoveOnlyType(20));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+
+  vector.PushBack(MoveOnlyType(30));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 30, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyInsert(void)
+{
+  tet_infoline("Testing Dali::Vector Insert with move-only type");
+
+  Vector<MoveOnlyType> vector;
+
+  // Insert at end (like PushBack)
+  vector.PushBack(MoveOnlyType(10));
+  vector.PushBack(MoveOnlyType(30));
+
+  // Insert in the middle
+  vector.Insert(vector.Begin() + 1, MoveOnlyType(20));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 30, TEST_LOCATION);
+
+  // Insert at beginning
+  vector.Insert(vector.Begin(), MoveOnlyType(5));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3].value, 30, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyErase(void)
+{
+  tet_infoline("Testing Dali::Vector Erase with move-only type");
+
+  Vector<MoveOnlyType> vector;
+  vector.PushBack(MoveOnlyType(10));
+  vector.PushBack(MoveOnlyType(20));
+  vector.PushBack(MoveOnlyType(30));
+  vector.PushBack(MoveOnlyType(40));
+
+  // Erase from middle
+  vector.Erase(vector.Begin() + 1);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 40, TEST_LOCATION);
+
+  // Erase from beginning
+  vector.Erase(vector.Begin());
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 40, TEST_LOCATION);
+
+  // Erase last element (goes through Remove path)
+  vector.Erase(vector.End() - 1);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 30, TEST_LOCATION);
+
+  // Erase sole element
+  vector.Erase(vector.Begin());
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyEraseRange(void)
+{
+  tet_infoline("Testing Dali::Vector Erase range with move-only type");
+
+  Vector<MoveOnlyType> vector;
+  vector.PushBack(MoveOnlyType(10));
+  vector.PushBack(MoveOnlyType(20));
+  vector.PushBack(MoveOnlyType(30));
+  vector.PushBack(MoveOnlyType(40));
+  vector.PushBack(MoveOnlyType(50));
+
+  // Erase range from middle
+  vector.Erase(vector.Begin() + 1, vector.Begin() + 3);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 40, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 50, TEST_LOCATION);
+
+  // Erase range from end
+  vector.Erase(vector.Begin() + 1, vector.End());
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyRemove(void)
+{
+  tet_infoline("Testing Dali::Vector Remove with move-only type");
+
+  Vector<MoveOnlyType> vector;
+  vector.PushBack(MoveOnlyType(10));
+  vector.PushBack(MoveOnlyType(20));
+  vector.PushBack(MoveOnlyType(30));
+
+  // Remove from beginning (swaps with last, destroys last)
+  vector.Remove(vector.Begin());
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Count(), TEST_LOCATION);
+  // After Remove: last element (30) was swapped to position 0, then old last destroyed
+  DALI_TEST_EQUALS(vector[0].value, 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+
+  // Remove last element (no swap needed)
+  vector.Remove(vector.End() - 1);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 30, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyGrowth(void)
+{
+  tet_infoline("Testing Dali::Vector automatic growth/reallocation with move-only type");
+
+  MoveOnlyType::ResetCounts();
+
+  Vector<MoveOnlyType> vector;
+
+  // Push enough elements to trigger multiple reallocations.
+  // Dali::Vector doubles capacity, so starting from 0:
+  //   capacity 0 → 2 → 4 → 8 → 16 → 32
+  const int count = 20;
+  for(int i = 0; i < count; ++i)
+  {
+    vector.PushBack(MoveOnlyType(i * 10));
+  }
+
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(count), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(count - 1), TEST_LOCATION);
+
+  // Verify all values survived multiple reallocations
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(vector[i].value, i * 10, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyReserveRealloc(void)
+{
+  tet_infoline("Testing Dali::Vector Reserve causing reallocation with existing move-only elements");
+
+  Vector<MoveOnlyType> vector;
+  vector.PushBack(MoveOnlyType(10));
+  vector.PushBack(MoveOnlyType(20));
+  vector.PushBack(MoveOnlyType(30));
+
+  auto oldCapacity = vector.Capacity();
+
+  // Force reallocation by reserving much more
+  vector.Reserve(128);
+  DALI_TEST_GREATER(vector.Capacity(), oldCapacity, TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+
+  // Values must survive the reallocation
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 30, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyClear(void)
+{
+  tet_infoline("Testing Dali::Vector Clear and Release with move-only type");
+
+  MoveOnlyType::ResetCounts();
+
+  {
+    Vector<MoveOnlyType> vector;
+    vector.PushBack(MoveOnlyType(10));
+    vector.PushBack(MoveOnlyType(20));
+    vector.PushBack(MoveOnlyType(30));
+
+    MoveOnlyType::ResetCounts();
+
+    vector.Clear();
+    DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+    DALI_TEST_GREATER(vector.Capacity(), ZERO, TEST_LOCATION);
+    // All 3 elements should have been destructed
+    DALI_TEST_EQUALS(MoveOnlyType::sDestructCount, 3, TEST_LOCATION);
+
+    MoveOnlyType::ResetCounts();
+  }
+  // Vector destructor calls Release — no elements remain, so no additional destructions
+  DALI_TEST_EQUALS(MoveOnlyType::sDestructCount, 0, TEST_LOCATION);
+
+  {
+    Vector<MoveOnlyType> vector;
+    vector.PushBack(MoveOnlyType(10));
+    vector.PushBack(MoveOnlyType(20));
+
+    MoveOnlyType::ResetCounts();
+
+    vector.Release();
+    DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+    DALI_TEST_EQUALS(ZERO, vector.Capacity(), TEST_LOCATION);
+    // All 2 elements should have been destructed
+    DALI_TEST_EQUALS(MoveOnlyType::sDestructCount, 2, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyInsertGrowth(void)
+{
+  tet_infoline("Testing Dali::Vector Insert at middle causing reallocation with move-only type");
+
+  Vector<MoveOnlyType> vector;
+  // Fill to capacity
+  vector.Reserve(4);
+  vector.PushBack(MoveOnlyType(10));
+  vector.PushBack(MoveOnlyType(20));
+  vector.PushBack(MoveOnlyType(30));
+  vector.PushBack(MoveOnlyType(40));
+  DALI_TEST_EQUALS(vector.Count(), vector.Capacity(), TEST_LOCATION);
+
+  // This insert must trigger reallocation AND shift elements
+  vector.Insert(vector.Begin() + 2, MoveOnlyType(25));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 25, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3].value, 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4].value, 40, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorComplexMovePushBack(void)
+{
+  tet_infoline("Testing Dali::Vector PushBack(ItemType&&) with copyable complex type");
+
+  TestApplication application;
+
+  Dali::BaseHandle handle0 = Dali::Actor::New();
+  DALI_TEST_EQUALS(handle0.GetBaseObject().ReferenceCount(), 1u, TEST_LOCATION);
+
+  Vector<Dali::BaseHandle> vector;
+
+  // Move handle into vector — reference count should NOT increase (moved, not copied)
+  Dali::BaseHandle movable = handle0;
+  DALI_TEST_EQUALS(handle0.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+
+  vector.PushBack(std::move(movable));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1u), vector.Count(), TEST_LOCATION);
+  // movable was moved, so ref count stays at 2 (handle0 + vector element)
+  DALI_TEST_EQUALS(handle0.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+  DALI_TEST_CHECK(!movable); // movable should be empty after move
+
+  END_TEST;
+}
+
+int UtcDaliVectorComplexMoveInsert(void)
+{
+  tet_infoline("Testing Dali::Vector Insert(Iterator, ItemType&&) with copyable complex type");
+
+  TestApplication application;
+
+  Dali::BaseHandle handle0 = Dali::Actor::New();
+  Dali::BaseHandle handle1 = Dali::Actor::New();
+  Dali::BaseHandle handle2 = Dali::Actor::New();
+
+  Vector<Dali::BaseHandle> vector;
+  vector.PushBack(handle0);
+  vector.PushBack(handle2);
+  DALI_TEST_EQUALS(handle0.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle1.GetBaseObject().ReferenceCount(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle2.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+
+  // Move-insert in the middle
+  Dali::BaseHandle movable1 = handle1;
+  DALI_TEST_EQUALS(handle1.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+
+  vector.Insert(vector.Begin() + 1, std::move(movable1));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(handle1.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+  DALI_TEST_CHECK(!movable1);
+  DALI_TEST_EQUALS(vector[0], handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], handle2, TEST_LOCATION);
+
+  END_TEST;
+}
