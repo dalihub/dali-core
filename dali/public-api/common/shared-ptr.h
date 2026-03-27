@@ -312,15 +312,18 @@ public:
    */
   void Reset(Type* ptr = nullptr) noexcept
   {
-    ResetInternal();
-    mPtr = ptr;
-    if(ptr)
+    if(ptr != mPtr)
     {
-      mRefCount = new uint32_t(1);
-    }
-    else
-    {
-      mRefCount = nullptr;
+      ResetInternal();
+      mPtr = ptr;
+      if(ptr)
+      {
+        mRefCount = new uint32_t(1);
+      }
+      else
+      {
+        mRefCount = nullptr;
+      }
     }
   }
 

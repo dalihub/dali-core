@@ -1121,3 +1121,20 @@ int UtcDaliSharedPtrConstructorWithNewAndReset(void)
 
   END_TEST;
 }
+
+int UtcDaliSharedPtrResetWithSamePtr(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  SharedPtr<TestClass> ptr(new TestClass(destructorCalled));
+  DALI_TEST_CHECK(!destructorCalled);
+  DALI_TEST_CHECK(ptr.UseCount() == 1);
+
+  auto rawPtr = ptr.Get();
+  ptr.Reset(rawPtr);
+
+  DALI_TEST_CHECK(!destructorCalled);
+
+  END_TEST;
+}
