@@ -27,6 +27,10 @@
 #include <dali/internal/update/manager/update-manager.h>
 
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+
+// EXTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <unordered_set>
 
@@ -127,66 +131,89 @@ private:
 
 inline void PrintTotalMemory()
 {
-  // Collect the result first.
-  static MemoryInfoCollector sImageCollector("Image");
-  static MemoryInfoCollector sTextCollector("Text");
-  static MemoryInfoCollector sDaliEtcCollector("ETC (DALi)");
-  static MemoryInfoCollector sOuterEtcCollector("ETC");
-  static MemoryInfoCollector sUnknownCollector{};
-
-  for(auto iter = gTextureMemoryInfoQueue.begin(); iter != gTextureMemoryInfoQueue.end(); iter++)
+  if(DALI_LIKELY(Dali::Internal::ThreadLocalStorage::Created()))
   {
-    int32_t collectorType = static_cast<int32_t>((*iter)->mTypeHint) / 1000;
-    switch(collectorType)
+    // Collect the result first.
+    static MemoryInfoCollector sImageCollector("Image");
+    static MemoryInfoCollector sTextCollector("Text");
+    static MemoryInfoCollector sDaliEtcCollector("ETC (DALi)");
+    static MemoryInfoCollector sOuterEtcCollector("ETC");
+    static MemoryInfoCollector sUnknownCollector{};
+
+    for(auto iter = gTextureMemoryInfoQueue.begin(); iter != gTextureMemoryInfoQueue.end(); iter++)
     {
-      case 0: // Unknown/Error (0xxx)
+      int32_t collectorType = static_cast<int32_t>((*iter)->mTypeHint) / 1000;
+      switch(collectorType)
       {
-        sUnknownCollector.Insert(*iter);
-        break;
-      }
-      case 1: // Image resources (1xxx)
-      {
-        sImageCollector.Insert(*iter);
-        break;
-      }
-      case 2: // Text (2xxx)
-      {
-        sTextCollector.Insert(*iter);
-        break;
-      }
-      case 3: // ETC (3xxx) ~ End of dali(9999)
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8:
-      case 9:
-      {
-        sDaliEtcCollector.Insert(*iter);
-        break;
-      }
-      // Some value inserted. Respect as it is not unknown type.
-      default:
-      {
-        sOuterEtcCollector.Insert(*iter);
-        break;
+        case 0: // Unknown/Error (0xxx)
+        {
+          sUnknownCollector.Insert(*iter);
+          break;
+        }
+        case 1: // Image resources (1xxx)
+        {
+          sImageCollector.Insert(*iter);
+          break;
+        }
+        case 2: // Text (2xxx)
+        {
+          sTextCollector.Insert(*iter);
+          break;
+        }
+        case 3: // ETC (3xxx) ~ End of dali(9999)
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        {
+          sDaliEtcCollector.Insert(*iter);
+          break;
+        }
+        // Some value inserted. Respect as it is not unknown type.
+        default:
+        {
+          sOuterEtcCollector.Insert(*iter);
+          break;
+        }
       }
     }
+    DALI_LOG_ERROR_NOFN("\n\n"); // For beauty
+    DALI_LOG_ERROR_NOFN("## DALI_TEXTURE_MEMORY_PROFILER\n");
+
+    sImageCollector.PrintAndClear();
+    sTextCollector.PrintAndClear();
+    sDaliEtcCollector.PrintAndClear();
+    sOuterEtcCollector.PrintAndClear();
+    sUnknownCollector.PrintAndClear();
+
+    DALI_LOG_ERROR_NOFN("+=================================================================================================================================+\n");
+    DALI_LOG_ERROR_NOFN(" >> textureCount     : %8d                 \n", gTextureMemoryInfoQueue.size());
+    DALI_LOG_ERROR_NOFN(" >> Total Memory(MB) : %8.3f            \n", static_cast<double>(gTotalTextureMemory) / (1024.0 * 1024.0));
+    DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
+    DALI_LOG_ERROR_NOFN("\n\n");
   }
-  DALI_LOG_ERROR_NOFN("\n\n"); // For beauty
-  DALI_LOG_ERROR_NOFN("## DALI_TEXTURE_MEMORY_PROFILER\n");
+}
 
-  sImageCollector.PrintAndClear();
-  sTextCollector.PrintAndClear();
-  sDaliEtcCollector.PrintAndClear();
-  sOuterEtcCollector.PrintAndClear();
-  sUnknownCollector.PrintAndClear();
+uint32_t gTimerId           = 0;
+uint32_t gTimerMilliseconds = 3000;
 
-  DALI_LOG_ERROR_NOFN("+=================================================================================================================================+\n");
-  DALI_LOG_ERROR_NOFN(" >> textureCount     : %8d                 \n", gTextureMemoryInfoQueue.size());
-  DALI_LOG_ERROR_NOFN(" >> Total Memory(MB) : %8.3f            \n", static_cast<double>(gTotalTextureMemory) / (1024.0 * 1024.0));
-  DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
-  DALI_LOG_ERROR_NOFN("\n\n");
+bool TimerCallback()
+{
+  gTimerId = 0;
+  PrintTotalMemory();
+  return false;
+}
+
+void PrintTotalMemoryRequest()
+{
+  if(gTimerId == 0 && DALI_LIKELY(Dali::Internal::ThreadLocalStorage::Created()))
+  {
+    Dali::Integration::PlatformAbstraction& platformAbstraction = Dali::Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
+    DALI_LOG_ERROR_NOFN("## DALI_TEXTURE_MEMORY_PROFILER will print after %u ms\n", gTimerMilliseconds);
+    gTimerId = platformAbstraction.StartTimer(gTimerMilliseconds, Dali::MakeCallback(&TimerCallback));
+  }
 }
 } // namespace
 
@@ -200,7 +227,7 @@ Dali::Internal::Texture::TextureMemoryInfo::TextureMemoryInfo(const Dali::Integr
 {
   gTotalTextureMemory += mMemorySize;
   gTextureMemoryInfoQueue.insert(this);
-  PrintTotalMemory();
+  PrintTotalMemoryRequest();
 }
 
 Dali::Internal::Texture::TextureMemoryInfo::~TextureMemoryInfo()
@@ -214,7 +241,7 @@ void Dali::Internal::Texture::TextureMemoryInfo::Destroy(bool printLog)
   gTextureMemoryInfoQueue.erase(this);
   if(printLog)
   {
-    PrintTotalMemory();
+    PrintTotalMemoryRequest();
   }
 }
 #endif
@@ -491,6 +518,11 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
             if(mMemoryInfo)
             {
+              if(gTypeHint == Dali::Integration::TextureContextTypeHint::UNKNOWN && gContext.empty())
+              {
+                gTypeHint = mMemoryInfo->mTypeHint;
+                gContext  = mMemoryInfo->mContext;
+              }
               mMemoryInfo->Destroy(false);
             }
             {
