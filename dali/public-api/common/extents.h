@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
-#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -118,16 +117,6 @@ public:
   uint16_t top;    ///< The top extent.    @SINCE_1_2.62
   uint16_t bottom; ///< The bottom extent. @SINCE_1_2.62
 };
-
-/**
- * @brief Converts the value of the extents into a string and insert in to an output stream.
- *
- * @SINCE_1_2.62
- * @param[in] stream The output stream operator
- * @param[in] extents The Extents to output
- * @return The output stream operator
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Extents& extents);
 
 /**
  * @}

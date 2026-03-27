@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/texture-integ.h>
 #include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/images/pixel-data-impl.h>
@@ -29,6 +30,11 @@
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/texture.h>
+
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+#include <memory> ///< for std::unique_ptr
+#include <string>
+#endif
 
 namespace Dali
 {
@@ -76,12 +82,10 @@ public:
    */
   Render::TextureKey GetRenderTextureKey() const;
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  bool Upload(PixelDataPtr pixelData, std::string url, int32_t textureId);
-#endif
+  bool Upload(PixelDataPtr pixelData, std::string context, Integration::TextureContextTypeHint::Type typeHint);
 
   /**
    * @copydoc Dali::Texture::Upload()
@@ -206,13 +210,6 @@ private: // implementation
    */
   void Initialize();
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  /**
-   * @brief Print TotalMemory
-   */
-  static void PrintTotalMemory();
-#endif
-
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -233,11 +230,12 @@ private:                                    // data
   uint32_t                mResourceId;
   bool                    mUseUploadedParameter : 1; ///< Whether ths texture size and format depend on uploaded image or not.
 
-#if defined(ENABLE_GPU_MEMORY_PROFILE)
-  // For memory profiling
-  int32_t     mTextureId;
-  uint32_t    mDataSize;
-  std::string mUrl;
+#if defined(GPU_MEMORY_PROFILE_ENABLED)
+public:
+  struct TextureMemoryInfo; // Keep it as public, to allow to access at unnamed namespace
+
+private:
+  std::unique_ptr<TextureMemoryInfo> mMemoryInfo;
 #endif
 };
 

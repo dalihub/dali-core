@@ -20,11 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <initializer_list>
-#include <iosfwd>
 #include <type_traits>
 #include <utility>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/property.h>
@@ -45,7 +45,7 @@ class Matrix3;
 class Matrix;
 struct Extents;
 
-using KeyValuePair = std::pair<Property::Key, Property::Value>;
+using KeyValuePair = Pair<Property::Key, Property::Value>;
 
 /**
  * @brief A value-type representing a property value.
@@ -561,13 +561,7 @@ public:
    */
   std::size_t GetHash() const;
 
-  /**
-   * @brief Output to stream.
-   * @SINCE_1_0.0
-   */
-  friend DALI_CORE_API std::ostream& operator<<(std::ostream& ouputStream, const Property::Value& value);
-
-private:
+public: // Not intended for developer use
   /// @cond internal
   struct DALI_INTERNAL Impl;
 
@@ -576,6 +570,10 @@ private:
    * @return A const reference to the Impl object
    */
   DALI_INTERNAL const Impl& Read() const;
+  /// @endcond
+
+private:
+  /// @cond internal
 
   /**
    * @brief Retrieves an already constructed Impl object from the storage buffer.
@@ -594,16 +592,6 @@ private:
   Storage mStorage;
   /// @endcond
 };
-
-/**
- * @brief Converts the value of the property into a string and append to an output stream.
- *
- * @SINCE_1_0.0
- * @param[in] ouputStream The output stream operator
- * @param[in] value The value to insert
- * @return The output stream operator
- */
-DALI_CORE_API std::ostream& operator<<(std::ostream& ouputStream, const Property::Value& value);
 
 /**
  * @}

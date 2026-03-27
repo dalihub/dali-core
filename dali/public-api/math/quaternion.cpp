@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
-#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
@@ -529,17 +528,6 @@ void Quaternion::SetFromAxes(const Vector3& xAxis, const Vector3& yAxis, const V
   }
 
   Normalize();
-}
-
-std::ostream& operator<<(std::ostream& o, const Quaternion& quaternion)
-{
-  Vector3 axis;
-  Radian  angleRadians;
-
-  quaternion.ToAxisAngle(axis, angleRadians);
-  Degree degrees(angleRadians);
-
-  return o << "[ Axis: [" << axis.x << ", " << axis.y << ", " << axis.z << "], Angle: " << degrees.degree << " degrees ]";
 }
 
 } // namespace Dali

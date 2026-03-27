@@ -68,6 +68,64 @@ DALI_CORE_API void SetTextureSize(Dali::Texture texture, uint16_t width, uint16_
  */
 DALI_CORE_API void SetTexturePixelFormat(Dali::Texture texture, Dali::Pixel::Format format);
 
+namespace TextureContextTypeHint
+{
+/**
+ * @brief Texture type hints for profiling and debugging
+ *
+ * The type hint values are organized as follows:
+ *   0xxx = Unknown, or error
+ *   1xxx = Image resources
+ *   2xxx = Text
+ *   3xxx = ETC
+ *   9999 = End of dali generated textures
+ *   10000 and over = Out of dali library generated texture
+ */
+enum Type
+{
+  // Unknown
+  UNKNOWN = 0,
+
+  // Image resources (1xxx)
+  STANDARD_IMAGE   = 1000, ///< Standard image
+  MASKING_IMAGE    = 1001, ///< Masking image
+  BROKEN_IMAGE     = 1002, ///< Broken image
+  CPU_MASKED_IMAGE = 1010, ///< Standard CPU masked image
+
+  FAST_TRACK_IMAGE = 1020, ///< Fast track image
+
+  NPATCH_IMAGE        = 1100, ///< NPatch image
+  SVG_IMAGE           = 1200, ///< SVG image
+  NATIVE_IMAGE        = 1300, ///< Standard native image
+  NATIVE_LOTTIE_IMAGE = 1301, ///< Lottie as native image
+
+  // Text (2xxx)
+  TEXT_SIMPLE_LABEL = 2000, ///< Text for simple label
+  TEXT_SCROLL       = 2001, ///< Text for scroll
+  TEXT_ATLAS        = 2100, ///< Text atlas (Editor / Field)
+
+  // ETC (3xxx ~ 9999)
+  EXTERNAL_IMAGE   = 3000, ///< External image from GenerateUrl()
+  GRADIENT_TEXTURE = 3100, ///< Gradient texture
+
+  // End marker
+  END_OF_DALI_TEXTURES = 9999 ///< End of Dali generated textures
+};
+} // namespace TextureContextTypeHint
+
+/**
+ * @brief Uploads data to the texture from a PixelData object, include context informations for profiling.
+ * @note If texture is native or fast track case, we don't actual upload. Just update the context.
+ *       In that case, pixelData only be used for get BytesPerPixel value.
+ *
+ * @param[in] texture The texture to upload data to.
+ * @param[in] pixelData The pixelData object
+ * @param[in] context The context of the uploaded data
+ * @param[in] typeHint Specifies hint for the texture which kind of image uploaded (optional)
+ * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
+ */
+DALI_CORE_API bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String context, TextureContextTypeHint::Type typeHint = TextureContextTypeHint::UNKNOWN);
+
 } // namespace Dali::Integration
 
 #endif // DALI_TEXTURE_INTEG_H

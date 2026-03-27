@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // EXTERNAL INCLUDES
 #include <cstdint> // uint32_t
 #include <cstring> // memcpy
-#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/matrix-utils.h>
@@ -290,13 +289,6 @@ bool Matrix3::operator==(const Matrix3& rhs) const
 bool Matrix3::operator!=(const Matrix3& rhs) const
 {
   return !(*this == rhs);
-}
-
-std::ostream& operator<<(std::ostream& o, const Matrix3& matrix)
-{
-  return o << "[ " << matrix.mElements[0] << ", " << matrix.mElements[1] << ", " << matrix.mElements[2] << ", "
-           << matrix.mElements[3] << ", " << matrix.mElements[4] << ", " << matrix.mElements[5] << ", "
-           << matrix.mElements[6] << ", " << matrix.mElements[7] << ", " << matrix.mElements[8] << " ]";
 }
 
 } // namespace Dali

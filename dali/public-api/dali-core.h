@@ -41,6 +41,7 @@
 
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-utility.h>
@@ -51,6 +52,7 @@
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/list-wrapper.h>
+#include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/common/vector-wrapper.h>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2026 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2024 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -229,7 +229,7 @@ void PanGestureDetector::RemoveAngle(Radian angle)
 
   for(AngleContainer::iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter)
   {
-    if(iter->angle == angle)
+    if(iter->first == angle)
     {
       mAngleContainer.erase(iter);
       break;
@@ -264,9 +264,11 @@ bool PanGestureDetector::CheckAngleAllowed(Radian angle) const
   {
     for(AngleContainer::const_iterator iter = mAngleContainer.begin(), endIter = mAngleContainer.end(); iter != endIter; ++iter)
     {
-      float angleAllowed(iter->angle);
-      float threshold(iter->threshold);
+      float angleAllowed(iter->first);
+      float threshold(iter->second);
+
       DALI_LOG_INFO(gLogFilter, Debug::General, "AngleToCheck: %.2f, CompareWith: %.2f, Threshold: %.2f\n", Degree(angle), Degree(angleAllowed), Degree(threshold));
+
       float relativeAngle(fabsf(WrapInDomain(angle - angleAllowed, -Math::PI, Math::PI)));
       if(relativeAngle <= threshold)
       {
@@ -275,6 +277,7 @@ bool PanGestureDetector::CheckAngleAllowed(Radian angle) const
       }
     }
   }
+
   return allowed;
 }
 

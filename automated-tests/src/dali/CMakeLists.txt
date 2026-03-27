@@ -61,6 +61,7 @@ SET(TC_SOURCES
         utc-Dali-PanGestureDetector.cpp
         utc-Dali-PanGestureRecognizer.cpp
         utc-Dali-Path.cpp
+        utc-Dali-Pair.cpp
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-PinchGestureRecognizer.cpp
         utc-Dali-Pixel.cpp
@@ -85,6 +86,7 @@ SET(TC_SOURCES
         utc-Dali-Scene.cpp
         utc-Dali-Scripting.cpp
         utc-Dali-Shader.cpp
+        utc-Dali-SharedPtr.cpp
         utc-Dali-SignalDelegate.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp

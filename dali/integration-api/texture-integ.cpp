@@ -19,6 +19,7 @@
 #include <dali/integration-api/texture-integ.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/rendering/texture-impl.h>
 
 namespace Dali::Integration
@@ -47,6 +48,12 @@ void SetTextureSize(Dali::Texture texture, uint16_t width, uint16_t height)
 void SetTexturePixelFormat(Dali::Texture texture, Dali::Pixel::Format format)
 {
   GetImplementation(texture).SetPixelFormat(format);
+}
+
+bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String content, TextureContextTypeHint::Type typeHint)
+{
+  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
+  return GetImplementation(texture).Upload(&internalPixelData, Integration::ToStdString(std::move(content)), typeHint);
 }
 
 } // namespace Dali::Integration

@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <ostream>
+#include <iostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-utility.h> ///< Dali::Min , Dali::Max
@@ -411,6 +411,7 @@ inline bool Rect<float>::IsEmpty() const
 /**
  * @brief Converts the value of the rectangle into a string and insert in to an output stream.
  *
+ * @note Templated inline function; not intrisically part of the library symbol table.
  * @SINCE_1_0.0
  * @param[in] stream The output stream operator
  * @param[in] rectangle the rectangle to output

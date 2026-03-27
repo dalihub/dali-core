@@ -41,7 +41,7 @@ namespace
 
 typedef std::vector<StringValuePair> StringValueContainer;
 
-using IndexValuePair      = std::pair<Property::Index, Property::Value>;
+using IndexValuePair      = Pair<Property::Index, Property::Value>;
 using IndexValueContainer = std::vector<IndexValuePair>;
 
 constexpr std::size_t NOT_HASHED    = 0u;
@@ -171,7 +171,7 @@ void Property::Map::Insert(Dali::String key, Value value)
     valueHash *= valueHash;
     mImpl->mHash += Dali::Internal::HashUtils::HashStringView(ToStdStringView(key), valueHash);
   }
-  mImpl->mStringValueContainer.push_back(std::make_pair(std::move(key), std::move(value)));
+  mImpl->mStringValueContainer.push_back(MakePair(std::move(key), std::move(value)));
 }
 
 void Property::Map::Insert(Property::Index key, Value value)
@@ -188,7 +188,7 @@ void Property::Map::Insert(Property::Index key, Value value)
     valueHash *= valueHash;
     mImpl->mHash += Dali::Internal::HashUtils::HashRawValue(key, valueHash);
   }
-  mImpl->mIndexValueContainer.push_back(std::make_pair(key, std::move(value)));
+  mImpl->mIndexValueContainer.push_back(MakePair(key, std::move(value)));
 }
 
 Property::Value& Property::Map::GetValue(SizeType position) const
@@ -383,8 +383,7 @@ bool Property::Map::Remove(Property::Index key)
 {
   if(DALI_LIKELY(mImpl))
   {
-    auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element)
-    { return element.first == key; });
+    auto iter = std::find_if(mImpl->mIndexValueContainer.begin(), mImpl->mIndexValueContainer.end(), [key](const IndexValuePair& element) { return element.first == key; });
     if(iter != mImpl->mIndexValueContainer.end())
     {
       if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
@@ -405,8 +404,7 @@ bool Property::Map::Remove(Dali::StringView key)
 {
   if(DALI_LIKELY(mImpl))
   {
-    auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element)
-    { return element.first == key; });
+    auto iter = std::find_if(mImpl->mStringValueContainer.begin(), mImpl->mStringValueContainer.end(), [key](const StringValuePair& element) { return element.first == key; });
     if(iter != mImpl->mStringValueContainer.end())
     {
       if(mImpl->mHash != ALWAYS_REHASH && mImpl->mHash != NOT_HASHED)
@@ -497,7 +495,7 @@ Property::Value& Property::Map::operator[](Dali::StringView key)
   }
 
   // Create and return reference to new value
-  mImpl->mStringValueContainer.push_back(std::make_pair(Dali::String(key), Property::Value()));
+  mImpl->mStringValueContainer.push_back(Dali::MakePair(Dali::String(key), Property::Value()));
   return mImpl->mStringValueContainer.back().second;
 }
 
@@ -539,7 +537,7 @@ Property::Value& Property::Map::operator[](Property::Index key)
   }
 
   // Create and return reference to new value
-  mImpl->mIndexValueContainer.push_back(std::make_pair(key, Property::Value()));
+  mImpl->mIndexValueContainer.push_back(Dali::MakePair(key, Property::Value()));
   return mImpl->mIndexValueContainer.back().second;
 }
 
@@ -655,15 +653,22 @@ std::size_t Property::Map::GetHash() const
   return DALI_LIKELY(mImpl) ? mImpl->GetHash() : Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
 }
 
+const Property::Map::Impl* Property::Map::Read() const
+{
+  return mImpl;
+}
+
 std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
 {
   stream << "Map(" << map.Count() << ") = {";
 
-  if(DALI_LIKELY(map.mImpl))
+  auto impl = map.Read();
+  if(impl != nullptr)
   {
     int32_t count = 0;
+
     // Output the String-Value pairs
-    for(auto&& iter : map.mImpl->mStringValueContainer)
+    for(auto&& iter : impl->mStringValueContainer)
     {
       if(count++ > 0)
       {
@@ -673,7 +678,7 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
     }
 
     // Output the Index-Value pairs
-    for(auto&& iter : map.mImpl->mIndexValueContainer)
+    for(auto&& iter : impl->mIndexValueContainer)
     {
       if(count++ > 0)
       {
@@ -682,12 +687,11 @@ std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
       stream << iter.first << ":" << iter.second;
     }
 
-    if(map.mImpl->mHash != NOT_HASHED)
+    if(impl->mHash != NOT_HASHED)
     {
-      stream << "(hash=" << map.mImpl->mHash << ")";
+      stream << "(hash=" << impl->mHash << ")";
     }
   }
-
   stream << "}";
 
   return stream;

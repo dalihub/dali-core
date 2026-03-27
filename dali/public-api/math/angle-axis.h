@@ -2,7 +2,7 @@
 #define DALI_ANGLE_AXIS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,6 @@
  * limitations under the License.
  *
  */
-
-// EXTERNAL INCLUDES
-#include <iosfwd>
-#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/radian.h>
@@ -91,19 +87,6 @@ public:
 inline bool operator==(const Dali::AngleAxis& lhs, const Dali::AngleAxis& rhs)
 {
   return (lhs.angle == rhs.angle) && (lhs.axis == rhs.axis);
-}
-
-/**
- * @brief Prints an angle axis.
- *
- * @SINCE_1_1.33
- * @param[in] o The output stream operator
- * @param[in] angleAxis The angle axis to print
- * @return The output stream operator
- */
-inline std::ostream& operator<<(std::ostream& o, const Dali::AngleAxis& angleAxis)
-{
-  return o << "[ Axis: [" << angleAxis.axis.x << ", " << angleAxis.axis.y << ", " << angleAxis.axis.z << "], Angle: " << Degree(angleAxis.angle).degree << " degrees ]";
 }
 
 /**

@@ -2,7 +2,7 @@
 #define DALI_TYPE_TRAITS_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -371,6 +371,88 @@ template<typename Type>
 struct RemoveReference<Type&&>
 {
   typedef Type type;
+};
+
+/**
+ * @brief Type trait to remove const and volatile qualifiers from a type.
+ *
+ * Removes top-level const and/or volatile qualifiers from a type.
+ *
+ * @tparam Type The type to process
+ *
+ * @SINCE_2_5.16
+ *
+ * Example usage:
+ * @code
+ * RemoveCV<int>::type;                 // int
+ * RemoveCV<const int>::type;           // int
+ * RemoveCV<volatile int>::type;        // int
+ * RemoveCV<const volatile int>::type;  // int
+ * @endcode
+ */
+template<typename Type>
+struct RemoveCV
+{
+  typedef Type type;
+};
+
+/**
+ * @brief Specialization to remove const qualifier.
+ *
+ * @tparam Type The const-qualified type
+ */
+template<typename Type>
+struct RemoveCV<const Type>
+{
+  typedef typename RemoveCV<Type>::type type;
+};
+
+/**
+ * @brief Specialization to remove volatile qualifier.
+ *
+ * @tparam Type The volatile-qualified type
+ */
+template<typename Type>
+struct RemoveCV<volatile Type>
+{
+  typedef typename RemoveCV<Type>::type type;
+};
+
+/**
+ * @brief Specialization to remove both const and volatile qualifiers.
+ *
+ * @tparam Type The const-volatile-qualified type
+ */
+template<typename Type>
+struct RemoveCV<const volatile Type>
+{
+  typedef typename RemoveCV<Type>::type type;
+};
+
+/**
+ * @brief Type trait to decay a type (remove references, const, and volatile).
+ *
+ * Removes both reference qualifiers (lvalue and rvalue) and cv-qualifiers
+ * (const and volatile) from a type. This is similar to std::decay but without STL.
+ *
+ * @tparam Type The type to process
+ *
+ * @SINCE_2_5.16
+ *
+ * Example usage:
+ * @code
+ * DecayType<int>::type;                   // int
+ * DecayType<int&>::type;                  // int
+ * DecayType<int&&>::type;                 // int
+ * DecayType<const int&>::type     ;       // int
+ * DecayType<volatile int>::type;          // int
+ * DecayType<const volatile int&&>::type;  // int
+ * @endcode
+ */
+template<typename Type>
+struct DecayType
+{
+  typedef typename RemoveCV<typename RemoveReference<Type>::type>::type type;
 };
 
 /**

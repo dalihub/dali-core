@@ -21,7 +21,6 @@
 
 // EXTERNAL INCLUDES
 #include <math.h>
-#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
@@ -164,11 +163,6 @@ void Vector3::Clamp(const Vector3& min, const Vector3& max)
   Dali::ClampInPlace<float>(x, min.x, max.x);
   Dali::ClampInPlace<float>(y, min.y, max.y);
   Dali::ClampInPlace<float>(z, min.z, max.z);
-}
-
-std::ostream& operator<<(std::ostream& o, const Vector3& vector)
-{
-  return o << "[" << vector.x << ", " << vector.y << ", " << vector.z << "]";
 }
 
 Vector3 Clamp(const Vector3& v, const float& min, const float& max)
