@@ -19,22 +19,22 @@
 #include <dali/public-api/signals/base-signal.h>
 
 // EXTERNAL INCLUDES
-#include <functional> ///< for std::hash, std::less
-#include <unordered_map>
+#include <functional> ///< for std::hash
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/open-hash-map.h>
 
 namespace
 {
 /**
  * @brief Block count threshold at which the hash map cache is created.
  *
- * With doubling block sizes (2, 4, 8, 16, 32, ...), block 5 gives a
- * cumulative capacity of 62. Below this, linear scan over contiguous
- * blocks is faster than hash map overhead.
+ * With doubling block sizes (2, 4, 8, 16, 32, ...), block 3 gives a
+ * cumulative capacity of 14. Below this (blocks 1-2, max 6 slots),
+ * linear scan is bounded and faster than hash map overhead.
  */
-constexpr uint32_t CACHE_BLOCK_THRESHOLD = 5u;
+constexpr uint32_t CACHE_BLOCK_THRESHOLD = 3u;
 
 struct CallbackBaseHash
 {
@@ -50,7 +50,17 @@ struct CallbackBaseEqual
 {
   bool operator()(const Dali::CallbackBase* lhs, const Dali::CallbackBase* rhs) const noexcept
   {
-    return *lhs == *rhs;
+    // Compare function pointers first.
+    // Note that std::less is safe way to ordering the function pointers.
+    const Dali::CallbackBase::StaticFunction& lhsFunctionPtr = lhs->mStaticFunction;
+    const Dali::CallbackBase::StaticFunction& rhsFunctionPtr = rhs->mStaticFunction;
+    if(!std::equal_to<Dali::CallbackBase::StaticFunction>()(lhsFunctionPtr, rhsFunctionPtr))
+    {
+      return false;
+    }
+
+    // If function pointers are equal, compare object pointers.
+    return std::equal_to<decltype(lhs->mImpl.mObjectPointer)>()(lhs->mImpl.mObjectPointer, rhs->mImpl.mObjectPointer);
   }
 };
 } // unnamed namespace
@@ -65,7 +75,7 @@ struct BaseSignal::Impl
   Impl()  = default;
   ~Impl() = default;
 
-  std::unordered_map<const CallbackBase*, SignalConnection*, CallbackBaseHash, CallbackBaseEqual> mCache;
+  Integration::OpenHashMap<const CallbackBase*, SignalConnection*, CallbackBaseHash, CallbackBaseEqual> mCache;
 };
 
 BaseSignal::BaseSignal() = default;
@@ -120,7 +130,7 @@ void BaseSignal::OnConnect(CallbackBase* callback)
 
     if(mCacheImpl)
     {
-      mCacheImpl->mCache[callback] = connection;
+      mCacheImpl->mCache.Insert(callback, connection);
     }
     else if(mPool.GetBlockCount() >= CACHE_BLOCK_THRESHOLD)
     {
@@ -164,7 +174,7 @@ void BaseSignal::OnConnect(ConnectionTrackerInterface* tracker, CallbackBase* ca
 
     if(mCacheImpl)
     {
-      mCacheImpl->mCache[callback] = connection;
+      mCacheImpl->mCache.Insert(callback, connection);
     }
     else if(mPool.GetBlockCount() >= CACHE_BLOCK_THRESHOLD)
     {
@@ -224,12 +234,8 @@ SignalConnection* BaseSignal::FindCallback(CallbackBase* callback) noexcept
   // Fast path: use hash map cache if available (large signals)
   if(mCacheImpl)
   {
-    auto iter = mCacheImpl->mCache.find(callback);
-    if(iter != mCacheImpl->mCache.end())
-    {
-      return iter->second;
-    }
-    return nullptr;
+    auto* result = mCacheImpl->mCache.Find(callback);
+    return result ? *result : nullptr;
   }
 
   // Slow path: linear scan over blocks (small signals, N < ~30)
@@ -258,7 +264,7 @@ void BaseSignal::DeleteConnection(SignalConnection* connection)
   // Remove from cache if it exists
   if(mCacheImpl)
   {
-    mCacheImpl->mCache.erase(connection->GetCallback());
+    mCacheImpl->mCache.Erase(connection->GetCallback());
   }
 
   if(mEmittingFlag)
@@ -321,7 +327,7 @@ void BaseSignal::EnsureCache()
       {
         if(slots[i] && slots[i].GetCallback())
         {
-          mCacheImpl->mCache[slots[i].GetCallback()] = &slots[i];
+          mCacheImpl->mCache.Insert(slots[i].GetCallback(), &slots[i]);
         }
       }
       block = block->mNext;

@@ -79,6 +79,88 @@ float StaticFloatCallbackFloatValueFloatValue(float value1, float value2)
   return value1 + value2;
 }
 
+int  totalCallbackCount = 0;
+void StaticVoidCallback01(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback02(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback03(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback04(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback05(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback06(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback07(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback08(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback09(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback10(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback11(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback12(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback13(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback14(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback15(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback16(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback17(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback18(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback19(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback20(void)
+{
+  totalCallbackCount++;
+}
+
 } // namespace
 
 /*******************************************
@@ -2407,6 +2489,69 @@ int UtcDaliSignalLargeReconnect(void)
   {
     delete handlers[i];
   }
+
+  END_TEST;
+}
+
+int UtcDaliSignalCacheThresholdBoundary(void)
+{
+  tet_infoline(
+    "Test that BaseSignal::EnsureCache() is called exactly at the cache threshold.\n"
+    "then that the cache is filled during connection.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  // Cache threshold is 3 blocks = 14 cumulative capacity (2+4+8)
+  // Block sizes: 2, 4, 8, 16, 32, ...
+  // Block 0: 2 slots (index 0-1)
+  // Block 1: 4 slots (index 2-5) - total: 6
+  // Block 2: 8 slots (index 6-13) - total: 14
+  // Cache is created when we reach block 3 (i.e., when adding the 15th connection)
+
+  void (*fns[])() = {
+    &StaticVoidCallback01,
+    &StaticVoidCallback02,
+    &StaticVoidCallback03,
+    &StaticVoidCallback04,
+    &StaticVoidCallback05,
+    &StaticVoidCallback06,
+    &StaticVoidCallback07,
+    &StaticVoidCallback08,
+    &StaticVoidCallback09,
+    &StaticVoidCallback10,
+    &StaticVoidCallback11,
+    &StaticVoidCallback12,
+    &StaticVoidCallback13,
+    &StaticVoidCallback14,
+    &StaticVoidCallback15,
+    &StaticVoidCallback16,
+    &StaticVoidCallback17,
+    &StaticVoidCallback18,
+    &StaticVoidCallback19,
+    &StaticVoidCallback20};
+
+  // Connect handlers up to just below the cache threshold (7 connections)
+  for(int i = 0; i < 7; ++i)
+  {
+    signal.Connect(fns[i]);
+  }
+
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), 7u, TEST_LOCATION);
+
+  // Emit to verify all 7 handlers work (linear scan path, no cache yet)
+  signal.Emit();
+  DALI_TEST_EQUALS(totalCallbackCount, 7, TEST_LOCATION);
+
+  // Wire up the remaining functions. We should now hit the cache.
+  for(int i = 7; i < 20; ++i)
+  {
+    signal.Connect(fns[i]);
+  }
+
+  totalCallbackCount = 0;
+  // Emit to verify all 20 handlers work (cached)
+  signal.Emit();
+  DALI_TEST_EQUALS(totalCallbackCount, 20, TEST_LOCATION);
 
   END_TEST;
 }
