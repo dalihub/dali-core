@@ -88,6 +88,7 @@ SET(TC_SOURCES
         utc-Dali-Shader.cpp
         utc-Dali-SharedPtr.cpp
         utc-Dali-SignalDelegate.cpp
+        utc-Dali-SignalConnectionPool.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
         utc-Dali-SingletonService.cpp

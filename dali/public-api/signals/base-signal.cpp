@@ -19,33 +19,38 @@
 #include <dali/public-api/signals/base-signal.h>
 
 // EXTERNAL INCLUDES
-#include <functional> ///< for std::less
-#include <map>
+#include <functional> ///< for std::hash, std::less
+#include <unordered_map>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
 namespace
 {
-struct CallbackBasePtrCompare
+/**
+ * @brief Block count threshold at which the hash map cache is created.
+ *
+ * With doubling block sizes (2, 4, 8, 16, 32, ...), block 5 gives a
+ * cumulative capacity of 62. Below this, linear scan over contiguous
+ * blocks is faster than hash map overhead.
+ */
+constexpr uint32_t CACHE_BLOCK_THRESHOLD = 5u;
+
+struct CallbackBaseHash
+{
+  size_t operator()(const Dali::CallbackBase* cb) const noexcept
+  {
+    size_t h1 = std::hash<Dali::CallbackBase::StaticFunction>()(cb->mStaticFunction);
+    size_t h2 = std::hash<decltype(cb->mImpl.mObjectPointer)>()(cb->mImpl.mObjectPointer);
+    return h1 ^ (h2 * 2654435761u); // Knuth multiplicative hash combine
+  }
+};
+
+struct CallbackBaseEqual
 {
   bool operator()(const Dali::CallbackBase* lhs, const Dali::CallbackBase* rhs) const noexcept
   {
-    // Compare function pointers first.
-    // Note that std::less is safe way to ordering the function pointers.
-    const Dali::CallbackBase::StaticFunction& lhsFunctionPtr = lhs->mStaticFunction;
-    const Dali::CallbackBase::StaticFunction& rhsFunctionPtr = rhs->mStaticFunction;
-    if(std::less<Dali::CallbackBase::StaticFunction>()(lhsFunctionPtr, rhsFunctionPtr))
-    {
-      return true;
-    }
-    else if(std::less<Dali::CallbackBase::StaticFunction>()(rhsFunctionPtr, lhsFunctionPtr))
-    {
-      return false;
-    }
-
-    // If function pointers are equal, compare object pointers.
-    return std::less<decltype(lhs->mImpl.mObjectPointer)>()(lhs->mImpl.mObjectPointer, rhs->mImpl.mObjectPointer);
+    return *lhs == *rhs;
   }
 };
 } // unnamed namespace
@@ -53,26 +58,17 @@ struct CallbackBasePtrCompare
 namespace Dali
 {
 /**
- * @brief Extra struct for callback base cache.
+ * @brief Lazy cache for large signals. Only allocated when block count >= CACHE_BLOCK_THRESHOLD.
  */
 struct BaseSignal::Impl
 {
   Impl()  = default;
   ~Impl() = default;
 
-  /**
-   * @brief Get the iterator of connections list by the callback base pointer.
-   * Note that we should compare the 'value' of callback, not pointer.
-   * So, we need to define custom compare functor of callback base pointer.
-   */
-  std::map<const CallbackBase*, std::list<SignalConnection>::iterator, CallbackBasePtrCompare> mCallbackCache;
+  std::unordered_map<const CallbackBase*, SignalConnection*, CallbackBaseHash, CallbackBaseEqual> mCache;
 };
 
-BaseSignal::BaseSignal()
-: mCacheImpl(new BaseSignal::Impl()),
-  mEmittingFlag(false)
-{
-}
+BaseSignal::BaseSignal() = default;
 
 BaseSignal::~BaseSignal()
 {
@@ -90,17 +86,23 @@ BaseSignal::~BaseSignal()
 
   // The signal is being destroyed. We have to inform any slots
   // that are connected, that the signal is dead.
-  for(auto iter = mSignalConnections.begin(), iterEnd = mSignalConnections.end(); iter != iterEnd; ++iter)
+  // Walk the pool and disconnect all live connections.
+  auto* block = mPool.GetFirstBlock();
+  while(block)
   {
-    auto& connection = *iter;
-
-    // Note that values are set to NULL in DeleteConnection
-    if(connection)
+    auto* slots = block->Slots();
+    for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
     {
-      connection.Disconnect(this);
+      if(slots[i])
+      {
+        // Disconnect notifies the tracker, then deletes the callback and nulls the slot.
+        slots[i].Disconnect(this);
+      }
     }
+    block = block->mNext;
   }
 
+  // Pool destructor runs next and frees all block memory.
   delete mCacheImpl;
 }
 
@@ -108,15 +110,22 @@ void BaseSignal::OnConnect(CallbackBase* callback)
 {
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Connect()");
 
-  auto iter = FindCallback(callback);
+  auto* existing = FindCallback(callback);
 
   // Don't double-connect the same callback
-  if(iter == mSignalConnections.end())
+  if(!existing)
   {
-    auto newIter = mSignalConnections.insert(mSignalConnections.end(), SignalConnection(callback));
+    auto* connection = mPool.Allocate(callback);
+    ++mActiveCount;
 
-    // Store inserted iterator for this callback
-    mCacheImpl->mCallbackCache[callback] = newIter;
+    if(mCacheImpl)
+    {
+      mCacheImpl->mCache[callback] = connection;
+    }
+    else if(mPool.GetBlockCount() >= CACHE_BLOCK_THRESHOLD)
+    {
+      EnsureCache();
+    }
   }
   else
   {
@@ -129,11 +138,11 @@ void BaseSignal::OnDisconnect(CallbackBase* callback)
 {
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Disconnect()");
 
-  auto iter = FindCallback(callback);
+  auto* connection = FindCallback(callback);
 
-  if(iter != mSignalConnections.end())
+  if(connection)
   {
-    DeleteConnection(iter);
+    DeleteConnection(connection);
   }
 
   // call back is a temporary created to find which slot should be disconnected.
@@ -145,15 +154,22 @@ void BaseSignal::OnConnect(ConnectionTrackerInterface* tracker, CallbackBase* ca
   DALI_ASSERT_ALWAYS(nullptr != tracker && "Invalid ConnectionTrackerInterface pointer passed to Connect()");
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Connect()");
 
-  auto iter = FindCallback(callback);
+  auto* existing = FindCallback(callback);
 
   // Don't double-connect the same callback
-  if(iter == mSignalConnections.end())
+  if(!existing)
   {
-    auto newIter = mSignalConnections.insert(mSignalConnections.end(), {tracker, callback});
+    auto* connection = mPool.Allocate(tracker, callback);
+    ++mActiveCount;
 
-    // Store inserted iterator for this callback
-    mCacheImpl->mCallbackCache[callback] = newIter;
+    if(mCacheImpl)
+    {
+      mCacheImpl->mCache[callback] = connection;
+    }
+    else if(mPool.GetBlockCount() >= CACHE_BLOCK_THRESHOLD)
+    {
+      EnsureCache();
+    }
 
     // Let the connection tracker know that a connection between a signal and a slot has been made.
     tracker->SignalConnected(this, callback);
@@ -170,21 +186,20 @@ void BaseSignal::OnDisconnect(ConnectionTrackerInterface* tracker, CallbackBase*
   DALI_ASSERT_ALWAYS(nullptr != tracker && "Invalid ConnectionTrackerInterface pointer passed to Disconnect()");
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Disconnect()");
 
-  auto iter = FindCallback(callback);
+  auto* connection = FindCallback(callback);
 
-  if(iter != mSignalConnections.end())
+  if(connection)
   {
     // temporary pointer to disconnected callback
-    // Note that (*iter).GetCallback() != callback is possible.
-    CallbackBase* disconnectedCallback = (*iter).GetCallback();
+    // Note that connection->GetCallback() != callback is possible.
+    CallbackBase* disconnectedCallback = connection->GetCallback();
 
     // close the signal side connection first.
-    DeleteConnection(iter);
+    DeleteConnection(connection);
 
     // close the slot side connection
     tracker->SignalDisconnected(this, disconnectedCallback);
   }
-
   // call back is a temporary created to find which slot should be disconnected.
   delete callback;
 }
@@ -194,65 +209,124 @@ void BaseSignal::SlotDisconnected(CallbackBase* callback)
 {
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid callback function passed to SlotObserver::SlotDisconnected()");
 
-  auto iter = FindCallback(callback);
-  if(DALI_LIKELY(iter != mSignalConnections.end()))
+  auto* connection = FindCallback(callback);
+  if(DALI_LIKELY(connection != nullptr))
   {
-    DeleteConnection(iter);
+    DeleteConnection(connection);
     return;
   }
 
   DALI_ABORT("Callback lost in SlotDisconnected()");
 }
 
-std::list<SignalConnection>::iterator BaseSignal::FindCallback(CallbackBase* callback) noexcept
+SignalConnection* BaseSignal::FindCallback(CallbackBase* callback) noexcept
 {
-  const auto& convertorIter = mCacheImpl->mCallbackCache.find(callback);
-
-  if(convertorIter != mCacheImpl->mCallbackCache.end())
+  // Fast path: use hash map cache if available (large signals)
+  if(mCacheImpl)
   {
-    const auto& iter = convertorIter->second; // std::list<SignalConnection>::iterator
-
-    if(*iter && iter->GetCallback()) // the value of iterator can be null.
+    auto iter = mCacheImpl->mCache.find(callback);
+    if(iter != mCacheImpl->mCache.end())
     {
-      if(*(iter->GetCallback()) == *callback)
+      return iter->second;
+    }
+    return nullptr;
+  }
+
+  // Slow path: linear scan over blocks (small signals, N < ~30)
+  auto* block = mPool.GetFirstBlock();
+  while(block)
+  {
+    auto* slots = block->Slots();
+    for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
+    {
+      if(slots[i] && slots[i].GetCallback())
       {
-        return iter;
+        if(*(slots[i].GetCallback()) == *callback)
+        {
+          return &slots[i];
+        }
       }
     }
+    block = block->mNext;
   }
-  return mSignalConnections.end();
+
+  return nullptr;
 }
 
-void BaseSignal::DeleteConnection(std::list<SignalConnection>::iterator iter)
+void BaseSignal::DeleteConnection(SignalConnection* connection)
 {
-  // Erase cache first.
-  mCacheImpl->mCallbackCache.erase(iter->GetCallback());
+  // Remove from cache if it exists
+  if(mCacheImpl)
+  {
+    mCacheImpl->mCache.erase(connection->GetCallback());
+  }
 
   if(mEmittingFlag)
   {
-    // IMPORTANT - do not remove from items from mSignalConnections, reset instead.
-    // Signal Emit() methods require that connection count is not reduced while iterating
-    // i.e. DeleteConnection can be called from within callbacks, while iterating through mSignalConnections.
-    (*iter) = {nullptr};
-    ++mNullConnections;
+    // IMPORTANT - do not free slots during emit, null instead.
+    // Signal Emit() methods require that active count is not reduced by frees
+    // while iterating. The slot will be freed in CleanupConnections after Emit.
+    *connection = SignalConnection{nullptr};
+    ++mNullCount;
   }
   else
   {
-    // If application connects and disconnects without the signal never emitting,
-    // the mSignalConnections vector keeps growing and growing as CleanupConnections() is done from Emit.
-    mSignalConnections.erase(iter);
+    // Not emitting: move the connection out before freeing. This prevents
+    // cascading destruction (if the callback owns the last handle to the object
+    // that owns this signal) from happening while Free() is modifying the pool.
+    SignalConnection moved(std::move(*connection));
+    mPool.Free(connection); // Frees a null slot — destructor is a no-op
+    // 'moved' destructor runs here — may cascade, but pool is in a consistent state.
   }
+  --mActiveCount;
 }
 
 void BaseSignal::CleanupConnections()
 {
-  if(!mSignalConnections.empty())
+  if(mNullCount == 0u)
   {
-    //Remove Signals that are already markeed nullptr.
-    mSignalConnections.remove_if([](auto& elem)
-    { return (elem) ? false : true; });
+    return;
   }
-  mNullConnections = 0;
+
+  uint32_t remaining = mNullCount;
+  auto*    block     = mPool.GetFirstBlock();
+  while(block && remaining > 0u)
+  {
+    auto* slots = block->Slots();
+    for(uint32_t i = 0; i < block->mHighWaterMark && remaining > 0u; ++i)
+    {
+      if(!slots[i])
+      {
+        mPool.Free(&slots[i]);
+        --remaining;
+      }
+    }
+    block = block->mNext;
+  }
+  mNullCount = 0u;
+}
+
+void BaseSignal::EnsureCache()
+{
+  if(!mCacheImpl)
+  {
+    mCacheImpl = new BaseSignal::Impl();
+
+    // Populate from existing live connections
+    auto* block = mPool.GetFirstBlock();
+    while(block)
+    {
+      auto* slots = block->Slots();
+      for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
+      {
+        if(slots[i] && slots[i].GetCallback())
+        {
+          mCacheImpl->mCache[slots[i].GetCallback()] = &slots[i];
+        }
+      }
+      block = block->mNext;
+    }
+  }
 }
 
 // BaseSignal::EmitGuard

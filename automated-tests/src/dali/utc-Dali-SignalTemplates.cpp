@@ -2254,7 +2254,7 @@ int UtcDaliSignalEmitOr(void)
   DALI_TEST_CHECK(signal.GetConnectionCount() == 1);
 
   handler.mBoolReturn = true;
-  bool result = signal.EmitOr(1.0f, 2);
+  bool result         = signal.EmitOr(1.0f, 2);
   DALI_TEST_CHECK(result);
 
   TestSlotHandler handler1;
@@ -2262,11 +2262,151 @@ int UtcDaliSignalEmitOr(void)
   DALI_TEST_CHECK(signal.GetConnectionCount() == 2);
 
   handler1.mBoolReturn = false;
-  result = signal.EmitOr(1.0f, 2);
+  result               = signal.EmitOr(1.0f, 2);
   DALI_TEST_CHECK(result);
 
   result = signal.Emit(1.0f, 2);
   DALI_TEST_CHECK(!result);
+
+  END_TEST;
+}
+
+int UtcDaliSignalLargeConnectionCount(void)
+{
+  tet_infoline(
+    "Test that signals with many connections (> cache threshold) work correctly.\n"
+    "This exercises the adaptive hash map cache path in BaseSignal.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  const int        count = 40; // Above the cache threshold (~30)
+  TestSlotHandler* handlers[count];
+
+  for(int i = 0; i < count; ++i)
+  {
+    handlers[i] = new TestSlotHandler();
+    signal.Connect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  signal.Emit();
+
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(handlers[i]->mHandledCount, 1, TEST_LOCATION);
+  }
+
+  // Disconnect half
+  for(int i = 0; i < count; i += 2)
+  {
+    signal.Disconnect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count / 2), TEST_LOCATION);
+
+  // Emit again — only odd-indexed handlers should fire
+  signal.Emit();
+
+  for(int i = 0; i < count; ++i)
+  {
+    if(i % 2 == 0)
+    {
+      DALI_TEST_EQUALS(handlers[i]->mHandledCount, 1, TEST_LOCATION); // not called again
+    }
+    else
+    {
+      DALI_TEST_EQUALS(handlers[i]->mHandledCount, 2, TEST_LOCATION); // called twice total
+    }
+  }
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete handlers[i];
+  }
+
+  END_TEST;
+}
+
+int UtcDaliSignalLargeDisconnectDuringEmit(void)
+{
+  tet_infoline("Test disconnect-during-emit with enough connections to trigger the cache.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  const int             count = 40;
+  TestSlotDisconnector* handlers[count];
+
+  for(int i = 0; i < count; ++i)
+  {
+    handlers[i] = new TestSlotDisconnector();
+    handlers[i]->VoidConnectVoid(signal);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // Each handler disconnects itself during emit
+  signal.Emit();
+
+  // All should have fired and disconnected
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(handlers[i]->mHandled, true, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(signal.Empty());
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete handlers[i];
+  }
+
+  END_TEST;
+}
+
+int UtcDaliSignalLargeReconnect(void)
+{
+  tet_infoline("Test repeated connect/disconnect cycles that grow past and shrink below the cache threshold.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  const int        count = 40;
+  TestSlotHandler* handlers[count];
+
+  for(int i = 0; i < count; ++i)
+  {
+    handlers[i] = new TestSlotHandler();
+  }
+
+  // Connect all
+  for(int i = 0; i < count; ++i)
+  {
+    signal.Connect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // Disconnect all
+  for(int i = 0; i < count; ++i)
+  {
+    signal.Disconnect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_CHECK(signal.Empty());
+
+  // Reconnect all
+  for(int i = 0; i < count; ++i)
+  {
+    signal.Connect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // Emit and verify
+  signal.Emit();
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(handlers[i]->mHandledCount, 1, TEST_LOCATION);
+  }
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete handlers[i];
+  }
 
   END_TEST;
 }

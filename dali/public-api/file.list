@@ -79,6 +79,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/signals/callback.cpp
   ${public_api_src_dir}/signals/connection-tracker.cpp
   ${public_api_src_dir}/signals/connection-tracker-interface.cpp
+  ${public_api_src_dir}/signals/signal-connection-pool.cpp
   ${public_api_src_dir}/signals/signal-slot-connections.cpp
   ${public_api_src_dir}/signals/signal-slot-observers.cpp
   ${public_api_src_dir}/signals/base-signal.cpp
@@ -245,6 +246,7 @@ SET( public_api_core_signals_header_files
   ${public_api_src_dir}/signals/connection-tracker.h
   ${public_api_src_dir}/signals/dali-signal.h
   ${public_api_src_dir}/signals/functor-delegate.h
+  ${public_api_src_dir}/signals/signal-connection-pool.h
   ${public_api_src_dir}/signals/signal-slot-connections.h
   ${public_api_src_dir}/signals/signal-slot-observers.h
   ${public_api_src_dir}/signals/slot-delegate.h
