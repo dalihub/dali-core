@@ -2,7 +2,7 @@
 #define DALI_COMMON_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,6 +220,15 @@ public:
 #if __has_cpp_attribute(fallthrough)
 #undef DALI_FALLTHROUGH
 #define DALI_FALLTHROUGH [[fallthrough]]
+#endif
+#endif
+
+/// Use DALI_NO_UNIQUE_ADDRESS to allow empty base class optimization for compilers that support it
+#define DALI_NO_UNIQUE_ADDRESS
+#if __GNUC__
+#if __has_cpp_attribute(no_unique_address)
+#undef DALI_NO_UNIQUE_ADDRESS
+#define DALI_NO_UNIQUE_ADDRESS [[no_unique_address]]
 #endif
 #endif
 
