@@ -46,7 +46,6 @@ public:
   /**
    * @brief Default constructor.
    * @SINCE_2_5.16
-   * @param[in] ptr Raw pointer to take ownership of
    */
   SharedPtr()
   : mPtr(nullptr),
