@@ -231,7 +231,8 @@ sub create_env
 
     copy($0, "$install_path/bin/dali_env");
     chmod(0755, "$install_path/bin/dali_env");
-    copy("$root_path/dali-core/build/scripts/fastcov.py", "$install_path/bin/fastcov.py");
+    my $fastcov_src = "$root_path/../dali-core/build/scripts/fastcov.py";
+    copy($fastcov_src, "$install_path/bin/fastcov.py") or die "Failed to copy $fastcov_src to $install_path/bin/fastcov.py: $!";
     chmod(0755, "$install_path/bin/fastcov.py");
 }
 
