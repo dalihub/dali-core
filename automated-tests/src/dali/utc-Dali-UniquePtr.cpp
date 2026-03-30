@@ -951,3 +951,40 @@ int UtcDaliMakeUniquePerfectForwardingRValue(void)
 
   END_TEST;
 }
+
+int UtcDaliUniquePtrResetWithSamePtr(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  UniquePtr<TestClass> ptr(new TestClass(destructorCalled));
+  DALI_TEST_CHECK(ptr);
+  DALI_TEST_CHECK(!destructorCalled);
+
+  auto rawPtr = ptr.Get();
+  ptr.Reset(rawPtr);
+
+  DALI_TEST_CHECK(!destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrResetWithSamePtrCustomDeleter(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+  bool            customDeleterCalled(false);
+  CustomDeleter   customDeleter(customDeleterCalled);
+
+  UniquePtr<TestClass, CustomDeleter> ptr(new TestClass(destructorCalled), customDeleter);
+  DALI_TEST_CHECK(ptr);
+  DALI_TEST_CHECK(!destructorCalled);
+
+  auto rawPtr = ptr.Get();
+  ptr.Reset(rawPtr);
+
+  DALI_TEST_CHECK(!destructorCalled);
+  DALI_TEST_CHECK(!customDeleterCalled);
+
+  END_TEST;
+}

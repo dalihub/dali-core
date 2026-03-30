@@ -254,12 +254,15 @@ public:
    */
   void Reset(Type* ptr = nullptr)
   {
-    // Delete the current object
-    if(mPtr && mDeleter)
+    if(ptr != mPtr)
     {
-      mDeleter(mPtr);
+      // Delete the current object
+      if(mPtr && mDeleter)
+      {
+        mDeleter(mPtr);
+      }
+      mPtr = ptr; // Take ownership of the new object
     }
-    mPtr = ptr; // Take ownership of the new object
   }
 
 private:
@@ -481,12 +484,15 @@ public:
    */
   void Reset(Type* ptr = nullptr)
   {
-    // Delete the current object
-    if(mPtr)
+    if(ptr != mPtr)
     {
-      mDeleter(mPtr);
+      // Delete the current object
+      if(mPtr)
+      {
+        mDeleter(mPtr);
+      }
+      mPtr = ptr; // Take ownership of the new object
     }
-    mPtr = ptr; // Take ownership of the new object
   }
 
 private:

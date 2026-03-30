@@ -1000,10 +1000,64 @@ int UtcDaliVectorInsert02(void)
   END_TEST;
 }
 
-int UtcDaliVectorIntInsertAssert(void)
+int UtcDaliVectorInsert03(void)
+{
+  tet_infoline("Testing Dali::Vector<char>::Insert(Iterator,RValue)");
+  struct MyInt
+  {
+  public:
+    int myInt;
+  };
+
+  Vector<MyInt> vector;
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(ZERO, vector.Capacity(), TEST_LOCATION);
+  vector.PushBack({1});
+  vector.PushBack({2});
+  vector.PushBack({3});
+  vector.PushBack({4});
+  vector.PushBack({5});
+
+  // Test insert at end
+  vector.Insert(vector.End(), MyInt{6});
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].myInt, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].myInt, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].myInt, 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3].myInt, 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4].myInt, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5].myInt, 6, TEST_LOCATION);
+
+  // Test insert at begin
+  vector.Insert(vector.Begin(), MyInt{7});
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(7), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].myInt, 7, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].myInt, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].myInt, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3].myInt, 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4].myInt, 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5].myInt, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[6].myInt, 6, TEST_LOCATION);
+
+  // Test insert in the middle
+  vector.Insert(vector.Begin() + 3, MyInt{9});
+  vector.Insert(vector.Begin() + 4, MyInt{10});
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(9), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].myInt, 7, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].myInt, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].myInt, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3].myInt, 9, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4].myInt, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5].myInt, 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[6].myInt, 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[7].myInt, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[8].myInt, 6, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVectorStructIntInsertAssert(void)
 {
   tet_infoline("Testing Dali::Vector<char>::Insert(Iterator,Iterator,Iterator) asserts");
-
   Vector<char> vector;
   DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(ZERO, vector.Capacity(), TEST_LOCATION);

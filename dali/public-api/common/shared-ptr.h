@@ -46,7 +46,6 @@ public:
   /**
    * @brief Default constructor.
    * @SINCE_2_5.16
-   * @param[in] ptr Raw pointer to take ownership of
    */
   SharedPtr()
   : mPtr(nullptr),
@@ -312,15 +311,18 @@ public:
    */
   void Reset(Type* ptr = nullptr) noexcept
   {
-    ResetInternal();
-    mPtr = ptr;
-    if(ptr)
+    if(ptr != mPtr)
     {
-      mRefCount = new uint32_t(1);
-    }
-    else
-    {
-      mRefCount = nullptr;
+      ResetInternal();
+      mPtr = ptr;
+      if(ptr)
+      {
+        mRefCount = new uint32_t(1);
+      }
+      else
+      {
+        mRefCount = nullptr;
+      }
     }
   }
 

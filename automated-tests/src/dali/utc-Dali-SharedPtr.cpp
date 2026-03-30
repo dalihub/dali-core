@@ -317,8 +317,15 @@ int UtcDaliSharedPtrMoveAssignmentSelf(void)
     DALI_TEST_CHECK(ptr);
     DALI_TEST_CHECK(ptr.UseCount() == 1);
 
-    // Self std::move assignment
+    // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
     ptr = std::move(ptr);
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
 
     DALI_TEST_CHECK(ptr);
     DALI_TEST_CHECK(ptr.UseCount() == 1);
@@ -1118,6 +1125,23 @@ int UtcDaliSharedPtrConstructorWithNewAndReset(void)
   ptr.Reset();
   DALI_TEST_CHECK(ptr.UseCount() == 0);
   DALI_TEST_CHECK(destructorCalled2);
+
+  END_TEST;
+}
+
+int UtcDaliSharedPtrResetWithSamePtr(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  SharedPtr<TestClass> ptr(new TestClass(destructorCalled));
+  DALI_TEST_CHECK(!destructorCalled);
+  DALI_TEST_CHECK(ptr.UseCount() == 1);
+
+  auto rawPtr = ptr.Get();
+  ptr.Reset(rawPtr);
+
+  DALI_TEST_CHECK(!destructorCalled);
 
   END_TEST;
 }
