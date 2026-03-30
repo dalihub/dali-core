@@ -361,6 +361,11 @@ private:
    */
   Integration::GraphicsConfig& GetGraphicsConfig() const;
 
+  const SceneGraph::MemoryPoolCollection& GetMemoryPools() const
+  {
+    return *mMemoryPoolCollection.Get();
+  }
+
 private:
   /**
    * Undefined copy and assignment operators

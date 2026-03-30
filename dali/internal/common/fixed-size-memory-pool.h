@@ -98,7 +98,7 @@ public:
   /**
    * @copydoc Dali::Internal::MemoryPoolInterface::GetCapacity
    */
-  uint32_t GetCapacity() const override;
+  void GetCapacity(uint32_t& capacity, uint32_t& filledSize) const override;
 
   /**
    * @copydoc Dali::Internal::MemoryPoolInterface::ResetMemoryPool

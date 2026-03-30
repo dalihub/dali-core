@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,12 @@
 
 namespace Dali::Internal::SceneGraph
 {
+namespace
+{
+constexpr uint32_t INITIAL_CAMERA_BLOCK_CAPACITY           = 4u;
+constexpr uint32_t INITIAL_RENDER_TASK_LIST_BLOCK_CAPACITY = 4u;
+constexpr uint32_t INITIAL_UBO_BLOCK_CAPACITY              = 4u;
+} //namespace
 /**
  * Structure to contain MemoryPoolCollection internal data
  */
@@ -48,17 +54,17 @@ struct MemoryPoolCollection::Impl
 
   // UpdateManager
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Animation>      mAnimationMemoryPool;
-  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Camera>         mCameraMemoryPool;
+  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Camera>         mCameraMemoryPool{INITIAL_CAMERA_BLOCK_CAPACITY};
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Node>           mNodeMemoryPool;
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::Renderer>       mRendererMemoryPool;
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderItem>     mRenderItemMemoryPool;
-  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> mRenderTaskListMemoryPool;
+  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::RenderTaskList> mRenderTaskListMemoryPool{INITIAL_RENDER_TASK_LIST_BLOCK_CAPACITY};
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::SceneGraph::TextureSet>     mTextureSetMemoryPool;
 
   // RenderManager
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::Renderer>          mRenderRendererMemoryPool;
   Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::Texture>           mRenderTextureMemoryPool;
-  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::UniformBufferView> mRenderUboViewMemoryPool;
+  Dali::Internal::MemoryPoolObjectAllocator<Dali::Internal::Render::UniformBufferView> mRenderUboViewMemoryPool{INITIAL_UBO_BLOCK_CAPACITY};
 };
 
 MemoryPoolCollection::MemoryPoolCollection()
@@ -259,56 +265,99 @@ MemoryPoolInterface::KeyType MemoryPoolCollection::GetKeyFromPtr(MemoryPoolColle
   }
 }
 
-uint32_t MemoryPoolCollection::GetCapacity(MemoryPoolCollection::MemoryPoolType type) const
+void MemoryPoolCollection::GetCapacity(MemoryPoolCollection::MemoryPoolType type, uint32_t& cap, uint32_t& size) const
 {
   switch(type)
   {
     case MemoryPoolCollection::MemoryPoolType::ANIMATION:
     {
-      return mImpl->mAnimationMemoryPool.GetCapacity();
+      mImpl->mAnimationMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::CAMERA:
     {
-      return mImpl->mCameraMemoryPool.GetCapacity();
+      mImpl->mCameraMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::NODE:
     {
-      return mImpl->mNodeMemoryPool.GetCapacity();
+      mImpl->mNodeMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDERER:
     {
-      return mImpl->mRendererMemoryPool.GetCapacity();
+      mImpl->mRendererMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_ITEM:
     {
-      return mImpl->mRenderItemMemoryPool.GetCapacity();
+      mImpl->mRenderItemMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_TASK_LIST:
     {
-      return mImpl->mRenderTaskListMemoryPool.GetCapacity();
+      mImpl->mRenderTaskListMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::TEXTURE_SET:
     {
-      return mImpl->mTextureSetMemoryPool.GetCapacity();
+      mImpl->mTextureSetMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_RENDERER:
     {
-      return mImpl->mRenderRendererMemoryPool.GetCapacity();
+      mImpl->mRenderRendererMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_TEXTURE:
     {
-      return mImpl->mRenderTextureMemoryPool.GetCapacity();
+      mImpl->mRenderTextureMemoryPool.GetCapacity(cap, size);
+      return;
     }
     case MemoryPoolCollection::MemoryPoolType::RENDER_UBO_VIEW:
     {
-      return mImpl->mRenderUboViewMemoryPool.GetCapacity();
+      mImpl->mRenderUboViewMemoryPool.GetCapacity(cap, size);
+      return;
     }
     default:
     {
       DALI_ASSERT_ALWAYS(0 && "Invalid memory pool type capacity");
-      return 0u;
+      return;
     }
   }
+}
+
+template<typename T>
+std::string SizeConvertor(const Dali::Internal::MemoryPoolObjectAllocator<T>& pool)
+{
+  uint32_t cap, size;
+  pool.GetCapacity(cap, size);
+  std::ostringstream oss;
+  oss.width(12);
+  oss << std::right << cap << " byte (";
+  oss.width(9);
+  oss << ((cap + (1 << 9)) >> 10) << " KB) (";
+  oss.width(4);
+  oss << TypeSizeWithAlignment<T>::size << " byte * " << (cap / TypeSizeWithAlignment<T>::size) << " items] ";
+  oss.width(3);
+  oss << (size * 100 / cap) << "%\n";
+  return oss.str();
+}
+
+std::string MemoryPoolCollection::LogPools() const
+{
+  std::ostringstream oss;
+  oss << "Animations:        " << SizeConvertor<Dali::Internal::SceneGraph::Animation>(mImpl->mAnimationMemoryPool) << std::endl
+      << "RenderItems:       " << SizeConvertor<Dali::Internal::SceneGraph::RenderItem>(mImpl->mRenderItemMemoryPool) << std::endl
+      << "Renderers:         " << SizeConvertor<Dali::Internal::SceneGraph::Renderer>(mImpl->mRendererMemoryPool) << std::endl
+      << "TextureSets:       " << SizeConvertor<Dali::Internal::SceneGraph::TextureSet>(mImpl->mTextureSetMemoryPool) << std::endl
+      << "RenderTasks:       " << SizeConvertor<Dali::Internal::SceneGraph::RenderTaskList>(mImpl->mRenderTaskListMemoryPool) << std::endl
+      << "Nodes:             " << SizeConvertor<Dali::Internal::SceneGraph::Node>(mImpl->mNodeMemoryPool) << std::endl
+      << "Cameras:           " << SizeConvertor<Dali::Internal::SceneGraph::Camera>(mImpl->mCameraMemoryPool) << std::endl
+      << "Render::Renderers: " << SizeConvertor<Dali::Internal::Render::Renderer>(mImpl->mRenderRendererMemoryPool) << std::endl
+      << "Render::Textures:  " << SizeConvertor<Dali::Internal::Render::Texture>(mImpl->mRenderTextureMemoryPool) << std::endl
+      << "Render::UboViews:  " << SizeConvertor<Dali::Internal::Render::UniformBufferView>(mImpl->mRenderUboViewMemoryPool) << std::endl;
+  return oss.str();
 }
 
 } // namespace Dali::Internal::SceneGraph

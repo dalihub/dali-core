@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_THREAD_LOCAL_STORAGE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/stage-def.h>
+#include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 
 namespace Dali
 {
@@ -149,6 +150,11 @@ public:
    * @return A reference to the Object registry
    */
   ObjectRegistry& GetObjectRegistry();
+
+  /**
+   * Returns the collection of scene graph memory pools
+   */
+  const SceneGraph::MemoryPoolCollection& GetMemoryPools() const;
 
   /**
    * @brief Gets the event thread services.

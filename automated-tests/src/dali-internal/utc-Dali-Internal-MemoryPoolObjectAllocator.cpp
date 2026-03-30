@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@
 // Internal headers are allowed here
 
 #include <dali/internal/common/memory-pool-object-allocator.h>
+#include <dali/internal/common/core-impl.h>
+#include <dali/integration-api/profiling.h>
 
 using namespace Dali;
 
@@ -179,6 +181,33 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocationPOD(void)
   DALI_TEST_CHECK(testObject2);
 
   allocator.Destroy(testObject2);
+
+  END_TEST;
+}
+
+
+int UtcDaliMemoryPoolLogging(void)
+{
+  setenv("DALI_MEMORY_POOL_INTERVAL", "1", 1);
+  TestApplication app;
+  tet_infoline("Testing DALi memory pool logging\n");
+
+  Actor parent = CreateRenderableActor();
+  app.GetScene().Add(parent);
+  Actor child = CreateRenderableActor();
+  parent.Add(child);
+  app.SendNotification();
+  app.Render();
+  Animation anim = Animation::New(10);
+  anim.AnimateTo(Property(child, Actor::Property::POSITION), Vector3(100.0f, 0.0f, 0.0f));
+  anim.Play();
+  app.SendNotification();
+  app.Render(1000);
+  app.GetCore().LogMemoryPools();
+
+  auto log = Dali::Integration::Profiling::LogMemoryPools();
+  tet_printf("Memory pool logging:\n%s\n", log.c_str());
+  DALI_TEST_CHECK(!log.empty());
 
   END_TEST;
 }
