@@ -471,7 +471,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   Vector3& Get(BufferIndex bufferIndex)
   {
@@ -480,7 +480,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   const Vector3& Get(BufferIndex bufferIndex) const
   {
@@ -578,7 +578,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   Quaternion& Get(BufferIndex bufferIndex)
   {
@@ -587,7 +587,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   const Quaternion& Get(BufferIndex bufferIndex) const
   {
@@ -685,7 +685,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   Matrix& Get(BufferIndex bufferIndex)
   {
@@ -696,7 +696,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   const Matrix& Get(BufferIndex bufferIndex) const
   {
@@ -746,20 +746,24 @@ public:
   TransformManagerBooleanIgnoredInput() = default;
 
   /**
-   * @copydoc Dali::PropertyInput::GetMatrix()
+   * @copydoc Dali::PropertyInput::GetBoolean()
    */
   const bool& GetBoolean(BufferIndex bufferIndex) const override
   {
     auto transformManagerData = GetTxManagerData();
     auto id                   = transformManagerData->Id();
+
+    // Keep it as static variables, to convert bool -> const bool&
+    thread_local static bool retValue;
     if constexpr(IsWorldT)
     {
-      return transformManagerData->Manager()->IsWorldIgnored(id);
+      retValue = transformManagerData->Manager()->IsWorldIgnored(id);
     }
     else
     {
-      return transformManagerData->Manager()->IsIgnored(id);
+      retValue = transformManagerData->Manager()->IsIgnored(id);
     }
+    return retValue;
   }
 
   /**
@@ -780,7 +784,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   bool& Get(BufferIndex bufferIndex)
   {
@@ -798,7 +802,7 @@ public:
   }
 
   /**
-   * @copydoc Dali::SceneGraph::PropertyInterface::Get()
+   * @copydoc Dali::Internal::SceneGraph::TransformManagerPropertyHandler::Get()
    */
   const bool& Get(BufferIndex bufferIndex) const
   {
