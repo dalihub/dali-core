@@ -54,9 +54,10 @@ void EmitLongPressSignal(
   Actor*                          actor,
   const GestureDetectorContainer& gestureDetectors,
   const LongPressGestureEvent&    longPressEvent,
-  Vector2                         localPoint)
+  Vector2                         localPoint,
+  GestureState                    state)
 {
-  Internal::LongPressGesturePtr longPress(new Internal::LongPressGesture(longPressEvent.state));
+  Internal::LongPressGesturePtr longPress(new Internal::LongPressGesture(state));
   longPress->SetTime(longPressEvent.time);
   longPress->SetNumberOfTouches(longPressEvent.numberOfTouches);
   longPress->SetScreenPoint(longPressEvent.point);
@@ -194,13 +195,23 @@ void LongPressGestureProcessor::Process(Scene& scene, const LongPressGestureEven
             RenderTask& renderTaskImpl = *mCurrentRenderTask.Get();
             currentGesturedActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
 
-            EmitLongPressSignal(currentGesturedActor, mCurrentEmitters, longPressEvent, actorCoords);
+            EmitLongPressSignal(currentGesturedActor, mCurrentEmitters, longPressEvent, actorCoords, longPressEvent.state);
           }
         }
 
-        // Clear current emitters and emitted actor
-        mCurrentEmitters.clear();
-        ResetActor();
+        else
+        {
+          if(!mCurrentEmitters.empty() && mCurrentRenderTask)
+          {
+            // If the actor is no longer hittable, but we still have emitters, we should cancel the gesture
+            Vector2 actorCoords;
+            currentGesturedActor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y);
+            EmitLongPressSignal(currentGesturedActor, mCurrentEmitters, longPressEvent, actorCoords, GestureState::CANCELLED);
+          }
+          // Clear current emitters and emitted actor
+          mCurrentEmitters.clear();
+          ResetActor();
+        }
       }
       break;
     }
@@ -367,7 +378,7 @@ void LongPressGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDet
   mCurrentEmitters.clear();
   ResetActor();
 
-  EmitLongPressSignal(actor, gestureDetectors, *mCurrentLongPressEvent, actorCoordinates);
+  EmitLongPressSignal(actor, gestureDetectors, *mCurrentLongPressEvent, actorCoordinates, mCurrentLongPressEvent->state);
 
   if(actor->OnScene())
   {
