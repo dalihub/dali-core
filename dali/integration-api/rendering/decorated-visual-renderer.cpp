@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
+#include <dali/integration-api/rendering/decorated-visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/decorated-visual-renderer-impl.h>

@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
-#include <dali/public-api/rendering/visual-renderer.h>   // Dali::VisualRenderer
+#include <dali/integration-api/rendering/visual-renderer.h> // Dali::VisualRenderer
+#include <dali/internal/event/rendering/renderer-impl.h>    // Dali::Internal::Renderer
 
 namespace Dali
 {

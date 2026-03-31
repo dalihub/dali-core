@@ -21,6 +21,7 @@
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/render-task-list-integ.h>
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/public-api/dali-core.h>
 #include <cstdio>
 #include <string>
