@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_RENDER_TARGET_GRAPHICS_OBJECTS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,8 @@ public:
   void Initialize(Graphics::Controller& graphicsController)
   {
     mGraphicsController = &graphicsController;
+
+    OnInitialize();
   }
 
   [[nodiscard]] Graphics::RenderTarget* GetGraphicsRenderTarget() const
@@ -137,6 +139,14 @@ protected:
     // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
     // If someone call AddObserver / RemoveObserver after this, assert.
     mObserverNotifying = true;
+  }
+
+  /**
+   * @brief Second-phase intiailize
+   */
+  virtual void OnInitialize()
+  {
+    // Do nothing.
   }
 
   /**

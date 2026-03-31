@@ -320,19 +320,34 @@ public:
     return mFramebufferDepthStencilAttachmentCount;
   }
 
-  inline GLenum CheckFramebufferDepthAttachment()
+  inline GLenum CheckFramebufferRenderbufferDepthAttachment()
   {
     return mFramebufferDepthAttached;
   }
 
-  inline GLenum CheckFramebufferStencilAttachment()
+  inline GLenum CheckFramebufferRenderbufferStencilAttachment()
   {
     return mFramebufferStencilAttached;
   }
 
-  inline GLenum CheckFramebufferDepthStencilAttachment()
+  inline GLenum CheckFramebufferRenderbufferDepthStencilAttachment()
   {
     return mFramebufferDepthStencilAttached;
+  }
+
+  inline GLenum CheckFramebufferDepthAttachment()
+  {
+    return mFramebufferDepthAttached || ((mFramebufferDepthAttachmentCount > 0 || mFramebufferDepthStencilAttachmentCount > 0) ? GL_TRUE : GL_FALSE);
+  }
+
+  inline GLenum CheckFramebufferStencilAttachment()
+  {
+    return mFramebufferStencilAttached || ((mFramebufferStencilAttachmentCount > 0 || mFramebufferDepthStencilAttachmentCount > 0) ? GL_TRUE : GL_FALSE);
+  }
+
+  inline GLenum CheckFramebufferDepthStencilAttachment()
+  {
+    return mFramebufferDepthStencilAttached || (mFramebufferDepthStencilAttachmentCount > 0 ? GL_TRUE : GL_FALSE);
   }
 
   inline void Clear(GLbitfield mask) override
@@ -650,19 +665,20 @@ public:
 
   inline void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) override
   {
+    const bool attached = (renderbuffer != 0u);
     if(attachment == GL_DEPTH_ATTACHMENT)
     {
-      mFramebufferDepthAttached = true;
+      mFramebufferDepthAttached = attached;
     }
     else if(attachment == GL_STENCIL_ATTACHMENT)
     {
-      mFramebufferStencilAttached = true;
+      mFramebufferStencilAttached = attached;
     }
     else if(attachment == GL_DEPTH_STENCIL_ATTACHMENT)
     {
-      mFramebufferStencilAttached      = true;
-      mFramebufferDepthAttached        = true;
-      mFramebufferDepthStencilAttached = true;
+      mFramebufferStencilAttached      = attached;
+      mFramebufferDepthAttached        = attached;
+      mFramebufferDepthStencilAttached = attached;
     }
   }
 

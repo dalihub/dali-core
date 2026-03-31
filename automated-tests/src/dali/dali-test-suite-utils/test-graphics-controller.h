@@ -438,8 +438,14 @@ public: // ResourceId relative API.
    */
   Graphics::UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) override;
 
-  bool          HasClipMatrix() const override;
   const Matrix& GetClipMatrix(const Graphics::RenderTarget* renderTarget) const override;
+
+  /**
+   * @brief Updates the depth/stencil state of a framebuffer
+   * @param[in] framebuffer The framebuffer to update
+   * @param[in] depthStencilState The new depth/stencil state
+   */
+  void UpdateFramebufferRenderbufferUsage(Graphics::Framebuffer& framebuffer, const Graphics::DepthStencilState& depthStencilState) override;
 
 public: // Test Functions
   void SetAutoAttrCreation(bool v)

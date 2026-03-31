@@ -1694,8 +1694,30 @@ inline RenderTargetTransformFlags operator|(T flags, RenderTargetTransformFlagBi
 enum class DeviceCapability
 {
   MIN_UNIFORM_BUFFER_OFFSET_ALIGNMENT,
-  SUPPORTED_DYNAMIC_STATES
+  SUPPORTED_DYNAMIC_STATES,
+  SUPPORTED_GRAPHICS_FEATURE_FLAGS,
 };
+
+enum class GraphicsFeatureFlagBits : uint32_t
+{
+  HAS_CLIP_MATRIX_BIT                        = 0x00000001,
+  PIPELINE_USE_RENDER_TARGET_BIT             = 0x00000002,
+  RUNTIME_RENDERBUFFER_ATTACHMENT_CHANGE_BIT = 0x00000004,
+};
+
+using GraphicsFeatureFlags = uint32_t;
+
+template<typename T>
+constexpr inline GraphicsFeatureFlags operator|(T flags, GraphicsFeatureFlagBits bit)
+{
+  return static_cast<GraphicsFeatureFlags>(flags) | static_cast<GraphicsFeatureFlags>(bit);
+}
+
+template<typename T>
+constexpr inline bool operator&(T flags, GraphicsFeatureFlagBits bit)
+{
+  return !!(static_cast<GraphicsFeatureFlags>(flags) & static_cast<GraphicsFeatureFlags>(bit));
+}
 
 /**
  * unique_ptr defined in the Graphics scope

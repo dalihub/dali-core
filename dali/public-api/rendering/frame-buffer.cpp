@@ -48,7 +48,7 @@ FrameBuffer FrameBuffer::New(uint32_t width, uint32_t height)
 FrameBuffer FrameBuffer::New(uint32_t width, uint32_t height, Attachment::Mask attachments)
 {
   Internal::FrameBufferPtr frameBuffer = Internal::FrameBuffer::New(width, height, attachments);
-  if(attachments & FrameBuffer::Attachment::COLOR)
+  if((attachments & FrameBuffer::Attachment::COLOR) && (attachments != FrameBuffer::Attachment::AUTO))
   {
     Internal::TexturePtr texture = Internal::Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::RGB888, width, height);
     frameBuffer->AttachColorTexture(texture, 0u, 0u);

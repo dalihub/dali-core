@@ -187,7 +187,7 @@ Dali::Rect<int32_t> RenderItem::CalculateViewportSpaceAABB(const Matrix& modelVi
   return Dali::Rect<int32_t>(x, y, z - x, w - y);
 }
 
-bool RenderItem::UsesDepthBuffer(bool depthTestEnabled)
+bool RenderItem::UsesDepthBuffer(bool depthTestEnabled) const
 {
   const DepthWriteMode::Type depthWriteMode = mRenderer->GetDepthWriteMode();
   const DepthTestMode::Type  depthTestMode  = mRenderer->GetDepthTestMode();

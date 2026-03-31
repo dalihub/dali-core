@@ -59,14 +59,16 @@ public:
      */
     enum Mask
     {
-      NONE                = 0,                    ///< No attachments are created initially.         @SINCE_1_1.45
-      DEPTH               = 1 << 0,               ///< Depth buffer is created.                      @SINCE_1_1.45
-      STENCIL             = 1 << 1,               ///< Stencil buffer is created.                    @SINCE_1_1.45
-      DEPTH_STENCIL       = DEPTH | STENCIL,      ///< Depth and stencil buffer are created.         @SINCE_1_1.45
-      COLOR               = 1 << 2,               ///< Color texture is created.                     @SINCE_1_4.0
-      COLOR_DEPTH         = COLOR | DEPTH,        ///< Color texture and depth buffer are created.   @SINCE_1_4.0
-      COLOR_STENCIL       = COLOR | STENCIL,      ///< Color texture and stencil buffer are created. @SINCE_1_4.0
-      COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL ///< Color, depth and stencil buffer are created.  @SINCE_1_4.0
+      NONE                = 0,                     ///< No attachments are created initially.         @SINCE_1_1.45
+      DEPTH               = 1 << 0,                ///< Depth buffer is created.                      @SINCE_1_1.45
+      STENCIL             = 1 << 1,                ///< Stencil buffer is created.                    @SINCE_1_1.45
+      DEPTH_STENCIL       = DEPTH | STENCIL,       ///< Depth and stencil buffer are created.         @SINCE_1_1.45
+      COLOR               = 1 << 2,                ///< Color texture is created.                     @SINCE_1_4.0
+      COLOR_DEPTH         = COLOR | DEPTH,         ///< Color texture and depth buffer are created.   @SINCE_1_4.0
+      COLOR_STENCIL       = COLOR | STENCIL,       ///< Color texture and stencil buffer are created. @SINCE_1_4.0
+      COLOR_DEPTH_STENCIL = COLOR_DEPTH | STENCIL, ///< Color, depth and stencil buffer are created.  @SINCE_1_4.0
+
+      AUTO = -1, ///< All operations are delegated to the platform.  @SINCE_2_5.17
     };
   };
 
