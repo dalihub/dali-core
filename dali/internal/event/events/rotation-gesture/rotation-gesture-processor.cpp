@@ -55,9 +55,10 @@ void EmitRotationSignal(
   Actor*                          actor,
   const GestureDetectorContainer& gestureDetectors,
   const RotationGestureEvent&     rotationEvent,
-  Vector2                         localCenter)
+  Vector2                         localCenter,
+  GestureState                    state)
 {
-  Internal::RotationGesturePtr rotation(new Internal::RotationGesture(rotationEvent.state));
+  Internal::RotationGesturePtr rotation(new Internal::RotationGesture(state));
   rotation->SetTime(rotationEvent.time);
   rotation->SetRotation(rotationEvent.rotation);
   rotation->SetScreenCenterPoint(rotationEvent.centerPoint);
@@ -172,7 +173,7 @@ void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent&
             RenderTask& renderTaskImpl(*mCurrentRenderTask.Get());
             currentGesturedActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
 
-            EmitRotationSignal(currentGesturedActor, mCurrentRotationEmitters, rotationEvent, actorCoords);
+            EmitRotationSignal(currentGesturedActor, mCurrentRotationEmitters, rotationEvent, actorCoords, rotationEvent.state);
           }
           else
           {
@@ -189,6 +190,13 @@ void RotationGestureProcessor::Process(Scene& scene, const RotationGestureEvent&
         }
         else
         {
+          if(!mCurrentRotationEmitters.empty() && mCurrentRenderTask)
+          {
+            // If the actor is no longer hittable, but we still have emitters, we should cancel the gesture
+            Vector2 actorCoords;
+            currentGesturedActor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, rotationEvent.centerPoint.x, rotationEvent.centerPoint.y);
+            EmitRotationSignal(currentGesturedActor, mCurrentRotationEmitters, rotationEvent, actorCoords, GestureState::CANCELLED);
+          }
           mCurrentRotationEmitters.clear();
           ResetActor();
         }
@@ -314,7 +322,7 @@ void RotationGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDete
 {
   DALI_ASSERT_DEBUG(mCurrentRotationEvent);
 
-  EmitRotationSignal(actor, gestureDetectors, *mCurrentRotationEvent, actorCoordinates);
+  EmitRotationSignal(actor, gestureDetectors, *mCurrentRotationEvent, actorCoordinates, mCurrentRotationEvent->state);
 
   if(actor->OnScene())
   {

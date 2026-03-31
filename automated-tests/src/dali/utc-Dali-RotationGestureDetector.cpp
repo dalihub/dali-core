@@ -560,6 +560,60 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
   END_TEST;
 }
 
+int UtcDaliRotationGestureSignalReceptionActorBecomesInvisible(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  RotationGestureDetector detector = RotationGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start rotation within the actor's area
+  TestStartRotation(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 100);
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Continue the rotation within the actor's area
+  data.Reset();
+  TestContinueRotation(application, Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), 500);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Make the actor invisible, this should emit CANCELLED gesture during the next rotation event
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  application.SendNotification();
+  application.Render();
+
+  // Next move should trigger the gesture state as CANCELLED, and no more gestures
+  TestContinueRotation(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(18.0f, 20.0f), Vector2(22.0f, 20.0f), 800);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Try again to finish the rotation - we should not receive it since it was cancelled
+  data.Reset();
+  TestEndRotation(application, Vector2(18.0f, 20.0f), Vector2(22.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 1000);
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliRotationGestureSignalReceptionRotatedActor(void)
 {
   TestApplication application;
@@ -763,7 +817,8 @@ int UtcDaliRotationGestureSignalReceptionActorBecomesUntouchable(void)
   // Gesture ends within actor's area
   data.Reset();
   TestEndRotation(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 3000);
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
   END_TEST;
 }
 
