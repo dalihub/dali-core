@@ -55,9 +55,10 @@ void EmitPinchSignal(
   Actor*                          actor,
   const GestureDetectorContainer& gestureDetectors,
   const PinchGestureEvent&        pinchEvent,
-  Vector2                         localCenter)
+  Vector2                         localCenter,
+  GestureState                    state)
 {
-  Internal::PinchGesturePtr pinch(new Internal::PinchGesture(pinchEvent.state));
+  Internal::PinchGesturePtr pinch(new Internal::PinchGesture(state));
   pinch->SetTime(pinchEvent.time);
 
   pinch->SetScale(pinchEvent.scale);
@@ -241,7 +242,7 @@ void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinch
             RenderTask& renderTaskImpl(*mCurrentRenderTask.Get());
             currentGesturedActor->ScreenToLocal(renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
 
-            EmitPinchSignal(currentGesturedActor, mCurrentPinchEmitters, pinchEvent, actorCoords);
+            EmitPinchSignal(currentGesturedActor, mCurrentPinchEmitters, pinchEvent, actorCoords, pinchEvent.state);
           }
           else
           {
@@ -258,6 +259,13 @@ void PinchGestureProcessor::Process(Scene& scene, const PinchGestureEvent& pinch
         }
         else
         {
+          if(!mCurrentPinchEmitters.empty() && mCurrentRenderTask)
+          {
+            // If the actor is no longer hittable, but we still have emitters, we should cancel the gesture
+            Vector2 actorCoords;
+            currentGesturedActor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y);
+            EmitPinchSignal(currentGesturedActor, mCurrentPinchEmitters, pinchEvent, actorCoords, GestureState::CANCELLED);
+          }
           mCurrentPinchEmitters.clear();
           ResetActor();
         }
@@ -349,7 +357,7 @@ void PinchGestureProcessor::EmitGestureSignal(Actor* actor, const GestureDetecto
 {
   DALI_ASSERT_DEBUG(mCurrentPinchEvent);
 
-  EmitPinchSignal(actor, gestureDetectors, *mCurrentPinchEvent, actorCoordinates);
+  EmitPinchSignal(actor, gestureDetectors, *mCurrentPinchEvent, actorCoordinates, mCurrentPinchEvent->state);
 
   if(actor->OnScene())
   {

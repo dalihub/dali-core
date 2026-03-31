@@ -469,6 +469,44 @@ int UtcDaliLongPressGestureSignalReceptionActorDestroyedDuringLongPress(void)
   END_TEST;
 }
 
+int UtcDaliLongPressGestureSignalReceptionActorBecomesInvisible(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // LongPress in actor's area
+  TestGenerateLongPress(application, 50.0f, 10.0f);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Actor becomes invisible
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  application.SendNotification();
+  application.Render();
+
+  // End long press, it should trigger CANCELLED instead of FINISHED
+  TestEndLongPress(application, 50.0f, 10.0f);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliLongPressGestureSignalReceptionRotatedActor(void)
 {
   TestApplication application;
