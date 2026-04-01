@@ -23,10 +23,10 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/list-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/public-api/common/list-wrapper.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 

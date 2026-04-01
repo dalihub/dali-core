@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
@@ -28,7 +29,6 @@
 #include <dali/internal/event/common/notifier-interface.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

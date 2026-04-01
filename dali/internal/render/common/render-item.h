@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/render/common/render-item-key.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
 

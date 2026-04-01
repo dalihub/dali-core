@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // for uint32_t
+#include <list>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 #include <dali/public-api/signals/signal-slot-connections.h>

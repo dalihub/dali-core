@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/graphics-config.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
 
 // INTERNAL INCLUDES

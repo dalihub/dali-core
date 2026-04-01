@@ -27,11 +27,11 @@
 #endif
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/manager/scene-graph-traveler.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

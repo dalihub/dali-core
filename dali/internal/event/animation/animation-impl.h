@@ -21,11 +21,11 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/key-frames.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/ref-object.h>
 

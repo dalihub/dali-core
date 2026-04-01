@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // uint32_t
-#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>

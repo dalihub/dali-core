@@ -19,13 +19,13 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>        // std::vector<>
 #include <dali/internal/common/shader-data.h>            // ShaderPtr
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h>      // Dali::Internal::Object
 #include <dali/public-api/common/dali-common.h>          // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/dali-string-view.h>     // Dali::StringView
 #include <dali/public-api/common/intrusive-ptr.h>        // Dali::IntrusivePtr
-#include <dali/public-api/common/vector-wrapper.h>       // std::vector<>
 #include <dali/public-api/rendering/shader.h>            // Dali::Shader
 #include <dali/public-api/rendering/uniform-block.h>     // Dali::UniformBlock
 

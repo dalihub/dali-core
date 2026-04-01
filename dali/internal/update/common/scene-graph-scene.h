@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_SCENE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #endif
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/scene.h>
@@ -35,7 +36,6 @@
 #include <dali/internal/render/common/render-target-graphics-objects.h>
 #include <dali/internal/render/renderers/render-renderer.h> // RendererKey
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/compile-time-math.h>
 
 namespace Dali

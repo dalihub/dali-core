@@ -23,11 +23,11 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/integration-api/scene-pre-render-status.h>
 #include <dali/integration-api/trace.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/internal/event/common/scene-impl.h>
 

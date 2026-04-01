@@ -22,9 +22,9 @@
 #include <limits>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/stream-operators.h>
 #include <dali/internal/common/hash-utils.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

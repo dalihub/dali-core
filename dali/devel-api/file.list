@@ -73,15 +73,17 @@ SET( devel_api_core_common_header_files
   ${devel_api_src_dir}/common/bitwise-enum.h
   ${devel_api_src_dir}/common/capabilities.h
   ${devel_api_src_dir}/common/circular-queue.h
-  ${devel_api_src_dir}/common/hash.h
   ${devel_api_src_dir}/common/free-list.h
-  ${devel_api_src_dir}/common/singleton-service.h
+  ${devel_api_src_dir}/common/hash.h
+  ${devel_api_src_dir}/common/list-wrapper.h
   ${devel_api_src_dir}/common/map-wrapper.h
   ${devel_api_src_dir}/common/owner-container.h
   ${devel_api_src_dir}/common/ref-counted-dali-vector.h
   ${devel_api_src_dir}/common/set-wrapper.h
+  ${devel_api_src_dir}/common/singleton-service.h
   ${devel_api_src_dir}/common/stage-devel.h
   ${devel_api_src_dir}/common/stage.h
+  ${devel_api_src_dir}/common/vector-wrapper.h
 )
 
 

@@ -22,8 +22,8 @@
 #include <unordered_set>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/list-wrapper.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/common/list-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/texture-set.h>

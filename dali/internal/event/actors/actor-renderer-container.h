@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTORS_ACTOR_RENDERER_CONTAINER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
  * limitations under the License.
  */
 
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali::Internal
 {

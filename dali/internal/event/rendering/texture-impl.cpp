@@ -31,7 +31,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <unordered_set>
 
 struct Dali::Internal::Texture::TextureMemoryInfo

@@ -18,10 +18,10 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/list-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-pipeline.h>
 #include <dali/graphics-api/graphics-types.h>
-#include <dali/public-api/common/list-wrapper.h>
 
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/render/common/render-target-graphics-objects.h> ///< For RenderTargetGraphicsObjects::LifecycleObserver

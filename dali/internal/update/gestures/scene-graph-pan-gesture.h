@@ -19,11 +19,11 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/internal/event/events/pan-gesture/pan-gesture-impl.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/gestures/gesture-properties.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

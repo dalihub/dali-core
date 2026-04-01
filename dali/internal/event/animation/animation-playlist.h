@@ -20,13 +20,13 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/set-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/internal/event/common/scene-graph-notifier-interface-mapper.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

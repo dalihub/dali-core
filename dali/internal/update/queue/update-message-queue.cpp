@@ -23,13 +23,13 @@
 #include <future> ///< for std::future and std::promise
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/common/performance-monitor.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 using std::vector;
 

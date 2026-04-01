@@ -61,4 +61,4 @@
 
 #endif // #ifndef HIDE_DALI_INTERNALS
 
-#endif // DALI_LISt_WRAPPER_H
+#endif // DALI_LIST_WRAPPER_H

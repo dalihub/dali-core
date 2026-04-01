@@ -22,9 +22,6 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/signals/render-callback.h>
 
-// EXTERNAL INCLUDES
-#include <memory>
-
 namespace Dali
 {
 namespace Internal

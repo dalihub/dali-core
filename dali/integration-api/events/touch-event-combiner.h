@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/point.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 
 namespace Dali

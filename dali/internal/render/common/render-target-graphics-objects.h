@@ -22,8 +22,8 @@
 #include <unordered_map>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h> ///< for Graphics relative structs.
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali::Internal::SceneGraph
 {
