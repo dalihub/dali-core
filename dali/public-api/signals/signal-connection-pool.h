@@ -36,7 +36,44 @@ class ConnectionTrackerInterface;
  */
 
 /**
- * @brief A block of SignalConnection slots in a chained-block pool.
+ * @brief Wraps a SignalConnection with emission-order linked list indices.
+ *
+ * BaseSignal maintains an intrusive doubly-linked list of these nodes to
+ * guarantee that callbacks fire in connection order. The pool allocates
+ * nodes; the linked list determines iteration order during Emit().
+ *
+ * Uses uint32_t indices instead of pointers to reduce memory footprint:
+ *
+ * @SINCE_2_5.17
+ */
+struct SignalConnectionNode
+{
+  static constexpr uint32_t INVALID_INDEX = 0xFFFFFFFFu; ///< Sentinel for null/unlinked nodes
+
+  explicit SignalConnectionNode(CallbackBase* callback) noexcept
+  : connection(callback)
+  {
+  }
+
+  SignalConnectionNode(SignalObserver* observer, CallbackBase* callback) noexcept
+  : connection(observer, callback)
+  {
+  }
+
+  ~SignalConnectionNode() = default;
+
+  SignalConnectionNode(const SignalConnectionNode&)            = delete; ///< @SINCE_2_5.17
+  SignalConnectionNode& operator=(const SignalConnectionNode&) = delete; ///< @SINCE_2_5.17
+  SignalConnectionNode(SignalConnectionNode&&)                 = delete; ///< @SINCE_2_5.17
+  SignalConnectionNode& operator=(SignalConnectionNode&&)      = delete; ///< @SINCE_2_5.17
+
+  SignalConnection connection;               ///< The signal connection (owned)
+  uint32_t         mEmitNext{INVALID_INDEX}; ///< Index of next node in emission-order list
+  uint32_t         mEmitPrev{INVALID_INDEX}; ///< Index of previous node in emission-order list
+};
+
+/**
+ * @brief A block of SignalConnectionNode slots in a chained-block pool.
  *
  * Blocks are allocated as contiguous memory: the block header followed by
  * an array of SignalConnection slots. Blocks are chained in allocation order
@@ -54,21 +91,21 @@ struct SignalConnectionBlock
   /**
    * @brief Access the slot array that follows this header in memory.
    * @SINCE_2_5.17
-   * @return Pointer to the first SignalConnection slot
+   * @return Pointer to the first SignalConnectionNode slot
    */
-  SignalConnection* Slots()
+  SignalConnectionNode* Slots()
   {
-    return reinterpret_cast<SignalConnection*>(this + 1);
+    return reinterpret_cast<SignalConnectionNode*>(this + 1);
   }
 
   /**
    * @brief Access the slot array (const).
    * @SINCE_2_5.17
-   * @return Const pointer to the first SignalConnection slot
+   * @return Const pointer to the first SignalConnectionNode slot
    */
-  const SignalConnection* Slots() const
+  const SignalConnectionNode* Slots() const
   {
-    return reinterpret_cast<const SignalConnection*>(this + 1);
+    return reinterpret_cast<const SignalConnectionNode*>(this + 1);
   }
 };
 
@@ -107,34 +144,34 @@ public:
   SignalConnectionPool& operator=(SignalConnectionPool&&)      = delete; ///< Deleted move assignment @SINCE_2_5.17
 
   /**
-   * @brief Allocate a slot and construct a SignalConnection with a callback.
+   * @brief Allocate a node and construct a SignalConnection with a callback.
    *
    * Recycles from the free list if available, otherwise allocates from the
    * current block (growing the pool if necessary).
    *
    * @SINCE_2_5.17
    * @param[in] callback The callback to store (takes ownership)
-   * @return Pointer to the constructed SignalConnection (stable for pool lifetime)
+   * @return Pointer to the constructed node (stable for pool lifetime)
    */
-  SignalConnection* Allocate(CallbackBase* callback);
+  SignalConnectionNode* Allocate(CallbackBase* callback);
 
   /**
-   * @brief Allocate a slot and construct a SignalConnection with tracker and callback.
+   * @brief Allocate a node and construct a SignalConnection with tracker and callback.
    *
    * @SINCE_2_5.17
    * @param[in] tracker The connection tracker
    * @param[in] callback The callback to store (takes ownership)
-   * @return Pointer to the constructed SignalConnection (stable for pool lifetime)
+   * @return Pointer to the constructed node (stable for pool lifetime)
    */
-  SignalConnection* Allocate(ConnectionTrackerInterface* tracker, CallbackBase* callback);
+  SignalConnectionNode* Allocate(ConnectionTrackerInterface* tracker, CallbackBase* callback);
 
   /**
-   * @brief Free a slot. Destructs the SignalConnection and adds the slot to the free list.
+   * @brief Free a node. Destructs the SignalConnectionNode and adds the slot to the free list.
    *
    * @SINCE_2_5.17
-   * @param[in] slot Pointer to the SignalConnection to free
+   * @param[in] node Pointer to the node to free
    */
-  void Free(SignalConnection* slot);
+  void Free(SignalConnectionNode* node);
 
   /**
    * @brief Get the first block in the chain (for iteration).
@@ -155,6 +192,22 @@ public:
   {
     return mBlockCount;
   }
+
+  /**
+   * @brief Convert a global node index to a node pointer.
+   * @SINCE_2_5.17
+   * @param[in] index The node index (0xFFFF = null)
+   * @return Pointer to the node, or nullptr if index is invalid
+   */
+  SignalConnectionNode* IndexToNode(uint32_t index) const;
+
+  /**
+   * @brief Convert a node pointer to its global index.
+   * @SINCE_2_5.17
+   * @param[in] node Pointer to the node
+   * @return The node's index, or 0xFFFF if not found
+   */
+  uint32_t NodeToIndex(const SignalConnectionNode* node) const;
 
 private:
   /**

@@ -40,13 +40,62 @@ SignalConnectionPool::~SignalConnectionPool()
   }
 }
 
+SignalConnectionNode* SignalConnectionPool::IndexToNode(uint32_t index) const
+{
+  if(index == SignalConnectionNode::INVALID_INDEX)
+  {
+    return nullptr;
+  }
+
+  // Find the block containing this index
+  uint32_t remaining = static_cast<uint32_t>(index);
+  auto*    block     = mFirstBlock;
+
+  while(block)
+  {
+    if(remaining < block->mCapacity)
+    {
+      return block->Slots() + remaining;
+    }
+    remaining -= block->mCapacity;
+    block = block->mNext;
+  }
+
+  return nullptr;
+}
+
+uint32_t SignalConnectionPool::NodeToIndex(const SignalConnectionNode* node) const
+{
+  if(!node)
+  {
+    return SignalConnectionNode::INVALID_INDEX;
+  }
+
+  // Find which block this node belongs to
+  uint32_t baseIndex = 0;
+  auto*    block     = mFirstBlock;
+
+  while(block)
+  {
+    auto* slots = block->Slots();
+    if(node >= slots && node < slots + block->mCapacity)
+    {
+      return static_cast<uint16_t>(baseIndex + (node - slots));
+    }
+    baseIndex += block->mCapacity;
+    block = block->mNext;
+  }
+
+  return SignalConnectionNode::INVALID_INDEX;
+}
+
 void SignalConnectionPool::AllocateBlock()
 {
   // First block: 2 slots. Subsequent blocks: double previous capacity.
   uint32_t capacity = mCurrentBlock ? mCurrentBlock->mCapacity * 2u : 2u;
 
   // Allocate block header + slot array as contiguous memory
-  void* raw        = malloc(sizeof(SignalConnectionBlock) + capacity * sizeof(SignalConnection));
+  void* raw        = malloc(sizeof(SignalConnectionBlock) + capacity * sizeof(SignalConnectionNode));
   auto* block      = new(raw) SignalConnectionBlock();
   block->mCapacity = capacity;
 
@@ -84,30 +133,30 @@ void* SignalConnectionPool::AllocateRaw()
   return memory;
 }
 
-SignalConnection* SignalConnectionPool::Allocate(CallbackBase* callback)
+SignalConnectionNode* SignalConnectionPool::Allocate(CallbackBase* callback)
 {
-  return new(AllocateRaw()) SignalConnection(callback);
+  return new(AllocateRaw()) SignalConnectionNode(callback);
 }
 
-SignalConnection* SignalConnectionPool::Allocate(ConnectionTrackerInterface* tracker, CallbackBase* callback)
+SignalConnectionNode* SignalConnectionPool::Allocate(ConnectionTrackerInterface* tracker, CallbackBase* callback)
 {
-  return new(AllocateRaw()) SignalConnection(tracker, callback);
+  return new(AllocateRaw()) SignalConnectionNode(tracker, callback);
 }
 
-void SignalConnectionPool::Free(SignalConnection* slot)
+void SignalConnectionPool::Free(SignalConnectionNode* node)
 {
-  // Destroy the connection (deletes the owned callback)
-  slot->~SignalConnection();
+  // Destroy the node (destructs the owned SignalConnection, deleting the callback)
+  node->~SignalConnectionNode();
 
-  // Zero the slot so ~BaseSignal's iteration loop sees operator bool() == false
-  // for freed slots. ~SignalConnection does not null mCallback after delete,
-  // so the second pointer field would otherwise contain a dangling non-null value.
-  memset(slot, 0, sizeof(SignalConnection));
+  // Zero the node so ~BaseSignal's iteration loop sees connection operator bool() == false
+  // for freed nodes. ~SignalConnection does not null mCallback after delete,
+  // so the pointer field would otherwise contain a dangling non-null value.
+  memset(node, 0, sizeof(SignalConnectionNode));
 
   // Thread into intrusive free list — reuse the first pointer-sized bytes
-  // for the next-free pointer. mCallback field (second pointer) stays zero.
-  *reinterpret_cast<void**>(slot) = mFreeHead;
-  mFreeHead                       = slot;
+  // for the next-free pointer.
+  *reinterpret_cast<void**>(node) = mFreeHead;
+  mFreeHead                       = node;
 }
 
 } // namespace Dali

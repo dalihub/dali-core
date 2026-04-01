@@ -56,7 +56,7 @@ int UtcSignalConnectionPoolNew(void)
   DALI_TEST_EQUALS(pool.GetBlockCount(), 0u, TEST_LOCATION);
   DALI_TEST_CHECK(pool.GetFirstBlock() == nullptr);
 
-  SignalConnection* connection = pool.Allocate(MakeCallback(&StaticVoidCallback));
+  SignalConnectionNode* connection = pool.Allocate(MakeCallback(&StaticVoidCallback));
   DALI_TEST_CHECK(connection != nullptr);
   DALI_TEST_EQUALS(pool.GetBlockCount(), 1u, TEST_LOCATION);
   DALI_TEST_CHECK(pool.GetFirstBlock() != nullptr);
@@ -167,11 +167,11 @@ int UtcSignalConnectionPoolStablePointers(void)
   // Original pointers must still be valid (blocks never move)
   DALI_TEST_CHECK(c0 != nullptr);
   DALI_TEST_CHECK(c1 != nullptr);
-  DALI_TEST_CHECK(static_cast<bool>(*c0)); // still live
-  DALI_TEST_CHECK(static_cast<bool>(*c1)); // still live
+  DALI_TEST_CHECK(static_cast<bool>(c0->connection)); // still live
+  DALI_TEST_CHECK(static_cast<bool>(c1->connection)); // still live
 
   // All pointers should be distinct
-  std::set<SignalConnection*> ptrs{c0, c1, c2, c3};
+  std::set<SignalConnectionNode*> ptrs{c0, c1, c2, c3};
   DALI_TEST_EQUALS(ptrs.size(), 4u, TEST_LOCATION);
 
   pool.Free(c0);
@@ -189,8 +189,8 @@ int UtcSignalConnectionPoolBlockIteration(void)
   SignalConnectionPool pool;
 
   // Allocate enough to span 2 blocks (2 + 4 = 6 slots)
-  const uint32_t    count = 5;
-  SignalConnection* connections[count];
+  const uint32_t        count = 5;
+  SignalConnectionNode* connections[count];
   for(uint32_t i = 0; i < count; ++i)
   {
     connections[i] = pool.Allocate(MakeCallback(&StaticVoidCallback));
@@ -205,7 +205,7 @@ int UtcSignalConnectionPoolBlockIteration(void)
     auto* slots = block->Slots();
     for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
     {
-      if(slots[i])
+      if(slots[i].connection)
       {
         ++liveCount;
       }
@@ -225,7 +225,7 @@ int UtcSignalConnectionPoolBlockIteration(void)
     auto* slots = block->Slots();
     for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
     {
-      if(slots[i])
+      if(slots[i].connection)
       {
         ++liveCount;
       }
@@ -275,8 +275,8 @@ int UtcSignalConnectionPoolStressTest(void)
 
   SignalConnectionPool pool;
 
-  const uint32_t    numConnections = 200;
-  SignalConnection* connections[numConnections];
+  const uint32_t        numConnections = 200;
+  SignalConnectionNode* connections[numConnections];
 
   // Allocate all
   for(uint32_t i = 0; i < numConnections; ++i)
@@ -290,7 +290,7 @@ int UtcSignalConnectionPoolStressTest(void)
   DALI_TEST_EQUALS(pool.GetBlockCount(), 7u, TEST_LOCATION);
 
   // Verify all pointers are unique
-  std::set<SignalConnection*> ptrs;
+  std::set<SignalConnectionNode*> ptrs;
   for(uint32_t i = 0; i < numConnections; ++i)
   {
     ptrs.insert(connections[i]);
@@ -338,7 +338,7 @@ int UtcSignalConnectionPoolFreedSlotIsInactive(void)
   uint32_t dead  = 0;
   for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
   {
-    if(slots[i])
+    if(slots[i].connection)
     {
       ++live;
     }
@@ -365,10 +365,10 @@ int UtcSignalConnectionPoolCallbackOwnership(void)
   auto*                connection = pool.Allocate(MakeCallback(&StaticVoidCallback));
 
   // Connection should hold the callback
-  DALI_TEST_CHECK(connection->GetCallback() != nullptr);
+  DALI_TEST_CHECK(connection->connection.GetCallback() != nullptr);
 
   // Execute the callback through the connection
-  CallbackBase::Execute(*connection->GetCallback());
+  CallbackBase::Execute(*connection->connection.GetCallback());
   DALI_TEST_CHECK(gStaticCallbackCalled);
 
   // Free destroys the callback

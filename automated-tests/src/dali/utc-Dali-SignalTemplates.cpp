@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
@@ -49,6 +50,44 @@ int   staticIntValue                                   = 0;
 bool  wasStaticFloatCallbackFloatValueFloatValueCalled = false;
 float staticFloatValue1                                = 0.0f;
 float staticFloatValue2                                = 0.0f;
+
+// Emission-order tracking
+std::vector<int> gEmitOrder;
+
+void OrderedCallback0()
+{
+  gEmitOrder.push_back(0);
+}
+void OrderedCallback1()
+{
+  gEmitOrder.push_back(1);
+}
+void OrderedCallback2()
+{
+  gEmitOrder.push_back(2);
+}
+void OrderedCallback3()
+{
+  gEmitOrder.push_back(3);
+}
+void OrderedCallback4()
+{
+  gEmitOrder.push_back(4);
+}
+void OrderedCallback5()
+{
+  gEmitOrder.push_back(5);
+}
+
+TestSignals::VoidRetNoParamSignal* gSignalForConnect = nullptr;
+
+void ConnectDuringEmitCallback()
+{
+  gEmitOrder.push_back(100);
+  // Connect new callbacks during emission — they must NOT fire this cycle
+  gSignalForConnect->Connect(&OrderedCallback4);
+  gSignalForConnect->Connect(&OrderedCallback5);
+}
 
 void StaticVoidCallbackVoid()
 {
@@ -2552,6 +2591,119 @@ int UtcDaliSignalCacheThresholdBoundary(void)
   // Emit to verify all 20 handlers work (cached)
   signal.Emit();
   DALI_TEST_EQUALS(totalCallbackCount, 20, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSignalConnectDuringEmitNotFired(void)
+{
+  tet_infoline("Test that callbacks connected during Emit() are not fired in that emission cycle.\n");
+
+  TestApplication application;
+
+  TestSignals::VoidRetNoParamSignal signal;
+  gSignalForConnect = &signal;
+  gEmitOrder.clear();
+
+  // Connect 3 callbacks: 0, ConnectDuringEmit (which adds 4+5), 2
+  signal.Connect(&OrderedCallback0);
+  signal.Connect(&ConnectDuringEmitCallback);
+  signal.Connect(&OrderedCallback2);
+
+  // First emit: callbacks 0, ConnectDuringEmit(100), 2 should fire.
+  // Callbacks 4 and 5 are connected during emit but must NOT fire.
+  signal.Emit();
+
+  DALI_TEST_EQUALS(gEmitOrder.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 2, TEST_LOCATION);
+
+  // Second emit: all 5 callbacks should fire in connection order
+  gEmitOrder.clear();
+  signal.Emit();
+
+  DALI_TEST_EQUALS(gEmitOrder.size(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[4], 5, TEST_LOCATION);
+
+  gSignalForConnect = nullptr;
+
+  END_TEST;
+}
+
+int UtcDaliSignalEmissionOrder(void)
+{
+  tet_infoline(
+    "Test that emission order is always connection order, even after\n"
+    "repeated disconnect/connect cycles that reuse pool free-list slots.\n");
+
+  TestApplication application;
+
+  TestSignals::VoidRetNoParamSignal signal;
+  gEmitOrder.clear();
+
+  // Connect 0, 1, 2, 3
+  signal.Connect(&OrderedCallback0);
+  signal.Connect(&OrderedCallback1);
+  signal.Connect(&OrderedCallback2);
+  signal.Connect(&OrderedCallback3);
+
+  // Emit — should be 0, 1, 2, 3
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 3, TEST_LOCATION);
+
+  // Disconnect 1 and 2 (middle slots go to free list)
+  signal.Disconnect(&OrderedCallback1);
+  signal.Disconnect(&OrderedCallback2);
+
+  // Connect 4 — should go after 3, not reuse the freed middle slots
+  signal.Connect(&OrderedCallback4);
+
+  gEmitOrder.clear();
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 4, TEST_LOCATION);
+
+  // Reconnect 1 — should go after 4
+  signal.Connect(&OrderedCallback1);
+
+  gEmitOrder.clear();
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 1, TEST_LOCATION);
+
+  // Disconnect all and reconnect in reverse — emission order should follow
+  // the new connection order, not the pool memory layout.
+  signal.Disconnect(&OrderedCallback0);
+  signal.Disconnect(&OrderedCallback3);
+  signal.Disconnect(&OrderedCallback4);
+  signal.Disconnect(&OrderedCallback1);
+
+  signal.Connect(&OrderedCallback3);
+  signal.Connect(&OrderedCallback2);
+  signal.Connect(&OrderedCallback1);
+  signal.Connect(&OrderedCallback0);
+
+  gEmitOrder.clear();
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 0, TEST_LOCATION);
 
   END_TEST;
 }

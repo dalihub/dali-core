@@ -174,36 +174,36 @@ public:
     bool signalDeleted{false};
     mSignalDeleted = &signalDeleted;
 
-    // Snapshot active count so connections added during emit are ignored
-    auto remaining = mActiveCount;
+    // Snapshot tail so connections added during emit are not emitted
+    auto emitEnd = mEmitTail;
 
-    auto* block = mPool.GetFirstBlock();
-    while(block && remaining > 0u)
+    auto nodeIndex = mEmitHead;
+    while(nodeIndex != SignalConnectionNode::INVALID_INDEX)
     {
-      auto*    slots = block->Slots();
-      uint32_t count = block->mHighWaterMark;
-      for(uint32_t i = 0; i < count && remaining > 0u; ++i)
+      auto*         node      = mPool.IndexToNode(nodeIndex);
+      auto          nextIndex = node->mEmitNext;
+      CallbackBase* callback(node->connection.GetCallback());
+      if(callback)
       {
-        CallbackBase* callback(slots[i] ? slots[i].GetCallback() : nullptr);
-        if(callback)
+        returnVal = CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
+        if(DALI_UNLIKELY(signalDeleted))
         {
-          --remaining;
-          returnVal = CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
+          // Previously, we'd have emitted to remaining connections after this
+          // but now we stop as soon as the signal has been deleted.
+          guard.mFlag = nullptr;
+          return returnVal;
         }
       }
-      block = block->mNext;
+      if(nodeIndex == emitEnd)
+      {
+        break;
+      }
+      nodeIndex = nextIndex;
     }
 
-    if(!signalDeleted)
-    {
-      // Cleanup NULL values from Connection container
-      CleanupConnections();
-      mSignalDeleted = nullptr;
-    }
-    else
-    {
-      guard.mFlag = nullptr;
-    }
+    // Cleanup NULL values from Connection container
+    CleanupConnections();
+    mSignalDeleted = nullptr;
 
     return returnVal;
   }
@@ -224,36 +224,34 @@ public:
     bool signalDeleted{false};
     mSignalDeleted = &signalDeleted;
 
-    // Snapshot active count so connections added during emit are ignored
-    auto remaining = mActiveCount;
+    // Snapshot tail so connections added during emit are not emitted
+    auto emitEnd = mEmitTail;
 
-    auto* block = mPool.GetFirstBlock();
-    while(block && remaining > 0u)
+    auto nodeIndex = mEmitHead;
+    while(nodeIndex != SignalConnectionNode::INVALID_INDEX)
     {
-      auto*    slots = block->Slots();
-      uint32_t count = block->mHighWaterMark;
-      for(uint32_t i = 0; i < count && remaining > 0u; ++i)
+      auto*         node      = mPool.IndexToNode(nodeIndex);
+      auto          nextIndex = node->mEmitNext;
+      CallbackBase* callback(node->connection.GetCallback());
+      if(callback)
       {
-        CallbackBase* callback(slots[i] ? slots[i].GetCallback() : nullptr);
-        if(callback)
+        returnVal |= CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
+        if(DALI_UNLIKELY(signalDeleted))
         {
-          --remaining;
-          returnVal |= CallbackBase::ExecuteReturn<Ret, Args...>(*callback, args...);
+          guard.mFlag = nullptr;
+          return returnVal;
         }
       }
-      block = block->mNext;
+      if(nodeIndex == emitEnd)
+      {
+        break;
+      }
+      nodeIndex = nextIndex;
     }
 
-    if(!signalDeleted)
-    {
-      // Cleanup NULL values from Connection container
-      CleanupConnections();
-      mSignalDeleted = nullptr;
-    }
-    else
-    {
-      guard.mFlag = nullptr;
-    }
+    // Cleanup NULL values from Connection container
+    CleanupConnections();
+    mSignalDeleted = nullptr;
 
     return returnVal;
   }
@@ -279,36 +277,34 @@ public:
     bool signalDeleted{false};
     mSignalDeleted = &signalDeleted;
 
-    // Snapshot active count so connections added during emit are ignored
-    auto remaining = mActiveCount;
+    // Snapshot tail so connections added during emit are not emitted
+    auto emitEnd = mEmitTail;
 
-    auto* block = mPool.GetFirstBlock();
-    while(block && remaining > 0u)
+    auto nodeIndex = mEmitHead;
+    while(nodeIndex != SignalConnectionNode::INVALID_INDEX)
     {
-      auto*    slots = block->Slots();
-      uint32_t count = block->mHighWaterMark;
-      for(uint32_t i = 0; i < count && remaining > 0u; ++i)
+      auto*         node      = mPool.IndexToNode(nodeIndex);
+      auto          nextIndex = node->mEmitNext;
+      CallbackBase* callback(node->connection.GetCallback());
+      if(callback)
       {
-        CallbackBase* callback(slots[i] ? slots[i].GetCallback() : nullptr);
-        if(callback)
+        CallbackBase::Execute<Args...>(*callback, args...);
+        if(DALI_UNLIKELY(signalDeleted))
         {
-          --remaining;
-          CallbackBase::Execute<Args...>(*callback, args...);
+          guard.mFlag = nullptr;
+          return;
         }
       }
-      block = block->mNext;
+      if(nodeIndex == emitEnd)
+      {
+        break;
+      }
+      nodeIndex = nextIndex;
     }
 
-    if(!signalDeleted)
-    {
-      // Cleanup NULL values from Connection container
-      CleanupConnections();
-      mSignalDeleted = nullptr;
-    }
-    else
-    {
-      guard.mFlag = nullptr;
-    }
+    // Cleanup NULL values from Connection container
+    CleanupConnections();
+    mSignalDeleted = nullptr;
   }
 
   // Connect / Disconnect function for use by Signal implementations
@@ -359,17 +355,17 @@ private:
    *
    * @SINCE_2_5.17
    * @param[in] callback The call back object
-   * @return Pointer to the SignalConnection, or nullptr if not found
+   * @return Pointer to the SignalConnectionNode, or nullptr if not found
    */
-  SignalConnection* FindCallback(CallbackBase* callback) noexcept;
+  SignalConnectionNode* FindCallback(CallbackBase* callback) noexcept;
 
   /**
-   * @brief Deletes a connection.
+   * @brief Deletes a connection by node pointer.
    *
    * @SINCE_2_5.17
-   * @param[in] connection Pointer to the SignalConnection to delete
+   * @param[in] node Pointer to the SignalConnectionNode to delete
    */
-  void DeleteConnection(SignalConnection* connection);
+  void DeleteConnection(SignalConnectionNode* node);
 
   /**
    * @brief Helper to remove NULL items from pool, which is only safe at the end of Emit()
@@ -384,6 +380,20 @@ private:
    */
   void EnsureCache();
 
+  /**
+   * @brief Append a node to the tail of the emission-order linked list.
+   * @SINCE_2_5.17
+   * @param[in] node The node to append
+   */
+  DALI_INTERNAL void AppendToEmitList(SignalConnectionNode* node);
+
+  /**
+   * @brief Unlink a node from the emission-order linked list.
+   * @SINCE_2_5.17
+   * @param[in] node The node to unlink
+   */
+  DALI_INTERNAL void UnlinkFromEmitList(SignalConnectionNode* node);
+
   BaseSignal(const BaseSignal&)            = delete; ///< Deleted copy constructor, signals don't support copying. @SINCE_1_0.0
   BaseSignal(BaseSignal&&)                 = delete; ///< Deleted move constructor, signals don't support moving. @SINCE_1_9.25
   BaseSignal& operator=(const BaseSignal&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
@@ -394,11 +404,13 @@ private:
   Impl*                mCacheImpl{nullptr}; ///< Lazy cache for large signals (N >= threshold).
 
 private:
-  SignalConnectionPool mPool{};                 ///< Chained-block pool for connections
-  uint32_t             mActiveCount{0};         ///< Number of active connections
-  uint32_t             mNullCount{0};           ///< Slots nulled during emit, pending cleanup
-  bool                 mEmittingFlag{false};    ///< Used to guard against nested Emit() calls.
-  bool*                mSignalDeleted{nullptr}; ///< Used to guard against deletion during Emit() calls.
+  SignalConnectionPool mPool{};                                        ///< Chained-block pool for connection nodes
+  uint32_t             mEmitHead{SignalConnectionNode::INVALID_INDEX}; ///< Head of emission-order doubly-linked list (index)
+  uint32_t             mEmitTail{SignalConnectionNode::INVALID_INDEX}; ///< Tail of emission-order doubly-linked list (index)
+  uint32_t             mActiveCount{0};                                ///< Number of active connections
+  uint32_t             mNullCount{0};                                  ///< Slots nulled during emit, pending cleanup
+  bool                 mEmittingFlag{false};                           ///< Used to guard against nested Emit() calls.
+  bool*                mSignalDeleted{nullptr};                        ///< Used to guard against deletion during Emit() calls.
 };
 
 /**

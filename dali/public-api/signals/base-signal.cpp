@@ -75,7 +75,7 @@ struct BaseSignal::Impl
   Impl()  = default;
   ~Impl() = default;
 
-  Integration::OpenHashMap<const CallbackBase*, SignalConnection*, CallbackBaseHash, CallbackBaseEqual> mCache;
+  Integration::OpenHashMap<const CallbackBase*, SignalConnectionNode*, CallbackBaseHash, CallbackBaseEqual> mCache;
 };
 
 BaseSignal::BaseSignal() = default;
@@ -103,10 +103,10 @@ BaseSignal::~BaseSignal()
     auto* slots = block->Slots();
     for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
     {
-      if(slots[i])
+      if(slots[i].connection)
       {
-        // Disconnect notifies the tracker, then deletes the callback and nulls the slot.
-        slots[i].Disconnect(this);
+        // Disconnect notifies the tracker, then deletes the callback and nulls the connection.
+        slots[i].connection.Disconnect(this);
       }
     }
     block = block->mNext;
@@ -125,12 +125,13 @@ void BaseSignal::OnConnect(CallbackBase* callback)
   // Don't double-connect the same callback
   if(!existing)
   {
-    auto* connection = mPool.Allocate(callback);
+    auto* node = mPool.Allocate(callback);
     ++mActiveCount;
+    AppendToEmitList(node);
 
     if(mCacheImpl)
     {
-      mCacheImpl->mCache.Insert(callback, connection);
+      mCacheImpl->mCache.Insert(callback, node);
     }
     else if(mPool.GetBlockCount() >= CACHE_BLOCK_THRESHOLD)
     {
@@ -148,11 +149,11 @@ void BaseSignal::OnDisconnect(CallbackBase* callback)
 {
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Disconnect()");
 
-  auto* connection = FindCallback(callback);
+  auto* node = FindCallback(callback);
 
-  if(connection)
+  if(node)
   {
-    DeleteConnection(connection);
+    DeleteConnection(node);
   }
 
   // call back is a temporary created to find which slot should be disconnected.
@@ -169,12 +170,13 @@ void BaseSignal::OnConnect(ConnectionTrackerInterface* tracker, CallbackBase* ca
   // Don't double-connect the same callback
   if(!existing)
   {
-    auto* connection = mPool.Allocate(tracker, callback);
+    auto* node = mPool.Allocate(tracker, callback);
     ++mActiveCount;
+    AppendToEmitList(node);
 
     if(mCacheImpl)
     {
-      mCacheImpl->mCache.Insert(callback, connection);
+      mCacheImpl->mCache.Insert(callback, node);
     }
     else if(mPool.GetBlockCount() >= CACHE_BLOCK_THRESHOLD)
     {
@@ -196,16 +198,16 @@ void BaseSignal::OnDisconnect(ConnectionTrackerInterface* tracker, CallbackBase*
   DALI_ASSERT_ALWAYS(nullptr != tracker && "Invalid ConnectionTrackerInterface pointer passed to Disconnect()");
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Disconnect()");
 
-  auto* connection = FindCallback(callback);
+  auto* node = FindCallback(callback);
 
-  if(connection)
+  if(node)
   {
     // temporary pointer to disconnected callback
-    // Note that connection->GetCallback() != callback is possible.
-    CallbackBase* disconnectedCallback = connection->GetCallback();
+    // Note that node->connection.GetCallback() != callback is possible.
+    CallbackBase* disconnectedCallback = node->connection.GetCallback();
 
     // close the signal side connection first.
-    DeleteConnection(connection);
+    DeleteConnection(node);
 
     // close the slot side connection
     tracker->SignalDisconnected(this, disconnectedCallback);
@@ -219,17 +221,17 @@ void BaseSignal::SlotDisconnected(CallbackBase* callback)
 {
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid callback function passed to SlotObserver::SlotDisconnected()");
 
-  auto* connection = FindCallback(callback);
-  if(DALI_LIKELY(connection != nullptr))
+  auto* node = FindCallback(callback);
+  if(DALI_LIKELY(node != nullptr))
   {
-    DeleteConnection(connection);
+    DeleteConnection(node);
     return;
   }
 
   DALI_ABORT("Callback lost in SlotDisconnected()");
 }
 
-SignalConnection* BaseSignal::FindCallback(CallbackBase* callback) noexcept
+SignalConnectionNode* BaseSignal::FindCallback(CallbackBase* callback) noexcept
 {
   // Fast path: use hash map cache if available (large signals)
   if(mCacheImpl)
@@ -245,9 +247,9 @@ SignalConnection* BaseSignal::FindCallback(CallbackBase* callback) noexcept
     auto* slots = block->Slots();
     for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
     {
-      if(slots[i] && slots[i].GetCallback())
+      if(slots[i].connection && slots[i].connection.GetCallback())
       {
-        if(*(slots[i].GetCallback()) == *callback)
+        if(*(slots[i].connection.GetCallback()) == *callback)
         {
           return &slots[i];
         }
@@ -259,29 +261,32 @@ SignalConnection* BaseSignal::FindCallback(CallbackBase* callback) noexcept
   return nullptr;
 }
 
-void BaseSignal::DeleteConnection(SignalConnection* connection)
+void BaseSignal::DeleteConnection(SignalConnectionNode* node)
 {
   // Remove from cache if it exists
   if(mCacheImpl)
   {
-    mCacheImpl->mCache.Erase(connection->GetCallback());
+    mCacheImpl->mCache.Erase(node->connection.GetCallback());
   }
 
   if(mEmittingFlag)
   {
-    // IMPORTANT - do not free slots during emit, null instead.
-    // Signal Emit() methods require that active count is not reduced by frees
-    // while iterating. The slot will be freed in CleanupConnections after Emit.
-    *connection = SignalConnection{nullptr};
+    // IMPORTANT - do not free nodes during emit, null the connection instead.
+    // The dlist pointers (mEmitPrev/mEmitNext) live on the node, not the
+    // connection, so they are preserved for emit traversal.
+    // CleanupConnections will unlink and free after Emit.
+    node->connection = SignalConnection{nullptr};
     ++mNullCount;
   }
   else
   {
+    // Unlink from emission-order list before freeing.
+    UnlinkFromEmitList(node);
     // Not emitting: move the connection out before freeing. This prevents
     // cascading destruction (if the callback owns the last handle to the object
     // that owns this signal) from happening while Free() is modifying the pool.
-    SignalConnection moved(std::move(*connection));
-    mPool.Free(connection); // Frees a null slot — destructor is a no-op
+    SignalConnection moved(std::move(node->connection));
+    mPool.Free(node); // Frees a null node — destructor is a no-op
     // 'moved' destructor runs here — may cascade, but pool is in a consistent state.
   }
   --mActiveCount;
@@ -294,22 +299,73 @@ void BaseSignal::CleanupConnections()
     return;
   }
 
+  // Walk the emission-order list and unlink+free dead nodes.
+  // Dead nodes were nulled during emit but kept linked for traversal.
   uint32_t remaining = mNullCount;
-  auto*    block     = mPool.GetFirstBlock();
-  while(block && remaining > 0u)
+  uint32_t nodeIndex = mEmitHead;
+
+  while(nodeIndex != SignalConnectionNode::INVALID_INDEX && remaining > 0u)
   {
-    auto* slots = block->Slots();
-    for(uint32_t i = 0; i < block->mHighWaterMark && remaining > 0u; ++i)
+    auto*    node      = mPool.IndexToNode(nodeIndex);
+    uint32_t nextIndex = node->mEmitNext;
+
+    if(!node->connection)
     {
-      if(!slots[i])
-      {
-        mPool.Free(&slots[i]);
-        --remaining;
-      }
+      UnlinkFromEmitList(node);
+      mPool.Free(node);
+      --remaining;
     }
-    block = block->mNext;
+    nodeIndex = nextIndex;
   }
   mNullCount = 0u;
+}
+
+void BaseSignal::AppendToEmitList(SignalConnectionNode* node)
+{
+  uint32_t nodeIndex = mPool.NodeToIndex(node);
+
+  node->mEmitPrev = mEmitTail;
+  node->mEmitNext = SignalConnectionNode::INVALID_INDEX;
+
+  if(mEmitTail != SignalConnectionNode::INVALID_INDEX)
+  {
+    auto* tailNode      = mPool.IndexToNode(mEmitTail);
+    tailNode->mEmitNext = nodeIndex;
+  }
+  else
+  {
+    mEmitHead = nodeIndex;
+  }
+  mEmitTail = nodeIndex;
+}
+
+void BaseSignal::UnlinkFromEmitList(SignalConnectionNode* node)
+{
+  uint32_t prevIndex = node->mEmitPrev;
+  uint32_t nextIndex = node->mEmitNext;
+
+  if(prevIndex != SignalConnectionNode::INVALID_INDEX)
+  {
+    auto* prevNode      = mPool.IndexToNode(prevIndex);
+    prevNode->mEmitNext = nextIndex;
+  }
+  else
+  {
+    mEmitHead = nextIndex;
+  }
+
+  if(nextIndex != SignalConnectionNode::INVALID_INDEX)
+  {
+    auto* nextNode      = mPool.IndexToNode(nextIndex);
+    nextNode->mEmitPrev = prevIndex;
+  }
+  else
+  {
+    mEmitTail = prevIndex;
+  }
+
+  node->mEmitPrev = SignalConnectionNode::INVALID_INDEX;
+  node->mEmitNext = SignalConnectionNode::INVALID_INDEX;
 }
 
 void BaseSignal::EnsureCache()
@@ -325,9 +381,9 @@ void BaseSignal::EnsureCache()
       auto* slots = block->Slots();
       for(uint32_t i = 0; i < block->mHighWaterMark; ++i)
       {
-        if(slots[i] && slots[i].GetCallback())
+        if(slots[i].connection && slots[i].connection.GetCallback())
         {
-          mCacheImpl->mCache.Insert(slots[i].GetCallback(), &slots[i]);
+          mCacheImpl->mCache.Insert(slots[i].connection.GetCallback(), &slots[i]);
         }
       }
       block = block->mNext;
