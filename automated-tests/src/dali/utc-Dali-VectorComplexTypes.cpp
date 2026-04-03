@@ -50,6 +50,8 @@ int UtcDaliVectorComplex(void)
 {
   tet_infoline("Testing Dali::Vector< ComplexType > ");
 
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<ComplexType>::BaseType), false, TEST_LOCATION);
+
   Vector<ComplexType> classvector;
   DALI_TEST_EQUALS(ZERO, classvector.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(ZERO, classvector.Capacity(), TEST_LOCATION);
@@ -128,25 +130,36 @@ int UtcDaliVectorBaseHandle(void)
 
   TestReferenceCount(1, 1, 1, 1, 1, TEST_LOCATION);
 
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<Dali::BaseHandle>::BaseType), false, TEST_LOCATION);
   Dali::Vector<Dali::BaseHandle> baseHandleVector;
 
   TestReferenceCount(1, 1, 1, 1, 1, TEST_LOCATION);
   baseHandleVector.PushBack(handle0);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 1, 1, 1, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle0, TEST_LOCATION);
   baseHandleVector.PushBack(handle1);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 1, 1, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle1, TEST_LOCATION);
   baseHandleVector.PushBack(handle2);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 2, 1, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle2, TEST_LOCATION);
   baseHandleVector.PushBack(handle3);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 2, 2, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle3, TEST_LOCATION);
   baseHandleVector.PushBack(handle4);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 2, 2, 2, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle0, handle1, handle2, handle3, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Get BaseHandle
   Dali::BaseHandle copiedHandle2 = baseHandleVector[2];
@@ -154,32 +167,44 @@ int UtcDaliVectorBaseHandle(void)
   TestReferenceCount(2, 2, 3, 2, 2, TEST_LOCATION);
   copiedHandle2.Reset();
   TestReferenceCount(2, 2, 2, 2, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Set BaseHandle
   baseHandleVector[2] = handle0;
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(3, 2, 1, 2, 2, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle0, handle1, handle0, handle3, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
   baseHandleVector[0] = handle2;
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 2, 2, 2, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle2, handle1, handle0, handle3, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle2, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Erase BaseHandle
   baseHandleVector.Erase(baseHandleVector.Begin());
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 1, 2, 2, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle1, handle0, handle3, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
   baseHandleVector.Erase(baseHandleVector.Begin() + 2);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 1, 1, 2, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle1, handle0, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Insert BaseHandle
   baseHandleVector.Insert(baseHandleVector.Begin() + 1, handle2);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), baseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(2, 2, 2, 1, 2, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Copy assign
   Dali::Vector<Dali::BaseHandle> copiedBaseHandleVector = baseHandleVector;
@@ -188,6 +213,10 @@ int UtcDaliVectorBaseHandle(void)
   TestReferenceCount(3, 3, 3, 1, 3, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4}, TEST_LOCATION);
   TestVectorVariable(copiedBaseHandleVector, {handle1, handle2, handle0, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
+  DALI_TEST_EQUALS(copiedBaseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(copiedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
   baseHandleVector.PushBack(handle3);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), baseHandleVector.Count(), TEST_LOCATION);
@@ -195,6 +224,10 @@ int UtcDaliVectorBaseHandle(void)
   TestReferenceCount(3, 3, 3, 2, 3, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4, handle3}, TEST_LOCATION);
   TestVectorVariable(copiedBaseHandleVector, {handle1, handle2, handle0, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle3, TEST_LOCATION);
+  DALI_TEST_EQUALS(copiedBaseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(copiedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Insert range
   copiedBaseHandleVector.Insert(copiedBaseHandleVector.Begin() + 1, baseHandleVector.Begin(), baseHandleVector.End());
@@ -203,6 +236,10 @@ int UtcDaliVectorBaseHandle(void)
   TestReferenceCount(4, 4, 4, 3, 4, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4, handle3}, TEST_LOCATION);
   TestVectorVariable(copiedBaseHandleVector, {handle1, handle1, handle2, handle0, handle4, handle3, handle2, handle0, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle3, TEST_LOCATION);
+  DALI_TEST_EQUALS(copiedBaseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(copiedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Move assign
   Dali::Vector<Dali::BaseHandle> movedBaseHandleVector = std::move(copiedBaseHandleVector);
@@ -213,6 +250,10 @@ int UtcDaliVectorBaseHandle(void)
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4, handle3}, TEST_LOCATION);
   TestVectorVariable(copiedBaseHandleVector, {}, TEST_LOCATION);
   TestVectorVariable(movedBaseHandleVector, {handle1, handle1, handle2, handle0, handle4, handle3, handle2, handle0, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle3, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Erase range
   movedBaseHandleVector.Erase(movedBaseHandleVector.Begin() + 2, movedBaseHandleVector.End() - 1);
@@ -222,6 +263,10 @@ int UtcDaliVectorBaseHandle(void)
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4, handle3}, TEST_LOCATION);
   TestVectorVariable(copiedBaseHandleVector, {}, TEST_LOCATION);
   TestVectorVariable(movedBaseHandleVector, {handle1, handle1, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle3, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
   baseHandleVector.Erase(baseHandleVector.End() - 1, baseHandleVector.End());
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), baseHandleVector.Count(), TEST_LOCATION);
@@ -230,6 +275,10 @@ int UtcDaliVectorBaseHandle(void)
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4}, TEST_LOCATION);
   TestVectorVariable(copiedBaseHandleVector, {}, TEST_LOCATION);
   TestVectorVariable(movedBaseHandleVector, {handle1, handle1, handle4}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Clear
   movedBaseHandleVector.Clear();
@@ -238,6 +287,8 @@ int UtcDaliVectorBaseHandle(void)
   TestVectorVariable(baseHandleVector, {handle1, handle2, handle0, handle4}, TEST_LOCATION);
   TestVectorVariable(movedBaseHandleVector, {}, TEST_LOCATION);
   DALI_TEST_GREATER(movedBaseHandleVector.Capacity(), ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Reserve
   movedBaseHandleVector.Reserve(128);
@@ -273,6 +324,8 @@ int UtcDaliVectorBaseHandle(void)
   TestReferenceCount(2, 2, 2, 1, 2, TEST_LOCATION);
   TestVectorVariable(movedBaseHandleVector, {handle1, handle2, handle0, handle4}, TEST_LOCATION);
   TestVectorVariable(baseHandleVector, {}, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle1, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
   // Remove
   movedBaseHandleVector.Remove(movedBaseHandleVector.Begin());
@@ -280,12 +333,32 @@ int UtcDaliVectorBaseHandle(void)
   TestReferenceCount(2, 1, 2, 1, 2, TEST_LOCATION);
   // Note : Below order depend on the remove behavior.
   TestVectorVariable(movedBaseHandleVector, {handle4, handle2, handle0}, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle4, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle0, TEST_LOCATION);
 
   movedBaseHandleVector.Remove(movedBaseHandleVector.End() - 1);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), movedBaseHandleVector.Count(), TEST_LOCATION);
   TestReferenceCount(1, 1, 2, 1, 2, TEST_LOCATION);
   // Note : Below order depend on the remove behavior.
   TestVectorVariable(movedBaseHandleVector, {handle4, handle2}, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle4, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle2, TEST_LOCATION);
+
+  // Chane front element
+  movedBaseHandleVector.Front() = handle3;
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), movedBaseHandleVector.Count(), TEST_LOCATION);
+  TestReferenceCount(1, 1, 2, 2, 1, TEST_LOCATION);
+  TestVectorVariable(movedBaseHandleVector, {handle3, handle2}, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle3, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle2, TEST_LOCATION);
+
+  // Chane back element
+  movedBaseHandleVector.Back() = handle0;
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), movedBaseHandleVector.Count(), TEST_LOCATION);
+  TestReferenceCount(2, 1, 1, 2, 1, TEST_LOCATION);
+  TestVectorVariable(movedBaseHandleVector, {handle3, handle0}, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Front(), handle3, TEST_LOCATION);
+  DALI_TEST_EQUALS(movedBaseHandleVector.Back(), handle0, TEST_LOCATION);
 
   END_TEST;
 }
@@ -353,6 +426,7 @@ int UtcDaliVectorMoveOnlyPushBack(void)
   tet_infoline("Testing Dali::Vector PushBack with move-only type");
 
   MoveOnlyType::ResetCounts();
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<MoveOnlyType>::BaseType), false, TEST_LOCATION);
 
   Vector<MoveOnlyType> vector;
   DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
@@ -371,6 +445,56 @@ int UtcDaliVectorMoveOnlyPushBack(void)
   DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
   DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
   DALI_TEST_EQUALS(vector[2].value, 30, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyFrontBack(void)
+{
+  tet_infoline("Testing Dali::Vector Back with move-only type");
+
+  MoveOnlyType::ResetCounts();
+
+  Vector<MoveOnlyType> vector;
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+
+  vector.PushBack(MoveOnlyType(10));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Front().value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Back().value, 10, TEST_LOCATION);
+
+  vector.PushBack(MoveOnlyType(20));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Front().value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Back().value, 20, TEST_LOCATION);
+
+  vector.PushBack(MoveOnlyType(30));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Front().value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Back().value, 30, TEST_LOCATION);
+
+  // Change value
+  vector.Front().value = 40;
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 40, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 30, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Front().value, 40, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Back().value, 30, TEST_LOCATION);
+
+  vector.Back().value = 50;
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 40, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 50, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Front().value, 40, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Back().value, 50, TEST_LOCATION);
 
   END_TEST;
 }
