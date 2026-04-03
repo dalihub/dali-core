@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-task-list-integ.h>

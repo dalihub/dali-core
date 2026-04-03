@@ -22,6 +22,7 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/matrix-utils.h>
@@ -43,7 +44,6 @@
 #include <dali/internal/render/shaders/render-shader.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/common/uniform-map.h>
-#include <dali/public-api/signals/render-callback.h>
 
 namespace Dali::Internal
 {

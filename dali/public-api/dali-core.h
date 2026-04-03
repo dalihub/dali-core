@@ -24,7 +24,6 @@
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/actors/drawable-actor.h>
 #include <dali/public-api/actors/layer.h>
 
 #include <dali/public-api/animation/alpha-function.h>
@@ -137,7 +136,6 @@
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/signals/functor-delegate.h>
-#include <dali/public-api/signals/render-callback.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 #include <dali/public-api/signals/slot-delegate.h>

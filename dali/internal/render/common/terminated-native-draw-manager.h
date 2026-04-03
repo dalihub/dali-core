@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
-#include <dali/public-api/signals/render-callback.h>
+#include <dali/devel-api/signals/render-callback.h>
 #include <unordered_map>
 
 // INTERNAL INCLUDES

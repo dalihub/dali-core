@@ -16,7 +16,8 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/public-api/actors/drawable-actor.h>
+#include <dali/devel-api/actors/drawable-actor.h>
+#include <dali/devel-api/signals/render-callback.h>
 
 namespace
 {

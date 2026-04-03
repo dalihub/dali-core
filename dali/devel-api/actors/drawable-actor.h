@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/public-api/actors/actor.h>
-#include <dali/public-api/signals/render-callback.h>
 
 namespace Dali
 {

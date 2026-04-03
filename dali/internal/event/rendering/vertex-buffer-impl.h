@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_VERTEX_BUFFER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/property-map.h>     // Dali::Property::Map
 #include <dali/public-api/rendering/vertex-buffer.h> // Dali::VertexBuffer
+
+#include <dali/devel-api/rendering/vertex-buffer-devel.h>
+#include <dali/devel-api/signals/vertex-buffer-update-callback.h> // Dali::VertexBufferUpdateCallback
 
 #include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>

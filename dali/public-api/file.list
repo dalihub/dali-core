@@ -7,7 +7,6 @@ SET( public_api_src_files
   ${public_api_src_dir}/actors/camera-actor.cpp
   ${public_api_src_dir}/actors/custom-actor.cpp
   ${public_api_src_dir}/actors/custom-actor-impl.cpp
-  ${public_api_src_dir}/actors/drawable-actor.cpp
   ${public_api_src_dir}/actors/layer.cpp
   ${public_api_src_dir}/animation/animation.cpp
   ${public_api_src_dir}/animation/alpha-function.cpp
@@ -101,7 +100,6 @@ SET( public_api_core_actors_header_files
   ${public_api_src_dir}/actors/camera-actor.h
   ${public_api_src_dir}/actors/custom-actor.h
   ${public_api_src_dir}/actors/custom-actor-impl.h
-  ${public_api_src_dir}/actors/drawable-actor.h
   ${public_api_src_dir}/actors/draw-mode.h
   ${public_api_src_dir}/actors/layer.h
 )
@@ -250,7 +248,6 @@ SET( public_api_core_signals_header_files
   ${public_api_src_dir}/signals/signal-slot-connections.h
   ${public_api_src_dir}/signals/signal-slot-observers.h
   ${public_api_src_dir}/signals/slot-delegate.h
-  ${public_api_src_dir}/signals/render-callback.h
 )
 
 

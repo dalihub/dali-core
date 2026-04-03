@@ -16,8 +16,8 @@
  */
 
 // CLASS HEADER
+#include <dali/devel-api/signals/vertex-buffer-update-callback.h> // Dali::VertexBufferUpdateCallback
 #include <dali/internal/render/renderers/gpu-buffer.h>
-#include <dali/public-api/rendering/vertex-buffer.h>
 
 // INTERNAL INCLUDES
 #include <dali/graphics-api/graphics-types.h>

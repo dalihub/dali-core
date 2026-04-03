@@ -107,16 +107,6 @@ uint32_t VertexBuffer::GetDivisor() const
   return GetImplementation(*this).GetDivisor();
 }
 
-void VertexBuffer::SetVertexBufferUpdateCallback(UniquePtr<VertexBufferUpdateCallback>&& updateCallback)
-{
-  GetImplementation(*this).SetVertexBufferUpdateCallback(*updateCallback.Release());
-}
-
-void VertexBuffer::ClearVertexBufferUpdateCallback()
-{
-  GetImplementation(*this).ClearVertexBufferUpdateCallback();
-}
-
 VertexBuffer::VertexBuffer(Internal::VertexBuffer* pointer)
 : BaseHandle(pointer)
 {

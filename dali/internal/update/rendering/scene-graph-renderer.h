@@ -18,6 +18,7 @@
  */
 
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/memory-pool-key.h>
 #include <dali/internal/event/common/event-thread-services.h>

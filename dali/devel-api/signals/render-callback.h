@@ -24,6 +24,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
+#include <dali/public-api/object/any.h>
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/signals/callback.h>
 
