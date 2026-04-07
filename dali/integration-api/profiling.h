@@ -60,7 +60,7 @@ DALI_CORE_API extern const std::size_t TEXTURE_SET_MEMORY_SIZE;     ///< Total s
 DALI_CORE_API extern const std::size_t SAMPLER_MEMORY_SIZE;         ///< Total size of Sampler and associated internal objects
 DALI_CORE_API extern const std::size_t SHADER_MEMORY_SIZE;          ///< Total size of shader and associated internal objects
 
-std::string LogMemoryPools();
+DALI_CORE_API std::string LogMemoryPools();
 } // namespace Profiling
 
 } // namespace Integration
