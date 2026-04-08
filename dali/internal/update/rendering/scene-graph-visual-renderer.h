@@ -132,7 +132,7 @@ struct VisualProperties
     mTransformOffset(Vector2::ZERO),
     mTransformSize(Vector2::ONE),
     mTransformOrigin(Vector2::ZERO),
-    mTransformAnchorPoint(Vector2::ZERO),
+    mTransformPivot(Vector2::ZERO),
     mTransformOffsetSizeMode(Vector4::ZERO),
     mExtraSize(Vector2::ZERO)
   {
@@ -191,8 +191,8 @@ public: // Default properties
   PROPERTY_WRAPPER(mCoefficient, VisualRendererProperty, Vector2, mTransformOffset);
   PROPERTY_WRAPPER(mTransformOffset, VisualRendererProperty, Vector2, mTransformSize);
   PROPERTY_WRAPPER(mTransformSize, VisualRendererProperty, Vector2, mTransformOrigin);
-  PROPERTY_WRAPPER(mTransformOrigin, VisualRendererProperty, Vector2, mTransformAnchorPoint);
-  PROPERTY_WRAPPER(mTransformAnchorPoint, VisualRendererProperty, Vector4, mTransformOffsetSizeMode);
+  PROPERTY_WRAPPER(mTransformOrigin, VisualRendererProperty, Vector2, mTransformPivot);
+  PROPERTY_WRAPPER(mTransformPivot, VisualRendererProperty, Vector4, mTransformOffsetSizeMode);
   PROPERTY_WRAPPER(mTransformOffsetSizeMode, VisualRendererProperty, Vector2, mExtraSize);
 
   // Properties that don't give any effort to coefficient.

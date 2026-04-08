@@ -204,7 +204,7 @@ int UtcDaliHitTestAlgorithmWithFunctor(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::NAME, "NonHittableActor");
   stage.Add(actor);
 
@@ -251,14 +251,14 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   blue.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(1.0f / 3.0f, 1.0f / 3.0f, 0.5f));
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   green.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(2.0f / 3.0f, 2.0f / 3.0f, 0.5f));
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
@@ -308,14 +308,14 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   blue.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.2f, 0.2f, 0.5f));
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   green.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.4f, 0.4f, 0.5f));
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
@@ -371,14 +371,14 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
 
   // Create a layer
   Layer layer = Layer::New();
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
   stage.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
-  clippingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
   clippingActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
@@ -388,7 +388,7 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   // Create a renderable actor and add it to the clipping actor.
   Actor childActor = CreateRenderableActor();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   childActor.SetProperty(Actor::Property::NAME, "childActor");
   clippingActor.Add(childActor);
@@ -422,14 +422,14 @@ int UtcDaliHitTestAlgorithmClippingActorStress(void)
 
   // Create a layer
   Layer layer = Layer::New();
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
   stage.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
-  clippingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::SIZE, Vector2(220.0f, 220.0f));
   clippingActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
@@ -447,7 +447,7 @@ int UtcDaliHitTestAlgorithmClippingActorStress(void)
     Actor childActor = CreateRenderableActor();
     childActor.SetProperty(Actor::Property::SIZE, Vector2(220.0f, 220.0f));
     childActor.SetProperty(Actor::Property::POSITION, Vector2(200.0f / depthMax, 200.0f / depthMax));
-    childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     childActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
     childActor.SetProperty(Actor::Property::NAME, tmp);
@@ -494,14 +494,14 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   blue.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(1.0f / 3.0f, 1.0f / 3.0f, 0.5f));
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   green.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(2.0f / 3.0f, 2.0f / 3.0f, 0.5f));
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
@@ -534,7 +534,7 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   // Create new actor child as blue. It will be shown over the blue, and green.
   Actor red = Actor::New();
   red.SetProperty(Actor::Property::NAME, "Red");
-  red.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  red.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   red.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   red.SetProperty(Actor::Property::POSITION, Vector2(actorSize.x * 5.0f / 6.0f, -actorSize.y * 1.0f / 6.0f));
   red.SetProperty(Actor::Property::SIZE, actorSize);
@@ -622,14 +622,14 @@ int UtcDaliHitTestAlgorithmDoesWantedHitTest(void)
   // Create two actors with half the size of the stage and set them to be overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   blue.SetProperty(Actor::Property::SIZE, actorSize);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
@@ -668,14 +668,14 @@ int UtcDaliHitTestAlgorithmOrder1(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -687,7 +687,7 @@ int UtcDaliHitTestAlgorithmOrder1(void)
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -723,28 +723,28 @@ int UtcDaliHitTestAlgorithmOrder2(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor yellow                                        = Actor::New();
   yellow[Dali::Actor::Property::NAME]                 = "Yellow";
-  yellow[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  yellow[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   yellow[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   yellow[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   yellow[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -757,7 +757,7 @@ int UtcDaliHitTestAlgorithmOrder2(void)
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -803,21 +803,21 @@ int UtcDaliHitTestAlgorithmOrder3(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -829,7 +829,7 @@ int UtcDaliHitTestAlgorithmOrder3(void)
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -875,28 +875,28 @@ int UtcDaliHitTestAlgorithmInMultipleLayer(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Layer layer                                        = Layer::New();
   layer[Dali::Actor::Property::NAME]                 = "Layer";
-  layer[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  layer[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   layer[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   layer[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   layer[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -910,7 +910,7 @@ int UtcDaliHitTestAlgorithmInMultipleLayer(void)
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -946,21 +946,21 @@ int UtcDaliHitTestAlgorithmOffSceneMappingActor(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -972,7 +972,7 @@ int UtcDaliHitTestAlgorithmOffSceneMappingActor(void)
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -1017,7 +1017,7 @@ int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -1028,7 +1028,7 @@ int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -1065,14 +1065,14 @@ int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -1085,7 +1085,7 @@ int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
   RenderTask     offRenderTask2 = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -1134,14 +1134,14 @@ int UtcDaliHitTestAlgorithmBuildPickingRay01(void)
   // Create two actors with half the size of the stage and set them to be overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   blue.SetProperty(Actor::Property::SIZE, actorSize);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
@@ -1209,26 +1209,26 @@ int UtcDaliHitTestAlgorithmBuildPickingRay02(void)
   // Create two actors with half the size of the stage and set them to be partial-overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION, -actorSize * 0.25f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   green.SetProperty(Actor::Property::SIZE, actorSize);
   green.SetProperty(Actor::Property::POSITION, actorSize * 0.25f);
 
   Actor red = Actor::New();
   red.SetProperty(Actor::Property::NAME, "Red");
-  red.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  red.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  red.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  red.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   red.SetProperty(Actor::Property::SIZE, offscreenSize * 0.5f);
 
   Dali::CameraActor offscreenCameraActor                     = Dali::CameraActor::New(offscreenSize);
-  offscreenCameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  offscreenCameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   offscreenCameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(offscreenCameraActor);
 
@@ -1370,7 +1370,7 @@ int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
     Actor actor = Handle::New<Actor>(
       {
         {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
-        {Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER},
+        {Actor::Property::PIVOT, Pivot::CENTER},
         {Actor::Property::SIZE, Vector3(200.0f, 200.0f, 0.0f)},
         {Actor::Property::POSITION, position},
       });
@@ -1594,7 +1594,7 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
     Actor actor = Handle::New<Actor>(
       {
         {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
-        {Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER},
+        {Actor::Property::PIVOT, Pivot::CENTER},
         {Actor::Property::SIZE, Vector3(200.0f, 200.0f, 0.0f)},
         {Actor::Property::POSITION, position},
       });
@@ -1699,7 +1699,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   rootActor.SetProperty(Actor::Property::NAME, "RootActor");
   rootActor.SetProperty(Actor::Property::SIZE, stageSize);
   rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  rootActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   // The rootActor is implicitly added to the stage as the source of the default render task.
   // For the test, we add it explicitly to the stage to ensure it's part of the main scene graph.
   stage.Add(rootActor);
@@ -1708,14 +1708,14 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   parentActor.SetProperty(Actor::Property::NAME, "ParentActor");
   parentActor.SetProperty(Actor::Property::SIZE, stageSize * 0.8f);
   parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   rootActor.Add(parentActor);
 
   Actor mappingActor = Actor::New();
   mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
   mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.6f);
   mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mappingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mappingActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   // To trigger HitTestActorOnce, mappingActor must be the source actor of an exclusive render task
   // AND the mapping actor of the same render task.
   parentActor.Add(mappingActor);
@@ -1725,7 +1725,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   RenderTask     fboRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
-  fboCamera[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  fboCamera[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(fboCamera);
 
@@ -1782,21 +1782,21 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
   rootActor.SetProperty(Actor::Property::NAME, "RootActor");
   rootActor.SetProperty(Actor::Property::SIZE, stageSize);
   rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  rootActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   stage.Add(rootActor);
 
   Actor mappingActor = Actor::New();
   mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
   mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.5f);
   mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mappingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mappingActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   rootActor.Add(mappingActor);
 
   Actor sourceActor = Actor::New();
   sourceActor.SetProperty(Actor::Property::NAME, "SourceActor");
   sourceActor.SetProperty(Actor::Property::SIZE, stageSize * 0.4f);
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   // Note: sourceActor is NOT added to the stage. It's the root of the FBO task.
   // This makes the FBO hit-test fail.
 
@@ -1805,7 +1805,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
   RenderTask     fboRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
-  fboCamera[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  fboCamera[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(fboCamera);
 
@@ -1860,14 +1860,14 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
   mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.8f);
   mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  mappingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  mappingActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   stage.Add(mappingActor);
 
   Actor sourceLayer = Actor::New();
   sourceLayer.SetProperty(Actor::Property::NAME, "SourceLayer");
   sourceLayer.SetProperty(Actor::Property::SIZE, stageSize * 0.7f);
   sourceLayer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  sourceLayer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sourceLayer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   sourceLayer.SetProperty(Actor::Property::SENSITIVE, false);
   mappingActor.Add(sourceLayer);
   // Note: sourceLayer is NOT added to the stage. It's the root of the FBO task.
@@ -1876,7 +1876,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   childActor.SetProperty(Actor::Property::NAME, "ChildActor");
   childActor.SetProperty(Actor::Property::SIZE, stageSize * 0.6f);
   childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   childActor.SetProperty(Actor::Property::SENSITIVE, false); // Make child actor non-hittable
   sourceLayer.Add(childActor);
 
@@ -1885,7 +1885,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   RenderTask     fboRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
-  fboCamera[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  fboCamera[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(fboCamera);
 

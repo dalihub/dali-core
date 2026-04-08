@@ -297,7 +297,7 @@ int UtcDaliTouchEventNormalProcessing01(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -360,7 +360,7 @@ int UtcDaliTouchEventCapturingActorMultiTouchClear(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Set actor to capture all touch after start
@@ -409,7 +409,7 @@ int UtcDaliTouchEventNormalProcessing02(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -442,7 +442,7 @@ int UtcDaliTouchEventAPINegative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -480,7 +480,7 @@ int UtcDaliTouchEventOutsideCameraNearFarPlanes(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   scene.Add(actor);
 
@@ -581,7 +581,7 @@ int UtcDaliTouchEventInterrupted(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -618,7 +618,7 @@ int UtcDaliTouchEventParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -718,7 +718,7 @@ int UtcDaliTouchEventInterruptedParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -797,7 +797,7 @@ int UtcDaliTouchEventLeave(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -852,7 +852,7 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -933,7 +933,7 @@ int UtcDaliTouchEventActorBecomesInsensitive(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -969,7 +969,7 @@ int UtcDaliTouchEventActorBecomesInsensitiveParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1019,7 +1019,7 @@ int UtcDaliTouchEventActorBecomesUserInteractionDisabled(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1059,12 +1059,12 @@ int UtcDaliTouchEventMultipleLayers(void)
 
   Layer layer1(Layer::New());
   layer1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(layer1);
 
   Actor actor1(Actor::New());
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::POSITION_Z, 1.0f); // Should hit actor1 in this layer
   layer1.Add(actor1);
 
@@ -1107,13 +1107,13 @@ int UtcDaliTouchEventMultipleLayers(void)
   // Add another layer
   Layer layer2(Layer::New());
   layer2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer2.SetProperty(Actor::Property::POSITION_Z, 10.0f); // Should hit layer2 in this layer rather than actor2
   application.GetScene().Add(layer2);
 
   Actor actor2(Actor::New());
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer2.Add(actor2);
 
   // Render and notify
@@ -1175,7 +1175,7 @@ int UtcDaliTouchEventMultipleRenderTasks(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(actor);
 
   // Create render task
@@ -1219,12 +1219,12 @@ int UtcDaliTouchEventMultipleRenderTasksWithChildLayer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(actor);
 
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.Add(layer);
 
   // Create render task
@@ -1280,7 +1280,7 @@ int UtcDaliTouchEventOffscreenRenderTasks(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(actor);
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE); // Ensure framebuffer connects
 
@@ -1320,12 +1320,12 @@ int UtcDaliTouchEventMultipleRenderableActors(void)
 
   Actor parent = CreateRenderableActor();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(parent);
 
   Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(actor);
 
   // Render and notify
@@ -1351,7 +1351,7 @@ int UtcDaliTouchEventActorRemovedInSignal(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1420,7 +1420,7 @@ int UtcDaliTouchEventActorSignalNotConsumed(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1444,7 +1444,7 @@ int UtcDaliTouchEventActorRemovedFromScene(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1482,7 +1482,7 @@ int UtcDaliTouchEventLayerConsumesTouch(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1497,7 +1497,7 @@ int UtcDaliTouchEventLayerConsumesTouch(void)
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(layer);
   layer.RaiseToTop();
 
@@ -1534,7 +1534,7 @@ int UtcDaliTouchEventLeaveActorReadded(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(actor);
 
   // Set actor to receive touch-events
@@ -1580,12 +1580,12 @@ int UtcDaliTouchEventClippedActor(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(actor);
 
   Actor clippingActor = Actor::New();
   clippingActor.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
-  clippingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
   scene.Add(clippingActor);
 
@@ -1593,7 +1593,7 @@ int UtcDaliTouchEventClippedActor(void)
   Actor clippingChild = Actor::New();
   clippingChild.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
   clippingChild.SetProperty(Actor::Property::POSITION, Vector2(25.0f, 25.0f));
-  clippingChild.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingChild.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.Add(clippingChild);
 
   // Render and notify.
@@ -1649,7 +1649,7 @@ int UtcDaliTouchEventActorUnparented(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1687,12 +1687,12 @@ int UtcDaliTouchEventParentRemovedFromScene(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(actor);
 
   // Render and notify
@@ -1730,12 +1730,12 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(actor);
 
   // Render and notify
@@ -1823,12 +1823,12 @@ int UtcDaliTouchEventInterruptedDifferentConsumer(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(actor);
 
   // Render and notify
@@ -1894,7 +1894,7 @@ int UtcDaliTouchEventGetRadius(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1925,7 +1925,7 @@ int UtcDaliTouchEventGetEllipseRadius(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1956,7 +1956,7 @@ int UtcDaliTouchEventGetAngle(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1985,7 +1985,7 @@ int UtcDaliTouchEventGetPressure(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2014,7 +2014,7 @@ int UtcDaliTouchEventUsage(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2039,7 +2039,7 @@ int UtcDaliTouchEventGetDeviceAPINegative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2070,7 +2070,7 @@ int UtcDaliTouchEventGetMouseButtonPositive(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2099,7 +2099,7 @@ int UtcDaliTouchEventGetMouseButtonNagative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2129,7 +2129,7 @@ int UtcDaliTouchEventCapturePropertySet(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2183,7 +2183,7 @@ int UtcDaliTouchEventCapturePropertySetWithMultiTouch(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2237,7 +2237,7 @@ int UtcDaliTouchEventIntercept01(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2268,12 +2268,12 @@ int UtcDaliTouchEventIntercept02(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(actor);
 
   // Render and notify
@@ -2349,7 +2349,7 @@ int UtcDaliTouchEventIntercept03(void)
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(layer);
   layer.RaiseToTop();
 
@@ -2362,7 +2362,7 @@ int UtcDaliTouchEventIntercept03(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.Add(actor);
 
   // Render and notify
@@ -2396,7 +2396,7 @@ int UtcDaliTouchAreaOffset(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(actor);
 
@@ -2475,7 +2475,7 @@ int UtcDaliTouchEventAllowOnlyOwnTouchPropertySet(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2550,7 +2550,7 @@ int UtcDaliTouchEventDispatchTouchMotionPropertySet(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2599,7 +2599,7 @@ int UtcDaliTouchEventGetDeviceNamePositive(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -2629,7 +2629,7 @@ int UtcDaliTouchEventGetDeviceNameNagative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify

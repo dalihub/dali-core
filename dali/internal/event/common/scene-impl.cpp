@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,7 +233,7 @@ Dali::Layer Scene::GetOverlayLayer()
     mOverlayLayer->SetName("OverlayLayer");
     mOverlayLayer->SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     mOverlayLayer->SetParentOrigin(Dali::ParentOrigin::TOP_LEFT);
-    mOverlayLayer->SetAnchorPoint(Dali::AnchorPoint::TOP_LEFT);
+    mOverlayLayer->SetPivot(Dali::Pivot::TOP_LEFT);
     mRootLayer->Add(*mOverlayLayer);
 
     // Create the overlay render-task and set exclusive to true.

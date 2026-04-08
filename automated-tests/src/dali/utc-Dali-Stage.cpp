@@ -1159,7 +1159,7 @@ int UtcDaliStageTouchedSignalP(void)
   // Add an actor to the scene.
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.TouchedSignal().Connect(&DummyTouchCallback);
   stage.Add(actor);
@@ -1312,7 +1312,7 @@ int UtcDaliStageTouchedSignalN(void)
   // Add an actor to the scene.
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.TouchedSignal().Connect(&DummyTouchCallback);
   stage.Add(actor);

@@ -126,7 +126,7 @@ int UtcDaliRotationGestureRecognizerRealistic(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -166,7 +166,7 @@ int UtcDaliRotationGestureRecognizerBasicInterrupted(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -194,7 +194,7 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEvents(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -235,7 +235,7 @@ int UtcDaliRotationGestureRecognizerMinimumTouchEventsAfterStart(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   application.SendNotification();

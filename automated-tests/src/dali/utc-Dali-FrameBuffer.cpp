@@ -879,7 +879,7 @@ int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil01(void)
 
   Actor sourceActor = renderTask.GetSourceActor();
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = sourceActor.GetRendererAt(0);
@@ -912,7 +912,7 @@ int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil02(void)
 
   Actor sourceActor = renderTask.GetSourceActor();
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = sourceActor.GetRendererAt(0);
@@ -945,7 +945,7 @@ int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil03(void)
 
   Actor sourceActor = renderTask.GetSourceActor();
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = sourceActor.GetRendererAt(0);
@@ -980,7 +980,7 @@ int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil04(void)
 
   Actor sourceActor = renderTask.GetSourceActor();
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = sourceActor.GetRendererAt(0);
@@ -1016,7 +1016,7 @@ int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil05(void)
 
   Actor sourceActor = renderTask.GetSourceActor();
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = sourceActor.GetRendererAt(0);
@@ -1092,7 +1092,7 @@ int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil06(void)
 
   Actor sourceActor = renderTask.GetSourceActor();
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
 
   Renderer renderer = sourceActor.GetRendererAt(0);

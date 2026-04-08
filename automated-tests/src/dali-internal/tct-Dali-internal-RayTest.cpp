@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ int UtcDaliTapGestureActorBoundingBoxTestP(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "Green");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  actor.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector3(1.0f, 1.0f, 1.0f));
 
   application.GetScene().Add(actor);
@@ -72,8 +72,8 @@ int UtcDaliTapGestureActorBoundingBoxTestN(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "Green");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  actor.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector3(1.0f, 1.0f, 1.0f));
 
   application.GetScene().Add(actor);

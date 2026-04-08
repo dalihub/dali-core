@@ -196,7 +196,7 @@ int UtcDaliVisualRendererDefaultProperties(void)
   TEST_RENDERER_PROPERTY(renderer, "transformOffset", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_OFFSET, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "transformSize", Property::VECTOR2, true, true, true, VisualRenderer::Property::TRANSFORM_SIZE, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "transformOrigin", Property::VECTOR2, true, false, false, VisualRenderer::Property::TRANSFORM_ORIGIN, TEST_LOCATION);
-  TEST_RENDERER_PROPERTY(renderer, "transformAnchorPoint", Property::VECTOR2, true, false, false, VisualRenderer::Property::TRANSFORM_ANCHOR_POINT, TEST_LOCATION);
+  TEST_RENDERER_PROPERTY(renderer, "transformPivot", Property::VECTOR2, true, false, false, VisualRenderer::Property::TRANSFORM_PIVOT, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "transformOffsetSizeMode", Property::VECTOR4, true, false, false, VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "extraSize", Property::VECTOR2, true, true, true, VisualRenderer::Property::EXTRA_SIZE, TEST_LOCATION);
   TEST_RENDERER_PROPERTY(renderer, "visualMixColor", Property::VECTOR3, true, false, true, VisualRenderer::Property::VISUAL_MIX_COLOR, TEST_LOCATION);
@@ -206,7 +206,7 @@ int UtcDaliVisualRendererDefaultProperties(void)
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET), Vector2::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE), Vector2::ONE, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN), Vector2::ZERO, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_PIVOT), Vector2::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE), Vector4::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE), Vector2::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR), Vector3::ONE, TEST_LOCATION);
@@ -215,7 +215,7 @@ int UtcDaliVisualRendererDefaultProperties(void)
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET), Vector2::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE), Vector2::ONE, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN), Vector2::ZERO, TEST_LOCATION);
-  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT), Vector2::ZERO, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_PIVOT), Vector2::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE), Vector4::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE), Vector2::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR), Vector3::ONE, TEST_LOCATION);
@@ -321,7 +321,7 @@ struct VisualProperties
   : mTransformOffset(offset),
     mTransformSize(size),
     mTransformOrigin(origin),
-    mTransformAnchorPoint(pivot),
+    mTransformPivot(pivot),
     mTransformOffsetSizeMode(modes),
     mExtraSize(extraSize),
     mMixColor(mixColor),
@@ -332,7 +332,7 @@ struct VisualProperties
   Vector2 mTransformOffset{Vector2::ZERO};
   Vector2 mTransformSize{Vector2::ONE};
   Vector2 mTransformOrigin{Vector2::ZERO};
-  Vector2 mTransformAnchorPoint{Vector2::ZERO};
+  Vector2 mTransformPivot{Vector2::ZERO};
   Vector4 mTransformOffsetSizeMode{Vector2::ZERO};
   Vector2 mExtraSize{Vector2::ZERO};
   Vector3 mMixColor{Vector3::ONE};
@@ -349,7 +349,7 @@ struct VisualProperties
     progress.mMixColor                = end.mMixColor; ///< mMixColor is not animatable anymore.
     progress.mTransformOffsetSizeMode = end.mTransformOffsetSizeMode;
     progress.mTransformOrigin         = end.mTransformOrigin;
-    progress.mTransformAnchorPoint    = end.mTransformAnchorPoint;
+    progress.mTransformPivot          = end.mTransformPivot;
     progress.mPreMultipliedAlpha      = end.mPreMultipliedAlpha;
     return progress;
   }
@@ -361,7 +361,7 @@ void PrintVisualProperties(const VisualProperties& props, const std::string& pre
     "%s: offset:(%5.3f, %5.3f)\n"
     "%*c size:(%5.3f, %5.3f)\n"
     "%*c origin:(%5.3f, %5.3f)\n"
-    "%*c anchorPoint:(%5.3f, %5.3f)\n"
+    "%*c pivot:(%5.3f, %5.3f)\n"
     "%*c offsetSizeMode:(%5.3f, %5.3f, %5.3f, %5.3f)\n"
     "%*c extraSize:(%5.3f, %5.3f)\n"
     "%*c mixColor:(%5.3f, %5.3f, %5.3f)\n"
@@ -379,8 +379,8 @@ void PrintVisualProperties(const VisualProperties& props, const std::string& pre
     props.mTransformOrigin.y,
     prefix.length() + 1,
     ' ',
-    props.mTransformAnchorPoint.x,
-    props.mTransformAnchorPoint.y,
+    props.mTransformPivot.x,
+    props.mTransformPivot.y,
     prefix.length() + 1,
     ' ',
     props.mTransformOffsetSizeMode.x,
@@ -406,7 +406,7 @@ void SetVisualProperties(VisualRenderer renderer, VisualProperties props)
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET, props.mTransformOffset);
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_SIZE, props.mTransformSize);
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_ORIGIN, props.mTransformOrigin);
-  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT, props.mTransformAnchorPoint);
+  renderer.SetProperty(VisualRenderer::Property::TRANSFORM_PIVOT, props.mTransformPivot);
   renderer.SetProperty(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, props.mTransformOffsetSizeMode);
   renderer.SetProperty(VisualRenderer::Property::EXTRA_SIZE, props.mExtraSize);
   renderer.SetProperty(VisualRenderer::Property::VISUAL_MIX_COLOR, props.mMixColor);
@@ -421,7 +421,7 @@ void CheckEventVisualProperties(VisualRenderer renderer, VisualProperties expect
   actualProps.mTransformOffset         = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
   actualProps.mTransformSize           = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE);
   actualProps.mTransformOrigin         = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN);
-  actualProps.mTransformAnchorPoint    = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT);
+  actualProps.mTransformPivot          = renderer.GetProperty<Vector2>(VisualRenderer::Property::TRANSFORM_PIVOT);
   actualProps.mTransformOffsetSizeMode = renderer.GetProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   actualProps.mExtraSize               = renderer.GetProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   actualProps.mMixColor                = renderer.GetProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
@@ -432,7 +432,7 @@ void CheckEventVisualProperties(VisualRenderer renderer, VisualProperties expect
   DALI_TEST_EQUALS(actualProps.mTransformOffset, expectedProps.mTransformOffset, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mTransformSize, expectedProps.mTransformSize, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mTransformOrigin, expectedProps.mTransformOrigin, TEST_LOCATION);
-  DALI_TEST_EQUALS(actualProps.mTransformAnchorPoint, expectedProps.mTransformAnchorPoint, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualProps.mTransformPivot, expectedProps.mTransformPivot, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mTransformOffsetSizeMode, expectedProps.mTransformOffsetSizeMode, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mExtraSize, expectedProps.mExtraSize, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mMixColor, expectedProps.mMixColor, TEST_LOCATION);
@@ -448,7 +448,7 @@ void CheckSceneGraphVisualProperties(VisualRenderer renderer, VisualProperties e
   actualProps.mTransformOffset         = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_OFFSET);
   actualProps.mTransformSize           = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_SIZE);
   actualProps.mTransformOrigin         = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ORIGIN);
-  actualProps.mTransformAnchorPoint    = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_ANCHOR_POINT);
+  actualProps.mTransformPivot          = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::TRANSFORM_PIVOT);
   actualProps.mTransformOffsetSizeMode = renderer.GetCurrentProperty<Vector4>(VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
   actualProps.mExtraSize               = renderer.GetCurrentProperty<Vector2>(VisualRenderer::Property::EXTRA_SIZE);
   actualProps.mMixColor                = renderer.GetCurrentProperty<Vector3>(VisualRenderer::Property::VISUAL_MIX_COLOR);
@@ -459,7 +459,7 @@ void CheckSceneGraphVisualProperties(VisualRenderer renderer, VisualProperties e
   DALI_TEST_EQUALS(actualProps.mTransformOffset, expectedProps.mTransformOffset, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mTransformSize, expectedProps.mTransformSize, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mTransformOrigin, expectedProps.mTransformOrigin, TEST_LOCATION);
-  DALI_TEST_EQUALS(actualProps.mTransformAnchorPoint, expectedProps.mTransformAnchorPoint, TEST_LOCATION);
+  DALI_TEST_EQUALS(actualProps.mTransformPivot, expectedProps.mTransformPivot, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mTransformOffsetSizeMode, expectedProps.mTransformOffsetSizeMode, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mExtraSize, expectedProps.mExtraSize, TEST_LOCATION);
   DALI_TEST_EQUALS(actualProps.mMixColor, expectedProps.mMixColor, TEST_LOCATION);
@@ -488,7 +488,7 @@ void CheckUniforms(VisualRenderer renderer, VisualProperties props, std::vector<
   ++uniformIndex;
 
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
-  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformAnchorPoint));
+  DALI_TEST_CHECK(gl.GetUniformValue<Vector2>(uniforms[uniformIndex].name.c_str(), props.mTransformPivot));
   ++uniformIndex;
 
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters(uniforms[uniformIndex].name, params));
@@ -514,7 +514,7 @@ int UtcDaliVisualRendererAnimatedProperty03(void)
   std::vector<UniformData> customUniforms{{"offset", Property::VECTOR2},
                                           {"size", Property::VECTOR2},
                                           {"origin", Property::VECTOR2},
-                                          {"anchorPoint", Property::VECTOR2},
+                                          {"pivot", Property::VECTOR2},
                                           {"offsetSizeMode", Property::VECTOR4},
                                           {"extraSize", Property::VECTOR2}};
 
@@ -590,12 +590,12 @@ int UtcDaliVisualRendererAnimatedProperty04(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
   application.GetScene().Add(actor);
 
-  Property::Index index = VisualRenderer::Property::TRANSFORM_ANCHOR_POINT;
-  renderer.SetProperty(index, Vector2(AnchorPoint::TOP_RIGHT));
+  Property::Index index = VisualRenderer::Property::TRANSFORM_PIVOT;
+  renderer.SetProperty(index, Vector2(Pivot::TOP_RIGHT));
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(AnchorPoint::TOP_RIGHT), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(renderer.GetProperty<Vector2>(index), Vector2(Pivot::TOP_RIGHT), 0.001f, TEST_LOCATION);
 
   Animation animation = Animation::New(1.0f);
   KeyFrames keyFrames = KeyFrames::New();
@@ -746,9 +746,9 @@ int UtcDaliVisualRendererPartialUpdate01(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(68.0f, 68.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(56.0f, 56.0f, 0.0f);
+  actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor[Actor::Property::POSITION] = Vector3(68.0f, 68.0f, 0.0f);
+  actor[Actor::Property::SIZE]     = Vector3(56.0f, 56.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
@@ -782,7 +782,7 @@ int UtcDaliVisualRendererPartialUpdate01(void)
 
   // Now current actor show as 112x28 rectangle, with center position (96, 96).
   // So, rectangle's top left position is (40, 82), and bottom right position is (152, 110).
-  // NOTE : VisualTransform's anchor point is not relative with actor's anchor point
+  // NOTE : VisualTransform's pivot is not relative with actor's pivot
 
   application.SendNotification();
   damagedRects.clear();
@@ -974,9 +974,9 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer1);
   actor.AddRenderer(renderer2);
-  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(68.0f, 68.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(56.0f, 56.0f, 0.0f);
+  actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor[Actor::Property::POSITION] = Vector3(68.0f, 68.0f, 0.0f);
+  actor[Actor::Property::SIZE]     = Vector3(56.0f, 56.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
@@ -1188,9 +1188,9 @@ int UtcDaliVisualRendererPartialUpdate03(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(68.0f, 68.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(56.0f, 56.0f, 0.0f);
+  actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor[Actor::Property::POSITION] = Vector3(68.0f, 68.0f, 0.0f);
+  actor[Actor::Property::SIZE]     = Vector3(56.0f, 56.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 

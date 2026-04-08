@@ -433,7 +433,7 @@ Actor CreateActorWithContent(uint32_t width, uint32_t height)
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Actor::Property::SIZE, Vector2(width, height));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   return actor;
 }
@@ -1124,88 +1124,88 @@ int UtcDaliActorGetCurrentParentOrigin(void)
   END_TEST;
 }
 
-int UtcDaliActorSetAnchorPoint(void)
+int UtcDaliActorSetPivot(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT));
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT));
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, vector);
+  actor.SetProperty(Actor::Property::PIVOT, vector);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT));
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT));
 
   application.GetScene().Add(actor);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, Vector3(0.1f, 0.2f, 0.3f));
+  actor.SetProperty(Actor::Property::PIVOT, Vector3(0.1f, 0.2f, 0.3f));
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(Vector3(0.1f, 0.2f, 0.3f), actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector3(0.1f, 0.2f, 0.3f), actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), TEST_LOCATION);
 
   application.GetScene().Remove(actor);
   END_TEST;
 }
 
-int UtcDaliActorSetAnchorPointIndividual(void)
+int UtcDaliActorSetPivotIndividual(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT));
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT));
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT_X, vector.x);
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(vector.x, actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT).x, TEST_LOCATION);
-
-  actor.SetProperty(Actor::Property::ANCHOR_POINT_Y, vector.y);
+  actor.SetProperty(Actor::Property::PIVOT_X, vector.x);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(vector.y, actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT).y, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.x, actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT).x, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT_Z, vector.z);
+  actor.SetProperty(Actor::Property::PIVOT_Y, vector.y);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(vector.z, actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT).z, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.y, actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT).y, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::PIVOT_Z, vector.z);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(vector.z, actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT).z, TEST_LOCATION);
 
   END_TEST;
 }
 
-int UtcDaliActorGetCurrentAnchorPoint(void)
+int UtcDaliActorGetCurrentPivot(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
   Vector3 vector(0.7f, 0.8f, 0.9f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT));
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT));
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, vector);
+  actor.SetProperty(Actor::Property::PIVOT, vector);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT));
+  DALI_TEST_CHECK(vector == actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT));
   END_TEST;
 }
 
@@ -1626,7 +1626,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   application.GetScene().Add(actor);
 
@@ -1665,7 +1665,7 @@ int UtcDaliActorCalculateCurrentScreenExtentsWithRotation(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   application.GetScene().Add(actor);
 
@@ -1704,7 +1704,7 @@ int UtcDaliActorCalculateScreenPositionWithRotation(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   application.GetScene().Add(actor);
 
@@ -1739,7 +1739,7 @@ int UtcDaliActorCalculateCurrentScreenPositionWithRotation(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 2.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(2.0f, 1.0f, 0.0f));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   application.GetScene().Add(actor);
 
@@ -1836,7 +1836,7 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   // Make 3D Layer
   Layer layer = Layer::New();
   layer.SetProperty(Layer::Property::BEHAVIOR, Layer::Behavior::LAYER_3D);
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   scene.Add(layer);
@@ -1871,7 +1871,7 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   }
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   actor.SetProperty(Actor::Property::POSITION, Vector3(2.0f, 0.0f, 16.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3{1.0f, 0.0f, 3.0f});
@@ -1899,7 +1899,7 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.height, actualExtent.height, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
-  // Since anchor point is center, screen position is same as center of expect extents
+  // Since pivot is center, screen position is same as center of expect extents
   DALI_TEST_EQUALS(expectedExtent.x + expectedExtent.width * 0.5f, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y + expectedExtent.height * 0.5f, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
@@ -1915,7 +1915,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
   // Make 3D Layer
   Layer layer = Layer::New();
   layer.SetProperty(Layer::Property::BEHAVIOR, Layer::Behavior::LAYER_3D);
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   layer.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   layer.SetProperty(Actor::Property::SIZE, sceneSize);
@@ -1926,7 +1926,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
   CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
 
   offscreenCameraActor.SetPerspectiveProjection(sceneSize);
-  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   scene.Add(offscreenCameraActor);
@@ -1960,7 +1960,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
   Vector3 sourceSize{1.0f, 0.0f, 3.0f};
 
   Actor sourceActor = Actor::New();
-  sourceActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sourceActor.SetProperty(Actor::Property::POSITION, sourcePosition);
   sourceActor.SetProperty(Actor::Property::SIZE, sourceSize);
@@ -1975,7 +1975,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
   frameBuffer.AttachColorTexture(texture);
 
   Actor rootActor = Actor::New();
-  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  rootActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   rootActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   rootActor.SetProperty(Actor::Property::SIZE, sceneSize);
@@ -2325,12 +2325,12 @@ int UtcDaliActorGetCurrentWorldPosition(void)
   Vector3 parentPosition(1.0f, 2.0f, 3.0f);
   parent.SetProperty(Actor::Property::POSITION, parentPosition);
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   Vector3 childPosition(6.0f, 6.0f, 6.0f);
   child.SetProperty(Actor::Property::POSITION, childPosition);
   parent.Add(child);
@@ -2360,12 +2360,12 @@ int UtcDaliActorSetInheritPosition(void)
   Vector3 parentPosition(1.0f, 2.0f, 3.0f);
   parent.SetProperty(Actor::Property::POSITION, parentPosition);
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   Vector3 childPosition(10.0f, 11.0f, 12.0f);
   child.SetProperty(Actor::Property::POSITION, childPosition);
   parent.Add(child);
@@ -3187,7 +3187,7 @@ int UtcDaliActorScreenToLocal(void)
 {
   TestApplication application;
   Actor           actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
   application.GetScene().Add(actor);
@@ -3733,7 +3733,7 @@ int UtcDaliActorHitTest(void)
 
   // get the root layer
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   application.GetScene().Add(actor);
@@ -3816,7 +3816,7 @@ int UtcDaliActorGeoHitTest(void)
 
   // get the root layer
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   application.GetScene().Add(actor);
@@ -3998,12 +3998,12 @@ int UtcDaliActorSetDrawModeOverlayWithClipping(void)
   application.GetGlAbstraction().ClearBoundTextures();
 
   b[Actor::Property::PARENT_ORIGIN] = ParentOrigin::BOTTOM_LEFT;
-  b[Actor::Property::ANCHOR_POINT]  = AnchorPoint::BOTTOM_LEFT;
+  b[Actor::Property::PIVOT]         = Pivot::BOTTOM_LEFT;
   b[Actor::Property::DRAW_MODE]     = DrawMode::OVERLAY_2D;
   b[Actor::Property::CLIPPING_MODE] = ClippingMode::CLIP_TO_BOUNDING_BOX;
 
   c[Actor::Property::PARENT_ORIGIN] = ParentOrigin::BOTTOM_LEFT;
-  c[Actor::Property::ANCHOR_POINT]  = AnchorPoint::BOTTOM_LEFT;
+  c[Actor::Property::PIVOT]         = Pivot::BOTTOM_LEFT;
   c[Actor::Property::CLIPPING_MODE] = ClippingMode::CLIP_TO_BOUNDING_BOX;
   c[Actor::Property::POSITION]      = Vector2(100.0f, -100.0f);
 
@@ -4063,7 +4063,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   Vector3    parentPosition(10.0f, 20.0f, 30.0f);
   Radian     rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
@@ -4111,7 +4111,7 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   Vector3    parentPosition(10.0f, 20.0f, 30.0f);
   Radian     rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
@@ -4149,7 +4149,7 @@ int UtcDaliActorConstrainedToOrientation(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   Vector3    parentPosition(10.0f, 20.0f, 30.0f);
   Radian     rotationAngle(Degree(85.0f));
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
@@ -4316,10 +4316,10 @@ const PropertyStringIndex PROPERTY_TABLE[] =
     {"parentOriginX", Actor::Property::PARENT_ORIGIN_X, Property::FLOAT},
     {"parentOriginY", Actor::Property::PARENT_ORIGIN_Y, Property::FLOAT},
     {"parentOriginZ", Actor::Property::PARENT_ORIGIN_Z, Property::FLOAT},
-    {"anchorPoint", Actor::Property::ANCHOR_POINT, Property::VECTOR3},
-    {"anchorPointX", Actor::Property::ANCHOR_POINT_X, Property::FLOAT},
-    {"anchorPointY", Actor::Property::ANCHOR_POINT_Y, Property::FLOAT},
-    {"anchorPointZ", Actor::Property::ANCHOR_POINT_Z, Property::FLOAT},
+    {"pivot", Actor::Property::PIVOT, Property::VECTOR3},
+    {"pivotX", Actor::Property::PIVOT_X, Property::FLOAT},
+    {"pivotY", Actor::Property::PIVOT_Y, Property::FLOAT},
+    {"pivotZ", Actor::Property::PIVOT_Z, Property::FLOAT},
     {"size", Actor::Property::SIZE, Property::VECTOR3},
     {"sizeWidth", Actor::Property::SIZE_WIDTH, Property::FLOAT},
     {"sizeHeight", Actor::Property::SIZE_HEIGHT, Property::FLOAT},
@@ -4799,42 +4799,42 @@ int UtcDaliActorGetHierachyDepth(void)
   END_TEST;
 }
 
-int UtcDaliActorAnchorPointPropertyAsString(void)
+int UtcDaliActorPivotPropertyAsString(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "TOP_LEFT");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::TOP_LEFT, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "TOP_LEFT");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::TOP_LEFT, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "TOP_CENTER");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::TOP_CENTER, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "TOP_CENTER");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::TOP_CENTER, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "TOP_RIGHT");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::TOP_RIGHT, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "TOP_RIGHT");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::TOP_RIGHT, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "CENTER_LEFT");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::CENTER_LEFT, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "CENTER_LEFT");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::CENTER_LEFT, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "CENTER");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::CENTER, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "CENTER");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::CENTER, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "CENTER_RIGHT");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::CENTER_RIGHT, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "CENTER_RIGHT");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::CENTER_RIGHT, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "BOTTOM_LEFT");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "BOTTOM_LEFT");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::BOTTOM_LEFT, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "BOTTOM_CENTER");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "BOTTOM_CENTER");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::BOTTOM_CENTER, TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "BOTTOM_RIGHT");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "BOTTOM_RIGHT");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION);
 
   // Invalid should not change anything
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, "INVALID_ARG");
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::PIVOT, "INVALID_ARG");
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), ParentOrigin::BOTTOM_RIGHT, TEST_LOCATION);
 
   END_TEST;
 }
@@ -5694,7 +5694,7 @@ int UtcDaliActorPropertyScissorClippingActor01(void)
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(clippingActorA);
 
@@ -5716,7 +5716,7 @@ int UtcDaliActorPropertyScissorClippingActor01(void)
   DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 0, 0, 16, 16
 
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT);
 
   // Gather the call trace.
   GenerateTrace(application, enabledDisableTrace, scissorTrace);
@@ -5756,7 +5756,7 @@ int UtcDaliActorPropertyScissorClippingActor02(void)
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(clippingActorA);
 
@@ -5778,7 +5778,7 @@ int UtcDaliActorPropertyScissorClippingActor02(void)
   DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 0, 0, 16, 16
 
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT);
 
   // Gather the call trace.
   GenerateTrace(application, enabledDisableTrace, scissorTrace);
@@ -5816,7 +5816,7 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRenderer(void)
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(clippingActorA);
 
@@ -5838,7 +5838,7 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRenderer(void)
   DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 0, 0, 16, 16
 
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT);
 
   // Gather the call trace.
   GenerateTrace(application, enabledDisableTrace, scissorTrace);
@@ -5880,7 +5880,7 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRendererUnderLayer3D(void)
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(clippingActorA);
 
@@ -5902,7 +5902,7 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRendererUnderLayer3D(void)
   DALI_TEST_CHECK(scissorTrace.FindMethodAndParams("Scissor", compareParametersString.str())); // Compare with 0, 0, 16, 16
 
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_RIGHT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_RIGHT);
 
   // Gather the call trace.
   GenerateTrace(application, enabledDisableTrace, scissorTrace);
@@ -5935,11 +5935,11 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
   Actor clippingActorB = CreateActorWithContent(sizeB.width, sizeB.height);
 
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
   clippingActorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  clippingActorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  clippingActorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   clippingActorB.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
   clippingActorA.SetProperty(Actor::Property::POSITION, Vector3(0.0f, -200.0f, 0.0f));
@@ -6006,14 +6006,14 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(clippingActorA);
 
   // Create a child clipping actor.
   Actor clippingActorB = CreateActorWithContent16x16();
   clippingActorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  clippingActorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  clippingActorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   clippingActorB.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   clippingActorA.Add(clippingActorB);
 
@@ -6085,23 +6085,23 @@ int UtcDaliActorPropertyScissorClippingActorNested02(void)
   Actor clippingActorE = CreateActorWithContent(sizeE.width, sizeE.height);
 
   clippingActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  clippingActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  clippingActorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   clippingActorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
   clippingActorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  clippingActorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  clippingActorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   clippingActorB.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
   clippingActorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  clippingActorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  clippingActorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   clippingActorC.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
   clippingActorD.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  clippingActorD.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  clippingActorD.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   clippingActorD.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
   clippingActorE.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_LEFT);
-  clippingActorE.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  clippingActorE.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
 
   clippingActorA.SetProperty(Actor::Property::POSITION, Vector3(0.0f, -200.0f, 0.0f));
   clippingActorB.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
@@ -6211,14 +6211,14 @@ int UtcDaliActorPropertyClippingActorCulled(void)
   // Note: Scissor coords are have flipped Y values compared with DALi's coordinate system.
   // We choose BOTTOM_LEFT to give us x=0, y=0 starting coordinates for the first test.
   clippingActorA[Actor::Property::PARENT_ORIGIN] = ParentOrigin::BOTTOM_LEFT;
-  clippingActorA[Actor::Property::ANCHOR_POINT]  = AnchorPoint::BOTTOM_LEFT;
+  clippingActorA[Actor::Property::PIVOT]         = Pivot::BOTTOM_LEFT;
   clippingActorA[Actor::Property::CLIPPING_MODE] = ClippingMode::CLIP_TO_BOUNDING_BOX;
   application.GetScene().Add(clippingActorA);
 
   // Create a child actor
   Actor childActor                              = CreateRenderableActor();
   childActor[Actor::Property::PARENT_ORIGIN]    = ParentOrigin::BOTTOM_LEFT;
-  childActor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::BOTTOM_LEFT;
+  childActor[Actor::Property::PIVOT]            = Pivot::BOTTOM_LEFT;
   childActor[Actor::Property::SIZE]             = Vector2(50.0f, 50.0f);
   childActor[Actor::Property::INHERIT_POSITION] = false;
 
@@ -6277,13 +6277,13 @@ int UtcDaliActorRaiseLower(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -6412,13 +6412,13 @@ int UtcDaliActorGeoTouchRaiseLower(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -6568,13 +6568,13 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -6799,13 +6799,13 @@ int UtcDaliActorGeoTouchRaiseToTopLowerToBottom(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -7008,13 +7008,13 @@ int UtcDaliActorRaiseAbove(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -7117,13 +7117,13 @@ int UtcDaliActorGeoTouchRaiseAbove(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -7227,13 +7227,13 @@ int UtcDaliActorRaiseAbove2(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -7338,13 +7338,13 @@ int UtcDaliActorGeoTouchRaiseAbove2(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -7473,13 +7473,13 @@ int UtcDaliActorLowerBelow(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -7693,13 +7693,13 @@ int UtcDaliActorGeoTouchLowerBelow(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -7919,13 +7919,13 @@ int UtcDaliActorLowerBelow2(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -8139,13 +8139,13 @@ int UtcDaliActorGeoTouchLowerBelow2(void)
   Renderer rendererC = Renderer::New(geometry, shaderC);
   actorC.AddRenderer(rendererC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -8340,10 +8340,10 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
   parentB.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
   parentB.SetProperty(Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
 
-  parentA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parentA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parentA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  parentB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parentB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parentB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   stage.Add(parentA);
@@ -8359,13 +8359,13 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
   tet_printf("Actor C added to different parent from A and B \n");
   parentB.Add(actorC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -8448,10 +8448,10 @@ int UtcDaliActorGeoTouchRaiseAboveDifferentParentsN(void)
   parentB.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
   parentB.SetProperty(Actor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
 
-  parentA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parentA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parentA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  parentB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parentB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parentB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   stage.Add(parentA);
@@ -8467,13 +8467,13 @@ int UtcDaliActorGeoTouchRaiseAboveDifferentParentsN(void)
   tet_printf("Actor C added to different parent from A and B \n");
   parentB.Add(actorC);
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -8554,13 +8554,13 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -8722,13 +8722,13 @@ int UtcDaliActorGeoTouchRaiseLowerWhenUnparentedTargetN(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -8891,13 +8891,13 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -9051,13 +9051,13 @@ int UtcDaliActorGeoTouchTestAllAPIwhenActorNotParented(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -9212,13 +9212,13 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -9318,13 +9318,13 @@ int UtcDaliActorGeoTouchRaiseAboveActorAndTargetTheSameN(void)
   Actor actorB = Actor::New();
   Actor actorC = Actor::New();
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   actorA.SetProperty(Actor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
@@ -9422,14 +9422,14 @@ int UtcDaliActorGetScreenPosition(void)
   Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   Vector2 size2(10.0f, 20.0f);
   actorA.SetProperty(Actor::Property::SIZE, size2);
 
   actorA.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
 
-  tet_infoline("UtcDaliActorGetScreenPosition Center Anchor Point and 0,0 position \n");
+  tet_infoline("UtcDaliActorGetScreenPosition Center Pivot and 0,0 position \n");
 
   stage.Add(actorA);
 
@@ -9439,31 +9439,15 @@ int UtcDaliActorGetScreenPosition(void)
   Vector3 actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   Vector2 actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::CENTER \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::CENTER \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position %f %f \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 0lu, TEST_LOCATION);
   DALI_TEST_EQUALS(actorScreenPosition.y, 0lu, TEST_LOCATION);
 
-  tet_infoline("UtcDaliActorGetScreenPosition Top Left Anchor Point and 0,0 position \n");
+  tet_infoline("UtcDaliActorGetScreenPosition Top Left Pivot and 0,0 position \n");
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
-
-  application.SendNotification();
-  application.Render();
-
-  actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
-  actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
-
-  tet_printf("Actor World Position  ( %f %f ) AnchorPoint::TOP_LEFT  \n", actorWorldPosition.x, actorWorldPosition.y);
-  tet_printf("Actor Screen Position  ( %f %f ) AnchorPoint::TOP_LEFT \n", actorScreenPosition.x, actorScreenPosition.y);
-
-  DALI_TEST_EQUALS(actorScreenPosition.x, 0lu, TEST_LOCATION);
-  DALI_TEST_EQUALS(actorScreenPosition.y, 0lu, TEST_LOCATION);
-
-  tet_infoline("UtcDaliActorGetScreenPosition Bottom right Anchor Point and 0,0 position \n");
-
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.SendNotification();
   application.Render();
@@ -9471,13 +9455,29 @@ int UtcDaliActorGetScreenPosition(void)
   actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT   \n", actorWorldPosition.x, actorWorldPosition.y);
-  tet_printf("Actor Screen Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT  \n", actorScreenPosition.x, actorScreenPosition.y);
+  tet_printf("Actor World Position  ( %f %f ) Pivot::TOP_LEFT  \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor Screen Position  ( %f %f ) Pivot::TOP_LEFT \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 0lu, TEST_LOCATION);
   DALI_TEST_EQUALS(actorScreenPosition.y, 0lu, TEST_LOCATION);
 
-  tet_infoline("UtcDaliActorGetScreenPosition Bottom right Anchor Point and 30,0 position \n");
+  tet_infoline("UtcDaliActorGetScreenPosition Bottom right Pivot and 0,0 position \n");
+
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
+
+  application.SendNotification();
+  application.Render();
+
+  actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
+  actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
+
+  tet_printf("Actor World Position ( %f %f ) Pivot::BOTTOM_RIGHT   \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor Screen Position ( %f %f ) Pivot::BOTTOM_RIGHT  \n", actorScreenPosition.x, actorScreenPosition.y);
+
+  DALI_TEST_EQUALS(actorScreenPosition.x, 0lu, TEST_LOCATION);
+  DALI_TEST_EQUALS(actorScreenPosition.y, 0lu, TEST_LOCATION);
+
+  tet_infoline("UtcDaliActorGetScreenPosition Bottom right Pivot and 30,0 position \n");
 
   actorA.SetProperty(Actor::Property::POSITION, Vector2(30.0, 0.0));
 
@@ -9487,13 +9487,13 @@ int UtcDaliActorGetScreenPosition(void)
   actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 0.0 \n", actorWorldPosition.x, actorWorldPosition.y);
-  tet_printf("Actor Screen Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 0.0   \n", actorScreenPosition.x, actorScreenPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::BOTTOM_RIGHT Position x=30 y = 0.0 \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor Screen Position ( %f %f ) Pivot::BOTTOM_RIGHT Position x=30 y = 0.0   \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 30lu, TEST_LOCATION);
   DALI_TEST_EQUALS(actorScreenPosition.y, 0lu, TEST_LOCATION);
 
-  tet_infoline("UtcDaliActorGetScreenPosition Bottom right Anchor Point and 30,420 position \n");
+  tet_infoline("UtcDaliActorGetScreenPosition Bottom right Pivot and 30,420 position \n");
 
   actorA.SetProperty(Actor::Property::POSITION, Vector2(30.0, 420.0));
 
@@ -9506,16 +9506,16 @@ int UtcDaliActorGetScreenPosition(void)
   DALI_TEST_EQUALS(actorScreenPosition.x, 30lu, TEST_LOCATION);
   DALI_TEST_EQUALS(actorScreenPosition.y, 420lu, TEST_LOCATION);
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0\n", actorWorldPosition.x, actorWorldPosition.y);
-  tet_printf("Actor Screen Position( %f %f ) AnchorPoint::BOTTOM_RIGHT Position x=30 y = 420.0 \n", actorScreenPosition.x, actorScreenPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::BOTTOM_RIGHT Position x=30 y = 420.0\n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor Screen Position( %f %f ) Pivot::BOTTOM_RIGHT Position x=30 y = 420.0 \n", actorScreenPosition.x, actorScreenPosition.y);
 
   tet_infoline("UtcDaliActorGetScreenPosition Scale parent and check child's screen position \n");
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::POSITION, Vector2(30.0, 30.0));
 
   Actor actorB = Actor::New();
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorB.SetProperty(Actor::Property::SIZE, size2);
   actorB.SetProperty(Actor::Property::POSITION, Vector2(10.f, 10.f));
   actorA.Add(actorB);
@@ -9542,14 +9542,14 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
   Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Vector2 size2(10.0f, 20.0f);
   actorA.SetProperty(Actor::Property::SIZE, size2);
   actorA.SetProperty(Actor::Property::SCALE, 1.5f);
   actorA.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
 
-  tet_infoline("UtcDaliActorGetScreenPositionAfterScaling TopRight Anchor Point, scale 1.5f and 0,0 position \n");
+  tet_infoline("UtcDaliActorGetScreenPositionAfterScaling TopRight Pivot, scale 1.5f and 0,0 position \n");
 
   stage.Add(actorA);
 
@@ -9559,15 +9559,15 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
   Vector3 actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   Vector2 actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::TOP_LEFT \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 0lu, TEST_LOCATION);
   DALI_TEST_EQUALS(actorScreenPosition.y, 0lu, TEST_LOCATION);
 
-  tet_infoline("UtcDaliActorGetScreenPositionAfterScaling BOTTOM_RIGHT Anchor Point, scale 1.5f and 0,0 position \n");
+  tet_infoline("UtcDaliActorGetScreenPositionAfterScaling BOTTOM_RIGHT Pivot, scale 1.5f and 0,0 position \n");
 
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
 
   application.SendNotification();
   application.Render();
@@ -9575,7 +9575,7 @@ int UtcDaliActorGetScreenPositionAfterScaling(void)
   actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::BOTTOM_RIGHT \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 0.0f, TEST_LOCATION);
@@ -9593,13 +9593,13 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
   Dali::Integration::Scene stage(application.GetScene());
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Vector2 size2(10.0f, 20.0f);
   actorA.SetProperty(Actor::Property::SIZE, size2);
   actorA.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
 
-  tet_infoline(" TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n");
+  tet_infoline(" TOP_LEFT Pivot, ParentOrigin::CENTER and 0,0 position \n");
 
   stage.Add(actorA);
 
@@ -9609,16 +9609,16 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
   Vector3 actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   Vector2 actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::TOP_LEFT ParentOrigin::CENTER  \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 240.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(actorScreenPosition.y, 400.0f, TEST_LOCATION);
 
-  tet_infoline(" BOTTOM_RIGHT Anchor Point, ParentOrigin::TOP_RIGHT and 0,0 position \n");
+  tet_infoline(" BOTTOM_RIGHT Pivot, ParentOrigin::TOP_RIGHT and 0,0 position \n");
 
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
 
   application.SendNotification();
   application.Render();
@@ -9626,7 +9626,7 @@ int UtcDaliActorGetScreenPositionWithDifferentParentOrigin(void)
   actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::BOTTOM_RIGHT ParentOrigin::TOP_RIGHT \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::BOTTOM_RIGHT ParentOrigin::TOP_RIGHT \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 480.0f, TEST_LOCATION);
@@ -9644,19 +9644,19 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
 
   Dali::Integration::Scene stage(application.GetScene());
 
-  tet_infoline("Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n");
+  tet_infoline("Create Child Actor 1 TOP_LEFT Pivot, ParentOrigin::CENTER and 0,0 position \n");
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Vector2 size1(10.0f, 20.0f);
   actorA.SetProperty(Actor::Property::SIZE, size1);
   actorA.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
 
-  tet_infoline("Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n");
+  tet_infoline("Create Parent Actor 1 TOP_LEFT Pivot, ParentOrigin::CENTER and 0,0 position \n");
 
   Actor parentActorA = Actor::New();
-  parentActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Vector2 size2(30.0f, 60.0f);
   parentActorA.SetProperty(Actor::Property::SIZE, size2);
@@ -9673,7 +9673,7 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   Vector3 actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   Vector2 actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::TOP_LEFT ParentOrigin::CENTER  \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 255.0f, TEST_LOCATION);
@@ -9681,9 +9681,9 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
 
   tet_infoline("Test 2\n");
 
-  tet_infoline("change parent anchor point and parent origin then check screen position \n");
+  tet_infoline("change parent pivot and parent origin then check screen position \n");
 
-  parentActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  parentActorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   parentActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
 
   application.SendNotification();
@@ -9692,7 +9692,7 @@ int UtcDaliActorGetScreenPositionWithChildActors(void)
   actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::BOTTOM_LEFT ParentOrigin::TOP_LEFT  \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::BOTTOM_LEFT ParentOrigin::TOP_LEFT  \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 15.0f, TEST_LOCATION);
@@ -9709,28 +9709,28 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
 
   Dali::Integration::Scene stage(application.GetScene());
 
-  tet_infoline("Create Child Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n");
+  tet_infoline("Create Child Actor 1 TOP_LEFT Pivot, ParentOrigin::CENTER and 0,0 position \n");
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Vector2 size1(10.0f, 20.0f);
   actorA.SetProperty(Actor::Property::SIZE, size1);
   actorA.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
 
-  tet_infoline("Create Parent Actor 1 TOP_LEFT Anchor Point, ParentOrigin::CENTER and 0,0 position \n");
+  tet_infoline("Create Parent Actor 1 TOP_LEFT Pivot, ParentOrigin::CENTER and 0,0 position \n");
 
   Actor parentActorA = Actor::New();
-  parentActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   Vector2 size2(30.0f, 60.0f);
   parentActorA.SetProperty(Actor::Property::SIZE, size2);
   parentActorA.SetProperty(Actor::Property::POSITION, Vector2(0.f, 0.f));
 
-  tet_infoline("Create Grand Parent Actor 1 BOTTOM_LEFT Anchor Point, ParentOrigin::BOTTOM_LEFT and 0,0 position \n");
+  tet_infoline("Create Grand Parent Actor 1 BOTTOM_LEFT Pivot, ParentOrigin::BOTTOM_LEFT and 0,0 position \n");
 
   Actor grandParentActorA = Actor::New();
-  grandParentActorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  grandParentActorA.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   grandParentActorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
   Vector2 size3(60.0f, 120.0f);
   grandParentActorA.SetProperty(Actor::Property::SIZE, size3);
@@ -9751,7 +9751,7 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   Vector3 actorWorldPosition  = actorA.GetProperty(Actor::Property::WORLD_POSITION).Get<Vector3>();
   Vector2 actorScreenPosition = actorA.GetProperty(Actor::Property::SCREEN_POSITION).Get<Vector2>();
 
-  tet_printf("Actor World Position ( %f %f ) AnchorPoint::TOP_LEFT ParentOrigin::CENTER  \n", actorWorldPosition.x, actorWorldPosition.y);
+  tet_printf("Actor World Position ( %f %f ) Pivot::TOP_LEFT ParentOrigin::CENTER  \n", actorWorldPosition.x, actorWorldPosition.y);
   tet_printf("Actor Screen Position ( %f %f ) \n", actorScreenPosition.x, actorScreenPosition.y);
 
   DALI_TEST_EQUALS(actorScreenPosition.x, 45.0f, TEST_LOCATION);
@@ -9760,39 +9760,39 @@ int UtcDaliActorGetScreenPositionWithChildActors02(void)
   END_TEST;
 }
 
-int UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse(void)
+int UtcDaliActorGetScreenPositionPositionUsesPivotFalse(void)
 {
-  tet_infoline("UtcDaliActorGetScreenPositionPositionUsesAnchorPointFalse Check screen position where the position does not use the anchor point");
+  tet_infoline("UtcDaliActorGetScreenPositionPositionUsesPivotFalse Check screen position where the position does not use the pivot");
 
   TestApplication application;
 
   Dali::Integration::Scene stage(application.GetScene());
 
-  tet_infoline("Create an actor with AnchorPoint::TOP_LEFT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false");
+  tet_infoline("Create an actor with Pivot::TOP_LEFT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false");
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actorA.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  actorA.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
   actorA.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 20.0f));
   stage.Add(actorA);
 
-  tet_infoline("Create an Actor with AnchorPoint::BOTTOM_RIGHT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false");
+  tet_infoline("Create an Actor with Pivot::BOTTOM_RIGHT, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false");
 
   Actor actorB = Actor::New();
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actorB.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  actorB.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
   Vector2 actorBSize(30.0f, 60.0f);
   actorB.SetProperty(Actor::Property::SIZE, actorBSize);
   stage.Add(actorB);
 
-  tet_infoline("Create an actor with AnchorPoint::CENTER, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false");
+  tet_infoline("Create an actor with Pivot::CENTER, ParentOrigin::CENTER and 0,0 position, POSITION_USES_ANCHOR false");
 
   Actor actorC = Actor::New();
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actorC.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  actorC.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
   Vector2 actorCSize(60.0f, 120.0f);
   actorC.SetProperty(Actor::Property::SIZE, actorCSize);
   stage.Add(actorC);
@@ -9832,7 +9832,7 @@ int UtcDaliActorGetScreenPositionResizeScene(void)
   Dali::Integration::Scene scene = application.GetScene();
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   actorA.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
 
@@ -9910,13 +9910,13 @@ int UtcDaliActorGetScreenPositionInCustomCameraAndLayer3D(void)
   }
 
   Actor actorA = Actor::New();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   actorA.SetProperty(Actor::Property::SIZE, Vector3(10.0f, 10.0f, 10.0f));
   actorA.SetProperty(Actor::Property::POSITION, Vector3(20.0f, 0.0f, 10.0f));
 
   Actor actorB = Actor::New();
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   actorB.SetProperty(Actor::Property::SIZE, Vector3(10.0f, 10.0f, 10.0f));
   actorB.SetProperty(Actor::Property::POSITION, Vector3(-20.0f, 0.0f, -10.0f));
@@ -9939,14 +9939,14 @@ int UtcDaliActorGetScreenPositionInCustomCameraAndLayer3D(void)
   END_TEST;
 }
 
-int utcDaliActorPositionUsesAnchorPoint(void)
+int utcDaliActorPositionUsesPivot(void)
 {
   TestApplication application;
   tet_infoline("Check default behaviour\n");
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   application.GetScene().Add(actor);
 
@@ -9956,8 +9956,8 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   tet_infoline("Check that the world position is in the center\n");
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION);
 
-  tet_infoline("Set the position uses anchor point property to false\n");
-  actor.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  tet_infoline("Set the position uses pivot property to false\n");
+  actor.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
 
   application.SendNotification();
   application.Render();
@@ -9968,17 +9968,17 @@ int utcDaliActorPositionUsesAnchorPoint(void)
   END_TEST;
 }
 
-int utcDaliActorPositionUsesAnchorPointCheckScale(void)
+int utcDaliActorPositionUsesPivotCheckScale(void)
 {
   TestApplication application;
-  tet_infoline("Check that the scale is adjusted appropriately when setting the positionUsesAnchorPoint to false\n");
+  tet_infoline("Check that the scale is adjusted appropriately when setting the positionUsesPivot to false\n");
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::SCALE, 2.0f);
-  actor.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  actor.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -9987,14 +9987,14 @@ int utcDaliActorPositionUsesAnchorPointCheckScale(void)
   tet_infoline("Check the world position is the same as it would be without a scale\n");
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(50.0f, 50.0f, 0.0f), TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  tet_infoline("Change the Pivot to TOP_LEFT and ensure the world position changes accordingly");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(100.0f, 100.0f, 0.0f), TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  tet_infoline("Change the Pivot to BOTTOM_RIGHT and ensure the world position changes accordingly");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(0.0f, 0.0f, 0.0f), TEST_LOCATION);
@@ -10002,17 +10002,17 @@ int utcDaliActorPositionUsesAnchorPointCheckScale(void)
   END_TEST;
 }
 
-int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
+int utcDaliActorPositionUsesPivotCheckRotation(void)
 {
   TestApplication application;
-  tet_infoline("Check that the rotation is adjusted appropriately when setting the positionUsesAnchorPoint to false\n");
+  tet_infoline("Check that the rotation is adjusted appropriately when setting the positionUsesPivot to false\n");
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Degree(90.0f), Vector3::ZAXIS));
-  actor.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  actor.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -10021,14 +10021,14 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   tet_infoline("Check the world position is the same as it would be without a rotation\n");
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(50.0f, 50.0f, 0.0f), TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  tet_infoline("Change the Pivot to TOP_LEFT and ensure the world position changes accordingly");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(-50.0f, 50.0f, 0.0f), TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  tet_infoline("Change the Pivot to BOTTOM_RIGHT and ensure the world position changes accordingly");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(150.0f, 50.0f, 0.0f), TEST_LOCATION);
@@ -10036,18 +10036,18 @@ int utcDaliActorPositionUsesAnchorPointCheckRotation(void)
   END_TEST;
 }
 
-int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
+int utcDaliActorPositionUsesPivotCheckScaleAndRotation(void)
 {
   TestApplication application;
-  tet_infoline("Check that the scale and rotation is adjusted appropriately when setting the positionUsesAnchorPoint to false\n");
+  tet_infoline("Check that the scale and rotation is adjusted appropriately when setting the positionUsesPivot to false\n");
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::ORIENTATION, Quaternion(Degree(90.0f), Vector3::ZAXIS));
   actor.SetProperty(Actor::Property::SCALE, 2.0f);
-  actor.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  actor.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -10056,14 +10056,14 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   tet_infoline("Check the world position is the same as it would be without a scale and rotation\n");
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(50.0f, 50.0f, 0.0f), TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to TOP_LEFT and ensure the world position changes accordingly");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  tet_infoline("Change the Pivot to TOP_LEFT and ensure the world position changes accordingly");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(-100.0f, 100.0f, 0.0f), TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to BOTTOM_RIGHT and ensure the world position changes accordingly");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  tet_infoline("Change the Pivot to BOTTOM_RIGHT and ensure the world position changes accordingly");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), Vector3(200.0f, 0.0f, 0.0f), TEST_LOCATION);
@@ -10071,10 +10071,10 @@ int utcDaliActorPositionUsesAnchorPointCheckScaleAndRotation(void)
   END_TEST;
 }
 
-int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
+int utcDaliActorPositionUsesPivotOnlyInheritPosition(void)
 {
   TestApplication application;
-  tet_infoline("Check that if not inheriting scale and position, then the position is adjusted appropriately when setting the positionUsesAnchorPoint to false\n");
+  tet_infoline("Check that if not inheriting scale and position, then the position is adjusted appropriately when setting the positionUsesPivot to false\n");
 
   Actor parent = Actor::New();
 
@@ -10083,11 +10083,11 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::INHERIT_SCALE, false);
   actor.SetProperty(Actor::Property::INHERIT_ORIENTATION, false);
-  actor.SetProperty(Actor::Property::POSITION_USES_ANCHOR_POINT, false);
+  actor.SetProperty(Actor::Property::POSITION_USES_PIVOT, false);
   parent.Add(actor);
 
   application.SendNotification();
@@ -10098,14 +10098,14 @@ int utcDaliActorPositionUsesAnchorPointOnlyInheritPosition(void)
   tet_infoline("Check the world position is in the right place\n");
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), expectedWorldPosition, TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to TOP_LEFT and ensure world position hasn't changed");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  tet_infoline("Change the Pivot to TOP_LEFT and ensure world position hasn't changed");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), expectedWorldPosition, TEST_LOCATION);
 
-  tet_infoline("Change the Anchor Point to BOTTOM_RIGHT and ensure world position hasn't changed");
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  tet_infoline("Change the Pivot to BOTTOM_RIGHT and ensure world position hasn't changed");
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::WORLD_POSITION), expectedWorldPosition, TEST_LOCATION);
@@ -10776,17 +10776,17 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   };
 
   DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-  { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+                                                                                                   { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-  { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+                                                                                                   { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-  { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+                                                                                                   { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-  {
+                                                                                                   {
     dataVCB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
     actorDSignalFunctor(); }));
   DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-  { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+                                                                                                   { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
   actorA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
   actorB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
@@ -11940,7 +11940,7 @@ int utcDaliActorPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -12044,7 +12044,7 @@ int utcDaliActorPartialUpdateSetColor(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -12162,7 +12162,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
 
   Texture image = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 4u, 4u);
   Actor   actor = CreateRenderableActor(image, RENDER_SHADOW_VERTEX_SOURCE, RENDER_SHADOW_FRAGMENT_SOURCE);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -12599,12 +12599,12 @@ int utcDaliActorPartialUpdateAnimation01(void)
   drawTrace.Reset();
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
   application.GetScene().Add(actor1);
 
   Actor actor2 = CreateRenderableActor();
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor2.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   application.GetScene().Add(actor2);
 
@@ -12664,7 +12664,7 @@ int utcDaliActorPartialUpdateAnimation01(void)
   actor2.Unparent();
 
   Actor actor3 = CreateRenderableActor();
-  actor3.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor3.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor3.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   application.GetScene().Add(actor3);
 
@@ -12711,7 +12711,7 @@ int utcDaliActorPartialUpdateAnimation02(void)
   drawTrace.Reset();
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   application.GetScene().Add(actor);
 
@@ -12793,7 +12793,7 @@ int utcDaliActorPartialUpdateChangeVisibility(void)
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -12869,7 +12869,7 @@ int utcDaliActorPartialUpdateOnOffScene(void)
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -12951,7 +12951,7 @@ int utcDaliActorPartialUpdateSkipRendering(void)
   drawTrace.Reset();
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
   application.GetScene().Add(actor1);
 
@@ -13040,7 +13040,7 @@ int utcDaliActorPartialUpdate3DNode(void)
   drawTrace.Reset();
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
   application.GetScene().Add(actor1);
 
@@ -13121,16 +13121,16 @@ int utcDaliActorPartialUpdateNotRenderableActor(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  Actor parent                          = Actor::New();
-  parent[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  parent[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  parent[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor parent                      = Actor::New();
+  parent[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  parent[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  parent[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   parent.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(parent);
 
-  Actor child                          = CreateRenderableActor();
-  child[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  child[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor child                   = CreateRenderableActor();
+  child[Actor::Property::PIVOT] = Pivot::TOP_LEFT;
+  child[Actor::Property::SIZE]  = Vector3(16.0f, 16.0f, 0.0f);
   child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   parent.Add(child);
 
@@ -13177,10 +13177,10 @@ int utcDaliActorPartialUpdateChangeTransparency(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  Actor actor                          = CreateRenderableActor();
-  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor actor                      = CreateRenderableActor();
+  actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
@@ -13317,17 +13317,17 @@ int utcDaliActorPartialUpdateChangeParentOpacity(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  Actor parent                          = Actor::New();
-  parent[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  parent[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  parent[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor parent                      = Actor::New();
+  parent[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  parent[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  parent[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   parent.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(parent);
 
-  Texture texture                      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 16u, 16u);
-  Actor   child                        = CreateRenderableActor(texture);
-  child[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  child[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Texture texture               = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 16u, 16u);
+  Actor   child                 = CreateRenderableActor(texture);
+  child[Actor::Property::PIVOT] = Pivot::TOP_LEFT;
+  child[Actor::Property::SIZE]  = Vector3(16.0f, 16.0f, 0.0f);
   child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   parent.Add(child);
 
@@ -13386,10 +13386,10 @@ int utcDaliActorPartialUpdateAddRemoveRenderer(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  Actor actor                          = CreateRenderableActor();
-  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor actor                      = CreateRenderableActor();
+  actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
@@ -13465,18 +13465,18 @@ int utcDaliActorPartialUpdate3DTransform(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  Actor actor1                          = CreateRenderableActor();
-  actor1[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor1[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor1[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor actor1                      = CreateRenderableActor();
+  actor1[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor1[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  actor1[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor1);
 
   // Add a new actor
-  Actor actor2                          = CreateRenderableActor();
-  actor2[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor2[Actor::Property::POSITION]     = Vector3(160.0f, 160.0f, 0.0f);
-  actor2[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor actor2                      = CreateRenderableActor();
+  actor2[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor2[Actor::Property::POSITION] = Vector3(160.0f, 160.0f, 0.0f);
+  actor2[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor2);
 
@@ -13621,9 +13621,9 @@ int utcDaliActorPartialUpdateOneActorMultipleRenderers(void)
   Renderer renderer2 = Renderer::New(geometry, shader);
   actor.AddRenderer(renderer2);
 
-  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
@@ -13706,10 +13706,10 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  Actor actor                          = CreateRenderableActor();
-  actor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  Actor actor                      = CreateRenderableActor();
+  actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
@@ -13717,9 +13717,9 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
   Actor    actor2   = Actor::New();
   Renderer renderer = actor.GetRendererAt(0);
   actor2.AddRenderer(renderer);
-  actor2[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  actor2[Actor::Property::POSITION]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor2[Actor::Property::SIZE]         = Vector3(16.0f, 16.0f, 0.0f);
+  actor2[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
+  actor2[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
+  actor2[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
   actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor2);
 
@@ -13782,7 +13782,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea01(void)
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
   Actor actor                              = CreateRenderableActor();
-  actor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::PIVOT]            = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
   actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
@@ -13855,7 +13855,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea02(void)
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
   Actor actor                              = CreateRenderableActor();
-  actor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::PIVOT]            = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
   actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
@@ -13939,7 +13939,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea03(void)
   Actor   actor    = CreateRenderableActor(texture1);
   actor.GetRendererAt(0).GetTextures().SetTexture(1u, texture2);
 
-  actor[Actor::Property::ANCHOR_POINT]     = AnchorPoint::TOP_LEFT;
+  actor[Actor::Property::PIVOT]            = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
   actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
@@ -14867,11 +14867,11 @@ int UtcDaliActorDoesWantedHitTest(void)
 
   // get the root layer
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   Actor lowerActor = Actor::New();
-  lowerActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  lowerActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   lowerActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
 
   // actor and lowerActor have no relationship.
@@ -14997,14 +14997,14 @@ int UtcDaliActorCalculateWorldTransform01(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  // Set anchor point to the same value as parent origin
+  // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PARENT_ORIGIN]   = ParentOrigin::TOP_LEFT;
   branchActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
   leafActor[Actor::Property::PARENT_ORIGIN]   = ParentOrigin::TOP_LEFT;
 
-  rootActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
-  branchActor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  leafActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
+  rootActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
+  branchActor[Actor::Property::PIVOT] = Pivot::TOP_LEFT;
+  leafActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
 
   application.GetScene().Add(rootActor);
   rootActor.Add(branchActor);
@@ -15047,10 +15047,10 @@ int UtcDaliActorCalculateWorldTransform02(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  // Set anchor point to the same value as parent origin
-  rootActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
-  branchActor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  leafActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
+  // Set pivot to the same value as parent origin
+  rootActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
+  branchActor[Actor::Property::PIVOT] = Pivot::TOP_LEFT;
+  leafActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
 
   application.GetScene().Add(rootActor);
   rootActor.Add(branchActor);
@@ -15091,10 +15091,10 @@ int UtcDaliActorCalculateWorldTransform03(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  // Set anchor point to the same value as parent origin
-  rootActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
-  branchActor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  leafActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
+  // Set pivot to the same value as parent origin
+  rootActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
+  branchActor[Actor::Property::PIVOT] = Pivot::TOP_LEFT;
+  leafActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
 
   application.GetScene().Add(rootActor);
   rootActor.Add(branchActor);
@@ -15135,11 +15135,11 @@ int UtcDaliActorCalculateWorldTransform04(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  // Set anchor point to the same value as parent origin
-  rootActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::CENTER;
-  rootActor[Actor::Property::PARENT_ORIGIN]  = ParentOrigin::CENTER;
-  branchActor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  leafActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
+  // Set pivot to the same value as parent origin
+  rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
+  rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  branchActor[Actor::Property::PIVOT]       = Pivot::TOP_LEFT;
+  leafActor[Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
 
   branchActor[Actor::Property::POSITION] = Vector3(100.0f, 100.0f, 0.0f);
   leafActor[Actor::Property::POSITION]   = Vector3(100.0f, 50.0f, 30.0f);
@@ -15179,11 +15179,11 @@ int UtcDaliActorCalculateWorldTransform05(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  // Set anchor point to the same value as parent origin
-  rootActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::CENTER;
-  rootActor[Actor::Property::PARENT_ORIGIN]  = ParentOrigin::CENTER;
-  branchActor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  leafActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
+  // Set pivot to the same value as parent origin
+  rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
+  rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  branchActor[Actor::Property::PIVOT]       = Pivot::TOP_LEFT;
+  leafActor[Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
 
   branchActor[Actor::Property::POSITION] = Vector3(100.0f, 100.0f, 0.0f);
   leafActor[Actor::Property::POSITION]   = Vector3(100.0f, 50.0f, 30.0f);
@@ -15226,11 +15226,11 @@ int UtcDaliActorCalculateWorldTransform06(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  // Set anchor point to the same value as parent origin
-  rootActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::CENTER;
-  rootActor[Actor::Property::PARENT_ORIGIN]  = ParentOrigin::CENTER;
-  branchActor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
-  leafActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::TOP_LEFT;
+  // Set pivot to the same value as parent origin
+  rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
+  rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  branchActor[Actor::Property::PIVOT]       = Pivot::TOP_LEFT;
+  leafActor[Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
 
   branchActor[Actor::Property::POSITION]    = Vector3(100.0f, 30.0f, -50.0f);
   branchActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(45.0f), Vector3::XAXIS);
@@ -15274,22 +15274,22 @@ int UtcDaliActorCalculateWorldTransform07(void)
   branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  // Set anchor point to the same value as parent origin
-  rootActor[Actor::Property::ANCHOR_POINT]   = AnchorPoint::CENTER;
-  rootActor[Actor::Property::PARENT_ORIGIN]  = ParentOrigin::CENTER;
-  branchActor[Actor::Property::ANCHOR_POINT] = AnchorPoint::TOP_LEFT;
+  // Set pivot to the same value as parent origin
+  rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
+  rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
+  branchActor[Actor::Property::PIVOT]       = Pivot::TOP_LEFT;
 
   // This should be ignored.
   leafActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  leafActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  leafActor[Actor::Property::PIVOT]         = Pivot::CENTER;
 
   branchActor[Actor::Property::POSITION]    = Vector3(100.0f, 30.0f, -50.0f);
   branchActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(45.0f), Vector3::XAXIS);
   leafActor[Actor::Property::POSITION]      = Vector3(100.0f, 50.0f, 30.0f);
 
-  leafActor[Actor::Property::INHERIT_POSITION]           = false;
-  leafActor[Actor::Property::INHERIT_SCALE]              = false;
-  leafActor[Actor::Property::POSITION_USES_ANCHOR_POINT] = false;
+  leafActor[Actor::Property::INHERIT_POSITION]    = false;
+  leafActor[Actor::Property::INHERIT_SCALE]       = false;
+  leafActor[Actor::Property::POSITION_USES_PIVOT] = false;
 
   application.GetScene().Add(rootActor);
   rootActor.Add(branchActor);
@@ -15340,16 +15340,16 @@ int UtcDaliActorCalculateWorldTransform08(void)
   rootActor[Actor::Property::SCALE]         = Vector3(1.0f, 2.0f, 1.0f);
   rootActor[Actor::Property::ORIENTATION]   = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
   rootActor[Actor::Property::SIZE]          = Vector2(200, 400);
-  rootActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
   rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
 
-  leafActor[Actor::Property::POSITION]                   = Vector3(0.0f, -50.0f, 0.0f);
-  leafActor[Actor::Property::SCALE]                      = Vector3(1.0f, 1.0f, 1.0f);
-  leafActor[Actor::Property::ORIENTATION]                = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
-  leafActor[Actor::Property::SIZE]                       = Vector2(200, 400);
-  leafActor[Actor::Property::ANCHOR_POINT]               = AnchorPoint::BOTTOM_CENTER;
-  leafActor[Actor::Property::PARENT_ORIGIN]              = ParentOrigin::TOP_CENTER;
-  leafActor[Actor::Property::POSITION_USES_ANCHOR_POINT] = true;
+  leafActor[Actor::Property::POSITION]            = Vector3(0.0f, -50.0f, 0.0f);
+  leafActor[Actor::Property::SCALE]               = Vector3(1.0f, 1.0f, 1.0f);
+  leafActor[Actor::Property::ORIENTATION]         = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
+  leafActor[Actor::Property::SIZE]                = Vector2(200, 400);
+  leafActor[Actor::Property::PIVOT]               = Pivot::BOTTOM_CENTER;
+  leafActor[Actor::Property::PARENT_ORIGIN]       = ParentOrigin::TOP_CENTER;
+  leafActor[Actor::Property::POSITION_USES_PIVOT] = true;
 
   application.GetScene().Add(rootActor);
   rootActor.Add(leafActor);
@@ -15393,7 +15393,7 @@ int UtcDaliActorCalculateWorldTransform09(void)
   rootActor[Actor::Property::POSITION]      = rootActorPosition;
   rootActor[Actor::Property::SCALE]         = Vector3::ONE;
   rootActor[Actor::Property::SIZE]          = Vector2(200, 400);
-  rootActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
   rootActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
 
   Vector3 middleActorPosition                 = Vector3(100.0f, 0.0f, 0.0f);
@@ -15401,14 +15401,14 @@ int UtcDaliActorCalculateWorldTransform09(void)
   middleActor[Actor::Property::POSITION]      = middleActorPosition;
   middleActor[Actor::Property::SCALE]         = Vector3::ONE;
   middleActor[Actor::Property::SIZE]          = middleActorSize;
-  middleActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  middleActor[Actor::Property::PIVOT]         = Pivot::CENTER;
   middleActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
 
   Vector3 leafActorPosition                 = Vector3(0.0f, 100.0f, 0.0f);
   leafActor[Actor::Property::POSITION]      = leafActorPosition;
   leafActor[Actor::Property::SCALE]         = Vector3::ONE;
   leafActor[Actor::Property::SIZE]          = Vector2(200, 400);
-  leafActor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  leafActor[Actor::Property::PIVOT]         = Pivot::CENTER;
   leafActor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT; ///< To test parent's size changeness applied
 
   middleActor[Actor::Property::INHERIT_SCALE] = true;
@@ -15786,7 +15786,7 @@ int UtcDaliActorCalculateLookAt(void)
   Actor actor = Actor::New();
 
   actor[Actor::Property::POSITION]      = Vector3(100.0f, 0.0f, 0.0f);
-  actor[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  actor[Actor::Property::PIVOT]         = Pivot::CENTER;
   actor[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
 
   application.GetScene().Add(actor);
@@ -15821,7 +15821,7 @@ int UtcDaliActorCalculateLookAt(void)
 
   Actor actor2                           = Actor::New();
   actor2[Actor::Property::POSITION]      = Vector3(0.0f, 50.0f, -10.0f);
-  actor2[Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  actor2[Actor::Property::PIVOT]         = Pivot::CENTER;
   actor2[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   actor.Add(actor2);
 
@@ -16037,7 +16037,7 @@ int UtcDaliActorWorldIgnoredPropertyP(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::WORLD_IGNORED).Get<bool>(), true, TEST_LOCATION);
@@ -16062,17 +16062,17 @@ int UtcDaliActorIgnored01(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(parent);
 
   Actor child1 = Actor::New();
   child1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  child1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child1.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parent.Add(child1);
 
   Actor child2 = Actor::New();
   child2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  child2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parent.Add(child2);
 
   PropertyNotification notification = child2.AddPropertyNotification(DevelActor::Property::IGNORED, LessThanCondition(0.5f));
@@ -16188,12 +16188,12 @@ int UtcDaliActorIgnoredConstraintInput(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parent.Add(child);
 
   gTestConstraintCalled = false;
@@ -16326,25 +16326,25 @@ int UtcDaliActorChildrenDepthIndexPolicyPropertyChangeRenderingOrder(void)
 
   rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   rootActor.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  rootActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   actor1.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   actor2.SetProperty(Actor::Property::POSITION, Vector2(30.0f, 10.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor11.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   actor11.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  actor11.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor11.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor12.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   actor12.SetProperty(Actor::Property::POSITION, Vector2(20.0f, 10.0f));
-  actor12.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor12.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor111.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   actor111.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  actor111.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor111.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor21.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   actor21.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
-  actor21.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor21.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   application.GetScene().Add(rootActor);
   rootActor.Add(actor1);

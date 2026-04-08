@@ -249,7 +249,7 @@ int UtcDaliLongPressGestureDetectorNew(void)
   // Attach an actor and emit a touch event on the actor to ensure complete line coverage
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -328,7 +328,7 @@ int UtcDaliLongPressGestureSignalReceptionNegative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -356,7 +356,7 @@ int UtcDaliLongPressGestureSignalReceptionPositive(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -385,7 +385,7 @@ int UtcDaliLongPressGestureSignalReceptionDetach(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -440,7 +440,7 @@ int UtcDaliLongPressGestureSignalReceptionActorDestroyedDuringLongPress(void)
   {
     Actor actor = Actor::New();
     actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     application.GetScene().Add(actor);
 
     // Render and notify
@@ -475,7 +475,7 @@ int UtcDaliLongPressGestureSignalReceptionActorBecomesInvisible(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -566,7 +566,7 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   // Set child to completely cover parent.
@@ -574,7 +574,7 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   // conversion of the parent actor is correct.
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   child.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS));
   parent.Add(child);
@@ -618,13 +618,13 @@ int UtcDaliLongPressGestureSignalReceptionAttachDetachMany(void)
 
   Actor first = Actor::New();
   first.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  first.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  first.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(first);
 
   Actor second = Actor::New();
   second.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   second.SetProperty(Actor::Property::POSITION_X, 100.0f);
-  second.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  second.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(second);
 
   // Render and notify
@@ -675,7 +675,7 @@ int UtcDaliLongPressGestureSignalReceptionActorBecomesUntouchable(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -715,7 +715,7 @@ int UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -749,7 +749,7 @@ int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -808,7 +808,7 @@ int UtcDaliLongPressGesturePossibleCancelled(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -836,7 +836,7 @@ int UtcDaliLongPressGestureDetachAfterStarted(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -870,7 +870,7 @@ int UtcDaliLongPressGestureActorUnstaged(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -924,14 +924,14 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
   Actor dummyActor(Actor::New());
   dummyActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   dummyActor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
-  dummyActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  dummyActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(dummyActor);
 
   // Render and notify
@@ -1004,7 +1004,7 @@ int UtcDaliLongPressGestureLayerConsumesTouch(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a detector
@@ -1017,7 +1017,7 @@ int UtcDaliLongPressGestureLayerConsumesTouch(void)
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(layer);
   layer.RaiseToTop();
 
@@ -1058,7 +1058,7 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1088,7 +1088,7 @@ int UtcDaliLongPressGestureDisableDetectionDuringLongPressN(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a detector
@@ -1133,11 +1133,11 @@ int UtcDaliLongPressGestureWhenGesturePropargation(void)
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   parentActor.Add(childActor);
   application.GetScene().Add(parentActor);
@@ -1190,7 +1190,7 @@ int UtcDaliLongPressGestureSignalWithGeometryHittest(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1232,11 +1232,11 @@ int UtcDaliLongPressGestureHandleEvent(void)
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   parentActor.Add(childActor);
   application.GetScene().Add(parentActor);

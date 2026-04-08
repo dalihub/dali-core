@@ -95,7 +95,7 @@ uniform mediump vec2 offset;
 uniform highp vec2 size;
 uniform mediump vec4 offsetSizeMode;
 uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
+uniform mediump vec2 pivot;
 uniform mediump vec2 extraSize;
 
 vec4 ComputeVertexPosition()
@@ -103,7 +103,7 @@ vec4 ComputeVertexPosition()
   vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
   vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
   mediump vec2 vPosition = aPosition * visualSize;
-  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+  return vec4(vPosition + pivot * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 }
 
 void main()
@@ -123,7 +123,7 @@ uniform mediump vec2 offset;
 uniform highp vec2 size;
 uniform mediump vec4 offsetSizeMode;
 uniform mediump vec2 origin;
-uniform mediump vec2 anchorPoint;
+uniform mediump vec2 pivot;
 uniform mediump vec2 extraSize;
 
 vec4 ComputeVertexPosition2()
@@ -131,7 +131,7 @@ vec4 ComputeVertexPosition2()
   vec2 visualSize = mix(size * uSize.xy, size, offsetSizeMode.zw ) + extraSize;
   vec2 visualOffset = mix(offset * uSize.xy, offset, offsetSizeMode.xy);
   mediump vec2 vPosition = aPosition * visualSize;
-  return vec4(vPosition + anchorPoint * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
+  return vec4(vPosition + pivot * visualSize + visualOffset + origin * uSize.xy, 0.0, 1.0);
 }
 
 void main()
@@ -842,7 +842,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
   {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
     actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     actor.SetProperty(Actor::Property::NAME, name);
 
@@ -957,7 +957,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
   {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
     actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     actor.SetProperty(Actor::Property::NAME, name);
 
@@ -1188,7 +1188,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
   {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
     actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     actor.SetProperty(Actor::Property::NAME, name);
 
@@ -1304,7 +1304,7 @@ int UtcDaliRenderTaskRenderUntil06(void)
   {
     Actor actor = CreateRenderableActor();
     actor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
     actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
     actor.SetProperty(Actor::Property::NAME, name);
 
@@ -3426,7 +3426,7 @@ int UtcDaliRenderTaskWorldToViewport(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(0.0, 0.0, 0.0));
 
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.5));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.5));
+  actor.SetProperty(Actor::Property::PIVOT, Vector3(0.5, 0.5, 0.5));
 
   application.GetScene().Add(actor);
 
@@ -3454,7 +3454,7 @@ int UtcDaliRenderTaskWorldToViewport(void)
   actor2.SetProperty(Actor::Property::SIZE, Vector2(actor2Size, actor2Size));
   actor2.SetProperty(Actor::Property::POSITION, Vector3(0.0, 0.0, 0.0));
   actor2.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.5, 0.5, 0.0));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, Vector3(0.5, 0.5, 0.0));
+  actor2.SetProperty(Actor::Property::PIVOT, Vector3(0.5, 0.5, 0.0));
   application.GetScene().Add(actor2);
   actor2.Add(actor);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0, 0, 0));
@@ -3476,7 +3476,7 @@ int UtcDaliRenderTaskViewportToLocal(void)
 {
   TestApplication application;
   Actor           actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
   application.GetScene().Add(actor);
@@ -3513,7 +3513,7 @@ int UtcDaliRenderTaskOffscreenViewportToLocal(void)
 {
   TestApplication application;
   Actor           actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::POSITION, Vector2(10.0f, 10.0f));
   application.GetScene().Add(actor);
@@ -4210,7 +4210,7 @@ int UtcDaliRenderTaskClippingMode01(void)
 
   CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
   offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(offscreenCameraActor);
 
   Shader     shader     = CreateShader();
@@ -4228,7 +4228,7 @@ int UtcDaliRenderTaskClippingMode01(void)
   secondRootActor.SetProperty(Actor::Property::POSITION, position);
   secondRootActor.SetProperty(Actor::Property::SIZE, size);
   secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(secondRootActor);
 
@@ -4269,7 +4269,7 @@ int UtcDaliRenderTaskClippingMode02(void)
 
   CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
   offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   offscreenCameraActor.SetInvertYAxis(true);
   application.GetScene().Add(offscreenCameraActor);
 
@@ -4288,7 +4288,7 @@ int UtcDaliRenderTaskClippingMode02(void)
   secondRootActor.SetProperty(Actor::Property::POSITION, position);
   secondRootActor.SetProperty(Actor::Property::SIZE, size);
   secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(secondRootActor);
 
@@ -4329,7 +4329,7 @@ int UtcDaliRenderTaskClippingMode03(void)
 
   CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
   offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(offscreenCameraActor);
 
   Shader     shader     = CreateShader();
@@ -4347,7 +4347,7 @@ int UtcDaliRenderTaskClippingMode03(void)
   secondRootActor.SetProperty(Actor::Property::POSITION, position);
   secondRootActor.SetProperty(Actor::Property::SIZE, size);
   secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(secondRootActor);
 
@@ -4391,7 +4391,7 @@ int UtcDaliRenderTaskClippingMode04(void)
 
   CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
   offscreenCameraActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  offscreenCameraActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  offscreenCameraActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   offscreenCameraActor.SetInvertYAxis(true);
   application.GetScene().Add(offscreenCameraActor);
 
@@ -4410,7 +4410,7 @@ int UtcDaliRenderTaskClippingMode04(void)
   secondRootActor.SetProperty(Actor::Property::POSITION, position);
   secondRootActor.SetProperty(Actor::Property::SIZE, size);
   secondRootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  secondRootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  secondRootActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   secondRootActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   application.GetScene().Add(secondRootActor);
 
@@ -4490,7 +4490,7 @@ int UtcDaliRenderTaskSetGetViewportGuideActor(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
@@ -4523,7 +4523,7 @@ int UtcDaliRenderTaskViewportGuideActor(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
@@ -4539,7 +4539,7 @@ int UtcDaliRenderTaskViewportGuideActor(void)
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -4590,7 +4590,7 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
   blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
@@ -4599,7 +4599,7 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
 
   Actor green                                 = Actor::New();
   green[Dali::Actor::Property::NAME]          = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
   green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
   green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
@@ -4610,7 +4610,7 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -4668,7 +4668,7 @@ int UtcDaliRenderTaskViewportGuideActor03(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
   blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
@@ -4677,7 +4677,7 @@ int UtcDaliRenderTaskViewportGuideActor03(void)
 
   Actor green                                 = Actor::New();
   green[Dali::Actor::Property::NAME]          = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
   green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
   green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
@@ -4688,7 +4688,7 @@ int UtcDaliRenderTaskViewportGuideActor03(void)
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -4767,7 +4767,7 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
   blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
@@ -4776,7 +4776,7 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
 
   Actor green                                 = Actor::New();
   green[Dali::Actor::Property::NAME]          = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::TOP_LEFT;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::TOP_LEFT;
   green[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::TOP_LEFT;
   green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
@@ -4787,7 +4787,7 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -4853,14 +4853,14 @@ int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
 
   Actor red                                 = Actor::New();
   red[Dali::Actor::Property::NAME]          = "Red";
-  red[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   red[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   red[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
@@ -4877,7 +4877,7 @@ int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -4972,21 +4972,21 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   Actor rootActor = CreateRenderableActor();
-  rootActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  rootActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   rootActor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   rootActor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   rootActor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(rootActor);
 
   CameraActor cameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
-  cameraActor.SetProperty(Dali::Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  cameraActor.SetProperty(Dali::Actor::Property::PIVOT, Pivot::CENTER);
   cameraActor.SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   application.GetScene().Add(cameraActor);
 
@@ -5149,7 +5149,7 @@ int UtcDaliRenderTaskRenderPassTag(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
@@ -5227,7 +5227,7 @@ int UtcDaliRenderTaskWithWrongShaderData01(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
@@ -5264,7 +5264,7 @@ int UtcDaliRenderTaskWithWrongShaderData02(void)
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);

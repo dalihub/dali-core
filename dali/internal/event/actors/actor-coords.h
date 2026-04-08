@@ -94,7 +94,7 @@ bool ConvertScreenToLocalRenderTaskList(
   float                 screenY);
 
 /**
- * Calculate the screen position of the actor from its transform and anchor point
+ * Calculate the screen position of the actor from its transform and pivot
  *
  * This function calculates the screen coordinates of an actor in 2D space using
  * the actor's target (goal) state properties. It calculates the world transform
@@ -113,7 +113,7 @@ bool ConvertScreenToLocalRenderTaskList(
 const Vector2 CalculateActorScreenPosition(const Actor& actor);
 
 /**
- * Calculate the current screen position of the actor from its node transform and anchor point
+ * Calculate the current screen position of the actor from its node transform and pivot
  *
  * This function calculates the screen coordinates of an actor in 2D space using
  * the actor's current state from the node. It uses the current world matrix
@@ -130,7 +130,7 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor);
 const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor);
 
 /**
- * Calculate the screen extents of the actor from its transform, anchor point and size
+ * Calculate the screen extents of the actor from its transform, pivot and size
  *
  * This function calculates the bounding box screen coordinates and size of an actor
  * in 2D space using the actor's target (goal) state properties. It transforms the
@@ -151,7 +151,7 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor);
 Rect<> CalculateActorScreenExtents(const Actor& actor);
 
 /**
- * Calculate the current screen extents of the actor from its node transform, anchor point and size
+ * Calculate the current screen extents of the actor from its node transform, pivot and size
  *
  * This function calculates the bounding box screen coordinates and size of an actor
  * in 2D space using the actor's current state from the node. It transforms the
@@ -230,7 +230,7 @@ bool ConvertLocalToScreenRenderTaskList(
   float&                screenY);
 
 /**
- * Calculate the screen position of the actor from it's transform and anchor point.
+ * Calculate the screen position of the actor from it's transform and pivot.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor
@@ -239,7 +239,7 @@ bool ConvertLocalToScreenRenderTaskList(
 const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor);
 
 /**
- * Calculate the screen position of the actor from it's node transform and anchor point.
+ * Calculate the screen position of the actor from it's node transform and pivot.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor
@@ -283,7 +283,7 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   Rect<>&               screenExtent);
 
 /**
- * Calculate the screen extents of the actor from it's transform, anchor point and size.
+ * Calculate the screen extents of the actor from it's transform, pivot and size.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor
@@ -292,7 +292,7 @@ bool ConvertLocalToScreenExtentRenderTaskList(
 Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor);
 
 /**
- * Calculate the screen extents of the actor from it's node transform, anchor point and size.
+ * Calculate the screen extents of the actor from it's node transform, pivot and size.
  * It will consider rendertasklist.
  *
  * @param[in] actor The actor

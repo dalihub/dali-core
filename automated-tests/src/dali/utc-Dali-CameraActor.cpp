@@ -1390,10 +1390,10 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
       {"parentOriginX", Property::FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_X},
       {"parentOriginY", Property::FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Y},
       {"parentOriginZ", Property::FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Z},
-      {"anchorPoint", Property::VECTOR3, true, false, true, Dali::Actor::Property::ANCHOR_POINT},
-      {"anchorPointX", Property::FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_X},
-      {"anchorPointY", Property::FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Y},
-      {"anchorPointZ", Property::FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Z},
+      {"pivot", Property::VECTOR3, true, false, true, Dali::Actor::Property::PIVOT},
+      {"pivotX", Property::FLOAT, true, false, true, Dali::Actor::Property::PIVOT_X},
+      {"pivotY", Property::FLOAT, true, false, true, Dali::Actor::Property::PIVOT_Y},
+      {"pivotZ", Property::FLOAT, true, false, true, Dali::Actor::Property::PIVOT_Z},
       {"size", Property::VECTOR3, true, true, true, Dali::Actor::Property::SIZE},
       {"sizeWidth", Property::FLOAT, true, true, true, Dali::Actor::Property::SIZE_WIDTH},
       {"sizeHeight", Property::FLOAT, true, true, true, Dali::Actor::Property::SIZE_HEIGHT},
@@ -1443,7 +1443,7 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
       {"inheritLayoutDirection", Property::BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION},
       {"opacity", Property::FLOAT, true, true, true, Dali::Actor::Property::OPACITY},
       {"screenPosition", Property::VECTOR2, false, false, false, Dali::Actor::Property::SCREEN_POSITION},
-      {"positionUsesAnchorPoint", Property::BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_ANCHOR_POINT},
+      {"positionUsesPivot", Property::BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_PIVOT},
       {"culled", Property::BOOLEAN, false, false, true, Dali::Actor::Property::CULLED},
       {"id", Property::INTEGER, false, false, false, Dali::Actor::Property::ID},
       {"hierarchyDepth", Property::INTEGER, false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH},
@@ -2922,7 +2922,7 @@ int UtcDaliCameraActorCulling01(void)
   Actor a = CreateRenderableActor(CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 200, 200));
 
   a[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER_LEFT;
-  a[Actor::Property::ANCHOR_POINT]  = ParentOrigin::CENTER_RIGHT;
+  a[Actor::Property::PIVOT]  = ParentOrigin::CENTER_RIGHT;
   a[Actor::Property::POSITION]      = Vector3(-10.0f, 0.0f, 0.0f);
 
   application.GetScene().Add(a);

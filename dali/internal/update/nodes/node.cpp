@@ -116,7 +116,7 @@ Node::Node()
   mIsRoot(false),
   mIsLayer(false),
   mIsCamera(false),
-  mPositionUsesAnchorPoint(true),
+  mPositionUsesPivot(true),
   mTransparent(false),
   mUpdateAreaChanged(false),
   mUpdateAreaUseSize(true),
@@ -156,8 +156,8 @@ void Node::CreateTransform(SceneGraph::TransformManager* transformManager)
   mTransformManagerData.mManager = transformManager;
   TransformId createdTransformId = transformManager->CreateTransform();
 
-  // Set whether the position should use the anchor point
-  transformManager->SetPositionUsesAnchorPoint(createdTransformId, mPositionUsesAnchorPoint);
+  // Set whether the position should use the pivot
+  transformManager->SetPositionUsesPivot(createdTransformId, mPositionUsesPivot);
   if(DALI_UNLIKELY(mIsRoot))
   {
     transformManager->SetParent(createdTransformId, PARENT_OF_ROOT_NODE_TRANSFORM_ID);
