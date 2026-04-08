@@ -228,6 +228,8 @@ void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint
   status.secondsFromLastFrame = elapsedSeconds;
 
   static bool rendererAdded = false;
+  bool        oldUploadOnly = uploadOnly;
+
   // Render returns true when there are updates on the stage or one or more animations are completed.
   // Use the estimated time diff till we render as the elapsed time.
   status.keepUpdating = mUpdateManager->Update(elapsedSeconds,
@@ -240,6 +242,9 @@ void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint
 
   // Get the value of renderer added from updateManager.
   status.rendererAdded = rendererAdded;
+
+  // Get the value of force render required if uploadOnly variable changed as true at updateManager.
+  status.needsForceRendering = (oldUploadOnly && !uploadOnly);
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();

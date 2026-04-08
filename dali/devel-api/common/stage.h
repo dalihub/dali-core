@@ -2,7 +2,7 @@
 #define DALI_STAGE_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,6 +271,13 @@ public:
    * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
    */
   void KeepRendering(float durationSeconds);
+
+  /**
+   * @brief Requests forced rendering for this scene.
+   * @param[in] frameCount The number of frames to render forcibly.
+   * @SINCE_2_5.17
+   */
+  void SetForceRendering(uint32_t frameCount);
 
   // Signals
 

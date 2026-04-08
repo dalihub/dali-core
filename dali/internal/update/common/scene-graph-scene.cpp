@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ Scene::Scene()
   mSurfaceOrientation(0),
   mScreenOrientation(0),
   mSurfaceRectChangedCount(0u),
+  mForceRenderingFrames(0u),
   mRotationCompletedAcknowledgement(false),
   mSkipRendering(false),
   mNeedFullUpdate(false),
@@ -268,6 +269,22 @@ void Scene::ClearItemsDirtyRects()
 #endif
 }
 
+void Scene::SetForceRenderingFramesCount(uint32_t forceRenderingFramesCount)
+{
+  mForceRenderingFrames = std::max(mForceRenderingFrames, forceRenderingFramesCount);
+}
+
+bool Scene::NeedsForceRendering()
+{
+  if(mForceRenderingFrames > 0u)
+  {
+    ClearItemsDirtyRects();
+    --mForceRenderingFrames;
+    return true;
+  }
+  return false;
+}
+
 void Scene::SetClearColor(const Vector4& color)
 {
   DALI_ASSERT_DEBUG(!mClearValues.empty());
@@ -297,7 +314,9 @@ bool Scene::KeepRenderingCheck(float elapsedSeconds)
   }
 
   mKeepRenderingSeconds = 0.0f;
-  return false;
+
+  // Keep update next frame if force rendering needs next frame.
+  return mForceRenderingFrames > 0u;
 }
 
 void Scene::SetPartialUpdateEnabled(bool enabled)

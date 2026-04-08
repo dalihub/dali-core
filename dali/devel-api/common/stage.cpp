@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,6 +132,11 @@ ObjectRegistry Stage::GetObjectRegistry() const
 void Stage::KeepRendering(float durationSeconds)
 {
   GetImplementation(*this).KeepRendering(durationSeconds);
+}
+
+void Stage::SetForceRendering(uint32_t frameCount)
+{
+  GetImplementation(*this).SetForceRendering(frameCount);
 }
 
 Stage::KeyEventSignalType& Stage::KeyEventSignal()

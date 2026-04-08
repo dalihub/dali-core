@@ -1684,6 +1684,79 @@ int UtcDaliStageOperatorAssign(void)
   END_TEST;
 }
 
+int UtcDaliStageSetForceRenderingP(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  tet_infoline("Testing Dali::Stage::SetForceRendering");
+
+  Actor actor = CreateRenderableActor();
+  stage.Add(actor);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for the next 3 frames
+  stage.SetForceRendering(3u);
+
+  application.SendNotification();
+
+  // Test that core wants to keep rendering for 3 frames, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating); // After 3 frames rendering, we don't need to keep rendering next frame.
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
+int UtcDaliStageSetForceRenderingN(void)
+{
+  TestApplication application;
+  Stage           stage = Stage::GetCurrent();
+
+  tet_infoline("Testing Dali::Stage::SetForceRendering with zero frames");
+
+  Actor actor = CreateRenderableActor();
+  stage.Add(actor);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for 0 frames - should not affect rendering
+  stage.SetForceRendering(0u);
+
+  application.SendNotification();
+
+  // Test that core does not want to keep rendering, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
 int UtcDaliStageRenderingBehavior(void)
 {
   TestApplication application;

@@ -3331,6 +3331,171 @@ int UtcDaliSceneDestructWorkerThreadN(void)
   END_TEST;
 }
 
+int UtcDaliSceneSetForceRenderingP(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetForceRendering");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  Actor actor = CreateRenderableActor();
+  scene.Add(actor);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for the next 5 frames
+  scene.SetForceRendering(5u);
+
+  application.SendNotification();
+
+  // Test that core wants to keep rendering for 5 frames, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating); // After 5 frames rendering, we don't need to keep rendering next frame.
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  // Force rendering for the next 3 frames
+  scene.SetForceRendering(3u);
+  application.SendNotification();
+
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+
+  // Force rendering for the next 3 frames again
+  scene.SetForceRendering(3u);
+  application.SendNotification();
+
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+
+  // No effect if we try to request more smaller frames request.
+  scene.SetForceRendering(1u);
+  application.SendNotification();
+
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating); // After 3 frames rendering, we don't need to keep rendering next frame.
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetForceRenderingN(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetForceRendering with zero frames");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  Actor actor = CreateRenderableActor();
+  scene.Add(actor);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for 0 frames - should not affect rendering
+  scene.SetForceRendering(0u);
+
+  application.SendNotification();
+
+  // Test that core does not want to keep rendering, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetForceRenderingMultipleScene(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetForceRendering with multiple scenes");
+
+  auto defaultScene = application.GetScene();
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  defaultScene.Add(actor1);
+
+  // Create another Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  application.AddScene(scene);
+
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  scene.Add(actor2);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for the default scene and second scene.
+  defaultScene.SetForceRendering(2u);
+  scene.SetForceRendering(3u);
+
+  application.SendNotification();
+
+  // Test that core wants to keep rendering for 3 frames, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating); // Second scene still need to render frames
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating); // After 3 frames
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
 int UtcDaliSceneRequestFullUpdatePartialRendering(void)
 {
   tet_infoline("Test that RequestFullUpdate() properly full-update");

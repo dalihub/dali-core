@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,6 +196,15 @@ void Scene::RequestFullUpdate()
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
     new(slot) LocalType(mSceneObject, &Internal::SceneGraph::Scene::ClearItemsDirtyRects);
+  }
+}
+
+void Scene::SetForceRendering(uint32_t frameCount)
+{
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
+  {
+    ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+    SetForceRenderingFramesCountMessage(tls->GetEventThreadServices(), *mSceneObject, frameCount);
   }
 }
 

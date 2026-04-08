@@ -191,6 +191,13 @@ public:
   void RequestFullUpdate();
 
   /**
+   * @brief Requests forced rendering for this scene.
+   * @param[in] frameCount The number of frames to render forcibly.
+   * @SINCE_2_5.17
+   */
+  void SetForceRendering(uint32_t frameCount);
+
+  /**
    * @brief Returns the size of the Scene in pixels as a Vector.
    *
    * The x component will be the width of the Scene in pixels.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,6 +86,11 @@ bool Scene::IsVisible() const
 void Scene::RequestFullUpdate()
 {
   GetImplementation(*this).RequestFullUpdate();
+}
+
+void Scene::SetForceRendering(uint32_t frameCount)
+{
+  GetImplementation(*this).SetForceRendering(frameCount);
 }
 
 Size Scene::GetSize() const
