@@ -798,32 +798,35 @@ std::size_t Renderer::BuildUniformIndexMap(const SceneGraph::NodeDataProvider& n
       mUniformIndexMaps[renderItemMapIndex][mapIndex].arrayIndex             = uniformMap.mUniformMap[mapIndex].arrayIndex;
     }
 
-    const auto& nodeMapContainer = uniformMapNode.GetUniformMapContainer();
-
-    for(const auto& uniformMap : nodeMapContainer)
+    if(mapNodeCount > 0u)
     {
-      const auto& uniformName      = uniformMap.first;
-      const auto& propertyMappings = uniformMap.second;
+      const auto& nodeMapContainer = uniformMapNode.GetUniformMapContainer();
 
-      bool found(false);
-      for(uint32_t i = 0; i < mapCount; ++i)
+      for(const auto& uniformMap : nodeMapContainer)
       {
-        if(mUniformIndexMaps[renderItemMapIndex][i].uniformName == uniformName)
+        const auto& uniformName      = uniformMap.first;
+        const auto& propertyMappings = uniformMap.second;
+
+        bool found(false);
+        for(uint32_t i = 0; i < mapCount; ++i)
         {
-          mUniformIndexMaps[renderItemMapIndex][i].propertyValue = propertyMappings.propertyPtr;
-          found                                                  = true;
-          break;
+          if(mUniformIndexMaps[renderItemMapIndex][i].uniformName == uniformName)
+          {
+            mUniformIndexMaps[renderItemMapIndex][i].propertyValue = propertyMappings.propertyPtr;
+            found                                                  = true;
+            break;
+          }
         }
-      }
 
-      if(!found)
-      {
-        mUniformIndexMaps[renderItemMapIndex][mapIndex].propertyValue          = propertyMappings.propertyPtr;
-        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformName            = uniformName;
-        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHash        = propertyMappings.uniformNameHash;
-        mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHashNoArray = propertyMappings.uniformNameHashNoArray;
-        mUniformIndexMaps[renderItemMapIndex][mapIndex].arrayIndex             = propertyMappings.arrayIndex;
-        ++mapIndex;
+        if(!found)
+        {
+          mUniformIndexMaps[renderItemMapIndex][mapIndex].propertyValue          = propertyMappings.propertyPtr;
+          mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformName            = uniformName;
+          mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHash        = propertyMappings.uniformNameHash;
+          mUniformIndexMaps[renderItemMapIndex][mapIndex].uniformNameHashNoArray = propertyMappings.uniformNameHashNoArray;
+          mUniformIndexMaps[renderItemMapIndex][mapIndex].arrayIndex             = propertyMappings.arrayIndex;
+          ++mapIndex;
+        }
       }
     }
 

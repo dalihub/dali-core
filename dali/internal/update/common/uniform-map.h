@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 #include <cstdint> // uint32_t
 #include <map>
+#include <memory> ///< std::unique_ptr
 #include <string>
 
 // INTERNAL INCLUDES
@@ -124,18 +125,36 @@ public:
    */
   const PropertyInputImpl* Find(ConstString uniformName) const;
 
+private:
+  /**
+   * Helper to call the observers when the mappings have changed
+   */
+  void MappingChanged();
+
+private:
+  struct Impl
+  {
+    UniformMapContainer  mUniformMaps;       ///< container of uniform maps
+    UniformMap::SizeType mChangeCounter{0u}; ///< Counter that is incremented when the map changes
+  };
+  std::unique_ptr<Impl> mImpl{nullptr};
+
+public: // inline functions using mImpl
   /**
    * Get the count of uniforms in the map
    * @return The number of uniform mappings
    */
-  SizeType Count() const;
+  inline UniformMap::SizeType Count() const
+  {
+    return static_cast<UniformMap::SizeType>(mImpl ? mImpl->mUniformMaps.size() : 0u);
+  }
 
   /**
    * Return the change counter
    */
-  inline std::size_t GetChangeCounter() const
+  inline UniformMap::SizeType GetChangeCounter() const
   {
-    return mChangeCounter;
+    return mImpl ? mImpl->mChangeCounter : 0u;
   }
 
   /**
@@ -144,18 +163,9 @@ public:
    */
   inline const UniformMapContainer& GetUniformMapContainer() const
   {
-    return mUniformMaps;
+    DALI_ASSERT_DEBUG(mImpl && "Do not call GetUniformMapContainer() without check Count() > 0u");
+    return mImpl->mUniformMaps;
   }
-
-private:
-  /**
-   * Helper to call the observers when the mappings have changed
-   */
-  void MappingChanged();
-
-private:
-  UniformMapContainer mUniformMaps;       ///< container of uniform maps
-  std::size_t         mChangeCounter{0u}; ///< Counter that is incremented when the map changes
 };
 
 } // namespace SceneGraph
