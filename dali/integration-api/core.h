@@ -86,6 +86,7 @@ public:
   : keepUpdating(false),
     needsNotification(false),
     rendererAdded(false),
+    needsForceRendering(false),
     secondsFromLastFrame(0.0f)
   {
   }
@@ -120,6 +121,15 @@ public:
   }
 
   /**
+   * Query whether the Core requires render phase forcibly.
+   * @return True if we need to run render phase forcibly.
+   */
+  bool NeedsForceRendering()
+  {
+    return needsForceRendering;
+  }
+
+  /**
    * This method is provided so that FPS can be easily calculated with a release version
    * of Core.
    * @return the seconds from last frame as float
@@ -133,6 +143,7 @@ public:
   uint32_t keepUpdating; ///< A bitmask of KeepUpdating values
   bool     needsNotification;
   bool     rendererAdded;
+  bool     needsForceRendering;
   float    secondsFromLastFrame;
 };
 

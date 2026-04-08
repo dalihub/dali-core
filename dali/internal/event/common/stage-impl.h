@@ -188,6 +188,11 @@ public:
   void KeepRendering(float durationSeconds);
 
   /**
+   * @copydoc Dali::Stage::SetForceRendering()
+   */
+  void SetForceRendering(uint32_t frameCount);
+
+  /**
    * @copydoc Dali::DevelStage::SetRenderingBehavior()
    */
   void SetRenderingBehavior(DevelStage::Rendering renderingBehavior);

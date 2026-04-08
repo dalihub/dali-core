@@ -302,6 +302,7 @@ public:
   /**
    * @brief Check whether rendering should keep going.
    *
+   * @pre Should call NeedsForceRendering() before this function.
    * @param[in] elapsedSeconds The time in seconds since the previous update.
    * @return True if rendering should keep going.
    */
@@ -378,6 +379,21 @@ public:
    */
   void ClearItemsDirtyRects();
 
+  /**
+   * @brief Request to rendering forcibly for this scene
+   * @param[in] forceRenderingFramesCount The number of frames to rendering forcibly.
+   */
+  void SetForceRenderingFramesCount(uint32_t forceRenderingFramesCount);
+
+  /**
+   * @brief Check whether force rendering required this frame.
+   *
+   * @note It will reduce mForceRenderingFrames value one.
+   * @post Should call KeepRenderingCheck() after this function.
+   * @return True if force rendering required this frame.
+   */
+  bool NeedsForceRendering();
+
 public: // From RenderTargetGraphicsObjects
   /**
    * Get the render target created for the scene
@@ -411,7 +427,8 @@ private:
   int32_t       mSurfaceOrientation; ///< The orientation of surface which is related of this scene
   int32_t       mScreenOrientation;  ///< The orientation of screen
 
-  uint32_t mSurfaceRectChangedCount; ///< The numbero of surface's rectangle is changed when is resized or moved.
+  uint32_t mSurfaceRectChangedCount; ///< The number of times the surface's rectangle has changed when resized or moved.
+  uint32_t mForceRenderingFrames;    ///< The number of frames that should render forcibly. Frame count reduced at NeedsForceRendering() API.
 
   float mKeepRenderingSeconds{0.0f}; ///< Time to keep rendering
 
@@ -528,6 +545,17 @@ inline void SetClearColorMessage(EventThreadServices& eventThreadServices, const
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new(slot) LocalType(&scene, &Scene::SetClearColor, color);
+}
+
+inline void SetForceRenderingFramesCountMessage(EventThreadServices& eventThreadServices, const Scene& scene, uint32_t forceRenderingFramesCount)
+{
+  using LocalType = MessageValue1<Scene, uint32_t>;
+
+  // Reserve some memory inside the message queue
+  uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new(slot) LocalType(&scene, &Scene::SetForceRenderingFramesCount, forceRenderingFramesCount);
 }
 
 } // namespace SceneGraph
