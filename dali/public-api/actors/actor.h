@@ -228,11 +228,6 @@ using Padding = Rect<float>; ///< Padding definition @SINCE_1_0.0
  * | layoutDirectionChanged     | @ref LayoutDirectionChangedSignal()     |
  * | inheritedVisibilityChanged | @ref InheritedVisibilityChangedSignal() |
  *
- * Actions
- * | %Action Name      | %Actor method called         |
- * |-------------------|------------------------------|
- * | show              | %SetVisible( true )          |
- * | hide              | %SetVisible( false )         |
  * @SINCE_1_0.0
  */
 
