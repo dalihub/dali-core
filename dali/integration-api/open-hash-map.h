@@ -416,6 +416,7 @@ private:
   void RehashTo(uint32_t newCapacity)
   {
     Entry* newEntries = static_cast<Entry*>(calloc(newCapacity, sizeof(Entry)));
+    DALI_ASSERT_ALWAYS(newEntries && "OpenHashMap::RehashTo() - Memory allocation failed");
 
     const Key empty     = TraitsType::Empty();
     const Key tombstone = TraitsType::Tombstone();

@@ -23,6 +23,7 @@
 #include <new>     // for placement new
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
 namespace Dali
@@ -95,7 +96,9 @@ void SignalConnectionPool::AllocateBlock()
   uint32_t capacity = mCurrentBlock ? mCurrentBlock->mCapacity * 2u : 2u;
 
   // Allocate block header + slot array as contiguous memory
-  void* raw        = malloc(sizeof(SignalConnectionBlock) + capacity * sizeof(SignalConnectionNode));
+  void* raw = malloc(sizeof(SignalConnectionBlock) + capacity * sizeof(SignalConnectionNode));
+  DALI_ASSERT_ALWAYS(raw && "SignalConnectionPool::AllocateBlock() - Memory allocation failed");
+
   auto* block      = new(raw) SignalConnectionBlock();
   block->mCapacity = capacity;
 
