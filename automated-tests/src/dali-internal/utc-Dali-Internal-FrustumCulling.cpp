@@ -52,7 +52,7 @@ const char* FRAGMENT_SHADER = MAKE_SHADER(
     gl_FragColor = texture2D(sTexture, vTexCoord);
   });
 
-Actor CreateMeshActorToScene(TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 anchorPoint = AnchorPoint::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE)
+Actor CreateMeshActorToScene(TestApplication& application, Vector3 parentOrigin = ParentOrigin::CENTER, Vector3 pivot = Pivot::CENTER, Shader::Hint::Value shaderHints = Shader::Hint::NONE)
 {
   uint8_t*  pixelBuffer = new uint8_t[4];
   PixelData pixelData   = PixelData::New(pixelBuffer, 4, 1, 1, Pixel::RGBA8888, PixelData::DELETE_ARRAY);
@@ -70,7 +70,7 @@ Actor CreateMeshActorToScene(TestApplication& application, Vector3 parentOrigin 
   meshActor.AddRenderer(renderer);
   meshActor.SetProperty(Actor::Property::SIZE, Vector3(400.0f, 400.0f, 0.1f));
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, parentOrigin);
-  meshActor.SetProperty(Actor::Property::ANCHOR_POINT, anchorPoint);
+  meshActor.SetProperty(Actor::Property::PIVOT, pivot);
   application.GetScene().Add(meshActor);
 
   application.SendNotification();
@@ -131,12 +131,12 @@ int UtcFrustumLeftCullP(void)
   drawTrace.Enable(true);
 
   float offset    = -0.01f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), AnchorPoint::CENTER_RIGHT);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), Pivot::CENTER_RIGHT);
 
   float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(-radius / sceneSize.width + offset, 0.5f, 0.5f));
-  meshActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  meshActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -156,7 +156,7 @@ int UtcFrustumLeftCullN(void)
   drawTrace.Enable(true);
 
   float offset    = 0.01f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), AnchorPoint::CENTER_RIGHT);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), Pivot::CENTER_RIGHT);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -175,13 +175,13 @@ int UtcFrustumRightCullP(void)
   drawTrace.Enable(true);
 
   float offset    = 1.01f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), AnchorPoint::CENTER_LEFT);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), Pivot::CENTER_LEFT);
 
   float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
 
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(radius / sceneSize.width + offset, 0.5f, 0.5f));
-  meshActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  meshActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -201,7 +201,7 @@ int UtcFrustumRightCullN(void)
   drawTrace.Enable(true);
 
   float offset    = 0.99f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), AnchorPoint::CENTER_LEFT);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), Pivot::CENTER_LEFT);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -220,13 +220,13 @@ int UtcFrustumTopCullP(void)
   drawTrace.Enable(true);
 
   float offset    = -0.01f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), AnchorPoint::BOTTOM_CENTER);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), Pivot::BOTTOM_CENTER);
 
   float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
 
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.5f, -radius / sceneSize.width + offset, 0.5f));
-  meshActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  meshActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -246,7 +246,7 @@ int UtcFrustumTopCullN(void)
   drawTrace.Enable(true);
 
   float offset    = 0.01f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), AnchorPoint::BOTTOM_CENTER);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), Pivot::BOTTOM_CENTER);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -266,13 +266,13 @@ int UtcFrustumBottomCullP(void)
   drawTrace.Enable(true);
 
   float offset    = 1.01f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), AnchorPoint::TOP_CENTER);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), Pivot::TOP_CENTER);
 
   float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
 
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.5f, radius / sceneSize.width + offset, 0.5f));
-  meshActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  meshActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -292,7 +292,7 @@ int UtcFrustumBottomCullN(void)
   drawTrace.Enable(true);
 
   float offset    = 0.99f;
-  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), AnchorPoint::TOP_CENTER);
+  Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), Pivot::TOP_CENTER);
 
   drawTrace.Reset();
   application.SendNotification();
@@ -418,7 +418,7 @@ int UtcFrustumCullDisabledP(void)
   TraceCallStack&    drawTrace     = glAbstraction.GetDrawTrace();
   drawTrace.Enable(true);
 
-  CreateMeshActorToScene(application, Vector3(7.0f, 0.5f, 0.5f), AnchorPoint::CENTER, Shader::Hint::MODIFIES_GEOMETRY);
+  CreateMeshActorToScene(application, Vector3(7.0f, 0.5f, 0.5f), Pivot::CENTER, Shader::Hint::MODIFIES_GEOMETRY);
 
   drawTrace.Reset();
   application.SendNotification();

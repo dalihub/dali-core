@@ -2,7 +2,7 @@
 #define DALI_CONSTANTS_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,12 @@ static constexpr Vector3 DEFAULT(TOP_LEFT);
 } // namespace ParentOrigin
 
 /**
- * @brief AnchorPoint constants.
+ * @brief Pivot constants.
  *
  * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f).
  * @SINCE_1_0.0
  */
-namespace AnchorPoint
+namespace Pivot
 {
 static constexpr float   TOP    = 0.0f;
 static constexpr float   BOTTOM = 1.0f;
@@ -81,7 +81,7 @@ static constexpr Vector3 BOTTOM_LEFT(0.0f, 1.0f, 0.5f);
 static constexpr Vector3 BOTTOM_CENTER(0.5f, 1.0f, 0.5f);
 static constexpr Vector3 BOTTOM_RIGHT(1.0f, 1.0f, 0.5f);
 static constexpr Vector3 DEFAULT(CENTER);
-} // namespace AnchorPoint
+} // namespace Pivot
 
 /**
  * @brief Color Constants.

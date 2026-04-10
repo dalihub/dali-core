@@ -99,15 +99,15 @@ public:
       TRANSFORM_ORIGIN,
 
       /**
-       * @brief The anchor-point of the visual renderer
-       * @details Name "transformAnchorPoint", type Property::VECTOR2
+       * @brief The pivot of the visual renderer
+       * @details Name "transformPivot", type Property::VECTOR2
        * @note This is relative to the size of the actor; where the origin is the center of the actor,
        * and the range is -0.5 to +0.5 vertically and horizontally
        * @note Toolkit may impose additional layout directions
        * @SINCE_2_1.13
        * @note The default is top left.
        */
-      TRANSFORM_ANCHOR_POINT,
+      TRANSFORM_PIVOT,
 
       /**
        * @brief Whether the x or y OFFSET/SIZE values are relative (percentage [0.0f to 1.0f] of the control) or absolute (in world units).

@@ -131,8 +131,8 @@ int UtcDaliInternalTransformPropertyGetValueAddress(void)
   {
     BASE(TransformManagerData, mTransformManagerData);
     PROPERTY_WRAPPER(mTransformManagerData, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SCALE, mScale);
-    PROPERTY_WRAPPER(mScale, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_ANCHOR_POINT, mAnchorPoint);
-    PROPERTY_WRAPPER(mAnchorPoint, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_PARENT_ORIGIN, mParentOrigin);
+    PROPERTY_WRAPPER(mScale, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_PIVOT, mPivot);
+    PROPERTY_WRAPPER(mPivot, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_PARENT_ORIGIN, mParentOrigin);
     TEMPLATE_WRAPPER(mParentOrigin, TransformManagerPropertyQuaternion, mOrientation);
     TEMPLATE_WRAPPER(mOrientation, TransformManagerVector3Input, mWorldPosition);
     TEMPLATE_WRAPPER(mWorldPosition, TransformManagerQuaternionInput, mWorldOrientation);
@@ -157,24 +157,24 @@ int UtcDaliInternalTransformPropertyGetValueAddress(void)
 
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(1.2f, 1.2f, 1.2f), TEST_LOCATION);
 
-  // Test anchor point, for coverage.
-  addr = node.mAnchorPoint.GetValueAddress();
-  node.mAnchorPoint.Set(Vector3(0.5f, 0.1f, 0.0f));
+  // Test pivot, for coverage.
+  addr = node.mPivot.GetValueAddress();
+  node.mPivot.Set(Vector3(0.5f, 0.1f, 0.0f));
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.1f, 0.0f), TEST_LOCATION);
 
-  node.mAnchorPoint.SetFloatComponent(0.9f, 1);
+  node.mPivot.SetFloatComponent(0.9f, 1);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.0f), TEST_LOCATION);
 
-  node.mAnchorPoint.BakeFloatComponent(0.4f, 2);
+  node.mPivot.BakeFloatComponent(0.4f, 2);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.5f, 0.9f, 0.4f), TEST_LOCATION);
 
-  node.mAnchorPoint.BakeX(0.0f);
+  node.mPivot.BakeX(0.0f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.9f, 0.4f), TEST_LOCATION);
 
-  node.mAnchorPoint.BakeY(0.1f);
+  node.mPivot.BakeY(0.1f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.4f), TEST_LOCATION);
 
-  node.mAnchorPoint.BakeZ(0.2f);
+  node.mPivot.BakeZ(0.2f);
   DALI_TEST_EQUALS(*reinterpret_cast<const Vector3*>(addr), Vector3(0.0f, 0.1f, 0.2f), TEST_LOCATION);
 
   // Test parent origin, for coverage.

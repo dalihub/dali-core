@@ -276,31 +276,31 @@ public:
 
       /**
        * @brief The anchor-point of an actor.
-       * @details Name "anchorPoint", type Property::VECTOR3, constraint-input
+       * @details Name "pivot", type Property::VECTOR3, constraint-input
        * @SINCE_1_0.0
        */
-      ANCHOR_POINT,
+      PIVOT,
 
       /**
        * @brief The x anchor-point of an actor.
-       * @details Name "anchorPointX", type Property::FLOAT, constraint-input
+       * @details Name "pivotX", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
        */
-      ANCHOR_POINT_X,
+      PIVOT_X,
 
       /**
        * @brief The y anchor-point of an actor.
-       * @details Name "anchorPointY", type Property::FLOAT, constraint-input
+       * @details Name "pivotY", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
        */
-      ANCHOR_POINT_Y,
+      PIVOT_Y,
 
       /**
        * @brief The z anchor-point of an actor.
-       * @details Name "anchorPointZ", type Property::FLOAT, constraint-input
+       * @details Name "pivotZ", type Property::FLOAT, constraint-input
        * @SINCE_1_0.0
        */
-      ANCHOR_POINT_Z,
+      PIVOT_Z,
 
       /**
        * @brief The size of an actor.
@@ -666,14 +666,14 @@ public:
       SCREEN_POSITION,
 
       /**
-       * @brief Determines whether the anchor point should be used to determine the position of the actor.
-       * @details Name "positionUsesAnchorPoint", type Property::BOOLEAN.
+       * @brief Determines whether the pivot should be used to determine the position of the actor.
+       * @details Name "positionUsesPivot", type Property::BOOLEAN.
        * @note This is true by default.
        * @note If false, then the top-left of the actor is used for the position.
        * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
        * @SINCE_1_9.17
        */
-      POSITION_USES_ANCHOR_POINT,
+      POSITION_USES_PIVOT,
 
       /**
        * @brief Returns whether the actor is culled or not.

@@ -80,7 +80,7 @@ void PrintNodeTree(const Node& node, std::string indentation)
   std::cout << "Node " << &node
             << " \"" << node.mDebugString << "\""
             << " Origin: " << node.GetParentOrigin()
-            << " Anchor: " << node.GetAnchorPoint()
+            << " Pivot: " << node.GetPivot()
             << " Size: " << node.GetSize()
             << " Pos: " << node.GetPosition()
             << " Ori: " << node.GetOrientation()

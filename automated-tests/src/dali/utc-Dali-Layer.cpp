@@ -39,7 +39,7 @@ Actor CreateActor(bool withAlpha)
 
   Actor actor = CreateRenderableActor(texture);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
 
   return actor;
 }
@@ -875,17 +875,17 @@ int UtcDaliLayerIgnored(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   application.GetScene().Add(parent);
 
   Actor child1 = Actor::New();
   child1.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  child1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child1.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parent.Add(child1);
 
   Layer child2 = Layer::New();
   child2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  child2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parent.Add(child2);
 
   DALI_TEST_EQUALS(child1.IsIgnored(), false, TEST_LOCATION);
@@ -1014,7 +1014,7 @@ int utcDaliLayerPartialUpdate(void)
   DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor1.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor1.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
@@ -1022,7 +1022,7 @@ int utcDaliLayerPartialUpdate(void)
   layer1.Add(actor1);
 
   Actor actor2 = CreateRenderableActor();
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor2.SetProperty(Actor::Property::POSITION, Vector3(32.0f, 16.0f, 0.0f));
   actor2.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor2.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
@@ -1116,7 +1116,7 @@ int utcDaliLayerUnderClippingNode(void)
   // TODO : We don't decide policy that layer2 should be clipped by parentClipper.
   // Before that policy fixed, let we use full-size clipper.
   Actor parentClipper = CreateRenderableActor();
-  parentClipper.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentClipper.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentClipper.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   parentClipper.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
@@ -1130,7 +1130,7 @@ int utcDaliLayerUnderClippingNode(void)
   DALI_TEST_EQUALS(layer2.GetProperty<int>(Layer::Property::DEPTH), 2u, TEST_LOCATION);
 
   Actor actorA = CreateRenderableActor();
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actorA.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
@@ -1140,7 +1140,7 @@ int utcDaliLayerUnderClippingNode(void)
   layer2.Add(actorA);
 
   Actor actorB = CreateRenderableActor();
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorB.SetProperty(Actor::Property::POSITION, Vector3(-160.0f, -160.0f, 0.0f));
   actorB.SetProperty(Actor::Property::SIZE, Vector3(480.0f, 480.0f, 0.0f));
   actorB.SetProperty(Actor::Property::NAME, "ActorB");
@@ -1150,7 +1150,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorA.Add(actorB);
 
   Actor actorC = CreateRenderableActor();
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorC.SetProperty(Actor::Property::POSITION, Vector3(48.0f, 16.0f, 0.0f));
   actorC.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actorC.SetProperty(Actor::Property::NAME, "ActorC");
@@ -1159,7 +1159,7 @@ int utcDaliLayerUnderClippingNode(void)
   layer2.Add(actorC);
 
   Actor actorD = CreateRenderableActor();
-  actorD.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorD.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorD.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   actorD.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actorD.SetProperty(Actor::Property::NAME, "ActorD");

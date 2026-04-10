@@ -40,14 +40,14 @@ bool GetViewportExtentsFromRenderTask(const RenderTask& renderTask, Rect<float>&
     if(mappingActor)
     {
       // NOTE : We will assume that mapping actor always use default camera.
-      Vector2 screenPosition    = mappingActor.GetProperty<Vector2>(Dali::Actor::Property::SCREEN_POSITION);
-      Vector3 size              = mappingActor.GetCurrentProperty<Vector3>(Dali::Actor::Property::SIZE) * mappingActor.GetCurrentProperty<Vector3>(Dali::Actor::Property::WORLD_SCALE);
-      Vector3 anchorPointOffSet = size * GetImplementation(mappingActor).GetAnchorPointForPosition();
-      Vector2 position          = Vector2(screenPosition.x - anchorPointOffSet.x, screenPosition.y - anchorPointOffSet.y);
-      viewportExtent.x          = position.x;
-      viewportExtent.y          = position.y;
-      viewportExtent.width      = size.x;
-      viewportExtent.height     = size.y;
+      Vector2 screenPosition = mappingActor.GetProperty<Vector2>(Dali::Actor::Property::SCREEN_POSITION);
+      Vector3 size           = mappingActor.GetCurrentProperty<Vector3>(Dali::Actor::Property::SIZE) * mappingActor.GetCurrentProperty<Vector3>(Dali::Actor::Property::WORLD_SCALE);
+      Vector3 pivotOffSet    = size * GetImplementation(mappingActor).GetPivotForPosition();
+      Vector2 position       = Vector2(screenPosition.x - pivotOffSet.x, screenPosition.y - pivotOffSet.y);
+      viewportExtent.x       = position.x;
+      viewportExtent.y       = position.y;
+      viewportExtent.width   = size.x;
+      viewportExtent.height  = size.y;
     }
     else
     {
@@ -100,7 +100,7 @@ Quaternion GetOrientationFromForwardAndUpVector(Vector3 forward, Vector3 up)
  * @brief Helper function to calculate actor's screen position in 2D space
  *
  * This function calculates the screen coordinates of an actor in 2D space using
- * the world transform matrix, actor size, anchor point, and camera position.
+ * the world transform matrix, actor size, pivot, and camera position.
  * 3D use cases are not supported.
  *
  * @note This function operates under the following assumptions:
@@ -112,7 +112,7 @@ Quaternion GetOrientationFromForwardAndUpVector(Vector3 forward, Vector3 up)
  *                                  This matrix includes the actor's position, rotation, and scale.
  * @param[in] actorSize The actor's size (width, height, depth).
  *                      In 2D space, the depth value is not used.
- * @param[in] anchor The actor's anchor point (0.0 ~ 1.0 range).
+ * @param[in] anchor The actor's pivot (0.0 ~ 1.0 range).
  *                   (0,0) means top-left, (1,1) means bottom-right.
  * @param[in] cameraPosition The camera's world space position.
  *                           For screen coordinate calculation, camera position is subtracted from actor position.
@@ -341,7 +341,7 @@ const Vector2 CalculateActorScreenPosition(const Actor& actor)
 
     Scene&  scene          = actor.GetScene();
     Vector3 cameraPosition = Dali::Internal::CalculateActorWorldTransform(scene.GetDefaultCameraActor()).GetTranslation3();
-    Vector2 anchor         = actor.GetAnchorPointForPosition().GetVectorXY();
+    Vector2 anchor         = actor.GetPivotForPosition().GetVectorXY();
 
     const auto& sceneSize = scene.GetSize();
     result                = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
@@ -360,7 +360,7 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor)
 
     Scene&  scene          = actor.GetScene();
     Vector3 cameraPosition = scene.GetDefaultCameraActor().GetNode().GetWorldPosition();
-    Vector2 anchor         = actor.GetAnchorPointForPosition().GetVectorXY();
+    Vector2 anchor         = actor.GetPivotForPosition().GetVectorXY();
 
     const auto& sceneSize = scene.GetCurrentSurfaceRect();
     result                = CalculateScreenPosition(sceneSize, worldTransformMatrix, actorSize, anchor, cameraPosition);
@@ -512,7 +512,7 @@ const Vector2 CalculateActorScreenPositionRenderTaskList(const Actor& actor)
     auto        worldMatrix    = Dali::Internal::CalculateActorWorldTransform(actor);
     const auto& renderTaskList = actor.GetScene().GetRenderTaskList();
 
-    ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, actor.GetTargetSize() * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
+    ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, actor.GetTargetSize() * (actor.GetPivotForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
   }
   return result;
 }
@@ -526,7 +526,7 @@ const Vector2 CalculateCurrentActorScreenPositionRenderTaskList(const Actor& act
     const auto& worldMatrix    = node.GetWorldMatrix();
     const auto& renderTaskList = actor.GetScene().GetRenderTaskList();
 
-    ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize() * (actor.GetAnchorPointForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
+    ConvertLocalToScreenRenderTaskList(renderTaskList, actor, worldMatrix, node.GetSize() * (actor.GetPivotForPosition() - Vector3(0.5f, 0.5f, 0.5f)), result.x, result.y);
   }
   return result;
 }
@@ -676,15 +676,15 @@ Rect<> CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor)
 
 /**
  * @brief Computes and center position by using transform properties.
- * @param[in] anchorPoint anchorPoint of an actor.
- * @param[in] positionUsesAnchorPoint positionUsesAnchorPoint of an actor.
+ * @param[in] pivot pivot of an actor.
+ * @param[in] positionUsesPivot positionUsesPivot of an actor.
  * @param[in] size size of an actor.
  * @param[in] scale scale of an actor.
  * @param[in] orientation orientation of an actor.
  */
 Vector3 CalculateCenterPosition(
-  const Vector3&    anchorPoint,
-  const bool        positionUsesAnchorPoint,
+  const Vector3&    pivot,
+  const bool        positionUsesPivot,
   const Vector3&    size,
   const Vector3&    scale,
   const Quaternion& orientation)
@@ -692,14 +692,14 @@ Vector3 CalculateCenterPosition(
   Vector3       centerPosition;
   const Vector3 half(0.5f, 0.5f, 0.5f);
   const Vector3 topLeft(0.0f, 0.0f, 0.5f);
-  // Calculate the center-point by applying the scale and rotation on the anchor point.
-  centerPosition = (half - anchorPoint) * size * scale;
+  // Calculate the center-point by applying the scale and rotation on the pivot.
+  centerPosition = (half - pivot) * size * scale;
   centerPosition *= orientation;
 
   // If the position is ignoring the anchor-point, then remove the anchor-point shift from the position.
-  if(!positionUsesAnchorPoint)
+  if(!positionUsesPivot)
   {
-    centerPosition -= (topLeft - anchorPoint) * size;
+    centerPosition -= (topLeft - pivot) * size;
   }
   return centerPosition;
 }
@@ -736,16 +736,16 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
   const size_t descentCount = descentList.size();
   for(size_t iter = 0u; iter < descentCount; ++iter)
   {
-    auto       i                       = descentCount - iter - 1u;
-    Vector3    anchorPoint             = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::ANCHOR_POINT);
-    Vector3    parentOrigin            = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::PARENT_ORIGIN);
-    bool       positionUsesAnchorPoint = descentList[i].GetProperty<bool>(Dali::Actor::Property::POSITION_USES_ANCHOR_POINT);
-    Vector3    size                    = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::SIZE);
-    Vector3    actorPosition           = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::POSITION);
-    Quaternion localOrientation        = descentList[i].GetProperty<Quaternion>(Dali::Actor::Property::ORIENTATION);
-    Vector3    localScale              = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::SCALE);
+    auto       i                 = descentCount - iter - 1u;
+    Vector3    pivot             = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::PIVOT);
+    Vector3    parentOrigin      = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::PARENT_ORIGIN);
+    bool       positionUsesPivot = descentList[i].GetProperty<bool>(Dali::Actor::Property::POSITION_USES_PIVOT);
+    Vector3    size              = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::SIZE);
+    Vector3    actorPosition     = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::POSITION);
+    Quaternion localOrientation  = descentList[i].GetProperty<Quaternion>(Dali::Actor::Property::ORIENTATION);
+    Vector3    localScale        = descentList[i].GetProperty<Vector3>(Dali::Actor::Property::SCALE);
 
-    Vector3 centerPosition = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, localScale, localOrientation);
+    Vector3 centerPosition = CalculateCenterPosition(pivot, positionUsesPivot, size, localScale, localOrientation);
     if(inheritanceModeList[i] != DONT_INHERIT_TRANSFORM && descentList[i].GetParent())
     {
       Matrix  localMatrix;
@@ -755,7 +755,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
         localPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
         localMatrix.SetTransformComponents(localScale, localOrientation, localPosition);
 
-        //Update the world matrix
+        // Update the world matrix
         Matrix tempMatrix;
         MatrixUtils::MultiplyTransformMatrix(tempMatrix, localMatrix, worldMatrix);
         worldMatrix = tempMatrix;
@@ -769,7 +769,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
         parentMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
 
         // Compute intermediate Local information
-        centerPosition                    = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, localScale, localOrientation);
+        centerPosition                    = CalculateCenterPosition(pivot, positionUsesPivot, size, localScale, localOrientation);
         Vector3 intermediateLocalPosition = actorPosition + centerPosition + (parentOrigin - Vector3(0.5f, 0.5f, 0.5f)) * parentSize;
         Matrix  intermediateLocalMatrix;
         intermediateLocalMatrix.SetTransformComponents(localScale, localOrientation, intermediateLocalPosition);
@@ -804,7 +804,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
         // The final world position of this node is computed as a sum of
         // parent origin position in world space and relative position of center from parent origin.
         // If this node doesn't inherit its parent position, simply use the relative position as a final world position.
-        Vector3 localCenterPosition = CalculateCenterPosition(anchorPoint, positionUsesAnchorPoint, size, finalWorldScale, finalWorldOrientation);
+        Vector3 localCenterPosition = CalculateCenterPosition(pivot, positionUsesPivot, size, finalWorldScale, finalWorldOrientation);
         finalWorldPosition          = actorPosition * finalWorldScale;
         finalWorldPosition *= finalWorldOrientation;
         finalWorldPosition += localCenterPosition;

@@ -147,7 +147,7 @@ int UtcDaliScriptingNewActorNegative(void)
   {
     Property::Map map;
     map["parentOrigin"] = ParentOrigin::TOP_CENTER;
-    map["anchorPoint"]  = AnchorPoint::TOP_CENTER;
+    map["pivot"]        = Pivot::TOP_CENTER;
     Actor handle        = NewActor(map);
     DALI_TEST_CHECK(!handle);
   }
@@ -211,9 +211,9 @@ int UtcDaliScriptingNewActorProperties(void)
     application.GetScene().Remove(handle);
   }
 
-  // Check Anchor point and parent origin vector3s
+  // Check pivot and parent origin vector3s
   map["parentOrigin"] = ParentOrigin::TOP_CENTER;
-  map["anchorPoint"]  = AnchorPoint::TOP_LEFT;
+  map["pivot"]        = Pivot::TOP_LEFT;
   {
     Actor handle = NewActor(map);
     DALI_TEST_CHECK(handle);
@@ -223,14 +223,14 @@ int UtcDaliScriptingNewActorProperties(void)
     application.Render();
 
     DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::PARENT_ORIGIN), ParentOrigin::TOP_CENTER, TEST_LOCATION);
-    DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), AnchorPoint::TOP_LEFT, TEST_LOCATION);
+    DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), Pivot::TOP_LEFT, TEST_LOCATION);
 
     application.GetScene().Remove(handle);
   }
 
-  // Check Anchor point and parent origin STRINGS
+  // Check pivot and parent origin STRINGS
   map["parentOrigin"] = "TOP_LEFT";
-  map["anchorPoint"]  = "CENTER_LEFT";
+  map["pivot"]        = "CENTER_LEFT";
   {
     Actor handle = NewActor(map);
     DALI_TEST_CHECK(handle);
@@ -240,7 +240,7 @@ int UtcDaliScriptingNewActorProperties(void)
     application.Render();
 
     DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::PARENT_ORIGIN), ParentOrigin::TOP_LEFT, TEST_LOCATION);
-    DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), AnchorPoint::CENTER_LEFT, TEST_LOCATION);
+    DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), Pivot::CENTER_LEFT, TEST_LOCATION);
 
     application.GetScene().Remove(handle);
   }
@@ -363,7 +363,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetProperty(Actor::Property::VISIBLE, false);
     actor.SetProperty(Actor::Property::COLOR, Color::MAGENTA);
     actor.SetProperty(Actor::Property::NAME, "MyActor");
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
     actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
     actor.SetProperty(Actor::Property::SENSITIVE, false);
     actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
@@ -391,8 +391,8 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_EQUALS(map.Find("color")->Get<Vector4>(), Color::MAGENTA, TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("name"));
     DALI_TEST_EQUALS(map.Find("name")->Get<String>(), "MyActor", TEST_LOCATION);
-    DALI_TEST_CHECK(NULL != map.Find("anchorPoint"));
-    DALI_TEST_EQUALS(map.Find("anchorPoint")->Get<Vector3>(), AnchorPoint::CENTER_LEFT, TEST_LOCATION);
+    DALI_TEST_CHECK(NULL != map.Find("pivot"));
+    DALI_TEST_EQUALS(map.Find("pivot")->Get<Vector3>(), Pivot::CENTER_LEFT, TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("parentOrigin"));
     DALI_TEST_EQUALS(map.Find("parentOrigin")->Get<Vector3>(), ParentOrigin::TOP_RIGHT, TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("sensitive"));

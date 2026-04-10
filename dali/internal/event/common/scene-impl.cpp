@@ -242,7 +242,7 @@ Dali::Layer Scene::GetOverlayLayer()
     mOverlayLayer->SetName("OverlayLayer");
     mOverlayLayer->SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
     mOverlayLayer->SetParentOrigin(Dali::ParentOrigin::TOP_LEFT);
-    mOverlayLayer->SetAnchorPoint(Dali::AnchorPoint::TOP_LEFT);
+    mOverlayLayer->SetPivot(Dali::Pivot::TOP_LEFT);
     mRootLayer->Add(*mOverlayLayer);
 
     // Create the overlay render-task and set exclusive to true.

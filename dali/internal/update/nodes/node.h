@@ -457,11 +457,11 @@ public:
    * Retrieve the anchor-point of the node.
    * @return The anchor-point.
    */
-  const Vector3& GetAnchorPoint() const
+  const Vector3& GetPivot() const
   {
     if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      return mAnchorPoint.Get();
+      return mPivot.Get();
     }
 
     return Vector3::ZERO;
@@ -471,9 +471,9 @@ public:
    * Sets both the local & base anchor-points of the node.
    * @param[in] anchor The new local & base anchor-points.
    */
-  void SetAnchorPoint(const Vector3& anchor)
+  void SetPivot(const Vector3& anchor)
   {
-    mAnchorPoint.Set(anchor);
+    mPivot.Set(anchor);
   }
 
   /**
@@ -1014,14 +1014,14 @@ public:
 
   /**
    * @brief Sets the boolean which states whether the position should use the anchor-point.
-   * @param[in] positionUsesAnchorPoint True if the position should use the anchor-point
+   * @param[in] positionUsesPivot True if the position should use the anchor-point
    */
-  void SetPositionUsesAnchorPoint(bool positionUsesAnchorPoint)
+  void SetPositionUsesPivot(bool positionUsesPivot)
   {
-    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())) && mPositionUsesAnchorPoint != positionUsesAnchorPoint)
+    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())) && mPositionUsesPivot != positionUsesPivot)
     {
-      mPositionUsesAnchorPoint = positionUsesAnchorPoint;
-      mTransformManagerData.Manager()->SetPositionUsesAnchorPoint(mTransformManagerData.Id(), mPositionUsesAnchorPoint);
+      mPositionUsesPivot = positionUsesPivot;
+      mTransformManagerData.Manager()->SetPositionUsesPivot(mTransformManagerData.Id(), mPositionUsesPivot);
     }
   }
 
@@ -1156,10 +1156,10 @@ public: // Default properties
   PROPERTY_WRAPPER(mTransformManagerData, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_PARENT_ORIGIN,
                    mParentOrigin); // Local transform; the position is relative to this. Sets the Transform flag dirty when changed
 
-  PROPERTY_WRAPPER(mParentOrigin, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_ANCHOR_POINT,
-                   mAnchorPoint); // Local transform; local center of rotation. Sets the Transform flag dirty when changed
+  PROPERTY_WRAPPER(mParentOrigin, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_PIVOT,
+                   mPivot); // Local transform; local center of rotation. Sets the Transform flag dirty when changed
 
-  PROPERTY_WRAPPER(mAnchorPoint, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SIZE,
+  PROPERTY_WRAPPER(mPivot, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_SIZE,
                    mSize); // Size is provided for layouting
 
   PROPERTY_WRAPPER(mSize, TransformManagerPropertyVector3, TRANSFORM_PROPERTY_POSITION,
@@ -1215,7 +1215,7 @@ protected:
   bool               mIsRoot : 1;                  ///< True if the node cannot have a parent
   bool               mIsLayer : 1;                 ///< True if the node is a layer
   bool               mIsCamera : 1;                ///< True if the node is a camera
-  bool               mPositionUsesAnchorPoint : 1; ///< True if the node should use the anchor-point when calculating the position
+  bool               mPositionUsesPivot : 1; ///< True if the node should use the anchor-point when calculating the position
   bool               mTransparent : 1;             ///< True if this node is transparent. This value do not affect children.
   bool               mUpdateAreaChanged : 1;       ///< True if the update area of the node is changed.
   bool               mUpdateAreaUseSize : 1;       ///< True if the update area of the node is same as node size.
@@ -1249,7 +1249,7 @@ inline void SetParentOriginMessage(EventThreadServices& eventThreadServices, con
   new(slot) LocalType(&node, &Node::SetParentOrigin, origin);
 }
 
-inline void SetAnchorPointMessage(EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor)
+inline void SetPivotMessage(EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor)
 {
   using LocalType = MessageValue1<Node, Vector3>;
 
@@ -1257,7 +1257,7 @@ inline void SetAnchorPointMessage(EventThreadServices& eventThreadServices, cons
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::SetAnchorPoint, anchor);
+  new(slot) LocalType(&node, &Node::SetPivot, anchor);
 }
 
 inline void SetInheritPositionMessage(EventThreadServices& eventThreadServices, const Node& node, bool inherit)
@@ -1337,7 +1337,7 @@ inline void SetClippingModeMessage(EventThreadServices& eventThreadServices, con
   new(slot) LocalType(&node, &Node::SetClippingMode, clippingMode);
 }
 
-inline void SetPositionUsesAnchorPointMessage(EventThreadServices& eventThreadServices, const Node& node, bool positionUsesAnchorPoint)
+inline void SetPositionUsesPivotMessage(EventThreadServices& eventThreadServices, const Node& node, bool positionUsesPivot)
 {
   using LocalType = MessageValue1<Node, bool>;
 
@@ -1345,7 +1345,7 @@ inline void SetPositionUsesAnchorPointMessage(EventThreadServices& eventThreadSe
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&node, &Node::SetPositionUsesAnchorPoint, positionUsesAnchorPoint);
+  new(slot) LocalType(&node, &Node::SetPositionUsesPivot, positionUsesPivot);
 }
 
 inline void SetIgnoredMessage(EventThreadServices& eventThreadServices, const Node& node, bool ignored)

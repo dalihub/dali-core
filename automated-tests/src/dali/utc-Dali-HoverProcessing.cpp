@@ -138,7 +138,7 @@ int UtcDaliHoverNormalProcessing(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -227,7 +227,7 @@ int UtcDaliHoverOutsideCameraNearFarPlanes(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   stage.Add(actor);
 
@@ -328,7 +328,7 @@ int UtcDaliHoverInterrupted(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -365,7 +365,7 @@ int UtcDaliHoverParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -465,7 +465,7 @@ int UtcDaliHoverInterruptedParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -548,14 +548,14 @@ int UtcDaliHoverDeliverInterruptedEventToHoverStartedActor(void)
 
   Actor actor1 = Actor::New();
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::NAME, "actor1");
   scene.Add(actor1);
 
   Actor actor2 = Actor::New();
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor2.SetProperty(Actor::Property::NAME, "actor2");
   scene.Add(actor2);
 
@@ -609,14 +609,14 @@ int UtcDaliHoverDeliverInterruptedEventToHoverStartedActorNoInterrupt(void)
 
   Actor actor1 = Actor::New();
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::NAME, "actor1");
   scene.Add(actor1);
 
   Actor actor2 = Actor::New();
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor2.SetProperty(Actor::Property::NAME, "actor2");
   scene.Add(actor2);
 
@@ -672,7 +672,7 @@ int UtcDaliHoverLeave(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -727,7 +727,7 @@ int UtcDaliHoverLeaveParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -810,7 +810,7 @@ int UtcDaliHoverLeaveWithDispatchMotion(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -885,7 +885,7 @@ int UtcDaliHoverActorBecomesInsensitive(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -921,7 +921,7 @@ int UtcDaliHoverActorBecomesInsensitiveParentConsumer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -981,7 +981,7 @@ int UtcDaliHoverActorBecomesUserInteractionDisabled(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1021,12 +1021,12 @@ int UtcDaliHoverMultipleLayers(void)
 
   Layer layer1(Layer::New());
   layer1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(layer1);
 
   Actor actor1(Actor::New());
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::POSITION_Z, 1.0f); // Should hit actor1 in this layer
   layer1.Add(actor1);
 
@@ -1069,13 +1069,13 @@ int UtcDaliHoverMultipleLayers(void)
   // Add another layer
   Layer layer2(Layer::New());
   layer2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer2.SetProperty(Actor::Property::POSITION_Z, 10.0f); // Should hit layer2 in this layer rather than actor2
   application.GetScene().Add(layer2);
 
   Actor actor2(Actor::New());
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer2.Add(actor2);
 
   // Render and notify
@@ -1143,7 +1143,7 @@ int UtcDaliHoverMultipleRenderTasks(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   stage.Add(actor);
 
   // Create render task
@@ -1187,12 +1187,12 @@ int UtcDaliHoverMultipleRenderTasksWithChildLayer(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   stage.Add(actor);
 
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.Add(layer);
 
   // Create render task
@@ -1248,7 +1248,7 @@ int UtcDaliHoverOffscreenRenderTasks(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   stage.Add(actor);
   application.GetGlAbstraction().SetCheckFramebufferStatusResult(GL_FRAMEBUFFER_COMPLETE); // Ensure framebuffer connects
 
@@ -1288,12 +1288,12 @@ int UtcDaliHoverMultipleRenderableActors(void)
 
   Actor parent = CreateRenderableActor();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   stage.Add(parent);
 
   Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(actor);
 
   // Render and notify
@@ -1319,7 +1319,7 @@ int UtcDaliHoverActorRemovedInSignal(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1388,7 +1388,7 @@ int UtcDaliHoverActorSignalNotConsumed(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1412,7 +1412,7 @@ int UtcDaliHoverActorUnStaged(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1455,7 +1455,7 @@ int UtcDaliHoverLeaveActorReadded(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   stage.Add(actor);
 
   // Set actor to receive hover-events
@@ -1501,12 +1501,12 @@ int UtcDaliHoverClippingActor(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   stage.Add(actor);
 
   Actor clippingActor = Actor::New();
   clippingActor.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
-  clippingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
   stage.Add(clippingActor);
 
@@ -1514,7 +1514,7 @@ int UtcDaliHoverClippingActor(void)
   Actor clippingChild = Actor::New();
   clippingChild.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
   clippingChild.SetProperty(Actor::Property::POSITION, Vector2(25.0f, 25.0f));
-  clippingChild.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingChild.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.Add(clippingChild);
 
   // Render and notify.
@@ -1581,7 +1581,7 @@ int UtcDaliHoverActorHide(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   stage.Add(actor);
 
   // Render and notify
@@ -1622,13 +1622,13 @@ int UtcDaliHoverStartConsumerDifferentAtEnd(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(actor);
 
   Actor actor2 = Actor::New();
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor2.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(actor2);
 
   // Render and notify
@@ -1699,12 +1699,12 @@ int UtcDaliHoverEnsureDifferentConsumerReceivesInterrupted(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(child);
 
   // Render and notify
@@ -1759,12 +1759,12 @@ int UtcDaliHoverEnsureDifferentConsumerReceivesLeave(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   scene.Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(child);
 
   // Render and notify
@@ -1817,7 +1817,7 @@ int UtcDaliHoverEventGetDeviceAPI(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1851,7 +1851,7 @@ int UtcDaliHoverEventGetDeviceAPINegative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1885,7 +1885,7 @@ int UtcDaliHoverEventGetDeviceNamePositive(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1921,7 +1921,7 @@ int UtcDaliHoverEventGetDeviceNameNagative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
