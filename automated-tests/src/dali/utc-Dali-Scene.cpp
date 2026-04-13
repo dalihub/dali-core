@@ -29,11 +29,55 @@
 #include <iostream>
 
 // Internal headers are allowed here
+#include "test-graphics-command-buffer.h"
+#include "test-graphics-controller.h"
+#include "test-graphics-render-pass.h"
 #include "test-render-surface.h"
 
 namespace
 {
 const Dali::String DEFAULT_DEVICE_NAME("hwKeyboard");
+
+// Walks the graphics submit stack and returns one entry per BeginRenderPass command, describing
+// whether that render pass has a depth/stencil attachment and whether the depth/stencil load ops
+// are CLEAR. Lets tests verify that the core library requested the correct render pass setup
+// from the graphics abstraction, rather than relying on GL-level mocks like GetLastClearMask()
+// which get overwritten by subsequent Clear() calls (e.g. LAYER_3D's per-task depth clear).
+struct RenderPassClearInfo
+{
+  bool hasDepthStencilAttachment{false};
+  bool depthLoadOpClear{false};
+  bool stencilLoadOpClear{false};
+};
+
+std::vector<RenderPassClearInfo> CollectRenderPassInfos(Dali::TestGraphicsController& gc)
+{
+  std::vector<RenderPassClearInfo> result;
+  for(auto& submitInfo : gc.mSubmitStack)
+  {
+    for(auto* graphicsCommandBuffer : submitInfo.cmdBuffer)
+    {
+      auto* commandBuffer = Dali::Uncast<Dali::TestGraphicsCommandBuffer>(graphicsCommandBuffer);
+      if(!commandBuffer) continue;
+      for(auto& cmd : commandBuffer->GetCommands())
+      {
+        if(cmd.type != Dali::CommandType::BEGIN_RENDER_PASS) continue;
+        auto* rp = static_cast<Dali::TestGraphicsRenderPass*>(cmd.data.beginRenderPass.renderPass);
+        if(!rp) continue;
+        RenderPassClearInfo info;
+        info.hasDepthStencilAttachment = (rp->attachments.size() >= 2);
+        if(info.hasDepthStencilAttachment)
+        {
+          const auto& ds          = rp->attachments.back();
+          info.depthLoadOpClear   = (ds.loadOp == Dali::Graphics::AttachmentLoadOp::CLEAR);
+          info.stencilLoadOpClear = (ds.stencilLoadOp == Dali::Graphics::AttachmentLoadOp::CLEAR);
+        }
+        result.push_back(info);
+      }
+    }
+  }
+  return result;
+}
 
 // Functor for EventProcessingFinished signal
 struct EventProcessingFinishedFunctor
@@ -320,6 +364,325 @@ int UtcDaliSceneAdd(void)
 
   scene.Add(actor);
   DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE));
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetStencilBufferEnabled(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetStencilBufferEnabled");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // Test default value
+  DALI_TEST_CHECK(!scene.IsStencilBufferEnabled());
+
+  // Test setting to true
+  scene.SetStencilBufferEnabled(true);
+  DALI_TEST_CHECK(scene.IsStencilBufferEnabled());
+
+  // Test setting to false
+  scene.SetStencilBufferEnabled(false);
+  DALI_TEST_CHECK(!scene.IsStencilBufferEnabled());
+  END_TEST;
+}
+
+int UtcDaliSceneStencilBufferClearWithLayer3D(void)
+{
+  TestApplication application;
+  tet_infoline("Testing that the scene's render pass clears the stencil attachment when stencil buffer is enabled and root layer has LAYER_3D behavior");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // TestApplication creates its scene with STENCIL_BUFFER_ENABLED, so stencil is already enabled.
+  scene.SetStencilBufferEnabled(true);
+  DALI_TEST_CHECK(scene.IsStencilBufferEnabled());
+
+  Layer rootLayer = scene.GetRootLayer();
+  rootLayer.SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
+  DALI_TEST_EQUALS(rootLayer.GetProperty<Layer::Behavior>(Layer::Property::BEHAVIOR), Layer::LAYER_3D, TEST_LOCATION);
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  scene.Add(actor);
+
+  application.GetGraphicsController().ClearSubmitStack();
+  application.SendNotification();
+  application.Render();
+
+  // Inspect the render pass passed to the graphics abstraction rather than GL mock state:
+  // the default scene's render pass must have a depth/stencil attachment whose stencil load
+  // op is CLEAR.
+  auto infos = CollectRenderPassInfos(application.GetGraphicsController());
+  bool found = false;
+  for(auto& i : infos)
+  {
+    if(i.hasDepthStencilAttachment && i.stencilLoadOpClear) found = true;
+  }
+  DALI_TEST_CHECK(found);
+  END_TEST;
+}
+
+int UtcDaliSceneStencilBufferDisabledNoClear(void)
+{
+  TestApplication application;
+  tet_infoline("Testing the render pass' stencil attachment reflects the scene's stencil-buffer flag");
+
+  // First, verify that a scene created WITHOUT stencil buffer has no stencil-clearing
+  // attachment in its render pass. Use a newly-created scene with its own render target so
+  // that we inspect only that scene's BeginRenderPass command.
+  TestRenderSurface*               noStencilSurface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(noStencilSurface);
+
+  Dali::Integration::Scene noStencilScene = Dali::Integration::Scene::New(rtInfo,
+                                                                          Size(480.0f, 800.0f), 0, 0, ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
+
+  noStencilScene.SetSurfaceRenderTarget(rtInfo);
+  application.AddScene(noStencilScene);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  noStencilScene.Add(actor);
+
+  application.GetGraphicsController().ClearSubmitStack();
+  application.SendNotification();
+  application.Render();
+
+  // Walk all BeginRenderPass commands. The stencil-less scene's render pass must not have a
+  // depth/stencil attachment, i.e. some render pass in this frame must lack one. The default
+  // scene (created with stencil enabled) continues to use its own pass with stencil CLEAR,
+  // so we also assert that both setups were seen in the same frame.
+  auto infos                 = CollectRenderPassInfos(application.GetGraphicsController());
+  bool sawStencilClearPass   = false;
+  bool sawNoDepthStencilPass = false;
+  for(auto& i : infos)
+  {
+    if(i.hasDepthStencilAttachment && i.stencilLoadOpClear) sawStencilClearPass = true;
+    if(!i.hasDepthStencilAttachment) sawNoDepthStencilPass = true;
+  }
+  DALI_TEST_CHECK(sawStencilClearPass);
+  DALI_TEST_CHECK(sawNoDepthStencilPass);
+
+  application.RemoveScene(noStencilScene);
+  delete noStencilSurface;
+  END_TEST;
+}
+
+int UtcDaliSceneDepthBufferDisabledNoClear(void)
+{
+  TestApplication application;
+  tet_infoline("Testing the render pass' depth attachment reflects the scene's depth-buffer flag");
+
+  // Verify that a scene created WITHOUT depth buffer has no depth-clearing attachment in its
+  // render pass.
+  TestRenderSurface*               noDepthSurface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(noDepthSurface);
+  Dali::Integration::Scene noDepthScene = Dali::Integration::Scene::New(
+    rtInfo, Size(480.0f, 800.0f), 0, 0, ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
+
+  noDepthScene.SetSurfaceRenderTarget(rtInfo);
+  application.AddScene(noDepthScene);
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  noDepthScene.Add(actor);
+
+  application.GetGraphicsController().ClearSubmitStack();
+  application.SendNotification();
+  application.Render();
+
+  // Walk all BeginRenderPass commands. The depth-less scene's render pass must not have a
+  // depth/stencil attachment. The default scene (created with depth enabled) still uses its
+  // own pass with depth CLEAR, so we assert both setups were seen in the same frame.
+  auto infos                 = CollectRenderPassInfos(application.GetGraphicsController());
+  bool sawDepthClearPass     = false;
+  bool sawNoDepthStencilPass = false;
+  for(auto& i : infos)
+  {
+    if(i.hasDepthStencilAttachment && i.depthLoadOpClear) sawDepthClearPass = true;
+    if(!i.hasDepthStencilAttachment) sawNoDepthStencilPass = true;
+  }
+  DALI_TEST_CHECK(sawDepthClearPass);
+  DALI_TEST_CHECK(sawNoDepthStencilPass);
+
+  application.RemoveScene(noDepthScene);
+  delete noDepthSurface;
+  END_TEST;
+}
+
+int UtcDaliSceneDepthBufferRuntimeToggleRebuildsRenderPass(void)
+{
+  TestApplication application;
+  tet_infoline("Testing that SetDepthBufferEnabled rebuilds the surface render pass at runtime");
+
+  // Create a dedicated scene with depth OFF. The default scene created by TestApplication
+  // also renders each frame and may contribute its own depth-enabled pass, so we count
+  // passes-with-depth and assert the count changes as we toggle our scene.
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(
+    rtInfo, Size(480.0f, 800.0f), 0, 0, ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
+  scene.SetSurfaceRenderTarget(rtInfo);
+  application.AddScene(scene);
+
+  DALI_TEST_CHECK(!scene.IsDepthBufferEnabled());
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  scene.Add(actor);
+
+  auto countDepthPasses = [&]()
+  {
+    int n = 0;
+    for(auto& i : CollectRenderPassInfos(application.GetGraphicsController()))
+    {
+      if(i.hasDepthStencilAttachment && i.depthLoadOpClear) ++n;
+    }
+    return n;
+  };
+
+  // Baseline: render once with our scene depth-off.
+  application.GetGraphicsController().ClearSubmitStack();
+  application.SendNotification();
+  application.Render();
+  const int baselineDepthPasses = countDepthPasses();
+
+  // Toggle depth on — Task 4 lazy rebuild should add a depth-enabled pass.
+  scene.SetDepthBufferEnabled(true);
+  DALI_TEST_CHECK(scene.IsDepthBufferEnabled());
+
+  application.GetGraphicsController().ClearSubmitStack();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(countDepthPasses(), baselineDepthPasses + 1, TEST_LOCATION);
+
+  // Toggle back off — pass count returns to baseline.
+  scene.SetDepthBufferEnabled(false);
+  DALI_TEST_CHECK(!scene.IsDepthBufferEnabled());
+
+  application.GetGraphicsController().ClearSubmitStack();
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(countDepthPasses(), baselineDepthPasses, TEST_LOCATION);
+
+  application.RemoveScene(scene);
+  delete surface;
+  END_TEST;
+}
+
+int UtcDaliSceneSetDepthBufferEnabled(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetDepthBufferEnabled");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // Test default value
+  DALI_TEST_CHECK(!scene.IsDepthBufferEnabled());
+
+  // Test setting to true
+  scene.SetDepthBufferEnabled(true);
+  DALI_TEST_CHECK(scene.IsDepthBufferEnabled());
+
+  // Test setting to false
+  scene.SetDepthBufferEnabled(false);
+  DALI_TEST_CHECK(!scene.IsDepthBufferEnabled());
+  END_TEST;
+}
+
+int UtcDaliSceneDepthBufferClearWithLayer3D(void)
+{
+  TestApplication application;
+  tet_infoline("Testing that glClear is called with depth mask when depth buffer is enabled and root layer has LAYER_3D behavior");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // Enable depth buffer
+  scene.SetDepthBufferEnabled(true);
+  DALI_TEST_CHECK(scene.IsDepthBufferEnabled());
+
+  // Set root layer behavior to LAYER_3D
+  Layer rootLayer = scene.GetRootLayer();
+  rootLayer.SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
+
+  // Check that layer behavior is set correctly
+  DALI_TEST_EQUALS(rootLayer.GetProperty<Layer::Behavior>(Layer::Property::BEHAVIOR), Layer::LAYER_3D, TEST_LOCATION);
+
+  // Create a simple renderable actor
+  Geometry geometry = CreateQuadGeometry();
+  Shader   shader   = CreateShader();
+  Renderer renderer = Renderer::New(geometry, shader);
+  Actor    actor    = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+
+  // Add actor to scene
+  scene.Add(actor);
+
+  // Get GL abstraction to check clear calls
+  TestGlAbstraction& glAbstraction    = application.GetGlAbstraction();
+  unsigned int       clearCountBefore = glAbstraction.GetClearCountCalled();
+
+  // Render the scene
+  application.SendNotification();
+  application.Render();
+
+  // Check that clear was called
+  unsigned int clearCountAfter = glAbstraction.GetClearCountCalled();
+  DALI_TEST_GREATER(clearCountAfter, clearCountBefore, TEST_LOCATION);
+
+  // Check that the clear mask includes depth buffer
+  GLbitfield lastClearMask = glAbstraction.GetLastClearMask();
+  DALI_TEST_CHECK((lastClearMask & GL_DEPTH_BUFFER_BIT) != 0);
+  END_TEST;
+}
+
+int UtcDaliSceneSetMSAAEnabled(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetMSAAEnabled");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  // Test default value
+  DALI_TEST_CHECK(!scene.IsMultiSampledAntiAliasingEnabled());
+
+  Actor actor = CreateRenderableActor();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  scene.Add(actor);
+
+  // Test setting to true
+  scene.SetMultiSampledAntiAliasingEnabled(true);
+  DALI_TEST_CHECK(scene.IsMultiSampledAntiAliasingEnabled());
+
+  // Render the scene (ensures scene graph objects are updated
+  application.SendNotification();
+  application.Render();
+
+  actor.SetProperty(Actor::Property::OPACITY, 0.5f);
+
+  // Test setting to false
+  scene.SetMultiSampledAntiAliasingEnabled(false);
+  DALI_TEST_CHECK(!scene.IsMultiSampledAntiAliasingEnabled());
+
+  // Render the scene (ensures scene graph objects are updated)
+  application.SendNotification();
+  application.Render();
 
   END_TEST;
 }
@@ -2931,7 +3294,7 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   rtInfo.SetExtent({480u, 800u});
   rtInfo.SetSurface(surface);
 
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f), 0, 0, ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
   DALI_TEST_CHECK(scene);
 
   application.AddScene(scene);
@@ -3012,6 +3375,7 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
 
   auto scene = application.GetScene();
   DALI_TEST_CHECK(scene);
+  scene.SetPartialUpdateEnabled(true);
 
   Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
@@ -3027,7 +3391,11 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 1 last frames updates
+  const Rect<int> ACTOR_CLIPPING_RECT = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 1 last frames updates
+  Size            sceneSize           = scene.GetSize();
+  const Rect<int> SCENE_CLIPPING_RECT = Rect<int>(0, 0, sceneSize.width, sceneSize.height);
+
+  Rect<int> clippingRect = ACTOR_CLIPPING_RECT;
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -3050,53 +3418,48 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
 
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  tet_infoline("Test that there is no damage rect, as partial rendering is now off");
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
+  tet_infoline("Make a change - there should still be no damage rect");
+  actor[Actor::Property::OPACITY] = 0.5f;
 
-  // Update full area even though there is no change
-  Size sceneSize = scene.GetSize();
-  clippingRect   = Rect<int>(0, 0, sceneSize.width, sceneSize.height); // full area
-  DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
-
+  application.SendNotification();
+  application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
+  DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
+  // Finish this render.
+  clippingRect = SCENE_CLIPPING_RECT;
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
-  // Eable partial update again
+  tet_infoline("Ensure that partial update is turned back on again");
   scene.SetPartialUpdateEnabled(true);
 
   DALI_TEST_EQUALS(scene.IsPartialUpdateEnabled(), true, TEST_LOCATION);
 
+  actor[Actor::Property::OPACITY] = 0.75f;
   application.SendNotification();
 
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-
+  tet_infoline("Check the damage rect exists");
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  // Update full area in the first frame after partial update is enabled
-  clippingRect = Rect<int>(0, 0, sceneSize.width, sceneSize.height);
+  // Finish this render
+  clippingRect = ACTOR_CLIPPING_RECT;
+  tet_infoline("Check the damage rect is limited to the actor");
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
-
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
-
-  damagedRects.clear();
-
-  // Ensure the damaged rect is empty
-  EnsureDirtyRectIsEmpty(application, TEST_LOCATION);
 
   // Make a change
   actor[Actor::Property::OPACITY] = 0.5f;
-
   application.SendNotification();
 
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
-
-  // Update partial area
+  clippingRect = ACTOR_CLIPPING_RECT;
+  tet_infoline("Check that the actor region only is drawn");
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
-
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // Aligned by 16
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
-
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   END_TEST;

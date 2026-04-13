@@ -111,10 +111,7 @@ Core::Core(RenderController&            renderController,
   mMemoryPoolCollection = new SceneGraph::MemoryPoolCollection();
 
   mRenderManager = RenderManager::New(graphicsController,
-                                      *mMemoryPoolCollection,
-                                      (corePolicy & Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE) ? Integration::DepthBufferAvailable::TRUE : Integration::DepthBufferAvailable::FALSE,
-                                      (corePolicy & Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE) ? Integration::StencilBufferAvailable::TRUE : Integration::StencilBufferAvailable::FALSE,
-                                      (corePolicy & Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE) ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
+                                      *mMemoryPoolCollection);
 
   mUpdateManager = new UpdateManager(*mNotificationManager,
                                      *mAnimationPlaylist,
@@ -461,10 +458,8 @@ uint32_t Core::GetMaximumUpdateCount() const
 
 void Core::ChangeCorePolicy(Integration::CorePolicyFlags corePolicy)
 {
+  mRenderManager->CheckSceneCount();
   DALI_LOG_RELEASE_INFO("Core policy enum changed to : 0x%x\n", static_cast<uint32_t>(corePolicy));
-  mRenderManager->UpdateGraphicsRequired((corePolicy & Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE) ? Integration::DepthBufferAvailable::TRUE : Integration::DepthBufferAvailable::FALSE,
-                                         (corePolicy & Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE) ? Integration::StencilBufferAvailable::TRUE : Integration::StencilBufferAvailable::FALSE,
-                                         (corePolicy & Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE) ? Integration::PartialUpdateAvailable::TRUE : Integration::PartialUpdateAvailable::FALSE);
 }
 
 void Core::ChangeGraphicsController(Graphics::Controller& graphicsController)

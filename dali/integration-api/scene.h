@@ -22,6 +22,7 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/bitwise-enum.h>
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-render-target-create-info.h>
@@ -48,6 +49,22 @@ namespace Graphics
 {
 class RenderTarget;
 }
+
+using ScenePolicyFlags = uint8_t;
+enum class ScenePolicyFlagBits : ScenePolicyFlags
+{
+  DEFAULT                = 0,
+  DEPTH_BUFFER_ENABLED   = 1 << 0, ///< Whether the depth buffer is available or not.
+  STENCIL_BUFFER_ENABLED = 1 << 1, ///< Whether the stencil buffer is available or not.
+  PARTIAL_UPDATE_ENABLED = 1 << 2, ///< Whether partial update is available or not.
+  MULTI_SAMPLING_ENABLED = 1 << 3, ///< Whether multi-sampling anti-aliasing is available or not.
+};
+
+template<>
+struct EnableBitMaskOperators<ScenePolicyFlagBits>
+{
+  static const bool ENABLE = true;
+};
 
 namespace Integration
 {
@@ -87,13 +104,14 @@ public:
    * @param[in] size The size of the set surface for this scene
    * @param[in] windowOrientation The rotated angle of the set surface for this scene
    * @param[in] screenOrientation The rotated angle of the screen
-   *
+   * @param[in] flags Scene policy flags
    * @return a handle to a newly allocated Dali resource.
    */
   static Scene New(const Graphics::RenderTargetCreateInfo& createInfo,
                    Size                                    size,
                    int32_t                                 windowOrientation = 0,
-                   int32_t                                 screenOrientation = 0);
+                   int32_t                                 screenOrientation = 0,
+                   ScenePolicyFlagBits                     flags             = ScenePolicyFlagBits::DEFAULT);
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -446,12 +464,26 @@ public:
    */
   void KeepRendering(float durationSeconds);
 
+  void SetDepthBufferEnabled(bool enabled);
+
+  bool IsDepthBufferEnabled() const;
+
+  void SetStencilBufferEnabled(bool enabled);
+
+  bool IsStencilBufferEnabled() const;
+
+  void SetMultiSampledAntiAliasingEnabled(bool enabled);
+
+  bool IsMultiSampledAntiAliasingEnabled() const;
+
   /**
    * @brief Sets whether the scene will update partial area or full area.
    *
    * @param[in] enabled True if the scene should update partial area
-   * @note This doesn't change the global value which is set by the environment variable.
-   * This works when partial update is enabled by the environment variable. If the partial update is disabled by the environment variable, it changes nothing.
+   * @note This is now the only way of setting partial update on the scene.
+   * The global environment variable is used to set the value for the main window
+   * on initialization; the application may change it afterwards through the window
+   * API.
    */
   void SetPartialUpdateEnabled(bool enabled);
 

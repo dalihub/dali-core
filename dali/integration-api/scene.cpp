@@ -31,9 +31,10 @@ namespace Dali
 namespace Integration
 {
 Scene Scene::New(const Graphics::RenderTargetCreateInfo& createInfo,
-                 Size size, int32_t windowOrientation, int32_t screenOrientation)
+                 Size size, int32_t windowOrientation, int32_t screenOrientation,
+                 ScenePolicyFlagBits flags)
 {
-  Internal::ScenePtr internal = Internal::Scene::New(createInfo, size, windowOrientation, screenOrientation);
+  Internal::ScenePtr internal = Internal::Scene::New(createInfo, size, windowOrientation, screenOrientation, flags);
   return Scene(internal.Get());
 }
 
@@ -242,6 +243,36 @@ bool Scene::IsRotationCompletedAcknowledgementSet() const
 void Scene::KeepRendering(float durationSeconds)
 {
   GetImplementation(*this).KeepRendering(durationSeconds);
+}
+
+void Scene::SetDepthBufferEnabled(bool enabled)
+{
+  GetImplementation(*this).SetDepthBufferEnabled(enabled);
+}
+
+bool Scene::IsDepthBufferEnabled() const
+{
+  return GetImplementation(*this).IsDepthBufferEnabled();
+}
+
+void Scene::SetStencilBufferEnabled(bool enabled)
+{
+  GetImplementation(*this).SetStencilBufferEnabled(enabled);
+}
+
+bool Scene::IsStencilBufferEnabled() const
+{
+  return GetImplementation(*this).IsStencilBufferEnabled();
+}
+
+void Scene::SetMultiSampledAntiAliasingEnabled(bool enabled)
+{
+  GetImplementation(*this).SetMultiSampledAntiAliasingEnabled(enabled);
+}
+
+bool Scene::IsMultiSampledAntiAliasingEnabled() const
+{
+  return GetImplementation(*this).IsMultiSampledAntiAliasingEnabled();
 }
 
 void Scene::SetPartialUpdateEnabled(bool enabled)

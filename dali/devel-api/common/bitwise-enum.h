@@ -26,7 +26,9 @@ namespace Dali
  * usage:
  *   template<> struct EnableBitMaskOperators< MyEnumType > { static const bool ENABLE = true; };
  * after this one can set bitfields with | and |=, like
- *   MyEnumType value = FLAG1 | FLAG2;
+ *   MyEnumType value = FLAG1 | FLAG2;,
+ * clear them with &~ and &= ~,
+ *   MyEnumType value &= ~FLAG1;
  * and test them with &, like:
  *   if( myFlag & FLAG2 )
  *    // do something
@@ -65,6 +67,20 @@ inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumTyp
 }
 
 /**
+ * Negate two bitfields
+ * @param lhs bitfield to and
+ * @param rhs bitfield to and
+ * @return reference to lhs with only common bits set
+ */
+template<typename EnumType>
+inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType&>::type operator&=(EnumType& lhs, EnumType rhs)
+{
+  using UnderlyingType = typename std::underlying_type<EnumType>::type;
+  lhs                  = static_cast<EnumType>(static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs));
+  return lhs;
+}
+
+/**
  * Test two bitfields.
  * @param lhs bitfield to AND
  * @param rhs bitfield to AND
@@ -75,6 +91,18 @@ inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, bool>::
 {
   using UnderlyingType = typename std::underlying_type<EnumType>::type;
   return static_cast<bool>(static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs));
+}
+
+/**
+ * One's complement of a bitfield
+ * @param bitfield to invert
+ * @return EnumType with inverted bits
+ */
+template<typename EnumType>
+inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType>::type operator~(EnumType bitfield)
+{
+  using UnderlyingType = typename std::underlying_type<EnumType>::type;
+  return static_cast<EnumType>(~(static_cast<UnderlyingType>(bitfield)));
 }
 
 } // namespace Dali

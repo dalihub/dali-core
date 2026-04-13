@@ -43,6 +43,12 @@ namespace Dali
 namespace Internal
 {
 
+// Enable ScenePolicyFlagBits to be passed by message
+template<>
+struct ParameterType<Dali::ScenePolicyFlagBits> : public BasicType<Dali::ScenePolicyFlagBits>
+{
+};
+
 namespace SceneGraph
 {
 class RenderInstructionContainer;
@@ -149,10 +155,17 @@ public:
    * to run afterwards.
    *
    * @param[in] graphicsController The graphics controller
-   * @param[in] depthBufferAvailable True if there is a depth buffer
-   * @param[in] stencilBufferAvailable True if there is a stencil buffer
    */
-  void Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable);
+  void Initialize(Graphics::Controller& graphicsController);
+
+  /**
+   * Rebuild the surface render passes if scene policy flags changed since
+   * the last build. Cheap when clean. Call on the render thread before
+   * consuming render instructions for this scene.
+   *
+   * @param[in] graphicsController The graphics controller
+   */
+  void RebuildRenderPassesIfDirty(Graphics::Controller& graphicsController);
 
   /**
    * Set the new render target of the surface (E.g. on rotation/resize)
@@ -175,7 +188,7 @@ public:
   /**
    * @brief Adds a callback that is called when the frame rendering is done by the graphics driver.
    *
-   * @param[in] callback The function to call
+I   * @param[in] callback The function to call
    * @param[in] frameId The Id to specify the frame. It will be passed when the callback is called.
    *
    * @note A callback of the following type may be used:
@@ -310,14 +323,13 @@ public:
    */
   bool KeepRenderingCheck(float elapsedSeconds);
 
-  /**
-   * @brief Sets whether the scene will update partial area or full area.
-   *
-   * @param[in] enabled True if the scene should update partial area
-   * @note This doesn't change the global value which is set by the environment variable.
-   * This works when partial update is enabled by the environment variable. If the partial update is disabled by the environment variable, it changes nothing.
-   */
-  void SetPartialUpdateEnabled(bool enabled);
+  void SetScenePolicyFlags(ScenePolicyFlagBits flags);
+
+  bool IsDepthBufferEnabled() const;
+
+  bool IsStencilBufferEnabled() const;
+
+  bool IsMultiSampledAntiAliasingEnabled() const;
 
   /**
    * @brief Queries whether the scene will update partial area.
@@ -417,6 +429,12 @@ public: // From RenderTargetGraphicsObjects
   }
 
 private:
+  /**
+   * Build mRenderPass / mRenderPassNoClear from current scene policy flags.
+   * Called from Initialize and from RebuildRenderPassesIfDirty.
+   */
+  void BuildRenderPasses(Graphics::Controller& graphicsController);
+
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one
 
@@ -441,8 +459,12 @@ private:
   bool mRotationCompletedAcknowledgement : 1; ///< The flag of sending the acknowledgement to complete window rotation.
   bool mSkipRendering : 1;                    ///< A flag to skip rendering
   bool mNeedFullUpdate : 1;                   ///< A flag to update full area
+  bool mDepthBufferEnabled : 1;               ///< True if this scene has a depth buffer
+  bool mStencilBufferEnabled : 1;             ///< True if this scene has a stencil buffer
+  bool mMSAAEnabled : 1;                      ///< True if this scene has MSAA enabled
   bool mPartialUpdateEnabled : 1;             ///< True if the partial update is enabled
   bool mHasRenderInstructionToScene : 1;      ///< True if has render instruction to the scene. Update at PreRender time.
+  bool mRenderPassDirty : 1;                  ///< True if depth/stencil flags changed since last BuildRenderPasses
 };
 
 /// Messages
@@ -523,15 +545,15 @@ inline void KeepRenderingMessage(EventThreadServices& eventThreadServices, const
   new(slot) LocalType(&scene, &Scene::KeepRendering, durationSeconds);
 }
 
-inline void SetPartialUpdateEnabledMessage(EventThreadServices& eventThreadServices, const Scene& scene, bool enabled)
+inline void SetScenePolicyFlagsMessage(EventThreadServices& eventThreadServices, const Scene& scene, ScenePolicyFlagBits flags)
 {
-  using LocalType = MessageValue1<Scene, bool>;
+  using LocalType = MessageValue1<Scene, ScenePolicyFlagBits>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new(slot) LocalType(&scene, &Scene::SetPartialUpdateEnabled, enabled);
+  new(slot) LocalType(&scene, &Scene::SetScenePolicyFlags, flags);
 }
 
 inline void SetClearColorMessage(EventThreadServices& eventThreadServices, const Scene& scene, const Vector4& color)

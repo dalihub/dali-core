@@ -73,8 +73,8 @@ public:
    */
   void ProcessRenderInstruction(const SceneGraph::RenderInstruction&     instruction,
                                 Graphics::CommandBuffer&                 commandBuffer,
-                                Integration::DepthBufferAvailable        depthBufferAvailable,
-                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                bool                                     depthBufferAvailable,
+                                bool                                     stencilBufferAvailable,
                                 const Rect<int32_t>&                     viewport,
                                 const Rect<int>&                         rootClippingRect,
                                 int                                      orientation,
@@ -118,7 +118,7 @@ private:
                             bool&                                                usedStencilBuffer,
                             uint32_t&                                            lastClippingDepth,
                             uint32_t&                                            lastClippingId,
-                            Integration::StencilBufferAvailable                  stencilBufferAvailable,
+                            bool                                                 stencilBufferAvailable,
                             const Dali::Internal::SceneGraph::RenderInstruction& instruction,
                             int                                                  orientation);
 
@@ -139,8 +139,8 @@ private:
                                 Graphics::CommandBuffer&                             commandBuffer,
                                 const Matrix&                                        viewMatrix,
                                 const Matrix&                                        projectionMatrix,
-                                Integration::DepthBufferAvailable                    depthBufferAvailable,
-                                Integration::StencilBufferAvailable                  stencilBufferAvailable,
+                                bool                                                 depthBufferAvailable,
+                                bool                                                 stencilBufferAvailable,
                                 const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
                                 const Rect<int32_t>&                                 viewport,
                                 const Rect<int>&                                     rootClippingRect,

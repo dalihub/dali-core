@@ -126,16 +126,6 @@ public:
    */
   void MakeContextCurrent() override;
 
-  /**
-   * @copydoc Dali::Integration::RenderSurface::GetDepthBufferRequired
-   */
-  Dali::Integration::DepthBufferAvailable GetDepthBufferRequired() override;
-
-  /**
-   * @copydoc Dali::Integration::RenderSurface::GetStencilBufferRequired
-   */
-  Dali::Integration::StencilBufferAvailable GetStencilBufferRequired() override;
-
 private:
   /**
    * @brief Undefined copy constructor. RenderSurface cannot be copied

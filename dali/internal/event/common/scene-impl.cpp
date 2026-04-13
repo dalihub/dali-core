@@ -42,12 +42,13 @@ namespace Dali
 namespace Internal
 {
 ScenePtr Scene::New(const Graphics::RenderTargetCreateInfo& createInfo,
-                    Size size, int32_t windowOrientation, int32_t screenOrientation)
+                    Size size, int32_t windowOrientation, int32_t screenOrientation,
+                    ScenePolicyFlagBits flags)
 {
   ScenePtr scene = new Scene;
 
   // Second-phase construction
-  scene->Initialize(createInfo, size, windowOrientation, screenOrientation);
+  scene->Initialize(createInfo, size, windowOrientation, screenOrientation, flags);
 
   return scene;
 }
@@ -58,6 +59,9 @@ Scene::Scene()
   mDpi(),
   mBackgroundColor(DEFAULT_BACKGROUND_COLOR),
   mDepthTreeDirty(false),
+  mDepthBufferEnabled(false),
+  mStencilBufferEnabled(false),
+  mMSAAEnabled(false),
   mPartialUpdateEnabled(true),
   mGeometryHittest(false),
   mIsVisible(true),
@@ -106,7 +110,8 @@ Scene::~Scene()
 }
 
 void Scene::Initialize(const Graphics::RenderTargetCreateInfo& createInfo,
-                       Size size, int32_t windowOrientation, int32_t screenOrientation)
+                       Size size, int32_t windowOrientation, int32_t screenOrientation,
+                       ScenePolicyFlagBits flags)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
 
@@ -145,7 +150,9 @@ void Scene::Initialize(const Graphics::RenderTargetCreateInfo& createInfo,
   renderTask->SetClearEnabled(true);
 
   // Create scene graph object
-  mSceneObject = new SceneGraph::Scene(createInfo);
+  mSceneObject      = new SceneGraph::Scene(createInfo);
+  mScenePolicyFlags = flags;
+  mSceneObject->SetScenePolicyFlags(flags);
   OwnerPointer<SceneGraph::Scene> transferOwnership(const_cast<SceneGraph::Scene*>(mSceneObject));
   AddSceneMessage(updateManager, transferOwnership);
 
@@ -572,12 +579,81 @@ void Scene::KeepRendering(float durationSeconds)
   KeepRenderingMessage(tls->GetEventThreadServices(), *mSceneObject, durationSeconds);
 }
 
+void Scene::SetDepthBufferEnabled(bool enabled)
+{
+  mDepthBufferEnabled = enabled;
+  if(enabled)
+  {
+    mScenePolicyFlags |= ScenePolicyFlagBits::DEPTH_BUFFER_ENABLED;
+  }
+  else
+  {
+    mScenePolicyFlags &= ~ScenePolicyFlagBits::DEPTH_BUFFER_ENABLED;
+  }
+
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  SetScenePolicyFlagsMessage(tls->GetEventThreadServices(), *mSceneObject, mScenePolicyFlags);
+}
+
+bool Scene::IsDepthBufferEnabled() const
+{
+  return mDepthBufferEnabled;
+}
+
+void Scene::SetStencilBufferEnabled(bool enabled)
+{
+  mStencilBufferEnabled = enabled;
+  if(enabled)
+  {
+    mScenePolicyFlags |= ScenePolicyFlagBits::STENCIL_BUFFER_ENABLED;
+  }
+  else
+  {
+    mScenePolicyFlags &= ~ScenePolicyFlagBits::STENCIL_BUFFER_ENABLED;
+  }
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  SetScenePolicyFlagsMessage(tls->GetEventThreadServices(), *mSceneObject, mScenePolicyFlags);
+}
+
+bool Scene::IsStencilBufferEnabled() const
+{
+  return mStencilBufferEnabled;
+}
+
+void Scene::SetMultiSampledAntiAliasingEnabled(bool enabled)
+{
+  mMSAAEnabled = enabled;
+  if(enabled)
+  {
+    mScenePolicyFlags |= ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED;
+  }
+  else
+  {
+    mScenePolicyFlags &= ~ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED;
+  }
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  SetScenePolicyFlagsMessage(tls->GetEventThreadServices(), *mSceneObject, mScenePolicyFlags);
+}
+
+bool Scene::IsMultiSampledAntiAliasingEnabled() const
+{
+  return mMSAAEnabled;
+}
+
 void Scene::SetPartialUpdateEnabled(bool enabled)
 {
   mPartialUpdateEnabled = enabled;
+  if(enabled)
+  {
+    mScenePolicyFlags |= ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED;
+  }
+  else
+  {
+    mScenePolicyFlags &= ~ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED;
+  }
 
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-  SetPartialUpdateEnabledMessage(tls->GetEventThreadServices(), *mSceneObject, enabled);
+  SetScenePolicyFlagsMessage(tls->GetEventThreadServices(), *mSceneObject, mScenePolicyFlags);
 }
 
 bool Scene::IsPartialUpdateEnabled() const

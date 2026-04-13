@@ -511,14 +511,14 @@ inline void RenderAlgorithms::SetupScissorClipping(
   }
 }
 
-inline void RenderAlgorithms::SetupClipping(const RenderItem&                   item,
-                                            Graphics::CommandBuffer&            commandBuffer,
-                                            bool&                               usedStencilBuffer,
-                                            uint32_t&                           lastClippingDepth,
-                                            uint32_t&                           lastClippingId,
-                                            Integration::StencilBufferAvailable stencilBufferAvailable,
-                                            const RenderInstruction&            instruction,
-                                            int                                 orientation)
+inline void RenderAlgorithms::SetupClipping(const RenderItem&        item,
+                                            Graphics::CommandBuffer& commandBuffer,
+                                            bool&                    usedStencilBuffer,
+                                            uint32_t&                lastClippingDepth,
+                                            uint32_t&                lastClippingId,
+                                            bool                     stencilBufferAvailable,
+                                            const RenderInstruction& instruction,
+                                            int                      orientation)
 {
   RenderMode::Type renderMode = RenderMode::AUTO;
   RendererKey      renderer   = item.mRenderer;
@@ -542,7 +542,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
       SetupScissorClipping(item, commandBuffer, instruction, orientation);
 
-      if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+      if(stencilBufferAvailable)
       {
         SetupStencilClipping(item, commandBuffer, lastClippingDepth, lastClippingId);
       }
@@ -555,7 +555,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
       // No clipping is performed for these modes.
       // Note: We do not turn off scissor clipping as it may be used for the whole layer.
       // The stencil buffer will not be used at all, but we only need to disable it if it's available.
-      if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+      if(stencilBufferAvailable)
       {
         commandBuffer.SetStencilTestEnable(false);
       }
@@ -568,7 +568,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
     case RenderMode::STENCIL:
     case RenderMode::COLOR_STENCIL:
     {
-      if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+      if(stencilBufferAvailable)
       {
         // We are using the low-level Renderer Stencil API.
         // The stencil buffer must be enabled for every renderer with stencil mode on, as renderers in between can disable it.
@@ -603,8 +603,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 Graphics::CommandBuffer&                 commandBuffer,
                                                 const Matrix&                            viewMatrix,
                                                 const Matrix&                            projectionMatrix,
-                                                Integration::DepthBufferAvailable        depthBufferAvailable,
-                                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                                bool                                     depthBufferAvailable,
+                                                bool                                     stencilBufferAvailable,
                                                 const RenderInstruction&                 instruction,
                                                 const Rect<int32_t>&                     viewport,
                                                 const Rect<int>&                         rootClippingRect,
@@ -617,7 +617,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // Note: The depth buffer is enabled or disabled on a per-renderer basis.
   // Here we pre-calculate the value to use if these modes are set to AUTO.
-  const bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
+  const bool        autoDepthTestMode(depthBufferAvailable &&
                                       !(renderList.GetSourceLayer()->IsDepthTestDisabled()) &&
                                       renderList.HasColorRenderItems());
   const std::size_t count = renderList.Count();
@@ -702,7 +702,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
       // draw-mode state, such as Overlays.
       // If the flags are set to "AUTO", the behavior then depends on the type of renderer. Overlay Renderers will
       // always disable depth testing and writing. Color Renderers will enable them if the Layer does.
-      if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE)
+      if(depthBufferAvailable)
       {
         SetupDepthBuffer(item, commandBuffer, autoDepthTestMode, firstDepthBufferUse);
       }
@@ -748,8 +748,8 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&                 instruction,
                                                 Graphics::CommandBuffer&                 commandBuffer,
-                                                Integration::DepthBufferAvailable        depthBufferAvailable,
-                                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                                bool                                     depthBufferAvailable,
+                                                bool                                     stencilBufferAvailable,
                                                 const Rect<int32_t>&                     viewport,
                                                 const Rect<int>&                         rootClippingRect,
                                                 int                                      orientation,

@@ -66,7 +66,7 @@ int UtcDaliCoreChangeCorePolicy(void)
 {
   TestApplication application;
 
-  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
+  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::RENDER_TO_FRAME_BUFFER;
 
   // Note that we should not call this method after ContextCreated() has been called.
   // But here is UTC, so we can call it after context creation at TestApplication initialized.
@@ -88,7 +88,7 @@ int UtcDaliCoreChangeCorePolicyN(void)
 {
   TestApplication application;
 
-  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
+  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::RENDER_TO_FRAME_BUFFER;
 
   // Render something.
   Actor actor = CreateRenderableActor();

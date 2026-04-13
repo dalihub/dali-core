@@ -168,20 +168,15 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
  */
 struct RenderManager::Impl
 {
-  Impl(Graphics::Controller&               graphicsController,
-       Integration::DepthBufferAvailable   depthBufferAvailableParam,
-       Integration::StencilBufferAvailable stencilBufferAvailableParam,
-       Integration::PartialUpdateAvailable partialUpdateAvailableParam)
+  Impl(Graphics::Controller& graphicsController)
   : graphicsController(graphicsController),
     renderAlgorithms(graphicsController),
     programController(graphicsController),
-    terminatedNativeDrawManager(graphicsController),
+    terminatedNativeDrawManager(graphicsController)
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
-    containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
+    ,
+    containerRemovedFlags(ContainerRemovedFlagBits::NOTHING)
 #endif
-    depthBufferAvailable(depthBufferAvailableParam),
-    stencilBufferAvailable(stencilBufferAvailableParam),
-    partialUpdateAvailable(partialUpdateAvailableParam)
   {
     uniformBufferManager = std::make_unique<Render::UniformBufferManager>(&graphicsController);
     pipelineCache        = std::make_unique<Render::PipelineCache>(graphicsController);
@@ -192,15 +187,6 @@ struct RenderManager::Impl
     geometryContainer.Clear(); // clear now before the pipeline cache is deleted
     rendererContainer.Clear(); // clear now before the program contoller and the pipeline cache are deleted
     pipelineCache.reset();     // clear now before the program contoller is deleted
-  }
-
-  void UpdateGraphicsRequired(Integration::DepthBufferAvailable   depthBufferAvailable,
-                              Integration::StencilBufferAvailable stencilBufferAvailable,
-                              Integration::PartialUpdateAvailable partialUpdateAvailable)
-  {
-    this->depthBufferAvailable   = depthBufferAvailable;
-    this->stencilBufferAvailable = stencilBufferAvailable;
-    this->partialUpdateAvailable = partialUpdateAvailable;
   }
 
   void AddRenderTracker(Render::RenderTracker* renderTracker)
@@ -353,10 +339,6 @@ struct RenderManager::Impl
   ContainerRemovedFlags containerRemovedFlags; ///< cumulative container removed flags during current frame
 #endif
 
-  Integration::DepthBufferAvailable   depthBufferAvailable;   ///< Whether the depth buffer is available
-  Integration::StencilBufferAvailable stencilBufferAvailable; ///< Whether the stencil buffer is available
-  Integration::PartialUpdateAvailable partialUpdateAvailable; ///< Whether the partial update is available
-
   Vector<Render::TextureKey> updatedTextures{}; ///< The updated texture list
 
   uint32_t frameCount{0u};                                                            ///< The current frame count
@@ -371,11 +353,8 @@ struct RenderManager::Impl
   bool clearCacheRequired{false};
 };
 
-RenderManager* RenderManager::New(Graphics::Controller&               graphicsController,
-                                  MemoryPoolCollection&               memoryPoolCollection,
-                                  Integration::DepthBufferAvailable   depthBufferAvailable,
-                                  Integration::StencilBufferAvailable stencilBufferAvailable,
-                                  Integration::PartialUpdateAvailable partialUpdateAvailable)
+RenderManager* RenderManager::New(Graphics::Controller& graphicsController,
+                                  MemoryPoolCollection& memoryPoolCollection)
 {
   // Register memory pool
   Render::Renderer::RegisterMemoryPoolCollection(memoryPoolCollection);
@@ -383,10 +362,7 @@ RenderManager* RenderManager::New(Graphics::Controller&               graphicsCo
   Render::UniformBufferView::RegisterMemoryPoolCollection(memoryPoolCollection);
 
   auto* manager  = new RenderManager;
-  manager->mImpl = new Impl(graphicsController,
-                            depthBufferAvailable,
-                            stencilBufferAvailable,
-                            partialUpdateAvailable);
+  manager->mImpl = new Impl(graphicsController);
   return manager;
 }
 
@@ -405,14 +381,9 @@ RenderManager::~RenderManager()
   Render::UniformBufferView::UnregisterMemoryPoolCollection();
 }
 
-void RenderManager::UpdateGraphicsRequired(Integration::DepthBufferAvailable   depthBufferAvailable,
-                                           Integration::StencilBufferAvailable stencilBufferAvailable,
-                                           Integration::PartialUpdateAvailable partialUpdateAvailable)
+void RenderManager::CheckSceneCount()
 {
-  DALI_ASSERT_ALWAYS(mImpl->sceneContainer.empty() &&
-                     "Could not change graphics required after some resource created!");
-
-  mImpl->UpdateGraphicsRequired(depthBufferAvailable, stencilBufferAvailable, partialUpdateAvailable);
+  DALI_ASSERT_ALWAYS(mImpl->sceneContainer.empty() && "Scene container should be empty");
 }
 
 void RenderManager::ChangeGraphicsController(Graphics::Controller& graphicsController)
@@ -430,12 +401,7 @@ void RenderManager::ChangeGraphicsController(Graphics::Controller& graphicsContr
 
   // Re-create Impl now.
   auto* oldImpl = mImpl;
-
-  mImpl = new Impl(graphicsController,
-                   oldImpl->depthBufferAvailable,
-                   oldImpl->stencilBufferAvailable,
-                   oldImpl->partialUpdateAvailable);
-
+  mImpl         = new Impl(graphicsController);
   delete oldImpl;
 }
 
@@ -553,7 +519,7 @@ void RenderManager::RemoveFrameBuffer(Render::FrameBuffer* frameBuffer)
 void RenderManager::InitializeScene(SceneGraph::Scene* scene)
 {
   DALI_LOG_RELEASE_INFO("InitializeScene %p\n", scene);
-  scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
+  scene->Initialize(mImpl->graphicsController);
   mImpl->sceneContainer.push_back(scene);
   mImpl->uniformBufferManager->RegisterScene(scene);
 }
@@ -571,7 +537,7 @@ void RenderManager::UninitializeScene(SceneGraph::Scene* scene)
 
 void RenderManager::SurfaceReplaced(SceneGraph::Scene* scene)
 {
-  scene->Initialize(mImpl->graphicsController, mImpl->depthBufferAvailable, mImpl->stencilBufferAvailable);
+  scene->Initialize(mImpl->graphicsController);
 }
 
 void RenderManager::AddVertexBuffer(OwnerPointer<Render::VertexBuffer>& vertexBuffer)
@@ -660,6 +626,9 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
     return;
   }
 
+  // Rebuild surface render passes if the app toggled depth/stencil since last frame.
+  sceneObject->RebuildRenderPassesIfDirty(mImpl->graphicsController);
+
   bool           renderToScene    = false;
   const uint32_t instructionCount = sceneObject->GetRenderInstructions().Count();
   for(uint32_t i = instructionCount; i > 0; --i)
@@ -689,7 +658,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
     sceneObject->SetHasRenderInstructionToScene(renderToScene);
   }
 
-  if(mImpl->partialUpdateAvailable != Integration::PartialUpdateAvailable::TRUE)
+  if(!sceneObject->IsPartialUpdateEnabled())
   {
     return;
   }
@@ -970,10 +939,6 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
   }
   DALI_LOG_INFO(gLogFilter, Debug::General, "No early out\n");
 
-  // @todo These should be members of scene
-  const Integration::DepthBufferAvailable   depthBufferAvailable   = mImpl->depthBufferAvailable;
-  const Integration::StencilBufferAvailable stencilBufferAvailable = mImpl->stencilBufferAvailable;
-
   uint32_t instructionCount = sceneObject->GetRenderInstructions().Count();
 
   Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
@@ -992,6 +957,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   std::unordered_map<Graphics::Program*, Graphics::ProgramResourceBindingInfo> programUsageCount;
 
+  bool depthBufferAvailable    = sceneObject->IsDepthBufferEnabled();
+  bool stencilBufferAvailable  = sceneObject->IsStencilBufferEnabled();
   bool sceneNeedsDepthBuffer   = false;
   bool sceneNeedsStencilBuffer = false;
 
@@ -1009,7 +976,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       for(auto j = 0u; j < instruction.RenderListCount(); ++j)
       {
         const auto& renderList = instruction.GetRenderList(j);
-        bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
+        bool        autoDepthTestMode(depthBufferAvailable &&
                                       !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
                                       renderList->HasColorRenderItems());
         for(auto k = 0u; k < renderList->Count(); ++k)
@@ -1208,8 +1175,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     {
       // @todo SceneObject should already have the depth clear / stencil clear in the clearValues array.
       // if the window has a depth/stencil buffer.
-      if((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE ||
-          stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE) &&
+      if((depthBufferAvailable || stencilBufferAvailable) &&
          (currentClearValues.size() <= 1))
       {
         currentClearValues.emplace_back();

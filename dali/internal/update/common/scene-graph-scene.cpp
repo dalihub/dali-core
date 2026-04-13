@@ -39,8 +39,12 @@ Scene::Scene(const Graphics::RenderTargetCreateInfo& createInfo)
   mRotationCompletedAcknowledgement(false),
   mSkipRendering(false),
   mNeedFullUpdate(false),
+  mDepthBufferEnabled(false),
+  mStencilBufferEnabled(false),
+  mMSAAEnabled(false),
   mPartialUpdateEnabled(true),
-  mHasRenderInstructionToScene(false)
+  mHasRenderInstructionToScene(false),
+  mRenderPassDirty(false)
 {
 }
 
@@ -50,13 +54,45 @@ Scene::~Scene()
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
+void Scene::SetScenePolicyFlags(ScenePolicyFlagBits flags)
+{
+  const bool newDepth   = (flags & ScenePolicyFlagBits::DEPTH_BUFFER_ENABLED);
+  const bool newStencil = (flags & ScenePolicyFlagBits::STENCIL_BUFFER_ENABLED);
+
+  if(newDepth != mDepthBufferEnabled || newStencil != mStencilBufferEnabled)
+  {
+    mRenderPassDirty = true;
+  }
+
+  mDepthBufferEnabled   = newDepth;
+  mStencilBufferEnabled = newStencil;
+  mPartialUpdateEnabled = (flags & ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
+  mMSAAEnabled          = (flags & ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED);
+}
+
+void Scene::Initialize(Graphics::Controller& graphicsController)
 {
   RenderTargetGraphicsObjects::Initialize(graphicsController);
 
   // Create the render target for the surface. (This must happen in render thread).
   RenderTargetGraphicsObjects::CreateRenderTarget(graphicsController, mRenderTargetCreateInfo);
 
+  BuildRenderPasses(graphicsController);
+  mRenderPassDirty = false;
+}
+
+void Scene::RebuildRenderPassesIfDirty(Graphics::Controller& graphicsController)
+{
+  if(!mRenderPassDirty)
+  {
+    return;
+  }
+  BuildRenderPasses(graphicsController);
+  mRenderPassDirty = false;
+}
+
+void Scene::BuildRenderPasses(Graphics::Controller& graphicsController)
+{
   // Create the render pass for the surface
   std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
@@ -71,8 +107,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
   desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
   attachmentDescriptions.push_back(desc);
 
-  if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE ||
-     stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+  if(mDepthBufferEnabled || mStencilBufferEnabled)
   {
     // Depth
     desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
@@ -302,9 +337,19 @@ bool Scene::KeepRenderingCheck(float elapsedSeconds)
   return mForceRenderingFrames > 0u;
 }
 
-void Scene::SetPartialUpdateEnabled(bool enabled)
+bool Scene::IsDepthBufferEnabled() const
 {
-  mPartialUpdateEnabled = enabled;
+  return mDepthBufferEnabled;
+}
+
+bool Scene::IsStencilBufferEnabled() const
+{
+  return mStencilBufferEnabled;
+}
+
+bool Scene::IsMultiSampledAntiAliasingEnabled() const
+{
+  return mMSAAEnabled;
 }
 
 bool Scene::IsPartialUpdateEnabled() const

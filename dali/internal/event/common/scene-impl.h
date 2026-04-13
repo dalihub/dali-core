@@ -63,7 +63,8 @@ public:
    * @copydoc Dali::Integration::Scene::New
    */
   static ScenePtr New(const Graphics::RenderTargetCreateInfo& createInfo, Size size,
-                      int32_t windowOrientation = 0, int32_t screenOrientation = 0);
+                      int32_t windowOrientation = 0, int32_t screenOrientation = 0,
+                      ScenePolicyFlagBits flags = ScenePolicyFlagBits::DEFAULT);
 
   /**
    * virtual destructor
@@ -396,6 +397,18 @@ public:
    */
   void KeepRendering(float durationSeconds);
 
+  void SetDepthBufferEnabled(bool enabled);
+
+  bool IsDepthBufferEnabled() const;
+
+  void SetStencilBufferEnabled(bool enabled);
+
+  bool IsStencilBufferEnabled() const;
+
+  void SetMultiSampledAntiAliasingEnabled(bool enabled);
+
+  bool IsMultiSampledAntiAliasingEnabled() const;
+
   /**
    * @copydoc Dali::Integration::Scene::SetPartialUpdateEnabled()
    */
@@ -470,8 +483,9 @@ private:
    * @param[in] size The size of the set surface
    * @param[in] windowOrientation The rotated angle of the set surface for this scene
    * @param[in] screenOrientation The rotated angle of the screen
+   * @param[in] flags Scene policy flags
    */
-  void Initialize(const Graphics::RenderTargetCreateInfo& createInfo, Size size, int32_t windowOrientation, int32_t screenOrientation);
+  void Initialize(const Graphics::RenderTargetCreateInfo& createInfo, Size size, int32_t windowOrientation, int32_t screenOrientation, ScenePolicyFlagBits flags);
 
   // Undefined
   Scene(const Scene&) = delete;
@@ -510,10 +524,14 @@ private:
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;
 
-  bool mDepthTreeDirty : 1;       ///< True if the depth tree needs recalculating
-  bool mPartialUpdateEnabled : 1; ///< True if the partial update is enabled
-  bool mGeometryHittest : 1;      ///< True if the geometry hittest is enabled
-  bool mIsVisible : 1;            ///< True if this Scene is visible
+  bool                mDepthTreeDirty : 1; ///< True if the depth tree needs recalculating
+  bool                mDepthBufferEnabled : 1;
+  bool                mStencilBufferEnabled : 1;
+  bool                mMSAAEnabled : 1;
+  bool                mPartialUpdateEnabled : 1; ///< True if the partial update is enabled
+  bool                mGeometryHittest : 1;      ///< True if the geometry hittest is enabled
+  bool                mIsVisible : 1;            ///< True if this Scene is visible
+  ScenePolicyFlagBits mScenePolicyFlags{0u};
 
   EventProcessor mEventProcessor;
 
