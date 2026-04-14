@@ -18,6 +18,7 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -1368,12 +1369,12 @@ int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
   auto createActor = [&](const Vector3& position)
   {
     Actor actor = Handle::New<Actor>(
-      {
+      CreatePropertyMap({
         {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
         {Actor::Property::PIVOT, Pivot::CENTER},
         {Actor::Property::SIZE, Vector3(200.0f, 200.0f, 0.0f)},
         {Actor::Property::POSITION, position},
-      });
+      }));
     return actor;
   };
 
@@ -1592,12 +1593,12 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
   auto createActor = [&](const Vector3& position)
   {
     Actor actor = Handle::New<Actor>(
-      {
+      CreatePropertyMap({
         {Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER},
         {Actor::Property::PIVOT, Pivot::CENTER},
         {Actor::Property::SIZE, Vector3(200.0f, 200.0f, 0.0f)},
         {Actor::Property::POSITION, position},
-      });
+      }));
     return actor;
   };
 

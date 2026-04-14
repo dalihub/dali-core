@@ -991,11 +991,6 @@ Property::Value::Value(const Extents& extentsValue)
   Impl::New(mStorage, extentsValue);
 }
 
-Property::Value::Value(const std::initializer_list<KeyValuePair>& values)
-{
-  Impl::New(mStorage, Property::Map(values));
-}
-
 Property::Value::Value(Type type)
 {
   switch(type)

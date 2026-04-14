@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <initializer_list>
 #include <type_traits>
 #include <utility>
 
@@ -189,14 +188,6 @@ public:
    * @param[in] mapValue A property map
    */
   Value(Property::Map mapValue);
-
-  /**
-   * @brief Create a map property value from an initializer_list.
-   *
-   * @SINCE_1_4.16
-   * @param [in] values An initializer_list of pairs of index and value.
-   */
-  Value(const std::initializer_list<KeyValuePair>& values);
 
   /**
    * @brief Creates an extents property value.

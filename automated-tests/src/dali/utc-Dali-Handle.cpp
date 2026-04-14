@@ -17,6 +17,7 @@
 
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/handle-devel.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
@@ -1910,12 +1911,12 @@ int UtcDaliHandlePropertySetProperties(void)
 
   Handle handle = Actor::New();
   handle.SetProperties(
-    Property::Map{
+    CreatePropertyMap({
       {Actor::Property::SIZE, actorSize},
       {Actor::Property::PIVOT, pivot},
       {"color", color},
       {"invalid", Vector2::ZERO} // It should quietly ignore invalid data
-    });
+    }));
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::SIZE).Get<Vector3>(), actorSize, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::PIVOT).Get<Vector3>(), pivot, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::COLOR).Get<Vector4>(), color, TEST_LOCATION);
@@ -1931,12 +1932,12 @@ int UtcDaliHandleTemplateNew01(void)
   const Vector4   color(0.1f, 0.2, 0.3f, 0.4f);
 
   Handle handle = Handle::New<Actor>(
-    Property::Map{
+    CreatePropertyMap({
       {Actor::Property::SIZE, actorSize},
       {Actor::Property::PIVOT, pivot},
       {"color", color},
       {"invalid", Vector2::ZERO} // It should quietly ignore invalid data
-    });
+    }));
 
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::SIZE).Get<Vector3>(), actorSize, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::PIVOT).Get<Vector3>(), pivot, TEST_LOCATION);
@@ -1951,14 +1952,14 @@ int UtcDaliHandleGetProperties(void)
 
   Handle handle = Actor::New();
   handle.SetProperties(
-    Property::Map{
+    CreatePropertyMap({
       {Actor::Property::SIZE, Vector3(400.0f, 200.0f, 100.0f)},
       {Actor::Property::PIVOT, Pivot::TOP_CENTER},
       {Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER},
       {Actor::Property::NAME, "Actor"},
       {Actor::Property::LEAVE_REQUIRED, true},
       {"color", Color::RED},
-    });
+    }));
 
   Property::Map map;
   handle.GetProperties(map);

@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <initializer_list>
 #include <utility> // std::move
 
 // INTERNAL INCLUDES
@@ -54,14 +53,6 @@ public:
    * @SINCE_1_0.0
    */
   Map();
-
-  /**
-   * @brief Constructor from initializer_list.
-   *
-   * @SINCE_1_4.17
-   * @param[in] values An initializer_list of pairs of index and value.
-   */
-  Map(const std::initializer_list<KeyValuePair>& values);
 
   /**
    * @brief Copy constructor.

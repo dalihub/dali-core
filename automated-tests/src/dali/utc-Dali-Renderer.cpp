@@ -21,6 +21,7 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/common/stage.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/signals/render-callback.h>
 #include <dali/devel-api/threading/thread.h>
@@ -5138,8 +5139,8 @@ int UtcDaliRendererSetInstanceCount(void)
 
   tet_infoline("Test setting the instance count results in instanced draw");
 
-  Property::Map vertexFormat{{"aPosition", Property::VECTOR2}, {"aTexCoord", Property::VECTOR2}};
-  Property::Map instanceFormat{{"aTranslation", Property::VECTOR2}, {"aSize", Property::VECTOR2}};
+  Property::Map vertexFormat   = CreatePropertyMap({{"aPosition", Property::VECTOR2}, {"aTexCoord", Property::VECTOR2}});
+  Property::Map instanceFormat = CreatePropertyMap({{"aTranslation", Property::VECTOR2}, {"aSize", Property::VECTOR2}});
 
   const float halfQuadSize = .5f;
   struct TexturedQuadVertex
@@ -5248,8 +5249,8 @@ int UtcDaliRendererVertexRange(void)
 
   tet_infoline("Test setting the instance count results in instanced draw");
 
-  Property::Map vertexFormat{{"aPosition", Property::VECTOR2}, {"aTexCoord", Property::VECTOR2}};
-  Property::Map instanceFormat{{"aTranslation", Property::VECTOR2}, {"aSize", Property::VECTOR2}};
+  Property::Map vertexFormat   = CreatePropertyMap({{"aPosition", Property::VECTOR2}, {"aTexCoord", Property::VECTOR2}});
+  Property::Map instanceFormat = CreatePropertyMap({{"aTranslation", Property::VECTOR2}, {"aSize", Property::VECTOR2}});
 
   const float halfQuadSize = .5f;
   struct TexturedQuadVertex

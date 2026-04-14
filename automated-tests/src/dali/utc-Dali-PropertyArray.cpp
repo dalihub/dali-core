@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-array-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -486,9 +487,9 @@ int UtcDaliPropertyArrayMovedArrayP1(void)
   END_TEST;
 }
 
-int UtcDaliPropertyArrayInitializerListConstructor(void)
+int UtcDaliCreatePropertyArray(void)
 {
-  Property::Array array{1, 2, "hello"};
+  Property::Array array = CreatePropertyArray({1, 2, "hello"});
   DALI_TEST_EQUALS(3u, array.Size(), TEST_LOCATION);
   DALI_TEST_EQUALS(Property::INTEGER, array.GetElementAt(0).GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(Property::INTEGER, array.GetElementAt(1).GetType(), TEST_LOCATION);
