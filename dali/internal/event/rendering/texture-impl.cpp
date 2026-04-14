@@ -94,17 +94,19 @@ struct MemoryInfoCollector
 
     uint32_t totalTextureMemory = 0u;
 
+    uint32_t index = 0u;
+
     DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
-    DALI_LOG_ERROR_NOFN("| Type hint | Content of [ %-20s ]                                                |    size     | bpp | memory(MB) +\n", mTypeName.c_str());
+    DALI_LOG_ERROR_NOFN("|    # | Type hint | Content of [ %-20s ]                                         |    size     | bpp | memory(MB) +\n", mTypeName.c_str());
     DALI_LOG_ERROR_NOFN("+---------------------------------------------------------------------------------------------------------------------------------+\n");
     for(auto iter = mData.begin(); iter != mData.end(); iter++)
     {
       auto context = (*iter)->mContext;
-      if(context.length() > 82)
+      if(context.length() > 75)
       {
-        context = std::string("...") + context.substr(context.length() - 79, 79);
+        context = std::string("...") + context.substr(context.length() - 72, 72);
       }
-      DALI_LOG_ERROR_NOFN("| %9d | %82s | %4d x %4d | %3d | %10.3f | \n", static_cast<int32_t>((*iter)->mTypeHint), context.c_str(), (*iter)->mWidth, (*iter)->mHeight, (*iter)->mBytesPerPixel, static_cast<double>((*iter)->mMemorySize) / (1024.0 * 1024.0));
+      DALI_LOG_ERROR_NOFN("| %4d | %9d | %75s | %4d x %4d | %3d | %10.3f | \n", ++index, static_cast<int32_t>((*iter)->mTypeHint), context.c_str(), (*iter)->mWidth, (*iter)->mHeight, (*iter)->mBytesPerPixel, static_cast<double>((*iter)->mMemorySize) / (1024.0 * 1024.0));
 
       totalTextureMemory += (*iter)->mMemorySize;
     }
