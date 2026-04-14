@@ -179,6 +179,27 @@ int UtcDaliStringDestructorP(void)
   END_TEST;
 }
 
+int UtcDaliStringUseAfterMoveP(void)
+{
+  TestApplication application;
+  const char*     result = "Sample String";
+  String          string1(result);
+
+  DALI_TEST_CHECK(!string1.Empty());
+  DALI_TEST_CHECK(strcmp(string1.CStr(), result) == 0);
+
+  String string2(std::move(string1));
+  DALI_TEST_CHECK(!string2.Empty());
+  DALI_TEST_EQUALS(string2.CStr(), result, TEST_LOCATION);
+  DALI_TEST_CHECK(string1.Empty());
+
+  string1 += 'A';
+  DALI_TEST_CHECK(!string1.Empty());
+  DALI_TEST_CHECK(strcmp(string1.CStr(), "A") == 0);
+
+  END_TEST;
+}
+
 int UtcDaliStringCStringSizeP(void)
 {
   TestApplication application;
@@ -214,6 +235,22 @@ int UtcDaliStringCStringEmpty(void)
   String string2;
   DALI_TEST_CHECK(string2.Empty());
   DALI_TEST_CHECK(string2.Size() == 0);
+  END_TEST;
+}
+
+int UtcDaliStringCStringClear(void)
+{
+  TestApplication application;
+  std::string     testString("A test string of some length");
+  String          string1(testString.c_str());
+
+  DALI_TEST_CHECK(!string1.Empty());
+  DALI_TEST_CHECK(strcmp(string1.CStr(), testString.c_str()) == 0);
+  DALI_TEST_EQUALS(string1.Size(), testString.size(), TEST_LOCATION);
+
+  string1.Clear();
+  DALI_TEST_CHECK(string1.Empty());
+  DALI_TEST_CHECK(string1.Size() == 0);
   END_TEST;
 }
 

@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/devel-api/common/stage-devel.h>
 
@@ -558,7 +558,7 @@ public:
    * @param[in] nextVSyncTimeMilliseconds The estimated time, in milliseconds, of the next VSync.
    * @param[in] renderToFboEnabled Whether rendering into the Frame Buffer Object is enabled.
    * @param[in] isRenderingToFbo   Whether this frame is being rendered into the Frame Buffer Object.
-   * @param[in] uploadOnly uploadOnly Upload the resource only without rendering.
+   * @param[in, out] uploadOnly uploadOnly Upload the resource only without rendering. It could be change as true if scene request to rendering forcibly.
    * @param[out] rendererAdded Whether at least one of renderer added to update manager, or not.
    * @return True if further updates are required e.g. during animations.
    */
@@ -567,7 +567,7 @@ public:
                   uint32_t nextVSyncTimeMilliseconds,
                   bool     renderToFboEnabled,
                   bool     isRenderingToFbo,
-                  bool     uploadOnly,
+                  bool&    uploadOnly,
                   bool&    rendererAdded);
 
   /**

@@ -217,6 +217,56 @@ public: // API
   }
 
   /**
+   * @brief Get the first element of vector.
+   * @SINCE_2_5.17
+   * @return Reference to the first element
+   * @pre Vector must not be empty.
+   */
+  ItemType& Front()
+  {
+    // reuse the const version
+    return const_cast<ItemType&>(const_cast<const Vector<ItemType>&>(*this).Front());
+  }
+
+  /**
+   * @brief Get the first element of vector.
+   * @SINCE_2_5.17
+   * @return Reference to the first element
+   * @pre Vector must not be empty.
+   */
+  const ItemType& Front() const
+  {
+    DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
+    return *reinterpret_cast<ItemType*>(VectorBase::mData);
+  }
+
+  /**
+   * @brief Get the last element of vector.
+   * @SINCE_2_5.17
+   * @return Reference to the last element
+   * @pre Vector must not be empty.
+   */
+  ItemType& Back()
+  {
+    // reuse the const version
+    return const_cast<ItemType&>(const_cast<const Vector<ItemType>&>(*this).Back());
+  }
+
+  /**
+   * @brief Get the last element of vector.
+   * @SINCE_2_5.17
+   * @return Reference to the last element
+   * @pre Vector must not be empty.
+   */
+  const ItemType& Back() const
+  {
+    DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
+    ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
+    address += VectorBase::Count() - 1u;
+    return *address;
+  }
+
+  /**
    * @brief Pushes back an element to the vector.
    *
    * The underlying storage may be reallocated to provide space.

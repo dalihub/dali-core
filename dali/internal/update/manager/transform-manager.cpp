@@ -46,7 +46,7 @@ static constexpr TransformComponentAnimatable gDefaultTransformComponentAnimatab
 static constexpr Vector3 CENTER(0.5f, 0.5f, 0.5f);
 static constexpr Vector3 TOP_LEFT(0.0f, 0.0f, 0.5f);
 
-// Default values for anchor point (CENTER) and parent origin (TOP_LEFT)
+// Default values for pivot (CENTER) and parent origin (TOP_LEFT)
 static constexpr TransformComponentStatic gDefaultTransformComponentStaticData{CENTER, TOP_LEFT};
 
 static constexpr uint32_t STATIC_COMPONENT_FLAG = 0x01; ///< Indicates that the value when we change static transform components, so need to update at least 1 frame.
@@ -54,7 +54,7 @@ static constexpr uint32_t STATIC_COMPONENT_FLAG = 0x01; ///< Indicates that the 
 static constexpr uint16_t IGNORED_COMPONENTS_SCENE_ID = 0xffff; ///< Special marker for ignored components, which we move them as end of components.
 
 static constexpr TransformComponentBitField::FlagType DEFAULT_BIT_FILED_FLAGS = (static_cast<TransformComponentBitField::FlagType>(InheritanceMode::INHERIT_ALL) << TransformComponentBitField::INHERITANCE_MODE_SHIFT) |
-                                                                                (TransformComponentBitField::POSITION_USES_ANCHOR_POINT_MASK << TransformComponentBitField::POSITION_USES_ANCHOR_POINT_SHIFT);
+                                                                                (TransformComponentBitField::POSITION_USES_PIVOT_MASK << TransformComponentBitField::POSITION_USES_PIVOT_SHIFT);
 
 static_assert(sizeof(gDefaultTransformComponentAnimatableData) == sizeof(TransformComponentAnimatable), "gDefaultTransformComponentAnimatableData should have the same number of floats as specified in TransformComponentAnimatable");
 static_assert(sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformComponentStatic), "gDefaultTransformComponentStaticData should have the same number of floats as specified in TransformComponentStatic");
@@ -63,27 +63,27 @@ static_assert(sizeof(gDefaultTransformComponentStaticData) == sizeof(TransformCo
  * @brief Calculates the center position for the transform component
  * @param[out] centerPosition The calculated center-position of the transform component
  * @param[in] transformComponentStatic A const reference to the static component transform struct
- * @param[in] positionUsesAnchorPoint bool whether position uses anchor point or not.
+ * @param[in] positionUsesPivot bool whether position uses pivot or not.
  * @param[in] scale scale factor to be applied to the center position.
  * @param[in] orientation orientation factor to be applied to the center position.
  * @param[in] size The size of the current transform component
  */
 inline void CalculateCenterPosition(
   Vector3&                        centerPosition,
-  const bool                      positionUsesAnchorPoint,
+  const bool                      positionUsesPivot,
   const TransformComponentStatic& transformComponentStatic,
   const Vector3&                  scale,
   const Quaternion&               orientation,
   const Vector3&                  size)
 {
-  // Calculate the center-point by applying the scale and rotation on the anchor point.
-  centerPosition = (CENTER - transformComponentStatic.mAnchorPoint) * size * scale;
+  // Calculate the center-point by applying the scale and rotation on the pivot.
+  centerPosition = (CENTER - transformComponentStatic.mPivot) * size * scale;
   centerPosition *= orientation;
 
   // If the position is ignoring the anchor-point, then remove the anchor-point shift from the position.
-  if(!positionUsesAnchorPoint)
+  if(!positionUsesPivot)
   {
-    centerPosition -= (TOP_LEFT - transformComponentStatic.mAnchorPoint) * size;
+    centerPosition -= (TOP_LEFT - transformComponentStatic.mPivot) * size;
   }
 }
 
@@ -376,7 +376,7 @@ bool TransformManager::Update()
   }
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
-  { oss << "[" << mComponentCount << ", i:" << (mComponentCount - mValidComponentCount) << "]"; });
+                                          { oss << "[" << mComponentCount << ", i:" << (mComponentCount - mValidComponentCount) << "]"; });
 
   // Iterate through all components to compute its world matrix
   Vector3 centerPosition;
@@ -386,10 +386,10 @@ bool TransformManager::Update()
   {
     TransformComponentBitField::SetWorldMatrixDirtyBitField(mTxComponentBitField[i], false);
 
-    bool       worldMatrixDirty        = false;
-    const auto inheritanceMode         = TransformComponentBitField::GetInheritanceModeBitField(mTxComponentBitField[i]);
-    const bool componentWasDirty       = TransformComponentBitField::IsComponentDirtyBitField(mTxComponentBitField[i]);
-    const bool positionUsesAnchorPoint = TransformComponentBitField::IsPositionUsesAnchorPointBitField(mTxComponentBitField[i]);
+    bool       worldMatrixDirty  = false;
+    const auto inheritanceMode   = TransformComponentBitField::GetInheritanceModeBitField(mTxComponentBitField[i]);
+    const bool componentWasDirty = TransformComponentBitField::IsComponentDirtyBitField(mTxComponentBitField[i]);
+    const bool positionUsesPivot = TransformComponentBitField::IsPositionUsesPivotBitField(mTxComponentBitField[i]);
 
     if(DALI_LIKELY(inheritanceMode != DONT_INHERIT_TRANSFORM && IsValidTransformId(mParent[i])))
     {
@@ -403,7 +403,7 @@ bool TransformManager::Update()
           worldMatrixDirty = true;
 
           // Full transform inherited
-          CalculateCenterPosition(centerPosition, positionUsesAnchorPoint, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
+          CalculateCenterPosition(centerPosition, positionUsesPivot, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
           localPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - CENTER) * mSize[parentIndex];
 
           localMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
@@ -424,7 +424,7 @@ bool TransformManager::Update()
         parentMatrix.GetTransformComponents(parentPosition, parentOrientation, parentScale);
 
         // Compute intermediate Local information
-        CalculateCenterPosition(centerPosition, positionUsesAnchorPoint, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
+        CalculateCenterPosition(centerPosition, positionUsesPivot, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
         Vector3 intermediateLocalPosition = mTxComponentAnimatable[i].mPosition + centerPosition + (mTxComponentStatic[i].mParentOrigin - CENTER) * mSize[parentIndex];
         localMatrix.SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, intermediateLocalPosition);
 
@@ -458,7 +458,7 @@ bool TransformManager::Update()
         // parent origin position in world space and relative position of center from parent origin.
         // If this node doesn't inherit its parent position, simply use the relative position as a final world position.
         Vector3 localCenterPosition;
-        CalculateCenterPosition(localCenterPosition, positionUsesAnchorPoint, mTxComponentStatic[i], finalWorldScale, finalWorldOrientation, mSize[i]);
+        CalculateCenterPosition(localCenterPosition, positionUsesPivot, mTxComponentStatic[i], finalWorldScale, finalWorldOrientation, mSize[i]);
         finalWorldPosition = mTxComponentAnimatable[i].mPosition * finalWorldScale;
         finalWorldPosition *= finalWorldOrientation;
         finalWorldPosition += localCenterPosition;
@@ -484,7 +484,7 @@ bool TransformManager::Update()
         //        Could we check size changeness only?
         worldMatrixDirty = true;
 
-        CalculateCenterPosition(centerPosition, positionUsesAnchorPoint, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
+        CalculateCenterPosition(centerPosition, positionUsesPivot, mTxComponentStatic[i], mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, mSize[i]);
         localPosition = mTxComponentAnimatable[i].mPosition + centerPosition;
 
         mWorld[i].SetTransformComponents(mTxComponentAnimatable[i].mScale, mTxComponentAnimatable[i].mOrientation, localPosition);
@@ -511,7 +511,7 @@ bool TransformManager::Update()
   mDirtyFlags >>= 1u; ///< age down.
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
-  { oss << "[componentsChanged:" << mUpdated << "]"; });
+                                        { oss << "[componentsChanged:" << mUpdated << "]"; });
 
   return mUpdated;
 }
@@ -672,9 +672,9 @@ Vector3& TransformManager::GetVector3PropertyValue(TransformId id, TransformMana
     {
       return mTxComponentStatic[mIds[id]].mParentOrigin;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      return mTxComponentStatic[mIds[id]].mAnchorPoint;
+      return mTxComponentStatic[mIds[id]].mPivot;
     }
     case TRANSFORM_PROPERTY_SIZE:
     {
@@ -704,9 +704,9 @@ const Vector3& TransformManager::GetVector3PropertyValue(TransformId id, Transfo
     {
       return mTxComponentStatic[mIds[id]].mParentOrigin;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      return mTxComponentStatic[mIds[id]].mAnchorPoint;
+      return mTxComponentStatic[mIds[id]].mPivot;
     }
     case TRANSFORM_PROPERTY_SIZE:
     {
@@ -736,9 +736,9 @@ const float& TransformManager::GetVector3PropertyComponentValue(TransformId id, 
     {
       return mTxComponentStatic[mIds[id]].mParentOrigin[component];
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      return mTxComponentStatic[mIds[id]].mAnchorPoint[component];
+      return mTxComponentStatic[mIds[id]].mPivot[component];
     }
     case TRANSFORM_PROPERTY_SIZE:
     {
@@ -773,9 +773,9 @@ void TransformManager::SetVector3PropertyValue(TransformId id, TransformManagerP
       SetTransfromProperty(mTxComponentStatic[index].mParentOrigin, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      SetTransfromProperty(mTxComponentStatic[index].mAnchorPoint, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+      SetTransfromProperty(mTxComponentStatic[index].mPivot, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -811,9 +811,9 @@ void TransformManager::SetVector3PropertyComponentValue(TransformId id, Transfor
       SetTransfromPropertyIfChanged(mTxComponentStatic[index].mParentOrigin[component], mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mAnchorPoint[component], mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mPivot[component], mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -849,9 +849,9 @@ void TransformManager::BakeVector3PropertyValue(TransformId id, TransformManager
       SetTransfromProperty(mTxComponentStatic[index].mParentOrigin, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      SetTransfromProperty(mTxComponentStatic[index].mAnchorPoint, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+      SetTransfromProperty(mTxComponentStatic[index].mPivot, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -888,9 +888,9 @@ void TransformManager::BakeRelativeVector3PropertyValue(TransformId id, Transfor
       mTxComponentStatic[index].mParentOrigin = mTxComponentStatic[index].mParentOrigin + value;
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      mTxComponentStatic[index].mAnchorPoint = mTxComponentStatic[index].mAnchorPoint + value;
+      mTxComponentStatic[index].mPivot = mTxComponentStatic[index].mPivot + value;
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -927,9 +927,9 @@ void TransformManager::BakeMultiplyVector3PropertyValue(TransformId id, Transfor
       mTxComponentStatic[index].mParentOrigin = mTxComponentStatic[index].mParentOrigin * value;
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      mTxComponentStatic[index].mAnchorPoint = mTxComponentStatic[index].mAnchorPoint * value;
+      mTxComponentStatic[index].mPivot = mTxComponentStatic[index].mPivot * value;
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -965,9 +965,9 @@ void TransformManager::BakeVector3PropertyComponentValue(TransformId id, Transfo
       SetTransfromPropertyIfChanged(mTxComponentStatic[index].mParentOrigin[component], mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mAnchorPoint[component], mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mPivot[component], mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -1003,9 +1003,9 @@ void TransformManager::BakeXVector3PropertyValue(TransformId id, TransformManage
       SetTransfromPropertyIfChanged(mTxComponentStatic[index].mParentOrigin.x, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mAnchorPoint.x, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mPivot.x, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -1041,9 +1041,9 @@ void TransformManager::BakeYVector3PropertyValue(TransformId id, TransformManage
       SetTransfromPropertyIfChanged(mTxComponentStatic[index].mParentOrigin.y, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mAnchorPoint.y, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mPivot.y, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -1079,9 +1079,9 @@ void TransformManager::BakeZVector3PropertyValue(TransformId id, TransformManage
       SetTransfromPropertyIfChanged(mTxComponentStatic[index].mParentOrigin.z, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
-    case TRANSFORM_PROPERTY_ANCHOR_POINT:
+    case TRANSFORM_PROPERTY_PIVOT:
     {
-      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mAnchorPoint.z, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
+      SetTransfromPropertyIfChanged(mTxComponentStatic[index].mPivot.z, mTxComponentBitField[index], mDirtyFlags, value, STATIC_COMPONENT_FLAG);
       break;
     }
     case TRANSFORM_PROPERTY_SIZE:
@@ -1138,11 +1138,11 @@ void TransformManager::GetWorldMatrixAndSize(TransformId id, Matrix& worldMatrix
   size              = mSize[index];
 }
 
-void TransformManager::SetPositionUsesAnchorPoint(TransformId id, bool value)
+void TransformManager::SetPositionUsesPivot(TransformId id, bool value)
 {
   TransformId index(mIds[id]);
 
-  TransformComponentBitField::SetPositionUsesAnchorPointBitField(mTxComponentBitField[index], value);
+  TransformComponentBitField::SetPositionUsesPivotBitField(mTxComponentBitField[index], value);
   TransformComponentBitField::SetComponentDirtyBitField(mTxComponentBitField[index], STATIC_COMPONENT_FLAG);
   mDirtyFlags |= STATIC_COMPONENT_FLAG;
 }

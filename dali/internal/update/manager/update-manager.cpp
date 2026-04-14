@@ -1221,7 +1221,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
                                uint32_t nextVSyncTimeMilliseconds,
                                bool     renderToFboEnabled,
                                bool     isRenderingToFbo,
-                               bool     uploadOnly,
+                               bool&    uploadOnly,
                                bool&    rendererAdded)
 {
   // Clear nodes/resources which were previously discarded
@@ -1367,7 +1367,15 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           DALI_TRACE_BEGIN(gTraceFilter, "DALI_PROCESS_RENDER_TASK");
           scene->scene->GetRenderInstructions().ResetAndReserve(static_cast<uint32_t>(scene->taskList->GetTasks().Count()));
 
-          bool sceneKeepUpdating = scene->scene->KeepRenderingCheck(elapsedSeconds);
+          const bool sceneForceRendering = scene->scene->NeedsForceRendering();
+
+          // Change uploadOnly flag as false if current scene requested force-rendering.
+          if(uploadOnly && sceneForceRendering)
+          {
+            uploadOnly = false;
+          }
+
+          const bool sceneKeepUpdating = scene->scene->KeepRenderingCheck(elapsedSeconds);
           if(sceneKeepUpdating)
           {
             keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
@@ -1376,7 +1384,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           // If there are animations running, only add render instruction if at least one animation is currently active (i.e. not delayed)
           // or the nodes are dirty
           // or keep rendering is requested
-          if(!isAnimationRunning || animationActive || mImpl->renderingRequired || (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || sceneKeepUpdating)
+          if(!isAnimationRunning || animationActive || mImpl->renderingRequired || (mImpl->nodeDirtyFlags & RenderableUpdateFlags) || sceneKeepUpdating || sceneForceRendering)
           {
             renderContinuously |= mImpl->renderTaskProcessor.Process(*scene->taskList,
                                                                      scene->sortedLayerList,

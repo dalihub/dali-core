@@ -22,6 +22,7 @@
 #include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/devel-api/signals/render-callback.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-task-list-integ.h>
@@ -101,8 +102,8 @@ Renderer CreateRenderer(Actor actor, Geometry geometry, Shader shader, int depth
 Actor CreateActor(Actor parent, int siblingOrder, const char* location)
 {
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  actor.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  actor.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   actor.SetProperty(Actor::Property::POSITION, Vector2(0.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   parent.Add(actor);
@@ -4821,7 +4822,7 @@ int utcDaliRendererPartialUpdateChangeUniform(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -4931,7 +4932,7 @@ int utcDaliRendererPartialUpdateAddRemoveRenderer(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -5025,7 +5026,7 @@ int utcDaliRendererPartialUpdateRenderingBehavior(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -5088,7 +5089,7 @@ int utcDaliRendererDoNotSkipRenderIfTextureSetChanged(void)
   drawTrace.Reset();
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
   application.GetScene().Add(actor);
 
@@ -6117,7 +6118,7 @@ int utcDaliRendererPartialUpdateUpdateAreaExtents(void)
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);

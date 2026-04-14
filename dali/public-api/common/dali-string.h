@@ -147,6 +147,13 @@ public:
   bool Empty() const;
 
   /**
+   * @brief Clear the string as empty.
+   *
+   * @SINCE_2_5.17
+   */
+  void Clear();
+
+  /**
    * @brief Get a pointer to a null-terminated character array
    * that is equivalent to the string content.
    *

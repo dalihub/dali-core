@@ -57,6 +57,7 @@ SET(TC_SOURCES
         utc-Dali-Mutex.cpp
         utc-Dali-Semaphore.cpp
         utc-Dali-ObjectRegistry.cpp
+        utc-Dali-OpenHashMap.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp
         utc-Dali-PanGestureRecognizer.cpp
@@ -88,6 +89,7 @@ SET(TC_SOURCES
         utc-Dali-Shader.cpp
         utc-Dali-SharedPtr.cpp
         utc-Dali-SignalDelegate.cpp
+        utc-Dali-SignalConnectionPool.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
         utc-Dali-SingletonService.cpp

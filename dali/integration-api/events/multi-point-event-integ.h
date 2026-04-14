@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_MULTI_POINT_EVENT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/events/point.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

@@ -214,7 +214,7 @@ int UtcDaliRotationGestureDetectorNew(void)
   // Attach an actor and emit a touch event on the actor to ensure complete line coverage
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -275,7 +275,7 @@ int UtcDaliRotationGestureSignalReceptionNegative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -314,7 +314,7 @@ int UtcDaliRotationGestureSignalReceptionDownMotionLeave(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -371,7 +371,7 @@ int UtcDaliRotationGestureSignalReceptionDownMotionUp(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -419,7 +419,7 @@ int UtcDaliRotationGestureSignalReceptionDetach(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -466,7 +466,7 @@ int UtcDaliRotationGestureSignalReceptionDetachWhileRotationing(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -515,7 +515,7 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
   // is destroyed.
   Actor tempActor = Actor::New();
   tempActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  tempActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  tempActor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.GetScene().Add(tempActor);
   detector.Attach(tempActor);
 
@@ -523,7 +523,7 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
   {
     Actor actor = Actor::New();
     actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     application.GetScene().Add(actor);
 
     // Render and notify
@@ -556,6 +556,60 @@ int UtcDaliRotationGestureSignalReceptionActorDestroyedWhileRotationing(void)
   // Gesture ends within the area where the actor used to be
   data.Reset();
   TestEndRotation(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 1000);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRotationGestureSignalReceptionActorBecomesInvisible(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  RotationGestureDetector detector = RotationGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start rotation within the actor's area
+  TestStartRotation(application, Vector2(2.0f, 20.0f), Vector2(38.0f, 20.0f), Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), 100);
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Continue the rotation within the actor's area
+  data.Reset();
+  TestContinueRotation(application, Vector2(10.0f, 20.0f), Vector2(30.0f, 20.0f), Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), 500);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Make the actor invisible, this should emit CANCELLED gesture during the next rotation event
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  application.SendNotification();
+  application.Render();
+
+  // Next move should trigger the gesture state as CANCELLED, and no more gestures
+  TestContinueRotation(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(18.0f, 20.0f), Vector2(22.0f, 20.0f), 800);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Try again to finish the rotation - we should not receive it since it was cancelled
+  data.Reset();
+  TestEndRotation(application, Vector2(18.0f, 20.0f), Vector2(22.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 1000);
+
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
 }
@@ -625,7 +679,7 @@ int UtcDaliRotationGestureSignalReceptionChildHit(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   // Set child to completely cover parent.
@@ -633,7 +687,7 @@ int UtcDaliRotationGestureSignalReceptionChildHit(void)
   // conversion of the parent actor is correct.
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   child.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS));
   parent.Add(child);
@@ -682,13 +736,13 @@ int UtcDaliRotationGestureSignalReceptionAttachDetachMany(void)
 
   Actor first = Actor::New();
   first.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  first.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  first.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(first);
 
   Actor second = Actor::New();
   second.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   second.SetProperty(Actor::Property::POSITION_X, 100.0f);
-  second.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  second.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(second);
 
   // Render and notify
@@ -730,7 +784,7 @@ int UtcDaliRotationGestureSignalReceptionActorBecomesUntouchable(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -763,7 +817,8 @@ int UtcDaliRotationGestureSignalReceptionActorBecomesUntouchable(void)
   // Gesture ends within actor's area
   data.Reset();
   TestEndRotation(application, Vector2(15.0f, 20.0f), Vector2(25.0f, 20.0f), Vector2(19.0f, 20.0f), Vector2(21.0f, 20.0f), 3000);
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -773,12 +828,12 @@ int UtcDaliRotationGestureSignalReceptionMultipleDetectorsOnActor(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   Actor actor2 = Actor::New();
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.GetScene().Add(actor2);
 
   // Render and notify
@@ -847,7 +902,7 @@ int UtcDaliRotationGestureSignalReceptionEnsureCorrectSignalling(void)
 
   Actor actor1 = Actor::New();
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor1);
   SignalData              data1;
   GestureReceivedFunctor  functor1(data1);
@@ -857,7 +912,7 @@ int UtcDaliRotationGestureSignalReceptionEnsureCorrectSignalling(void)
 
   Actor actor2 = Actor::New();
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   actor2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT);
   application.GetScene().Add(actor2);
   SignalData              data2;
@@ -883,7 +938,7 @@ int UtcDaliRotationGestureActorUnstaged(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -966,14 +1021,14 @@ int UtcDaliRotationGestureActorStagedAndDestroyed(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
   Actor dummyActor(Actor::New());
   dummyActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   dummyActor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
-  dummyActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  dummyActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(dummyActor);
 
   // Render and notify
@@ -1052,7 +1107,7 @@ int UtcDaliRotationGestureLayerConsumesTouch(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a detector
@@ -1065,7 +1120,7 @@ int UtcDaliRotationGestureLayerConsumesTouch(void)
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(layer);
   layer.RaiseToTop();
 
@@ -1103,7 +1158,7 @@ int UtcDaliRotationGestureDisableDetectionDuringRotationN(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a detector
@@ -1149,11 +1204,11 @@ int UtcDaliRotationGestureWhenGesturePropargation(void)
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   parentActor.Add(childActor);
   application.GetScene().Add(parentActor);
@@ -1205,7 +1260,7 @@ int UtcDaliRotationGestureSignalReceptionWithGeometryHittest(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1255,11 +1310,11 @@ int UtcDaliRotationGestureHandleEvent(void)
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   parentActor.Add(childActor);
   application.GetScene().Add(parentActor);

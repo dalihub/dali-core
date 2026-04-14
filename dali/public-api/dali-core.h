@@ -24,7 +24,6 @@
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/actors/custom-actor.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/actors/drawable-actor.h>
 #include <dali/public-api/actors/layer.h>
 
 #include <dali/public-api/animation/alpha-function.h>
@@ -51,11 +50,9 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
-#include <dali/public-api/common/list-wrapper.h>
 #include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/common/unique-ptr.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/public-api/events/device.h>
 #include <dali/public-api/events/gesture-detector.h>
@@ -122,7 +119,6 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-#include <dali/public-api/rendering/decorated-visual-renderer.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 #include <dali/public-api/rendering/geometry.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -133,7 +129,6 @@
 #include <dali/public-api/rendering/texture.h>
 #include <dali/public-api/rendering/uniform-block.h>
 #include <dali/public-api/rendering/vertex-buffer.h>
-#include <dali/public-api/rendering/visual-renderer.h>
 
 #include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>
@@ -141,7 +136,6 @@
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/signals/functor-delegate.h>
-#include <dali/public-api/signals/render-callback.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 #include <dali/public-api/signals/slot-delegate.h>

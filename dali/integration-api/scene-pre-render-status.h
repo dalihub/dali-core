@@ -2,7 +2,7 @@
 #define DALI_SCENE_PRE_RENDER_STATUS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/graphics-api/graphics-controller.h>
 #include <dali/graphics-api/graphics-render-target-create-info.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture-enumerations.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>

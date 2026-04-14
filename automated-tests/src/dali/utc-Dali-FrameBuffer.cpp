@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -623,8 +623,8 @@ int UtcDaliFrameBufferSetMultiSampingLevel(void)
   application.Render();
 
   DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
-  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
   DALI_TEST_EQUALS(DevelFrameBuffer::GetMultiSamplingLevel(frameBuffer), 4u, TEST_LOCATION);
 
@@ -859,6 +859,293 @@ int UtcDaliFrameBufferDestructWorkerThreadN(void)
 
   // Always success
   DALI_TEST_CHECK(true);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil01(void)
+{
+  TestApplication application;
+
+  // Test case 1: No depth or stencil required
+  // Create a simple renderer with no depth/stencil operations
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
+  DALI_TEST_CHECK(frameBuffer);
+
+  // Create render task with framebuffer
+  RenderTask renderTask = CreateRenderTask(application, frameBuffer);
+
+  Actor sourceActor = renderTask.GetSourceActor();
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = sourceActor.GetRendererAt(0);
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check no depth/stencil buffer be used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil02(void)
+{
+  TestApplication application;
+
+  // Test case 2: Only depth required
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
+  DALI_TEST_CHECK(frameBuffer);
+
+  // Create render task with framebuffer
+  RenderTask renderTask = CreateRenderTask(application, frameBuffer);
+
+  Actor sourceActor = renderTask.GetSourceActor();
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = sourceActor.GetRendererAt(0);
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil03(void)
+{
+  TestApplication application;
+
+  // Test case 3: Only stencil required (via clipping)
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
+  DALI_TEST_CHECK(frameBuffer);
+
+  // Create render task with framebuffer
+  RenderTask renderTask = CreateRenderTask(application, frameBuffer);
+
+  Actor sourceActor = renderTask.GetSourceActor();
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = sourceActor.GetRendererAt(0);
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  sourceActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN); // Requires stencil
+
+  application.SendNotification();
+  application.Render();
+
+  // Check stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil04(void)
+{
+  TestApplication application;
+
+  // Test case 4: Both depth and stencil required
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
+  DALI_TEST_CHECK(frameBuffer);
+
+  // Create render task with framebuffer
+  RenderTask renderTask = CreateRenderTask(application, frameBuffer);
+
+  Actor sourceActor = renderTask.GetSourceActor();
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = sourceActor.GetRendererAt(0);
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  sourceActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN); // Requires stencil
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth/stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil05(void)
+{
+  TestApplication application;
+
+  // Test case 5: Both depth and stencil required after property changed.
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
+  DALI_TEST_CHECK(frameBuffer);
+
+  // Create render task with framebuffer
+  RenderTask renderTask = CreateRenderTask(application, frameBuffer);
+
+  Actor sourceActor = renderTask.GetSourceActor();
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = sourceActor.GetRendererAt(0);
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check no depth/stencil buffer be used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  sourceActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN); // Requires stencil
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth/stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  // Keep it several frames.
+  application.SendNotification();
+  application.Render();
+
+  // Check depth/stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  // Reset buffer attachment as previous version.
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  sourceActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check not depth/stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_FALSE, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliFrameBufferAttachmentAutoRequiresDepthStencil06(void)
+{
+  TestApplication application;
+
+  auto& graphicsController = application.GetGraphicsController();
+  graphicsController.SetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_GRAPHICS_FEATURE_FLAGS,
+                                         static_cast<uint32_t>(Graphics::GraphicsFeatureFlagBits::HAS_CLIP_MATRIX_BIT));
+
+  // Test case 6: Case when graphics don't support RUNTIME_RENDERBUFFER_ATTACHMENT_CHANGE_BIT.
+  unsigned int width(64);
+  unsigned int height(64);
+  FrameBuffer  frameBuffer = FrameBuffer::New(width, height, FrameBuffer::Attachment::AUTO);
+  DALI_TEST_CHECK(frameBuffer);
+
+  // Create render task with framebuffer
+  RenderTask renderTask = CreateRenderTask(application, frameBuffer);
+
+  Actor sourceActor = renderTask.GetSourceActor();
+  sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  DALI_TEST_EQUALS(sourceActor.GetRendererCount(), 1u, TEST_LOCATION);
+
+  Renderer renderer = sourceActor.GetRendererAt(0);
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth/stencil buffer be used as default
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::ON);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  sourceActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN); // Requires stencil
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth/stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  // Keep it several frames.
+  application.SendNotification();
+  application.Render();
+
+  // Check depth/stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+
+  // Reset buffer attachment as previous version.
+  renderer.SetProperty(Renderer::Property::DEPTH_TEST_MODE, DepthTestMode::OFF);
+  renderer.SetProperty(Renderer::Property::DEPTH_WRITE_MODE, DepthWriteMode::OFF);
+
+  sourceActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::DISABLED);
+
+  application.SendNotification();
+  application.Render();
+
+  // Check depth/stencil buffer used
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferColorAttachmentCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
+  DALI_TEST_EQUALS(application.GetGlAbstraction().CheckFramebufferRenderbufferDepthStencilAttachment(), (GLenum)GL_TRUE, TEST_LOCATION);
 
   END_TEST;
 }

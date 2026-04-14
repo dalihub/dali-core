@@ -20,9 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <initializer_list>
-#include <sstream>
-#include <string>
-#include <string_view>
 #include <utility> // std::move
 
 // INTERNAL INCLUDES

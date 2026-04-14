@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // int32_t
-#include <string>
 #include <utility>
 
 // INTERNAL INCLUDES

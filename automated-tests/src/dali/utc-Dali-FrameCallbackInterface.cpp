@@ -435,7 +435,8 @@ public:
 
 public:
   FrameCallbackCustomProperty(uint32_t actorId)
-  : mActorId(actorId)
+  : mActorId(actorId),
+    mPropertyRegistered(false)
   {
   }
 
@@ -445,68 +446,113 @@ public:
 
     Property::Value ret;
 
-    // Boolean
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_BOOL_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
+    if(mPropertyRegistered)
+    {
+      // Boolean
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_BOOL_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
 
-    // Integer
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_INTEGER_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
+      // Integer
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_INTEGER_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
 
-    // Float
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_FLOAT_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
+      // Float
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_FLOAT_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
 
-    // Vector2
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR2, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_VECTOR2_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR2, CUSTOM_PROPERTY_VECTOR2_AFTER), true, TEST_LOCATION);
+      // Vector2
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR2, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_VECTOR2_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR2, CUSTOM_PROPERTY_VECTOR2_AFTER), true, TEST_LOCATION);
 
-    // Vector3
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR3, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_VECTOR3_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR3, CUSTOM_PROPERTY_VECTOR3_AFTER), true, TEST_LOCATION);
+      // Vector3
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR3, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_VECTOR3_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR3, CUSTOM_PROPERTY_VECTOR3_AFTER), true, TEST_LOCATION);
 
-    // Vector4
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR4, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_VECTOR4_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR4, CUSTOM_PROPERTY_VECTOR4_AFTER), true, TEST_LOCATION);
+      // Vector4
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR4, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_VECTOR4_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR4, CUSTOM_PROPERTY_VECTOR4_AFTER), true, TEST_LOCATION);
 
-    // Matrix3
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX3, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_MATRIX3_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX3, CUSTOM_PROPERTY_MATRIX3_AFTER), true, TEST_LOCATION);
+      // Matrix3
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX3, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_MATRIX3_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX3, CUSTOM_PROPERTY_MATRIX3_AFTER), true, TEST_LOCATION);
 
-    // Matrix
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_MATRIX_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX, CUSTOM_PROPERTY_MATRIX_AFTER), true, TEST_LOCATION);
+      // Matrix
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_MATRIX_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX, CUSTOM_PROPERTY_MATRIX_AFTER), true, TEST_LOCATION);
 
-    // Rotation (Quaternion)
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_ROTATION, ret), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_ROTATION_BEFORE, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_ROTATION, CUSTOM_PROPERTY_ROTATION_AFTER), true, TEST_LOCATION);
+      // Rotation (Quaternion)
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_ROTATION, ret), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(ret, CUSTOM_PROPERTY_ROTATION_BEFORE, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_ROTATION, CUSTOM_PROPERTY_ROTATION_AFTER), true, TEST_LOCATION);
 
-    // Invalid case
-    DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_INVALID, ret), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INVALID, Property::Value("not_matched_type")), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_VECTOR4_AFTER), false, TEST_LOCATION);
+      // Invalid case
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_INVALID, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INVALID, Property::Value("not_matched_type")), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_VECTOR4_AFTER), false, TEST_LOCATION);
 
-    // Convert type test
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
+      // Convert type test
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
 
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
 
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
-    DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_BOOL_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_INTEGER_AFTER), true, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_FLOAT_AFTER), true, TEST_LOCATION);
+    }
+    else
+    {
+      // Boolean
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_BOOL, CUSTOM_PROPERTY_BOOL_AFTER), false, TEST_LOCATION);
+
+      // Integer
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_INTEGER, CUSTOM_PROPERTY_INTEGER_AFTER), false, TEST_LOCATION);
+
+      // Float
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_FLOAT_AFTER), false, TEST_LOCATION);
+
+      // Vector2
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR2, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR2, CUSTOM_PROPERTY_VECTOR2_AFTER), false, TEST_LOCATION);
+
+      // Vector3
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR3, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR3, CUSTOM_PROPERTY_VECTOR3_AFTER), false, TEST_LOCATION);
+
+      // Vector4
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR4, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_VECTOR4, CUSTOM_PROPERTY_VECTOR4_AFTER), false, TEST_LOCATION);
+
+      // Matrix3
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX3, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX3, CUSTOM_PROPERTY_MATRIX3_AFTER), false, TEST_LOCATION);
+
+      // Matrix
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_MATRIX, CUSTOM_PROPERTY_MATRIX_AFTER), false, TEST_LOCATION);
+
+      // Rotation (Quaternion)
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_ROTATION, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_ROTATION, CUSTOM_PROPERTY_ROTATION_AFTER), false, TEST_LOCATION);
+
+      // Invalid case
+      DALI_TEST_EQUALS(updateProxy.GetCustomProperty(mActorId, CUSTOM_PROPERTY_INVALID, ret), false, TEST_LOCATION);
+      DALI_TEST_EQUALS(updateProxy.BakeCustomProperty(mActorId, CUSTOM_PROPERTY_FLOAT, CUSTOM_PROPERTY_VECTOR4_AFTER), false, TEST_LOCATION);
+    }
 
     return false;
   }
@@ -517,7 +563,13 @@ public:
     FrameCallbackBasic::Reset();
   }
 
+  void AllPropertyRegistered()
+  {
+    mPropertyRegistered = true;
+  }
+
   const uint32_t mActorId;
+  bool           mPropertyRegistered;
 };
 
 } // namespace
@@ -827,7 +879,7 @@ int UtcDaliFrameCallbackGetters(void)
   Quaternion orientation; //(Radian(Math::PI_2), Vector3::ZAXIS);
   Actor      actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
   actor.SetProperty(Actor::Property::COLOR, color);
   actor.SetProperty(Actor::Property::POSITION, position);
@@ -887,7 +939,7 @@ int UtcDaliFrameCallbackSetters(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
   Stage stage = Stage::GetCurrent();
@@ -958,7 +1010,7 @@ int UtcDaliFrameCallbackBake(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
   Stage stage = Stage::GetCurrent();
@@ -1056,56 +1108,56 @@ int UtcDaliFrameCallbackMultipleActors(void)
 
   Actor actorA = Actor::New();
   actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actorA.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::SIZE, sizes['A']);
   actorA.SetProperty(Actor::Property::POSITION, positions['A']);
   stage.Add(actorA);
 
   Actor actorB = Actor::New();
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT);
-  actorB.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorB.SetProperty(Actor::Property::SIZE, sizes['B']);
   actorB.SetProperty(Actor::Property::POSITION, positions['B']);
   actorA.Add(actorB);
 
   Actor actorC = Actor::New();
   actorC.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER);
-  actorC.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER);
+  actorC.SetProperty(Actor::Property::PIVOT, Pivot::TOP_CENTER);
   actorC.SetProperty(Actor::Property::SIZE, sizes['C']);
   actorC.SetProperty(Actor::Property::POSITION, positions['C']);
   actorB.Add(actorC);
 
   Actor actorD = Actor::New();
   actorD.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT);
-  actorD.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  actorD.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   actorD.SetProperty(Actor::Property::SIZE, sizes['D']);
   actorD.SetProperty(Actor::Property::POSITION, positions['D']);
   actorA.Add(actorD);
 
   Actor actorE = Actor::New();
   actorE.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_LEFT);
-  actorE.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  actorE.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   actorE.SetProperty(Actor::Property::SIZE, sizes['E']);
   actorE.SetProperty(Actor::Property::POSITION, positions['E']);
   stage.Add(actorE);
 
   Actor actorF = Actor::New();
   actorF.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
-  actorF.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_CENTER);
+  actorF.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_CENTER);
   actorF.SetProperty(Actor::Property::SIZE, sizes['F']);
   actorF.SetProperty(Actor::Property::POSITION, positions['F']);
   actorE.Add(actorF);
 
   Actor actorG = Actor::New();
   actorG.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER_RIGHT);
-  actorG.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER_LEFT);
+  actorG.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
   actorG.SetProperty(Actor::Property::SIZE, sizes['G']);
   actorG.SetProperty(Actor::Property::POSITION, positions['G']);
   actorE.Add(actorG);
 
   Actor actorH = Actor::New();
   actorH.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
-  actorH.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_LEFT);
+  actorH.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   actorH.SetProperty(Actor::Property::SIZE, sizes['H']);
   actorH.SetProperty(Actor::Property::POSITION, positions['H']);
   actorG.Add(actorH);
@@ -1162,7 +1214,7 @@ int UtcDaliFrameCallbackCheckActorNotAdded(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, Vector2(200, 300));
 
   Stage                 stage = Stage::GetCurrent();
@@ -1558,7 +1610,7 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
   Stage stage = Stage::GetCurrent();
@@ -1762,8 +1814,17 @@ int UtcDaliFrameCallbackCustomPropertyGetBake(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
+
+  Stage stage = Stage::GetCurrent();
+  stage.Add(actor);
+
+  FrameCallbackCustomProperty frameCallback(actor.GetProperty<int>(Actor::Property::ID));
+  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+
+  application.SendNotification();
+  application.Render();
 
   // Register custom properties for all types
   auto customPropertyBoolIndex     = actor.RegisterProperty(FrameCallbackCustomProperty::CUSTOM_PROPERTY_BOOL, FrameCallbackCustomProperty::CUSTOM_PROPERTY_BOOL_BEFORE);
@@ -1776,11 +1837,7 @@ int UtcDaliFrameCallbackCustomPropertyGetBake(void)
   auto customPropertyMatrixIndex   = actor.RegisterProperty(FrameCallbackCustomProperty::CUSTOM_PROPERTY_MATRIX, FrameCallbackCustomProperty::CUSTOM_PROPERTY_MATRIX_BEFORE);
   auto customPropertyRotationIndex = actor.RegisterProperty(FrameCallbackCustomProperty::CUSTOM_PROPERTY_ROTATION, FrameCallbackCustomProperty::CUSTOM_PROPERTY_ROTATION_BEFORE);
 
-  Stage stage = Stage::GetCurrent();
-  stage.Add(actor);
-
-  FrameCallbackCustomProperty frameCallback(actor.GetProperty<int>(Actor::Property::ID));
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  frameCallback.AllPropertyRegistered();
 
   application.SendNotification();
   application.Render();

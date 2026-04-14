@@ -116,7 +116,7 @@ int UtcDaliGeoHitTestAlgorithmWithFunctor(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::NAME, "NonHittableActor");
   stage.Add(actor);
 
@@ -165,14 +165,14 @@ int UtcDaliGeoHitTestAlgorithmOrtho01(void)
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   blue.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(1.0f / 3.0f, 1.0f / 3.0f, 0.5f));
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   green.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(2.0f / 3.0f, 2.0f / 3.0f, 0.5f));
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
@@ -224,14 +224,14 @@ int UtcDaliGeoHitTestAlgorithmOrtho02(void)
   // Create two actors with half the size of the stage and set them to be partially overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   blue.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.2f, 0.2f, 0.5f));
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   green.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.4f, 0.4f, 0.5f));
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
@@ -289,14 +289,14 @@ int UtcDaliGeoHitTestAlgorithmClippingActor(void)
 
   // Create a layer
   Layer layer = Layer::New();
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
   stage.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
-  clippingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::SIZE, Vector2(50.0f, 50.0f));
   clippingActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
@@ -306,7 +306,7 @@ int UtcDaliGeoHitTestAlgorithmClippingActor(void)
   // Create a renderable actor and add it to the clipping actor.
   Actor childActor = CreateRenderableActor();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   childActor.SetProperty(Actor::Property::NAME, "childActor");
   clippingActor.Add(childActor);
@@ -342,14 +342,14 @@ int UtcDaliGeoHitTestAlgorithmClippingActorStress(void)
 
   // Create a layer
   Layer layer = Layer::New();
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
   stage.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
-  clippingActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  clippingActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   clippingActor.SetProperty(Actor::Property::SIZE, Vector2(220.0f, 220.0f));
   clippingActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
@@ -367,7 +367,7 @@ int UtcDaliGeoHitTestAlgorithmClippingActorStress(void)
     Actor childActor = CreateRenderableActor();
     childActor.SetProperty(Actor::Property::SIZE, Vector2(220.0f, 220.0f));
     childActor.SetProperty(Actor::Property::POSITION, Vector2(200.0f / depthMax, 200.0f / depthMax));
-    childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     childActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
     childActor.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
     childActor.SetProperty(Actor::Property::NAME, tmp);
@@ -416,14 +416,14 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::DRAW_MODE, DrawMode::OVERLAY_2D);
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   blue.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(1.0f / 3.0f, 1.0f / 3.0f, 0.5f));
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION_Z, 30.0f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   green.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(2.0f / 3.0f, 2.0f / 3.0f, 0.5f));
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
@@ -456,7 +456,7 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   // Create new actor child as blue. It will be shown over the blue, and green.
   Actor red = Actor::New();
   red.SetProperty(Actor::Property::NAME, "Red");
-  red.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  red.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   red.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   red.SetProperty(Actor::Property::POSITION, Vector2(actorSize.x * 5.0f / 6.0f, -actorSize.y * 1.0f / 6.0f));
   red.SetProperty(Actor::Property::SIZE, actorSize);
@@ -538,14 +538,14 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -557,7 +557,7 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -596,14 +596,14 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::ANCHOR_POINT]         = AnchorPoint::CENTER;
+  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
@@ -616,7 +616,7 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
   RenderTask     offRenderTask2 = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(cameraActor);
 
@@ -667,14 +667,14 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay01(void)
   // Create two actors with half the size of the stage and set them to be overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   blue.SetProperty(Actor::Property::SIZE, actorSize);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
@@ -744,26 +744,26 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay02(void)
   // Create two actors with half the size of the stage and set them to be partial-overlapping
   Actor blue = Actor::New();
   blue.SetProperty(Actor::Property::NAME, "Blue");
-  blue.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  blue.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  blue.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  blue.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   blue.SetProperty(Actor::Property::SIZE, actorSize);
   blue.SetProperty(Actor::Property::POSITION, -actorSize * 0.25f);
 
   Actor green = Actor::New();
   green.SetProperty(Actor::Property::NAME, "Green");
-  green.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  green.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  green.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  green.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   green.SetProperty(Actor::Property::SIZE, actorSize);
   green.SetProperty(Actor::Property::POSITION, actorSize * 0.25f);
 
   Actor red = Actor::New();
   red.SetProperty(Actor::Property::NAME, "Red");
-  red.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
-  red.SetProperty(Actor::Property::PARENT_ORIGIN, AnchorPoint::CENTER);
+  red.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  red.SetProperty(Actor::Property::PARENT_ORIGIN, Pivot::CENTER);
   red.SetProperty(Actor::Property::SIZE, offscreenSize * 0.5f);
 
   Dali::CameraActor offscreenCameraActor                     = Dali::CameraActor::New(offscreenSize);
-  offscreenCameraActor[Dali::Actor::Property::ANCHOR_POINT]  = AnchorPoint::CENTER;
+  offscreenCameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
   offscreenCameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
   stage.Add(offscreenCameraActor);
 

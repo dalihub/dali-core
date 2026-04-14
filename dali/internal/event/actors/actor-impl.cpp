@@ -80,10 +80,10 @@ DALI_PROPERTY("parentOrigin", VECTOR3, true, false, true, Dali::Actor::Property:
 DALI_PROPERTY("parentOriginX", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_X)
 DALI_PROPERTY("parentOriginY", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Y)
 DALI_PROPERTY("parentOriginZ", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Z)
-DALI_PROPERTY("anchorPoint", VECTOR3, true, false, true, Dali::Actor::Property::ANCHOR_POINT)
-DALI_PROPERTY("anchorPointX", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_X)
-DALI_PROPERTY("anchorPointY", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Y)
-DALI_PROPERTY("anchorPointZ", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Z)
+DALI_PROPERTY("pivot", VECTOR3, true, false, true, Dali::Actor::Property::PIVOT)
+DALI_PROPERTY("pivotX", FLOAT, true, false, true, Dali::Actor::Property::PIVOT_X)
+DALI_PROPERTY("pivotY", FLOAT, true, false, true, Dali::Actor::Property::PIVOT_Y)
+DALI_PROPERTY("pivotZ", FLOAT, true, false, true, Dali::Actor::Property::PIVOT_Z)
 DALI_PROPERTY("size", VECTOR3, true, true, true, Dali::Actor::Property::SIZE)
 DALI_PROPERTY("sizeWidth", FLOAT, true, true, true, Dali::Actor::Property::SIZE_WIDTH)
 DALI_PROPERTY("sizeHeight", FLOAT, true, true, true, Dali::Actor::Property::SIZE_HEIGHT)
@@ -133,7 +133,7 @@ DALI_PROPERTY("layoutDirection", STRING, true, false, false, Dali::Actor::Proper
 DALI_PROPERTY("inheritLayoutDirection", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION)
 DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::Actor::Property::OPACITY)
 DALI_PROPERTY("screenPosition", VECTOR2, false, false, false, Dali::Actor::Property::SCREEN_POSITION)
-DALI_PROPERTY("positionUsesAnchorPoint", BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_ANCHOR_POINT)
+DALI_PROPERTY("positionUsesPivot", BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_PIVOT)
 DALI_PROPERTY("culled", BOOLEAN, false, false, true, Dali::Actor::Property::CULLED)
 DALI_PROPERTY("id", INTEGER, false, false, false, Dali::Actor::Property::ID)
 DALI_PROPERTY("hierarchyDepth", INTEGER, false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH)
@@ -488,31 +488,31 @@ const Vector3& Actor::GetCurrentParentOrigin() const
   return (mParentOrigin) ? *mParentOrigin : ParentOrigin::DEFAULT;
 }
 
-void Actor::SetAnchorPoint(const Vector3& anchor)
+void Actor::SetPivot(const Vector3& anchor)
 {
   // node is being used in a separate thread; queue a message to set the value & base value
-  SetAnchorPointMessage(GetEventThreadServices(), GetNode(), anchor);
+  SetPivotMessage(GetEventThreadServices(), GetNode(), anchor);
 
   // Cache for event-thread access
-  if(!mAnchorPoint)
+  if(!mPivot)
   {
     // not allocated, check if different from default
-    if(AnchorPoint::DEFAULT != anchor)
+    if(Pivot::DEFAULT != anchor)
     {
-      mAnchorPoint = new Vector3(anchor);
+      mPivot = new Vector3(anchor);
     }
   }
   else
   {
     // check if different from current costs more than just set
-    *mAnchorPoint = anchor;
+    *mPivot = anchor;
   }
 }
 
-const Vector3& Actor::GetCurrentAnchorPoint() const
+const Vector3& Actor::GetCurrentPivot() const
 {
   // Cached for event-thread access
-  return (mAnchorPoint) ? *mAnchorPoint : AnchorPoint::DEFAULT;
+  return (mPivot) ? *mPivot : Pivot::DEFAULT;
 }
 
 void Actor::SetPosition(const Vector3& position)
@@ -1231,7 +1231,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mRenderers(nullptr),
   mCacheRenderers(nullptr),
   mParentOrigin(nullptr),
-  mAnchorPoint(nullptr),
+  mPivot(nullptr),
   mGestureData(nullptr),
   mInterceptTouchedSignal(),
   mTouchedSignal(),
@@ -1266,7 +1266,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mInheritPosition(true),
   mInheritOrientation(true),
   mInheritScale(true),
-  mPositionUsesAnchorPoint(true),
+  mPositionUsesPivot(true),
   mVisible(true),
   mInheritLayoutDirection(true),
   mCaptureAllTouchAfterStart(false),
@@ -1338,7 +1338,7 @@ Actor::~Actor()
 
   // Cleanup optional parent origin and anchor
   delete mParentOrigin;
-  delete mAnchorPoint;
+  delete mPivot;
 }
 
 void Actor::Add(Actor& child, bool notify)
@@ -1748,9 +1748,9 @@ Rect<> Actor::CalculateCurrentScreenExtents() const
   }
 }
 
-Vector3 Actor::GetAnchorPointForPosition() const
+Vector3 Actor::GetPivotForPosition() const
 {
-  return (mPositionUsesAnchorPoint ? GetCurrentAnchorPoint() : AnchorPoint::TOP_LEFT);
+  return (mPositionUsesPivot ? GetCurrentPivot() : Pivot::TOP_LEFT);
 }
 
 bool Actor::GetCachedPropertyValue(Property::Index index, Property::Value& value) const

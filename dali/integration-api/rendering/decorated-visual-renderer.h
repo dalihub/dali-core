@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/rendering/visual-renderer.h>
+#include <dali/integration-api/rendering/visual-renderer.h>
 
 namespace Dali
 {

@@ -45,7 +45,7 @@ DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY("transformOffset", VECTOR2, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_OFFSET)
 DALI_PROPERTY("transformSize", VECTOR2, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_SIZE)
 DALI_PROPERTY("transformOrigin", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_ORIGIN)
-DALI_PROPERTY("transformAnchorPoint", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT)
+DALI_PROPERTY("transformPivot", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_PIVOT)
 DALI_PROPERTY("transformOffsetSizeMode", VECTOR4, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE)
 DALI_PROPERTY("extraSize", VECTOR2, true, true, true, Dali::VisualRenderer::Property::EXTRA_SIZE)
 DALI_PROPERTY("visualMixColor", VECTOR3, true, false, true, Dali::VisualRenderer::Property::VISUAL_MIX_COLOR)
@@ -96,7 +96,7 @@ inline constexpr bool IsVisualPropertyIndex(Property::Index index)
 {
   return IsAnimatableVisualPropertyIndex(index) ||
          (index == Dali::VisualRenderer::Property::TRANSFORM_ORIGIN) ||
-         (index == Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT) ||
+         (index == Dali::VisualRenderer::Property::TRANSFORM_PIVOT) ||
          (index == Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
 }
 
@@ -180,9 +180,9 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
         break;
       }
 
-      case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
       {
-        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformAnchorPoint, mVisualProperties->mTransformAnchorPoint);
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformPivot, mVisualProperties->mTransformPivot);
         break;
       }
 
@@ -249,9 +249,9 @@ Property::Value VisualRenderer::GetDefaultProperty(Property::Index index) const
         value = mPropertyCache->mTransformOrigin;
         break;
       }
-      case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
       {
-        value = mPropertyCache->mTransformAnchorPoint;
+        value = mPropertyCache->mTransformPivot;
         break;
       }
       case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
@@ -335,15 +335,15 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
         }
         break;
       }
-      case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
       {
         if(mVisualProperties)
         {
-          value = mVisualProperties->mTransformAnchorPoint.Get();
+          value = mVisualProperties->mTransformPivot.Get();
         }
         else
         {
-          value = mPropertyCache->mTransformAnchorPoint;
+          value = mPropertyCache->mTransformPivot;
         }
         break;
       }
@@ -510,9 +510,9 @@ const PropertyInputImpl* VisualRenderer::GetSceneObjectInputProperty(Property::I
     {
       return &mVisualProperties->mTransformOrigin;
     }
-    case Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT:
+    case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
     {
-      return &mVisualProperties->mTransformAnchorPoint;
+      return &mVisualProperties->mTransformPivot;
     }
     case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
     {
@@ -567,7 +567,7 @@ void VisualRenderer::EnsureVisualPropertiesAndCache() const
     AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_SIZE, ConstString("size"));
     AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE, ConstString("offsetSizeMode"));
     AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ORIGIN, ConstString("origin"));
-    AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_ANCHOR_POINT, ConstString("anchorPoint"));
+    AddUniformMapping(Dali::VisualRenderer::Property::TRANSFORM_PIVOT, ConstString("pivot"));
     AddUniformMapping(Dali::VisualRenderer::Property::EXTRA_SIZE, ConstString("extraSize"));
   }
 }

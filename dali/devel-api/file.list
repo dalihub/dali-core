@@ -6,6 +6,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/actors/actor-devel.cpp
   ${devel_api_src_dir}/actors/camera-actor-devel.cpp
   ${devel_api_src_dir}/actors/custom-actor-devel.cpp
+  ${devel_api_src_dir}/actors/drawable-actor.cpp
   ${devel_api_src_dir}/animation/animation-data.cpp
   ${devel_api_src_dir}/animation/animation-devel.cpp
   ${devel_api_src_dir}/animation/key-frames-devel.cpp
@@ -37,6 +38,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/rendering/frame-buffer-devel.cpp
   ${devel_api_src_dir}/rendering/renderer-devel.cpp
   ${devel_api_src_dir}/rendering/texture-devel.cpp
+  ${devel_api_src_dir}/rendering/vertex-buffer-devel.cpp
   ${devel_api_src_dir}/scripting/scripting.cpp
   ${devel_api_src_dir}/signals/signal-delegate.cpp
   ${devel_api_src_dir}/threading/conditional-wait.cpp
@@ -50,9 +52,10 @@ SET( devel_api_src_files
 # Add devel header files here DALi internal developer files used by Adaptor & Toolkit
 SET( devel_api_core_actors_header_files
   ${devel_api_src_dir}/actors/actor-devel.h
-  ${devel_api_src_dir}/actors/custom-actor-devel.h
-  ${devel_api_src_dir}/actors/layer-devel.h
   ${devel_api_src_dir}/actors/camera-actor-devel.h
+  ${devel_api_src_dir}/actors/custom-actor-devel.h
+  ${devel_api_src_dir}/actors/drawable-actor.h
+  ${devel_api_src_dir}/actors/layer-devel.h
 )
 
 SET( devel_api_core_addons_header_files
@@ -73,15 +76,17 @@ SET( devel_api_core_common_header_files
   ${devel_api_src_dir}/common/bitwise-enum.h
   ${devel_api_src_dir}/common/capabilities.h
   ${devel_api_src_dir}/common/circular-queue.h
-  ${devel_api_src_dir}/common/hash.h
   ${devel_api_src_dir}/common/free-list.h
-  ${devel_api_src_dir}/common/singleton-service.h
+  ${devel_api_src_dir}/common/hash.h
+  ${devel_api_src_dir}/common/list-wrapper.h
   ${devel_api_src_dir}/common/map-wrapper.h
   ${devel_api_src_dir}/common/owner-container.h
   ${devel_api_src_dir}/common/ref-counted-dali-vector.h
   ${devel_api_src_dir}/common/set-wrapper.h
+  ${devel_api_src_dir}/common/singleton-service.h
   ${devel_api_src_dir}/common/stage-devel.h
   ${devel_api_src_dir}/common/stage.h
+  ${devel_api_src_dir}/common/vector-wrapper.h
 )
 
 
@@ -122,11 +127,14 @@ SET( devel_api_core_rendering_header_files
   ${devel_api_src_dir}/rendering/frame-buffer-devel.h
   ${devel_api_src_dir}/rendering/renderer-devel.h
   ${devel_api_src_dir}/rendering/texture-devel.h
+  ${devel_api_src_dir}/rendering/vertex-buffer-devel.h
 )
 
 
 SET( devel_api_core_signals_header_files
+  ${devel_api_src_dir}/signals/render-callback.h
   ${devel_api_src_dir}/signals/signal-delegate.h
+  ${devel_api_src_dir}/signals/vertex-buffer-update-callback.h
 )
 
 

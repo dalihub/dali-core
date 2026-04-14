@@ -22,10 +22,10 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/event/animation/key-frame-channel.h>
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/key-frames.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 
 namespace Dali

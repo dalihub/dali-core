@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/events/gesture-event.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/ref-object.h>

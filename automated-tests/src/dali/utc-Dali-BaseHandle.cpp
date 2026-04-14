@@ -480,7 +480,7 @@ int UtcDaliBaseHandleConnectSignal(void)
 
   // get the root layer
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector2(240, 400));
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));

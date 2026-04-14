@@ -7,7 +7,6 @@ SET( public_api_src_files
   ${public_api_src_dir}/actors/camera-actor.cpp
   ${public_api_src_dir}/actors/custom-actor.cpp
   ${public_api_src_dir}/actors/custom-actor-impl.cpp
-  ${public_api_src_dir}/actors/drawable-actor.cpp
   ${public_api_src_dir}/actors/layer.cpp
   ${public_api_src_dir}/animation/animation.cpp
   ${public_api_src_dir}/animation/alpha-function.cpp
@@ -68,7 +67,6 @@ SET( public_api_src_files
   ${public_api_src_dir}/object/ref-object.cpp
   ${public_api_src_dir}/render-tasks/render-task.cpp
   ${public_api_src_dir}/render-tasks/render-task-list.cpp
-  ${public_api_src_dir}/rendering/decorated-visual-renderer.cpp
   ${public_api_src_dir}/rendering/frame-buffer.cpp
   ${public_api_src_dir}/rendering/geometry.cpp
   ${public_api_src_dir}/rendering/renderer.cpp
@@ -78,10 +76,10 @@ SET( public_api_src_files
   ${public_api_src_dir}/rendering/texture-set.cpp
   ${public_api_src_dir}/rendering/uniform-block.cpp
   ${public_api_src_dir}/rendering/vertex-buffer.cpp
-  ${public_api_src_dir}/rendering/visual-renderer.cpp
   ${public_api_src_dir}/signals/callback.cpp
   ${public_api_src_dir}/signals/connection-tracker.cpp
   ${public_api_src_dir}/signals/connection-tracker-interface.cpp
+  ${public_api_src_dir}/signals/signal-connection-pool.cpp
   ${public_api_src_dir}/signals/signal-slot-connections.cpp
   ${public_api_src_dir}/signals/signal-slot-observers.cpp
   ${public_api_src_dir}/signals/base-signal.cpp
@@ -103,7 +101,6 @@ SET( public_api_core_actors_header_files
   ${public_api_src_dir}/actors/camera-actor.h
   ${public_api_src_dir}/actors/custom-actor.h
   ${public_api_src_dir}/actors/custom-actor-impl.h
-  ${public_api_src_dir}/actors/drawable-actor.h
   ${public_api_src_dir}/actors/draw-mode.h
   ${public_api_src_dir}/actors/layer.h
 )
@@ -137,11 +134,9 @@ SET( public_api_core_common_header_files
   ${public_api_src_dir}/common/dali-vector.h
   ${public_api_src_dir}/common/extents.h
   ${public_api_src_dir}/common/intrusive-ptr.h
-  ${public_api_src_dir}/common/list-wrapper.h
   ${public_api_src_dir}/common/shared-ptr.h
   ${public_api_src_dir}/common/type-traits.h
   ${public_api_src_dir}/common/unique-ptr.h
-  ${public_api_src_dir}/common/vector-wrapper.h
 )
 
 
@@ -226,7 +221,6 @@ SET( public_api_core_render_tasks_header_files
 
 
 SET( public_api_core_rendering_header_files
-  ${public_api_src_dir}/rendering/decorated-visual-renderer.h
   ${public_api_src_dir}/rendering/frame-buffer.h
   ${public_api_src_dir}/rendering/geometry.h
   ${public_api_src_dir}/rendering/renderer.h
@@ -237,7 +231,6 @@ SET( public_api_core_rendering_header_files
   ${public_api_src_dir}/rendering/texture-set.h
   ${public_api_src_dir}/rendering/uniform-block.h
   ${public_api_src_dir}/rendering/vertex-buffer.h
-  ${public_api_src_dir}/rendering/visual-renderer.h
 )
 
 
@@ -253,10 +246,10 @@ SET( public_api_core_signals_header_files
   ${public_api_src_dir}/signals/connection-tracker.h
   ${public_api_src_dir}/signals/dali-signal.h
   ${public_api_src_dir}/signals/functor-delegate.h
+  ${public_api_src_dir}/signals/signal-connection-pool.h
   ${public_api_src_dir}/signals/signal-slot-connections.h
   ${public_api_src_dir}/signals/signal-slot-observers.h
   ${public_api_src_dir}/signals/slot-delegate.h
-  ${public_api_src_dir}/signals/render-callback.h
 )
 
 

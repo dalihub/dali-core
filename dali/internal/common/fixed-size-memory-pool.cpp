@@ -19,9 +19,9 @@
 #include <dali/internal/common/fixed-size-memory-pool.h>
 
 // INTERNAL HEADERS
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <cmath>
 
 namespace Dali

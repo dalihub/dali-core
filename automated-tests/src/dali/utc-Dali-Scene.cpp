@@ -747,7 +747,7 @@ int UtcDaliSceneTouchedSignalP(void)
   // Add an actor to the scene.
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.TouchedSignal().Connect(&DummyTouchCallback);
   scene.Add(actor);
@@ -870,7 +870,7 @@ int UtcDaliSceneTouchedSignalN(void)
   // Add an actor to the scene.
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.TouchedSignal().Connect(&DummyTouchCallback);
   scene.Add(actor);
@@ -1245,7 +1245,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1317,7 +1317,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1396,7 +1396,7 @@ int UtcDaliSceneScreenRotatedWithAngle90(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1475,7 +1475,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle90(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1554,7 +1554,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1632,7 +1632,7 @@ int UtcDaliSceneScreenRotatedWithAngle180(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1710,7 +1710,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle180(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1782,7 +1782,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1861,7 +1861,7 @@ int UtcDaliSceneScreenRotatedWithAngle270(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -1940,7 +1940,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle270(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -2017,7 +2017,7 @@ int UtcDaliSceneSetSurfaceRotationCompletedAcknowledgementWithAngle90(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -2098,7 +2098,7 @@ int UtcDaliSceneSetScreenRotationCompletedAcknowledgementWithAngle90(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -2179,7 +2179,7 @@ int UtcDaliSceneSetSurfaceAndScreenRotationCompletedAcknowledgementWithAngle90(v
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -2262,7 +2262,7 @@ int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
@@ -2971,7 +2971,7 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
   DALI_TEST_CHECK(scene);
 
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   scene.Add(actor);
@@ -3105,7 +3105,7 @@ int UtcDaliSceneGeoTouchedEnabledDisabled(void)
   // Add an actor to the scene.
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.TouchedSignal().Connect(&DummyTouchCallback);
   scene.Add(actor);
@@ -3340,6 +3340,171 @@ int UtcDaliSceneDestructWorkerThreadN(void)
   END_TEST;
 }
 
+int UtcDaliSceneSetForceRenderingP(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetForceRendering");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  Actor actor = CreateRenderableActor();
+  scene.Add(actor);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for the next 5 frames
+  scene.SetForceRendering(5u);
+
+  application.SendNotification();
+
+  // Test that core wants to keep rendering for 5 frames, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating); // After 5 frames rendering, we don't need to keep rendering next frame.
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  // Force rendering for the next 3 frames
+  scene.SetForceRendering(3u);
+  application.SendNotification();
+
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+
+  // Force rendering for the next 3 frames again
+  scene.SetForceRendering(3u);
+  application.SendNotification();
+
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+
+  // No effect if we try to request more smaller frames request.
+  scene.SetForceRendering(1u);
+  application.SendNotification();
+
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating); // After 3 frames rendering, we don't need to keep rendering next frame.
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetForceRenderingN(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetForceRendering with zero frames");
+
+  Dali::Integration::Scene scene = application.GetScene();
+
+  Actor actor = CreateRenderableActor();
+  scene.Add(actor);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for 0 frames - should not affect rendering
+  scene.SetForceRendering(0u);
+
+  application.SendNotification();
+
+  // Test that core does not want to keep rendering, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
+int UtcDaliSceneSetForceRenderingMultipleScene(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Scene::SetForceRendering with multiple scenes");
+
+  auto defaultScene = application.GetScene();
+
+  Actor actor1 = CreateRenderableActor();
+  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  defaultScene.Add(actor1);
+
+  // Create another Scene
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  application.AddScene(scene);
+
+  Actor actor2 = CreateRenderableActor();
+  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
+  scene.Add(actor2);
+
+  // Run core until it wants to sleep
+  bool keepUpdating(true);
+  while(keepUpdating)
+  {
+    application.SendNotification();
+    keepUpdating = application.Render();
+  }
+  keepUpdating = application.Render();
+
+  // Force rendering for the default scene and second scene.
+  defaultScene.SetForceRendering(2u);
+  scene.SetForceRendering(3u);
+
+  application.SendNotification();
+
+  // Test that core wants to keep rendering for 3 frames, with uploadOnly flags
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating);
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(keepUpdating); // Second scene still need to render frames
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating); // After 3 frames
+  keepUpdating = application.Render(1000.0f, TEST_LOCATION, true);
+  DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
+  DALI_TEST_CHECK(!keepUpdating);
+
+  END_TEST;
+}
+
 int UtcDaliSceneRequestFullUpdatePartialRendering(void)
 {
   tet_infoline("Test that RequestFullUpdate() properly full-update");
@@ -3357,7 +3522,7 @@ int UtcDaliSceneRequestFullUpdatePartialRendering(void)
 
   // Create an actor to generate dirty rects
   Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   scene.Add(actor);
@@ -3398,7 +3563,7 @@ int UtcDaliSceneRequestFullUpdatePartialRendering(void)
 
   // Create new actor and remove old actor to generate dirty rects
   Actor actor2 = CreateRenderableActor();
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor2.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 16.0f, 0.0f));
   scene.Add(actor2);
 

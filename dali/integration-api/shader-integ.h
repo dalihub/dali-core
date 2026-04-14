@@ -23,8 +23,8 @@
 #include <string_view> // std::string_view
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-string-view.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/rendering/shader.h>
 #include <dali/public-api/rendering/uniform-block.h>
 

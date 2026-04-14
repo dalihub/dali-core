@@ -25,15 +25,21 @@ namespace SceneGraph
 {
 void UniformMap::MappingChanged()
 {
-  ++mChangeCounter;
+  ++(mImpl->mChangeCounter);
 }
 
 void UniformMap::Add(UniformPropertyMapping newMap)
 {
-  auto iter = mUniformMaps.lower_bound(newMap.uniformName);
-  if(iter == mUniformMaps.end() || ConstStringComparator()(newMap.uniformName, iter->first))
+  if(!mImpl)
   {
-    mUniformMaps.insert(iter, {newMap.uniformName, newMap});
+    mImpl = std::make_unique<UniformMap::Impl>();
+  }
+  auto& uniformMaps = mImpl->mUniformMaps;
+
+  auto iter = uniformMaps.lower_bound(newMap.uniformName);
+  if(iter == uniformMaps.end() || ConstStringComparator()(newMap.uniformName, iter->first))
+  {
+    uniformMaps.insert(iter, {newMap.uniformName, newMap});
   }
   else
   {
@@ -45,23 +51,30 @@ void UniformMap::Add(UniformPropertyMapping newMap)
 
 void UniformMap::Remove(ConstString uniformName)
 {
-  auto iter = mUniformMaps.find(uniformName);
-  if(iter != mUniformMaps.end())
+  if(!mImpl)
   {
-    mUniformMaps.erase(iter);
+    return;
+  }
+  auto& uniformMaps = mImpl->mUniformMaps;
+
+  auto iter = uniformMaps.find(uniformName);
+  if(iter != uniformMaps.end())
+  {
+    uniformMaps.erase(iter);
     MappingChanged();
   }
 }
 
 const PropertyInputImpl* UniformMap::Find(ConstString uniformName) const
 {
-  auto iter = mUniformMaps.find(uniformName);
-  return (iter != mUniformMaps.end()) ? iter->second.propertyPtr : nullptr;
-}
+  if(!mImpl)
+  {
+    return nullptr;
+  }
+  auto& uniformMaps = mImpl->mUniformMaps;
 
-UniformMap::SizeType UniformMap::Count() const
-{
-  return static_cast<UniformMap::SizeType>(mUniformMaps.size());
+  auto iter = uniformMaps.find(uniformName);
+  return (iter != uniformMaps.end()) ? iter->second.propertyPtr : nullptr;
 }
 
 } // namespace SceneGraph

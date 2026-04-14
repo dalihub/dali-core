@@ -75,11 +75,15 @@ int UtcDaliVectorInt(void)
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1), intvector.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2), intvector.Capacity(), TEST_LOCATION);
   DALI_TEST_EQUALS(11, intvector[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(11, intvector.Front(), TEST_LOCATION);
+  DALI_TEST_EQUALS(11, intvector.Back(), TEST_LOCATION);
 
   intvector.PushBack(99);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2), intvector.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2), intvector.Capacity(), TEST_LOCATION);
   DALI_TEST_EQUALS(99, intvector[1], TEST_LOCATION);
+  DALI_TEST_EQUALS(11, intvector.Front(), TEST_LOCATION);
+  DALI_TEST_EQUALS(99, intvector.Back(), TEST_LOCATION);
 
   intvector.PushBack(34);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), intvector.Count(), TEST_LOCATION);
@@ -87,6 +91,26 @@ int UtcDaliVectorInt(void)
   DALI_TEST_EQUALS(11, intvector[0], TEST_LOCATION);
   DALI_TEST_EQUALS(99, intvector[1], TEST_LOCATION);
   DALI_TEST_EQUALS(34, intvector[2], TEST_LOCATION);
+  DALI_TEST_EQUALS(11, intvector.Front(), TEST_LOCATION);
+  DALI_TEST_EQUALS(34, intvector.Back(), TEST_LOCATION);
+
+  intvector.Front() = 22;
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), intvector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6), intvector.Capacity(), TEST_LOCATION);
+  DALI_TEST_EQUALS(22, intvector[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(99, intvector[1], TEST_LOCATION);
+  DALI_TEST_EQUALS(34, intvector[2], TEST_LOCATION);
+  DALI_TEST_EQUALS(22, intvector.Front(), TEST_LOCATION);
+  DALI_TEST_EQUALS(34, intvector.Back(), TEST_LOCATION);
+
+  intvector.Back() = 55;
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(3), intvector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6), intvector.Capacity(), TEST_LOCATION);
+  DALI_TEST_EQUALS(22, intvector[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(99, intvector[1], TEST_LOCATION);
+  DALI_TEST_EQUALS(55, intvector[2], TEST_LOCATION);
+  DALI_TEST_EQUALS(22, intvector.Front(), TEST_LOCATION);
+  DALI_TEST_EQUALS(55, intvector.Back(), TEST_LOCATION);
 
   intvector.Clear();
   DALI_TEST_EQUALS(ZERO, intvector.Count(), TEST_LOCATION);
@@ -94,6 +118,8 @@ int UtcDaliVectorInt(void)
   intvector.PushBack(123);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(1), intvector.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(123, intvector[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(123, intvector.Front(), TEST_LOCATION);
+  DALI_TEST_EQUALS(123, intvector.Back(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -532,6 +558,8 @@ int UtcDaliVectorPair(void)
   DALI_TEST_EQUALS(ZERO, pairvector.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(ZERO, pairvector.Capacity(), TEST_LOCATION);
 
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<std::pair<int, float> >::BaseType), true, TEST_LOCATION);
+
   pairvector.PushBack(std::make_pair(5, 0.1f));
   pairvector.PushBack(std::make_pair(3, 0.2f));
   pairvector.PushBack(std::make_pair(4, 0.3f));
@@ -541,6 +569,34 @@ int UtcDaliVectorPair(void)
 
   Vector<std::pair<int, float> >::Iterator iter  = pairvector.Begin();
   int                                      index = 0;
+  for(; iter != pairvector.End(); ++iter, ++index)
+  {
+    std::cout << "pair " << (*iter).first << ":" << (*iter).second << std::endl;
+    DALI_TEST_EQUALS((*iter).first, pairvector[index].first, TEST_LOCATION);
+    DALI_TEST_EQUALS((*iter).second, pairvector[index].second, TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliVectorDaliPair(void)
+{
+  tet_infoline("Testing Dali::Vector< Dali::Pair< int, float > >");
+
+  Vector<Dali::Pair<int, float> > pairvector;
+  DALI_TEST_EQUALS(ZERO, pairvector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(ZERO, pairvector.Capacity(), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<Dali::Pair<int, float> >::BaseType), true, TEST_LOCATION);
+
+  pairvector.PushBack(Dali::MakePair(5, 0.1f));
+  pairvector.PushBack(Dali::MakePair(3, 0.2f));
+  pairvector.PushBack(Dali::MakePair(4, 0.3f));
+  pairvector.PushBack(Dali::MakePair(1, 0.4f));
+  pairvector.PushBack(Dali::MakePair(2, 0.5f));
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5), pairvector.Count(), TEST_LOCATION);
+
+  Vector<Dali::Pair<int, float> >::Iterator iter  = pairvector.Begin();
+  int                                       index = 0;
   for(; iter != pairvector.End(); ++iter, ++index)
   {
     std::cout << "pair " << (*iter).first << ":" << (*iter).second << std::endl;
@@ -596,6 +652,60 @@ int UtcDaliVectorAsserts(void)
   Vector<int*>::Iterator iter = pointervector.Begin();
   if(iter != pointervector.End())
   {
+    tet_result(TET_FAIL);
+  }
+
+  try
+  {
+    auto* value = pointervector[0];
+    (void)value; // to "use" the value
+    tet_printf("Assertion expected, but not occurred at %s\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "VectorBase::mData", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  try
+  {
+    auto* value = pointervector.Front();
+    (void)value; // to "use" the value
+    tet_printf("Assertion expected, but not occurred at %s\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "VectorBase::mData", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  try
+  {
+    auto* value = pointervector.Back();
+    (void)value; // to "use" the value
+    tet_printf("Assertion expected, but not occurred at %s\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "VectorBase::mData", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
     tet_result(TET_FAIL);
   }
 

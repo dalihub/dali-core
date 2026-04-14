@@ -23,10 +23,10 @@
 #include <memory> // for unique_ptr
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 

@@ -218,7 +218,7 @@ bool TestApplication::Render(uint32_t intervalMilliseconds, const char* location
   mRenderStatus.SetNeedsPostRender(false);
 
   mCore->PreRender(mRenderStatus, false /*do not force clear*/);
-  if(!uploadOnly)
+  if(!uploadOnly || mStatus.NeedsForceRendering())
   {
     for(auto&& scene : mScenes)
     {

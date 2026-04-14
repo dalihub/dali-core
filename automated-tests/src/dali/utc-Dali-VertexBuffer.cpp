@@ -16,6 +16,8 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/rendering/vertex-buffer-devel.h>
+#include <dali/devel-api/signals/vertex-buffer-update-callback.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/public-api/dali-core.h>
 #include <chrono>
@@ -635,7 +637,7 @@ int UtcDaliVertexBufferUpdateCallback(void)
 
   // set callback
   auto callback = std::make_unique<VertexBufferUpdater>();
-  vertexBuffer.SetVertexBufferUpdateCallback(callback->CreateCallback());
+  DevelVertexBuffer::SetVertexBufferUpdateCallback(vertexBuffer, callback->CreateCallback());
 
   struct Vertex
   {
@@ -715,7 +717,7 @@ int UtcDaliVertexBufferUpdateCallback(void)
   DALI_TEST_EQUALS(result, false, TEST_LOCATION);
 
   // Test 4. removing callback, original behaviour should kick in
-  vertexBuffer.SetVertexBufferUpdateCallback(UniquePtr<VertexBufferUpdateCallback>());
+  DevelVertexBuffer::SetVertexBufferUpdateCallback(vertexBuffer, UniquePtr<VertexBufferUpdateCallback>());
   trace.Reset();
   callback->Reset();
 
@@ -744,7 +746,7 @@ int UtcDaliSetAndRemoveVertexBufferUpdateCallback(void)
 
   // set callback
   auto callback = std::make_unique<VertexBufferUpdater>();
-  vertexBuffer.SetVertexBufferUpdateCallback(callback->CreateCallback());
+  DevelVertexBuffer::SetVertexBufferUpdateCallback(vertexBuffer, callback->CreateCallback());
 
   struct Vertex
   {
@@ -794,7 +796,7 @@ int UtcDaliSetAndRemoveVertexBufferUpdateCallback(void)
   trace.Reset();
 
   // Remove the callback
-  vertexBuffer.ClearVertexBufferUpdateCallback();
+  DevelVertexBuffer::ClearVertexBufferUpdateCallback(vertexBuffer);
 
   application.SendNotification();
   application.Render();

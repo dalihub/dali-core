@@ -42,23 +42,23 @@ namespace Internal
 {
 namespace // unnamed namespace
 {
-struct AnchorValue
+struct PivotValue
 {
   const char*    name;
   const Vector3& value;
 };
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE(AnchorValue, ANCHOR_CONSTANT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, TOP_LEFT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, TOP_CENTER)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, TOP_RIGHT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, CENTER_LEFT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, CENTER)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, CENTER_RIGHT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, BOTTOM_LEFT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, BOTTOM_CENTER)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(AnchorPoint, BOTTOM_RIGHT)
-DALI_ENUM_TO_STRING_TABLE_END(ANCHOR_CONSTANT)
+DALI_ENUM_TO_STRING_TABLE_BEGIN_WITH_TYPE(PivotValue, PIVOT_CONSTANT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, TOP_LEFT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, TOP_CENTER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, TOP_RIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, CENTER_LEFT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, CENTER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, CENTER_RIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, BOTTOM_LEFT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, BOTTOM_CENTER)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(Pivot, BOTTOM_RIGHT)
+DALI_ENUM_TO_STRING_TABLE_END(PIVOT_CONSTANT)
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(COLOR_MODE)
   DALI_ENUM_TO_STRING(USE_OWN_COLOR)
@@ -104,14 +104,14 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(CHILDREN_DEPTH_INDEX_POLICY)
   DALI_ENUM_TO_STRING_WITH_SCOPE(DevelActor::ChildrenDepthIndexPolicy, EQUAL)
 DALI_ENUM_TO_STRING_TABLE_END(CHILDREN_DEPTH_INDEX_POLICY)
 
-bool GetAnchorPointParentOriginConstant(const std::string& value, Vector3& anchor)
+bool GetPivotParentOriginConstant(const std::string& value, Vector3& anchor)
 {
-  for(uint32_t i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i)
+  for(uint32_t i = 0; i < PIVOT_CONSTANT_TABLE_COUNT; ++i)
   {
     uint32_t sizeIgnored = 0;
-    if(CompareTokens(value.c_str(), ANCHOR_CONSTANT_TABLE[i].name, sizeIgnored))
+    if(CompareTokens(value.c_str(), PIVOT_CONSTANT_TABLE[i].name, sizeIgnored))
     {
-      anchor = ANCHOR_CONSTANT_TABLE[i].value;
+      anchor = PIVOT_CONSTANT_TABLE[i].value;
       return true;
     }
   }
@@ -129,7 +129,7 @@ bool GetVector3Value(const Property::Value& property, Vector3& vector3)
     Dali::String stringConstant;
     if(property.Get(stringConstant))
     {
-      return GetAnchorPointParentOriginConstant(Dali::Integration::ToStdString(stringConstant), vector3);
+      return GetPivotParentOriginConstant(Dali::Integration::ToStdString(stringConstant), vector3);
     }
     else
     {
@@ -215,30 +215,30 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT:
+    case Dali::Actor::Property::PIVOT:
     {
-      DetermineVector3ValueAndSet(property, actor, &Actor::SetAnchorPoint);
+      DetermineVector3ValueAndSet(property, actor, &Actor::SetPivot);
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT_X:
+    case Dali::Actor::Property::PIVOT_X:
     {
-      const Vector3& current = actor.GetCurrentAnchorPoint();
-      actor.SetAnchorPoint(Vector3(property.Get<float>(), current.y, current.z));
+      const Vector3& current = actor.GetCurrentPivot();
+      actor.SetPivot(Vector3(property.Get<float>(), current.y, current.z));
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
+    case Dali::Actor::Property::PIVOT_Y:
     {
-      const Vector3& current = actor.GetCurrentAnchorPoint();
-      actor.SetAnchorPoint(Vector3(current.x, property.Get<float>(), current.z));
+      const Vector3& current = actor.GetCurrentPivot();
+      actor.SetPivot(Vector3(current.x, property.Get<float>(), current.z));
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
+    case Dali::Actor::Property::PIVOT_Z:
     {
-      const Vector3& current = actor.GetCurrentAnchorPoint();
-      actor.SetAnchorPoint(Vector3(current.x, current.y, property.Get<float>()));
+      const Vector3& current = actor.GetCurrentPivot();
+      actor.SetPivot(Vector3(current.x, current.y, property.Get<float>()));
       break;
     }
 
@@ -523,13 +523,13 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::POSITION_USES_ANCHOR_POINT:
+    case Dali::Actor::Property::POSITION_USES_PIVOT:
     {
       bool value = false;
-      if(property.Get(value) && value != actor.mPositionUsesAnchorPoint)
+      if(property.Get(value) && value != actor.mPositionUsesPivot)
       {
-        actor.mPositionUsesAnchorPoint = value;
-        SetPositionUsesAnchorPointMessage(actor.GetEventThreadServices(), actor.GetNode(), actor.mPositionUsesAnchorPoint);
+        actor.mPositionUsesPivot = value;
+        SetPositionUsesPivotMessage(actor.GetEventThreadServices(), actor.GetNode(), actor.mPositionUsesPivot);
       }
       break;
     }
@@ -1037,12 +1037,12 @@ const PropertyInputImpl* Actor::PropertyHandler::GetSceneObjectInputProperty(Pro
       property = &node.mParentOrigin;
       break;
     }
-    case Dali::Actor::Property::ANCHOR_POINT:   // FALLTHROUGH
-    case Dali::Actor::Property::ANCHOR_POINT_X: // FALLTHROUGH
-    case Dali::Actor::Property::ANCHOR_POINT_Y: // FALLTHROUGH
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
+    case Dali::Actor::Property::PIVOT:   // FALLTHROUGH
+    case Dali::Actor::Property::PIVOT_X: // FALLTHROUGH
+    case Dali::Actor::Property::PIVOT_Y: // FALLTHROUGH
+    case Dali::Actor::Property::PIVOT_Z:
     {
-      property = &node.mAnchorPoint;
+      property = &node.mPivot;
       break;
     }
     case Dali::Actor::Property::WORLD_POSITION:   // FALLTHROUGH
@@ -1104,7 +1104,7 @@ int32_t Actor::PropertyHandler::GetPropertyComponentIndex(Property::Index index)
   switch(index)
   {
     case Dali::Actor::Property::PARENT_ORIGIN_X:
-    case Dali::Actor::Property::ANCHOR_POINT_X:
+    case Dali::Actor::Property::PIVOT_X:
     case Dali::Actor::Property::SIZE_WIDTH:
     case Dali::Actor::Property::POSITION_X:
     case Dali::Actor::Property::WORLD_POSITION_X:
@@ -1116,7 +1116,7 @@ int32_t Actor::PropertyHandler::GetPropertyComponentIndex(Property::Index index)
     }
 
     case Dali::Actor::Property::PARENT_ORIGIN_Y:
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
+    case Dali::Actor::Property::PIVOT_Y:
     case Dali::Actor::Property::SIZE_HEIGHT:
     case Dali::Actor::Property::POSITION_Y:
     case Dali::Actor::Property::WORLD_POSITION_Y:
@@ -1128,7 +1128,7 @@ int32_t Actor::PropertyHandler::GetPropertyComponentIndex(Property::Index index)
     }
 
     case Dali::Actor::Property::PARENT_ORIGIN_Z:
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
+    case Dali::Actor::Property::PIVOT_Z:
     case Dali::Actor::Property::SIZE_DEPTH:
     case Dali::Actor::Property::POSITION_Z:
     case Dali::Actor::Property::WORLD_POSITION_Z:
@@ -1186,27 +1186,27 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT:
+    case Dali::Actor::Property::PIVOT:
     {
-      value = actor.GetCurrentAnchorPoint();
+      value = actor.GetCurrentPivot();
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT_X:
+    case Dali::Actor::Property::PIVOT_X:
     {
-      value = actor.GetCurrentAnchorPoint().x;
+      value = actor.GetCurrentPivot().x;
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
+    case Dali::Actor::Property::PIVOT_Y:
     {
-      value = actor.GetCurrentAnchorPoint().y;
+      value = actor.GetCurrentPivot().y;
       break;
     }
 
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
+    case Dali::Actor::Property::PIVOT_Z:
     {
-      value = actor.GetCurrentAnchorPoint().z;
+      value = actor.GetCurrentPivot().z;
       break;
     }
 
@@ -1455,9 +1455,9 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::Actor::Property::POSITION_USES_ANCHOR_POINT:
+    case Dali::Actor::Property::POSITION_USES_PIVOT:
     {
-      value = actor.mPositionUsesAnchorPoint;
+      value = actor.mPositionUsesPivot;
       break;
     }
 

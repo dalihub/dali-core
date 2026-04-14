@@ -22,13 +22,13 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/list-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/devel-api/update/frame-callback-interface.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/manager/scene-graph-traveler-interface.h>
 #include <dali/internal/update/manager/update-proxy-impl.h>
-#include <dali/public-api/common/list-wrapper.h>
 
 namespace Dali
 {

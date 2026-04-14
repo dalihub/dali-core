@@ -19,6 +19,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <vector>
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
@@ -50,6 +51,44 @@ bool  wasStaticFloatCallbackFloatValueFloatValueCalled = false;
 float staticFloatValue1                                = 0.0f;
 float staticFloatValue2                                = 0.0f;
 
+// Emission-order tracking
+std::vector<int> gEmitOrder;
+
+void OrderedCallback0()
+{
+  gEmitOrder.push_back(0);
+}
+void OrderedCallback1()
+{
+  gEmitOrder.push_back(1);
+}
+void OrderedCallback2()
+{
+  gEmitOrder.push_back(2);
+}
+void OrderedCallback3()
+{
+  gEmitOrder.push_back(3);
+}
+void OrderedCallback4()
+{
+  gEmitOrder.push_back(4);
+}
+void OrderedCallback5()
+{
+  gEmitOrder.push_back(5);
+}
+
+TestSignals::VoidRetNoParamSignal* gSignalForConnect = nullptr;
+
+void ConnectDuringEmitCallback()
+{
+  gEmitOrder.push_back(100);
+  // Connect new callbacks during emission — they must NOT fire this cycle
+  gSignalForConnect->Connect(&OrderedCallback4);
+  gSignalForConnect->Connect(&OrderedCallback5);
+}
+
 void StaticVoidCallbackVoid()
 {
   wasStaticVoidCallbackVoidCalled = true;
@@ -77,6 +116,88 @@ float StaticFloatCallbackFloatValueFloatValue(float value1, float value2)
   staticFloatValue1                                = value1;
   staticFloatValue2                                = value2;
   return value1 + value2;
+}
+
+int  totalCallbackCount = 0;
+void StaticVoidCallback01(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback02(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback03(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback04(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback05(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback06(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback07(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback08(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback09(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback10(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback11(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback12(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback13(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback14(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback15(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback16(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback17(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback18(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback19(void)
+{
+  totalCallbackCount++;
+}
+void StaticVoidCallback20(void)
+{
+  totalCallbackCount++;
 }
 
 } // namespace
@@ -2254,7 +2375,7 @@ int UtcDaliSignalEmitOr(void)
   DALI_TEST_CHECK(signal.GetConnectionCount() == 1);
 
   handler.mBoolReturn = true;
-  bool result = signal.EmitOr(1.0f, 2);
+  bool result         = signal.EmitOr(1.0f, 2);
   DALI_TEST_CHECK(result);
 
   TestSlotHandler handler1;
@@ -2262,11 +2383,327 @@ int UtcDaliSignalEmitOr(void)
   DALI_TEST_CHECK(signal.GetConnectionCount() == 2);
 
   handler1.mBoolReturn = false;
-  result = signal.EmitOr(1.0f, 2);
+  result               = signal.EmitOr(1.0f, 2);
   DALI_TEST_CHECK(result);
 
   result = signal.Emit(1.0f, 2);
   DALI_TEST_CHECK(!result);
+
+  END_TEST;
+}
+
+int UtcDaliSignalLargeConnectionCount(void)
+{
+  tet_infoline(
+    "Test that signals with many connections (> cache threshold) work correctly.\n"
+    "This exercises the adaptive hash map cache path in BaseSignal.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  const int        count = 40; // Above the cache threshold (~30)
+  TestSlotHandler* handlers[count];
+
+  for(int i = 0; i < count; ++i)
+  {
+    handlers[i] = new TestSlotHandler();
+    signal.Connect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  signal.Emit();
+
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(handlers[i]->mHandledCount, 1, TEST_LOCATION);
+  }
+
+  // Disconnect half
+  for(int i = 0; i < count; i += 2)
+  {
+    signal.Disconnect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count / 2), TEST_LOCATION);
+
+  // Emit again — only odd-indexed handlers should fire
+  signal.Emit();
+
+  for(int i = 0; i < count; ++i)
+  {
+    if(i % 2 == 0)
+    {
+      DALI_TEST_EQUALS(handlers[i]->mHandledCount, 1, TEST_LOCATION); // not called again
+    }
+    else
+    {
+      DALI_TEST_EQUALS(handlers[i]->mHandledCount, 2, TEST_LOCATION); // called twice total
+    }
+  }
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete handlers[i];
+  }
+
+  END_TEST;
+}
+
+int UtcDaliSignalLargeDisconnectDuringEmit(void)
+{
+  tet_infoline("Test disconnect-during-emit with enough connections to trigger the cache.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  const int             count = 40;
+  TestSlotDisconnector* handlers[count];
+
+  for(int i = 0; i < count; ++i)
+  {
+    handlers[i] = new TestSlotDisconnector();
+    handlers[i]->VoidConnectVoid(signal);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // Each handler disconnects itself during emit
+  signal.Emit();
+
+  // All should have fired and disconnected
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(handlers[i]->mHandled, true, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(signal.Empty());
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete handlers[i];
+  }
+
+  END_TEST;
+}
+
+int UtcDaliSignalLargeReconnect(void)
+{
+  tet_infoline("Test repeated connect/disconnect cycles that grow past and shrink below the cache threshold.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  const int        count = 40;
+  TestSlotHandler* handlers[count];
+
+  for(int i = 0; i < count; ++i)
+  {
+    handlers[i] = new TestSlotHandler();
+  }
+
+  // Connect all
+  for(int i = 0; i < count; ++i)
+  {
+    signal.Connect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // Disconnect all
+  for(int i = 0; i < count; ++i)
+  {
+    signal.Disconnect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_CHECK(signal.Empty());
+
+  // Reconnect all
+  for(int i = 0; i < count; ++i)
+  {
+    signal.Connect(handlers[i], &TestSlotHandler::VoidSlotVoid);
+  }
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // Emit and verify
+  signal.Emit();
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(handlers[i]->mHandledCount, 1, TEST_LOCATION);
+  }
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete handlers[i];
+  }
+
+  END_TEST;
+}
+
+int UtcDaliSignalCacheThresholdBoundary(void)
+{
+  tet_infoline(
+    "Test that BaseSignal::EnsureCache() is called exactly at the cache threshold.\n"
+    "then that the cache is filled during connection.\n");
+
+  TestSignals::VoidRetNoParamSignal signal;
+
+  // Cache threshold is 3 blocks = 14 cumulative capacity (2+4+8)
+  // Block sizes: 2, 4, 8, 16, 32, ...
+  // Block 0: 2 slots (index 0-1)
+  // Block 1: 4 slots (index 2-5) - total: 6
+  // Block 2: 8 slots (index 6-13) - total: 14
+  // Cache is created when we reach block 3 (i.e., when adding the 15th connection)
+
+  void (*fns[])() = {
+    &StaticVoidCallback01,
+    &StaticVoidCallback02,
+    &StaticVoidCallback03,
+    &StaticVoidCallback04,
+    &StaticVoidCallback05,
+    &StaticVoidCallback06,
+    &StaticVoidCallback07,
+    &StaticVoidCallback08,
+    &StaticVoidCallback09,
+    &StaticVoidCallback10,
+    &StaticVoidCallback11,
+    &StaticVoidCallback12,
+    &StaticVoidCallback13,
+    &StaticVoidCallback14,
+    &StaticVoidCallback15,
+    &StaticVoidCallback16,
+    &StaticVoidCallback17,
+    &StaticVoidCallback18,
+    &StaticVoidCallback19,
+    &StaticVoidCallback20};
+
+  // Connect handlers up to just below the cache threshold (7 connections)
+  for(int i = 0; i < 7; ++i)
+  {
+    signal.Connect(fns[i]);
+  }
+
+  DALI_TEST_EQUALS(signal.GetConnectionCount(), 7u, TEST_LOCATION);
+
+  // Emit to verify all 7 handlers work (linear scan path, no cache yet)
+  signal.Emit();
+  DALI_TEST_EQUALS(totalCallbackCount, 7, TEST_LOCATION);
+
+  // Wire up the remaining functions. We should now hit the cache.
+  for(int i = 7; i < 20; ++i)
+  {
+    signal.Connect(fns[i]);
+  }
+
+  totalCallbackCount = 0;
+  // Emit to verify all 20 handlers work (cached)
+  signal.Emit();
+  DALI_TEST_EQUALS(totalCallbackCount, 20, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSignalConnectDuringEmitNotFired(void)
+{
+  tet_infoline("Test that callbacks connected during Emit() are not fired in that emission cycle.\n");
+
+  TestApplication application;
+
+  TestSignals::VoidRetNoParamSignal signal;
+  gSignalForConnect = &signal;
+  gEmitOrder.clear();
+
+  // Connect 3 callbacks: 0, ConnectDuringEmit (which adds 4+5), 2
+  signal.Connect(&OrderedCallback0);
+  signal.Connect(&ConnectDuringEmitCallback);
+  signal.Connect(&OrderedCallback2);
+
+  // First emit: callbacks 0, ConnectDuringEmit(100), 2 should fire.
+  // Callbacks 4 and 5 are connected during emit but must NOT fire.
+  signal.Emit();
+
+  DALI_TEST_EQUALS(gEmitOrder.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 2, TEST_LOCATION);
+
+  // Second emit: all 5 callbacks should fire in connection order
+  gEmitOrder.clear();
+  signal.Emit();
+
+  DALI_TEST_EQUALS(gEmitOrder.size(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[4], 5, TEST_LOCATION);
+
+  gSignalForConnect = nullptr;
+
+  END_TEST;
+}
+
+int UtcDaliSignalEmissionOrder(void)
+{
+  tet_infoline(
+    "Test that emission order is always connection order, even after\n"
+    "repeated disconnect/connect cycles that reuse pool free-list slots.\n");
+
+  TestApplication application;
+
+  TestSignals::VoidRetNoParamSignal signal;
+  gEmitOrder.clear();
+
+  // Connect 0, 1, 2, 3
+  signal.Connect(&OrderedCallback0);
+  signal.Connect(&OrderedCallback1);
+  signal.Connect(&OrderedCallback2);
+  signal.Connect(&OrderedCallback3);
+
+  // Emit — should be 0, 1, 2, 3
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 3, TEST_LOCATION);
+
+  // Disconnect 1 and 2 (middle slots go to free list)
+  signal.Disconnect(&OrderedCallback1);
+  signal.Disconnect(&OrderedCallback2);
+
+  // Connect 4 — should go after 3, not reuse the freed middle slots
+  signal.Connect(&OrderedCallback4);
+
+  gEmitOrder.clear();
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 4, TEST_LOCATION);
+
+  // Reconnect 1 — should go after 4
+  signal.Connect(&OrderedCallback1);
+
+  gEmitOrder.clear();
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 1, TEST_LOCATION);
+
+  // Disconnect all and reconnect in reverse — emission order should follow
+  // the new connection order, not the pool memory layout.
+  signal.Disconnect(&OrderedCallback0);
+  signal.Disconnect(&OrderedCallback3);
+  signal.Disconnect(&OrderedCallback4);
+  signal.Disconnect(&OrderedCallback1);
+
+  signal.Connect(&OrderedCallback3);
+  signal.Connect(&OrderedCallback2);
+  signal.Connect(&OrderedCallback1);
+  signal.Connect(&OrderedCallback0);
+
+  gEmitOrder.clear();
+  signal.Emit();
+  DALI_TEST_EQUALS(gEmitOrder.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[0], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[2], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(gEmitOrder[3], 0, TEST_LOCATION);
 
   END_TEST;
 }

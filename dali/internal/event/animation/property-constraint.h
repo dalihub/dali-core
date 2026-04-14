@@ -19,12 +19,12 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/event/animation/property-input-accessor.h>
 #include <dali/internal/event/animation/property-input-indexer.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

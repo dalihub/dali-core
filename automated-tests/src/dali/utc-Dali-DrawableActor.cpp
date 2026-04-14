@@ -16,7 +16,8 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/public-api/actors/drawable-actor.h>
+#include <dali/devel-api/actors/drawable-actor.h>
+#include <dali/devel-api/signals/render-callback.h>
 
 namespace
 {
@@ -352,13 +353,13 @@ int UtcDaliDrawableActor2P(void)
   const float opacity = 0.5f;
   parentActor.SetProperty(Actor::Property::POSITION, Vector2(20, 50));
   parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parentActor.SetProperty(Actor::Property::COLOR, Color::DARK_OLIVE_GREEN * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 200));
   actor.SetProperty(Actor::Property::POSITION, Vector2(50, 70));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
   auto renderer = Renderer::New(*callback);
@@ -394,12 +395,12 @@ int UtcDaliDrawableActorSceneRotated(void)
 
   parentActor.SetProperty(Actor::Property::POSITION, Vector2(20, 50));
   parentActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 200));
   actor.SetProperty(Actor::Property::POSITION, Vector2(50, 70));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   auto renderer = Renderer::New(*callback);
   actor.AddRenderer(renderer);

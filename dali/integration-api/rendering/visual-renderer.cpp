@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/rendering/visual-renderer.h>
+#include <dali/integration-api/rendering/visual-renderer.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/rendering/visual-renderer-impl.h>

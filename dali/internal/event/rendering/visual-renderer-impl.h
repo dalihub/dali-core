@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
-#include <dali/public-api/rendering/visual-renderer.h>   // Dali::VisualRenderer
+#include <dali/integration-api/rendering/visual-renderer.h> // Dali::VisualRenderer
+#include <dali/internal/event/rendering/renderer-impl.h>    // Dali::Internal::Renderer
 
 namespace Dali
 {
@@ -135,7 +135,7 @@ public:
     Vector2 mTransformOffset{Vector2::ZERO};
     Vector2 mTransformSize{Vector2::ONE};
     Vector2 mTransformOrigin{Vector2::ZERO};
-    Vector2 mTransformAnchorPoint{Vector2::ZERO};
+    Vector2 mTransformPivot{Vector2::ZERO};
     Vector4 mTransformOffsetSizeMode{Vector4::ZERO};
     Vector2 mExtraSize{Vector2::ZERO};
   };

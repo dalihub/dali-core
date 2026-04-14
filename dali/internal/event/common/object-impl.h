@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/object/handle-devel.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/const-string.h>
@@ -34,7 +35,6 @@
 #include <dali/internal/update/common/property-base.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>

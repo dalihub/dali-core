@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/render/common/render-item-key.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
 
@@ -116,7 +116,7 @@ struct RenderItem
    * @param[in] depthTestEnabled True if depth testing is currently on
    * @return true if this node/renderer pair uses the depth buffer
    */
-  bool UsesDepthBuffer(bool depthTestEnabled);
+  bool UsesDepthBuffer(bool depthTestEnabled) const;
 
   /**
    * @brief Returns true if this node/renderer uses the stencil buffer (read or write)
@@ -148,11 +148,6 @@ struct RenderItem
 
   bool mIsOpaque : 1;
   bool mIsUpdated : 1;
-
-  /**
-   * @return true if this render item uses the depth buffer (reads or writes to it)
-   */
-  bool UsesDepthBuffer();
 
 private:
   /**

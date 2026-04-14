@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_EVENT_EVENTS_TAP_GESTURE_RECOGNIZER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/point.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <cstdint>
 
 // INTERNAL INCLUDES
@@ -179,15 +179,15 @@ private:
 
   State mState; ///< Current state of the detector.
 
-  Vector2  mTouchPosition;                ///< The initial touch down position.
-  uint32_t mTapsRegistered;               ///< In current detection, the number of taps registered.
-  uint32_t mTouchTime;                    ///< The touch down time.
-  uint32_t mLastTapTime;                  ///< Time last tap gesture was registered
-  uint32_t mDeltaBetweenTouchDownTouchUp; ///< Time from touchdown to touchup
-  uint32_t mMaximumAllowedTime;           ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
-  uint32_t mRecognizerTime;               ///< The recognizer time required to be recognized as a tap gesture (millisecond)
-  float    mMaximumMotionAllowedDistance; ///< The recognizer distance required to be recognized as a tap gesture
-  ActorObserver mCurrentActor;             ///< The current actor that was hit-tested at the touch position
+  Vector2       mTouchPosition;                ///< The initial touch down position.
+  uint32_t      mTapsRegistered;               ///< In current detection, the number of taps registered.
+  uint32_t      mTouchTime;                    ///< The touch down time.
+  uint32_t      mLastTapTime;                  ///< Time last tap gesture was registered
+  uint32_t      mDeltaBetweenTouchDownTouchUp; ///< Time from touchdown to touchup
+  uint32_t      mMaximumAllowedTime;           ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+  uint32_t      mRecognizerTime;               ///< The recognizer time required to be recognized as a tap gesture (millisecond)
+  float         mMaximumMotionAllowedDistance; ///< The recognizer distance required to be recognized as a tap gesture
+  ActorObserver mCurrentActor;                 ///< The current actor that was hit-tested at the touch position
 };
 
 } // namespace Internal

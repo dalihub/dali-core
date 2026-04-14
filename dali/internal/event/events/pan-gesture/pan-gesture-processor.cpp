@@ -263,6 +263,13 @@ void PanGestureProcessor::Process(Scene& scene, const PanGestureEvent& panEvent)
         }
         else
         {
+          if(!mCurrentPanEmitters.empty() && mCurrentRenderTask)
+          {
+            // If the actor is no longer hittable, but we still have emitters, we should cancel the gesture
+            Vector2 actorCoords;
+            currentGesturedActor->ScreenToLocal(*mCurrentRenderTask.Get(), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y);
+            EmitPanSignal(currentGesturedActor, mCurrentPanEmitters, panEvent, actorCoords, GestureState::CANCELLED, mCurrentRenderTask, mCurrentScene);
+          }
           mCurrentPanEmitters.clear();
           ResetActor();
         }

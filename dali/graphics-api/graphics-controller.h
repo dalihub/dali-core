@@ -2,7 +2,7 @@
 #define DALI_GRAPHICS_CONTROLLER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
  */
 
 // EXTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/graphics-config.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -235,6 +235,14 @@ public:
   virtual UniquePtr<Framebuffer> CreateFramebuffer(const FramebufferCreateInfo& framebufferCreateInfo, UniquePtr<Framebuffer>&& oldFramebuffer) = 0;
 
   /**
+   * @brief Updates the renderbuffer usage for an existing Framebuffer
+   *
+   * @param[in] framebuffer The framebuffer to update
+   * @param[in] depthStencilState The new depth/stencil state
+   */
+  virtual void UpdateFramebufferRenderbufferUsage(Framebuffer& framebuffer, const DepthStencilState& depthStencilState) = 0;
+
+  /**
    * @brief Creates new Pipeline object
    *
    * @param[in] pipelineCreateInfo The valid PipelineCreateInfo structure
@@ -419,13 +427,6 @@ public: // ResourceId relative API.
    * @return Pointer of Graphics::Texture.
    */
   virtual UniquePtr<Graphics::Texture> ReleaseTextureFromResourceId(uint32_t resourceId) = 0;
-
-  /**
-   * @brief Determine if the backend needs to multiply the projection matrix by a clip matrix
-   *
-   * @return TRUE if the graphics backend requires an alternative clip matrix
-   */
-  virtual bool HasClipMatrix() const = 0;
 
   /**
    * @brief Get the alternative clipping matrix.

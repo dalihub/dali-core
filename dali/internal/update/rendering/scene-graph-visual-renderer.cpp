@@ -40,13 +40,13 @@ void VisualProperties::GetVisualTransformedUpdateArea(Vector4& updateArea) noexc
     const Vector4 transformOffsetSizeMode = mTransformOffsetSizeMode.Get();
     const Vector2 transformSize           = mTransformSize.Get();
     const Vector2 transformOrigin         = mTransformOrigin.Get();
-    const Vector2 transformAnchorPoint    = mTransformAnchorPoint.Get();
+    const Vector2 transformPivot          = mTransformPivot.Get();
     const Vector2 extraSize               = mExtraSize.Get();
 
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform size   %5.3f %5.3f\n", transformSize.x, transformSize.y);
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform offset %5.3f %5.3f\n", transformOffset.x, transformOffset.y);
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform origin %5.3f %5.3f\n", transformOrigin.x, transformOrigin.y);
-    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform anchor %5.3f %5.3f\n", transformAnchorPoint.x, transformAnchorPoint.y);
+    DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "transform anchor %5.3f %5.3f\n", transformPivot.x, transformPivot.y);
     DALI_LOG_INFO(gSceneGraphRendererLogFilter, Debug::Verbose, "extra size       %5.3f %5.3f\n", extraSize.x, extraSize.y);
 
     // const Vector2 visualSize = Vector2(Dali::Lerp(transformOffsetSizeMode.z, originalWH.x * transformSize.x, transformSize.x),
@@ -60,31 +60,31 @@ void VisualProperties::GetVisualTransformedUpdateArea(Vector4& updateArea) noexc
     // const Vector2 decoratedVisualSize    = visualSize + Vector2(decoratedBorderlineWidth, decoratedBorderlineWidth);
 
     // Note : vertexPosition.xy = aPosition * decoratedVisualSize
-    //                          + anchorPoint * visualSize
+    //                          + pivot * visualSize
     //                          + origin * uSize.xy
     //                          + visualOffset;
 
     // Calculate same logic of visual's vertex shader transform.
-    // minVertexPosition = -0.5f * decoratedVisualSize + transformAnchorPoint * visualSize + transformOrigin * originalWH.xy + visualOffset
-    // maxVertexPosition =  0.5f * decoratedVisualSize + transformAnchorPoint * visualSize + transformOrigin * originalWH.xy + visualOffset
+    // minVertexPosition = -0.5f * decoratedVisualSize + transformPivot * visualSize + transformOrigin * originalWH.xy + visualOffset
+    // maxVertexPosition =  0.5f * decoratedVisualSize + transformPivot * visualSize + transformOrigin * originalWH.xy + visualOffset
 
     // Update cached VisualTransformedUpdateSizeCoefficientCache
 
     // Note : vertexPosition = (XA * aPosition + XB) * originalWH + (CA * aPosition + CB) + Vector2(D, D) * aPosition + originalXY
 
     // XA = transformSize * (1.0 - transformOffsetSizeMode.zw)
-    // XB = transformSize * (1.0 - transformOffsetSizeMode.zw) * transformAnchorPoint
+    // XB = transformSize * (1.0 - transformOffsetSizeMode.zw) * transformPivot
     //    + transformOffset * (1.0 - transformOffsetSizeMode.xy)
     //    + transformOrigin
     // CA = transformSize * transformOffsetSizeMode.zw + extraSize
-    // CB = (transformSize * transformOffsetSizeMode.zw + extraSize) * transformAnchorPoint
+    // CB = (transformSize * transformOffsetSizeMode.zw + extraSize) * transformPivot
     //    + transformOffset * transformOffsetSizeMode.xy
     // D = max((1.0 + clamp(borderlineOffset, -1.0, 1.0)) * borderlineWidth, 2.0 * blurRadius)
 
     coefficient.coefXA = transformSize * Vector2(1.0f - transformOffsetSizeMode.z, 1.0f - transformOffsetSizeMode.w);
-    coefficient.coefXB = coefficient.coefXA * transformAnchorPoint + transformOffset * Vector2(1.0f - transformOffsetSizeMode.x, 1.0f - transformOffsetSizeMode.y) + transformOrigin;
+    coefficient.coefXB = coefficient.coefXA * transformPivot + transformOffset * Vector2(1.0f - transformOffsetSizeMode.x, 1.0f - transformOffsetSizeMode.y) + transformOrigin;
     coefficient.coefCA = transformSize * Vector2(transformOffsetSizeMode.z, transformOffsetSizeMode.w) + extraSize;
-    coefficient.coefCB = coefficient.coefCA * transformAnchorPoint + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
+    coefficient.coefCB = coefficient.coefCA * transformPivot + transformOffset * Vector2(transformOffsetSizeMode.x, transformOffsetSizeMode.y);
 
     coefficient.MarkCoefficientCalculated();
   }

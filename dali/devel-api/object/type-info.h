@@ -22,9 +22,9 @@
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-handle.h>
 
 namespace Dali

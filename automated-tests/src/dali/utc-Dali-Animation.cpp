@@ -20,12 +20,13 @@
 #include <dali/devel-api/animation/animation-devel.h>
 #include <dali/devel-api/animation/key-frames-devel.h>
 #include <dali/devel-api/threading/thread.h>
+#include <dali/integration-api/rendering/visual-renderer.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include <stdlib.h>
 
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 
 #include <algorithm>
 #include <iostream>
@@ -7964,37 +7965,37 @@ int UtcDaliAnimationAnimateToActorParentOriginZN(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointN(void)
+int UtcDaliAnimationAnimateToActorPivotN(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT), AnchorPoint::CENTER, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT), Pivot::CENTER, TEST_LOCATION);
 
   // Build the animation
   float     durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
-  Vector3   targetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Vector3   targetPivot(Pivot::TOP_LEFT);
 
   DALI_TEST_ASSERTION(
     {
-      animation.AnimateTo(Property(actor, Actor::Property::ANCHOR_POINT), targetAnchorPoint);
+      animation.AnimateTo(Property(actor, Actor::Property::PIVOT), targetPivot);
     },
     "Property is not animatable");
 
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointXN(void)
+int UtcDaliAnimationAnimateToActorPivotXN(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
   float startValue(0.5f);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT).x, startValue, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::ANCHOR_POINT_X), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT).x, startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::PIVOT_X), startValue, TEST_LOCATION);
 
   // Build the animation
   float     durationSeconds(1.0f);
@@ -8003,22 +8004,22 @@ int UtcDaliAnimationAnimateToActorAnchorPointXN(void)
 
   DALI_TEST_ASSERTION(
     {
-      animation.AnimateTo(Property(actor, Actor::Property::ANCHOR_POINT_X), targetX);
+      animation.AnimateTo(Property(actor, Actor::Property::PIVOT_X), targetX);
     },
     "Property is not animatable");
 
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointYN(void)
+int UtcDaliAnimationAnimateToActorPivotYN(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
   float startValue(0.5f);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT).y, startValue, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::ANCHOR_POINT_Y), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT).y, startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::PIVOT_Y), startValue, TEST_LOCATION);
 
   // Build the animation
   float     durationSeconds(1.0f);
@@ -8027,22 +8028,22 @@ int UtcDaliAnimationAnimateToActorAnchorPointYN(void)
 
   DALI_TEST_ASSERTION(
     {
-      animation.AnimateTo(Property(actor, Actor::Property::ANCHOR_POINT_Y), targetY);
+      animation.AnimateTo(Property(actor, Actor::Property::PIVOT_Y), targetY);
     },
     "Property is not animatable");
 
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorAnchorPointZN(void)
+int UtcDaliAnimationAnimateToActorPivotZN(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
   application.GetScene().Add(actor);
   float startValue(0.5f);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::ANCHOR_POINT).z, startValue, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::ANCHOR_POINT_Z), startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::PIVOT).z, startValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::PIVOT_Z), startValue, TEST_LOCATION);
 
   // Build the animation
   float     durationSeconds(1.0f);
@@ -8051,7 +8052,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointZN(void)
 
   DALI_TEST_ASSERTION(
     {
-      animation.AnimateTo(Property(actor, Actor::Property::ANCHOR_POINT_Z), targetZ);
+      animation.AnimateTo(Property(actor, Actor::Property::PIVOT_Z), targetZ);
     },
     "Property is not animatable");
 
@@ -17313,7 +17314,7 @@ int UtcDaliAnimationSpringFinished(void)
   tet_infoline("UtcDaliAnimation spring test finished in expected time.");
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
   application.GetScene().Add(actor);
@@ -17389,7 +17390,7 @@ int UtcDaliAnimationSpringPreset(void)
   tet_infoline("UtcDaliAnimation spring test, preset case");
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
   application.GetScene().Add(actor);
@@ -17434,7 +17435,7 @@ int UtcDaliAnimationSpringOverdamped(void)
   tet_infoline("UtcDaliAnimation spring test, overdamped case");
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
   application.GetScene().Add(actor);
@@ -17484,7 +17485,7 @@ int UtcDaliAnimationSpringUnderdamped(void)
   tet_infoline("UtcDaliAnimation spring test, overdamped case");
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Dali::Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Dali::Actor::Property::POSITION_X, 0);
   application.GetScene().Add(actor);

@@ -201,6 +201,11 @@ void Stage::KeepRendering(float durationSeconds)
   KeepRenderingMessage(mUpdateManager, durationSeconds);
 }
 
+void Stage::SetForceRendering(uint32_t frameCount)
+{
+  mScene->SetForceRendering(frameCount);
+}
+
 void Stage::SetRenderingBehavior(DevelStage::Rendering renderingBehavior)
 {
   if(mRenderingBehavior != renderingBehavior)

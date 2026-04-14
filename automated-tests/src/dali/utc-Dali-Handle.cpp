@@ -328,10 +328,10 @@ int UtcDaliHandleIsPropertyWritable(void)
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::PARENT_ORIGIN_X));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::PARENT_ORIGIN_Y));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::PARENT_ORIGIN_Z));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::ANCHOR_POINT));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::ANCHOR_POINT_X));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::ANCHOR_POINT_Y));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::ANCHOR_POINT_Z));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::PIVOT));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::PIVOT_X));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::PIVOT_Y));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::PIVOT_Z));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::SIZE));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::SIZE_WIDTH));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::SIZE_HEIGHT));
@@ -377,10 +377,10 @@ int UtcDaliHandleIsPropertyAnimatable(void)
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::PARENT_ORIGIN_X));
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::PARENT_ORIGIN_Y));
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::PARENT_ORIGIN_Z));
-  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::ANCHOR_POINT));
-  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::ANCHOR_POINT_X));
-  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::ANCHOR_POINT_Y));
-  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::ANCHOR_POINT_Z));
+  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::PIVOT));
+  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::PIVOT_X));
+  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::PIVOT_Y));
+  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::PIVOT_Z));
   DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::SIZE));
   DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::SIZE_WIDTH));
   DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::SIZE_HEIGHT));
@@ -425,10 +425,10 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::PARENT_ORIGIN_X));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::PARENT_ORIGIN_Y));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::PARENT_ORIGIN_Z));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::ANCHOR_POINT));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::ANCHOR_POINT_X));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::ANCHOR_POINT_Y));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::ANCHOR_POINT_Z));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::PIVOT));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::PIVOT_X));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::PIVOT_Y));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::PIVOT_Z));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::SIZE));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::SIZE_WIDTH));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::SIZE_HEIGHT));
@@ -477,7 +477,7 @@ int UtcDaliHandleGetPropertyType(void)
 
   Actor actor = Actor::New();
   DALI_TEST_CHECK(Property::VECTOR3 == actor.GetPropertyType(Actor::Property::PARENT_ORIGIN));
-  DALI_TEST_CHECK(Property::VECTOR3 == actor.GetPropertyType(Actor::Property::ANCHOR_POINT));
+  DALI_TEST_CHECK(Property::VECTOR3 == actor.GetPropertyType(Actor::Property::PIVOT));
   DALI_TEST_CHECK(Property::VECTOR3 == actor.GetPropertyType(Actor::Property::SIZE));
   DALI_TEST_CHECK(Property::VECTOR3 == actor.GetPropertyType(Actor::Property::POSITION));
   DALI_TEST_CHECK(Property::ROTATION == actor.GetPropertyType(Actor::Property::ORIENTATION));
@@ -941,7 +941,7 @@ int UtcDaliHandleGetProperty(void)
   Actor actor = Actor::New();
 
   DALI_TEST_CHECK(ParentOrigin::TOP_LEFT == actor.GetProperty(Actor::Property::PARENT_ORIGIN).Get<Vector3>());
-  DALI_TEST_CHECK(AnchorPoint::CENTER == actor.GetProperty(Actor::Property::ANCHOR_POINT).Get<Vector3>());
+  DALI_TEST_CHECK(Pivot::CENTER == actor.GetProperty(Actor::Property::PIVOT).Get<Vector3>());
   DALI_TEST_CHECK(Vector3::ZERO == actor.GetProperty(Actor::Property::SIZE).Get<Vector3>());
   DALI_TEST_CHECK(Vector3::ZERO == actor.GetProperty(Actor::Property::POSITION).Get<Vector3>());
   DALI_TEST_CHECK(Vector3::ONE == actor.GetProperty(Actor::Property::SCALE).Get<Vector3>());
@@ -1905,19 +1905,19 @@ int UtcDaliHandlePropertySetProperties(void)
 {
   TestApplication application;
   const Vector3   actorSize(10.0f, 20.0f, 30.0f);
-  const Vector3   anchorPoint(1.0f, 0.5f, 0.0f);
+  const Vector3   pivot(1.0f, 0.5f, 0.0f);
   const Vector4   color(0.1f, 0.2, 0.3f, 0.4f);
 
   Handle handle = Actor::New();
   handle.SetProperties(
     Property::Map{
       {Actor::Property::SIZE, actorSize},
-      {Actor::Property::ANCHOR_POINT, anchorPoint},
+      {Actor::Property::PIVOT, pivot},
       {"color", color},
       {"invalid", Vector2::ZERO} // It should quietly ignore invalid data
     });
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::SIZE).Get<Vector3>(), actorSize, TEST_LOCATION);
-  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::ANCHOR_POINT).Get<Vector3>(), anchorPoint, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::PIVOT).Get<Vector3>(), pivot, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::COLOR).Get<Vector4>(), color, TEST_LOCATION);
 
   END_TEST;
@@ -1927,19 +1927,19 @@ int UtcDaliHandleTemplateNew01(void)
 {
   TestApplication application;
   const Vector3   actorSize(10.0f, 20.0f, 30.0f);
-  const Vector3   anchorPoint(1.0f, 0.5f, 0.0f);
+  const Vector3   pivot(1.0f, 0.5f, 0.0f);
   const Vector4   color(0.1f, 0.2, 0.3f, 0.4f);
 
   Handle handle = Handle::New<Actor>(
     Property::Map{
       {Actor::Property::SIZE, actorSize},
-      {Actor::Property::ANCHOR_POINT, anchorPoint},
+      {Actor::Property::PIVOT, pivot},
       {"color", color},
       {"invalid", Vector2::ZERO} // It should quietly ignore invalid data
     });
 
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::SIZE).Get<Vector3>(), actorSize, TEST_LOCATION);
-  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::ANCHOR_POINT).Get<Vector3>(), anchorPoint, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::PIVOT).Get<Vector3>(), pivot, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::COLOR).Get<Vector4>(), color, TEST_LOCATION);
 
   END_TEST;
@@ -1953,7 +1953,7 @@ int UtcDaliHandleGetProperties(void)
   handle.SetProperties(
     Property::Map{
       {Actor::Property::SIZE, Vector3(400.0f, 200.0f, 100.0f)},
-      {Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_CENTER},
+      {Actor::Property::PIVOT, Pivot::TOP_CENTER},
       {Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER},
       {Actor::Property::NAME, "Actor"},
       {Actor::Property::LEAVE_REQUIRED, true},

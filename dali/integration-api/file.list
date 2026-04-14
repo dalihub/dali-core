@@ -34,6 +34,11 @@ SET( platform_abstraction_events_src_files
    ${platform_abstraction_src_dir}/events/wheel-event-integ.cpp
 )
 
+SET( platform_abstraction_rendering_src_files
+  ${platform_abstraction_src_dir}/rendering/decorated-visual-renderer.cpp
+  ${platform_abstraction_src_dir}/rendering/visual-renderer.cpp
+)
+
 SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/addon-manager.h
    ${platform_abstraction_src_dir}/constraint-integ.h
@@ -48,6 +53,7 @@ SET( platform_abstraction_header_files
    ${platform_abstraction_src_dir}/graphics-sync-abstraction.h
    ${platform_abstraction_src_dir}/input-options.h
    ${platform_abstraction_src_dir}/lockless-buffer.h
+   ${platform_abstraction_src_dir}/open-hash-map.h
    ${platform_abstraction_src_dir}/ordered-set.h
    ${platform_abstraction_src_dir}/pixel-data-integ.h
    ${platform_abstraction_src_dir}/platform-abstraction.h
@@ -78,13 +84,20 @@ SET( platform_abstraction_events_header_files
    ${platform_abstraction_src_dir}/events/wheel-event-integ.h
 )
 
+SET( platform_abstraction_rendering_header_files
+  ${platform_abstraction_src_dir}/rendering/decorated-visual-renderer.h
+  ${platform_abstraction_src_dir}/rendering/visual-renderer.h
+)
+
 
 SET( SOURCES ${SOURCES}
   ${platform_abstraction_src_files}
   ${platform_abstraction_events_src_files}
+  ${platform_abstraction_rendering_src_files}
 )
 
 SET( INTEGRATION_API_HEADERS ${INTEGRATION_API_HEADERS}
   ${platform_abstraction_header_files}
   ${platform_abstraction_events_header_files}
+  ${platform_abstraction_rendering_header_files}
 )

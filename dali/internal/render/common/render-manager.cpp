@@ -23,11 +23,11 @@
 #include <memory>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/ordered-set.h>
 #include <dali/integration-api/scene-pre-render-status.h>
 #include <dali/integration-api/trace.h>
-#include <dali/public-api/common/vector-wrapper.h>
 
 #include <dali/internal/event/common/scene-impl.h>
 
@@ -1003,14 +1003,15 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     if((instruction.mFrameBuffer != nullptr && renderToFbo) ||
        (instruction.mFrameBuffer == nullptr && !renderToFbo))
     {
+      bool usesDepthBuffer   = false;
+      bool usesStencilBuffer = false;
+
       for(auto j = 0u; j < instruction.RenderListCount(); ++j)
       {
         const auto& renderList = instruction.GetRenderList(j);
         bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
                                       !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
                                       renderList->HasColorRenderItems());
-        bool        usesDepthBuffer   = false;
-        bool        usesStencilBuffer = false;
         for(auto k = 0u; k < renderList->Count(); ++k)
         {
           auto& item        = renderList->GetItem(k);
@@ -1049,11 +1050,16 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
             }
           }
         }
-        if(!instruction.mFrameBuffer)
-        {
-          sceneNeedsDepthBuffer |= usesDepthBuffer;
-          sceneNeedsStencilBuffer |= usesStencilBuffer;
-        }
+      }
+
+      if(!instruction.mFrameBuffer)
+      {
+        sceneNeedsDepthBuffer |= usesDepthBuffer;
+        sceneNeedsStencilBuffer |= usesStencilBuffer;
+      }
+      else if(instruction.mFrameBuffer->IsBufferUsageChangeableAtRuntime())
+      {
+        instruction.mFrameBuffer->ChangeDepthStencilEnabled(usesDepthBuffer, usesStencilBuffer);
       }
     }
   }

@@ -96,11 +96,17 @@ String& String::operator=(const String& other)
 String::String(String&& other) noexcept
 {
   new(mStorage) std::string(std::move(GetString(other.mStorage)));
+
+  GetString(other.mStorage).~basic_string();
+  new(other.mStorage) std::string(); // Leave in valid state for destructor
 }
 
 String& String::operator=(String&& other) noexcept
 {
   GetString(mStorage) = std::move(GetString(other.mStorage));
+
+  GetString(other.mStorage).~basic_string();
+  new(other.mStorage) std::string(); // Leave in valid state for destructor
   return *this;
 }
 
@@ -140,6 +146,11 @@ size_t String::Size() const
 bool String::Empty() const
 {
   return GetString(mStorage).empty();
+}
+
+void String::Clear()
+{
+  GetString(mStorage).clear();
 }
 
 const char* String::CStr() const

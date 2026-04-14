@@ -43,11 +43,11 @@ struct TransformComponentAnimatable
 };
 
 /**
- * Struct to store the non-animatable part of a component (AnchorPoint and ParentOrigin)
+ * Struct to store the non-animatable part of a component (Pivot and ParentOrigin)
  */
 struct TransformComponentStatic
 {
-  Vector3 mAnchorPoint;
+  Vector3 mPivot;
   Vector3 mParentOrigin;
 };
 
@@ -83,20 +83,20 @@ static constexpr uint32_t COMPONENT_DIRTY_BITS_COUNT            = 2u;
 static constexpr uint32_t WORLD_MATRIX_DIRTY_BITS_COUNT         = 1u;
 static constexpr uint32_t INHERITANCE_MODE_BITS_COUNT           = 3u;
 static constexpr uint32_t IGNORED_BITS_COUNT                    = 1u;
-static constexpr uint32_t POSITION_USES_ANCHOR_POINT_BITS_COUNT = 1u;
+static constexpr uint32_t POSITION_USES_PIVOT_BITS_COUNT = 1u;
 
-static_assert(COMPONENT_DIRTY_BITS_COUNT + WORLD_MATRIX_DIRTY_BITS_COUNT + INHERITANCE_MODE_BITS_COUNT + IGNORED_BITS_COUNT + POSITION_USES_ANCHOR_POINT_BITS_COUNT <= 8 * sizeof(FlagType));
+static_assert(COMPONENT_DIRTY_BITS_COUNT + WORLD_MATRIX_DIRTY_BITS_COUNT + INHERITANCE_MODE_BITS_COUNT + IGNORED_BITS_COUNT + POSITION_USES_PIVOT_BITS_COUNT <= 8 * sizeof(FlagType));
 
 static constexpr uint32_t WORLD_MATRIX_DIRTY_SHIFT         = COMPONENT_DIRTY_BITS_COUNT;
 static constexpr uint32_t INHERITANCE_MODE_SHIFT           = WORLD_MATRIX_DIRTY_SHIFT + WORLD_MATRIX_DIRTY_BITS_COUNT;
 static constexpr uint32_t IGNORED_SHIFT                    = INHERITANCE_MODE_SHIFT + INHERITANCE_MODE_BITS_COUNT;
-static constexpr uint32_t POSITION_USES_ANCHOR_POINT_SHIFT = IGNORED_SHIFT + IGNORED_BITS_COUNT;
+static constexpr uint32_t POSITION_USES_PIVOT_SHIFT = IGNORED_SHIFT + IGNORED_BITS_COUNT;
 
 static constexpr uint32_t COMPONENT_DIRTY_MASK            = ((1u << COMPONENT_DIRTY_BITS_COUNT) - 1u);
 static constexpr uint32_t WORLD_MATRIX_DIRTY_MASK         = ((1u << WORLD_MATRIX_DIRTY_BITS_COUNT) - 1u);
 static constexpr uint32_t INHERITANCE_MODE_MASK           = ((1u << INHERITANCE_MODE_BITS_COUNT) - 1u);
 static constexpr uint32_t IGNORED_MASK                    = ((1u << IGNORED_BITS_COUNT) - 1u);
-static constexpr uint32_t POSITION_USES_ANCHOR_POINT_MASK = ((1u << POSITION_USES_ANCHOR_POINT_BITS_COUNT) - 1u);
+static constexpr uint32_t POSITION_USES_PIVOT_MASK = ((1u << POSITION_USES_PIVOT_BITS_COUNT) - 1u);
 
 /**
  * @brief Helper codes to set / get variables from TransformBitField::FlagType
@@ -137,15 +137,15 @@ inline void SetIgnoredBitField(TransformComponentBitField::FlagType& flags, bool
   }
 }
 
-inline void SetPositionUsesAnchorPointBitField(TransformComponentBitField::FlagType& flags, bool used)
+inline void SetPositionUsesPivotBitField(TransformComponentBitField::FlagType& flags, bool used)
 {
   if(used)
   {
-    flags |= (TransformComponentBitField::POSITION_USES_ANCHOR_POINT_MASK << TransformComponentBitField::POSITION_USES_ANCHOR_POINT_SHIFT);
+    flags |= (TransformComponentBitField::POSITION_USES_PIVOT_MASK << TransformComponentBitField::POSITION_USES_PIVOT_SHIFT);
   }
   else
   {
-    flags &= ~(TransformComponentBitField::POSITION_USES_ANCHOR_POINT_MASK << TransformComponentBitField::POSITION_USES_ANCHOR_POINT_SHIFT);
+    flags &= ~(TransformComponentBitField::POSITION_USES_PIVOT_MASK << TransformComponentBitField::POSITION_USES_PIVOT_SHIFT);
   }
 }
 
@@ -169,9 +169,9 @@ inline bool IsIgnoredBitField(const TransformComponentBitField::FlagType& flags)
   return flags & (TransformComponentBitField::IGNORED_MASK << TransformComponentBitField::IGNORED_SHIFT);
 }
 
-inline bool IsPositionUsesAnchorPointBitField(const TransformComponentBitField::FlagType& flags)
+inline bool IsPositionUsesPivotBitField(const TransformComponentBitField::FlagType& flags)
 {
-  return flags & (TransformComponentBitField::POSITION_USES_ANCHOR_POINT_MASK << TransformComponentBitField::POSITION_USES_ANCHOR_POINT_SHIFT);
+  return flags & (TransformComponentBitField::POSITION_USES_PIVOT_MASK << TransformComponentBitField::POSITION_USES_PIVOT_SHIFT);
 }
 
 inline void ComponentDirtyAging(TransformComponentBitField::FlagType& flags)
@@ -189,7 +189,7 @@ enum TransformManagerProperty
   TRANSFORM_PROPERTY_POSITION = 0,
   TRANSFORM_PROPERTY_SCALE,
   TRANSFORM_PROPERTY_IGNORED,
-  TRANSFORM_PROPERTY_ANCHOR_POINT,
+  TRANSFORM_PROPERTY_PIVOT,
   TRANSFORM_PROPERTY_PARENT_ORIGIN,
   TRANSFORM_PROPERTY_SIZE,
   TRANSFORM_PROPERTY_WORLD_POSITION,
@@ -492,7 +492,7 @@ public:
    * @param[in] id Id of the transform component
    * @param[in] value True if the position should use the anchor-point
    */
-  void SetPositionUsesAnchorPoint(TransformId id, bool value);
+  void SetPositionUsesPivot(TransformId id, bool value);
 
   /**
    * @brief Sets ignored value.

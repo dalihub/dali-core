@@ -19,7 +19,7 @@
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/devel-api/common/vector-wrapper.h>
 
 #include <algorithm>
 #include <iomanip>

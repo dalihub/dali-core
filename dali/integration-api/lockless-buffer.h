@@ -22,8 +22,8 @@
 #include <cstdint> // uint32_t, uint8_t
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <cstring>
 
 namespace Dali

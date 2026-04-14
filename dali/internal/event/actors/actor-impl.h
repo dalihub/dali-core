@@ -391,27 +391,27 @@ public:
   const Vector3& GetCurrentParentOrigin() const;
 
   /**
-   * Set the anchor-point of an actor. This is expressed in 2D unit coordinates, such that
+   * Set the pivot of an actor. This is expressed in 2D unit coordinates, such that
    * (0.0, 0.0, 0.5) is the top-left corner of the actor, and (1.0, 1.0, 0.5) is the bottom-right corner.
-   * The default anchor point is top-left (0.0, 0.0, 0.5).
+   * The default pivot is top-left (0.0, 0.0, 0.5).
    * An actor position is the distance between its parent-origin, and this anchor-point.
    * An actor's rotation is centered around its anchor-point.
-   * @param [in] anchorPoint The new anchor-point.
+   * @param [in] pivot The new anchor-point.
    */
-  void SetAnchorPoint(const Vector3& anchorPoint);
+  void SetPivot(const Vector3& pivot);
 
   /**
    * Retrieve the anchor-point of an actor.
    * @return The anchor-point.
    */
-  const Vector3& GetCurrentAnchorPoint() const;
+  const Vector3& GetCurrentPivot() const;
 
   /**
-   * If the position uses the anchor point, return the anchor point, otherwise
+   * If the position uses the pivot, return the pivot, otherwise
    * return top left.
-   * @return The anchor point for positioning.
+   * @return The pivot for positioning.
    */
-  Vector3 GetAnchorPointForPosition() const;
+  Vector3 GetPivotForPosition() const;
 
   /**
    * Sets the position of the Actor.
@@ -2140,7 +2140,7 @@ protected:
   RendererContainer* mRenderers;      ///< Renderer container
   RendererContainer* mCacheRenderers; ///< Renderers rendering offscreen rendering results
   Vector3*           mParentOrigin;   ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
-  Vector3*           mAnchorPoint;    ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
+  Vector3*           mPivot;          ///< NULL means Pivot::DEFAULT. Pivot is non-animatable
   ActorGestureData*  mGestureData;    ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
@@ -2182,7 +2182,7 @@ protected:
   bool mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
   bool mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.
-  bool mPositionUsesAnchorPoint : 1;   ///< Cached: Whether the position uses the anchor point or not.
+  bool mPositionUsesPivot : 1;         ///< Cached: Whether the position uses the pivot or not.
   bool mVisible : 1;                   ///< Cached: Whether the actor is visible or not.
   bool mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
   bool mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.

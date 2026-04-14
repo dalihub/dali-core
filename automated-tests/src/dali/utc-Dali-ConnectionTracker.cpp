@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@
 
 using namespace Dali;
 
-void utc_dali_conenction_tracker_startup(void)
+void utc_dali_connection_tracker_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_conenction_tracker_cleanup(void)
+void utc_dali_connection_tracker_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
@@ -217,6 +217,176 @@ int UtcConnectionTrackerGetConnectionCountN(void)
   DALI_TEST_CHECK(button->DownSignal().GetConnectionCount() == 0);
 
   delete button;
+
+  END_TEST;
+}
+
+int UtcConnectionTrackerInlineToMapHandover(void)
+{
+  tet_infoline("Test that connecting >8 signals triggers inline-to-map handover");
+  TestApplication application;
+
+  const int   count = 12; // Exceeds inline capacity of 8
+  TestButton* buttons[count];
+  TestApp     testApp;
+
+  for(int i = 0; i < count; ++i)
+  {
+    buttons[i] = new TestButton(i);
+    buttons[i]->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+  }
+
+  DALI_TEST_EQUALS(testApp.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // All signals should still be connected
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(buttons[i]->DownSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+  }
+
+  // Emit each — all should fire
+  for(int i = 0; i < count; ++i)
+  {
+    testApp.mButtonPressed = false;
+    buttons[i]->Press();
+    DALI_TEST_EQUALS(testApp.mButtonPressed, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(testApp.GetButtonPressedId(), i, TEST_LOCATION);
+  }
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete buttons[i];
+  }
+
+  END_TEST;
+}
+
+int UtcConnectionTrackerDisconnectAfterHandover(void)
+{
+  tet_infoline("Test disconnecting signals after inline-to-map handover");
+  TestApplication application;
+
+  const int   count = 12;
+  TestButton* buttons[count];
+  TestApp     testApp;
+
+  for(int i = 0; i < count; ++i)
+  {
+    buttons[i] = new TestButton(i);
+    buttons[i]->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+  }
+
+  DALI_TEST_EQUALS(testApp.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  // Disconnect half
+  for(int i = 0; i < count; i += 2)
+  {
+    buttons[i]->DownSignal().Disconnect(&testApp, &TestApp::OnButtonPress);
+  }
+
+  DALI_TEST_EQUALS(testApp.GetConnectionCount(), static_cast<std::size_t>(count / 2), TEST_LOCATION);
+
+  // Even-indexed buttons should be disconnected
+  for(int i = 0; i < count; i += 2)
+  {
+    DALI_TEST_EQUALS(buttons[i]->DownSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  }
+
+  // Odd-indexed buttons should still work
+  for(int i = 1; i < count; i += 2)
+  {
+    DALI_TEST_EQUALS(buttons[i]->DownSignal().GetConnectionCount(), 1u, TEST_LOCATION);
+    testApp.mButtonPressed = false;
+    buttons[i]->Press();
+    DALI_TEST_EQUALS(testApp.mButtonPressed, true, TEST_LOCATION);
+  }
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete buttons[i];
+  }
+
+  END_TEST;
+}
+
+int UtcConnectionTrackerDisconnectAllAfterHandover(void)
+{
+  tet_infoline("Test DisconnectAll resets to inline mode after map handover");
+  TestApplication application;
+
+  const int   count = 12;
+  TestButton* buttons[count];
+  TestApp     testApp;
+
+  for(int i = 0; i < count; ++i)
+  {
+    buttons[i] = new TestButton(i);
+    buttons[i]->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+  }
+
+  DALI_TEST_EQUALS(testApp.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+
+  testApp.DisconnectAll();
+
+  DALI_TEST_EQUALS(testApp.GetConnectionCount(), static_cast<std::size_t>(0), TEST_LOCATION);
+
+  // All signals should be disconnected
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(buttons[i]->DownSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  }
+
+  // Reconnect a few (should work in inline mode again after reset)
+  buttons[0]->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+  buttons[1]->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+
+  DALI_TEST_EQUALS(testApp.GetConnectionCount(), static_cast<std::size_t>(2), TEST_LOCATION);
+
+  testApp.mButtonPressed = false;
+  buttons[0]->Press();
+  DALI_TEST_EQUALS(testApp.mButtonPressed, true, TEST_LOCATION);
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete buttons[i];
+  }
+
+  END_TEST;
+}
+
+int UtcConnectionTrackerDestroyAfterHandover(void)
+{
+  tet_infoline("Test tracker destruction after map handover disconnects all signals");
+  TestApplication application;
+
+  const int   count = 12;
+  TestButton* buttons[count];
+
+  for(int i = 0; i < count; ++i)
+  {
+    buttons[i] = new TestButton(i);
+  }
+
+  {
+    TestApp testApp;
+    for(int i = 0; i < count; ++i)
+    {
+      buttons[i]->DownSignal().Connect(&testApp, &TestApp::OnButtonPress);
+    }
+    DALI_TEST_EQUALS(testApp.GetConnectionCount(), static_cast<std::size_t>(count), TEST_LOCATION);
+    // testApp goes out of scope here
+  }
+
+  // All signals should be disconnected after tracker destruction
+  for(int i = 0; i < count; ++i)
+  {
+    DALI_TEST_EQUALS(buttons[i]->DownSignal().GetConnectionCount(), 0u, TEST_LOCATION);
+  }
+
+  for(int i = 0; i < count; ++i)
+  {
+    delete buttons[i];
+  }
 
   END_TEST;
 }

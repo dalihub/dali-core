@@ -42,37 +42,40 @@ void CollectedUniformMap::AddMappings(const UniformMap& uniformMap)
 
   newUniformMappings.Clear();
 
-  auto& uniformMapContainer = uniformMap.GetUniformMapContainer();
-
-  for(const auto& uniformMap : uniformMapContainer)
+  if(uniformMap.Count() > 0u)
   {
-    const auto& uniformName      = uniformMap.first;
-    const auto& propertyMappings = uniformMap.second;
+    auto& uniformMapContainer = uniformMap.GetUniformMapContainer();
 
-    bool found = false;
-
-    for(UniformMap::SizeType j = 0, jCount = mUniformMap.Count(); j < jCount; ++j)
+    for(const auto& uniformMap : uniformMapContainer)
     {
-      if(mUniformMap[j].uniformName == uniformName)
+      const auto& uniformName      = uniformMap.first;
+      const auto& propertyMappings = uniformMap.second;
+
+      bool found = false;
+
+      for(UniformMap::SizeType j = 0, jCount = mUniformMap.Count(); j < jCount; ++j)
       {
-        found = true;
-        break;
+        if(mUniformMap[j].uniformName == uniformName)
+        {
+          found = true;
+          break;
+        }
+      }
+
+      if(!found)
+      {
+        newUniformMappings.PushBack(propertyMappings);
       }
     }
 
-    if(!found)
+    if(newUniformMappings.Count() > 0)
     {
-      newUniformMappings.PushBack(propertyMappings);
-    }
-  }
+      mUniformMap.Reserve(mUniformMap.Count() + newUniformMappings.Count());
 
-  if(newUniformMappings.Count() > 0)
-  {
-    mUniformMap.Reserve(mUniformMap.Count() + newUniformMappings.Count());
-
-    for(UniformMap::SizeType i = 0, iCount = newUniformMappings.Count(); i < iCount; ++i)
-    {
-      mUniformMap.PushBack(newUniformMappings[i]);
+      for(UniformMap::SizeType i = 0, iCount = newUniformMappings.Count(); i < iCount; ++i)
+      {
+        mUniformMap.PushBack(newUniformMappings[i]);
+      }
     }
   }
 }

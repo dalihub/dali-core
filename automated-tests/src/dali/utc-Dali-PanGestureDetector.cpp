@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -322,7 +322,7 @@ int UtcDaliPanGestureDetectorNew(void)
   // Attach an actor and emit a touch event on the actor to ensure complete line coverage
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   detector.Attach(actor);
 
   application.GetScene().Add(actor);
@@ -383,7 +383,7 @@ int UtcDaliPanGestureSetMinimumTouchesRequired(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -425,7 +425,7 @@ int UtcDaliPanGestureSetMaximumTouchesRequired(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -463,7 +463,7 @@ int UtcDaliPanGestureSetMaximumMotionEventAge(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -516,7 +516,7 @@ int UtcDaliPanGestureSignalReceptionNegative(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -556,7 +556,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionLeave(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -631,7 +631,7 @@ int UtcDaliPanGestureSignalReceptionDownMotionUp(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -692,7 +692,7 @@ int UtcDaliPanGestureSignalReceptionDetach(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -748,7 +748,7 @@ int UtcDaliPanGestureSignalReceptionDetachWhilePanning(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -803,7 +803,7 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
   // is destroyed.
   Actor tempActor = Actor::New();
   tempActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  tempActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  tempActor.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.GetScene().Add(tempActor);
   detector.Attach(tempActor);
 
@@ -813,7 +813,7 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
   {
     Actor actor = Actor::New();
     actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-    actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
     application.GetScene().Add(actor);
 
     // Render and notify
@@ -849,6 +849,63 @@ int UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning(void)
   data.Reset();
 
   TestEndPan(application, Vector2(10.0f, 4.0f), time);
+
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliPanGestureSignalReceptionActorBecomesInvisible(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start pan within the actor's area
+  uint32_t time = 100;
+  TestStartPan(application, Vector2(10.0f, 20.0f), Vector2(26.0f, 20.0f), time);
+  application.SendNotification();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::STARTED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Continue the pan within the actor's area
+  data.Reset();
+  TestMovePan(application, Vector2(26.0f, 4.0f), time);
+  time += TestGetFrameInterval();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CONTINUING, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Make the actor invisible, this should emit CANCELLED gesture during the next pan event
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  application.SendNotification();
+  application.Render();
+
+  // Next move should trigger the gesture state as CANCELLED, and no more gestures
+  TestMovePan(application, Vector2(10.0f, 4.0f), time);
+  time += TestGetFrameInterval();
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
+
+  // Try again to finish the pan - we should not receive it since it was cancelled
+  data.Reset();
+  TestEndPan(application, Vector2(5.0f, 4.0f), time);
 
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   END_TEST;
@@ -923,7 +980,7 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   // Set child to completely cover parent.
@@ -931,7 +988,7 @@ int UtcDaliPanGestureSignalReceptionChildHit(void)
   // conversion of the parent actor is correct.
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   child.SetProperty(Actor::Property::ORIENTATION, Quaternion(Dali::Degree(90.0f), Vector3::ZAXIS));
   parent.Add(child);
@@ -983,13 +1040,13 @@ int UtcDaliPanGestureSignalReceptionAttachDetachMany(void)
 
   Actor first = Actor::New();
   first.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  first.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  first.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(first);
 
   Actor second = Actor::New();
   second.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   second.SetProperty(Actor::Property::POSITION_X, 100.0f);
-  second.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  second.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(second);
 
   // Render and notify
@@ -1046,7 +1103,7 @@ int UtcDaliPanGestureSignalReceptionActorBecomesUntouchable(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1086,7 +1143,8 @@ int UtcDaliPanGestureSignalReceptionActorBecomesUntouchable(void)
 
   TestEndPan(application, Vector2(10.0f, 4.0f), time);
 
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(GestureState::CANCELLED, data.receivedGesture.GetState(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -1096,12 +1154,12 @@ int UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   Actor actor2 = Actor::New();
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   application.GetScene().Add(actor2);
 
   // Render and notify
@@ -1182,7 +1240,7 @@ int UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling(void)
 
   Actor actor1 = Actor::New();
   actor1.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor1.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor1);
   SignalData             data1;
   GestureReceivedFunctor functor1(data1);
@@ -1192,7 +1250,7 @@ int UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling(void)
 
   Actor actor2 = Actor::New();
   actor2.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor2.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::BOTTOM_RIGHT);
+  actor2.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_RIGHT);
   actor2.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT);
   application.GetScene().Add(actor2);
   SignalData             data2;
@@ -1222,7 +1280,7 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDown(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1270,12 +1328,12 @@ int UtcDaliPanGestureSignalReceptionAttachActorAfterDownAfterInitialPanToAnother
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::CENTER);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   child.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   parent.Add(child);
 
@@ -1342,7 +1400,7 @@ int UtcDaliPanGestureSignalReceptionDifferentPossible(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1411,7 +1469,7 @@ int UtcDaliPanGestureActorUnstaged(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -1511,14 +1569,14 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Create and add a second actor so that GestureDetector destruction does not come into play.
   Actor dummyActor(Actor::New());
   dummyActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   dummyActor.SetProperty(Actor::Property::POSITION, Vector2(100.0f, 100.0f));
-  dummyActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  dummyActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(dummyActor);
 
   // Render and notify
@@ -1752,12 +1810,12 @@ int UtcDaliPanGestureAngleProcessing(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(child);
 
   // Render and notify
@@ -1884,12 +1942,12 @@ int UtcDaliPanGestureDirectionProcessing(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parent.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(parent);
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  child.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  child.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   parent.Add(child);
 
   // Render and notify
@@ -1999,7 +2057,7 @@ int UtcDaliPanGestureNoPredictionNoSmoothing(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2062,7 +2120,7 @@ int UtcDaliPanGestureNoPredictionSmoothing(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2126,7 +2184,7 @@ int UtcDaliPanGesturePredictionNoSmoothing(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2189,7 +2247,7 @@ int UtcDaliPanGesturePredictionSmoothing01(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2255,7 +2313,7 @@ int UtcDaliPanGesturePredictionSmoothing02(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2362,7 +2420,7 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap01(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2436,7 +2494,7 @@ int UtcDaliPanGesturePrediction2SmoothingMultiTap02(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2541,7 +2599,7 @@ int UtcDaliPanGesturePrediction2Smoothing(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2635,7 +2693,7 @@ int UtcDaliPanGestureSetProperties(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2697,7 +2755,7 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2827,7 +2885,7 @@ int UtcDaliPanGestureGetPropertyWithSceneObject(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2863,7 +2921,7 @@ int UtcDaliPanGestureLayerConsumesTouch(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2876,7 +2934,7 @@ int UtcDaliPanGestureLayerConsumesTouch(void)
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  layer.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(layer);
   layer.RaiseToTop();
 
@@ -2916,7 +2974,7 @@ int UtcDaliPanGestureNoTimeDiff(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -2957,7 +3015,7 @@ int UtcDaliPanGestureDisableDetectionDuringPanN(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Add a pan detector
@@ -3003,11 +3061,11 @@ int UtcDaliPanGestureWhenGesturePropargation(void)
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   parentActor.Add(childActor);
   application.GetScene().Add(parentActor);
@@ -3091,11 +3149,11 @@ int UtcDaliPanGestureHandleEvent(void)
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   parentActor.Add(childActor);
   application.GetScene().Add(parentActor);
@@ -3151,7 +3209,7 @@ int UtcDaliPanGestureSignalReceptionWithGeometryHittest(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -3210,11 +3268,11 @@ int UtcDaliPanGestureFeedTouchWhenGesturePropagation(void)
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  parentActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  parentActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  childActor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  childActor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   parentActor.Add(childActor);
   application.GetScene().Add(parentActor);
@@ -3361,7 +3419,7 @@ int UtcDaliPanGestureSignalGetLastGestureState(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  actor.SetProperty(Actor::Property::ANCHOR_POINT, AnchorPoint::TOP_LEFT);
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
   Dali::Integration::Scene scene = application.GetScene();
   scene.Add(actor);

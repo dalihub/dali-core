@@ -529,7 +529,7 @@ bool PipelineCacheQueryInfo::Equal(const PipelineCacheQueryInfo& lhs, const Pipe
 
 PipelineCache::PipelineCache(Graphics::Controller& controller)
 : graphicsController(&controller),
-  mPipelineUseRenderTarget(controller.HasClipMatrix()) ///< TODO : Need to implement more clever way to determine whether render target is used or not.
+  mPipelineUseRenderTarget(controller.GetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_GRAPHICS_FEATURE_FLAGS) & Graphics::GraphicsFeatureFlagBits::PIPELINE_USE_RENDER_TARGET_BIT)
 {
   // Clean up cache first
   CleanLatestUsedCache();
