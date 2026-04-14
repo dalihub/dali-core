@@ -191,6 +191,12 @@ bool String::operator==(const char* rhs) const
   return (rhs && GetString(mStorage) == rhs) || (!rhs && Empty());
 }
 
+bool String::operator==(const StringView& rhs) const
+{
+  // re-use Dali::StringView comparision.
+  return rhs == *this;
+}
+
 bool String::operator!=(const String& rhs) const
 {
   return GetString(mStorage) != GetString(rhs.mStorage);

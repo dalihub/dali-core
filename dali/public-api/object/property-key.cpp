@@ -51,7 +51,7 @@ Property::Key::Key(const char* key)
 {
 }
 
-bool Property::Key::operator==(const Dali::StringView& rhs)
+bool Property::Key::operator==(const Dali::StringView& rhs) const
 {
   bool result = false;
   if(type == Key::STRING)
@@ -61,12 +61,12 @@ bool Property::Key::operator==(const Dali::StringView& rhs)
   return result;
 }
 
-bool Property::Key::operator==(const char* rhs)
+bool Property::Key::operator==(const char* rhs) const
 {
   return operator==(Dali::StringView(rhs));
 }
 
-bool Property::Key::operator==(Property::Index rhs)
+bool Property::Key::operator==(Property::Index rhs) const
 {
   bool result = false;
   if(type == Key::INDEX)
@@ -76,7 +76,7 @@ bool Property::Key::operator==(Property::Index rhs)
   return result;
 }
 
-bool Property::Key::operator==(const Key& rhs)
+bool Property::Key::operator==(const Key& rhs) const
 {
   bool result = false;
   if(type == Key::STRING && rhs.type == Key::STRING)
@@ -90,22 +90,22 @@ bool Property::Key::operator==(const Key& rhs)
   return result;
 }
 
-bool Property::Key::operator!=(const Dali::StringView& rhs)
+bool Property::Key::operator!=(const Dali::StringView& rhs) const
 {
   return !operator==(rhs);
 }
 
-bool Property::Key::operator!=(const char* rhs)
+bool Property::Key::operator!=(const char* rhs) const
 {
   return !operator==(rhs);
 }
 
-bool Property::Key::operator!=(Property::Index rhs)
+bool Property::Key::operator!=(Property::Index rhs) const
 {
   return !operator==(rhs);
 }
 
-bool Property::Key::operator!=(const Key& rhs)
+bool Property::Key::operator!=(const Key& rhs) const
 {
   return !operator==(rhs);
 }

@@ -29,11 +29,11 @@
  */
 #define DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex)                                                                           \
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::develNamespace ::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty); \
-  static_assert((objectNamespace::develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
+  static_assert((static_cast<int>(objectNamespace::develNamespace ::Property::enumIndex) - static_cast<int>(objectNamespace::objectType::PROPERTY_START_INDEX)) == count);
 
 #define DALI_DEVEL_PROPERTY_REGISTRATION_INTERNAL_READ_ONLY(count, typeRegistrationObject, objectNamespace, objectType, develNamespace, text, valueType, enumIndex)                                             \
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::develNamespace ::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty); \
-  static_assert((objectNamespace::develNamespace ::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
+  static_assert((static_cast<int>(objectNamespace::develNamespace ::Property::enumIndex) - static_cast<int>(objectNamespace::objectType::PROPERTY_START_INDEX)) == count);
 
 /**
  * @brief These macros are used to define properties for implementations of CustomActor.

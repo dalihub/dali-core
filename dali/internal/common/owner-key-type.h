@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OWNER_KEY_TYPE_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ public:
    * Compare with a key.
    * @return true if the key matches the one owned by this object.
    */
-  bool operator==(const KeyType key)
+  bool operator==(const KeyType key) const
   {
     return (mKey == key);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,15 +39,15 @@ Dali::FreeList& GetFreeList()
 uint32_t AcquireConstrainerTag()
 {
   uint32_t tag = GetFreeList().Add(0);
-  DALI_ASSERT_ALWAYS(tag < Dali::ConstraintTagRanges::INTERNAL_TAG_MAX_COUNT_PER_DERIVATION && "To many constrainer applied!");
-  return tag + Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START;
+  DALI_ASSERT_ALWAYS(tag < static_cast<uint32_t>(Dali::ConstraintTagRanges::INTERNAL_TAG_MAX_COUNT_PER_DERIVATION) && "To many constrainer applied!");
+  return tag + static_cast<uint32_t>(Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START);
 }
 
 void ReleaseConstrainerTag(uint32_t tag)
 {
-  if(DALI_LIKELY(tag >= Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START))
+  if(DALI_LIKELY(tag >= static_cast<uint32_t>(Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START)))
   {
-    GetFreeList().Remove(tag - Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START);
+    GetFreeList().Remove(tag - static_cast<uint32_t>(Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START));
   }
 }
 
@@ -55,8 +55,8 @@ void ReleaseConstrainerTag(uint32_t tag)
  * @brief Special tag number if we never apply the constraints before.
  */
 constexpr uint32_t NOT_APPLIED_TAG_NUMBER = 0u;
-static_assert(NOT_APPLIED_TAG_NUMBER < Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START);
-static_assert(NOT_APPLIED_TAG_NUMBER < Dali::ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START);
+static_assert(NOT_APPLIED_TAG_NUMBER < static_cast<uint32_t>(Dali::ConstraintTagRanges::CORE_CONSTRAINT_TAG_START));
+static_assert(NOT_APPLIED_TAG_NUMBER < static_cast<uint32_t>(Dali::ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START));
 } // namespace
 
 Constrainer::Constrainer()

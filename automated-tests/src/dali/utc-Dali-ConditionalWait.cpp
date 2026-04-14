@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,7 +163,7 @@ int UtcConditionalWait3P(void)
   while(gNotifyCount > 0)
   {
     gConditionalWait->Wait();
-    --gNotifyCount;
+    gNotifyCount = (gNotifyCount - 1);
     DALI_TEST_EQUALS(0u, gConditionalWait->GetWaitCount(), TEST_LOCATION);
     usleep(10); // 10 microseconds between each notify
   }
@@ -193,7 +193,7 @@ int UtcConditionalWait4P(void)
   while(gNotifyCount > 0)
   {
     gConditionalWait->Wait();
-    --gNotifyCount;
+    gNotifyCount = (gNotifyCount - 1);
     DALI_TEST_EQUALS(0u, gConditionalWait->GetWaitCount(), TEST_LOCATION);
     usleep(10); // 10 microseconds between each notify
   }

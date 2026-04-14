@@ -739,6 +739,37 @@ int UtcDaliStringViewEqualityCStringLeftSideP(void)
   END_TEST;
 }
 
+int UtcDaliStringViewEqualityDaliStringOperatorP(void)
+{
+  tet_printf("Test StringView equality operator with Dali::String\n");
+  TestApplication application;
+
+  String     string1("Hello");
+  String     string2("World");
+  StringView view1("Hello");
+  DALI_TEST_CHECK(view1 == string1);
+  DALI_TEST_CHECK(string1 == view1);
+  DALI_TEST_CHECK(!(view1 == string2));
+  DALI_TEST_CHECK(!(string2 == view1));
+
+  tet_printf("Test empty view comparison with const char*\n");
+  String     emptyString;
+  StringView emptyView;
+  DALI_TEST_CHECK(emptyView == emptyString);
+  DALI_TEST_CHECK(emptyString == emptyView);
+  DALI_TEST_CHECK(!(emptyView == string1));
+  DALI_TEST_CHECK(!(string1 == emptyView));
+  DALI_TEST_CHECK(!(view1 == emptyString));
+  DALI_TEST_CHECK(!(emptyString == view1));
+
+  tet_printf("Test substring view comparison\n");
+  StringView partial("Hello World", 5);
+  DALI_TEST_CHECK(partial == string1);
+  DALI_TEST_CHECK(string1 == partial);
+
+  END_TEST;
+}
+
 int UtcDaliStringViewNotEqualsCStringP(void)
 {
   tet_printf("Test StringView inequality operator (free function with const char* on left)\n");

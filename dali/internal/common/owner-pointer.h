@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_OWNER_POINTER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,7 +167,7 @@ public:
    * Compare with a raw pointer.
    * @return true if the raw pointer matches the one owned by this object.
    */
-  bool operator==(const T* pointer)
+  bool operator==(const T* pointer) const
   {
     return (mObject == pointer);
   }

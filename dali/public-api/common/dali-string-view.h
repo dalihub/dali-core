@@ -144,6 +144,15 @@ public:
    */
   bool operator==(const char* other) const;
 
+  /**
+   * @brief Comparison equality operator
+   *
+   * @SINCE_2_5.18
+   * @param[in] other The string to compare
+   * @return True if both strings are equal
+   */
+  bool operator==(const String& other) const;
+
 private:
   static constexpr size_t StorageSize  = 16; ///< Opaque storage sized for std::string_view
   static constexpr size_t StorageAlign = 8;  ///< Opaque storage aligned for std::string_view
