@@ -55,8 +55,6 @@ struct Vector2;
 struct Vector3;
 struct Vector4;
 
-using Padding = Rect<float>; ///< Padding definition @SINCE_1_0.0
-
 /**
  * @brief Actor is the primary object with which Dali applications interact.
  *

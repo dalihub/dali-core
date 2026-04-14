@@ -32,13 +32,13 @@ namespace Dali
  */
 
 /**
- * @brief Structure describing the a collection of uint16_t.
+ * @brief Structure describing the a collection of int16_t.
  * @SINCE_1_2.62
  */
 struct DALI_CORE_API Extents
 {
   /**
-   * @brief Default constructor which provides an initialized Dali::Extents( 0u, 0u, 0u, 0u ).
+   * @brief Default constructor which provides an initialized Dali::Extents( 0, 0, 0, 0 ).
    * @SINCE_1_2.62
    */
   Extents();
@@ -55,18 +55,18 @@ struct DALI_CORE_API Extents
    * @SINCE_2_2.17
    * @param[in] move A reference to the moved Extents
    */
-  Extents(Extents&& move) = default;
+  Extents(Extents&& move) noexcept = default;
 
   /**
    * @brief Constructor.
    *
    * @SINCE_1_2.62
-   * @param[in] start     Start extent
-   * @param[in] end       End extent
-   * @param[in] top       Top extent
-   * @param[in] bottom    Bottom extent
+   * @param[in] start  Start extent
+   * @param[in] end    End extent
+   * @param[in] top    Top extent
+   * @param[in] bottom Bottom extent
    */
-  Extents(uint16_t start, uint16_t end, uint16_t top, uint16_t bottom);
+  Extents(int16_t start, int16_t end, int16_t top, int16_t bottom);
 
   /**
    * @brief Copy Assignment operator.
@@ -82,16 +82,16 @@ struct DALI_CORE_API Extents
    * @param[in] move A reference to the moved Extents
    * @return Itself
    */
-  Extents& operator=(Extents&& move) = default;
+  Extents& operator=(Extents&& move) noexcept = default;
 
   /**
    * @brief Assignment operator.
    *
    * @SINCE_1_2.62
-   * @param[in] array Array of uint16_t
+   * @param[in] array Array of int16_t
    * @return Itself
    */
-  Extents& operator=(const uint16_t* array);
+  Extents& operator=(const int16_t* array);
 
   /**
    * @brief Equality operator.
@@ -112,10 +112,10 @@ struct DALI_CORE_API Extents
   bool operator!=(const Extents& rhs) const;
 
 public:
-  uint16_t start;  ///< The start extent.  @SINCE_1_2.62
-  uint16_t end;    ///< The end extent.    @SINCE_1_2.62
-  uint16_t top;    ///< The top extent.    @SINCE_1_2.62
-  uint16_t bottom; ///< The bottom extent. @SINCE_1_2.62
+  int16_t start;  ///< The start extent.  @SINCE_1_2.62
+  int16_t end;    ///< The end extent.    @SINCE_1_2.62
+  int16_t top;    ///< The top extent.    @SINCE_1_2.62
+  int16_t bottom; ///< The bottom extent. @SINCE_1_2.62
 };
 
 /**

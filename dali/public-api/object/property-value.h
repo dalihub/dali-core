@@ -528,7 +528,7 @@ public:
    * @brief Retrieves an extents.
    *
    * @SINCE_1_2.62
-   * @param[out] extentsValue Extents, a collection of 4 uint16_t
+   * @param[out] extentsValue Extents, a collection of 4 int16_t
    * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
    * @pre GetType() is a type convertible to Extents.
    */

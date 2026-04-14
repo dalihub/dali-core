@@ -28,7 +28,7 @@ Extents::Extents()
 {
 }
 
-Extents::Extents(uint16_t start, uint16_t end, uint16_t top, uint16_t bottom)
+Extents::Extents(int16_t start, int16_t end, int16_t top, int16_t bottom)
 : start(start),
   end(end),
   top(top),
@@ -36,7 +36,7 @@ Extents::Extents(uint16_t start, uint16_t end, uint16_t top, uint16_t bottom)
 {
 }
 
-Extents& Extents::operator=(const uint16_t* array)
+Extents& Extents::operator=(const int16_t* array)
 {
   start  = array[0];
   end    = array[1];

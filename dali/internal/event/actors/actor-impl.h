@@ -1044,7 +1044,7 @@ public:
   /**
    * @brief Set the padding for a dimension
    *
-   * @param[in] padding Padding for the dimension. X = start (e.g. left, bottom), y = end (e.g. right, top)
+   * @param[in] padding Padding for the dimension. X = start (e.g. left, top), y = end (e.g. right, bottom)
    * @param[in] dimension The dimension to set
    */
   void SetPadding(const Vector2& padding, Dimension::Type dimension);
@@ -1399,21 +1399,21 @@ public:
   }
 
   /**
-   * Sets the touch area offset of an actor.
-   * @param [in] offset The new offset of area (left, right, bottom, top).
+   * Sets the touch area margin of an actor.
+   * @param [in] offset The new extents of area.
    */
-  void SetTouchAreaOffset(Rect<int> offset)
+  void SetTouchAreaMargin(const Extents& extents)
   {
-    mTouchAreaOffset = offset;
+    mTouchAreaMargin = extents;
   }
 
   /**
-   * Retrieve the Actor's touch area offset.
-   * @return The Actor's touch area offset.
+   * Retrieve the Actor's touch area margin.
+   * @return The Actor's touch area margin.
    */
-  const Rect<int>& GetTouchAreaOffset() const
+  const Extents& GetTouchAreaMargin() const
   {
-    return mTouchAreaOffset;
+    return mTouchAreaMargin;
   }
 
   /**
@@ -2161,7 +2161,7 @@ protected:
   Vector4    mTargetColor;       ///< Event-side storage for color
   Vector3    mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3    mTargetScale;       ///< Event-side storage for scale
-  Rect<int>  mTouchAreaOffset;   ///< touch area offset (left, right, bottom, top)
+  Extents    mTouchAreaMargin;   ///< Extents info of touch area margin
 
   std::string mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.

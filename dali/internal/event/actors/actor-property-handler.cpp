@@ -584,9 +584,9 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_AREA_OFFSET:
+    case Dali::DevelActor::Property::TOUCH_AREA_MARGIN:
     {
-      CheckValidAndSet(property, actor, &Actor::SetTouchAreaOffset);
+      CheckValidAndSet(property, actor, &Actor::SetTouchAreaMargin);
       break;
     }
 
@@ -1528,9 +1528,9 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_AREA_OFFSET:
+    case Dali::DevelActor::Property::TOUCH_AREA_MARGIN:
     {
-      value = actor.GetTouchAreaOffset();
+      value = actor.GetTouchAreaMargin();
       break;
     }
 

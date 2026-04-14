@@ -96,7 +96,7 @@ struct DALI_CORE_API Property
     STRING,    ///< A string type @SINCE_1_0.0
     ARRAY,     ///< an array of Property::Value @SINCE_1_0.0
     MAP,       ///< a string key to Property:value mapping @SINCE_1_0.0
-    EXTENTS    ///< a collection of 4 x uint16_t @SINCE_1_2.62
+    EXTENTS    ///< a collection of 4 x int16_t @SINCE_1_2.62
   };
 
   /**

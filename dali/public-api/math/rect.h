@@ -57,10 +57,10 @@ struct Rect
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] x      X coordinate (or left)
-   * @param[in] y      Y coordinate (or right)
-   * @param[in] width  Width (or bottom)
-   * @param[in] height Height (or top)
+   * @param[in] x      X coordinate
+   * @param[in] y      Y coordinate
+   * @param[in] width  Width
+   * @param[in] height Height
    */
   Rect(T x, T y, T width, T height)
   : x(x),
@@ -321,30 +321,11 @@ struct Rect
            other.y >= y && (other.y + other.height) <= (y + height);
   }
 
-public: // Data
-  union
-  {
-    T x;    ///< X position of the rectangle
-    T left; ///< The left value
-  };
-
-  union
-  {
-    T y;     ///< Y position of the rectangle
-    T right; ///< The right value
-  };
-
-  union
-  {
-    T width;  ///< width of the rectangle
-    T bottom; ///< The bottom value
-  };
-
-  union
-  {
-    T height; ///< height of the rectangle
-    T top;    ///< The top value
-  };
+public:     // Data
+  T x;      ///< X position of the rectangle
+  T y;      ///< Y position of the rectangle
+  T width;  ///< Width of the rectangle
+  T height; ///< Height of the rectangle
 };
 
 /**

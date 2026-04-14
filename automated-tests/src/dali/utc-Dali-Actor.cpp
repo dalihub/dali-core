@@ -4634,23 +4634,23 @@ int UtcDaliActorSetPadding(void)
 
   Actor actor = Actor::New();
 
-  Padding padding;
+  Vector4 padding;
   padding = actor.GetProperty<Vector4>(Actor::Property::PADDING);
 
-  DALI_TEST_EQUALS(padding.left, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.right, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.bottom, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.top, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.x, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.y, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.z, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.w, 0.0f, TEST_LOCATION);
 
-  Padding padding2(1.0f, 2.0f, 3.0f, 4.0f);
+  Vector4 padding2(1.0f, 2.0f, 3.0f, 4.0f);
   actor.SetProperty(Actor::Property::PADDING, padding2);
 
   padding = actor.GetProperty<Vector4>(Actor::Property::PADDING);
 
-  DALI_TEST_EQUALS(padding.left, padding2.left, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.right, padding2.right, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.bottom, padding2.bottom, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.top, padding2.top, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.x, padding2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.y, padding2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.z, padding2.z, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.w, padding2.w, TEST_LOCATION);
 
   END_TEST;
 }
@@ -14095,12 +14095,12 @@ int UtcDaliActorTouchAreaOffsetPropertyP(void)
 {
   TestApplication application;
 
-  Actor     actor           = Actor::New();
-  Rect<int> touchAreaOffset = actor.GetProperty(DevelActor::Property::TOUCH_AREA_OFFSET).Get<Rect<int>>();
-  DALI_TEST_EQUALS(Rect<int>(0, 0, 0, 0), touchAreaOffset, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(10, 20, 30, 40));
-  touchAreaOffset = actor.GetProperty(DevelActor::Property::TOUCH_AREA_OFFSET).Get<Rect<int>>();
-  DALI_TEST_EQUALS(Rect<int>(10, 20, 30, 40), touchAreaOffset, TEST_LOCATION);
+  Actor   actor           = Actor::New();
+  Extents touchAreaMargin = actor.GetProperty(DevelActor::Property::TOUCH_AREA_MARGIN).Get<Extents>();
+  DALI_TEST_EQUALS(Extents(), touchAreaMargin, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(10, 20, 30, 40));
+  touchAreaMargin = actor.GetProperty(DevelActor::Property::TOUCH_AREA_MARGIN).Get<Extents>();
+  DALI_TEST_EQUALS(Extents(10, 20, 30, 40), touchAreaMargin, TEST_LOCATION);
   END_TEST;
 }
 
@@ -14113,12 +14113,12 @@ int UtcDaliActorTouchAreaOffsetPropertyN(void)
   // Make sure setting invalid types does not cause a crash
   try
   {
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, 1.0f);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector2::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector3::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector4::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Property::Map());
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Property::Array());
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, 1.0f);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Property::Map());
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Property::Array());
     tet_result(TET_PASS);
   }
   catch(...)

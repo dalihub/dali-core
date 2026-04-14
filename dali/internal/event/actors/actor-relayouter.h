@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTOR_RELAYOUTER_H
 
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ public:
 
   Dimension::Type dimensionDependencies[Dimension::DIMENSION_COUNT]; ///< A list of dimension dependencies
 
-  Vector2 dimensionPadding[Dimension::DIMENSION_COUNT]; ///< Padding for each dimension. X = start (e.g. left, bottom), y = end (e.g. right, top)
+  Vector2 dimensionPadding[Dimension::DIMENSION_COUNT]; ///< Padding for each dimension. X = start (e.g. left, top), y = end (e.g. right, bottom)
 
   float negotiatedDimensions[Dimension::DIMENSION_COUNT]; ///< Storage for when a dimension is negotiated but before set on actor
 
