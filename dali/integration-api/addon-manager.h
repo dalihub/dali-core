@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_ADDON_MANAGER_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,14 +41,14 @@ enum class AddOnType
  * @brief Helper function building the version number as 32-bit integer.
  * The return value should be used to encode AddOnInfo::version field.
  *
- * @param[in] maj Major version number
- * @param[in] min Minor version number
- * @param[in] rev Revision version number
+ * @param[in] maj Major version number [0 to 255]
+ * @param[in] min Minor version number [0 to 255]
+ * @param[in] rev Revision version number [0 to 65535]
  * @return returns 32-bit version number
  */
 constexpr uint32_t DALI_ADDON_VERSION(uint32_t maj, uint32_t min, uint32_t rev)
 {
-  return ((maj & 0xff) << 24) | ((min & 0xfff) << 16);
+  return ((maj & 0xff) << 24) | ((min & 0xff) << 16) | ((rev & 0xffff));
 }
 
 /**
