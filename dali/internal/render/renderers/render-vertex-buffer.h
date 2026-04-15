@@ -17,14 +17,16 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
+#include <atomic>
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
-#include <dali/public-api/object/property.h>
-
 #include <dali/graphics-api/graphics-types.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/renderers/gpu-buffer.h>
+#include <dali/public-api/object/property.h>
 
 namespace Dali
 {
