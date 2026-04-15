@@ -2702,6 +2702,48 @@ int UtcDaliActorSetScale03(void)
   END_TEST;
 }
 
+// SetScale(Vector2 scale)
+int UtcDaliActorSetScaleVector2(void)
+{
+  TestApplication application;
+
+  Vector3 originalScale(12.0f, 1.0f, 2.0f);
+  Vector2 scaleV2(10.0f, 5.0f);
+
+  Actor actor = Actor::New();
+
+  // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
+  actor.SetProperty(Actor::Property::SCALE, originalScale);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::SCALE) != originalScale);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::SCALE, scaleV2);
+
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_X), scaleV2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Y), scaleV2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Z), originalScale.z, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_X), scaleV2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Y), scaleV2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Z), originalScale.z, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::SCALE_X), scaleV2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::SCALE_Y), scaleV2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::SCALE_Z), originalScale.z, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliActorSetScaleIndividual(void)
 {
   TestApplication application;
@@ -10776,17 +10818,17 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   };
 
   DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   {
+  {
     dataVCB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
     actorDSignalFunctor(); }));
   DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
   actorA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
   actorB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
