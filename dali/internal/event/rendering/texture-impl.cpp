@@ -36,7 +36,7 @@
 
 struct Dali::Internal::Texture::TextureMemoryInfo
 {
-  TextureMemoryInfo(const Dali::Integration::TextureContextTypeHint::Type typeHint, const std::string context, const int32_t width, const int32_t height, const uint32_t bytesPerPixel, const uint32_t memorySize = 0);
+  TextureMemoryInfo(const Dali::Integration::TextureContextTypeHint::Type typeHint, std::string context, const int32_t width, const int32_t height, const uint32_t bytesPerPixel, const uint32_t memorySize = 0);
 
   ~TextureMemoryInfo();
 
@@ -219,9 +219,9 @@ void PrintTotalMemoryRequest()
 }
 } // namespace
 
-Dali::Internal::Texture::TextureMemoryInfo::TextureMemoryInfo(const Dali::Integration::TextureContextTypeHint::Type typeHint, const std::string context, const int32_t width, const int32_t height, const uint32_t bytesPerPixel, const uint32_t memorySize)
+Dali::Internal::Texture::TextureMemoryInfo::TextureMemoryInfo(const Dali::Integration::TextureContextTypeHint::Type typeHint, std::string context, const int32_t width, const int32_t height, const uint32_t bytesPerPixel, const uint32_t memorySize)
 : mTypeHint(typeHint),
-  mContext(context),
+  mContext(std::move(context)),
   mBytesPerPixel(bytesPerPixel),
   mWidth(width),
   mHeight(height),
@@ -409,7 +409,7 @@ bool Texture::Upload(PixelDataPtr pixelData, std::string context, Dali::Integrat
   gContext    = std::move(context);
   bool result = Upload(pixelData);
   gTypeHint   = Dali::Integration::TextureContextTypeHint::UNKNOWN;
-  gContext.clear();
+  gContext    = std::string();
   return result;
 #else
   // When GPU_MEMORY_PROFILE_ENABLED is not defined, fall back to basic Upload
@@ -532,7 +532,10 @@ bool Texture::UploadSubPixelData(PixelDataPtr pixelData,
 
               // Set size of this texture as mSize. (For partial upload cases.)
               // Send size of buffer only if bpp is zero, mean compressed type, or something error.
-              mMemoryInfo.reset(new TextureMemoryInfo(gTypeHint, gContext, mSize.GetWidth(), mSize.GetHeight(), bpp, bpp ? 0 : pixelData.Get()->GetBufferSize()));
+              mMemoryInfo.reset(new TextureMemoryInfo(gTypeHint, std::move(gContext), mSize.GetWidth(), mSize.GetHeight(), bpp, bpp ? 0 : pixelData.Get()->GetBufferSize()));
+
+              gTypeHint = Dali::Integration::TextureContextTypeHint::UNKNOWN;
+              gContext  = std::string();
             }
 #endif
 
