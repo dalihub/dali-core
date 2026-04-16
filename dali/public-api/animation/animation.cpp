@@ -41,6 +41,11 @@ Animation Animation::New(float durationSeconds)
   return Animation(internal.Get());
 }
 
+Animation Animation::New()
+{
+  return Animation::New(0.0f);
+}
+
 Animation Animation::DownCast(BaseHandle handle)
 {
   return Animation(dynamic_cast<Dali::Internal::Animation*>(handle.GetObjectPtr()));
