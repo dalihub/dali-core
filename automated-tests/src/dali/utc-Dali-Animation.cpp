@@ -182,6 +182,21 @@ int UtcDaliAnimationNewN(void)
   END_TEST;
 }
 
+int UtcDaliAnimationNewEmptyDurationP(void)
+{
+  TestApplication application;
+
+  Animation animation = Animation::New();
+
+  DALI_TEST_CHECK(animation);
+  DALI_TEST_EQUALS(animation.GetDuration(), 0.0f, TEST_LOCATION);
+
+  // Duration can be extended after creation
+  animation.SetDuration(1.0f);
+  DALI_TEST_EQUALS(animation.GetDuration(), 1.0f, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliAnimationDownCastP(void)
 {
   TestApplication application;
