@@ -83,13 +83,17 @@ public:
   /**
    * @brief Create an initialized Scene handle.
    *
+   * @param[in] createInfo The RenderTarget create info this scene needs to generate (in the render thread)
    * @param[in] size The size of the set surface for this scene
    * @param[in] windowOrientation The rotated angle of the set surface for this scene
    * @param[in] screenOrientation The rotated angle of the screen
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static Scene New(Size size, int32_t windowOrientation = 0, int32_t screenOrientation = 0);
+  static Scene New(const Graphics::RenderTargetCreateInfo& createInfo,
+                   Size                                    size,
+                   int32_t                                 windowOrientation = 0,
+                   int32_t                                 screenOrientation = 0);
 
   /**
    * @brief Downcast an Object handle to Scene handle.

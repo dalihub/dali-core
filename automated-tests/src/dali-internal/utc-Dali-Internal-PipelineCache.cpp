@@ -156,8 +156,13 @@ int UtcDaliCorePipelineCacheTest(void)
   // Test another actor with seperated scene.
 
   // Create a new Scene with compatible render target
-  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(newScene);
+
   application.AddScene(newScene);
   {
     Actor    actor4    = Actor::New();
@@ -199,6 +204,7 @@ int UtcDaliCorePipelineCacheTest(void)
   application.Render();
 
   DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
+  delete surface;
 
   END_TEST;
 }
@@ -317,7 +323,11 @@ int UtcDaliCorePipelineCacheWithDynamicBlendTest(void)
   // Test another actor with seperated scene.
 
   // Create a new Scene with compatible render target
-  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(newScene);
   application.AddScene(newScene);
   {
@@ -373,5 +383,6 @@ int UtcDaliCorePipelineCacheWithDynamicBlendTest(void)
 
   DALI_TEST_EQUALS(gPipelineCache->level0nodes.size(), 1, TEST_LOCATION);
 
+  delete surface;
   END_TEST;
 }

@@ -27,8 +27,9 @@ namespace Internal
 {
 namespace SceneGraph
 {
-Scene::Scene()
-: mFrameRenderedCallbacks(),
+Scene::Scene(const Graphics::RenderTargetCreateInfo& createInfo)
+: mRenderTargetCreateInfo(createInfo),
+  mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
   mSurfaceRect(),
   mSurfaceOrientation(0),
@@ -49,35 +50,11 @@ Scene::~Scene()
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
-{
-  // TODO : protected data using here
-  if(mRenderTarget != nullptr &&
-     mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface)
-  {
-    // Only recreate if the surface has changed.
-    mRenderTargetCreateInfo = renderTargetCreateInfo;
-    if(mGraphicsController) // shouldn't be null, as we can't have already set mRenderTarget unless graphics controller exists.
-    {
-      RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, mRenderTargetCreateInfo);
-    }
-  }
-  else
-  {
-    // 2nd Stage initialization happens in RenderManager, not UpdateManager, so is delayed.
-    mRenderTargetCreateInfo = renderTargetCreateInfo;
-    if(mRenderTarget != nullptr)
-    {
-      mGraphicsController->UpdateRenderTarget(*mRenderTarget, mRenderTargetCreateInfo);
-    }
-  }
-}
-
 void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
 {
   RenderTargetGraphicsObjects::Initialize(graphicsController);
 
-  // Create the render target for the surface. It should already have been sent via message.
+  // Create the render target for the surface. (This must happen in render thread).
   RenderTargetGraphicsObjects::CreateRenderTarget(graphicsController, mRenderTargetCreateInfo);
 
   // Create the render pass for the surface
@@ -141,6 +118,21 @@ void Scene::ContextDestroyed()
 
   NotifyRenderTargetDestroyed();
   mRenderTarget.reset();
+}
+
+void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
+{
+  const bool surfaceChanged = (mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface);
+
+  mRenderTargetCreateInfo = renderTargetCreateInfo;
+  if(surfaceChanged)
+  {
+    RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, mRenderTargetCreateInfo);
+  }
+  else
+  {
+    mGraphicsController->UpdateRenderTarget(*mRenderTarget, mRenderTargetCreateInfo);
+  }
 }
 
 RenderInstructionContainer& Scene::GetRenderInstructions()

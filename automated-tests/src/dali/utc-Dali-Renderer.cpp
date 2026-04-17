@@ -5874,8 +5874,12 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   application.GetScene().Add(dummyActor);
   application.SendNotification();
   application.Render();
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
 
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(scene);
   application.AddScene(scene);
 
@@ -5915,6 +5919,7 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   namedParams["id"] << 5;
   DALI_TEST_CHECK(gl.mBufferTrace.FindMethodAndParams("DeleteBuffers", namedParams));
 
+  delete surface;
   END_TEST;
 }
 

@@ -121,8 +121,18 @@ struct TouchedSignalData
 struct TouchFunctor
 {
   TouchFunctor(TouchedSignalData& data)
-  : signalData(data)
+  : signalData(data),
+    mRenderSurface{nullptr}
   {
+  }
+
+  ~TouchFunctor()
+  {
+    if(mRenderSurface)
+    {
+      delete mRenderSurface;
+    }
+    mRenderSurface = nullptr;
   }
 
   void operator()(const TouchEvent& touch)
@@ -132,7 +142,12 @@ struct TouchFunctor
 
     if(signalData.createNewScene)
     {
-      Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+      mRenderSurface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+      Graphics::RenderTargetCreateInfo rtInfo{};
+      rtInfo.SetExtent({480, 800});
+      rtInfo.SetSurface(mRenderSurface);
+
+      Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
       DALI_TEST_CHECK(scene);
 
       signalData.newSceneCreated = true;
@@ -145,6 +160,7 @@ struct TouchFunctor
   }
 
   TouchedSignalData& signalData;
+  TestRenderSurface* mRenderSurface;
 };
 
 // Stores data that is populated in the wheel-event callback and will be read by the TET cases
@@ -480,7 +496,11 @@ int UtcDaliSceneDiscard(void)
   tet_infoline("Testing Dali::Scene::Discard");
 
   // Create a new Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(scene);
 
   // One reference of scene kept here and the other one kept in the Core
@@ -518,6 +538,7 @@ int UtcDaliSceneDiscard(void)
   application.SendNotification();
   application.Render(0);
 
+  delete surface;
   END_TEST;
 }
 
@@ -551,7 +572,11 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   TestApplication application;
 
   // Create a Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(scene);
 
   // One reference of scene kept here and the other one kept in the Core
@@ -587,7 +612,12 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   DALI_TEST_CHECK(rootLayer.GetBaseObject().ReferenceCount() == 1);
 
   // Create a new Scene while the root layer of the deleted scene is still alive
-  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface2 = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo2{};
+  rtInfo2.SetExtent({480u, 800u});
+  rtInfo2.SetSurface(surface2);
+
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(rtInfo2, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(newScene);
 
   // Render and notify.
@@ -605,6 +635,8 @@ int UtcDaliSceneRootLayerAndSceneAlignment(void)
   application.SendNotification();
   application.Render(0);
 
+  delete surface;
+  delete surface2;
   END_TEST;
 }
 
@@ -1178,7 +1210,12 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   TestApplication application;
   Vector2         originalSurfaceSize(500.0f, 1000.0f);
 
-  auto scene = Dali::Integration::Scene::New(Size(originalSurfaceSize.width, originalSurfaceSize.height));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+
+  auto scene = Dali::Integration::Scene::New(rtInfo, Size(originalSurfaceSize.width, originalSurfaceSize.height));
 
   // Ensure stage size does NOT match the surface size
   auto       stage     = Stage::GetCurrent();
@@ -2889,7 +2926,12 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   defaultScene.Add(actor1);
 
   // Create a Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(scene);
 
   application.AddScene(scene);
@@ -2950,6 +2992,7 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   DALI_TEST_CHECK(!keepUpdating);
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION); // Nothing drawn
 
+  delete surface;
   END_TEST;
 }
 
@@ -3199,7 +3242,12 @@ int UtcDaliSceneRemoveSceneObjectAndRender01(void)
   defaultScene.Add(actor1);
 
   // Create a Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(scene);
 
   application.AddScene(scene);
@@ -3229,6 +3277,7 @@ int UtcDaliSceneRemoveSceneObjectAndRender01(void)
   application.SendNotification();
   application.Render(0);
 
+  delete surface;
   END_TEST;
 }
 
@@ -3253,7 +3302,12 @@ int UtcDaliSceneRemoveSceneObjectAndRender02(void)
   defaultScene.Add(actor1);
 
   // Create a Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(scene);
 
   application.AddScene(scene);
@@ -3283,6 +3337,7 @@ int UtcDaliSceneRemoveSceneObjectAndRender02(void)
   application.SendNotification();
   application.Render(0);
 
+  delete surface;
   END_TEST;
 }
 
@@ -3304,13 +3359,20 @@ int UtcDaliSceneDestructWorkerThreadN(void)
         mScene.Discard();
 
         mScene.Reset();
+        delete mSurface;
       }
 
       Dali::Integration::Scene mScene;
+      TestRenderSurface*       mSurface;
     };
     TestThread thread;
 
-    Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+    thread.mSurface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+    Graphics::RenderTargetCreateInfo rtInfo{};
+    rtInfo.SetExtent({480u, 800u});
+    rtInfo.SetSurface(thread.mSurface);
+
+    Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
 
     // Unparent of DefaultCamera might throw exception. and exception at destructor will make abort.
     // To avoid it, we should remove all children of root layer.
@@ -3465,7 +3527,12 @@ int UtcDaliSceneSetForceRenderingMultipleScene(void)
   defaultScene.Add(actor1);
 
   // Create another Scene
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   application.AddScene(scene);
 
   Actor actor2 = CreateRenderableActor();
@@ -3502,6 +3569,7 @@ int UtcDaliSceneSetForceRenderingMultipleScene(void)
   DALI_TEST_CHECK(!application.GetRenderNeedsPostRender());
   DALI_TEST_CHECK(!keepUpdating);
 
+  delete surface;
   END_TEST;
 }
 

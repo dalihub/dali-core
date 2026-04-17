@@ -81,15 +81,14 @@ void TestApplication::CreateCore()
 
 void TestApplication::CreateScene()
 {
-  mScene = Dali::Integration::Scene::New(Size(static_cast<float>(mSurfaceWidth), static_cast<float>(mSurfaceHeight)));
-  mScene.SetDpi(Vector2(static_cast<float>(mDpi.x), static_cast<float>(mDpi.y)));
-
   // Create render target for the scene
   mRenderSurface = new TestRenderSurface(Dali::PositionSize(0, 0, mSurfaceWidth, mSurfaceHeight));
   Graphics::RenderTargetCreateInfo rtInfo{};
   rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
   rtInfo.SetSurface(mRenderSurface);
-  mScene.SetSurfaceRenderTarget(rtInfo);
+
+  mScene = Dali::Integration::Scene::New(rtInfo, Size(static_cast<float>(mSurfaceWidth), static_cast<float>(mSurfaceHeight)), 0, 0);
+  mScene.SetDpi(Vector2(static_cast<float>(mDpi.x), static_cast<float>(mDpi.y)));
 
   mScenes.push_back(mScene);
 }

@@ -62,7 +62,8 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::New
    */
-  static ScenePtr New(Size size, int32_t windowOrientation = 0, int32_t screenOrientation = 0);
+  static ScenePtr New(const Graphics::RenderTargetCreateInfo& createInfo, Size size,
+                      int32_t windowOrientation = 0, int32_t screenOrientation = 0);
 
   /**
    * virtual destructor
@@ -465,11 +466,12 @@ private:
   /**
    * Second-phase constructor.
    *
+   * @param[in] createInfo The render target create info
    * @param[in] size The size of the set surface
    * @param[in] windowOrientation The rotated angle of the set surface for this scene
    * @param[in] screenOrientation The rotated angle of the screen
    */
-  void Initialize(Size size, int32_t windowOrientation, int32_t screenOrientation);
+  void Initialize(const Graphics::RenderTargetCreateInfo& createInfo, Size size, int32_t windowOrientation, int32_t screenOrientation);
 
   // Undefined
   Scene(const Scene&) = delete;

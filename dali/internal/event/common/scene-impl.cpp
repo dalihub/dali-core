@@ -41,12 +41,13 @@ namespace Dali
 {
 namespace Internal
 {
-ScenePtr Scene::New(Size size, int32_t windowOrientation, int32_t screenOrientation)
+ScenePtr Scene::New(const Graphics::RenderTargetCreateInfo& createInfo,
+                    Size size, int32_t windowOrientation, int32_t screenOrientation)
 {
   ScenePtr scene = new Scene;
 
   // Second-phase construction
-  scene->Initialize(size, windowOrientation, screenOrientation);
+  scene->Initialize(createInfo, size, windowOrientation, screenOrientation);
 
   return scene;
 }
@@ -104,7 +105,8 @@ Scene::~Scene()
   // When this destructor is called, the scene has either already been removed from Core or Core has already been destroyed
 }
 
-void Scene::Initialize(Size size, int32_t windowOrientation, int32_t screenOrientation)
+void Scene::Initialize(const Graphics::RenderTargetCreateInfo& createInfo,
+                       Size size, int32_t windowOrientation, int32_t screenOrientation)
 {
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
 
@@ -143,7 +145,7 @@ void Scene::Initialize(Size size, int32_t windowOrientation, int32_t screenOrien
   renderTask->SetClearEnabled(true);
 
   // Create scene graph object
-  mSceneObject = new SceneGraph::Scene();
+  mSceneObject = new SceneGraph::Scene(createInfo);
   OwnerPointer<SceneGraph::Scene> transferOwnership(const_cast<SceneGraph::Scene*>(mSceneObject));
   AddSceneMessage(updateManager, transferOwnership);
 

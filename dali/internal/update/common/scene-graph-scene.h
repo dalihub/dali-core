@@ -131,21 +131,16 @@ public:
 
   /**
    * Constructor
+   *
+   * @param[in] createInfo The createInfo for a surface render target for this scene.
+   * The render target must be created on render thread.
    */
-  Scene();
+  Scene(const Graphics::RenderTargetCreateInfo& createInfo);
 
   /**
    * Destructor
    */
   virtual ~Scene();
-
-  /**
-   * Set the render target of the surface
-   * Called from UpdateManager Queue, before Initialize
-   *
-   * @param[in] renderTarget The render target.
-   */
-  void SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
 
   /**
    * Creates a scene object
@@ -158,6 +153,13 @@ public:
    * @param[in] stencilBufferAvailable True if there is a stencil buffer
    */
   void Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable);
+
+  /**
+   * Set the new render target of the surface (E.g. on rotation/resize)
+   *
+   * @param[in] renderTarget The new render target.
+   */
+  void SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo);
 
   /**
    * @brief The graphics context is being shutdown. Clean down any outstanding graphics resources.
@@ -418,6 +420,10 @@ private:
   // Render instructions describe what should be rendered during RenderManager::RenderScene()
   // Update manager updates instructions for the next frame while we render the current one
 
+  Graphics::RenderTargetCreateInfo mRenderTargetCreateInfo; ///< base class holds created graphics objects
+  SceneGraph::Layer*               mRoot{nullptr};          ///< Root node
+  ItemsDirtyRectsContainer         mItemsDirtyRects{};      ///< Dirty rect list
+
   RenderInstructionContainer mInstructions; ///< Render instructions for the scene
 
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
@@ -437,14 +443,6 @@ private:
   bool mNeedFullUpdate : 1;                   ///< A flag to update full area
   bool mPartialUpdateEnabled : 1;             ///< True if the partial update is enabled
   bool mHasRenderInstructionToScene : 1;      ///< True if has render instruction to the scene. Update at PreRender time.
-
-  // Render target, command buffer and render passes
-
-  Graphics::RenderTargetCreateInfo mRenderTargetCreateInfo; // Passed in by message before 2nd stage Initialization happens.
-
-  SceneGraph::Layer* mRoot{nullptr}; ///< Root node
-
-  ItemsDirtyRectsContainer mItemsDirtyRects{}; ///< Dirty rect list
 };
 
 /// Messages

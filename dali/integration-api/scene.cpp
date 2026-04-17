@@ -30,9 +30,10 @@ namespace Dali
 {
 namespace Integration
 {
-Scene Scene::New(Size size, int32_t windowOrientation, int32_t screenOrientation)
+Scene Scene::New(const Graphics::RenderTargetCreateInfo& createInfo,
+                 Size size, int32_t windowOrientation, int32_t screenOrientation)
 {
-  Internal::ScenePtr internal = Internal::Scene::New(size, windowOrientation, screenOrientation);
+  Internal::ScenePtr internal = Internal::Scene::New(createInfo, size, windowOrientation, screenOrientation);
   return Scene(internal.Get());
 }
 

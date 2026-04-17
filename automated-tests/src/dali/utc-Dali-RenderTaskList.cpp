@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -341,13 +341,20 @@ int UtcDaliRenderTaskListDestructWorkerThreadN(void)
         tet_printf("Run TestThread\n");
         // Destruct at worker thread.
         mRenderTaskList.Reset();
+        delete mRenderSurface;
       }
 
       Dali::RenderTaskList mRenderTaskList;
+      TestRenderSurface*   mRenderSurface;
     };
     TestThread thread;
 
-    Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+    thread.mRenderSurface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+    Graphics::RenderTargetCreateInfo rtInfo{};
+    rtInfo.SetExtent({480, 800});
+    rtInfo.SetSurface(thread.mRenderSurface);
+
+    Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
 
     RenderTaskList renderTaskList = scene.GetRenderTaskList();
 
