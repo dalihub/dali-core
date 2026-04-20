@@ -2,7 +2,7 @@
 #define DALI_GESTURE_DETECTOR_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/touch-event.h>
@@ -153,7 +156,7 @@ public: // Actor related
    * @return The count
    * @pre The gesture detector has been initialized.
    */
-  size_t GetAttachedActorCount() const;
+  uint32_t GetAttachedActorCount() const;
 
   /**
    * @brief Returns an actor by index. An empty handle if the index is not valid.
@@ -163,7 +166,7 @@ public: // Actor related
    * @return The attached actor or an empty handle
    * @pre The gesture detector has been initialized.
    */
-  Actor GetAttachedActor(size_t index) const;
+  Actor GetAttachedActor(uint32_t index) const;
 
   /**
    * @brief The gesture is recognized by sending a Touch event to the actor.

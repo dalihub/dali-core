@@ -48,41 +48,41 @@ TextureSet::TextureSet(TextureSet&& rhs) noexcept = default;
 
 TextureSet& TextureSet::operator=(TextureSet&& rhs) noexcept = default;
 
-void TextureSet::SetTexture(size_t index, Texture texture)
+void TextureSet::SetTexture(uint32_t index, Texture texture)
 {
   if(texture)
   {
     Internal::TexturePtr texturePtr(&GetImplementation(texture));
-    GetImplementation(*this).SetTexture(static_cast<uint32_t>(index), texturePtr); // only support 4,294,967,295 textures
+    GetImplementation(*this).SetTexture(index, texturePtr);
   }
   else
   {
-    GetImplementation(*this).SetTexture(static_cast<uint32_t>(index), nullptr); // only support 4,294,967,295 textures
+    GetImplementation(*this).SetTexture(index, nullptr);
   }
 }
 
-Texture TextureSet::GetTexture(size_t index) const
+Texture TextureSet::GetTexture(uint32_t index) const
 {
-  Internal::Texture* texturePtr = GetImplementation(*this).GetTexture(static_cast<uint32_t>(index)); // only support 4,294,967,295 textures
+  Internal::Texture* texturePtr = GetImplementation(*this).GetTexture(index);
   return Dali::Texture(texturePtr);
 }
 
-void TextureSet::SetSampler(size_t index, Sampler sampler)
+void TextureSet::SetSampler(uint32_t index, Sampler sampler)
 {
   if(sampler)
   {
     Internal::SamplerPtr samplerPtr(&GetImplementation(sampler));
-    GetImplementation(*this).SetSampler(static_cast<uint32_t>(index), samplerPtr); // only support 4,294,967,295 samplers
+    GetImplementation(*this).SetSampler(index, samplerPtr);
   }
   else
   {
-    GetImplementation(*this).SetSampler(static_cast<uint32_t>(index), nullptr); // only support 4,294,967,295 samplers
+    GetImplementation(*this).SetSampler(index, nullptr);
   }
 }
 
-Sampler TextureSet::GetSampler(size_t index) const
+Sampler TextureSet::GetSampler(uint32_t index) const
 {
-  Internal::Sampler* samplerPtr = GetImplementation(*this).GetSampler(static_cast<uint32_t>(index)); // only support 4,294,967,295 samplers
+  Internal::Sampler* samplerPtr = GetImplementation(*this).GetSampler(index);
   return Dali::Sampler(samplerPtr);
 }
 

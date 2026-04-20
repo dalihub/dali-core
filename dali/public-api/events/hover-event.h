@@ -121,7 +121,7 @@ public:
    * @SINCE_1_9.25
    * @return Total number of Points
    */
-  std::size_t GetPointCount() const;
+  uint32_t GetPointCount() const;
 
   /**
    * @brief Returns the ID of the device used for the Point specified.
@@ -134,7 +134,7 @@ public:
    * @return The Device ID of this point
    * @note If point is greater than GetPointCount() then this method will return -1.
    */
-  int32_t GetDeviceId(std::size_t point) const;
+  int32_t GetDeviceId(uint32_t point) const;
 
   /**
    * @brief Retrieves the State of the point specified.
@@ -148,7 +148,7 @@ public:
    * However, an actor that received a hover PointState::STARTED event will not receive any event when Actor::Property::SENSITIVE is changed to false.
    * @see State
    */
-  PointState::Type GetState(std::size_t point) const;
+  PointState::Type GetState(uint32_t point) const;
 
   /**
    * @brief Retrieves the actor that was underneath the point specified.
@@ -158,7 +158,7 @@ public:
    * @return The actor that was underneath the point specified
    * @note If point is greater than GetPointCount() then this method will return an empty handle.
    */
-  Actor GetHitActor(std::size_t point) const;
+  Actor GetHitActor(uint32_t point) const;
 
   /**
    * @brief Retrieves the co-ordinates relative to the top-left of the hit-actor at the point specified.
@@ -172,7 +172,7 @@ public:
    * then you should use Actor::ScreenToLocal().
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetLocalPosition(std::size_t point) const;
+  const Vector2& GetLocalPosition(uint32_t point) const;
 
   /**
    * @brief Retrieves the co-ordinates relative to the top-left of the screen of the point specified.
@@ -182,7 +182,7 @@ public:
    * @return The co-ordinates relative to the top-left of the screen of the point specified
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetScreenPosition(std::size_t point) const;
+  const Vector2& GetScreenPosition(uint32_t point) const;
 
   /**
    * @brief Gets the device class type from which the hover event is originated.
@@ -192,7 +192,7 @@ public:
    * @param[in] point The point required
    * @return The type of the device class
    */
-  Device::Class::Type GetDeviceClass(std::size_t point) const;
+  Device::Class::Type GetDeviceClass(uint32_t point) const;
 
   /**
    * @brief Gets the subclass type of the device from which the hover event is originated.
@@ -202,7 +202,7 @@ public:
    * @param[in] point The point required
    * @return The type of the device subclass
    */
-  Device::Subclass::Type GetDeviceSubclass(std::size_t point) const;
+  Device::Subclass::Type GetDeviceSubclass(uint32_t point) const;
 
   /**
    * @brief Gets the device name
@@ -210,7 +210,7 @@ public:
    * @SINCE_2_4.34
    * @return The device name string
    */
-  const Dali::String& GetDeviceName(std::size_t point) const;
+  const Dali::String& GetDeviceName(uint32_t point) const;
 
 public: // Not intended for application developers
   /// @cond internal

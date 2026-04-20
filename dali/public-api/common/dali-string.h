@@ -136,7 +136,7 @@ public:
    * @SINCE_2_5.15
    * @return the number of bytes in the string
    */
-  size_t Size() const;
+  uint32_t Size() const;
 
   /**
    * @brief Determine if the string is empty.
@@ -169,7 +169,7 @@ public:
    * @param[in] position The position in the string to index
    * @return a modifiable reference to the character
    */
-  char& operator[](size_t position);
+  char& operator[](uint32_t position);
 
   /**
    * @brief Get a character at the given position.
@@ -178,7 +178,7 @@ public:
    * @param[in] position The position in the string to index
    * @return an unmodifiable reference to the character
    */
-  const char& operator[](size_t position) const;
+  const char& operator[](uint32_t position) const;
 
   /**
    * @brief Append operator.

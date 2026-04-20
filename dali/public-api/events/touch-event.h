@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -131,7 +132,7 @@ public:
    * @SINCE_1_9.26
    * @return Total number of Points
    */
-  std::size_t GetPointCount() const;
+  uint32_t GetPointCount() const;
 
   /**
    * @brief Returns the ID of the device used for the Point specified.
@@ -144,7 +145,7 @@ public:
    * @return The Device ID of this point
    * @note If point is greater than GetPointCount() then this method will return -1.
    */
-  int32_t GetDeviceId(std::size_t point) const;
+  int32_t GetDeviceId(uint32_t point) const;
 
   /**
    * @brief Retrieves the State of the point specified.
@@ -155,7 +156,7 @@ public:
    * @note If point is greater than GetPointCount() then this method will return PointState::FINISHED.
    * @see State
    */
-  PointState::Type GetState(std::size_t point) const;
+  PointState::Type GetState(uint32_t point) const;
 
   /**
    * @brief Retrieves the actor that was underneath the point specified.
@@ -165,7 +166,7 @@ public:
    * @return The actor that was underneath the point specified
    * @note If point is greater than GetPointCount() then this method will return an empty handle.
    */
-  Actor GetHitActor(std::size_t point) const;
+  Actor GetHitActor(uint32_t point) const;
 
   /**
    * @brief Retrieves the co-ordinates relative to the top-left of the hit-actor at the point specified.
@@ -179,7 +180,7 @@ public:
    * then you should use Actor::ScreenToLocal().
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetLocalPosition(std::size_t point) const;
+  const Vector2& GetLocalPosition(uint32_t point) const;
 
   /**
    * @brief Retrieves the co-ordinates relative to the top-left of the screen of the point specified.
@@ -189,7 +190,7 @@ public:
    * @return The co-ordinates relative to the top-left of the screen of the point specified
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetScreenPosition(std::size_t point) const;
+  const Vector2& GetScreenPosition(uint32_t point) const;
 
   /**
    * @brief Retrieves the radius of the press point.
@@ -201,7 +202,7 @@ public:
    * @return The radius of the press point
    * @note If point is greater than GetPointCount() then this method will return 0.0f.
    */
-  float GetRadius(std::size_t point) const;
+  float GetRadius(uint32_t point) const;
 
   /**
    * @brief Retrieves BOTH the horizontal and the vertical radii of the press point.
@@ -211,7 +212,7 @@ public:
    * @return The horizontal and vertical radii of the press point
    * @note If point is greater than GetPointCount() then this method will return Vector2::ZERO.
    */
-  const Vector2& GetEllipseRadius(std::size_t point) const;
+  const Vector2& GetEllipseRadius(uint32_t point) const;
 
   /**
    * @brief Retrieves the touch pressure.
@@ -226,7 +227,7 @@ public:
    * @return The touch pressure
    * @note If point is greater than GetPointCount() then this method will return 1.0f.
    */
-  float GetPressure(std::size_t point) const;
+  float GetPressure(uint32_t point) const;
 
   /**
    * @brief Retrieves the angle of the press point relative to the Y-Axis.
@@ -236,7 +237,7 @@ public:
    * @return The angle of the press point
    * @note If point is greater than GetPointCount() then this method will return Degree().
    */
-  Degree GetAngle(std::size_t point) const;
+  Degree GetAngle(uint32_t point) const;
 
   /**
    * @brief Gets the device class type from which the mouse/touch event is originated.
@@ -246,7 +247,7 @@ public:
    * @param[in] point The point required
    * @return The type of the device class
    */
-  Device::Class::Type GetDeviceClass(std::size_t point) const;
+  Device::Class::Type GetDeviceClass(uint32_t point) const;
 
   /**
    * @brief Gets the subclass type of the device from which the mouse/touch event is originated.
@@ -256,7 +257,7 @@ public:
    * @param[in] point The point required
    * @return The type of the device subclass
    */
-  Device::Subclass::Type GetDeviceSubclass(std::size_t point) const;
+  Device::Subclass::Type GetDeviceSubclass(uint32_t point) const;
 
   /**
    * @brief Gets the value, which indicates a mouse button. (ex: right/left button)
@@ -265,7 +266,7 @@ public:
    * @param[in] point The point required
    * @return The mouse button value
    */
-  MouseButton::Type GetMouseButton(std::size_t point) const;
+  MouseButton::Type GetMouseButton(uint32_t point) const;
 
   /**
    * @brief Retrieves the render-task that was used to generate this touch-event.
@@ -281,7 +282,7 @@ public:
    * @SINCE_2_4.34
    * @return The device name string
    */
-  const Dali::String& GetDeviceName(std::size_t point) const;
+  const Dali::String& GetDeviceName(uint32_t point) const;
 
 public: // Not intended for application developers
   /// @cond internal

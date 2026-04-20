@@ -87,12 +87,12 @@ VertexBuffer::VertexBuffer(VertexBuffer&& rhs) noexcept = default;
 
 VertexBuffer& VertexBuffer::operator=(VertexBuffer&& rhs) noexcept = default;
 
-void VertexBuffer::SetData(const void* data, std::size_t size)
+void VertexBuffer::SetData(const void* data, uint32_t size)
 {
-  GetImplementation(*this).SetData(data, static_cast<uint32_t>(size)); // only support 4,294,967,295 bytes
+  GetImplementation(*this).SetData(data, size);
 }
 
-std::size_t VertexBuffer::GetSize() const
+uint32_t VertexBuffer::GetSize() const
 {
   return GetImplementation(*this).GetSize();
 }

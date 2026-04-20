@@ -44,47 +44,47 @@ unsigned long HoverEvent::GetTime() const
   return GetImplementation(*this).GetTime();
 }
 
-std::size_t HoverEvent::GetPointCount() const
+uint32_t HoverEvent::GetPointCount() const
 {
   return GetImplementation(*this).GetPointCount();
 }
 
-int32_t HoverEvent::GetDeviceId(std::size_t point) const
+int32_t HoverEvent::GetDeviceId(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceId(point);
 }
 
-PointState::Type HoverEvent::GetState(std::size_t point) const
+PointState::Type HoverEvent::GetState(uint32_t point) const
 {
   return GetImplementation(*this).GetState(point);
 }
 
-Actor HoverEvent::GetHitActor(std::size_t point) const
+Actor HoverEvent::GetHitActor(uint32_t point) const
 {
   return GetImplementation(*this).GetHitActor(point);
 }
 
-const Vector2& HoverEvent::GetLocalPosition(std::size_t point) const
+const Vector2& HoverEvent::GetLocalPosition(uint32_t point) const
 {
   return GetImplementation(*this).GetLocalPosition(point);
 }
 
-const Vector2& HoverEvent::GetScreenPosition(std::size_t point) const
+const Vector2& HoverEvent::GetScreenPosition(uint32_t point) const
 {
   return GetImplementation(*this).GetScreenPosition(point);
 }
 
-Device::Class::Type HoverEvent::GetDeviceClass(std::size_t point) const
+Device::Class::Type HoverEvent::GetDeviceClass(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceClass(point);
 }
 
-Device::Subclass::Type HoverEvent::GetDeviceSubclass(std::size_t point) const
+Device::Subclass::Type HoverEvent::GetDeviceSubclass(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceSubclass(point);
 }
 
-const Dali::String& HoverEvent::GetDeviceName(std::size_t point) const
+const Dali::String& HoverEvent::GetDeviceName(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceName(point);
 }

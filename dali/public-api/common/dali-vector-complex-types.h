@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector-base.h>
@@ -287,11 +288,11 @@ private:
     }
   }
 
-  static void* MoveItem(void* destination, const void* source, size_t moveByte) noexcept
+  static void* MoveItem(void* destination, const void* source, SizeType moveByte) noexcept
   {
     const SizeType elementSize = static_cast<SizeType>(sizeof(ItemType));
 
-    MoveItemInternal<false>(reinterpret_cast<uint8_t*>(destination), const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(source)), static_cast<SizeType>(moveByte), elementSize);
+    MoveItemInternal<false>(reinterpret_cast<uint8_t*>(destination), const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(source)), moveByte, elementSize);
 
     return destination;
   }

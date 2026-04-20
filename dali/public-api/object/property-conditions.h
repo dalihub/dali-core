@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
@@ -95,7 +98,7 @@ public:
    * @SINCE_1_0.0
    * @return The arguments used for this condition
    */
-  std::size_t GetArgumentCount() const;
+  uint32_t GetArgumentCount() const;
 
   /**
    * @brief Retrieves the arguments that this condition uses.
@@ -105,7 +108,7 @@ public:
    * @return The arguments used for this condition
    * @note The container will only be valid as long PropertyCondition is valid.
    */
-  float GetArgument(std::size_t index) const;
+  float GetArgument(uint32_t index) const;
 };
 
 /**

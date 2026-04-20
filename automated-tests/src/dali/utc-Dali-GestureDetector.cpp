@@ -242,7 +242,7 @@ int UtcDaliGestureDetectorAttachP(void)
   detector.Attach(actor);
 
   bool found = false;
-  for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
+  for(uint32_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
     if(detector.GetAttachedActor(i) == actor)
     {
@@ -300,7 +300,7 @@ int UtcDaliGestureDetectorDetachP(void)
   detector.Attach(actor);
 
   bool found = false;
-  for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
+  for(uint32_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
     if(detector.GetAttachedActor(i) == actor)
     {
@@ -318,7 +318,7 @@ int UtcDaliGestureDetectorDetachP(void)
   detector.Detach(actor);
 
   found = false;
-  for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
+  for(uint32_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
     if(detector.GetAttachedActor(i) == actor)
     {

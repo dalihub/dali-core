@@ -111,7 +111,7 @@ public:
    * @SINCE_1_0.0
    * @return The number of slots connected to this signal
    */
-  std::size_t GetConnectionCount() const
+  uint32_t GetConnectionCount() const
   {
     return mActiveCount;
   }

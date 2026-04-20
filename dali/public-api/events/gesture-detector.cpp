@@ -60,12 +60,12 @@ void GestureDetector::DetachAll()
   GetImplementation(*this).DetachAll();
 }
 
-size_t GestureDetector::GetAttachedActorCount() const
+uint32_t GestureDetector::GetAttachedActorCount() const
 {
   return GetImplementation(*this).GetAttachedActorCount();
 }
 
-Actor GestureDetector::GetAttachedActor(size_t index) const
+Actor GestureDetector::GetAttachedActor(uint32_t index) const
 {
   return GetImplementation(*this).GetAttachedActor(index);
 }

@@ -300,7 +300,7 @@ public: // Directional Panning
    * @return The count
    * @pre The gesture detector has been initialized.
    */
-  size_t GetAngleCount() const;
+  uint32_t GetAngleCount() const;
 
   /**
    * @brief Returns the angle by index that this pan gesture detector emits a signal.
@@ -311,7 +311,7 @@ public: // Directional Panning
    * @pre The gesture detector has been initialized.
    * @pre The index is less than GetAngleCount()
    */
-  AngleThresholdPair GetAngle(size_t index) const;
+  AngleThresholdPair GetAngle(uint32_t index) const;
 
   /**
    * @brief Clears any directional angles that are used by the gesture detector.

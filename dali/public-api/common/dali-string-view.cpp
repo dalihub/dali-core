@@ -63,7 +63,7 @@ StringView::StringView(const char* str)
   }
 }
 
-StringView::StringView(const char* str, size_t length)
+StringView::StringView(const char* str, uint32_t length)
 {
   new(mStorage) std::string_view(str, length);
 }
@@ -98,9 +98,9 @@ StringView& StringView::operator=(const StringView& other)
 }
 
 // Basic Operations
-size_t StringView::Size() const
+uint32_t StringView::Size() const
 {
-  return GetView(mStorage).size();
+  return static_cast<uint32_t>(GetView(mStorage).size());
 }
 
 bool StringView::Empty() const
