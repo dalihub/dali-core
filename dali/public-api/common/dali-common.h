@@ -216,4 +216,13 @@ public:
 #endif
 #endif
 
+/// Use DALI_NO_UNIQUE_ADDRESS to allow empty base class optimization for compilers that support it
+#define DALI_NO_UNIQUE_ADDRESS
+#if __GNUC__
+#if __has_cpp_attribute(no_unique_address)
+#undef DALI_NO_UNIQUE_ADDRESS
+#define DALI_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#endif
+#endif
+
 #endif // DALI_COMMON_H

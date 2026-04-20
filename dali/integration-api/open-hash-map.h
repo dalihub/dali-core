@@ -103,9 +103,7 @@ public:
   : mEntries(rhs.mEntries),
     mCapacity(rhs.mCapacity),
     mSize(rhs.mSize),
-    mOccupied(rhs.mOccupied),
-    mHash(std::move(rhs.mHash)),
-    mKeyEqual(std::move(rhs.mKeyEqual))
+    mOccupied(rhs.mOccupied)
   {
     rhs.mEntries  = nullptr;
     rhs.mCapacity = 0;
@@ -122,8 +120,6 @@ public:
       mCapacity = rhs.mCapacity;
       mSize     = rhs.mSize;
       mOccupied = rhs.mOccupied;
-      mHash     = std::move(rhs.mHash);
-      mKeyEqual = std::move(rhs.mKeyEqual);
 
       rhs.mEntries  = nullptr;
       rhs.mCapacity = 0;
@@ -449,8 +445,8 @@ private:
   uint32_t mSize{0};     ///< Live entries.
   uint32_t mOccupied{0}; ///< Live entries + tombstones (drives load-factor check).
 
-  Hash     mHash{};
-  KeyEqual mKeyEqual{};
+  DALI_NO_UNIQUE_ADDRESS Hash     mHash{};
+  DALI_NO_UNIQUE_ADDRESS KeyEqual mKeyEqual{};
 };
 
 } // namespace Integration

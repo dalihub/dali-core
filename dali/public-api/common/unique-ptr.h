@@ -17,6 +17,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
 
 namespace Dali
@@ -266,8 +267,8 @@ public:
   }
 
 private:
-  Type*   mPtr;     ///< The managed object
-  Deleter mDeleter; ///< The custom deleter
+  Type*                          mPtr;     ///< The managed object
+  DALI_NO_UNIQUE_ADDRESS Deleter mDeleter; ///< The custom deleter
 };
 
 /**
@@ -496,8 +497,8 @@ public:
   }
 
 private:
-  Type*   mPtr;     ///< The managed object
-  Deleter mDeleter; ///< The custom deleter
+  Type*                          mPtr;     ///< The managed object
+  DALI_NO_UNIQUE_ADDRESS Deleter mDeleter; ///< The custom deleter
 };
 
 /**
