@@ -868,3 +868,19 @@ int UtcDaliStringAssignStringView(void)
 
   END_TEST;
 }
+
+int UtcDaliStringViewCStringOperatorStreamOperator(void)
+{
+  TestApplication application;
+  std::string     resultString("A test string of some length");
+  String          testString(resultString.c_str());
+
+  // Test partial string
+  StringView testStringView(testString.CStr() + 2u, testString.Size() - 2u);
+
+  std::ostringstream oss;
+  oss << testStringView;
+
+  DALI_TEST_EQUALS(oss.str().c_str(), resultString.c_str() + 2u, TEST_LOCATION);
+  END_TEST;
+};

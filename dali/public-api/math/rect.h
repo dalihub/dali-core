@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <iostream>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-utility.h> ///< Dali::Min , Dali::Max
 #include <dali/public-api/math/math-utils.h>
@@ -387,21 +384,6 @@ inline bool Rect<float>::IsEmpty() const
 {
   return (fabsf(width) <= GetRangedEpsilon(width, width) ||
           fabsf(height) <= GetRangedEpsilon(height, height));
-}
-
-/**
- * @brief Converts the value of the rectangle into a string and insert in to an output stream.
- *
- * @note Templated inline function; not intrisically part of the library symbol table.
- * @SINCE_1_0.0
- * @param[in] stream The output stream operator
- * @param[in] rectangle the rectangle to output
- * @return The output stream operator
- */
-template<typename T>
-inline std::ostream& operator<<(std::ostream& stream, const Rect<T>& rectangle)
-{
-  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
 }
 
 /**
