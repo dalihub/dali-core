@@ -19,10 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#include <unordered_map>
+#include <functional> ///< for std::hash and std::equal_to
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/list-wrapper.h>
+#include <dali/integration-api/open-hash-map.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -55,9 +56,9 @@ public:
   using ConstIterator = typename ListContainer::const_iterator;
 
   // Find helper map container.
-  using MapContainer = typename std::unordered_map<const T*, Iterator, Hash, KeyEqual>;
+  using MapContainer = typename Dali::Integration::OpenHashMap<const T*, Iterator, Hash, KeyEqual>;
 
-  using SizeType = std::size_t;
+  using SizeType = uint32_t;
 
   /**
    * @brief Construct a new OrderedSet object
@@ -71,8 +72,7 @@ public:
   : mMap(std::move(rhs.mMap)),
     mList(std::move(rhs.mList))
   {
-    rhs.mMap.clear();
-    rhs.mMap.rehash(0);
+    rhs.mMap.Release();
     rhs.mList.clear();
   }
 
@@ -84,8 +84,7 @@ public:
     Clear();
     mMap  = std::move(rhs.mMap);
     mList = std::move(rhs.mList);
-    rhs.mMap.clear();
-    rhs.mMap.rehash(0);
+    rhs.mMap.Release();
     rhs.mList.clear();
     return *this;
   }
@@ -140,7 +139,7 @@ public:
    */
   SizeType Count() const
   {
-    return mMap.size();
+    return mMap.Size();
   }
 
   /**
@@ -150,7 +149,7 @@ public:
    */
   bool IsEmpty() const
   {
-    return mMap.empty();
+    return mMap.Empty();
   }
 
   /**
@@ -160,9 +159,9 @@ public:
    */
   void Reserve(SizeType count)
   {
-    if(mMap.size() < count)
+    if(mMap.Capacity() < count)
     {
-      mMap.rehash(count);
+      mMap.Rehash(count);
     }
   }
 
@@ -174,21 +173,21 @@ public:
    */
   Iterator Find(T* object)
   {
-    auto mapIter = mMap.find(object);
-    if(mapIter == mMap.end())
+    auto mapIter = mMap.Find(object);
+    if(!mapIter)
     {
       return End();
     }
-    return mapIter->second;
+    return *mapIter;
   }
   ConstIterator Find(const T* object) const
   {
-    auto mapIter = mMap.find(object);
-    if(mapIter == mMap.end())
+    auto mapIter = mMap.Find(object);
+    if(!mapIter)
     {
       return End();
     }
-    return mapIter->second;
+    return *mapIter;
   }
 
   /**
@@ -201,7 +200,7 @@ public:
   {
     DALI_ASSERT_DEBUG(Find(object) == End());
     auto newIter = mList.insert(mList.end(), object);
-    mMap.insert({object, newIter});
+    mMap.Insert(object, newIter);
   }
 
   /**
@@ -233,9 +232,8 @@ public:
     if(iter != mList.end())
     {
       // Erase mMap first.
-      auto mapIter = mMap.find(*iter);
-      DALI_ASSERT_DEBUG(mapIter != mMap.end());
-      mMap.erase(mapIter);
+      [[maybe_unused]] bool erased = mMap.Erase(*iter);
+      DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
       // Erase owned object.
       if constexpr(owned)
@@ -252,9 +250,8 @@ public:
     if(iter != mList.end())
     {
       // Erase mMap first.
-      auto mapIter = mMap.find(*iter);
-      DALI_ASSERT_DEBUG(mapIter != mMap.end());
-      mMap.erase(mapIter);
+      [[maybe_unused]] bool erased = mMap.Erase(*iter);
+      DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
       // Erase owned object.
       if constexpr(owned)
@@ -278,9 +275,8 @@ public:
     T* result = (*iter);
 
     // Erase mMap first.
-    auto mapIter = mMap.find(result);
-    DALI_ASSERT_DEBUG(mapIter != mMap.end());
-    mMap.erase(mapIter);
+    [[maybe_unused]] bool erased = mMap.Erase(*iter);
+    DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
     // Erase without delete reference
     mList.erase(iter);
@@ -291,9 +287,8 @@ public:
     const T* result = (*iter);
 
     // Erase mMap first.
-    auto mapIter = mMap.find(result);
-    DALI_ASSERT_DEBUG(mapIter != mMap.end());
-    mMap.erase(mapIter);
+    [[maybe_unused]] bool erased = mMap.Erase(result);
+    DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
     // Erase without delete reference
     mList.erase(iter);
@@ -313,8 +308,7 @@ public:
         delete iter;
       }
     }
-    mMap.clear();
-    mMap.rehash(0);
+    mMap.Release();
     mList.clear();
   }
 
@@ -323,10 +317,10 @@ public:
    */
   void ReorderCacheMap()
   {
-    mMap.clear();
+    mMap.Clear();
     for(auto iter = mList.begin(), iterEnd = mList.end(); iter != iterEnd; ++iter)
     {
-      mMap.insert({*iter, iter});
+      mMap.Insert(*iter, iter);
     }
   }
 

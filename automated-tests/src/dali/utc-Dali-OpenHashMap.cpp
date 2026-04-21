@@ -843,6 +843,32 @@ int UtcDaliOpenHashMapEraseAll(void)
   END_TEST;
 }
 
+int UtcDaliOpenHashMapRelease(void)
+{
+  tet_infoline("Erasing all entries results by Release() in empty map that still works");
+
+  OpenHashMap<int*, int, PtrHash, PtrEqual> map;
+
+  int a = 1, b = 2, c = 3;
+  map.Insert(&a, 10);
+  map.Insert(&b, 20);
+  map.Insert(&c, 30);
+
+  map.Release();
+
+  DALI_TEST_EQUALS(map.Size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Empty(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Capacity(), 0u, TEST_LOCATION); ///< Remove allocated memory.
+
+  // Can still insert after release everything
+  int d = 4;
+  map.Insert(&d, 40);
+  DALI_TEST_EQUALS(map.Size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(*map.Find(&d), 40, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliOpenHashMapClearThenInsert(void)
 {
   tet_infoline("Clear followed by inserts works correctly");
@@ -927,6 +953,26 @@ int UtcDaliOpenHashMapRehashEmpty(void)
   map.Insert(&a, 20);
   DALI_TEST_EQUALS(map.Size(), 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(*map.Find(&a), 20, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliOpenHashMapRehashForReserve(void)
+{
+  tet_infoline("Rehash to reserve table entirely");
+
+  OpenHashMap<int*, int, PtrHash, PtrEqual> map;
+
+  int a = 1;
+  map.Rehash(10);
+
+  DALI_TEST_EQUALS(map.Size(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Capacity(), 16u, TEST_LOCATION);
+
+  map.Insert(&a, 20);
+  DALI_TEST_EQUALS(map.Size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(*map.Find(&a), 20, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Capacity(), 16u, TEST_LOCATION);
 
   END_TEST;
 }
