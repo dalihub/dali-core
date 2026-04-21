@@ -84,23 +84,23 @@ WeakHandleBase::WeakHandleBase(BaseHandle& handle)
 
 WeakHandleBase::~WeakHandleBase()
 {
+  delete mImpl;
 }
 
 WeakHandleBase::WeakHandleBase(const WeakHandleBase& handle)
 : mImpl(nullptr)
 {
   BaseHandle object = handle.GetBaseHandle();
-  mImpl             = MakeUnique<Impl>(object);
+  mImpl             = new Impl(object);
 }
 
 WeakHandleBase& WeakHandleBase::operator=(const WeakHandleBase& rhs)
 {
   if(this != &rhs)
   {
-    mImpl.Reset();
-
+    delete mImpl;
     BaseHandle handle = rhs.GetBaseHandle();
-    mImpl             = MakeUnique<Impl>(handle);
+    mImpl             = new Impl(handle);
   }
 
   return *this;
@@ -109,13 +109,16 @@ WeakHandleBase& WeakHandleBase::operator=(const WeakHandleBase& rhs)
 WeakHandleBase::WeakHandleBase(WeakHandleBase&& rhs) noexcept
 : mImpl(std::move(rhs.mImpl))
 {
+  rhs.mImpl = nullptr;
 }
 
 WeakHandleBase& WeakHandleBase::operator=(WeakHandleBase&& rhs) noexcept
 {
   if(this != &rhs)
   {
-    mImpl = std::move(rhs.mImpl);
+    delete mImpl;
+    mImpl     = std::move(rhs.mImpl);
+    rhs.mImpl = nullptr;
   }
 
   return *this;

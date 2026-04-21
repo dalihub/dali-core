@@ -131,7 +131,7 @@ public:
 protected:
   /// @cond internal
   struct Impl;
-  UniquePtr<Impl> mImpl;
+  Impl* mImpl;
   /// @endcond
 };
 

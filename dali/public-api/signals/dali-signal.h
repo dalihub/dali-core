@@ -163,18 +163,29 @@ public:
     return mImpl ? mImpl->GetConnectionCount() : 0;
   }
 
+public:
+  SignalMixin()
+  : mImpl(nullptr)
+  {
+  }
+
+  ~SignalMixin()
+  {
+    delete mImpl;
+  }
+
 protected:
   BaseSignal& Impl()
   {
     if(!mImpl)
     {
-      mImpl = MakeUnique<BaseSignal>();
+      mImpl = new BaseSignal();
     }
     return *mImpl;
   }
 
 private:
-  UniquePtr<BaseSignal> mImpl;
+  BaseSignal* mImpl;
 };
 
 /**
