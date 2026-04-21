@@ -117,7 +117,7 @@ public:
    * @param[in]  iFace  The FrameCallbackInterface pointer to compare with
    * @return True if iFace matches our internally stored FrameCallbackInterface.
    */
-  inline bool operator==(const FrameCallbackInterface* iFace)
+  inline bool operator==(const FrameCallbackInterface* iFace) const
   {
     return mFrameCallbackInterface == iFace;
   }

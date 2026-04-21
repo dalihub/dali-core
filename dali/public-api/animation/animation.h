@@ -195,6 +195,17 @@ public:
   static Animation New(float durationSeconds);
 
   /**
+   * @brief Creates an initialized Animation.
+   *
+   * The animation will not loop.
+   * The default end action is "Bake".
+   * The default alpha function is linear.
+   * @SINCE_2_5.18
+   * @return A handle to a newly allocated Dali resource
+   */
+  static Animation New();
+
+  /**
    * @brief Downcasts a handle to Animation handle.
    *
    * If handle points to an Animation object, the downcast produces valid handle.

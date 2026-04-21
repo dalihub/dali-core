@@ -481,6 +481,18 @@ public: // Data
 using Size = Vector2;
 
 /**
+ * @brief Position is an alias of Dali::Vector2.
+ * @SINCE_2_5.18
+ */
+using Position = Vector2;
+
+/**
+ * @brief Scale is an alias of Dali::Vector2.
+ * @SINCE_2_5.18
+ */
+using Scale = Vector2;
+
+/**
  * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
  *
  * If a=0,1 and b=1,0 returns a vector of 0,0.

@@ -88,8 +88,7 @@ void PanGesture::AddGesture(const Internal::PanGesture& gesture)
   mGestures[mWritePosition] = gesture;
 
   // Update our write position.
-  ++mWritePosition;
-  mWritePosition %= PAN_GESTURE_HISTORY;
+  mWritePosition = (mWritePosition + 1) % PAN_GESTURE_HISTORY;
 }
 
 void PanGesture::RemoveOldHistory(PanInfoHistory& panHistory, unsigned int currentTime, unsigned int maxAge, unsigned int minEvents)

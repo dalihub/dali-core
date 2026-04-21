@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -912,14 +913,14 @@ int UtcDaliPropertyKeyOutputStream(void)
   END_TEST;
 }
 
-int UtcDaliPropertyMapInitializerListConstructor(void)
+int UtcDaliCreatePropertyMap(void)
 {
-  auto map = Property::Map{
+  auto map = CreatePropertyMap({
     {"number mapped to string", 1},
     {10, "string mapped to number"},
     {"string mapped", "to string"},
     {100, 3},
-  };
+  });
 
   DALI_TEST_CHECK(!map.Empty());                   // Should not be empty
   DALI_TEST_EQUALS(4, map.Count(), TEST_LOCATION); // Should have four items
@@ -932,12 +933,11 @@ int UtcDaliPropertyMapInitializerListConstructor(void)
   END_TEST;
 }
 
-int UtcDaliPropertyMapNestedInitializerListConstructor(void)
+int UtcDaliCreatePropertyMapNested(void)
 {
-  auto map = Property::Map{
-    {1, 1},
-    {2, {{2, 2}}},
-    {3, {{3, {{3, 3}}}}}};
+  auto map = CreatePropertyMap({{1, 1},
+                                {2, CreatePropertyMap({{2, 2}})},
+                                {3, CreatePropertyMap({{3, CreatePropertyMap({{3, 3}})}})}});
 
   DALI_TEST_CHECK(!map.Empty());
   DALI_TEST_EQUALS(3, map.Count(), TEST_LOCATION);

@@ -16,6 +16,9 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-array-devel.h>
+#include <dali/devel-api/object/property-map-devel.h>
+#include <dali/devel-api/object/property-value-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -1790,8 +1793,8 @@ int UtcDaliPropertyValueGetHashP01(void)
       Property::Value(AngleAxis(Radian(2.0f), Vector3(0.0f, 1.0f, 0.0f))),
       Property::Value("Hello, World!"),
       Property::Value(Extents(8, 4, 2, 5)),
-      Property::Value(Property::Array({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), Property::Value("Five"), Matrix(a)})),
-      Property::Value(Property::Map({{1, 1.0f}, {"2", Vector4(2.0f, 3.0f, 4.0f, 5.0f)}, {3, static_cast<int32_t>(6)}, {4, Property::Value("Lucky")}})),
+      Property::Value(CreatePropertyArray({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), Property::Value("Five"), Matrix(a)})),
+      Property::Value(CreatePropertyMap({{1, 1.0f}, {"2", Vector4(2.0f, 3.0f, 4.0f, 5.0f)}, {3, static_cast<int32_t>(6)}, {4, Property::Value("Lucky")}})),
     };
   Property::Value otherValueList[] =
     {
@@ -1807,8 +1810,8 @@ int UtcDaliPropertyValueGetHashP01(void)
       Property::Value(AngleAxis(Radian(20.0f), Vector3(0.0f, 1.0f, 0.0f))),
       Property::Value("Hell, o, World!"),
       Property::Value(Extents(4, 8, 5, 2)),
-      Property::Value(Property::Array({5.0f, Vector2(4.0f, 3.0f), static_cast<int32_t>(2), Property::Value("ONE"), Matrix(b)})),
-      Property::Value(Property::Map({{"1", 5.0f}, {2, Vector4(4.0f, 3.0f, 2.0f, 1.0f)}, {"three", static_cast<int32_t>(0)}, {1, Property::Value("-1")}})),
+      Property::Value(CreatePropertyArray({5.0f, Vector2(4.0f, 3.0f), static_cast<int32_t>(2), Property::Value("ONE"), Matrix(b)})),
+      Property::Value(CreatePropertyMap({{"1", 5.0f}, {2, Vector4(4.0f, 3.0f, 2.0f, 1.0f)}, {"three", static_cast<int32_t>(0)}, {1, Property::Value("-1")}})),
     };
   const int valueCount = sizeof(valueList) / sizeof(valueList[0]);
 
@@ -1840,7 +1843,7 @@ int UtcDaliPropertyValueGetHashP02(void)
   tet_infoline("Check Property::Value::GetHash() equality for Property::Array.");
 
   const float     a[]   = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
-  Property::Value value = Property::Value(Property::Array({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), Property::Value("Five"), Matrix(a)}));
+  Property::Value value = Property::Value(CreatePropertyArray({1.0f, Vector2(2.0f, 3.0f), static_cast<int32_t>(4), Property::Value("Five"), Matrix(a)}));
 
   const auto originHash = value.GetHash();
 
@@ -1873,12 +1876,42 @@ int UtcDaliPropertyValueGetHashP02(void)
   END_TEST;
 }
 
+int UtcDaliCreatePropertyValue(void)
+{
+  tet_infoline("Testing CreatePropertyValue");
+
+  // Test with string keys
+  {
+    Property::Value value = CreatePropertyValue({{"key1", Property::Value(100)},
+                                                 {"key2", Property::Value(200.5f)}});
+
+    DALI_TEST_CHECK(value.GetType() == Property::MAP);
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK(map != nullptr);
+    DALI_TEST_EQUALS(map->Count(), 2u, TEST_LOCATION);
+    DALI_TEST_EQUALS((*map)["key1"].Get<int>(), 100, TEST_LOCATION);
+    DALI_TEST_EQUALS((*map)["key2"].Get<float>(), 200.5f, TEST_LOCATION);
+  }
+
+  // Test with empty initializer list
+  {
+    Property::Value value = CreatePropertyValue({});
+
+    DALI_TEST_CHECK(value.GetType() == Property::MAP);
+    Property::Map* map = value.GetMap();
+    DALI_TEST_CHECK(map != nullptr);
+    DALI_TEST_EQUALS(map->Count(), 0u, TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliPropertyValueGetHashP03(void)
 {
   tet_infoline("Check Property::Value::GetHash() equality for Property::Map.");
 
   const float     a[]   = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f};
-  Property::Value value = Property::Value(Property::Map({{0, 1.0f}, {1, Vector2(2.0f, 3.0f)}, {"2", static_cast<int32_t>(4)}, {"3", Property::Value("Five")}, {4, Matrix(a)}}));
+  Property::Value value = CreatePropertyValue({{0, 1.0f}, {1, Vector2(2.0f, 3.0f)}, {"2", static_cast<int32_t>(4)}, {"3", Property::Value("Five")}, {4, Matrix(a)}});
 
   const auto originHash = value.GetHash();
 

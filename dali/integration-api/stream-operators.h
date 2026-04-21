@@ -16,13 +16,16 @@
  * limitations under the License.
  */
 
+// EXTERNAL INCLUDES
 #include <iosfwd>
+#include <iostream>
 
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/extents.h>
-#include <dali/public-api/math/angle-axis.h> //incl vec3
+#include <dali/public-api/math/angle-axis.h> // incl vec3
 #include <dali/public-api/math/matrix3.h>    // incl vec3,mat
-#include <dali/public-api/math/quaternion.h> //incl vec4
+#include <dali/public-api/math/quaternion.h> // incl vec4
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/property-value.h>
@@ -45,6 +48,16 @@ class String;
  * @return The output stream operator
  */
 DALI_CORE_API std::ostream& operator<<(std::ostream& outStream, const String& string);
+
+/**
+ * @brief Print a StringView
+ *
+ * @SINCE_2.5.19
+ * @param[in] o The output stream operator
+ * @param[in] stringView The string view to print
+ * @return The output stream operator
+ */
+DALI_CORE_API std::ostream& operator<<(std::ostream& outStream, const StringView& stringView);
 /**
  * @}
  */
@@ -53,6 +66,26 @@ DALI_CORE_API std::ostream& operator<<(std::ostream& outStream, const String& st
  * @addtogroup dali_core_math
  * @{
  */
+
+/**
+ * @brief Print Dali::Rect<int32_t>.
+ *
+ * @SINCE_1_0.0
+ * @param[in] stream The output stream operator
+ * @param[in] rectangle the rectangle to output
+ * @return The output stream operator
+ */
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Rect<int32_t>& rectangle);
+
+/**
+ * @brief Print Dali::Rect<float>.
+ *
+ * @SINCE_1_0.0
+ * @param[in] stream The output stream operator
+ * @param[in] rectangle the rectangle to output
+ * @return The output stream operator
+ */
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Rect<float>& rectangle);
 
 /**
  * @brief Print a Vector2.

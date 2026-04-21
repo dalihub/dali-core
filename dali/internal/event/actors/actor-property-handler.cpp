@@ -298,7 +298,20 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::SCALE:
     {
-      DetermineVector3ValueAndSet(property, actor, &Actor::SetScale);
+      if(property.GetType() == Property::VECTOR2)
+      {
+        // For special case of Vector2, let we change only X and Y, without touch Z.
+        Vector2 scaleVector2;
+        if(DALI_LIKELY(property.Get(scaleVector2)))
+        {
+          actor.SetScaleX(scaleVector2.x);
+          actor.SetScaleY(scaleVector2.y);
+        }
+      }
+      else
+      {
+        DetermineVector3ValueAndSet(property, actor, &Actor::SetScale);
+      }
       break;
     }
 
@@ -571,9 +584,9 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_AREA_OFFSET:
+    case Dali::DevelActor::Property::TOUCH_AREA_MARGIN:
     {
-      CheckValidAndSet(property, actor, &Actor::SetTouchAreaOffset);
+      CheckValidAndSet(property, actor, &Actor::SetTouchAreaMargin);
       break;
     }
 
@@ -1515,9 +1528,9 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_AREA_OFFSET:
+    case Dali::DevelActor::Property::TOUCH_AREA_MARGIN:
     {
-      value = actor.GetTouchAreaOffset();
+      value = actor.GetTouchAreaMargin();
       break;
     }
 

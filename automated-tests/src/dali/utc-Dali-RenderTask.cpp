@@ -2072,7 +2072,15 @@ int UtcDaliRenderTaskGetScreenToFrameBufferMappingActor02N(void)
 
   RenderTaskList taskList   = application.GetScene().GetRenderTaskList();
   RenderTask     renderTask = taskList.CreateTask();
-  Actor          actor;
+
+  Actor mappingActor = Actor::New();
+  renderTask.SetScreenToFrameBufferMappingActor(mappingActor);
+  DALI_TEST_EQUALS(mappingActor, renderTask.GetScreenToFrameBufferMappingActor(), TEST_LOCATION);
+
+  renderTask.SetScreenToFrameBufferMappingActor(mappingActor);
+  DALI_TEST_EQUALS(mappingActor, renderTask.GetScreenToFrameBufferMappingActor(), TEST_LOCATION);
+
+  Actor actor;
   renderTask.SetScreenToFrameBufferMappingActor(actor);
 
   DALI_TEST_EQUALS((bool)renderTask.GetScreenToFrameBufferMappingActor(), false, TEST_LOCATION);

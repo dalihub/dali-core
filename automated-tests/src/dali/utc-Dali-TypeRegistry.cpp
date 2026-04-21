@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
@@ -4120,13 +4121,12 @@ int UtcDaliTypeRegistryDifferentHandleObjectNameTestFromScript(void)
   using THProp     = TestHandle::Property;
 
   TestApplication application;
-  Property::Map   map{
-    {"type", "TestHandle"},
-    {"propertyString", "Hello Script"},
-    {"propertyFloat", 8.5f},
-    {"propertyFloatReadOnly", 7.5f}, // Attempt to write a read-only property
-    {"propertyAnimatableX", 80.5f}};
-  Actor handle = Scripting::NewActor(map);
+  Property::Map   map    = CreatePropertyMap({{"type", "TestHandle"},
+                                              {"propertyString", "Hello Script"},
+                                              {"propertyFloat", 8.5f},
+                                              {"propertyFloatReadOnly", 7.5f}, // Attempt to write a read-only property
+                                              {"propertyAnimatableX", 80.5f}});
+  Actor           handle = Scripting::NewActor(map);
   DALI_TEST_EQUALS(handle.GetProperty<String>(THProp::PROPERTY_STRING), "Hello Script", TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT), 8.5f, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty<float>(THProp::PROPERTY_FLOAT_READ_ONLY), 10.0f, TEST_LOCATION);

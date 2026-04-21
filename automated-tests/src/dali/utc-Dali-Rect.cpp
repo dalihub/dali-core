@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -351,16 +351,31 @@ int UtcDaliRectOperatorEquals(void)
   END_TEST;
 }
 
-int UtcDaliRectOStreamOperatorP(void)
+int UtcDaliRectOStreamOperatorRectIntegerP(void)
 {
   TestApplication    application;
   std::ostringstream oss;
 
-  Rect<int> rect(1, 2, 10, 10);
+  Rect<int32_t> rect(1, 2, 10, 10);
 
   oss << rect;
 
   std::string expectedOutput = "[1, 2, 10, 10]";
+
+  DALI_TEST_EQUALS(oss.str(), expectedOutput, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRectOStreamOperatorRectFloatP(void)
+{
+  TestApplication    application;
+  std::ostringstream oss;
+
+  Rect<float> rect(1.1f, 2.2f, 10.1f, 10.1f);
+
+  oss << rect;
+
+  std::string expectedOutput = "[1.1, 2.2, 10.1, 10.1]";
 
   DALI_TEST_EQUALS(oss.str(), expectedOutput, TEST_LOCATION);
   END_TEST;

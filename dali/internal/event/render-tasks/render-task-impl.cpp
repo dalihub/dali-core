@@ -225,17 +225,17 @@ RenderTask::ScreenToFrameBufferFunction RenderTask::GetScreenToFrameBufferFuncti
 
 void RenderTask::SetScreenToFrameBufferMappingActor(Dali::Actor& mappingActor)
 {
-  if(mInputMappingActor == mappingActor)
+  Dali::Actor oldInputMappingActor = mInputMappingActor.GetHandle();
+  if(oldInputMappingActor == mappingActor)
   {
     return;
   }
 
   if(!mappingActor)
   {
-    Dali::Actor actor = mInputMappingActor.GetHandle();
-    if(actor)
+    if(oldInputMappingActor)
     {
-      GetImplementation(actor).SetIsRenderTaskMappingActor(false);
+      GetImplementation(oldInputMappingActor).SetIsRenderTaskMappingActor(false);
     }
     mInputMappingActor.Reset();
     return;

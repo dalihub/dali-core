@@ -15,14 +15,33 @@
  */
 
 #include <dali/integration-api/stream-operators.h>
+#include <dali/integration-api/string-utils.h>
+
+#include <string_view>
 
 namespace Dali
 {
 
 std::ostream& operator<<(std::ostream& outStream, const String& string)
 {
-  outStream << string.CStr();
+  outStream << Integration::ToStdStringView(string);
   return outStream;
+}
+
+std::ostream& operator<<(std::ostream& outStream, const StringView& stringView)
+{
+  outStream << Integration::ToStdStringView(stringView);
+  return outStream;
+}
+
+std::ostream& operator<<(std::ostream& o, const Rect<int32_t>& rectangle)
+{
+  return o << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+}
+
+std::ostream& operator<<(std::ostream& o, const Rect<float>& rectangle)
+{
+  return o << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
 }
 
 std::ostream& operator<<(std::ostream& o, const Vector2& vector)

@@ -1217,7 +1217,7 @@ struct UniformInfo
   uint32_t     elementStride{0u};
   uint32_t     matrixStride{0u}; ///< Number of bytes for matrix row
 
-  bool operator==(const UniformInfo& rhs)
+  bool operator==(const UniformInfo& rhs) const
   {
     return name == rhs.name &&
            uniformClass == rhs.uniformClass &&

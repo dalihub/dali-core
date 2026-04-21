@@ -1,5 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.8.2)
 CMAKE_POLICY(SET CMP0012 NEW) # Prevent dereferencing of OFF/ON as variables
+IF(POLICY CMP0177)
+  CMAKE_POLICY(SET CMP0177 NEW) # install() DESTINATION paths are normalized.
+ENDIF()
 
 SET(name "dali2-core")
 

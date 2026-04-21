@@ -272,7 +272,7 @@ Dali::Graphics::VertexInputAttributeFormat TestGraphicsReflection::GetVertexAttr
 std::string TestGraphicsReflection::GetVertexAttributeName(uint32_t location) const
 {
   tet_infoline("Warning, TestGraphicsReflection::GetVertexAttributeName is unimplemented\n");
-  return 0u;
+  return "";
 }
 
 std::vector<uint32_t> TestGraphicsReflection::GetVertexAttributeLocations() const

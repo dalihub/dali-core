@@ -171,15 +171,26 @@ public:
     SceneGraph::Node*         node;
     SceneGraph::PropertyBase* propertyBase;
 
-    NodePropertyPair(const NodePropertyPair&)            = delete;  ///< Deleted copy constructor.
-    NodePropertyPair(NodePropertyPair&&)                 = default; ///< Default move constructor.
-    NodePropertyPair& operator=(const NodePropertyPair&) = delete;  ///< Deleted assignment operator.
-    NodePropertyPair& operator=(NodePropertyPair&&)      = default; ///< Default move assignment operator.
+    constexpr NodePropertyPair(SceneGraph::Node* node, SceneGraph::PropertyBase* propertyBase)
+    : node(node),
+      propertyBase(propertyBase)
+    {
+    }
+
+    constexpr NodePropertyPair()
+    : NodePropertyPair(nullptr, nullptr)
+    {
+    }
+
+    NodePropertyPair(const NodePropertyPair&)                = delete;  ///< Deleted copy constructor.
+    NodePropertyPair(NodePropertyPair&&) noexcept            = default; ///< Default move constructor.
+    NodePropertyPair& operator=(const NodePropertyPair&)     = delete;  ///< Deleted assignment operator.
+    NodePropertyPair& operator=(NodePropertyPair&&) noexcept = default; ///< Default move assignment operator.
 
     /**
      * Comparison operator
      */
-    bool operator==(const NodePropertyPair& other)
+    bool operator==(const NodePropertyPair& other) const
     {
       return (other.node == node) &&
              (other.propertyBase == propertyBase);

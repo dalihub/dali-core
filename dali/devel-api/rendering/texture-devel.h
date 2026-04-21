@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <string>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/rendering/texture.h>
 

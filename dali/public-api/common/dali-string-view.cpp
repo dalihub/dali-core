@@ -123,4 +123,10 @@ bool StringView::operator==(const char* rhs) const
   return GetView(mStorage) == rhs;
 }
 
+bool StringView::operator==(const String& rhs) const
+{
+  const char* cstr = rhs.CStr();
+  return GetView(mStorage) == (cstr ? std::string_view(cstr, rhs.Size()) : std::string_view());
+}
+
 } // namespace Dali

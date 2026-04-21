@@ -32,19 +32,19 @@
 
 #define DALI_PROPERTY_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex)                                                                                            \
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, &objectType::SetProperty, &objectType::GetProperty); \
-  static_assert((objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
+  static_assert((static_cast<int>(objectNamespace::objectType::Property::enumIndex) - static_cast<int>(objectNamespace::objectType::PROPERTY_START_INDEX)) == count);
 
 #define DALI_PROPERTY_REGISTRATION_FULL_INTERNAL(count, typeRegistrationObject, handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex)                                                                           \
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, handleNamespace::handleType::Property::enumIndex, Dali::Property::valueType, &objectNamespace::objectType::SetProperty, &objectType::GetProperty); \
-  static_assert((handleNamespace::handleType::Property::enumIndex - handleNamespace::handleType::PROPERTY_START_INDEX) == count);
+  static_assert((static_cast<int>(handleNamespace::handleType::Property::enumIndex) - static_cast<int>(handleNamespace::handleType::PROPERTY_START_INDEX)) == count);
 
 #define DALI_PROPERTY_REGISTRATION_READ_ONLY_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex)                                                              \
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType, NULL, &objectType::GetProperty); \
-  static_assert((objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX) == count);
+  static_assert((static_cast<int>(objectNamespace::objectType::Property::enumIndex) - static_cast<int>(objectNamespace::objectType::PROPERTY_START_INDEX)) == count);
 
 #define DALI_PROPERTY_REGISTRATION_READ_ONLY_FULL_INTERNAL(count, typeRegistrationObject, handleNamespace, handleType, objectNamespace, objectType, text, valueType, enumIndex)                                             \
   Dali::PropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, handleNamespace::handleType::Property::enumIndex, Dali::Property::valueType, NULL, &objectNamespace::objectType::GetProperty); \
-  static_assert((handleNamespace::handleType::Property::enumIndex - handleNamespace::handleType::PROPERTY_START_INDEX) == count);
+  static_assert((static_cast<int>(handleNamespace::handleType::Property::enumIndex) - static_cast<int>(handleNamespace::handleType::PROPERTY_START_INDEX)) == count);
 
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL(count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
   Dali::AnimatablePropertyRegistration DALI_TOKEN_PASTE(property, count)(typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Dali::Property::valueType);

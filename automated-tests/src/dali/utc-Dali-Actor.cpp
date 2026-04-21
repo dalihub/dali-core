@@ -2702,6 +2702,48 @@ int UtcDaliActorSetScale03(void)
   END_TEST;
 }
 
+// SetScale(Vector2 scale)
+int UtcDaliActorSetScaleVector2(void)
+{
+  TestApplication application;
+
+  Vector3 originalScale(12.0f, 1.0f, 2.0f);
+  Vector2 scaleV2(10.0f, 5.0f);
+
+  Actor actor = Actor::New();
+
+  // Set to random value first -.GetCurrentProperty< Vector3 >( Actor::Property::SCALE ) asserts if called before SetScale()
+  actor.SetProperty(Actor::Property::SCALE, originalScale);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+  DALI_TEST_CHECK(actor.GetCurrentProperty<Vector3>(Actor::Property::SCALE) != originalScale);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::SCALE, scaleV2);
+
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_X), scaleV2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Y), scaleV2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Z), originalScale.z, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::SCALE), originalScale, TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_X), scaleV2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Y), scaleV2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::SCALE_Z), originalScale.z, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::SCALE_X), scaleV2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::SCALE_Y), scaleV2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<float>(Actor::Property::SCALE_Z), originalScale.z, TEST_LOCATION);
+  END_TEST;
+}
+
 int UtcDaliActorSetScaleIndividual(void)
 {
   TestApplication application;
@@ -4592,23 +4634,23 @@ int UtcDaliActorSetPadding(void)
 
   Actor actor = Actor::New();
 
-  Padding padding;
+  Vector4 padding;
   padding = actor.GetProperty<Vector4>(Actor::Property::PADDING);
 
-  DALI_TEST_EQUALS(padding.left, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.right, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.bottom, 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.top, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.x, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.y, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.z, 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.w, 0.0f, TEST_LOCATION);
 
-  Padding padding2(1.0f, 2.0f, 3.0f, 4.0f);
+  Vector4 padding2(1.0f, 2.0f, 3.0f, 4.0f);
   actor.SetProperty(Actor::Property::PADDING, padding2);
 
   padding = actor.GetProperty<Vector4>(Actor::Property::PADDING);
 
-  DALI_TEST_EQUALS(padding.left, padding2.left, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.right, padding2.right, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.bottom, padding2.bottom, TEST_LOCATION);
-  DALI_TEST_EQUALS(padding.top, padding2.top, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.x, padding2.x, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.y, padding2.y, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.z, padding2.z, TEST_LOCATION);
+  DALI_TEST_EQUALS(padding.w, padding2.w, TEST_LOCATION);
 
   END_TEST;
 }
@@ -10776,17 +10818,17 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   };
 
   DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
   DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   {
+  {
     dataVCB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
     actorDSignalFunctor(); }));
   DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
-                                                                                                   { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
+  { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
   actorA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
   actorB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
@@ -14053,12 +14095,12 @@ int UtcDaliActorTouchAreaOffsetPropertyP(void)
 {
   TestApplication application;
 
-  Actor     actor           = Actor::New();
-  Rect<int> touchAreaOffset = actor.GetProperty(DevelActor::Property::TOUCH_AREA_OFFSET).Get<Rect<int>>();
-  DALI_TEST_EQUALS(Rect<int>(0, 0, 0, 0), touchAreaOffset, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Rect<int>(10, 20, 30, 40));
-  touchAreaOffset = actor.GetProperty(DevelActor::Property::TOUCH_AREA_OFFSET).Get<Rect<int>>();
-  DALI_TEST_EQUALS(Rect<int>(10, 20, 30, 40), touchAreaOffset, TEST_LOCATION);
+  Actor   actor           = Actor::New();
+  Extents touchAreaMargin = actor.GetProperty(DevelActor::Property::TOUCH_AREA_MARGIN).Get<Extents>();
+  DALI_TEST_EQUALS(Extents(), touchAreaMargin, TEST_LOCATION);
+  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(10, 20, 30, 40));
+  touchAreaMargin = actor.GetProperty(DevelActor::Property::TOUCH_AREA_MARGIN).Get<Extents>();
+  DALI_TEST_EQUALS(Extents(10, 20, 30, 40), touchAreaMargin, TEST_LOCATION);
   END_TEST;
 }
 
@@ -14071,12 +14113,12 @@ int UtcDaliActorTouchAreaOffsetPropertyN(void)
   // Make sure setting invalid types does not cause a crash
   try
   {
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, 1.0f);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector2::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector3::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Vector4::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Property::Map());
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_OFFSET, Property::Array());
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, 1.0f);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector2::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector4::ONE);
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Property::Map());
+    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Property::Array());
     tet_result(TET_PASS);
   }
   catch(...)

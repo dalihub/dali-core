@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-
-// EXTERNAL INCLUDES
-#include <stdint.h>
 
 namespace Dali
 {
@@ -54,12 +51,13 @@ RefObject& RefObject::operator=(const RefObject&)
 
 void RefObject::Reference()
 {
-  ++mCount;
+  __sync_fetch_and_add(&mCount, 1); // Atomic increment
 }
 
 void RefObject::Unreference()
 {
-  if((--mCount) == 0)
+  // Atomic decrement, returns value BEFORE the subtraction
+  if(__sync_fetch_and_sub(&mCount, 1) == 1)
   {
     OnDestroy();
 

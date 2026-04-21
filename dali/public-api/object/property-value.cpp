@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <ostream>
 
@@ -991,11 +992,6 @@ Property::Value::Value(const Extents& extentsValue)
   Impl::New(mStorage, extentsValue);
 }
 
-Property::Value::Value(const std::initializer_list<KeyValuePair>& values)
-{
-  Impl::New(mStorage, Property::Map(values));
-}
-
 Property::Value::Value(Type type)
 {
   switch(type)
@@ -1463,10 +1459,10 @@ bool Property::Value::Get(Extents& extentsValue) const
   else if(obj.GetType() == VECTOR4)
   {
     auto& vec4          = obj.GetVector4();
-    extentsValue.start  = static_cast<uint16_t>(vec4.x);
-    extentsValue.end    = static_cast<uint16_t>(vec4.y);
-    extentsValue.top    = static_cast<uint16_t>(vec4.z);
-    extentsValue.bottom = static_cast<uint16_t>(vec4.w);
+    extentsValue.start  = static_cast<int16_t>(std::roundf(vec4.x));
+    extentsValue.end    = static_cast<int16_t>(std::roundf(vec4.y));
+    extentsValue.top    = static_cast<int16_t>(std::roundf(vec4.z));
+    extentsValue.bottom = static_cast<int16_t>(std::roundf(vec4.w));
     converted           = true;
   }
 

@@ -2,7 +2,7 @@
 #define DALI_REF_OBJECT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <atomic>
 #include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
@@ -115,7 +114,7 @@ private:
   RefObject& operator=(RefObject&& rhs) = delete; ///< Deleted move assignment operator
 
 private:
-  std::atomic_uint32_t mCount{0u}; ///< Reference count
+  uint32_t mCount{0u}; ///< Reference count
 };
 
 /**

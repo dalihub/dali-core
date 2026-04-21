@@ -35,6 +35,9 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/object/base-object-observer.cpp
   ${devel_api_src_dir}/object/type-info.cpp
   ${devel_api_src_dir}/object/type-registry.cpp
+  ${devel_api_src_dir}/object/property-map-devel.cpp
+  ${devel_api_src_dir}/object/property-array-devel.cpp
+  ${devel_api_src_dir}/object/property-value-devel.cpp
   ${devel_api_src_dir}/rendering/frame-buffer-devel.cpp
   ${devel_api_src_dir}/rendering/renderer-devel.cpp
   ${devel_api_src_dir}/rendering/texture-devel.cpp
@@ -117,6 +120,9 @@ SET( devel_api_core_object_header_files
   ${devel_api_src_dir}/object/csharp-type-registry.h
   ${devel_api_src_dir}/object/handle-devel.h
   ${devel_api_src_dir}/object/property-helper-devel.h
+  ${devel_api_src_dir}/object/property-map-devel.h
+  ${devel_api_src_dir}/object/property-array-devel.h
+  ${devel_api_src_dir}/object/property-value-devel.h
   ${devel_api_src_dir}/object/type-info.h
   ${devel_api_src_dir}/object/type-registry.h
   ${devel_api_src_dir}/object/type-registry-helper.h

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ void ConditionalWait::Wait()
 {
   // conditional wait requires a lock to be held
   ScopedLock scope(*this);
-  ++(mImpl->count);
+  mImpl->count = (mImpl->count + 1);
   // conditional wait may wake up without anyone calling Notify
   do
   {
@@ -129,7 +129,7 @@ void ConditionalWait::Wait(const ScopedLock& scope)
   // Scope must be locked:
   DALI_ASSERT_ALWAYS(&scope.GetLockedWait() == this);
 
-  ++(mImpl->count);
+  mImpl->count = (mImpl->count + 1);
 
   // conditional wait may wake up without anyone calling Notify
   do
@@ -147,7 +147,7 @@ void ConditionalWait::WaitUntil(const ScopedLock& scope, ConditionalWait::TimePo
   // Scope must be locked:
   DALI_ASSERT_ALWAYS(&scope.GetLockedWait() == this);
 
-  ++(mImpl->count);
+  mImpl->count = (mImpl->count + 1);
 
   // conditional wait may wake up without anyone calling Notify
   do
@@ -159,7 +159,7 @@ void ConditionalWait::WaitUntil(const ScopedLock& scope, ConditionalWait::TimePo
       // Note that we should not wake-up other wait requests.
       if(mImpl->count > 0u)
       {
-        --mImpl->count;
+        mImpl->count = (mImpl->count - 1);
       }
     }
   } while(0 != mImpl->count);

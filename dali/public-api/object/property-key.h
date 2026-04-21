@@ -92,7 +92,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A string key to compare against.
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
-  bool operator==(const Dali::StringView& rhs);
+  bool operator==(const Dali::StringView& rhs) const;
 
   /**
    * @brief Constructor
@@ -101,7 +101,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] key The string key as a const char *
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
-  bool operator==(const char* key);
+  bool operator==(const char* key) const;
 
   /**
    * @brief The equality operator
@@ -110,7 +110,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs An index key to compare against.
    * @return true if the key compares, or false if it isn't equal or of the wrong type
    */
-  bool operator==(Property::Index rhs);
+  bool operator==(Property::Index rhs) const;
 
   /**
    * @brief The equality operator
@@ -119,7 +119,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A key  to compare against.
    * @return true if the keys are of the same type and have the same value
    */
-  bool operator==(const Key& rhs);
+  bool operator==(const Key& rhs) const;
 
   /**
    * @brief The inequality operator
@@ -128,7 +128,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A string key to compare against.
    * @return true if the key is not equal or not a string key
    */
-  bool operator!=(const Dali::StringView& rhs);
+  bool operator!=(const Dali::StringView& rhs) const;
 
   /**
    * @brief The inequality operator
@@ -137,7 +137,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A const char* key to compare against.
    * @return true if the key is not equal or not a string key
    */
-  bool operator!=(const char* rhs);
+  bool operator!=(const char* rhs) const;
 
   /**
    * @brief The inequality operator
@@ -146,7 +146,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs An index key to compare against.
    * @return true if the key is not equal, or not an index key
    */
-  bool operator!=(Property::Index rhs);
+  bool operator!=(Property::Index rhs) const;
 
   /**
    * @brief The inequality operator
@@ -155,7 +155,7 @@ struct DALI_CORE_API Property::Key
    * @param[in] rhs A key to compare against.
    * @return true if the keys are not of the same type or are not equal
    */
-  bool operator!=(const Key& rhs);
+  bool operator!=(const Key& rhs) const;
 };
 
 /**

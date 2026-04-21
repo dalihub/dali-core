@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <iostream>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-utility.h> ///< Dali::Min , Dali::Max
 #include <dali/public-api/math/math-utils.h>
@@ -57,10 +54,10 @@ struct Rect
    * @brief Constructor.
    *
    * @SINCE_1_0.0
-   * @param[in] x      X coordinate (or left)
-   * @param[in] y      Y coordinate (or right)
-   * @param[in] width  Width (or bottom)
-   * @param[in] height Height (or top)
+   * @param[in] x      X coordinate
+   * @param[in] y      Y coordinate
+   * @param[in] width  Width
+   * @param[in] height Height
    */
   Rect(T x, T y, T width, T height)
   : x(x),
@@ -321,30 +318,11 @@ struct Rect
            other.y >= y && (other.y + other.height) <= (y + height);
   }
 
-public: // Data
-  union
-  {
-    T x;    ///< X position of the rectangle
-    T left; ///< The left value
-  };
-
-  union
-  {
-    T y;     ///< Y position of the rectangle
-    T right; ///< The right value
-  };
-
-  union
-  {
-    T width;  ///< width of the rectangle
-    T bottom; ///< The bottom value
-  };
-
-  union
-  {
-    T height; ///< height of the rectangle
-    T top;    ///< The top value
-  };
+public:     // Data
+  T x;      ///< X position of the rectangle
+  T y;      ///< Y position of the rectangle
+  T width;  ///< Width of the rectangle
+  T height; ///< Height of the rectangle
 };
 
 /**
@@ -406,21 +384,6 @@ inline bool Rect<float>::IsEmpty() const
 {
   return (fabsf(width) <= GetRangedEpsilon(width, width) ||
           fabsf(height) <= GetRangedEpsilon(height, height));
-}
-
-/**
- * @brief Converts the value of the rectangle into a string and insert in to an output stream.
- *
- * @note Templated inline function; not intrisically part of the library symbol table.
- * @SINCE_1_0.0
- * @param[in] stream The output stream operator
- * @param[in] rectangle the rectangle to output
- * @return The output stream operator
- */
-template<typename T>
-inline std::ostream& operator<<(std::ostream& stream, const Rect<T>& rectangle)
-{
-  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
 }
 
 /**

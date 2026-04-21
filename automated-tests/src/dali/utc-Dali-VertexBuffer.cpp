@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/rendering/vertex-buffer-devel.h>
 #include <dali/devel-api/signals/vertex-buffer-update-callback.h>
 #include <dali/devel-api/threading/thread.h>
@@ -356,9 +357,9 @@ int UtcDaliVertexBufferMapInitializerList(void)
 {
   TestApplication application;
 
-  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
-                                                         {"aTexCoord", Property::VECTOR2},
-                                                         {"aColor", Property::VECTOR4}};
+  Property::Map texturedQuadVertexFormat = CreatePropertyMap({{"aPosition", Property::VECTOR2},
+                                                              {"aTexCoord", Property::VECTOR2},
+                                                              {"aColor", Property::VECTOR4}});
 
   try
   {
@@ -397,9 +398,9 @@ int UtcDaliVertexBufferInvalidTypeN02(void)
 {
   TestApplication application;
 
-  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::MAP},
-                                                         {"aTexCoord", Property::STRING},
-                                                         {"aColor", Property::VECTOR4}};
+  Property::Map texturedQuadVertexFormat = CreatePropertyMap({{"aPosition", Property::MAP},
+                                                              {"aTexCoord", Property::STRING},
+                                                              {"aColor", Property::VECTOR4}});
 
   try
   {
@@ -435,9 +436,9 @@ int UtcDaliVertexBufferSetDataNegative02(void)
 {
   TestApplication application;
 
-  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
-                                                         {"aTexCoord", Property::VECTOR2},
-                                                         {"aColor", Property::VECTOR4}};
+  Property::Map texturedQuadVertexFormat = CreatePropertyMap({{"aPosition", Property::VECTOR2},
+                                                              {"aTexCoord", Property::VECTOR2},
+                                                              {"aColor", Property::VECTOR4}});
 
   try
   {
@@ -460,9 +461,9 @@ int UtcDaliVertexBufferSetDataWithZeroLength(void)
 {
   TestApplication application;
 
-  Property::Map texturedQuadVertexFormat = Property::Map{{"aPosition", Property::VECTOR2},
-                                                         {"aTexCoord", Property::VECTOR2},
-                                                         {"aColor", Property::VECTOR4}};
+  Property::Map texturedQuadVertexFormat = CreatePropertyMap({{"aPosition", Property::VECTOR2},
+                                                              {"aTexCoord", Property::VECTOR2},
+                                                              {"aColor", Property::VECTOR4}});
 
   try
   {
@@ -537,7 +538,7 @@ int UtcDaliVertexBufferSetDivisor(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
 
-  Property::Map instanceFormat{{"aTranslate", Property::VECTOR2}, {"aColor", Property::VECTOR4}};
+  Property::Map instanceFormat = CreatePropertyMap({{"aTranslate", Property::VECTOR2}, {"aColor", Property::VECTOR4}});
 
   VertexBuffer vertexBuffer = VertexBuffer::New(texturedQuadVertexFormat);
   DALI_TEST_EQUALS((bool)vertexBuffer, true, TEST_LOCATION);
@@ -631,9 +632,9 @@ int UtcDaliVertexBufferUpdateCallback(void)
   TestApplication application;
 
   // Create vertex buffer
-  VertexBuffer vertexBuffer = VertexBuffer::New(Property::Map() = {
-                                                  {"aPosition", Property::Type::VECTOR2},
+  Property::Map vertexFormat = CreatePropertyMap({{"aPosition", Property::Type::VECTOR2},
                                                   {"aTexCoord", Property::Type::VECTOR2}});
+  VertexBuffer  vertexBuffer = VertexBuffer::New(vertexFormat);
 
   // set callback
   auto callback = std::make_unique<VertexBufferUpdater>();
@@ -740,9 +741,9 @@ int UtcDaliSetAndRemoveVertexBufferUpdateCallback(void)
   TestApplication application;
 
   // Create vertex buffer
-  VertexBuffer vertexBuffer = VertexBuffer::New(Property::Map() = {
-                                                  {"aPosition", Property::Type::VECTOR2},
+  Property::Map vertexFormat = CreatePropertyMap({{"aPosition", Property::Type::VECTOR2},
                                                   {"aTexCoord", Property::Type::VECTOR2}});
+  VertexBuffer  vertexBuffer = VertexBuffer::New(vertexFormat);
 
   // set callback
   auto callback = std::make_unique<VertexBufferUpdater>();
@@ -830,9 +831,9 @@ int UtcDaliVertexBufferDestructWorkerThreadN(void)
     };
     TestThread thread;
 
-    Dali::VertexBuffer vertexBuffer = VertexBuffer::New(Property::Map() = {
-                                                          {"aPosition", Property::Type::VECTOR2},
-                                                          {"aTexCoord", Property::Type::VECTOR2}});
+    Property::Map      vertexFormat = CreatePropertyMap({{"aPosition", Property::Type::VECTOR2},
+                                                         {"aTexCoord", Property::Type::VECTOR2}});
+    Dali::VertexBuffer vertexBuffer = VertexBuffer::New(vertexFormat);
     thread.mVertexBuffer            = std::move(vertexBuffer);
     vertexBuffer.Reset();
 
