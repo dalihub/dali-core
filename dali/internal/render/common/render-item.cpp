@@ -23,6 +23,7 @@
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
+#include <cstdlib>
 
 namespace
 {
@@ -70,8 +71,10 @@ RenderItem::~RenderItem() = default;
 
 void RenderItem::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "RenderItem::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->Free(gMemoryPoolType, ptr);
+  if(DALI_LIKELY(gMemoryPoolCollection))
+  {
+    gMemoryPoolCollection->Free(gMemoryPoolType, ptr);
+  }
 }
 
 RenderItem* RenderItem::Get(RenderItemKey::KeyType key)
@@ -128,7 +131,7 @@ Dali::Rect<int32_t> RenderItem::CalculateTransformSpaceAABB(const Matrix& transf
   int z = static_cast<int>(ceilf(aabb.z));
   int w = static_cast<int>(ceilf(aabb.w));
 
-  return Dali::Rect<int32_t>(x, y, z - x, fabsf(w - y));
+  return Dali::Rect<int32_t>(x, y, z - x, std::abs(w - y));
 }
 
 Dali::Rect<int32_t> RenderItem::CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor)

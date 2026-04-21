@@ -45,7 +45,7 @@ class RenderManager;
 
 namespace Render
 {
-struct Sampler;
+class Sampler;
 
 class Texture
 {

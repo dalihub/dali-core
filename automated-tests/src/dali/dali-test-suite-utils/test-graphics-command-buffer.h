@@ -804,7 +804,7 @@ struct Command
 class TestGraphicsCommandBuffer : public Graphics::CommandBuffer
 {
 public:
-  TestGraphicsCommandBuffer(TraceCallStack& callstack, TestGlAbstraction& glAbstraction);
+  TestGraphicsCommandBuffer(TraceCallStack& callstack);
   ~TestGraphicsCommandBuffer()
   {
   }
@@ -982,7 +982,7 @@ public:
     mCallStack.PushCall("ExecuteCommandBuffers", "");
   }
 
-  void DrawNative(const Graphics::DrawNativeInfo* drawInfo)
+  void DrawNative(const Graphics::DrawNativeInfo* drawInfo) override
   {
     mCommands.emplace_back();
     mCommands.back().type         = CommandType::DRAW_NATIVE;
@@ -1302,8 +1302,7 @@ public:
   std::vector<const Command*> GetChildCommandsByType(CommandTypeMask mask) const;
 
 private:
-  TraceCallStack&    mCallStack;
-  TestGlAbstraction& mGlAbstraction;
+  TraceCallStack& mCallStack;
 
   std::vector<Command> mCommands;
 };

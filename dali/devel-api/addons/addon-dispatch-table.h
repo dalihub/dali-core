@@ -123,7 +123,7 @@ struct DispatchTable
       return nullptr;
     }
 
-    auto iter = std::find_if(entries.begin(), entries.end(), [funcName, entries = &this->entries](Entry& entry)
+    auto iter = std::find_if(entries.begin(), entries.end(), [funcName](Entry& entry)
     {
       return (entry.functionName == funcName);
     });

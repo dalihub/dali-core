@@ -72,7 +72,7 @@ class TouchResampler;
 
 namespace Render
 {
-struct Sampler;
+class Sampler;
 class FrameBuffer;
 } // namespace Render
 // value types used by messages

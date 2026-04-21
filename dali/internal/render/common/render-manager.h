@@ -47,7 +47,7 @@ namespace Render
 {
 class FrameBuffer;
 class Renderer;
-struct Sampler;
+class Sampler;
 class RenderTracker;
 class Geometry;
 class Texture;

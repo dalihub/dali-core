@@ -100,13 +100,6 @@ inline constexpr bool IsBlurPropertyIndex(Property::Index index)
   return (index == Dali::DecoratedVisualRenderer::Property::BLUR_RADIUS);
 }
 
-inline constexpr bool IsDecoratedVisualPropertyIndex(Property::Index index)
-{
-  return IsCornerSquarenessPropertyIndex(index) ||
-         IsBorderlinePropertyIndex(index) ||
-         IsBlurPropertyIndex(index);
-}
-
 inline constexpr uint8_t GetDecoratedVisualRendererUseType(Property::Index index)
 {
   if(IsCornerRadiusPropertyIndex(index))

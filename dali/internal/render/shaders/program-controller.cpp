@@ -31,9 +31,8 @@ constexpr uint32_t MAXIMUM_COLLECTING_ITEM_COUNTS_PER_GC_CALL = 5u;
 static_assert(1u <= MAXIMUM_COLLECTING_ITEM_COUNTS_PER_GC_CALL); /// Should delete at least 1 item.
 } // namespace
 
-ProgramController::ProgramController(Graphics::Controller& graphicsController)
-: mGraphicsController(graphicsController),
-  mProgramCacheAdded(false)
+ProgramController::ProgramController()
+: mProgramCacheAdded(false)
 {
   mProgramCache.Reserve(32);
 

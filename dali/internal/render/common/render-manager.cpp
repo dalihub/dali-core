@@ -171,7 +171,7 @@ struct RenderManager::Impl
   Impl(Graphics::Controller& graphicsController)
   : graphicsController(graphicsController),
     renderAlgorithms(graphicsController),
-    programController(graphicsController),
+    programController(),
     terminatedNativeDrawManager(graphicsController)
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     ,

@@ -78,13 +78,13 @@ public:
 
   bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation) override;
 
-  uint32_t GetShaderLanguageVersion();
+  uint32_t GetShaderLanguageVersion() override;
 
-  std::string GetShaderVersionPrefix();
+  std::string GetShaderVersionPrefix() override;
 
-  std::string GetVertexShaderPrefix();
+  std::string GetVertexShaderPrefix() override;
 
-  std::string GetFragmentShaderPrefix();
+  std::string GetFragmentShaderPrefix() override;
 
   bool TextureRequiresConverting(const GLenum imageGlFormat, const GLenum textureGlFormat, const bool isSubImage) const override;
 
@@ -2169,7 +2169,7 @@ public:
   {
   }
 
-  inline void BlendBarrier(void)
+  inline void BlendBarrier(void) override
   {
   }
 

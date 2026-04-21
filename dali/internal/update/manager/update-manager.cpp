@@ -1347,10 +1347,11 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
     if(mImpl->renderersAdded)
     {
       rendererAdded = true;
+
+#if defined(DEBUG_ENABLED)
       // Calculate how many render tasks we have in total
       std::size_t numberOfRenderTasks        = 0;
       std::size_t numberOfRenderInstructions = 0;
-      bool        renderContinuously         = false;
       for(auto&& scene : mImpl->scenes)
       {
         if(scene && scene->taskList)
@@ -1358,6 +1359,9 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           numberOfRenderTasks += scene->taskList->GetTasks().Count();
         }
       }
+#endif
+
+      bool renderContinuously = false;
 
       mImpl->renderInstructionCapacity = 0u;
       for(auto&& scene : mImpl->scenes)
@@ -1402,7 +1406,9 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_PROCESS_RENDER_TASK", [&](std::ostringstream& oss)
           { oss << "[render instruction capacity : " << mImpl->renderInstructionCapacity << "]\n"; });
 
+#if defined(DEBUG_ENABLED)
           numberOfRenderInstructions += scene->scene->GetRenderInstructions().Count();
+#endif
         }
       }
 

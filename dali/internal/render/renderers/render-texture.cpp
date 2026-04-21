@@ -137,8 +137,10 @@ Texture::~Texture() = default;
 
 void Texture::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Texture::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  if(DALI_LIKELY(gMemoryPoolCollection))
+  {
+    gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  }
 }
 
 Render::Texture* Texture::Get(TextureKey::KeyType key)
@@ -165,7 +167,7 @@ void Texture::Initialize(Graphics::Controller& graphicsController, SceneGraph::R
   if(mResourceId != 0u && mGraphicsController->GetTextureFromResourceId(mResourceId))
   {
     // Take ownership from graphics controller
-    mGraphicsTexture = std::move(mGraphicsController->ReleaseTextureFromResourceId(mResourceId));
+    mGraphicsTexture = mGraphicsController->ReleaseTextureFromResourceId(mResourceId);
     // Now we take on the Graphics::Texture ownership. We don't need to keep mResourceId anymore.
     mResourceId = 0u;
   }
@@ -197,7 +199,7 @@ Graphics::Texture* Texture::GetGraphicsObject()
       if(graphicsTexturePtr)
       {
         // Take ownership from graphics controller
-        mGraphicsTexture = std::move(mGraphicsController->ReleaseTextureFromResourceId(mResourceId));
+        mGraphicsTexture = mGraphicsController->ReleaseTextureFromResourceId(mResourceId);
         // (Partial update) Do not make mResourceId as 0 until we update mLatestUsedGraphicsTexture.
         NotifyTextureUpdated();
       }

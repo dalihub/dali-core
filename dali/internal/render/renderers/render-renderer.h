@@ -611,7 +611,7 @@ public: // From SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver
   /**
    * @copydoc Dali::Internal::SceneGraph::RenderTargetGraphicsObjects::LifecycleObserver::RenderTargetGraphicsObjectsDestroyed()
    */
-  void RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects);
+  void RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects) override;
 
 private:
   struct UniformIndexMap;

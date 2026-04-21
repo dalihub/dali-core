@@ -41,44 +41,44 @@ public:
   {
     createResult = result;
   }
-  inline virtual bool CreateResource()
+  inline virtual bool CreateResource() override
   {
     ++mExtensionCreateCalls;
     mCallStack.PushCall("CreateResource", "");
     return createResult;
   };
-  inline virtual void DestroyResource()
+  inline virtual void DestroyResource() override
   {
     ++mExtensionDestroyCalls;
     mCallStack.PushCall("DestroyResource", "");
   };
-  inline virtual GLenum TargetTexture()
+  inline virtual uint32_t TargetTexture() override
   {
     ++mTargetTextureCalls;
     mCallStack.PushCall("TargetTexture", "");
     return mTargetTextureError > 0u ? mTargetTextureError-- : 0u;
   };
-  inline virtual Dali::NativeImageInterface::PrepareTextureResult PrepareTexture()
+  inline virtual Dali::NativeImageInterface::PrepareTextureResult PrepareTexture() override
   {
     mCallStack.PushCall("PrepareTexture", "");
     return mPrepareTextureResult;
   };
-  inline virtual uint32_t GetWidth() const
+  inline virtual uint32_t GetWidth() const override
   {
     mCallStack.PushCall("GetWidth", "");
     return mWidth;
   };
-  inline virtual uint32_t GetHeight() const
+  inline virtual uint32_t GetHeight() const override
   {
     mCallStack.PushCall("GetHeight", "");
     return mHeight;
   };
-  inline virtual bool RequiresBlending() const
+  inline virtual bool RequiresBlending() const override
   {
     mCallStack.PushCall("RequiresBlending", "");
     return true;
   };
-  inline virtual int GetTextureTarget() const
+  inline virtual int GetTextureTarget() const override
   {
     mCallStack.PushCall("GetTextureTarget", "");
     return GL_TEXTURE_EXTERNAL_OES;
@@ -142,7 +142,7 @@ public:
     mCallStack.PushCall("PostRender", "");
   }
 
-  inline virtual Dali::NativeImageInterface::Extension* GetExtension()
+  inline virtual Dali::NativeImageInterface::Extension* GetExtension() override
   {
     return nullptr;
   }

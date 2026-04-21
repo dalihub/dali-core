@@ -214,7 +214,6 @@ private:
   Render::TextureKey              mDepthStencilTexture;
 
   bool            mIsKeepingRenderResultRequested{false};
-  bool            mIsRenderResultDrawn{false};
   uint8_t*        mRenderResult;
   Dali::PixelData mRenderedPixelData;
   Dali::Mutex     mPixelDataMutex;

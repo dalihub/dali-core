@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,8 +71,10 @@ UniformBufferView::~UniformBufferView() = default;
 
 void UniformBufferView::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "UniformBufferView::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->Free(gMemoryPoolType, ptr);
+  if(DALI_LIKELY(gMemoryPoolCollection))
+  {
+    gMemoryPoolCollection->Free(gMemoryPoolType, ptr);
+  }
 }
 
 void UniformBufferView::Write(const void* data, uint32_t size, uint32_t offset)

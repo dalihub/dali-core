@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@
 namespace
 {
 // These match the GL specification
-const GLint GL_MINIFY_DEFAULT  = GL_NEAREST_MIPMAP_LINEAR;
-const GLint GL_MAGNIFY_DEFAULT = GL_LINEAR;
-const GLint GL_WRAP_DEFAULT    = GL_CLAMP_TO_EDGE;
+// const GLint GL_MINIFY_DEFAULT  = GL_NEAREST_MIPMAP_LINEAR;
+// const GLint GL_MAGNIFY_DEFAULT = GL_LINEAR;
+// const GLint GL_WRAP_DEFAULT    = GL_CLAMP_TO_EDGE;
 
 // These are the Dali defaults
 const GLint DALI_MINIFY_DEFAULT  = GL_LINEAR;
 const GLint DALI_MAGNIFY_DEFAULT = GL_LINEAR;
+const GLint DALI_WRAP_DEFAULT    = GL_CLAMP_TO_EDGE;
 
 GLuint GetTextureTarget(Graphics::TextureType type)
 {
@@ -841,7 +842,7 @@ TestGraphicsTexture::TestGraphicsTexture(TestGlAbstraction& glAbstraction, const
           glAbstraction.CompressedTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, mGlInternalFormat, createInfo.size.width, createInfo.size.height, 0, 0, nullptr);
         }
       }
-      TestGraphicsSampler::SetTexParameter(glAbstraction, target, GL_TEXTURE_WRAP_R, GL_WRAP_DEFAULT);
+      TestGraphicsSampler::SetTexParameter(glAbstraction, target, GL_TEXTURE_WRAP_R, DALI_WRAP_DEFAULT);
     }
   }
 }
@@ -869,8 +870,8 @@ void TestGraphicsTexture::Initialize(GLuint target)
   // Apply default sampling parameters
   TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_MIN_FILTER, DALI_MINIFY_DEFAULT);
   TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_MAG_FILTER, DALI_MAGNIFY_DEFAULT);
-  TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_WRAP_S, GL_WRAP_DEFAULT);
-  TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_WRAP_T, GL_WRAP_DEFAULT);
+  TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_WRAP_S, DALI_WRAP_DEFAULT);
+  TestGraphicsSampler::SetTexParameter(mGlAbstraction, target, GL_TEXTURE_WRAP_T, DALI_WRAP_DEFAULT);
 }
 
 void TestGraphicsTexture::InitializeNativeImage(GLuint target)

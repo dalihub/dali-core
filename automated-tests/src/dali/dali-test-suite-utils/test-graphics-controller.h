@@ -108,7 +108,7 @@ public:
     return mGl;
   }
 
-  Dali::Integration::GraphicsConfig& GetGraphicsConfig()
+  Dali::Integration::GraphicsConfig& GetGraphicsConfig() override
   {
     return mGl;
   }

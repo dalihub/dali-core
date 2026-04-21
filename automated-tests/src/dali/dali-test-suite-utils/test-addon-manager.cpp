@@ -125,18 +125,16 @@ void AddOnManager::RegisterAddOnDispatchTable(const AddOnDispatchTable* dispatch
 
 bool AddOnManager::GetAddOnInfo(const std::string& name, AddOnInfo& info)
 {
-  auto retval = false;
-  std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &info](AddOnCacheEntry& entry)
+  auto iter = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [name, &info](AddOnCacheEntry& entry)
   {
     if(entry.name == name)
     {
       entry.GetAddOnInfo(info);
-      retval = true;
       return true;
     }
     return false;
   });
-  return retval;
+  return iter != mAddOnCache.end();
 }
 
 std::vector<AddOnLibrary> AddOnManager::LoadAddOns(const std::vector<std::string>& addonNames)
@@ -150,7 +148,7 @@ std::vector<AddOnLibrary> AddOnManager::LoadAddOns(const std::vector<std::string
   for(auto& name : addonNames)
   {
     size_t index = 0;
-    auto   iter  = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [&retval, name, &index](AddOnCacheEntry& entry)
+    auto   iter  = std::find_if(mAddOnCache.begin(), mAddOnCache.end(), [name, &index](AddOnCacheEntry& entry)
        {
       index++;
       if(entry.name == name)

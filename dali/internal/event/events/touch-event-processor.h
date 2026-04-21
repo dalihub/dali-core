@@ -70,11 +70,12 @@ public:
    */
   bool ProcessTouchEvent(const Integration::TouchEvent& event);
 
-  // Movable but not copyable
+private:
+  // Not movable and not copyable
   TouchEventProcessor(const TouchEventProcessor&)            = delete;
-  TouchEventProcessor(TouchEventProcessor&&)                 = default;
+  TouchEventProcessor(TouchEventProcessor&&)                 = delete;
   TouchEventProcessor& operator=(const TouchEventProcessor&) = delete;
-  TouchEventProcessor& operator=(TouchEventProcessor&&)      = default;
+  TouchEventProcessor& operator=(TouchEventProcessor&&)      = delete;
 
 private:
   /**

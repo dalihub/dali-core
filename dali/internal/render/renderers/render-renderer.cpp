@@ -207,8 +207,10 @@ Renderer::~Renderer()
 
 void Renderer::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Renderer::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  if(DALI_LIKELY(gMemoryPoolCollection))
+  {
+    gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  }
 }
 
 Renderer* Renderer::Get(RendererKey::KeyType rendererKey)

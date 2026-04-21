@@ -31,8 +31,8 @@ namespace SceneGraph
 class Renderer;
 namespace VisualRenderer
 {
-class DecoratedVisualCornerRadiusProperties;
-class DecoratedVisualBorderlineProperties;
+struct DecoratedVisualCornerRadiusProperties;
+struct DecoratedVisualBorderlineProperties;
 } // namespace VisualRenderer
 } // namespace SceneGraph
 

@@ -1,7 +1,7 @@
 #ifndef DALI_INTERNAL_ACTOR_PARENT_IMPL_H
 #define DALI_INTERNAL_ACTOR_PARENT_IMPL_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use actor file except in compliance with the License.
@@ -55,7 +55,7 @@ public:
    * @param [in] notify Emits notification if set to true. Default is true.
    * @post The child will be referenced by its parent.
    */
-  void Add(Actor& child, bool notify = true);
+  void Add(Actor& child, bool notify = true) override;
 
   /**
    * Removes a child Actor from this ActorParent.
@@ -64,18 +64,18 @@ public:
    * @post The child will be unreferenced.
    * @note If notify is false, Add() method must be called after this method.
    */
-  void Remove(Actor& child, bool notify = true);
+  void Remove(Actor& child, bool notify = true) override;
 
   /**
    * Retrieve the number of children held by the actor.
    * @return The number of children
    */
-  uint32_t GetChildCount() const;
+  uint32_t GetChildCount() const override;
 
   /**
    * @copydoc Dali::Actor::GetChildAt
    */
-  ActorPtr GetChildAt(uint32_t index) const;
+  ActorPtr GetChildAt(uint32_t index) const override;
 
   /**
    * @copydoc Dali::Actor::FindChildByName
@@ -85,7 +85,7 @@ public:
   /**
    * @copydoc Dali::Actor::FindChildById
    */
-  ActorPtr FindChildById(const uint32_t id);
+  ActorPtr FindChildById(const uint32_t id) override;
 
   /**
    * Retrieve a reference to children.
@@ -101,7 +101,7 @@ public:
   /**
    * @brief Unparent all the children
    */
-  void UnparentChildren();
+  void UnparentChildren() override;
 
   /**
    * @brief Change the sibling order of the given child.

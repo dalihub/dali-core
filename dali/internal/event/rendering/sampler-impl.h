@@ -32,13 +32,13 @@ namespace Dali
 {
 namespace Internal
 {
-namespace Render
-{
-struct Sampler;
-}
-
 class Sampler;
 using SamplerPtr = IntrusivePtr<Sampler>;
+
+namespace Render
+{
+class Sampler;
+}
 
 /**
  * Sampler is an object that contains an array of structures of values that

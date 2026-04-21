@@ -39,8 +39,6 @@ const uint32_t UPDATE_COUNT         = 2u; // Update projection or view matrix th
 const uint32_t COPY_PREVIOUS_MATRIX = 1u; // Copy view or projection matrix from previous frame
 
 // For reflection and clipping plane
-const float REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_A = 2.0f;
-const float REFLECTION_NORMALIZED_DEVICE_COORDINATE_PARAMETER_D = 1.0f;
 } // namespace
 
 namespace Dali
@@ -384,8 +382,10 @@ Camera::~Camera() = default;
 
 void Camera::operator delete(void* ptr)
 {
-  DALI_ASSERT_DEBUG(gMemoryPoolCollection && "Camera::RegisterMemoryPoolCollection not called!");
-  gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  if(DALI_LIKELY(gMemoryPoolCollection))
+  {
+    gMemoryPoolCollection->FreeThreadSafe(gMemoryPoolType, ptr);
+  }
 }
 
 void Camera::SetType(Dali::Camera::Type type)

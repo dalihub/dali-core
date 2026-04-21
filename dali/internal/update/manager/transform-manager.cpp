@@ -376,7 +376,7 @@ bool TransformManager::Update()
   }
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
-                                          { oss << "[" << mComponentCount << ", i:" << (mComponentCount - mValidComponentCount) << "]"; });
+  { oss << "[" << mComponentCount << ", i:" << (mComponentCount - mValidComponentCount) << "]"; });
 
   // Iterate through all components to compute its world matrix
   Vector3 centerPosition;
@@ -499,7 +499,7 @@ bool TransformManager::Update()
       float centerToEdge           = mSize[i].Length() * 0.5f;
       float centerToEdgeWorldSpace = TransformFloat(mWorld[i].AsFloat(), centerToEdge);
 
-      mBoundingSpheres[i] = std::move(Vector4(mWorld[i].GetTranslation3(), centerToEdgeWorldSpace));
+      mBoundingSpheres[i] = Vector4(mWorld[i].GetTranslation3(), centerToEdgeWorldSpace);
     }
 
     mUpdated = mUpdated || worldMatrixDirty;
@@ -511,7 +511,7 @@ bool TransformManager::Update()
   mDirtyFlags >>= 1u; ///< age down.
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRANSFORM_UPDATE", [&](std::ostringstream& oss)
-                                        { oss << "[componentsChanged:" << mUpdated << "]"; });
+  { oss << "[componentsChanged:" << mUpdated << "]"; });
 
   return mUpdated;
 }

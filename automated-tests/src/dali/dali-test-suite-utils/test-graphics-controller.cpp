@@ -1320,7 +1320,7 @@ Graphics::UniquePtr<Graphics::CommandBuffer> TestGraphicsController::CreateComma
   std::ostringstream oss;
   oss << "commandBufferCreateInfo:" << commandBufferCreateInfo;
   mCallStack.PushCall("CreateCommandBuffer", oss.str());
-  return Graphics::MakeUnique<TestGraphicsCommandBuffer>(mCommandBufferCallStack, mGl);
+  return Graphics::MakeUnique<TestGraphicsCommandBuffer>(mCommandBufferCallStack);
 }
 
 Graphics::UniquePtr<Graphics::RenderPass> TestGraphicsController::CreateRenderPass(const Graphics::RenderPassCreateInfo& renderPassCreateInfo, Graphics::UniquePtr<Graphics::RenderPass>&& oldRenderPass)

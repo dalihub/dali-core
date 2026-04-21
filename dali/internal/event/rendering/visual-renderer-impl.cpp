@@ -54,11 +54,6 @@ DALI_PROPERTY_TABLE_END(Dali::VisualRenderer::Property::DEFAULT_VISUAL_RENDERER_
 
 // Property string to enumeration tables:
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN(TRANSFORM_POLICY)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::VisualRenderer::TransformPolicy::Type, RELATIVE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(Dali::VisualRenderer::TransformPolicy::Type, ABSOLUTE)
-DALI_ENUM_TO_STRING_TABLE_END(TRANSFORM_POLICY)
-
 BaseHandle Create()
 {
   return Dali::BaseHandle();

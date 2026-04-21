@@ -18,6 +18,17 @@
  *
  */
 
+/*
+ * Definitions for basic type traits built-in macro
+ */
+#define DALI_HAS_TRIVIAL_COPY(Type) __is_trivially_copyable(Type)
+
+#if defined(__clang__) || defined(_MSC_VER)
+#define DALI_HAS_TRIVIAL_DESTRUCTOR(Type) __is_trivially_destructible(Type)
+#else
+#define DALI_HAS_TRIVIAL_DESTRUCTOR(Type) __has_trivial_destructor(Type)
+#endif
+
 namespace Dali
 {
 /**
@@ -43,7 +54,7 @@ struct BasicTypes
    */
   enum
   {
-    IS_TRIVIAL_TYPE = __has_trivial_destructor(Type) && __has_trivial_copy(Type)
+    IS_TRIVIAL_TYPE = DALI_HAS_TRIVIAL_DESTRUCTOR(Type) && DALI_HAS_TRIVIAL_COPY(Type)
   };
 };
 
