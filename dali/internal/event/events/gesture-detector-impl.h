@@ -90,7 +90,7 @@ public:
   /**
    * @copydoc Dali::GestureDetector::HandleEvent()
    */
-  bool HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch);
+  bool HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& touch);
 
   /**
    * Returns a const reference to the container of attached actor pointers.
