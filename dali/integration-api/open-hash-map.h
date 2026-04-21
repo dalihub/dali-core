@@ -24,6 +24,8 @@
 #include <type_traits> // is_trivially_copyable_v, is_trivially_destructible_v
 
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-utility.h>
+#include <dali/public-api/math/math-utils.h>
 
 namespace Dali
 {
@@ -279,10 +281,32 @@ public:
     if(mEntries && mOccupied > 0)
     {
       // Zero the entire table — all keys become Empty (nullptr for pointers).
+      // Entry is guaranteed trivially copyable and trivially destructible by the
+      // static_asserts on Key and Value, so memset is safe.  GCC's -Wclass-memaccess
+      // may still warn if Value has user-provided constructors (e.g. std::_List_iterator),
+      // even though the type is trivially copyable, so suppress it here.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
       memset(mEntries, 0, mCapacity * sizeof(Entry));
+#pragma GCC diagnostic pop
     }
     mSize     = 0u;
     mOccupied = 0u;
+  }
+
+  /**
+   * @brief Remove all entries and release relative memory too.
+   */
+  void Release()
+  {
+    if(mEntries)
+    {
+      free(mEntries);
+      mEntries  = nullptr;
+      mCapacity = 0u;
+      mSize     = 0u;
+      mOccupied = 0u;
+    }
   }
 
   /**
@@ -350,38 +374,41 @@ public:
   }
 
   /**
-   * @brief Shrink the table to the smallest power-of-2 capacity that keeps
+   * @brief Resize the table to the smallest power-of-2 capacity that keeps
    *        load under 75%, clearing all tombstones in the process.
    *
-   * If the map is empty, the table is freed entirely (capacity becomes 0).
-   * If the current capacity is already optimal, this is a no-op.
+   * If the input capacity is bigger than zero, the table will be resized to
+   * at least that capacity (rounded up to the next power of 2).
+   *
+   * If the map is empty and targetCapacity is 0, the table is freed entirely
+   * (capacity becomes 0). If the current capacity is already optimal, this is
+   * a no-op.
+   *
+   * @param[in] targetCapacity Minimum desired capacity (0 to shrink to fit).
    */
-  void Rehash()
+  void Rehash(uint32_t targetCapacity = 0u)
   {
-    if(mSize == 0u)
+    if(mSize == 0u && targetCapacity == 0u)
     {
-      free(mEntries);
-      mEntries  = nullptr;
-      mCapacity = 0u;
-      mOccupied = 0u;
+      Release();
       return;
     }
 
     // Find the smallest power-of-2 capacity where mSize / capacity < 75%.
     // That is: capacity > mSize * 4 / 3.
-    uint32_t minCapacity = INITIAL_CAPACITY;
+    uint32_t minCapacity = Dali::Max(Dali::NextPowerOfTwo(targetCapacity), INITIAL_CAPACITY);
     while(minCapacity * 3u <= mSize * 4u)
     {
       minCapacity *= 2u;
     }
 
-    if(minCapacity < mCapacity)
+    if(minCapacity != mCapacity)
     {
       RehashTo(minCapacity);
     }
     else if(mOccupied > mSize)
     {
-      // Capacity is already minimal, but there are tombstones — rehash in-place to clear them.
+      // Capacity not changed, but there are tombstones — rehash in-place to clear them.
       RehashTo(mCapacity);
     }
   }
