@@ -68,7 +68,7 @@ public:
    * @param[in] str A pointer to character data (not necessarily null-terminated)
    * @param[in] length The number of characters
    */
-  StringView(const char* str, size_t length);
+  StringView(const char* str, uint32_t length);
 
   /**
    * @brief Constructor from a Dali::String.
@@ -106,7 +106,7 @@ public:
    * @SINCE_2_5.15
    * @return The number of bytes in the view
    */
-  size_t Size() const;
+  uint32_t Size() const;
 
   /**
    * @brief Determine if the view is empty.

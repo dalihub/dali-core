@@ -94,7 +94,7 @@ Property::Array::~Array()
 
 Property::Array::SizeType Property::Array::Count() const
 {
-  return DALI_LIKELY(mImpl) ? mImpl->mArray.size() : 0;
+  return DALI_LIKELY(mImpl) ? static_cast<SizeType>(mImpl->mArray.size()) : 0;
 }
 
 void Property::Array::PushBack(const Value& value)
@@ -128,7 +128,7 @@ void Property::Array::Reserve(SizeType size)
     mImpl = new Impl();
   }
 
-  mImpl->mArray.reserve(size);
+  mImpl->mArray.reserve(static_cast<std::size_t>(size));
 }
 
 void Property::Array::Resize(SizeType size)
@@ -138,9 +138,9 @@ void Property::Array::Resize(SizeType size)
     mImpl = new Impl();
   }
 
-  if(mImpl->mArray.size() != size)
+  if(mImpl->mArray.size() != static_cast<std::size_t>(size))
   {
-    mImpl->mArray.resize(size);
+    mImpl->mArray.resize(static_cast<std::size_t>(size));
 
     // Just reset hash as zero.
     if(mImpl->mHash != ALWAYS_REHASH)
@@ -152,7 +152,7 @@ void Property::Array::Resize(SizeType size)
 
 Property::Array::SizeType Property::Array::Capacity()
 {
-  return DALI_LIKELY(mImpl) ? mImpl->mArray.capacity() : 0;
+  return DALI_LIKELY(mImpl) ? static_cast<SizeType>(mImpl->mArray.capacity()) : 0;
 }
 
 const Property::Value& Property::Array::operator[](SizeType index) const
@@ -160,7 +160,7 @@ const Property::Value& Property::Array::operator[](SizeType index) const
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
   // Note says no bounds checking is performed so we don't need to verify mImpl as Count() will return 0 anyway
-  return mImpl->mArray[index];
+  return mImpl->mArray[static_cast<std::size_t>(index)];
 }
 
 Property::Value& Property::Array::operator[](SizeType index)
@@ -174,7 +174,7 @@ Property::Value& Property::Array::operator[](SizeType index)
   }
 
   // Note says no bounds checking is performed so we don't need to verify mImpl as Count() will return 0 anyway
-  return mImpl->mArray[index];
+  return mImpl->mArray[static_cast<std::size_t>(index)];
 }
 
 Property::Array& Property::Array::operator=(const Property::Array& other)

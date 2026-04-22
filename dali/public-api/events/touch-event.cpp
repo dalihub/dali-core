@@ -43,67 +43,67 @@ unsigned long TouchEvent::GetTime() const
   return GetImplementation(*this).GetTime();
 }
 
-std::size_t TouchEvent::GetPointCount() const
+uint32_t TouchEvent::GetPointCount() const
 {
   return GetImplementation(*this).GetPointCount();
 }
 
-int32_t TouchEvent::GetDeviceId(std::size_t point) const
+int32_t TouchEvent::GetDeviceId(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceId(point);
 }
 
-PointState::Type TouchEvent::GetState(std::size_t point) const
+PointState::Type TouchEvent::GetState(uint32_t point) const
 {
   return GetImplementation(*this).GetState(point);
 }
 
-Actor TouchEvent::GetHitActor(std::size_t point) const
+Actor TouchEvent::GetHitActor(uint32_t point) const
 {
   return GetImplementation(*this).GetHitActor(point);
 }
 
-const Vector2& TouchEvent::GetLocalPosition(std::size_t point) const
+const Vector2& TouchEvent::GetLocalPosition(uint32_t point) const
 {
   return GetImplementation(*this).GetLocalPosition(point);
 }
 
-const Vector2& TouchEvent::GetScreenPosition(std::size_t point) const
+const Vector2& TouchEvent::GetScreenPosition(uint32_t point) const
 {
   return GetImplementation(*this).GetScreenPosition(point);
 }
 
-float TouchEvent::GetRadius(std::size_t point) const
+float TouchEvent::GetRadius(uint32_t point) const
 {
   return GetImplementation(*this).GetRadius(point);
 }
 
-const Vector2& TouchEvent::GetEllipseRadius(std::size_t point) const
+const Vector2& TouchEvent::GetEllipseRadius(uint32_t point) const
 {
   return GetImplementation(*this).GetEllipseRadius(point);
 }
 
-float TouchEvent::GetPressure(std::size_t point) const
+float TouchEvent::GetPressure(uint32_t point) const
 {
   return GetImplementation(*this).GetPressure(point);
 }
 
-Degree TouchEvent::GetAngle(std::size_t point) const
+Degree TouchEvent::GetAngle(uint32_t point) const
 {
   return GetImplementation(*this).GetAngle(point);
 }
 
-Device::Class::Type TouchEvent::GetDeviceClass(std::size_t point) const
+Device::Class::Type TouchEvent::GetDeviceClass(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceClass(point);
 }
 
-Device::Subclass::Type TouchEvent::GetDeviceSubclass(std::size_t point) const
+Device::Subclass::Type TouchEvent::GetDeviceSubclass(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceSubclass(point);
 }
 
-MouseButton::Type TouchEvent::GetMouseButton(std::size_t point) const
+MouseButton::Type TouchEvent::GetMouseButton(uint32_t point) const
 {
   return GetImplementation(*this).GetMouseButton(point);
 }
@@ -113,7 +113,7 @@ RenderTask TouchEvent::GetRenderTask() const
   return GetImplementation(*this).GetRenderTask();
 }
 
-const Dali::String& TouchEvent::GetDeviceName(std::size_t point) const
+const Dali::String& TouchEvent::GetDeviceName(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceName(point);
 }

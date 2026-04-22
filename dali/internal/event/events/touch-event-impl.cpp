@@ -33,7 +33,7 @@ TouchEventPtr TouchEvent::Clone(const TouchEvent& other)
   return touchEvent;
 }
 
-int32_t TouchEvent::GetDeviceId(std::size_t point) const
+int32_t TouchEvent::GetDeviceId(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -42,7 +42,7 @@ int32_t TouchEvent::GetDeviceId(std::size_t point) const
   return -1;
 }
 
-PointState::Type TouchEvent::GetState(std::size_t point) const
+PointState::Type TouchEvent::GetState(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -51,7 +51,7 @@ PointState::Type TouchEvent::GetState(std::size_t point) const
   return PointState::FINISHED;
 }
 
-Dali::Actor TouchEvent::GetHitActor(std::size_t point) const
+Dali::Actor TouchEvent::GetHitActor(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -60,7 +60,7 @@ Dali::Actor TouchEvent::GetHitActor(std::size_t point) const
   return Dali::Actor();
 }
 
-const Vector2& TouchEvent::GetLocalPosition(std::size_t point) const
+const Vector2& TouchEvent::GetLocalPosition(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -69,7 +69,7 @@ const Vector2& TouchEvent::GetLocalPosition(std::size_t point) const
   return Vector2::ZERO;
 }
 
-const Vector2& TouchEvent::GetScreenPosition(std::size_t point) const
+const Vector2& TouchEvent::GetScreenPosition(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -78,7 +78,7 @@ const Vector2& TouchEvent::GetScreenPosition(std::size_t point) const
   return Vector2::ZERO;
 }
 
-float TouchEvent::GetRadius(std::size_t point) const
+float TouchEvent::GetRadius(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -87,7 +87,7 @@ float TouchEvent::GetRadius(std::size_t point) const
   return 0.0f;
 }
 
-const Vector2& TouchEvent::GetEllipseRadius(std::size_t point) const
+const Vector2& TouchEvent::GetEllipseRadius(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -96,7 +96,7 @@ const Vector2& TouchEvent::GetEllipseRadius(std::size_t point) const
   return Vector2::ZERO;
 }
 
-float TouchEvent::GetPressure(std::size_t point) const
+float TouchEvent::GetPressure(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -105,7 +105,7 @@ float TouchEvent::GetPressure(std::size_t point) const
   return 1.0f;
 }
 
-Degree TouchEvent::GetAngle(std::size_t point) const
+Degree TouchEvent::GetAngle(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -114,19 +114,19 @@ Degree TouchEvent::GetAngle(std::size_t point) const
   return Degree();
 }
 
-const Integration::Point& TouchEvent::GetPoint(std::size_t point) const
+const Integration::Point& TouchEvent::GetPoint(uint32_t point) const
 {
   DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");
   return mPoints[point];
 }
 
-Integration::Point& TouchEvent::GetPoint(std::size_t point)
+Integration::Point& TouchEvent::GetPoint(uint32_t point)
 {
   DALI_ASSERT_DEBUG(point < mPoints.size() && "No point at index");
   return mPoints[point];
 }
 
-Device::Class::Type TouchEvent::GetDeviceClass(std::size_t point) const
+Device::Class::Type TouchEvent::GetDeviceClass(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -135,7 +135,7 @@ Device::Class::Type TouchEvent::GetDeviceClass(std::size_t point) const
   return Device::Class::NONE;
 }
 
-Device::Subclass::Type TouchEvent::GetDeviceSubclass(std::size_t point) const
+Device::Subclass::Type TouchEvent::GetDeviceSubclass(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -144,7 +144,7 @@ Device::Subclass::Type TouchEvent::GetDeviceSubclass(std::size_t point) const
   return Device::Subclass::NONE;
 }
 
-MouseButton::Type TouchEvent::GetMouseButton(std::size_t point) const
+MouseButton::Type TouchEvent::GetMouseButton(uint32_t point) const
 {
   if(point < mPoints.size())
   {
@@ -153,7 +153,7 @@ MouseButton::Type TouchEvent::GetMouseButton(std::size_t point) const
   return MouseButton::INVALID;
 }
 
-const Dali::String& TouchEvent::GetDeviceName(std::size_t point) const
+const Dali::String& TouchEvent::GetDeviceName(uint32_t point) const
 {
   static const Dali::String emptyString;
   if(point < mPoints.size())

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/internal/event/actors/actor-impl.h>
@@ -80,12 +83,12 @@ public:
   /**
    * @copydoc Dali::GestureDetector::GetAttachedActorCount() const
    */
-  size_t GetAttachedActorCount() const;
+  uint32_t GetAttachedActorCount() const;
 
   /**
    * @copydoc Dali::GestureDetector::GetAttachedActor() const
    */
-  Dali::Actor GetAttachedActor(size_t index) const;
+  Dali::Actor GetAttachedActor(uint32_t index) const;
 
   /**
    * @copydoc Dali::GestureDetector::HandleEvent()

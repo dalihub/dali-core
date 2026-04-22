@@ -24,6 +24,17 @@
 
 namespace Dali
 {
+namespace
+{
+// Wrapper to adapt memcpy to MemMoveFunctionType signature.
+// On macOS 64-bit, size_t and uint64_t are distinct types despite having the same size,
+// so memcpy cannot be passed directly where MemMoveFunctionType is expected.
+void* MemCpyWrapper(void* dest, const void* src, VectorBase::SizeType count)
+{
+  return memcpy(dest, src, static_cast<size_t>(count));
+}
+} // namespace
+
 VectorBase::VectorBase()
 : mData(nullptr)
 {
@@ -127,7 +138,7 @@ void VectorBase::SetCount(SizeType count)
 
 void VectorBase::Reserve(SizeType capacity, SizeType elementSize)
 {
-  ReserveWithCustomMoveFunction(capacity, elementSize, memcpy);
+  ReserveWithCustomMoveFunction(capacity, elementSize, MemCpyWrapper);
 }
 
 void VectorBase::ReserveWithCustomMoveFunction(SizeType capacity, SizeType elementSize, MemMoveFunctionType memMoveFunction)
@@ -213,7 +224,7 @@ uint8_t* VectorBase::Erase(uint8_t* first, uint8_t* last, SizeType elementSize)
   return next;
 }
 
-void VectorBase::CopyMemory(uint8_t* destination, const uint8_t* source, size_t numberOfBytes)
+void VectorBase::CopyMemory(uint8_t* destination, const uint8_t* source, SizeType numberOfBytes)
 {
   if(((source < destination) && (source + numberOfBytes > destination)) ||
      ((destination < source) && (destination + numberOfBytes > source)))

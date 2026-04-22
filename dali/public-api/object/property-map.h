@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
 #include <utility> // std::move
 
 // INTERNAL INCLUDES
@@ -46,7 +47,7 @@ using StringValuePair = Pair<Dali::String, Property::Value>;
 class DALI_CORE_API Property::Map
 {
 public:
-  using SizeType = std::size_t;
+  using SizeType = uint32_t;
 
   /**
    * @brief Default constructor.

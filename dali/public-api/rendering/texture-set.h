@@ -2,7 +2,7 @@
 #define DALI_TEXTURE_SET_H
 
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstddef> // std::size_t
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>     // Dali::Handle
@@ -119,7 +119,7 @@ public:
    * @param[in] index The position in the texture set of the texture
    * @param[in] texture The texture
    */
-  void SetTexture(size_t index, Texture texture);
+  void SetTexture(uint32_t index, Texture texture);
 
   /**
    * @brief Gets the image at position "index".
@@ -128,7 +128,7 @@ public:
    * @param[in] index The position in the texture set of the image
    * @return A handle to the image at the the specified position
    */
-  Texture GetTexture(size_t index) const;
+  Texture GetTexture(uint32_t index) const;
 
   /**
    * @brief Sets the sampler to be used by the image at position "index".
@@ -137,7 +137,7 @@ public:
    * @param[in] index The position in the texture set of the sampler
    * @param[in] sampler The sampler to use
    */
-  void SetSampler(size_t index, Sampler sampler);
+  void SetSampler(uint32_t index, Sampler sampler);
 
   /**
    * @brief Sets the sampler to be used by the image at position "index".
@@ -146,7 +146,7 @@ public:
    * @param[in] index The position in the texture set of the image
    * @return A handle to the sampler at the specified position
    */
-  Sampler GetSampler(size_t index) const;
+  Sampler GetSampler(uint32_t index) const;
 
   /**
    * @brief Gets the number of textures present in the TextureSet.

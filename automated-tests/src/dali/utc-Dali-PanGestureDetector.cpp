@@ -1671,7 +1671,7 @@ int UtcDaliPanGestureAngleHandling(void)
   detector.AddAngle(PanGestureDetector::DIRECTION_LEFT, Radian(Math::PI * 0.25));
   DALI_TEST_EQUALS(detector.GetAngleCount(), 1u, TEST_LOCATION);
   bool found = false;
-  for(size_t i = 0; i < detector.GetAngleCount(); i++)
+  for(uint32_t i = 0; i < detector.GetAngleCount(); i++)
   {
     if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT)
     {
@@ -1696,7 +1696,7 @@ int UtcDaliPanGestureAngleHandling(void)
 
   detector.RemoveAngle(PanGestureDetector::DIRECTION_RIGHT);
   DALI_TEST_EQUALS(detector.GetAngleCount(), 1u, TEST_LOCATION);
-  for(size_t i = 0; i < detector.GetAngleCount(); i++)
+  for(uint32_t i = 0; i < detector.GetAngleCount(); i++)
   {
     if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT)
     {
@@ -1894,7 +1894,7 @@ int UtcDaliPanGestureDirectionHandling(void)
   detector.AddDirection(PanGestureDetector::DIRECTION_LEFT, Radian(Math::PI * 0.25));
   DALI_TEST_EQUALS(detector.GetAngleCount(), 2u, TEST_LOCATION);
   bool found = false;
-  for(size_t i = 0; detector.GetAngleCount(); i++)
+  for(uint32_t i = 0; i < detector.GetAngleCount(); i++)
   {
     if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT)
     {
@@ -1911,7 +1911,7 @@ int UtcDaliPanGestureDirectionHandling(void)
   }
 
   found = false;
-  for(size_t i = 0; i < detector.GetAngleCount(); i++)
+  for(uint32_t i = 0; i < detector.GetAngleCount(); i++)
   {
     if(detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT)
     {

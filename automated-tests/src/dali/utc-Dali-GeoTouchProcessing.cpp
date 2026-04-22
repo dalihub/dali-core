@@ -127,7 +127,7 @@ struct TouchEventFunctor
     signalData.receivedTouch.time = touch.GetTime();
     signalData.receivedTouch.points.clear();
 
-    for(size_t i = 0; i < touch.GetPointCount(); ++i)
+    for(uint32_t i = 0; i < touch.GetPointCount(); ++i)
     {
       TestPoint p;
       p.deviceId       = touch.GetDeviceId(i);
@@ -239,7 +239,7 @@ struct OutOfBoundsFunctor
   bool operator()(Actor actor, const TouchEvent& touch)
   {
     outOfBoundsData.functorCalled = true;
-    size_t count                  = touch.GetPointCount();
+    uint32_t count                = touch.GetPointCount();
 
     // Read out of bounds data
     outOfBoundsData.point.deviceId = touch.GetDeviceId(count + 1);
