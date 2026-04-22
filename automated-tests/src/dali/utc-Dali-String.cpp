@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/common/hash.h>
 #include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/context-notifier.h>
@@ -884,3 +885,59 @@ int UtcDaliStringViewCStringOperatorStreamOperator(void)
   DALI_TEST_EQUALS(oss.str().c_str(), resultString.c_str() + 2u, TEST_LOCATION);
   END_TEST;
 };
+
+int UtcDaliStringHash(void)
+{
+  tet_infoline("StringHash produces consistent and distinct hashes");
+
+  StringHash hasher;
+
+  String s1("hello");
+  String s2("hello");
+  String s3("world");
+  String s4; // empty
+
+  // Same string produces same hash
+  DALI_TEST_EQUALS(hasher(s1), hasher(s2), TEST_LOCATION);
+
+  // Different strings produce different hashes
+  DALI_TEST_CHECK(hasher(s1) != hasher(s3));
+
+  // Empty string produces a valid hash
+  DALI_TEST_CHECK(hasher(s4) == hasher(Dali::String("")));
+
+  // Hash is consistent with CalculateHash on the same content
+  DALI_TEST_EQUALS(hasher(s1), CalculateHash(std::string_view("hello")), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliStringEqual(void)
+{
+  tet_infoline("StringEqual correctly compares String objects");
+
+  StringEqual eq;
+
+  String s1("hello");
+  String s2("hello");
+  String s3("world");
+  String s4;     // empty
+  String s5(""); // empty but explicit
+
+  // Same strings are equal
+  DALI_TEST_EQUALS(eq(s1, s2), true, TEST_LOCATION);
+
+  // Different strings are not equal
+  DALI_TEST_EQUALS(eq(s1, s3), false, TEST_LOCATION);
+
+  // Empty strings are equal
+  DALI_TEST_EQUALS(eq(s4, s5), true, TEST_LOCATION);
+
+  // Empty and non-empty are not equal
+  DALI_TEST_EQUALS(eq(s1, s4), false, TEST_LOCATION);
+
+  // Self-equality
+  DALI_TEST_EQUALS(eq(s1, s1), true, TEST_LOCATION);
+
+  END_TEST;
+}

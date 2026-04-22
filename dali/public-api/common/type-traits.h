@@ -501,6 +501,177 @@ struct AddLValueReference<const void>
 };
 
 /**
+ * @brief Cast a value to an rvalue reference.
+ *
+ * Equivalent to std::move. Converts the argument to an rvalue reference,
+ * enabling move semantics. This is a custom implementation that doesn't
+ * depend on the standard library.
+ *
+ * @tparam Type The type of the argument
+ * @param[in] arg The argument to cast
+ * @return The argument as an rvalue reference
+ *
+ * @SINCE_2_5.20
+ *
+ * Example usage:
+ * @code
+ * String a = "hello";
+ * String b = Move(a);  // a is now in a valid but unspecified state
+ * @endcode
+ */
+template<typename Type>
+inline typename RemoveReference<Type>::type&& Move(Type&& arg) noexcept
+{
+  return static_cast<typename RemoveReference<Type>::type&&>(arg);
+}
+
+namespace Detail
+{
+/**
+ * @brief Declval helper - never defined, used only in unevaluated contexts.
+ *
+ * Equivalent to std::declval. Converts any type T to a reference type,
+ * enabling use in decltype/noexcept contexts without constructing the object.
+ */
+template<typename Type>
+Type&& Declval() noexcept;
+
+} // namespace Detail
+
+/**
+ * @brief Type trait to check if a type is nothrow-move-constructible.
+ *
+ * Equivalent to std::is_nothrow_move_constructible. Uses the noexcept
+ * operator to detect whether Type's move constructor is noexcept.
+ *
+ * @tparam Type The type to check
+ *
+ * @SINCE_2_5.20
+ *
+ * Example usage:
+ * @code
+ * IsNothrowMoveConstructible<int>::value;  // true
+ * @endcode
+ */
+template<typename Type>
+struct IsNothrowMoveConstructible : public IntegralConstant<noexcept(Type(Detail::Declval<Type&&>()))>
+{
+};
+
+/**
+ * @brief Type trait to check if a type is nothrow-move-assignable.
+ *
+ * Equivalent to std::is_nothrow_move_assignable. Uses the noexcept operator
+ * to detect whether Type's move-assignment operator is noexcept.
+ *
+ * The tested expression `lvalue = rvalue` mirrors exactly what a move-assignment
+ * operator call looks like at the call site, so the noexcept deduction is precise.
+ *
+ * This is distinct from IsNothrowMoveConstructible: a type may have a noexcept
+ * move constructor but a potentially-throwing move-assignment operator (e.g. one
+ * that frees heap memory before acquiring the new resource). The two traits must
+ * therefore be used in the appropriate context:
+ * - Use IsNothrowMoveConstructible for move-constructor noexcept specs.
+ * - Use IsNothrowMoveAssignable  for move-assignment operator noexcept specs.
+ *
+ * @tparam Type The type to check
+ *
+ * @SINCE_2_5.20
+ *
+ * Example usage:
+ * @code
+ * IsNothrowMoveAssignable<int>::value;     // true
+ * IsNothrowMoveAssignable<MyClass>::value; // true only if MyClass::operator=(MyClass&&) is noexcept
+ * @endcode
+ */
+template<typename Type>
+struct IsNothrowMoveAssignable
+: public IntegralConstant<noexcept(Detail::Declval<Type&>() = Detail::Declval<Type&&>())>
+{
+};
+
+/**
+ * @brief Type trait to check if a type is nothrow-copy-assignable.
+ *
+ * Equivalent to std::is_nothrow_copy_assignable. Uses the noexcept operator
+ * to detect whether Type's copy-assignment operator is noexcept.
+ *
+ * The tested expression `lvalue = const_lvalue` mirrors exactly what a
+ * copy-assignment call looks like at the call site.
+ *
+ * This is the copy counterpart of IsNothrowMoveAssignable:
+ * - Use IsNothrowCopyAssignable when the operation being guarded copies from
+ *   a const lvalue source (e.g. rehashing an existing table into a new one).
+ * - Use IsNothrowMoveAssignable when the operation moves from an rvalue source.
+ *
+ * @tparam Type The type to check
+ *
+ * @SINCE_2_5.20
+ *
+ * Example usage:
+ * @code
+ * IsNothrowCopyAssignable<int>::value;     // true
+ * IsNothrowCopyAssignable<MyClass>::value; // true only if MyClass::operator=(const MyClass&) is noexcept
+ * @endcode
+ */
+template<typename Type>
+struct IsNothrowCopyAssignable
+: public IntegralConstant<noexcept(Detail::Declval<Type&>() = Detail::Declval<const Type&>())>
+{
+};
+
+/**
+ * @brief Move a value if its move constructor is noexcept, otherwise copy it.
+ *
+ * Equivalent to std::move_if_noexcept. If the type's move constructor is
+ * noexcept (or if the type has no copy constructor), returns an rvalue
+ * reference (enabling move). Otherwise returns a const lvalue reference
+ * (forcing a copy), preserving the strong exception guarantee.
+ *
+ * @tparam Type The type of the argument
+ * @param[in] arg The argument to move or copy
+ * @return An rvalue reference if move is noexcept, otherwise a const lvalue reference
+ *
+ * @SINCE_2_5.20
+ *
+ * Example usage:
+ * @code
+ * // If MyType has a noexcept move, this moves. Otherwise it copies.
+ * auto ref = MoveIfNoexcept(value);
+ * @endcode
+ */
+template<typename Type>
+inline typename EnableIf<
+  IsNothrowMoveConstructible<Type>::value,
+  Type&&>::type
+MoveIfNoexcept(Type& arg) noexcept
+{
+  return Move(arg);
+}
+
+/**
+ * @brief Copy a value when its move constructor may throw.
+ *
+ * This overload is selected when the type's move constructor is not
+ * noexcept. Returns a const lvalue reference, forcing a copy and
+ * preserving the strong exception guarantee.
+ *
+ * @tparam Type The type of the argument
+ * @param[in] arg The argument to copy
+ * @return A const lvalue reference to the argument
+ *
+ * @SINCE_2_5.20
+ */
+template<typename Type>
+inline typename EnableIf<
+  !IsNothrowMoveConstructible<Type>::value,
+  const Type&>::type
+MoveIfNoexcept(Type& arg) noexcept
+{
+  return arg;
+}
+
+/**
  * @brief Perfect forwarding helper function.
  *
  * Preserves the value category (lvalue/rvalue) of the argument when
