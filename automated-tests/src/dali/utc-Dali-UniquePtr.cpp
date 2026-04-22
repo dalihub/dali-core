@@ -85,6 +85,15 @@ void CustomDeleterFunction(TestClass* ptr)
   delete ptr;
 }
 
+// Empty Custom Functor Deleter to check for EBO
+struct CustomDeleterEmpty
+{
+  void operator()(TestClass* p) const
+  {
+    delete p;
+  }
+};
+
 // Test class with constructors for MakeUnique testing
 class MakeUniqueTestClass
 {
@@ -229,7 +238,7 @@ int UtcDaliUniquePtrConstructorWithRawPointerCustomDeleterFunction(void)
   bool            destructorCalled(false);
   gCustomDeleterFunctionCalled = false;
   {
-    UniquePtr<TestClass> ptr(new TestClass(destructorCalled), &CustomDeleterFunction);
+    UniquePtr<TestClass, void (*)(TestClass*)> ptr(new TestClass(destructorCalled), &CustomDeleterFunction);
     DALI_TEST_CHECK(ptr);
     DALI_TEST_CHECK(!destructorCalled);
     DALI_TEST_CHECK(!gCustomDeleterFunctionCalled);
@@ -985,6 +994,341 @@ int UtcDaliUniquePtrResetWithSamePtrCustomDeleter(void)
 
   DALI_TEST_CHECK(!destructorCalled);
   DALI_TEST_CHECK(!customDeleterCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrEqualityOperator(void)
+{
+  TestApplication application;
+
+  UniquePtr<TestClass> ptr1(new TestClass());
+  UniquePtr<TestClass> ptr2(new TestClass());
+  UniquePtr<TestClass> ptr3;
+
+  // Two different pointers should not be equal
+  DALI_TEST_CHECK(!(ptr1 == ptr2));
+
+  // A pointer and a null pointer should not be equal
+  DALI_TEST_CHECK(!(ptr1 == ptr3));
+
+  // Two null pointers should be equal
+  UniquePtr<TestClass> ptr4;
+  DALI_TEST_CHECK(ptr3 == ptr4);
+
+  // Self equality
+  UniquePtr<TestClass> ptr5(new TestClass());
+  DALI_TEST_CHECK(ptr5 == ptr5);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrInequalityOperator(void)
+{
+  TestApplication application;
+
+  UniquePtr<TestClass> ptr1(new TestClass());
+  UniquePtr<TestClass> ptr2(new TestClass());
+  UniquePtr<TestClass> ptr3;
+
+  // Two different pointers should be unequal
+  DALI_TEST_CHECK(ptr1 != ptr2);
+
+  // A pointer and a null pointer should be unequal
+  DALI_TEST_CHECK(ptr1 != ptr3);
+
+  // Two null pointers should not be unequal
+  UniquePtr<TestClass> ptr4;
+  DALI_TEST_CHECK(!(ptr3 != ptr4));
+
+  // Self inequality
+  UniquePtr<TestClass> ptr5(new TestClass());
+  DALI_TEST_CHECK(!(ptr5 != ptr5));
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrLessThanOperator(void)
+{
+  TestApplication application;
+
+  UniquePtr<TestClass> ptr1(new TestClass());
+  UniquePtr<TestClass> ptr2(new TestClass());
+  UniquePtr<TestClass> ptr3;
+
+  // One of two different pointers must be less than the other
+  DALI_TEST_CHECK((ptr1 < ptr2) || (ptr2 < ptr1));
+
+  // A null pointer should be less than a non-null pointer (or vice versa, depending on address)
+  // At minimum, they should be orderable
+  bool isLess    = (ptr3 < ptr1);
+  bool isGreater = (ptr1 < ptr3);
+  DALI_TEST_CHECK(isLess != isGreater); // Exactly one must be true
+
+  // A pointer should not be less than itself
+  DALI_TEST_CHECK(!(ptr1 < ptr1));
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrLessThanOrEqualOperator(void)
+{
+  TestApplication application;
+
+  UniquePtr<TestClass> ptr1(new TestClass());
+  UniquePtr<TestClass> ptr2(new TestClass());
+
+  // A pointer should be <= itself
+  DALI_TEST_CHECK(ptr1 <= ptr1);
+
+  // One of two different pointers must be <= the other
+  DALI_TEST_CHECK((ptr1 <= ptr2) || (ptr2 <= ptr1));
+
+  // Both should be true only if they point to the same address (they don't)
+  if(ptr1.Get() != ptr2.Get())
+  {
+    // Exactly one should be strictly less
+    DALI_TEST_CHECK((ptr1 <= ptr2) != (ptr2 <= ptr1) || (ptr1 <= ptr2 && ptr2 <= ptr1));
+  }
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrGreaterThanOperator(void)
+{
+  TestApplication application;
+
+  UniquePtr<TestClass> ptr1(new TestClass());
+  UniquePtr<TestClass> ptr2(new TestClass());
+
+  // One of two different pointers must be greater than the other
+  DALI_TEST_CHECK((ptr1 > ptr2) || (ptr2 > ptr1));
+
+  // A pointer should not be greater than itself
+  DALI_TEST_CHECK(!(ptr1 > ptr1));
+
+  // Consistency with less-than: (a > b) == (b < a)
+  DALI_TEST_CHECK((ptr1 > ptr2) == (ptr2 < ptr1));
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrGreaterThanOrEqualOperator(void)
+{
+  TestApplication application;
+
+  UniquePtr<TestClass> ptr1(new TestClass());
+  UniquePtr<TestClass> ptr2(new TestClass());
+
+  // A pointer should be >= itself
+  DALI_TEST_CHECK(ptr1 >= ptr1);
+
+  // One of two different pointers must be >= the other
+  DALI_TEST_CHECK((ptr1 >= ptr2) || (ptr2 >= ptr1));
+
+  // Consistency with less-than-or-equal: (a >= b) == (b <= a)
+  DALI_TEST_CHECK((ptr1 >= ptr2) == (ptr2 <= ptr1));
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrGetDeleterFunctionPointer(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+  gCustomDeleterFunctionCalled = false;
+
+  using DeleterType = void (*)(TestClass*);
+  UniquePtr<TestClass, DeleterType> ptr(new TestClass(destructorCalled), &CustomDeleterFunction);
+
+  // GetDeleter should return the function pointer we passed
+  DeleterType& deleter = ptr.GetDeleter();
+  DALI_TEST_CHECK(deleter == &CustomDeleterFunction);
+
+  // Verify the deleter works by destroying the object
+  ptr.Reset();
+  DALI_TEST_CHECK(destructorCalled);
+  DALI_TEST_CHECK(gCustomDeleterFunctionCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrGetDeleterFunctor(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+  bool            customDeleterCalled(false);
+  CustomDeleter   customDeleter(customDeleterCalled);
+
+  UniquePtr<TestClass, CustomDeleter> ptr(new TestClass(destructorCalled), customDeleter);
+
+  // GetDeleter should return a reference to the CustomDeleter
+  CustomDeleter& retrievedDeleter = ptr.GetDeleter();
+  DALI_TEST_CHECK(retrievedDeleter.mDeleterCalled == &customDeleterCalled);
+
+  // Verify the deleter works by destroying the object
+  ptr.Reset();
+  DALI_TEST_CHECK(destructorCalled);
+  DALI_TEST_CHECK(customDeleterCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrGetDeleterConst(void)
+{
+  TestApplication application;
+
+  // Test const GetDeleter on function pointer specialization
+  using DeleterType = void (*)(TestClass*);
+  const UniquePtr<TestClass, DeleterType> ptr1(new TestClass(), &CustomDeleterFunction);
+  const DeleterType&                      deleter1 = ptr1.GetDeleter();
+  DALI_TEST_CHECK(deleter1 == &CustomDeleterFunction);
+
+  // Test const GetDeleter on functor specialization
+  bool                                      customDeleterCalled(false);
+  CustomDeleter                             customDeleter(customDeleterCalled);
+  const UniquePtr<TestClass, CustomDeleter> ptr2(new TestClass(), customDeleter);
+  const CustomDeleter&                      deleter2 = ptr2.GetDeleter();
+  DALI_TEST_CHECK(deleter2.mDeleterCalled == &customDeleterCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrDefaultDeleterConvertingConstructor(void)
+{
+  // Test that DefaultDeleter<Derived> can be converted to DefaultDeleter<Base>
+  DefaultDeleter<DerivedClass> derivedDeleter;
+  DefaultDeleter<BaseClass>    baseDeleter(derivedDeleter);
+
+  // Verify the deleter works by deleting a derived object through base pointer
+  bool       destructorCalled(false);
+  BaseClass* rawPtr = new DerivedClass(42, "test", destructorCalled);
+  baseDeleter(rawPtr);
+  DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrFunctorDeleterDefaultConstructor(void)
+{
+  TestApplication application;
+  {
+    // Default-construct UniquePtr with functor deleter
+    // The deleter should be default-constructed
+    UniquePtr<TestClass, CustomDeleter> ptr;
+    DALI_TEST_CHECK(!ptr);
+    DALI_TEST_CHECK(ptr.Get() == nullptr);
+
+    // Now assign a new object
+    ptr.Reset(new TestClass());
+    DALI_TEST_CHECK(ptr);
+  }
+  // After going out of scope, the default-constructed CustomDeleter should be used
+  // (it uses gDiscardedBool, so we can't easily check, but the test verifies no crash)
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrNullptrDeleterFallback(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  {
+    // Passing nullptr as the deleter should fall back to the default deleter (simple delete)
+    using DeleterType = void (*)(TestClass*);
+    UniquePtr<TestClass, DeleterType> ptr(new TestClass(destructorCalled), nullptr);
+    DALI_TEST_CHECK(ptr);
+
+    // The deleter should have been replaced with the default (non-null) deleter
+    DeleterType& deleter = ptr.GetDeleter();
+    DALI_TEST_CHECK(deleter != nullptr);
+  }
+  // The object should still be properly deleted via the default deleter
+  DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrMoveAssignmentSelfWithCustomDeleter(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+  bool            customDeleterCalled(false);
+  CustomDeleter   customDeleter(customDeleterCalled);
+  {
+    UniquePtr<TestClass, CustomDeleter> ptr(new TestClass(destructorCalled), customDeleter);
+    DALI_TEST_CHECK(ptr);
+
+    // Self std::move assignment make compile warning over gcc-13. Let we ignore the warning.
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wself-move"
+#endif
+    ptr = std::move(ptr);
+
+    DALI_TEST_CHECK(ptr);
+    DALI_TEST_CHECK(!destructorCalled);
+    DALI_TEST_CHECK(!customDeleterCalled);
+#if (__GNUC__ >= 13)
+#pragma GCC diagnostic pop
+#endif
+  }
+  DALI_TEST_CHECK(destructorCalled);
+  DALI_TEST_CHECK(customDeleterCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrReleaseWithFunctorDeleter(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+  bool            customDeleterCalled(false);
+  CustomDeleter   customDeleter(customDeleterCalled);
+
+  TestClass*                          rawPtr = new TestClass(destructorCalled);
+  UniquePtr<TestClass, CustomDeleter> ptr(rawPtr, customDeleter);
+
+  DALI_TEST_CHECK(ptr);
+  DALI_TEST_CHECK(ptr.Get() == rawPtr);
+  DALI_TEST_CHECK(!destructorCalled);
+  DALI_TEST_CHECK(!customDeleterCalled);
+
+  TestClass* releasedPtr = ptr.Release();
+
+  DALI_TEST_CHECK(releasedPtr == rawPtr);
+  DALI_TEST_CHECK(!ptr);
+  DALI_TEST_CHECK(ptr.Get() == nullptr);
+  DALI_TEST_CHECK(!destructorCalled);
+  DALI_TEST_CHECK(!customDeleterCalled);
+
+  // Manually delete the released pointer
+  delete releasedPtr;
+  DALI_TEST_CHECK(destructorCalled);
+  // Custom deleter should NOT have been called since we used plain delete
+  DALI_TEST_CHECK(!customDeleterCalled);
+
+  END_TEST;
+}
+
+int UtcDaliUniquePtrSizeComparisons(void)
+{
+  const auto sizeOfTestClassPtr              = sizeof(TestClass*);
+  const auto sizeOfTestClassFunctionPtr      = sizeof(void (*)(TestClass*));
+  const auto sizeOfTestClassCustomDeleterPtr = sizeof(CustomDeleter*);
+
+  // UniquePtr uses Empty Base Optimization, so shouldn't add any more memory usage when using the default deleter
+  DALI_TEST_CHECK(sizeof(UniquePtr<TestClass>) == sizeOfTestClassPtr);
+
+  // Function pointer needs to store BOTH ptr and function pointer
+  DALI_TEST_CHECK(sizeof(UniquePtr<TestClass, void (*)(TestClass*)>) == (sizeOfTestClassPtr + sizeOfTestClassFunctionPtr));
+
+  // An empty custom functor deleter should also use EBO
+  DALI_TEST_CHECK(sizeof(UniquePtr<TestClass, CustomDeleterEmpty>) == sizeOfTestClassPtr);
+
+  // A custom functor deleter with data needs an extra pointer to the functor though
+  DALI_TEST_CHECK(sizeof(UniquePtr<TestClass, CustomDeleter>) == (sizeOfTestClassPtr + sizeOfTestClassCustomDeleterPtr));
 
   END_TEST;
 }
