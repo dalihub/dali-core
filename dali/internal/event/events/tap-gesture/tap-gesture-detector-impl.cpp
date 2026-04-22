@@ -273,8 +273,7 @@ void TapGestureDetector::OnActorDestroyed(Object& object)
 
 bool TapGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
 {
-  Dali::TouchEvent touchEvent(touch);
-  return HandleEvent(actor, touchEvent);
+  return HandleEvent(actor, touch);
 }
 
 bool TapGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask)

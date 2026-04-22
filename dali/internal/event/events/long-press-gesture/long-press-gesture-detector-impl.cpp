@@ -188,8 +188,7 @@ void LongPressGestureDetector::OnActorDestroyed(Object& object)
 
 bool LongPressGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
 {
-  Dali::TouchEvent touchEvent(touch);
-  return HandleEvent(actor, touchEvent);
+  return HandleEvent(actor, touch);
 }
 
 uint32_t LongPressGestureDetector::GetMinimumHoldingTime() const

@@ -272,15 +272,16 @@ Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
   return actor;
 }
 
-bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
+bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& touch)
 {
   bool                   ret = false;
   Dali::Internal::Actor& actorImpl(GetImplementation(actor));
   if(touch.GetPointCount() > 0 && actorImpl.OnScene())
   {
-    const PointState::Type      state = touch.GetState(0);
-    Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
-    if(touchEventImpl.GetRenderTaskPtr())
+    const PointState::Type            state = touch.GetState(0);
+    const Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
+    Dali::RenderTask                  renderTask = touchEventImpl.GetRenderTask();
+    if(renderTask)
     {
       if(state == PointState::DOWN)
       {
@@ -313,7 +314,7 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
       }
 
       mFeededActor.SetActor(&actorImpl);
-      mRenderTask = &GetImplementation(touchEventImpl.GetRenderTaskPtr());
+      mRenderTask = &GetImplementation(renderTask);
 
       if(!actorImpl.NeedGesturePropagation())
       {

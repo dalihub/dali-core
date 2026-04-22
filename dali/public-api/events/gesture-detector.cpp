@@ -70,7 +70,7 @@ Actor GestureDetector::GetAttachedActor(size_t index) const
   return GetImplementation(*this).GetAttachedActor(index);
 }
 
-bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
+bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& touch)
 {
   return GetImplementation(*this).HandleEvent(actor, touch);
 }
