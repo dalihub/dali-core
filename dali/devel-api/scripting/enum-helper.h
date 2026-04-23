@@ -55,6 +55,12 @@ namespace Dali
  */
 #define DALI_ENUM_TO_STRING_WITH_SCOPE(className, enumName) {#enumName, className::enumName},
 
+/**
+ * Adds a value, typically an enum class, to the table within a scope but without the scope name
+ * Example converts ( GestureSourceType, MOUSE ) to ( "MOUSE", GestureSourceType::MOUSE )
+ */
+#define DALI_ENUM_CLASS_TO_STRING_WITH_SCOPE(className, enumName) {#enumName, static_cast<int32_t>(className::enumName)},
+
 } // namespace Dali
 
 #endif // DALI_ENUM_HELPER_H
