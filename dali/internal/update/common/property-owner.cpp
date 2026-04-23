@@ -66,11 +66,15 @@ void PropertyOwner::AddObserver(Observer& observer)
 {
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot add observer while notifying PropertyOwner::Observers");
 
-  auto [iter, inserted] = mObservers.emplace(&observer, 1u);
-  if(!inserted)
+  auto* referenceCountPtr = mObservers.Find(&observer);
+  if(referenceCountPtr != nullptr)
   {
     // Increase the number of observer count
-    ++(iter->second);
+    ++(*referenceCountPtr);
+  }
+  else
+  {
+    mObservers.Insert(&observer, 1u);
   }
 }
 
@@ -78,18 +82,18 @@ void PropertyOwner::RemoveObserver(Observer& observer)
 {
   DALI_ASSERT_ALWAYS(!mObserverNotifying && "Cannot remove observer while notifying PropertyOwner::Observers");
 
-  auto iter = mObservers.find(&observer);
-  DALI_ASSERT_ALWAYS(iter != mObservers.end());
+  auto* referenceCountPtr = mObservers.Find(&observer);
+  DALI_ASSERT_ALWAYS(referenceCountPtr && (*referenceCountPtr) > 0u);
 
-  if(--(iter->second) == 0u)
+  if(--(*referenceCountPtr) == 0u)
   {
-    mObservers.erase(iter);
+    mObservers.Erase(&observer);
   }
 }
 
 bool PropertyOwner::IsObserved()
 {
-  return mObservers.size() != 0u;
+  return !mObservers.Empty();
 }
 
 void PropertyOwner::Destroy()
@@ -98,16 +102,16 @@ void PropertyOwner::Destroy()
   mObserverNotifying = true;
 
   // Notification for observers
-  for(auto&& item : mObservers)
+  mObservers.ForEach([this](PropertyOwner::Observer* key, const uint32_t& value)
   {
-    item.first->PropertyOwnerDestroyed(*this);
-  }
+    (*key).PropertyOwnerDestroyed(*this);
+  });
 
   // Note : We don't need to restore mObserverNotifying to false as we are in delete the object.
   // If someone call AddObserver / RemoveObserver after this, assert.
 
   // Remove all observers
-  mObservers.clear();
+  mObservers.Release();
 
   // Remove all constraints when disconnected from scene-graph
   mConstraints.Clear();
@@ -125,10 +129,10 @@ void PropertyOwner::ConnectToSceneGraph()
   mObserverNotifying = true;
 
   // Notification for observers
-  for(auto&& item : mObservers)
+  mObservers.ForEach([this](PropertyOwner::Observer* key, const uint32_t& value)
   {
-    item.first->PropertyOwnerConnected(*this);
-  }
+    (*key).PropertyOwnerConnected(*this);
+  });
 
   mObserverNotifying = false;
 }
@@ -143,17 +147,18 @@ void PropertyOwner::DisconnectFromSceneGraph()
   mObserverNotifying = true;
 
   // Notification for observers
-  for(auto iter = mObservers.begin(); iter != mObservers.end();)
+  std::vector<PropertyOwner::Observer*> removedObservers;
+  mObservers.ForEach([this, &removedObservers](PropertyOwner::Observer* key, const uint32_t& value)
   {
-    auto returnValue = (*iter).first->PropertyOwnerDisconnected(*this);
-    if(returnValue == Observer::KEEP_OBSERVING)
+    auto returnValue = (*key).PropertyOwnerDisconnected(*this);
+    if(returnValue == Observer::STOP_OBSERVING)
     {
-      ++iter;
+      removedObservers.push_back(key);
     }
-    else
-    {
-      iter = mObservers.erase(iter);
-    }
+  });
+  for(auto* removedObserver : removedObservers)
+  {
+    mObservers.Erase(removedObserver);
   }
 
   mObserverNotifying = false;
