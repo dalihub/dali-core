@@ -28,13 +28,57 @@ namespace Dali
  */
 
 /**
+ * @brief Default deleter for UniquePtr.
+ *
+ * Uses operator delete to free the managed object. Being an empty class,
+ * it qualifies for Empty Base Optimization (EBO) so that UniquePtr<T>
+ * (with the default deleter) does not waste memory storing the deleter.
+ *
+ * @SINCE_2_5.19
+ * @tparam Type The type of the pointer to delete
+ */
+template<typename Type>
+struct DefaultDeleter
+{
+  /**
+   * @brief Default constructor.
+   * @SINCE_2_5.19
+   */
+  DefaultDeleter() = default;
+
+  /**
+   * @brief Converting constructor.
+   *
+   * Allows construction of DefaultDeleter<Base> from DefaultDeleter<Derived>,
+   * enabling UniquePtr<Derived> to be converted to UniquePtr<Base>.
+   *
+   * @SINCE_2_5.19
+   * @tparam U The derived type (must be convertible to Type*)
+   */
+  template<typename U>
+  DefaultDeleter(const DefaultDeleter<U>&, typename EnableIf<IsConvertible<U*, Type*>::value>::type* = nullptr)
+  {
+  }
+
+  /**
+   * @brief Deletes the managed object.
+   * @SINCE_2_5.19
+   * @param[in] ptr Pointer to the object to delete
+   */
+  void operator()(Type* ptr) const
+  {
+    delete ptr;
+  }
+};
+
+/**
  * @brief Templated unique pointer class with function pointer deleters.
  *
  * @SINCE_2_5.11
  * @tparam Type The type of the pointer stored
  * @tparam Deleter The function to delete the object
  */
-template<typename Type, typename Deleter = void (*)(Type*), typename = void>
+template<typename Type, typename Deleter = DefaultDeleter<Type>, typename = void>
 class UniquePtr
 {
 public:
@@ -132,7 +176,7 @@ public:
   template<typename U, typename E, typename = typename EnableIf<IsConvertible<U*, Type*>::value>::type>
   UniquePtr(UniquePtr<U, E>&& other) noexcept
   : mPtr(other.Release()),
-    mDeleter(Deleter(other.mDeleter) ? Deleter(other.mDeleter) : DefaultDeleter)
+    mDeleter(Deleter(other.GetDeleter()) ? Deleter(other.GetDeleter()) : DefaultDeleter)
   {
   }
 
@@ -158,7 +202,7 @@ public:
     }
     // Take ownership of the new object
     mPtr     = other.Release();
-    mDeleter = Deleter(other.mDeleter) ? Deleter(other.mDeleter) : DefaultDeleter;
+    mDeleter = Deleter(other.GetDeleter()) ? Deleter(other.GetDeleter()) : DefaultDeleter;
     return *this;
   }
 
@@ -266,6 +310,26 @@ public:
     }
   }
 
+  /**
+   * @brief Get the deleter.
+   * @SINCE_2_5.19
+   * @return A reference to the deleter
+   */
+  Deleter& GetDeleter()
+  {
+    return mDeleter;
+  }
+
+  /**
+   * @brief Get the deleter (const).
+   * @SINCE_2_5.19
+   * @return A const reference to the deleter
+   */
+  const Deleter& GetDeleter() const
+  {
+    return mDeleter;
+  }
+
 private:
   Type*                          mPtr;     ///< The managed object
   DALI_NO_UNIQUE_ADDRESS Deleter mDeleter; ///< The custom deleter
@@ -274,12 +338,16 @@ private:
 /**
  * @brief Templated unique pointer partial specialization with functor deleters (non-function-pointer types).
  *
+ * Uses Empty Base Optimization (EBO) by inheriting from the Deleter. When the
+ * Deleter is an empty class (like DefaultDeleter), no additional memory is used
+ * for storing the deleter.
+ *
  * @SINCE_2_5.11
  * @tparam Type The type of the pointer stored
  * @tparam Deleter The functor to delete the object
  */
 template<typename Type, typename Deleter>
-class UniquePtr<Type, Deleter, typename EnableIf<!IsFunctionPointer<Deleter>::value>::type>
+class UniquePtr<Type, Deleter, typename EnableIf<!IsFunctionPointer<Deleter>::value>::type> : private Deleter
 {
 public:
   // Allow converting constructors to access private members from other template instantiations
@@ -287,15 +355,28 @@ public:
   friend class UniquePtr;
 
   /**
+   * @brief Default constructor.
+   *
+   * Constructs a UniquePtr with a null pointer and default-constructed Deleter.
+   * This is enabled only when Deleter is default-constructible.
+   *
+   * @SINCE_2_5.19
+   */
+  UniquePtr()
+  : Deleter(),
+    mPtr(nullptr)
+  {
+  }
+
+  /**
    * @brief Constructor that takes ownership of a raw pointer.
    * @SINCE_2_5.11
    * @param[in] ptr Raw pointer to take ownership of
    * @param[in] deleter The functor to delete the *ptr*
-   * @note For functor deleters, the deleter parameter is required
    */
-  explicit UniquePtr(Type* ptr, Deleter deleter)
-  : mPtr(ptr),
-    mDeleter(deleter)
+  explicit UniquePtr(Type* ptr, Deleter deleter = Deleter())
+  : Deleter(deleter),
+    mPtr(ptr)
   {
   }
 
@@ -307,7 +388,7 @@ public:
   {
     if(mPtr)
     {
-      mDeleter(mPtr);
+      GetDeleter()(mPtr);
     }
   }
 
@@ -318,8 +399,8 @@ public:
    * @note *other* deleter is not changed but is copied
    */
   UniquePtr(UniquePtr&& other) noexcept
-  : mPtr(other.mPtr),
-    mDeleter(other.mDeleter)
+  : Deleter(other.GetDeleter()),
+    mPtr(other.mPtr)
   {
     other.mPtr = nullptr;
   }
@@ -337,12 +418,12 @@ public:
       // Release current ownership
       if(mPtr)
       {
-        mDeleter(mPtr);
+        GetDeleter()(mPtr);
       }
       // Take ownership of the new object
-      mPtr       = other.mPtr;
-      mDeleter   = other.mDeleter;
-      other.mPtr = nullptr;
+      mPtr         = other.mPtr;
+      GetDeleter() = other.GetDeleter();
+      other.mPtr   = nullptr;
     }
     return *this;
   }
@@ -360,8 +441,8 @@ public:
    */
   template<typename U, typename E, typename = typename EnableIf<IsConvertible<U*, Type*>::value>::type>
   UniquePtr(UniquePtr<U, E>&& other) noexcept
-  : mPtr(other.Release()),
-    mDeleter(other.mDeleter)
+  : Deleter(other.GetDeleter()),
+    mPtr(other.Release())
   {
   }
 
@@ -383,15 +464,14 @@ public:
     // Release current ownership
     if(mPtr)
     {
-      mDeleter(mPtr);
+      GetDeleter()(mPtr);
     }
     // Take ownership of the new object
-    mPtr     = other.Release();
-    mDeleter = other.mDeleter;
+    mPtr         = other.Release();
+    GetDeleter() = other.GetDeleter();
     return *this;
   }
 
-  UniquePtr()                            = delete; ///< Deleted default constructor
   UniquePtr(const UniquePtr&)            = delete; ///< Deleted copy constructor
   UniquePtr& operator=(const UniquePtr&) = delete; ///< Deleted copy assignment operator
 
@@ -490,15 +570,34 @@ public:
       // Delete the current object
       if(mPtr)
       {
-        mDeleter(mPtr);
+        GetDeleter()(mPtr);
       }
       mPtr = ptr; // Take ownership of the new object
     }
   }
 
+  /**
+   * @brief Get the deleter.
+   * @SINCE_2_5.19
+   * @return A reference to the deleter
+   */
+  Deleter& GetDeleter()
+  {
+    return *this;
+  }
+
+  /**
+   * @brief Get the deleter (const).
+   * @SINCE_2_5.19
+   * @return A const reference to the deleter
+   */
+  const Deleter& GetDeleter() const
+  {
+    return *this;
+  }
+
 private:
-  Type*                          mPtr;     ///< The managed object
-  DALI_NO_UNIQUE_ADDRESS Deleter mDeleter; ///< The custom deleter
+  Type* mPtr; ///< The managed object
 };
 
 /**
