@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_OWNER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,11 @@
  */
 
 // EXTERNAL INCLUDES
-#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
-#include <dali/devel-api/common/map-wrapper.h>
-#else
-#include <unordered_map>
-#endif
+#include <functional> ///< for std::hash and std::equal_to
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
+#include <dali/integration-api/open-hash-map.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/animation/scene-graph-constraint-container.h>
@@ -343,15 +340,9 @@ protected:
   bool                   mIsConnectedToSceneGraph;
 
 private:
-#if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
-  using ObserverContainer = std::map<PropertyOwner::Observer*, uint32_t>; ///< Observers container. We allow to add same observer multiple times.
-                                                                          ///< Key is a pointer to observer, value is the number of observer added.
-#else
-  using ObserverContainer = std::unordered_map<PropertyOwner::Observer*, uint32_t>; ///< Observers container. We allow to add same observer multiple times.
-                                                                                    ///< Key is a pointer to observer, value is the number of observer added.
-#endif
-  using ObserverIter      = ObserverContainer::iterator;
-  using ConstObserverIter = ObserverContainer::const_iterator;
+  // Observers container. We allow to add same observer multiple times.
+  // Key is a pointer to observer, value is the number of observer added.
+  using ObserverContainer = Dali::Integration::OpenHashMap<PropertyOwner::Observer*, uint32_t, std::hash<PropertyOwner::Observer*>, std::equal_to<PropertyOwner::Observer*>>;
 
   ObserverContainer mObservers; ///< Container of observer raw-pointers (not owned)
 
