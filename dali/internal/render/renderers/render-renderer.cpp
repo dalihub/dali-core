@@ -230,8 +230,10 @@ void Renderer::SetGeometry(Render::Geometry* geometry)
 
 void Renderer::SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size)
 {
-  mDrawCommands.clear();
-  mDrawCommands.insert(mDrawCommands.end(), pDrawCommands, pDrawCommands + size);
+  std::vector<Dali::DevelRenderer::DrawCommand> drawCommands;
+  drawCommands.insert(drawCommands.end(), pDrawCommands, pDrawCommands + size);
+
+  mDrawCommands.reset(new std::vector<Dali::DevelRenderer::DrawCommand>(std::move(drawCommands)));
 }
 
 bool Renderer::BindTextures(Graphics::CommandBuffer& commandBuffer)
@@ -509,8 +511,13 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
         auto iter = connectedUniformBlocks.find(uboNameHash);
         if(DALI_LIKELY(iter != connectedUniformBlocks.end()))
         {
-          auto* sharedUniformBlock                                = iter->second;
-          mSharedUboCache[instruction.mRenderPassTag][program][i] = sharedUniformBlock;
+          auto* sharedUniformBlock = iter->second;
+
+          if(!mSharedUboCache)
+          {
+            mSharedUboCache.reset(new SharedUniformBlockCache());
+          }
+          mSharedUboCache->RegisterSharedUniformBlock(instruction.mRenderPassTag, i, program, sharedUniformBlock);
           mSharedUniformBufferViewContainer->RegisterSharedUniformBlockAndPrograms(*program, *(iter->second), programRequirements.blockSize[i], programRequirements.blockSizeAligned[i]);
         }
       }
@@ -537,7 +544,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       uint32_t                                             queueIndex)
 {
   // Before doing anything test if the call happens in the right queue
-  if(mDrawCommands.empty() && queueIndex > 0)
+  if(!IsDrawCommandsExist() && queueIndex > 0)
   {
     return false;
   }
@@ -596,9 +603,14 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
     // Note : We should keep render target objects even if for Graphics::DrawNativeExecutionMode::DIRECT.
     //        Since the context for direct rendering has ownership by the context which native draw callback called.
-    if(mRenderCallbackInvokedTargets.find(&renderTargetGraphicsObjects) == mRenderCallbackInvokedTargets.end())
+    if(!mRenderCallbackInvokedTargets)
     {
-      mRenderCallbackInvokedTargets.insert(&renderTargetGraphicsObjects);
+      mRenderCallbackInvokedTargets.reset(new RenderCallbackInvokedTargetContainer());
+    }
+
+    if((*mRenderCallbackInvokedTargets).find(&renderTargetGraphicsObjects) == (*mRenderCallbackInvokedTargets).end())
+    {
+      (*mRenderCallbackInvokedTargets).insert(&renderTargetGraphicsObjects);
       renderTargetGraphicsObjects.AddLifecycleObserver(*this);
     }
 
@@ -618,9 +630,9 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
 
   // Prepare commands
   std::vector<DevelRenderer::DrawCommand*> commands;
-  if(!mDrawCommands.empty())
+  if(IsDrawCommandsExist())
   {
-    for(auto& cmd : mDrawCommands)
+    for(auto& cmd : (*mDrawCommands))
     {
       if(cmd.queue == queueIndex)
       {
@@ -702,7 +714,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     {
       uint32_t instanceCount = mRenderDataProvider->GetInstanceCount();
 
-      if(mDrawCommands.empty())
+      if(!IsDrawCommandsExist())
       {
         drawn = mGeometry->Draw(*mGraphicsController, commandBuffer, mIndexedDrawFirstElement, mIndexedDrawElementsCount, instanceCount);
       }
@@ -878,20 +890,12 @@ void Renderer::WriteUniformBuffer(
       {
         useSharedBlock                           = false;
         Render::UniformBlock* sharedUniformBlock = nullptr;
+        if(mSharedUboCache)
         {
-          auto iter1 = mSharedUboCache.find(instruction.mRenderPassTag);
-          if(iter1 != mSharedUboCache.end())
+          sharedUniformBlock = mSharedUboCache->GetSharedUniformBlock(instruction.mRenderPassTag, i, program);
+          if(sharedUniformBlock)
           {
-            auto iter2 = iter1->second.find(program);
-            if(iter2 != iter1->second.end())
-            {
-              auto iter3 = iter2->second.find(i);
-              if(iter3 != iter2->second.end())
-              {
-                useSharedBlock     = true;
-                sharedUniformBlock = iter3->second;
-              }
-            }
+            useSharedBlock = true;
           }
         }
 
@@ -1123,7 +1127,7 @@ void Renderer::WriteDynUniform(
 void Renderer::SetShaderChanged(bool value)
 {
   mShaderChanged = value;
-  mSharedUboCache.clear();
+  mSharedUboCache.reset();
 }
 
 bool Renderer::Updated()
@@ -1192,7 +1196,7 @@ void Renderer::PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::Noti
     {
       mCurrentProgram = nullptr;
 
-      mSharedUboCache.clear();
+      mSharedUboCache.reset();
 
       // Destroy whole mNodeIndexMap and mUniformIndexMaps container.
       // It will be re-created at next render time.
@@ -1222,7 +1226,10 @@ void Renderer::PipelineCacheInvalidated(PipelineCacheL0::LifecycleObserver::Noti
 
 void Renderer::RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects)
 {
-  mRenderCallbackInvokedTargets.erase(renderTargetGraphicsObjects);
+  if(mRenderCallbackInvokedTargets)
+  {
+    (*mRenderCallbackInvokedTargets).erase(renderTargetGraphicsObjects);
+  }
 
   // TODO : Could we send Terminate callback this case?
 }
@@ -1349,32 +1356,35 @@ void Renderer::SetRenderCallback(RenderCallback* callback)
 
 void Renderer::TerminateRenderCallback(bool invokeCallback)
 {
-  for(const auto* renderTargetGraphicsObjects : mRenderCallbackInvokedTargets)
+  if(mRenderCallbackInvokedTargets)
   {
+    for(const auto* renderTargetGraphicsObjects : (*mRenderCallbackInvokedTargets))
     {
-      auto& mutableRenderTargetGraphicsObjects = *const_cast<SceneGraph::RenderTargetGraphicsObjects*>(renderTargetGraphicsObjects);
-      mutableRenderTargetGraphicsObjects.RemoveLifecycleObserver(*this);
+      {
+        auto& mutableRenderTargetGraphicsObjects = *const_cast<SceneGraph::RenderTargetGraphicsObjects*>(renderTargetGraphicsObjects);
+        mutableRenderTargetGraphicsObjects.RemoveLifecycleObserver(*this);
+      }
+
+      // We should invoke it at the matched context :(
+      if(invokeCallback && mRenderCallback)
+      {
+        auto& renderCallbackInput = GetRenderCallbackInput();
+
+        const bool isolatedNotDirect = (mRenderCallback->GetExecutionMode() == RenderCallback::ExecutionMode::ISOLATED);
+
+        // Tell custom renderer whether code executes in isolation or is injected directly and may alter
+        // state or DALi rendering pipeline
+        renderCallbackInput.usingOwnEglContext = isolatedNotDirect;
+
+        // Add some special command for terminate
+        renderCallbackInput.isTerminated = true;
+
+        // We don't need callback input now. Move ownership to terminated native draw manager.
+        mTerminatedNativeDrawManager->RegisterTerminatedRenderCallback(*renderTargetGraphicsObjects, mRenderCallback, std::move(mRenderCallbackInput));
+      }
     }
-
-    // We should invoke it at the matched context :(
-    if(invokeCallback && mRenderCallback)
-    {
-      auto& renderCallbackInput = GetRenderCallbackInput();
-
-      const bool isolatedNotDirect = (mRenderCallback->GetExecutionMode() == RenderCallback::ExecutionMode::ISOLATED);
-
-      // Tell custom renderer whether code executes in isolation or is injected directly and may alter
-      // state or DALi rendering pipeline
-      renderCallbackInput.usingOwnEglContext = isolatedNotDirect;
-
-      // Add some special command for terminate
-      renderCallbackInput.isTerminated = true;
-
-      // We don't need callback input now. Move ownership to terminated native draw manager.
-      mTerminatedNativeDrawManager->RegisterTerminatedRenderCallback(*renderTargetGraphicsObjects, mRenderCallback, std::move(mRenderCallbackInput));
-    }
+    mRenderCallbackInvokedTargets.reset();
   }
-  mRenderCallbackInvokedTargets.clear();
 }
 
 } // namespace Render
