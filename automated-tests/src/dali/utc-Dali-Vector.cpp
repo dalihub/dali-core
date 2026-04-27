@@ -683,7 +683,7 @@ int UtcDaliVectorAsserts(void)
   catch(Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT(e);
-    DALI_TEST_ASSERT(e, "VectorBase::mData", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "!VectorBase::Empty()", TEST_LOCATION);
   }
   catch(...)
   {
@@ -701,7 +701,7 @@ int UtcDaliVectorAsserts(void)
   catch(Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT(e);
-    DALI_TEST_ASSERT(e, "VectorBase::mData", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "!VectorBase::Empty()", TEST_LOCATION);
   }
   catch(...)
   {
@@ -800,6 +800,42 @@ int UtcDaliVectorAsserts(void)
   {
     DALI_TEST_PRINT_ASSERT(e);
     DALI_TEST_ASSERT(e, "index < VectorBase::Count()", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  try
+  {
+    auto* value = pointervector.Front();
+    (void)value; // to "use" the value
+    tet_printf("Assertion expected, but not occurred at %s\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "!VectorBase::Empty()", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  try
+  {
+    auto* value = pointervector.Back();
+    (void)value; // to "use" the value
+    tet_printf("Assertion expected, but not occurred at %s\n", TEST_LOCATION);
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "!VectorBase::Empty()", TEST_LOCATION);
   }
   catch(...)
   {
