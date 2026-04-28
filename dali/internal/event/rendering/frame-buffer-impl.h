@@ -25,7 +25,7 @@
 #include <dali/internal/event/rendering/texture-impl.h>
 #include <dali/public-api/common/dali-common.h>   // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/math/uint-16-pair.h>
+#include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 

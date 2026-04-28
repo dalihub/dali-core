@@ -24,8 +24,8 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/math/vector3.h>
 
 namespace Dali

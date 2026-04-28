@@ -183,7 +183,6 @@ SET( public_api_core_math_header_files
   ${public_api_src_dir}/math/radian.h
   ${public_api_src_dir}/math/random.h
   ${public_api_src_dir}/math/rect.h
-  ${public_api_src_dir}/math/uint-16-pair.h
   ${public_api_src_dir}/math/vector2.h
   ${public_api_src_dir}/math/vector3.h
   ${public_api_src_dir}/math/vector4.h
