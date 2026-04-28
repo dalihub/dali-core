@@ -223,6 +223,10 @@ int UtcDaliPairMakePairP(void)
     auto p = MakePair(std::move(s1), std::move(s2));
     DALI_TEST_EQUALS(p.first, "hello", TEST_LOCATION);
     DALI_TEST_EQUALS(p.second, "world", TEST_LOCATION);
+
+    // If the move actually happened, the source strings should be empty.
+    DALI_TEST_EQUALS(s1.empty(), true, TEST_LOCATION);
+    DALI_TEST_EQUALS(s2.empty(), true, TEST_LOCATION);
   }
 
   END_TEST;
