@@ -19,8 +19,8 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/uint-16-pair.h>
 
 namespace Dali
 {
