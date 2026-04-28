@@ -2593,6 +2593,73 @@ int UtcDaliTouchEventDispatchTouchMotionPropertySet(void)
   END_TEST;
 }
 
+int UtcDaliTouchEventDispatchTouchMotionMultiTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data);
+  actor.TouchedSignal().Connect(&application, functor);
+
+  // Set dispatch touch motion to false
+  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, false);
+
+  // Emit a double touch down signal, both points are STARTED so it should be received
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STARTED, Vector2(10.0f, 10.0f), PointState::STARTED, Vector2(20.0f, 20.0f), 100));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a double touch where first point is STATIONARY and second is MOTION
+  // Since DispatchTouchMotion is false and there is a MOTION point, should NOT receive the event
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STATIONARY, Vector2(10.0f, 10.0f), PointState::MOTION, Vector2(25.0f, 25.0f), 110));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a double touch where first point is MOTION and second is STATIONARY
+  // Since DispatchTouchMotion is false and there is a MOTION point, should NOT receive the event
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(15.0f, 15.0f), PointState::STATIONARY, Vector2(25.0f, 25.0f), 120));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a double touch where both points are MOTION
+  // Should NOT receive the event
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(30.0f, 30.0f), PointState::MOTION, Vector2(35.0f, 35.0f), 130));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a double touch where first point is FINISHED and second is STATIONARY (no MOTION)
+  // Should receive the event
+  application.ProcessEvent(GenerateDoubleTouch(PointState::FINISHED, Vector2(30.0f, 30.0f), PointState::STATIONARY, Vector2(35.0f, 35.0f), 140));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Now enable dispatch touch motion
+  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, true);
+
+  // Emit a down signal to restart touch sequence
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STARTED, Vector2(10.0f, 10.0f), PointState::STARTED, Vector2(20.0f, 20.0f), 200));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Emit a double touch where second point is MOTION
+  // Since DispatchTouchMotion is now true, should receive the event
+  application.ProcessEvent(GenerateDoubleTouch(PointState::STATIONARY, Vector2(10.0f, 10.0f), PointState::MOTION, Vector2(25.0f, 25.0f), 210));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}
+
 int UtcDaliTouchEventGetDeviceNamePositive(void)
 {
   TestApplication application;
