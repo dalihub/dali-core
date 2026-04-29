@@ -669,6 +669,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   {
     const RenderItem& item = renderList.GetItem(index);
 
+    // For now, we don't allow to rendering nodeless renderer.
+    DALI_ASSERT_DEBUG(item.mNode && "RenderItem should have node!");
+
     // Get NodeInformation as const l-value, to reduce memory access operations.
     const SceneGraph::PartialRenderingData::NodeInfomations& nodeInfo = item.GetPartialRenderingDataNodeInfomations();
 
