@@ -87,7 +87,7 @@ public:
   /**
    * @copydoc Dali::Integration::RenderSurface::Resize
    */
-  void Resize(Dali::Uint16Pair size) override;
+  void Resize(Dali::SurfaceSize size) override;
 
   /**
    * @copydoc Dali::Integration::RenderSurface::StartRender

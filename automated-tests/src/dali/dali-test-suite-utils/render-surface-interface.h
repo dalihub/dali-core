@@ -25,6 +25,8 @@
 namespace Dali
 {
 using PositionSize = Dali::Rect<int>;
+using SurfaceSize  = Int32Pair;
+
 class ThreadSynchronizationInterface;
 
 namespace Integration
@@ -49,7 +51,7 @@ public:
   virtual void         DestroySurface()                                                                                    = 0;
   virtual bool         ReplaceGraphicsSurface()                                                                            = 0;
   virtual void         MoveResize(Dali::PositionSize positionSize)                                                         = 0;
-  virtual void         Resize(Dali::Uint16Pair size)                                                                       = 0;
+  virtual void         Resize(Dali::SurfaceSize size)                                                                      = 0;
   virtual void         StartRender()                                                                                       = 0;
   virtual bool         PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect) = 0;
   virtual void         PostRender()                                                                                        = 0;
