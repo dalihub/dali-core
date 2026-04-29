@@ -35,14 +35,18 @@ BaseObject::BaseObject()
 {
 }
 
-BaseObject::~BaseObject() = default;
+BaseObject::~BaseObject()
+{
+  delete mImpl;
+}
 
 void BaseObject::OnDestroy()
 {
   DALI_ASSERT_ALWAYS(mImpl && "~BaseObject OnDestroy should not be called twice!");
 
   // Notify BaseObject::Impl::Observer destroyed first.
-  mImpl.Reset();
+  delete mImpl;
+  mImpl = nullptr;
 }
 
 void BaseObject::RegisterObject()

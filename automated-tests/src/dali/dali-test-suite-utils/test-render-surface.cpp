@@ -111,14 +111,4 @@ void TestRenderSurface::MakeContextCurrent()
 {
 }
 
-Dali::Integration::DepthBufferAvailable TestRenderSurface::GetDepthBufferRequired()
-{
-  return Dali::Integration::DepthBufferAvailable::TRUE;
-}
-
-Dali::Integration::StencilBufferAvailable TestRenderSurface::GetStencilBufferRequired()
-{
-  return Dali::Integration::StencilBufferAvailable::TRUE;
-}
-
 } // namespace Dali

@@ -53,7 +53,7 @@ namespace Dali
 /**
  * @brief Base class to handle the memory of simple vector.
  *
- * Memory layout is such that it has two size_t to hold the count
+ * Memory layout is such that it has two SizeType values to hold the count
  * and capacity of the vector. VectorBase::mData is adjusted so that it points to the
  * beginning of the first real item so that iterating the items is quick.
  * @SINCE_1_0.0
@@ -61,8 +61,12 @@ namespace Dali
 class DALI_CORE_API VectorBase
 {
 public: // Typedefs
-  using SizeType            = size_t;
-  using MemMoveFunctionType = void* (*)(void*, const void*, size_t);
+#if INTPTR_MAX == INT32_MAX
+  using SizeType = uint32_t; // 32-bit system
+#else
+  using SizeType = uint64_t; // 64-bit system
+#endif
+  using MemMoveFunctionType = void* (*)(void*, const void*, SizeType);
 
   constexpr static uint32_t SHRINK_REQUIRED_RATIO = 4; ///< The ratio of auto shrink to fit calling. @SINCE_2_3.22
 
@@ -214,7 +218,7 @@ protected: // for Derived classes
    * @param[in] source Pointer to the source address
    * @param[in] numberOfBytes The number of bytes to be copied
    */
-  void CopyMemory(uint8_t* destination, const uint8_t* source, size_t numberOfBytes);
+  void CopyMemory(uint8_t* destination, const uint8_t* source, SizeType numberOfBytes);
 
   /**
    * @brief Replace the data as new data address.
@@ -238,11 +242,11 @@ protected: // for Derived classes
 
 private:
   // not copyable as it does not know the size of elements
-  VectorBase(const VectorBase&)            = delete; ///< Deleted copy constructor. @SINCE_1_0.0
+  VectorBase(const VectorBase&) = delete;            ///< Deleted copy constructor. @SINCE_1_0.0
   VectorBase& operator=(const VectorBase&) = delete; ///< Deleted copy assignment operator. @SINCE_1_0.0
 
   // not movable as this is handled by deriving classes
-  VectorBase(VectorBase&&)            = delete; ///< Deleted move constructor. @SINCE_1_9.25
+  VectorBase(VectorBase&&) = delete;            ///< Deleted move constructor. @SINCE_1_9.25
   VectorBase& operator=(VectorBase&&) = delete; ///< Deleted copy assignment operator. @SINCE_1_9.25
 
 protected:     // Data

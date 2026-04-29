@@ -292,7 +292,9 @@ struct TypeTraits<Pair<T1, T2>> : public BasicTypes<Pair<T1, T2>>
 /**
  * @brief Creates a Pair from two values.
  *
- * It constructs a Pair efficiently with decayed types (removes references, const, volatile)
+ * Constructs a Pair with decayed types (removes references, const, volatile)
+ * while preserving the value category of each argument via perfect forwarding.
+ * Rvalue arguments are moved into the Pair; lvalue arguments are copied.
  *
  * @tparam T1 The type of the first value
  * @tparam T2 The type of the second value
@@ -305,7 +307,7 @@ template<typename T1, typename T2>
 inline Pair<typename DecayType<T1>::type, typename DecayType<T2>::type>
 MakePair(T1&& t1, T2&& t2)
 {
-  return Pair<typename DecayType<T1>::type, typename DecayType<T2>::type>(t1, t2);
+  return Pair<typename DecayType<T1>::type, typename DecayType<T2>::type>(Dali::Forward<T1>(t1), Dali::Forward<T2>(t2));
 }
 
 /**

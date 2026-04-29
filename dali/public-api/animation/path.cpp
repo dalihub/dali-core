@@ -71,17 +71,17 @@ void Path::Sample(float progress, Vector3& position, Vector3& tangent) const
   GetImplementation(*this).Sample(progress, position, tangent);
 }
 
-Vector3& Path::GetPoint(size_t index)
+Vector3& Path::GetPoint(uint32_t index)
 {
-  return GetImplementation(*this).GetPoint(static_cast<uint32_t>(index));
+  return GetImplementation(*this).GetPoint(index);
 }
 
-Vector3& Path::GetControlPoint(size_t index)
+Vector3& Path::GetControlPoint(uint32_t index)
 {
-  return GetImplementation(*this).GetControlPoint(static_cast<uint32_t>(index));
+  return GetImplementation(*this).GetControlPoint(index);
 }
 
-size_t Path::GetPointCount() const
+uint32_t Path::GetPointCount() const
 {
   return GetImplementation(*this).GetPointCount();
 }

@@ -363,8 +363,7 @@ void PanGestureDetector::OnActorDestroyed(Object& object)
 
 bool PanGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
 {
-  Dali::TouchEvent touchEvent(touch);
-  return HandleEvent(actor, touchEvent);
+  return HandleEvent(actor, touch);
 }
 
 void PanGestureDetector::SetDefaultProperty(Property::Index index, const Property::Value& property)

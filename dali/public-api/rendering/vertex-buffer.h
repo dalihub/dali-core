@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstddef> // std::size_t
+#include <cstdint> // uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/unique-ptr.h>
@@ -161,7 +161,7 @@ public:
    * @param[in] data A pointer to the data that will be copied to the buffer
    * @param[in] size Number of elements to expand or contract the buffer
    */
-  void SetData(const void* data, std::size_t size);
+  void SetData(const void* data, uint32_t size);
 
   /**
    * @brief Gets the number of elements in the buffer.
@@ -169,7 +169,7 @@ public:
    * @SINCE_1_9.27
    * @return Number of elements to expand or contract the buffer
    */
-  std::size_t GetSize() const;
+  uint32_t GetSize() const;
 
   /**
    * @brief Sets vertex divisor for all attributes

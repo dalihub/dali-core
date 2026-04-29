@@ -25,7 +25,7 @@
 #include <dali/internal/render/common/render-list.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/public-api/math/uint-16-pair.h>
+#include <dali/public-api/math/int-pair.h>
 
 using Dali::Internal::SceneGraph::RenderInstruction;
 using Dali::Internal::SceneGraph::RenderItem;
@@ -511,14 +511,14 @@ inline void RenderAlgorithms::SetupScissorClipping(
   }
 }
 
-inline void RenderAlgorithms::SetupClipping(const RenderItem&                   item,
-                                            Graphics::CommandBuffer&            commandBuffer,
-                                            bool&                               usedStencilBuffer,
-                                            uint32_t&                           lastClippingDepth,
-                                            uint32_t&                           lastClippingId,
-                                            Integration::StencilBufferAvailable stencilBufferAvailable,
-                                            const RenderInstruction&            instruction,
-                                            int                                 orientation)
+inline void RenderAlgorithms::SetupClipping(const RenderItem&        item,
+                                            Graphics::CommandBuffer& commandBuffer,
+                                            bool&                    usedStencilBuffer,
+                                            uint32_t&                lastClippingDepth,
+                                            uint32_t&                lastClippingId,
+                                            bool                     stencilBufferAvailable,
+                                            const RenderInstruction& instruction,
+                                            int                      orientation)
 {
   RenderMode::Type renderMode = RenderMode::AUTO;
   RendererKey      renderer   = item.mRenderer;
@@ -542,7 +542,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
       // Both methods with return rapidly if there is nothing to be done for that type of clipping.
       SetupScissorClipping(item, commandBuffer, instruction, orientation);
 
-      if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+      if(stencilBufferAvailable)
       {
         SetupStencilClipping(item, commandBuffer, lastClippingDepth, lastClippingId);
       }
@@ -555,7 +555,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
       // No clipping is performed for these modes.
       // Note: We do not turn off scissor clipping as it may be used for the whole layer.
       // The stencil buffer will not be used at all, but we only need to disable it if it's available.
-      if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+      if(stencilBufferAvailable)
       {
         commandBuffer.SetStencilTestEnable(false);
       }
@@ -568,7 +568,7 @@ inline void RenderAlgorithms::SetupClipping(const RenderItem&                   
     case RenderMode::STENCIL:
     case RenderMode::COLOR_STENCIL:
     {
-      if(stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+      if(stencilBufferAvailable)
       {
         // We are using the low-level Renderer Stencil API.
         // The stencil buffer must be enabled for every renderer with stencil mode on, as renderers in between can disable it.
@@ -603,8 +603,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 Graphics::CommandBuffer&                 commandBuffer,
                                                 const Matrix&                            viewMatrix,
                                                 const Matrix&                            projectionMatrix,
-                                                Integration::DepthBufferAvailable        depthBufferAvailable,
-                                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                                bool                                     depthBufferAvailable,
+                                                bool                                     stencilBufferAvailable,
                                                 const RenderInstruction&                 instruction,
                                                 const Rect<int32_t>&                     viewport,
                                                 const Rect<int>&                         rootClippingRect,
@@ -617,7 +617,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
 
   // Note: The depth buffer is enabled or disabled on a per-renderer basis.
   // Here we pre-calculate the value to use if these modes are set to AUTO.
-  const bool        autoDepthTestMode((depthBufferAvailable == Integration::DepthBufferAvailable::TRUE) &&
+  const bool        autoDepthTestMode(depthBufferAvailable &&
                                       !(renderList.GetSourceLayer()->IsDepthTestDisabled()) &&
                                       renderList.HasColorRenderItems());
   const std::size_t count = renderList.Count();
@@ -669,6 +669,9 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
   {
     const RenderItem& item = renderList.GetItem(index);
 
+    // For now, we don't allow to rendering nodeless renderer.
+    DALI_ASSERT_DEBUG(item.mNode && "RenderItem should have node!");
+
     // Get NodeInformation as const l-value, to reduce memory access operations.
     const SceneGraph::PartialRenderingData::NodeInfomations& nodeInfo = item.GetPartialRenderingDataNodeInfomations();
 
@@ -702,7 +705,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
       // draw-mode state, such as Overlays.
       // If the flags are set to "AUTO", the behavior then depends on the type of renderer. Overlay Renderers will
       // always disable depth testing and writing. Color Renderers will enable them if the Layer does.
-      if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE)
+      if(depthBufferAvailable)
       {
         SetupDepthBuffer(item, commandBuffer, autoDepthTestMode, firstDepthBufferUse);
       }
@@ -726,7 +729,7 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
         const bool     drawOffscreenRenderingCache = (item.mNode->GetCacheRendererCount() > 0u) && (instruction.mFrameBuffer != nullptr);
         const Vector4& worldColor                  = drawOffscreenRenderingCache ? Vector4::ONE : nodeInfo.worldColor;
 
-        auto const MAX_QUEUE = item.mRenderer->GetDrawCommands().empty() ? 1 : DevelRenderer::RENDER_QUEUE_MAX;
+        auto const MAX_QUEUE = item.mRenderer->IsDrawCommandsExist() ? DevelRenderer::RENDER_QUEUE_MAX : 1;
         for(auto queue = 0u; queue < MAX_QUEUE; ++queue)
         {
           // Render the item. It will write into the command buffer everything it has to render
@@ -748,8 +751,8 @@ RenderAlgorithms::RenderAlgorithms(Graphics::Controller& graphicsController)
 
 void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&                 instruction,
                                                 Graphics::CommandBuffer&                 commandBuffer,
-                                                Integration::DepthBufferAvailable        depthBufferAvailable,
-                                                Integration::StencilBufferAvailable      stencilBufferAvailable,
+                                                bool                                     depthBufferAvailable,
+                                                bool                                     stencilBufferAvailable,
                                                 const Rect<int32_t>&                     viewport,
                                                 const Rect<int>&                         rootClippingRect,
                                                 int                                      orientation,

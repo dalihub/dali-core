@@ -52,6 +52,9 @@
  * @SINCE_1_0.0
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/unique-ptr.h>
@@ -158,9 +161,20 @@ public:
    * @SINCE_1_0.0
    * @return The number of slots connected to this signal
    */
-  std::size_t GetConnectionCount() const
+  uint32_t GetConnectionCount() const
   {
     return mImpl ? mImpl->GetConnectionCount() : 0;
+  }
+
+public:
+  SignalMixin()
+  : mImpl(nullptr)
+  {
+  }
+
+  ~SignalMixin()
+  {
+    delete mImpl;
   }
 
 protected:
@@ -168,13 +182,13 @@ protected:
   {
     if(!mImpl)
     {
-      mImpl = MakeUnique<BaseSignal>();
+      mImpl = new BaseSignal();
     }
     return *mImpl;
   }
 
 private:
-  UniquePtr<BaseSignal> mImpl;
+  BaseSignal* mImpl;
 };
 
 /**

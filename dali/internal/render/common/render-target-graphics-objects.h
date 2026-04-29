@@ -27,6 +27,7 @@
 
 namespace Dali::Internal::SceneGraph
 {
+
 /**
  * An interface to hold Graphics::RenderTarget, Graphics::RenderPass (with and w.o. clear)
  * and list of Graphics::ClearValue data.

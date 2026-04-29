@@ -72,11 +72,8 @@ enum class PartialUpdateAvailable
  */
 enum class CorePolicyFlags
 {
-  DEFAULT                  = 0,      ///< Zero means that no additional policy is set.
-  RENDER_TO_FRAME_BUFFER   = 1 << 0, ///< Whether we should render to the frame-buffer or not.
-  DEPTH_BUFFER_AVAILABLE   = 1 << 1, ///< Whether the depth buffer is available or not.
-  STENCIL_BUFFER_AVAILABLE = 1 << 2, ///< Whether the stencil buffer is available or not.
-  PARTIAL_UPDATE_AVAILABLE = 1 << 3, ///< Whether the partial update is available or not.
+  DEFAULT                = 0,      ///< Zero means that no additional policy is set.
+  RENDER_TO_FRAME_BUFFER = 1 << 0, ///< Whether we should render to the frame-buffer or not.
 };
 
 } // namespace Integration

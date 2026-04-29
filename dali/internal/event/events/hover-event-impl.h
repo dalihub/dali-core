@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/events/touch-point.h>
@@ -70,52 +73,52 @@ public:
   /**
    * @copydoc Dali::HoverEvent::GetPointCount()
    */
-  std::size_t GetPointCount() const;
+  uint32_t GetPointCount() const;
 
   /**
    * @copydoc Dali::HoverEvent::GetDeviceId()
    */
-  int32_t GetDeviceId(std::size_t point) const;
+  int32_t GetDeviceId(uint32_t point) const;
 
   /**
    * @copydoc Dali::HoverEvent::GetGetState()
    */
-  PointState::Type GetState(std::size_t point) const;
+  PointState::Type GetState(uint32_t point) const;
 
   /**
    * @copydoc Dali::HoverEvent::GetHitActor()
    */
-  Dali::Actor GetHitActor(std::size_t point) const;
+  Dali::Actor GetHitActor(uint32_t point) const;
 
   /**
    * @copydoc Dali::HoverEvent::GetLocalPosition()
    */
-  const Vector2& GetLocalPosition(std::size_t point) const;
+  const Vector2& GetLocalPosition(uint32_t point) const;
 
   /**
    * @copydoc Dali::HoverEvent::GetScreenPosition()
    */
-  const Vector2& GetScreenPosition(std::size_t point) const;
+  const Vector2& GetScreenPosition(uint32_t point) const;
 
   /**
    * @brief Get the device class the hover event originated from
    *
    * @return The device class
    */
-  Device::Class::Type GetDeviceClass(std::size_t point) const;
+  Device::Class::Type GetDeviceClass(uint32_t point) const;
 
   /**
    * @brief Get the device subclass the hover event originated from
    *
    * @return The device subclass
    */
-  Device::Subclass::Type GetDeviceSubclass(std::size_t point) const;
+  Device::Subclass::Type GetDeviceSubclass(uint32_t point) const;
 
   /**
    * @brief Gets the device name
    * @return The device name string
    */
-  const Dali::String& GetDeviceName(std::size_t point) const;
+  const Dali::String& GetDeviceName(uint32_t point) const;
 
   /**
    * @brief Returns a const reference to a point at the index requested.
@@ -126,7 +129,7 @@ public:
    * @return A const reference to the Point at the position requested
    * @note point should be less than the value returned by GetPointCount(). Will assert if out of range.
    */
-  const Integration::Point& GetPoint(std::size_t point) const;
+  const Integration::Point& GetPoint(uint32_t point) const;
 
   /**
    * @brief Returns a reference to a point at the index requested.
@@ -137,7 +140,7 @@ public:
    * @return A reference to the Point at the position requested
    * @note point should be less than the value returned by GetPointCount(). Will assert if out of range.
    */
-  Integration::Point& GetPoint(std::size_t point);
+  Integration::Point& GetPoint(uint32_t point);
 
   // Setters
 

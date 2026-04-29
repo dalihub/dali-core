@@ -126,8 +126,7 @@ void PinchGestureDetector::OnActorDestroyed(Object& object)
 
 bool PinchGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
 {
-  Dali::TouchEvent touchEvent(touch);
-  return HandleEvent(actor, touchEvent);
+  return HandleEvent(actor, touch);
 }
 
 void PinchGestureDetector::CancelProcessing()

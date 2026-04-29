@@ -3044,6 +3044,9 @@ Renderer RendererTestFixture(TestApplication& application)
 int UtcDaliRendererSetDepthTestMode(void)
 {
   TestApplication application;
+  application.GetScene().SetDepthBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
   tet_infoline("Test setting the DepthTestMode");
 
   Renderer           renderer             = RendererTestFixture(application);
@@ -3144,6 +3147,9 @@ int UtcDaliRendererSetDepthTestMode(void)
 int UtcDaliRendererSetDepthWriteMode(void)
 {
   TestApplication application;
+  application.GetScene().SetDepthBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
   tet_infoline("Test setting the DepthWriteMode");
 
   Renderer           renderer      = RendererTestFixture(application);
@@ -3190,6 +3196,9 @@ int UtcDaliRendererSetDepthWriteMode(void)
 int UtcDaliRendererBlendModeUseActorOpacity(void)
 {
   TestApplication application;
+  application.GetScene().SetDepthBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
   tet_infoline("Test setting the UseActorOpacity");
 
   Geometry geometry = CreateQuadGeometry();
@@ -3247,6 +3256,9 @@ int UtcDaliRendererBlendModeUseActorOpacity(void)
 int UtcDaliRendererCheckStencilDefaults(void)
 {
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
   tet_infoline("Test the stencil defaults");
 
   Renderer           renderer               = RendererTestFixture(application);
@@ -3275,6 +3287,9 @@ int UtcDaliRendererCheckStencilDefaults(void)
 int UtcDaliRendererSetRenderModeToUseStencilBuffer(void)
 {
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
   tet_infoline("Test setting the RenderMode to use the stencil buffer");
 
   Renderer           renderer               = RendererTestFixture(application);
@@ -3369,6 +3384,9 @@ int UtcDaliRendererSetRenderModeToUseColorBuffer(void)
 int UtcDaliRendererSetStencilFunction(void)
 {
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
   tet_infoline("Test setting the StencilFunction");
 
   Renderer           renderer               = RendererTestFixture(application);
@@ -3464,6 +3482,9 @@ int UtcDaliRendererSetStencilFunction(void)
 int UtcDaliRendererSetStencilOperation(void)
 {
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
   tet_infoline("Test setting the StencilOperation");
 
   Renderer           renderer               = RendererTestFixture(application);
@@ -3562,6 +3583,9 @@ int UtcDaliRendererSetStencilMask(void)
 {
   TestApplication application;
   tet_infoline("Test setting the StencilMask");
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   Renderer           renderer               = RendererTestFixture(application);
   TestGlAbstraction& glAbstraction          = application.GetGlAbstraction();
@@ -5874,8 +5898,12 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   application.GetScene().Add(dummyActor);
   application.SendNotification();
   application.Render();
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
 
-  Dali::Integration::Scene scene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  Dali::Integration::Scene scene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(scene);
   application.AddScene(scene);
 
@@ -5915,6 +5943,7 @@ int UtcDaliRendererUniformBlocksUnregisterScene01(void)
   namedParams["id"] << 5;
   DALI_TEST_CHECK(gl.mBufferTrace.FindMethodAndParams("DeleteBuffers", namedParams));
 
+  delete surface;
   END_TEST;
 }
 

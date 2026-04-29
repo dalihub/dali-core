@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/events/point.h>
@@ -85,55 +88,55 @@ public:
   /**
    * @copydoc Dali::TouchEvent::GetPointCount()
    */
-  inline std::size_t GetPointCount() const
+  inline uint32_t GetPointCount() const
   {
-    return mPoints.size();
+    return static_cast<uint32_t>(mPoints.size());
   }
 
   /**
    * @copydoc Dali::TouchEvent::GetDeviceId()
    */
-  int32_t GetDeviceId(std::size_t point) const;
+  int32_t GetDeviceId(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetGetState()
    */
-  PointState::Type GetState(std::size_t point) const;
+  PointState::Type GetState(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetHitActor()
    */
-  Dali::Actor GetHitActor(std::size_t point) const;
+  Dali::Actor GetHitActor(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetLocalPosition()
    */
-  const Vector2& GetLocalPosition(std::size_t point) const;
+  const Vector2& GetLocalPosition(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetScreenPosition()
    */
-  const Vector2& GetScreenPosition(std::size_t point) const;
+  const Vector2& GetScreenPosition(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetRadius()
    */
-  float GetRadius(std::size_t point) const;
+  float GetRadius(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetEllipseRadius()
    */
-  const Vector2& GetEllipseRadius(std::size_t point) const;
+  const Vector2& GetEllipseRadius(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetPressure()
    */
-  float GetPressure(std::size_t point) const;
+  float GetPressure(uint32_t point) const;
 
   /**
    * @copydoc Dali::TouchEvent::GetAngle()
    */
-  Degree GetAngle(std::size_t point) const;
+  Degree GetAngle(uint32_t point) const;
 
   /**
    * @brief Returns a const reference to a point at the index requested.
@@ -144,7 +147,7 @@ public:
    * @return A const reference to the Point at the position requested
    * @note point should be less than the value returned by GetPointCount(). Will assert if out of range.
    */
-  const Integration::Point& GetPoint(std::size_t point) const;
+  const Integration::Point& GetPoint(uint32_t point) const;
 
   /**
    * @brief Returns a reference to a point at the index requested.
@@ -155,34 +158,34 @@ public:
    * @return A reference to the Point at the position requested
    * @note point should be less than the value returned by GetPointCount(). Will assert if out of range.
    */
-  Integration::Point& GetPoint(std::size_t point);
+  Integration::Point& GetPoint(uint32_t point);
 
   /**
    * @brief Get the device class the mouse/touch event originated from
    *
    * @return The device class
    */
-  Device::Class::Type GetDeviceClass(std::size_t point) const;
+  Device::Class::Type GetDeviceClass(uint32_t point) const;
 
   /**
    * @brief Get the device subclass the mouse/touch event originated from
    *
    * @return The device subclass
    */
-  Device::Subclass::Type GetDeviceSubclass(std::size_t point) const;
+  Device::Subclass::Type GetDeviceSubclass(uint32_t point) const;
 
   /**
    * @brief Get mouse's button value (ex: right/left button)
    *
    * @return The value of mouse button
    */
-  MouseButton::Type GetMouseButton(std::size_t point) const;
+  MouseButton::Type GetMouseButton(uint32_t point) const;
 
   /**
    * @brief Gets the device name
    * @return The device name string
    */
-  const Dali::String& GetDeviceName(std::size_t point) const;
+  const Dali::String& GetDeviceName(uint32_t point) const;
 
   Dali::RenderTask GetRenderTask() const
   {

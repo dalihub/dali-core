@@ -251,12 +251,12 @@ void GestureDetector::DetachAll()
   }
 }
 
-size_t GestureDetector::GetAttachedActorCount() const
+uint32_t GestureDetector::GetAttachedActorCount() const
 {
-  return mPendingAttachActors.size() + mAttachedActors.size();
+  return static_cast<uint32_t>(mPendingAttachActors.size() + mAttachedActors.size());
 }
 
-Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
+Dali::Actor GestureDetector::GetAttachedActor(uint32_t index) const
 {
   Dali::Actor actor;
 
@@ -266,21 +266,22 @@ Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
   }
   else if(index < mPendingAttachActors.size() + mAttachedActors.size())
   {
-    actor = Dali::Actor(mAttachedActors[index - mPendingAttachActors.size()]);
+    actor = Dali::Actor(mAttachedActors[index - static_cast<uint32_t>(mPendingAttachActors.size())]);
   }
 
   return actor;
 }
 
-bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
+bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& touch)
 {
   bool                   ret = false;
   Dali::Internal::Actor& actorImpl(GetImplementation(actor));
   if(touch.GetPointCount() > 0 && actorImpl.OnScene())
   {
-    const PointState::Type      state = touch.GetState(0);
-    Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
-    if(touchEventImpl.GetRenderTaskPtr())
+    const PointState::Type            state = touch.GetState(0);
+    const Dali::Internal::TouchEvent& touchEventImpl(GetImplementation(touch));
+    Dali::RenderTask                  renderTask = touchEventImpl.GetRenderTask();
+    if(renderTask)
     {
       if(state == PointState::DOWN)
       {
@@ -295,7 +296,7 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
       }
 
       Integration::TouchEvent touchEvent(touch.GetTime());
-      for(std::size_t i = 0; i < touch.GetPointCount(); i++)
+      for(uint32_t i = 0; i < touch.GetPointCount(); i++)
       {
         Integration::Point point;
         point.SetState(touch.GetState(i));
@@ -313,7 +314,7 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, Dali::TouchEvent& touch)
       }
 
       mFeededActor.SetActor(&actorImpl);
-      mRenderTask = &GetImplementation(touchEventImpl.GetRenderTaskPtr());
+      mRenderTask = &GetImplementation(renderTask);
 
       if(!actorImpl.NeedGesturePropagation())
       {

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
@@ -184,7 +187,7 @@ public:
    * @param[in] index The index of the interpolation point
    * @return A reference to the interpolation point
    */
-  Vector3& GetPoint(size_t index);
+  Vector3& GetPoint(uint32_t index);
 
   /**
    * @brief Accessor for the control points.
@@ -193,7 +196,7 @@ public:
    * @param[in] index The index of the control point
    * @return A reference to the control point
    */
-  Vector3& GetControlPoint(size_t index);
+  Vector3& GetControlPoint(uint32_t index);
 
   /**
    * @brief Gets the number of interpolation points in the path.
@@ -201,7 +204,7 @@ public:
    * @SINCE_1_0.0
    * @return The number of interpolation points in the path
    */
-  size_t GetPointCount() const;
+  uint32_t GetPointCount() const;
 
 public: // Not intended for application developers
   /// @cond internal

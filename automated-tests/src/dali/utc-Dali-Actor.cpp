@@ -5416,6 +5416,10 @@ int UtcDaliActorPropertyClippingActor(void)
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor");
   TestApplication application;
+  application.GetScene().SetDepthBufferEnabled(true);
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    stencilTrace        = glAbstraction.GetStencilFunctionTrace();
@@ -5430,6 +5434,7 @@ int UtcDaliActorPropertyClippingActor(void)
 
   // Gather the call trace.
   gfxTrace.Enable(true);
+  gfxTrace.EnableLogging(true);
   stencilTrace.EnableLogging(true);
   GenerateTrace(application, enabledDisableTrace, stencilTrace);
 
@@ -5465,6 +5470,9 @@ int UtcDaliActorPropertyClippingActorEnableThenDisable(void)
   // This test checks that an actor is correctly setup for clipping and then correctly setup when clipping is disabled
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN actor enable and then disable");
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   size_t startIndex = 0u;
 
@@ -5540,6 +5548,9 @@ int UtcDaliActorPropertyClippingNestedChildren(void)
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    stencilTrace        = glAbstraction.GetStencilFunctionTrace();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   // Create a clipping actor.
   Actor actorDepth1Clip = CreateActorWithContent16x16();
@@ -5625,7 +5636,11 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
 {
   // This test checks that a hierarchy of actors are drawn in the correct order when clipping is enabled.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_CHILDREN draw order");
-  TestApplication    application;
+  TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
+
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
@@ -5723,6 +5738,9 @@ int UtcDaliActorPropertyScissorClippingActor01(void)
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor");
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
@@ -5777,6 +5795,9 @@ int UtcDaliActorPropertyScissorClippingActor02(void)
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor with a transparent renderer");
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
@@ -5838,6 +5859,9 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRenderer(void)
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor without renderer");
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
@@ -5899,6 +5923,9 @@ int UtcDaliActorPropertyScissorClippingActorWihtoutRendererUnderLayer3D(void)
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor without renderer under layer 3d");
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
@@ -5963,6 +5990,9 @@ int UtcDaliActorPropertyScissorClippingActorSiblings(void)
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actors which are siblings");
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
@@ -6018,6 +6048,9 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
   // This test checks that an actor is correctly setup for clipping.
   tet_infoline("Testing Actor::Property::ClippingMode: CLIP_TO_BOUNDING_BOX actor nested");
   TestApplication application;
+  application.GetScene().SetStencilBufferEnabled(true);
+  application.SendNotification();
+  application.Render();
 
   TestGlAbstraction& glAbstraction       = application.GetGlAbstraction();
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();

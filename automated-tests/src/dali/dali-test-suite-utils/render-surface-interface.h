@@ -19,8 +19,8 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/uint-16-pair.h>
 
 namespace Dali
 {
@@ -40,26 +40,26 @@ public:
   };
   RenderSurfaceInterface();
 
-  virtual PositionSize                                    GetPositionSize() const                                                                             = 0;
-  virtual void                                            GetDpi(unsigned int& dpiHorizontal, unsigned int& dpiVertical)                                      = 0;
-  virtual int                                             GetSurfaceOrientation() const                                                                       = 0;
-  virtual int                                             GetScreenOrientation() const                                                                        = 0;
-  virtual void                                            InitializeGraphics()                                                                                = 0;
-  virtual void                                            CreateSurface()                                                                                     = 0;
-  virtual void                                            DestroySurface()                                                                                    = 0;
-  virtual bool                                            ReplaceGraphicsSurface()                                                                            = 0;
-  virtual void                                            MoveResize(Dali::PositionSize positionSize)                                                         = 0;
-  virtual void                                            Resize(Dali::Uint16Pair size)                                                                       = 0;
-  virtual void                                            StartRender()                                                                                       = 0;
-  virtual bool                                            PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect) = 0;
-  virtual void                                            PostRender()                                                                                        = 0;
-  virtual void                                            StopRender()                                                                                        = 0;
-  virtual void                                            ReleaseLock()                                                                                       = 0;
-  virtual void                                            SetThreadSynchronization(ThreadSynchronizationInterface& threadSynchronization)                     = 0;
-  virtual Dali::Integration::RenderSurfaceInterface::Type GetSurfaceType()                                                                                    = 0;
-  virtual void                                            MakeContextCurrent()                                                                                = 0;
-  virtual Dali::Integration::DepthBufferAvailable         GetDepthBufferRequired()                                                                            = 0;
-  virtual Dali::Integration::StencilBufferAvailable       GetStencilBufferRequired()                                                                          = 0;
+  virtual PositionSize GetPositionSize() const                                                                             = 0;
+  virtual void         GetDpi(unsigned int& dpiHorizontal, unsigned int& dpiVertical)                                      = 0;
+  virtual int          GetSurfaceOrientation() const                                                                       = 0;
+  virtual int          GetScreenOrientation() const                                                                        = 0;
+  virtual void         InitializeGraphics()                                                                                = 0;
+  virtual void         CreateSurface()                                                                                     = 0;
+  virtual void         DestroySurface()                                                                                    = 0;
+  virtual bool         ReplaceGraphicsSurface()                                                                            = 0;
+  virtual void         MoveResize(Dali::PositionSize positionSize)                                                         = 0;
+  virtual void         Resize(Dali::Uint16Pair size)                                                                       = 0;
+  virtual void         StartRender()                                                                                       = 0;
+  virtual bool         PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect) = 0;
+  virtual void         PostRender()                                                                                        = 0;
+  virtual void         StopRender()                                                                                        = 0;
+  virtual void         ReleaseLock()                                                                                       = 0;
+  virtual void         SetThreadSynchronization(ThreadSynchronizationInterface& threadSynchronization)                     = 0;
+
+  virtual Dali::Integration::RenderSurfaceInterface::Type GetSurfaceType() = 0;
+
+  virtual void MakeContextCurrent() = 0;
 
 protected:
   virtual ~RenderSurfaceInterface();

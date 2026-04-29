@@ -120,7 +120,7 @@ Property::Map::SizeType Property::Map::Count() const
 {
   if(DALI_LIKELY(mImpl))
   {
-    return mImpl->mStringValueContainer.size() + mImpl->mIndexValueContainer.size();
+    return static_cast<SizeType>(mImpl->mStringValueContainer.size() + mImpl->mIndexValueContainer.size());
   }
   return 0;
 }

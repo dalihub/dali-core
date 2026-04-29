@@ -130,7 +130,7 @@ public:
   class DALI_INTERNAL Impl;
 
 private:
-  UniquePtr<Impl> mImpl;
+  Impl* mImpl;
 };
 
 // Helpers for public-api forwarding methods

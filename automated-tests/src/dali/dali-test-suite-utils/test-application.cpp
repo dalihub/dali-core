@@ -57,11 +57,7 @@ void TestApplication::CreateCore()
   // We always need the first update!
   mStatus.keepUpdating = Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING;
 
-  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEPTH_BUFFER_AVAILABLE | Dali::Integration::CorePolicyFlags::STENCIL_BUFFER_AVAILABLE;
-  if(mPartialUpdateEnabled)
-  {
-    corePolicyFlags |= Dali::Integration::CorePolicyFlags::PARTIAL_UPDATE_AVAILABLE;
-  }
+  Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEFAULT;
 
   mCore = Dali::Integration::Core::New(mRenderController,
                                        mPlatformAbstraction,
@@ -81,15 +77,14 @@ void TestApplication::CreateCore()
 
 void TestApplication::CreateScene()
 {
-  mScene = Dali::Integration::Scene::New(Size(static_cast<float>(mSurfaceWidth), static_cast<float>(mSurfaceHeight)));
-  mScene.SetDpi(Vector2(static_cast<float>(mDpi.x), static_cast<float>(mDpi.y)));
-
   // Create render target for the scene
   mRenderSurface = new TestRenderSurface(Dali::PositionSize(0, 0, mSurfaceWidth, mSurfaceHeight));
   Graphics::RenderTargetCreateInfo rtInfo{};
   rtInfo.SetExtent({mSurfaceWidth, mSurfaceHeight});
   rtInfo.SetSurface(mRenderSurface);
-  mScene.SetSurfaceRenderTarget(rtInfo);
+
+  mScene = Dali::Integration::Scene::New(rtInfo, Size(static_cast<float>(mSurfaceWidth), static_cast<float>(mSurfaceHeight)), 0, 0, Dali::ScenePolicyFlagBits::DEPTH_BUFFER_ENABLED | ScenePolicyFlagBits::STENCIL_BUFFER_ENABLED | ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
+  mScene.SetDpi(Vector2(static_cast<float>(mDpi.x), static_cast<float>(mDpi.y)));
 
   mScenes.push_back(mScene);
 }

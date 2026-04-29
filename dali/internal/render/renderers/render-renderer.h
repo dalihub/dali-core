@@ -19,12 +19,15 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory> ///< for std::unique_ptr
 #include <unordered_set>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/list-wrapper.h>
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/signals/render-callback.h>
+#include <dali/public-api/common/dali-pair.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector4.h>
 
@@ -202,12 +205,12 @@ public:
   void SetDrawCommands(Dali::DevelRenderer::DrawCommand* pDrawCommands, uint32_t size);
 
   /**
-   * @brief Returns a reference to an array of draw commands
-   * @return Valid array of draw commands (may be empty)
+   * @brief Returns whether we have a draw commands or not.
+   * @return True if draw commands applied
    */
-  [[nodiscard]] const std::vector<Dali::DevelRenderer::DrawCommand>& GetDrawCommands() const
+  [[nodiscard]] bool IsDrawCommandsExist() const
   {
-    return mDrawCommands;
+    return mDrawCommands && !(mDrawCommands->empty());
   }
 
   /**
@@ -724,11 +727,6 @@ private:
   PipelineCachePtr             mPipeline{};
   PipelineLifecycleNotifierPtr mPipelineLifecycleNotifier{};
 
-  // mSharedUboCache[renderpassTag][program][uniformBlockIndex] = matched UBO.
-  // Clear this cache when program destroyed / shader changed.
-  using SharedUniformBlockCache = std::unordered_map<uint32_t, std::unordered_map<const Program*, std::unordered_map<uint32_t, Render::UniformBlock*>>>;
-  SharedUniformBlockCache mSharedUboCache{};
-
   using Hash = std::size_t;
 
   struct UniformIndexMap
@@ -783,16 +781,136 @@ private:
   bool                  mPipelineNotifierCached : 1;    ///< Flag indicating whether renderer cache valid pipeline notifier or not.
   bool                  mUseSharedUniformBlock : 1;     ///< Flag whether we should use shared uniform block or not. Usually it must be true.
 
-  std::vector<Dali::DevelRenderer::DrawCommand> mDrawCommands; // Devel stuff
-
   // For render callback features.
   Render::TerminatedNativeDrawManager* mTerminatedNativeDrawManager{nullptr};
   RenderCallback*                      mRenderCallback{nullptr};
   std::unique_ptr<RenderCallbackInput> mRenderCallbackInput{nullptr};
   std::vector<Graphics::Texture*>      mRenderCallbackTextureBindings{};
 
+  // Struct to get matched UBO block correctly.
+  // Most of case the number of UBO is 1 or 2 usually. (VisualRenderer + RenderEffect case)
+  // So store 2 level registry cache to fast-out, and use unordered_map if more items exist.
+  struct SharedUniformBlockCache
+  {
+    // mSharedUboCache[renderpassTag][uniformBlockIndex][program] = matched UBO.
+    // Clear this cache when program destroyed / shader changed.
+    using CacheContainer = std::unordered_map<uint32_t, std::unordered_map<uint32_t, std::unordered_map<const Program*, Render::UniformBlock*>>>;
+
+    using Key          = Dali::Pair<uint32_t, Dali::Pair<uint32_t, const Program*>>;
+    using KeyValuePair = Dali::Pair<Key, Render::UniformBlock*>;
+
+    static constexpr uint8_t CACHE_CREATE_THRESHOLD = 3;
+
+    union
+    {
+      Dali::Vector<KeyValuePair> mRegistry;
+      CacheContainer*            mCache; ///< Lazy cache for large UBO. Only allocated when block count >= CACHE_CREATE_THRESHOLD.
+    };
+    uint8_t mCount{0u};
+
+    SharedUniformBlockCache()
+    : mRegistry(),
+      mCount(0u)
+    {
+    }
+
+    ~SharedUniformBlockCache()
+    {
+      // Call manual destructor
+      if(mCount < CACHE_CREATE_THRESHOLD)
+      {
+        mRegistry.~Vector();
+      }
+      else
+      {
+        delete mCache;
+      }
+    }
+
+    void RegisterSharedUniformBlock(uint32_t renderpassTag, uint32_t uniformBlockIndex, const Program* program, Render::UniformBlock* uniformBlock)
+    {
+      if(mCount < CACHE_CREATE_THRESHOLD)
+      {
+        Key key = Dali::MakePair(renderpassTag, Dali::MakePair(uniformBlockIndex, program));
+        for(uint32_t i = 0; i < mCount; ++i)
+        {
+          if(mRegistry[i].first == key)
+          {
+            mRegistry[i].second = uniformBlock;
+            return;
+          }
+        }
+
+        // Add new item
+        if(mCount == CACHE_CREATE_THRESHOLD - 1)
+        {
+          // Copy previous variables first
+          Dali::Vector<KeyValuePair> registry = mRegistry;
+
+          // Call manual destructor and constructor.
+          mRegistry.~Vector();
+          mCache = new CacheContainer();
+
+          for(uint32_t i = 0; i < mCount; ++i)
+          {
+            (*mCache)[registry[i].first.first][registry[i].first.second.first][registry[i].first.second.second] = registry[i].second;
+          }
+          (*mCache)[renderpassTag][uniformBlockIndex][program] = uniformBlock;
+        }
+        else
+        {
+          mRegistry.PushBack(Dali::MakePair(key, uniformBlock));
+          ;
+        }
+        ++mCount;
+      }
+      else
+      {
+        (*mCache)[renderpassTag][uniformBlockIndex][program] = uniformBlock;
+      }
+    }
+
+    Render::UniformBlock* GetSharedUniformBlock(uint32_t renderpassTag, uint32_t uniformBlockIndex, const Program* program) const
+    {
+      if(mCount < CACHE_CREATE_THRESHOLD)
+      {
+        Key key = Dali::MakePair(renderpassTag, Dali::MakePair(uniformBlockIndex, program));
+        for(uint32_t i = 0; i < mCount; ++i)
+        {
+          if(mRegistry[i].first == key)
+          {
+            return mRegistry[i].second;
+          }
+        }
+      }
+      else
+      {
+        auto iter1 = (*mCache).find(renderpassTag);
+        if(iter1 != (*mCache).end())
+        {
+          auto& cache2 = iter1->second;
+          auto  iter2  = cache2.find(uniformBlockIndex);
+          if(iter2 != cache2.end())
+          {
+            auto& cache3 = iter2->second;
+            auto  iter3  = cache3.find(program);
+            if(iter3 != cache3.end())
+            {
+              return iter3->second;
+            }
+          }
+        }
+      }
+      return nullptr;
+    }
+  };
+  std::unique_ptr<SharedUniformBlockCache> mSharedUboCache{nullptr};
+
   // Set of render targets that NativeDraw called. It will be used when we need to call NativeDraw callback's terminate callback.
-  std::unordered_set<const SceneGraph::RenderTargetGraphicsObjects*> mRenderCallbackInvokedTargets{};
+  using RenderCallbackInvokedTargetContainer = std::unordered_set<const SceneGraph::RenderTargetGraphicsObjects*>;
+  std::unique_ptr<RenderCallbackInvokedTargetContainer> mRenderCallbackInvokedTargets{nullptr};
+
+  std::unique_ptr<std::vector<Dali::DevelRenderer::DrawCommand>> mDrawCommands{nullptr}; // Devel stuff
 
   Program* mCurrentProgram{nullptr}; ///< Prefetched program
 };

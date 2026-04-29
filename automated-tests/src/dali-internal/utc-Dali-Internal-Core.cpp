@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -263,7 +263,12 @@ int UtcDaliCoreRemoveSceneObjectAndClearSceneN(void)
   application.SendNotification();
   application.Render();
 
-  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
   DALI_TEST_CHECK(newScene);
   application.AddScene(newScene);
 
@@ -320,6 +325,7 @@ int UtcDaliCoreRemoveSceneObjectAndClearSceneN(void)
   application.SendNotification();
   application.Render(0);
 
+  delete surface;
   END_TEST;
 }
 
@@ -346,7 +352,13 @@ int UtcDaliCoreClearSceneN(void)
 
   // Create new scene befoer Render(), and after SendNotification()
   application.SendNotification();
-  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(Size(480.0f, 800.0f));
+
+  TestRenderSurface*               surface = new TestRenderSurface(Dali::PositionSize(0, 0, 480, 800));
+  Graphics::RenderTargetCreateInfo rtInfo{};
+  rtInfo.SetExtent({480u, 800u});
+  rtInfo.SetSurface(surface);
+  Dali::Integration::Scene newScene = Dali::Integration::Scene::New(rtInfo, Size(480.0f, 800.0f));
+
   application.Render();
 
   DALI_TEST_CHECK(!cmdTrace.FindMethod("BeginRenderPass"));
@@ -369,5 +381,6 @@ int UtcDaliCoreClearSceneN(void)
   core.ClearScene(newScene);
   DALI_TEST_CHECK(cmdTrace.FindMethod("BeginRenderPass"));
 
+  delete surface;
   END_TEST;
 }

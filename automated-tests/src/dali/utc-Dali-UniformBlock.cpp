@@ -1051,3 +1051,130 @@ int utcDaliUniformBlockPartialUpdate(void)
 
   END_TEST;
 }
+
+int UtcDaliUniformBlockConnectToShaderConstructorArray(void)
+{
+  TestApplication application;
+
+  tet_printf("Create shader at least three sperated tag\n");
+
+  const std::string uniformBlockName("testBlock");
+  const std::string uniformValue1Name("uValue1");
+  const std::string uniformValue2Name("uValue2");
+
+  const uint32_t uniformAlign     = sizeof(float) * 4;
+  const uint32_t uniformBlockSize = (uniformAlign) * 2;
+
+  tet_infoline("Prepare graphics to check UTC for testBlock\n");
+  auto& graphics = application.GetGraphicsController();
+  auto& gl       = application.GetGlAbstraction();
+  gl.mBufferTrace.EnableLogging(true);
+
+  const uint32_t UNIFORM_BLOCK_ALIGNMENT(512);
+  gl.SetUniformBufferOffsetAlignment(UNIFORM_BLOCK_ALIGNMENT);
+
+  // Add custom uniform block
+  TestGraphicsReflection::TestUniformBlockInfo block{
+    uniformBlockName,
+    0,
+    0,
+    uniformBlockSize,
+    {
+      {uniformValue1Name, Graphics::UniformClass::UNIFORM, 0, 0, {0}, {1}, 0, Property::Type::FLOAT, uniformAlign, 0},
+      {uniformValue2Name, Graphics::UniformClass::UNIFORM, 0, 0, {uniformAlign}, {2}, 0, Property::Type::VECTOR2, uniformAlign, 0},
+    }};
+  graphics.AddCustomUniformBlock(block);
+  tet_infoline("Prepare done\n");
+
+  Property::Map map[3];
+  map[0]["vertex"]        = VertexSource;
+  map[0]["fragment"]      = FragmentSource;
+  map[0]["renderPassTag"] = 0;
+  map[0]["hints"]         = Shader::Hint::Value::NONE;
+  map[0]["name"]          = "Test0";
+
+  map[1]["vertex"]        = FragmentSource;
+  map[1]["fragment"]      = VertexSource;
+  map[1]["renderPassTag"] = 1;
+  map[1]["hints"]         = Shader::Hint::Value::NONE;
+  map[1]["name"]          = "Test1";
+
+  map[2]["vertex"]        = VertexSource;
+  map[2]["fragment"]      = VertexSource;
+  map[2]["renderPassTag"] = 2;
+  map[2]["hints"]         = Shader::Hint::Value::NONE;
+  map[2]["name"]          = "Test2";
+
+  Property::Array array;
+  array.PushBack(map[0]);
+  array.PushBack(map[1]);
+  array.PushBack(map[2]);
+
+  Shader   shader   = Shader::New(array);
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, shader);
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(actor);
+
+  RenderTaskList taskList      = application.GetScene().GetRenderTaskList();
+  CameraActor    defaultCamera = taskList.GetTask(0).GetCameraActor();
+
+  // Create render task with tag
+  RenderTask task1 = taskList.CreateTask();
+  task1.SetRenderPassTag(1);
+  task1.SetCameraActor(defaultCamera);
+  task1.SetSourceActor(actor);
+  task1.SetExclusive(false);
+
+  RenderTask task2 = taskList.CreateTask();
+  task2.SetRenderPassTag(2);
+  task2.SetCameraActor(defaultCamera);
+  task2.SetSourceActor(actor);
+  task2.SetExclusive(false);
+
+  UniformBlock uniformBlock1 = UniformBlock::New(ToDaliString(uniformBlockName));
+  UniformBlock uniformBlock2 = UniformBlock::New("testBlock2"); ///< dummy
+
+  tet_printf("Connect to shader\n");
+  bool ret = uniformBlock1.ConnectToShader(shader);
+  DALI_TEST_EQUALS(ret, true, TEST_LOCATION);
+
+  tet_printf("Re-connect to already connected uniform block will be failed\n");
+  ret = uniformBlock1.ConnectToShader(shader);
+  DALI_TEST_EQUALS(ret, false, TEST_LOCATION);
+
+  ret = uniformBlock2.ConnectToShader(shader);
+  DALI_TEST_EQUALS(ret, true, TEST_LOCATION);
+
+  tet_printf("Re-connect to already connected uniform block will be failed\n");
+  ret = uniformBlock2.ConnectToShader(shader);
+  DALI_TEST_EQUALS(ret, false, TEST_LOCATION);
+
+  tet_printf("disconnect from shader\n");
+  uniformBlock1.DisconnectFromShader(shader);
+
+  ret = uniformBlock2.ConnectToShader(shader);
+  DALI_TEST_EQUALS(ret, false, TEST_LOCATION);
+
+  tet_printf("Connect to shader again\n");
+  ret = uniformBlock1.ConnectToShader(shader);
+  DALI_TEST_EQUALS(ret, true, TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(0);
+
+  uniformBlock2.Reset();
+
+  application.SendNotification();
+  application.Render(0);
+
+  uniformBlock1.Reset();
+
+  application.SendNotification();
+  application.Render(0);
+
+  END_TEST;
+}

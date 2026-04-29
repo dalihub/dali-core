@@ -138,9 +138,9 @@ String& String::operator=(const char* other)
 }
 
 // Basic Operations
-size_t String::Size() const
+uint32_t String::Size() const
 {
-  return GetString(mStorage).size();
+  return static_cast<uint32_t>(GetString(mStorage).size());
 }
 
 bool String::Empty() const
@@ -158,12 +158,12 @@ const char* String::CStr() const
   return GetString(mStorage).c_str();
 }
 
-char& String::operator[](size_t position)
+char& String::operator[](uint32_t position)
 {
   return GetString(mStorage)[position];
 }
 
-const char& String::operator[](size_t position) const
+const char& String::operator[](uint32_t position) const
 {
   return GetString(mStorage)[position];
 }

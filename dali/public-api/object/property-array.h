@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstdint> // for uint32_t
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/property-value.h>
@@ -37,7 +40,7 @@ namespace Dali
 class DALI_CORE_API Property::Array
 {
 public:
-  using SizeType = std::size_t;
+  using SizeType = uint32_t;
 
   /**
    * @brief Default constructor.

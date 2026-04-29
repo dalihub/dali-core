@@ -46,30 +46,30 @@ Geometry::Geometry(Geometry&& rhs) noexcept = default;
 
 Geometry& Geometry::operator=(Geometry&& rhs) noexcept = default;
 
-std::size_t Geometry::AddVertexBuffer(VertexBuffer& vertexBuffer)
+uint32_t Geometry::AddVertexBuffer(VertexBuffer& vertexBuffer)
 {
   DALI_ASSERT_ALWAYS(vertexBuffer && "VertexBuffer is not initialized ");
   return GetImplementation(*this).AddVertexBuffer(GetImplementation(vertexBuffer));
 }
 
-std::size_t Geometry::GetNumberOfVertexBuffers() const
+uint32_t Geometry::GetNumberOfVertexBuffers() const
 {
   return GetImplementation(*this).GetNumberOfVertexBuffers();
 }
 
-void Geometry::RemoveVertexBuffer(std::size_t index)
+void Geometry::RemoveVertexBuffer(uint32_t index)
 {
-  GetImplementation(*this).RemoveVertexBuffer(static_cast<uint32_t>(index));
+  GetImplementation(*this).RemoveVertexBuffer(index);
 }
 
-void Geometry::SetIndexBuffer(const uint16_t* indices, size_t count)
+void Geometry::SetIndexBuffer(const uint16_t* indices, uint32_t count)
 {
-  GetImplementation(*this).SetIndexBuffer(indices, static_cast<uint32_t>(count));
+  GetImplementation(*this).SetIndexBuffer(indices, count);
 }
 
-void Geometry::SetIndexBuffer(const uint32_t* indices, size_t count)
+void Geometry::SetIndexBuffer(const uint32_t* indices, uint32_t count)
 {
-  GetImplementation(*this).SetIndexBuffer(indices, static_cast<uint32_t>(count));
+  GetImplementation(*this).SetIndexBuffer(indices, count);
 }
 
 void Geometry::SetType(Type geometryType)

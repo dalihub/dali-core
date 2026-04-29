@@ -27,8 +27,9 @@ namespace Internal
 {
 namespace SceneGraph
 {
-Scene::Scene()
-: mFrameRenderedCallbacks(),
+Scene::Scene(const Graphics::RenderTargetCreateInfo& createInfo)
+: mRenderTargetCreateInfo(createInfo),
+  mFrameRenderedCallbacks(),
   mFramePresentedCallbacks(),
   mSurfaceRect(),
   mSurfaceOrientation(0),
@@ -38,8 +39,12 @@ Scene::Scene()
   mRotationCompletedAcknowledgement(false),
   mSkipRendering(false),
   mNeedFullUpdate(false),
+  mDepthBufferEnabled(false),
+  mStencilBufferEnabled(false),
+  mMSAAEnabled(false),
   mPartialUpdateEnabled(true),
-  mHasRenderInstructionToScene(false)
+  mHasRenderInstructionToScene(false),
+  mRenderPassDirty(false)
 {
 }
 
@@ -49,37 +54,45 @@ Scene::~Scene()
   mFramePresentedCallbacks.clear();
 }
 
-void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
+void Scene::SetScenePolicyFlags(ScenePolicyFlagBits flags)
 {
-  // TODO : protected data using here
-  if(mRenderTarget != nullptr &&
-     mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface)
+  const bool newDepth   = (flags & ScenePolicyFlagBits::DEPTH_BUFFER_ENABLED);
+  const bool newStencil = (flags & ScenePolicyFlagBits::STENCIL_BUFFER_ENABLED);
+
+  if(newDepth != mDepthBufferEnabled || newStencil != mStencilBufferEnabled)
   {
-    // Only recreate if the surface has changed.
-    mRenderTargetCreateInfo = renderTargetCreateInfo;
-    if(mGraphicsController) // shouldn't be null, as we can't have already set mRenderTarget unless graphics controller exists.
-    {
-      RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, mRenderTargetCreateInfo);
-    }
+    mRenderPassDirty = true;
   }
-  else
-  {
-    // 2nd Stage initialization happens in RenderManager, not UpdateManager, so is delayed.
-    mRenderTargetCreateInfo = renderTargetCreateInfo;
-    if(mRenderTarget != nullptr)
-    {
-      mGraphicsController->UpdateRenderTarget(*mRenderTarget, mRenderTargetCreateInfo);
-    }
-  }
+
+  mDepthBufferEnabled   = newDepth;
+  mStencilBufferEnabled = newStencil;
+  mPartialUpdateEnabled = (flags & ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
+  mMSAAEnabled          = (flags & ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED);
 }
 
-void Scene::Initialize(Graphics::Controller& graphicsController, Integration::DepthBufferAvailable depthBufferAvailable, Integration::StencilBufferAvailable stencilBufferAvailable)
+void Scene::Initialize(Graphics::Controller& graphicsController)
 {
   RenderTargetGraphicsObjects::Initialize(graphicsController);
 
-  // Create the render target for the surface. It should already have been sent via message.
+  // Create the render target for the surface. (This must happen in render thread).
   RenderTargetGraphicsObjects::CreateRenderTarget(graphicsController, mRenderTargetCreateInfo);
 
+  BuildRenderPasses(graphicsController);
+  mRenderPassDirty = false;
+}
+
+void Scene::RebuildRenderPassesIfDirty(Graphics::Controller& graphicsController)
+{
+  if(!mRenderPassDirty)
+  {
+    return;
+  }
+  BuildRenderPasses(graphicsController);
+  mRenderPassDirty = false;
+}
+
+void Scene::BuildRenderPasses(Graphics::Controller& graphicsController)
+{
   // Create the render pass for the surface
   std::vector<Graphics::AttachmentDescription> attachmentDescriptions;
 
@@ -94,8 +107,7 @@ void Scene::Initialize(Graphics::Controller& graphicsController, Integration::De
   desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
   attachmentDescriptions.push_back(desc);
 
-  if(depthBufferAvailable == Integration::DepthBufferAvailable::TRUE ||
-     stencilBufferAvailable == Integration::StencilBufferAvailable::TRUE)
+  if(mDepthBufferEnabled || mStencilBufferEnabled)
   {
     // Depth
     desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
@@ -141,6 +153,21 @@ void Scene::ContextDestroyed()
 
   NotifyRenderTargetDestroyed();
   mRenderTarget.reset();
+}
+
+void Scene::SetSurfaceRenderTargetCreateInfo(const Graphics::RenderTargetCreateInfo& renderTargetCreateInfo)
+{
+  const bool surfaceChanged = (mRenderTargetCreateInfo.surface != renderTargetCreateInfo.surface);
+
+  mRenderTargetCreateInfo = renderTargetCreateInfo;
+  if(surfaceChanged)
+  {
+    RenderTargetGraphicsObjects::CreateRenderTarget(*mGraphicsController, mRenderTargetCreateInfo);
+  }
+  else
+  {
+    mGraphicsController->UpdateRenderTarget(*mRenderTarget, mRenderTargetCreateInfo);
+  }
 }
 
 RenderInstructionContainer& Scene::GetRenderInstructions()
@@ -310,9 +337,19 @@ bool Scene::KeepRenderingCheck(float elapsedSeconds)
   return mForceRenderingFrames > 0u;
 }
 
-void Scene::SetPartialUpdateEnabled(bool enabled)
+bool Scene::IsDepthBufferEnabled() const
 {
-  mPartialUpdateEnabled = enabled;
+  return mDepthBufferEnabled;
+}
+
+bool Scene::IsStencilBufferEnabled() const
+{
+  return mStencilBufferEnabled;
+}
+
+bool Scene::IsMultiSampledAntiAliasingEnabled() const
+{
+  return mMSAAEnabled;
 }
 
 bool Scene::IsPartialUpdateEnabled() const

@@ -39,12 +39,12 @@ PropertyCondition::PropertyCondition(PropertyCondition&& rhs) noexcept = default
 
 PropertyCondition& PropertyCondition::operator=(PropertyCondition&& rhs) noexcept = default;
 
-std::size_t PropertyCondition::GetArgumentCount() const
+uint32_t PropertyCondition::GetArgumentCount() const
 {
-  return GetImplementation(*this).arguments.Count();
+  return static_cast<uint32_t>(GetImplementation(*this).arguments.Count());
 }
 
-float PropertyCondition::GetArgument(std::size_t index) const
+float PropertyCondition::GetArgument(uint32_t index) const
 {
   return GetImplementation(*this).arguments[index];
 }

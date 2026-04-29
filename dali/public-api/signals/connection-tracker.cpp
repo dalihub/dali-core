@@ -209,7 +209,7 @@ void ConnectionTracker::SignalDisconnected(SlotObserver* slotObserver, CallbackB
   DALI_ABORT("Callback lost in SignalDisconnected()");
 }
 
-std::size_t ConnectionTracker::GetConnectionCount() const
+uint32_t ConnectionTracker::GetConnectionCount() const
 {
   return mCacheImpl ? mCacheImpl->GetSize() : 0u;
 }

@@ -236,7 +236,7 @@ public: // API
    */
   const ItemType& Front() const
   {
-    DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
+    DALI_ASSERT_VECTOR(!VectorBase::Empty() && "Vector is empty");
     return *reinterpret_cast<ItemType*>(VectorBase::mData);
   }
 
@@ -260,7 +260,7 @@ public: // API
    */
   const ItemType& Back() const
   {
-    DALI_ASSERT_VECTOR(VectorBase::mData && "Vector is empty");
+    DALI_ASSERT_VECTOR(!VectorBase::Empty() && "Vector is empty");
     ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     address += VectorBase::Count() - 1u;
     return *address;

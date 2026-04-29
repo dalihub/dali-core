@@ -19,8 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstddef> // std::size_t
-#include <cstdint> // uint16_t
+#include <cstdint> // uint16_t, uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>                // Dali::Handle
@@ -136,7 +135,7 @@ public:
    * @return Index of the newly added buffer, can be used with RemoveVertexBuffer to remove
    *         this buffer if no longer required
    */
-  std::size_t AddVertexBuffer(VertexBuffer& vertexBuffer);
+  uint32_t AddVertexBuffer(VertexBuffer& vertexBuffer);
 
   /**
    * @brief Retrieves the number of vertex buffers that have been added to this geometry.
@@ -144,7 +143,7 @@ public:
    * @SINCE_1_9.27
    * @return Number of vertex buffers that have been added to this geometry
    */
-  std::size_t GetNumberOfVertexBuffers() const;
+  uint32_t GetNumberOfVertexBuffers() const;
 
   /**
    * @brief Removes a vertex buffer.
@@ -153,7 +152,7 @@ public:
    * @SINCE_1_9.27
    * @param[in] index Index to the vertex buffer to remove
    */
-  void RemoveVertexBuffer(std::size_t index);
+  void RemoveVertexBuffer(uint32_t index);
 
   /**
    * @brief Sets the index data to be used as a source of indices for the geometry
@@ -164,7 +163,7 @@ public:
    * @param[in] indices Array of indices
    * @param[in] count Number of indices in the array
    */
-  void SetIndexBuffer(const uint16_t* indices, size_t count);
+  void SetIndexBuffer(const uint16_t* indices, uint32_t count);
 
   /**
    * @brief Sets the 32bits index data to be used as a source of indices for the geometry
@@ -175,7 +174,7 @@ public:
    * @param[in] indices Array of indices with uint32_t elements.
    * @param[in] count Number of indices in the array
    */
-  void SetIndexBuffer(const uint32_t* indices, size_t count);
+  void SetIndexBuffer(const uint32_t* indices, uint32_t count);
 
   /**
    * @brief Sets the type of primitives this geometry contains.

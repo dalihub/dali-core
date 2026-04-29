@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstddef> // for std::size_t
+#include <cstdint> // for uint32_t
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -76,7 +76,7 @@ public:
    * @SINCE_1_0.0
    * @return The connection count
    */
-  std::size_t GetConnectionCount() const;
+  uint32_t GetConnectionCount() const;
 
 private:
   ConnectionTracker(const ConnectionTracker&)            = delete; ///< Deleted copy constructor. @SINCE_1_0.0
