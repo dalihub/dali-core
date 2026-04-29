@@ -82,16 +82,30 @@ const char* TOUCH_POINT_STATE[6] =
     "INTERRUPTED",
 };
 
+/**
+ * @brief Checks whether any point in the touch event has the specified state.
+ */
+bool HasPointState(const Dali::TouchEvent& event, PointState::Type targetState)
+{
+  const uint32_t pointCount = event.GetPointCount();
+  for(uint32_t i = 0; i < pointCount; ++i)
+  {
+    if(event.GetState(i) == targetState)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool ShouldEmitInterceptTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
-  PointState::Type state = event.GetState(0);
-  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || state == PointState::INTERRUPTED) && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotion() || !HasPointState(event, PointState::MOTION));
 }
 
 bool ShouldEmitTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
-  PointState::Type state = event.GetState(0);
-  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || state == PointState::INTERRUPTED) && (state != PointState::MOTION || actorImpl.IsDispatchTouchMotion());
+  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotion() || !HasPointState(event, PointState::MOTION));
 }
 
 // child -> parent
