@@ -24,10 +24,10 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/type-traits.h>
+#include <dali/public-api/math/int-pair.h>
 
 namespace Dali
 {
-class Uint16Pair;
 
 /**
  * @addtogroup dali_core_math
@@ -100,13 +100,21 @@ public:
   explicit Vector2(const Vector4& vec4);
 
   /**
-   * @brief Conversion constructor from a Uint16Pair.
+   * @brief Conversion constructor from an IntPair.
    *
-   * @SINCE_1_9.21
+   * @SINCE_2_5.20
    *
-   * @param[in] pair The Uint16Pair to create this vector from
+   * @tparam tIntType The integer type used by the IntPair.
+   * @tparam tUintType The unsigned integer type used by the IntPair.
+   * @tparam tDataType The packed data type used by the IntPair.
+   * @param[in] pair The IntPair to create this vector from
    */
-  Vector2(const Uint16Pair& pair);
+  template<typename tIntType, typename tUintType, typename tDataType>
+  Vector2(const IntPair<tIntType, tUintType, tDataType>& pair)
+  : x(static_cast<float>(pair.GetX())),
+    y(static_cast<float>(pair.GetY()))
+  {
+  }
 
   // Constants
 
