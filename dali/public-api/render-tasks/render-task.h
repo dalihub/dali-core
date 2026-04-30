@@ -26,6 +26,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -182,6 +183,22 @@ public:
     REFRESH_ALWAYS = 1  ///< Process every frame. @SINCE_1_0.0
   };
 
+  enum class BuiltinCameraType
+  {
+    ATTACHED_TO_SCENE,         ///< Builtin camera attached to scene. @SINCE_2_5.21
+    ATTACHED_TO_SOURCE_ACTOR,  ///< Builtin camera attached to source actor. @SINCE_2_5.21
+    ATTACHED_TO_STOPPER_ACTOR, ///< Builtin camera attached to stopper actor, or source actor if stopper node not applied. @SINCE_2_5.21
+  };
+
+  enum class CameraActorType
+  {
+    DEFAULT,               ///< Default camera from RenderTaskList. @SINCE_2_5.21
+    USER,                  ///< CameraActor set by SetCameraActor. @SINCE_2_5.21
+    BUILTIN_SCENE,         ///< CameraActor set by SetBuiltinCameraActor with BuiltinCameraType::ATTACHED_TO_SCENE. @SINCE_2_5.21
+    BUILTIN_SOURCE_ACTOR,  ///< CameraActor set by SetBuiltinCameraActor with BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR. @SINCE_2_5.21
+    BUILTIN_STOPPER_ACTOR, ///< CameraActor set by SetBuiltinCameraActor with BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR. @SINCE_2_5.21
+  };
+
   static const bool     DEFAULT_EXCLUSIVE;     ///< false
   static const bool     DEFAULT_INPUT_ENABLED; ///< true
   static const Vector4  DEFAULT_CLEAR_COLOR;   ///< Color::BLACK
@@ -307,10 +324,35 @@ public:
 
   /**
    * @brief Sets the actor from which the scene is viewed.
+   *
+   * It will make CameraActorType::USER
+   * This is exclusive with SetBuiltinCameraActor - calling this will clear any built-in camera actor.
+   *
    * @SINCE_1_0.0
    * @param[in] cameraActor The scene is viewed from the perspective of this actor
    */
   void SetCameraActor(CameraActor cameraActor);
+
+  /**
+   * @brief Sets an internal built-in camera actor.
+   *
+   * This method creates an internal camera actor, looks at the center of it's parent.
+   * The camera uses the provided size for perspective projection via SetPerspectiveProjection.
+   *
+   * BuiltinCameraType decide where to be attached the camera actor.
+   * - BuiltinCameraType::ATTACHED_TO_SCENE attached to the root layer of the source actor.
+   * - BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR attached to the source actor.
+   * - BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR attached to the stopper actor.
+   *
+   * It will make CameraActorType::BUILTIN_SCENE, CameraActorType::BUILTIN_SOURCE_ACTOR, and CameraActorType::BUILTIN_STOPPER_ACTOR
+   * This is exclusive with SetCameraActor - calling this will clear any user-set camera actor.
+   *
+   * @SINCE_2_5.21
+   * @param[in] builtinCameraType The type of built-in camera actor. It will decide where will the camera be attached.
+   * @param[in] screenSize The size used for SetPerspectiveProjection of the internal camera.
+   * @param[in] cameraPropertyMap The extra properties for the internal camera. For example, InvertY, or offset from center of parent.
+   */
+  void SetBuiltinCameraActor(BuiltinCameraType builtinCameraType, Dali::Size screenSize, const Dali::Property::Map& cameraPropertyMap = Dali::Property::Map());
 
   /**
    * @brief Retrieves the actor from which the scene is viewed.
@@ -318,6 +360,14 @@ public:
    * @return The scene is viewed from the perspective of this actor
    */
   CameraActor GetCameraActor() const;
+
+  /**
+   * @brief Retrieves the type of camera actor.
+   *
+   * @SINCE_2_5.21
+   * @return The type of camera actor for the render task.
+   */
+  CameraActorType GetCameraActorType() const;
 
   /**
    * @brief Sets the frame-buffer used as a render target.
