@@ -103,9 +103,19 @@ public:
   void SetCameraActor(CameraActor* cameraActor);
 
   /**
+   * @copydoc Dali::RenderTask::SetBuiltinCameraActor
+   */
+  void SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType builtinCameraType, Dali::Size screenSize, const Dali::Property::Map& cameraPropertyMap);
+
+  /**
    * @copydoc Dali::RenderTask::GetCameraActor()
    */
   CameraActor* GetCameraActor() const;
+
+  /**
+   * @copydoc Dali::RenderTask::GetCameraActorType()
+   */
+  Dali::RenderTask::CameraActorType GetCameraActorType() const;
 
   /**
    * @copydoc Dali::RenderTask::SetFrameBuffer()
@@ -326,6 +336,24 @@ public:
    */
   Dali::PixelData GetRenderResult();
 
+private:
+  /**
+   * @brief Clears the internal camera actor, without change camera actor type.
+   */
+  void ClearInternalCameraActor();
+
+  /**
+   * @brief Actually logis to set the camera actor, without change camera actor type.
+   * @param cameraActor The camera actor to set, or nullptr to clear the camera actor
+   */
+  void SetCameraActorInternal(CameraActor* cameraActor);
+
+  /**
+   * @brief Change the camera actor type
+   * @param cameraActorType The new camera actor type.
+   */
+  void SetCameraActorType(Dali::RenderTask::CameraActorType cameraActorType);
+
 public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
   /**
    * Retrieve the scene-graph RenderTask object.
@@ -434,6 +462,8 @@ private:
   WeakHandle<Dali::Actor> mInputMappingActor;  /// used to mapping screen to frame buffer coordinate, not kept alive by rendertask
   RenderTaskList&         mRenderTaskList;     ///< The render task list
 
+  Dali::RenderTask::CameraActorType mCameraActorType;
+
   Vector4 mClearColor; ///< Optional clear color
 
   Vector2 mViewportPosition; ///< The cached viewport position
@@ -460,6 +490,10 @@ private:
   bool mClearEnabled : 1; ///< True if the render-task should be clear the color buffer.
   bool mCullMode : 1;     ///< True if the render-task's actors should be culled
   bool mRequiresSync : 1; ///< True if the GL sync is required to track the render of.
+
+  // Internal camera tracking
+  struct InternalCameraContext;
+  std::unique_ptr<InternalCameraContext> mInternalCameraContext; ///< Context for internal built-in camera
 
   // Signals
   Dali::RenderTask::RenderTaskSignalType mSignalFinished; ///< Signal emmited when the render task has been processed.
