@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <vector>
 
 // Temp include
 #include <dali/public-api/object/any.h>
@@ -91,7 +92,7 @@ int UtcDaliAnyConstructors(void)
   // Test default constructor.
   Any value;
 
-  DALI_TEST_CHECK(typeid(void) == value.GetType());
+  DALI_TEST_CHECK(!value.GetType().IsValid());
 
   // Test constructor Any( const Type& )
   Any value1 = 4u;
@@ -105,17 +106,17 @@ int UtcDaliAnyConstructors(void)
   // Test constructor Any( Any&& ) with a non initialized Any
   Any value4(Any(MyStruct(1.0f, 2)));
 
-  DALI_TEST_CHECK(typeid(unsigned int) == value1.GetType());
-  DALI_TEST_CHECK(typeid(unsigned int) == value2.GetType());
-  DALI_TEST_CHECK(typeid(void) == value3.GetType());
-  DALI_TEST_CHECK(typeid(MyStruct) == value4.GetType());
+  DALI_TEST_CHECK(value1.IsType<unsigned int>());
+  DALI_TEST_CHECK(value2.IsType<unsigned int>());
+  DALI_TEST_CHECK(!value3.GetType().IsValid());
+  DALI_TEST_CHECK(value4.IsType<MyStruct>());
   DALI_TEST_CHECK(gRefCount == 1);
 
   // Test std::move operation result.
   Any value5(std::move(value4));
 
   DALI_TEST_CHECK(value4.Empty());
-  DALI_TEST_CHECK(typeid(MyStruct) == value5.GetType());
+  DALI_TEST_CHECK(value5.IsType<MyStruct>());
   DALI_TEST_CHECK(gRefCount == 1);
 
   unsigned int uiValue1 = 0u;
@@ -205,24 +206,24 @@ int UtcDaliAnyAssignmentOperators(void)
   // Do something to above compiler optimize out
   Any value8 = value3;
 
-  DALI_TEST_CHECK(typeid(float) == value8.GetType());
+  DALI_TEST_CHECK(value8.IsType<float>());
 
   // Test operator=( Any&& ).
   value8 = Any(MyStruct(3.0f, 4));
 
-  DALI_TEST_CHECK(typeid(MyStruct) == value8.GetType());
+  DALI_TEST_CHECK(value8.IsType<MyStruct>());
   DALI_TEST_CHECK(gRefCount == 1);
 
   // Do something to above compiler optimize out
   Any value9 = value3;
 
-  DALI_TEST_CHECK(typeid(float) == value9.GetType());
+  DALI_TEST_CHECK(value9.IsType<float>());
 
   // Test std::move operation result.
   value9 = std::move(value8);
 
   DALI_TEST_CHECK(value8.Empty());
-  DALI_TEST_CHECK(typeid(MyStruct) == value9.GetType());
+  DALI_TEST_CHECK(value9.IsType<MyStruct>());
   DALI_TEST_CHECK(gRefCount == 1);
 
   MyStruct myValue;
@@ -273,12 +274,11 @@ int UtcDaliAnyGetType(void)
   tet_infoline("Test GetType().");
 
   Any value;
-
-  DALI_TEST_CHECK(typeid(void) == value.GetType());
+  DALI_TEST_CHECK(!value.GetType().IsValid());
 
   value = 5.f;
 
-  DALI_TEST_CHECK(typeid(float) == value.GetType());
+  DALI_TEST_CHECK(value.IsType<float>());
   END_TEST;
 }
 
@@ -453,6 +453,174 @@ int UtcDaliAnyReferenceCheck(void)
 
   // Check whether all Dali::Any are released
   DALI_TEST_EQUALS(gRefCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoIdBasic(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test TypeInfoId basic functionality.");
+
+  // Test default constructor (void type)
+  TypeInfoId voidType;
+  DALI_TEST_CHECK(!voidType.IsValid());
+  DALI_TEST_EQUALS(voidType.GetName(), "void", TEST_LOCATION);
+  DALI_TEST_EQUALS(voidType.GetId(), 0u, TEST_LOCATION);
+
+  // Test constructor with id and name
+  TypeInfoId intType(12345, "int");
+  DALI_TEST_CHECK(intType.IsValid());
+  DALI_TEST_EQUALS(intType.GetName(), "int", TEST_LOCATION);
+  DALI_TEST_EQUALS(intType.GetId(), 12345u, TEST_LOCATION);
+
+  // Test equality operator
+  TypeInfoId intType2(12345, "int");
+  TypeInfoId floatType(67890, "float");
+  DALI_TEST_CHECK(intType == intType2);
+  DALI_TEST_CHECK(intType != floatType);
+  DALI_TEST_CHECK(intType != voidType);
+
+  // Test inequality operator
+  DALI_TEST_CHECK(!(intType != intType2));
+  DALI_TEST_CHECK(intType != floatType);
+
+  // Test equality operator when one has null name (void) and other has valid name
+  // This covers the branch: if(!mName || !other.mName) return false;
+  TypeInfoId validType(0, "someType"); // hash 0 but valid name
+  DALI_TEST_CHECK(voidType != validType);
+  DALI_TEST_CHECK(validType != voidType);
+
+  // Test equality with same hash but different names (collision case)
+  // This covers the strcmp fallback branch
+  TypeInfoId collision1(99999, "TypeA");
+  TypeInfoId collision2(99999, "TypeB");
+  DALI_TEST_CHECK(collision1 != collision2); // Same hash, different names
+
+  // Test equality with same hash and same name pointer
+  TypeInfoId sameRef = collision1;
+  DALI_TEST_CHECK(collision1 == sameRef); // Same pointer path
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoIdMacro(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test DALI_TYPE_ID macro.");
+
+  // Test DALI_TYPE_ID for primitive types
+  TypeInfoId intType = DALI_TYPE_ID(int);
+  DALI_TEST_CHECK(intType.IsValid());
+  DALI_TEST_EQUALS(intType.GetName(), "int", TEST_LOCATION);
+
+  TypeInfoId floatType = DALI_TYPE_ID(float);
+  DALI_TEST_CHECK(floatType.IsValid());
+  DALI_TEST_EQUALS(floatType.GetName(), "float", TEST_LOCATION);
+
+  // Different types should have different IDs
+  DALI_TEST_CHECK(intType != floatType);
+
+  // Same type should produce same TypeInfoId
+  TypeInfoId intType2 = DALI_TYPE_ID(int);
+  DALI_TEST_CHECK(intType == intType2);
+
+  // Test DALI_TYPE_ID for namespaced type
+  TypeInfoId actorType = DALI_TYPE_ID(Dali::Actor);
+  DALI_TEST_CHECK(actorType.IsValid());
+  DALI_TEST_EQUALS(actorType.GetName(), "Dali::Actor", TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoIdAlias(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test DALI_TYPE_ID_ALIAS macro.");
+
+  // Test DALI_TYPE_ID_ALIAS for complex types
+  TypeInfoId vectorType = DALI_TYPE_ID_ALIAS(std::vector<int>, "std::vector<int>");
+  DALI_TEST_CHECK(vectorType.IsValid());
+  DALI_TEST_EQUALS(vectorType.GetName(), "std::vector<int>", TEST_LOCATION);
+
+  // Same alias should produce same TypeInfoId
+  TypeInfoId vectorType2 = DALI_TYPE_ID_ALIAS(std::vector<int>, "std::vector<int>");
+  DALI_TEST_CHECK(vectorType == vectorType2);
+
+  // Different aliases should produce different TypeInfoIds
+  TypeInfoId stringType = DALI_TYPE_ID_ALIAS(std::string, "std::string");
+  DALI_TEST_CHECK(vectorType != stringType);
+
+  END_TEST;
+}
+
+int UtcDaliHashFNV1a(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test HashFNV1a function.");
+
+  // Test that same input produces same hash
+  uint32_t hash1 = HashFNV1a("int");
+  uint32_t hash2 = HashFNV1a("int");
+  DALI_TEST_EQUALS(hash1, hash2, TEST_LOCATION);
+
+  // Test that different inputs produce different hashes
+  uint32_t hash3 = HashFNV1a("float");
+  DALI_TEST_CHECK(hash1 != hash3);
+
+  // Test empty string
+  uint32_t hashEmpty = HashFNV1a("");
+  DALI_TEST_CHECK(hashEmpty != 0u); // FNV offset basis
+
+  // Test that hash is deterministic
+  DALI_TEST_EQUALS(HashFNV1a("Dali::Actor"), HashFNV1a("Dali::Actor"), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnyIsType(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test Any::IsType<T>.");
+
+  // Test on empty Any
+  Any emptyAny;
+  DALI_TEST_CHECK(!emptyAny.IsType<int>());
+  DALI_TEST_CHECK(!emptyAny.IsType<float>());
+
+  // Test on Any with int
+  Any intAny = 42;
+  DALI_TEST_CHECK(intAny.IsType<int>());
+  DALI_TEST_CHECK(!intAny.IsType<float>());
+  DALI_TEST_CHECK(!intAny.IsType<unsigned int>());
+
+  // Test on Any with float
+  Any floatAny = 3.14f;
+  DALI_TEST_CHECK(floatAny.IsType<float>());
+  DALI_TEST_CHECK(!floatAny.IsType<int>());
+  DALI_TEST_CHECK(!floatAny.IsType<double>());
+
+  // Test on Any with custom type
+  Any structAny = MyStruct(1.0f, 2);
+  DALI_TEST_CHECK(structAny.IsType<MyStruct>());
+  DALI_TEST_CHECK(!structAny.IsType<int>());
+
+  // Test that IsType works correctly before AnyCast
+  Any value = 42;
+  if(value.IsType<int>())
+  {
+    int intValue = AnyCast<int>(value);
+    DALI_TEST_EQUALS(intValue, 42, TEST_LOCATION);
+  }
+  else
+  {
+    tet_result(TET_FAIL);
+  }
 
   END_TEST;
 }

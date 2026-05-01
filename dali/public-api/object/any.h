@@ -24,6 +24,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/object/type-info-id.h>
 
 namespace Dali
 {
@@ -42,7 +44,7 @@ namespace Dali
  * Any strVariable( Dali::String( "Hello world" ) );
  * uintVariable = 1u;
  * uint32_t variable = AnyCast< uint32_t >( uintVariable );
- * if ( typeid( int ) == uintVariable.GetType() )
+ * if ( uintVariable.IsType< int >() )
  * \endcode
  * @SINCE_1_0.0
  */
@@ -132,7 +134,7 @@ public:
     else
     {
       // Check to see if this type is compatible with current container?
-      if(mContainer->GetType() == typeid(Type))
+      if(mContainer->GetType() == TypeInfoIdFromTypeid<Type>())
       {
         // Same type so just set the new value
         static_cast<AnyContainerImpl<Type>*>(mContainer)->SetValue(value);
@@ -179,13 +181,53 @@ public:
   }
 
   /**
-   * @brief Returns the type info of the stored value.
+   * @brief Returns the type identifier of the stored value.
    *
    * @SINCE_1_0.0
-   * @return The std::type_info of the stored value or the type info of the void
-   * type if there is no value stored
+   * @return The TypeInfoId of the stored value, or a default-constructed
+   * TypeInfoId (representing void) if there is no value stored
    */
-  DALI_CORE_API const std::type_info& GetType() const;
+  DALI_CORE_API const TypeInfoId& GetType() const;
+
+  /**
+   * @brief Checks if the stored value is of type T.
+   *
+   * This method provides a type-safe way to query the type of the stored value
+   * without using RTTI directly. It is the recommended way to check types
+   * before calling Get\<T\>() or AnyCast\<T\>() to avoid exceptions.
+   *
+   * @note Use this method instead of comparing GetType() with DALI_TYPE_ID(T).
+   * The IsType\<T\>() method handles the type name resolution internally and
+   * works correctly even when T is a template parameter.
+   *
+   * Typical use cases:
+   * - Checking if an Any value can be safely retrieved as a specific type
+   * - Implementing type-safe visitors for Any values
+   * - Conditional processing based on the stored type
+   *
+   * Example:
+   * \code{.cpp}
+   * Any value = 42;
+   * if(value.IsType<int>())
+   * {
+   *   int intValue = AnyCast<int>(value);  // Safe, no exception
+   * }
+   * else if(value.IsType<float>())
+   * {
+   *   float floatValue = AnyCast<float>(value);
+   * }
+   * \endcode
+   *
+   * @SINCE_2_5.21
+   * @tparam T The type to check against
+   * @return true if the stored value is of type T, false otherwise (including if empty)
+   */
+  template<typename T>
+  bool IsType() const
+  {
+    if(!mContainer) return false;
+    return mContainer->GetType() == TypeInfoIdFromTypeid<T>();
+  }
 
   /**
    * @brief Retrieves the stored value in the Any type.
@@ -200,7 +242,7 @@ public:
     {
       AssertAlways("Any::Get(). mContainer is NULL");
     }
-    else if(mContainer->GetType() != typeid(Type)) // Check if the value has the same value than the Any type.
+    else if(mContainer->GetType() != TypeInfoIdFromTypeid<Type>()) // Check if the value has the same value than the Any type.
     {
       AssertAlways("Any::Get(). Trying to retrieve a value of a different type than the template one.");
     }
@@ -221,7 +263,7 @@ public:
       return NULL;
     }
     // Check if the value has the same value than the Any type.
-    if(mContainer->GetType() != typeid(Type))
+    if(mContainer->GetType() != TypeInfoIdFromTypeid<Type>())
     {
       AssertAlways("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
     }
@@ -242,7 +284,7 @@ public:
       return NULL;
     }
     // Check if the value has the same value than the Any type.
-    if(mContainer->GetType() != typeid(Type))
+    if(mContainer->GetType() != TypeInfoIdFromTypeid<Type>())
     {
       AssertAlways("Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one.");
     }
@@ -276,11 +318,11 @@ public:
      * @brief Constructor of base container.
      *
      * @SINCE_1_0.0
-     * @param[in] type typeid of container
+     * @param[in] type TypeInfoId of container
      * @param[in] cloneFunc Cloning function to replicate this container type
      * @param[in] deleteFunc Deleting function to destroy this container type
      */
-    AnyContainerBase(const std::type_info& type, CloneFunc cloneFunc, DeleteFunc deleteFunc)
+    AnyContainerBase(TypeInfoId type, CloneFunc cloneFunc, DeleteFunc deleteFunc)
     : mType(type),
       mCloneFunc(cloneFunc),
       mDeleteFunc(deleteFunc)
@@ -288,19 +330,19 @@ public:
     }
 
     /**
-     * @brief Gets the typeid of this container.
+     * @brief Gets the TypeInfoId of this container.
      *
      * @SINCE_1_0.0
      * @return Type
      */
-    const std::type_info& GetType() const
+    const TypeInfoId& GetType() const
     {
       return mType;
     }
 
-    const ::std::type_info& mType;       // typeID
-    CloneFunc               mCloneFunc;  // cloning function for this container
-    DeleteFunc              mDeleteFunc; // deleting function for this container
+    TypeInfoId mType;       // typeID
+    CloneFunc  mCloneFunc;  // cloning function for this container
+    DeleteFunc mDeleteFunc; // deleting function for this container
   };
 
   /**
@@ -349,7 +391,7 @@ public:
      * @param[in] value Value of Type
      */
     AnyContainerImpl(const Type& value)
-    : AnyContainerBase(typeid(Type),
+    : AnyContainerBase(TypeInfoIdFromTypeid<Type>(),
                        static_cast<CloneFunc>(&AnyContainerImplCloner<Type>::Clone),
                        static_cast<DeleteFunc>(&AnyContainerImplDelete<Type>::Delete)),
       mValue(value)
@@ -363,7 +405,7 @@ public:
      * @param[in] base The reference to base container to copy from
      */
     AnyContainerImpl(const AnyContainerBase& base)
-    : AnyContainerBase(typeid(Type),
+    : AnyContainerBase(TypeInfoIdFromTypeid<Type>(),
                        static_cast<CloneFunc>(&AnyContainerImplCloner<Type>::Clone),
                        static_cast<DeleteFunc>(&AnyContainerImplDelete<Type>::Delete))
     {
@@ -419,6 +461,52 @@ public:
   };
 
 private:
+  /// @cond internal
+  /**
+   * @brief Demangles a typeid name to a human-readable class name.
+   *
+   * @note DALI_CORE_API is required because this is called by the inline
+   * template TypeInfoIdFromTypeid<T>(), which is instantiated in user code.
+   * On Windows DLLs, the symbol must be exported for the linker to find it.
+   * Without DALI_CORE_API, user code calling IsType<T>() or AnyCast<T>()
+   * would fail to link on Windows.
+   *
+   * @param[in] mangledName The mangled type name (e.g., from typeid(T).name())
+   * @return The demangled, human-readable type name
+   */
+  static DALI_CORE_API Dali::String DemangleTypeName(const char* mangledName);
+
+  /**
+   * @brief Constructs a TypeInfoId from typeid(T), with proper demangling.
+   *
+   * This helper is used by the Any class template methods where Type is a
+   * template parameter and DALI_TYPE_ID(Type) cannot be used (because the
+   * preprocessor cannot stringify a template parameter).
+   *
+   * The demangled name is cached per-type per-translation-unit (static local)
+   * to avoid repeated demangling calls. The cost is paid once on the first
+   * Any<T> construction in each translation unit; subsequent calls in that
+   * TU are a single load of a static reference. The const char* stored in
+   * the returned TypeInfoId points into the static Dali::String buffer,
+   * which has program-lifetime storage duration.
+   *
+   * Demangling consistency: on GCC, typeid(int).name() returns "i" (mangled).
+   * DemangleTypeName converts this to "int", which matches what
+   * DALI_TYPE_ID(int) produces via \#Type stringification. This ensures
+   * that TypeInfoIdFromTypeid\<int\>() == DALI_TYPE_ID(int).
+   *
+   * @tparam T The C++ type to create a TypeInfoId for
+   * @return A const reference to a cached TypeInfoId representing type T
+   */
+  template<typename T>
+  static const TypeInfoId& TypeInfoIdFromTypeid()
+  {
+    static const Dali::String demangledName = DemangleTypeName(typeid(T).name());
+    static const TypeInfoId   cached(Dali::HashFNV1a(demangledName.CStr()), demangledName.CStr());
+    return cached;
+  }
+  /// @endcond
+
   AnyContainerBase* mContainer;
 };
 
