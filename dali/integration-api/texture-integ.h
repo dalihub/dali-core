@@ -94,19 +94,40 @@ enum Type
 
   FAST_TRACK_IMAGE = 1020, ///< Fast track image
 
-  NPATCH_IMAGE        = 1100, ///< NPatch image
-  SVG_IMAGE           = 1200, ///< SVG image
-  NATIVE_IMAGE        = 1300, ///< Standard native image
-  NATIVE_LOTTIE_IMAGE = 1301, ///< Lottie as native image
+  NPATCH_IMAGE = 1100, ///< NPatch image
+  SVG_IMAGE    = 1200, ///< SVG image
 
   // Text (2xxx)
   TEXT_SIMPLE_LABEL = 2000, ///< Text for simple label
   TEXT_SCROLL       = 2001, ///< Text for scroll
   TEXT_ATLAS        = 2100, ///< Text atlas (Editor / Field)
 
-  // ETC (3xxx ~ 9999)
-  EXTERNAL_IMAGE   = 3000, ///< External image from GenerateUrl()
-  GRADIENT_TEXTURE = 3100, ///< Gradient texture
+  // Native image (3xxx)
+  NATIVE_IMAGE        = 3000, ///< Standard native image
+  NATIVE_LOTTIE_IMAGE = 3100, ///< Lottie as native image
+
+  // FBO attached texture (4xxx)
+  FBO_ATTACHED_COLOR_TEXTURE         = 4000, ///< Texture attached to FBO
+  FBO_ATTACHED_DEPTH_TEXTURE         = 4100, ///< Depth texture attached to FBO
+  FBO_ATTACHED_DEPTH_STENCIL_TEXTURE = 4200, ///< Depth stencil texture attached to FBO
+
+  // Scene3D (5xxx)
+  SCENE3D_STANDARD_IMAGE = 5000, ///< Standard image for Scene3D
+  SCENE3D_BUFFER_IMAGE   = 5001, ///< Buffer image for Scene3D
+
+  SCENE3D_DEFAULT_WHITE      = 5010, ///< Global default white texture for Scene3D
+  SCENE3D_DEFAULT_WHITE_CUBE = 5011, ///< Global default white cube texture for Scene3D
+  SCENE3D_DEFAULT_BRDF       = 5020, ///< Global default brdf texture for Scene3D
+
+  SCENE3D_ENVIRONMENT_CUBEMAP         = 5100, ///< Environment map for Scene3D, as cubemap and 2d environment map
+  SCENE3D_ENVIRONMENT_EQUIRECTANGULAR = 5101, ///< Environment map for Scene3D, for equirectangular projection
+
+  SCENE3D_MATERIAL_IMAGE = 5200, ///< Material texture for Scene3D, like base color, metallic roughness, normal, etc
+
+  // ETC (6xxx ~ 9999)
+  EXTERNAL_IMAGE          = 6000, ///< External image from GenerateUrl()
+  GRADIENT_TEXTURE        = 6100, ///< Gradient texture
+  SCENE3D_BLENDSHAPE_DATA = 6500, ///< Data exture for Scene3D blend shape
 
   // End marker
   END_OF_DALI_TEXTURES = 9999 ///< End of Dali generated textures

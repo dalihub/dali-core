@@ -138,6 +138,9 @@ inline void PrintTotalMemory()
     // Collect the result first.
     static MemoryInfoCollector sImageCollector("Image");
     static MemoryInfoCollector sTextCollector("Text");
+    static MemoryInfoCollector sNativeImageCollector("Native Image");
+    static MemoryInfoCollector sFBOAttachedTextureCollector("FBO Attached Texture");
+    static MemoryInfoCollector sScene3DCollector("Scene3D");
     static MemoryInfoCollector sDaliEtcCollector("ETC (DALi)");
     static MemoryInfoCollector sOuterEtcCollector("ETC");
     static MemoryInfoCollector sUnknownCollector{};
@@ -162,10 +165,22 @@ inline void PrintTotalMemory()
           sTextCollector.Insert(*iter);
           break;
         }
-        case 3: // ETC (3xxx) ~ End of dali(9999)
-        case 4:
-        case 5:
-        case 6:
+        case 3: // Native image (3xxx)
+        {
+          sNativeImageCollector.Insert(*iter);
+          break;
+        }
+        case 4: // FBO attached texture (4xxx)
+        {
+          sFBOAttachedTextureCollector.Insert(*iter);
+          break;
+        }
+        case 5: // Scene3D (5xxx)
+        {
+          sScene3DCollector.Insert(*iter);
+          break;
+        }
+        case 6: // ETC (6xxx) ~ End of dali(9999)
         case 7:
         case 8:
         case 9:
@@ -186,6 +201,9 @@ inline void PrintTotalMemory()
 
     sImageCollector.PrintAndClear();
     sTextCollector.PrintAndClear();
+    sNativeImageCollector.PrintAndClear();
+    sFBOAttachedTextureCollector.PrintAndClear();
+    sScene3DCollector.PrintAndClear();
     sDaliEtcCollector.PrintAndClear();
     sOuterEtcCollector.PrintAndClear();
     sUnknownCollector.PrintAndClear();
