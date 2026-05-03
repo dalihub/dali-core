@@ -140,12 +140,14 @@ enum Type
  *       In that case, pixelData only be used for get BytesPerPixel value.
  *
  * @param[in] texture The texture to upload data to.
- * @param[in] pixelData The pixelData object
+ * @param[in] pixelData The pixelData object. If empty handle, only context will be updated without actual upload.
  * @param[in] context The context of the uploaded data
  * @param[in] typeHint Specifies hint for the texture which kind of image uploaded (optional)
+ * @param[in] updateContextOnly Whether to only update the context without actual upload (optional)
+ * @param[in] keepPreviousContext Whether to keep previous context when update context (optional)
  * @return True if the PixelData object has compatible pixel format and fits within the texture, false otherwise
  */
-DALI_CORE_API bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String context, TextureContextTypeHint::Type typeHint = TextureContextTypeHint::UNKNOWN);
+DALI_CORE_API bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String context, TextureContextTypeHint::Type typeHint = TextureContextTypeHint::UNKNOWN, bool updateContextOnly = false, bool keepPreviousContext = false);
 
 } // namespace Dali::Integration
 

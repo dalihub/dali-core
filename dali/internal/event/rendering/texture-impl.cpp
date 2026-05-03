@@ -406,25 +406,38 @@ std::string                                     gContext{};
 } //namespace
 #endif
 
-bool Texture::Upload(PixelDataPtr pixelData, std::string context, Dali::Integration::TextureContextTypeHint::Type typeHint)
+bool Texture::Upload(PixelDataPtr pixelData, std::string context, Dali::Integration::TextureContextTypeHint::Type typeHint, bool updateContextOnly, bool keepPreviousContext)
 {
-  if(mNativeImage || mResourceId != 0u)
+  if(mNativeImage || mResourceId != 0u || DALI_UNLIKELY(!pixelData) || DALI_UNLIKELY(updateContextOnly))
   {
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
     // Change stored memory data and memory info here, To change newest data of native / resouces.
     // PixelData only be used for get hint of pixel format.
+    gTypeHint = typeHint;
+    gContext  = std::move(context);
     if(mMemoryInfo)
     {
+      if(keepPreviousContext)
+      {
+        gTypeHint = mMemoryInfo->mTypeHint;
+        gContext  = mMemoryInfo->mContext;
+      }
       mMemoryInfo->Destroy(false);
     }
-    mMemoryInfo.reset(new TextureMemoryInfo(typeHint, context, mSize.GetWidth(), mSize.GetHeight(), Pixel::GetBytesPerPixel(pixelData->GetPixelFormat())));
+    mMemoryInfo.reset(new TextureMemoryInfo(gTypeHint, std::move(gContext), mSize.GetWidth(), mSize.GetHeight(), Pixel::GetBytesPerPixel(pixelData ? pixelData->GetPixelFormat() : mFormat)));
+
+    gTypeHint = Dali::Integration::TextureContextTypeHint::UNKNOWN;
+    gContext  = std::string();
 #endif
     return false;
   }
 
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
-  gTypeHint   = typeHint;
-  gContext    = std::move(context);
+  if(!keepPreviousContext)
+  {
+    gTypeHint = typeHint;
+    gContext  = std::move(context);
+  }
   bool result = Upload(pixelData);
   gTypeHint   = Dali::Integration::TextureContextTypeHint::UNKNOWN;
   gContext    = std::string();
