@@ -95,14 +95,14 @@ int UtcSignalConnectionPoolBlockGrowth(void)
   DALI_TEST_EQUALS(block1->mCapacity, 4u, TEST_LOCATION);
 
   // Fill block 1 (3 more to fill remaining 3 of 4)
-  pool.Allocate(MakeCallback(&StaticVoidCallback));
-  pool.Allocate(MakeCallback(&StaticVoidCallback));
-  pool.Allocate(MakeCallback(&StaticVoidCallback));
+  auto* c3 = pool.Allocate(MakeCallback(&StaticVoidCallback));
+  auto* c4 = pool.Allocate(MakeCallback(&StaticVoidCallback));
+  auto* c5 = pool.Allocate(MakeCallback(&StaticVoidCallback));
   DALI_TEST_EQUALS(pool.GetBlockCount(), 2u, TEST_LOCATION);
   DALI_TEST_EQUALS(block1->mHighWaterMark, 4u, TEST_LOCATION);
 
   // Next triggers block 2 (capacity 8)
-  pool.Allocate(MakeCallback(&StaticVoidCallback));
+  auto* c6 = pool.Allocate(MakeCallback(&StaticVoidCallback));
   DALI_TEST_EQUALS(pool.GetBlockCount(), 3u, TEST_LOCATION);
 
   auto* block2 = block1->mNext;
@@ -113,8 +113,10 @@ int UtcSignalConnectionPoolBlockGrowth(void)
   pool.Free(c0);
   pool.Free(c1);
   pool.Free(c2);
-  // Remaining 4 connections are still live — pool destructor frees block memory.
-  // (In real usage, ~BaseSignal disconnects all live connections before pool destruction.)
+  pool.Free(c3);
+  pool.Free(c4);
+  pool.Free(c5);
+  pool.Free(c6);
 
   END_TEST;
 }
@@ -409,10 +411,10 @@ int UtcSignalConnectionPoolHighWaterMark(void)
   pool.Free(c1);
   DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
 
-  pool.Allocate(MakeCallback(&StaticVoidCallback));
+  auto* c2 = pool.Allocate(MakeCallback(&StaticVoidCallback));
   DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
 
-  pool.Allocate(MakeCallback(&StaticVoidCallback));
+  auto* c3 = pool.Allocate(MakeCallback(&StaticVoidCallback));
   DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
 
   // Third alloc — free list empty, block full — triggers new block
@@ -420,7 +422,38 @@ int UtcSignalConnectionPoolHighWaterMark(void)
   DALI_TEST_EQUALS(pool.GetBlockCount(), 2u, TEST_LOCATION);
   DALI_TEST_EQUALS(pool.GetFirstBlock()->mNext->mHighWaterMark, 1u, TEST_LOCATION);
 
+  // Free and reallocate — high water mark should NOT decrease (recycled from free list)
   pool.Free(c4);
+  DALI_TEST_EQUALS(pool.GetBlockCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mNext->mHighWaterMark, 1u, TEST_LOCATION);
+
+  auto* c5 = pool.Allocate(MakeCallback(&StaticVoidCallback));
+  DALI_TEST_EQUALS(pool.GetBlockCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mNext->mHighWaterMark, 1u, TEST_LOCATION);
+
+  pool.Free(c2);
+  DALI_TEST_EQUALS(pool.GetBlockCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mNext->mHighWaterMark, 1u, TEST_LOCATION);
+
+  // Reuse freed slot in block 0, should not affect block 1's high water mark
+  auto* c6 = pool.Allocate(MakeCallback(&StaticVoidCallback));
+  DALI_TEST_EQUALS(pool.GetBlockCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mNext->mHighWaterMark, 1u, TEST_LOCATION);
+
+  // Allocate again to trigger block 1 growth.
+  auto* c7 = pool.Allocate(MakeCallback(&StaticVoidCallback));
+  DALI_TEST_EQUALS(pool.GetBlockCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mHighWaterMark, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(pool.GetFirstBlock()->mNext->mHighWaterMark, 2u, TEST_LOCATION);
+
+  pool.Free(c3);
+  pool.Free(c5);
+  pool.Free(c6);
+  pool.Free(c7);
 
   END_TEST;
 }

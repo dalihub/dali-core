@@ -1129,9 +1129,9 @@ void Animation::AddAnimatorConnector(AnimatorConnectorBase* connector)
 {
   DALI_ASSERT_DEBUG(NULL != connector);
 
-  connector->SetParent(*this);
-
   mConnectors.PushBack(connector);
+
+  connector->SetParent(*this);
 
   // Send notify when animator connected during animation playing
   if(DALI_UNLIKELY(GetState() == Dali::Animation::PLAYING))

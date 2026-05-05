@@ -119,9 +119,15 @@ bool BaseObject::DoConnectSignal(ConnectionTrackerInterface* connectionTracker, 
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
-  if(registry)
+  if(DALI_LIKELY(registry))
   {
     return registry->ConnectSignal(this, connectionTracker, Integration::ToStdString(signalName), functorDelegate);
+  }
+  else
+  {
+    DALI_LOG_ERROR("TypeRegistry not available! signal '%.*s' connection failed \n", signalName.Size(), signalName.Data());
+    // Ownership of functorDelegate was not passed to Dali::CallbackBase, so clean-up now
+    delete functorDelegate;
   }
 
   return false;

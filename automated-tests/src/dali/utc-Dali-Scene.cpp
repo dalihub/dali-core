@@ -1595,6 +1595,8 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
   DALI_TEST_EQUALS(stage.GetSize(), stageSize, TEST_LOCATION);
   DALI_TEST_EQUALS(scene.GetSize(), newSize, TEST_LOCATION);
 
+  delete surface;
+
   END_TEST;
 }
 
