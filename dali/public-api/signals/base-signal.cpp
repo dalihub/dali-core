@@ -277,19 +277,25 @@ void BaseSignal::DeleteConnection(SignalConnectionNode* node)
     // CleanupConnections will unlink and free after Emit.
     node->connection = SignalConnection{nullptr};
     ++mNullCount;
+    --mActiveCount;
   }
   else
   {
-    // Unlink from emission-order list before freeing.
-    UnlinkFromEmitList(node);
+    // Reduce active count before freeing.
+    --mActiveCount;
+
     // Not emitting: move the connection out before freeing. This prevents
     // cascading destruction (if the callback owns the last handle to the object
     // that owns this signal) from happening while Free() is modifying the pool.
     SignalConnection moved(std::move(node->connection));
+
+    // Unlink from emission-order list before freeing.
+    UnlinkFromEmitList(node);
+
     mPool.Free(node); // Frees a null node — destructor is a no-op
+
     // 'moved' destructor runs here — may cascade, but pool is in a consistent state.
   }
-  --mActiveCount;
 }
 
 void BaseSignal::CleanupConnections()
