@@ -86,7 +86,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const PanGesture& pan)
+  void operator()(Actor actor, PanGesture pan)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = pan;
@@ -115,7 +115,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const PanGesture& pan)
+  void operator()(Actor actor, PanGesture pan)
   {
     GestureReceivedFunctor::operator()(actor, pan);
 
@@ -138,7 +138,7 @@ struct PropagationActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const PanGesture& pan)
+  void operator()(Actor actor, PanGesture pan)
   {
     GestureReceivedFunctor::operator()(actor, pan);
     Dali::DevelActor::SetNeedGesturePropagation(actor, propagation);
@@ -3024,7 +3024,7 @@ int UtcDaliPanGestureDisableDetectionDuringPanN(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(
     &application,
-    [&detector, &functorCalled](Actor actor, const PanGesture& pan)
+    [&detector, &functorCalled](Actor actor, PanGesture pan)
   {
     if(pan.GetState() == GestureState::FINISHED)
     {

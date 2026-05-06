@@ -85,10 +85,10 @@ class KeyEvent;
 class DALI_CORE_API Stage : public BaseHandle
 {
 public:
-  using KeyEventSignalType                = Signal<void(const KeyEvent&)>;   ///< Key event signal type
+  using KeyEventSignalType                = Signal<void(KeyEvent)>;   ///< Key event signal type
   using EventProcessingFinishedSignalType = Signal<void()>;                  ///< Event Processing finished signal type
-  using TouchEventSignalType              = Signal<void(const TouchEvent&)>; ///< Touch signal type
-  using WheelEventSignalType              = Signal<void(const WheelEvent&)>; ///< Wheel signal type
+  using TouchEventSignalType              = Signal<void(TouchEvent)>; ///< Touch signal type
+  using WheelEventSignalType              = Signal<void(WheelEvent)>; ///< Wheel signal type
   using ContextStatusSignal               = Signal<void()>;                  ///< Context status signal type
   using SceneCreatedSignalType            = Signal<void()>;                  ///< Scene created signal type
 
@@ -286,7 +286,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(const KeyEvent& event);
+   *   void YourCallbackName(KeyEvent event);
    * @endcode
    * @return The signal to connect to
    */
@@ -321,7 +321,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(const WheelEvent& event);
+   *   void YourCallbackName(WheelEvent event);
    * @endcode
    * @return The signal to connect to
    */

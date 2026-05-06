@@ -63,7 +63,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const LongPressGesture& pan)
+  void operator()(Actor actor, LongPressGesture pan)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = pan;

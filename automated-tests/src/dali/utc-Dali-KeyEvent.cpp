@@ -79,7 +79,7 @@ struct KeyEventReceivedFunctor
   {
   }
 
-  bool operator()(Actor actor, const KeyEvent& keyEvent)
+  bool operator()(Actor actor, KeyEvent keyEvent)
   {
     signalData.functorCalled    = true;
     signalData.receivedKeyEvent = keyEvent;

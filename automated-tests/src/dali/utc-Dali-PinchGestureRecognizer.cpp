@@ -62,7 +62,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const PinchGesture& pinch)
+  void operator()(Actor actor, PinchGesture pinch)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = pinch;

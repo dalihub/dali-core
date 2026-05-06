@@ -37,7 +37,7 @@ enum class Rendering
   CONTINUOUSLY, ///< Will render continuously.
 };
 
-using KeyEventGeneratedSignalType = Signal<bool(const KeyEvent&)>; ///< Stage key event generated signal type
+using KeyEventGeneratedSignalType = Signal<bool(KeyEvent)>; ///< Stage key event generated signal type
 
 /**
  * @brief The user would connect to this signal to get a KeyEvent when KeyEvent is generated.

@@ -125,7 +125,7 @@ struct KeyEventReceivedFunctor
   {
   }
 
-  bool operator()(const KeyEvent& keyEvent)
+  bool operator()(KeyEvent keyEvent)
   {
     signalData.functorCalled    = true;
     signalData.receivedKeyEvent = keyEvent;
@@ -179,7 +179,7 @@ struct TouchFunctor
     mRenderSurface = nullptr;
   }
 
-  void operator()(const TouchEvent& touch)
+  void operator()(TouchEvent touch)
   {
     signalData.functorCalled      = true;
     signalData.receivedTouchEvent = touch;
@@ -232,7 +232,7 @@ struct WheelEventReceivedFunctor
   {
   }
 
-  bool operator()(const WheelEvent& wheelEvent)
+  bool operator()(WheelEvent wheelEvent)
   {
     signalData.functorCalled      = true;
     signalData.receivedWheelEvent = wheelEvent;
@@ -270,7 +270,7 @@ struct KeyEventGeneratedReceivedFunctor
   {
   }
 
-  bool operator()(const KeyEvent& keyEvent)
+  bool operator()(KeyEvent keyEvent)
   {
     signalData.functorCalled    = true;
     signalData.receivedKeyEvent = keyEvent;
@@ -314,7 +314,7 @@ struct WheelEventGeneratedReceivedFunctor
   {
   }
 
-  bool operator()(const WheelEvent& wheelEvent)
+  bool operator()(WheelEvent wheelEvent)
   {
     signalData.functorCalled      = true;
     signalData.receivedWheelEvent = wheelEvent;
@@ -341,7 +341,7 @@ void GenerateTouch(TestApplication& application, PointState::Type state, const V
   application.ProcessEvent(touchEvent);
 }
 
-bool DummyTouchCallback(Actor actor, const TouchEvent& touch)
+bool DummyTouchCallback(Actor actor, TouchEvent touch)
 {
   return true;
 }

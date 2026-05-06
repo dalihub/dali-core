@@ -25,6 +25,9 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/hover-event.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>

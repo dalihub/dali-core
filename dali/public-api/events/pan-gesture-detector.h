@@ -91,7 +91,7 @@ public:
   };
 
   // Typedefs
-  using DetectedSignalType = Signal<void(Actor, const PanGesture&)>; ///< Pan gesture detected signal type @SINCE_1_0.0
+  using DetectedSignalType = Signal<void(Actor, PanGesture)>; ///< Pan gesture detected signal type @SINCE_1_0.0
 
   // Directional Pan
   using AngleThresholdPair = Dali::Pair<Radian, Radian>; ///< Range of angles for a direction @SINCE_1_0.0
@@ -352,7 +352,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( Actor actor, const PanGesture& gesture );
+   *   void YourCallbackName( Actor actor, PanGesture gesture );
    * @endcode
    * @SINCE_1_0.0
    * @return The signal to connect to

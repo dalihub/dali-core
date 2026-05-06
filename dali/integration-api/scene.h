@@ -89,11 +89,11 @@ public:
   };
 
   using EventProcessingFinishedSignalType = Signal<void()>;                        ///< Event Processing finished signal type
-  using KeyEventSignalType                = Signal<void(const Dali::KeyEvent&)>;   ///< Key event signal type
-  using KeyEventGeneratedSignalType       = Signal<bool(const Dali::KeyEvent&)>;   ///< key event generated signal type
-  using TouchEventSignalType              = Signal<void(const Dali::TouchEvent&)>; ///< Touch signal type
-  using WheelEventSignalType              = Signal<void(const Dali::WheelEvent&)>; ///< WheelEvent signal type
-  using WheelEventGeneratedSignalType     = Signal<bool(const Dali::WheelEvent&)>; ///< WheelEvent generated signal type
+  using KeyEventSignalType                = Signal<void(Dali::KeyEvent)>;   ///< Key event signal type
+  using KeyEventGeneratedSignalType       = Signal<bool(Dali::KeyEvent)>;   ///< key event generated signal type
+  using TouchEventSignalType              = Signal<void(Dali::TouchEvent)>; ///< Touch signal type
+  using WheelEventSignalType              = Signal<void(Dali::WheelEvent)>; ///< WheelEvent signal type
+  using WheelEventGeneratedSignalType     = Signal<bool(Dali::WheelEvent)>; ///< WheelEvent generated signal type
 
   using FrameCallbackContainer = std::vector<std::pair<std::unique_ptr<CallbackBase>, int32_t> >;
 
@@ -548,7 +548,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(const KeyEvent& event);
+   *   void YourCallbackName(KeyEvent event);
    * @endcode
    * @return The signal to connect to
    */
@@ -563,7 +563,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(const KeyEvent& event);
+   *   bool YourCallbackName(KeyEvent event);
    * @endcode
    *
    * @return The return is true if KeyEvent is consumed, otherwise false.
@@ -578,7 +578,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(const KeyEvent& event);
+   *   bool YourCallbackName(KeyEvent event);
    * @endcode
    *
    * @return The return is true if KeyEvent is consumed, otherwise false.
@@ -591,7 +591,7 @@ public:
    *
    * A Callback of the following type may be connected:
    * @code
-   *  bool YourCallbackName(const KeyEvent& event);
+   *  bool YourCallbackName(KeyEvent event);
    * @endcode
    *
    * @return The signal to connect to
@@ -620,7 +620,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(const WheelEvent& event);
+   *   void YourCallbackName(WheelEvent event);
    * @endcode
    * @return The signal to connect to
    */
@@ -636,7 +636,7 @@ public:
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(const WheelEvent& event);
+   *   bool YourCallbackName(WheelEvent event);
    * @endcode
    *
    * @return The return is true if WheelEvent is consumed, otherwise false.

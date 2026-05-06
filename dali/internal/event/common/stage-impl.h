@@ -210,17 +210,17 @@ public:
   /**
    * Callback for Internal::Scene KeyEventSignal signal
    */
-  void OnKeyEvent(const Dali::KeyEvent& event);
+  void OnKeyEvent(Dali::KeyEvent event);
 
   /**
    * Callback for Internal::Scene TouchedSignal signal
    */
-  void OnTouchEvent(const Dali::TouchEvent& touch);
+  void OnTouchEvent(Dali::TouchEvent touch);
 
   /**
    * Callback for Internal::Scene WheelEventSignal signal
    */
-  void OnWheelEvent(const Dali::WheelEvent& event);
+  void OnWheelEvent(Dali::WheelEvent event);
 
   /**
    * Used by the EventProcessor to emit key event signals.

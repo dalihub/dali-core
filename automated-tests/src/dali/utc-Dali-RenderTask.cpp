@@ -178,7 +178,7 @@ struct RenderTaskFinished
   {
   }
 
-  void operator()(RenderTask& renderTask)
+  void operator()(RenderTask renderTask)
   {
     finished = true;
   }
@@ -194,7 +194,7 @@ struct RenderTaskFinishedRemoveSource
   {
   }
 
-  void operator()(RenderTask& renderTask)
+  void operator()(RenderTask renderTask)
   {
     DALI_TEST_CHECK(finishedOnce == false);
     finished       = true;
@@ -215,7 +215,7 @@ struct RenderTaskFinishedRenderAgain
   {
   }
 
-  void operator()(RenderTask& renderTask)
+  void operator()(RenderTask renderTask)
   {
     DALI_TEST_CHECK(finishedOnce == false);
     finished     = true;

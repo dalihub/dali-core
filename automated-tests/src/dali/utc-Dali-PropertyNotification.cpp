@@ -37,7 +37,7 @@ namespace
 {
 static bool gCallBackCalled;
 
-static void TestCallback(PropertyNotification& source)
+static void TestCallback(PropertyNotification source)
 {
   gCallBackCalled = true;
 }
@@ -82,7 +82,7 @@ public:
     mNotification.Reset();
   }
 
-  void OnPropertyNotify(PropertyNotification& source)
+  void OnPropertyNotify(PropertyNotification source)
   {
     tet_infoline(" OnPropertyNotify");
     gCallBackCalled = true;
@@ -1180,7 +1180,7 @@ int UtcDaliPropertyNotificationVariableStep(void)
 }
 
 static bool gCallBack2Called = false;
-void        TestCallback2(PropertyNotification& source)
+void        TestCallback2(PropertyNotification source)
 {
   gCallBack2Called = true;
 }

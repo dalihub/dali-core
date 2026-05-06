@@ -38,7 +38,9 @@
 #include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 
@@ -283,7 +285,7 @@ void Stage::OnEventProcessingFinished()
   EmitEventProcessingFinishedSignal();
 }
 
-void Stage::OnKeyEvent(const Dali::KeyEvent& event)
+void Stage::OnKeyEvent(Dali::KeyEvent event)
 {
   bool consumed = EmitKeyEventGeneratedSignal(event);
   if(!consumed)
@@ -292,24 +294,24 @@ void Stage::OnKeyEvent(const Dali::KeyEvent& event)
   }
 }
 
-void Stage::OnTouchEvent(const Dali::TouchEvent& touch)
+void Stage::OnTouchEvent(Dali::TouchEvent touch)
 {
   EmitTouchedSignal(touch);
 }
 
-void Stage::OnWheelEvent(const Dali::WheelEvent& event)
+void Stage::OnWheelEvent(Dali::WheelEvent event)
 {
   EmitWheelEventSignal(event);
 }
 
-void Stage::EmitKeyEventSignal(const KeyEvent& event)
+void Stage::EmitKeyEventSignal(const Dali::KeyEvent& event)
 {
   // Emit the key event signal when no actor in the stage has gained the key input focus
 
   mKeyEventSignal.Emit(event);
 }
 
-bool Stage::EmitKeyEventGeneratedSignal(const KeyEvent& event)
+bool Stage::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)
 {
   // Emit the KeyEventGenerated signal when KeyEvent is generated
 
@@ -326,7 +328,7 @@ void Stage::EmitTouchedSignal(const Dali::TouchEvent& touch)
   mTouchedSignal.Emit(touch);
 }
 
-void Stage::EmitWheelEventSignal(const WheelEvent& event)
+void Stage::EmitWheelEventSignal(const Dali::WheelEvent& event)
 {
   // Emit the wheel event signal when no actor in the stage has gained the wheel input focus
 

@@ -361,7 +361,7 @@ void PanGestureDetector::OnActorDestroyed(Object& object)
   // Do nothing
 }
 
-bool PanGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
+bool PanGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
   return HandleEvent(actor, touch);
 }

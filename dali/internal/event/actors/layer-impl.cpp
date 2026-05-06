@@ -24,6 +24,7 @@
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/touch-event.h>
 
 #include <dali/integration-api/string-utils.h>
 
@@ -300,7 +301,7 @@ void Layer::SetTouchConsumed(bool consume)
   mTouchConsumed = consume;
 }
 
-bool Layer::OnTouched(Dali::Actor actor, const Dali::TouchEvent& touch)
+bool Layer::OnTouched(Dali::Actor actor, Dali::TouchEvent touch)
 {
   // This event is only called when mTouchConsumed is true. So touch always consumed.
   return true;

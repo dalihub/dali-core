@@ -82,7 +82,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const LongPressGesture& longPress)
+  void operator()(Actor actor, LongPressGesture longPress)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = longPress;
@@ -111,7 +111,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const LongPressGesture& longPress)
+  void operator()(Actor actor, LongPressGesture longPress)
   {
     GestureReceivedFunctor::operator()(actor, longPress);
 
@@ -1097,7 +1097,7 @@ int UtcDaliLongPressGestureDisableDetectionDuringLongPressN(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(
     &application,
-    [&detector, &functorCalled](Actor actor, const LongPressGesture& gesture)
+    [&detector, &functorCalled](Actor actor, LongPressGesture gesture)
   {
     if(gesture.GetState() == GestureState::FINISHED)
     {
