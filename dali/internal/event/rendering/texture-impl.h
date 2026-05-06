@@ -85,7 +85,7 @@ public:
   /**
    * @copydoc Dali::Texture::Upload()
    */
-  bool Upload(PixelDataPtr pixelData, std::string context, Integration::TextureContextTypeHint::Type typeHint);
+  bool Upload(PixelDataPtr pixelData, std::string context, Integration::TextureContextTypeHint::Type typeHint, bool updateContextOnly = false, bool keepPreviousContext = false);
 
   /**
    * @copydoc Dali::Texture::Upload()
