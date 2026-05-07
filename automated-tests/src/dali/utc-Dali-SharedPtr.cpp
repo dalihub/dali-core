@@ -150,6 +150,48 @@ private:
   std::string mName;
 };
 
+// Test class for EnableSharedFromThis
+class EnableSharedFromThisTestClass : public EnableSharedFromThis<EnableSharedFromThisTestClass>
+{
+public:
+  EnableSharedFromThisTestClass(int value = 0)
+  : mValue(value)
+  {
+  }
+
+  int GetValue() const
+  {
+    return mValue;
+  }
+
+private:
+  int mValue;
+};
+
+// Another polymorphic class for DynamicPointerCast testing
+class AnotherBaseClass
+{
+public:
+  virtual ~AnotherBaseClass() = default;
+  virtual int GetType() const
+  {
+    return 0;
+  }
+};
+
+class AnotherDerivedClass : public AnotherBaseClass
+{
+public:
+  int GetType() const override
+  {
+    return 1;
+  }
+  int GetDerivedData() const
+  {
+    return 42;
+  }
+};
+
 } // unnamed namespace
 
 int UtcDaliSharedPtrDefaultConstructor(void)
@@ -1142,6 +1184,431 @@ int UtcDaliSharedPtrResetWithSamePtr(void)
   ptr.Reset(rawPtr);
 
   DALI_TEST_CHECK(!destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliSharedPtrIsEmpty(void)
+{
+  TestApplication application;
+
+  // Test empty SharedPtr
+  SharedPtr<TestClass> ptr1;
+  DALI_TEST_CHECK(ptr1.IsEmpty());
+  DALI_TEST_CHECK(!ptr1);
+
+  // Test SharedPtr constructed with nullptr
+  SharedPtr<TestClass> ptr2(nullptr);
+  DALI_TEST_CHECK(ptr2.IsEmpty());
+  DALI_TEST_CHECK(!ptr2);
+
+  // Test non-empty SharedPtr
+  SharedPtr<TestClass> ptr3(new TestClass());
+  DALI_TEST_CHECK(!ptr3.IsEmpty());
+  DALI_TEST_CHECK(ptr3);
+
+  // Test after reset
+  ptr3.Reset();
+  DALI_TEST_CHECK(ptr3.IsEmpty());
+  DALI_TEST_CHECK(!ptr3);
+
+  END_TEST;
+}
+
+int UtcDaliEnableSharedFromThis(void)
+{
+  TestApplication application;
+
+  // Create a SharedPtr using MakeShared
+  auto ptr = MakeShared<EnableSharedFromThisTestClass>(42);
+  DALI_TEST_CHECK(ptr);
+  DALI_TEST_CHECK(ptr->GetValue() == 42);
+  DALI_TEST_CHECK(ptr.UseCount() == 1);
+
+  // Call SharedFromThis() to get another SharedPtr to the same object
+  SharedPtr<EnableSharedFromThisTestClass> ptr2 = ptr->SharedFromThis();
+  DALI_TEST_CHECK(ptr2);
+  DALI_TEST_CHECK(ptr2.Get() == ptr.Get());
+  DALI_TEST_CHECK(ptr.UseCount() == 2);
+  DALI_TEST_CHECK(ptr2.UseCount() == 2);
+  DALI_TEST_CHECK(ptr2->GetValue() == 42);
+
+  END_TEST;
+}
+
+int UtcDaliEnableSharedFromThisConst(void)
+{
+  TestApplication application;
+
+  // Create a const SharedPtr
+  const auto ptr = MakeShared<EnableSharedFromThisTestClass>(100);
+  DALI_TEST_CHECK(ptr);
+  DALI_TEST_CHECK(ptr->GetValue() == 100);
+
+  // Call SharedFromThis() on a const object
+  SharedPtr<const EnableSharedFromThisTestClass> ptr2 = ptr->SharedFromThis();
+  DALI_TEST_CHECK(ptr2);
+  DALI_TEST_CHECK(ptr2.Get() == ptr.Get());
+  DALI_TEST_CHECK(ptr.UseCount() == 2);
+  DALI_TEST_CHECK(ptr2.UseCount() == 2);
+
+  END_TEST;
+}
+
+int UtcDaliEnableSharedFromThisCopy(void)
+{
+  TestApplication application;
+
+  auto ptr1 = MakeShared<EnableSharedFromThisTestClass>(55);
+  DALI_TEST_CHECK(ptr1.UseCount() == 1);
+
+  // Get SharedFromThis and verify reference counting
+  SharedPtr<EnableSharedFromThisTestClass> ptr2 = ptr1->SharedFromThis();
+  DALI_TEST_CHECK(ptr1.UseCount() == 2);
+  DALI_TEST_CHECK(ptr2.UseCount() == 2);
+
+  // Create another copy
+  SharedPtr<EnableSharedFromThisTestClass> ptr3(ptr1);
+  DALI_TEST_CHECK(ptr1.UseCount() == 3);
+  DALI_TEST_CHECK(ptr2.UseCount() == 3);
+  DALI_TEST_CHECK(ptr3.UseCount() == 3);
+
+  // All should point to the same object
+  DALI_TEST_CHECK(ptr1.Get() == ptr2.Get());
+  DALI_TEST_CHECK(ptr2.Get() == ptr3.Get());
+
+  END_TEST;
+}
+
+int UtcDaliEnableSharedFromThisWithRawPointer(void)
+{
+  TestApplication application;
+
+  // Create using raw pointer constructor
+  SharedPtr<EnableSharedFromThisTestClass> ptr(new EnableSharedFromThisTestClass(77));
+  DALI_TEST_CHECK(ptr);
+  DALI_TEST_CHECK(ptr->GetValue() == 77);
+
+  // SharedFromThis should work
+  SharedPtr<EnableSharedFromThisTestClass> ptr2 = ptr->SharedFromThis();
+  DALI_TEST_CHECK(ptr2.Get() == ptr.Get());
+  DALI_TEST_CHECK(ptr.UseCount() == 2);
+  DALI_TEST_CHECK(ptr2.UseCount() == 2);
+
+  END_TEST;
+}
+
+int UtcDaliDynamicPointerCast(void)
+{
+  TestApplication application;
+
+  // Create a derived class object held by base class pointer
+  SharedPtr<AnotherBaseClass> basePtr(new AnotherDerivedClass());
+  DALI_TEST_CHECK(basePtr);
+  DALI_TEST_CHECK(basePtr->GetType() == 1);
+
+  // Dynamic cast to derived class
+  SharedPtr<AnotherDerivedClass> derivedPtr = DynamicPointerCast<AnotherDerivedClass>(basePtr);
+  DALI_TEST_CHECK(derivedPtr);
+  DALI_TEST_CHECK(derivedPtr->GetType() == 1);
+  DALI_TEST_CHECK(derivedPtr->GetDerivedData() == 42);
+
+  // Both pointers should share ownership
+  DALI_TEST_CHECK(basePtr.UseCount() == 2);
+  DALI_TEST_CHECK(derivedPtr.UseCount() == 2);
+
+  END_TEST;
+}
+
+int UtcDaliDynamicPointerCastFail(void)
+{
+  TestApplication application;
+
+  // Create a base class object (not a derived)
+  SharedPtr<AnotherBaseClass> basePtr(new AnotherBaseClass());
+  DALI_TEST_CHECK(basePtr);
+  DALI_TEST_CHECK(basePtr->GetType() == 0);
+
+  // Attempt to cast to derived - should fail and return empty SharedPtr
+  SharedPtr<AnotherDerivedClass> derivedPtr = DynamicPointerCast<AnotherDerivedClass>(basePtr);
+  DALI_TEST_CHECK(!derivedPtr);
+  DALI_TEST_CHECK(derivedPtr.IsEmpty());
+
+  // Original pointer should still be valid with use count of 1
+  DALI_TEST_CHECK(basePtr);
+  DALI_TEST_CHECK(basePtr.UseCount() == 1);
+
+  END_TEST;
+}
+
+int UtcDaliDynamicPointerCastNull(void)
+{
+  TestApplication application;
+
+  // Cast from null SharedPtr
+  SharedPtr<AnotherBaseClass> basePtr;
+  DALI_TEST_CHECK(!basePtr);
+
+  SharedPtr<AnotherDerivedClass> derivedPtr = DynamicPointerCast<AnotherDerivedClass>(basePtr);
+  DALI_TEST_CHECK(!derivedPtr);
+  DALI_TEST_CHECK(derivedPtr.IsEmpty());
+
+  END_TEST;
+}
+
+int UtcDaliDynamicPointerCastShared(void)
+{
+  TestApplication application;
+
+  // Create derived object
+  SharedPtr<AnotherDerivedClass> originalPtr(new AnotherDerivedClass());
+  DALI_TEST_CHECK(originalPtr.UseCount() == 1);
+
+  // Assign to base pointer
+  SharedPtr<AnotherBaseClass> basePtr = originalPtr;
+  DALI_TEST_CHECK(originalPtr.UseCount() == 2);
+  DALI_TEST_CHECK(basePtr.UseCount() == 2);
+
+  // Dynamic cast back to derived
+  SharedPtr<AnotherDerivedClass> derivedPtr = DynamicPointerCast<AnotherDerivedClass>(basePtr);
+  DALI_TEST_CHECK(derivedPtr);
+  DALI_TEST_CHECK(derivedPtr.Get() == originalPtr.Get());
+
+  // All three should share ownership
+  DALI_TEST_CHECK(originalPtr.UseCount() == 3);
+  DALI_TEST_CHECK(basePtr.UseCount() == 3);
+  DALI_TEST_CHECK(derivedPtr.UseCount() == 3);
+
+  END_TEST;
+}
+
+int UtcDaliDynamicPointerCastWithBaseClass(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  {
+    // Use the existing BaseClass/DerivedClass hierarchy
+    SharedPtr<BaseClass> basePtr(new DerivedClass(42, "test", destructorCalled));
+    DALI_TEST_CHECK(basePtr);
+    DALI_TEST_CHECK(basePtr->GetValue() == 42);
+    DALI_TEST_CHECK(basePtr->GetDerivedValue() == 142); // Virtual call
+
+    // Dynamic cast to derived
+    SharedPtr<DerivedClass> derivedPtr = DynamicPointerCast<DerivedClass>(basePtr);
+    DALI_TEST_CHECK(derivedPtr);
+    DALI_TEST_CHECK(derivedPtr->GetName() == "test");
+    DALI_TEST_CHECK(derivedPtr->GetDerivedValue() == 142);
+
+    // Both share ownership
+    DALI_TEST_CHECK(basePtr.UseCount() == 2);
+    DALI_TEST_CHECK(derivedPtr.UseCount() == 2);
+    DALI_TEST_CHECK(!destructorCalled);
+  }
+
+  DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}
+
+///////////////////////////////////////////////////////////////////////////////////
+// WeakPtr test cases
+///////////////////////////////////////////////////////////////////////////////////
+
+int UtcDaliWeakPtrDefaultConstructor(void)
+{
+  TestApplication application;
+
+  WeakPtr<TestClass> weakPtr;
+  DALI_TEST_CHECK(weakPtr.Expired());
+  DALI_TEST_CHECK(weakPtr.UseCount() == 0);
+  DALI_TEST_CHECK(weakPtr.Lock().IsEmpty());
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrFromSharedPtr(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  {
+    SharedPtr<TestClass> sharedPtr(new TestClass(destructorCalled));
+    WeakPtr<TestClass>   weakPtr(sharedPtr);
+
+    DALI_TEST_CHECK(!weakPtr.Expired());
+    DALI_TEST_CHECK(weakPtr.UseCount() == 1);
+
+    // Lock should return a valid SharedPtr
+    SharedPtr<TestClass> lockedPtr = weakPtr.Lock();
+    DALI_TEST_CHECK(lockedPtr);
+    DALI_TEST_CHECK(lockedPtr.Get() == sharedPtr.Get());
+    DALI_TEST_CHECK(sharedPtr.UseCount() == 2);
+    DALI_TEST_CHECK(lockedPtr.UseCount() == 2);
+    DALI_TEST_CHECK(!destructorCalled);
+  }
+
+  DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrExpired(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  WeakPtr<TestClass> weakPtr;
+  {
+    SharedPtr<TestClass> sharedPtr(new TestClass(destructorCalled));
+    weakPtr = sharedPtr;
+    DALI_TEST_CHECK(!weakPtr.Expired());
+  }
+
+  // SharedPtr is destroyed, weakPtr should be expired
+  DALI_TEST_CHECK(weakPtr.Expired());
+  DALI_TEST_CHECK(weakPtr.Lock().IsEmpty());
+  DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrCopyConstructor(void)
+{
+  TestApplication application;
+
+  SharedPtr<TestClass> sharedPtr(new TestClass());
+  WeakPtr<TestClass>   weakPtr1(sharedPtr);
+
+  WeakPtr<TestClass> weakPtr2(weakPtr1);
+
+  DALI_TEST_CHECK(!weakPtr1.Expired());
+  DALI_TEST_CHECK(!weakPtr2.Expired());
+  DALI_TEST_CHECK(weakPtr1.Lock().Get() == weakPtr2.Lock().Get());
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrMoveConstructor(void)
+{
+  TestApplication application;
+
+  SharedPtr<TestClass> sharedPtr(new TestClass());
+  WeakPtr<TestClass>   weakPtr1(sharedPtr);
+
+  WeakPtr<TestClass> weakPtr2(std::move(weakPtr1));
+
+  DALI_TEST_CHECK(weakPtr1.Expired()); // Moved-from state
+  DALI_TEST_CHECK(!weakPtr2.Expired());
+  DALI_TEST_CHECK(weakPtr2.Lock().Get() == sharedPtr.Get());
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrAssignment(void)
+{
+  TestApplication application;
+
+  SharedPtr<TestClass> sharedPtr1(new TestClass());
+  SharedPtr<TestClass> sharedPtr2(new TestClass());
+
+  WeakPtr<TestClass> weakPtr(sharedPtr1);
+  DALI_TEST_CHECK(weakPtr.Lock().Get() == sharedPtr1.Get());
+
+  weakPtr = sharedPtr2;
+  DALI_TEST_CHECK(weakPtr.Lock().Get() == sharedPtr2.Get());
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrReset(void)
+{
+  TestApplication application;
+
+  SharedPtr<TestClass> sharedPtr(new TestClass());
+  WeakPtr<TestClass>   weakPtr(sharedPtr);
+
+  DALI_TEST_CHECK(!weakPtr.Expired());
+
+  weakPtr.Reset();
+
+  DALI_TEST_CHECK(weakPtr.Expired());
+  DALI_TEST_CHECK(weakPtr.Lock().IsEmpty());
+
+  // Original SharedPtr should still be valid
+  DALI_TEST_CHECK(sharedPtr);
+  DALI_TEST_CHECK(sharedPtr.UseCount() == 1);
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrWithEnableSharedFromThis(void)
+{
+  TestApplication application;
+
+  auto sharedPtr = MakeShared<EnableSharedFromThisTestClass>(42);
+  DALI_TEST_CHECK(sharedPtr);
+
+  // Get WeakPtr from the object
+  WeakPtr<EnableSharedFromThisTestClass> weakPtr = sharedPtr->WeakFromThis();
+  DALI_TEST_CHECK(!weakPtr.Expired());
+
+  // Lock should return a valid SharedPtr
+  auto lockedPtr = weakPtr.Lock();
+  DALI_TEST_CHECK(lockedPtr);
+  DALI_TEST_CHECK(lockedPtr.Get() == sharedPtr.Get());
+  DALI_TEST_CHECK(sharedPtr.UseCount() == 2);
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrPolymorphic(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  {
+    SharedPtr<DerivedClass> derivedPtr(new DerivedClass(42, "test", destructorCalled));
+    SharedPtr<BaseClass>    basePtr(derivedPtr);
+
+    WeakPtr<BaseClass> weakBasePtr(basePtr);
+    DALI_TEST_CHECK(!weakBasePtr.Expired());
+
+    auto lockedPtr = weakBasePtr.Lock();
+    DALI_TEST_CHECK(lockedPtr);
+    DALI_TEST_CHECK(lockedPtr.Get() == basePtr.Get());
+    DALI_TEST_CHECK(basePtr.UseCount() == 3); // derivedPtr, basePtr, lockedPtr
+  }
+
+  DALI_TEST_CHECK(destructorCalled);
+
+  END_TEST;
+}
+
+int UtcDaliWeakPtrMultipleWeakRefs(void)
+{
+  TestApplication application;
+  bool            destructorCalled(false);
+
+  {
+    SharedPtr<TestClass> sharedPtr(new TestClass(destructorCalled));
+
+    WeakPtr<TestClass> weak1(sharedPtr);
+    WeakPtr<TestClass> weak2(sharedPtr);
+    WeakPtr<TestClass> weak3(weak1);
+
+    DALI_TEST_CHECK(!weak1.Expired());
+    DALI_TEST_CHECK(!weak2.Expired());
+    DALI_TEST_CHECK(!weak3.Expired());
+
+    // All should lock to the same object
+    DALI_TEST_CHECK(weak1.Lock().Get() == sharedPtr.Get());
+    DALI_TEST_CHECK(weak2.Lock().Get() == sharedPtr.Get());
+    DALI_TEST_CHECK(weak3.Lock().Get() == sharedPtr.Get());
+    DALI_TEST_CHECK(!destructorCalled);
+  }
+
+  DALI_TEST_CHECK(destructorCalled);
 
   END_TEST;
 }
