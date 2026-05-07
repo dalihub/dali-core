@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/scene-graph-traveler.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
+
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
@@ -26,6 +30,13 @@ namespace Dali
 {
 namespace Internal
 {
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_UPDATE_PROCESS, false);
+
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_UPDATE_PROCESS_THRESHOLD_TIME, 48);
+} // namespace
+
 SceneGraphTraveler::SceneGraphTraveler(SceneGraph::UpdateManager& updateManager, SceneGraph::Node& rootNode)
 : SceneGraphTravelerInterface(updateManager),
   mRootNode(rootNode),
@@ -57,6 +68,11 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
     }
     else
     {
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRAVELER_FIND_NEW_NODE", [&](std::ostringstream& oss)
+      { oss << "root[" << mRootNode.GetId() << "] input [" << id << "] cached count[" << mTravledNodeMap.size() << "]"; });
+
+      DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
+
       SceneGraph::Node* currentNode = mUpdateManager.GetNodePointerById(id);
 
       bool isNodeUnderRootNode = false;
@@ -91,6 +107,14 @@ SceneGraph::Node* SceneGraphTraveler::FindNode(uint32_t id)
         }
         node = currentNode;
       }
+
+      DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+      {
+        oss << "Traveler Check. root[" << mRootNode.GetId() << "] input [" << id << "] valid:" << (isNodeUnderRootNode ? "T" : "F") << " iter count[" << nodeStack.size() << "] cached count[" << mTravledNodeMap.size() << "]";
+      });
+
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_TRAVELER_FIND_NEW_NODE", [&](std::ostringstream& oss)
+      { oss << "root[" << mRootNode.GetId() << "] input [" << id << "] valid:" << (isNodeUnderRootNode ? "T" : "F") << " iter count[" << nodeStack.size() << "] cached count[" << mTravledNodeMap.size() << "]"; });
     }
   }
 
