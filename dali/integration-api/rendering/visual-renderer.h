@@ -80,12 +80,60 @@ public:
       TRANSFORM_OFFSET = DEFAULT_VISUAL_RENDERER_PROPERTY_START_INDEX,
 
       /**
+       * @brief Name "transformOffsetX", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_OFFSET_X,
+
+      /**
+       * @brief Name "transformOffsetY", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_OFFSET_Y,
+
+      /**
        * @brief Size of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
        * @details Name "transformSize", type Property::VECTOR2, animatable.
        * @SINCE_2_1.13
        * @see TRANSFORM_SIZE_POLICY
        */
       TRANSFORM_SIZE,
+
+      /**
+       * @brief Width of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
+       * @details Name "transformSizeWidth", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_SIZE_WIDTH,
+
+      /**
+       * @brief Height of the visual, which can be either relative (percentage [0.0f to 1.0f] of the parent) or absolute (in world units).
+       * @details Name "transformSizeHeight", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_SIZE_HEIGHT,
+
+      /**
+       * @brief Any extra size the shader needs for drawing into.
+       * @details Name "extraSize", type Property::VECTOR2, animatable
+       * @SINCE_2_1.13
+       * @note the default is (0, 0)
+       */
+      EXTRA_SIZE,
+
+      /**
+       * @brief Any extra width the shader needs for drawing into.
+       * @details Name "extraSizeWidth", type Property::FLOAT, animatable
+       * @SINCE_2_5.22
+       */
+      EXTRA_SIZE_WIDTH,
+
+      /**
+       * @brief Any extra height the shader needs for drawing into.
+       * @details Name "extraSizeHeight", type Property::FLOAT, animatable
+       * @SINCE_2_5.22
+       */
+      EXTRA_SIZE_HEIGHT,
 
       /**
        * @brief The origin of the visual renderer within its control area.
@@ -99,6 +147,20 @@ public:
       TRANSFORM_ORIGIN,
 
       /**
+       * @brief The x origin of the visual renderer within its control area.
+       * @details Name "transformOriginX", type Property::FLOAT.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_ORIGIN_X,
+
+      /**
+       * @brief The y origin of the visual renderer within its control area.
+       * @details Name "transformOriginY", type Property::FLOAT.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_ORIGIN_Y,
+
+      /**
        * @brief The pivot of the visual renderer
        * @details Name "transformPivot", type Property::VECTOR2
        * @note This is relative to the size of the actor; where the origin is the center of the actor,
@@ -110,42 +172,64 @@ public:
       TRANSFORM_PIVOT,
 
       /**
+       * @brief The x pivot of the visual renderer
+       * @details Name "transformPivotX", type Property::FLOAT.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_PIVOT_X,
+
+      /**
+       * @brief The y pivot of the visual renderer
+       * @details Name "transformPivotY", type Property::FLOAT.
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_PIVOT_Y,
+
+      /**
        * @brief Whether the x or y OFFSET/SIZE values are relative (percentage [0.0f to 1.0f] of the control) or absolute (in world units).
        * @details Name "transformOffsetSizeMode", type Property::VECTOR4
        *
        * @code
        * visualRenderer.SetProperty( VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE,
-       *                             Vector4( Policy::ABSOLUTE, Policy::RELATIVE, Policy::ABSOLUTE, Policy::RELATIVE ));
+       *                             Vector4( TransformPolicy::ABSOLUTE, TransformPolicy::RELATIVE, TransformPolicy::ABSOLUTE, TransformPolicy::RELATIVE ));
        * @endcode
-       * @see Policy::Type
+       * @see TransformPolicy::Type
        * @SINCE_2_1.13
        * @note By default, both the x and the y offset/size is RELATIVE.
        */
       TRANSFORM_OFFSET_SIZE_MODE,
 
       /**
-       * @brief Any extra size the shader needs for drawing into.
-       * @details Name "extraSize", type Property::VECTOR2, animatable
-       * @SINCE_2_1.13
-       * @note the default is (0, 0)
+       * @brief The x offset transform policy
+       * @details Name "transformOffsetXPolicy", type Property::FLOAT.
+       * @see TransformPolicy::Type
+       * @SINCE_2_5.22
        */
-      EXTRA_SIZE,
+      TRANSFORM_OFFSET_X_POLICY,
 
       /**
-       * @brief Mix color is a generic color for any visual.
-       * @details Name "visualMixColor", type Property::VECTOR3
-       * @SINCE_2_1.13
-       * @DEPRECATED_2_3.41 Use Renderer::Property::MIX_COLOR instead.
+       * @brief The y offset transform policy
+       * @details Name "transformOffsetYPolicy", type Property::FLOAT.
+       * @see TransformPolicy::Type
+       * @SINCE_2_5.22
        */
-      VISUAL_MIX_COLOR,
+      TRANSFORM_OFFSET_Y_POLICY,
 
       /**
-       * @brief PremultipliedAlpha is a float representing a bool, and is either 0.0f, or 1.0f
-       * @details Name "visualPreMultipliedAlpha", type Property::FLOAT
-       * @SINCE_2_1.13
-       * @DEPRECATED_2_3.41 Not be added as uniform anymore. Use Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA instead.
+       * @brief The width transform policy
+       * @details Name "transformSizeWidthPolicy", type Property::FLOAT.
+       * @see TransformPolicy::Type
+       * @SINCE_2_5.22
        */
-      VISUAL_PRE_MULTIPLIED_ALPHA,
+      TRANSFORM_SIZE_WIDTH_POLICY,
+
+      /**
+       * @brief The height transform policy
+       * @details Name "transformSizeHeightPolicy", type Property::FLOAT.
+       * @see TransformPolicy::Type
+       * @SINCE_2_5.22
+       */
+      TRANSFORM_SIZE_HEIGHT_POLICY,
     };
   };
 

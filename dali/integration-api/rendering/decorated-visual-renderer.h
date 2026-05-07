@@ -66,6 +66,34 @@ public:
       CORNER_RADIUS = DEFAULT_DECORATED_VISUAL_RENDERER_PROPERTY_START_INDEX,
 
       /**
+       * @brief The top-left radius for the rounded corners of the visual.
+       * @details Name "cornerRadiusTopLeft", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_RADIUS_TOP_LEFT,
+
+      /**
+       * @brief The top-right radius for the rounded corners of the visual.
+       * @details Name "cornerRadiusTopRight", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_RADIUS_TOP_RIGHT,
+
+      /**
+       * @brief The bottom-right radius for the rounded corners of the visual.
+       * @details Name "cornerRadiusBottomRight", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_RADIUS_BOTTOM_RIGHT,
+
+      /**
+       * @brief The bottom-left radius for the rounded corners of the visual.
+       * @details Name "cornerRadiusBottomLeft", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_RADIUS_BOTTOM_LEFT,
+
+      /**
        * @brief Whether the CORNER_RADIUS values are relative (percentage [0.0f to 0.5f] of the control) or absolute (in world units).
        * @details Name "cornerRadiusPolicy", type Property::FLOAT
        *
@@ -79,6 +107,44 @@ public:
        * @note The default value is Policy::RELATIVE.
        */
       CORNER_RADIUS_POLICY,
+
+      /**
+       * @brief The squareness for the rounded corners of the visual. (recommend [0.0f to 1.0f]).
+       * @details Name "cornerSquareness", type Property::Vector4, animatable.
+       *
+       * @see Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS
+       * @SINCE_2_3.48
+       * @note The default value is (0, 0, 0, 0).
+       */
+      CORNER_SQUARENESS,
+
+      /**
+       * @brief The top-left squareness for the rounded corners of the visual.
+       * @details Name "cornerSquarenessTopLeft", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_SQUARENESS_TOP_LEFT,
+
+      /**
+       * @brief The top-right squareness for the rounded corners of the visual.
+       * @details Name "cornerSquarenessTopRight", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_SQUARENESS_TOP_RIGHT,
+
+      /**
+       * @brief The bottom-right squareness for the rounded corners of the visual.
+       * @details Name "cornerSquarenessBottomRight", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_SQUARENESS_BOTTOM_RIGHT,
+
+      /**
+       * @brief The bottom-left squareness for the rounded corners of the visual.
+       * @details Name "cornerSquarenessBottomLeft", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      CORNER_SQUARENESS_BOTTOM_LEFT,
 
       /**
        * @brief The width for the borderline of the visual.
@@ -101,6 +167,34 @@ public:
       BORDERLINE_COLOR,
 
       /**
+       * @brief The red component of borderline color of the visual.
+       * @details Name "borderlineColorRed", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      BORDERLINE_COLOR_RED,
+
+      /**
+       * @brief The green component of borderline color of the visual.
+       * @details Name "borderlineColorGreen", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      BORDERLINE_COLOR_GREEN,
+
+      /**
+       * @brief The blue component of borderline color of the visual.
+       * @details Name "borderlineColorBlue", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      BORDERLINE_COLOR_BLUE,
+
+      /**
+       * @brief The alpha component of borderline color of the visual.
+       * @details Name "borderlineOpacity", type Property::FLOAT, animatable.
+       * @SINCE_2_5.22
+       */
+      BORDERLINE_OPACITY,
+
+      /**
        * @brief The offset from the visual borderline (recommend [-1.0f to 1.0f]).
        * @details Name "borderlineOffset", type Property::FLOAT, animatable.
        *
@@ -120,16 +214,6 @@ public:
        * @note The default value is 0.0f.
        */
       BLUR_RADIUS,
-
-      /**
-       * @brief The squareness for the rounded corners of the visual. (recommend [0.0f to 1.0f]).
-       * @details Name "cornerSquareness", type Property::Vector4, animatable.
-       *
-       * @see Dali::Toolkit::DevelVisual::Property::CORNER_SQUARENESS
-       * @SINCE_2_3.48
-       * @note The default value is (0, 0, 0, 0).
-       */
-      CORNER_SQUARENESS,
     };
   };
 
