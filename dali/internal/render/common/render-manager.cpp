@@ -161,6 +161,8 @@ inline void AlignDamagedRect(Rect<int32_t>& rect)
 }
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
+
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_RENDER_PROCESS_THRESHOLD_TIME, 48);
 } // namespace
 
 /**
@@ -1474,6 +1476,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     if(!renderToFbo)
     {
       DALI_LOG_INFO(gLogFilter, Debug::General, "Present\n");
+      DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_RENDER_FINISHED");
 
       DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
       auto renderTarget = sceneObject->GetSurfaceRenderTarget();
@@ -1503,6 +1506,9 @@ void RenderManager::ClearScene(Integration::Scene scene)
   {
     return;
   }
+  DALI_LOG_DEBUG_INFO("ClearScene comes\n");
+
+  DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_CLEAR_SCENE");
 
   DALI_TRACE_BEGIN(gTraceFilter, "DALI_CLEAR_SCENE");
   auto& currentRenderTarget = *sceneObject->GetSurfaceRenderTarget();

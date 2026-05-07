@@ -89,6 +89,8 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_UPD
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_UPDATE_PROCESS, false);
+
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_UPDATE_PROCESS_THRESHOLD_TIME, 48);
 } // namespace
 
 using namespace Dali::Integration;
@@ -1052,6 +1054,8 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
   { oss << "[" << mImpl->animations.Count() << "]"; });
 
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
+
   while(iter != mImpl->animations.End())
   {
     Animation* animation             = *iter;
@@ -1100,6 +1104,11 @@ bool UpdateManager::Animate(BufferIndex bufferIndex, float elapsedSeconds)
   {
     mImpl->notificationManager.QueueNotification(&mImpl->animationPlaylist, std::move(mImpl->notifyRequiredAnimations));
   }
+
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "DALI_ANIMATION_ANIMATE. [" << mImpl->animations.Count() << "]";
+  });
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_ANIMATION_ANIMATE", [&](std::ostringstream& oss)
   { oss << "[" << mImpl->animations.Count() << "]"; });
@@ -1192,6 +1201,8 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_UPDATE_RENDERERS", [&](std::ostringstream& oss)
   { oss << "[" << mImpl->renderers.Count() << "]"; });
 
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
+
   for(const auto& rendererKey : mImpl->renderers)
   {
     // Apply constraints
@@ -1201,11 +1212,17 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners, 
     mImpl->renderingRequired = renderer->PrepareRender(bufferIndex) || mImpl->renderingRequired;
   }
 
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "DALI_UPDATE_RENDERERS. [" << mImpl->renderers.Count() << "]";
+  });
+
   DALI_TRACE_END(gTraceFilter, "DALI_UPDATE_RENDERERS");
 }
 
 void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, BufferIndex bufferIndex)
 {
+  DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_UPDATE_NODES");
   mImpl->nodeDirtyFlags = NodePropertyFlags::NOTHING;
 
   for(auto&& scene : mImpl->scenes)
@@ -1224,6 +1241,7 @@ void UpdateManager::UpdateNodes(PropertyOwnerContainer& postPropertyOwners, Buff
 
 void UpdateManager::UpdateLayers(BufferIndex bufferIndex)
 {
+  DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_UPDATE_LAYERS");
   for(auto&& scene : mImpl->scenes)
   {
     if(scene && scene->root)
@@ -1296,6 +1314,8 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
       oss << "r:" << mImpl->renderers.Size() << ",";
       oss << "t:" << mImpl->textureSets.Size() << ",";
       oss << "s:" << mImpl->shaders.Size() << "]"; });
+
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_UPDATE_INTERNAL");
 
     // Animate
     bool animationActive = Animate(bufferIndex, elapsedSeconds);
@@ -1384,6 +1404,8 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
       {
         if(scene && scene->root && scene->taskList && scene->scene)
         {
+          DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_PROCESS_RENDER_TASK");
+
           DALI_TRACE_BEGIN(gTraceFilter, "DALI_PROCESS_RENDER_TASK");
           scene->scene->GetRenderInstructions().ResetAndReserve(bufferIndex,
                                                                 static_cast<uint32_t>(scene->taskList->GetTasks().Count()));
