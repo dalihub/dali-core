@@ -402,6 +402,8 @@ inline void SetupDepthBuffer(const RenderItem& item, Graphics::CommandBuffer& co
 }
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
+
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_RENDER_PROCESS_THRESHOLD_TIME, 48);
 } // Unnamed namespace
 
 /**
@@ -784,9 +786,10 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
 
   DALI_PRINT_RENDER_INSTRUCTION(instruction, bufferIndex);
 
+  DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_RENDER_INSTRUCTION_PROCESS");
+
   const Matrix* viewMatrix       = instruction.GetViewMatrix(bufferIndex);
   const Matrix* projectionMatrix = instruction.GetProjectionMatrix(bufferIndex);
-
   DALI_ASSERT_DEBUG(viewMatrix);
   DALI_ASSERT_DEBUG(projectionMatrix);
 
