@@ -93,6 +93,8 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "DALI_LO
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_UPDATE_PROCESS, false);
 
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_UPDATE_PROCESS_THRESHOLD_TIME, 48);
+
 /**
  * @brief Helper codes to set / bake the dirty flags for the components.
  * It will be useful when we want to reduce the number of lines.
@@ -1149,10 +1151,13 @@ void TransformManager::SetPositionUsesAnchorPoint(TransformId id, bool value)
 
 void TransformManager::SetIgnored(TransformId id, bool value)
 {
+// NOTE : Temporal duration checker for issue tracking. Should be removed after issue resolved.
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   TransformId index(mIds[id]);
 
   if(TransformComponentBitField::IsIgnoredBitField(mTxComponentBitField[index]) != value)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetIgnored");
     mReorder = true;
 
     TransformComponentBitField::SetIgnoredBitField(mTxComponentBitField[index], value);
@@ -1165,6 +1170,10 @@ void TransformManager::SetIgnored(TransformId id, bool value)
       mDirtyFlags |= mTxComponentBitField[index] & TransformComponentBitField::COMPONENT_DIRTY_MASK;
     }
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetIgnored[" << id << "] [" << value << "]";
+  });
 }
 
 } // namespace SceneGraph

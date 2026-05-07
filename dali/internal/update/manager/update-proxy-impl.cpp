@@ -18,6 +18,10 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/update-proxy-impl.h>
 
+// EXTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/trace.h>
+
 // INTERNAL INCLUDES
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/manager/update-proxy-property-modifier.h>
@@ -26,6 +30,14 @@ namespace Dali
 {
 namespace Internal
 {
+// NOTE : Temporal duration checker for issue tracking. Should be removed after issue resolved.
+namespace
+{
+DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_UPDATE_PROCESS, false);
+
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_UPDATE_PROCESS_THRESHOLD_TIME, 48);
+} // namespace
+
 UpdateProxy::UpdateProxy(SceneGraph::UpdateManager& updateManager, SceneGraph::TransformManager& transformManager, SceneGraphTravelerInterfacePtr traveler)
 : mLastCachedIdNodePair({0u, nullptr}),
   mDirtyNodes(),
@@ -41,136 +53,198 @@ UpdateProxy::~UpdateProxy() = default;
 
 bool UpdateProxy::GetPosition(uint32_t id, Vector3& position) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetPosition");
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
     position                                             = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION);
     success                                              = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetPosition[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::SetPosition(uint32_t id, const Vector3& position)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetPosition");
     mTransformManager.SetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetPosition[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::BakePosition(uint32_t id, const Vector3& position)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "BakePosition");
     mTransformManager.BakeVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION, position);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "BakePosition[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetOrientation(uint32_t id, Quaternion& orientation) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetOrientation");
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
 
     orientation = transformManager.GetQuaternionPropertyValue(node->GetTransformId());
     success     = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetOrientation[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::SetOrientation(uint32_t id, const Quaternion& orientation)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetOrientation");
     mTransformManager.SetQuaternionPropertyValue(node->GetTransformId(), orientation);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetOrientation[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::BakeOrientation(uint32_t id, const Quaternion& orientation)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "BakeOrientation");
     mTransformManager.BakeQuaternionPropertyValue(node->GetTransformId(), orientation);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "BakeOrientation[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetSize(uint32_t id, Vector3& size) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetSize");
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
     size                                                 = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
     success                                              = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetSize[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::SetSize(uint32_t id, const Vector3& size)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetSize");
     mTransformManager.SetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetSize[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::BakeSize(uint32_t id, const Vector3& size)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "BakeSize");
     mTransformManager.BakeVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE, size);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "BakeSize[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetPositionAndSize(uint32_t id, Vector3& position, Vector3& size) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetPositionAndSize");
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
     position                                             = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_POSITION);
     size                                                 = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
     success                                              = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetPositionAndSize[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetWorldPositionScaleAndSize");
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
     const Matrix&                       worldMatrix      = transformManager.GetWorldMatrix(node->GetTransformId());
 
@@ -180,15 +254,21 @@ bool UpdateProxy::GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, V
     size    = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetWorldPositionScaleAndSize[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetWorldTransformAndSize(uint32_t id, Vector3& position, Vector3& scale, Quaternion& orientation, Vector3& size) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetWorldTransformAndSize");
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
     const Matrix&                       worldMatrix      = transformManager.GetWorldMatrix(node->GetTransformId());
 
@@ -196,107 +276,158 @@ bool UpdateProxy::GetWorldTransformAndSize(uint32_t id, Vector3& position, Vecto
     size    = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SIZE);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetWorldTransformAndSize[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetScale(uint32_t id, Vector3& scale) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetScale");
     const SceneGraph::TransformManager& transformManager = mTransformManager; // To ensure we call the const getter
     scale                                                = transformManager.GetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE);
     success                                              = true;
   }
 
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetScale[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::SetScale(uint32_t id, const Vector3& scale)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetScale");
     mTransformManager.SetVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetScale[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::BakeScale(uint32_t id, const Vector3& scale)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "BakeScale");
     mTransformManager.BakeVector3PropertyValue(node->GetTransformId(), SceneGraph::TRANSFORM_PROPERTY_SCALE, scale);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "BakeScale[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetColor(uint32_t id, Vector4& color) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetColor");
     color   = node->mColor.Get(mCurrentBufferIndex);
     success = true;
   }
 
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetColor[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::SetColor(uint32_t id, const Vector4& color)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetColor");
     node->mColor.Set(mCurrentBufferIndex, color);
     node->SetDirtyFlag(SceneGraph::NodePropertyFlags::COLOR);
     mDirtyNodes.push_back(id);
     AddResetter(*node, node->mColor);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetColor[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "BakeColor");
     node->mColor.Bake(mCurrentBufferIndex, color);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "BakeColor[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 void UpdateProxy::NodeHierarchyChanged()
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   mLastCachedIdNodePair = {0u, nullptr};
   mPropertyModifier.reset();
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  { oss << "NodeHierarchyChanged"; });
 }
 
 void UpdateProxy::Notify(Dali::UpdateProxy::NotifySyncPoint syncPoint)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   mSyncPoints.push_back(syncPoint);
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  { oss << "Notify [" << syncPoint << "]"; });
 }
 
 Dali::UpdateProxy::NotifySyncPoint UpdateProxy::PopSyncPoint()
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   if(!mSyncPoints.empty())
   {
     auto syncPoint = mSyncPoints.front();
     mSyncPoints.pop_front();
+    DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+    { oss << "PopSyncPoint [" << syncPoint << "]"; });
     return syncPoint;
   }
 
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  { oss << "PopSyncPoint failed"; });
   return Dali::UpdateProxy::INVALID_SYNC;
 }
 
@@ -345,58 +476,84 @@ void UpdateProxy::AddNodeResetters()
 
 bool UpdateProxy::GetUpdateArea(uint32_t id, Vector4& updateArea) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetUpdateArea");
     updateArea = node->GetUpdateAreaHint();
     success    = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetUpdateArea[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::SetUpdateArea(uint32_t id, const Vector4& updateArea)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetUpdateArea");
     node->SetUpdateAreaHint(updateArea);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetUpdateArea[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::SetIgnored(uint32_t id, bool ignored)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "SetIgnored");
     node->SetIgnored(ignored);
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "SetIgnored[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetIgnored(uint32_t id, bool& ignored) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetIgnored");
     ignored = node->IsIgnored();
     success = true;
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetIgnored[" << id << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::GetCustomProperty(uint32_t id, ConstString propertyName, Property::Value& value) const
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "GetCustomProperty");
     const auto& uniformMap = node->GetUniformMap();
 
     const PropertyInputImpl* propertyInputImpl = uniformMap.Find(propertyName);
@@ -410,15 +567,21 @@ bool UpdateProxy::GetCustomProperty(uint32_t id, ConstString propertyName, Prope
       }
     }
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "GetCustomProperty[" << id << "] [" << propertyName.GetStringView() << "] [" << success << "]";
+  });
   return success;
 }
 
 bool UpdateProxy::BakeCustomProperty(uint32_t id, ConstString propertyName, const Property::Value& value)
 {
+  DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
+    DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "BakeCustomProperty");
     const auto& uniformMap = node->GetUniformMap();
 
     const PropertyInputImpl* propertyInputImpl = uniformMap.Find(propertyName);
@@ -532,6 +695,10 @@ bool UpdateProxy::BakeCustomProperty(uint32_t id, ConstString propertyName, cons
       }
     }
   }
+  DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+  {
+    oss << "BakeCustomProperty[" << id << "] [" << propertyName.GetStringView() << "] [" << success << "]";
+  });
   return success;
 }
 
