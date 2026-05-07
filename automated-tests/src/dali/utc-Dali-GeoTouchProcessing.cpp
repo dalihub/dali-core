@@ -119,7 +119,7 @@ struct TouchEventFunctor
   {
   }
 
-  bool operator()(Actor actor, const TouchEvent& touch)
+  bool operator()(Actor actor, TouchEvent touch)
   {
     signalData.functorCalled = true;
     signalData.touchedActor  = actor;
@@ -175,7 +175,7 @@ struct TouchEventHandleFunctor
   {
   }
 
-  bool operator()(Actor actor, const TouchEvent& someTouchEvent)
+  bool operator()(Actor actor, TouchEvent someTouchEvent)
   {
     handleData.signalReceived      = true;
     handleData.receivedTouchHandle = someTouchEvent;
@@ -199,7 +199,7 @@ struct RemoveActorFunctor : public TouchEventFunctor
   {
   }
 
-  bool operator()(Actor actor, const TouchEvent& touch)
+  bool operator()(Actor actor, TouchEvent touch)
   {
     Actor parent(actor.GetParent());
     if(parent)
@@ -236,7 +236,7 @@ struct OutOfBoundsFunctor
   {
   }
 
-  bool operator()(Actor actor, const TouchEvent& touch)
+  bool operator()(Actor actor, TouchEvent touch)
   {
     outOfBoundsData.functorCalled = true;
     uint32_t count                = touch.GetPointCount();

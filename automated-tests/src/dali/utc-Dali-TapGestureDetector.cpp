@@ -44,7 +44,7 @@ void utc_dali_tap_gesture_detector_cleanup(void)
 namespace
 {
 bool        gHitTestTouchCallBackCalled = false;
-static bool TestHitTestTouchCallback(Actor, const TouchEvent&)
+static bool TestHitTestTouchCallback(Actor, TouchEvent)
 {
   gHitTestTouchCallBackCalled = true;
   return false;
@@ -85,7 +85,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const TapGesture& tap)
+  void operator()(Actor actor, TapGesture tap)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = tap;
@@ -113,7 +113,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const TapGesture& tap)
+  void operator()(Actor actor, TapGesture tap)
   {
     GestureReceivedFunctor::operator()(actor, tap);
     scene.Remove(actor);
@@ -125,7 +125,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 // Functor for receiving a touch event
 struct TouchEventFunctor
 {
-  bool operator()(Actor actor, const TouchEvent& touch)
+  bool operator()(Actor actor, TouchEvent touch)
   {
     //For line coverage
     unsigned int points = touch.GetPointCount();
@@ -1006,7 +1006,7 @@ int UtcDaliTapGestureDisableDetectionDuringTapN(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(
     &application,
-    [&detector, &functorCalled](Actor actor, const TapGesture& gesture)
+    [&detector, &functorCalled](Actor actor, TapGesture gesture)
   {
     detector.Detach(actor);
     functorCalled = true;

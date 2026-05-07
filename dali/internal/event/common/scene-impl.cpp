@@ -33,6 +33,9 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 using Dali::Internal::SceneGraph::Node;

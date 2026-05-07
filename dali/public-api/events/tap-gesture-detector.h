@@ -74,7 +74,7 @@ public: // Typedefs
    * @brief Signal type for detected signal.
    * @SINCE_1_0.0
    */
-  using DetectedSignalType = Signal<void(Actor, const TapGesture&)>;
+  using DetectedSignalType = Signal<void(Actor, TapGesture)>;
 
 public: // Creation & Destruction
   /**
@@ -215,7 +215,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( Actor actor, const TapGesture& gesture );
+   *   void YourCallbackName( Actor actor, TapGesture gesture );
    * @endcode
    * @SINCE_1_0.0
    * @return The signal to connect to

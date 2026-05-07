@@ -116,7 +116,7 @@ void RotationGestureDetector::OnActorDetach(Actor& actor)
   }
 }
 
-bool RotationGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
+bool RotationGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
   return HandleEvent(actor, touch);
 }

@@ -30,7 +30,7 @@ using namespace Dali;
 namespace
 {
 bool        gHitTestTouchCallBackCalled = false;
-static bool TestHitTestTouchCallback(Actor, const TouchEvent&)
+static bool TestHitTestTouchCallback(Actor, TouchEvent)
 {
   gHitTestTouchCallBackCalled = true;
   return false;

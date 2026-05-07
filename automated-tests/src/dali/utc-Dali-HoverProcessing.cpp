@@ -78,7 +78,7 @@ struct HoverEventFunctor
   {
   }
 
-  bool operator()(Actor actor, const HoverEvent& hoverEvent)
+  bool operator()(Actor actor, HoverEvent hoverEvent)
   {
     signalData.functorCalled = true;
     signalData.hoveredActor  = actor;
@@ -104,7 +104,7 @@ struct RemoveActorFunctor : public HoverEventFunctor
   {
   }
 
-  bool operator()(Actor actor, const HoverEvent& hoverEvent)
+  bool operator()(Actor actor, HoverEvent hoverEvent)
   {
     Actor parent(actor.GetParent());
     if(parent)

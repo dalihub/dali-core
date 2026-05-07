@@ -95,28 +95,28 @@ struct TestConstraintRef
   unsigned int  mValue;
 };
 
-static bool TestTouchCallback(Actor, const TouchEvent&)
+static bool TestTouchCallback(Actor, TouchEvent)
 {
   gTouchCallBackCalled = true;
   return true;
   END_TEST;
 }
 
-static bool TestTouchCallback2(Actor, const TouchEvent&)
+static bool TestTouchCallback2(Actor, TouchEvent)
 {
   gTouchCallBackCalled2 = true;
   return true;
   END_TEST;
 }
 
-static bool TestTouchCallback3(Actor, const TouchEvent&)
+static bool TestTouchCallback3(Actor, TouchEvent)
 {
   gTouchCallBackCalled3 = true;
   return true;
   END_TEST;
 }
 
-static bool TestHitTestTouchCallback(Actor, const TouchEvent&)
+static bool TestHitTestTouchCallback(Actor, TouchEvent)
 {
   gHitTestTouchCallBackCalled = true;
   return false;
@@ -144,7 +144,7 @@ static void ResetTouchCallbacks(TestApplication& application)
   ResetTouchCallbacks();
 }
 
-static bool TestCallback3(Actor actor, const HoverEvent& event)
+static bool TestCallback3(Actor actor, HoverEvent event)
 {
   gHoverCallBackCalled = true;
   return false;
@@ -413,7 +413,7 @@ struct PropertyNotificationFunctor
   {
   }
 
-  void operator()(PropertyNotification& source)
+  void operator()(PropertyNotification source)
   {
     mSignalCalled         = true;
     mPropertyNotification = source;

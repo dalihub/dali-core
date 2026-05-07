@@ -123,7 +123,7 @@ class Animation;
 class DALI_CORE_API Animation : public BaseHandle
 {
 public:
-  using AnimationSignalType = Signal<void(Animation&)>; ///< Animation finished signal type @SINCE_1_0.0
+  using AnimationSignalType = Signal<void(Animation)>; ///< Animation finished signal type @SINCE_1_0.0
 
   using AnyFunction = Any; ///< Interpolation function @SINCE_1_0.0
 

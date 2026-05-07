@@ -64,7 +64,7 @@ struct WheelEventReceivedFunctor
   {
   }
 
-  bool operator()(Actor actor, const WheelEvent& wheelEvent)
+  bool operator()(Actor actor, WheelEvent wheelEvent)
   {
     signalData.functorCalled      = true;
     signalData.receivedWheelEvent = wheelEvent;

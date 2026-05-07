@@ -222,7 +222,7 @@ private:
    * @param actor The actor
    * @param touch The touch event that has occurred
    */
-  virtual bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) = 0;
+  virtual bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) = 0;
 
   /**
    * @brief Delivers touch events to each detector.

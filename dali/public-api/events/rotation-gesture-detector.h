@@ -59,7 +59,7 @@ public: // Typedefs
   /**
    * @brief Signal type.
    */
-  using DetectedSignalType = Signal<void(Actor, const RotationGesture&)>;
+  using DetectedSignalType = Signal<void(Actor, RotationGesture)>;
 
 public: // Creation & Destruction
   /**
@@ -137,7 +137,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( Actor actor, const RotationGesture& gesture );
+   *   void YourCallbackName( Actor actor, RotationGesture gesture );
    * @endcode
    * @SINCE_1_9.27
    * @return The signal to connect to

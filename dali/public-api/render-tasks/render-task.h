@@ -139,7 +139,7 @@ public:
    * @brief Typedef for signals sent by this class.
    * @SINCE_1_0.0
    */
-  using RenderTaskSignalType = Signal<void(RenderTask&)>;
+  using RenderTaskSignalType = Signal<void(RenderTask)>;
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.
