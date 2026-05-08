@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,9 +112,19 @@ void RenderTask::SetCameraActor(CameraActor cameraActor)
   GetImplementation(*this).SetCameraActor(actorImpl);
 }
 
+void RenderTask::SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType builtinCameraType, Dali::Size screenSize, const Dali::Property::Map& cameraPropertyMap)
+{
+  GetImplementation(*this).SetBuiltinCameraActor(builtinCameraType, screenSize, cameraPropertyMap);
+}
+
 CameraActor RenderTask::GetCameraActor() const
 {
   return Dali::CameraActor(GetImplementation(*this).GetCameraActor());
+}
+
+Dali::RenderTask::CameraActorType RenderTask::GetCameraActorType() const
+{
+  return GetImplementation(*this).GetCameraActorType();
 }
 
 void RenderTask::SetFrameBuffer(FrameBuffer frameBuffer)

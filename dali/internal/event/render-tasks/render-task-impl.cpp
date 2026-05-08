@@ -70,7 +70,71 @@ TypeRegistration mType(typeid(Dali::RenderTask), typeid(Dali::BaseHandle), nullp
 
 SignalConnectorType signalConnector1(mType, Dali::String(SIGNAL_FINISHED), &RenderTask::DoConnectSignal);
 
-} // Unnamed namespace
+Dali::RenderTask::CameraActorType ConvertBuiltinCameraTypeToCameraActorType(Dali::RenderTask::BuiltinCameraType builtinCameraType)
+{
+  switch(builtinCameraType)
+  {
+    case Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SCENE:
+    {
+      return Dali::RenderTask::CameraActorType::BUILTIN_SCENE;
+    }
+    case Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR:
+    {
+      return Dali::RenderTask::CameraActorType::BUILTIN_SOURCE_ACTOR;
+    }
+    case Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR:
+    {
+      return Dali::RenderTask::CameraActorType::BUILTIN_STOPPER_ACTOR;
+    }
+    default:
+    {
+      // Never comes here, but keep it for safety.
+      return Dali::RenderTask::CameraActorType::DEFAULT;
+    }
+  }
+}
+
+Dali::RenderTask::BuiltinCameraType ConvertCameraActorTypeToBuiltinCameraType(Dali::RenderTask::CameraActorType cameraActorType)
+{
+  switch(cameraActorType)
+  {
+    case Dali::RenderTask::CameraActorType::BUILTIN_SCENE:
+    default: // Never comes here, but keep it for safety.
+    {
+      return Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SCENE;
+    }
+    case Dali::RenderTask::CameraActorType::BUILTIN_SOURCE_ACTOR:
+    {
+      return Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR;
+    }
+    case Dali::RenderTask::CameraActorType::BUILTIN_STOPPER_ACTOR:
+    {
+      return Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR;
+    }
+  }
+}
+
+} // unnamed namespace
+
+// Context for internal built-in camera for SetBuiltinCameraActor
+// This is used to track the internal camera actor and related data for auto camera setup
+// It will be created only when SetBuiltinCameraActor is called, and destroyed when the internal camera is cleared.
+struct RenderTask::InternalCameraContext
+{
+public:
+  CameraActorPtr      mInternalCameraActor{};      ///< Internal camera actor
+  Dali::Size          mBuiltinCameraScreenSize{};  ///< The screen position and size used for auto camera setup, used to detect changes in screen size
+  Dali::Property::Map mBuiltinCameraPropertyMap{}; ///< The property map for auto camera setup
+
+public:
+  void CreateInternalCameraActor()
+  {
+    mInternalCameraActor = CameraActor::New(Dali::Size(mBuiltinCameraScreenSize.width, mBuiltinCameraScreenSize.height));
+
+    mInternalCameraActor->SetProperty(Dali::Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    mInternalCameraActor->SetProperties(mBuiltinCameraPropertyMap);
+  }
+};
 
 RenderTaskPtr RenderTask::New(Actor* sourceActor, CameraActor* cameraActor, RenderTaskList& renderTaskList, bool isOverlayTask)
 {
@@ -88,6 +152,8 @@ RenderTaskPtr RenderTask::New(Actor* sourceActor, CameraActor* cameraActor, Rend
   // Set the default source & camera actors
   task->SetSourceActor(sourceActor);
   task->SetCameraActor(cameraActor);
+
+  task->SetCameraActorType(Dali::RenderTask::CameraActorType::DEFAULT);
 
   // no need for additional messages as scene objects defaults match ours
   return task;
@@ -111,6 +177,11 @@ void RenderTask::SetSourceActor(Actor* actor)
 
   // set the actor on exclusive container for hit testing
   mRenderTaskList.SetExclusive(this, mExclusive);
+
+  if(mInternalCameraContext)
+  {
+    SetBuiltinCameraActor(ConvertCameraActorTypeToBuiltinCameraType(mCameraActorType), mInternalCameraContext->mBuiltinCameraScreenSize, mInternalCameraContext->mBuiltinCameraPropertyMap);
+  }
 }
 
 Actor* RenderTask::GetSourceActor() const
@@ -156,31 +227,153 @@ bool RenderTask::GetInputEnabled() const
 
 void RenderTask::SetCameraActor(CameraActor* cameraActor)
 {
-  mCameraActor.SetActor(cameraActor);
+  // Clear internal camera when user sets a camera explicitly
+  ClearInternalCameraActor();
 
-  if(GetRenderTaskSceneObject())
+  SetCameraActorType(Dali::RenderTask::CameraActorType::USER);
+
+  mInternalCameraContext.reset();
+  SetCameraActorInternal(cameraActor);
+}
+
+void RenderTask::SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType builtinCameraType, Dali::Size screenSize, const Dali::Property::Map& cameraPropertyMap)
+{
+  // Clear any existing user-set camera actor
+  ClearInternalCameraActor();
+
+  if(!mInternalCameraContext)
   {
-    if(cameraActor)
+    mInternalCameraContext = std::make_unique<InternalCameraContext>();
+  }
+
+  SetCameraActorType(ConvertBuiltinCameraTypeToCameraActorType(builtinCameraType));
+
+  mInternalCameraContext->mBuiltinCameraScreenSize  = screenSize;
+  mInternalCameraContext->mBuiltinCameraPropertyMap = cameraPropertyMap;
+
+  Actor* parentOfCamera = nullptr;
+
+  switch(builtinCameraType)
+  {
+    case Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SCENE:
     {
-      SetCameraMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), &cameraActor->GetCameraSceneObject());
+      // Get source actor to find root layer
+      Actor* sourceActor = mSourceActor.GetActor();
+      if(!sourceActor)
+      {
+        return;
+      }
+
+      // Find the root layer of the source actor
+      // TODO : Need to request again if sourceActor added to scene after this method is called. (since root layer can be changed after sourceActor is added to scene)
+      // For now, just find the root layer at the time of this method call and parent the internal camera to it. If sourceActor is not on scene, ignore this logic.
+      if(!sourceActor->OnScene())
+      {
+        return;
+      }
+
+      Scene& scene = sourceActor->GetScene();
+      if(!scene.GetRootLayer())
+      {
+        return;
+      }
+
+      parentOfCamera = &scene.GetDefaultRootActor();
+      break;
     }
-    else
+    case Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR:
     {
-      SetCameraMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
+      // Get source actor
+      parentOfCamera = mSourceActor.GetActor();
+      break;
+    }
+    case Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR:
+    {
+      // Get stopper actor.
+      // If stopper actor not applied, use source actor instead.
+      parentOfCamera = mStopperActor.GetActor();
+      if(!parentOfCamera)
+      {
+        parentOfCamera = mSourceActor.GetActor();
+      }
+      break;
     }
   }
 
-  // set the actor on exclusive container for hit testing
-  mRenderTaskList.SetExclusive(this, mExclusive);
+  if(!parentOfCamera)
+  {
+    return;
+  }
+
+  mInternalCameraContext->CreateInternalCameraActor();
+  Internal::CameraActor& internalCamera = *(mInternalCameraContext->mInternalCameraActor.Get());
+
+  // Attach the camera
+  (*parentOfCamera).Add(internalCamera);
+
+  // Set as the camera for this render task
+  SetCameraActorInternal(&internalCamera);
+}
+
+void RenderTask::SetCameraActorInternal(CameraActor* cameraActor)
+{
+  mCameraActor.SetActor(cameraActor);
+
+  if(DALI_LIKELY(!EventThreadServices::IsShuttingDown()))
+  {
+    if(GetRenderTaskSceneObject())
+    {
+      if(cameraActor)
+      {
+        SetCameraMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), &cameraActor->GetCameraSceneObject());
+      }
+      else
+      {
+        SetCameraMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
+      }
+    }
+
+    // set the actor on exclusive container for hit testing
+    mRenderTaskList.SetExclusive(this, mExclusive);
+  }
+}
+
+void RenderTask::SetCameraActorType(Dali::RenderTask::CameraActorType cameraActorType)
+{
+  mCameraActorType = cameraActorType;
 }
 
 CameraActor* RenderTask::GetCameraActor() const
 {
-  if(mCameraActor.GetActor())
+  switch(mCameraActorType)
   {
-    return static_cast<CameraActor*>(mCameraActor.GetActor());
+    case Dali::RenderTask::CameraActorType::DEFAULT:
+    case Dali::RenderTask::CameraActorType::USER:
+    default:
+    {
+      if(mCameraActor.GetActor())
+      {
+        return static_cast<CameraActor*>(mCameraActor.GetActor());
+      }
+      break;
+    }
+    case Dali::RenderTask::CameraActorType::BUILTIN_SCENE:
+    case Dali::RenderTask::CameraActorType::BUILTIN_SOURCE_ACTOR:
+    case Dali::RenderTask::CameraActorType::BUILTIN_STOPPER_ACTOR:
+    {
+      if(mInternalCameraContext && mInternalCameraContext->mInternalCameraActor)
+      {
+        return mInternalCameraContext->mInternalCameraActor.Get();
+      }
+      break;
+    }
   }
   return nullptr;
+}
+
+Dali::RenderTask::CameraActorType RenderTask::GetCameraActorType() const
+{
+  return mCameraActorType;
 }
 
 void RenderTask::SetFrameBuffer(FrameBufferPtr frameBuffer)
@@ -727,6 +920,11 @@ void RenderTask::RenderUntil(Actor* stopperActor)
       SetStopperNodeMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
     }
   }
+
+  if(mInternalCameraContext && mCameraActorType == Dali::RenderTask::CameraActorType::BUILTIN_STOPPER_ACTOR)
+  {
+    SetBuiltinCameraActor(ConvertCameraActorTypeToBuiltinCameraType(mCameraActorType), mInternalCameraContext->mBuiltinCameraScreenSize, mInternalCameraContext->mBuiltinCameraPropertyMap);
+  }
 }
 
 void RenderTask::KeepRenderResult()
@@ -761,6 +959,21 @@ Dali::PixelData RenderTask::GetRenderResult()
     pixelData = mFrameBuffer->GetRenderResult();
   }
   return pixelData;
+}
+
+void RenderTask::ClearInternalCameraActor()
+{
+  if(mInternalCameraContext && mInternalCameraContext->mInternalCameraActor)
+  {
+    // If this is the current camera, clear it from the render task
+    SetCameraActorInternal(nullptr);
+
+    // Unparent and reset the internal camera
+    mInternalCameraContext->mInternalCameraActor->Unparent();
+
+    // Clear the internal camera reference
+    mInternalCameraContext->mInternalCameraActor.Reset();
+  }
 }
 
 const SceneGraph::RenderTask* RenderTask::GetRenderTaskSceneObject() const
@@ -1095,6 +1308,7 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
   mViewportGuideActor(),
   mInputMappingActor(),
   mRenderTaskList(renderTaskList),
+  mCameraActorType(Dali::RenderTask::CameraActorType::DEFAULT),
   mClearColor(Dali::RenderTask::DEFAULT_CLEAR_COLOR),
   mViewportPosition(Vector2::ZERO),
   mViewportSize(Vector2::ZERO),
@@ -1107,7 +1321,8 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
   mInputEnabled(Dali::RenderTask::DEFAULT_INPUT_ENABLED),
   mClearEnabled(Dali::RenderTask::DEFAULT_CLEAR_ENABLED),
   mCullMode(Dali::RenderTask::DEFAULT_CULL_MODE),
-  mRequiresSync(false)
+  mRequiresSync(false),
+  mInternalCameraContext(nullptr)
 {
   // Set id of render task
   mRenderTaskId = sceneObject->GetNotifyId();
@@ -1135,8 +1350,11 @@ RenderTask::~RenderTask()
   mInputMappingActor.Reset();
 
   ClearRenderResult();
+
+  // Clear internal camera actor if exists
+  ClearInternalCameraActor();
 }
 
 } // namespace Internal
 
-} // namespace Dali
+} //namespace Dali
