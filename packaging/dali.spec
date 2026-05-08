@@ -12,6 +12,7 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
+BuildRequires:  python3
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -149,6 +150,7 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
+%{_bindir}/dali-invoke-method-generator
 %{_libdir}/pkgconfig/dali2-core.pc
 %{dev_include_path}/dali/public-api/*
 %{dev_include_path}/dali/doc/*

@@ -81,6 +81,18 @@ bool BaseObject::DoAction(const Dali::StringView& actionName, const Property::Ma
   return false;
 }
 
+bool BaseObject::InvokeMethod(const Dali::StringView& methodName, const InvokeArguments& arguments, InvokeResult& result)
+{
+  Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
+
+  if(registry)
+  {
+    return registry->InvokeMethodTo(this, Integration::ToStdString(methodName), arguments, result);
+  }
+
+  return false;
+}
+
 Dali::String BaseObject::GetTypeName() const
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();

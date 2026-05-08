@@ -142,6 +142,11 @@ public:
   void AddActionFunction(std::string actionName, Dali::TypeInfo::ActionFunction function);
 
   /*
+   * Add an invokable method function
+   */
+  void AddMethodFunction(std::string methodName, Dali::TypeInfo::MethodFunction function);
+
+  /*
    * Add a function for connecting a signal.
    * @param[in] signalName The name of the signal.
    * @param[in] function The function used for connecting to the signal.
@@ -214,6 +219,16 @@ public:
    * @return bool If the action could be executed
    */
   bool DoActionTo(BaseObject* object, const std::string& actionName, const Property::Map& properties);
+
+  /**
+   * Invoke a method on base object.
+   * @param[in] object The base object to invoke upon
+   * @param[in] methodName The name of the desired method
+   * @param[in] arguments The arguments for the method
+   * @param[out] result The method result
+   * @return true if the method could be invoked
+   */
+  bool InvokeMethodTo(BaseObject* object, const std::string& methodName, const InvokeArguments& arguments, InvokeResult& result);
 
   /**
    * Connects a callback function with the object's signals.
@@ -404,11 +419,13 @@ private:
   };
 
   using ActionPair               = std::pair<std::string, Dali::TypeInfo::ActionFunction>;
+  using MethodPair               = std::pair<std::string, Dali::TypeInfo::MethodFunction>;
   using ConnectionPair           = std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction>;
   using RegisteredPropertyPair   = std::pair<std::uint32_t, RegisteredProperty>;
   using PropertyDefaultValuePair = std::pair<std::uint32_t, Property::Value>;
 
   using ActionContainer               = Dali::Internal::IndexedConstStringMap<Dali::TypeInfo::ActionFunction>;
+  using MethodContainer               = Dali::Internal::IndexedConstStringMap<Dali::TypeInfo::MethodFunction>;
   using ConnectorContainer            = Dali::Internal::IndexedConstStringMap<Dali::TypeInfo::SignalConnectorFunction>;
   using RegisteredPropertyContainer   = Dali::Internal::IndexedIntegerMap<RegisteredProperty>;
   using PropertyDefaultValueContainer = Dali::Internal::IndexedIntegerMap<Property::Value>;
@@ -432,6 +449,7 @@ private:
     Dali::CSharpTypeInfo::CreateFunction mCSharpCreate; // only one field can be initialized but this will have same value anyways
   };
   ActionContainer               mActions;
+  MethodContainer               mMethods;
   ConnectorContainer            mSignalConnectors;
   RegisteredPropertyContainer   mRegisteredProperties;
   RegisteredPropertyContainer   mRegisteredChildProperties;

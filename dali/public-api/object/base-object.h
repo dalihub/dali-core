@@ -23,6 +23,7 @@
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/object/invoke-method.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/signals/functor-delegate.h>
@@ -63,6 +64,11 @@ public:
    * @copydoc Dali::BaseHandle::DoAction
    */
   bool DoAction(const Dali::StringView& actionName, const Property::Map& attributes);
+
+  /**
+   * @copydoc Dali::BaseHandle::InvokeMethod
+   */
+  bool InvokeMethod(const Dali::StringView& methodName, const InvokeArguments& arguments, InvokeResult& result);
 
   /**
    * @copydoc Dali::BaseHandle::GetTypeName
