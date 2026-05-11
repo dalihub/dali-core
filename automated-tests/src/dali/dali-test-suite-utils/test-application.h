@@ -40,7 +40,7 @@ public:
   static const uint32_t DEFAULT_SURFACE_WIDTH  = 480;
   static const uint32_t DEFAULT_SURFACE_HEIGHT = 800;
 
-  static const Rect<int> DEFAULT_SURFACE_RECT;
+  static const BoundsInteger DEFAULT_SURFACE_RECT;
 
   static constexpr uint32_t DEFAULT_HORIZONTAL_DPI = 220;
   static constexpr uint32_t DEFAULT_VERTICAL_DPI   = 217;
@@ -74,8 +74,8 @@ public:
   void        ProcessEvent(const Dali::Integration::Event& event);
   void        SendNotification();
   bool        Render(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL, const char* location = NULL, bool uploadOnly = false);
-  bool        PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects);
-  bool        RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect);
+  bool        PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<BoundsInteger>& damagedRects);
+  bool        RenderWithPartialUpdate(std::vector<BoundsInteger>& damagedRects, BoundsInteger& clippingRect);
   bool        RenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location = NULL);
   uint32_t    GetUpdateStatus();
   bool        UpdateOnly(uint32_t intervalMilliseconds = DEFAULT_RENDER_INTERVAL);

@@ -272,7 +272,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::GetCurrentSurfaceRect
    */
-  const Rect<int32_t>& GetCurrentSurfaceRect() const;
+  const BoundsInteger& GetCurrentSurfaceRect() const;
 
   /**
    * @copydoc Dali::Integration::Scene::GetSurfaceRectChangedCount

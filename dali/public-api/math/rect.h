@@ -326,6 +326,18 @@ public:     // Data
 };
 
 /**
+ * @brief Bounds is an alias of Dali::Rect<float>.
+ * @SINCE_2_5.22
+ */
+using Bounds = Rect<float>;
+
+/**
+ * @brief BoundsInteger is an alias of Dali::Rect<int32_t>.
+ * @SINCE_2_5.22
+ */
+using BoundsInteger = Rect<int32_t>;
+
+/**
  * @brief Equality operator.
  *
  * @SINCE_1_0.0

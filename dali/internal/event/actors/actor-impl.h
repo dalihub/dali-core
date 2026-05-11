@@ -258,7 +258,7 @@ public:
    * @return Rect containing position of top-left corner on screen and size respectively.
    *         Returns (0,0,0,0) if actor is not on scene.
    */
-  Rect<> CalculateScreenExtents() const;
+  Bounds CalculateScreenExtents() const;
 
   /**
    * Calculates screen position and size from current node values.
@@ -285,7 +285,7 @@ public:
    * @return Rect containing position of top-left corner on screen and size respectively.
    *         Returns (0,0,0,0) if actor is not on scene.
    */
-  Rect<> CalculateCurrentScreenExtents() const;
+  Bounds CalculateCurrentScreenExtents() const;
 
   /**
    * @copydoc DevelActor::SetNeedGesturePropagation.

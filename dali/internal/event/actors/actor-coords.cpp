@@ -32,7 +32,7 @@ namespace
  * @param[out] viewportExtent Calculated extent by renderTask.
  * @return True if we success to get viewports. False otherwise
  */
-bool GetViewportExtentsFromRenderTask(const RenderTask& renderTask, Rect<float>& viewportExtent)
+bool GetViewportExtentsFromRenderTask(const RenderTask& renderTask, Bounds& viewportExtent)
 {
   if(renderTask.GetFrameBuffer())
   {
@@ -368,7 +368,7 @@ const Vector2 CalculateCurrentActorScreenPosition(const Actor& actor)
   return result;
 }
 
-Rect<> CalculateActorScreenExtents(const Actor& actor)
+Bounds CalculateActorScreenExtents(const Actor& actor)
 {
   Vector2 position2;
   Vector2 size2;
@@ -386,7 +386,7 @@ Rect<> CalculateActorScreenExtents(const Actor& actor)
   return {position2.x, position2.y, size2.x, size2.y};
 }
 
-Rect<> CalculateCurrentActorScreenExtents(const Actor& actor)
+Bounds CalculateCurrentActorScreenExtents(const Actor& actor)
 {
   Vector2 position2;
   Vector2 size2;
@@ -409,7 +409,7 @@ bool ConvertLocalToScreen(
   const Matrix&  viewMatrix,
   const Matrix&  projectionMatrix,
   const Matrix&  worldMatrix,
-  const Rect<>&  viewportExtent,
+  const Bounds&  viewportExtent,
   const Vector3& localPosition,
   float&         screenX,
   float&         screenY)
@@ -468,7 +468,7 @@ bool ConvertLocalToScreenRenderTask(
   CameraActor* camera = renderTask.GetCameraActor();
   if(camera)
   {
-    Rect<float> viewportExtent = {0.f, 0.f, 0.f, 0.f};
+    Bounds viewportExtent = {0.f, 0.f, 0.f, 0.f};
     if(!GetViewportExtentsFromRenderTask(renderTask, viewportExtent))
     {
       return success;
@@ -536,7 +536,7 @@ bool ConvertLocalToScreenExtentRenderTask(
   const Actor&      actor,
   const Matrix&     worldMatrix,
   const Vector3&    currentSize,
-  Rect<>&           screenExtent)
+  Bounds&           screenExtent)
 {
   bool         success     = false;
   const Actor* sourceActor = renderTask.GetSourceActor();
@@ -565,7 +565,7 @@ bool ConvertLocalToScreenExtentRenderTask(
   CameraActor* camera = renderTask.GetCameraActor();
   if(camera)
   {
-    Rect<float> viewportExtent = {0.f, 0.f, 0.f, 0.f};
+    Bounds viewportExtent = {0.f, 0.f, 0.f, 0.f};
     if(!GetViewportExtentsFromRenderTask(renderTask, viewportExtent))
     {
       return success;
@@ -628,7 +628,7 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   const Actor&          actor,
   const Matrix&         worldMatrix,
   const Vector3&        currentSize,
-  Rect<>&               screenExtent)
+  Bounds&               screenExtent)
 {
   // do a reverse traversal of all lists (as the default onscreen one is typically the last one)
   uint32_t taskCount = renderTaskList.GetTaskCount();
@@ -644,9 +644,9 @@ bool ConvertLocalToScreenExtentRenderTaskList(
   return false;
 }
 
-Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor)
+Bounds CalculateActorScreenExtentsRenderTaskList(const Actor& actor)
 {
-  Rect<> result = {0.0f, 0.0f, 0.0f, 0.0f};
+  Bounds result = {0.0f, 0.0f, 0.0f, 0.0f};
 
   if(actor.OnScene())
   {
@@ -659,9 +659,9 @@ Rect<> CalculateActorScreenExtentsRenderTaskList(const Actor& actor)
   return result;
 }
 
-Rect<> CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor)
+Bounds CalculateCurrentActorScreenExtentsRenderTaskList(const Actor& actor)
 {
-  Rect<> result = {0.0f, 0.0f, 0.0f, 0.0f};
+  Bounds result = {0.0f, 0.0f, 0.0f, 0.0f};
 
   if(actor.OnScene())
   {

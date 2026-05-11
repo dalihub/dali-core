@@ -1606,7 +1606,7 @@ int UtcDaliActorCalculateScreenExtents(void)
   application.SendNotification();
   application.Render();
 
-  auto expectedExtent = Rect<>{1.5f, 1.5f, 1.0f, 1.0f};
+  auto expectedExtent = Bounds{1.5f, 1.5f, 1.0f, 1.0f};
   auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1633,7 +1633,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   application.SendNotification();
   application.Render();
 
-  auto expectedExtent = Rect<>{1.0f, 1.5f, 2.0f, 1.0f};
+  auto expectedExtent = Bounds{1.0f, 1.5f, 2.0f, 1.0f};
   auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1645,7 +1645,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   application.SendNotification();
   application.Render();
 
-  expectedExtent = Rect<>{1.5f, 1.0f, 1.0f, 2.0f};
+  expectedExtent = Bounds{1.5f, 1.0f, 1.0f, 2.0f};
   actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1672,7 +1672,7 @@ int UtcDaliActorCalculateCurrentScreenExtentsWithRotation(void)
   application.SendNotification();
   application.Render();
 
-  auto expectedExtent = Rect<>{1.0f, 1.5f, 2.0f, 1.0f};
+  auto expectedExtent = Bounds{1.0f, 1.5f, 2.0f, 1.0f};
   auto actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1684,7 +1684,7 @@ int UtcDaliActorCalculateCurrentScreenExtentsWithRotation(void)
   application.SendNotification();
   application.Render();
 
-  expectedExtent = Rect<>{1.5f, 1.0f, 1.0f, 2.0f};
+  expectedExtent = Bounds{1.5f, 1.0f, 1.0f, 2.0f};
   actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1784,7 +1784,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
-  auto expectedExtent = Rect<>{1.5f, 1.5f, 1.0f, 1.0f};
+  auto expectedExtent = Bounds{1.5f, 1.5f, 1.0f, 1.0f};
   auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1805,7 +1805,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
-  expectedExtent = Rect<>(4.5f, 0.5f, 3.0f, 7.0f);
+  expectedExtent = Bounds(4.5f, 0.5f, 3.0f, 7.0f);
   actualExtent   = DevelActor::CalculateScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1817,7 +1817,7 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
-  expectedExtent = Rect<>(3.0f, 1.0f, 2.0f, 4.0f);
+  expectedExtent = Bounds(3.0f, 1.0f, 2.0f, 4.0f);
   actualExtent   = DevelActor::CalculateCurrentScreenExtents(actor);
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1883,7 +1883,7 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
 
   Vector2 sceneSize = scene.GetSize();
 
-  auto expectedExtent = Rect<>{sceneSize.x * 0.5f + 1.5f, sceneSize.y * 0.5f + 14.5f, 1.0f, 3.0f};
+  auto expectedExtent = Bounds{sceneSize.x * 0.5f + 1.5f, sceneSize.y * 0.5f + 14.5f, 1.0f, 3.0f};
   auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
   auto actualPosition = DevelActor::CalculateScreenPosition(actor);
   {
@@ -1995,7 +1995,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
   application.SendNotification();
   application.Render(16u);
 
-  auto expectedExtent = Rect<>{sceneSize.x * 0.5f + sourcePosition.x - sourceSize.x * 0.5f,
+  auto expectedExtent = Bounds{sceneSize.x * 0.5f + sourcePosition.x - sourceSize.x * 0.5f,
                                sceneSize.y * 0.5f + sourcePosition.z - sourceSize.z * 0.5f,
                                sourceSize.x,
                                sourceSize.z};
@@ -2035,7 +2035,7 @@ int UtcDaliActorCalculateScreenInCustomCameraAndOffscreenLayer3D(void)
   application.SendNotification();
   application.Render(16u);
 
-  expectedExtent = Rect<>{sceneSize.x * 0.5f + rootPosition.x + (sourcePosition.x - sourceSize.x * 0.5f) * rootSize.x / sceneSize.x,
+  expectedExtent = Bounds{sceneSize.x * 0.5f + rootPosition.x + (sourcePosition.x - sourceSize.x * 0.5f) * rootSize.x / sceneSize.x,
                           sceneSize.y * 0.5f + rootPosition.y + (sourcePosition.z - sourceSize.z * 0.5f) * rootSize.y / sceneSize.y,
                           sourceSize.x * rootSize.x / sceneSize.x,
                           sourceSize.z * rootSize.y / sceneSize.y};
@@ -12003,8 +12003,8 @@ int utcDaliActorPartialUpdate(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -12029,7 +12029,7 @@ int utcDaliActorPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12046,7 +12046,7 @@ int utcDaliActorPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 736, 64, 64); // in screen coordinates
+  clippingRect = BoundsInteger(0, 736, 64, 64); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12063,7 +12063,7 @@ int utcDaliActorPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 720, 80, 80); // in screen coordinates
+  clippingRect = BoundsInteger(0, 720, 80, 80); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12082,7 +12082,7 @@ int utcDaliActorPartialUpdate(void)
   clippingRect = damagedRects[0];
 
   DALI_TEST_EQUALS(clippingRect.IsValid(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, Rect<int>(16, 720, 64, 64), TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, BoundsInteger(16, 720, 64, 64), TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12107,8 +12107,8 @@ int utcDaliActorPartialUpdateSetColor(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -12133,7 +12133,7 @@ int utcDaliActorPartialUpdateSetColor(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12158,7 +12158,7 @@ int utcDaliActorPartialUpdateSetColor(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12173,8 +12173,8 @@ namespace
 {
 void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
 {
-  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  std::vector<Rect<int>> damagedRects;
+  BoundsInteger              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<BoundsInteger> damagedRects;
 
   // Try render several frames as full surface.
   for(int i = 0; i < 3; i++)
@@ -12224,8 +12224,8 @@ int utcDaliActorPartialUpdateSetProperty(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -12251,7 +12251,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12306,7 +12306,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(0, 736, 64, 64); // new clipping rect size increased due to change in actor size
+  clippingRect = BoundsInteger(0, 736, 64, 64); // new clipping rect size increased due to change in actor size
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12349,14 +12349,14 @@ int utcDaliActorPartialUpdateTwoActors(void)
   application.GetScene().Add(actor2);
 
   application.SendNotification();
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
   application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
-  DirtyRectChecker(damagedRects, {Rect<int>(64, 672, 64, 64), Rect<int>(96, 592, 112, 112)}, true, TEST_LOCATION);
+  DirtyRectChecker(damagedRects, {BoundsInteger(64, 672, 64, 64), BoundsInteger(96, 592, 112, 112)}, true, TEST_LOCATION);
 
   // in screen coordinates, adaptor would calculate it using previous frames information
-  Rect<int> clippingRect = Rect<int>(64, 592, 144, 192);
+  BoundsInteger clippingRect = BoundsInteger(64, 592, 144, 192);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12379,7 +12379,7 @@ int utcDaliActorPartialUpdateTwoActors(void)
   application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_CHECK(damagedRects.size() > 0);
-  DirtyRectChecker(damagedRects, {Rect<int>(64, 672, 64, 64)}, false, TEST_LOCATION);
+  DirtyRectChecker(damagedRects, {BoundsInteger(64, 672, 64, 64)}, false, TEST_LOCATION);
 
   // in screen coordinates, adaptor would calculate it using previous frames information
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12419,12 +12419,12 @@ int utcDaliActorPartialUpdateActorsWithSizeHint01(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
   application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  Rect<int> clippingRect = Rect<int>(16, 688, 96, 96);
+  BoundsInteger clippingRect = BoundsInteger(16, 688, 96, 96);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12459,7 +12459,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint01(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(48, 688, 64, 64);
+  clippingRect = BoundsInteger(48, 688, 64, 64);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12494,7 +12494,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint01(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(0, 704, 80, 96);
+  clippingRect = BoundsInteger(0, 704, 80, 96);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12528,12 +12528,12 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
   application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  Rect<int> clippingRect = Rect<int>(32, 704, 64, 64);
+  BoundsInteger clippingRect = BoundsInteger(32, 704, 64, 64);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12555,7 +12555,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(16, 688, 96, 96);
+  clippingRect = BoundsInteger(16, 688, 96, 96);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12578,7 +12578,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(16, 672, 112, 112);
+  clippingRect = BoundsInteger(16, 672, 112, 112);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12613,12 +12613,12 @@ int utcDaliActorPartialUpdateActorsWithSizeHint03(void)
   application.GetScene().Add(actor);
 
   application.SendNotification();
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
   application.PreRenderWithPartialUpdate(TestApplication::DEFAULT_RENDER_INTERVAL, nullptr, damagedRects);
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  Rect<int> clippingRect = Rect<int>(16, 688, 96, 96);
+  BoundsInteger clippingRect = BoundsInteger(16, 688, 96, 96);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12644,7 +12644,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint03(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(16, 688, 112, 112);
+  clippingRect = BoundsInteger(16, 688, 112, 112);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12683,9 +12683,9 @@ int utcDaliActorPartialUpdateAnimation01(void)
   actor2.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   application.GetScene().Add(actor2);
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
-  Rect<int>              expectedRect1, expectedRect2;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
+  BoundsInteger              expectedRect1, expectedRect2;
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -12693,8 +12693,8 @@ int utcDaliActorPartialUpdateAnimation01(void)
   DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
 
   // Aligned by 16
-  expectedRect1 = Rect<int>(0, 704, 96, 112); // in screen coordinates, includes 1 last frames updates
-  expectedRect2 = Rect<int>(0, 768, 32, 48);  // in screen coordinates, includes 1 last frames updates
+  expectedRect1 = BoundsInteger(0, 704, 96, 112); // in screen coordinates, includes 1 last frames updates
+  expectedRect2 = BoundsInteger(0, 768, 32, 48);  // in screen coordinates, includes 1 last frames updates
   DirtyRectChecker(damagedRects, {expectedRect1, expectedRect2}, true, TEST_LOCATION);
 
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
@@ -12790,8 +12790,8 @@ int utcDaliActorPartialUpdateAnimation02(void)
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   application.GetScene().Add(actor);
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -12799,7 +12799,7 @@ int utcDaliActorPartialUpdateAnimation02(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 768, 32, 48); // in screen coordinates, includes 1 last frames updates
+  clippingRect = BoundsInteger(0, 768, 32, 48); // in screen coordinates, includes 1 last frames updates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -12822,7 +12822,7 @@ int utcDaliActorPartialUpdateAnimation02(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  clippingRect = Rect<int>(0, 768, 32, 48);
+  clippingRect = BoundsInteger(0, 768, 32, 48);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Started animation
@@ -12876,15 +12876,15 @@ int utcDaliActorPartialUpdateChangeVisibility(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   // 1. Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -12952,15 +12952,15 @@ int utcDaliActorPartialUpdateOnOffScene(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   // 1. Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -13030,9 +13030,9 @@ int utcDaliActorPartialUpdateSkipRendering(void)
   actor1.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
   application.GetScene().Add(actor1);
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
-  Rect<int>              expectedRect1;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
+  BoundsInteger              expectedRect1;
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -13040,7 +13040,7 @@ int utcDaliActorPartialUpdateSkipRendering(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  expectedRect1 = Rect<int>(0, 704, 96, 112); // in screen coordinates
+  expectedRect1 = BoundsInteger(0, 704, 96, 112); // in screen coordinates
   DirtyRectChecker(damagedRects, {expectedRect1}, true, TEST_LOCATION);
 
   clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
@@ -13073,7 +13073,7 @@ int utcDaliActorPartialUpdateSkipRendering(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 0, TEST_LOCATION);
 
-  clippingRect = Rect<int>();
+  clippingRect = BoundsInteger();
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Skip rendering
@@ -13119,8 +13119,8 @@ int utcDaliActorPartialUpdate3DNode(void)
   actor1.SetProperty(Actor::Property::SIZE, Vector3(80.0f, 80.0f, 0.0f));
   application.GetScene().Add(actor1);
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -13211,14 +13211,14 @@ int utcDaliActorPartialUpdateNotRenderableActor(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // 1. Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13261,14 +13261,14 @@ int utcDaliActorPartialUpdateChangeTransparency(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13408,14 +13408,14 @@ int utcDaliActorPartialUpdateChangeParentOpacity(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13470,14 +13470,14 @@ int utcDaliActorPartialUpdateAddRemoveRenderer(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13557,27 +13557,27 @@ int utcDaliActorPartialUpdate3DTransform(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect1 = Rect<int>(0, 752, 48, 48); // in screen coordinates
-  Rect<int> clippingRect2 = Rect<int>(144, 608, 48, 48);
+  BoundsInteger clippingRect1 = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  BoundsInteger clippingRect2 = BoundsInteger(144, 608, 48, 48);
   DirtyRectChecker(damagedRects, {clippingRect1, clippingRect2}, true, TEST_LOCATION);
 
-  Rect<int> surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  BoundsInteger surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
 
   damagedRects.clear();
-  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
 
   damagedRects.clear();
-  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
 
@@ -13593,7 +13593,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   // Should update full area
-  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {surfaceRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
@@ -13607,7 +13607,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   // Should update full area
-  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {surfaceRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
@@ -13621,7 +13621,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   // Should update full area
-  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {surfaceRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
@@ -13634,7 +13634,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect2 = Rect<int>(144, 592, 64, 64);
+  clippingRect2 = BoundsInteger(144, 592, 64, 64);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect2}, true, TEST_LOCATION);
 
@@ -13650,7 +13650,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   application.SendNotification();
 
   damagedRects.clear();
-  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
 
@@ -13666,7 +13666,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   // Should update full area
-  surfaceRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  surfaceRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {surfaceRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, surfaceRect);
@@ -13706,14 +13706,14 @@ int utcDaliActorPartialUpdateOneActorMultipleRenderers(void)
 
   DALI_TEST_EQUALS(actor.GetRendererCount(), 2u, TEST_LOCATION);
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect, clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13735,7 +13735,7 @@ int utcDaliActorPartialUpdateOneActorMultipleRenderers(void)
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
@@ -13754,7 +13754,7 @@ int utcDaliActorPartialUpdateOneActorMultipleRenderers(void)
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
@@ -13800,14 +13800,14 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect, clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13829,7 +13829,7 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
   damagedRects.clear();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
   DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect, clippingRect}, true, TEST_LOCATION);
 
@@ -13874,14 +13874,14 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea01(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 736, 64, 64); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 736, 64, 64); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13907,7 +13907,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea01(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 736, 64, 64); // in screen coordinates
+  clippingRect = BoundsInteger(0, 736, 64, 64); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
@@ -13951,14 +13951,14 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea02(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 736, 64, 64); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 736, 64, 64); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -13985,7 +13985,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea02(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 736, 64, 80); // in screen coordinates
+  clippingRect = BoundsInteger(0, 736, 64, 80); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
@@ -14024,14 +14024,14 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea03(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(0, 736, 64, 64); // in screen coordinates
+  BoundsInteger clippingRect = BoundsInteger(0, 736, 64, 64); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -14062,7 +14062,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea03(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 736, 64, 80); // in screen coordinates
+  clippingRect = BoundsInteger(0, 736, 64, 80); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::USE_TEXTURE_UPDATE_AREA).Get<bool>(), true, TEST_LOCATION);
@@ -14078,7 +14078,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea03(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 720, 80, 96); // in screen coordinates
+  clippingRect = BoundsInteger(0, 720, 80, 96); // in screen coordinates
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   END_TEST;

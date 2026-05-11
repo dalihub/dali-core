@@ -958,8 +958,8 @@ namespace
 {
 void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
 {
-  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  std::vector<Rect<int>> damagedRects;
+  BoundsInteger              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<BoundsInteger> damagedRects;
 
   // Try render several frames as full surface.
   for(int i = 0; i < 3; i++)
@@ -1006,8 +1006,8 @@ int utcDaliUniformBlockPartialUpdate(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   // 1. Actor added, damaged rect is added size of actor
   damagedRects.clear();
@@ -1015,7 +1015,7 @@ int utcDaliUniformBlockPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
 
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -1040,7 +1040,7 @@ int utcDaliUniformBlockPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
 
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);

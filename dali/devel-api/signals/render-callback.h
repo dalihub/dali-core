@@ -46,7 +46,7 @@ struct DALI_CORE_API RenderCallbackInput
   Dali::Matrix           mvp;
   Dali::Matrix           projection;
   Dali::Size             size;
-  Dali::Rect<int32_t>    clippingBox; ///< in screen coordinates
+  Dali::BoundsInteger    clippingBox; ///< in screen coordinates
   Dali::Vector<uint32_t> textureBindings;
 
   Dali::Any eglContext;         ///< Storage for EGL Context

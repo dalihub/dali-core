@@ -69,7 +69,7 @@ TextureSet CreateTextureSet(Pixel::Format format, int width, int height);
 // Note that the order of damagedRect is not important
 struct RectSorter
 {
-  bool operator()(const Rect<int>& lhs, const Rect<int>& rhs) const
+  bool operator()(const BoundsInteger& lhs, const BoundsInteger& rhs) const
   {
     if(lhs.x != rhs.x)
     {
@@ -87,7 +87,7 @@ struct RectSorter
   }
 };
 
-void DirtyRectChecker(const std::vector<Rect<int>>& damagedRects, std::multiset<Rect<int>, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation);
+void DirtyRectChecker(const std::vector<BoundsInteger>& damagedRects, std::multiset<BoundsInteger, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation);
 
 } // namespace Dali
 

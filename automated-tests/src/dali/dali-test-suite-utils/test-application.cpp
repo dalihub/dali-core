@@ -20,7 +20,7 @@
 
 namespace Dali
 {
-const Rect<int> TestApplication::DEFAULT_SURFACE_RECT = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+const BoundsInteger TestApplication::DEFAULT_SURFACE_RECT = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
 
 bool TestApplication::mLoggingEnabled = true;
 
@@ -217,7 +217,7 @@ bool TestApplication::Render(uint32_t intervalMilliseconds, const char* location
   {
     for(auto&& scene : mScenes)
     {
-      std::vector<Rect<int>> damagedRects;
+      std::vector<BoundsInteger> damagedRects;
 
       mCore->PreRenderScene(scene, mScenePreRenderStatus, damagedRects);
       mCore->RenderScene(mRenderStatus, scene, true /*render the off-screen buffers*/);
@@ -231,7 +231,7 @@ bool TestApplication::Render(uint32_t intervalMilliseconds, const char* location
   return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
 }
 
-bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<Rect<int>>& damagedRects)
+bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, const char* location, std::vector<BoundsInteger>& damagedRects)
 {
   DoUpdate(intervalMilliseconds, location);
 
@@ -241,7 +241,7 @@ bool TestApplication::PreRenderWithPartialUpdate(uint32_t intervalMilliseconds, 
   return mStatus.KeepUpdating() || mRenderStatus.NeedsUpdate();
 }
 
-bool TestApplication::RenderWithPartialUpdate(std::vector<Rect<int>>& damagedRects, Rect<int>& clippingRect)
+bool TestApplication::RenderWithPartialUpdate(std::vector<BoundsInteger>& damagedRects, BoundsInteger& clippingRect)
 {
   mCore->RenderScene(mRenderStatus, mScene, true /*render the off-screen buffers*/);
   if(!clippingRect.IsEmpty())
@@ -271,8 +271,8 @@ bool TestApplication::RenderWithPartialUpdate(uint32_t intervalMilliseconds, con
 
   for(auto&& scene : mScenes)
   {
-    std::vector<Rect<int>> damagedRects;
-    Rect<int>              clippingRect{};
+    std::vector<BoundsInteger> damagedRects;
+    BoundsInteger              clippingRect{};
 
     mCore->PreRenderScene(scene, mScenePreRenderStatus, damagedRects);
     mCore->RenderScene(mRenderStatus, scene, true /*render the off-screen buffers*/);
@@ -319,7 +319,7 @@ bool TestApplication::GetRenderNeedsPostRender()
 
 bool TestApplication::RenderOnly()
 {
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Update Time values
   mCore->PreRender(mRenderStatus, false /*do not force clear*/);

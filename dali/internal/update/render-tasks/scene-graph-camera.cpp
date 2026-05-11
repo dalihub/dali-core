@@ -805,7 +805,7 @@ bool Camera::CheckAABBInFrustum(const Vector3& origin, const Vector3& halfExtent
   return true;
 }
 
-Dali::Rect<int32_t> Camera::GetOrthographicClippingBox() const
+Dali::BoundsInteger Camera::GetOrthographicClippingBox() const
 {
   const float orthographicSize = mOrthographicSize.Get();
   const float aspect           = mAspectRatio.Get();
@@ -813,7 +813,7 @@ Dali::Rect<int32_t> Camera::GetOrthographicClippingBox() const
   const float halfWidth  = mProjectionDirection.Get() == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize * aspect : orthographicSize;
   const float halfHeight = mProjectionDirection.Get() == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize : orthographicSize / aspect;
 
-  return Dali::Rect<int32_t>(-halfWidth, -halfHeight, halfWidth * 2.0f, halfHeight * 2.0f);
+  return Dali::BoundsInteger(-halfWidth, -halfHeight, halfWidth * 2.0f, halfHeight * 2.0f);
 }
 
 uint32_t Camera::UpdateProjection()

@@ -217,7 +217,7 @@ bool Scene::IsRenderingSkipped() const
   return mSkipRendering;
 }
 
-void Scene::SetSurfaceRect(const Rect<int32_t>& rect)
+void Scene::SetSurfaceRect(const BoundsInteger& rect)
 {
   DALI_LOG_RELEASE_INFO("update surfce rect in scene-graph, from width[%d], height[%d], to width[%d], height[%d]. Changed count [%d]\n", mSurfaceRect.width, mSurfaceRect.height, rect.width, rect.height, mSurfaceRectChangedCount + 1u);
 
@@ -230,7 +230,7 @@ void Scene::SetSurfaceRect(const Rect<int32_t>& rect)
   }
 }
 
-const Rect<int32_t>& Scene::GetSurfaceRect() const
+const BoundsInteger& Scene::GetSurfaceRect() const
 {
   return mSurfaceRect;
 }

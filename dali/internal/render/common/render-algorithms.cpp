@@ -220,7 +220,7 @@ inline Graphics::Rect2D Rect2DFromClippingBox(ClippingBox clippingBox, int orien
   return RecalculateRect(rect2D, orientation, viewport);
 }
 
-inline Graphics::Rect2D Rect2DFromRect(Dali::Rect<int> rect, int orientation, Graphics::Viewport viewport)
+inline Graphics::Rect2D Rect2DFromRect(Dali::BoundsInteger rect, int orientation, Graphics::Viewport viewport)
 {
   Graphics::Rect2D rect2D{rect.x, rect.y, static_cast<uint32_t>(abs(rect.width)), static_cast<uint32_t>(abs(rect.height))};
   return RecalculateRect(rect2D, orientation, viewport);
@@ -608,8 +608,8 @@ inline void RenderAlgorithms::ProcessRenderList(const RenderList&               
                                                 bool                                     depthBufferAvailable,
                                                 bool                                     stencilBufferAvailable,
                                                 const RenderInstruction&                 instruction,
-                                                const Rect<int32_t>&                     viewport,
-                                                const Rect<int>&                         rootClippingRect,
+                                                const BoundsInteger&                     viewport,
+                                                const BoundsInteger&                     rootClippingRect,
                                                 int                                      orientation,
                                                 const Uint16Pair&                        sceneSize,
                                                 Graphics::RenderPass&                    renderPass,
@@ -755,8 +755,8 @@ void RenderAlgorithms::ProcessRenderInstruction(const RenderInstruction&        
                                                 Graphics::CommandBuffer&                 commandBuffer,
                                                 bool                                     depthBufferAvailable,
                                                 bool                                     stencilBufferAvailable,
-                                                const Rect<int32_t>&                     viewport,
-                                                const Rect<int>&                         rootClippingRect,
+                                                const BoundsInteger&                     viewport,
+                                                const BoundsInteger&                     rootClippingRect,
                                                 int                                      orientation,
                                                 const Uint16Pair&                        sceneSize,
                                                 Graphics::RenderPass&                    renderPass,
