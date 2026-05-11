@@ -102,6 +102,18 @@ protected: // API for deriving classes
   }
 
   /**
+   * @brief Replaces the vector data with new data.
+   *
+   * For trivial types, just swap pointers.
+   * @SINCE_2_5.23
+   * @param[in] newData New data address to be replaced
+   */
+  void Replace(void* newData) noexcept
+  {
+    VectorBase::Replace(newData);
+  }
+
+  /**
    * @brief Erases an element. Does not change capacity.
    *
    * @SINCE_1_0.0
