@@ -44,7 +44,7 @@ public:
   /**
    * @brief Rectangle describing area on screen.
    */
-  using ClippingBox = Dali::Rect<int32_t>;
+  using ClippingBox = Dali::BoundsInteger;
 
 public:
   /**
@@ -75,8 +75,8 @@ public:
                                 Graphics::CommandBuffer&                 commandBuffer,
                                 bool                                     depthBufferAvailable,
                                 bool                                     stencilBufferAvailable,
-                                const Rect<int32_t>&                     viewport,
-                                const Rect<int>&                         rootClippingRect,
+                                const BoundsInteger&                     viewport,
+                                const BoundsInteger&                     rootClippingRect,
                                 int                                      orientation,
                                 const Uint16Pair&                        sceneSize,
                                 Graphics::RenderPass&                    renderPass,
@@ -142,8 +142,8 @@ private:
                                 bool                                                 depthBufferAvailable,
                                 bool                                                 stencilBufferAvailable,
                                 const Dali::Internal::SceneGraph::RenderInstruction& instruction, // in the case of reflection, things like CullFace need to be adjusted for reflection world
-                                const Rect<int32_t>&                                 viewport,
-                                const Rect<int>&                                     rootClippingRect,
+                                const BoundsInteger&                                 viewport,
+                                const BoundsInteger&                                 rootClippingRect,
                                 int                                                  orientation,
                                 const Uint16Pair&                                    sceneSize,
                                 Graphics::RenderPass&                                renderPass,

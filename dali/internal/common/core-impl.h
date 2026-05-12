@@ -130,7 +130,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::PreRenderScene()
    */
-  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects);
+  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<BoundsInteger>& damagedRects);
 
   /**
    * @copydoc Dali::Integration::Core::RenderScene()
@@ -140,7 +140,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::RenderScene()
    */
-  void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
+  void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, BoundsInteger& clippingRect);
 
   /**
    * @copydoc Dali::Integration::Core::ClearScene()

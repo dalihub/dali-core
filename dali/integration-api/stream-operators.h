@@ -68,24 +68,24 @@ DALI_CORE_API std::ostream& operator<<(std::ostream& outStream, const StringView
  */
 
 /**
- * @brief Print Dali::Rect<int32_t>.
+ * @brief Print Dali::BoundsInteger.
  *
  * @SINCE_1_0.0
  * @param[in] stream The output stream operator
- * @param[in] rectangle the rectangle to output
+ * @param[in] boundsInteger the integer bounds to output
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Rect<int32_t>& rectangle);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const BoundsInteger& boundsInteger);
 
 /**
- * @brief Print Dali::Rect<float>.
+ * @brief Print Dali::Bounds.
  *
  * @SINCE_1_0.0
  * @param[in] stream The output stream operator
- * @param[in] rectangle the rectangle to output
+ * @param[in] bounds the bounds to output
  * @return The output stream operator
  */
-DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Rect<float>& rectangle);
+DALI_CORE_API std::ostream& operator<<(std::ostream& o, const Bounds& bounds);
 
 /**
  * @brief Print a Vector2.

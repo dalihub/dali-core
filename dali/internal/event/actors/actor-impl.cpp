@@ -1725,7 +1725,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
   }
 }
 
-Rect<> Actor::CalculateScreenExtents() const
+Bounds Actor::CalculateScreenExtents() const
 {
   if(mLayer3DParentsCount == 0)
   {
@@ -1738,7 +1738,7 @@ Rect<> Actor::CalculateScreenExtents() const
   }
 }
 
-Rect<> Actor::CalculateCurrentScreenExtents() const
+Bounds Actor::CalculateCurrentScreenExtents() const
 {
   if(mLayer3DParentsCount == 0)
   {

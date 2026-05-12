@@ -81,7 +81,7 @@ void TestRenderSurface::StartRender()
 {
 }
 
-bool TestRenderSurface::PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect)
+bool TestRenderSurface::PreRender(bool resizingSurface, const std::vector<BoundsInteger>& damageRects, BoundsInteger& clippingRect)
 {
   return true;
 }

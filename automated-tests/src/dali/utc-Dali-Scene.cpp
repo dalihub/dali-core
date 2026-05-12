@@ -1404,7 +1404,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   auto stage = Stage::GetCurrent();
   DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
 
-  Rect<int32_t> surfaceRect = defaultScene.GetCurrentSurfaceRect();
+  BoundsInteger surfaceRect = defaultScene.GetCurrentSurfaceRect();
 
   uint32_t surfaceResized;
   // check resized flag before surface is resized.
@@ -1421,7 +1421,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
   // Check current surface rect
-  Rect<int32_t> newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
+  BoundsInteger newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
 
   // It should not be changed yet.
   DALI_TEST_CHECK(surfaceRect == newSurfaceRect);
@@ -1461,7 +1461,7 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
     DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
     // Check current surface rect
-    Rect<int32_t> newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
+    BoundsInteger newSurfaceRect = defaultScene.GetCurrentSurfaceRect();
 
     // It should not be changed yet.
     DALI_TEST_CHECK(surfaceRect == newSurfaceRect);
@@ -1527,7 +1527,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   application.Render(0);
   glAbstraction.ResetViewportCallStack();
 
-  Rect<int32_t> initialViewport = newTask.GetViewport();
+  BoundsInteger initialViewport = newTask.GetViewport();
   int           initialWidth    = initialViewport.width;
   int           initialHeight   = initialViewport.height;
   DALI_TEST_EQUALS(initialWidth, testWidth, TEST_LOCATION);
@@ -1557,7 +1557,7 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   DALI_TEST_CHECK(callStack.FindMethodAndGetParameters("Viewport", viewportParams));
 
   // Second render-task should not be affected
-  Rect<int32_t> viewport = newTask.GetViewport();
+  BoundsInteger viewport = newTask.GetViewport();
   int           width    = viewport.width;
   int           height   = viewport.height;
   DALI_TEST_EQUALS(width, testWidth, TEST_LOCATION);
@@ -1604,8 +1604,8 @@ namespace
 {
 void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
 {
-  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  std::vector<Rect<int>> damagedRects;
+  BoundsInteger              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<BoundsInteger> damagedRects;
 
   // Try render several frames as full surface.
   for(int i = 0; i < 3; i++)
@@ -1636,8 +1636,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -1674,8 +1674,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -1708,8 +1708,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -1745,8 +1745,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -1787,8 +1787,8 @@ int UtcDaliSceneScreenRotatedWithAngle90(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -1824,8 +1824,8 @@ int UtcDaliSceneScreenRotatedWithAngle90(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -1866,8 +1866,8 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle90(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -1903,8 +1903,8 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle90(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -1945,8 +1945,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -1982,8 +1982,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2023,8 +2023,8 @@ int UtcDaliSceneScreenRotatedWithAngle180(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2060,8 +2060,8 @@ int UtcDaliSceneScreenRotatedWithAngle180(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2101,8 +2101,8 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle180(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2139,8 +2139,8 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle180(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -2173,8 +2173,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2210,8 +2210,8 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2252,8 +2252,8 @@ int UtcDaliSceneScreenRotatedWithAngle270(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2289,8 +2289,8 @@ int UtcDaliSceneScreenRotatedWithAngle270(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2331,8 +2331,8 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle270(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2368,8 +2368,8 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle270(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2410,8 +2410,8 @@ int UtcDaliSceneSetSurfaceRotationCompletedAcknowledgementWithAngle90(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2447,8 +2447,8 @@ int UtcDaliSceneSetSurfaceRotationCompletedAcknowledgementWithAngle90(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2491,8 +2491,8 @@ int UtcDaliSceneSetScreenRotationCompletedAcknowledgementWithAngle90(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2528,8 +2528,8 @@ int UtcDaliSceneSetScreenRotationCompletedAcknowledgementWithAngle90(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2572,8 +2572,8 @@ int UtcDaliSceneSetSurfaceAndScreenRotationCompletedAcknowledgementWithAngle90(v
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2609,8 +2609,8 @@ int UtcDaliSceneSetSurfaceAndScreenRotationCompletedAcknowledgementWithAngle90(v
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
-  clippingRect = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // It is recalculation for glScissor.
@@ -2653,8 +2653,8 @@ int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -2673,9 +2673,9 @@ int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(208, 368, 64, 64); // in screen coordinates
+  clippingRect = BoundsInteger(208, 368, 64, 64); // in screen coordinates
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -2700,9 +2700,9 @@ int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(208, 208, 224, 224); // in screen coordinates, merged value with the previous rect
+  clippingRect = BoundsInteger(208, 208, 224, 224); // in screen coordinates, merged value with the previous rect
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -3385,7 +3385,7 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   scene.Add(actor);
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
@@ -3393,11 +3393,11 @@ int UtcDaliSceneEnableDisablePartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  const Rect<int> ACTOR_CLIPPING_RECT = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 1 last frames updates
-  Size            sceneSize           = scene.GetSize();
-  const Rect<int> SCENE_CLIPPING_RECT = Rect<int>(0, 0, sceneSize.width, sceneSize.height);
+  const BoundsInteger ACTOR_CLIPPING_RECT = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 1 last frames updates
+  Size                sceneSize           = scene.GetSize();
+  const BoundsInteger SCENE_CLIPPING_RECT = BoundsInteger(0, 0, sceneSize.width, sceneSize.height);
 
-  Rect<int> clippingRect = ACTOR_CLIPPING_RECT;
+  BoundsInteger clippingRect = ACTOR_CLIPPING_RECT;
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
@@ -3960,9 +3960,9 @@ int UtcDaliSceneRequestFullUpdatePartialRendering(void)
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   scene.Add(actor);
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
-  Rect<int>              expectedRect1, expectedRect2;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
+  BoundsInteger              expectedRect1, expectedRect2;
 
   // Initial render to populate dirty rects
   application.SendNotification();
@@ -3971,8 +3971,8 @@ int UtcDaliSceneRequestFullUpdatePartialRendering(void)
   // Should have dirty rects from adding the actor
   DALI_TEST_EQUALS(damagedRects.size(), 1u, TEST_LOCATION);
 
-  clippingRect  = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates;
-  expectedRect1 = Rect<int>(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 1 last frames updates
+  clippingRect  = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates;
+  expectedRect1 = BoundsInteger(CLIPPING_RECT_X, CLIPPING_RECT_Y, CLIPPING_RECT_WIDTH, CLIPPING_RECT_HEIGHT); // in screen coordinates, includes 1 last frames updates
 
   DirtyRectChecker(damagedRects, {expectedRect1}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);

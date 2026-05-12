@@ -88,7 +88,7 @@ public:
     GEOMETRY ///< events are propagated based on geometry.
   };
 
-  using EventProcessingFinishedSignalType = Signal<void()>;                        ///< Event Processing finished signal type
+  using EventProcessingFinishedSignalType = Signal<void()>;                 ///< Event Processing finished signal type
   using KeyEventSignalType                = Signal<void(Dali::KeyEvent)>;   ///< Key event signal type
   using KeyEventGeneratedSignalType       = Signal<bool(Dali::KeyEvent)>;   ///< key event generated signal type
   using TouchEventSignalType              = Signal<void(Dali::TouchEvent)>; ///< Touch signal type
@@ -421,7 +421,7 @@ public:
    *
    * @return The current surface rectangle
    */
-  const Rect<int32_t>& GetCurrentSurfaceRect() const;
+  const BoundsInteger& GetCurrentSurfaceRect() const;
 
   /**
    * Query how many times the surface rect changed.

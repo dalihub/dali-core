@@ -34,14 +34,14 @@ std::ostream& operator<<(std::ostream& outStream, const StringView& stringView)
   return outStream;
 }
 
-std::ostream& operator<<(std::ostream& o, const Rect<int32_t>& rectangle)
+std::ostream& operator<<(std::ostream& o, const BoundsInteger& boundsInteger)
 {
-  return o << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+  return o << "[" << boundsInteger.x << ", " << boundsInteger.y << ", " << boundsInteger.width << ", " << boundsInteger.height << "]";
 }
 
-std::ostream& operator<<(std::ostream& o, const Rect<float>& rectangle)
+std::ostream& operator<<(std::ostream& o, const Bounds& bounds)
 {
-  return o << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+  return o << "[" << bounds.x << ", " << bounds.y << ", " << bounds.width << ", " << bounds.height << "]";
 }
 
 std::ostream& operator<<(std::ostream& o, const Vector2& vector)

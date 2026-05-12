@@ -97,7 +97,7 @@ public:
   /**
    * @copydoc Dali::Integration::RenderSurface::PreRender
    */
-  bool PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect) override;
+  bool PreRender(bool resizingSurface, const std::vector<BoundsInteger>& damageRects, BoundsInteger& clippingRect) override;
 
   /**
    * @copydoc Dali::Integration::RenderSurface::PostRender

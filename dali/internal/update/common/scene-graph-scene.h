@@ -105,7 +105,7 @@ struct DirtyRectKey
 
 struct DirtyRectValue
 {
-  DirtyRectValue(Rect<int>& rect)
+  DirtyRectValue(BoundsInteger& rect)
   : rect(rect),
     visited(true)
   {
@@ -113,7 +113,7 @@ struct DirtyRectValue
 
   DirtyRectValue() = default;
 
-  Rect<int32_t> rect{};
+  BoundsInteger rect{};
   bool          visited{true};
 };
 
@@ -249,14 +249,14 @@ I   * @param[in] callback The function to call
    * @param[in] scene The resized scene.
    * @param[in] rect The retangle representing the surface.
    */
-  void SetSurfaceRect(const Rect<int32_t>& rect);
+  void SetSurfaceRect(const BoundsInteger& rect);
 
   /**
    * Get the surface rectangle.
    *
    * @return the current surface rectangle
    */
-  const Rect<int32_t>& GetSurfaceRect() const;
+  const BoundsInteger& GetSurfaceRect() const;
 
   /**
    * Set the surface orientations when surface or screen is rotated.
@@ -447,7 +447,7 @@ private:
   Dali::Integration::Scene::FrameCallbackContainer mFrameRenderedCallbacks;  ///< Frame rendered callbacks
   Dali::Integration::Scene::FrameCallbackContainer mFramePresentedCallbacks; ///< Frame presented callbacks
 
-  Rect<int32_t> mSurfaceRect;        ///< The rectangle of surface which is related ot this scene.
+  BoundsInteger mSurfaceRect;        ///< The rectangle of surface which is related ot this scene.
   int32_t       mSurfaceOrientation; ///< The orientation of surface which is related of this scene
   int32_t       mScreenOrientation;  ///< The orientation of screen
 
@@ -490,9 +490,9 @@ inline void AddFramePresentedCallbackMessage(EventThreadServices& eventThreadSer
   new(slot) LocalType(&scene, &Scene::AddFramePresentedCallback, const_cast<CallbackBase*>(callback), frameId);
 }
 
-inline void SetSurfaceRectMessage(EventThreadServices& eventThreadServices, const Scene& scene, const Rect<int32_t>& rect)
+inline void SetSurfaceRectMessage(EventThreadServices& eventThreadServices, const Scene& scene, const BoundsInteger& rect)
 {
-  using LocalType = MessageValue1<Scene, Rect<int32_t> >;
+  using LocalType = MessageValue1<Scene, BoundsInteger>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = eventThreadServices.ReserveMessageSlot(sizeof(LocalType));

@@ -50,7 +50,7 @@ struct DrawableObject
   }
 
   Size          size{};
-  Rect<int32_t> clippingBox{};
+  BoundsInteger clippingBox{};
   Vector4       worldColor{};
   bool          terminate{};
 };
@@ -374,7 +374,7 @@ int UtcDaliDrawableActor2P(void)
   DALI_TEST_EQUALS(drawable.worldColor, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity * opacity), TEST_LOCATION);
 
   // Check clippingBox. Note that clippingBox coordinate is in screen coordinates
-  DALI_TEST_EQUALS(drawable.clippingBox, Rect<int32_t>(20 + 50, 800 - (50 + 70 + 200), 100, 200), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.clippingBox, BoundsInteger(20 + 50, 800 - (50 + 70 + 200), 100, 200), TEST_LOCATION);
 
   END_TEST;
 }
@@ -413,7 +413,7 @@ int UtcDaliDrawableActorSceneRotated(void)
   DALI_TEST_EQUALS(drawable.size, Size(100, 200), TEST_LOCATION);
 
   // Check clippingBox. Note that clippingBox coordinate is in screen coordinates
-  DALI_TEST_EQUALS(drawable.clippingBox, Rect<int32_t>(20 + 50, TestApplication::DEFAULT_SURFACE_HEIGHT - (50 + 70 + 200), 100, 200), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.clippingBox, BoundsInteger(20 + 50, TestApplication::DEFAULT_SURFACE_HEIGHT - (50 + 70 + 200), 100, 200), TEST_LOCATION);
 
   // Reset size (to check callback comes)
   drawable.size = Size();
@@ -430,7 +430,7 @@ int UtcDaliDrawableActorSceneRotated(void)
   DALI_TEST_EQUALS(drawable.size, Size(100, 200), TEST_LOCATION);
 
   // Check clippingBox. Note that clippingBox coordinate is in screen coordinates
-  DALI_TEST_EQUALS(drawable.clippingBox, Rect<int32_t>(50 + 70, 20 + 50, 200, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.clippingBox, BoundsInteger(50 + 70, 20 + 50, 200, 100), TEST_LOCATION);
 
   END_TEST;
 }
