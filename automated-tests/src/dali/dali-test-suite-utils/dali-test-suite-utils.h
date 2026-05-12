@@ -60,7 +60,7 @@ constexpr int32_t basenameIndex(const char* const path, const int32_t index = 0,
 
 #define __FILELINE__ ({ static const int32_t basenameIdx = basenameIndex( __FILE__ ); \
                          static_assert (basenameIdx >= 0, "compile-time basename" );   \
-                         __FILE__ ":" STRINGIZE(__LINE__) + basenameIdx ; })
+                         &(__FILE__ ":" STRINGIZE(__LINE__))[basenameIdx]; })
 
 #define TEST_LOCATION __FILELINE__
 #define TEST_INNER_LOCATION(x) (std::string(x) + " (" + STRINGIZE(__LINE__) + ")").c_str()

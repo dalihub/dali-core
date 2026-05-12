@@ -29,7 +29,7 @@ namespace Dali
 {
 namespace Graphics
 {
-struct RenderPass;
+class RenderPass;
 
 /**
  * @brief Interface class for FramebufferCreateInfo types in the graphics API.

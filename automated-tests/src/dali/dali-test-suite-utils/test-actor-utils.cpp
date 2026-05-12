@@ -142,7 +142,7 @@ TextureSet CreateTextureSet(Pixel::Format format, int width, int height)
   return textureSet;
 }
 
-void DirtyRectChecker(const std::vector<Rect<int>>& damagedRects, std::multiset<Rect<int>, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation)
+void DirtyRectChecker(const std::vector<BoundsInteger>& damagedRects, std::multiset<BoundsInteger, RectSorter> expectedRectList, bool checkRectsExact, const char* testLocation)
 {
   // Just check damagedRect contain all expectRectList.
   DALI_TEST_GREATER(damagedRects.size() + 1u, expectedRectList.size(), testLocation);

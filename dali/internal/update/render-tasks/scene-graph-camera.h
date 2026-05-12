@@ -300,7 +300,7 @@ public:
   /**
    * @brief Calculate orthographic clipping box by this camera's orthographic size.
    */
-  Dali::Rect<int32_t> GetOrthographicClippingBox() const;
+  Dali::BoundsInteger GetOrthographicClippingBox() const;
 
   /**
    * Retrieve the projection-matrix.

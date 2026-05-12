@@ -83,13 +83,23 @@ int UtcDaliVector2Constructor05P(void)
   END_TEST;
 }
 
-int UtcDaliVector2ConstructorUint16PairP(void)
+int UtcDaliVector2ConstructorIntPairUint16P(void)
 {
   TestApplication application;
   Uint16Pair      pair(20, 30);
   Vector2         vec2(pair);
   DALI_TEST_EQUALS(vec2.x, 20.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 30.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector2ConstructorIntPairInt32P(void)
+{
+  TestApplication application;
+  Int32Pair       pair(100, 200);
+  Vector2         vec2(pair);
+  DALI_TEST_EQUALS(vec2.x, 100.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec2.y, 200.0f, 0.001, TEST_LOCATION);
   END_TEST;
 }
 

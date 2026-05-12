@@ -47,7 +47,7 @@ namespace Render
 {
 class FrameBuffer;
 class Renderer;
-struct Sampler;
+class Sampler;
 class RenderTracker;
 class Geometry;
 class Texture;
@@ -244,7 +244,7 @@ public:
    * @param[out] damagedRects The list of damaged rects for the current render pass.
    * @return True if this scene will present, false otherwise.
    */
-  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects);
+  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<BoundsInteger>& damagedRects);
 
   // This method should be called from Core::RenderScene()
 
@@ -271,7 +271,7 @@ public:
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
    * @param[in] clippingRect The clipping rect for the rendered scene.
    */
-  void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
+  void RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, BoundsInteger& clippingRect);
 
   /**
    * Clear the scene's surface.

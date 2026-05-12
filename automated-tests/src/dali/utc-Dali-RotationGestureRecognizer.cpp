@@ -71,7 +71,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const RotationGesture& rotation)
+  void operator()(Actor actor, RotationGesture rotation)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = rotation;

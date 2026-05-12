@@ -50,10 +50,18 @@ void SetTexturePixelFormat(Dali::Texture texture, Dali::Pixel::Format format)
   GetImplementation(texture).SetPixelFormat(format);
 }
 
-bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String content, TextureContextTypeHint::Type typeHint)
+bool TextureUploadWithContent(Dali::Texture texture, Dali::PixelData pixelData, Dali::String content, TextureContextTypeHint::Type typeHint, bool updateContextOnly, bool keepPreviousContext)
 {
-  Internal::PixelData& internalPixelData = GetImplementation(pixelData);
-  return GetImplementation(texture).Upload(&internalPixelData, Integration::ToStdString(std::move(content)), typeHint);
+  if(pixelData)
+  {
+    Internal::PixelData& internalPixelData = GetImplementation(pixelData);
+    return GetImplementation(texture).Upload(&internalPixelData, Integration::ToStdString(std::move(content)), typeHint, updateContextOnly, keepPreviousContext);
+  }
+  else
+  {
+    return GetImplementation(texture).Upload(nullptr, Integration::ToStdString(std::move(content)), typeHint, updateContextOnly, keepPreviousContext);
+    ;
+  }
 }
 
 } // namespace Dali::Integration

@@ -351,7 +351,7 @@ DALI_CORE_API Vector2 CalculateScreenPosition(Actor actor);
  * @return Rect containing position of top-left corner on screen and size respectively.
  *         Returns (0,0,0,0) if actor is not on scene.
  */
-DALI_CORE_API Rect<> CalculateScreenExtents(Actor actor);
+DALI_CORE_API Bounds CalculateScreenExtents(Actor actor);
 
 /**
  * Calculates screen position and size from current node values.
@@ -378,7 +378,7 @@ DALI_CORE_API Rect<> CalculateScreenExtents(Actor actor);
  * @return Rect containing position of top-left corner on screen and size respectively.
  *         Returns (0,0,0,0) if actor is not on scene.
  */
-DALI_CORE_API Rect<> CalculateCurrentScreenExtents(Actor actor);
+DALI_CORE_API Bounds CalculateCurrentScreenExtents(Actor actor);
 
 using ChildChangedSignalType = Signal<void(Actor)>; ///< Called when the actor has a child added or removed
 

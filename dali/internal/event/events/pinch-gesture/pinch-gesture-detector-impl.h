@@ -107,9 +107,9 @@ private: // GestureDetector overrides
   void OnActorDestroyed(Object& object) override;
 
   /**
-   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, const Dali::TouchEvent&)
+   * @copydoc Dali::Internal::GestureDetector::OnTouchEvent(Dali::Actor, Dali::TouchEvent)
    */
-  bool OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch) override;
+  bool OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch) override;
 
   /**
    * @copydoc Dali::Internal::GestureDetector::ProcessTouchEvent(Scene&, const Integration::TouchEvent&)

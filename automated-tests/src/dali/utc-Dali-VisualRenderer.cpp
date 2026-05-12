@@ -712,8 +712,8 @@ namespace
 {
 void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
 {
-  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  std::vector<Rect<int>> damagedRects;
+  BoundsInteger              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<BoundsInteger> damagedRects;
 
   // Try render several frames as full surface.
   for(int i = 0; i < 3; i++)
@@ -754,15 +754,15 @@ int UtcDaliVisualRendererPartialUpdate01(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(64, 672, 64, 64); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  BoundsInteger clippingRect = BoundsInteger(64, 672, 64, 64); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -790,7 +790,7 @@ int UtcDaliVisualRendererPartialUpdate01(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
   // Note, this damagedRect is combine of previous rect and current rect
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 672, 128, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(32, 672, 128, 64), damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -820,7 +820,7 @@ int UtcDaliVisualRendererPartialUpdate01(void)
   // Aligned by 16
   // Note, this damagedRect don't contain previous rect now.
   // Current rectangle's top left position is (40, 82), and bottom right position is (152, 110).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 688, 128, 32), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(32, 688, 128, 32), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
@@ -899,7 +899,7 @@ int UtcDaliVisualRendererPartialUpdate01(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
@@ -939,7 +939,7 @@ int UtcDaliVisualRendererPartialUpdate01(void)
 
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(80, 640, 32, 128), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(80, 640, 32, 128), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
@@ -982,20 +982,20 @@ int UtcDaliVisualRendererPartialUpdate02(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 2, TEST_LOCATION);
 
   // Set clippingRect as full surface now. TODO : Set valid rect if we can.
-  Rect<int> clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  BoundsInteger clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
 
   // Aligned by 16
   DirtyRectChecker(damagedRects,
                    {
-                     Rect<int>(64, 672, 64, 64),
-                     Rect<int>(64, 672, 64, 64),
+                     BoundsInteger(64, 672, 64, 64),
+                     BoundsInteger(64, 672, 64, 64),
                    },
                    true,
                    TEST_LOCATION);
@@ -1028,8 +1028,8 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   // Note, this damagedRect is combine of previous rect and current rect
   DirtyRectChecker(damagedRects,
                    {
-                     Rect<int>(64, 672, 64, 64),
-                     Rect<int>(64, 672, 64, 64),
+                     BoundsInteger(64, 672, 64, 64),
+                     BoundsInteger(64, 672, 64, 64),
                    },
                    true,
                    TEST_LOCATION);
@@ -1064,8 +1064,8 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   // So, first rectangle's top left position is (66, 66), and seoncd rectangle's bottom right position is (126, 126).
   DirtyRectChecker(damagedRects,
                    {
-                     Rect<int>(64, 704, 32, 32),
-                     Rect<int>(96, 672, 32, 32),
+                     BoundsInteger(64, 704, 32, 32),
+                     BoundsInteger(96, 672, 32, 32),
                    },
                    true,
                    TEST_LOCATION);
@@ -1101,8 +1101,8 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   // Note, this damagedRect is combine of previous rect and current rect
   DirtyRectChecker(damagedRects,
                    {
-                     Rect<int>(64, 672, 32, 64),
-                     Rect<int>(96, 640, 32, 64),
+                     BoundsInteger(64, 672, 32, 64),
+                     BoundsInteger(96, 640, 32, 64),
                    },
                    true,
                    TEST_LOCATION);
@@ -1137,8 +1137,8 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   // Current rectangle's top left position is (66, 82), and bottom right position is (126, 142).
   DirtyRectChecker(damagedRects,
                    {
-                     Rect<int>(64, 672, 32, 32),
-                     Rect<int>(96, 640, 32, 32),
+                     BoundsInteger(64, 672, 32, 32),
+                     BoundsInteger(96, 640, 32, 32),
                    },
                    true,
                    TEST_LOCATION);
@@ -1196,15 +1196,15 @@ int UtcDaliVisualRendererPartialUpdate03(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(64, 672, 64, 64); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  BoundsInteger clippingRect = BoundsInteger(64, 672, 64, 64); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -1238,7 +1238,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
   // Note, this damagedRect is combine of previous rect and current rect
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 656, 80, 80), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(64, 656, 80, 80), damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -1268,7 +1268,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   // Aligned by 16
   // Note, this damagedRect don't contain previous rect now.
   // Current rectangle's top left position is (82, 82), and bottom right position is (142, 142).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(80, 656, 64, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(80, 656, 64, 64), damagedRects[0], TEST_LOCATION);
 
   // Update dummy property to damangeRect buffer aging
   actor.SetProperty(Actor::Property::COLOR, Color::GREEN);
@@ -1282,7 +1282,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
   // Note, this damagedRect is combine of previous rect and current rect
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(80, 640, 80, 80), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(80, 640, 80, 80), damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -1312,7 +1312,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   // Aligned by 16
   // Note, this damagedRect don't contain previous rect now.
   // Current rectangle's top left position is (98, 98), and bottom right position is (158, 158).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(96, 640, 64, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(96, 640, 64, 64), damagedRects[0], TEST_LOCATION);
 
   // Update dummy property to damangeRect buffer aging
   actor.SetProperty(Actor::Property::COLOR, Color::GREEN);
@@ -1326,7 +1326,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
   // Note, this damagedRect is combine of previous rect and current rect
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(96, 624, 80, 80), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(96, 624, 80, 80), damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -1356,7 +1356,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   // Aligned by 16
   // Note, this damagedRect don't contain previous rect now.
   // Current rectangle's top left position is (114, 114), and bottom right position is (174, 174).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(112, 624, 64, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(112, 624, 64, 64), damagedRects[0], TEST_LOCATION);
 
   // Update dummy property to damangeRect buffer aging
   actor.SetProperty(Actor::Property::COLOR, Color::GREEN);
@@ -1371,7 +1371,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
   // Note, this damagedRect is combine of previous rect and current rect
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(112, 608, 80, 80), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(112, 608, 80, 80), damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -1401,7 +1401,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   // Aligned by 16
   // Note, this damagedRect don't contain previous rect now.
   // Current rectangle's top left position is (66, 66), and bottom right position is (126, 126).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
 
   // Update dummy property to damangeRect buffer aging
   actor.SetProperty(Actor::Property::COLOR, Color::GREEN);

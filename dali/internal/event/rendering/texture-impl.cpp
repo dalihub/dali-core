@@ -138,6 +138,9 @@ inline void PrintTotalMemory()
     // Collect the result first.
     static MemoryInfoCollector sImageCollector("Image");
     static MemoryInfoCollector sTextCollector("Text");
+    static MemoryInfoCollector sNativeImageCollector("Native Image");
+    static MemoryInfoCollector sFBOAttachedTextureCollector("FBO Attached Texture");
+    static MemoryInfoCollector sScene3DCollector("Scene3D");
     static MemoryInfoCollector sDaliEtcCollector("ETC (DALi)");
     static MemoryInfoCollector sOuterEtcCollector("ETC");
     static MemoryInfoCollector sUnknownCollector{};
@@ -162,10 +165,22 @@ inline void PrintTotalMemory()
           sTextCollector.Insert(*iter);
           break;
         }
-        case 3: // ETC (3xxx) ~ End of dali(9999)
-        case 4:
-        case 5:
-        case 6:
+        case 3: // Native image (3xxx)
+        {
+          sNativeImageCollector.Insert(*iter);
+          break;
+        }
+        case 4: // FBO attached texture (4xxx)
+        {
+          sFBOAttachedTextureCollector.Insert(*iter);
+          break;
+        }
+        case 5: // Scene3D (5xxx)
+        {
+          sScene3DCollector.Insert(*iter);
+          break;
+        }
+        case 6: // ETC (6xxx) ~ End of dali(9999)
         case 7:
         case 8:
         case 9:
@@ -186,6 +201,9 @@ inline void PrintTotalMemory()
 
     sImageCollector.PrintAndClear();
     sTextCollector.PrintAndClear();
+    sNativeImageCollector.PrintAndClear();
+    sFBOAttachedTextureCollector.PrintAndClear();
+    sScene3DCollector.PrintAndClear();
     sDaliEtcCollector.PrintAndClear();
     sOuterEtcCollector.PrintAndClear();
     sUnknownCollector.PrintAndClear();
@@ -388,25 +406,38 @@ std::string                                     gContext{};
 } //namespace
 #endif
 
-bool Texture::Upload(PixelDataPtr pixelData, std::string context, Dali::Integration::TextureContextTypeHint::Type typeHint)
+bool Texture::Upload(PixelDataPtr pixelData, std::string context, Dali::Integration::TextureContextTypeHint::Type typeHint, bool updateContextOnly, bool keepPreviousContext)
 {
-  if(mNativeImage || mResourceId != 0u)
+  if(mNativeImage || mResourceId != 0u || DALI_UNLIKELY(!pixelData) || DALI_UNLIKELY(updateContextOnly))
   {
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
     // Change stored memory data and memory info here, To change newest data of native / resouces.
     // PixelData only be used for get hint of pixel format.
+    gTypeHint = typeHint;
+    gContext  = std::move(context);
     if(mMemoryInfo)
     {
+      if(keepPreviousContext)
+      {
+        gTypeHint = mMemoryInfo->mTypeHint;
+        gContext  = mMemoryInfo->mContext;
+      }
       mMemoryInfo->Destroy(false);
     }
-    mMemoryInfo.reset(new TextureMemoryInfo(typeHint, context, mSize.GetWidth(), mSize.GetHeight(), Pixel::GetBytesPerPixel(pixelData->GetPixelFormat())));
+    mMemoryInfo.reset(new TextureMemoryInfo(gTypeHint, std::move(gContext), mSize.GetWidth(), mSize.GetHeight(), Pixel::GetBytesPerPixel(pixelData ? pixelData->GetPixelFormat() : mFormat)));
+
+    gTypeHint = Dali::Integration::TextureContextTypeHint::UNKNOWN;
+    gContext  = std::string();
 #endif
     return false;
   }
 
 #if defined(GPU_MEMORY_PROFILE_ENABLED)
-  gTypeHint   = typeHint;
-  gContext    = std::move(context);
+  if(!keepPreviousContext)
+  {
+    gTypeHint = typeHint;
+    gContext  = std::move(context);
+  }
   bool result = Upload(pixelData);
   gTypeHint   = Dali::Integration::TextureContextTypeHint::UNKNOWN;
   gContext    = std::string();

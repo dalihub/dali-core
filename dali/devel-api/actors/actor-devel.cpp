@@ -29,12 +29,12 @@ Vector2 CalculateScreenPosition(Actor actor)
   return GetImplementation(actor).CalculateScreenPosition();
 }
 
-Rect<> CalculateScreenExtents(Actor actor)
+Bounds CalculateScreenExtents(Actor actor)
 {
   return GetImplementation(actor).CalculateScreenExtents();
 }
 
-Rect<> CalculateCurrentScreenExtents(Actor actor)
+Bounds CalculateCurrentScreenExtents(Actor actor)
 {
   return GetImplementation(actor).CalculateCurrentScreenExtents();
 }

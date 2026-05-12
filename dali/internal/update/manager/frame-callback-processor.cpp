@@ -39,6 +39,8 @@ namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_UPDATE_PROCESS, false);
 
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_UPDATE_PROCESS_THRESHOLD_TIME, 48);
+
 #ifdef TRACE_ENABLED
 uint64_t GetNanoseconds()
 {
@@ -152,6 +154,8 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
       oss << "[" << mFrameCallbacks.size() << "]";
     });
 
+    DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
+
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
       mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback)
@@ -174,6 +178,11 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
       return (requests & FrameCallback::CONTINUE_CALLING) == 0;
     });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
+
+    DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
+    {
+      oss << "DALI_FRAME_CALLBACK_UPDATE. [" << mFrameCallbacks.size() << "]";
+    });
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss)
     {

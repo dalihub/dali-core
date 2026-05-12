@@ -79,7 +79,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const PinchGesture& pinch)
+  void operator()(Actor actor, PinchGesture pinch)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = pinch;
@@ -108,7 +108,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const PinchGesture& pinch)
+  void operator()(Actor actor, PinchGesture pinch)
   {
     GestureReceivedFunctor::operator()(actor, pinch);
 
@@ -1179,7 +1179,7 @@ int UtcDaliPinchGestureDisableDetectionDuringPinchN(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(
     &application,
-    [&detector, &functorCalled](Actor actor, const PinchGesture& gesture)
+    [&detector, &functorCalled](Actor actor, PinchGesture gesture)
   {
     if(gesture.GetState() == GestureState::FINISHED)
     {

@@ -294,9 +294,8 @@ std::ostream& operator<<(std::ostream& os, Graphics::CompareOp op)
   return os;
 };
 
-TestGraphicsCommandBuffer::TestGraphicsCommandBuffer(TraceCallStack& callstack, TestGlAbstraction& glAbstraction)
-: mCallStack(callstack),
-  mGlAbstraction(glAbstraction)
+TestGraphicsCommandBuffer::TestGraphicsCommandBuffer(TraceCallStack& callstack)
+: mCallStack(callstack)
 {
 }
 

@@ -877,8 +877,8 @@ namespace
 {
 void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
 {
-  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  std::vector<Rect<int>> damagedRects;
+  BoundsInteger              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<BoundsInteger> damagedRects;
 
   // Try render several frames as full surface.
   for(int i = 0; i < 3; i++)
@@ -919,15 +919,15 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
 
   application.SendNotification();
 
-  std::vector<Rect<int>> damagedRects;
+  std::vector<BoundsInteger> damagedRects;
 
   // Actor added, damaged rect is added size of actor
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  Rect<int> clippingRect = Rect<int>(64, 672, 64, 64); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  BoundsInteger clippingRect = BoundsInteger(64, 672, 64, 64); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -956,7 +956,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 640, 128, 128), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(32, 640, 128, 128), damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -983,7 +983,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(32, 640, 128, 128), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(32, 640, 128, 128), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1061,7 +1061,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
   // Now current actor show as 88x88 rectangle, with center position (96, 96).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(48, 656, 96, 96), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(48, 656, 96, 96), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1102,7 +1102,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   // Aligned by 16
   // Now current actor show as 56x56 rectangle, with center position (96, 96).
-  DALI_TEST_EQUALS<Rect<int>>(Rect<int>(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(BoundsInteger(64, 672, 64, 64), damagedRects[0], TEST_LOCATION);
 
   application.SendNotification();
   damagedRects.clear();

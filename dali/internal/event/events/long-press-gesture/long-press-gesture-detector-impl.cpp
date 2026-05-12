@@ -186,7 +186,7 @@ void LongPressGestureDetector::OnActorDestroyed(Object& object)
   // Do nothing
 }
 
-bool LongPressGestureDetector::OnTouchEvent(Dali::Actor actor, const Dali::TouchEvent& touch)
+bool LongPressGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
   return HandleEvent(actor, touch);
 }

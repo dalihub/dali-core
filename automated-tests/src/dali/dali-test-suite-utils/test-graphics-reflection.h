@@ -2,7 +2,7 @@
 #define DALI_TEST_GRAPHICS_REFLECTION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class TestGraphicsController;
 class TestGraphicsReflection : public Graphics::Reflection
 {
 public:
-  class TestUniformBlockInfo;
+  struct TestUniformBlockInfo;
 
   TestGraphicsReflection(TestGraphicsController& controller, TestGlAbstraction& gl, uint32_t program_id, Property::Array& vertexFormats, const Graphics::ProgramCreateInfo& createInfo, std::vector<UniformData>& customUniforms, std::vector<TestUniformBlockInfo>& customUniformBlocks);
 

@@ -3815,8 +3815,8 @@ public:
 public: // Construction / Destruction
   TestHandle() = default;
   static TestHandle New();
-  ~TestHandle()                            = default;
-  TestHandle(const TestHandle& testHandle) = default;
+  ~TestHandle()                                  = default;
+  TestHandle(const TestHandle& testHandle)       = default;
   TestHandle&       operator=(const TestHandle&) = default;
   static TestHandle DownCast(BaseHandle handle);
 
@@ -3835,8 +3835,8 @@ public: // Construction / Destruction
   : CustomActorImpl(ACTOR_BEHAVIOUR_DEFAULT)
   {
   }
-  ~TestObject()                 = default;
-  TestObject(const TestObject&) = delete;
+  ~TestObject()                            = default;
+  TestObject(const TestObject&)            = delete;
   TestObject& operator=(const TestObject&) = delete;
 
 public: // Properties, Signals & Actions
@@ -3844,6 +3844,13 @@ public: // Properties, Signals & Actions
   static Dali::Property::Value GetProperty(Dali::BaseObject* object, Dali::Property::Index propertyIndex);
   static bool                  DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrackerInterface* tracker, const Dali::String& signalName, Dali::FunctorDelegate* functor);
   static bool                  DoAction(Dali::BaseObject* object, const String& actionName, const Dali::Property::Map& attributes);
+
+  using TestObjectSignal = Signal<void()>;
+
+  TestObjectSignal& MySignal()
+  {
+    return mSignal;
+  }
 
 private: // Overrides
   void OnSceneConnection(int32_t depth) override
@@ -3901,6 +3908,8 @@ private: // Overrides
   }
 
 private: // Implementation details
+  TestObjectSignal mSignal;
+
   String mString;
   float  mFloat{0.0f};
 };
@@ -4034,8 +4043,9 @@ bool TestObject::DoConnectSignal(Dali::BaseObject* object, Dali::ConnectionTrack
 {
   BaseHandle handle(object);
   TestHandle testHandle = TestHandle::DownCast(handle);
-  if(signalName == SIGNAL_MY)
+  if(testHandle && signalName == SIGNAL_MY)
   {
+    static_cast<TestObject&>(testHandle.GetImplementation()).MySignal().Connect(tracker, functor);
     return true;
   }
   return false;

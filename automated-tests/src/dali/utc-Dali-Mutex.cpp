@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ int UtcDaliMutexNonCopyable(void)
 {
   // we want to make sure that mutex is not copyable (its copy constructor is not defined)
   // this test will stop compiling if Mutex has compiler generated copy constructor
-  static_assert(!__has_trivial_copy(Mutex), "Mutex should NOT be copyable");
+  static_assert(!DALI_HAS_TRIVIAL_COPY(Mutex), "Mutex should NOT be copyable");
 
   DALI_TEST_CHECK(true);
   END_TEST;

@@ -119,7 +119,7 @@ void Core::PreRender(RenderStatus& status, bool forceClear)
   mImpl->PreRender(status, forceClear);
 }
 
-void Core::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects)
+void Core::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<BoundsInteger>& damagedRects)
 {
   mImpl->PreRenderScene(scene, status, damagedRects);
 }
@@ -129,7 +129,7 @@ void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool ren
   mImpl->RenderScene(status, scene, renderToFbo);
 }
 
-void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
+void Core::RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, BoundsInteger& clippingRect)
 {
   mImpl->RenderScene(status, scene, renderToFbo, clippingRect);
 }

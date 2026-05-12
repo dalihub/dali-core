@@ -25,6 +25,9 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/hover-event.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
@@ -1722,7 +1725,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
   }
 }
 
-Rect<> Actor::CalculateScreenExtents() const
+Bounds Actor::CalculateScreenExtents() const
 {
   if(mLayer3DParentsCount == 0)
   {
@@ -1735,7 +1738,7 @@ Rect<> Actor::CalculateScreenExtents() const
   }
 }
 
-Rect<> Actor::CalculateCurrentScreenExtents() const
+Bounds Actor::CalculateCurrentScreenExtents() const
 {
   if(mLayer3DParentsCount == 0)
   {

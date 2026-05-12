@@ -34,7 +34,7 @@ class PropertyNotification;
  * @brief Signal type for Dali::PropertyNotification::NotifySignal().
  * @SINCE_1_0.0
  */
-using PropertyNotifySignalType = Signal<void(PropertyNotification&)>;
+using PropertyNotifySignalType = Signal<void(PropertyNotification)>;
 
 /**
  * @}

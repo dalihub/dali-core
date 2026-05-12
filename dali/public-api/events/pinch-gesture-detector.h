@@ -65,7 +65,7 @@ public: // Typedefs
    * @brief Signal type.
    * @SINCE_1_0.0
    */
-  using DetectedSignalType = Signal<void(Actor, const PinchGesture&)>;
+  using DetectedSignalType = Signal<void(Actor, PinchGesture)>;
 
 public: // Creation & Destruction
   /**
@@ -143,7 +143,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName( Actor actor, const PinchGesture& gesture );
+   *   void YourCallbackName( Actor actor, PinchGesture gesture );
    * @endcode
    * @SINCE_1_0.0
    * @return The signal to connect to

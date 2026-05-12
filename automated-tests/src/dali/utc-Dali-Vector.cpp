@@ -550,34 +550,6 @@ int UtcDaliVectorIterate(void)
   END_TEST;
 }
 
-int UtcDaliVectorPair(void)
-{
-  tet_infoline("Testing Dali::Vector< std::pair< int, float > >");
-
-  Vector<std::pair<int, float> > pairvector;
-  DALI_TEST_EQUALS(ZERO, pairvector.Count(), TEST_LOCATION);
-  DALI_TEST_EQUALS(ZERO, pairvector.Capacity(), TEST_LOCATION);
-
-  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<std::pair<int, float> >::BaseType), true, TEST_LOCATION);
-
-  pairvector.PushBack(std::make_pair(5, 0.1f));
-  pairvector.PushBack(std::make_pair(3, 0.2f));
-  pairvector.PushBack(std::make_pair(4, 0.3f));
-  pairvector.PushBack(std::make_pair(1, 0.4f));
-  pairvector.PushBack(std::make_pair(2, 0.5f));
-  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5), pairvector.Count(), TEST_LOCATION);
-
-  Vector<std::pair<int, float> >::Iterator iter  = pairvector.Begin();
-  int                                      index = 0;
-  for(; iter != pairvector.End(); ++iter, ++index)
-  {
-    std::cout << "pair " << (*iter).first << ":" << (*iter).second << std::endl;
-    DALI_TEST_EQUALS((*iter).first, pairvector[index].first, TEST_LOCATION);
-    DALI_TEST_EQUALS((*iter).second, pairvector[index].second, TEST_LOCATION);
-  }
-  END_TEST;
-}
-
 int UtcDaliVectorDaliPair(void)
 {
   tet_infoline("Testing Dali::Vector< Dali::Pair< int, float > >");

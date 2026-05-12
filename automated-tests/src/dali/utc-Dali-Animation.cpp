@@ -60,7 +60,7 @@ struct AnimationFinishCheck
   {
   }
 
-  void operator()(Animation& animation)
+  void operator()(Animation animation)
   {
     tet_printf("emitted animation [%u]\n", animation.GetAnimationId());
     mSignalReceived = true;
@@ -109,7 +109,7 @@ struct AnimationProgressCheck
   {
   }
 
-  void operator()(Animation& animation)
+  void operator()(Animation animation)
   {
     mSignalReceived = true;
   }
@@ -16842,7 +16842,7 @@ struct AnimationClearCheck
     tet_printf("Add clear animation [%u], clear?[%zu]\n", animation.GetAnimationId(), mClearRequiredAnimations.size());
   }
 
-  void operator()(Animation& animation)
+  void operator()(Animation animation)
   {
     tet_printf("emitted animation [%u], clear?[%zu]\n", animation.GetAnimationId(), mClearRequiredAnimations.size());
     mSignalReceived = true;

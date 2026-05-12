@@ -24,7 +24,9 @@
 
 namespace Dali
 {
-using PositionSize = Dali::Rect<int>;
+using PositionSize = Dali::BoundsInteger;
+using SurfaceSize  = Int32Pair;
+
 class ThreadSynchronizationInterface;
 
 namespace Integration
@@ -40,22 +42,22 @@ public:
   };
   RenderSurfaceInterface();
 
-  virtual PositionSize GetPositionSize() const                                                                             = 0;
-  virtual void         GetDpi(unsigned int& dpiHorizontal, unsigned int& dpiVertical)                                      = 0;
-  virtual int          GetSurfaceOrientation() const                                                                       = 0;
-  virtual int          GetScreenOrientation() const                                                                        = 0;
-  virtual void         InitializeGraphics()                                                                                = 0;
-  virtual void         CreateSurface()                                                                                     = 0;
-  virtual void         DestroySurface()                                                                                    = 0;
-  virtual bool         ReplaceGraphicsSurface()                                                                            = 0;
-  virtual void         MoveResize(Dali::PositionSize positionSize)                                                         = 0;
-  virtual void         Resize(Dali::Uint16Pair size)                                                                       = 0;
-  virtual void         StartRender()                                                                                       = 0;
-  virtual bool         PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect) = 0;
-  virtual void         PostRender()                                                                                        = 0;
-  virtual void         StopRender()                                                                                        = 0;
-  virtual void         ReleaseLock()                                                                                       = 0;
-  virtual void         SetThreadSynchronization(ThreadSynchronizationInterface& threadSynchronization)                     = 0;
+  virtual PositionSize GetPositionSize() const                                                                                     = 0;
+  virtual void         GetDpi(unsigned int& dpiHorizontal, unsigned int& dpiVertical)                                              = 0;
+  virtual int          GetSurfaceOrientation() const                                                                               = 0;
+  virtual int          GetScreenOrientation() const                                                                                = 0;
+  virtual void         InitializeGraphics()                                                                                        = 0;
+  virtual void         CreateSurface()                                                                                             = 0;
+  virtual void         DestroySurface()                                                                                            = 0;
+  virtual bool         ReplaceGraphicsSurface()                                                                                    = 0;
+  virtual void         MoveResize(Dali::PositionSize positionSize)                                                                 = 0;
+  virtual void         Resize(Dali::SurfaceSize size)                                                                              = 0;
+  virtual void         StartRender()                                                                                               = 0;
+  virtual bool         PreRender(bool resizingSurface, const std::vector<BoundsInteger>& damageRects, BoundsInteger& clippingRect) = 0;
+  virtual void         PostRender()                                                                                                = 0;
+  virtual void         StopRender()                                                                                                = 0;
+  virtual void         ReleaseLock()                                                                                               = 0;
+  virtual void         SetThreadSynchronization(ThreadSynchronizationInterface& threadSynchronization)                             = 0;
 
   virtual Dali::Integration::RenderSurfaceInterface::Type GetSurfaceType() = 0;
 

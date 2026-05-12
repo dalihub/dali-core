@@ -33,6 +33,9 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/events/key-event.h>
+#include <dali/public-api/events/touch-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 using Dali::Internal::SceneGraph::Node;
@@ -412,16 +415,16 @@ int32_t Scene::GetCurrentScreenOrientation() const
   return mSceneObject ? mSceneObject->GetScreenOrientation() : 0;
 }
 
-const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
+const BoundsInteger& Scene::GetCurrentSurfaceRect() const
 {
-  static Rect<int32_t> emptyRect{};
+  static BoundsInteger emptyRect{};
   return mSceneObject ? mSceneObject->GetSurfaceRect() : emptyRect;
 }
 
 void Scene::ChangedSurface(float width, float height, int32_t windowOrientation, int32_t screenOrientation)
 {
   bool          changedOrientation = false;
-  Rect<int32_t> newSize(0, 0, static_cast<int32_t>(width), static_cast<int32_t>(height)); // truncated
+  BoundsInteger newSize(0, 0, static_cast<int32_t>(width), static_cast<int32_t>(height)); // truncated
   mSize.width  = width;
   mSize.height = height;
 

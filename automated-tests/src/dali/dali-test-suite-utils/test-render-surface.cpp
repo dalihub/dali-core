@@ -71,7 +71,7 @@ void TestRenderSurface::MoveResize(Dali::PositionSize positionSize)
   mPositionSize = positionSize;
 }
 
-void TestRenderSurface::Resize(Dali::Uint16Pair size)
+void TestRenderSurface::Resize(Dali::SurfaceSize size)
 {
   mPositionSize.width  = size.GetWidth();
   mPositionSize.height = size.GetHeight();
@@ -81,7 +81,7 @@ void TestRenderSurface::StartRender()
 {
 }
 
-bool TestRenderSurface::PreRender(bool resizingSurface, const std::vector<Rect<int>>& damageRects, Rect<int>& clippingRect)
+bool TestRenderSurface::PreRender(bool resizingSurface, const std::vector<BoundsInteger>& damageRects, BoundsInteger& clippingRect)
 {
   return true;
 }

@@ -890,7 +890,7 @@ int UtcDaliTextureUploadWithContext01(void)
   DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
   DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
 
-  Dali::Integration::TextureUploadWithContent(texture, pixelData, "testTexture", Integration::TextureContextTypeHint::STANDARD_IMAGE);
+  DALI_TEST_EQUALS(true, Dali::Integration::TextureUploadWithContent(texture, pixelData, "testTexture", Integration::TextureContextTypeHint::STANDARD_IMAGE), TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
@@ -1015,11 +1015,110 @@ int UtcDaliTextureUploadWithContext03(void)
     DALI_TEST_CHECK(!callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
   }
 
-  // Check whether the buffer become nullptr after texture uploaded.
+  // Check whether the buffer still exist due to texture not be uploaded.
   pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
 
   DALI_TEST_CHECK(pixelDataBuffer.buffer != nullptr);
   DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTextureUploadWithContext04(void)
+{
+  TestApplication application;
+
+  // Create the texture
+  uint32_t width(64u);
+  uint32_t height(64u);
+  Texture  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  // Upload data to the texture
+  callStack.Reset();
+
+  DALI_TEST_EQUALS(false, Dali::Integration::TextureUploadWithContent(texture, Dali::PixelData(), "UploadWithEmptyPixelData", Integration::TextureContextTypeHint::STANDARD_IMAGE), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // TexImage2D should not be called to upload the data
+  DALI_TEST_CHECK(!callStack.FindMethod("TexImage2D"));
+
+  END_TEST;
+}
+
+int UtcDaliTextureUploadWithContext05(void)
+{
+  TestApplication application;
+
+  // Create the texture
+  uint32_t width(64u);
+  uint32_t height(64u);
+  Texture  texture = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, width, height);
+
+  application.GetGlAbstraction().EnableTextureCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& callStack = application.GetGlAbstraction().GetTextureTrace();
+
+  // Upload data to the texture
+  callStack.Reset();
+
+  uint32_t bufferSize(width * height * 4u);
+  uint8_t* buffer = reinterpret_cast<uint8_t*>(malloc(bufferSize));
+  buffer[0]       = 'a';
+
+  PixelData pixelData = Dali::Integration::NewPixelDataWithReleaseAfterUpload(buffer, bufferSize, width, height, 0u, Pixel::RGBA8888, PixelData::FREE);
+  DALI_TEST_CHECK(pixelData);
+
+  Dali::Integration::PixelDataBuffer pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_EQUALS(pixelDataBuffer.bufferSize, bufferSize, TEST_LOCATION);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  // Add parameter for update-context-only.
+  DALI_TEST_EQUALS(false, Dali::Integration::TextureUploadWithContent(texture, pixelData, "testTexture", Integration::TextureContextTypeHint::STANDARD_IMAGE, true), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // TexImage2D should not be called to upload the data
+  DALI_TEST_CHECK(!callStack.FindMethod("TexImage2D"));
+  callStack.Reset();
+
+  // Check whether the buffer still exist due to texture not be uploaded.
+  pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_CHECK(pixelDataBuffer.buffer != nullptr);
+  DALI_TEST_EQUALS(pixelDataBuffer.buffer[0], static_cast<uint8_t>('a'), TEST_LOCATION);
+
+  // Add parameter for use-previous-context.
+  // We cannot test the context changed well. But just keep this test for line coverage.
+  DALI_TEST_EQUALS(true, Dali::Integration::TextureUploadWithContent(texture, pixelData, "notAvailableContext", Integration::TextureContextTypeHint::UNKNOWN, false, true), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  // TexImage2D should be called to upload the data
+  {
+    std::stringstream out;
+    out << GL_TEXTURE_2D << ", " << 0u << ", " << width << ", " << height;
+    DALI_TEST_CHECK(callStack.FindMethodAndParams("TexImage2D", out.str().c_str()));
+  }
+
+  // Check whether the buffer become nullptr after texture uploaded.
+  pixelDataBuffer = Dali::Integration::GetPixelDataBuffer(pixelData);
+
+  DALI_TEST_CHECK(pixelDataBuffer.buffer == nullptr);
 
   END_TEST;
 }
@@ -1808,8 +1907,8 @@ namespace
 {
 void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
 {
-  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  std::vector<Rect<int>> damagedRects;
+  BoundsInteger              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<BoundsInteger> damagedRects;
 
   // Try render several frames as full surface.
   for(int i = 0; i < 3; i++)
@@ -1836,8 +1935,8 @@ int utcDaliTexturePartialUpdate01(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int32_t>> damagedRects;
-  Rect<int32_t>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   Geometry geometry = CreateQuadGeometry();
   Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
@@ -1864,8 +1963,8 @@ int utcDaliTexturePartialUpdate01(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int32_t>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int32_t>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -1889,8 +1988,8 @@ int utcDaliTexturePartialUpdate01(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int32_t>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int32_t>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -1919,8 +2018,8 @@ int utcDaliTexturePartialUpdate02(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int32_t>> damagedRects;
-  Rect<int32_t>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   Geometry geometry = CreateQuadGeometry();
   Shader   shader   = Shader::New("vertexSrc", "fragmentSrc");
@@ -1948,8 +2047,8 @@ int utcDaliTexturePartialUpdate02(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int32_t>(0, 752, 48, 48); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int32_t>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -1970,8 +2069,8 @@ int utcDaliTexturePartialUpdate02(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int32_t>(0, 752, 48, 48); // in screen coordinates, includes 3 last frames updates
-  DALI_TEST_EQUALS<Rect<int32_t>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates, includes 3 last frames updates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);

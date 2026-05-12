@@ -315,6 +315,38 @@ inline DALI_CORE_API bool operator!=(const char* other, const String& rhs)
 }
 
 /**
+ * @brief Hash functor for Dali::String.
+ * @SINCE_2_5.20
+ */
+struct DALI_CORE_API StringHash
+{
+  /**
+   * @brief Computes hash value for a Dali::String.
+   * @param key The string to hash
+   * @return The hash value
+   * @note Uses std::size_t as the return type to match the standard hash functor interface.
+   * @SINCE_2_5.20
+   */
+  std::size_t operator()(const String& key) const;
+};
+
+/**
+ * @brief Equality functor for Dali::String.
+ * @SINCE_2_5.20
+ */
+struct DALI_CORE_API StringEqual
+{
+  /**
+   * @brief Compares two Dali::String objects for equality.
+   * @param a First string
+   * @param b Second string
+   * @return true if strings are equal, false otherwise
+   * @SINCE_2_5.20
+   */
+  bool operator()(const String& a, const String& b) const;
+};
+
+/**
  * @}
  */
 } // namespace Dali

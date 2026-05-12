@@ -21,6 +21,10 @@
 // EXTERNAL INCLUDES
 #include <new>
 #include <string>
+#include <string_view>
+
+// INTERNAL INCLUDES
+#include <dali/devel-api/common/hash.h>
 
 static_assert(sizeof(std::string) <= 32,
               "std::string exceeds Dali::String inline storage (32 bytes). "
@@ -227,6 +231,18 @@ String operator+(const String& lhs, const String& rhs)
   String result(lhs);
   result += rhs;
   return result;
+}
+
+// StringHash implementation
+std::size_t StringHash::operator()(const String& key) const
+{
+  return CalculateHash(std::string_view(key.CStr(), key.Size()));
+}
+
+// StringEqual implementation
+bool StringEqual::operator()(const String& a, const String& b) const
+{
+  return a == b;
 }
 
 } // namespace Dali

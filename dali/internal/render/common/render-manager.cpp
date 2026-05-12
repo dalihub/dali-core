@@ -96,7 +96,7 @@ enum ContainerRemovedFlagBits : uint8_t
 using ContainerRemovedFlags = uint8_t;
 #endif
 
-inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorArea, int orientation, const Rect<int32_t>& viewportRect)
+inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorArea, int orientation, const BoundsInteger& viewportRect)
 {
   Graphics::Rect2D newScissorArea;
 
@@ -131,7 +131,7 @@ inline Graphics::Rect2D RecalculateScissorArea(const Graphics::Rect2D& scissorAr
   return newScissorArea;
 }
 
-inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& updatedPositionSize, const Rect<int32_t>& viewportRect)
+inline BoundsInteger CalculateUpdateArea(const RenderItem& item, const Vector4& updatedPositionSize, const BoundsInteger& viewportRect)
 {
   Vector4 updateArea;
   if(item.mNode && item.mNode->IsTextureUpdateAreaUsed() && item.mRenderer)
@@ -146,7 +146,7 @@ inline Rect<int32_t> CalculateUpdateArea(const RenderItem& item, const Vector4& 
   return RenderItem::CalculateViewportSpaceAABB(item.mModelViewMatrix, Vector3(updateArea.x, updateArea.y, 0.0f), Vector3(updateArea.z, updateArea.w, 0.0f), viewportRect.width, viewportRect.height, Vector2::ONE);
 }
 
-inline void AlignDamagedRect(Rect<int32_t>& rect)
+inline void AlignDamagedRect(BoundsInteger& rect)
 {
   const int left   = rect.x;
   const int top    = rect.y;
@@ -161,6 +161,8 @@ inline void AlignDamagedRect(Rect<int32_t>& rect)
 }
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_RENDER_PROCESS, false);
+
+DALI_INIT_TIME_CHECKER_FILTER_WITH_DEFAULT_THRESHOLD(gTimeCheckerFilter, DALI_RENDER_PROCESS_THRESHOLD_TIME, 48);
 } // namespace
 
 /**
@@ -171,7 +173,7 @@ struct RenderManager::Impl
   Impl(Graphics::Controller& graphicsController)
   : graphicsController(graphicsController),
     renderAlgorithms(graphicsController),
-    programController(graphicsController),
+    programController(),
     terminatedNativeDrawManager(graphicsController)
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     ,
@@ -614,7 +616,7 @@ void RenderManager::PreRender(Integration::RenderStatus& status, bool forceClear
   mImpl->commandBufferSubmitted = false;
 }
 
-void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects)
+void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<BoundsInteger>& damagedRects)
 {
   Internal::Scene& sceneInternal = GetImplementation(scene);
   Scene*           sceneObject   = sceneInternal.GetSceneObject();
@@ -673,7 +675,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
   class DamagedRectsCleaner
   {
   public:
-    explicit DamagedRectsCleaner(std::vector<Rect<int>>& damagedRects, Rect<int>& surfaceRect, Scene*& sceneObject)
+    explicit DamagedRectsCleaner(std::vector<BoundsInteger>& damagedRects, BoundsInteger& surfaceRect, Scene*& sceneObject)
     : mDamagedRects(damagedRects),
       mSurfaceRect(surfaceRect),
       mSceneObject(sceneObject),
@@ -707,14 +709,14 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
     }
 
   private:
-    std::vector<Rect<int>>& mDamagedRects;
-    Rect<int>               mSurfaceRect;
-    Scene*&                 mSceneObject;
-    bool                    mFullUpdateNextFrame;
-    bool                    mCleanOnReturn;
+    std::vector<BoundsInteger>& mDamagedRects;
+    BoundsInteger               mSurfaceRect;
+    Scene*&                     mSceneObject;
+    bool                        mFullUpdateNextFrame;
+    bool                        mCleanOnReturn;
   };
 
-  Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
+  BoundsInteger surfaceRect = sceneObject->GetSurfaceRect();
 
   // Clean collected dirty/damaged rects on exit if 3d layer or 3d node or other conditions.
   DamagedRectsCleaner damagedRectCleaner(damagedRects, surfaceRect, sceneObject);
@@ -771,7 +773,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
       return;
     }
 
-    Rect<int32_t> viewportRect;
+    BoundsInteger viewportRect;
     if(instruction.mIsViewportSet)
     {
       const int32_t y = (surfaceRect.height - instruction.mViewport.height) - instruction.mViewport.y;
@@ -815,8 +817,8 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
                 return;
               }
 
-              Rect<int>    rect;
-              DirtyRectKey dirtyRectKey(item.mNode, item.mRenderer);
+              BoundsInteger rect;
+              DirtyRectKey  dirtyRectKey(item.mNode, item.mRenderer);
               // If the item refers to updated node or renderer.
               if(item.mIsUpdated ||
                  (item.mNode->Updated() || (item.mRenderer && item.mRenderer->Updated())))
@@ -832,7 +834,7 @@ void RenderManager::PreRenderScene(Integration::Scene& scene, Integration::Scene
                   auto dirtyRectPos = itemsDirtyRects.find(dirtyRectKey);
                   if(dirtyRectPos != itemsDirtyRects.end())
                   {
-                    Rect<int> currentRect = rect;
+                    BoundsInteger currentRect = rect;
 
                     // Same item, merge it with the previous rect
                     rect.Merge(dirtyRectPos->second.rect);
@@ -922,11 +924,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     return;
   }
 
-  Rect<int> clippingRect = sceneObject->GetSurfaceRect();
+  BoundsInteger clippingRect = sceneObject->GetSurfaceRect();
   RenderScene(status, scene, renderToFbo, clippingRect);
 }
 
-void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect)
+void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::Scene& scene, bool renderToFbo, BoundsInteger& clippingRect)
 {
   DALI_LOG_INFO(gLogFilter, Debug::General, "Rendering to %s\n", renderToFbo ? "Framebuffer" : "Surface");
 
@@ -941,13 +943,13 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   uint32_t instructionCount = sceneObject->GetRenderInstructions().Count();
 
-  Rect<int32_t> surfaceRect = sceneObject->GetSurfaceRect();
+  BoundsInteger surfaceRect = sceneObject->GetSurfaceRect();
   if(clippingRect == surfaceRect)
   {
     // Full rendering case
     // Make clippingRect empty because we're doing full rendering now if the clippingRect is empty.
     // To reduce side effects, keep this logic now.
-    clippingRect = Rect<int>();
+    clippingRect = BoundsInteger();
   }
 
   // Prefetch programs before we start rendering so reflection is
@@ -1122,7 +1124,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // Mark that we will require a post-render step to be performed (includes swap-buffers).
     status.SetNeedsPostRender(true);
 
-    Rect<int32_t> viewportRect;
+    BoundsInteger viewportRect;
 
     int32_t surfaceOrientation = sceneObject->GetSurfaceOrientation() + sceneObject->GetScreenOrientation();
     if(surfaceOrientation >= 360)
@@ -1227,7 +1229,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       if(!clippingRect.Intersect(viewportRect))
       {
         DALI_LOG_ERROR("Invalid clipping rect %d %d %d %d\n", clippingRect.x, clippingRect.y, clippingRect.width, clippingRect.height);
-        clippingRect = Rect<int>();
+        clippingRect = BoundsInteger();
       }
       clearFullFrameRect = false;
     }
@@ -1325,6 +1327,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     if(!renderToFbo)
     {
       DALI_LOG_INFO(gLogFilter, Debug::General, "Present\n");
+      DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_RENDER_FINISHED");
 
       DALI_TRACE_BEGIN(gTraceFilter, "DALI_RENDER_FINISHED");
       auto renderTarget = sceneObject->GetSurfaceRenderTarget();
@@ -1354,6 +1357,9 @@ void RenderManager::ClearScene(Integration::Scene scene)
   {
     return;
   }
+  DALI_LOG_DEBUG_INFO("ClearScene comes\n");
+
+  DALI_TIME_CHECKER_SCOPE(gTimeCheckerFilter, "DALI_CLEAR_SCENE");
 
   DALI_TRACE_BEGIN(gTraceFilter, "DALI_CLEAR_SCENE");
   auto& currentRenderTarget = *sceneObject->GetSurfaceRenderTarget();
@@ -1361,7 +1367,7 @@ void RenderManager::ClearScene(Integration::Scene scene)
   auto& currentClearValues  = sceneObject->GetGraphicsRenderPassClearValues();
   DALI_ASSERT_DEBUG(!currentClearValues.empty());
 
-  Rect<int32_t>    surfaceRect = sceneObject->GetSurfaceRect();
+  BoundsInteger    surfaceRect = sceneObject->GetSurfaceRect();
   Graphics::Rect2D scissorArea{0, 0, uint32_t(surfaceRect.width), uint32_t(surfaceRect.height)};
   int32_t          surfaceOrientation = sceneObject->GetSurfaceOrientation() + sceneObject->GetScreenOrientation();
   if(surfaceOrientation >= 360)

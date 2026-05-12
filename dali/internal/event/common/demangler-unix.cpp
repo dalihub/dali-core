@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  */
 
 // EXTERNAL HEADER
+#include <cxxabi.h>
+#include <cstdlib>
 #include <string_view>
 
 // FILE HEADER
@@ -35,7 +37,7 @@ size_t ExtractNumber(std::string_view& src)
     char c = src[i];
     if(!IsDigit(c))
     {
-      //update the src view.
+      // update the src view.
       src.remove_prefix(i);
       break;
     }
@@ -91,6 +93,33 @@ namespace Internal
 std::string DemangleClassName(const char* typeIdName)
 {
   return std::string(ExtractDemangleNestedName(typeIdName));
+}
+
+std::string DemangleTypeInfoName(const char* typeIdName)
+{
+  if(!typeIdName || typeIdName[0] == '\0')
+  {
+    return {};
+  }
+
+  int   status    = 0;
+  char* demangled = abi::__cxa_demangle(typeIdName, nullptr, nullptr, &status);
+
+  if(status == 0 && demangled != nullptr)
+  {
+    // abi::__cxa_demangle allocates with malloc(); must be freed with free().
+    std::string result(demangled);
+    free(demangled);
+    return result;
+  }
+
+  // Demangling failed (status != 0): return the raw mangled name as fallback
+  // so callers always get a non-empty, usable string.
+  if(demangled != nullptr)
+  {
+    free(demangled);
+  }
+  return std::string(typeIdName);
 }
 
 } // namespace Internal

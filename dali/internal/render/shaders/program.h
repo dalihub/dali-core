@@ -196,11 +196,10 @@ public:
 private: // Implementation
   /**
    * Constructor, private so no direct instantiation
-   * @param[in] cache where the programs are stored
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
    * @param[in] gfxController Reference to Graphics Controller object
    */
-  Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
+  Program(Internal::ShaderDataPtr shaderData, Graphics::Controller& gfxController);
 
 public:
   Program()                          = delete; ///< default constructor, not defined
@@ -261,9 +260,7 @@ public:
     return mUniformBlockMemoryRequirements;
   }
 
-private:                // Data
-  ProgramCache& mCache; ///< The program cache
-
+private:                                                                               // Data
   using LifecycleObserverContainer = std::unordered_map<LifecycleObserver*, uint32_t>; ///< Lifecycle observers container. We allow to add same observer multiple times.
                                                                                        ///< Key is a pointer to observer, value is the number of observer added.
   LifecycleObserverContainer mLifecycleObservers;

@@ -31,7 +31,7 @@ namespace SceneGraph
 class Renderer;
 namespace VisualRenderer
 {
-class VisualProperties;
+struct VisualProperties;
 } // namespace VisualRenderer
 } // namespace SceneGraph
 

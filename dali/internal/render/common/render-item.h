@@ -88,7 +88,7 @@ struct RenderItem
    * @param[in]    position          The center position of the render item
    * @param[in]    size              The size of the render item
    */
-  static Dali::Rect<int32_t> CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size);
+  static Dali::BoundsInteger CalculateTransformSpaceAABB(const Matrix& transformMatrix, const Vector3& position, const Vector3& size);
 
   /**
    * @brief This method is an optimized calculation of a viewport-space AABB (Axis-Aligned-Bounding-Box).
@@ -109,7 +109,7 @@ struct RenderItem
    * @param[in]    scaleFactor       The scale factor between viewport and object.
    * @return                         The AABB coordinates in viewport-space (x, y, width, height)
    */
-  static Dali::Rect<int32_t> CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor);
+  static Dali::BoundsInteger CalculateViewportSpaceAABB(const Matrix& modelViewMatrix, const Vector3& position, const Vector3& size, const int viewportWidth, const int viewportHeight, const Vector2& scaleFactor);
 
   /**
    * @brief Returns true if this node/renderer uses the depth buffer (read or write)

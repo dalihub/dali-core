@@ -285,10 +285,14 @@ public:
       // static_asserts on Key and Value, so memset is safe.  GCC's -Wclass-memaccess
       // may still warn if Value has user-provided constructors (e.g. std::_List_iterator),
       // even though the type is trivially copyable, so suppress it here.
+#if !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
       memset(mEntries, 0, mCapacity * sizeof(Entry));
+#if !defined(__clang__)
 #pragma GCC diagnostic pop
+#endif
     }
     mSize     = 0u;
     mOccupied = 0u;

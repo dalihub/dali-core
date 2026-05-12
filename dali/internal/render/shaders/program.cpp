@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shader
   if(nullptr == program)
   {
     // program not found so create it
-    program = new Program(cache, shaderData, gfxController);
+    program = new Program(shaderData, gfxController);
 
     DALI_LOG_INFO(Debug::Filter::gShader, Debug::Verbose, "Program::New() created a unique program:\n  VertexShader:\n%s\n\n  FragShader:\n%s\n", shaderData->GetVertexShader(), shaderData->GetFragmentShader());
     cache.AddProgram(shaderHash, program);
@@ -95,9 +95,8 @@ Program* Program::New(ProgramCache& cache, const Internal::ShaderDataPtr& shader
   return program;
 }
 
-Program::Program(ProgramCache& cache, Internal::ShaderDataPtr shaderData, Graphics::Controller& controller)
-: mCache(cache),
-  mLifecycleObservers(),
+Program::Program(Internal::ShaderDataPtr shaderData, Graphics::Controller& controller)
+: mLifecycleObservers(),
   mGfxController(controller),
   mProgramData(std::move(shaderData)),
   mObserverNotifying(false)

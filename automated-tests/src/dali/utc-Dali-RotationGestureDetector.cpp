@@ -79,7 +79,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const RotationGesture& rotation)
+  void operator()(Actor actor, RotationGesture rotation)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = rotation;
@@ -108,7 +108,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const RotationGesture& rotation)
+  void operator()(Actor actor, RotationGesture rotation)
   {
     GestureReceivedFunctor::operator()(actor, rotation);
 
@@ -1167,7 +1167,7 @@ int UtcDaliRotationGestureDisableDetectionDuringRotationN(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect(
     &application,
-    [&detector, &functorCalled](Actor actor, const RotationGesture& gesture)
+    [&detector, &functorCalled](Actor actor, RotationGesture gesture)
   {
     if(gesture.GetState() == GestureState::FINISHED)
     {

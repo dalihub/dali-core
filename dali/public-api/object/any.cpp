@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,9 @@
 
 // EXTERNAL HEADERS
 #include <dali/integration-api/debug.h>
+
+// INTERNAL HEADERS
+#include <dali/internal/event/common/demangler.h>
 
 namespace Dali
 {
@@ -98,9 +101,25 @@ Any& Any::operator=(Any&& any) noexcept
   return *this;
 }
 
-const std::type_info& Any::GetType() const
+const TypeInfoId& Any::GetType() const
 {
-  return mContainer ? mContainer->GetType() : typeid(void);
+  static const TypeInfoId voidType;
+  return mContainer ? mContainer->GetType() : voidType;
+}
+
+Dali::String Any::DemangleTypeName(const char* mangledName)
+{
+  if(!mangledName || mangledName[0] == '\0')
+  {
+    return Dali::String();
+  }
+
+  // DemangleTypeInfoName returns a std::string. Capture it in a named local
+  // variable before calling c_str() — calling c_str() on a temporary would
+  // be undefined behaviour because the temporary is destroyed before the
+  // Dali::String constructor completes.
+  std::string demangled = Dali::Internal::DemangleTypeInfoName(mangledName);
+  return Dali::String(demangled.c_str());
 }
 
 void Any::AssertAlways(const char* assertMessage)
@@ -109,4 +128,4 @@ void Any::AssertAlways(const char* assertMessage)
   throw Dali::DaliException(assertMessage, "");
 }
 
-} //namespace Dali
+} // namespace Dali

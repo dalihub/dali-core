@@ -91,7 +91,7 @@ struct KeyEventGeneratedReceivedFunctor
   {
   }
 
-  bool operator()(const KeyEvent& keyEvent)
+  bool operator()(KeyEvent keyEvent)
   {
     signalData.functorCalled    = true;
     signalData.receivedKeyEvent = keyEvent;
@@ -135,7 +135,7 @@ struct KeyEventReceivedFunctor
   {
   }
 
-  bool operator()(const KeyEvent& keyEvent)
+  bool operator()(KeyEvent keyEvent)
   {
     signalData.functorCalled    = true;
     signalData.receivedKeyEvent = keyEvent;
@@ -173,7 +173,7 @@ struct TouchFunctor
   {
   }
 
-  void operator()(const TouchEvent& touch)
+  void operator()(TouchEvent touch)
   {
     signalData.functorCalled = true;
     TouchEvent handle(touch);
@@ -215,7 +215,7 @@ struct WheelEventReceivedFunctor
   {
   }
 
-  bool operator()(const WheelEvent& wheelEvent)
+  bool operator()(WheelEvent wheelEvent)
   {
     signalData.functorCalled      = true;
     signalData.receivedWheelEvent = wheelEvent;
@@ -244,7 +244,7 @@ struct WheelEventReceivedVoidFunctor
   WheelEventSignalData& signalData;
 };
 
-bool DummyTouchCallback(Actor actor, const TouchEvent& touch)
+bool DummyTouchCallback(Actor actor, TouchEvent touch)
 {
   return true;
 }

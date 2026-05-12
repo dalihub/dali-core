@@ -739,9 +739,9 @@ public:
 
   // Typedefs
 
-  using TouchEventSignalType                 = Signal<bool(Actor, const TouchEvent&)>;     ///< Touch signal type @SINCE_1_1.37
-  using HoverSignalType                      = Signal<bool(Actor, const HoverEvent&)>;     ///< Hover signal type @SINCE_1_0.0
-  using WheelEventSignalType                 = Signal<bool(Actor, const WheelEvent&)>;     ///< Wheel signal type @SINCE_1_0.0
+  using TouchEventSignalType                 = Signal<bool(Actor, TouchEvent)>;     ///< Touch signal type @SINCE_1_1.37
+  using HoverSignalType                      = Signal<bool(Actor, HoverEvent)>;     ///< Hover signal type @SINCE_1_0.0
+  using WheelEventSignalType                 = Signal<bool(Actor, WheelEvent)>;     ///< Wheel signal type @SINCE_1_0.0
   using OnSceneSignalType                    = Signal<void(Actor)>;                        ///< Scene connection signal type @SINCE_1_9.24
   using OffSceneSignalType                   = Signal<void(Actor)>;                        ///< Scene disconnection signal type @SINCE_1_9.24
   using OnRelayoutSignalType                 = Signal<void(Actor)>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
@@ -1230,7 +1230,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(Actor actor, const HoverEvent& event);
+   *   bool YourCallbackName(Actor actor, HoverEvent event);
    * @endcode
    * The return value of True, indicates that the hover event should be consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
@@ -1245,7 +1245,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(Actor actor, const WheelEvent& event);
+   *   bool YourCallbackName(Actor actor, WheelEvent event);
    * @endcode
    * The return value of True, indicates that the wheel event should be consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.

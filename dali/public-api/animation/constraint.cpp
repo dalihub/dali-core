@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/animation/constraint.h>
 
+// EXTERNAL INCLUDES
+#include <memory> ///< for std::unique_ptr
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/animation/constraint-source-impl.h>
@@ -145,13 +148,16 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 {
   Constraint                constraint;
   Internal::SourceContainer sources;
-  Internal::Object&         object = GetImplementation(handle);
+
+  std::unique_ptr<CallbackBase> functionPtr(function); // Ensure function is deleted if an exception is thrown
+
+  Internal::Object& object = GetImplementation(handle);
 
   switch(targetType)
   {
     case Property::BOOLEAN:
     {
-      Internal::PropertyConstraintPtr<bool>::Type funcPtr(CreatePropertyConstraint<bool>(function));
+      Internal::PropertyConstraintPtr<bool>::Type funcPtr(CreatePropertyConstraint<bool>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<bool>::New(object,
                                                                     targetIndex,
@@ -162,7 +168,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::FLOAT:
     {
-      Internal::PropertyConstraintPtr<float>::Type funcPtr(CreatePropertyConstraint<float>(function));
+      Internal::PropertyConstraintPtr<float>::Type funcPtr(CreatePropertyConstraint<float>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<float>::New(object,
                                                                      targetIndex,
@@ -173,7 +179,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::INTEGER:
     {
-      Internal::PropertyConstraintPtr<int>::Type funcPtr(CreatePropertyConstraint<int>(function));
+      Internal::PropertyConstraintPtr<int>::Type funcPtr(CreatePropertyConstraint<int>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<int>::New(object,
                                                                    targetIndex,
@@ -184,7 +190,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::VECTOR2:
     {
-      Internal::PropertyConstraintPtr<Vector2>::Type funcPtr(CreatePropertyConstraint<Vector2>(function));
+      Internal::PropertyConstraintPtr<Vector2>::Type funcPtr(CreatePropertyConstraint<Vector2>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<Vector2>::New(object,
                                                                        targetIndex,
@@ -195,7 +201,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::VECTOR3:
     {
-      Internal::PropertyConstraintPtr<Vector3>::Type funcPtr(CreatePropertyConstraint<Vector3>(function));
+      Internal::PropertyConstraintPtr<Vector3>::Type funcPtr(CreatePropertyConstraint<Vector3>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<Vector3>::New(object,
                                                                        targetIndex,
@@ -206,7 +212,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::VECTOR4:
     {
-      Internal::PropertyConstraintPtr<Vector4>::Type funcPtr(CreatePropertyConstraint<Vector4>(function));
+      Internal::PropertyConstraintPtr<Vector4>::Type funcPtr(CreatePropertyConstraint<Vector4>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<Vector4>::New(object,
                                                                        targetIndex,
@@ -217,7 +223,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::ROTATION:
     {
-      Internal::PropertyConstraintPtr<Quaternion>::Type funcPtr(CreatePropertyConstraint<Quaternion>(function));
+      Internal::PropertyConstraintPtr<Quaternion>::Type funcPtr(CreatePropertyConstraint<Quaternion>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<Quaternion>::New(object,
                                                                           targetIndex,
@@ -228,7 +234,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::MATRIX:
     {
-      Internal::PropertyConstraintPtr<Matrix>::Type funcPtr(CreatePropertyConstraint<Matrix>(function));
+      Internal::PropertyConstraintPtr<Matrix>::Type funcPtr(CreatePropertyConstraint<Matrix>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<Matrix>::New(object,
                                                                       targetIndex,
@@ -239,7 +245,7 @@ Constraint Constraint::New(Handle handle, Property::Index targetIndex, Property:
 
     case Property::MATRIX3:
     {
-      Internal::PropertyConstraintPtr<Matrix3>::Type funcPtr(CreatePropertyConstraint<Matrix3>(function));
+      Internal::PropertyConstraintPtr<Matrix3>::Type funcPtr(CreatePropertyConstraint<Matrix3>(functionPtr.release()));
 
       constraint = Dali::Constraint(Internal::Constraint<Matrix3>::New(object,
                                                                        targetIndex,

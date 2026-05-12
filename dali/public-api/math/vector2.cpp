@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/int-pair.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector3.h>
 
@@ -46,12 +45,6 @@ Vector2::Vector2(const Vector3& vec3)
 Vector2::Vector2(const Vector4& vec4)
 : x(vec4.x),
   y(vec4.y)
-{
-}
-
-Vector2::Vector2(const Uint16Pair& pair)
-: width(pair.GetWidth()),
-  height(pair.GetHeight())
 {
 }
 

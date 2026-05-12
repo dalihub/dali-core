@@ -178,7 +178,7 @@ struct RenderTaskFinished
   {
   }
 
-  void operator()(RenderTask& renderTask)
+  void operator()(RenderTask renderTask)
   {
     finished = true;
   }
@@ -194,7 +194,7 @@ struct RenderTaskFinishedRemoveSource
   {
   }
 
-  void operator()(RenderTask& renderTask)
+  void operator()(RenderTask renderTask)
   {
     DALI_TEST_CHECK(finishedOnce == false);
     finished       = true;
@@ -215,7 +215,7 @@ struct RenderTaskFinishedRenderAgain
   {
   }
 
-  void operator()(RenderTask& renderTask)
+  void operator()(RenderTask renderTask)
   {
     DALI_TEST_CHECK(finishedOnce == false);
     finished     = true;
@@ -1854,10 +1854,230 @@ int UtcDaliRenderTaskGetCameraActorP(void)
 
   RenderTask task = taskList.GetTask(0u);
 
-  CameraActor actor = task.GetCameraActor();
-  DALI_TEST_CHECK(actor);
-  DALI_TEST_EQUALS(actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
-  DALI_TEST_GREATER(actor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  CameraActor cameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(cameraActor);
+  DALI_TEST_EQUALS(cameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(cameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetBuiltinCameraActorP01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetCameraActor() after call SetBuiltinCameraActor()");
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask(0u);
+
+  CameraActor cameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(cameraActor);
+  DALI_TEST_EQUALS(cameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(cameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::DEFAULT, TEST_LOCATION);
+
+  task.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SCENE, Dali::Size(100.0f, 200.0f), Dali::Property::Map().Add("position", Vector2(10.0f, 20.0f)));
+  CameraActor autoWorldCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(autoWorldCameraActor);
+  DALI_TEST_CHECK(autoWorldCameraActor != cameraActor);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(autoWorldCameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<float>(Actor::Property::POSITION_X), 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<float>(Actor::Property::POSITION_Y), 20.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetInvertYAxis(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::BUILTIN_SCENE, TEST_LOCATION);
+
+  task.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR, Dali::Size(100.0f, 200.0f), Dali::Property::Map().Add(CameraActor::Property::INVERT_Y_AXIS, true));
+  CameraActor autoSourceCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(autoSourceCameraActor);
+  DALI_TEST_CHECK(autoSourceCameraActor != cameraActor);
+  DALI_TEST_CHECK(autoSourceCameraActor != autoWorldCameraActor);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(autoSourceCameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetInvertYAxis(), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<float>(Actor::Property::POSITION_X), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<float>(Actor::Property::POSITION_Y), 0.0f, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::BUILTIN_SOURCE_ACTOR, TEST_LOCATION);
+
+  task.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR, Dali::Size(100.0f, 200.0f));
+  CameraActor autoStopperCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(autoStopperCameraActor);
+  DALI_TEST_CHECK(autoStopperCameraActor != cameraActor);
+  DALI_TEST_CHECK(autoStopperCameraActor != autoWorldCameraActor);
+  DALI_TEST_CHECK(autoStopperCameraActor != autoSourceCameraActor);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(autoStopperCameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<float>(Actor::Property::POSITION_X), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<float>(Actor::Property::POSITION_Y), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetInvertYAxis(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::BUILTIN_STOPPER_ACTOR, TEST_LOCATION);
+
+  task.SetCameraActor(cameraActor);
+  CameraActor currentCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(currentCameraActor);
+  DALI_TEST_CHECK(currentCameraActor == cameraActor);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+
+  // CameraActorType should be USER even if we set default camera again.
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::USER, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetBuiltinCameraActorP02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetCameraActor() after call SetBuiltinCameraActor()");
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask(0u);
+
+  Actor actor1 = Actor::New();
+  Actor actor2 = Actor::New();
+  Actor actor3 = Actor::New();
+
+  application.GetScene().Add(actor1);
+  application.GetScene().Add(actor2);
+  actor1.Add(actor3);
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::DEFAULT, TEST_LOCATION);
+
+  // Remove SourceActor of task first.
+  task.SetSourceActor(Actor());
+
+  CameraActor cameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(cameraActor);
+  DALI_TEST_EQUALS(cameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(cameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::DEFAULT, TEST_LOCATION);
+
+  task.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SCENE, Dali::Size(100.0f, 200.0f), Dali::Property::Map().Add("position", Vector2(10.0f, 20.0f)));
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::BUILTIN_SCENE, TEST_LOCATION);
+  CameraActor autoWorldCameraActor = task.GetCameraActor();
+
+  // World camera not be created yet.
+  // Return empty handle.
+  DALI_TEST_CHECK(!autoWorldCameraActor);
+
+  task.SetSourceActor(actor1);
+  autoWorldCameraActor = task.GetCameraActor();
+
+  // Check world camera is on scene now.
+  DALI_TEST_CHECK(autoWorldCameraActor);
+  DALI_TEST_CHECK(autoWorldCameraActor != cameraActor);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<float>(Actor::Property::POSITION_X), 10.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<float>(Actor::Property::POSITION_Y), 20.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetInvertYAxis(), false, TEST_LOCATION);
+
+  // Remove SourceActor of task first.
+  task.SetSourceActor(Actor());
+
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+
+  task.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_SOURCE_ACTOR, Dali::Size(100.0f, 200.0f), Dali::Property::Map().Add(CameraActor::Property::INVERT_Y_AXIS, true));
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::BUILTIN_SOURCE_ACTOR, TEST_LOCATION);
+  CameraActor autoSourceCameraActor = task.GetCameraActor();
+
+  // Source camera not be created yet.
+  // Return empty handle.
+  DALI_TEST_CHECK(!autoSourceCameraActor);
+
+  task.SetSourceActor(actor1);
+  autoSourceCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(autoSourceCameraActor);
+  DALI_TEST_CHECK(autoSourceCameraActor != cameraActor);
+  DALI_TEST_CHECK(autoSourceCameraActor != autoWorldCameraActor);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(autoSourceCameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetInvertYAxis(), true, TEST_LOCATION);
+
+  // Check source camera is on scene now.
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+  DALI_TEST_CHECK(autoSourceCameraActor.GetParent() == actor1);
+
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<float>(Actor::Property::POSITION_X), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<float>(Actor::Property::POSITION_Y), 0.0f, TEST_LOCATION);
+
+  task.SetSourceActor(actor2);
+  autoSourceCameraActor = task.GetCameraActor();
+
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+  DALI_TEST_CHECK(autoSourceCameraActor.GetParent() == actor2);
+
+  task.SetSourceActor(Actor());
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_CHECK(!autoSourceCameraActor.GetParent());
+
+  task.SetBuiltinCameraActor(Dali::RenderTask::BuiltinCameraType::ATTACHED_TO_STOPPER_ACTOR, Dali::Size(100.0f, 200.0f));
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::BUILTIN_STOPPER_ACTOR, TEST_LOCATION);
+  CameraActor autoStopperCameraActor = task.GetCameraActor();
+
+  // Stopper camera not be created yet.
+  // Return empty handle.
+  DALI_TEST_CHECK(!autoStopperCameraActor);
+
+  task.SetSourceActor(actor1);
+  autoStopperCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(autoStopperCameraActor);
+  DALI_TEST_CHECK(autoStopperCameraActor != cameraActor);
+  DALI_TEST_CHECK(autoStopperCameraActor != autoWorldCameraActor);
+  DALI_TEST_CHECK(autoStopperCameraActor != autoSourceCameraActor);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION);
+  DALI_TEST_GREATER(autoStopperCameraActor.GetFieldOfView(), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetInvertYAxis(), false, TEST_LOCATION);
+
+  // Check stopper camera is on scene now.
+  // Since StopperActor not setted, stopper camera is attached to source actor.
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+  DALI_TEST_CHECK(autoStopperCameraActor.GetParent() == actor1);
+
+  // Set StopperActor. stopper cameran is attached to stopper actor now.
+  task.RenderUntil(actor3);
+  autoStopperCameraActor = task.GetCameraActor();
+
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+  DALI_TEST_CHECK(autoStopperCameraActor.GetParent() == actor3);
+
+  // Reset StopperActor. It will make camera attach to source actor again.
+  task.RenderUntil(Actor());
+  autoStopperCameraActor = task.GetCameraActor();
+
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), true, TEST_LOCATION);
+  DALI_TEST_CHECK(autoStopperCameraActor.GetParent() == actor1);
+
+  task.SetSourceActor(Actor());
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_CHECK(!autoStopperCameraActor.GetParent());
+
+  task.SetCameraActor(cameraActor);
+  DALI_TEST_EQUALS(task.GetCameraActorType(), Dali::RenderTask::CameraActorType::USER, TEST_LOCATION);
+  CameraActor currentCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK(currentCameraActor);
+  DALI_TEST_CHECK(currentCameraActor == cameraActor);
+  DALI_TEST_EQUALS(autoWorldCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoSourceCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(autoStopperCameraActor.GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
   END_TEST;
 }
 
@@ -3704,7 +3924,7 @@ int UtcDaliRenderTaskSetViewportNegative(void)
   Dali::RenderTask instance;
   try
   {
-    Dali::Rect<int> arg1;
+    Dali::BoundsInteger arg1;
     instance.SetViewport(arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
@@ -5014,17 +5234,17 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   newTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
   newTask.SetFrameBuffer(frameBuffer);
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
 
   // First frame result.
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(0, 752, 48, 48);
+  clippingRect = BoundsInteger(0, 752, 48, 48);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -5056,10 +5276,10 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
     application.SendNotification();
     application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-    clippingRect = Rect<int>(0, 752, 48, 48);
+    clippingRect = BoundsInteger(0, 752, 48, 48);
     DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
     DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
-    DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+    DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
     application.RenderWithPartialUpdate(damagedRects, clippingRect);
     DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -5077,10 +5297,10 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
-  clippingRect = Rect<int>(0, 752, 48, 48);
+  clippingRect = BoundsInteger(0, 752, 48, 48);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
   DirtyRectChecker(damagedRects, {clippingRect}, true, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
@@ -5106,9 +5326,9 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   // Full update because the task viewport is invalid
-  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  clippingRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -5123,9 +5343,9 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   // Full update because the camera orientation is changed
-  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  clippingRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
@@ -5138,9 +5358,9 @@ int UtcDaliRenderTaskSetPartialUpdate(void)
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
   // Full update because the camera is moved
-  clippingRect = Rect<int>(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
+  clippingRect = BoundsInteger(0, 0, TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
 
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 

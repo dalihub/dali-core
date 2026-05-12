@@ -106,9 +106,8 @@ public:
 
   /**
    * Constructor
-   * graphicsController The graphics backend controller
    */
-  explicit ProgramController(Graphics::Controller& graphicsController);
+  ProgramController();
 
   /**
    * Destructor, non virtual as not a base class
@@ -164,8 +163,6 @@ private: // From ProgramCache
   void AddProgram(size_t shaderHash, Program* program) override;
 
 private: // Data
-  Graphics::Controller& mGraphicsController;
-
   using ProgramContainer = OwnerContainer<ProgramPair*>;
   using ProgramIterator  = ProgramContainer::Iterator;
   ProgramContainer mProgramCache;

@@ -62,7 +62,7 @@ struct GestureReceivedFunctor
   {
   }
 
-  void operator()(Actor actor, const TapGesture& tap)
+  void operator()(Actor actor, TapGesture tap)
   {
     signalData.functorCalled   = true;
     signalData.receivedGesture = tap;

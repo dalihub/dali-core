@@ -823,8 +823,8 @@ namespace
 {
 void EnsureDirtyRectIsEmpty(TestApplication& application, const char* location)
 {
-  Rect<int>              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
-  std::vector<Rect<int>> damagedRects;
+  BoundsInteger              clippingRect = TestApplication::DEFAULT_SURFACE_RECT;
+  std::vector<BoundsInteger> damagedRects;
 
   // Try render several frames as full surface.
   for(int i = 0; i < 3; i++)
@@ -851,8 +851,8 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
 
   const TestGlAbstraction::ScissorParams& glScissorParams(application.GetGlAbstraction().GetScissorParams());
 
-  std::vector<Rect<int>> damagedRects;
-  Rect<int>              clippingRect;
+  std::vector<BoundsInteger> damagedRects;
+  BoundsInteger              clippingRect;
   application.SendNotification();
   application.PreRenderWithPartialUpdate(TestApplication::RENDER_FRAME_INTERVAL, nullptr, damagedRects);
 
@@ -901,8 +901,8 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -923,8 +923,8 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -945,8 +945,8 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -967,8 +967,8 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -991,8 +991,8 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);
@@ -1013,8 +1013,8 @@ int utcDaliGeometryPartialUpdateChangeIndicies(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Aligned by 16
-  clippingRect = Rect<int>(0, 752, 48, 48); // in screen coordinates
-  DALI_TEST_EQUALS<Rect<int>>(clippingRect, damagedRects[0], TEST_LOCATION);
+  clippingRect = BoundsInteger(0, 752, 48, 48); // in screen coordinates
+  DALI_TEST_EQUALS<BoundsInteger>(clippingRect, damagedRects[0], TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
   DALI_TEST_EQUALS(clippingRect.x, glScissorParams.x, TEST_LOCATION);
   DALI_TEST_EQUALS(clippingRect.y, glScissorParams.y, TEST_LOCATION);

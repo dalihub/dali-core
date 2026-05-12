@@ -219,7 +219,6 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
     auto&    reflection = graphicsController->GetProgramReflection(program->GetGraphicsProgram());
 
     Graphics::VertexInputState vertexInputState{};
-    uint32_t                   base = 0;
 
     bool attrNotFound = false;
     for(auto&& vertexBuffer : geometry->GetVertexBuffers())
@@ -235,8 +234,7 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
                                                    vertexInputRate);
       //@todo Add the actual rate to the graphics struct
 
-      const uint32_t attributeCount          = vertexBuffer->GetAttributeCount();
-      uint32_t       lastBoundAttributeIndex = 0;
+      const uint32_t attributeCount = vertexBuffer->GetAttributeCount();
       for(uint32_t i = 0; i < attributeCount; ++i)
       {
         auto    attributeName = vertexBuffer->GetAttributeName(i);
@@ -248,7 +246,6 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
                                                    bindingIndex,
                                                    vertexFormat.components[i].offset,
                                                    GetPropertyVertexFormat(vertexFormat.components[i].type));
-          ++lastBoundAttributeIndex;
         }
         else
         {
@@ -257,7 +254,6 @@ PipelineCacheL0Ptr PipelineCache::GetPipelineCacheL0(Program* program, Render::G
           // Don't bind unused attributes.
         }
       }
-      base += lastBoundAttributeIndex;
       ++bindingIndex;
     }
     PipelineCacheL0 level0;

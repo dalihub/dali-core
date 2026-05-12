@@ -33,8 +33,9 @@ namespace Render
  * only created when the filters and wrap modes are not default
  * values.
  */
-struct Sampler
+class Sampler
 {
+public:
   using FilterMode = Dali::FilterMode::Type;
   using WrapMode   = Dali::WrapMode::Type;
 
@@ -165,6 +166,7 @@ struct Sampler
 
   Graphics::Sampler* CreateGraphicsObject();
 
+public:
   Graphics::Controller*                  mGraphicsController;
   Graphics::UniquePtr<Graphics::Sampler> mGraphicsSampler;
 

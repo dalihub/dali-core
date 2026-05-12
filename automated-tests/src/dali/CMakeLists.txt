@@ -50,6 +50,7 @@ SET(TC_SOURCES
         utc-Dali-LocklessBuffer.cpp
         utc-Dali-LongPressGestureDetector.cpp
         utc-Dali-LongPressGestureRecognizer.cpp
+        utc-Dali-ManagedOpenHashMap.cpp
         utc-Dali-MathUtils.cpp
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp

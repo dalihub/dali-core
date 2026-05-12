@@ -227,7 +227,7 @@ private:
    * @param[in] touch Touch information
    * @return True if the touch is consumed.
    */
-  bool OnTouched(Dali::Actor actor, const Dali::TouchEvent& touch);
+  bool OnTouched(Dali::Actor actor, Dali::TouchEvent touch);
 
   LayerList* mLayerList; ///< Only valid when layer is on-scene
 

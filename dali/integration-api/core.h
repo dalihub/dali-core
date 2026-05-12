@@ -386,7 +386,7 @@ public:
    * @param[out] damagedRects containing damaged render items rects for this pass.
    * @return true if the scene has something to render, false if there is nothing to render
    */
-  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<Rect<int>>& damagedRects);
+  void PreRenderScene(Integration::Scene& scene, Integration::ScenePreRenderStatus& status, std::vector<BoundsInteger>& damagedRects);
 
   /**
    * Render a scene in the next frame. This method should be preceded by a call up PreRender.
@@ -411,7 +411,7 @@ public:
    * @param[in] renderToFbo True to render off-screen frame buffers only if any, and False to render the surface only.
    * @param[in] clippingRect The rect to clip rendered scene.
    */
-  void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, Rect<int>& clippingRect);
+  void RenderScene(RenderStatus& status, Integration::Scene& scene, bool renderToFbo, BoundsInteger& clippingRect);
 
   /**
    * Clear the scene's surface if there is nothing else to draw.

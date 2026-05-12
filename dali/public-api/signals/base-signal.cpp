@@ -162,7 +162,11 @@ void BaseSignal::OnDisconnect(CallbackBase* callback)
 
 void BaseSignal::OnConnect(ConnectionTrackerInterface* tracker, CallbackBase* callback)
 {
-  DALI_ASSERT_ALWAYS(nullptr != tracker && "Invalid ConnectionTrackerInterface pointer passed to Connect()");
+  if(DALI_UNLIKELY(tracker == nullptr))
+  {
+    delete callback;
+    DALI_ASSERT_ALWAYS(false && "Invalid ConnectionTrackerInterface pointer passed to Connect()");
+  }
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Connect()");
 
   auto* existing = FindCallback(callback);
@@ -195,7 +199,11 @@ void BaseSignal::OnConnect(ConnectionTrackerInterface* tracker, CallbackBase* ca
 
 void BaseSignal::OnDisconnect(ConnectionTrackerInterface* tracker, CallbackBase* callback)
 {
-  DALI_ASSERT_ALWAYS(nullptr != tracker && "Invalid ConnectionTrackerInterface pointer passed to Disconnect()");
+  if(DALI_UNLIKELY(tracker == nullptr))
+  {
+    delete callback;
+    DALI_ASSERT_ALWAYS(false && "Invalid ConnectionTrackerInterface pointer passed to Disconnect()");
+  }
   DALI_ASSERT_ALWAYS(nullptr != callback && "Invalid member function pointer passed to Disconnect()");
 
   auto* node = FindCallback(callback);
@@ -277,19 +285,25 @@ void BaseSignal::DeleteConnection(SignalConnectionNode* node)
     // CleanupConnections will unlink and free after Emit.
     node->connection = SignalConnection{nullptr};
     ++mNullCount;
+    --mActiveCount;
   }
   else
   {
-    // Unlink from emission-order list before freeing.
-    UnlinkFromEmitList(node);
+    // Reduce active count before freeing.
+    --mActiveCount;
+
     // Not emitting: move the connection out before freeing. This prevents
     // cascading destruction (if the callback owns the last handle to the object
     // that owns this signal) from happening while Free() is modifying the pool.
     SignalConnection moved(std::move(node->connection));
+
+    // Unlink from emission-order list before freeing.
+    UnlinkFromEmitList(node);
+
     mPool.Free(node); // Frees a null node — destructor is a no-op
+
     // 'moved' destructor runs here — may cascade, but pool is in a consistent state.
   }
-  --mActiveCount;
 }
 
 void BaseSignal::CleanupConnections()

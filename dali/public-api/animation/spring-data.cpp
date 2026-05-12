@@ -27,12 +27,10 @@
 
 namespace
 {
-static constexpr float  MIN_STIFFNESS      = 0.1f;
-static constexpr float  MIN_DAMPING        = 0.1f;
-static constexpr float  MIN_MASS           = 0.1f;
-static constexpr double TIME_STEP          = 1.0 / 60.0;
-static constexpr double EPSILON            = 0.001;
-static constexpr double MINIMUM_DIFFERENCE = static_cast<double>(Dali::Math::MACHINE_EPSILON_10);
+static constexpr float  MIN_STIFFNESS = 0.1f;
+static constexpr float  MIN_DAMPING   = 0.1f;
+static constexpr float  MIN_MASS      = 0.1f;
+static constexpr double EPSILON       = 0.001;
 } // namespace
 
 namespace Dali

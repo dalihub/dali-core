@@ -30,7 +30,7 @@ namespace Internal
 {
 namespace Render
 {
-struct Sampler;
+class Sampler;
 class Texture;
 } // namespace Render
 namespace SceneGraph

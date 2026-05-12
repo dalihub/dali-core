@@ -352,7 +352,7 @@ int UtcConditionalWaitNonCopyable(void)
 {
   // we want to make sure that ConditionalWait is not copyable (its copy constructor is not defined)
   // this test will stop compiling if ConditionalWait has compiler generated copy constructor
-  static_assert(!__has_trivial_copy(ConditionalWait), "ConditionalWait should NOT be copyable");
+  static_assert(!DALI_HAS_TRIVIAL_COPY(ConditionalWait), "ConditionalWait should NOT be copyable");
 
   DALI_TEST_CHECK(true);
   END_TEST;

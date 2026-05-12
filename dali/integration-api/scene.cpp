@@ -220,7 +220,7 @@ int32_t Scene::GetCurrentScreenOrientation() const
   return GetImplementation(*this).GetCurrentScreenOrientation();
 }
 
-const Rect<int32_t>& Scene::GetCurrentSurfaceRect() const
+const BoundsInteger& Scene::GetCurrentSurfaceRect() const
 {
   return GetImplementation(*this).GetCurrentSurfaceRect();
 }
