@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/threading/mutex.h>
-#include <dali/devel-api/update/frame-callback-interface.h>
-#include <dali/devel-api/update/update-proxy.h>
 #include <dali/internal/event/update/frame-callback-interface-impl.h>
+#include <dali/public-api/update/frame-callback-interface.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {

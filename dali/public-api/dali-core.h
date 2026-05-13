@@ -141,6 +141,9 @@
 
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
+#include <dali/public-api/update/frame-callback-interface.h>
+#include <dali/public-api/update/update-proxy.h>
+
 #include <dali/public-api/dali-core-version.h>
 
 #endif // DALI_CORE_H

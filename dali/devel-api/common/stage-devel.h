@@ -2,7 +2,7 @@
 #define DALI_STAGE_DEVEL_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/stage.h>
-#include <dali/devel-api/update/update-proxy.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {

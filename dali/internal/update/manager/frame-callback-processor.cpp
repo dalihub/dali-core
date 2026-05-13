@@ -28,12 +28,12 @@
 #endif
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/update/frame-callback-interface.h>
-#include <dali/devel-api/update/update-proxy.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/update/manager/global-scene-graph-traveler.h>
 #include <dali/internal/update/manager/scene-graph-traveler.h>
+#include <dali/public-api/update/frame-callback-interface.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace
 {
