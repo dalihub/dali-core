@@ -2470,6 +2470,38 @@ int UtcDaliHandleIndexOperatorByIndexP01(void)
   END_TEST;
 }
 
+int UtcDaliHandleSetPropertyByStringP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+
+  DALI_TEST_CHECK(actor.SetProperty("name", String("StringKeyActor")));
+  DALI_TEST_EQUALS(actor.GetProperty("name").Get<String>(), String("StringKeyActor"), TEST_LOCATION);
+
+  DALI_TEST_CHECK(actor.SetProperty("size", Vector3(10.0f, 20.0f, 30.0f)));
+  DALI_TEST_EQUALS(actor.GetProperty<Vector3>("size"), Vector3(10.0f, 20.0f, 30.0f), TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetCurrentProperty("name").Get<String>(), String("StringKeyActor"), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>("size"), Vector3(10.0f, 20.0f, 30.0f), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHandleSetPropertyByStringN(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+
+  DALI_TEST_CHECK(!actor.SetProperty("not-a-property", 10));
+  DALI_TEST_EQUALS(actor.GetProperty("not-a-property").GetType(), Property::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty("not-a-property").GetType(), Property::NONE, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliHandleIndexOperatorByIndexP02(void)
 {
   TestApplication application;
