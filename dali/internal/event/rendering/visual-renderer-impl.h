@@ -88,6 +88,11 @@ public: // Default property extensions from Object
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
+  /**
+   * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
+   */
+  int32_t GetPropertyComponentIndex(Property::Index index) const override;
+
 protected: // From Renderer
   /**
    * @copydoc Dali::Internal::Renderer::OnShaderChanged()
@@ -134,10 +139,10 @@ public:
   {
     Vector2 mTransformOffset{Vector2::ZERO};
     Vector2 mTransformSize{Vector2::ONE};
+    Vector2 mExtraSize{Vector2::ZERO};
     Vector2 mTransformOrigin{Vector2::ZERO};
     Vector2 mTransformPivot{Vector2::ZERO};
     Vector4 mTransformOffsetSizeMode{Vector4::ZERO};
-    Vector2 mExtraSize{Vector2::ZERO};
   };
 
 private:

@@ -43,13 +43,25 @@ namespace
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY("transformOffset", VECTOR2, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_OFFSET)
+DALI_PROPERTY("transformOffsetX", FLOAT, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X)
+DALI_PROPERTY("transformOffsetY", FLOAT, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y)
 DALI_PROPERTY("transformSize", VECTOR2, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_SIZE)
-DALI_PROPERTY("transformOrigin", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_ORIGIN)
-DALI_PROPERTY("transformPivot", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_PIVOT)
-DALI_PROPERTY("transformOffsetSizeMode", VECTOR4, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE)
+DALI_PROPERTY("transformSizeWidth", FLOAT, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH)
+DALI_PROPERTY("transformSizeHeight", FLOAT, true, true, true, Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT)
 DALI_PROPERTY("extraSize", VECTOR2, true, true, true, Dali::VisualRenderer::Property::EXTRA_SIZE)
-DALI_PROPERTY("visualMixColor", VECTOR3, true, false, true, Dali::VisualRenderer::Property::VISUAL_MIX_COLOR)
-DALI_PROPERTY("visualPreMultipliedAlpha", FLOAT, true, false, false, Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA)
+DALI_PROPERTY("extraSizeWidth", FLOAT, true, true, true, Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH)
+DALI_PROPERTY("extraSizeHeight", FLOAT, true, true, true, Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT)
+DALI_PROPERTY("transformOrigin", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_ORIGIN)
+DALI_PROPERTY("transformOriginX", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X)
+DALI_PROPERTY("transformOriginY", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_Y)
+DALI_PROPERTY("transformPivot", VECTOR2, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_PIVOT)
+DALI_PROPERTY("transformPivotX", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X)
+DALI_PROPERTY("transformPivotY", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_PIVOT_Y)
+DALI_PROPERTY("transformOffsetSizeMode", VECTOR4, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE)
+DALI_PROPERTY("transformOffsetXPolicy", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY)
+DALI_PROPERTY("transformOffsetYPolicy", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y_POLICY)
+DALI_PROPERTY("transformSizeWidthPolicy", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH_POLICY)
+DALI_PROPERTY("transformSizeHeightPolicy", FLOAT, true, false, false, Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT_POLICY)
 DALI_PROPERTY_TABLE_END(Dali::VisualRenderer::Property::DEFAULT_VISUAL_RENDERER_PROPERTY_START_INDEX, VisualRendererDefaultProperties)
 
 // Property string to enumeration tables:
@@ -65,34 +77,65 @@ constexpr uint32_t DEFAULT_VISUAL_UNIFORM_BLOCK_COUNT = 1u;
 
 /**
  * Sets both the cached value of a property and sends a message to set the animatable property in the Update thread.
- * @tparam T The property type
- * @param[in] eventThreadServices The event thread services
- * @param[in] propertyValue The new property value given
- * @param[in,out] cachedValue The local cached value of the property
- * @param[in] animatableProperty The animatable property to set on the update-thread
+ * @tparam PropertyT The property type
+ * @tparam componentIndex The component index of animatable property
+ * @param eventThreadServices The event thread services
+ * @param propertyValue The new property value given
+ * @param cachedValue The local cached value of the property
+ * @param animatableProperty The animatable property to set on the update-thread
  */
-template<typename T>
-void SetValue(EventThreadServices& eventThreadServices, const SceneGraph::PropertyOwner& propertyOwner, const Property::Value& propertyValue, T& cachedValue, const SceneGraph::AnimatableProperty<T>& animatableProperty)
+template<typename PropertyT, uint32_t componentIndex = static_cast<uint32_t>(Property::INVALID_COMPONENT_INDEX)>
+void SetValue(EventThreadServices& eventThreadServices, const SceneGraph::PropertyOwner& propertyOwner, const Property::Value& propertyValue, PropertyT& cachedValue, const SceneGraph::AnimatableProperty<PropertyT>& animatableProperty)
 {
-  if(propertyValue.Get(cachedValue))
+  if constexpr(componentIndex == 0 && (std::is_same_v<PropertyT, Dali::Vector2> || std::is_same_v<PropertyT, Dali::Vector3> || std::is_same_v<PropertyT, Dali::Vector4>))
   {
-    BakeMessage<T>(eventThreadServices, propertyOwner, animatableProperty, cachedValue);
+    if(propertyValue.Get(cachedValue.x))
+    {
+      SetXComponentMessage<PropertyT>(eventThreadServices, propertyOwner, animatableProperty, cachedValue.x);
+    }
+  }
+  else if constexpr(componentIndex == 1 && (std::is_same_v<PropertyT, Dali::Vector2> || std::is_same_v<PropertyT, Dali::Vector3> || std::is_same_v<PropertyT, Dali::Vector4>))
+  {
+    if(propertyValue.Get(cachedValue.y))
+    {
+      SetYComponentMessage<PropertyT>(eventThreadServices, propertyOwner, animatableProperty, cachedValue.y);
+    }
+  }
+  else if constexpr(componentIndex == 2 && (std::is_same_v<PropertyT, Dali::Vector3> || std::is_same_v<PropertyT, Dali::Vector4>))
+  {
+    if(propertyValue.Get(cachedValue.z))
+    {
+      SetZComponentMessage<PropertyT>(eventThreadServices, propertyOwner, animatableProperty, cachedValue.z);
+    }
+  }
+  else if constexpr(componentIndex == 3 && (std::is_same_v<PropertyT, Dali::Vector4>))
+  {
+    if(propertyValue.Get(cachedValue.w))
+    {
+      SetWComponentMessage<PropertyT>(eventThreadServices, propertyOwner, animatableProperty, cachedValue.w);
+    }
+  }
+  else
+  {
+    static_assert(componentIndex == static_cast<uint32_t>(Property::INVALID_COMPONENT_INDEX));
+    if(propertyValue.Get(cachedValue))
+    {
+      BakeMessage<PropertyT>(eventThreadServices, propertyOwner, animatableProperty, cachedValue);
+    }
   }
 }
 
 inline constexpr bool IsAnimatableVisualPropertyIndex(Property::Index index)
 {
-  return (index == Dali::VisualRenderer::Property::TRANSFORM_OFFSET) ||
-         (index == Dali::VisualRenderer::Property::TRANSFORM_SIZE) ||
-         (index == Dali::VisualRenderer::Property::EXTRA_SIZE);
+  return (index >= Dali::VisualRenderer::Property::TRANSFORM_OFFSET) &&
+         (index <= Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT);
 }
 
 inline constexpr bool IsVisualPropertyIndex(Property::Index index)
 {
   return IsAnimatableVisualPropertyIndex(index) ||
-         (index == Dali::VisualRenderer::Property::TRANSFORM_ORIGIN) ||
-         (index == Dali::VisualRenderer::Property::TRANSFORM_PIVOT) ||
-         (index == Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE);
+         ((index >= Dali::VisualRenderer::Property::TRANSFORM_ORIGIN) &&
+          (index <= Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT_POLICY));
 }
 
 VisualRenderer::VisualPropertyCache gDummyVisualPropertyCache; // dummy cache for get default variables.
@@ -162,28 +205,30 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
         SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffset, mVisualProperties->mTransformOffset);
         break;
       }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X:
+      {
+        SetValue<Vector2, 0>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffset, mVisualProperties->mTransformOffset);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y:
+      {
+        SetValue<Vector2, 1>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffset, mVisualProperties->mTransformOffset);
+        break;
+      }
 
       case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
       {
         SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformSize, mVisualProperties->mTransformSize);
         break;
       }
-
-      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH:
       {
-        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOrigin, mVisualProperties->mTransformOrigin);
+        SetValue<Vector2, 0>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformSize, mVisualProperties->mTransformSize);
         break;
       }
-
-      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT:
       {
-        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformPivot, mVisualProperties->mTransformPivot);
-        break;
-      }
-
-      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
-      {
-        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffsetSizeMode, mVisualProperties->mTransformOffsetSizeMode);
+        SetValue<Vector2, 1>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformSize, mVisualProperties->mTransformSize);
         break;
       }
 
@@ -192,25 +237,72 @@ void VisualRenderer::SetDefaultProperty(Property::Index        index,
         SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mExtraSize, mVisualProperties->mExtraSize);
         break;
       }
-
-      case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
+      case Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH:
       {
-        Vector3 mixColorVec3;
-        if(propertyValue.Get(mixColorVec3))
-        {
-          float opacity = Renderer::GetDefaultProperty(Dali::Renderer::Property::OPACITY).Get<float>();
-          Renderer::SetDefaultProperty(Dali::Renderer::Property::MIX_COLOR, Vector4(mixColorVec3.r, mixColorVec3.g, mixColorVec3.b, opacity));
-        }
+        SetValue<Vector2, 0>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mExtraSize, mVisualProperties->mExtraSize);
+        break;
+      }
+      case Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT:
+      {
+        SetValue<Vector2, 1>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mExtraSize, mVisualProperties->mExtraSize);
         break;
       }
 
-      case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
       {
-        float preMultipliedAlpha = 0.0f;
-        if(propertyValue.Get(preMultipliedAlpha))
-        {
-          Renderer::SetDefaultProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, !Dali::EqualsZero(preMultipliedAlpha));
-        }
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOrigin, mVisualProperties->mTransformOrigin);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X:
+      {
+        SetValue<Vector2, 0>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOrigin, mVisualProperties->mTransformOrigin);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_Y:
+      {
+        SetValue<Vector2, 1>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOrigin, mVisualProperties->mTransformOrigin);
+        break;
+      }
+
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformPivot, mVisualProperties->mTransformPivot);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X:
+      {
+        SetValue<Vector2, 0>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformPivot, mVisualProperties->mTransformPivot);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_Y:
+      {
+        SetValue<Vector2, 1>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformPivot, mVisualProperties->mTransformPivot);
+        break;
+      }
+
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
+      {
+        SetValue(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffsetSizeMode, mVisualProperties->mTransformOffsetSizeMode);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY:
+      {
+        SetValue<Vector4, 0>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffsetSizeMode, mVisualProperties->mTransformOffsetSizeMode);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y_POLICY:
+      {
+        SetValue<Vector4, 1>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffsetSizeMode, mVisualProperties->mTransformOffsetSizeMode);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH_POLICY:
+      {
+        SetValue<Vector4, 2>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffsetSizeMode, mVisualProperties->mTransformOffsetSizeMode);
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT_POLICY:
+      {
+        SetValue<Vector4, 3>(GetEventThreadServices(), *mUpdateObject, propertyValue, mPropertyCache->mTransformOffsetSizeMode, mVisualProperties->mTransformOffsetSizeMode);
         break;
       }
     }
@@ -234,24 +326,23 @@ Property::Value VisualRenderer::GetDefaultProperty(Property::Index index) const
         value = mPropertyCache->mTransformOffset;
         break;
       }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X:
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X);
+        value                         = mPropertyCache->mTransformOffset[componentIndex];
+        break;
+      }
       case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
       {
         value = mPropertyCache->mTransformSize;
         break;
       }
-      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT:
       {
-        value = mPropertyCache->mTransformOrigin;
-        break;
-      }
-      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
-      {
-        value = mPropertyCache->mTransformPivot;
-        break;
-      }
-      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
-      {
-        value = mPropertyCache->mTransformOffsetSizeMode;
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH);
+        value                         = mPropertyCache->mTransformSize[componentIndex];
         break;
       }
       case Dali::VisualRenderer::Property::EXTRA_SIZE:
@@ -259,17 +350,49 @@ Property::Value VisualRenderer::GetDefaultProperty(Property::Index index) const
         value = mPropertyCache->mExtraSize;
         break;
       }
-      case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
+      case Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH:
+      case Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT:
       {
-        Vector4 mixColor     = Renderer::GetDefaultProperty(Dali::Renderer::Property::MIX_COLOR).Get<Vector4>();
-        Vector3 mixColorVec3 = Vector3(mixColor.r, mixColor.g, mixColor.b);
-        value                = mixColorVec3;
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH);
+        value                         = mPropertyCache->mExtraSize[componentIndex];
         break;
       }
-      case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
       {
-        bool blendPreMultipliedAlpha = Renderer::GetDefaultProperty(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA).Get<bool>();
-        value                        = blendPreMultipliedAlpha ? 1.0f : 0.0f;
+        value = mPropertyCache->mTransformOrigin;
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X:
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_Y:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X);
+        value                         = mPropertyCache->mTransformOrigin[componentIndex];
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
+      {
+        value = mPropertyCache->mTransformPivot;
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X:
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_Y:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X);
+        value                         = mPropertyCache->mTransformPivot[componentIndex];
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
+      {
+        value = mPropertyCache->mTransformOffsetSizeMode;
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY:
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y_POLICY:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH_POLICY:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT_POLICY:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY);
+        value                         = mPropertyCache->mTransformOffsetSizeMode[componentIndex];
         break;
       }
       default:
@@ -306,6 +429,20 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
         }
         break;
       }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X:
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X);
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mTransformOffset.Get()[componentIndex];
+        }
+        else
+        {
+          value = mPropertyCache->mTransformOffset[componentIndex];
+        }
+        break;
+      }
       case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
       {
         if(mVisualProperties)
@@ -318,39 +455,17 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
         }
         break;
       }
-      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT:
       {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH);
         if(mVisualProperties)
         {
-          value = mVisualProperties->mTransformOrigin.Get();
+          value = mVisualProperties->mTransformSize.Get()[componentIndex];
         }
         else
         {
-          value = mPropertyCache->mTransformOrigin;
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
-      {
-        if(mVisualProperties)
-        {
-          value = mVisualProperties->mTransformPivot.Get();
-        }
-        else
-        {
-          value = mPropertyCache->mTransformPivot;
-        }
-        break;
-      }
-      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
-      {
-        if(mVisualProperties)
-        {
-          value = mVisualProperties->mTransformOffsetSizeMode.Get();
-        }
-        else
-        {
-          value = mPropertyCache->mTransformOffsetSizeMode;
+          value = mPropertyCache->mTransformSize[componentIndex];
         }
         break;
       }
@@ -366,17 +481,98 @@ Property::Value VisualRenderer::GetDefaultPropertyCurrentValue(Property::Index i
         }
         break;
       }
-      case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
+      case Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH:
+      case Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT:
       {
-        Vector4 mixColor     = Renderer::GetDefaultPropertyCurrentValue(Dali::Renderer::Property::MIX_COLOR).Get<Vector4>();
-        Vector3 mixColorVec3 = Vector3(mixColor.r, mixColor.g, mixColor.b);
-        value                = mixColorVec3;
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH);
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mExtraSize.Get()[componentIndex];
+        }
+        else
+        {
+          value = mPropertyCache->mExtraSize[componentIndex];
+        }
         break;
       }
-      case Dali::VisualRenderer::Property::VISUAL_PRE_MULTIPLIED_ALPHA:
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
       {
-        bool blendPreMultipliedAlpha = Renderer::GetDefaultPropertyCurrentValue(Dali::Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA).Get<bool>();
-        value                        = blendPreMultipliedAlpha ? 1.0f : 0.0f;
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mTransformOrigin.Get();
+        }
+        else
+        {
+          value = mPropertyCache->mTransformOrigin;
+        }
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X:
+      case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_Y:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X);
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mTransformOrigin.Get()[componentIndex];
+        }
+        else
+        {
+          value = mPropertyCache->mTransformOrigin[componentIndex];
+        }
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
+      {
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mTransformPivot.Get();
+        }
+        else
+        {
+          value = mPropertyCache->mTransformPivot;
+        }
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X:
+      case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_Y:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X);
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mTransformPivot.Get()[componentIndex];
+        }
+        else
+        {
+          value = mPropertyCache->mTransformPivot[componentIndex];
+        }
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
+      {
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mTransformOffsetSizeMode.Get();
+        }
+        else
+        {
+          value = mPropertyCache->mTransformOffsetSizeMode;
+        }
+        break;
+      }
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY:
+      case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y_POLICY:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH_POLICY:
+      case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT_POLICY:
+      {
+        const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY);
+        if(mVisualProperties)
+        {
+          value = mVisualProperties->mTransformOffsetSizeMode.Get()[componentIndex];
+        }
+        else
+        {
+          value = mPropertyCache->mTransformOffsetSizeMode[componentIndex];
+        }
         break;
       }
     }
@@ -409,14 +605,35 @@ void VisualRenderer::OnNotifyDefaultPropertyAnimation(Animation& animation, Prop
             value.Get(mPropertyCache->mTransformOffset);
             break;
           }
+          case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X:
+          case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y:
+          {
+            const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X);
+            value.Get(mPropertyCache->mTransformOffset[componentIndex]);
+            break;
+          }
           case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
           {
             value.Get(mPropertyCache->mTransformSize);
             break;
           }
+          case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH:
+          case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT:
+          {
+            const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH);
+            value.Get(mPropertyCache->mTransformSize[componentIndex]);
+            break;
+          }
           case Dali::VisualRenderer::Property::EXTRA_SIZE:
           {
             value.Get(mPropertyCache->mExtraSize);
+            break;
+          }
+          case Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH:
+          case Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT:
+          {
+            const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH);
+            value.Get(mPropertyCache->mExtraSize[componentIndex]);
             break;
           }
         }
@@ -432,14 +649,35 @@ void VisualRenderer::OnNotifyDefaultPropertyAnimation(Animation& animation, Prop
             AdjustValue<Vector2>(mPropertyCache->mTransformOffset, value);
             break;
           }
+          case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X:
+          case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y:
+          {
+            const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X);
+            AdjustValue<float>(mPropertyCache->mTransformOffset[componentIndex], value);
+            break;
+          }
           case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
           {
             AdjustValue<Vector2>(mPropertyCache->mTransformSize, value);
             break;
           }
+          case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH:
+          case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT:
+          {
+            const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH);
+            AdjustValue<float>(mPropertyCache->mTransformSize[componentIndex], value);
+            break;
+          }
           case Dali::VisualRenderer::Property::EXTRA_SIZE:
           {
             AdjustValue<Vector2>(mPropertyCache->mExtraSize, value);
+            break;
+          }
+          case Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH:
+          case Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT:
+          {
+            const uint32_t componentIndex = static_cast<uint32_t>(index) - static_cast<uint32_t>(Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH);
+            AdjustValue<float>(mPropertyCache->mExtraSize[componentIndex], value);
             break;
           }
         }
@@ -461,24 +699,24 @@ const SceneGraph::PropertyBase* VisualRenderer::GetSceneObjectAnimatableProperty
   switch(index)
   {
     case Dali::VisualRenderer::Property::TRANSFORM_OFFSET:
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X:
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y:
     {
       property = &mVisualProperties->mTransformOffset;
       break;
     }
     case Dali::VisualRenderer::Property::TRANSFORM_SIZE:
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH:
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT:
     {
       property = &mVisualProperties->mTransformSize;
       break;
     }
     case Dali::VisualRenderer::Property::EXTRA_SIZE:
+    case Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH:
+    case Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT:
     {
       property = &mVisualProperties->mExtraSize;
-      break;
-    }
-    case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
-    {
-      // We should use Dali::Renderer::Property::MIX_COLOR, instead of it.
-      property = Renderer::GetSceneObjectAnimatableProperty(Dali::Renderer::Property::MIX_COLOR);
       break;
     }
   }
@@ -502,21 +740,24 @@ const PropertyInputImpl* VisualRenderer::GetSceneObjectInputProperty(Property::I
   switch(index)
   {
     case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN:
+    case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X:
+    case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_Y:
     {
       return &mVisualProperties->mTransformOrigin;
     }
     case Dali::VisualRenderer::Property::TRANSFORM_PIVOT:
+    case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X:
+    case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_Y:
     {
       return &mVisualProperties->mTransformPivot;
     }
     case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_SIZE_MODE:
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY:
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y_POLICY:
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH_POLICY:
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT_POLICY:
     {
       return &mVisualProperties->mTransformOffsetSizeMode;
-    }
-    case Dali::VisualRenderer::Property::VISUAL_MIX_COLOR:
-    {
-      // We should use Dali::Renderer::Property::MIX_COLOR, instead of it.
-      return Renderer::GetSceneObjectInputProperty(Dali::Renderer::Property::MIX_COLOR);
     }
     default:
     {
@@ -524,6 +765,59 @@ const PropertyInputImpl* VisualRenderer::GetSceneObjectInputProperty(Property::I
     }
   }
   return nullptr;
+}
+
+int32_t VisualRenderer::GetPropertyComponentIndex(Property::Index index) const
+{
+  int32_t componentIndex = Property::INVALID_COMPONENT_INDEX;
+
+  switch(index)
+  {
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X:
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH:
+    case Dali::VisualRenderer::Property::EXTRA_SIZE_WIDTH:
+    case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_X:
+    case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_X:
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_X_POLICY:
+    {
+      componentIndex = 0;
+      break;
+    }
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y:
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT:
+    case Dali::VisualRenderer::Property::EXTRA_SIZE_HEIGHT:
+    case Dali::VisualRenderer::Property::TRANSFORM_ORIGIN_Y:
+    case Dali::VisualRenderer::Property::TRANSFORM_PIVOT_Y:
+    case Dali::VisualRenderer::Property::TRANSFORM_OFFSET_Y_POLICY:
+    {
+      componentIndex = 1;
+      break;
+    }
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_WIDTH_POLICY:
+    {
+      componentIndex = 2;
+      break;
+    }
+    case Dali::VisualRenderer::Property::TRANSFORM_SIZE_HEIGHT_POLICY:
+    {
+      componentIndex = 2;
+      break;
+    }
+
+    default:
+    {
+      // Do nothing
+      break;
+    }
+  }
+
+  if(Property::INVALID_COMPONENT_INDEX == componentIndex)
+  {
+    // ask base
+    componentIndex = Renderer::GetPropertyComponentIndex(index);
+  }
+
+  return componentIndex;
 }
 
 void VisualRenderer::OnShaderChanged()
