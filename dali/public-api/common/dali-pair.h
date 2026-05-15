@@ -275,17 +275,24 @@ public:
 /**
  * @brief TypeTraits specialization for Dali::Pair.
  *
- * IS_TRIVIAL_TYPE is true only if both TypeTraits<T1>::IS_TRIVIAL_TYPE
- * and TypeTraits<T2>::IS_TRIVIAL_TYPE are true.
+ * Delegates to Detail::PairIsTrivial rather than inheriting from
+ * BasicTypes&lt;Pair&lt;T1,T2&gt;&gt; or reading TypeTraits&lt;T1&gt;/TypeTraits&lt;T2&gt;,
+ * so that this specialization can be instantiated with incomplete T1
+ * or T2 (e.g. when Pair&lt;T1,T2&gt; appears in a type alias).
+ *
+ * The compiler intrinsics that require complete types live inside
+ * Detail::PairIsTrivial, which is only instantiated when code actually
+ * reads IS_TRIVIAL_TYPE - at that point both types must already be
+ * complete, so the intrinsics are safe to evaluate.
  *
  * @SINCE_2_5.16
  */
 template<typename T1, typename T2>
-struct TypeTraits<Pair<T1, T2>> : public BasicTypes<Pair<T1, T2>>
+struct TypeTraits<Pair<T1, T2>>
 {
   enum
   {
-    IS_TRIVIAL_TYPE = TypeTraits<T1>::IS_TRIVIAL_TYPE && TypeTraits<T2>::IS_TRIVIAL_TYPE
+    IS_TRIVIAL_TYPE = Detail::PairIsTrivial<T1, T2>::value
   };
 };
 

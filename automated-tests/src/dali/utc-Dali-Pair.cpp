@@ -8,7 +8,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an an "AS IS" BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -308,6 +308,35 @@ int UtcDaliPairLexicographicalComparisonP(void)
 
   DALI_TEST_EQUALS(p1 < p3, true, TEST_LOCATION); // 1 < 2
   DALI_TEST_EQUALS(p1 < p2, false, TEST_LOCATION); // 3 > 2
+
+  END_TEST;
+}
+
+int UtcDaliPairTypeTraitsP(void)
+{
+  // Verify that TypeTraits<Pair<T1,T2>>::IS_TRIVIAL_TYPE is correctly set via
+  // Detail::PairIsTrivial rather than the old BasicTypes<Pair<T1,T2>> path.
+  //
+  // Pair<int,int> — both elements are trivially copyable and destructible.
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::TypeTraits<Pair<int, int>>::IS_TRIVIAL_TYPE), true, TEST_LOCATION);
+
+  // Pair<int,float> — both trivial.
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::TypeTraits<Pair<int, float>>::IS_TRIVIAL_TYPE), true, TEST_LOCATION);
+
+  // Pair<std::string,int> — std::string has a non-trivial destructor.
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::TypeTraits<Pair<std::string, int>>::IS_TRIVIAL_TYPE), false, TEST_LOCATION);
+
+  // Pair<int,std::string> — same, second element is non-trivial.
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::TypeTraits<Pair<int, std::string>>::IS_TRIVIAL_TYPE), false, TEST_LOCATION);
+
+  // Pair<std::string,std::string> — both non-trivial.
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::TypeTraits<Pair<std::string, std::string>>::IS_TRIVIAL_TYPE), false, TEST_LOCATION);
+
+  // Dali::Vector<Pair<int,int>> should pick the trivial algorithm path.
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<Pair<int, int>>::BaseType), true, TEST_LOCATION);
+
+  // Dali::Vector<Pair<std::string,int>> should pick the complex algorithm path.
+  DALI_TEST_EQUALS(static_cast<bool>(Dali::Vector<Pair<std::string, int>>::BaseType), false, TEST_LOCATION);
 
   END_TEST;
 }

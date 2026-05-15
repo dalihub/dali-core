@@ -547,6 +547,63 @@ namespace Detail
 template<typename Type>
 Type&& Declval() noexcept;
 
+/**
+ * @brief Deferred triviality evaluator for Pair<T1, T2>.
+ *
+ * Placing the compiler intrinsics here, rather than directly in the
+ * TypeTraits&lt;Pair&lt;T1,T2&gt;&gt; enum, means they are only evaluated when this
+ * struct is explicitly instantiated. TypeTraits&lt;Pair&lt;T1,T2&gt;&gt; names
+ * PairIsTrivial in its enum initialiser but never instantiates it, so
+ * the intrinsics are not fired merely because Pair&lt;T1,T2&gt; appears in a
+ * type alias with incomplete T1 or T2.
+ *
+ * The unused Dummy parameter prevents aggressive compilers (MSVC, GCC
+ * with -fno-implicit-templates) from pre-instantiating the value member
+ * when they see the \::value reference inside the TypeTraits enum.
+ *
+ * The intrinsics are applied directly to T1 and T2 (not to Pair&lt;T1,T2&gt;
+ * and not via TypeTraits&lt;T1&gt;/TypeTraits&lt;T2&gt;) to avoid pulling in
+ * BasicTypes, which would reintroduce the eager-evaluation problem.
+ *
+ * @tparam T1    First element type of the Pair
+ * @tparam T2    Second element type of the Pair
+ * @tparam Dummy Unused; keeps the body dependent so it is not pre-instantiated
+ */
+template<typename T1, typename T2, typename /*Dummy*/ = void>
+struct PairIsTrivial
+{
+  static const bool value =
+    (DALI_HAS_TRIVIAL_DESTRUCTOR(T1) && DALI_HAS_TRIVIAL_COPY(T1)) &&
+    (DALI_HAS_TRIVIAL_DESTRUCTOR(T2) && DALI_HAS_TRIVIAL_COPY(T2));
+};
+
+/**
+ * @brief Deferred triviality evaluator for Vector<T>.
+ *
+ * Vector<T> uses this as its default second template argument instead of
+ * reading TypeTraits<T>::IS_TRIVIAL_TYPE directly. This is necessary because
+ * default template arguments for class templates are evaluated whenever the
+ * template name is used — including in type aliases and forward declarations
+ * — which would fire the compiler intrinsics in BasicTypes<T> before T is
+ * complete.
+ *
+ * By placing the intrinsics inside this helper struct, they are only
+ * evaluated when VectorIsTrivial<T> is explicitly instantiated, which only
+ * happens when Vector<T> itself is instantiated (i.e. when T is complete).
+ *
+ * The unused Dummy parameter prevents aggressive compilers (MSVC, GCC with
+ * -fno-implicit-templates) from pre-instantiating the value member when they
+ * see the \::value reference in the default argument.
+ *
+ * @tparam T     The element type of the Vector
+ * @tparam Dummy Unused; keeps the body dependent so it is not pre-instantiated
+ */
+template<typename T, typename /*Dummy*/ = void>
+struct VectorIsTrivial
+{
+  static const bool value = DALI_HAS_TRIVIAL_DESTRUCTOR(T) && DALI_HAS_TRIVIAL_COPY(T);
+};
+
 } // namespace Detail
 
 /**

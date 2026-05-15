@@ -39,7 +39,7 @@ namespace Dali
  * @SINCE_1_0.0
  * @param type The type of the data that the vector holds
  */
-template<class T, bool IsTrivialType = TypeTraits<T>::IS_TRIVIAL_TYPE == true>
+template<class T, bool IsTrivialType = Detail::VectorIsTrivial<T>::value>
 class Vector : public VectorAlgorithms<IsTrivialType, T>
 {
 public: // API
@@ -138,7 +138,16 @@ public: // API
   {
     if(this != &vector)
     {
-      VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData);
+      if constexpr(IsTrivialType)
+      {
+        // For trivial types: just swaps pointers
+        VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData);
+      }
+      else
+      {
+        // For complex types: destruct existing elements first
+        VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData, sizeof(ItemType));
+      }
       vector.mData = nullptr;
     }
     return *this;
@@ -264,6 +273,36 @@ public: // API
     ItemType* address = reinterpret_cast<ItemType*>(VectorBase::mData);
     address += VectorBase::Count() - 1u;
     return *address;
+  }
+
+  /**
+   * @brief Get a pointer to the underlying data storage.
+   *
+   * @SINCE_2_5.23
+   * @return Pointer to the first element, or nullptr if empty.
+   * @warning The returned pointer is invalidated by any operation that may
+   *          reallocate internal storage, including PushBack(), Insert(),
+   *          Reserve(), and Resize() when growing. Do not store the pointer
+   *          across such calls.
+   */
+  ItemType* Data()
+  {
+    return reinterpret_cast<ItemType*>(VectorBase::mData);
+  }
+
+  /**
+   * @brief Get a const pointer to the underlying data storage.
+   *
+   * @SINCE_2_5.23
+   * @return Const pointer to the first element, or nullptr if empty.
+   * @warning The returned pointer is invalidated by any operation that may
+   *          reallocate internal storage, including PushBack(), Insert(),
+   *          Reserve(), and Resize() when growing. Do not store the pointer
+   *          across such calls.
+   */
+  const ItemType* Data() const
+  {
+    return reinterpret_cast<const ItemType*>(VectorBase::mData);
   }
 
   /**
@@ -484,19 +523,71 @@ public: // API
   void Resize(SizeType count, const ItemType& item)
   {
     const SizeType oldCount = VectorBase::Count();
-    if(count <= oldCount)
+    if(count < oldCount)
     {
-      // getting smaller so just set count
-      VectorBase::SetCount(count);
+      // Shrink: need to destroy elements
+      Erase(Begin() + count, End());
     }
-    else
+    else if(count > oldCount)
     {
-      // remember how many new items get added
+      // Grow: add new elements
       SizeType newItems = count - oldCount;
       Reserve(count);
       for(; newItems > 0u; --newItems)
       {
         PushBack(item);
+      }
+    }
+  }
+
+  /**
+   * @brief Resizes the vector using move semantics for the fill element.
+   *
+   * This overload is only available for non-trivial types. For trivial types
+   * (e.g. int, short, float) the const-reference overload above is always
+   * selected, which correctly fills every new slot with a copy of the value.
+   *
+   * For non-trivial types, a move-only object cannot be cloned, so only the
+   * first new slot receives @p item via move-construction. Any additional new
+   * slots beyond the first are filled by default-construction (ItemType()).
+   * Callers that need a specific value in every new slot should use
+   * Reserve() followed by repeated PushBack() calls instead.
+   *
+   * When shrinking, destructors are called on every removed element exactly
+   * once, and @p item is not used.
+   *
+   * @SINCE_2_5.23
+   * @param[in] count Count to resize to
+   * @param[in] item  Item to move into the first new slot when growing.
+   *                  Not used when shrinking or when count == current size.
+   *                  Additional new slots are default-constructed.
+   * @note This overload is disabled for trivial types to prevent rvalue
+   *       arguments (e.g. integer literals) from being routed here instead
+   *       of to the const-reference overload.
+   */
+  template<bool Dependent = IsTrivialType>
+  typename EnableIf<!Dependent>::type Resize(SizeType count, ItemType&& item)
+  {
+    const SizeType oldCount = VectorBase::Count();
+    if(count < oldCount)
+    {
+      // Shrink: destroy surplus elements. item is unused on this path.
+      Erase(Begin() + count, End());
+    }
+    else if(count > oldCount)
+    {
+      SizeType newItems = count - oldCount;
+      Reserve(count);
+
+      // Move item into the first new slot — the only slot we can fill this way.
+      PushBack(Dali::Move(item));
+      --newItems;
+
+      // A move-only type cannot be cloned, so fill remaining new slots
+      // by default-construction.
+      for(; newItems > 0u; --newItems)
+      {
+        PushBack(ItemType());
       }
     }
   }
