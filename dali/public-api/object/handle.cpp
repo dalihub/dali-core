@@ -104,6 +104,18 @@ void Handle::SetProperty(Property::Index index, Property::Value propertyValue)
   GetImplementation(*this).SetProperty(index, std::move(propertyValue));
 }
 
+bool Handle::SetProperty(const Dali::String& propertyName, Property::Value propertyValue)
+{
+  Property::Index index = GetPropertyIndex(Property::Key(propertyName));
+  if(index == Property::INVALID_INDEX)
+  {
+    return false;
+  }
+
+  SetProperty(index, std::move(propertyValue));
+  return true;
+}
+
 void Handle::ReserveCustomProperties(int propertyCount)
 {
   GetImplementation(*this).ReserveCustomProperties(propertyCount);
@@ -139,9 +151,31 @@ Property::Value Handle::GetProperty(Property::Index index) const
   return GetImplementation(*this).GetProperty(index);
 }
 
+Property::Value Handle::GetProperty(const Dali::String& propertyName) const
+{
+  Property::Index index = GetPropertyIndex(Property::Key(propertyName));
+  if(index == Property::INVALID_INDEX)
+  {
+    return Property::Value();
+  }
+
+  return GetProperty(index);
+}
+
 Property::Value Handle::GetCurrentProperty(Property::Index index) const
 {
   return GetImplementation(*this).GetCurrentProperty(index);
+}
+
+Property::Value Handle::GetCurrentProperty(const Dali::String& propertyName) const
+{
+  Property::Index index = GetPropertyIndex(Property::Key(propertyName));
+  if(index == Property::INVALID_INDEX)
+  {
+    return Property::Value();
+  }
+
+  return GetCurrentProperty(index);
 }
 
 void Handle::SetProperties(const Property::Map& properties)

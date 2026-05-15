@@ -267,6 +267,21 @@ public:
   void SetProperty(Property::Index index, Property::Value propertyValue);
 
   /**
+   * @brief Sets the value of an existing property by name.
+   *
+   * This is a convenience overload for looking up the property index from a
+   * string key before setting the value.
+   *
+   * Property should be write-able. Setting a read-only property is a no-op.
+   * @SINCE_2_5.22
+   * @param[in] propertyName The name of the property
+   * @param[in] propertyValue The new value of the property
+   * @return True if the property name was found and the set request was issued
+   * @pre The property types match i.e. propertyValue.GetType() is equal to GetPropertyType(index).
+   */
+  bool SetProperty(const Dali::String& propertyName, Property::Value propertyValue);
+
+  /**
    * @brief Reserves a number of custom properties
    *
    * Saves automatic re-allocation of vectors for properties when we know in advance how many there
@@ -478,6 +493,39 @@ public:
   }
 
   /**
+   * @brief Retrieves a property value by name.
+   *
+   * This is a convenience overload for looking up the property index from a
+   * string key before retrieving the value.
+   *
+   * @SINCE_2_5.22
+   * @param[in] propertyName The name of the property
+   * @return The property value, or an empty Property::Value if the property name was not found
+   * @note This returns the value set by SetProperty() or the animation target value if it is being animated.
+   * @note To get the current value on the scene-graph, use GetCurrentProperty().
+   */
+  Property::Value GetProperty(const Dali::String& propertyName) const;
+
+  /**
+   * @brief Convenience function for obtaining a property of a known type by name.
+   *
+   * This is a convenience overload for looking up the property index from a
+   * string key before retrieving the value.
+   *
+   * @SINCE_2_5.22
+   * @param[in] propertyName The name of the property
+   * @return The property value, or a default-constructed T if the property name was not found
+   * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
+   * @see GetProperty(const Dali::String&)
+   */
+  template<typename T>
+  T GetProperty(const Dali::String& propertyName) const
+  {
+    Property::Value value = GetProperty(propertyName);
+    return value.Get<T>();
+  }
+
+  /**
    * @brief Retrieves the latest value of the property from the scene-graph.
    *
    * @SINCE_1_2.41
@@ -504,6 +552,40 @@ public:
     Property::Value value = GetCurrentProperty(index);
 
     return T(value.Get<T>());
+  }
+
+  /**
+   * @brief Retrieves the latest value of the property from the scene-graph by name.
+   *
+   * This is a convenience overload for looking up the property index from a
+   * string key before retrieving the current value.
+   *
+   * @SINCE_2_5.22
+   * @param[in] propertyName The name of the property
+   * @return The property value, or an empty Property::Value if the property name was not found
+   * @note This returns the value of the property in the last rendered frame so can be different to that
+   *       set by SetProperty() if the set-message has not been processed by the scene-graph yet.
+   * @note To retrieve the value set by SetProperty(), use GetProperty().
+   */
+  Property::Value GetCurrentProperty(const Dali::String& propertyName) const;
+
+  /**
+   * @brief Convenience function for obtaining the current value of a property of a known type by name.
+   *
+   * This is a convenience overload for looking up the property index from a
+   * string key before retrieving the current value.
+   *
+   * @SINCE_2_5.22
+   * @param[in] propertyName The name of the property
+   * @return The property value, or a default-constructed T if the property name was not found
+   * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
+   * @see GetCurrentProperty(const Dali::String&)
+   */
+  template<typename T>
+  T GetCurrentProperty(const Dali::String& propertyName) const
+  {
+    Property::Value value = GetCurrentProperty(propertyName);
+    return value.Get<T>();
   }
 
   /**
