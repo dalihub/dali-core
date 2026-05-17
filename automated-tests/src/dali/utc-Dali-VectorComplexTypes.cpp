@@ -537,6 +537,52 @@ int UtcDaliVectorMoveOnlyPushBack(void)
   END_TEST;
 }
 
+int UtcDaliVectorMoveOnlyShrinkToFit(void)
+{
+  tet_infoline("Testing Dali::Vector ShrinkToFit with move-only type");
+
+  MoveOnlyType::ResetCounts();
+
+  Vector<MoveOnlyType> vector;
+  vector.Reserve(8);
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(8u), vector.Capacity(), TEST_LOCATION);
+
+  vector.PushBack(MoveOnlyType(10));
+  vector.PushBack(MoveOnlyType(20));
+
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_GREATER(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(2u), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(MoveOnlyType::sConstructCount, 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(MoveOnlyType::sDestructCount, 2, TEST_LOCATION);
+
+  vector.ShrinkToFit();
+
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(2u), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(MoveOnlyType::sConstructCount, 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(MoveOnlyType::sDestructCount, 4, TEST_LOCATION);
+
+  vector.Clear();
+
+  DALI_TEST_EQUALS(MoveOnlyType::sDestructCount, 6, TEST_LOCATION);
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.Capacity(), static_cast<Dali::VectorBase::SizeType>(2u), TEST_LOCATION);
+
+  vector.ShrinkToFit();
+
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(ZERO, vector.Capacity(), TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVectorMoveOnlyFrontBack(void)
 {
   tet_infoline("Testing Dali::Vector Back with move-only type");

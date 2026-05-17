@@ -81,6 +81,11 @@ protected: // API for deriving classes
     VectorBase::Reserve(count, elementSize);
   }
 
+  void ShrinkToFit(SizeType elementSize)
+  {
+    VectorBase::ShrinkToFit(elementSize);
+  }
+
   /**
    * @brief Clears the contents.
    *

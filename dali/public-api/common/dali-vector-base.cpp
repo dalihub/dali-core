@@ -168,6 +168,40 @@ void VectorBase::ReserveWithCustomMoveFunction(SizeType capacity, SizeType eleme
   }
 }
 
+void VectorBase::ShrinkToFitWithCustomMoveFunction(SizeType elementSize, MemMoveFunctionType memMoveFunction)
+{
+  if(mData)
+  {
+    const SizeType count = Count();
+    if(count)
+    {
+      const SizeType oldCapacity = Capacity();
+      if(count != oldCapacity)
+      {
+        DALI_ASSERT_VECTOR(count < oldCapacity && "Count is bigger than capacity!");
+
+        const SizeType wholeAllocation = sizeof(SizeType) * 2u + count * elementSize;
+        void*          wholeData       = malloc(wholeAllocation);
+        DALI_ASSERT_ALWAYS(wholeData && "VectorBase::ShrinkToFitWithCustomMoveFunction - Memory allocation failed");
+
+#if defined(DEBUG_ENABLED)
+        memset(wholeData, 0xaa, wholeAllocation);
+#endif
+        SizeType* metaData = reinterpret_cast<SizeType*>(wholeData);
+        *metaData++        = count;
+        *metaData++        = count;
+
+        memMoveFunction(metaData, mData, count * elementSize);
+        Replace(reinterpret_cast<void*>(metaData));
+      }
+    }
+    else
+    {
+      Release();
+    }
+  }
+}
+
 void VectorBase::Copy(const VectorBase& vector, SizeType elementSize)
 {
   // reserve space based on source capacity

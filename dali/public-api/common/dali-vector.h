@@ -736,7 +736,7 @@ public: // API
    */
   void ShrinkToFit()
   {
-    VectorBase::ShrinkToFit(sizeof(ItemType));
+    VectorAlgorithms<BaseType, ItemType>::ShrinkToFit(sizeof(ItemType));
   }
 
   /**
@@ -751,7 +751,7 @@ public: // API
     // Run ShrinkToFit only if VectorBase::Capacity() is bigger than the smallest malloc block size.
     if(DALI_UNLIKELY(VectorBase::Count() * VectorBase::SHRINK_REQUIRED_RATIO < VectorBase::Capacity()))
     {
-      VectorBase::ShrinkToFit(sizeof(ItemType));
+      VectorAlgorithms<BaseType, ItemType>::ShrinkToFit(sizeof(ItemType));
     }
   }
 };

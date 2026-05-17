@@ -92,6 +92,11 @@ protected: // API for deriving classes
     VectorBase::ReserveWithCustomMoveFunction(count, elementSize, MoveItem);
   }
 
+  void ShrinkToFit(SizeType elementSize)
+  {
+    VectorBase::ShrinkToFitWithCustomMoveFunction(elementSize, MoveItem);
+  }
+
   /**
    * @brief Clears the contents.
    *
