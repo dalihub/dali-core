@@ -113,7 +113,7 @@ protected: // API for deriving classes
    * @SINCE_2_5.23
    * @param[in] newData New data address to be replaced
    */
-  void Replace(void* newData) noexcept
+  void Replace(void* newData, SizeType /* not used */) noexcept
   {
     VectorBase::Replace(newData);
   }
@@ -180,6 +180,21 @@ protected: // API for deriving classes
 
     // Copy the given items.
     VectorBase::CopyMemory(reinterpret_cast<uint8_t*>(at), reinterpret_cast<const uint8_t*>(from), size);
+  }
+
+  /**
+   * @brief Inserts the given elements into the vector using move construction.
+   *
+   * @SINCE_2_5.23
+   * @param[in] at Address where to insert the elements into the vector
+   * @param[in] from Address to the first element to be inserted
+   * @param[in] to Address to the last element to be inserted
+   * @param[in] elementSize Size of one of the elements to be inserted
+   */
+  void InsertMove(uint8_t* at, uint8_t* from, uint8_t* to, SizeType elementSize)
+  {
+    // For trivial types, move is the same as copy.
+    Insert(at, from, to, elementSize);
   }
 };
 /// @endcond
