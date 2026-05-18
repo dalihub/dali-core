@@ -183,6 +183,30 @@ void Core::UnregisterProcessorOnce(Processor& processor, bool postProcessor)
   mImpl->UnregisterProcessorOnce(processor, postProcessor);
 }
 
+// FrameCallbackInterface
+
+void Core::AddFrameCallback(FrameCallbackInterface& frameCallback, Actor rootActor)
+{
+  if(rootActor)
+  {
+    mImpl->AddFrameCallback(frameCallback, GetImplementation(rootActor));
+  }
+  else
+  {
+    mImpl->AddGlobalFrameCallback(frameCallback);
+  }
+}
+
+void Core::RemoveFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  mImpl->RemoveFrameCallback(frameCallback);
+}
+
+Dali::UpdateProxy::NotifySyncPoint Core::NotifyFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  return mImpl->NotifyFrameCallback(frameCallback);
+}
+
 // ETC
 
 ObjectRegistry Core::GetObjectRegistry() const

@@ -27,12 +27,15 @@
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {
 class Layer;
 class ObjectRegistry;
 class RenderTaskList;
+class FrameCallbackInterface;
+class Actor;
 
 namespace Graphics
 {
@@ -483,6 +486,44 @@ public:
    * @param[in] postProcessor True if the processor to be unregister is for post processor.
    */
   void UnregisterProcessorOnce(Processor& processor, bool postProcessor = false);
+
+  // FrameCallbackInterface
+
+  /**
+   * @brief The FrameCallbackInterface implementation added gets called on every frame from the update-thread.
+   *
+   * @param[in] frameCallback An implementation of the FrameCallbackInterface
+   * @param[in] rootActor The root-actor in the scene that the callback applies to. Or empty handle if we don't care whether the node is scene on or not.
+   *
+   * @note The frameCallback cannot be added more than once. This will assert if that is attempted.
+   * @note Only the rootActor and it's children will be parsed by the UpdateProxy.
+   * @note If the rootActor is destroyed, then the callback is automatically removed.
+   * @note If the rootActor is empty handle, given frameCallback will not be removed automatically.
+   * @see FrameCallbackInterface
+   */
+  void AddFrameCallback(FrameCallbackInterface& frameCallback, Actor rootActor);
+
+  /**
+   * @brief Removes the specified FrameCallbackInterface implementation from being called on every frame.
+   *
+   * @param[in] frameCallback The FrameCallbackInterface implementation to remove
+   *
+   * @note This function will block if the FrameCallbackInterface::Update method is being processed in the update-thread.
+   * @note If the callback implementation has already been removed, then this is a no-op.
+   */
+  void RemoveFrameCallback(FrameCallbackInterface& frameCallback);
+
+  /**
+   * @brief Notify the frame callback that there is a new sync point.
+   *
+   * The sync point can be matched during a subsequent frameCallback::Update().
+   *
+   * @param[in] frameCallback The FrameCallbackInterface implementation to notify
+   *
+   * @return NotifySyncPoint - a unique sync value that will also be sent to the
+   * UpdateProxy prior to FrameCallback::Update() being called from the update thread.
+   */
+  UpdateProxy::NotifySyncPoint NotifyFrameCallback(FrameCallbackInterface& frameCallback);
 
   // ETC
 

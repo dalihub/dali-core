@@ -218,6 +218,26 @@ public:
   void UnregisterProcessorOnce(Dali::Integration::Processor& processor, bool postProcessor = false);
 
   /**
+   * @copydoc Dali::Integration::Core::AddFrameCallback()
+   */
+  void AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootActor);
+
+  /**
+   * @copydoc Dali::Integration::Core::AddFrameCallback()
+   */
+  void AddGlobalFrameCallback(FrameCallbackInterface& frameCallback);
+
+  /**
+   * @copydoc Dali::Integration::Core::RemoveFrameCallback()
+   */
+  void RemoveFrameCallback(FrameCallbackInterface& frameCallback);
+
+  /**
+   * @copydoc Dali::Integration::Core::NotifyFrameCallback
+   */
+  Dali::UpdateProxy::NotifySyncPoint NotifyFrameCallback(FrameCallbackInterface& frameCallback);
+
+  /**
    * @copydoc Dali::Internal::ThreadLocalStorage::AddScene()
    */
   void AddScene(Scene* scene);
