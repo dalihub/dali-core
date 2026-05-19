@@ -1173,6 +1173,95 @@ int UtcDaliVectorInsert03(void)
   END_TEST;
 }
 
+int UtcDaliVectorInsert04(void)
+{
+  tet_infoline("Testing Dali::Vector<char>::Insert(Iterator,Iterator,Iterator) by self");
+
+  Vector<char> vector;
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(ZERO, vector.Capacity(), TEST_LOCATION);
+  vector.PushBack(1);
+  vector.PushBack(2);
+  vector.PushBack(3);
+  vector.PushBack(4);
+  vector.PushBack(5);
+
+  // Test self-insert at end
+  vector.Insert(vector.End(), vector.Begin(), vector.Begin() + 1u);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5], 1, TEST_LOCATION);
+
+  // Test self-insert at begin
+  vector.Insert(vector.Begin(), vector.Begin() + 1, vector.Begin() + 2u);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(7), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5], 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[6], 1, TEST_LOCATION);
+
+  // Test self-insert in the middle
+  vector.Insert(vector.Begin() + 3, vector.Begin() + 3, vector.End());
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(11), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5], 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[6], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[7], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[8], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[9], 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[10], 1, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVectorInsertMove01(void)
+{
+  tet_infoline("Testing Dali::Vector<char>::InsertMove(Iterator,Iterator,Iterator)");
+
+  Vector<char> vector;
+  DALI_TEST_EQUALS(ZERO, vector.Count(), TEST_LOCATION);
+  vector.PushBack(1);
+  vector.PushBack(2);
+  vector.PushBack(3);
+  vector.PushBack(4);
+
+  vector.InsertMove(vector.Begin() + 2, vector.Begin(), vector.Begin() + 2u);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5], 4, TEST_LOCATION);
+
+  vector.InsertMove(vector.Begin() + 1, vector.Begin(), vector.End());
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(12), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[4], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[6], 4, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[7], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[8], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[9], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[10], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[11], 4, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVectorStructIntInsertAssert(void)
 {
   tet_infoline("Testing Dali::Vector<char>::Insert(Iterator,Iterator,Iterator) asserts");
