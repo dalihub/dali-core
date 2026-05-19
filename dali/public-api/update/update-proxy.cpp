@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/update/update-proxy.h>
+#include <dali/public-api/update/update-proxy.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/const-string.h>
@@ -139,12 +139,12 @@ bool UpdateProxy::GetIgnored(uint32_t id, bool& ignored) const
   return mImpl.GetIgnored(id, ignored);
 }
 
-bool UpdateProxy::GetCustomProperty(uint32_t id, const std::string& propertyName, Property::Value& value) const
+bool UpdateProxy::GetCustomProperty(uint32_t id, const String& propertyName, Property::Value& value) const
 {
   return mImpl.GetCustomProperty(id, Dali::Internal::ConstString(propertyName), value);
 }
 
-bool UpdateProxy::BakeCustomProperty(uint32_t id, const std::string& propertyName, const Property::Value& value)
+bool UpdateProxy::BakeCustomProperty(uint32_t id, const String& propertyName, const Property::Value& value)
 {
   return mImpl.BakeCustomProperty(id, Dali::Internal::ConstString(propertyName), value);
 }

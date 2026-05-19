@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // for uint32_t
+#include <new>     // For new placement
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector-base.h>
@@ -91,6 +92,11 @@ protected: // API for deriving classes
     VectorBase::ReserveWithCustomMoveFunction(count, elementSize, MoveItem);
   }
 
+  void ShrinkToFit(SizeType elementSize)
+  {
+    VectorBase::ShrinkToFitWithCustomMoveFunction(elementSize, MoveItem);
+  }
+
   /**
    * @brief Clears the contents.
    *
@@ -114,6 +120,20 @@ protected: // API for deriving classes
   {
     Clear(elementSize);
     VectorBase::Release();
+  }
+
+  /**
+   * @brief Replaces the vector data with new data.
+   *
+   * For complex types, clear existing elements first to call destructors.
+   * @SINCE_2_5.23
+   * @param[in] newData New data address to be replaced
+   * @param[in] elementSize Size of a single element
+   */
+  void Replace(void* newData, SizeType elementSize) noexcept
+  {
+    Clear(elementSize);
+    VectorBase::Replace(newData);
   }
 
   /**

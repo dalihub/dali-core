@@ -81,6 +81,11 @@ protected: // API for deriving classes
     VectorBase::Reserve(count, elementSize);
   }
 
+  void ShrinkToFit(SizeType elementSize)
+  {
+    VectorBase::ShrinkToFit(elementSize);
+  }
+
   /**
    * @brief Clears the contents.
    *
@@ -99,6 +104,18 @@ protected: // API for deriving classes
   void Release(SizeType /* not used */)
   {
     VectorBase::Release();
+  }
+
+  /**
+   * @brief Replaces the vector data with new data.
+   *
+   * For trivial types, just swap pointers.
+   * @SINCE_2_5.23
+   * @param[in] newData New data address to be replaced
+   */
+  void Replace(void* newData) noexcept
+  {
+    VectorBase::Replace(newData);
   }
 
   /**

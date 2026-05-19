@@ -169,6 +169,15 @@ protected: // for Derived classes
   void ReserveWithCustomMoveFunction(SizeType count, SizeType elementSize, MemMoveFunctionType memMoveFunction);
 
   /**
+   * @brief Fit the capacity of vector as item counts with custom move semantics.
+   *
+   * @SINCE_2_5.23
+   * @param[in] elementSize Size of a single element
+   * @param[in] memMoveFunction Custom memory move function when moving existing elements
+   */
+  void ShrinkToFitWithCustomMoveFunction(SizeType elementSize, MemMoveFunctionType memMoveFunction);
+
+  /**
    * @brief Copy a vector.
    *
    * @SINCE_1_0.0

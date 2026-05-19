@@ -82,6 +82,11 @@ public: // Default property extensions from Object
    */
   const PropertyInputImpl* GetSceneObjectInputProperty(Property::Index index) const override;
 
+  /**
+   * @copydoc Dali::Internal::Object::GetPropertyComponentIndex()
+   */
+  int32_t GetPropertyComponentIndex(Property::Index index) const override;
+
 protected: // implementation
   /**
    * @brief Constructor.

@@ -86,6 +86,8 @@ SET( public_api_src_files
   ${public_api_src_dir}/signals/functor-delegate.cpp
   ${public_api_src_dir}/object/weak-handle.cpp
   ${public_api_src_dir}/dali-core-version.cpp
+  ${public_api_src_dir}/update/frame-callback-interface.cpp
+  ${public_api_src_dir}/update/update-proxy.cpp
 )
 
 #
@@ -254,6 +256,12 @@ SET( public_api_core_signals_header_files
 )
 
 
+SET( public_api_core_update_header_files
+  ${public_api_src_dir}/update/frame-callback-interface.h
+  ${public_api_src_dir}/update/update-proxy.h
+)
+
+
 SET( SOURCES ${SOURCES}
   ${public_api_src_files}
 )
@@ -271,4 +279,5 @@ SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
   ${public_api_core_rendering_header_files}
   ${public_api_core_size_negotiation_header_files}
   ${public_api_core_signals_header_files}
+  ${public_api_core_update_header_files}
 )

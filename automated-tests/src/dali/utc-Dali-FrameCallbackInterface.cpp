@@ -19,9 +19,9 @@
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/devel-api/common/stage-devel.h>
-#include <dali/devel-api/update/frame-callback-interface.h>
-#include <dali/devel-api/update/update-proxy.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/public-api/update/frame-callback-interface.h>
+#include <dali/public-api/update/update-proxy.h>
 #include <stdlib.h>
 
 #include <iostream>

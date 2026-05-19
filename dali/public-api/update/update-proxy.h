@@ -20,10 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint>
-#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/object/property-value.h>
@@ -43,12 +43,14 @@ class UpdateProxy;
  * An actor's data can be accessed using the Actor's Unique ID.
  * The unique ID should be passed to the callback using this class in a thread-safe manner
  * (as you cannot call Actor::GetId from the update-thread).
+ * @SINCE_2_5.21
  */
 class DALI_CORE_API UpdateProxy
 {
 public:
   /**
    * Type to define a unique sync point.
+   * @SINCE_2_5.21
    */
   using NotifySyncPoint = int;
   static constexpr NotifySyncPoint INVALID_SYNC{-1};
@@ -58,6 +60,7 @@ public:
    * @param[in]   id        The Actor ID
    * @param[out]  position  Set to the Actor's current position, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetPosition(uint32_t id, Vector3& position) const;
 
@@ -67,6 +70,7 @@ public:
    * @param[in]  position  The position to set
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   * @SINCE_2_5.21
    */
   bool SetPosition(uint32_t id, const Vector3& position);
 
@@ -76,6 +80,7 @@ public:
    * @param[in]  position  The position to bake
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
+   * @SINCE_2_5.21
    */
   bool BakePosition(uint32_t id, const Vector3& position);
 
@@ -84,6 +89,7 @@ public:
    * @param[in]   id        The Actor ID
    * @param[out]  orientation  Set to the Actor's current orientation, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetOrientation(uint32_t id, Quaternion& orientation) const;
 
@@ -93,6 +99,7 @@ public:
    * @param[in]  orientation  The orientation to set
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   * @SINCE_2_5.21
    */
   bool SetOrientation(uint32_t id, const Quaternion& orientation);
 
@@ -102,6 +109,7 @@ public:
    * @param[in]  orientation  The orientation to bake
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
+   * @SINCE_2_5.21
    */
   bool BakeOrientation(uint32_t id, const Quaternion& orientation);
 
@@ -110,6 +118,7 @@ public:
    * @param[in]   id    The Actor ID
    * @param[out]  size  Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetSize(uint32_t id, Vector3& size) const;
 
@@ -119,6 +128,7 @@ public:
    * @param[in]  size  The size to set
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   * @SINCE_2_5.21
    */
   bool SetSize(uint32_t id, const Vector3& size);
 
@@ -128,6 +138,7 @@ public:
    * @param[in]  size  The size to bake
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
+   * @SINCE_2_5.21
    */
   bool BakeSize(uint32_t id, const Vector3& size);
 
@@ -137,6 +148,7 @@ public:
    * @param[out]  position  Set to the Actor's current position, if Actor ID is valid
    * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetPositionAndSize(uint32_t id, Vector3& position, Vector3& size) const;
 
@@ -147,6 +159,7 @@ public:
    * @param[out]  scale     Set to the Actor's current world scale, if Actor ID is valid
    * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetWorldPositionScaleAndSize(uint32_t id, Vector3& position, Vector3& scale, Vector3& size) const;
 
@@ -158,6 +171,7 @@ public:
    * @param[out]  orientation Set to the Actor's current world orientation, if Actor ID is valid
    * @param[out]  size      Set to the Actor's current size, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetWorldTransformAndSize(uint32_t id, Vector3& position, Vector3& scale, Quaternion& orientation, Vector3& size) const;
 
@@ -166,6 +180,7 @@ public:
    * @param[in]   id     The Actor ID
    * @param[out]  scale  Set to the Actor's current scale, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetScale(uint32_t id, Vector3& scale) const;
 
@@ -175,6 +190,7 @@ public:
    * @param[in]  scale  The scale to set
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   * @SINCE_2_5.21
    */
   bool SetScale(uint32_t id, const Vector3& scale);
 
@@ -184,6 +200,7 @@ public:
    * @param[in]  scale  The scale to bake
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
+   * @SINCE_2_5.21
    */
   bool BakeScale(uint32_t id, const Vector3& scale);
 
@@ -192,6 +209,7 @@ public:
    * @param[in]   id     The Actor ID
    * @param[out]  color  Set to the Actor's current color, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetColor(uint32_t id, Vector4& color) const;
 
@@ -201,6 +219,7 @@ public:
    * @param[in]  color  The color to set
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   * @SINCE_2_5.21
    */
   bool SetColor(uint32_t id, const Vector4& color);
 
@@ -210,6 +229,7 @@ public:
    * @param[in]  color  The color to bake
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
+   * @SINCE_2_5.21
    */
   bool BakeColor(uint32_t id, const Vector4& color);
 
@@ -218,6 +238,7 @@ public:
    *
    * Sync points can be added from the event side using Dali::DevelStage::NotifyFrameCallback().
    * @return INVALID_SYNC if there was no SyncPoint, or a unique value if there was a sync point.
+   * @SINCE_2_5.21
    */
   NotifySyncPoint PopSyncPoint();
 
@@ -227,6 +248,7 @@ public:
    * @param[in]   id     The Actor ID
    * @param[out]  updateArea  Get to the Actor's current updated area, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetUpdateArea(uint32_t id, Vector4& updateArea) const;
 
@@ -236,6 +258,7 @@ public:
    * @param[in]   id     The Actor ID
    * @param[in]   updateArea  Set to the Actor's current updated area, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool SetUpdateArea(uint32_t id, const Vector4& updateArea);
 
@@ -245,6 +268,7 @@ public:
    * @param[in]  id       The Actor ID
    * @param[in]  ignored  True to make the actor be ignored.
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool SetIgnored(uint32_t id, bool ignored);
 
@@ -253,6 +277,7 @@ public:
    * @param[in]  id       The Actor ID
    * @param[out] ignored  Set to the Actor's current ignored state, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
   bool GetIgnored(uint32_t id, bool& ignored) const;
 
@@ -262,8 +287,9 @@ public:
    * @param[in]  propertyName The name of custom property.
    * @param[out] value        Get to the Actor's current custom property value.
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
-  bool GetCustomProperty(uint32_t id, const std::string& propertyName, Property::Value& value) const;
+  bool GetCustomProperty(uint32_t id, const String& propertyName, Property::Value& value) const;
 
   /**
    * @brief Bake an Actor's custom animatable property value from the Frame callback function.
@@ -272,8 +298,9 @@ public:
    * @param[in]  propertyName The name of custom property.
    * @param[in] value         Set to the Actor's current custom property value, if Actor ID and Property is valid.
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.21
    */
-  bool BakeCustomProperty(uint32_t id, const std::string& propertyName, const Property::Value& value);
+  bool BakeCustomProperty(uint32_t id, const String& propertyName, const Property::Value& value);
 
 public: // Not intended for application developers
   /// @cond internal

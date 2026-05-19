@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/update/frame-callback-interface.h>
+#include <dali/public-api/update/frame-callback-interface.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/update/update-proxy.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/update/frame-callback-interface-impl.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {

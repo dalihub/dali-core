@@ -55,6 +55,7 @@ class UpdateProxy;
  *   The sync notification is to enable the synchronization of the frame
  * upate callback with the setting of other dali object properties,
  * for instance, actor visibility, on the update thread.
+ * @SINCE_2_5.21
  */
 class DALI_CORE_API FrameCallbackInterface
 {
@@ -63,10 +64,11 @@ public:
 
   /**
    * @brief Called from the update-thread after the scene has been updated, and is ready to render.
-   * @param[in]  updateProxy  Use this to get/set required values for the Actor.
-   * @param[in]  elapsedSeconds  Time elapsed time since the last frame (in seconds)
+   * @param[in] updateProxy Use this to get/set required values for the Actor.
+   * @param[in] elapsedSeconds Time elapsed time since the last frame (in seconds)
    * @return Whether we should keep rendering.
    * @see FrameCallbackInterface
+   * @SINCE_2_5.21
    */
   virtual bool Update(UpdateProxy& updateProxy, float elapsedSeconds) = 0;
 
@@ -74,6 +76,7 @@ public:
    * @brief Retrieves the extension for the interface.
    *
    * @return The extension if available, nullptr otherwise
+   * @SINCE_2_5.21
    */
   virtual Extension* GetExtension()
   {
@@ -83,11 +86,13 @@ public:
 protected:
   /**
    * @brief Protected constructor.
+   * @SINCE_2_5.21
    */
   FrameCallbackInterface();
 
   /**
    * @brief Protected virtual destructor.
+   * @SINCE_2_5.21
    */
   virtual ~FrameCallbackInterface();
 
