@@ -46,6 +46,7 @@
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
+#include <dali/internal/event/update/frame-callback-interface-impl.h>
 
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
@@ -817,6 +818,39 @@ GestureEventProcessor& Core::GetGestureEventProcessor()
 RelayoutController& Core::GetRelayoutController()
 {
   return *(mRelayoutController.Get());
+}
+
+void Core::AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootActor)
+{
+  DALI_ASSERT_ALWAYS((!FrameCallbackInterface::Impl::Get(frameCallback).IsConnectedToSceneGraph()) && "FrameCallbackInterface implementation already added");
+
+  // Create scene-graph object and transfer to UpdateManager
+  OwnerPointer<SceneGraph::FrameCallback> transferOwnership(SceneGraph::FrameCallback::New(frameCallback));
+  AddFrameCallbackMessage(*mUpdateManager, transferOwnership, rootActor.GetNode());
+}
+
+void Core::AddGlobalFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  DALI_ASSERT_ALWAYS((!FrameCallbackInterface::Impl::Get(frameCallback).IsConnectedToSceneGraph()) && "FrameCallbackInterface implementation already added");
+
+  // Create scene-graph object and transfer to UpdateManager
+  OwnerPointer<SceneGraph::FrameCallback> transferOwnership(SceneGraph::FrameCallback::New(frameCallback));
+  AddGlobalFrameCallbackMessage(*mUpdateManager, transferOwnership);
+}
+
+void Core::RemoveFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  FrameCallbackInterface::Impl::Get(frameCallback).Invalidate();
+  RemoveFrameCallbackMessage(*mUpdateManager, frameCallback);
+}
+
+Dali::UpdateProxy::NotifySyncPoint Core::NotifyFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  static Dali::UpdateProxy::NotifySyncPoint sSyncPoint = 0;
+  ++sSyncPoint;
+
+  NotifyFrameCallbackMessage(*mUpdateManager, &frameCallback, sSyncPoint);
+  return sSyncPoint;
 }
 
 ObjectRegistry& Core::GetObjectRegistry() const

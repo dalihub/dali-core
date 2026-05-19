@@ -18,7 +18,6 @@
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/map-wrapper.h>
-#include <dali/devel-api/common/stage-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <dali/public-api/update/update-proxy.h>
@@ -584,8 +583,7 @@ int UtcDaliFrameCallbackCheckInstallationAndRemoval(void)
 
   FrameCallbackBasic frameCallback;
 
-  Stage stage = Stage::GetCurrent();
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -594,7 +592,7 @@ int UtcDaliFrameCallbackCheckInstallationAndRemoval(void)
 
   frameCallback.mCalled = false;
 
-  DevelStage::RemoveFrameCallback(stage, frameCallback);
+  application.GetCore().RemoveFrameCallback(frameCallback);
 
   application.SendNotification();
   application.Render();
@@ -609,17 +607,16 @@ int UtcDaliFrameCallbackSetIgnored(void)
   // Test UpdateProxy::SetIgnored functionality via FrameCallbackInterface
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   unsigned int actorId = actor.GetProperty<int>(Actor::Property::ID);
 
   // Test setting ignored to true
   {
     FrameCallbackSetIgnored frameCallback(actorId, true);
-    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+    application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
     actor.SetIgnored(false);
 
     application.SendNotification();
@@ -629,7 +626,7 @@ int UtcDaliFrameCallbackSetIgnored(void)
     DALI_TEST_EQUALS(frameCallback.mSetIgnoredCallSuccess, true, TEST_LOCATION);
 
     // Remove callback to prevent it from being called again
-    DevelStage::RemoveFrameCallback(stage, frameCallback);
+    application.GetCore().RemoveFrameCallback(frameCallback);
 
     application.SendNotification();
     application.Render(); // Second render: Check if Actor::IsIgnored() is true
@@ -656,7 +653,7 @@ int UtcDaliFrameCallbackSetIgnored(void)
   // Test setting ignored to false
   {
     FrameCallbackSetIgnored frameCallback(actorId, false);
-    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+    application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
     actor.SetIgnored(true);
 
     application.SendNotification();
@@ -666,7 +663,7 @@ int UtcDaliFrameCallbackSetIgnored(void)
     DALI_TEST_EQUALS(frameCallback.mSetIgnoredCallSuccess, true, TEST_LOCATION);
 
     // Remove callback
-    DevelStage::RemoveFrameCallback(stage, frameCallback);
+    application.GetCore().RemoveFrameCallback(frameCallback);
 
     application.SendNotification();
     application.Render(); // Fourth render: Check if Actor::IsIgnored() is false
@@ -698,10 +695,9 @@ int UtcDaliFrameCallbackGetIgnored(void)
   // Test UpdateProxy::GetIgnored functionality via FrameCallbackInterface
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   unsigned int actorId = actor.GetProperty<int>(Actor::Property::ID);
 
@@ -745,7 +741,7 @@ int UtcDaliFrameCallbackGetIgnored(void)
     };
 
     FrameCallbackGetIgnored frameCallback(actorId);
-    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+    application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
     application.SendNotification();
     application.Render();
@@ -760,7 +756,7 @@ int UtcDaliFrameCallbackGetIgnored(void)
     DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), false, TEST_LOCATION);
 
-    DevelStage::RemoveFrameCallback(stage, frameCallback);
+    application.GetCore().RemoveFrameCallback(frameCallback);
   }
 
   // Test getting ignored state when it's true
@@ -803,7 +799,7 @@ int UtcDaliFrameCallbackGetIgnored(void)
     };
 
     FrameCallbackGetIgnoredTrue frameCallback(actorId);
-    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+    application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
     application.SendNotification();
     application.Render();
@@ -817,7 +813,7 @@ int UtcDaliFrameCallbackGetIgnored(void)
     DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), true, TEST_LOCATION);
 
-    DevelStage::RemoveFrameCallback(stage, frameCallback);
+    application.GetCore().RemoveFrameCallback(frameCallback);
   }
 
   // Test getting ignored state for an invalid actor ID
@@ -850,7 +846,7 @@ int UtcDaliFrameCallbackGetIgnored(void)
     };
 
     FrameCallbackGetIgnoredInvalidId frameCallback(99999); // Invalid ID
-    DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+    application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
     application.SendNotification();
     application.Render();
@@ -860,7 +856,7 @@ int UtcDaliFrameCallbackGetIgnored(void)
     // mRetrievedIgnoredState should not be modified if the call fails
     DALI_TEST_EQUALS(frameCallback.mRetrievedIgnoredState, false, TEST_LOCATION);
 
-    DevelStage::RemoveFrameCallback(stage, frameCallback);
+    application.GetCore().RemoveFrameCallback(frameCallback);
   }
 
   END_TEST;
@@ -886,11 +882,10 @@ int UtcDaliFrameCallbackGetters(void)
   actor.SetProperty(Actor::Property::SCALE, scale);
   actor.SetProperty(Actor::Property::ORIENTATION, orientation);
 
-  Stage stage = Stage::GetCurrent();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   FrameCallbackOneActor frameCallback(actor.GetProperty<int>(Actor::Property::ID));
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -942,8 +937,7 @@ int UtcDaliFrameCallbackSetters(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
-  Stage stage = Stage::GetCurrent();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   Vector3    sizeToSet(1.0f, 2.0f, 3.0f);
   Vector3    positionToSet(10.0f, 20.0f, 30.0f);
@@ -953,7 +947,7 @@ int UtcDaliFrameCallbackSetters(void)
   Vector4    updateAreaToSet(10.0f, 10.0f, 200.0f, 100.0f);
 
   FrameCallbackSetter frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet, orientationToSet, updateAreaToSet);
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -967,7 +961,7 @@ int UtcDaliFrameCallbackSetters(void)
   DALI_TEST_EQUALS(frameCallback.mUpdateAreaAfterSetting, updateAreaToSet, TEST_LOCATION);
 
   // Ensure the actual actor values haven't changed as we didn't bake the values after removing the callback
-  DevelStage::RemoveFrameCallback(stage, frameCallback);
+  application.GetCore().RemoveFrameCallback(frameCallback);
 
   application.SendNotification();
   application.Render();
@@ -1013,8 +1007,7 @@ int UtcDaliFrameCallbackBake(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
-  Stage stage = Stage::GetCurrent();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   Vector3    sizeToSet(1.0f, 2.0f, 3.0f);
   Vector3    positionToSet(10.0f, 20.0f, 30.0f);
@@ -1023,7 +1016,7 @@ int UtcDaliFrameCallbackBake(void)
   Quaternion orientationToSet(Radian(Math::PI * 0.3), Vector3::YAXIS);
 
   FrameCallbackBaker frameCallback(actor.GetProperty<int>(Actor::Property::ID), sizeToSet, positionToSet, colorToSet, scaleToSet, orientationToSet);
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -1036,7 +1029,7 @@ int UtcDaliFrameCallbackBake(void)
   DALI_TEST_EQUALS(frameCallback.mOrientationAfterSetting, orientationToSet, TEST_LOCATION);
 
   // Ensure the new values are saved after removing the callback
-  DevelStage::RemoveFrameCallback(stage, frameCallback);
+  application.GetCore().RemoveFrameCallback(frameCallback);
 
   application.SendNotification();
   application.Render();
@@ -1084,7 +1077,6 @@ int UtcDaliFrameCallbackMultipleActors(void)
    */
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   std::map<char, Vector3> sizes;
   sizes['A'] = Vector3(50.0f, 50.0f, 0.0f);
@@ -1111,7 +1103,7 @@ int UtcDaliFrameCallbackMultipleActors(void)
   actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actorA.SetProperty(Actor::Property::SIZE, sizes['A']);
   actorA.SetProperty(Actor::Property::POSITION, positions['A']);
-  stage.Add(actorA);
+  application.GetScene().Add(actorA);
 
   Actor actorB = Actor::New();
   actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_RIGHT);
@@ -1139,7 +1131,7 @@ int UtcDaliFrameCallbackMultipleActors(void)
   actorE.SetProperty(Actor::Property::PIVOT, Pivot::BOTTOM_LEFT);
   actorE.SetProperty(Actor::Property::SIZE, sizes['E']);
   actorE.SetProperty(Actor::Property::POSITION, positions['E']);
-  stage.Add(actorE);
+  application.GetScene().Add(actorE);
 
   Actor actorF = Actor::New();
   actorF.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_CENTER);
@@ -1178,7 +1170,7 @@ int UtcDaliFrameCallbackMultipleActors(void)
     frameCallback.mActorIds.PushBack(i.second);
   }
 
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -1217,9 +1209,8 @@ int UtcDaliFrameCallbackCheckActorNotAdded(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, Vector2(200, 300));
 
-  Stage                 stage = Stage::GetCurrent();
   FrameCallbackOneActor frameCallback(actor.GetProperty<int>(Actor::Property::ID));
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -1242,10 +1233,9 @@ int UtcDaliFrameCallbackInvalidActorId(void)
   // Test to ensure that there are no issues when trying to use the update-proxy methods with an invalid actor ID.
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   FrameCallbackActorIdCheck frameCallback(10000);
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -1281,17 +1271,16 @@ int UtcDaliFrameCallbackInvalidActorId(void)
 
 int UtcDaliFrameCallbackActorRemovedAndAdded(void)
 {
-  // Test to ensure that we do not call methods on actors that have been removed on the stage
-  // and then re-start calling the required methods if that actor is re-added back to the stage
+  // Test to ensure that we do not call methods on actors that have been removed on the scene
+  // and then re-start calling the required methods if that actor is re-added back to the scene
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   FrameCallbackActorIdCheck frameCallback(actor.GetProperty<int>(Actor::Property::ID));
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -1322,9 +1311,9 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
 
   frameCallback.Reset();
 
-  // Remove the actor from stage, the methods should not return successfully.
+  // Remove the actor from the scene, the methods should not return successfully.
 
-  stage.Remove(actor);
+  application.GetScene().Remove(actor);
 
   application.SendNotification();
   application.Render();
@@ -1353,9 +1342,9 @@ int UtcDaliFrameCallbackActorRemovedAndAdded(void)
 
   frameCallback.Reset();
 
-  // Re-add the actor back to the stage, all the methods should once again, return successfully.
+  // Re-add the actor back to the scene, all the methods should once again, return successfully.
 
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
@@ -1390,15 +1379,14 @@ int UtcDaliFrameCallbackMultipleCallbacks(void)
   // Test to ensure multiple frame-callbacks work as expected
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   FrameCallbackBasic frameCallback1;
   FrameCallbackBasic frameCallback2;
-  DevelStage::AddFrameCallback(stage, frameCallback1, stage.GetRootLayer());
-  DevelStage::AddFrameCallback(stage, frameCallback2, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback1, application.GetScene().GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback2, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -1410,7 +1398,7 @@ int UtcDaliFrameCallbackMultipleCallbacks(void)
 
   // Remove the second frame-callback, only the first should be called
 
-  DevelStage::RemoveFrameCallback(stage, frameCallback2);
+  application.GetCore().RemoveFrameCallback(frameCallback2);
 
   application.SendNotification();
   application.Render();
@@ -1422,8 +1410,8 @@ int UtcDaliFrameCallbackMultipleCallbacks(void)
 
   // Re-add the second frame-callback and remove the first, only the second should be called
 
-  DevelStage::AddFrameCallback(stage, frameCallback2, stage.GetRootLayer());
-  DevelStage::RemoveFrameCallback(stage, frameCallback1);
+  application.GetCore().AddFrameCallback(frameCallback2, application.GetScene().GetRootLayer());
+  application.GetCore().RemoveFrameCallback(frameCallback1);
 
   application.SendNotification();
   application.Render();
@@ -1434,7 +1422,7 @@ int UtcDaliFrameCallbackMultipleCallbacks(void)
   frameCallback2.Reset();
 
   // Attempt removal of the first frame-callback again, should be a no-op and yield the exact same results as the last run
-  DevelStage::RemoveFrameCallback(stage, frameCallback1);
+  application.GetCore().RemoveFrameCallback(frameCallback1);
 
   application.SendNotification();
   application.Render();
@@ -1445,7 +1433,7 @@ int UtcDaliFrameCallbackMultipleCallbacks(void)
   frameCallback2.Reset();
 
   // Remove the second frame-callback as well, neither should be called
-  DevelStage::RemoveFrameCallback(stage, frameCallback2);
+  application.GetCore().RemoveFrameCallback(frameCallback2);
 
   application.SendNotification();
   application.Render();
@@ -1461,15 +1449,14 @@ int UtcDaliFrameCallbackActorDestroyed(void)
   // Test to ensure that the frame-callback behaves gracefully if the connected root-actor is destroyed
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   FrameCallbackBasic frameCallback1;
   FrameCallbackBasic frameCallback2;
-  DevelStage::AddFrameCallback(stage, frameCallback1, actor);
-  DevelStage::AddFrameCallback(stage, frameCallback2, actor);
+  application.GetCore().AddFrameCallback(frameCallback1, actor);
+  application.GetCore().AddFrameCallback(frameCallback2, actor);
 
   application.SendNotification();
   application.Render();
@@ -1481,7 +1468,7 @@ int UtcDaliFrameCallbackActorDestroyed(void)
 
   // Remove the second frame-callback, only the first should be called
 
-  DevelStage::RemoveFrameCallback(stage, frameCallback2);
+  application.GetCore().RemoveFrameCallback(frameCallback2);
 
   application.SendNotification();
   application.Render();
@@ -1492,7 +1479,7 @@ int UtcDaliFrameCallbackActorDestroyed(void)
   frameCallback2.Reset();
 
   // Remove and destroy the actor, the first one should not be called either
-  stage.Remove(actor);
+  application.GetScene().Remove(actor);
   actor.Reset();
 
   application.SendNotification();
@@ -1509,14 +1496,13 @@ int UtcDaliFrameCallbackDestroyedBeforeRemoving(void)
   // Ensure there's no segmentation fault if the callback is deleted without being removed
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   {
     FrameCallbackBasic frameCallback;
-    DevelStage::AddFrameCallback(stage, frameCallback, actor);
+    application.GetCore().AddFrameCallback(frameCallback, actor);
 
     application.SendNotification();
     application.Render();
@@ -1539,15 +1525,14 @@ int UtcDaliFrameCallbackDoubleAddition(void)
   // Ensure we don't connect the same frame-callback twice
 
   TestApplication application;
-  Stage           stage     = Stage::GetCurrent();
-  Actor           rootActor = stage.GetRootLayer();
+  Actor           rootActor = application.GetScene().GetRootLayer();
 
   FrameCallbackBasic frameCallback;
-  DevelStage::AddFrameCallback(stage, frameCallback, rootActor);
+  application.GetCore().AddFrameCallback(frameCallback, rootActor);
 
   try
   {
-    DevelStage::AddFrameCallback(stage, frameCallback, rootActor);
+    application.GetCore().AddFrameCallback(frameCallback, rootActor);
   }
   catch(...)
   {
@@ -1562,10 +1547,9 @@ int UtcDaliFrameCallbackUpdateStatus(void)
   // Ensure the update status is consistent with whether the framecallback requests to keep rendering or not
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
@@ -1574,7 +1558,7 @@ int UtcDaliFrameCallbackUpdateStatus(void)
 
   // This framecallback doesn't request to keep rendering
   FrameCallbackMultipleActors frameCallbackMultipleActors;
-  DevelStage::AddFrameCallback(stage, frameCallbackMultipleActors, actor);
+  application.GetCore().AddFrameCallback(frameCallbackMultipleActors, actor);
 
   application.SendNotification();
   application.Render();
@@ -1583,7 +1567,7 @@ int UtcDaliFrameCallbackUpdateStatus(void)
 
   // This framecallback requests to keep rendering
   FrameCallbackBasic frameCallbackBasic;
-  DevelStage::AddFrameCallback(stage, frameCallbackBasic, actor);
+  application.GetCore().AddFrameCallback(frameCallbackBasic, actor);
 
   application.SendNotification();
   application.Render();
@@ -1613,8 +1597,7 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
-  Stage stage = Stage::GetCurrent();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   Vector3    sizeToSet(1.0f, 2.0f, 3.0f);
   Vector3    positionToSet(10.0f, 20.0f, 30.0f);
@@ -1624,8 +1607,8 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
 
   tet_infoline("Test that the frame callback was called without a notify");
   FrameCallbackNotify frameCallback;
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
-  Stage::GetCurrent().KeepRendering(30);
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
+  application.GetScene().KeepRendering(30);
   application.SendNotification();
   application.Render(16);
 
@@ -1633,7 +1616,7 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
   DALI_TEST_CHECK(frameCallback.mSyncPoints.empty());
 
   tet_infoline("Test that the frame callback was called with a notify");
-  UpdateProxy::NotifySyncPoint syncPoint = DevelStage::NotifyFrameCallback(stage, frameCallback);
+  UpdateProxy::NotifySyncPoint syncPoint = application.GetCore().NotifyFrameCallback(frameCallback);
   DALI_TEST_CHECK(syncPoint != UpdateProxy::INVALID_SYNC);
   frameCallback.SetSyncTrigger(syncPoint);
 
@@ -1655,9 +1638,9 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
 
   tet_infoline("Test that adding 2 notify before next update contains both");
 
-  auto syncPoint1 = DevelStage::NotifyFrameCallback(stage, frameCallback);
+  auto syncPoint1 = application.GetCore().NotifyFrameCallback(frameCallback);
   DALI_TEST_CHECK(syncPoint1 != UpdateProxy::INVALID_SYNC);
-  auto syncPoint2 = DevelStage::NotifyFrameCallback(stage, frameCallback);
+  auto syncPoint2 = application.GetCore().NotifyFrameCallback(frameCallback);
   DALI_TEST_CHECK(syncPoint2 != UpdateProxy::INVALID_SYNC);
   DALI_TEST_CHECK(syncPoint1 != syncPoint2);
   application.SendNotification();
@@ -1671,17 +1654,16 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
 
 int UtcDaliFrameCallbackWithoutRootActor(void)
 {
-  // Test to ensure that we should call methods on actors even if have been removed on the stage
+  // Test to ensure that we should call methods on actors even if have been removed on the scene
   // If we add frame callback with empty handle.
 
   TestApplication application;
-  Stage           stage = Stage::GetCurrent();
 
   Actor actor = Actor::New();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   FrameCallbackActorIdCheck frameCallback(actor.GetProperty<int>(Actor::Property::ID));
-  DevelStage::AddFrameCallback(stage, frameCallback, Actor());
+  application.GetCore().AddFrameCallback(frameCallback, Actor());
 
   application.SendNotification();
   application.Render();
@@ -1712,9 +1694,9 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
 
   frameCallback.Reset();
 
-  // Remove the actor from stage, the methods should return successfully.
+  // Remove the actor from the scene, the methods should return successfully.
 
-  stage.Remove(actor);
+  application.GetScene().Remove(actor);
 
   application.SendNotification();
   application.Render();
@@ -1744,7 +1726,7 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
   // Remove callback. frameCallback should not be called.
 
   frameCallback.Reset();
-  DevelStage::RemoveFrameCallback(stage, frameCallback);
+  application.GetCore().RemoveFrameCallback(frameCallback);
 
   application.SendNotification();
   application.Render();
@@ -1773,9 +1755,9 @@ int UtcDaliFrameCallbackWithoutRootActor(void)
 
   frameCallback.Reset();
 
-  // Re-add the actor back to the stage, but frameCallback should not be emitted because we remove it.
+  // Re-add the actor back to the scene, but frameCallback should not be emitted because we remove it.
 
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
@@ -1817,11 +1799,10 @@ int UtcDaliFrameCallbackCustomPropertyGetBake(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
-  Stage stage = Stage::GetCurrent();
-  stage.Add(actor);
+  application.GetScene().Add(actor);
 
   FrameCallbackCustomProperty frameCallback(actor.GetProperty<int>(Actor::Property::ID));
-  DevelStage::AddFrameCallback(stage, frameCallback, stage.GetRootLayer());
+  application.GetCore().AddFrameCallback(frameCallback, application.GetScene().GetRootLayer());
 
   application.SendNotification();
   application.Render();
@@ -1854,7 +1835,7 @@ int UtcDaliFrameCallbackCustomPropertyGetBake(void)
   DALI_TEST_EQUALS(actor.GetCurrentProperty(customPropertyRotationIndex), FrameCallbackCustomProperty::CUSTOM_PROPERTY_ROTATION_AFTER, TEST_LOCATION);
 
   // Ensure the new values are saved after removing the callback
-  DevelStage::RemoveFrameCallback(stage, frameCallback);
+  application.GetCore().RemoveFrameCallback(frameCallback);
 
   application.SendNotification();
   application.Render();
