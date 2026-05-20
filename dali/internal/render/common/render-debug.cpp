@@ -19,6 +19,7 @@
 #include <dali/internal/render/common/render-debug.h>
 
 // EXTERNAL INCLUDES
+#include <locale>
 #include <sstream>
 
 // INTERNAL INCLUDES
@@ -56,6 +57,7 @@ void PrintRenderInstruction(const SceneGraph::RenderInstruction& instruction)
   const char* target = (nullptr != instruction.mFrameBuffer) ? "FrameBuffer" : "Screen";
 
   std::stringstream debugStream;
+  debugStream.imbue(std::locale::classic());
   debugStream << "Rendering to " << target << ", View: " << *(instruction.GetViewMatrix()) << " Projection: " << *(instruction.GetProjectionMatrix());
 
   if(instruction.mIsViewportSet)
@@ -75,6 +77,7 @@ void PrintRenderInstruction(const SceneGraph::RenderInstruction& instruction)
 void PrintRenderList(const RenderList& list)
 {
   std::stringstream debugStream;
+  debugStream.imbue(std::locale::classic());
   debugStream << "Rendering items";
 
   std::string debugString(debugStream.str());
@@ -84,6 +87,7 @@ void PrintRenderList(const RenderList& list)
 void PrintRenderItem(const SceneGraph::RenderItem& item)
 {
   std::stringstream debugStream;
+  debugStream.imbue(std::locale::classic());
   debugStream << "Rendering item, ModelView: " << item.mModelViewMatrix;
 
   std::string debugString(debugStream.str());

@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <cstring>
 #include <iostream>
+#include <locale>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -369,6 +370,7 @@ public:
   if(filter && filter->IsEnabledFor(level))    \
   {                                            \
     std::ostringstream o;                      \
+    o.imbue(std::locale::classic());           \
     o << stream << std::endl;                  \
     filter->Log(level, "%s", o.str().c_str()); \
   }
@@ -438,7 +440,8 @@ public:                                    \
 #define DALI_LOG_ACTOR_TREE(node)                                  \
   {                                                                \
     std::stringstream branch;                                      \
-    Node*             tempNode = node;                             \
+    branch.imbue(std::locale::classic());                          \
+    Node* tempNode = node;                                         \
     while(tempNode)                                                \
     {                                                              \
       branch << "<" << tempNode->mDebugString << ">::";            \
@@ -671,6 +674,7 @@ public:
   if(filter && filter->IsEnabled())                                            \
   {                                                                            \
     std::ostringstream oss;                                                    \
+    oss.imbue(std::locale::classic());                                         \
     messageGenerator(oss);                                                     \
     filter->EndTimeCheck(oss.str().c_str(),                                    \
                          DALI_LOG_FORMAT_PREFIX_ARGS);                         \

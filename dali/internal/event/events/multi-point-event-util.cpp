@@ -16,6 +16,7 @@
  */
 
 #if defined(DEBUG_ENABLED)
+#include <locale>
 #include <sstream>
 #endif
 
@@ -41,6 +42,7 @@ static const Debug::LogLevel HIERARCHY_DEBUG_LOG_LEVEL(Debug::Verbose);
 void PrintChildren(Debug::Filter* logFilter, Dali::Actor actor, int level)
 {
   std::ostringstream output;
+  output.imbue(std::locale::classic());
 
   for(int t = 0; t < level; ++t)
   {

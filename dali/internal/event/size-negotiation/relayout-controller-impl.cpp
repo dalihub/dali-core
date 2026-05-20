@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #if defined(DEBUG_ENABLED)
+#include <locale>
 #include <sstream>
 #endif // defined(DEBUG_ENABLED)
 
@@ -55,6 +56,7 @@ Integration::Log::Filter* gLogFilter(Integration::Log::Filter::New(Debug::NoLogg
 void PrintChildren(Dali::Actor actor, int level)
 {
   std::ostringstream output;
+  output.imbue(std::locale::classic());
 
   for(int t = 0; t < level; ++t)
   {
@@ -494,14 +496,10 @@ void RelayoutController::Relayout()
 
       PRINT_HIERARCHY;
 
-#ifdef TRACE_ENABLED
-      if(gTraceFilter && gTraceFilter->IsTraceEnabled())
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_RELAYOUT", [&](std::ostringstream& oss)
       {
-        std::ostringstream stream;
-        stream << "[relayoutActor:" << relayoutActorCount << " negotiatedActor:" << negotiatedActorCount << "]";
-        DALI_TRACE_END_WITH_MESSAGE(gTraceFilter, "DALI_RELAYOUT", stream.str().c_str());
-      }
-#endif
+        oss << "[relayoutActor:" << relayoutActorCount << " negotiatedActor:" << negotiatedActorCount << "]";
+      });
     }
 
     mPerformingRelayout = false;

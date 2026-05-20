@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <limits>
-#include <locale>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
@@ -254,7 +253,6 @@ const Property::Array::Impl* Property::Array::Read() const
 
 std::ostream& operator<<(std::ostream& stream, const Property::Array& array)
 {
-  stream.imbue(std::locale::classic());
   stream << "Array(" << array.Count() << ") = [";
 
   auto impl = array.Read();

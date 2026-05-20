@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <locale>
 
 // INTERNAL INCLDUES
 #include <dali/internal/common/memory-pool-object-allocator.h>
@@ -333,6 +334,7 @@ std::string SizeConvertor(const Dali::Internal::MemoryPoolObjectAllocator<T>& po
   uint32_t cap, size;
   pool.GetCapacity(cap, size);
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss.width(12);
   oss << std::right << cap << " byte (";
   oss.width(9);
@@ -347,6 +349,7 @@ std::string SizeConvertor(const Dali::Internal::MemoryPoolObjectAllocator<T>& po
 std::string MemoryPoolCollection::LogPools() const
 {
   std::ostringstream oss;
+  oss.imbue(std::locale::classic());
   oss << "Animations:        " << SizeConvertor<Dali::Internal::SceneGraph::Animation>(mImpl->mAnimationMemoryPool) << std::endl
       << "RenderItems:       " << SizeConvertor<Dali::Internal::SceneGraph::RenderItem>(mImpl->mRenderItemMemoryPool) << std::endl
       << "Renderers:         " << SizeConvertor<Dali::Internal::SceneGraph::Renderer>(mImpl->mRendererMemoryPool) << std::endl

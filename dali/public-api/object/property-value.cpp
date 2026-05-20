@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstring>
-#include <locale>
 #include <ostream>
 
 // INTERNAL INCLUDES
@@ -1477,9 +1476,6 @@ std::size_t Property::Value::GetHash() const
 
 std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
 {
-  // Ensure C locale for numeric output so floats use '.' as decimal separator
-  stream.imbue(std::locale::classic());
-
   const auto& obj = value.Read();
 
   switch(obj.GetType())
