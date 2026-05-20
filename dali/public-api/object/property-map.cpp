@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <algorithm> // for std::find_if
 #include <limits>
+#include <locale>
 #include <unordered_map>
 
 // INTERNAL INCLUDES
@@ -640,6 +641,7 @@ const Property::Map::Impl* Property::Map::Read() const
 
 std::ostream& operator<<(std::ostream& stream, const Property::Map& map)
 {
+  stream.imbue(std::locale::classic());
   stream << "Map(" << map.Count() << ") = {";
 
   auto impl = map.Read();

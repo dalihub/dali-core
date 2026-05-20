@@ -47,6 +47,7 @@ SET(TC_SOURCES
         utc-Dali-IntrusivePtr.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
+        utc-Dali-LocaleNumericGuard.cpp
         utc-Dali-LocklessBuffer.cpp
         utc-Dali-LongPressGestureDetector.cpp
         utc-Dali-LongPressGestureRecognizer.cpp

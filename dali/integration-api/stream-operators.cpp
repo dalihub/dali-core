@@ -17,6 +17,7 @@
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/string-utils.h>
 
+#include <locale>
 #include <string_view>
 
 namespace Dali
@@ -41,26 +42,31 @@ std::ostream& operator<<(std::ostream& o, const BoundsInteger& boundsInteger)
 
 std::ostream& operator<<(std::ostream& o, const Bounds& bounds)
 {
+  o.imbue(std::locale::classic());
   return o << "[" << bounds.x << ", " << bounds.y << ", " << bounds.width << ", " << bounds.height << "]";
 }
 
 std::ostream& operator<<(std::ostream& o, const Vector2& vector)
 {
+  o.imbue(std::locale::classic());
   return o << "[" << vector.x << ", " << vector.y << "]";
 }
 
 std::ostream& operator<<(std::ostream& o, const Vector3& vector)
 {
+  o.imbue(std::locale::classic());
   return o << "[" << vector.x << ", " << vector.y << ", " << vector.z << "]";
 }
 
 std::ostream& operator<<(std::ostream& o, const Vector4& vector)
 {
+  o.imbue(std::locale::classic());
   return o << "[" << vector.x << ", " << vector.y << ", " << vector.z << ", " << vector.w << "]";
 }
 
 std::ostream& operator<<(std::ostream& o, const Quaternion& quaternion)
 {
+  o.imbue(std::locale::classic());
   Vector3 axis;
   Radian  angleRadians;
 
@@ -72,6 +78,7 @@ std::ostream& operator<<(std::ostream& o, const Quaternion& quaternion)
 
 std::ostream& operator<<(std::ostream& o, const Matrix3& matrix)
 {
+  o.imbue(std::locale::classic());
   const float* elements = matrix.AsFloat();
   return o << "[ " << elements[0] << ", " << elements[1] << ", " << elements[2] << ", "
            << elements[3] << ", " << elements[4] << ", " << elements[5] << ", "
@@ -80,6 +87,7 @@ std::ostream& operator<<(std::ostream& o, const Matrix3& matrix)
 
 std::ostream& operator<<(std::ostream& o, const Matrix& matrix)
 {
+  o.imbue(std::locale::classic());
   const float* elements = matrix.AsFloat();
   return o << "[ " << elements[0] << ", " << elements[1] << ", " << elements[2] << ", " << elements[3] << ", "
            << elements[4] << ", " << elements[5] << ", " << elements[6] << ", " << elements[7] << ", "
@@ -89,6 +97,7 @@ std::ostream& operator<<(std::ostream& o, const Matrix& matrix)
 
 std::ostream& operator<<(std::ostream& o, const Dali::AngleAxis& angleAxis)
 {
+  o.imbue(std::locale::classic());
   return o << "[ Axis: [" << angleAxis.axis.x << ", " << angleAxis.axis.y << ", " << angleAxis.axis.z << "], Angle: " << Degree(angleAxis.angle).degree << " degrees ]";
 }
 
