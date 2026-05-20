@@ -24,12 +24,14 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
+#include <dali/internal/update/common/property-resetter.h>
+#include <dali/internal/update/manager/update-manager.h>
 #include <dali/public-api/object/handle.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
@@ -101,7 +103,7 @@ ConstraintBase* ConstraintBase::Clone(Object& object)
 ConstraintBase::~ConstraintBase()
 {
   DALI_LOG_CONSTRAINT_INFO("~Constraint[%p] SG[%p] tag[%u] index[%u] rate[%u] with sources[%zu]\n", this, mSceneGraphConstraint, mTag, mTargetPropertyIndex, mApplyRate, mSources.size());
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~ConstraintBase[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }
@@ -172,7 +174,7 @@ void ConstraintBase::RemoveInternal()
     mConstraintResetterApplied = false;
 
     // Guard against constraint sending messages during core destruction
-    if(Stage::IsInstalled())
+    if(EventThreadServices::IsCoreRunning())
     {
       if(mTargetObject && mSceneGraphConstraint)
       {

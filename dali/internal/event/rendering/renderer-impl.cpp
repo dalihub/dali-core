@@ -952,7 +952,7 @@ Renderer::Renderer(const SceneGraph::Renderer* sceneObject)
 
 Renderer::~Renderer()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Renderer[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/update/manager/scene-graph-frame-callback.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 
 namespace Dali
