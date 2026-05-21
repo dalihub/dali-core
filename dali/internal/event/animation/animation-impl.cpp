@@ -32,7 +32,6 @@
 #include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-helper.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -319,13 +318,13 @@ void Animation::Initialize()
 
 Animation::~Animation()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Animation[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }
 
   // Guard to allow handle destruction after Core has been destroyed
-  if(Stage::IsInstalled())
+  if(EventThreadServices::IsCoreRunning())
   {
     // Disconnect from the animation playlist
     mPlaylist.AnimationDestroyed(*this);

@@ -29,7 +29,6 @@
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/update/common/animatable-property-messages.h>
 #include <dali/internal/update/nodes/node.h>
@@ -570,21 +569,17 @@ void RenderTask::GetViewport(Viewport& viewPort) const
   {
     if(!GetRenderTaskSceneObject()->GetViewportEnabled())
     {
-      Internal::Stage* stage = Internal::Stage::GetCurrent();
-      if(stage)
+      Vector2 size(0.0f, 0.0f);
+      Actor*  sourceActor = mSourceActor.GetActor();
+      if(sourceActor && sourceActor->OnScene())
       {
-        Vector2 size(stage->GetSize());
-        Actor*  sourceActor = mSourceActor.GetActor();
-        if(sourceActor && sourceActor->OnScene())
-        {
-          Scene& scene = sourceActor->GetScene();
-          size         = scene.GetSize();
-        }
-
-        viewPort.x = viewPort.y = 0;
-        viewPort.width          = static_cast<int32_t>(size.width);  // truncated
-        viewPort.height         = static_cast<int32_t>(size.height); // truncated
+        Scene& scene = sourceActor->GetScene();
+        size         = scene.GetSize();
       }
+
+      viewPort.x = viewPort.y = 0;
+      viewPort.width          = static_cast<int32_t>(size.width);  // truncated
+      viewPort.height         = static_cast<int32_t>(size.height); // truncated
     }
     else
     {
@@ -751,43 +746,40 @@ bool RenderTask::TranslateCoordinates(Vector2& screenCoords) const
     }
 
     CameraActor* localCamera = GetCameraActor();
-    StagePtr     stage       = Stage::GetCurrent();
-    if(stage)
+    Vector2      size(0.0f, 0.0f);
+    CameraActor* defaultCamera = nullptr;
+    Actor*       sourceActor   = mSourceActor.GetActor();
+
+    if(sourceActor && sourceActor->OnScene())
     {
-      Vector2      size(stage->GetSize());
-      CameraActor* defaultCamera(&stage->GetDefaultCameraActor());
-      Actor*       sourceActor = mSourceActor.GetActor();
-      if(sourceActor && sourceActor->OnScene())
-      {
-        Scene& scene  = sourceActor->GetScene();
-        size          = scene.GetSize();
-        defaultCamera = &scene.GetDefaultCameraActor();
-      }
+      Scene& scene  = sourceActor->GetScene();
+      size          = scene.GetSize();
+      defaultCamera = &scene.GetDefaultCameraActor();
+    }
 
-      if(localCamera)
-      {
-        Viewport viewport;
-        viewport.x = viewport.y = 0;
-        viewport.width          = static_cast<int32_t>(size.width);  // truncated
-        viewport.height         = static_cast<int32_t>(size.height); // truncated
+    if(localCamera && defaultCamera)
+    {
+      Viewport viewport;
+      viewport.x = viewport.y = 0;
+      viewport.width          = static_cast<int32_t>(size.width);  // truncated
+      viewport.height         = static_cast<int32_t>(size.height); // truncated
 
-        float localX, localY;
-        inside            = inputMappingActor->ScreenToLocal(defaultCamera->GetViewMatrix(), defaultCamera->GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
-        Vector3 actorSize = inputMappingActor->GetCurrentSize() * inputMappingActor->GetCurrentWorldScale();
-        if(inside && localX >= 0.f && localX <= actorSize.x && localY >= 0.f && localY <= actorSize.y)
-        {
-          screenCoords.x = localX;
-          screenCoords.y = localY;
-        }
-        else
-        {
-          inside = false;
-        }
+      float localX, localY;
+      inside            = inputMappingActor->ScreenToLocal(defaultCamera->GetViewMatrix(), defaultCamera->GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
+      Vector3 actorSize = inputMappingActor->GetCurrentSize() * inputMappingActor->GetCurrentWorldScale();
+      if(inside && localX >= 0.f && localX <= actorSize.x && localY >= 0.f && localY <= actorSize.y)
+      {
+        screenCoords.x = localX;
+        screenCoords.y = localY;
       }
       else
       {
         inside = false;
       }
+    }
+    else
+    {
+      inside = false;
     }
   }
   else if(mFrameBuffer && mScreenToFrameBufferFunction)
@@ -1333,7 +1325,7 @@ RenderTask::RenderTask(const SceneGraph::RenderTask* sceneObject, RenderTaskList
 
 RenderTask::~RenderTask()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~RenderTask[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

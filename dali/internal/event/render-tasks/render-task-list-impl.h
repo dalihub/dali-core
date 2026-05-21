@@ -74,9 +74,11 @@ public:
 
   /**
    * Create a RenderTaskList.
+   * @param[in] defaults Provider of the default root actor and camera actor.
+   *                     If nullptr, the no-arg CreateTask() must not be called.
    * @return A newly allocated RenderTaskList; the caller takes ownership.
    */
-  static RenderTaskListPtr New();
+  static RenderTaskListPtr New(RenderTaskDefaults* defaults = nullptr);
 
   /**
    * @copydoc Dali::RenderTaskList::CreateTask()
@@ -210,8 +212,9 @@ public:
 protected:
   /**
    * Construct a new RenderTaskList.
+   * @param[in] defaults Provider of the default root actor and camera actor. May be nullptr.
    */
-  RenderTaskList();
+  explicit RenderTaskList(RenderTaskDefaults* defaults);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -230,7 +233,7 @@ private: // from CompleteNotificationInterface
   void NotifyCompleted(CompleteNotificationInterface::ParameterList notifierList) override;
 
 private:
-  RenderTaskDefaults& mDefaults;
+  RenderTaskDefaults* mDefaults; ///< Provider of default root/camera actors; may be nullptr for standalone lists.
 
   SceneGraph::RenderTaskList* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
 

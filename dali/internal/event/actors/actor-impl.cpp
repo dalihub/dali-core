@@ -46,7 +46,6 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
@@ -1302,7 +1301,7 @@ void Actor::Initialize()
 
 Actor::~Actor()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Actor[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

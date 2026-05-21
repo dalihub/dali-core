@@ -28,7 +28,6 @@
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/property-notification-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
@@ -956,7 +955,7 @@ void Object::RemoveConstraint(ConstraintBase& constraint)
 void Object::RemoveConstraints()
 {
   // guard against constraint sending messages during core destruction
-  if(mConstraints && Stage::IsInstalled())
+  if(mConstraints && EventThreadServices::IsCoreRunning())
   {
     for(auto&& item : *mConstraints)
     {
@@ -973,7 +972,7 @@ void Object::RemoveConstraints()
 void Object::RemoveConstraints(uint32_t tag)
 {
   // guard against constraint sending messages during core destruction
-  if(mConstraints && Stage::IsInstalled())
+  if(mConstraints && EventThreadServices::IsCoreRunning())
   {
     auto iter(mConstraints->begin());
     while(iter != mConstraints->end())
@@ -1002,7 +1001,7 @@ void Object::RemoveConstraints(uint32_t tag)
 void Object::RemoveConstraints(uint32_t tagBegin, uint32_t tagEnd)
 {
   // guard against constraint sending messages during core destruction
-  if(mConstraints && tagBegin < tagEnd && Stage::IsInstalled())
+  if(mConstraints && tagBegin < tagEnd && EventThreadServices::IsCoreRunning())
   {
     auto iter(mConstraints->begin());
     while(iter != mConstraints->end())
@@ -1117,7 +1116,7 @@ Object::Object(const SceneGraph::PropertyOwner* sceneObject)
 
 Object::~Object()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     if(nullptr != mUpdateObject)
     {
@@ -1132,7 +1131,7 @@ Object::~Object()
   delete mPropertyNotifications;
 
   // Guard to allow handle destruction after Core has been destroyed
-  if(Stage::IsInstalled())
+  if(EventThreadServices::IsCoreRunning())
   {
     if(nullptr != mUpdateObject)
     {

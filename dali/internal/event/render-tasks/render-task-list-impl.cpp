@@ -23,8 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/camera-actor-impl.h>
+#include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -54,9 +54,9 @@ namespace
 static constexpr uint32_t ORDER_INDEX_OVERLAY_RENDER_TASK = INT32_MAX;
 }
 
-RenderTaskListPtr RenderTaskList::New()
+RenderTaskListPtr RenderTaskList::New(RenderTaskDefaults* defaults)
 {
-  RenderTaskListPtr taskList = new RenderTaskList();
+  RenderTaskListPtr taskList = new RenderTaskList(defaults);
 
   taskList->Initialize();
 
@@ -65,7 +65,8 @@ RenderTaskListPtr RenderTaskList::New()
 
 RenderTaskPtr RenderTaskList::CreateTask()
 {
-  return CreateTask(&mDefaults.GetDefaultRootActor(), &mDefaults.GetDefaultCameraActor());
+  DALI_ASSERT_ALWAYS(mDefaults && "CreateTask() requires a RenderTaskDefaults provider");
+  return CreateTask(&mDefaults->GetDefaultRootActor(), &mDefaults->GetDefaultCameraActor());
 }
 
 RenderTaskPtr RenderTaskList::CreateTask(Actor* sourceActor, CameraActor* cameraActor, bool isOverlayTask)
@@ -360,16 +361,16 @@ void RenderTaskList::ReorderTasks(Dali::Internal::LayerList& layerList)
   mIsRequestedToReorderTask = false;
 }
 
-RenderTaskList::RenderTaskList()
+RenderTaskList::RenderTaskList(RenderTaskDefaults* defaults)
 : EventThreadServicesHolder(EventThreadServices::Get()),
-  mDefaults(*Stage::GetCurrent()),
+  mDefaults(defaults),
   mSceneObject(nullptr)
 {
 }
 
 RenderTaskList::~RenderTaskList()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~RenderTaskList[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

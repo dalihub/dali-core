@@ -19,9 +19,8 @@
 #include <dali/public-api/update/frame-callback-interface.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/update/frame-callback-interface-impl.h>
-#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {
@@ -32,14 +31,10 @@ FrameCallbackInterface::FrameCallbackInterface()
 
 FrameCallbackInterface::~FrameCallbackInterface()
 {
-  if(Internal::Stage::IsInstalled())
+  if(Internal::ThreadLocalStorage::Created())
   {
-    Internal::StagePtr stage = Internal::Stage::GetCurrent();
-    if(stage)
-    {
-      // This will be a no-op if the callback has already been removed
-      stage->RemoveFrameCallback(*this);
-    }
+    // This will be a no-op if the callback has already been removed
+    Internal::ThreadLocalStorage::Get().RemoveFrameCallback(*this);
   }
 
   delete mImpl;

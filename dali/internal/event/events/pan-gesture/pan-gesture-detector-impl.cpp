@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
@@ -735,7 +736,7 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
   }
 
   // We should not use scene object if Core is shutting down.
-  if(DALI_LIKELY(Dali::Stage::IsInstalled() && mSceneObject))
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning() && mSceneObject))
   {
     // We update the scene object directly rather than sending a message.
     // Sending a message could cause unnecessary delays, the scene object ensure thread safe behaviour.
