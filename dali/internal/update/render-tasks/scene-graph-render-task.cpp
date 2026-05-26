@@ -585,7 +585,7 @@ void RenderTask::PropertyOwnerDestroyed(PropertyOwner& owner)
   {
     mViewportGuideNode = nullptr;
 
-    if(DALI_LIKELY(!Dali::Stage::IsShuttingDown()))
+    if(DALI_LIKELY(!EventThreadServices::IsShuttingDown()))
     {
       // TODO : Until SG::RenderTask Resseter preopared, just call this internal API without dirty flag down.
       mViewportPosition.ResetToBaseValueInternal();

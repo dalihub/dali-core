@@ -19,7 +19,6 @@
 #include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/render/renderers/render-sampler-messages.h>
 #include <dali/internal/render/renderers/render-sampler.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -73,7 +72,7 @@ void Sampler::Initialize()
 
 Sampler::~Sampler()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Sampler[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

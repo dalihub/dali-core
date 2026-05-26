@@ -329,6 +329,35 @@ int UtcDaliVectorBaseHandle(void)
   DALI_TEST_EQUALS(copiedBaseHandleVector.Front(), handle1, TEST_LOCATION);
   DALI_TEST_EQUALS(copiedBaseHandleVector.Back(), handle4, TEST_LOCATION);
 
+  // Self insert range within same vector.
+  baseHandleVector.Clear();
+  TestReferenceCount(3, 3, 3, 2, 3, TEST_LOCATION);
+
+  baseHandleVector.PushBack(handle0);
+  baseHandleVector.PushBack(handle1);
+  baseHandleVector.PushBack(handle2);
+  baseHandleVector.PushBack(handle3);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), baseHandleVector.Count(), TEST_LOCATION);
+  TestReferenceCount(4, 4, 4, 3, 3, TEST_LOCATION);
+  TestVectorVariable(baseHandleVector, {handle0, handle1, handle2, handle3}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle3, TEST_LOCATION);
+
+  baseHandleVector.Insert(baseHandleVector.Begin() + 1, baseHandleVector.Begin(), baseHandleVector.End());
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(8u), baseHandleVector.Count(), TEST_LOCATION);
+  TestReferenceCount(5, 5, 5, 4, 3, TEST_LOCATION);
+  TestVectorVariable(baseHandleVector, {handle0, handle0, handle1, handle2, handle3, handle1, handle2, handle3}, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Front(), handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(baseHandleVector.Back(), handle3, TEST_LOCATION);
+
+  // Revive the original vector for further tests (Since the above self-insert test made after below test case prepared. The number of references is not updated).
+  baseHandleVector.Clear();
+  baseHandleVector.PushBack(handle1);
+  baseHandleVector.PushBack(handle2);
+  baseHandleVector.PushBack(handle0);
+  baseHandleVector.PushBack(handle4);
+  baseHandleVector.PushBack(handle3);
+
   // Move assign
   Dali::Vector<Dali::BaseHandle> movedBaseHandleVector = std::move(copiedBaseHandleVector);
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(5u), baseHandleVector.Count(), TEST_LOCATION);
@@ -657,6 +686,45 @@ int UtcDaliVectorMoveOnlyInsert(void)
   DALI_TEST_EQUALS(vector[1].value, 10, TEST_LOCATION);
   DALI_TEST_EQUALS(vector[2].value, 20, TEST_LOCATION);
   DALI_TEST_EQUALS(vector[3].value, 30, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliVectorMoveOnlyInsertMove(void)
+{
+  tet_infoline("Testing Dali::Vector InsertMove with move-only type");
+
+  MoveOnlyType::ResetCounts();
+
+  Vector<MoveOnlyType> source;
+  source.PushBack(MoveOnlyType(10));
+  source.PushBack(MoveOnlyType(20));
+
+  Vector<MoveOnlyType> vector;
+  vector.PushBack(MoveOnlyType(5));
+  vector.PushBack(MoveOnlyType(15));
+
+  vector.InsertMove(vector.End(), source.Begin(), source.End());
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1].value, 15, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3].value, 20, TEST_LOCATION);
+
+  // Note that we don't touch the original container size.
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), source.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(source[0].value, -1, TEST_LOCATION); // moved
+  DALI_TEST_EQUALS(source[1].value, -1, TEST_LOCATION); // moved
+
+  // InsertMove self
+  vector.InsertMove(vector.Begin() + 1, vector.Begin(), vector.Begin() + 2);
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(6u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0].value, -1, TEST_LOCATION); // moved
+  DALI_TEST_EQUALS(vector[1].value, 5, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[2].value, 15, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[3].value, -1, TEST_LOCATION); // moved
+  DALI_TEST_EQUALS(vector[4].value, 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[5].value, 20, TEST_LOCATION);
 
   END_TEST;
 }

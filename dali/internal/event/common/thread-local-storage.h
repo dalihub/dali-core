@@ -26,10 +26,12 @@
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {
 struct Vector2;
+class FrameCallbackInterface;
 
 namespace Integration
 {
@@ -38,6 +40,7 @@ class PlatformAbstraction;
 
 namespace Internal
 {
+class Actor;
 class Core;
 class NotificationManager;
 class ShaderFactory;
@@ -214,6 +217,26 @@ public:
    * @param[in] scene The Scene.
    */
   void RemoveScene(Scene* scene);
+
+  /**
+   * @copydoc Dali::Integration::Core::AddFrameCallback()
+   */
+  void AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootActor);
+
+  /**
+   * @copydoc Dali::Integration::Core::AddFrameCallback()
+   */
+  void AddGlobalFrameCallback(FrameCallbackInterface& frameCallback);
+
+  /**
+   * @copydoc Dali::Integration::Core::RemoveFrameCallback()
+   */
+  void RemoveFrameCallback(FrameCallbackInterface& frameCallback);
+
+  /**
+   * @copydoc Dali::Integration::Core::NotifyFrameCallback()
+   */
+  Dali::UpdateProxy::NotifySyncPoint NotifyFrameCallback(FrameCallbackInterface& frameCallback);
 
   /**
    * @copydoc Dali::SingletonService::Register()

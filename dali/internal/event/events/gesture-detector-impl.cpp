@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
@@ -47,7 +47,7 @@ GestureDetector::GestureDetector(GestureType::Value type, const SceneGraph::Prop
 
 GestureDetector::~GestureDetector()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~GestureDetector[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }
@@ -76,7 +76,7 @@ GestureDetector::~GestureDetector()
     mAttachedActors.clear();
 
     // Guard to allow handle destruction after Core has been destroyed
-    if(DALI_LIKELY(Stage::IsInstalled()))
+    if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
     {
       mGestureEventProcessor.RemoveGestureDetector(this);
     }
@@ -94,7 +94,7 @@ void GestureDetector::Attach(Actor& actor)
     if(actor.OnScene())
     {
       // Register with EventProcessor if first actor being added
-      if(mAttachedActors.empty() && DALI_LIKELY(Stage::IsInstalled()))
+      if(mAttachedActors.empty() && DALI_LIKELY(EventThreadServices::IsCoreRunning()))
       {
         mGestureEventProcessor.AddGestureDetector(this, actor.GetScene());
       }
@@ -131,7 +131,7 @@ void GestureDetector::SceneObjectAdded(Object& object)
       mPendingAttachActors.erase(match);
 
       // Register with EventProcessor if first actor being added
-      if(mAttachedActors.empty() && DALI_LIKELY(Stage::IsInstalled()))
+      if(mAttachedActors.empty() && DALI_LIKELY(EventThreadServices::IsCoreRunning()))
       {
         mGestureEventProcessor.AddGestureDetector(this, actor.GetScene());
       }
@@ -192,7 +192,7 @@ void GestureDetector::Detach(Actor& actor)
       if(mAttachedActors.empty())
       {
         // Guard to allow handle destruction after Core has been destroyed
-        if(DALI_LIKELY(Stage::IsInstalled()))
+        if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
         {
           mGestureEventProcessor.RemoveGestureDetector(this);
         }
@@ -243,7 +243,7 @@ void GestureDetector::DetachAll()
     }
 
     // Guard to allow handle destruction after Core has been destroyed
-    if(DALI_LIKELY(Stage::IsInstalled()))
+    if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
     {
       // Unregister from gesture event processor
       mGestureEventProcessor.RemoveGestureDetector(this);
@@ -289,7 +289,7 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& to
         Clear();
         actorImpl.SetNeedGesturePropagation(false);
         // Guard to allow handle destruction after Core has been destroyed
-        if(DALI_LIKELY(Stage::IsInstalled()))
+        if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
         {
           mGestureEventProcessor.RegisterGestureDetector(this);
         }
@@ -336,7 +336,7 @@ bool GestureDetector::HandleEvent(Dali::Actor& actor, const Dali::TouchEvent& to
 void GestureDetector::CancelAllOtherGestureDetectors()
 {
   // Guard to allow handle destruction after Core has been destroyed
-  if(DALI_LIKELY(Stage::IsInstalled()))
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     mGestureEventProcessor.CancelAllOtherGestureDetectors(this);
   }
@@ -355,7 +355,7 @@ void GestureDetector::SetDetected(bool detected)
 void GestureDetector::Clear()
 {
   // Guard to allow handle destruction after Core has been destroyed
-  if(DALI_LIKELY(Stage::IsInstalled()))
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
   {
     mGestureEventProcessor.UnregisterGestureDetector(this);
   }
@@ -395,7 +395,7 @@ void GestureDetector::ObjectDestroyed(Object& object)
       if(mAttachedActors.empty())
       {
         // Guard to allow handle destruction after Core has been destroyed
-        if(DALI_LIKELY(Stage::IsInstalled()))
+        if(DALI_LIKELY(EventThreadServices::IsCoreRunning()))
         {
           mGestureEventProcessor.RemoveGestureDetector(this);
         }

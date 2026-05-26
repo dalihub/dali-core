@@ -108,6 +108,15 @@ public:
    * @note It returns false if the core hasn't been initialised yet.
    */
   static bool IsShuttingDown();
+
+  /**
+   * @brief Queries whether the current thread is the Core event thread.
+   *
+   * Useful for asserting that code is running on the event thread after the Core has been initialized.
+   *
+   * @return True if called from the event thread, false otherwise.
+   */
+  static bool IsEventThread();
 };
 
 } // namespace Internal

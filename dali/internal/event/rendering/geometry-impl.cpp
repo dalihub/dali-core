@@ -115,7 +115,7 @@ void Geometry::Initialize()
 
 Geometry::~Geometry()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Geometry[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

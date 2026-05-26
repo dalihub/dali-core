@@ -78,7 +78,7 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Scene[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }
@@ -145,7 +145,7 @@ void Scene::Initialize(const Graphics::RenderTargetCreateInfo& createInfo,
   Add(*(mDefaultCamera.Get()));
 
   // Create the list of render-tasks
-  mRenderTaskList = RenderTaskList::New();
+  mRenderTaskList = RenderTaskList::New(this);
 
   // Create the default render-task and ensure clear is enabled on it to show the background color
   RenderTaskPtr renderTask = mRenderTaskList->CreateTask(mRootLayer.Get(), mDefaultCamera.Get());
@@ -315,7 +315,7 @@ void Scene::RemoveSceneObject()
     RemoveSceneMessage(tls->GetUpdateManager(), *mSceneObject);
     mSceneObject = nullptr;
   }
-  else if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  else if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("Scene[%p] called RemoveSceneObject API from non-UI thread!\n", this);
   }
@@ -328,7 +328,7 @@ void Scene::Discard()
     ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
     tls->RemoveScene(this);
   }
-  else if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  else if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("Scene[%p] called Discard API from non-UI thread!\n", this);
   }

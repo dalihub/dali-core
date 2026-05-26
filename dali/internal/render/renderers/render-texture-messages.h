@@ -23,6 +23,7 @@
 #include <dali/public-api/images/pixel.h>                     ///< for Dali::Pixel::Format
 
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/render/renderers/render-texture-key.h>
 #include <dali/internal/render/renderers/render-texture.h>

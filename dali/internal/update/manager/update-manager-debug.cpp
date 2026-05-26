@@ -50,7 +50,8 @@ void PrintNodes(const Node& node, int level)
   std::string nodeName = DALI_LOG_GET_OBJECT_STRING((&node));
 
   {
-    std::ostringstream      oss;
+    std::ostringstream oss;
+    oss.imbue(std::locale::classic());
     std::ios_base::fmtflags mask = oss.flags();
     mask &= ~std::ios_base::scientific;
     mask |= std::ios_base::fixed;

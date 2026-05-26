@@ -22,7 +22,6 @@
 #include <dali/integration-api/render-controller.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/common/owner-key-type.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/render/renderers/render-texture-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -374,7 +373,7 @@ void Texture::Initialize()
 
 Texture::~Texture()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Texture[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

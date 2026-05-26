@@ -138,16 +138,9 @@ public: // API
   {
     if(this != &vector)
     {
-      if constexpr(IsTrivialType)
-      {
-        // For trivial types: just swaps pointers
-        VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData);
-      }
-      else
-      {
-        // For complex types: destruct existing elements first
-        VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData, sizeof(ItemType));
-      }
+      // For trivial types: just swaps pointers
+      // For complex types: destruct existing elements first
+      VectorAlgorithms<BaseType, ItemType>::Replace(vector.mData, sizeof(ItemType));
       vector.mData = nullptr;
     }
     return *this;
@@ -416,26 +409,13 @@ public: // API
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
 
-    if constexpr(IsTrivialType)
-    {
-      const SizeType size    = sizeof(ItemType);
-      uint8_t*       address = reinterpret_cast<uint8_t*>(&element);
+    const SizeType size    = sizeof(ItemType);
+    uint8_t*       address = reinterpret_cast<uint8_t*>(&element);
 
-      VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
-                                                   address,
-                                                   address + size,
-                                                   size);
-    }
-    else
-    {
-      const SizeType size    = sizeof(ItemType);
-      uint8_t*       address = reinterpret_cast<uint8_t*>(&element);
-
-      VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
-                                                       address,
-                                                       address + size,
-                                                       size);
-    }
+    VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
+                                                     address,
+                                                     address + size,
+                                                     size);
   }
 
   /**
@@ -467,10 +447,75 @@ public: // API
       return;
     }
 
+    if(DALI_UNLIKELY(from >= Begin() && to <= End()))
+    {
+      // Self insert case where the source range belongs to this vector.
+      // Reserve may reallocate and invalidate the source pointers, so copy
+      // the range into a temporary vector first.
+      Vector<ItemType> temporary;
+      temporary.Insert(temporary.End(), from, to);
+
+      VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
+                                                   reinterpret_cast<uint8_t*>(temporary.Begin()),
+                                                   reinterpret_cast<uint8_t*>(temporary.End()),
+                                                   sizeof(ItemType));
+      return;
+    }
+
     VectorAlgorithms<BaseType, ItemType>::Insert(reinterpret_cast<uint8_t*>(at),
                                                  reinterpret_cast<uint8_t*>(from),
                                                  reinterpret_cast<uint8_t*>(to),
                                                  sizeof(ItemType));
+  }
+
+  /**
+   * @brief Inserts the given elements into the vector as move operator.
+   *
+   * Elements after \e at are moved the number of given elements positions to the right.
+   *
+   * The underlying storage may be reallocated to provide space.
+   * If this occurs, all pre-existing pointers into the vector will
+   * become invalid.
+   *
+   * @SINCE_2_5.23
+   * @param[in] at Iterator where to insert the elements into the vector
+   * @param[in] from Iterator to the first element to be moved
+   * @param[in] to Iterator to the last element to be moved
+   * @pre Iterator \e at must be in the vector's range ( Vector::Begin(), Vector::End() ).
+   * @pre Iterators \e from and \e to must be valid iterators.
+   * @pre Iterator \e from must not be grater than Iterator \e to.
+   *
+   */
+  void InsertMove(Iterator at, Iterator from, Iterator to)
+  {
+    DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
+    DALI_ASSERT_VECTOR((from <= to) && "from address can't be greater than to");
+
+    if(from == to)
+    {
+      // nothing to copy.
+      return;
+    }
+
+    if(DALI_UNLIKELY(from >= Begin() && to <= End()))
+    {
+      // Self insert case where the source range belongs to this vector.
+      // Reserve may reallocate and invalidate the source pointers, so copy
+      // the range into a temporary vector first.
+      Vector<ItemType> temporary;
+      temporary.InsertMove(temporary.End(), from, to);
+
+      VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
+                                                       reinterpret_cast<uint8_t*>(temporary.Begin()),
+                                                       reinterpret_cast<uint8_t*>(temporary.End()),
+                                                       sizeof(ItemType));
+      return;
+    }
+
+    VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
+                                                     reinterpret_cast<uint8_t*>(from),
+                                                     reinterpret_cast<uint8_t*>(to),
+                                                     sizeof(ItemType));
   }
 
   /**

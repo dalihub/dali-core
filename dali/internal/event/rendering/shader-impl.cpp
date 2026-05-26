@@ -423,7 +423,7 @@ void Shader::ObjectDestroyed(Object& object)
 
 Shader::~Shader()
 {
-  if(DALI_UNLIKELY(!Dali::Stage::IsCoreThread()))
+  if(DALI_UNLIKELY(!EventThreadServices::IsEventThread()))
   {
     DALI_LOG_ERROR("~Shader[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
   }

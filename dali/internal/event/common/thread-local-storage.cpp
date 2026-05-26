@@ -21,9 +21,11 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/processor-interface.h>
 #include <dali/internal/common/core-impl.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/update/frame-callback-interface.h>
 
 #if defined(DEBUG_ENABLED)
 #include <dali/integration-api/debug.h>
@@ -207,6 +209,26 @@ void ThreadLocalStorage::AddScene(Scene* scene)
 void ThreadLocalStorage::RemoveScene(Scene* scene)
 {
   mCore->RemoveScene(scene);
+}
+
+void ThreadLocalStorage::AddFrameCallback(FrameCallbackInterface& frameCallback, Actor& rootActor)
+{
+  mCore->AddFrameCallback(frameCallback, rootActor);
+}
+
+void ThreadLocalStorage::AddGlobalFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  mCore->AddGlobalFrameCallback(frameCallback);
+}
+
+void ThreadLocalStorage::RemoveFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  mCore->RemoveFrameCallback(frameCallback);
+}
+
+Dali::UpdateProxy::NotifySyncPoint ThreadLocalStorage::NotifyFrameCallback(FrameCallbackInterface& frameCallback)
+{
+  return mCore->NotifyFrameCallback(frameCallback);
 }
 
 void ThreadLocalStorage::Register(const std::type_info& info, BaseHandle singleton)
