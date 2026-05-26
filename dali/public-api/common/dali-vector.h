@@ -409,6 +409,21 @@ public: // API
   {
     DALI_ASSERT_VECTOR((at <= End()) && (at >= Begin()) && "Iterator not inside vector");
 
+    // If element is inside this vector and at is at or before element's position,
+    // MoveItemInternal will shift (and destroy) element before we can move-construct
+    // from it. Move element out to a local first so the source is always valid.
+    if(DALI_UNLIKELY(&element >= Begin() && &element < End() && at <= &element))
+    {
+      ItemType       temp(static_cast<ItemType&&>(element));
+      const SizeType size    = sizeof(ItemType);
+      uint8_t*       address = reinterpret_cast<uint8_t*>(&temp);
+      VectorAlgorithms<BaseType, ItemType>::InsertMove(reinterpret_cast<uint8_t*>(at),
+                                                       address,
+                                                       address + size,
+                                                       size);
+      return;
+    }
+
     const SizeType size    = sizeof(ItemType);
     uint8_t*       address = reinterpret_cast<uint8_t*>(&element);
 

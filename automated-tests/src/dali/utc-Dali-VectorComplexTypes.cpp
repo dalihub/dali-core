@@ -1311,6 +1311,114 @@ int UtcDaliVectorResizeTrivialShrinkP(void)
   END_TEST;
 }
 
+int UtcDaliVectorMoveOnlyInsertSelf(void)
+{
+  tet_infoline("Testing Dali::Vector Insert(at, element&&) where element is already inside the vector (self-insert)");
+  // Regression test: Insert(Iterator, ItemType&&) used to have a use-after-move bug.
+  // MoveItemInternal shifts existing elements right (moving and destroying originals),
+  // then the loop move-constructs from 'element'.  When 'element' lived in [at, End()),
+  // it was already destroyed before the loop read from it.
+  // The fix: if &element is inside [Begin(), End()) and at <= &element, move element
+  // to a local variable first so the source is valid throughout InsertMove.
+
+  // Case 1: insert last element before a middle element.
+  // vector=[10,20,30], insert vector[2](30) at position 1 → [10,30,20,-1]
+  {
+    Vector<MoveOnlyType> vector;
+    vector.Reserve(5);
+    vector.PushBack(MoveOnlyType(10));
+    vector.PushBack(MoveOnlyType(20));
+    vector.PushBack(MoveOnlyType(30));
+
+    vector.Insert(vector.Begin() + 1, std::move(vector[2]));
+
+    DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+    DALI_TEST_EQUALS(vector[1].value, 30, TEST_LOCATION); // inserted value
+    DALI_TEST_EQUALS(vector[2].value, 20, TEST_LOCATION); // shifted
+    DALI_TEST_EQUALS(vector[3].value, -1, TEST_LOCATION); // moved-from original
+  }
+
+  // Case 2: insert last element at the front.
+  // vector=[10,20,30], insert vector[2](30) at Begin() → [30,10,20,-1]
+  {
+    Vector<MoveOnlyType> vector;
+    vector.Reserve(5);
+    vector.PushBack(MoveOnlyType(10));
+    vector.PushBack(MoveOnlyType(20));
+    vector.PushBack(MoveOnlyType(30));
+
+    vector.Insert(vector.Begin(), std::move(vector[2]));
+
+    DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vector[0].value, 30, TEST_LOCATION); // inserted value
+    DALI_TEST_EQUALS(vector[1].value, 10, TEST_LOCATION); // shifted
+    DALI_TEST_EQUALS(vector[2].value, 20, TEST_LOCATION); // shifted
+    DALI_TEST_EQUALS(vector[3].value, -1, TEST_LOCATION); // moved-from original
+  }
+
+  // Case 3: at == &element (inserting an element at its own position).
+  // vector=[10,20,30], insert vector[1](20) at position 1 → [10,20,-1,30]
+  {
+    Vector<MoveOnlyType> vector;
+    vector.Reserve(5);
+    vector.PushBack(MoveOnlyType(10));
+    vector.PushBack(MoveOnlyType(20));
+    vector.PushBack(MoveOnlyType(30));
+
+    vector.Insert(vector.Begin() + 1, std::move(vector[1]));
+
+    DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+    DALI_TEST_EQUALS(vector[0].value, 10, TEST_LOCATION);
+    DALI_TEST_EQUALS(vector[1].value, 20, TEST_LOCATION); // inserted value
+    DALI_TEST_EQUALS(vector[2].value, -1, TEST_LOCATION); // moved-from original (shifted to pos 2)
+    DALI_TEST_EQUALS(vector[3].value, 30, TEST_LOCATION); // shifted
+  }
+
+  END_TEST;
+}
+
+int UtcDaliVectorComplexMoveInsertSelf(void)
+{
+  tet_infoline("Testing Dali::Vector Insert(at, element&&) self-insert with BaseHandle (verifies reference counts)");
+  // Same regression as UtcDaliVectorMoveOnlyInsertSelf but uses BaseHandle so we can
+  // confirm that reference counts are correct (no double-release, no leak).
+
+  TestApplication application;
+
+  Dali::BaseHandle handle0 = Dali::Actor::New();
+  Dali::BaseHandle handle1 = Dali::Actor::New();
+  Dali::BaseHandle handle2 = Dali::Actor::New();
+
+  Vector<Dali::BaseHandle> vector;
+  vector.Reserve(4);
+  vector.PushBack(handle0);
+  vector.PushBack(handle1);
+  vector.PushBack(handle2);
+
+  DALI_TEST_EQUALS(handle0.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle1.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle2.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+
+  // Self-insert: move vector[2] (a copy of handle2) to position 1.
+  // Expected order:  [handle0, handle2, handle1, <empty>]
+  // Reference counts must not change for handle0/handle1/handle2.
+  vector.Insert(vector.Begin() + 1, std::move(vector[2]));
+
+  DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(4u), vector.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[0], handle0, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector[1], handle2, TEST_LOCATION); // inserted
+  DALI_TEST_EQUALS(vector[2], handle1, TEST_LOCATION); // shifted
+  DALI_TEST_CHECK(!vector[3]);                         // moved-from: empty handle
+
+  // No extra AddRef or Release should have happened.
+  DALI_TEST_EQUALS(handle0.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle1.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle2.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliVectorComplexTypeTraitsP(void)
 {
   tet_infoline("Testing VectorIsTrivial / TypeTraits gives correct trivial classification");
