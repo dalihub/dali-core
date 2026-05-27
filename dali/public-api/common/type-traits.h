@@ -37,6 +37,28 @@ namespace Dali
  */
 
 /**
+ * @brief Type trait to check if a type is an enumeration.
+ *
+ * Equivalent to std::is_enum. Uses compiler intrinsics to detect
+ * whether a type is an enumeration type.
+ *
+ * @tparam Type The type to check
+ *
+ * @SINCE_2_5.24
+ *
+ * Example usage:
+ * @code
+ * IsEnum<int>::value;      // false
+ * IsEnum<MyEnum>::value;   // true (if MyEnum is an enum)
+ * @endcode
+ */
+template<typename Type>
+struct IsEnum
+{
+  static const bool value = __is_enum(Type);
+};
+
+/**
  * @brief Basic type traits that every type has by default.
  *
  * This allows specializations to not have to repeat all flags.

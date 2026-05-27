@@ -19,12 +19,12 @@
  */
 
 // EXTERNAL INCLUDES
-#include <type_traits>
 #include <utility>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-pair.h>
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/property.h>
 
@@ -203,7 +203,7 @@ public:
    * @SINCE_1_4.36
    * @param[in] enumValue An enumeration value
    */
-  template<typename T, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
+  template<typename T, typename EnableIf<IsEnum<T>::value>::type* = nullptr>
   Value(T enumValue)
   : Value(static_cast<int32_t>(enumValue))
   {
@@ -307,7 +307,7 @@ public:
    * @SINCE_1_4.36
    * @return A value of type T
    */
-  template<typename T, typename std::enable_if<!std::is_enum<T>::value>::type* = nullptr>
+  template<typename T, typename EnableIf<!IsEnum<T>::value>::type* = nullptr>
   T DALI_INTERNAL Get() const
   {
     T temp = T(); // value (zero) initialize
@@ -324,7 +324,7 @@ public:
    * @SINCE_1_4.36
    * @return A value of type T
    */
-  template<typename T, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
+  template<typename T, typename EnableIf<IsEnum<T>::value>::type* = nullptr>
   T DALI_INTERNAL Get() const
   {
     int32_t temp = 0; // value (zero) initialize
@@ -340,7 +340,7 @@ public:
    * @return @c true if the value is successfully retrieved, @c false if the type is different
    * @pre GetType() is any enumeration
    */
-  template<typename T, typename std::enable_if<std::is_enum<T>::value>::type* = nullptr>
+  template<typename T, typename EnableIf<IsEnum<T>::value>::type* = nullptr>
   bool DALI_INTERNAL Get(T& enumValue) const
   {
     int32_t temp = 0;
