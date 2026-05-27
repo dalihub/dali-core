@@ -207,6 +207,23 @@ Dali::UpdateProxy::NotifySyncPoint Core::NotifyFrameCallback(FrameCallbackInterf
   return mImpl->NotifyFrameCallback(frameCallback);
 }
 
+// Rendering Behavior
+
+void Core::KeepRendering(float durationSeconds)
+{
+  mImpl->KeepRendering(durationSeconds);
+}
+
+void Core::SetRenderingBehavior(Integration::RenderingBehavior renderingBehavior)
+{
+  mImpl->SetRenderingBehavior(renderingBehavior);
+}
+
+Integration::RenderingBehavior Core::GetRenderingBehavior() const
+{
+  return mImpl->GetRenderingBehavior();
+}
+
 // ETC
 
 ObjectRegistry Core::GetObjectRegistry() const

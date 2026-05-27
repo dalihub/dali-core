@@ -951,6 +951,25 @@ void Core::LogMemoryPools() const
     totalPoolCapacity, ((totalPoolCapacity + (1 << 9)) >> 10), ((totalPoolCapacity + (1 << 19)) >> 20));
 }
 
+void Core::SetRenderingBehavior(Integration::RenderingBehavior renderingBehavior)
+{
+  if(mRenderingBehavior != renderingBehavior)
+  {
+    SetRenderingBehaviorMessage(*mUpdateManager, static_cast<DevelStage::Rendering>(renderingBehavior));
+    mRenderingBehavior = renderingBehavior;
+  }
+}
+
+Integration::RenderingBehavior Core::GetRenderingBehavior() const
+{
+  return mRenderingBehavior;
+}
+
+void Core::KeepRendering(float durationSeconds)
+{
+  KeepRenderingMessage(*mUpdateManager, durationSeconds);
+}
+
 EventThreadServices& Core::GetEventThreadServices()
 {
   return *this;

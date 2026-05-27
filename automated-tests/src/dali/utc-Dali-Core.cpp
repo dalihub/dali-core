@@ -191,3 +191,43 @@ int UtcDaliCorePreInitializeCompleted(void)
   tet_result(TET_PASS);
   END_TEST;
 }
+
+int UtcDaliCoreGetRenderingBehavior(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::GetRenderingBehavior");
+
+  // Default rendering behavior should be IF_REQUIRED
+  DALI_TEST_EQUALS(application.GetCore().GetRenderingBehavior(),
+                   Dali::Integration::RenderingBehavior::IF_REQUIRED,
+                   TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliCoreSetRenderingBehavior(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Integration::Core::SetRenderingBehavior");
+
+  // Default should be IF_REQUIRED
+  DALI_TEST_EQUALS(application.GetCore().GetRenderingBehavior(),
+                   Dali::Integration::RenderingBehavior::IF_REQUIRED,
+                   TEST_LOCATION);
+
+  // Set to CONTINUOUSLY and verify
+  application.GetCore().SetRenderingBehavior(Dali::Integration::RenderingBehavior::CONTINUOUSLY);
+  DALI_TEST_EQUALS(application.GetCore().GetRenderingBehavior(),
+                   Dali::Integration::RenderingBehavior::CONTINUOUSLY,
+                   TEST_LOCATION);
+
+  application.SendNotification();
+  application.Render(16);
+
+  // Revert to IF_REQUIRED and verify
+  application.GetCore().SetRenderingBehavior(Dali::Integration::RenderingBehavior::IF_REQUIRED);
+  DALI_TEST_EQUALS(application.GetCore().GetRenderingBehavior(),
+                   Dali::Integration::RenderingBehavior::IF_REQUIRED,
+                   TEST_LOCATION);
+
+  END_TEST;
+}

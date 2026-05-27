@@ -4252,7 +4252,7 @@ int UtcDaliRendererRegenerateUniformMap(void)
   shader.RegisterProperty("opacity", 0.5f);
   renderer.SetShader(shader);
 
-  Stage::GetCurrent().KeepRendering(1.0f);
+  application.GetCore().KeepRendering(1.0f);
 
   // Update for several frames
   application.SendNotification();
