@@ -201,13 +201,13 @@ int UtcDaliHitTestAlgorithmWithFunctor(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm functor");
 
-  Stage stage = Stage::GetCurrent();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::NAME, "NonHittableActor");
-  stage.Add(actor);
+  scene.Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -219,7 +219,7 @@ int UtcDaliHitTestAlgorithmWithFunctor(void)
 
   // Perform a hit-test at the given screen coordinates
   Dali::HitTestAlgorithm::Results results;
-  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction);
+  Dali::HitTestAlgorithm::HitTest(scene, screenCoordinates, results, IsActorHittableFunction);
   DALI_TEST_CHECK(results.actor != actor);
 
   actor.SetProperty(Actor::Property::NAME, "HittableActor");
@@ -228,7 +228,7 @@ int UtcDaliHitTestAlgorithmWithFunctor(void)
   results.actorCoordinates = Vector2::ZERO;
 
   // Perform a hit-test at the given screen coordinates
-  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction);
+  Dali::HitTestAlgorithm::HitTest(scene, screenCoordinates, results, IsActorHittableFunction);
   DALI_TEST_CHECK(results.actor == actor);
   DALI_TEST_EQUALS(localCoordinates, results.actorCoordinates, 0.1f, TEST_LOCATION);
   END_TEST;
@@ -239,12 +239,12 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with parallel Ortho camera()");
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
   cameraActor.SetOrthographicProjection(stageSize);
   cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
@@ -264,8 +264,8 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -273,15 +273,15 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 1.0f / 6.0f, TEST_LOCATION);
 
-  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
-  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
   END_TEST;
@@ -292,12 +292,12 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with offset Ortho camera()");
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
   cameraActor.SetOrthographicProjection(stageSize);
   cameraActor.SetNearClippingPlane(800.0f);
   cameraActor.SetFarClippingPlane(4895.0f);
@@ -321,8 +321,8 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -331,21 +331,21 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2(240.0f, 400.0f), results, &DefaultIsActorTouchableFunction);
+    HitTest(scene, Vector2(240.0f, 400.0f), results, &DefaultIsActorTouchableFunction);
     DALI_TEST_CHECK(results.actor == green);
     DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.6f, 0.01f, TEST_LOCATION);
   }
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2(0.001f, 0.001f), results, &DefaultIsActorTouchableFunction);
+    HitTest(scene, Vector2(0.001f, 0.001f), results, &DefaultIsActorTouchableFunction);
     DALI_TEST_CHECK(results.actor == blue);
     DALI_TEST_EQUALS(results.actorCoordinates, Vector2(0.001f, 0.001f), 0.001f, TEST_LOCATION);
   }
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, stageSize, results, &DefaultIsActorTouchableFunction);
+    HitTest(scene, stageSize, results, &DefaultIsActorTouchableFunction);
     DALI_TEST_CHECK(!results.actor);
     DALI_TEST_EQUALS(results.actorCoordinates, Vector2::ZERO, TEST_LOCATION);
   }
@@ -353,7 +353,7 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   // Just inside green
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, stageSize * 0.69f, results, &DefaultIsActorTouchableFunction);
+    HitTest(scene, stageSize * 0.69f, results, &DefaultIsActorTouchableFunction);
     DALI_TEST_CHECK(results.actor == green);
     DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.98f, 0.01f, TEST_LOCATION);
   }
@@ -366,8 +366,8 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with a stencil");
 
-  Stage stage     = Stage::GetCurrent();
-  Actor rootLayer = stage.GetRootLayer();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Actor                    rootLayer = scene.GetRootLayer();
   rootLayer.SetProperty(Actor::Property::NAME, "RootLayer");
 
   // Create a layer
@@ -375,7 +375,7 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
-  stage.Add(layer);
+  scene.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
@@ -400,12 +400,12 @@ int UtcDaliHitTestAlgorithmClippingActor(void)
 
   // Hit within clippingActor and childActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == childActor);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
-  HitTest(stage, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == rootLayer);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
@@ -417,8 +417,8 @@ int UtcDaliHitTestAlgorithmClippingActorStress(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with many many stencil");
 
-  Stage stage     = Stage::GetCurrent();
-  Actor rootLayer = stage.GetRootLayer();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Actor                    rootLayer = scene.GetRootLayer();
   rootLayer.SetProperty(Actor::Property::NAME, "RootLayer");
 
   // Create a layer
@@ -426,7 +426,7 @@ int UtcDaliHitTestAlgorithmClippingActorStress(void)
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
-  stage.Add(layer);
+  scene.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
@@ -464,12 +464,12 @@ int UtcDaliHitTestAlgorithmClippingActorStress(void)
 
   // Hit within clippingActor and latestActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == latestActor);
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
-  HitTest(stage, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == rootLayer);
 
@@ -481,12 +481,12 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with overlay actors");
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
   cameraActor.SetOrthographicProjection(stageSize);
   cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
@@ -507,8 +507,8 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -518,17 +518,17 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   HitTestAlgorithm::Results results;
 
   //Hit in the intersection. Should pick the blue actor since it is an overlay.
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 5.0f / 6.0f, TEST_LOCATION);
 
   //Hit in the blue actor
-  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
   //Hit in the green actor
-  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
@@ -548,25 +548,25 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   application.Render(10);
 
   //Hit in the intersection red, green, blue. Should pick the red actor since it is an child of overlay.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, green. Should pick the red actor since it is an child of overlay.
-  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the blue actor since it is an overlay.
-  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 9.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
@@ -580,25 +580,25 @@ int UtcDaliHitTestAlgorithmOverlay(void)
   application.Render(10);
 
   //Hit in the intersection red, green, blue. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, green. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 3.0f / 12.0f), TEST_LOCATION);
@@ -610,12 +610,12 @@ int UtcDaliHitTestAlgorithmDoesWantedHitTest(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with does wanted to HitTest");
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
   cameraActor.SetOrthographicProjection(stageSize);
   cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
@@ -634,8 +634,8 @@ int UtcDaliHitTestAlgorithmDoesWantedHitTest(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // connect to its hit-test signal
   Dali::DevelActor::HitTestResultSignal(green).Connect(TestHitTestTouchCallback);
@@ -648,7 +648,7 @@ int UtcDaliHitTestAlgorithmDoesWantedHitTest(void)
   gHitTestTouchCallBackCalled = false;
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
 
   // check hit-test events
   // The green actor received an event that the green actor was hit.
@@ -664,33 +664,33 @@ int UtcDaliHitTestAlgorithmOrder1(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm between On/Off render task");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -708,7 +708,7 @@ int UtcDaliHitTestAlgorithmOrder1(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -719,48 +719,48 @@ int UtcDaliHitTestAlgorithmOrder2(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm in for the mapping actor and its child");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor yellow                                        = Actor::New();
   yellow[Dali::Actor::Property::NAME]                 = "Yellow";
-  yellow[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  yellow[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   yellow[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   yellow[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   yellow[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(green);
-  stage.Add(yellow);
+  scene.Add(blue);
+  scene.Add(green);
+  scene.Add(yellow);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -778,7 +778,7 @@ int UtcDaliHitTestAlgorithmOrder2(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == yellow);
 
   green.Add(red);
@@ -788,7 +788,7 @@ int UtcDaliHitTestAlgorithmOrder2(void)
   application.Render(10);
 
   results = HitTestAlgorithm::Results();
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == red);
 
   END_TEST;
@@ -799,40 +799,40 @@ int UtcDaliHitTestAlgorithmOrder3(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm in for the mapping actor and its child");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -850,7 +850,7 @@ int UtcDaliHitTestAlgorithmOrder3(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
 
   green.Add(red);
@@ -860,7 +860,7 @@ int UtcDaliHitTestAlgorithmOrder3(void)
   application.Render(10);
 
   results = HitTestAlgorithm::Results();
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == red);
 
   END_TEST;
@@ -871,49 +871,49 @@ int UtcDaliHitTestAlgorithmInMultipleLayer(void)
   TestApplication application;
   tet_infoline("Testing UtcDaliHitTestAlgorithmInMultipleLayer");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Layer layer                                        = Layer::New();
   layer[Dali::Actor::Property::NAME]                 = "Layer";
-  layer[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  layer[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   layer[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   layer[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   layer[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(layer);
+  scene.Add(blue);
+  scene.Add(layer);
   layer.Add(green);
-  stage.Add(red);
+  scene.Add(red);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -931,7 +931,7 @@ int UtcDaliHitTestAlgorithmInMultipleLayer(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -942,40 +942,40 @@ int UtcDaliHitTestAlgorithmOffSceneMappingActor(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with OffSceneMappingActor");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor red                                        = Actor::New();
   red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -993,16 +993,16 @@ int UtcDaliHitTestAlgorithmOffSceneMappingActor(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == blue);
 
-  stage.Add(red);
+  scene.Add(red);
 
   // Render and notify
   application.SendNotification();
   application.Render(10);
 
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -1013,25 +1013,25 @@ int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm using ScreenToFrameBufferFunction");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(green);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -1050,7 +1050,7 @@ int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &IsActorTouchableFunctionWithoutLayerHit);
+  HitTest(scene, stageSize / 2.0f, results, &IsActorTouchableFunctionWithoutLayerHit);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -1061,34 +1061,34 @@ int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm between On/Off render task with multiple exclusived");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
   RenderTask     offRenderTask2 = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -1113,7 +1113,7 @@ int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -1124,12 +1124,12 @@ int UtcDaliHitTestAlgorithmBuildPickingRay01(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm::BuildPickingRay positive test");
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
 
   Vector2 actorSize(stageSize * 0.5f);
   // Create two actors with half the size of the stage and set them to be overlapping
@@ -1146,8 +1146,8 @@ int UtcDaliHitTestAlgorithmBuildPickingRay01(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -1195,14 +1195,14 @@ int UtcDaliHitTestAlgorithmBuildPickingRay02(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm::BuildPickingRay positive test for offscreen");
 
-  Stage          stage             = Stage::GetCurrent();
-  RenderTaskList renderTaskList    = stage.GetRenderTaskList();
-  RenderTask     defaultRenderTask = renderTaskList.GetTask(0u);
-  RenderTask     offRenderTask     = renderTaskList.CreateTask();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  RenderTask               offRenderTask     = renderTaskList.CreateTask();
 
   Dali::CameraActor defaultCameraActor = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
 
   Vector2 actorSize(stageSize * 0.5f);
   Vector2 offscreenSize(1920.0f, 1080.0f); // Quit big size.
@@ -1229,9 +1229,9 @@ int UtcDaliHitTestAlgorithmBuildPickingRay02(void)
   red.SetProperty(Actor::Property::SIZE, offscreenSize * 0.5f);
 
   Dali::CameraActor offscreenCameraActor                     = Dali::CameraActor::New(offscreenSize);
-  offscreenCameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  offscreenCameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   offscreenCameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(offscreenCameraActor);
+  scene.Add(offscreenCameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -1245,9 +1245,9 @@ int UtcDaliHitTestAlgorithmBuildPickingRay02(void)
   offRenderTask.SetFrameBuffer(renderTarget);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
-  stage.Add(red);
+  scene.Add(blue);
+  scene.Add(green);
+  scene.Add(red);
 
   // Render and notify
   application.SendNotification();
@@ -1363,8 +1363,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with overlay actors and some different clipping configurations");
 
-  Stage stage     = Stage::GetCurrent();
-  Actor rootLayer = stage.GetRootLayer();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Actor                    rootLayer = scene.GetRootLayer();
 
   auto createActor = [&](const Vector3& position)
   {
@@ -1378,10 +1378,10 @@ int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
     return actor;
   };
 
-  auto hitTest = [&stage](const Vector2& screenCoordinates)
+  auto hitTest = [&scene](const Vector2& screenCoordinates)
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, screenCoordinates, results, &DefaultIsActorTouchableFunction);
+    HitTest(scene, screenCoordinates, results, &DefaultIsActorTouchableFunction);
     return results.actor;
   };
 
@@ -1389,8 +1389,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClipping(void)
   auto green = createActor(Vector3(25.0f, 75.0f, 0.0f));
   auto blue  = createActor(Vector3(100.0f, 100.0f, 0.0f));
 
-  stage.Add(red);
-  stage.Add(green);
+  scene.Add(red);
+  scene.Add(green);
   red.Add(blue);
 
   // Render and notify
@@ -1587,8 +1587,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
   TestApplication application;
   tet_infoline("Testing Dali::HitTestAlgorithm with different overlay actors and clipping configurations throughout a hierarchy");
 
-  Stage stage     = Stage::GetCurrent();
-  Actor rootLayer = stage.GetRootLayer();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Actor                    rootLayer = scene.GetRootLayer();
 
   auto createActor = [&](const Vector3& position)
   {
@@ -1602,10 +1602,10 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
     return actor;
   };
 
-  auto hitTest = [&stage](const Vector2& screenCoordinates)
+  auto hitTest = [&scene](const Vector2& screenCoordinates)
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, screenCoordinates, results, &DefaultIsActorTouchableFunction);
+    HitTest(scene, screenCoordinates, results, &DefaultIsActorTouchableFunction);
     return results.actor;
   };
 
@@ -1615,8 +1615,8 @@ int UtcDaliHitTestAlgorithmOverlayWithClippingComplicatedHierarchy(void)
   auto yellow = createActor(Vector3(25.0f, -25.0f, 0.0f));
   auto purple = createActor(Vector3(25.0f, -25.0f, 0.0f));
 
-  stage.Add(red);
-  stage.Add(green);
+  scene.Add(red);
+  scene.Add(green);
   red.Add(blue);
   blue.Add(yellow);
   yellow.Add(purple);
@@ -1691,8 +1691,8 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   TestApplication application;
   tet_infoline("Testing FBO fallback in HitTestActorOnce scenario");
 
-  Stage   stage     = Stage::GetCurrent();
-  Vector2 stageSize = stage.GetSize();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Vector2                  stageSize = scene.GetSize();
 
   // Create actor hierarchy: Root -> Parent -> MappingActor
   // This structure ensures HitTestActorRecursively is invoked and can find MappingActor as an exclusive child.
@@ -1703,7 +1703,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   rootActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   // The rootActor is implicitly added to the stage as the source of the default render task.
   // For the test, we add it explicitly to the stage to ensure it's part of the main scene graph.
-  stage.Add(rootActor);
+  scene.Add(rootActor);
 
   Actor parentActor = Actor::New();
   parentActor.SetProperty(Actor::Property::NAME, "ParentActor");
@@ -1722,13 +1722,13 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
   parentActor.Add(mappingActor);
 
   // Setup RenderTask for FBO
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     fboRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
-  fboCamera[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  fboCamera[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(fboCamera);
+  scene.Add(fboCamera);
 
   // The mappingActor will serve as both the source and the mapping actor for the FBO render task.
   // This makes it an "exclusive" actor, triggering the HitTestActorOnce path.
@@ -1750,7 +1750,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorOnce(void)
 
   // Perform hit-test at the center of the stage, which should hit the mapping actor
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize * 0.5f, results, &IsActorTouchableFunctionOnce);
+  HitTest(scene, stageSize * 0.5f, results, &IsActorTouchableFunctionOnce);
   gOnceHitActorList.clear();
 
   // IsActorTouchableFunctionOnce ensures mappingActor is only hittable once.
@@ -1772,8 +1772,8 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
   TestApplication application;
   tet_infoline("Testing FBO fallback in HitTestActorRecursively scenario");
 
-  Stage   stage     = Stage::GetCurrent();
-  Vector2 stageSize = stage.GetSize();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Vector2                  stageSize = scene.GetSize();
 
   // Create actors: Root -> MappingActor -> Source
   // This structure forces the HitTestActorRecursively path.
@@ -1784,7 +1784,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
   rootActor.SetProperty(Actor::Property::SIZE, stageSize);
   rootActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   rootActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  stage.Add(rootActor);
+  scene.Add(rootActor);
 
   Actor mappingActor = Actor::New();
   mappingActor.SetProperty(Actor::Property::NAME, "MappingActor");
@@ -1798,17 +1798,17 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
   sourceActor.SetProperty(Actor::Property::SIZE, stageSize * 0.4f);
   sourceActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   sourceActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  // Note: sourceActor is NOT added to the stage. It's the root of the FBO task.
+  // Note: sourceActor is NOT added to the scene. It's the root of the FBO task.
   // This makes the FBO hit-test fail.
 
   // Setup RenderTask for FBO
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     fboRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
-  fboCamera[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  fboCamera[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(fboCamera);
+  scene.Add(fboCamera);
 
   fboRenderTask.SetCameraActor(fboCamera);
   fboRenderTask.SetSourceActor(sourceActor);
@@ -1827,7 +1827,7 @@ int UtcDaliHitTestAlgorithmFboFallbackHitTestActorRecursively(void)
 
   // Perform hit-test at the center of the mapping actor
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
 
   // The expected behavior is:
   // 1. HitTestActorRecursively is called on rootActor.
@@ -1850,8 +1850,8 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   TestApplication application;
   tet_infoline("Testing FBO fallback in a Nested scenario");
 
-  Stage   stage     = Stage::GetCurrent();
-  Vector2 stageSize = stage.GetSize();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Vector2                  stageSize = scene.GetSize();
 
   // Create actors: MappingActor -> Source(Layer) -> Child
   // MappingActor is itself, acting as a mapping actor.
@@ -1862,7 +1862,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   mappingActor.SetProperty(Actor::Property::SIZE, stageSize * 0.8f);
   mappingActor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   mappingActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
-  stage.Add(mappingActor);
+  scene.Add(mappingActor);
 
   Actor sourceLayer = Actor::New();
   sourceLayer.SetProperty(Actor::Property::NAME, "SourceLayer");
@@ -1871,7 +1871,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   sourceLayer.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   sourceLayer.SetProperty(Actor::Property::SENSITIVE, false);
   mappingActor.Add(sourceLayer);
-  // Note: sourceLayer is NOT added to the stage. It's the root of the FBO task.
+  // Note: sourceLayer is NOT added to the scene. It's the root of the FBO task.
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::NAME, "ChildActor");
@@ -1882,13 +1882,13 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   sourceLayer.Add(childActor);
 
   // Setup RenderTask for FBO
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     fboRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor fboCamera                     = Dali::CameraActor::New(stageSize);
-  fboCamera[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  fboCamera[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   fboCamera[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(fboCamera);
+  scene.Add(fboCamera);
 
   fboRenderTask.SetCameraActor(fboCamera);
   fboRenderTask.SetSourceActor(sourceLayer);
@@ -1907,7 +1907,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
 
   // Perform hit-test at the center of the mapping actor
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
 
   // The expected behavior is:
   // 1. HitTestActorRecursively is called.
@@ -1927,7 +1927,7 @@ int UtcDaliHitTestAlgorithmFboFallbackNestedCase(void)
   application.Render();
 
   results = HitTestAlgorithm::Results();
-  HitTest(stage, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
+  HitTest(scene, stageSize * 0.5f, results, &DefaultIsActorTouchableFunction);
 
   DALI_TEST_CHECK(results.actor == childActor);
   tet_printf("Hit actor (child sensitive): %s\n", results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL");

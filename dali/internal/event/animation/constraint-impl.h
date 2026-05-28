@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_ACTIVE_CONSTRAINT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@
 #include <dali/internal/event/animation/property-constraint-ptr.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/property-component-accessor.h>
@@ -34,6 +33,7 @@
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-resetter.h>
+#include <dali/internal/update/manager/update-manager.h>
 #include <memory>
 
 namespace Dali

@@ -67,9 +67,9 @@ class Scene;
  * Multi-Touch events are received through signals emitted by the actor tree.
  *
  * An Actor is a proxy for a Node in the scene graph.
- * When an Actor is added to the Stage, it creates a node and connects it to the scene graph.
+ * When an Actor is added to the Scene, it creates a node and connects it to the scene graph.
  * The scene-graph can be updated in a separate thread, so the connection is done using an asynchronous message.
- * When a tree of Actors is detached from the Stage, a message is sent to destroy the associated nodes.
+ * When a tree of Actors is detached from the Scene, a message is sent to destroy the associated nodes.
  */
 class Actor : public Object, public ActorParent
 {
@@ -109,7 +109,7 @@ public:
   // Containment
 
   /**
-   * Query whether an actor is the root actor, which is owned by the Stage.
+   * Query whether an actor is the root actor, which is owned by the Scene.
    * @return True if the actor is a root actor.
    */
   bool IsRoot() const

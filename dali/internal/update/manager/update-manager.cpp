@@ -225,7 +225,7 @@ struct UpdateManager::Impl
     frameCallbackProcessor(nullptr),
     nodeDirtyFlags(NodePropertyFlags::TRANSFORM), // set to TransformFlag to ensure full update the first time through Update()
     frameCounter(0),
-    renderingBehavior(DevelStage::Rendering::IF_REQUIRED),
+    renderingBehavior(Integration::RenderingBehavior::IF_REQUIRED),
     activatedRendererCount(0),
 #if defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     containerRemovedFlags(ContainerRemovedFlagBits::NOTHING),
@@ -385,10 +385,10 @@ struct UpdateManager::Impl
 
   OwnerPointer<FrameCallbackProcessor> frameCallbackProcessor; ///< Owned FrameCallbackProcessor, only created if required.
 
-  std::atomic<std::size_t> renderInstructionCapacity{0u};
-  NodePropertyFlags        nodeDirtyFlags;    ///< cumulative node dirty flags from previous frame
-  uint32_t                 frameCounter;      ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
-  DevelStage::Rendering    renderingBehavior; ///< Set via DevelStage::SetRenderingBehavior
+  std::atomic<std::size_t>       renderInstructionCapacity{0u};
+  NodePropertyFlags              nodeDirtyFlags;    ///< cumulative node dirty flags from previous frame
+  uint32_t                       frameCounter;      ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
+  Integration::RenderingBehavior renderingBehavior; ///< Set via Integration::Core::SetRenderingBehavior
 
   uint32_t activatedRendererCount; ///< The number of valid renderers. (Deactivated only for VisualRenderer case now.)
                                    ///< At Renderer container, [0 ~ activatedRendererCount) are activated, and [activatedRendererCount ~ renderers.Count()) deactivated.
@@ -1575,7 +1575,7 @@ uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
   // No need to check for RenderManager as there is always a render after update and if that
   // render needs another update it will tell the adaptor to call update again
 
-  if(mImpl->renderingBehavior == DevelStage::Rendering::CONTINUOUSLY)
+  if(mImpl->renderingBehavior == Integration::RenderingBehavior::CONTINUOUSLY)
   {
     keepUpdatingRequest |= KeepUpdating::STAGE_KEEP_RENDERING;
   }
@@ -1606,7 +1606,7 @@ void UpdateManager::KeepRendering(float durationSeconds)
   }
 }
 
-void UpdateManager::SetRenderingBehavior(DevelStage::Rendering renderingBehavior)
+void UpdateManager::SetRenderingBehavior(const Integration::RenderingBehavior& renderingBehavior)
 {
   mImpl->renderingBehavior = renderingBehavior;
 }

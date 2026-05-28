@@ -38,7 +38,7 @@ class Layer;
 /**
  * An ordered list of layers.
  * Layers are not owned by the LayerList; each layer is responsible for registering & unregistering.
- * This is used by the Stage, to keep track of layer depths.
+ * This is used by the Scene, to keep track of layer depths.
  */
 class LayerList
 {

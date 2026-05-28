@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 
@@ -29,10 +28,10 @@ namespace Dali
 {
 namespace HitTestAlgorithm
 {
-bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType)
+bool HitTest(Integration::Scene scene, const Vector2& screenCoordinates, Results& results, HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType)
 {
-  Internal::Stage& stageImpl = GetImplementation(stage);
-  return Internal::HitTestAlgorithm::HitTest(stageImpl.GetSize(), stageImpl.GetRenderTaskList(), stageImpl.GetLayerList(), screenCoordinates, results, func, propagationType);
+  Internal::Scene& sceneImpl = GetImplementation(scene);
+  return Internal::HitTestAlgorithm::HitTest(sceneImpl.GetSize(), sceneImpl.GetRenderTaskList(), sceneImpl.GetLayerList(), screenCoordinates, results, func, propagationType);
 }
 
 bool BuildPickingRay(RenderTask renderTask, const Vector2& screenCoordinates, Vector3& origin, Vector3& direction)

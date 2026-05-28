@@ -22,8 +22,6 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 
-#include <dali/devel-api/common/stage-devel.h>
-
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-key-type.h>
 #include <dali/internal/common/type-abstraction-enums.h>
@@ -576,14 +574,14 @@ public:
   void PostRender();
 
   /**
-   * @copydoc Dali::Stage::KeepRendering()
+   * @copydoc Dali::Integration::Core::KeepRendering()
    */
   void KeepRendering(float durationSeconds);
 
   /**
-   * @copydoc Dali::DevelStage::SetRenderingBehavior()
+   * @copydoc Dali::Integration::Core::SetRenderingBehavior()
    */
-  void SetRenderingBehavior(DevelStage::Rendering renderingBehavior);
+  void SetRenderingBehavior(const Integration::RenderingBehavior& renderingBehavior);
 
   /**
    * Request to render the current frame
@@ -1040,9 +1038,9 @@ inline void KeepRenderingMessage(UpdateManager& manager, float durationSeconds)
   new(slot) LocalType(&manager, &UpdateManager::KeepRendering, durationSeconds);
 }
 
-inline void SetRenderingBehaviorMessage(UpdateManager& manager, DevelStage::Rendering renderingBehavior)
+inline void SetRenderingBehaviorMessage(UpdateManager& manager, Integration::RenderingBehavior renderingBehavior)
 {
-  using LocalType = MessageValue1<UpdateManager, DevelStage::Rendering>;
+  using LocalType = MessageValue1<UpdateManager, Integration::RenderingBehavior>;
 
   // Reserve some memory inside the message queue
   uint32_t* slot = manager.ReserveMessageSlot(sizeof(LocalType));

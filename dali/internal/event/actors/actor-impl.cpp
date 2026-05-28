@@ -1414,7 +1414,7 @@ void Actor::ConnectToScene(uint32_t parentDepth, uint32_t layer3DParentsCount, b
 }
 
 /**
- * This method is called when the Actor is connected to the Stage.
+ * This method is called when the Actor is connected to the Scene.
  * The parent must have added its Node to the scene-graph.
  * The child must connect its Node to the parent's Node.
  * This is recursive; the child calls ConnectToScene() for its children.

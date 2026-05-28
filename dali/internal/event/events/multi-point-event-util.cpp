@@ -22,7 +22,7 @@
 
 // CLASS HEADER
 #include <dali/integration-api/stream-operators.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/multi-point-event-util.h>
 
 namespace Dali
@@ -96,7 +96,10 @@ void PrintHierarchy(Debug::Filter* logFilter)
 {
   if(logFilter && logFilter->IsEnabledFor(HIERARCHY_DEBUG_LOG_LEVEL))
   {
-    PrintChildren(logFilter, Dali::Stage().GetCurrent().GetRootLayer(), 0);
+    for(const auto& scene : ThreadLocalStorage::Get().GetScenes())
+    {
+      PrintChildren(logFilter, scene->GetRootLayer(), 0);
+    }
   }
 }
 

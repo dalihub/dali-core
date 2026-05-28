@@ -299,9 +299,14 @@ public: // Implementation of EventThreadServices
    */
   uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene) override;
 
-private:
   using SceneContainer = std::vector<ScenePtr>;
 
+  /**
+   * @copydoc Dali::Internal::ThreadLocalStorage::GetScenes()
+   */
+  const SceneContainer& GetScenes() const;
+
+private:
   /**
    * Run each registered processor
    */

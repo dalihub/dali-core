@@ -2,7 +2,7 @@
 #define DALI_RENDER_TASK_LIST_H
 
 /*
- * Copyright (c) 2020 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ public:
   /**
    * @brief Creates an empty RenderTaskList handle.
    *
-   * This can be initialised with Stage::GetRenderTaskList().
+   * This can be initialised with Scene::GetRenderTaskList().
    * @SINCE_1_0.0
    */
   RenderTaskList();

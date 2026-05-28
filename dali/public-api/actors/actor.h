@@ -75,9 +75,9 @@ struct Vector4;
  *
  * <i>Hit Test Algorithm:</i>
  *
- * - Stage
+ * - Scene
  *   - Gets the first down and the last up touch events to the screen, regardless of actor touch event consumption.
- *   - Stage's root layer can be used to catch unconsumed touch events.
+ *   - Scene's root layer can be used to catch unconsumed touch events.
  *
  * - RenderTasks
  *   - Hit testing is dependent on the camera used, which is specific to each RenderTask.
@@ -739,9 +739,9 @@ public:
 
   // Typedefs
 
-  using TouchEventSignalType                 = Signal<bool(Actor, TouchEvent)>;     ///< Touch signal type @SINCE_1_1.37
-  using HoverSignalType                      = Signal<bool(Actor, HoverEvent)>;     ///< Hover signal type @SINCE_1_0.0
-  using WheelEventSignalType                 = Signal<bool(Actor, WheelEvent)>;     ///< Wheel signal type @SINCE_1_0.0
+  using TouchEventSignalType                 = Signal<bool(Actor, TouchEvent)>;            ///< Touch signal type @SINCE_1_1.37
+  using HoverSignalType                      = Signal<bool(Actor, HoverEvent)>;            ///< Hover signal type @SINCE_1_0.0
+  using WheelEventSignalType                 = Signal<bool(Actor, WheelEvent)>;            ///< Wheel signal type @SINCE_1_0.0
   using OnSceneSignalType                    = Signal<void(Actor)>;                        ///< Scene connection signal type @SINCE_1_9.24
   using OffSceneSignalType                   = Signal<void(Actor)>;                        ///< Scene disconnection signal type @SINCE_1_9.24
   using OnRelayoutSignalType                 = Signal<void(Actor)>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
@@ -826,7 +826,7 @@ public:
    * @brief Gets the layer in which the actor is present.
    *
    * @SINCE_1_0.0
-   * @return The layer, which will be uninitialized if the actor is off-stage
+   * @return The layer, which will be uninitialized if the actor is off-scene
    * @pre The Actor has been initialized.
    */
   Layer GetLayer();
@@ -1263,7 +1263,7 @@ public: // Signals
    * @return The signal to connect to
    * @note The root Actor is provided automatically by the Scene, and is always considered to be connected.
    *
-   * @note When the parent of a set of actors is connected to the stage, then all of the children
+   * @note When the parent of a set of actors is connected to the scene, then all of the children
    * will received this callback.
    * For the following actor tree, the callback order will be A, B, D, E, C, and finally F.
    *

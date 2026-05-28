@@ -167,7 +167,7 @@ int UtcDaliCustomActorOnSceneConnectionDisconnection(void)
   Test::TestCustomActor custom = Test::TestCustomActor::New();
   DALI_TEST_EQUALS(0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION);
 
-  // add the custom actor to stage
+  // add the custom actor to scene
   application.GetScene().Add(custom);
 
   DALI_TEST_EQUALS(1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION);
@@ -227,7 +227,7 @@ int UtcDaliCustomActorOnSceneConnectionOrder(void)
   actorF.SetProperty(Actor::Property::NAME, "ActorF");
   actorC.Add(actorF);
 
-  // add the custom actor to stage
+  // add the custom actor to scene
   application.GetScene().Add(actorA);
 
   DALI_TEST_EQUALS(4, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION);
@@ -296,7 +296,7 @@ int UtcDaliCustomActorOnSceneDisconnectionOrder(void)
   TestApplication application;
   tet_infoline("Testing Dali::CustomActor::OnSceneDisconnection() order");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   /* Build tree of actors:
    *
@@ -311,7 +311,7 @@ int UtcDaliCustomActorOnSceneDisconnectionOrder(void)
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
   actorB.SetProperty(Actor::Property::NAME, "ActorB");
@@ -348,7 +348,7 @@ int UtcDaliCustomActorOnSceneDisconnectionOrder(void)
   actorF.ResetCallStack();
   MasterCallStack.clear();
 
-  stage.Remove(actorA);
+  scene.Remove(actorA);
 
   DALI_TEST_EQUALS(1, (int)(actorA.GetMethodsCalled().size()), TEST_LOCATION);
   DALI_TEST_EQUALS("OnSceneDisconnection", actorA.GetMethodsCalled()[0], TEST_LOCATION);
@@ -392,7 +392,7 @@ int UtcDaliCustomActorAddDuringOnSceneConnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Add behaviour during Dali::CustomActor::OnSceneConnection() callback");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -405,7 +405,7 @@ int UtcDaliCustomActorAddDuringOnSceneConnection(void)
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant1(actorB);
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   // Check callback sequence
 
@@ -434,7 +434,7 @@ int UtcDaliCustomActorAddDuringOnSceneConnection(void)
 
   // Check everything is ok after Actors are removed
 
-  stage.Remove(actorA);
+  scene.Remove(actorA);
   application.SendNotification();
   application.Render();
   application.Render();
@@ -446,7 +446,7 @@ int UtcDaliCustomActorRemoveDuringOnSceneConnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Remove behaviour during Dali::CustomActor::OnSceneConnection() callback");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -465,7 +465,7 @@ int UtcDaliCustomActorRemoveDuringOnSceneConnection(void)
   actorC.SetProperty(Actor::Property::NAME, "ActorC");
   actorA.Add(actorC);
 
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   // Check callback sequence
 
@@ -502,7 +502,7 @@ int UtcDaliCustomActorRemoveDuringOnSceneConnection(void)
 
   // Check everything is ok after last actor is removed
 
-  stage.Remove(actorA);
+  scene.Remove(actorA);
   application.SendNotification();
   application.Render();
   application.Render();
@@ -514,7 +514,7 @@ int UtcDaliCustomActorAddDuringOnSceneDisconnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Add behaviour during Dali::CustomActor::OnSceneDisonnection() callback");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   /* The actorA is a special variant which adds a child to itself during OnSceneDisconnection()
    * The actorB is provided as the child
@@ -525,7 +525,7 @@ int UtcDaliCustomActorAddDuringOnSceneDisconnection(void)
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant3(actorB);
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   // Excercise the message passing to Update thread
 
@@ -538,7 +538,7 @@ int UtcDaliCustomActorAddDuringOnSceneDisconnection(void)
   actorB.ResetCallStack();
   MasterCallStack.clear();
 
-  stage.Remove(actorA);
+  scene.Remove(actorA);
 
   // Check callback sequence
 
@@ -567,7 +567,7 @@ int UtcDaliCustomActorRemoveDuringOnSceneDisconnection(void)
   TestApplication application;
   tet_infoline("Testing Actor::Remove behaviour during Dali::CustomActor::OnSceneDisconnection() callback");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   /* The actorA is a special variant which removes its children during OnSceneDisconnection()
    * The actorB is provided as the child
@@ -575,7 +575,7 @@ int UtcDaliCustomActorRemoveDuringOnSceneDisconnection(void)
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant4();
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
   actorB.SetProperty(Actor::Property::NAME, "ActorB");
@@ -592,7 +592,7 @@ int UtcDaliCustomActorRemoveDuringOnSceneDisconnection(void)
   actorB.ResetCallStack();
   MasterCallStack.clear();
 
-  stage.Remove(actorA);
+  scene.Remove(actorA);
 
   // Check callback sequence
 
@@ -620,7 +620,7 @@ int UtcDaliCustomActorRemoveDuringOnSceneDisconnection(void)
 int UtcDaliCustomActorRemoveParentDuringOnSceneConnection(void)
 {
   TestApplication application;
-  tet_infoline("Weird test where child removes its own parent from Stage during Dali::CustomActor::OnSceneConnection() callback");
+  tet_infoline("Weird test where child removes its own parent from Scene during Dali::CustomActor::OnSceneConnection() callback");
 
   Dali::Integration::Scene scene = application.GetScene();
 
@@ -628,7 +628,7 @@ int UtcDaliCustomActorRemoveParentDuringOnSceneConnection(void)
 
   /* The actorA is the parent of actorB
    * The actorB is a special variant which removes its own parent during OnSceneConnection()
-   * The child actor is interrupting the parent's connection to stage, therefore the parent should not get an OnSceneDisconnection()
+   * The child actor is interrupting the parent's connection to scene, therefore the parent should not get an OnSceneDisconnection()
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
@@ -672,7 +672,7 @@ int UtcDaliCustomActorRemoveParentDuringOnSceneConnection(void)
 int UtcDaliCustomActorAddParentDuringOnSceneDisconnection(void)
 {
   TestApplication application;
-  tet_infoline("Weird test where child adds its own parent to Stage during Dali::CustomActor::OnSceneDisconnection() callback");
+  tet_infoline("Weird test where child adds its own parent to Scene during Dali::CustomActor::OnSceneDisconnection() callback");
 
   Dali::Integration::Scene scene = application.GetScene();
 
@@ -752,7 +752,7 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
   TestApplication application;
   tet_infoline("Testing Actor:Add (reparenting) behaviour during Dali::CustomActor::OnChildAdd() callback");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -761,7 +761,7 @@ int UtcDaliCustomActorReparentDuringOnChildAdd(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant7("ActorA");
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
   actorB.SetProperty(Actor::Property::NAME, "ActorB");
@@ -839,7 +839,7 @@ int UtcDaliCustomActorRemoveDuringOnChildRemove(void)
   TestApplication application;
   tet_infoline("Testing Actor:Remove behaviour during OnChildRemove() callback triggered when reparenting");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   MasterCallStack.clear();
 
@@ -850,11 +850,11 @@ int UtcDaliCustomActorRemoveDuringOnChildRemove(void)
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
   actorB.SetProperty(Actor::Property::NAME, "ActorB");
-  stage.Add(actorB);
+  scene.Add(actorB);
 
   Test::TestCustomActor actorA = Test::TestCustomActor::NewVariant8(actorB);
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   Actor childActor = Actor::New();
   childActor.SetProperty(Actor::Property::NAME, "Child");
@@ -1293,7 +1293,7 @@ int UtcDaliCustomActorOnConnectionDepth(void)
   TestApplication application;
   tet_infoline("Testing Dali::CustomActor::OnSceneConnection() hierarchy depth");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   /* Build tree of actors:
    *
@@ -1309,7 +1309,7 @@ int UtcDaliCustomActorOnConnectionDepth(void)
    */
 
   Test::TestCustomActor actorA = Test::TestCustomActor::New();
-  stage.Add(actorA);
+  scene.Add(actorA);
 
   Test::TestCustomActor actorB = Test::TestCustomActor::New();
   actorA.Add(actorB);

@@ -2,7 +2,7 @@
 #define __DALI_HIT_TEST_ALGORITHM_H__
 
 /*
- * Copyright (c) 2023 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
  *
  */
 
-#include <dali/devel-api/common/stage.h>
 #include <dali/integration-api/scene.h>
 #include <dali/public-api/actors/actor.h>
 
@@ -135,14 +134,14 @@ using HitTestFunction = bool (*)(Actor, TraverseType);
  * Typically, if an actor has a zero size or its world color is fully transparent, it should not be
  * hittable; and if an actor's visibility flag is unset, its children should not be hittable either.
  *
- * @param[in] stage The stage.
+ * @param[in] scene The scene.
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test, only modified if something is hit
  * @param[in] func The function to use in the hit-test algorithm.
  * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
  * @return true if something was hit
  */
-DALI_CORE_API bool HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
+DALI_CORE_API bool HitTest(Integration::Scene scene, const Vector2& screenCoordinates, Results& results, HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
 
 /**
  * @brief Given screen coordinates, this method returns the camera origin in world coordinates and the direction of the picking ray in world-space.

@@ -955,7 +955,7 @@ void Core::SetRenderingBehavior(Integration::RenderingBehavior renderingBehavior
 {
   if(mRenderingBehavior != renderingBehavior)
   {
-    SetRenderingBehaviorMessage(*mUpdateManager, static_cast<DevelStage::Rendering>(renderingBehavior));
+    SetRenderingBehaviorMessage(*mUpdateManager, renderingBehavior);
     mRenderingBehavior = renderingBehavior;
   }
 }
@@ -988,6 +988,11 @@ AnimationPlaylist& Core::GetAnimationPlaylist() const
 Integration::GraphicsConfig& Core::GetGraphicsConfig() const
 {
   return (*mRenderManager).GetGraphicsConfig();
+}
+
+const Core::SceneContainer& Core::GetScenes() const
+{
+  return mScenes;
 }
 
 void Core::AddScene(Scene* scene)

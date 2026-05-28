@@ -16,7 +16,6 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -764,7 +763,7 @@ int UtcDaliSceneGetRenderTaskList(void)
   DALI_TEST_EQUALS(tasks.GetTaskCount(), 1u, TEST_LOCATION);
 
   // RenderTaskList has it's own UTC tests.
-  // But we can confirm that GetRenderTaskList in Stage retrieves the same RenderTaskList each time.
+  // But we can confirm that GetRenderTaskList in Scene retrieves the same RenderTaskList each time.
   RenderTask newTask = scene.GetRenderTaskList().CreateTask();
 
   DALI_TEST_EQUALS(scene.GetRenderTaskList().GetTask(1), newTask, TEST_LOCATION);
@@ -1355,16 +1354,11 @@ int UtcDaliSceneSurfaceResizedDefaultScene(void)
   auto defaultScene = application.GetScene();
   DALI_TEST_CHECK(defaultScene);
 
-  // Ensure stage size matches the scene size
-  auto stage = Stage::GetCurrent();
-  DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
-
   // Resize the scene
   Vector2 newSize(1000.0f, 2000.0f);
-  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  DALI_TEST_CHECK(defaultScene.GetSize() != newSize);
   defaultScene.SurfaceResized(newSize.width, newSize.height);
 
-  DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
   END_TEST;
@@ -1400,10 +1394,6 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   // consume the resize flag by first rendering
   defaultScene.GetSurfaceRectChangedCount();
 
-  // Ensure stage size matches the scene size
-  auto stage = Stage::GetCurrent();
-  DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
-
   BoundsInteger surfaceRect = defaultScene.GetCurrentSurfaceRect();
 
   uint32_t surfaceResized;
@@ -1414,10 +1404,9 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   // Resize the scene
   Vector2     newSize(1000.0f, 2000.0f);
   std::string viewportParams("0, 0, 1000, 2000"); // to match newSize
-  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  DALI_TEST_CHECK(defaultScene.GetSize() != newSize);
   defaultScene.SurfaceResized(newSize.width, newSize.height);
 
-  DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
   // Check current surface rect
@@ -1454,10 +1443,10 @@ int UtcDaliSceneSurfaceResizedDefaultSceneViewport(void)
   for(uint32_t i = 0u; i < resizeCount; ++i)
   {
     Vector2 newSize(1000.0f, 2100.0f + i);
-    DALI_TEST_CHECK(stage.GetSize() != newSize);
+    DALI_TEST_CHECK(defaultScene.GetSize() != newSize);
     defaultScene.SurfaceResized(newSize.width, newSize.height);
 
-    DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
+    DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
     DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
     // Check current surface rect
@@ -1536,17 +1525,12 @@ int UtcDaliSceneSurfaceResizedMultipleRenderTasks(void)
   auto defaultScene = application.GetScene();
   DALI_TEST_CHECK(defaultScene);
 
-  // Ensure stage size matches the scene size
-  auto stage = Stage::GetCurrent();
-  DALI_TEST_EQUALS(stage.GetSize(), defaultScene.GetSize(), TEST_LOCATION);
-
   // Resize the scene
   Vector2     newSize(1000.0f, 2000.0f);
   std::string viewportParams("0, 0, 1000, 2000"); // to match newSize
-  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  DALI_TEST_CHECK(defaultScene.GetSize() != newSize);
   defaultScene.SurfaceResized(newSize.width, newSize.height);
 
-  DALI_TEST_EQUALS(stage.GetSize(), newSize, TEST_LOCATION);
   DALI_TEST_EQUALS(defaultScene.GetSize(), newSize, TEST_LOCATION);
 
   // Render after resizing surface
@@ -1580,19 +1564,19 @@ int UtcDaliSceneSurfaceResizedAdditionalScene(void)
 
   auto scene = Dali::Integration::Scene::New(rtInfo, Size(originalSurfaceSize.width, originalSurfaceSize.height));
 
-  // Ensure stage size does NOT match the surface size
-  auto       stage     = Stage::GetCurrent();
-  const auto stageSize = stage.GetSize();
-  DALI_TEST_CHECK(stageSize != originalSurfaceSize);
+  // Ensure default scene size does NOT match the surface size
+  auto       defaultScene = application.GetScene();
+  const auto defaultSize  = defaultScene.GetSize();
+  DALI_TEST_CHECK(defaultSize != originalSurfaceSize);
   DALI_TEST_EQUALS(originalSurfaceSize, scene.GetSize(), TEST_LOCATION);
 
   // Resize the surface and inform the scene accordingly
   Vector2 newSize(1000.0f, 2000.0f);
-  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  DALI_TEST_CHECK(defaultScene.GetSize() != newSize);
   scene.SurfaceResized(newSize.width, newSize.height);
 
-  // Ensure the stage hasn't been resized
-  DALI_TEST_EQUALS(stage.GetSize(), stageSize, TEST_LOCATION);
+  // Ensure the default scene hasn't been resized
+  DALI_TEST_EQUALS(defaultScene.GetSize(), defaultSize, TEST_LOCATION);
   DALI_TEST_EQUALS(scene.GetSize(), newSize, TEST_LOCATION);
 
   delete surface;
@@ -3202,11 +3186,8 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
   RenderTask defaultTask = tasks.GetTask(0u);
   DALI_TEST_EQUALS(scene.GetRootLayer(), defaultTask.GetSourceActor(), TEST_LOCATION);
 
-  // Ensure stage size matches the scene size
-  auto     stage     = Stage::GetCurrent();
-  Vector2  sceneSize = stage.GetSize();
+  Vector2  sceneSize = scene.GetSize();
   Viewport sceneViewport(0, 0, sceneSize.x, sceneSize.y);
-  DALI_TEST_EQUALS(stage.GetSize(), scene.GetSize(), TEST_LOCATION);
   Viewport defaultViewport = defaultTask.GetViewport();
   DALI_TEST_EQUALS(defaultViewport, sceneViewport, TEST_LOCATION);
 
@@ -3219,7 +3200,7 @@ int UtcDaliSceneSurfaceResizedWithOverlayLayer(void)
 
   // Resize the scene
   Vector2 newSize(1000.0f, 2000.0f);
-  DALI_TEST_CHECK(stage.GetSize() != newSize);
+  DALI_TEST_CHECK(scene.GetSize() != newSize);
   scene.SurfaceResized(newSize.width, newSize.height);
   Viewport newViewport(0, 0, newSize.x, newSize.y);
   DALI_TEST_EQUALS(newViewport, defaultTask.GetViewport(), TEST_LOCATION);

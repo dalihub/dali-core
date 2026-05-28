@@ -213,7 +213,7 @@ void Stage::SetRenderingBehavior(DevelStage::Rendering renderingBehavior)
   if(mRenderingBehavior != renderingBehavior)
   {
     // Send message to change the rendering behavior
-    SetRenderingBehaviorMessage(mUpdateManager, renderingBehavior);
+    SetRenderingBehaviorMessage(mUpdateManager, static_cast<Integration::RenderingBehavior>(renderingBehavior));
 
     mRenderingBehavior = renderingBehavior;
   }

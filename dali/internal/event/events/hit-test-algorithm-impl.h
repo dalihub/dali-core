@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_HIT_TEST_ALGORITHM_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ private:
  * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
  * @return true if something was hit
  *
- * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
+ * @see HitTest(Integration::Scene, const Vector2&, Results&, HitTestInterface&)
  */
 bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
 
@@ -196,7 +196,7 @@ bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList
  * @param[in] propagationType If Integration::Scene::TouchPropagationType::GEOMETRY, hittest works in a geometry way.
  * @return true if something was hit
  *
- * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
+ * @see HitTest(Integration::Scene, const Vector2&, Results&, HitTestInterface&)
  */
 bool HitTest(const Vector2& sceneSize, RenderTaskList& renderTaskList, LayerList& layerList, const Vector2& screenCoordinates, Results& results, const Actor* ownActor = nullptr, const Integration::Scene::TouchPropagationType propagationType = Integration::Scene::TouchPropagationType::PARENT);
 
