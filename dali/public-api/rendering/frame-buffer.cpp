@@ -18,13 +18,11 @@
 // CLASS HEADER
 #include <dali/public-api/rendering/frame-buffer.h>
 
-// EXTERNAL INCLUDES
-#include <type_traits>
-
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>                      // DALI_LOG_WARNING_NOFN
 #include <dali/internal/event/rendering/frame-buffer-impl.h> // Dali::Internal::FrameBuffer
 #include <dali/internal/event/rendering/texture-impl.h>      // Dali::Internal::Texture
+#include <dali/public-api/common/type-traits.h>
 
 namespace Dali
 {
@@ -34,7 +32,7 @@ namespace
 /// in cpp as only used in this file
 bool operator&(FrameBuffer::Attachment::Mask lhs, FrameBuffer::Attachment::Mask rhs)
 {
-  using UnderlyingType = typename std::underlying_type<FrameBuffer::Attachment::Mask>::type;
+  using UnderlyingType = typename GetUnderlyingType<FrameBuffer::Attachment::Mask>::type;
   return static_cast<bool>(static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs));
 }
 

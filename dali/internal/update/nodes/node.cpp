@@ -25,6 +25,7 @@
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 
 #include <dali/internal/update/common/resetter-manager.h> ///< For AddInitializeResetter
 
@@ -336,7 +337,7 @@ NodePropertyFlags Node::GetInheritedDirtyFlags(NodePropertyFlags parentFlags) co
 {
   // Size is not inherited. VisibleFlag is inherited
   static const NodePropertyFlags InheritedDirtyFlags = NodePropertyFlags::TRANSFORM | NodePropertyFlags::VISIBLE | NodePropertyFlags::COLOR;
-  using UnderlyingType                               = typename std::underlying_type<NodePropertyFlags>::type;
+  using UnderlyingType                               = typename GetUnderlyingType<NodePropertyFlags>::type;
 
   return static_cast<NodePropertyFlags>(static_cast<UnderlyingType>(mDirtyFlags) |
                                         (static_cast<UnderlyingType>(parentFlags) & static_cast<UnderlyingType>(InheritedDirtyFlags)));

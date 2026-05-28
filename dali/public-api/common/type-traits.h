@@ -59,6 +59,28 @@ struct IsEnum
 };
 
 /**
+ * @brief Type trait to get the underlying type of an enumeration.
+ *
+ * Equivalent to std::underlying_type. Uses the __underlying_type compiler
+ * intrinsic to obtain the underlying integer type of an enumeration.
+ *
+ * @tparam Type The enumeration type
+ *
+ * @SINCE_2_5.24
+ *
+ * Example usage:
+ * @code
+ * enum class MyEnum : int { A, B, C };
+ * using Underlying = GetUnderlyingType<MyEnum>::type; // int
+ * @endcode
+ */
+template<typename Type>
+struct GetUnderlyingType
+{
+  using type = __underlying_type(Type);
+};
+
+/**
  * @brief Basic type traits that every type has by default.
  *
  * This allows specializations to not have to repeat all flags.
