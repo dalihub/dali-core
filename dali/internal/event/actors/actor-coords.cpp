@@ -20,6 +20,7 @@
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali::Internal
 {
@@ -182,8 +183,8 @@ void CalculateScreenExtents(Vector2& position, Vector2& size, const SceneSizeTyp
    * Vector4 pos2 = worldTransformMatrix * Vector4(-halfSize.x, halfSize.y, 0.0f, 1.0f);
    * Vector4 pos3 = worldTransformMatrix * Vector4(halfSize.x, halfSize.y, 0.0f, 1.0f);
    *
-   * Vector2 minPos = Vector2(std::min(pos0.x, std::min(pos1.x, std::min(pos2.x, pos3.x))), std::min(pos0.y, std::min(pos1.y, std::min(pos2.y, pos3.y))));
-   * Vector2 maxPos = Vector2(std::max(pos0.x, std::max(pos1.x, std::max(pos2.x, pos3.x))), std::max(pos0.y, std::max(pos1.y, std::max(pos2.y, pos3.y))));
+   * Vector2 minPos = Vector2(Min(pos0.x, Min(pos1.x, Min(pos2.x, pos3.x))), Min(pos0.y, Min(pos1.y, Min(pos2.y, pos3.y))));
+   * Vector2 maxPos = Vector2(Max(pos0.x, Max(pos1.x, Max(pos2.x, pos3.x))), Max(pos0.y, Max(pos1.y, Max(pos2.y, pos3.y))));
    * @endcode
    */
 
@@ -199,8 +200,8 @@ void CalculateScreenExtents(Vector2& position, Vector2& size, const SceneSizeTyp
   const Matrix worldBoundingBox = worldTransformMatrix * boundingBox;
   const float* retPtr           = worldBoundingBox.AsFloat();
 
-  const Vector2 minPos = Vector2(std::min(retPtr[0], std::min(retPtr[4], std::min(retPtr[8], retPtr[12]))), std::min(retPtr[1], std::min(retPtr[5], std::min(retPtr[9], retPtr[13]))));
-  const Vector2 maxPos = Vector2(std::max(retPtr[0], std::max(retPtr[4], std::max(retPtr[8], retPtr[12]))), std::max(retPtr[1], std::max(retPtr[5], std::max(retPtr[9], retPtr[13]))));
+  const Vector2 minPos = Vector2(Min(retPtr[0], Min(retPtr[4], Min(retPtr[8], retPtr[12]))), Min(retPtr[1], Min(retPtr[5], Min(retPtr[9], retPtr[13]))));
+  const Vector2 maxPos = Vector2(Max(retPtr[0], Max(retPtr[4], Max(retPtr[8], retPtr[12]))), Max(retPtr[1], Max(retPtr[5], Max(retPtr[9], retPtr[13]))));
 
   const Vector2 halfSceneSize(sceneSize.width * 0.5f, sceneSize.height * 0.5f);
   const Vector2 cameraP2  = cameraPosition.GetVectorXY();
@@ -606,10 +607,10 @@ bool ConvertLocalToScreenExtentRenderTask(
           success = false;
           break;
         }
-        minScreenX = std::min(minScreenX, screenX);
-        maxScreenX = std::max(maxScreenX, screenX);
-        minScreenY = std::min(minScreenY, screenY);
-        maxScreenY = std::max(maxScreenY, screenY);
+        minScreenX = Min(minScreenX, screenX);
+        maxScreenX = Max(maxScreenX, screenX);
+        minScreenY = Min(minScreenY, screenY);
+        maxScreenY = Max(maxScreenY, screenY);
       }
       if(success)
       {

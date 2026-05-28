@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/nodes/node-messages.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/public-api/common/dali-utility.h>
 
 #if defined(DEBUG_ENABLED)
 extern Debug::Filter* gLogRelayoutFilter;
@@ -497,7 +498,7 @@ float ActorSizer::NegotiateFromChildren(Dimension::Type dimension)
       // Calculate the min and max points that the children range across
       float childPosition = GetDimensionValue(child->GetTargetPosition(), dimension);
       float dimensionSize = child->mSizer.GetRelayoutSize(dimension);
-      maxDimensionPoint   = std::max(maxDimensionPoint, childPosition + dimensionSize);
+      maxDimensionPoint   = Max(maxDimensionPoint, childPosition + dimensionSize);
     }
   }
 
@@ -777,7 +778,7 @@ float ActorSizer::ClampDimension(float size, Dimension::Type dimension) const
   const float minSize = GetMinimumSize(dimension);
   const float maxSize = GetMaximumSize(dimension);
 
-  return std::max(minSize, std::min(size, maxSize));
+  return Max(minSize, Min(size, maxSize));
 }
 
 void ActorSizer::NegotiateDimension(Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack)

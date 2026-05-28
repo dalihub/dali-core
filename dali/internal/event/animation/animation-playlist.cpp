@@ -24,6 +24,7 @@
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
+#include <dali/public-api/common/dali-utility.h>
 
 #ifdef TRACE_ENABLED
 #include <chrono>
@@ -235,7 +236,7 @@ void AnimationPlaylist::NotifyCompleted(CompleteNotificationInterface::Parameter
     {
       oss << ",";
       std::sort(animationFinishedTimeChecker.rbegin(), animationFinishedTimeChecker.rend());
-      auto topCount = std::min(5u, static_cast<uint32_t>(animationFinishedTimeChecker.size()));
+      auto topCount = Min(5u, static_cast<uint32_t>(animationFinishedTimeChecker.size()));
 
       oss << "top" << topCount;
       for(auto i = 0u; i < topCount; ++i)

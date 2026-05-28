@@ -19,7 +19,6 @@
 #include <dali/internal/render/common/render-manager.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm>
 #include <memory>
 
 // INTERNAL INCLUDES
@@ -51,6 +50,8 @@
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
 #include <dali/internal/render/renderers/uniform-buffer.h>
 #include <dali/internal/render/shaders/program-controller.h>
+
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali
 {
@@ -271,7 +272,7 @@ struct RenderManager::Impl
 
         // Double up threshold
         programCacheCleanRequiredThreshold <<= 1;
-        programCacheCleanRequiredThreshold = std::max(programCacheCleanRequiredThreshold, programController.GetCachedProgramCount());
+        programCacheCleanRequiredThreshold = Max(programCacheCleanRequiredThreshold, programController.GetCachedProgramCount());
 
         if(programCacheCleanRequiredThreshold > MAXIMUM_PROGRAM_CACHE_CLEAN_THRESHOLD)
         {
@@ -979,8 +980,8 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       {
         const auto& renderList = instruction.GetRenderList(j);
         bool        autoDepthTestMode(depthBufferAvailable &&
-                                      !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
-                                      renderList->HasColorRenderItems());
+                               !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
+                               renderList->HasColorRenderItems());
         for(auto k = 0u; k < renderList->Count(); ++k)
         {
           auto& item        = renderList->GetItem(k);

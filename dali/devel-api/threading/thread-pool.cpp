@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
  *
  */
 
-#include "thread-pool.h"
+#include <dali/public-api/common/dali-utility.h>
+
 #include <cmath>
+#include "thread-pool.h"
 
 namespace Dali
 {
@@ -90,7 +92,7 @@ void WorkerThread::WaitAndExecute()
       std::unique_lock<std::mutex> lock{mTaskQueueMutex};
 
       mConditionVariable.wait(lock, [this]() -> bool
-      { return !mTaskQueue.empty() || mTerminating; });
+                              { return !mTaskQueue.empty() || mTerminating; });
 
       if(mTerminating)
       {
@@ -153,7 +155,7 @@ void WorkerThread::Wait()
 {
   std::unique_lock<std::mutex> lock{mTaskQueueMutex};
   mConditionVariable.wait(lock, [this]() -> bool
-  { return mTaskQueue.empty(); });
+                          { return mTaskQueue.empty(); });
 }
 
 // ThreadPool -----------------------------------------------------------------------------------------------
@@ -214,7 +216,7 @@ SharedFuture ThreadPool::SubmitTask(uint32_t workerIndex, const Task& task)
 {
   auto future = std::shared_ptr<Future<void>>(new Future<void>);
   mImpl->mWorkers[workerIndex]->AddTask([task, future](uint32_t index)
-  {
+                                        {
     task(index);
 
     future->mPromise.set_value(); });
@@ -228,14 +230,14 @@ SharedFuture ThreadPool::SubmitTasks(const std::vector<Task>& tasks)
 
   mImpl->mWorkers[mImpl->mWorkerIndex++ % static_cast<uint32_t>(mImpl->mWorkers.size())]->AddTask(
     [future, tasks](uint32_t index)
-  {
-    for(auto& task : tasks)
     {
-      task(index);
-    }
+      for(auto& task : tasks)
+      {
+        task(index);
+      }
 
-    future->mPromise.set_value();
-  });
+      future->mPromise.set_value();
+    });
 
   return future;
 }
@@ -252,7 +254,7 @@ UniqueFutureGroup ThreadPool::SubmitTasks(const std::vector<Task>& tasks, uint32
 
   if(threadMask != 0)
   {
-    threads = std::min(threadMask, threads);
+    threads = Min(threadMask, threads);
   }
 
   if(threads > mImpl->mWorkers.size())
@@ -277,15 +279,15 @@ UniqueFutureGroup ThreadPool::SubmitTasks(const std::vector<Task>& tasks, uint32
     retval->mFutures.emplace_back(future);
     mImpl->mWorkers[mImpl->mWorkerIndex++ % static_cast<uint32_t>(mImpl->mWorkers.size())]->AddTask(
       [future, tasks, taskIndex, taskSize](uint32_t index)
-    {
-      auto begin = tasks.begin() + int(taskIndex);
-      auto end   = begin + int(taskSize);
-      for(auto it = begin; it < end; ++it)
       {
-        (*it)(index);
-      }
-      future->mPromise.set_value();
-    });
+        auto begin = tasks.begin() + int(taskIndex);
+        auto end   = begin + int(taskSize);
+        for(auto it = begin; it < end; ++it)
+        {
+          (*it)(index);
+        }
+        future->mPromise.set_value();
+      });
 
     taskIndex += taskSize;
     taskSize = payloadPerThread;

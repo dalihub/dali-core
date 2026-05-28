@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali
 {
@@ -295,7 +296,7 @@ void Scene::ClearItemsDirtyRects()
 
 void Scene::SetForceRenderingFramesCount(uint32_t forceRenderingFramesCount)
 {
-  mForceRenderingFrames = std::max(mForceRenderingFrames, forceRenderingFramesCount);
+  mForceRenderingFrames = Max(mForceRenderingFrames, forceRenderingFramesCount);
 }
 
 bool Scene::NeedsForceRendering()
@@ -319,7 +320,7 @@ void Scene::SetClearColor(const Vector4& color)
 
 void Scene::KeepRendering(float durationSeconds)
 {
-  mKeepRenderingSeconds = std::max(mKeepRenderingSeconds, durationSeconds);
+  mKeepRenderingSeconds = Max(mKeepRenderingSeconds, durationSeconds);
 }
 
 bool Scene::KeepRenderingCheck(float elapsedSeconds)
@@ -327,7 +328,7 @@ bool Scene::KeepRenderingCheck(float elapsedSeconds)
   if(mKeepRenderingSeconds > 0.0f)
   {
     mNeedFullUpdate       = true; // Full update if KeepRendering is required
-    mKeepRenderingSeconds = std::max(0.0f, mKeepRenderingSeconds - elapsedSeconds);
+    mKeepRenderingSeconds = Max(0.0f, mKeepRenderingSeconds - elapsedSeconds);
     return true;
   }
 

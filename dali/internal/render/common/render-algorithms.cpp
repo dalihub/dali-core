@@ -25,6 +25,7 @@
 #include <dali/internal/render/common/render-list.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/int-pair.h>
 
 using Dali::Internal::SceneGraph::RenderInstruction;
@@ -238,15 +239,15 @@ inline ClippingBox IntersectAABB(const ClippingBox& aabbA, const ClippingBox& aa
   ClippingBox intersectionBox;
 
   // First calculate the largest starting positions in X and Y.
-  intersectionBox.x = std::max(aabbA.x, aabbB.x);
-  intersectionBox.y = std::max(aabbA.y, aabbB.y);
+  intersectionBox.x = Max(aabbA.x, aabbB.x);
+  intersectionBox.y = Max(aabbA.y, aabbB.y);
 
   // Now calculate the smallest ending positions, and take the largest starting
   // positions from the result, to get the width and height respectively.
   // If the two boxes do not intersect at all, then we need a 0 width and height clipping area.
   // We use max here to clamp both width and height to >= 0 for this use-case.
-  intersectionBox.width  = std::max(std::min(aabbA.x + aabbA.width, aabbB.x + aabbB.width) - intersectionBox.x, 0);
-  intersectionBox.height = std::max(std::min(aabbA.y + aabbA.height, aabbB.y + aabbB.height) - intersectionBox.y, 0);
+  intersectionBox.width  = Max(Min(aabbA.x + aabbA.width, aabbB.x + aabbB.width) - intersectionBox.x, 0);
+  intersectionBox.height = Max(Min(aabbA.y + aabbA.height, aabbB.y + aabbB.height) - intersectionBox.y, 0);
 
   return intersectionBox;
 }

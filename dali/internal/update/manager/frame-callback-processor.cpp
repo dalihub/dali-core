@@ -32,6 +32,7 @@
 #include <dali/integration-api/trace.h>
 #include <dali/internal/update/manager/global-scene-graph-traveler.h>
 #include <dali/internal/update/manager/scene-graph-traveler.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <dali/public-api/update/update-proxy.h>
 
@@ -150,16 +151,14 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
 #endif
 
     DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss)
-    {
-      oss << "[" << mFrameCallbacks.size() << "]";
-    });
+                                            { oss << "[" << mFrameCallbacks.size() << "]"; });
 
     DALI_TIME_CHECKER_BEGIN(gTimeCheckerFilter);
 
     // If any of the FrameCallback::Update calls returns false, then they are no longer required & can be removed.
     auto iter = std::remove_if(
       mFrameCallbacks.begin(), mFrameCallbacks.end(), [&](OwnerPointer<FrameCallback>& frameCallback)
-    {
+      {
 #ifdef TRACE_ENABLED
       if(gTraceFilter && gTraceFilter->IsTraceEnabled())
       {
@@ -175,21 +174,18 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
       }
 #endif
       keepRendering |= (requests & FrameCallback::KEEP_RENDERING);
-      return (requests & FrameCallback::CONTINUE_CALLING) == 0;
-    });
+      return (requests & FrameCallback::CONTINUE_CALLING) == 0; });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 
     DALI_TIME_CHECKER_END_WITH_MESSAGE_GENERATOR(gTimeCheckerFilter, [&](std::ostringstream& oss)
-    {
-      oss << "DALI_FRAME_CALLBACK_UPDATE. [" << mFrameCallbacks.size() << "]";
-    });
+                                                 { oss << "DALI_FRAME_CALLBACK_UPDATE. [" << mFrameCallbacks.size() << "]"; });
 
     DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_FRAME_CALLBACK_UPDATE", [&](std::ostringstream& oss)
-    {
+                                          {
       oss << "[" << mFrameCallbacks.size() << ",";
 
       std::sort(frameCallbackTimeChecker.rbegin(), frameCallbackTimeChecker.rend());
-      auto topCount = std::min(5u, static_cast<uint32_t>(frameCallbackTimeChecker.size()));
+      auto topCount = Min(5u, static_cast<uint32_t>(frameCallbackTimeChecker.size()));
 
       oss << "top" << topCount;
       for(auto i = 0u; i < topCount; ++i)
@@ -197,8 +193,7 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
         oss << "(" << static_cast<float>(frameCallbackTimeChecker[i].first) / 1000000.0f << "ms,";
         oss << frameCallbackTimeChecker[i].second << ")";
       }
-      oss << "]";
-    });
+      oss << "]"; });
   }
 
   mNodeHierarchyChanged = false;

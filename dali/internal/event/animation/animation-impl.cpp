@@ -38,6 +38,7 @@
 #include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 
@@ -523,7 +524,7 @@ void Animation::PlayFrom(float progress)
 void Animation::PlayAfter(float delaySeconds)
 {
   // The negative delay means play immediately.
-  delaySeconds = std::max(0.f, delaySeconds);
+  delaySeconds = Max(0.f, delaySeconds);
 
   mDelaySeconds = delaySeconds;
 

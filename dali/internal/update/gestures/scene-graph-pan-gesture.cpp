@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/update/gestures/pan-gesture-profiling.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali
 {
@@ -451,7 +452,7 @@ bool PanGesture::UpdateProperties(unsigned int lastVSyncTime, unsigned int nextV
         mCurrentPredictionAmount = mPredictionAmount; // Reset the prediction amount for each new gesture
       }
 
-      mCurrentPredictionAmount = std::max(mMinPredictionAmount, std::min(mCurrentPredictionAmount, mMaxPredictionAmount));
+      mCurrentPredictionAmount = Max(mMinPredictionAmount, Min(mCurrentPredictionAmount, mMaxPredictionAmount));
 
       // Calculate the delta of positions before the prediction
       Vector2 deltaPosition = frameGesture.screen.position - mLastUnmodifiedGesture.screen.position;
@@ -488,7 +489,7 @@ bool PanGesture::UpdateProperties(unsigned int lastVSyncTime, unsigned int nextV
         {
           mCurrentPredictionAmount = 0;
         }
-        mCurrentPredictionAmount = std::max(mMinPredictionAmount, std::min(mCurrentPredictionAmount, mMaxPredictionAmount));
+        mCurrentPredictionAmount = Max(mMinPredictionAmount, Min(mCurrentPredictionAmount, mMaxPredictionAmount));
 
         if(overshotXAxis && !overshotYAxis)
         {

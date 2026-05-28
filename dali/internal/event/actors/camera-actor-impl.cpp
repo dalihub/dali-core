@@ -34,6 +34,8 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/render-tasks/scene-graph-camera-messages.h>
 
+#include <dali/public-api/common/dali-utility.h>
+
 namespace Dali
 {
 namespace Internal
@@ -71,7 +73,7 @@ DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, CameraDefau
 // calculate the far plane distance for a 16bit depth buffer with 4 bits per unit precision
 void CalculateClippingAndZ(float width, float height, float& nearClippingPlane, float& farClippingPlane, float& cameraZ)
 {
-  nearClippingPlane = std::max(width, height);
+  nearClippingPlane = Max(width, height);
   farClippingPlane  = nearClippingPlane + static_cast<float>(0xFFFF >> 4);
   cameraZ           = 2.0f * nearClippingPlane;
 }

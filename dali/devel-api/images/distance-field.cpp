@@ -27,6 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector2.h>
 
@@ -53,14 +54,14 @@ void ScaleField(int width, int height, float* in, uint32_t targetWidth, uint32_t
   for(uint32_t y = 0; y < targetHeight; ++y)
   {
     const int32_t sampleY = static_cast<int32_t>(yScale * static_cast<float>(y));
-    const int32_t otherY  = std::min(sampleY + 1, height - 1);
+    const int32_t otherY  = Min(sampleY + 1, height - 1);
     const float   dy      = (yScale * static_cast<float>(y)) - static_cast<float>(sampleY);
 
     // for each column in target
     for(uint32_t x = 0; x < targetWidth; ++x)
     {
       const int32_t sampleX = static_cast<int32_t>(xScale * static_cast<float>(x));
-      const int32_t otherX  = std::min(sampleX + 1, width - 1);
+      const int32_t otherX  = Min(sampleX + 1, width - 1);
       const float   dx      = (xScale * static_cast<float>(x)) - static_cast<float>(sampleX);
 
       float value = Bilinear(in[sampleY * width + sampleX],
@@ -70,7 +71,7 @@ void ScaleField(int width, int height, float* in, uint32_t targetWidth, uint32_t
                              dx,
                              dy);
 
-      out[y * targetWidth + x] = std::min(value, 1.0f);
+      out[y * targetWidth + x] = Min(value, 1.0f);
     }
   }
 }
@@ -179,8 +180,8 @@ void GenerateDistanceFieldMap(const uint8_t* const imagePixels, const Size& imag
   const uint32_t maxWidth(static_cast<int32_t>(maxSize.width) + (fieldBorder * 2));
   const uint32_t maxHeight(static_cast<int32_t>(maxSize.height) + (fieldBorder * 2));
 
-  const uint32_t bufferLength(std::max(maxWidth, std::max(paddedWidth, scaledWidth)) *
-                              std::max(maxHeight, std::max(paddedHeight, scaledHeight)));
+  const uint32_t bufferLength(Max(maxWidth, Max(paddedWidth, scaledWidth)) *
+                              Max(maxHeight, Max(paddedHeight, scaledHeight)));
 
   std::vector<float> outsidePixels(bufferLength, 0.0f);
   std::vector<float> insidePixels(bufferLength, 0.0f);
@@ -213,7 +214,7 @@ void GenerateDistanceFieldMap(const uint8_t* const imagePixels, const Size& imag
   if(highQuality)
   {
     // create temporary buffers for DistanceTransform()
-    const uint32_t     tempBufferLength(std::max(paddedWidth, paddedHeight));
+    const uint32_t     tempBufferLength(Max(paddedWidth, paddedHeight));
     std::vector<float> tempSourceBuffer(tempBufferLength, 0.0f);
     std::vector<float> tempDestBuffer(tempBufferLength, 0.0f);
 
