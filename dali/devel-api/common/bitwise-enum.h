@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-#include <type_traits> // std::enable_if, std::underlying_type
+#include <dali/public-api/common/type-traits.h>
 
 namespace Dali
 {
@@ -46,9 +46,9 @@ struct EnableBitMaskOperators
  * @return EnumType with both flags set
  */
 template<typename EnumType>
-inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType>::type operator|(EnumType lhs, EnumType rhs)
+inline typename EnableIf<EnableBitMaskOperators<EnumType>::ENABLE, EnumType>::type operator|(EnumType lhs, EnumType rhs)
 {
-  using UnderlyingType = typename std::underlying_type<EnumType>::type;
+  using UnderlyingType = typename GetUnderlyingType<EnumType>::type;
   return static_cast<EnumType>(static_cast<UnderlyingType>(lhs) | static_cast<UnderlyingType>(rhs));
 }
 
@@ -59,9 +59,9 @@ inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumTyp
  * @return reference to lhs with both flags set
  */
 template<typename EnumType>
-inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType&>::type operator|=(EnumType& lhs, EnumType rhs)
+inline typename EnableIf<EnableBitMaskOperators<EnumType>::ENABLE, EnumType&>::type operator|=(EnumType& lhs, EnumType rhs)
 {
-  using UnderlyingType = typename std::underlying_type<EnumType>::type;
+  using UnderlyingType = typename GetUnderlyingType<EnumType>::type;
   lhs                  = static_cast<EnumType>(static_cast<UnderlyingType>(lhs) | static_cast<UnderlyingType>(rhs));
   return lhs;
 }
@@ -73,9 +73,9 @@ inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumTyp
  * @return reference to lhs with only common bits set
  */
 template<typename EnumType>
-inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType&>::type operator&=(EnumType& lhs, EnumType rhs)
+inline typename EnableIf<EnableBitMaskOperators<EnumType>::ENABLE, EnumType&>::type operator&=(EnumType& lhs, EnumType rhs)
 {
-  using UnderlyingType = typename std::underlying_type<EnumType>::type;
+  using UnderlyingType = typename GetUnderlyingType<EnumType>::type;
   lhs                  = static_cast<EnumType>(static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs));
   return lhs;
 }
@@ -87,9 +87,9 @@ inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumTyp
  * @return true if at least one flag is same in both
  */
 template<typename EnumType>
-inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, bool>::type operator&(EnumType lhs, EnumType rhs)
+inline typename EnableIf<EnableBitMaskOperators<EnumType>::ENABLE, bool>::type operator&(EnumType lhs, EnumType rhs)
 {
-  using UnderlyingType = typename std::underlying_type<EnumType>::type;
+  using UnderlyingType = typename GetUnderlyingType<EnumType>::type;
   return static_cast<bool>(static_cast<UnderlyingType>(lhs) & static_cast<UnderlyingType>(rhs));
 }
 
@@ -99,9 +99,9 @@ inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, bool>::
  * @return EnumType with inverted bits
  */
 template<typename EnumType>
-inline typename std::enable_if<EnableBitMaskOperators<EnumType>::ENABLE, EnumType>::type operator~(EnumType bitfield)
+inline typename EnableIf<EnableBitMaskOperators<EnumType>::ENABLE, EnumType>::type operator~(EnumType bitfield)
 {
-  using UnderlyingType = typename std::underlying_type<EnumType>::type;
+  using UnderlyingType = typename GetUnderlyingType<EnumType>::type;
   return static_cast<EnumType>(~(static_cast<UnderlyingType>(bitfield)));
 }
 
