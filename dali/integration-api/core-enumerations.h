@@ -76,6 +76,15 @@ enum class CorePolicyFlags
   RENDER_TO_FRAME_BUFFER = 1 << 0, ///< Whether we should render to the frame-buffer or not.
 };
 
+/**
+ * @brief The DALi rendering behavior.
+ */
+enum class RenderingBehavior
+{
+  IF_REQUIRED,  ///< Default. Will only render if required to do so.
+  CONTINUOUSLY, ///< Will render continuously.
+};
+
 } // namespace Integration
 
 // specialization has to be done in the same namespace

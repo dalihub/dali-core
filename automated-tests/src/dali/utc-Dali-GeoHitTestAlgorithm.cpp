@@ -112,13 +112,13 @@ int UtcDaliGeoHitTestAlgorithmWithFunctor(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage stage = Stage::GetCurrent();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::NAME, "NonHittableActor");
-  stage.Add(actor);
+  scene.Add(actor);
 
   // Render and notify
   application.SendNotification();
@@ -130,7 +130,7 @@ int UtcDaliGeoHitTestAlgorithmWithFunctor(void)
 
   // Perform a hit-test at the given screen coordinates
   Dali::HitTestAlgorithm::Results results;
-  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  Dali::HitTestAlgorithm::HitTest(scene, screenCoordinates, results, IsActorHittableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor != actor);
 
   actor.SetProperty(Actor::Property::NAME, "HittableActor");
@@ -139,7 +139,7 @@ int UtcDaliGeoHitTestAlgorithmWithFunctor(void)
   results.actorCoordinates = Vector2::ZERO;
 
   // Perform a hit-test at the given screen coordinates
-  Dali::HitTestAlgorithm::HitTest(stage, screenCoordinates, results, IsActorHittableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  Dali::HitTestAlgorithm::HitTest(scene, screenCoordinates, results, IsActorHittableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == actor);
   DALI_TEST_EQUALS(localCoordinates, results.actorCoordinates, 0.1f, TEST_LOCATION);
   END_TEST;
@@ -152,12 +152,12 @@ int UtcDaliGeoHitTestAlgorithmOrtho01(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
   cameraActor.SetOrthographicProjection(stageSize);
   cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
@@ -177,8 +177,8 @@ int UtcDaliGeoHitTestAlgorithmOrtho01(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -186,15 +186,15 @@ int UtcDaliGeoHitTestAlgorithmOrtho01(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 1.0f / 6.0f, TEST_LOCATION);
 
-  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
-  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
   END_TEST;
@@ -207,12 +207,12 @@ int UtcDaliGeoHitTestAlgorithmOrtho02(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
   cameraActor.SetOrthographicProjection(stageSize);
   cameraActor.SetNearClippingPlane(800.0f);
   cameraActor.SetFarClippingPlane(4895.0f);
@@ -236,8 +236,8 @@ int UtcDaliGeoHitTestAlgorithmOrtho02(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -246,21 +246,21 @@ int UtcDaliGeoHitTestAlgorithmOrtho02(void)
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2(240.0f, 400.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(scene, Vector2(240.0f, 400.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(results.actor == green);
     DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.6f, 0.01f, TEST_LOCATION);
   }
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2(0.001f, 0.001f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(scene, Vector2(0.001f, 0.001f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(results.actor == blue);
     DALI_TEST_EQUALS(results.actorCoordinates, Vector2(0.001f, 0.001f), 0.001f, TEST_LOCATION);
   }
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, stageSize, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(scene, stageSize, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(!results.actor);
     DALI_TEST_EQUALS(results.actorCoordinates, Vector2::ZERO, TEST_LOCATION);
   }
@@ -268,7 +268,7 @@ int UtcDaliGeoHitTestAlgorithmOrtho02(void)
   // Just inside green
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, stageSize * 0.69f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+    HitTest(scene, stageSize * 0.69f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
     DALI_TEST_CHECK(results.actor == green);
     DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.98f, 0.01f, TEST_LOCATION);
   }
@@ -283,8 +283,8 @@ int UtcDaliGeoHitTestAlgorithmClippingActor(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage stage     = Stage::GetCurrent();
-  Actor rootLayer = stage.GetRootLayer();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Actor                    rootLayer = scene.GetRootLayer();
   rootLayer.SetProperty(Actor::Property::NAME, "RootLayer");
 
   // Create a layer
@@ -292,7 +292,7 @@ int UtcDaliGeoHitTestAlgorithmClippingActor(void)
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
-  stage.Add(layer);
+  scene.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
@@ -317,12 +317,12 @@ int UtcDaliGeoHitTestAlgorithmClippingActor(void)
 
   // Hit within clippingActor and childActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(10.0f, 10.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == childActor);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
-  HitTest(stage, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(60.0f, 60.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == rootLayer);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
 
@@ -336,8 +336,8 @@ int UtcDaliGeoHitTestAlgorithmClippingActorStress(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage stage     = Stage::GetCurrent();
-  Actor rootLayer = stage.GetRootLayer();
+  Dali::Integration::Scene scene     = application.GetScene();
+  Actor                    rootLayer = scene.GetRootLayer();
   rootLayer.SetProperty(Actor::Property::NAME, "RootLayer");
 
   // Create a layer
@@ -345,7 +345,7 @@ int UtcDaliGeoHitTestAlgorithmClippingActorStress(void)
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   layer.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   layer.SetProperty(Actor::Property::NAME, "layer");
-  stage.Add(layer);
+  scene.Add(layer);
 
   // Create a clipping actor and add it to the layer.
   Actor clippingActor = CreateRenderableActor();
@@ -383,12 +383,12 @@ int UtcDaliGeoHitTestAlgorithmClippingActorStress(void)
 
   // Hit within clippingActor and latestActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(201.0f, 201.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == latestActor);
 
   // Hit within childActor but outside of clippingActor, should hit the root-layer instead.
-  HitTest(stage, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(221.0f, 221.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("Hit: %s\n", (results.actor ? results.actor.GetProperty<String>(Actor::Property::NAME).CStr() : "NULL"));
   DALI_TEST_CHECK(results.actor == rootLayer);
 
@@ -402,12 +402,12 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
   cameraActor.SetOrthographicProjection(stageSize);
   cameraActor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 1600.0f));
 
@@ -428,8 +428,8 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -439,17 +439,17 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   HitTestAlgorithm::Results results;
 
   //Hit in the intersection. Should pick the blue actor since it is an overlay.
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 5.0f / 6.0f, TEST_LOCATION);
 
   //Hit in the blue actor
-  HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
   //Hit in the green actor
-  HitTest(stage, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize * 2.0f / 3.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, actorSize * 0.5f, TEST_LOCATION);
 
@@ -469,25 +469,25 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   application.Render(10);
 
   //Hit in the intersection red, green, blue. Should pick the red actor since it is an child of overlay.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, green. Should pick the red actor since it is an child of overlay.
-  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the blue actor since it is an overlay.
-  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == blue);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 9.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
@@ -501,25 +501,25 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   application.Render(10);
 
   //Hit in the intersection red, green, blue. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, blue. Should pick the red actor since it is an child of blue.
-  HitTest(stage, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 13.0f / 24.0f, stageSize.y * 9.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == red);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 9.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection red, green. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the green actor since it is latest ordered actor.
-  HitTest(stage, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
   DALI_TEST_CHECK(results.actor == green);
   DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 1.0f / 12.0f, actorSize.y * 3.0f / 12.0f), TEST_LOCATION);
@@ -533,33 +533,33 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -578,7 +578,7 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
 
   // Because the offRenderTask is set to exclusive, the green will not be rendered and it cannot be touched as a MappingActor.
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -591,34 +591,34 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  stageSize(scene.GetSize());
 
   Actor blue                                        = Actor::New();
   blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   Actor green                                        = Actor::New();
   green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
+  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
   green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
   green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
   green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     offRenderTask  = renderTaskList.CreateTask();
   RenderTask     offRenderTask2 = renderTaskList.CreateTask();
 
   Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
-  cameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -643,7 +643,7 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
+  HitTest(scene, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   DALI_TEST_CHECK(results.actor == green);
 
   END_TEST;
@@ -656,12 +656,12 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay01(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage             stage             = Stage::GetCurrent();
-  RenderTaskList    renderTaskList    = stage.GetRenderTaskList();
-  RenderTask        defaultRenderTask = renderTaskList.GetTask(0u);
-  Dali::CameraActor cameraActor       = defaultRenderTask.GetCameraActor();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  Dali::CameraActor        cameraActor       = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
 
   Vector2 actorSize(stageSize * 0.5f);
   // Create two actors with half the size of the stage and set them to be overlapping
@@ -678,8 +678,8 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay01(void)
   green.SetProperty(Actor::Property::SIZE, actorSize);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
+  scene.Add(blue);
+  scene.Add(green);
 
   // Render and notify
   application.SendNotification();
@@ -729,14 +729,14 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay02(void)
 
   application.GetScene().SetGeometryHittestEnabled(true);
 
-  Stage          stage             = Stage::GetCurrent();
-  RenderTaskList renderTaskList    = stage.GetRenderTaskList();
-  RenderTask     defaultRenderTask = renderTaskList.GetTask(0u);
-  RenderTask     offRenderTask     = renderTaskList.CreateTask();
+  Dali::Integration::Scene scene             = application.GetScene();
+  RenderTaskList           renderTaskList    = scene.GetRenderTaskList();
+  RenderTask               defaultRenderTask = renderTaskList.GetTask(0u);
+  RenderTask               offRenderTask     = renderTaskList.CreateTask();
 
   Dali::CameraActor defaultCameraActor = defaultRenderTask.GetCameraActor();
 
-  Vector2 stageSize(stage.GetSize());
+  Vector2 stageSize(scene.GetSize());
 
   Vector2 actorSize(stageSize * 0.5f);
   Vector2 offscreenSize(1920.0f, 1080.0f); // Quit big size.
@@ -763,9 +763,9 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay02(void)
   red.SetProperty(Actor::Property::SIZE, offscreenSize * 0.5f);
 
   Dali::CameraActor offscreenCameraActor                     = Dali::CameraActor::New(offscreenSize);
-  offscreenCameraActor[Dali::Actor::Property::PIVOT]  = Pivot::CENTER;
+  offscreenCameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   offscreenCameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(offscreenCameraActor);
+  scene.Add(offscreenCameraActor);
 
   offRenderTask.SetExclusive(true);
   offRenderTask.SetInputEnabled(true);
@@ -779,9 +779,9 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay02(void)
   offRenderTask.SetFrameBuffer(renderTarget);
 
   // Add the actors to the view
-  stage.Add(blue);
-  stage.Add(green);
-  stage.Add(red);
+  scene.Add(blue);
+  scene.Add(green);
+  scene.Add(red);
 
   // Render and notify
   application.SendNotification();

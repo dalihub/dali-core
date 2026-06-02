@@ -24,7 +24,6 @@
 #include <dali/integration-api/string-utils.h>
 #include <dali/internal/event/common/base-object-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 

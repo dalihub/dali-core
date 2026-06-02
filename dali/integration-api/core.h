@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
@@ -66,7 +65,7 @@ namespace KeepUpdating
 enum Reasons
 {
   NOT_REQUESTED          = 0,      ///< Zero means that no further updates are required
-  STAGE_KEEP_RENDERING   = 1 << 1, ///<  - Stage::KeepRendering() is being used
+  STAGE_KEEP_RENDERING   = 1 << 1, ///< - Core::KeepRendering() is being used
   ANIMATIONS_RUNNING     = 1 << 2, ///< - Animations are ongoing
   MONITORING_PERFORMANCE = 1 << 3, ///< - The --enable-performance-monitor option is being used
   RENDER_TASK_SYNC       = 1 << 4, ///< - A render task is waiting for render sync
@@ -524,6 +523,31 @@ public:
    * UpdateProxy prior to FrameCallback::Update() being called from the update thread.
    */
   UpdateProxy::NotifySyncPoint NotifyFrameCallback(FrameCallbackInterface& frameCallback);
+
+  // Rendering Behavior
+
+  /**
+   * @brief Request that Core keeps rendering for the given number of seconds.
+   *
+   * This is useful for making sure that e.g. loading animations play correctly.
+   * @param[in] durationSeconds Time to keep rendering, 0 means render at least one more frame
+   */
+  void KeepRendering(float durationSeconds);
+
+  /**
+   * @brief Sets the rendering behavior.
+   *
+   * @param[in] renderingBehavior The rendering behavior required
+   * @note By default, Core uses RenderingBehavior::IF_REQUIRED.
+   */
+  void SetRenderingBehavior(Integration::RenderingBehavior renderingBehavior);
+
+  /**
+   * @brief Retrieves the rendering behavior.
+   *
+   * @return The current rendering behavior
+   */
+  Integration::RenderingBehavior GetRenderingBehavior() const;
 
   // ETC
 

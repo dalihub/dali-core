@@ -385,11 +385,11 @@ int UtcDaliRenderTaskSetSourceActorN(void)
 {
   TestApplication application;
   tet_infoline("Testing RenderTask::SetSourceActor() Negative - try with empty actor handle");
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor srcActor;
 
-  RenderTaskList taskList   = stage.GetRenderTaskList();
+  RenderTaskList taskList   = scene.GetRenderTaskList();
   RenderTask     renderTask = taskList.CreateTask();
   renderTask.SetSourceActor(srcActor);
 
@@ -406,8 +406,8 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that setting a non-renderable actor stops existing source actor being rendered ");
 
-  Dali::Integration::Scene stage    = application.GetScene();
-  RenderTaskList           taskList = stage.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
   RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
@@ -416,10 +416,10 @@ int UtcDaliRenderTaskSetSourceActorP01(void)
   Texture img      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  stage.Add(newActor);
+  scene.Add(newActor);
 
   Actor nonRenderableActor = Actor::New();
-  stage.Add(nonRenderableActor);
+  scene.Add(nonRenderableActor);
 
   // Stop the newActor from being rendered by changing the source actor
   DALI_TEST_CHECK(nonRenderableActor);
@@ -448,9 +448,9 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that switching source from a non-renderable to a renderable actor causes the texture to be drawn");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
-  RenderTaskList taskList = stage.GetRenderTaskList();
+  RenderTaskList taskList = scene.GetRenderTaskList();
 
   RenderTask task = taskList.GetTask(0u);
 
@@ -460,10 +460,10 @@ int UtcDaliRenderTaskSetSourceActorP02(void)
   Texture img      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  stage.Add(newActor);
+  scene.Add(newActor);
 
   Actor nonRenderableActor = Actor::New();
-  stage.Add(nonRenderableActor);
+  scene.Add(nonRenderableActor);
 
   TestGlAbstraction& gl        = application.GetGlAbstraction();
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
@@ -503,10 +503,10 @@ int UtcDaliRenderTaskSetSourceActorOffScene(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::SetSourceActor (on/off stage testing)");
+  tet_infoline("Testing RenderTask::SetSourceActor (on/off scene testing)");
 
-  Dali::Integration::Scene stage    = application.GetScene();
-  RenderTaskList           taskList = stage.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
   RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
@@ -520,19 +520,19 @@ int UtcDaliRenderTaskSetSourceActorOffScene(void)
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
   task.SetSourceActor(newActor);
-  // Don't add newActor to stage yet   //'
+  // Don't add newActor to scene yet   //'
 
-  // Update & Render with the actor initially off-stage
+  // Update & Render with the actor initially off-scene
   application.SendNotification();
   application.Render();
 
   // Check that nothing was rendered
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION);
 
-  // Now add to stage
-  stage.Add(newActor);
+  // Now add to scene
+  scene.Add(newActor);
 
-  // Update & Render with the actor on-stage
+  // Update & Render with the actor on-scene
   application.GetGlAbstraction().ClearBoundTextures();
   application.SendNotification();
   application.Render();
@@ -541,10 +541,10 @@ int UtcDaliRenderTaskSetSourceActorOffScene(void)
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
   drawTrace.Reset();
 
-  // Now remove from stage
-  stage.Remove(newActor);
+  // Now remove from scene
+  scene.Remove(newActor);
 
-  // Update & Render with the actor off-stage
+  // Update & Render with the actor off-scene
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 0, TEST_LOCATION);
@@ -558,8 +558,8 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor (empty handle case)");
 
-  Dali::Integration::Scene stage    = application.GetScene();
-  RenderTaskList           taskList = stage.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
   RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
@@ -568,10 +568,10 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   Texture img      = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 1, 1);
   Actor   newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  stage.Add(newActor);
+  scene.Add(newActor);
 
   Actor nonRenderableActor = Actor::New();
-  stage.Add(nonRenderableActor);
+  scene.Add(nonRenderableActor);
 
   // Set with empty handle
   task.SetSourceActor(Actor());
@@ -608,8 +608,8 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
 
   tet_infoline("Testing RenderTask::SetSourceActor - Set a source actor and destroy the source actor");
 
-  Dali::Integration::Scene stage    = application.GetScene();
-  RenderTaskList           taskList = stage.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
   RenderTask               task     = taskList.GetTask(0u);
 
   Actor actor = task.GetSourceActor();
@@ -619,7 +619,7 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
 
   Actor newActor = CreateRenderableActor(img);
   newActor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
-  stage.Add(newActor);
+  scene.Add(newActor);
 
   task.SetSourceActor(newActor);
 
@@ -630,7 +630,7 @@ int UtcDaliRenderTaskSetSourceActorDestroyed(void)
   application.Render();
 
   // Destroy the source actor
-  stage.Remove(newActor);
+  scene.Remove(newActor);
   newActor.Reset();
 
   DALI_TEST_CHECK(!task.GetSourceActor()); // The source actor should be an empty handle.
@@ -661,7 +661,7 @@ int UtcDaliRenderTaskGetSourceActorP02(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::GetSourceActor() Create a new render task, Add a new actor to the stage and set it as the source of the new render task. Get its source actor and check that it is equivalent to what was set.");
+  tet_infoline("Testing RenderTask::GetSourceActor() Create a new render task, Add a new actor to the scene and set it as the source of the new render task. Get its source actor and check that it is equivalent to what was set.");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.CreateTask();
@@ -698,7 +698,7 @@ int UtcDaliRenderTaskGetStopperActorP(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::GetStopperActor() Create a new render task, Add a new actor to the stage and set RenderTask::RenderUntil(actor). Get its stopper actor and check it is equivalent to what was set.");
+  tet_infoline("Testing RenderTask::GetStopperActor() Create a new render task, Add a new actor to the scene and set RenderTask::RenderUntil(actor). Get its stopper actor and check it is equivalent to what was set.");
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.CreateTask();
@@ -746,7 +746,7 @@ int UtcDaliRenderTaskRenderUntil01(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor secondChild;
   for(int i = 0; i < 5; i++)
@@ -757,7 +757,7 @@ int UtcDaliRenderTaskRenderUntil01(void)
     Actor child = CreateRenderableActor();
     child.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
-    stage.Add(parent);
+    scene.Add(parent);
     parent.Add(child);
 
     if(i == 1)
@@ -767,7 +767,7 @@ int UtcDaliRenderTaskRenderUntil01(void)
   }
   task.RenderUntil(secondChild);
 
-  // Update & Render with the actor on-stage
+  // Update & Render with the actor on-scene
   TestGlAbstraction& gl        = application.GetGlAbstraction();
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
@@ -791,7 +791,7 @@ int UtcDaliRenderTaskRenderUntil02(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Actor secondChild;
   for(int i = 0; i < 5; i++)
@@ -802,7 +802,7 @@ int UtcDaliRenderTaskRenderUntil02(void)
     Actor child = Actor::New(); // Has no renderer
     child.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 1.0f));
 
-    stage.Add(parent);
+    scene.Add(parent);
     parent.Add(child);
 
     if(i == 1)
@@ -812,7 +812,7 @@ int UtcDaliRenderTaskRenderUntil02(void)
   }
   task.RenderUntil(secondChild);
 
-  // Update & Render with the actor on-stage
+  // Update & Render with the actor on-scene
   TestGlAbstraction& gl        = application.GetGlAbstraction();
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
@@ -836,7 +836,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -851,7 +851,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
 
   // Compose a tree
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   //     |- l0 (depth = 1)
   //         |- (renderable)
@@ -879,26 +879,26 @@ int UtcDaliRenderTaskRenderUntil03(void)
 
   Actor a2 = CreateRenderableActorWithName("a2");
 
-  stage.Add(a0);
+  scene.Add(a0);
   a0.Add(l0);
   l0.Add(CreateRenderableActorWithName("l0-c0"));
   l0.Add(CreateRenderableActorWithName("l0-c1"));
 
-  stage.Add(a1);
+  scene.Add(a1);
   a1.Add(target);
 
-  stage.Add(a2);
+  scene.Add(a2);
   a2.Add(l2);
   l2.Add(CreateRenderableActorWithName("l2-c0"));
   l2.Add(CreateRenderableActorWithName("l2-c1"));
   l2.Add(CreateRenderableActorWithName("l2-c2"));
 
   // draw only a0 and a1 (2 items)
-  // l0, l2 and children is cut(high depth index than stage)
+  // l0, l2 and children is cut(high depth index than scene)
   // a2 and children are cut(added after target)
   task.RenderUntil(target);
 
-  // Update & Render with the actor on-stage
+  // Update & Render with the actor on-scene
   TestGlAbstraction& gl        = application.GetGlAbstraction();
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
@@ -912,9 +912,9 @@ int UtcDaliRenderTaskRenderUntil03(void)
 
   drawTrace.Reset();
 
-  // Move l2 lower than stage.
+  // Move l2 lower than scene.
   //
-  // stage (depth = 1)
+  // scene (depth = 1)
   // |- a0 (renderable)
   //     |- l0 (depth = 2)
   //         |- (renderable)
@@ -929,7 +929,7 @@ int UtcDaliRenderTaskRenderUntil03(void)
   l2.LowerToBottom();
 
   // After now, draw a0, a1, and child of l2 (2 + 3 items)
-  // l0 and children is cut(high depth index than stage)
+  // l0 and children is cut(high depth index than scene)
   // a2 and children are cut(added after target)
 
   // Update & Render
@@ -951,7 +951,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -966,7 +966,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
 
   // Compose a tree
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   //     |- l0 (depth = 1)
   //         |- (renderable)
@@ -1005,18 +1005,18 @@ int UtcDaliRenderTaskRenderUntil04(void)
 
   Actor a2 = CreateRenderableActorWithName("a2");
 
-  stage.Add(a0);
+  scene.Add(a0);
   a0.Add(l0);
   l0.Add(CreateRenderableActorWithName("l0-c0"));
   l0.Add(CreateRenderableActorWithName("l0-c1"));
 
-  stage.Add(a1);
+  scene.Add(a1);
   a1.Add(l1);
   l1.Add(b0);
   l1.Add(target);
   l1.Add(b1);
 
-  stage.Add(a2);
+  scene.Add(a2);
   a2.Add(l2);
   l2.Add(CreateRenderableActorWithName("l2-c0"));
   l2.Add(CreateRenderableActorWithName("l2-c1"));
@@ -1027,7 +1027,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
   // b1 is cut out (added after target)
   task.RenderUntil(target);
 
-  // Update & Render with the actor on-stage
+  // Update & Render with the actor on-scene
   TestGlAbstraction& gl        = application.GetGlAbstraction();
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
@@ -1041,9 +1041,9 @@ int UtcDaliRenderTaskRenderUntil04(void)
 
   drawTrace.Reset();
 
-  // Move l1 lower than stage.
+  // Move l1 lower than scene.
   //
-  // stage (depth = 1)
+  // scene (depth = 1)
   // |- a0 (renderable)
   //     |- l0 (depth = 2)
   //         |- (renderable)
@@ -1073,9 +1073,9 @@ int UtcDaliRenderTaskRenderUntil04(void)
 
   drawTrace.Reset();
 
-  // Move l2 lower than stage.
+  // Move l2 lower than scene.
   //
-  // stage (depth = 2)
+  // scene (depth = 2)
   // |- a0 (renderable)
   //     |- l0 (depth = 3)
   //         |- (renderable)
@@ -1107,7 +1107,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
 
   // Make b0 and a2 draw mode as overlay
   //
-  // stage (depth = 2)
+  // scene (depth = 2)
   // |- a0 (renderable)
   //     |- l0 (depth = 3)
   //         |- (renderable)
@@ -1142,7 +1142,7 @@ int UtcDaliRenderTaskRenderUntil04(void)
 
   // Make target draw mode as overlay
   //
-  // stage (depth = 2)
+  // scene (depth = 2)
   // |- a0 (renderable)
   //     |- l0 (depth = 3)
   //         |- (renderable)
@@ -1182,7 +1182,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -1197,7 +1197,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
 
   // Compose a tree
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   // |- a1 (renderable)
   //     |- target (stopper node)
@@ -1207,15 +1207,15 @@ int UtcDaliRenderTaskRenderUntil05(void)
   Actor a2     = CreateRenderableActorWithName("a2");
   Actor target = CreateRenderableActorWithName("target");
 
-  stage.Add(a0);
-  stage.Add(a1);
-  stage.Add(a2);
+  scene.Add(a0);
+  scene.Add(a1);
+  scene.Add(a2);
   a1.Add(target);
 
   // draw a0, a1 (2 items)
   task.RenderUntil(target);
 
-  // Update & Render with the actor on-stage
+  // Update & Render with the actor on-scene
   TestGlAbstraction& gl        = application.GetGlAbstraction();
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
@@ -1231,7 +1231,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
 
   // Unparent target
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   // |- a1 (renderable)
   // |- a2 (renderable)
@@ -1250,7 +1250,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
 
   // Add target under a0.
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   //     |- target (stopper node)
   // |- a1 (renderable)
@@ -1270,7 +1270,7 @@ int UtcDaliRenderTaskRenderUntil05(void)
 
   // Cancel RenderUntil.
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   //     |- target (renderable)
   // |- a1 (renderable)
@@ -1298,7 +1298,7 @@ int UtcDaliRenderTaskRenderUntil06(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     task     = taskList.GetTask(0u);
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   auto CreateRenderableActorWithName = [](const char* name) -> Actor
   {
@@ -1313,7 +1313,7 @@ int UtcDaliRenderTaskRenderUntil06(void)
 
   // Compose a tree
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   // |- a1 (renderable)
   //     |- target (stopper node)
@@ -1323,15 +1323,15 @@ int UtcDaliRenderTaskRenderUntil06(void)
   Actor a2     = CreateRenderableActorWithName("a2");
   Actor target = CreateRenderableActorWithName("target");
 
-  stage.Add(a0);
-  stage.Add(a1);
-  stage.Add(a2);
+  scene.Add(a0);
+  scene.Add(a1);
+  scene.Add(a2);
   a1.Add(target);
 
   // draw a0, a1 (2 items)
   task.RenderUntil(target);
 
-  // Update & Render with the actor on-stage
+  // Update & Render with the actor on-scene
   TestGlAbstraction& gl        = application.GetGlAbstraction();
   TraceCallStack&    drawTrace = gl.GetDrawTrace();
   drawTrace.Enable(true);
@@ -1347,7 +1347,7 @@ int UtcDaliRenderTaskRenderUntil06(void)
 
   // Destroy target
   //
-  // stage (depth = 0)
+  // scene (depth = 0)
   // |- a0 (renderable)
   // |- a1 (renderable)
   // |- a2 (renderable)
@@ -1375,7 +1375,7 @@ int UtcDaliRenderTaskRenderUntil06(void)
 
     // Add target under a0.
     //
-    // stage (depth = 0)
+    // scene (depth = 0)
     // |- a0 (renderable)
     //     |- target (renderable)
     // |- a1 (renderable)
@@ -1826,8 +1826,8 @@ int UtcDaliRenderTaskSetCameraActorDestroyed(void)
 
   tet_infoline("Testing RenderTask::SetCameraActor - Set a camera actor and destroy the camera actor");
 
-  Dali::Integration::Scene stage    = application.GetScene();
-  RenderTaskList           taskList = stage.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
   RenderTask               task     = taskList.GetTask(0u);
 
   CameraActor newCameraActor = CameraActor::New();
@@ -2317,9 +2317,9 @@ int UtcDaliRenderTaskGetViewportP01(void)
   RenderTask     task     = taskList.GetTask(0u);
   Viewport       viewport = task.GetViewport();
 
-  // By default the viewport should match the stage width/height
-  Vector2  stageSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, stageSize.width, stageSize.height);
+  // By default the viewport should match the scene width/height
+  Vector2  sceneSize = application.GetScene().GetSize();
+  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
   DALI_TEST_CHECK(viewport == expectedViewport);
   END_TEST;
 }
@@ -2334,9 +2334,9 @@ int UtcDaliRenderTaskGetViewportP02(void)
   RenderTask     task     = taskList.CreateTask();
   Viewport       viewport = task.GetViewport();
 
-  // By default the viewport should match the stage width/height
-  Vector2  stageSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, stageSize.width, stageSize.height);
+  // By default the viewport should match the scene width/height
+  Vector2  sceneSize = application.GetScene().GetSize();
+  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
   DALI_TEST_CHECK(viewport == expectedViewport);
   END_TEST;
 }
@@ -2370,8 +2370,8 @@ int UtcDaliRenderTaskSetViewportP(void)
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
 
   RenderTask task      = taskList.GetTask(0u);
-  Vector2    stageSize = application.GetScene().GetSize();
-  Viewport   newViewport(0, 0, stageSize.width * 0.5f, stageSize.height * 0.5f);
+  Vector2    sceneSize = application.GetScene().GetSize();
+  Viewport   newViewport(0, 0, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
   task.SetViewport(newViewport);
 
   // Update (viewport is a property)
@@ -2393,8 +2393,8 @@ int UtcDaliRenderTaskSetViewportN(void)
   RenderTask task;
   try
   {
-    Vector2  stageSize = application.GetScene().GetSize();
-    Viewport newViewport(0, 0, stageSize.width * 0.5f, stageSize.height * 0.5f);
+    Vector2  sceneSize = application.GetScene().GetSize();
+    Viewport newViewport(0, 0, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
     task.SetViewport(newViewport);
   }
   catch(Dali::DaliException& e)
@@ -2418,10 +2418,10 @@ int UtcDaliRenderTaskSetViewportPosition(void)
 
   Viewport viewport = task.GetViewport();
 
-  // By default the viewport should match the stage width/height
+  // By default the viewport should match the scene width/height
 
-  Vector2  stageSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, stageSize.width, stageSize.height);
+  Vector2  sceneSize = application.GetScene().GetSize();
+  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
   DALI_TEST_CHECK(viewport == expectedViewport);
 
   // 'Setter' test
@@ -2493,10 +2493,10 @@ int UtcDaliRenderTaskSetViewportSize(void)
 
   Viewport viewport = task.GetViewport();
 
-  // By default the viewport should match the stage width/height
+  // By default the viewport should match the scene width/height
 
-  Vector2  stageSize = application.GetScene().GetSize();
-  Viewport expectedViewport(0, 0, stageSize.width, stageSize.height);
+  Vector2  sceneSize = application.GetScene().GetSize();
+  Viewport expectedViewport(0, 0, sceneSize.width, sceneSize.height);
   DALI_TEST_CHECK(viewport == expectedViewport);
 
   Vector2 newSize(128.0f, 64.0f);
@@ -2948,7 +2948,7 @@ int UtcDaliRenderTaskContinuous01(void)
   // START PROCESS/RENDER                     Input,    Expected  Input, Expected, KeepUpdating
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, false, finished, false, false, __LINE__));
 
-  // ADD SOURCE ACTOR TO STAGE - expect continuous renders to start, no finished signal
+  // ADD SOURCE ACTOR TO SCENE - expect continuous renders to start, no finished signal
   application.GetScene().Add(secondRootActor);
   application.SendNotification();
 
@@ -3023,7 +3023,7 @@ int UtcDaliRenderTaskContinuous03(void)
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
   DALI_TEST_CHECK(UpdateRender(application, drawTrace, false, finished, false, false, __LINE__));
 
-  // ADD CAMERA ACTOR TO STAGE - expect continuous renders to start, no finished signal
+  // ADD CAMERA ACTOR TO SCENE - expect continuous renders to start, no finished signal
   application.GetScene().Add(offscreenCameraActor);
   application.SendNotification();
 
@@ -3609,16 +3609,16 @@ int UtcDaliRenderTaskFinishMissingImage(void)
   // Previously we had bugs where not having a resource ID would cause render-tasks to wait forever
   tet_infoline("Testing RenderTask::SignalFinished() when an Actor has no Image set");
 
-  Dali::Integration::Scene stage = application.GetScene();
+  Dali::Integration::Scene scene = application.GetScene();
 
   Texture image     = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 10, 10);
   Actor   rootActor = CreateRenderableActor(image);
   rootActor.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-  stage.Add(rootActor);
+  scene.Add(rootActor);
 
   Actor actorWithMissingImage = CreateRenderableActor(Texture());
   actorWithMissingImage.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
-  stage.Add(actorWithMissingImage);
+  scene.Add(actorWithMissingImage);
 
   RenderTaskList taskList = application.GetScene().GetRenderTaskList();
   RenderTask     newTask  = taskList.CreateTask();
@@ -4713,8 +4713,8 @@ int UtcDaliRenderTaskSetGetViewportGuideActor(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with Set/Get ViewportGuideActor");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -4723,9 +4723,9 @@ int UtcDaliRenderTaskSetGetViewportGuideActor(void)
   blue[Dali::Actor::Property::SIZE]          = Vector2(300, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(0, 0);
 
-  stage.Add(blue);
+  scene.Add(blue);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
   renderTask.SetViewportGuideActor(blue);
@@ -4746,8 +4746,8 @@ int UtcDaliRenderTaskViewportGuideActor(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with ViewportGuideActor");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -4761,15 +4761,15 @@ int UtcDaliRenderTaskViewportGuideActor(void)
   Renderer renderer = Renderer::New(geometry, shader);
   blue.AddRenderer(renderer);
 
-  stage.Add(blue);
+  scene.Add(blue);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
-  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(sceneSize);
   cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   renderTask.SetExclusive(true);
   renderTask.SetInputEnabled(true);
@@ -4804,8 +4804,8 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
   glAbstraction.EnableViewportCallTrace(true);
   tet_infoline("Testing RenderTask with ViewportGuideActor02");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   // Render and notify
   application.SendNotification();
@@ -4823,7 +4823,7 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
   blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
   blue.AddRenderer(renderer);
-  stage.Add(blue);
+  scene.Add(blue);
 
   Actor green                                 = Actor::New();
   green[Dali::Actor::Property::NAME]          = "Green";
@@ -4832,15 +4832,15 @@ int UtcDaliRenderTaskViewportGuideActor02(void)
   green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
   green.AddRenderer(renderer);
-  stage.Add(green);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
-  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(sceneSize);
   cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   renderTask.SetExclusive(true);
   renderTask.SetInputEnabled(true);
@@ -4882,8 +4882,8 @@ int UtcDaliRenderTaskViewportGuideActor03(void)
   glAbstraction.EnableViewportCallTrace(true);
   tet_infoline("Testing that adding a viewport guide actor to RenderTask will change the viewport");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   // Render and notify
   application.SendNotification();
@@ -4901,7 +4901,7 @@ int UtcDaliRenderTaskViewportGuideActor03(void)
   blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
   blue.AddRenderer(renderer);
-  stage.Add(blue);
+  scene.Add(blue);
 
   Actor green                                 = Actor::New();
   green[Dali::Actor::Property::NAME]          = "Green";
@@ -4910,15 +4910,15 @@ int UtcDaliRenderTaskViewportGuideActor03(void)
   green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
   green.AddRenderer(renderer);
-  stage.Add(green);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
-  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(sceneSize);
   cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   renderTask.SetExclusive(true);
   renderTask.SetInputEnabled(true);
@@ -4981,8 +4981,8 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
   glAbstraction.EnableViewportCallTrace(true);
   tet_infoline("Testing that adding a viewport guide actor to RenderTask will change the viewport");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   // Render and notify
   application.SendNotification();
@@ -5000,7 +5000,7 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
   blue[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   blue[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
   blue.AddRenderer(renderer);
-  stage.Add(blue);
+  scene.Add(blue);
 
   Actor green                                 = Actor::New();
   green[Dali::Actor::Property::NAME]          = "Green";
@@ -5009,15 +5009,15 @@ int UtcDaliRenderTaskViewportGuideActor04(void)
   green[Dali::Actor::Property::SIZE]          = Vector2(400, 300);
   green[Dali::Actor::Property::POSITION]      = Vector2(100, 50);
   green.AddRenderer(renderer);
-  stage.Add(green);
+  scene.Add(green);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
-  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(sceneSize);
   cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   renderTask.SetExclusive(true);
   renderTask.SetInputEnabled(true);
@@ -5076,8 +5076,8 @@ int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with ViewportGuideActor, and check viewport if guide actor destroyed");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5098,16 +5098,16 @@ int UtcDaliRenderTaskViewportGuideActorDestroyed(void)
   Renderer renderer = Renderer::New(geometry, shader);
   red.AddRenderer(renderer);
 
-  stage.Add(blue);
-  stage.Add(red);
+  scene.Add(blue);
+  scene.Add(red);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask     = renderTaskList.CreateTask();
 
-  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(stageSize);
+  Dali::CameraActor cameraActor                     = Dali::CameraActor::New(sceneSize);
   cameraActor[Dali::Actor::Property::PIVOT]         = Pivot::CENTER;
   cameraActor[Dali::Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER;
-  stage.Add(cameraActor);
+  scene.Add(cameraActor);
 
   renderTask.SetExclusive(true);
   renderTask.SetInputEnabled(true);
@@ -5372,8 +5372,8 @@ int UtcDaliRenderTaskRenderPassTag(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with RenderPassTag");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5401,12 +5401,12 @@ int UtcDaliRenderTaskRenderPassTag(void)
   Renderer renderer = Renderer::New(geometry, shader);
   blue.AddRenderer(renderer);
 
-  stage.Add(blue);
+  scene.Add(blue);
 
   auto& gfx = application.GetGraphicsController();
   gfx.mCallStack.EnableLogging(true);
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
@@ -5450,8 +5450,8 @@ int UtcDaliRenderTaskWithWrongShaderData01(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with wrong shader data");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5466,11 +5466,11 @@ int UtcDaliRenderTaskWithWrongShaderData01(void)
   Renderer renderer = Renderer::New(geometry, shader);
   blue.AddRenderer(renderer);
 
-  stage.Add(blue);
+  scene.Add(blue);
 
   auto& gfx = application.GetGraphicsController();
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
@@ -5487,8 +5487,8 @@ int UtcDaliRenderTaskWithWrongShaderData02(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with wrong shader data. This UTC is for line coverage");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5503,11 +5503,11 @@ int UtcDaliRenderTaskWithWrongShaderData02(void)
   Renderer renderer    = Renderer::New(geometry, validShader);
   blue.AddRenderer(renderer);
 
-  stage.Add(blue);
+  scene.Add(blue);
 
   auto& gfx = application.GetGraphicsController();
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   DALI_TEST_EQUALS(0u, renderTaskList.GetTask(0u).GetRenderPassTag(), TEST_LOCATION);
   // Render and notify
   application.SendNotification();
@@ -5535,10 +5535,10 @@ int UtcDaliRenderTaskOrderIndex01(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with OrderIndex");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask1    = renderTaskList.CreateTask();
 
   application.SendNotification();
@@ -5583,7 +5583,6 @@ int UtcDaliRenderTaskOrderIndex01(void)
     DALI_TEST_EQUALS(answer5[i], renderTaskList.GetTask(i).GetOrderIndex(), TEST_LOCATION);
   }
 
-  Dali::Integration::Scene scene = application.GetScene();
   scene.GetOverlayLayer();
   application.SendNotification();
   DALI_TEST_EQUALS(5, renderTaskList.GetTaskCount(), TEST_LOCATION);
@@ -5617,10 +5616,10 @@ int UtcDaliRenderTaskOrderIndex02(void)
   TestApplication application;
   tet_infoline("Testing RenderTask with OrderIndex");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask1    = renderTaskList.CreateTask();
   application.SendNotification();
   DALI_TEST_EQUALS(renderTask1, renderTaskList.GetTask(1u), TEST_LOCATION);
@@ -5658,10 +5657,10 @@ int UtcDaliRenderTaskGetRenderTaskId(void)
   TestApplication application;
   tet_infoline("Testing RenderTask Id get");
 
-  Stage   stage = Stage::GetCurrent();
-  Vector2 stageSize(stage.GetSize());
+  Dali::Integration::Scene scene = application.GetScene();
+  Vector2                  sceneSize(scene.GetSize());
 
-  RenderTaskList renderTaskList = stage.GetRenderTaskList();
+  RenderTaskList renderTaskList = scene.GetRenderTaskList();
 
   RenderTask renderTask1 = renderTaskList.CreateTask();
   RenderTask renderTask2 = renderTaskList.CreateTask();
@@ -5697,11 +5696,11 @@ int UtcDaliRenderTaskDestructWorkerThreadN(void)
 
       Dali::RenderTask mRenderTask;
     };
-    TestThread thread;
-    Stage      stage = Stage::GetCurrent();
-    Vector2    stageSize(stage.GetSize());
+    TestThread               thread;
+    Dali::Integration::Scene scene = application.GetScene();
+    Vector2                  sceneSize(scene.GetSize());
 
-    RenderTaskList renderTaskList = stage.GetRenderTaskList();
+    RenderTaskList renderTaskList = scene.GetRenderTaskList();
 
     RenderTask renderTask = renderTaskList.CreateTask();
 
@@ -5866,18 +5865,18 @@ int UtcDaliRenderTaskExclusiveAddCacheRenderer(void)
   drawTrace.Enable(true);
 
   // Create scene and actors
-  Dali::Integration::Scene stage    = application.GetScene();
-  RenderTaskList           taskList = stage.GetRenderTaskList();
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
 
   // Create a renderable actor
   Texture image           = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
   Actor   renderableActor = CreateRenderableActor(image);
   renderableActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  stage.Add(renderableActor);
+  scene.Add(renderableActor);
 
   // Create camera for offscreen rendering
   CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
-  stage.Add(offscreenCameraActor);
+  scene.Add(offscreenCameraActor);
 
   // Create framebuffer for offscreen rendering
   FrameBuffer frameBuffer        = FrameBuffer::New(100, 100);

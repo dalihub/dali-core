@@ -53,7 +53,6 @@ class ConstraintBase;
 class EventThreadServices;
 class PropertyCondition;
 class PropertyInputImpl;
-class Stage;
 class TypeInfo;
 
 namespace SceneGraph

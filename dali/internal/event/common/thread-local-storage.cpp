@@ -201,6 +201,11 @@ std::string ThreadLocalStorage::GetFragmentShaderPrefix()
   return mCore->GetGraphicsConfig().GetFragmentShaderPrefix();
 }
 
+const std::vector<ScenePtr>& ThreadLocalStorage::GetScenes() const
+{
+  return mCore->GetScenes();
+}
+
 void ThreadLocalStorage::AddScene(Scene* scene)
 {
   mCore->AddScene(scene);

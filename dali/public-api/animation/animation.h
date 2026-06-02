@@ -2,7 +2,7 @@
 #define DALI_ANIMATION_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ class Animation;
  * } // At this point the animation handle has gone out of scope
  *
  * Actor actor = Actor::New();
- * Stage::GetCurrent().Add( actor );
+ * scene.Add( actor );
  *
  * // Fire animation and forget about it
  * ExampleAnimation( actor );
@@ -349,7 +349,7 @@ public:
   /**
    * @brief Sets the disconnect action.
    *
-   * If any of the animated property owners are disconnected from the stage while the animation is being played, then this action is performed.
+   * If any of the animated property owners are disconnected from the scene while the animation is being played, then this action is performed.
    * Default action is to BakeFinal.
    * @SINCE_1_0.0
    * @param[in] disconnectAction The disconnect action

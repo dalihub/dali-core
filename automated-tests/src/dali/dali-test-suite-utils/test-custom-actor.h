@@ -311,7 +311,7 @@ struct TestCustomActorVariant4 : public TestCustomActor
 };
 
 /**
- * Variant which removes its parent from Stage during OnSceneConnection
+ * Variant which removes its parent from Scene during OnSceneConnection
  */
 struct TestCustomActorVariant5 : public TestCustomActor
 {
@@ -329,7 +329,7 @@ struct TestCustomActorVariant5 : public TestCustomActor
     // Chain up first
     TestCustomActor::OnSceneConnection(depth);
 
-    // Take parent off-stage
+    // Take parent off-scene
     Dali::Actor parent = Self().GetParent();
     if(parent)
     {
@@ -342,7 +342,7 @@ private:
 };
 
 /**
- * Variant which adds its parent to Stage during OnSceneDisconnection
+ * Variant which adds its parent to Scene during OnSceneDisconnection
  */
 struct TestCustomActorVariant6 : public TestCustomActor
 {
@@ -360,7 +360,7 @@ struct TestCustomActorVariant6 : public TestCustomActor
     // Chain up first
     TestCustomActor::OnSceneDisconnection();
 
-    // Put parent on-stage
+    // Put parent on-scene
     Dali::Actor parent = Self().GetParent();
     if(parent)
     {

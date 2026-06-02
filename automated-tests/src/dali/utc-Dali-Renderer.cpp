@@ -20,7 +20,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/capabilities.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/signals/render-callback.h>
@@ -4252,7 +4251,7 @@ int UtcDaliRendererRegenerateUniformMap(void)
   shader.RegisterProperty("opacity", 0.5f);
   renderer.SetShader(shader);
 
-  Stage::GetCurrent().KeepRendering(1.0f);
+  application.GetCore().KeepRendering(1.0f);
 
   // Update for several frames
   application.SendNotification();
@@ -4851,7 +4850,7 @@ int utcDaliRendererPartialUpdateChangeUniform(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
 
@@ -4961,7 +4960,7 @@ int utcDaliRendererPartialUpdateAddRemoveRenderer(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
 
@@ -5055,7 +5054,7 @@ int utcDaliRendererPartialUpdateRenderingBehavior(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
 
@@ -6152,7 +6151,7 @@ int utcDaliRendererPartialUpdateUpdateAreaExtents(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
-  Stage::GetCurrent().Add(actor);
+  application.GetScene().Add(actor);
 
   application.SendNotification();
 

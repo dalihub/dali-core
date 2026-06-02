@@ -258,6 +258,21 @@ public:
    */
   void LogMemoryPools() const;
 
+  /**
+   * @copydoc Dali::Integration::Core::KeepRendering()
+   */
+  void KeepRendering(float durationSeconds);
+
+  /**
+   * @copydoc Dali::Integration::Core::SetRenderingBehavior()
+   */
+  void SetRenderingBehavior(Integration::RenderingBehavior renderingBehavior);
+
+  /**
+   * @copydoc Dali::Integration::Core::GetRenderingBehavior()
+   */
+  Integration::RenderingBehavior GetRenderingBehavior() const;
+
 public: // Implementation of EventThreadServices
   /**
    * @copydoc EventThreadServices::RegisterObject
@@ -284,9 +299,14 @@ public: // Implementation of EventThreadServices
    */
   uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene) override;
 
-private:
   using SceneContainer = std::vector<ScenePtr>;
 
+  /**
+   * @copydoc Dali::Internal::ThreadLocalStorage::GetScenes()
+   */
+  const SceneContainer& GetScenes() const;
+
+private:
   /**
    * Run each registered processor
    */
@@ -417,6 +437,8 @@ private:
 
   // The object registry
   ObjectRegistryPtr mObjectRegistry;
+
+  Integration::RenderingBehavior mRenderingBehavior{Integration::RenderingBehavior::IF_REQUIRED}; ///< The current rendering behavior
 
   uint32_t mProcessorOnceIndex : 1;     ///< Index of the once processor in mProcessorsOnce
   uint32_t mPostProcessorOnceIndex : 1; ///< Index of the once processor in mProcessorsOnce

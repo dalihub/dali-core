@@ -951,6 +951,25 @@ void Core::LogMemoryPools() const
     totalPoolCapacity, ((totalPoolCapacity + (1 << 9)) >> 10), ((totalPoolCapacity + (1 << 19)) >> 20));
 }
 
+void Core::SetRenderingBehavior(Integration::RenderingBehavior renderingBehavior)
+{
+  if(mRenderingBehavior != renderingBehavior)
+  {
+    SetRenderingBehaviorMessage(*mUpdateManager, renderingBehavior);
+    mRenderingBehavior = renderingBehavior;
+  }
+}
+
+Integration::RenderingBehavior Core::GetRenderingBehavior() const
+{
+  return mRenderingBehavior;
+}
+
+void Core::KeepRendering(float durationSeconds)
+{
+  KeepRenderingMessage(*mUpdateManager, durationSeconds);
+}
+
 EventThreadServices& Core::GetEventThreadServices()
 {
   return *this;
@@ -969,6 +988,11 @@ AnimationPlaylist& Core::GetAnimationPlaylist() const
 Integration::GraphicsConfig& Core::GetGraphicsConfig() const
 {
   return (*mRenderManager).GetGraphicsConfig();
+}
+
+const Core::SceneContainer& Core::GetScenes() const
+{
+  return mScenes;
 }
 
 void Core::AddScene(Scene* scene)

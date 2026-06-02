@@ -31,7 +31,7 @@
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/object-registry.h>
 
@@ -93,9 +93,11 @@ void PrintHierarchy()
 {
   if(gLogFilter->IsEnabledFor(Debug::Verbose))
   {
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "---------- ROOT LAYER ----------\n");
-
-    PrintChildren(Stage::GetCurrent()->GetRootLayer(), 0);
+    for(const auto& scene : ThreadLocalStorage::Get().GetScenes())
+    {
+      DALI_LOG_INFO(gLogFilter, Debug::Verbose, "---------- ROOT LAYER ----------\n");
+      PrintChildren(scene->GetRootLayer(), 0);
+    }
   }
 }
 

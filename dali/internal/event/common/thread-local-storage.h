@@ -205,6 +205,12 @@ public:
   std::string GetFragmentShaderPrefix();
 
   /**
+   * Get the list of scenes.
+   * @return A reference to the list of scenes.
+   */
+  const std::vector<ScenePtr>& GetScenes() const;
+
+  /**
    * Add a Scene to the Core.
    * This is only used by the Scene to add itself to the core when the Scene is created.
    * @param[in] scene The Scene.
