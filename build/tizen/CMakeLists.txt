@@ -218,6 +218,39 @@ ELSEIF( UNIX )
 ENDIF()
 INCLUDE( ${ROOT_SRC_DIR}/doc/file.list )
 
+OPTION(ENABLE_INVOKE_METHOD_WRAPPERS "Generate InvokeMethod wrappers for exported public API handle methods" ON)
+
+SET(INVOKE_METHOD_GENERATOR ${ROOT_SRC_DIR}/scripts/dali-invoke-method-generator.py)
+SET(INVOKE_METHOD_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated/invoke-method)
+SET(INVOKE_METHOD_PUBLIC_API_CPP ${INVOKE_METHOD_GENERATED_DIR}/public-api-invoke-methods.cpp)
+FILE(GLOB_RECURSE INVOKE_METHOD_PUBLIC_API_HEADERS CONFIGURE_DEPENDS ${ROOT_SRC_DIR}/dali/public-api/*.h)
+
+IF(ENABLE_INVOKE_METHOD_WRAPPERS)
+  FIND_PACKAGE(Python3 COMPONENTS Interpreter REQUIRED)
+  FILE(GLOB_RECURSE INVOKE_METHOD_REGISTRATION_SCAN_FILES CONFIGURE_DEPENDS
+       ${ROOT_SRC_DIR}/dali/*.cpp
+       ${ROOT_SRC_DIR}/dali/*.h
+       ${ROOT_SRC_DIR}/dali/*.hpp)
+
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${INVOKE_METHOD_PUBLIC_API_CPP}
+    COMMAND ${Python3_EXECUTABLE} ${INVOKE_METHOD_GENERATOR}
+            --scan-root ${ROOT_SRC_DIR}/dali/public-api
+            --include-prefix dali/public-api
+            --namespace Dali
+            --auto-export-api DALI_CORE_API
+            --registration-scan-root ${ROOT_SRC_DIR}/dali
+            --output ${INVOKE_METHOD_PUBLIC_API_CPP}
+    DEPENDS ${INVOKE_METHOD_GENERATOR}
+            ${INVOKE_METHOD_PUBLIC_API_HEADERS}
+            ${INVOKE_METHOD_REGISTRATION_SCAN_FILES}
+    COMMENT "Generating DALi invoke-method wrappers for exported core public API"
+    VERBATIM
+  )
+
+  LIST(APPEND SOURCES ${INVOKE_METHOD_PUBLIC_API_CPP})
+ENDIF()
+
 SET(LIBTYPE SHARED)
 IF(DEFINED STATIC)
   SET(LIBTYPE STATIC)
@@ -289,6 +322,8 @@ ENDIF()
 IF( ENABLE_PKG_CONFIGURE )
   INSTALL( FILES ${CORE_PKG_CFG_FILE} DESTINATION ${LIB_DIR}/pkgconfig )
 ENDIF()
+
+INSTALL(PROGRAMS ${INVOKE_METHOD_GENERATOR} DESTINATION ${BIN_DIR} RENAME dali-invoke-method-generator)
 
 # macro for installing headers by replacing prefix. (TODO, investigate
 # if there is a CMAKE way of doing this automatically)

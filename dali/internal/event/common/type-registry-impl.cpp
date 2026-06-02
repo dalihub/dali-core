@@ -54,6 +54,13 @@ TypeRegistry::TypeRegistry() = default;
 
 TypeRegistry::~TypeRegistry()
 {
+  for(const auto& pendingMethod : mPendingMethodRegistrations)
+  {
+    DALI_LOG_ERROR("Unresolved pending method registration for type '%s', method '%s'\n",
+                   pendingMethod.typeName.c_str(),
+                   pendingMethod.methodName.c_str());
+  }
+
   mRegistryLut.clear();
   mRegistryAlternativeObjectNameLut.clear();
 }
@@ -198,6 +205,19 @@ std::string TypeRegistry::Register(std::string                    uniqueTypeName
     mInitFunctions.push_back(createInstance);
   }
 
+  for(auto iter = mPendingMethodRegistrations.begin(); iter != mPendingMethodRegistrations.end();)
+  {
+    if(iter->typeName == uniqueTypeName || iter->typeName == uniqueObjectTypeName)
+    {
+      typeInfo->AddMethodFunction(std::move(iter->methodName), iter->function);
+      iter = mPendingMethodRegistrations.erase(iter);
+    }
+    else
+    {
+      ++iter;
+    }
+  }
+
   return uniqueTypeName;
 }
 
@@ -270,6 +290,29 @@ bool TypeRegistry::RegisterProperty(const std::string& objectName, std::string n
   return false;
 }
 
+bool TypeRegistry::RegisterMethod(TypeRegistration& typeRegistration, std::string name, Dali::TypeInfo::MethodFunction f)
+{
+  return RegisterMethod(ToStdString(typeRegistration.RegisteredName()), std::move(name), f);
+}
+
+bool TypeRegistry::RegisterMethod(const std::string& registeredTypeName, std::string name, Dali::TypeInfo::MethodFunction f)
+{
+  if(!f)
+  {
+    return false;
+  }
+
+  auto typeInfo = GetTypeInfo(ToDaliStringView(registeredTypeName));
+  if(typeInfo)
+  {
+    typeInfo->AddMethodFunction(std::move(name), f);
+    return true;
+  }
+
+  mPendingMethodRegistrations.push_back({registeredTypeName, std::move(name), f});
+  return true;
+}
+
 bool TypeRegistry::RegisterAnimatableProperty(TypeRegistration& typeRegistration, std::string name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc)
 {
   auto iter = mRegistryLut.Get(ConstString(ToStdStringView(typeRegistration.RegisteredName())));
@@ -338,6 +381,27 @@ bool TypeRegistry::DoActionTo(BaseObject* const object, const std::string& actio
   }
 
   return done;
+}
+
+bool TypeRegistry::InvokeMethodTo(BaseObject* const object, const std::string& methodName, const InvokeArguments& arguments, InvokeResult& result)
+{
+  bool invoked = false;
+
+  auto&& type = GetTypeInfo(object);
+  if(!type)
+  {
+    DALI_LOG_ERROR("TypeRegistry cannot find type info for object while invoking method '%s'\n", methodName.c_str());
+    return false;
+  }
+
+  invoked = type->InvokeMethodTo(object, methodName, arguments, result);
+
+  if(!invoked)
+  {
+    DALI_LOG_ERROR("Type '%s' cannot invoke method '%s'\n", type->GetName().CStr(), methodName.c_str());
+  }
+
+  return invoked;
 }
 
 bool TypeRegistry::ConnectSignal(BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor)

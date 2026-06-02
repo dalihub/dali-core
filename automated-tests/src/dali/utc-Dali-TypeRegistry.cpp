@@ -481,6 +481,27 @@ bool          DoActionCustom(BaseObject* object, const String& actionName, const
   return true;
 }
 
+static String lastMethodCustom;
+bool          InvokeMethodCustom(BaseObject* object, const StringView& methodName, const InvokeArguments& arguments, InvokeResult& result)
+{
+  lastMethodCustom = Integration::ToDaliString(methodName);
+
+  if(!object || arguments.Count() != 2u)
+  {
+    return false;
+  }
+
+  const int*    integerArgument = arguments[0].IsType<int>() ? AnyCast<int>(&arguments[0]) : nullptr;
+  const String* stringArgument  = arguments[1].IsType<String>() ? AnyCast<String>(&arguments[1]) : nullptr;
+  if(!integerArgument || !stringArgument)
+  {
+    return false;
+  }
+
+  result = String("method-result");
+  return (*integerArgument == 23 && *stringArgument == "argument");
+}
+
 // Custom type registration
 static TypeRegistration customType1(typeid(MyTestCustomActor), typeid(Dali::CustomActor), CreateCustom);
 
@@ -493,10 +514,22 @@ static const int           TEST_SIGNAL_COUNT = 2;
 static TypeAction customAction1(customType1, "act1", DoActionCustom);
 static const int  TEST_ACTION_COUNT = 1;
 
+// Custom invokable methods
+static TypeMethod customMethod1(customType1, "method1", InvokeMethodCustom);
+static TypeMethod namedActorMethod1("Actor", "named-method", InvokeMethodCustom);
+
 class TestConnectionTracker : public ConnectionTracker
 {
 public:
   TestConnectionTracker()
+  {
+  }
+};
+
+class UnregisteredBaseObject : public BaseObject
+{
+public:
+  UnregisteredBaseObject()
   {
   }
 };
@@ -2498,6 +2531,191 @@ int UtcDaliTypeRegistryActionViaBaseHandle(void)
   DALI_TEST_CHECK(a.GetCurrentProperty<bool>(Actor::Property::VISIBLE));
 
   DALI_TEST_CHECK(!hdl.DoAction("unknownAction", attributes));
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryInvokeMethodViaBaseHandle(void)
+{
+  TestApplication application;
+
+  TypeInfo type = TypeRegistry::Get().GetTypeInfo(typeid(MyTestCustomActor));
+  DALI_TEST_CHECK(type);
+
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK(handle);
+
+  InvokeArguments arguments;
+  arguments.PushBack(Any(23));
+  arguments.PushBack(Any(String("argument")));
+
+  InvokeResult result;
+  DALI_TEST_CHECK(handle.InvokeMethod("method1", arguments, result));
+  DALI_TEST_EQUALS(lastMethodCustom, String("method1"), TEST_LOCATION);
+
+  const String* stringResult = AnyCast<String>(&result);
+  DALI_TEST_CHECK(stringResult);
+  DALI_TEST_EQUALS(*stringResult, String("method-result"), TEST_LOCATION);
+
+  InvokeArguments wrongTypeArguments;
+  wrongTypeArguments.PushBack(Any(23.0f));
+  wrongTypeArguments.PushBack(Any(String("argument")));
+  DALI_TEST_CHECK(!handle.InvokeMethod("method1", wrongTypeArguments, result));
+
+  DALI_TEST_CHECK(!handle.InvokeMethod("method1", InvokeArguments(), result));
+  DALI_TEST_CHECK(!handle.InvokeMethod("unknownMethod", arguments, result));
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryInvokeMethodByRegisteredTypeName(void)
+{
+  TestApplication application;
+
+  TypeInfo type = TypeRegistry::Get().GetTypeInfo("MyNamedActor");
+  DALI_TEST_CHECK(type);
+
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK(handle);
+
+  InvokeArguments arguments;
+  arguments.PushBack(Any(23));
+  arguments.PushBack(Any(String("argument")));
+
+  InvokeResult result;
+  DALI_TEST_CHECK(handle.InvokeMethod("named-method", arguments, result));
+
+  const String* stringResult = AnyCast<String>(&result);
+  DALI_TEST_CHECK(stringResult);
+  DALI_TEST_EQUALS(*stringResult, String("method-result"), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryInvokeMethodUnregisteredTypeN(void)
+{
+  TestApplication application;
+
+  BaseHandle handle(new UnregisteredBaseObject);
+
+  InvokeResult result;
+  DALI_TEST_CHECK(!handle.InvokeMethod("Unknown", InvokeArguments(), result));
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryGeneratedInvokeMethod(void)
+{
+  TestApplication application;
+
+  Actor      parent = Actor::New();
+  Actor      child  = Actor::New();
+  BaseHandle handle = parent;
+
+  InvokeArguments addArguments;
+  addArguments.PushBack(Any(child));
+
+  InvokeResult result;
+  DALI_TEST_CHECK(handle.InvokeMethod("Add", addArguments, result));
+
+  DALI_TEST_CHECK(handle.InvokeMethod("GetChildCount", InvokeArguments(), result));
+  const uint32_t* childCount = AnyCast<uint32_t>(&result);
+  DALI_TEST_CHECK(childCount);
+  DALI_TEST_EQUALS(*childCount, 1u, TEST_LOCATION);
+
+  InvokeArguments wrongTypeArguments;
+  wrongTypeArguments.PushBack(Any(1));
+  DALI_TEST_CHECK(!handle.InvokeMethod("Add", wrongTypeArguments, result));
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryGeneratedInvokeMethodFiltersUnsupportedApi(void)
+{
+  TestApplication application;
+
+  Actor      actor           = Actor::New();
+  Animation  animation       = Animation::New(1.0f);
+  BaseHandle actorHandle     = actor;
+  BaseHandle animationHandle = animation;
+
+  auto expectNotInvokable = [](BaseHandle handle, const char* methodName)
+  {
+    InvokeResult result;
+    DALI_TEST_CHECK(!handle.InvokeMethod(methodName, InvokeArguments(), result));
+  };
+
+  InvokeResult result;
+  DALI_TEST_CHECK(actorHandle.InvokeMethod("GetChildCount", InvokeArguments(), result));
+
+  DALI_TEST_CHECK(animationHandle.InvokeMethod("GetDuration", InvokeArguments(), result));
+  const float* duration = AnyCast<float>(&result);
+  DALI_TEST_CHECK(duration);
+  DALI_TEST_EQUALS(*duration, 1.0f, TEST_LOCATION);
+
+  InvokeArguments setLoopingArguments;
+  setLoopingArguments.PushBack(Any(true));
+  DALI_TEST_CHECK(animationHandle.InvokeMethod("SetLooping", setLoopingArguments, result));
+  DALI_TEST_CHECK(animation.IsLooping());
+
+  expectNotInvokable(actorHandle, "New");
+  expectNotInvokable(actorHandle, "DownCast");
+  expectNotInvokable(actorHandle, "GetImplementation");
+  expectNotInvokable(actorHandle, "TouchedSignal");
+  expectNotInvokable(actorHandle, "HoveredSignal");
+  expectNotInvokable(actorHandle, "WheelEventSignal");
+  expectNotInvokable(actorHandle, "OnSceneSignal");
+
+  expectNotInvokable(animationHandle, "FinishedSignal");
+  expectNotInvokable(animationHandle, "AnimateTo");
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryInvokeMethodBaseTypeFallback(void)
+{
+  TestApplication application;
+
+  Layer      layer  = Layer::New();
+  BaseHandle handle = layer;
+
+  InvokeResult result;
+  DALI_TEST_CHECK(handle.InvokeMethod("GetChildCount", InvokeArguments(), result));
+
+  const uint32_t* childCount = AnyCast<uint32_t>(&result);
+  DALI_TEST_CHECK(childCount);
+  DALI_TEST_EQUALS(*childCount, 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryInvokeMethodRegistrationBranches(void)
+{
+  TestApplication application;
+
+  TypeMethod nullMethod(customType1, "null-method", nullptr);
+  TypeMethod duplicateMethod(customType1, "method1", InvokeMethodCustom);
+
+  TypeMethod pendingMethod("PendingInvokeTypeForCoverage", "pending-method", InvokeMethodCustom);
+  TypeRegistration pendingType("PendingInvokeTypeForCoverage", typeid(Dali::CustomActor), CreateCustom);
+
+  TypeInfo type = TypeRegistry::Get().GetTypeInfo("PendingInvokeTypeForCoverage");
+  DALI_TEST_CHECK(type);
+
+  BaseHandle handle = type.CreateInstance();
+  DALI_TEST_CHECK(handle);
+
+  InvokeArguments arguments;
+  arguments.PushBack(Any(23));
+  arguments.PushBack(Any(String("argument")));
+
+  InvokeResult result;
+  DALI_TEST_CHECK(!GetImplementation(type).InvokeMethodTo(&GetImplementation(handle), "null-method", arguments, result));
+  DALI_TEST_CHECK(GetImplementation(type).InvokeMethodTo(&GetImplementation(handle), "pending-method", arguments, result));
+
+  const String* stringResult = AnyCast<String>(&result);
+  DALI_TEST_CHECK(stringResult);
+  DALI_TEST_EQUALS(*stringResult, String("method-result"), TEST_LOCATION);
+
   END_TEST;
 }
 

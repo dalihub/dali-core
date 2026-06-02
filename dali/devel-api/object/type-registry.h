@@ -336,6 +336,34 @@ public:
 };
 
 /**
+ * @brief Registers an invokable method function.
+ */
+class DALI_CORE_API TypeMethod
+{
+public:
+  /**
+   * @brief Constructor registers an invokable method function.
+   *
+   * @param[in] registered The TypeRegistration object
+   * @param[in] name The method name
+   * @param[in] f The method function
+   */
+  TypeMethod(TypeRegistration& registered, Dali::String name, TypeInfo::MethodFunction f);
+
+  /**
+   * @brief Constructor registers an invokable method function by registered type name.
+   *
+   * This form is intended for generated method wrappers that are compiled in a
+   * separate translation unit from the type registration object.
+   *
+   * @param[in] registeredTypeName The registered type name
+   * @param[in] name The method name
+   * @param[in] f The method function
+   */
+  TypeMethod(Dali::String registeredTypeName, Dali::String name, TypeInfo::MethodFunction f);
+};
+
+/**
  * @brief Registers a property for the given type.
  * @SINCE_1_0.0
  */

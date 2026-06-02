@@ -142,6 +142,16 @@ TypeAction::TypeAction(TypeRegistration& registered, Dali::String name, TypeInfo
   Internal::TypeRegistry::Get()->RegisterAction(registered, ToStdString(std::move(name)), f);
 }
 
+TypeMethod::TypeMethod(TypeRegistration& registered, Dali::String name, TypeInfo::MethodFunction f)
+{
+  Internal::TypeRegistry::Get()->RegisterMethod(registered, ToStdString(std::move(name)), f);
+}
+
+TypeMethod::TypeMethod(Dali::String registeredTypeName, Dali::String name, TypeInfo::MethodFunction f)
+{
+  Internal::TypeRegistry::Get()->RegisterMethod(ToStdString(std::move(registeredTypeName)), ToStdString(std::move(name)), f);
+}
+
 PropertyRegistration::PropertyRegistration(TypeRegistration& registered, Dali::String name, Property::Index index, Property::Type type, TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc)
 {
   DALI_ASSERT_ALWAYS((index >= PROPERTY_REGISTRATION_START_INDEX) && (index <= PROPERTY_REGISTRATION_MAX_INDEX));
