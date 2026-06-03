@@ -23,6 +23,7 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
+#include <dali/public-api/common/dali-utility.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -448,7 +449,7 @@ void ActorParentImpl::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths
       {
         depthIndex = childDepthIndex;
         actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
-        maxDepthIndex = std::max(maxDepthIndex, depthIndex);
+        maxDepthIndex = Max(maxDepthIndex, depthIndex);
       }
       depthIndex = maxDepthIndex;
     }

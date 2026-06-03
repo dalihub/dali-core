@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace
 {
@@ -56,9 +57,9 @@ struct SpringData::Impl
    * @brief Constructor with parameters.
    */
   Impl(float stiffnessParam, float dampingParam, float massParam)
-  : stiffness(std::max(stiffnessParam, MIN_STIFFNESS)),
-    damping(std::max(dampingParam, MIN_DAMPING)),
-    mass(std::max(massParam, MIN_MASS))
+  : stiffness(Max(stiffnessParam, MIN_STIFFNESS)),
+    damping(Max(dampingParam, MIN_DAMPING)),
+    mass(Max(massParam, MIN_MASS))
   {
   }
 };
@@ -112,7 +113,7 @@ SpringData& SpringData::operator=(SpringData&& rhs) noexcept
 
 void SpringData::SetStiffness(float stiffness)
 {
-  mImpl->stiffness = std::max(stiffness, MIN_STIFFNESS);
+  mImpl->stiffness = Max(stiffness, MIN_STIFFNESS);
 }
 
 float SpringData::GetStiffness() const
@@ -122,7 +123,7 @@ float SpringData::GetStiffness() const
 
 void SpringData::SetDamping(float damping)
 {
-  mImpl->damping = std::max(damping, MIN_DAMPING);
+  mImpl->damping = Max(damping, MIN_DAMPING);
 }
 
 float SpringData::GetDamping() const
@@ -132,7 +133,7 @@ float SpringData::GetDamping() const
 
 void SpringData::SetMass(float mass)
 {
-  mImpl->mass = std::max(mass, MIN_MASS);
+  mImpl->mass = Max(mass, MIN_MASS);
 }
 
 float SpringData::GetMass() const
@@ -157,7 +158,7 @@ float SpringData::GetDuration() const
   }
   else
   {
-    double sqrtTerm = std::sqrt(std::max(zeta * zeta - 1.0f, 1e-6));
+    double sqrtTerm = std::sqrt(Max(zeta * zeta - 1.0f, 1e-6));
     double r1       = -omega0 * (zeta - sqrtTerm); // dominant(Slower) root
     time            = std::log(1.0 / EPSILON) / std::abs(r1);
   }

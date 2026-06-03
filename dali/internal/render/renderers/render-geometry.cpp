@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/renderers/render-vertex-buffer.h>
 #include <dali/internal/render/shaders/program.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali::Internal::Render
 {
@@ -240,7 +241,7 @@ bool Geometry::Draw(
 
     if(elementBufferCount != 0u)
     {
-      numIndices = std::min(elementBufferCount, numIndices);
+      numIndices = Min(elementBufferCount, numIndices);
     }
   }
 
@@ -279,7 +280,7 @@ bool Geometry::Draw(
       auto elementsCount = mVertexBuffers[0]->GetRenderableElementCount();
       for(auto& vertexBuffer : mVertexBuffers)
       {
-        elementsCount = std::min(elementsCount, vertexBuffer->GetRenderableElementCount());
+        elementsCount = Min(elementsCount, vertexBuffer->GetRenderableElementCount());
       }
       numVertices = elementsCount;
     }

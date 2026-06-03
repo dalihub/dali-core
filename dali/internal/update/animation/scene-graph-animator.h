@@ -33,6 +33,7 @@
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
 
@@ -353,7 +354,7 @@ public:
       }
       else
       {
-        double sqrtTerm = std::sqrt(std::max(zeta * zeta - 1.0, 1e-6));
+        double sqrtTerm = std::sqrt(Max(zeta * zeta - 1.0, 1e-6));
         double r1       = -omega0 * (zeta - sqrtTerm);
         double r2       = -omega0 * (zeta + sqrtTerm);
         double A        = r2 / (r2 - r1);
