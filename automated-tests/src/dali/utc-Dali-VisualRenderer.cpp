@@ -18,7 +18,6 @@
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/capabilities.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/integration-api/rendering/visual-renderer.h>
