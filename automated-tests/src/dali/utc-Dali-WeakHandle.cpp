@@ -48,67 +48,61 @@ struct MyTestCustomActor : public CustomActorImpl
   }
 
   // From CustomActorImpl
-  virtual void OnSceneConnection(int depth)
+  virtual void OnSceneConnection(int depth) override
   {
   }
-  virtual void OnSceneDisconnection()
+  virtual void OnSceneDisconnection() override
   {
   }
-  virtual void OnChildAdd(Actor& child)
+  virtual void OnChildAdd(Actor& child) override
   {
   }
-  virtual void OnChildRemove(Actor& child)
+  virtual void OnChildRemove(Actor& child) override
   {
   }
-  virtual void OnSizeSet(const Vector3& targetSize)
+  virtual void OnSizeSet(const Vector3& targetSize) override
   {
   }
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override
   {
   }
-  virtual void OnKeyInputFocusGained()
-  {
-  }
-  virtual void OnKeyInputFocusLost()
-  {
-  }
-  virtual Vector3 GetNaturalSize()
+  virtual Vector3 GetNaturalSize() override
   {
     return Vector3(0.0f, 0.0f, 0.0f);
   }
 
-  virtual float GetHeightForWidth(float width)
+  virtual float GetHeightForWidth(float width) override
   {
     return 0.0f;
   }
 
-  virtual float GetWidthForHeight(float height)
+  virtual float GetWidthForHeight(float height) override
   {
     return 0.0f;
   }
 
-  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container)
+  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container) override
   {
   }
 
-  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
+  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override
   {
   }
 
-  virtual void OnCalculateRelayoutSize(Dimension::Type dimension)
+  virtual void OnCalculateRelayoutSize(Dimension::Type dimension) override
   {
   }
 
-  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
+  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
   {
     return 0.0f;
   }
 
-  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension)
+  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) override
   {
   }
 
-  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS)
+  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
   {
     return false;
   }

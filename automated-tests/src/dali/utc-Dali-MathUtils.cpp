@@ -318,6 +318,11 @@ int UtcDaliMathUtilsRoundP(void)
 
 int UtcDaliMathUtilsConstExprP(void)
 {
+#if !defined(__clang__)
+  // fabsf be constexpr after c++23.
+  // Until now, gcc pass this UTC, but clang doesn't. So, exclude clang for now.
+  // TODO : Remove this define after c++ version is updated over c++23.
+
   // Equals
   constexpr float zero  = 0.0f;
   constexpr float v1    = 1.49f;
@@ -376,6 +381,7 @@ int UtcDaliMathUtilsConstExprP(void)
   static_assert(Equals(ShortestDistanceInDomain(2.1f, 2.3f, 2.0f, 5.0f), 0.2f, 0.02f));
   static_assert(Equals(ShortestDistanceInDomain(2.2f, 3.69f, 2.0f, 5.0f), 1.49f, 0.02f));
   static_assert(Equals(ShortestDistanceInDomain(2.2f, 3.71f, 2.0f, 5.0f), -1.49f, 0.02f));
+#endif
 
   // Always pass if compile success.
   DALI_TEST_CHECK(true);

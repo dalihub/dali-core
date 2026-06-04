@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ int UtcDaliGraphicsApiRect2DOpNotEq(void)
 {
   TestApplication application;
 
-  Graphics::Rect2D rect1, rect2;
+  Graphics::Rect2D rect1;
   Graphics::Rect2D zeroRect;
   zeroRect.x      = 0;
   zeroRect.y      = 0;

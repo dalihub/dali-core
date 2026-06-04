@@ -3813,8 +3813,6 @@ int UtcDaliAnimationClearIgnoreFinishedSignal(void)
   Vector3   targetPosition(100.0f, 100.0f, 100.0f);
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
-  Vector3 fiftyPercentProgress(targetPosition * 0.5f);
-
   // Start the animation
   animation.Play();
 
@@ -5800,8 +5798,6 @@ int UtcDaliAnimationAnimateByActorPositionTimePeriodP(void)
                       relativePosition,
                       TimePeriod(delay, durationSeconds - delay));
 
-  Vector3 ninetyFivePercentProgress(startPosition + relativePosition * 0.95f);
-
   // Start the animation
   animation.Play();
 
@@ -5855,8 +5851,6 @@ int UtcDaliAnimationAnimateByActorPositionAlphaFunctionTimePeriodP(void)
                       relativePosition,
                       AlphaFunction::LINEAR,
                       TimePeriod(delay, durationSeconds - delay));
-
-  Vector3 ninetyFivePercentProgress(startPosition + relativePosition * 0.95f);
 
   // Start the animation
   animation.Play();

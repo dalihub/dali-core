@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -298,14 +298,28 @@ int UtcDaliVector4Divide01P(void)
 
 int UtcDaliVector4Divide02P(void)
 {
-  Vector4       v0(2.0f, 4.0f, 8.0f, 16.0f);
   const Vector4 r0(20.0f, 40.0f, 80.0f, 160.0f);
   const Vector4 r1(10.0f, 20.0f, 40.0f, 80.0f);
   const Vector4 r2(1.0f, 2.0f, 4.0f, 8.0f);
   const Vector4 r3(2.0f, 4.0f, 8.0f, 16.0f);
 
-  Vector4 v2 = r0 / 10.0f;
-  DALI_TEST_EQUALS(v2, r3, TEST_LOCATION);
+  Vector4 v0 = r0 / 1.0f;
+  DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
+  Vector4 v1 = r0 / 2.0f;
+  DALI_TEST_EQUALS(v1, r1, TEST_LOCATION);
+  Vector4 v2 = r0 / 20.0f;
+  DALI_TEST_EQUALS(v2, r2, TEST_LOCATION);
+  Vector4 v3 = r0 / 10.0f;
+  DALI_TEST_EQUALS(v3, r3, TEST_LOCATION);
+
+  v0 = r2 / 0.05f;
+  DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
+  v1 = r2 / 0.1f;
+  DALI_TEST_EQUALS(v1, r1, TEST_LOCATION);
+  v2 = r2 / 1.0f;
+  DALI_TEST_EQUALS(v2, r2, TEST_LOCATION);
+  v3 = r2 / 0.5f;
+  DALI_TEST_EQUALS(v3, r3, TEST_LOCATION);
 
   END_TEST;
 }
@@ -336,15 +350,36 @@ int UtcDaliVector4Divide03P(void)
 
 int UtcDaliVector4Divide04P(void)
 {
-  Vector4       v0(2.0f, 4.0f, 8.0f, 16.0f);
   const Vector4 r0(20.0f, 40.0f, 80.0f, 160.0f);
   const Vector4 r1(10.0f, 20.0f, 40.0f, 80.0f);
   const Vector4 r2(1.0f, 2.0f, 4.0f, 8.0f);
   const Vector4 r3(2.0f, 4.0f, 8.0f, 16.0f);
 
+  Vector4 v0(r0);
+  v0 /= 1.0f;
+  DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
+  Vector4 v1(r0);
+  v1 /= 2.0f;
+  DALI_TEST_EQUALS(v1, r1, TEST_LOCATION);
   Vector4 v2(r0);
-  v2 /= 10.0f;
-  DALI_TEST_EQUALS(v2, r3, TEST_LOCATION);
+  v2 /= 20.0f;
+  DALI_TEST_EQUALS(v2, r2, TEST_LOCATION);
+  Vector4 v3(r0);
+  v3 /= 10.0f;
+  DALI_TEST_EQUALS(v3, r3, TEST_LOCATION);
+
+  v0 = r2;
+  v0 /= 0.05f;
+  DALI_TEST_EQUALS(v0, r0, TEST_LOCATION);
+  v1 = r2;
+  v1 /= 0.1f;
+  DALI_TEST_EQUALS(v1, r1, TEST_LOCATION);
+  v2 = r2;
+  v2 /= 1.0f;
+  DALI_TEST_EQUALS(v2, r2, TEST_LOCATION);
+  v3 = r2;
+  v3 /= 0.5f;
+  DALI_TEST_EQUALS(v3, r3, TEST_LOCATION);
 
   END_TEST;
 }
@@ -375,6 +410,7 @@ int UtcDaliVector4NotEqualsP(void)
   Vector4 v1(1.0f, 2.0f, 3.0f, 4.0f);
 
   Vector4 v2 = Vector4(0.0f, 2.0f, 3.0f, 4.0f);
+  DALI_TEST_CHECK(v0 == v1);
   DALI_TEST_CHECK(v0 != v2);
 
   v2 = Vector4(1.0f, 0.0f, 3.0f, 4.0f);

@@ -28,7 +28,6 @@
 namespace Dali
 {
 class Actor;
-class Image;
 class Texture;
 
 /**

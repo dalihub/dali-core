@@ -384,13 +384,12 @@ int UtcDaliAnyNegativeGet(void)
   bool assert1 = false;
   bool assert2 = false;
 
-  unsigned int uiValue = 0u;
+  [[maybe_unused]] unsigned int uiValue = 0u;
 
   try
   {
     uiValue = value1.Get<unsigned int>();
   }
-
   catch(Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT(e);
@@ -401,7 +400,6 @@ int UtcDaliAnyNegativeGet(void)
   {
     uiValue = value2.Get<unsigned int>();
   }
-
   catch(Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT(e);
@@ -416,7 +414,7 @@ int UtcDaliAnyNegativeGet(void)
   {
     tet_result(TET_FAIL);
   }
-  uiValue++; // supresss warning from unused variable
+
   END_TEST;
 }
 

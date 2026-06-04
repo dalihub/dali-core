@@ -1707,6 +1707,12 @@ int UtcDaliRendererPreMultipledAlpha(void)
   DALI_TEST_EQUALS((int)DEFAULT_BLEND_FACTOR_SRC_ALPHA, srcFactorAlpha, TEST_LOCATION);
   DALI_TEST_EQUALS((int)DEFAULT_BLEND_FACTOR_DEST_ALPHA, destFactorAlpha, TEST_LOCATION);
 
+  int blendEquationRgb   = renderer.GetProperty<int>(Renderer::Property::BLEND_EQUATION_RGB);
+  int blendEquationAlpha = renderer.GetProperty<int>(Renderer::Property::BLEND_EQUATION_ALPHA);
+
+  DALI_TEST_EQUALS((int)DEFAULT_BLEND_EQUATION_RGB, blendEquationRgb, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)DEFAULT_BLEND_EQUATION_ALPHA, blendEquationAlpha, TEST_LOCATION);
+
   application.SendNotification();
   application.Render();
 

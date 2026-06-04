@@ -31,7 +31,7 @@ public:
   {
   }
 
-  virtual void Process(bool postProcessor)
+  virtual void Process(bool postProcessor) override
   {
     processRun = true;
   }
@@ -52,7 +52,7 @@ public:
   {
   }
 
-  virtual void Process(bool postProcessor)
+  virtual void Process(bool postProcessor) override
   {
     processRun = true;
     if(unregisterProcessor)
@@ -83,7 +83,7 @@ public:
   {
   }
 
-  virtual void Process(bool postProcessor)
+  virtual void Process(bool postProcessor) override
   {
     processRun = true;
     if(unregisterProcessor)

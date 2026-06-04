@@ -4714,7 +4714,6 @@ int UtcDaliRenderTaskSetGetViewportGuideActor(void)
   tet_infoline("Testing RenderTask with Set/Get ViewportGuideActor");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5373,7 +5372,6 @@ int UtcDaliRenderTaskRenderPassTag(void)
   tet_infoline("Testing RenderTask with RenderPassTag");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5451,7 +5449,6 @@ int UtcDaliRenderTaskWithWrongShaderData01(void)
   tet_infoline("Testing RenderTask with wrong shader data");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5488,7 +5485,6 @@ int UtcDaliRenderTaskWithWrongShaderData02(void)
   tet_infoline("Testing RenderTask with wrong shader data. This UTC is for line coverage");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Vector2                  sceneSize(scene.GetSize());
 
   Actor blue                                 = Actor::New();
   blue[Dali::Actor::Property::NAME]          = "Blue";
@@ -5536,7 +5532,6 @@ int UtcDaliRenderTaskOrderIndex01(void)
   tet_infoline("Testing RenderTask with OrderIndex");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Vector2                  sceneSize(scene.GetSize());
 
   RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask1    = renderTaskList.CreateTask();
@@ -5617,7 +5612,6 @@ int UtcDaliRenderTaskOrderIndex02(void)
   tet_infoline("Testing RenderTask with OrderIndex");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Vector2                  sceneSize(scene.GetSize());
 
   RenderTaskList renderTaskList = scene.GetRenderTaskList();
   RenderTask     renderTask1    = renderTaskList.CreateTask();
@@ -5658,7 +5652,6 @@ int UtcDaliRenderTaskGetRenderTaskId(void)
   tet_infoline("Testing RenderTask Id get");
 
   Dali::Integration::Scene scene = application.GetScene();
-  Vector2                  sceneSize(scene.GetSize());
 
   RenderTaskList renderTaskList = scene.GetRenderTaskList();
 
@@ -5698,7 +5691,6 @@ int UtcDaliRenderTaskDestructWorkerThreadN(void)
     };
     TestThread               thread;
     Dali::Integration::Scene scene = application.GetScene();
-    Vector2                  sceneSize(scene.GetSize());
 
     RenderTaskList renderTaskList = scene.GetRenderTaskList();
 

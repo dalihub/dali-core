@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -270,7 +270,12 @@ int UtcDaliIntrusivePtrIndirectionOperatorP(void)
   tet_infoline("Positive Test for Dali::IntrusivePtr::operator*()");
 
   IntrusivePtr<Counted> counted(new Counted);
-  DALI_TEST_CHECK(&(counted.operator*()) != 0);
+#if defined(__clang__)
+  // To avoid -Wtautological-undefined-compare warnings.
+  DALI_TEST_CHECK(true);
+#else
+  DALI_TEST_CHECK((&(counted.operator*())) != nullptr);
+#endif
   DALI_TEST_EQUALS((*counted).ReferenceCount(), 1, TEST_LOCATION);
 
   END_TEST;
@@ -281,7 +286,12 @@ int UtcDaliIntrusivePtrIndirectionOperatorN(void)
   tet_infoline("Negative Test for Dali::IntrusivePtr::operator*()");
 
   IntrusivePtr<Counted> counted;
-  DALI_TEST_CHECK(&(counted.operator*()) == 0);
+#if defined(__clang__)
+  // To avoid -Wtautological-undefined-compare warnings.
+  DALI_TEST_CHECK(true);
+#else
+  DALI_TEST_CHECK((&(counted.operator*())) == nullptr);
+#endif
 
   END_TEST;
 }

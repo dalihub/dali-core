@@ -1284,7 +1284,6 @@ int UtcDaliHoverMultipleRenderableActors(void)
 {
   TestApplication          application;
   Dali::Integration::Scene scene(application.GetScene());
-  Vector2                  sceneSize(scene.GetSize());
 
   Actor parent = CreateRenderableActor();
   parent.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));

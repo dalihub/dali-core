@@ -347,6 +347,9 @@ int UtcDaliVector2Divide02P(void)
   DALI_TEST_EQUALS(v0 / 1.f, v0, TEST_LOCATION);
   DALI_TEST_EQUALS(v1 / 1.f, v1, TEST_LOCATION);
   DALI_TEST_EQUALS(v1 / 3.f, v0, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2 / 1.f, v2, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2 / 3.f, v1, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2 / 9.f, v0, TEST_LOCATION);
 
   END_TEST;
 }
@@ -415,6 +418,7 @@ int UtcDaliVector2NotEqualsP(void)
   Vector2         v1(1.0f, 2.0f);
 
   Vector2 v2 = Vector2(0.0f, 2.0f);
+  DALI_TEST_CHECK(v0 == v1);
   DALI_TEST_CHECK(v0 != v2);
 
   v2 = Vector2(1.0f, 0.0f);

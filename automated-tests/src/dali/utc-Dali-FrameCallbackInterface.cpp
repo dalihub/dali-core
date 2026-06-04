@@ -394,18 +394,15 @@ class FrameCallbackCustomProperty : public FrameCallbackBasic
 {
 public:
   // Property Names
-  static constexpr const char* CUSTOM_PROPERTY_INTEGER   = "fCustomPropertyInteger";
-  static constexpr const char* CUSTOM_PROPERTY_FLOAT     = "fCustomPropertyFloat";
-  static constexpr const char* CUSTOM_PROPERTY_VECTOR2   = "fCustomPropertyVector2";
-  static constexpr const char* CUSTOM_PROPERTY_VECTOR3   = "fCustomPropertyVector3";
-  static constexpr const char* CUSTOM_PROPERTY_VECTOR4   = "fCustomPropertyVector4";
-  static constexpr const char* CUSTOM_PROPERTY_MATRIX3   = "fCustomPropertyMatrix3";
-  static constexpr const char* CUSTOM_PROPERTY_MATRIX    = "fCustomPropertyMatrix";
-  static constexpr const char* CUSTOM_PROPERTY_ROTATION  = "fCustomPropertyRotation";
-  static constexpr const char* CUSTOM_PROPERTY_STRING    = "fCustomPropertyString";
-  static constexpr const char* CUSTOM_PROPERTY_RECTANGLE = "fCustomPropertyRectangle";
-  static constexpr const char* CUSTOM_PROPERTY_EXTENTS   = "fCustomPropertyExtents";
-  static constexpr const char* CUSTOM_PROPERTY_BOOL      = "fCustomPropertyBool";
+  static constexpr const char* CUSTOM_PROPERTY_BOOL     = "fCustomPropertyBool";
+  static constexpr const char* CUSTOM_PROPERTY_INTEGER  = "fCustomPropertyInteger";
+  static constexpr const char* CUSTOM_PROPERTY_FLOAT    = "fCustomPropertyFloat";
+  static constexpr const char* CUSTOM_PROPERTY_VECTOR2  = "fCustomPropertyVector2";
+  static constexpr const char* CUSTOM_PROPERTY_VECTOR3  = "fCustomPropertyVector3";
+  static constexpr const char* CUSTOM_PROPERTY_VECTOR4  = "fCustomPropertyVector4";
+  static constexpr const char* CUSTOM_PROPERTY_MATRIX3  = "fCustomPropertyMatrix3";
+  static constexpr const char* CUSTOM_PROPERTY_MATRIX   = "fCustomPropertyMatrix";
+  static constexpr const char* CUSTOM_PROPERTY_ROTATION = "fCustomPropertyRotation";
 
   // Property Name for invalid
   static constexpr const char* CUSTOM_PROPERTY_INVALID = "fCustomPropertyInvalid";
@@ -1598,12 +1595,6 @@ int UtcDaliFrameCallbackUpdateNotify01(void)
   actor.SetProperty(Actor::Property::SIZE, actorSize);
 
   application.GetScene().Add(actor);
-
-  Vector3    sizeToSet(1.0f, 2.0f, 3.0f);
-  Vector3    positionToSet(10.0f, 20.0f, 30.0f);
-  Vector4    colorToSet(Color::MAGENTA);
-  Vector3    scaleToSet(1.0f, 3.0f, 5.0f);
-  Quaternion orientationToSet(Radian(Math::PI * 0.3), Vector3::YAXIS);
 
   tet_infoline("Test that the frame callback was called without a notify");
   FrameCallbackNotify frameCallback;
