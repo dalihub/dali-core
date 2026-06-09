@@ -689,8 +689,7 @@ void PanGestureDetector::EmitPanSignal(Actor*                 actor,
   pan->SetNumberOfTouches(panEvent.numberOfTouches);
   pan->SetScreenPosition(panEvent.currentPosition);
   pan->SetPosition(localCurrent);
-  pan->SetSourceType(panEvent.sourceType);
-  pan->SetSourceData(panEvent.sourceData);
+  pan->SetTriggerPoint(panEvent.triggerPoint);
 
   RenderTask& renderTaskImpl(*renderTask.Get());
 

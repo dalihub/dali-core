@@ -55,14 +55,19 @@ uint32_t Gesture::GetTime() const
   return GetImplementation(*this).GetTime();
 }
 
-GestureSourceType Gesture::GetSourceType() const
+Device::Class::Type Gesture::GetDeviceClass() const
 {
-  return GetImplementation(*this).GetSourceType();
+  return GetImplementation(*this).GetDeviceClass();
 }
 
-GestureSourceData Gesture::GetSourceData() const
+MouseButton::Type Gesture::GetMouseButton() const
 {
-  return GetImplementation(*this).GetSourceData();
+  return GetImplementation(*this).GetMouseButton();
+}
+
+Device::Subclass::Type Gesture::GetDeviceSubclass() const
+{
+  return GetImplementation(*this).GetDeviceSubclass();
 }
 
 } // namespace Dali

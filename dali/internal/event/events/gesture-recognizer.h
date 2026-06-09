@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/vector-wrapper.h>
+#include <dali/integration-api/events/point.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/event/events/gesture-event.h>
 #include <dali/public-api/events/gesture.h>
@@ -101,42 +102,16 @@ public:
     mScene = &scene;
     if(event.GetPointCount() > 0)
     {
-      const Integration::Point& point       = event.points[0];
-      MouseButton::Type         mouseButton = point.GetMouseButton();
-      if(mouseButton != MouseButton::INVALID)
+      const Integration::Point& p = event.points[0];
+      // Mouse button is INVALID during motion events (touch move, mouse drag),
+      // so only capture device info on press/release events.
+      // Copy individual fields instead of the full Point to avoid retaining
+      // the hitActor reference, which would prevent Actor destruction.
+      if(p.GetMouseButton() != MouseButton::INVALID)
       {
-        Device::Class::Type type = point.GetDeviceClass();
-        if(type == Device::Class::Type::MOUSE)
-        {
-          mSourceType = GestureSourceType::MOUSE;
-        }
-        else if(type == Device::Class::Type::TOUCH)
-        {
-          mSourceType = GestureSourceType::TOUCH;
-        }
-        switch(mouseButton)
-        {
-          case MouseButton::PRIMARY:
-          {
-            mSourceData = GestureSourceData::MOUSE_PRIMARY;
-            break;
-          }
-          case MouseButton::SECONDARY:
-          {
-            mSourceData = GestureSourceData::MOUSE_SECONDARY;
-            break;
-          }
-          case MouseButton::TERTIARY:
-          {
-            mSourceData = GestureSourceData::MOUSE_TERTIARY;
-            break;
-          }
-          default:
-          {
-            mSourceData = GestureSourceData::INVALID;
-            break;
-          }
-        }
+        mTriggerPoint.SetDeviceClass(p.GetDeviceClass());
+        mTriggerPoint.SetDeviceSubclass(p.GetDeviceSubclass());
+        mTriggerPoint.SetMouseButton(p.GetMouseButton());
       }
     }
     SendEvent(event);
@@ -152,8 +127,7 @@ protected:
   : mScreenSize(screenSize),
     mType(detectorType),
     mScene(nullptr),
-    mSourceType(GestureSourceType::INVALID),
-    mSourceData(GestureSourceData::INVALID)
+    mTriggerPoint()
   {
   }
 
@@ -177,8 +151,7 @@ protected:
   Vector2            mScreenSize;
   GestureType::Value mType;
   Scene*             mScene;
-  GestureSourceType  mSourceType; /// < Gesture input source type.
-  GestureSourceData  mSourceData; /// < Gesture input source data.
+  Integration::Point mTriggerPoint; ///< Touch point that triggered the gesture.
 };
 
 using GestureRecognizerPtr = IntrusivePtr<GestureRecognizer>;

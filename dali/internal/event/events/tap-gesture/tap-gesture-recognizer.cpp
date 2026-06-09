@@ -257,8 +257,7 @@ void TapGestureRecognizer::EmitTap(uint32_t time, TapGestureEvent& event)
 
 void TapGestureRecognizer::ProcessEvent(TapGestureEvent& event)
 {
-  event.sourceType = mSourceType;
-  event.sourceData = mSourceData;
+  event.triggerPoint = mTriggerPoint;
 
   if(mScene)
   {

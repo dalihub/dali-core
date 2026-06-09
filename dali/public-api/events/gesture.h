@@ -23,7 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/device.h>
 #include <dali/public-api/events/gesture-enumerations.h>
+#include <dali/public-api/events/mouse-button.h>
 #include <dali/public-api/object/base-handle.h>
 
 namespace Dali
@@ -125,18 +127,25 @@ public:
   uint32_t GetTime() const;
 
   /**
-   * @brief Gets the value of which source the gesture was started with. (ex : mouse)
+   * @brief Gets the device class of the input source that triggered the gesture.
    * @SINCE_2_2.0
-   * @return The gesture input source.
+   * @return The device class (e.g. Device::Class::MOUSE, Device::Class::TOUCH).
    */
-  GestureSourceType GetSourceType() const;
+  Device::Class::Type GetDeviceClass() const;
 
   /**
-   * @brief Gets the data of the source type.
+   * @brief Gets the mouse button of the input source that triggered the gesture.
    * @SINCE_2_2.0
-   * @return The gesture source data.
+   * @return The mouse button (e.g. MouseButton::PRIMARY).
    */
-  GestureSourceData GetSourceData() const;
+  MouseButton::Type GetMouseButton() const;
+
+  /**
+   * @brief Gets the device subclass of the input source that triggered the gesture.
+   * @SINCE_2_5.26
+   * @return The device subclass (e.g. Device::Subclass::FINGER).
+   */
+  Device::Subclass::Type GetDeviceSubclass() const;
 
 public: // Not intended for application developers
   /// @cond internal
