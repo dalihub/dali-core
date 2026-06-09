@@ -160,8 +160,7 @@ void PinchGestureDetector::EmitPinchSignal(Actor* actor, const PinchGestureEvent
   pinch->SetScreenCenterPoint(pinchEvent.centerPoint);
 
   pinch->SetLocalCenterPoint(localCenter);
-  pinch->SetSourceType(pinchEvent.sourceType);
-  pinch->SetSourceData(pinchEvent.sourceData);
+  pinch->SetTriggerPoint(pinchEvent.triggerPoint);
 
   Dali::Actor actorHandle(actor);
   EmitPinchGestureSignal(actorHandle, Dali::PinchGesture(pinch.Get()));

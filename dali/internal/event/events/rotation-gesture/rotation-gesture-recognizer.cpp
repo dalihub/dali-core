@@ -226,9 +226,8 @@ void RotationGestureRecognizer::SendRotation(GestureState state, const Integrati
     gesture.state = GestureState::CANCELLED;
   }
 
-  gesture.time       = currentEvent.time;
-  gesture.sourceType = mSourceType;
-  gesture.sourceData = mSourceData;
+  gesture.time           = currentEvent.time;
+  gesture.triggerPoint = mTriggerPoint;
 
   if(mScene)
   {

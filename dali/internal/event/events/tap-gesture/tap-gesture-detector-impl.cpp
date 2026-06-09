@@ -26,6 +26,7 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
+#include <dali/internal/event/events/gesture-impl.h>
 #include <dali/internal/event/events/gesture-requests.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-impl.h>
 #include <dali/internal/event/events/tap-gesture/tap-gesture-recognizer.h>
@@ -192,8 +193,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
       internalTap->SetNumberOfTouches(tap.GetNumberOfTouches());
       internalTap->SetScreenPoint(tap.GetScreenPoint());
       internalTap->SetLocalPoint(tap.GetLocalPoint());
-      internalTap->SetSourceType(tap.GetSourceType());
-      internalTap->SetSourceData(tap.GetSourceData());
+      internalTap->SetTriggerPoint(GetImplementation(tap).GetTriggerPoint());
       internalTap->SetNumberOfTaps(numberOfTaps);
       mTap = Dali::TapGesture(internalTap.Get());
       if(numberOfTaps == mMaximumTapsRequired || mReceiveAllTapEvents)
@@ -330,8 +330,7 @@ void TapGestureDetector::Process(Scene& scene, const TapGestureEvent& tapEvent)
         tap->SetNumberOfTouches(tapEvent.numberOfTouches);
         tap->SetScreenPoint(tapEvent.point);
         tap->SetLocalPoint(actorCoords);
-        tap->SetSourceType(tapEvent.sourceType);
-        tap->SetSourceData(tapEvent.sourceData);
+        tap->SetTriggerPoint(tapEvent.triggerPoint);
 
         Dali::Actor actorHandle(feededActor);
         EmitTapGestureSignal(actorHandle, Dali::TapGesture(tap.Get()));

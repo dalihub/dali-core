@@ -28,8 +28,7 @@ GestureEvent::GestureEvent(GestureType::Value gesture, GestureState gestureState
 : gestureType(gesture),
   state(gestureState),
   time(0),
-  sourceType(GestureSourceType::INVALID),
-  sourceData(GestureSourceData::INVALID)
+  triggerPoint()
 {
 }
 } // namespace Internal
