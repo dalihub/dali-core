@@ -15,13 +15,12 @@
  *
  */
 
+#include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/common/capabilities.h>
-#include <dali/devel-api/common/stage.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/dali-core.h>
-#include <dali-test-suite-utils.h>
 #include <mesh-builder.h>
 #include "test-graphics-command-buffer.h"
 #include "test-graphics-controller.h"
@@ -77,7 +76,7 @@ int UtcDaliRendererDynamicBlend01(void)
     const auto& submitInfo = commands[i];
     for(uint32_t j = 0; j < submitInfo.cmdBuffer.size(); ++j)
     {
-      const auto& cmdBuffer = *static_cast<const TestGraphicsCommandBuffer*>(submitInfo.cmdBuffer[j]);
+      const auto& cmdBuffer           = *static_cast<const TestGraphicsCommandBuffer*>(submitInfo.cmdBuffer[j]);
       const auto& blendEnableCommands = cmdBuffer.GetChildCommandsByType(static_cast<CommandTypeMask>(CommandType::SET_COLOR_BLEND_ENABLE));
       if(!blendEnableCommands.empty())
       {
@@ -98,12 +97,12 @@ int UtcDaliRendererDynamicBlend01(void)
 int UtcDaliRendererDynamicBlend02(void)
 {
   TestApplication application;
-  auto& graphicsController = application.GetGraphicsController();
+  auto&           graphicsController = application.GetGraphicsController();
   graphicsController.SetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES,
-                                        Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT |
-                                        Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
+                                         Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT |
+                                         Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
 
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
+  Shader   shader   = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = Geometry::New();
   Renderer renderer = Renderer::New(geometry, shader);
 
@@ -132,7 +131,7 @@ int UtcDaliRendererDynamicBlend02(void)
     const auto& submitInfo = commands[i];
     for(uint32_t j = 0; j < submitInfo.cmdBuffer.size(); ++j)
     {
-      const auto& cmdBuffer = *static_cast<const TestGraphicsCommandBuffer*>(submitInfo.cmdBuffer[j]);
+      const auto& cmdBuffer             = *static_cast<const TestGraphicsCommandBuffer*>(submitInfo.cmdBuffer[j]);
       const auto& blendEquationCommands = cmdBuffer.GetChildCommandsByType(static_cast<CommandTypeMask>(CommandType::SET_COLOR_BLEND_EQUATION));
       if(!blendEquationCommands.empty())
       {
@@ -155,12 +154,12 @@ int UtcDaliRendererDynamicBlend02(void)
 int UtcDaliRendererDynamicBlend03(void)
 {
   TestApplication application;
-  auto& graphicsController = application.GetGraphicsController();
+  auto&           graphicsController = application.GetGraphicsController();
   graphicsController.SetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES,
-                                        Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT |
-                                        Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
+                                         Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT |
+                                         Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
 
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
+  Shader   shader   = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = Geometry::New();
   Renderer renderer = Renderer::New(geometry, shader);
 
@@ -187,7 +186,7 @@ int UtcDaliRendererDynamicBlend03(void)
     const auto& submitInfo = commands[i];
     for(uint32_t j = 0; j < submitInfo.cmdBuffer.size(); ++j)
     {
-      const auto& cmdBuffer = *static_cast<const TestGraphicsCommandBuffer*>(submitInfo.cmdBuffer[j]);
+      const auto& cmdBuffer             = *static_cast<const TestGraphicsCommandBuffer*>(submitInfo.cmdBuffer[j]);
       const auto& blendAdvancedCommands = cmdBuffer.GetChildCommandsByType(static_cast<CommandTypeMask>(CommandType::SET_COLOR_BLEND_ADVANCED));
       if(!blendAdvancedCommands.empty())
       {

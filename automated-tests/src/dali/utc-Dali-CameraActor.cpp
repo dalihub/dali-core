@@ -2282,7 +2282,6 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
   Dali::Integration::Scene stage     = application.GetScene();
   Vector2                  stageSize = stage.GetSize();
 
-  Vector3 targetPosition(Vector3::ZERO);
   Vector3 cameraOffset(0.0f, 0.0f, 100.0f);
 
   CameraActor freeLookCameraActor = CameraActor::New(stageSize);
@@ -2922,7 +2921,7 @@ int UtcDaliCameraActorCulling01(void)
   Actor a = CreateRenderableActor(CreateTexture(TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 200, 200));
 
   a[Actor::Property::PARENT_ORIGIN] = ParentOrigin::CENTER_LEFT;
-  a[Actor::Property::PIVOT]  = ParentOrigin::CENTER_RIGHT;
+  a[Actor::Property::PIVOT]         = ParentOrigin::CENTER_RIGHT;
   a[Actor::Property::POSITION]      = Vector3(-10.0f, 0.0f, 0.0f);
 
   application.GetScene().Add(a);

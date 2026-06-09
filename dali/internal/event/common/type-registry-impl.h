@@ -26,6 +26,7 @@
 #include <dali/internal/event/object/default-property-metadata.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
+#include <vector>
 
 namespace Dali
 {
@@ -167,6 +168,28 @@ public:
   bool RegisterAction(TypeRegistration& registered, std::string name, Dali::TypeInfo::ActionFunction f);
 
   /**
+   * Register an invokable method function to a type
+   * @param [in] registered TypeRegistration object used to register the type
+   * @param [in] name Method name
+   * @param [in] f Method function
+   * @return true if registered
+   */
+  bool RegisterMethod(TypeRegistration& registered, std::string name, Dali::TypeInfo::MethodFunction f);
+
+  /**
+   * Register an invokable method function to a type by registered type name.
+   *
+   * If the type has not been registered yet, the method registration is kept
+   * pending and applied when the type is registered.
+   *
+   * @param [in] registeredTypeName Registered type name
+   * @param [in] name Method name
+   * @param [in] f Method function
+   * @return true if registered immediately or stored for later registration
+   */
+  bool RegisterMethod(const std::string& registeredTypeName, std::string name, Dali::TypeInfo::MethodFunction f);
+
+  /**
    * Register an event-thread only property with a type
    * @param [in] registered TypeRegistration object used to register the type
    * @param [in] name Property name
@@ -252,6 +275,11 @@ public:
   bool DoActionTo(BaseObject* const object, const std::string& actionName, const Property::Map& properties);
 
   /**
+   * Walks all base types until it finds an invokable method.
+   */
+  bool InvokeMethodTo(BaseObject* const object, const std::string& methodName, const InvokeArguments& arguments, InvokeResult& result);
+
+  /**
    * @copydoc Dali::BaseHandle::ConnectSignal()
    */
   bool ConnectSignal(BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor);
@@ -284,6 +312,15 @@ private:
   Dali::Internal::IndexedConstStringMap<TypeInfoPointer> mRegistryAlternativeObjectNameLut;
 
   std::vector<Dali::TypeInfo::CreateFunction> mInitFunctions;
+
+  struct PendingMethodRegistration
+  {
+    std::string                    typeName;
+    std::string                    methodName;
+    Dali::TypeInfo::MethodFunction function;
+  };
+
+  std::vector<PendingMethodRegistration> mPendingMethodRegistrations;
 
 private:
   TypeRegistry();

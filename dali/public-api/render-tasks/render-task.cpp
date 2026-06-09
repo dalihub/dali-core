@@ -23,6 +23,7 @@
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/rendering/frame-buffer.h>
 
 namespace Dali
@@ -316,8 +317,8 @@ void RenderTask::SetOrderIndex(int32_t orderIndex)
   if(orderIndex < MIN_ORDER_INDEX || orderIndex > MAX_ORDER_INDEX)
   {
     DALI_LOG_ERROR("OrderIndex value can be available between [-1000, 1000].\n");
-    orderIndex = std::min(orderIndex, MAX_ORDER_INDEX);
-    orderIndex = std::max(orderIndex, MIN_ORDER_INDEX);
+    orderIndex = Min(orderIndex, MAX_ORDER_INDEX);
+    orderIndex = Max(orderIndex, MIN_ORDER_INDEX);
   }
   GetImplementation(*this).SetOrderIndex(orderIndex);
 }

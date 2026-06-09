@@ -28,6 +28,7 @@
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/math-utils.h>
 
 #include <dali/internal/update/common/property-resetter.h>
@@ -229,7 +230,7 @@ void AdjustNearPlaneForPerspective(Matrix& perspective, const Vector4& clipPlane
     // v[5] * Q.y = (+-1.0f - v[9]) * Q.z
     Q.y = (((testCase & 2) ? 1.0f : -1.0f) - v[9]) * Q.z * inverseV5;
 
-    maximalCDotQ = std::max(maximalCDotQ, clipPlane.Dot3(Q));
+    maximalCDotQ = Max(maximalCDotQ, clipPlane.Dot3(Q));
   }
 
   float scale = 2.0f * far / maximalCDotQ;
@@ -303,7 +304,7 @@ void AdjustNearPlaneForOrthographic(Matrix& orthographic, const Vector4& clipPla
     // v[5] * Q.y = (+-1.0f - v[13])
     Q.y = (((testCase & 2) ? 1.0f : -1.0f) - v[13]) * inverseV5;
 
-    maximalCDotQ = std::max(maximalCDotQ, clipPlane.Dot3(Q));
+    maximalCDotQ = Max(maximalCDotQ, clipPlane.Dot3(Q));
   }
 
   float scale = 2.0f / maximalCDotQ;

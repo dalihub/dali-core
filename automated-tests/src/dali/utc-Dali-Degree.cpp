@@ -50,7 +50,7 @@ int UtcDaliDegreeConstructors01(void)
   DALI_TEST_EQUALS(degree1.degree, 180.0f, 0.001f, TEST_LOCATION);
 
   // Constructor from a Radian
-  Degree degree2(Radian(Math::PI));
+  Degree degree2(Radian{Math::PI});
   DALI_TEST_EQUALS(degree2.degree, 180.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;

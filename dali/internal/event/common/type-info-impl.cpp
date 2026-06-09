@@ -235,6 +235,27 @@ bool TypeInfo::DoActionTo(BaseObject* object, const std::string& actionName, con
   return done;
 }
 
+bool TypeInfo::InvokeMethodTo(BaseObject* object, const std::string& methodName, const InvokeArguments& arguments, InvokeResult& result)
+{
+  bool invoked = false;
+
+  auto iter = mMethods.Get(ConstString(methodName));
+  if(iter != mMethods.end())
+  {
+    invoked = (iter->second)(object, Integration::ToDaliStringView(methodName), arguments, result);
+  }
+
+  if(!invoked)
+  {
+    if(GetBaseType(mBaseType, mTypeRegistry, mBaseTypeName))
+    {
+      invoked = mBaseType->InvokeMethodTo(object, methodName, arguments, result);
+    }
+  }
+
+  return invoked;
+}
+
 bool TypeInfo::ConnectSignal(BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor)
 {
   bool connected(false);
@@ -449,6 +470,21 @@ void TypeInfo::AddActionFunction(std::string actionName, Dali::TypeInfo::ActionF
     if(DALI_UNLIKELY(!mActions.Register(ConstString(actionName), function)))
     {
       DALI_LOG_ERROR("Action already exists in TypeRegistry Type\n", actionName.c_str());
+    }
+  }
+}
+
+void TypeInfo::AddMethodFunction(std::string methodName, Dali::TypeInfo::MethodFunction function)
+{
+  if(DALI_UNLIKELY(nullptr == function))
+  {
+    DALI_LOG_WARNING("Method function is empty\n");
+  }
+  else
+  {
+    if(DALI_UNLIKELY(!mMethods.Register(ConstString(methodName), function)))
+    {
+      DALI_LOG_ERROR("Method '%s' already exists in TypeRegistry Type\n", methodName.c_str());
     }
   }
 }

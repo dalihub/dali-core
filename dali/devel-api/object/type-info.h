@@ -26,6 +26,7 @@
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/object/invoke-method.h>
 
 namespace Dali
 {
@@ -55,6 +56,8 @@ public:
   using CreateFunction = BaseHandle (*)(); ///< Function signature for creating an instance of the associated object type. @SINCE_1_0.0
 
   using ActionFunction = bool (*)(BaseObject*, const Dali::String&, const Property::Map&); ///< Function signature for creating scriptable actions @SINCE_1_0.0
+
+  using MethodFunction = bool (*)(BaseObject*, const Dali::StringView&, const InvokeArguments&, InvokeResult&); ///< Function signature for invokable methods
 
   /**
    * @brief Connects a callback function with the object's signals.

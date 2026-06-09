@@ -51,6 +51,11 @@ bool BaseHandle::DoAction(const Dali::StringView& actionName, const Property::Ma
   return GetImplementation(*this).DoAction(actionName, attributes);
 }
 
+bool BaseHandle::InvokeMethod(const Dali::StringView& methodName, const InvokeArguments& arguments, InvokeResult& result)
+{
+  return GetImplementation(*this).InvokeMethod(methodName, arguments, result);
+}
+
 Dali::String BaseHandle::GetTypeName() const
 {
   return GetImplementation(*this).GetTypeName();

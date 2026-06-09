@@ -4018,9 +4018,6 @@ int UtcDaliActorSetDrawModeOverlayWithClipping(void)
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
-  const Vector2 surfaceSize(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
-  const Vector2 imageSize(16.0f, 16.0f);
-
   std::vector<GLuint> ids;
   ids.push_back(8);  // first rendered actor
   ids.push_back(9);  // second rendered actor
@@ -6056,7 +6053,6 @@ int UtcDaliActorPropertyScissorClippingActorNested01(void)
   TraceCallStack&    scissorTrace        = glAbstraction.GetScissorTrace();
   TraceCallStack&    enabledDisableTrace = glAbstraction.GetEnableDisableTrace();
 
-  const Vector2 stageSize(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT);
   const Vector2 imageSize(16.0f, 16.0f);
 
   /* Create a nest of 2 scissors to test nesting (intersecting clips).

@@ -22,6 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-string-view.h>
 #include <dali/public-api/common/dali-string.h>
+#include <dali/public-api/object/invoke-method.h>
 #include <dali/public-api/object/property-types.h>
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/ref-object.h>
@@ -157,6 +158,61 @@ public:
    * @return The action is performed by the object or not
    */
   bool DoAction(const Dali::StringView& actionName, const Property::Map& attributes);
+
+  /**
+   * @brief Invokes a registered method on this object with the given method name and arguments.
+   *
+   * InvokeMethod dispatches by name through the DALi TypeRegistry. Methods are
+   * registered by generated wrappers for supported public API methods in
+   * exported DALi BaseHandle-derived classes. The target object's runtime type
+   * must have TypeRegistry information.
+   *
+   * At build time, DALi's invoke-method generator scans classes marked with the
+   * library export macros such as DALI_CORE_API, DALI_ADAPTOR_API,
+   * DALI_TOOLKIT_API, or DALI_UI_API. It emits wrappers only for public
+   * non-static member functions on BaseHandle-derived classes that can be called
+   * safely through the TypeRegistry.
+   * Constructors, destructors, operators, New(), DownCast(), GetImplementation(),
+   * signal accessors, raw pointer APIs, callback/functor APIs, std public types,
+   * output parameters, non-const reference parameters, and APIs using incomplete
+   * forward-declared value types are intentionally excluded.
+   *
+   * The target object must be a valid Dali::BaseHandle whose runtime object has
+   * TypeRegistry information and a registered invokable method matching
+   * @p methodName. The wrapper validates the argument count and argument types
+   * before calling the underlying public API method.
+   *
+   * Arguments are passed as Dali::Any values in declaration order. If the
+   * invoked method returns a value, the wrapper stores it in @p result as a
+   * Dali::Any. For void methods, @p result is reset to an empty Dali::Any.
+   *
+   * Overloaded invokable methods are resolved by argument count and exact
+   * Dali::Any value types. Methods with trailing default parameters may be
+   * invoked with those trailing arguments omitted, provided the generated
+   * overload set remains unambiguous.
+   *
+   * InvokeMethod does not perform normal C++ implicit conversions. For example,
+   * if a method expects a float, the argument must be stored in Dali::Any as a
+   * float, not as an int. When a method is not registered, the argument count is
+   * wrong, or an argument type does not match, the generated wrapper reports the
+   * failure through DALI_LOG_ERROR and returns false.
+   *
+   * InvokeMethod dispatch starts from the object's runtime TypeRegistry type
+   * and then falls back to registered base types. For virtual public API
+   * methods this can match normal override behavior. For non-virtual methods
+   * hidden by derived classes, InvokeMethod follows runtime registry dispatch
+   * and may not match C++ static dispatch through a base-typed handle.
+   *
+   * @note This API is intended for ABI-tolerant dynamic dispatch of selected
+   * public API methods. It is not a general C++ reflection system, and it only
+   * works for methods that have generated TypeRegistry wrappers.
+   *
+   * @param[in] methodName The name of the registered method
+   * @param[in] arguments The arguments for the method
+   * @param[out] result The method result, if any
+   * @return True if the method was found and invoked
+   */
+  bool InvokeMethod(const Dali::StringView& methodName, const InvokeArguments& arguments, InvokeResult& result);
 
   /**
    * @brief Returns the type name for the Handle.

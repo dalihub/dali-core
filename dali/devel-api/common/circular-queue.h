@@ -2,7 +2,7 @@
 #define DALI_CIRCULAR_QUEUE_H
 
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali
 {
@@ -54,7 +55,7 @@ public:
       Queue newQueue;
       newQueue.Reserve(maximumSize);
 
-      auto newNumberOfElements = std::min(mNumberOfElements, maximumSize);
+      auto newNumberOfElements = Min(mNumberOfElements, maximumSize);
       newQueue.Resize(newNumberOfElements);
       for(uint32_t newIndex = 0u, oldIndex = mStartMarker; newIndex < newNumberOfElements; ++newIndex)
       {

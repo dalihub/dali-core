@@ -1180,14 +1180,7 @@ int UtcDaliVectorComplexMoveAssignmentDestruct(void)
   //   1. dst's existing elements (handle0, handle1 copies) are destroyed -> refcounts drop to 1.
   //   2. dst takes ownership of src's buffer (handle2, handle3 copies).
   //   3. src becomes empty.
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wself-move"
-#endif
   dst = std::move(src);
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic pop
-#endif
 
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), dst.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(ZERO, src.Count(), TEST_LOCATION);
@@ -1221,14 +1214,7 @@ int UtcDaliVectorComplexMoveAssignmentSelf(void)
   DALI_TEST_EQUALS(handle1.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
 
   // Self-assign: guarded by the (this != &vector) check; must be a no-op.
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wself-move"
-#endif
   v = std::move(v);
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic pop
-#endif
 
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), v.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(handle0.GetBaseObject().ReferenceCount(), 2u, TEST_LOCATION);
@@ -1255,14 +1241,7 @@ int UtcDaliVectorMoveOnlyMoveAssignment(void)
   MoveOnlyType::ResetCounts();
 
   // Move src into dst. dst's 3 existing elements must be destroyed.
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wself-move"
-#endif
   dst = std::move(src);
-#if (__GNUC__ >= 13)
-#pragma GCC diagnostic pop
-#endif
 
   DALI_TEST_EQUALS(static_cast<Dali::VectorBase::SizeType>(2u), dst.Count(), TEST_LOCATION);
   DALI_TEST_EQUALS(ZERO, src.Count(), TEST_LOCATION);

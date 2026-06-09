@@ -27,21 +27,6 @@ using namespace Dali::Scripting;
 
 namespace
 {
-const StringEnum COLOR_MODE_VALUES[] =
-  {
-    {"USE_OWN_COLOR", USE_OWN_COLOR},
-    {"USE_PARENT_COLOR", USE_PARENT_COLOR},
-    {"USE_OWN_MULTIPLY_PARENT_COLOR", USE_OWN_MULTIPLY_PARENT_COLOR},
-    {"USE_OWN_MULTIPLY_PARENT_ALPHA", USE_OWN_MULTIPLY_PARENT_ALPHA},
-};
-const unsigned int COLOR_MODE_VALUES_COUNT = sizeof(COLOR_MODE_VALUES) / sizeof(COLOR_MODE_VALUES[0]);
-
-const StringEnum DRAW_MODE_VALUES[] =
-  {
-    {"NORMAL", DrawMode::NORMAL},
-    {"OVERLAY_2D", DrawMode::OVERLAY_2D}};
-const unsigned int DRAW_MODE_VALUES_COUNT = sizeof(DRAW_MODE_VALUES) / sizeof(DRAW_MODE_VALUES[0]);
-
 ////////////////////////////////////////////////////////////////////////////////
 // Helpers for string to enum comparisons for Image and Image loading parameters
 ////////////////////////////////////////////////////////////////////////////////

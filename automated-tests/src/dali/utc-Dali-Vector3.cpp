@@ -366,6 +366,7 @@ int UtcDaliVector3NotEqualsP(void)
   Vector3         v0(1.0f, 2.0f, 3.0f);
   Vector3         v1(1.0f, 2.0f, 3.0f);
   Vector3         v2 = Vector3(0.0f, 2.0f, 3.0f);
+  DALI_TEST_CHECK(v0 == v1);
   DALI_TEST_CHECK(v0 != v2);
 
   v2 = Vector3(1.0f, 0.0f, 3.0f);

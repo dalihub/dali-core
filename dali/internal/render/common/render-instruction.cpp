@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/public-api/common/constants.h> // for Color::BLACK
+#include <dali/public-api/common/dali-utility.h>
 
 namespace Dali
 {
@@ -99,7 +100,7 @@ const RenderList* RenderInstruction::GetRenderList(RenderListContainer::SizeType
   DALI_ASSERT_DEBUG((index < mNextFreeRenderList) && (index < mRenderLists.Size()) && "Renderlist index out of container bounds");
 
   // Return null if the caller has passed an invalid index:
-  if(index >= std::min(mNextFreeRenderList, mRenderLists.Size()))
+  if(index >= Min(mNextFreeRenderList, mRenderLists.Size()))
   {
     return nullptr;
   }

@@ -47,7 +47,6 @@ void utc_dali_pan_gesture_detector_cleanup(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-const int PAN_EVENT_TIME_DELTA     = 8;
 const int PAN_GESTURE_UPDATE_COUNT = 50;
 
 // Stores data that is populated in the callback and will be read by the test cases
@@ -1736,11 +1735,6 @@ int UtcDaliPanGestureGetAngle(void)
   DALI_TEST_EQUALS(detector.GetAngle(3).first, PanGestureDetector::DIRECTION_DOWN, TEST_LOCATION);
 
   END_TEST;
-}
-
-inline float RadiansToDegrees(float radian)
-{
-  return radian * 180.0f / Math::PI;
 }
 
 int UtcDaliPanGestureAngleOutOfRange(void)

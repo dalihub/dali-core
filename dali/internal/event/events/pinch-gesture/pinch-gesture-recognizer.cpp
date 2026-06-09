@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <cmath>
 
 #include <dali/devel-api/events/touch-point.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/vector2.h>
 
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -57,7 +58,7 @@ inline bool IsValidDpi(const Vector2& dpi)
 
 inline float GetDefaultMinimumPinchDistance(const Vector2& dpi)
 {
-  return IsValidDpi(dpi) ? ((MINIMUM_DISTANCE_IN_MILLIINCH * std::min(dpi.x, dpi.y)) / 1000.f) : MINIMUM_DISTANCE_IN_PIXEL;
+  return IsValidDpi(dpi) ? ((MINIMUM_DISTANCE_IN_MILLIINCH * Min(dpi.x, dpi.y)) / 1000.f) : MINIMUM_DISTANCE_IN_PIXEL;
 }
 
 } // unnamed namespace

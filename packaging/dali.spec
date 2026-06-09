@@ -1,6 +1,6 @@
 Name:       dali2
 Summary:    DALi 3D Engine
-Version:    2.5.24
+Version:    2.5.25
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
@@ -12,6 +12,7 @@ Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
+BuildRequires:  python3
 
 %if 0%{?tizen_version_major} >= 3
 BuildRequires:  pkgconfig(libtzplatform-config)
@@ -149,6 +150,7 @@ exit 0
 
 %files devel
 %defattr(-,root,root,-)
+%{_bindir}/dali-invoke-method-generator
 %{_libdir}/pkgconfig/dali2-core.pc
 %{dev_include_path}/dali/public-api/*
 %{dev_include_path}/dali/doc/*

@@ -25,8 +25,6 @@
 using std::max;
 using namespace Dali;
 
-static const float ROTATION_EPSILON = 0.0001f;
-
 void utc_dali_pixel_startup(void)
 {
   test_return_value = TET_UNDEF;

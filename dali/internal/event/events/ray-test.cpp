@@ -19,7 +19,7 @@
 #include <dali/internal/event/events/ray-test.h>
 
 // EXTERNAL INCLUDES
-#include <algorithm> ///< for std::min, std::max
+#include <dali/public-api/math/math-utils.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/actor-impl.h>
@@ -46,7 +46,7 @@ constexpr float RAY_TEST_RELATIVE_EPSILON = Dali::Epsilon<1000>::value; ///< 0.0
  */
 constexpr float GetEpsilon(const float targetScale)
 {
-  return std::max(RAY_TEST_ABSOLUTE_EPSILON, RAY_TEST_RELATIVE_EPSILON * targetScale);
+  return Dali::Max(RAY_TEST_ABSOLUTE_EPSILON, RAY_TEST_RELATIVE_EPSILON * targetScale);
 }
 } // namespace
 
@@ -137,7 +137,7 @@ bool RayTest::SphereTest(const Internal::Actor& actor, const Vector4& rayOrigin,
   const float height = size.height * scale.height + touchAreaMargin.top + touchAreaMargin.bottom;
 
   // Correction numeric error.
-  const float epsilon = GetEpsilon(std::max(width, height));
+  const float epsilon = GetEpsilon(Max(width, height));
 
   float squareSphereRadius = 0.5f * (width * width + height * height) + epsilon;
 
@@ -180,7 +180,7 @@ bool RayTest::ActorTest(const Internal::Actor& actor, const Vector4& rayOrigin, 
       hitPointLocal.y                = rayOriginLocal.y + rayDirLocal.y * distance + size.y * 0.5f;
 
       // Correction numeric error.
-      const float epsilon = GetEpsilon(std::max(size.x, size.y));
+      const float epsilon = GetEpsilon(Max(size.x, size.y));
 
       // Test with the actor's geometry.
       hit = (hitPointLocal.x >= -touchAreaMargin.start - epsilon) && (hitPointLocal.x <= (size.x + touchAreaMargin.end + epsilon) && (hitPointLocal.y >= -touchAreaMargin.top - epsilon) && (hitPointLocal.y <= (size.y + touchAreaMargin.bottom + epsilon)));
@@ -245,8 +245,8 @@ bool RayTest::ActorBoundingBoxTest(const Internal::Actor& actor, const Vector4& 
           std::swap(hit1, hit2);
         }
 
-        distanceMin = std::max(distanceMin, hit1);
-        distanceMax = std::min(distanceMax, hit2);
+        distanceMin = Max(distanceMin, hit1);
+        distanceMax = Min(distanceMax, hit2);
 
         if(distanceMin > distanceMax)
         {

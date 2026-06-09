@@ -38,12 +38,13 @@ void utc_dali_key_event_cleanup(void)
 namespace
 {
 // Key Event Test references
-const static int SHIFT_MODIFIER          = 0x1;
-const static int CTRL_MODIFIER           = 0x2;
-const static int ALT_MODIFIER            = 0x4;
-const static int SHIFT_AND_CTRL_MODIFIER = SHIFT_MODIFIER | CTRL_MODIFIER;
-const static int SHIFT_AND_ALT_MODIFIER  = SHIFT_MODIFIER | ALT_MODIFIER;
-const static int CTRL_AND_ALT_MODIFIER   = CTRL_MODIFIER | ALT_MODIFIER;
+const static int SHIFT_MODIFIER                  = 0x1;
+const static int CTRL_MODIFIER                   = 0x2;
+const static int ALT_MODIFIER                    = 0x4;
+const static int SHIFT_AND_CTRL_MODIFIER         = SHIFT_MODIFIER | CTRL_MODIFIER;
+const static int SHIFT_AND_ALT_MODIFIER          = SHIFT_MODIFIER | ALT_MODIFIER;
+const static int CTRL_AND_ALT_MODIFIER           = CTRL_MODIFIER | ALT_MODIFIER;
+const static int SHIFT_AND_CTRL_AND_ALT_MODIFIER = SHIFT_MODIFIER | CTRL_MODIFIER | ALT_MODIFIER;
 
 const static int32_t KEY_INVALID_CODE = -1;
 
@@ -419,16 +420,62 @@ int UtcDaliKeyEventIsNotAltModifier(void)
 }
 
 // Positive test case for a method
-int UtcDaliKeyEventANDModifer(void)
+int UtcDaliKeyEventANDModifer01(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
   Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_CTRL_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
-  DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() & event.IsShiftModifier()), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() && event.IsShiftModifier()), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, event.IsAltModifier(), TEST_LOCATION);
 
   DevelKeyEvent::SetKeyModifier(event, SHIFT_MODIFIER); // Set to Shift Modifier
 
-  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() & event.IsShiftModifier()), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, event.IsShiftModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() && event.IsAltModifier()), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliKeyEventANDModifer02(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_ALT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  DALI_TEST_EQUALS(true, (bool)(event.IsAltModifier() && event.IsShiftModifier()), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, event.IsCtrlModifier(), TEST_LOCATION);
+
+  DevelKeyEvent::SetKeyModifier(event, SHIFT_MODIFIER); // Set to Shift Modifier
+
+  DALI_TEST_EQUALS(true, event.IsShiftModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() && event.IsAltModifier()), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliKeyEventANDModifer03(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, CTRL_AND_ALT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  DALI_TEST_EQUALS(true, (bool)(event.IsAltModifier() && event.IsCtrlModifier()), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, event.IsShiftModifier(), TEST_LOCATION);
+
+  DevelKeyEvent::SetKeyModifier(event, SHIFT_MODIFIER); // Set to Shift Modifier
+
+  DALI_TEST_EQUALS(true, event.IsShiftModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() && event.IsAltModifier()), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliKeyEventANDModifer04(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_CTRL_AND_ALT_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
+  DALI_TEST_EQUALS(true, (bool)(event.IsShiftModifier() && event.IsCtrlModifier() && event.IsAltModifier()), TEST_LOCATION);
+
+  DevelKeyEvent::SetKeyModifier(event, SHIFT_MODIFIER); // Set to Shift Modifier
+
+  DALI_TEST_EQUALS(true, event.IsShiftModifier(), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() && event.IsAltModifier()), TEST_LOCATION);
   END_TEST;
 }
 
@@ -438,11 +485,11 @@ int UtcDaliKeyEventORModifer(void)
   TestApplication application; // Reset all test adapter return codes
 
   Dali::KeyEvent event = DevelKeyEvent::New("i", "I", "i", 0, SHIFT_AND_CTRL_MODIFIER, 0lu, KeyEvent::DOWN, "", "", Device::Class::NONE, Device::Subclass::NONE);
-  DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() | event.IsAltModifier()), TEST_LOCATION);
+  DALI_TEST_EQUALS(true, (bool)(event.IsCtrlModifier() || event.IsAltModifier()), TEST_LOCATION);
 
   DevelKeyEvent::SetKeyModifier(event, SHIFT_MODIFIER); // Set to Shift Modifier
 
-  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() & event.IsAltModifier()), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, (bool)(event.IsCtrlModifier() && event.IsAltModifier()), TEST_LOCATION);
   END_TEST;
 }
 

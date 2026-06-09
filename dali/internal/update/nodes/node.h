@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <algorithm>
-
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>
@@ -37,7 +34,7 @@
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/math/math-utils.h>
+#include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector3.h>
 
@@ -715,10 +712,10 @@ public:
     if(mUpdateAreaChanged)
     {
       // Merge area if the update area is dirty
-      float x         = std::min(updateAreaHint.x - updateAreaHint.z / 2.0f, mUpdateAreaHint.x - mUpdateAreaHint.z / 2.0f);
-      float y         = std::min(updateAreaHint.y - updateAreaHint.w / 2.0f, mUpdateAreaHint.y - mUpdateAreaHint.w / 2.0f);
-      float width     = std::max(updateAreaHint.x + updateAreaHint.z / 2.0f, mUpdateAreaHint.x + mUpdateAreaHint.z / 2.0f) - x;
-      float height    = std::max(updateAreaHint.y + updateAreaHint.w / 2.0f, mUpdateAreaHint.y + mUpdateAreaHint.w / 2.0f) - y;
+      float x         = Min(updateAreaHint.x - updateAreaHint.z / 2.0f, mUpdateAreaHint.x - mUpdateAreaHint.z / 2.0f);
+      float y         = Min(updateAreaHint.y - updateAreaHint.w / 2.0f, mUpdateAreaHint.y - mUpdateAreaHint.w / 2.0f);
+      float width     = Max(updateAreaHint.x + updateAreaHint.z / 2.0f, mUpdateAreaHint.x + mUpdateAreaHint.z / 2.0f) - x;
+      float height    = Max(updateAreaHint.y + updateAreaHint.w / 2.0f, mUpdateAreaHint.y + mUpdateAreaHint.w / 2.0f) - y;
       mUpdateAreaHint = Vector4(x + width / 2, y + height / 2, width, height);
     }
     else
