@@ -157,8 +157,7 @@ void RotationGestureDetector::EmitRotationSignal(
   rotation->SetRotation(rotationEvent.rotation);
   rotation->SetScreenCenterPoint(rotationEvent.centerPoint);
   rotation->SetLocalCenterPoint(localCenter);
-  rotation->SetSourceType(rotationEvent.sourceType);
-  rotation->SetSourceData(rotationEvent.sourceData);
+  rotation->SetTriggerPoint(rotationEvent.triggerPoint);
 
   Dali::Actor actorHandle(actor);
   EmitRotationGestureSignal(actorHandle, Dali::RotationGesture(rotation.Get()));

@@ -53,28 +53,7 @@ enum class GestureState : uint8_t
   POSSIBLE    ///< A gesture is possible. @SINCE_1_9.28
 };
 
-/**
- * @brief Enumeration for gesture input source type.
- * @SINCE_2_2.0
- */
-enum class GestureSourceType : int8_t
-{
-  INVALID, ///< invalid data
-  MOUSE,   ///< mouse
-  TOUCH,   ///< touch
-};
 
-/**
- * @brief Enumeration for data of gesture input source type.
- * @SINCE_2_2.0
- */
-enum class GestureSourceData : int8_t
-{
-  INVALID         = -1, ///< invalid data
-  MOUSE_PRIMARY   = 1,  /**< Primary(Left) mouse button */
-  MOUSE_SECONDARY = 3,  /**< Secondary(Right) mouse button */
-  MOUSE_TERTIARY  = 2,  /**< Center(Wheel) mouse button */
-};
 
 } // namespace Dali
 

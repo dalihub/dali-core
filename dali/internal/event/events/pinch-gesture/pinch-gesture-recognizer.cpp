@@ -264,9 +264,8 @@ void PinchGestureRecognizer::SendPinch(GestureState state, const Integration::To
     gesture.state = GestureState::CANCELLED;
   }
 
-  gesture.time       = currentEvent.time;
-  gesture.sourceType = mSourceType;
-  gesture.sourceData = mSourceData;
+  gesture.time           = currentEvent.time;
+  gesture.triggerPoint = mTriggerPoint;
 
   if(mScene)
   {

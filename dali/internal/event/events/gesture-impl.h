@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
+#include <dali/integration-api/events/point.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/object/base-object.h>
 
@@ -86,39 +87,48 @@ public:
   }
 
   /**
-   * @brief Sets the value of which source the gesture was started with. (ex : mouse)
-   * @param[in] source The gesture source type.
+   * @brief Sets the touch point that triggered the gesture.
+   * @param[in] point The trigger point.
    */
-  inline void SetSourceType(GestureSourceType source)
+  inline void SetTriggerPoint(const Integration::Point& point)
   {
-    mSourceType = source;
+    mTriggerPoint = point;
   }
 
   /**
-   * @brief Gets the value of which source the gesture was started with.
-   * @return The gesture source type.
+   * @brief Gets the touch point that triggered the gesture.
+   * @return The trigger point.
    */
-  inline GestureSourceType GetSourceType() const
+  inline const Integration::Point& GetTriggerPoint() const
   {
-    return mSourceType;
+    return mTriggerPoint;
   }
 
   /**
-   * @brief Sets the value of source data.
-   * @param[in] data The gesture source data.
+   * @brief Gets the device class of the gesture source.
+   * @return The device class.
    */
-  inline void SetSourceData(GestureSourceData data)
+  inline Device::Class::Type GetDeviceClass() const
   {
-    mSourceData = data;
+    return mTriggerPoint.GetDeviceClass();
   }
 
   /**
-   * @brief Gets the data of source type.
-   * @return The gesture source data.
+   * @brief Gets the mouse button of the gesture source.
+   * @return The mouse button.
    */
-  inline GestureSourceData GetSourceData() const
+  inline MouseButton::Type GetMouseButton() const
   {
-    return mSourceData;
+    return mTriggerPoint.GetMouseButton();
+  }
+
+  /**
+   * @brief Gets the device subclass of the gesture source.
+   * @return The device subclass.
+   */
+  inline Device::Subclass::Type GetDeviceSubclass() const
+  {
+    return mTriggerPoint.GetDeviceSubclass();
   }
 
   Gesture(const Gesture&)            = delete; ///< Deleted copy constructor
@@ -135,8 +145,7 @@ protected:
   Gesture(GestureType::Value gestureType, GestureState gestureState)
   : mGestureType(gestureType),
     mState(gestureState),
-    mSourceType(GestureSourceType::INVALID),
-    mSourceData(GestureSourceData::INVALID)
+    mTriggerPoint()
   {
   }
 
@@ -151,8 +160,7 @@ private:
   GestureType::Value mGestureType;
   GestureState       mState;
   uint32_t           mTime{0u};
-  GestureSourceType  mSourceType;
-  GestureSourceData  mSourceData;
+  Integration::Point mTriggerPoint;
 };
 
 } // namespace Internal

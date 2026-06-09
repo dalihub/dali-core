@@ -20,7 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
-#include <dali/internal/event/events/gesture-impl.h>
+#include <dali/integration-api/events/point.h>
+#include <dali/public-api/events/gesture-enumerations.h>
 
 namespace Dali
 {
@@ -57,14 +58,9 @@ struct GestureEvent
   uint32_t time;
 
   /**
-   * This is the value of which source the gesture was started with. (ex : mouse)
+   * The touch point that triggered the gesture.
    */
-  GestureSourceType sourceType;
-
-  /**
-   * The data of the source type.
-   */
-  GestureSourceData sourceData;
+  Integration::Point triggerPoint;
 
 protected: // Constructors only to be used by derived structures.
   /**
