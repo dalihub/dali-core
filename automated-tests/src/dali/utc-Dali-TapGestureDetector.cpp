@@ -1111,8 +1111,8 @@ int UtcDaliTapGestureGetSourceTypeWithMouse(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::MOUSE, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceData(), GestureSourceData::MOUSE_PRIMARY, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetMouseButton(), MouseButton::PRIMARY, TEST_LOCATION);
 
   data.Reset();
 
@@ -1122,8 +1122,8 @@ int UtcDaliTapGestureGetSourceTypeWithMouse(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::MOUSE, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceData(), GestureSourceData::MOUSE_SECONDARY, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetMouseButton(), MouseButton::SECONDARY, TEST_LOCATION);
 
   data.Reset();
 
@@ -1133,8 +1133,8 @@ int UtcDaliTapGestureGetSourceTypeWithMouse(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::MOUSE, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceData(), GestureSourceData::MOUSE_TERTIARY, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetMouseButton(), MouseButton::TERTIARY, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1165,8 +1165,101 @@ int UtcDaliTapGestureGetSourceTypeWithTouch(void)
   application.SendNotification();
 
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(data.receivedGesture.GetSourceType(), GestureSourceType::TOUCH, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::TOUCH, TEST_LOCATION);
 
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTapGestureGetSourceSubType(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Helper: emit a touch tap with the given subclass; source=1 (PRIMARY) triggers the recognizer source update.
+  auto EmitTouchTapWithSubclass = [&](Device::Subclass::Type subclass) {
+    Dali::Integration::TouchEvent ev;
+    Dali::Integration::Point      p;
+    p.SetState(PointState::DOWN);
+    p.SetDeviceId(4);
+    p.SetScreenPosition(Vector2(20.0f, 20.0f));
+    p.SetDeviceClass(Device::Class::TOUCH);
+    p.SetDeviceSubclass(subclass);
+    p.SetMouseButton(MouseButton::PRIMARY);
+    ev.points.push_back(p);
+    ev.time = 100;
+    application.ProcessEvent(ev);
+
+    p.SetState(PointState::UP);
+    ev.points[0] = p;
+    ev.time      = 120;
+    application.ProcessEvent(ev);
+    application.SendNotification();
+  };
+
+  // Touch with FINGER subclass
+  EmitTouchTapWithSubclass(Device::Subclass::FINGER);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::TOUCH, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::FINGER, TEST_LOCATION);
+  data.Reset();
+
+  // Touch with KNUCKLE subclass
+  EmitTouchTapWithSubclass(Device::Subclass::KNUCKLE);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::KNUCKLE, TEST_LOCATION);
+  data.Reset();
+
+  // Touch with PALM subclass
+  EmitTouchTapWithSubclass(Device::Subclass::PALM);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::PALM, TEST_LOCATION);
+  data.Reset();
+
+  // Mouse with TRACKPAD subclass
+  {
+    Dali::Integration::TouchEvent ev;
+    Dali::Integration::Point      p;
+    p.SetState(PointState::DOWN);
+    p.SetDeviceId(4);
+    p.SetScreenPosition(Vector2(20.0f, 20.0f));
+    p.SetDeviceClass(Device::Class::MOUSE);
+    p.SetDeviceSubclass(Device::Subclass::TRACKPAD);
+    p.SetMouseButton(MouseButton::PRIMARY);
+    ev.points.push_back(p);
+    ev.time = 1000;
+    application.ProcessEvent(ev);
+
+    p.SetState(PointState::UP);
+    ev.points[0] = p;
+    ev.time      = 1020;
+    application.ProcessEvent(ev);
+    application.SendNotification();
+  }
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::TRACKPAD, TEST_LOCATION);
+  data.Reset();
+
+  // Default: touch with NONE subclass stays NONE
+  EmitTouchTapWithSubclass(Device::Subclass::NONE);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::NONE, TEST_LOCATION);
   data.Reset();
 
   END_TEST;

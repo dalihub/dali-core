@@ -62,8 +62,7 @@ void EmitLongPressSignal(
   longPress->SetNumberOfTouches(longPressEvent.numberOfTouches);
   longPress->SetScreenPoint(longPressEvent.point);
   longPress->SetLocalPoint(localPoint);
-  longPress->SetSourceType(longPressEvent.sourceType);
-  longPress->SetSourceData(longPressEvent.sourceData);
+  longPress->SetTriggerPoint(longPressEvent.triggerPoint);
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_LONG_PRESS_GESTURE_SIGNAL", [&](std::ostringstream& oss)
   {

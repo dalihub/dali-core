@@ -66,8 +66,7 @@ void EmitPinchSignal(
   pinch->SetScreenCenterPoint(pinchEvent.centerPoint);
 
   pinch->SetLocalCenterPoint(localCenter);
-  pinch->SetSourceType(pinchEvent.sourceType);
-  pinch->SetSourceData(pinchEvent.sourceData);
+  pinch->SetTriggerPoint(pinchEvent.triggerPoint);
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_PINCH_GESTURE_SIGNAL", [&](std::ostringstream& oss)
   {

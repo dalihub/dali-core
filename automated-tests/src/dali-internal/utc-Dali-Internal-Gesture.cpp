@@ -148,3 +148,42 @@ int UtcDaliGestureGetTimeP(void)
 
   END_TEST;
 }
+
+int UtcDaliGestureGetSourceSubTypeP(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Gesture gesture(new TestGesture(GestureType::PAN, GestureState::STARTED));
+
+  // Default value must be NONE
+  DALI_TEST_EQUALS(Device::Subclass::NONE, gesture.GetDeviceSubclass(), TEST_LOCATION);
+
+  // Test each representative subclass value via SetTriggerPoint
+  Integration::Point point;
+
+  point.SetDeviceSubclass(Device::Subclass::FINGER);
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_EQUALS(Device::Subclass::FINGER, gesture.GetDeviceSubclass(), TEST_LOCATION);
+
+  point.SetDeviceSubclass(Device::Subclass::KNUCKLE);
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_EQUALS(Device::Subclass::KNUCKLE, gesture.GetDeviceSubclass(), TEST_LOCATION);
+
+  point.SetDeviceSubclass(Device::Subclass::PALM);
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_EQUALS(Device::Subclass::PALM, gesture.GetDeviceSubclass(), TEST_LOCATION);
+
+  point.SetDeviceSubclass(Device::Subclass::TRACKPAD);
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_EQUALS(Device::Subclass::TRACKPAD, gesture.GetDeviceSubclass(), TEST_LOCATION);
+
+  point.SetDeviceSubclass(Device::Subclass::VIRTUAL_MOUSE);
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_EQUALS(Device::Subclass::VIRTUAL_MOUSE, gesture.GetDeviceSubclass(), TEST_LOCATION);
+
+  point.SetDeviceSubclass(Device::Subclass::NONE);
+  GetImplementation(gesture).SetTriggerPoint(point);
+  DALI_TEST_EQUALS(Device::Subclass::NONE, gesture.GetDeviceSubclass(), TEST_LOCATION);
+
+  END_TEST;
+}

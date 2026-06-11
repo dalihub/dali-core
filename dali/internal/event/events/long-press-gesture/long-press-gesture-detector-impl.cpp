@@ -298,8 +298,7 @@ void LongPressGestureDetector::EmitLongPressSignal(Actor* actor, const LongPress
   longPress->SetNumberOfTouches(longPressEvent.numberOfTouches);
   longPress->SetScreenPoint(longPressEvent.point);
   longPress->SetLocalPoint(localPoint);
-  longPress->SetSourceType(longPressEvent.sourceType);
-  longPress->SetSourceData(longPressEvent.sourceData);
+  longPress->SetTriggerPoint(longPressEvent.triggerPoint);
 
   Dali::Actor actorHandle(actor);
   EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));

@@ -262,8 +262,7 @@ void LongPressGestureRecognizer::EmitGesture(GestureState state)
     {
       longPress.time += mMinimumHoldingTime;
     }
-    longPress.sourceType = mSourceType;
-    longPress.sourceData = mSourceData;
+    longPress.triggerPoint = mTriggerPoint;
 
     if(mScene)
     {
