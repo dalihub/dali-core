@@ -20,17 +20,18 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/owner-container.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/core-enumerations.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
 {
+class FrameCallbackInterface;
+
 namespace Graphics
 {
 class Controller;
@@ -93,11 +94,6 @@ public:
   void Initialize();
 
   /**
-   * @copydoc Dali::Integration::Core::GetContextNotifier()
-   */
-  Integration::ContextNotifierInterface* GetContextNotifier();
-
-  /**
    * @copydoc Dali::Integration::Core::ContextCreated()
    */
   void ContextCreated();
@@ -106,11 +102,6 @@ public:
    * @copydoc Dali::Integration::Core::ContextDestroyed()
    */
   void ContextDestroyed();
-
-  /**
-   * @copydoc Dali::Integration::Core::RecoverFromContextLoss()
-   */
-  void RecoverFromContextLoss();
 
   /**
    * @copydoc Dali::Integration::Core::SetMinimumFrameTimeInterval(uint32_t)
@@ -330,12 +321,6 @@ private:
   // for use by ThreadLocalStorage
 
   /**
-   * Returns the current stage.
-   * @return A smart-pointer to the current stage.
-   */
-  StagePtr GetCurrentStage();
-
-  /**
    * Returns the platform abstraction.
    * @return A reference to the platform abstraction.
    */
@@ -416,7 +401,6 @@ private:
   Integration::RenderController&    mRenderController; ///< Reference to Render controller to tell it to keep rendering
   Integration::PlatformAbstraction& mPlatform;         ///< The interface providing platform specific services.
 
-  IntrusivePtr<Stage>                       mStage;                       ///< The current stage
   OwnerPointer<AnimationPlaylist>           mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   IntrusivePtr<RelayoutController>          mRelayoutController;          ///< Size negotiation relayout controller

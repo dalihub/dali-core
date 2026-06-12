@@ -29,11 +29,13 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
+#include <dali/public-api/update/update-proxy.h>
 
 #include <dali/internal/update/manager/scene-graph-traveler-interface.h>
 
 namespace Dali
 {
+
 namespace Internal
 {
 namespace SceneGraph

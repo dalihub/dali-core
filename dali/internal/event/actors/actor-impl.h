@@ -34,7 +34,6 @@
 #include <dali/internal/event/actors/actor-renderer-container.h>
 #include <dali/internal/event/actors/actor-sizer.h>
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
@@ -147,7 +146,7 @@ public:
 
   /**
    * Gets the layer in which the actor is present
-   * @return The layer, which will be uninitialized if the actor is off-stage.
+   * @return The layer, which will be uninitialized if the actor is off-scene.
    */
   Dali::Layer GetLayer();
 
@@ -1781,7 +1780,7 @@ protected:
    * Helper for ConnectToScene, to notify a connected actor through the public API.
    * @param[in] notify Emits notification if set to true.
    */
-  void NotifyStageConnection(bool notify);
+  void NotifySceneConnection(bool notify);
 
   /**
    * Called on a child during Remove() when the actor was previously on the Scene.
@@ -1798,7 +1797,7 @@ protected:
    * Helper for DisconnectFromScene, to notify a disconnected actor through the public API.
    * @param[in] notify Emits notification if set to true.
    */
-  void NotifyStageDisconnection(bool notify);
+  void NotifySceneDisconnection(bool notify);
 
   /**
    * When the Actor is OnScene, checks whether the corresponding Node is connected to the scene graph.

@@ -4155,7 +4155,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
   uint32_t updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   TraceCallStack&    drawTrace     = glAbstraction.GetDrawTrace();
@@ -4228,7 +4228,7 @@ int UtcDaliRendererRenderingBehavior(void)
 
   updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   END_TEST;
 }
@@ -4276,7 +4276,7 @@ int UtcDaliRendererRegenerateUniformMap(void)
 
   // Nothing to test here, the test must not crash
   auto updateStatus = application.GetUpdateStatus();
-  DALI_TEST_CHECK(updateStatus & Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING);
+  DALI_TEST_CHECK(updateStatus & Dali::Integration::KeepUpdating::KEEP_RENDERING);
 
   END_TEST;
 }
@@ -4318,7 +4318,7 @@ int UtcDaliRendererRenderAfterAddShader(void)
 
   uint32_t updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   // Update for several frames
   application.SendNotification();
@@ -4349,7 +4349,7 @@ int UtcDaliRendererRenderAfterAddShader(void)
 
   updateStatus = application.GetUpdateStatus();
 
-  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
+  DALI_TEST_CHECK(!(updateStatus & (Dali::Integration::KeepUpdating::KEEP_RENDERING | Dali::Integration::KeepUpdating::RENDERER_CONTINUOUSLY)));
 
   DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements"), 1, TEST_LOCATION);
 

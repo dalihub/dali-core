@@ -136,11 +136,6 @@ ShaderFactory& ThreadLocalStorage::GetShaderFactory()
   return mCore->GetShaderFactory();
 }
 
-StagePtr ThreadLocalStorage::GetCurrentStage()
-{
-  return mCore->GetCurrentStage();
-}
-
 GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
 {
   return mCore->GetGestureEventProcessor();

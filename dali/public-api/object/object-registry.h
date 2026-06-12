@@ -46,7 +46,7 @@ class ObjectRegistry;
  * should only be used to connect to signals.
  *
  * Usage:
- * ObjectRegistry registry = Stage::GetObjectRegistry();
+ * ObjectRegistry registry = application.GetObjectRegistry();
  * registry.ObjectCreatedSignal().Connect( ObjectCreatedCallbackFunc );
  *
  * Signals
@@ -77,7 +77,7 @@ public:
    * @brief Allows the creation of an empty objectRegistry handle.
    *
    * To retrieve the current objectRegistry,
-   * this handle can be set using Stage::GetCurrent().GetObjectRegistry().
+   * this handle can be set using Application::GetObjectRegistry().
    * @SINCE_1_0.0
    */
   ObjectRegistry();

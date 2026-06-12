@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/internal/event/common/scene-impl.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/public-api/update/update-proxy.h>
 
@@ -129,12 +128,6 @@ public:
    * @return reference to the Shader Factory
    */
   ShaderFactory& GetShaderFactory();
-
-  /**
-   * Returns the current stage.
-   * @return A pointer to the current stage.
-   */
-  StagePtr GetCurrentStage();
 
   /**
    * Returns the gesture event processor.

@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/common/bitwise-enum.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/public-api/common/dali-common.h>
 
 #undef FALSE

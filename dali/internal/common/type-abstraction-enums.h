@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/camera-actor-devel.h>
-#include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/type-abstraction.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -59,10 +58,6 @@ struct ParameterType<Dali::StencilFunction::Type> : public BasicType<Dali::Stenc
 };
 template<>
 struct ParameterType<Dali::StencilOperation::Type> : public BasicType<Dali::StencilOperation::Type>
-{
-};
-template<>
-struct ParameterType<Dali::DevelStage::Rendering> : public BasicType<Dali::DevelStage::Rendering>
 {
 };
 template<>

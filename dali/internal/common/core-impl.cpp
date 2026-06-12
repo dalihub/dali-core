@@ -37,7 +37,6 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-notification-manager.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/event/effects/shader-factory.h>
@@ -56,6 +55,8 @@
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/render/renderers/uniform-buffer-view.h>
+
+#include <dali/public-api/update/frame-callback-interface.h>
 
 using Dali::Internal::SceneGraph::RenderManager;
 using Dali::Internal::SceneGraph::UpdateManager;
@@ -124,9 +125,6 @@ Core::Core(RenderController&            renderController,
 
   mObjectRegistry = ObjectRegistry::New();
 
-  mStage = IntrusivePtr<Stage>(Stage::New(*mUpdateManager));
-
-  // This must be called after stage is created but before stage initialization
   mRelayoutController = IntrusivePtr<RelayoutController>(new RelayoutController(mRenderController));
 
   mGestureEventProcessor = new GestureEventProcessor(*mUpdateManager, mRenderController);
@@ -146,7 +144,6 @@ Core::~Core()
 
   // clear the thread local storage first
   // allows core to be created / deleted many times in the same thread (how TET cases work).
-  // Do this before mStage.Reset() so Stage::IsInstalled() returns false
   ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
   if(tls)
   {
@@ -159,14 +156,11 @@ Core::~Core()
 
   mObjectRegistry.Reset();
 
-  // Stop relayout requests being raised on stage destruction
+  // Stop relayout requests
   mRelayoutController.Reset();
 
   // Remove all Scenes
   mScenes.clear();
-
-  // remove (last?) reference to stage
-  mStage.Reset();
 
   // Destroy before UpdateManager.
   mGestureEventProcessor.Reset();
@@ -190,19 +184,6 @@ Core::~Core()
 
 void Core::Initialize()
 {
-  mStage->Initialize(*mScenes[0]);
-}
-
-Integration::ContextNotifierInterface* Core::GetContextNotifier()
-{
-  return mStage.Get();
-}
-
-void Core::RecoverFromContextLoss()
-{
-  DALI_LOG_INFO(gCoreFilter, Debug::Verbose, "Core::RecoverFromContextLoss()\n");
-
-  mStage->GetRenderTaskList().RecoverFromContextLoss(); // Re-trigger render-tasks
 }
 
 void Core::ContextCreated()
@@ -224,7 +205,7 @@ void Core::Update(float elapsedSeconds, uint32_t lastVSyncTimeMilliseconds, uint
   static bool rendererAdded = false;
   bool        oldUploadOnly = uploadOnly;
 
-  // Render returns true when there are updates on the stage or one or more animations are completed.
+  // Render returns true when there are updates on the scene or one or more animations are completed.
   // Use the estimated time diff till we render as the elapsed time.
   status.keepUpdating = mUpdateManager->Update(elapsedSeconds,
                                                lastVSyncTimeMilliseconds,
@@ -280,8 +261,6 @@ void Core::PostRender()
 
 void Core::SceneCreated()
 {
-  mStage->EmitSceneCreatedSignal();
-
   mRelayoutController->OnApplicationSceneCreated();
 
   for(const auto& scene : mScenes)
@@ -778,11 +757,6 @@ void Core::RunPostProcessors()
       }
       oss << "]"; });
   }
-}
-
-StagePtr Core::GetCurrentStage()
-{
-  return mStage.Get();
 }
 
 PlatformAbstraction& Core::GetPlatform()
