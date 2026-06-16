@@ -55,11 +55,6 @@ void Core::Initialize()
   mImpl->Initialize();
 }
 
-ContextNotifierInterface* Core::GetContextNotifier()
-{
-  return mImpl->GetContextNotifier();
-}
-
 // Graphics Context Lifecycle
 
 void Core::ContextCreated()
@@ -70,11 +65,6 @@ void Core::ContextCreated()
 void Core::ContextDestroyed()
 {
   mImpl->ContextDestroyed();
-}
-
-void Core::RecoverFromContextLoss()
-{
-  mImpl->RecoverFromContextLoss();
 }
 
 // Core Lifecycle

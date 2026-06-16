@@ -1404,7 +1404,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
           const bool sceneKeepUpdating = scene->scene->KeepRenderingCheck(elapsedSeconds);
           if(sceneKeepUpdating)
           {
-            keepUpdating |= KeepUpdating::STAGE_KEEP_RENDERING;
+            keepUpdating |= KeepUpdating::KEEP_RENDERING;
           }
 
           // If there are animations running, only add render instruction if at least one animation is currently active (i.e. not delayed)
@@ -1531,7 +1531,7 @@ uint32_t UpdateManager::Update(float    elapsedSeconds,
   // Check whether further updates are required
   keepUpdating |= KeepUpdatingCheck(elapsedSeconds);
 
-  if(keepUpdating & (KeepUpdating::STAGE_KEEP_RENDERING | KeepUpdating::FRAME_UPDATE_CALLBACK | KeepUpdating::RENDERER_CONTINUOUSLY))
+  if(keepUpdating & (KeepUpdating::KEEP_RENDERING | KeepUpdating::FRAME_UPDATE_CALLBACK | KeepUpdating::RENDERER_CONTINUOUSLY))
   {
     // Set dirty flags for next frame to continue rendering
     mImpl->nodeDirtyFlags |= RenderableUpdateFlags;
@@ -1577,7 +1577,7 @@ uint32_t UpdateManager::KeepUpdatingCheck(float elapsedSeconds) const
 
   if(mImpl->renderingBehavior == Integration::RenderingBehavior::CONTINUOUSLY)
   {
-    keepUpdatingRequest |= KeepUpdating::STAGE_KEEP_RENDERING;
+    keepUpdatingRequest |= KeepUpdating::KEEP_RENDERING;
   }
 
   if(IsAnimationRunning() ||

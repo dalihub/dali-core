@@ -19,6 +19,8 @@
 #include <dali/integration-api/locale-numeric-guard.h>
 #include <dali/public-api/dali-core.h>
 #include <clocale>
+#include <cstdlib>
+#include <cstring>
 
 #include <iostream>
 
@@ -39,7 +41,7 @@ int UtcDaliLocaleNumericGuard01(void)
   const char* originalLocale = "en_US.UTF-8";
   const char* classicLocale  = "C";
 
-  char* prev = setlocale(LC_NUMERIC, originalLocale);
+  char* prev = strdup(setlocale(LC_NUMERIC, originalLocale));
   DALI_LOG_ERROR("prev : %s\n", prev);
 
   DALI_TEST_EQUALS(std::string(originalLocale), std::string(setlocale(LC_NUMERIC, nullptr)), TEST_LOCATION);
@@ -71,6 +73,7 @@ int UtcDaliLocaleNumericGuard01(void)
 
   // Revert it
   setlocale(LC_NUMERIC, prev);
+  free(prev);
 
   END_TEST;
 }

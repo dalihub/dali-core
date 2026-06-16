@@ -169,11 +169,6 @@ private:
   void RemoveRequest(const Dali::Internal::Actor& actorImpl);
 
   /**
-   * @brief Disconnect the Relayout() method from the Stage::EventProcessingFinishedSignal().
-   */
-  void Disconnect();
-
-  /**
    * @brief Propagate dirty layout flags to actor and all sub-actors. This will stop propagating when a dirty actor
    * is found.
    *

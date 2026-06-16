@@ -65,7 +65,7 @@ namespace KeepUpdating
 enum Reasons
 {
   NOT_REQUESTED          = 0,      ///< Zero means that no further updates are required
-  STAGE_KEEP_RENDERING   = 1 << 1, ///< - Core::KeepRendering() is being used
+  KEEP_RENDERING         = 1 << 1, ///< - Core::KeepRendering() is being used
   ANIMATIONS_RUNNING     = 1 << 2, ///< - Animations are ongoing
   MONITORING_PERFORMANCE = 1 << 3, ///< - The --enable-performance-monitor option is being used
   RENDER_TASK_SYNC       = 1 << 4, ///< - A render task is waiting for render sync
@@ -269,11 +269,6 @@ public:
   // Graphics Context Lifecycle
 
   /**
-   * Get the object that will notify the application/toolkit when context is lost/regained
-   */
-  ContextNotifierInterface* GetContextNotifier();
-
-  /**
    * Notify the Core that the GL context has been created.
    * The context must be created before the Core can render.
    * Multi-threading note: this method should be called from the rendering thread only
@@ -288,17 +283,6 @@ public:
    * @post The Core is unaware of any GL context.
    */
   void ContextDestroyed();
-
-  /**
-   * Notify the Core that the GL context has been re-created, e.g. after ReplaceSurface
-   * or Context loss.
-   *
-   * In the case of ReplaceSurface, both ContextToBeDestroyed() and ContextCreated() will have
-   * been called on the render thread before this is called on the event thread.
-   *
-   * Multi-threading note: this method should be called from the main thread
-   */
-  void RecoverFromContextLoss();
 
   // Core Lifecycle
 

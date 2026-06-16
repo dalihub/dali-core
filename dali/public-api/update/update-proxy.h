@@ -236,7 +236,7 @@ public:
   /**
    * @brief Pop a sync point off the stack.
    *
-   * Sync points can be added from the event side using Dali::DevelStage::NotifyFrameCallback().
+   * Sync points can be added from the event side using Dali::UiContext::NotifyFrameCallback().
    * @return INVALID_SYNC if there was no SyncPoint, or a unique value if there was a sync point.
    * @SINCE_2_5.21
    */

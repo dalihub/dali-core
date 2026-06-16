@@ -63,8 +63,7 @@ void EmitRotationSignal(
   rotation->SetRotation(rotationEvent.rotation);
   rotation->SetScreenCenterPoint(rotationEvent.centerPoint);
   rotation->SetLocalCenterPoint(localCenter);
-  rotation->SetSourceType(rotationEvent.sourceType);
-  rotation->SetSourceData(rotationEvent.sourceData);
+  rotation->SetTriggerPoint(rotationEvent.triggerPoint);
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_ROTATION_GESTURE_SIGNAL", [&](std::ostringstream& oss)
   {

@@ -17,9 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/common/hash.h>
-#include <dali/devel-api/common/stage-devel.h>
 #include <dali/devel-api/threading/thread.h>
-#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/wheel-event-integ.h>

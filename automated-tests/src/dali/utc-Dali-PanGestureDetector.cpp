@@ -3463,3 +3463,79 @@ int UtcDaliPanGestureSignalGetLastGestureState(void)
   DALI_TEST_EQUALS(GestureState::CONTINUING, scene.GetLastPanGestureState(), TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliPanGestureGetSourceSubType(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData             data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Helper: send a pan sequence where the DOWN event carries the given subclass.
+  // source=1 (PRIMARY) triggers the recognizer source update block.
+  auto EmitPanWithSubclass = [&](Device::Subclass::Type subclass, uint32_t startTime) {
+    auto MakeTouch = [&](PointState::Type state, const Vector2& pos, uint32_t time) {
+      Dali::Integration::TouchEvent ev;
+      Dali::Integration::Point      p;
+      p.SetState(state);
+      p.SetDeviceId(4);
+      p.SetScreenPosition(pos);
+      p.SetDeviceClass(Device::Class::TOUCH);
+      p.SetDeviceSubclass(subclass);
+      p.SetMouseButton(MouseButton::PRIMARY);
+      ev.points.push_back(p);
+      ev.time = time;
+      return ev;
+    };
+
+    application.ProcessEvent(MakeTouch(PointState::DOWN,   Vector2(10.0f, 10.0f), startTime));
+    application.ProcessEvent(MakeTouch(PointState::MOTION, Vector2(26.0f, 10.0f), startTime + 16));
+    application.ProcessEvent(MakeTouch(PointState::MOTION, Vector2(42.0f, 10.0f), startTime + 32));
+    application.ProcessEvent(MakeTouch(PointState::MOTION, Vector2(58.0f, 10.0f), startTime + 48));
+    application.SendNotification();
+  };
+
+  // Pan with FINGER subclass
+  EmitPanWithSubclass(Device::Subclass::FINGER, 100);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceClass(), Device::Class::TOUCH, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::FINGER, TEST_LOCATION);
+  data.Reset();
+
+  // Finish the previous pan
+  {
+    Dali::Integration::TouchEvent ev;
+    Dali::Integration::Point      p;
+    p.SetState(PointState::UP);
+    p.SetDeviceId(4);
+    p.SetScreenPosition(Vector2(58.0f, 10.0f));
+    p.SetDeviceClass(Device::Class::TOUCH);
+    p.SetDeviceSubclass(Device::Subclass::FINGER);
+    p.SetMouseButton(MouseButton::PRIMARY);
+    ev.points.push_back(p);
+    ev.time = 200;
+    application.ProcessEvent(ev);
+    application.SendNotification();
+    data.Reset();
+  }
+
+  // Pan with PALM subclass
+  EmitPanWithSubclass(Device::Subclass::PALM, 1000);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedGesture.GetDeviceSubclass(), Device::Subclass::PALM, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}

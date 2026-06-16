@@ -55,7 +55,7 @@ void TestApplication::Initialize()
 void TestApplication::CreateCore()
 {
   // We always need the first update!
-  mStatus.keepUpdating = Dali::Integration::KeepUpdating::STAGE_KEEP_RENDERING;
+  mStatus.keepUpdating = Dali::Integration::KeepUpdating::KEEP_RENDERING;
 
   Dali::Integration::CorePolicyFlags corePolicyFlags = Dali::Integration::CorePolicyFlags::DEFAULT;
 

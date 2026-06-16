@@ -67,8 +67,7 @@ void EmitTapSignal(
   tap->SetNumberOfTouches(tapEvent.numberOfTouches);
   tap->SetScreenPoint(tapEvent.point);
   tap->SetLocalPoint(localPoint);
-  tap->SetSourceType(tapEvent.sourceType);
-  tap->SetSourceData(tapEvent.sourceData);
+  tap->SetTriggerPoint(tapEvent.triggerPoint);
 
   DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_TAP_GESTURE_SIGNAL", [&](std::ostringstream& oss)
   {

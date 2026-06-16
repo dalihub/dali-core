@@ -1401,13 +1401,13 @@ void Actor::ConnectToScene(uint32_t parentDepth, uint32_t layer3DParentsCount, b
     mScene->RequestRebuildDepthTree();
   }
 
-  // This stage is not interrupted by user callbacks.
+  // This scene is not interrupted by user callbacks.
   mParentImpl.RecursiveConnectToScene(connectionList, layer3DParentsCount, parentDepth + 1);
 
   // Notify applications about the newly connected actors.
   for(const auto& actor : connectionList)
   {
-    actor->NotifyStageConnection(notify);
+    actor->NotifySceneConnection(notify);
   }
 
   RelayoutRequest();
@@ -1433,9 +1433,9 @@ void Actor::ConnectToSceneGraph()
   OnSceneObjectAdd();
 }
 
-void Actor::NotifyStageConnection(bool notify)
+void Actor::NotifySceneConnection(bool notify)
 {
-  // Actors can be removed (in a callback), before the on-stage stage is reported.
+  // Actors can be removed (in a callback), before the on-scene state is reported.
   // The actor may also have been reparented, in which case mOnSceneSignalled will be true.
   if(OnScene() && !mOnSceneSignalled)
   {
@@ -1470,13 +1470,13 @@ void Actor::DisconnectFromScene(bool notify)
     mScene->RequestRebuildDepthTree();
   }
 
-  // This stage is not interrupted by user callbacks
+  // This scene is not interrupted by user callbacks
   mParentImpl.RecursiveDisconnectFromScene(disconnectionList);
 
   // Notify applications about the newly disconnected actors.
   for(const auto& actor : disconnectionList)
   {
-    actor->NotifyStageDisconnection(notify);
+    actor->NotifySceneDisconnection(notify);
   }
 }
 
@@ -1490,11 +1490,11 @@ void Actor::DisconnectFromSceneGraph()
   OnSceneObjectRemove();
 }
 
-void Actor::NotifyStageDisconnection(bool notify)
+void Actor::NotifySceneDisconnection(bool notify)
 {
-  // Actors can be added (in a callback), before the off-stage state is reported.
+  // Actors can be added (in a callback), before the off-scene state is reported.
   // Also if the actor was added & removed before mOnSceneSignalled was set, then we don't notify here.
-  // only do this step if there is a stage, i.e. Core is not being shut down
+  // only do this step if there is a scene, i.e. Core is not being shut down
   if(DALI_LIKELY(EventThreadServices::IsCoreRunning()) && !OnScene() && mOnSceneSignalled)
   {
     if(notify)

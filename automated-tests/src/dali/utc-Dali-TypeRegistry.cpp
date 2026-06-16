@@ -600,12 +600,12 @@ int UtcDaliTypeRegistryMoveConstructor(void)
 
   TypeRegistry registry = TypeRegistry::Get();
   DALI_TEST_CHECK(registry);
-  DALI_TEST_EQUALS(17, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(16, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(registry.GetTypeInfo("Actor").GetName() == "Actor");
 
   TypeRegistry movedRegistry = std::move(registry);
   DALI_TEST_CHECK(movedRegistry);
-  DALI_TEST_EQUALS(17, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(16, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(movedRegistry.GetTypeInfo("Actor").GetName() == "Actor");
   DALI_TEST_CHECK(!registry);
 
@@ -629,13 +629,13 @@ int UtcDaliTypeRegistryMoveAssignment(void)
 
   TypeRegistry registry = TypeRegistry::Get();
   DALI_TEST_CHECK(registry);
-  DALI_TEST_EQUALS(17, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(16, registry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(registry.GetTypeInfo("Actor").GetName() == "Actor");
 
   TypeRegistry movedRegistry;
   movedRegistry = std::move(registry);
   DALI_TEST_CHECK(movedRegistry);
-  DALI_TEST_EQUALS(17, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(16, movedRegistry.GetBaseObject().ReferenceCount(), TEST_LOCATION);
   DALI_TEST_CHECK(movedRegistry.GetTypeInfo("Actor").GetName() == "Actor");
   DALI_TEST_CHECK(!registry);
 
