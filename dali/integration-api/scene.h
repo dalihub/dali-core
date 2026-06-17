@@ -534,7 +534,7 @@ public:
    *
    * @return Dali::GestureState
    */
-  Dali::GestureState GetLastPanGestureState();
+  Dali::GestureState GetLastPanGestureState() const;
 
   /**
    * @brief This signal is emitted just after the event processing is finished.

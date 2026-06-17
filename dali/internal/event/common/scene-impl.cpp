@@ -694,7 +694,7 @@ void Scene::SetLastPanGestureState(Dali::GestureState state)
   mPanGestureState = state;
 }
 
-Dali::GestureState Scene::GetLastPanGestureState()
+Dali::GestureState Scene::GetLastPanGestureState() const
 {
   return mPanGestureState;
 }
