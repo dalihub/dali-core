@@ -225,7 +225,11 @@ public:
   {                                                                            \
     std::ostringstream oss;                                                    \
     oss.imbue(std::locale::classic());                                         \
+    auto __traceFlags     = oss.flags();                                       \
+    auto __tracePrecision = oss.precision();                                   \
     messageGenerator(oss);                                                     \
+    oss.flags(__traceFlags);                                                   \
+    oss.precision(__tracePrecision);                                           \
     filter->BeginTrace(tag, oss.str().c_str());                                \
   }
 
@@ -249,7 +253,11 @@ public:
   {                                                                          \
     std::ostringstream oss;                                                  \
     oss.imbue(std::locale::classic());                                       \
+    auto __traceFlags     = oss.flags();                                     \
+    auto __tracePrecision = oss.precision();                                 \
     messageGenerator(oss);                                                   \
+    oss.flags(__traceFlags);                                                 \
+    oss.precision(__tracePrecision);                                         \
     filter->EndTrace(tag, oss.str().c_str());                                \
   }
 
