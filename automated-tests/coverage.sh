@@ -29,7 +29,7 @@ for i in `find . -name "*.dir"` ; do
         then
             ${DESKTOP_PREFIX}/bin/fastcov.py $FASTCOV_OPTS \
                 -d . \
-                --exclude /usr/include automated-tests dali-env \
+                --exclude /usr/include automated-tests dali-env third-party generated \
                 -o dali.info
             if [ ! -s dali.info ]
             then

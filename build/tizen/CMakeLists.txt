@@ -364,7 +364,7 @@ IF( ENABLE_COVERAGE )
     ADD_CUSTOM_TARGET( ${DALI_CORE_PREFIX}cov_data
       COMMAND ${FASTCOV_BIN} ${FASTCOV_OPTS}
         -d .
-        --exclude /usr/include automated-tests dali-env
+        --exclude /usr/include automated-tests dali-env build/tizen/generated
         -o dali.info )
 
     # genhtml works with fastcov.py output (lcov-compatible format)
