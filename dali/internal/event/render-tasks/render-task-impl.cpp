@@ -331,9 +331,6 @@ void RenderTask::SetCameraActorInternal(CameraActor* cameraActor)
         SetCameraMessage(GetEventThreadServices(), *GetRenderTaskSceneObject(), nullptr);
       }
     }
-
-    // set the actor on exclusive container for hit testing
-    mRenderTaskList.SetExclusive(this, mExclusive);
   }
 }
 
