@@ -100,11 +100,11 @@ Dali::Actor EmitHoverSignals(Dali::Actor actor, const Dali::HoverEvent& event)
 
     bool consumed(false);
 
-    // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
+    // Only dispatch the event if the actor's hover signal has connections (or derived actor implementation requires hover).
     if(ShouldEmitHoverEvent(actorImpl, event))
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_HOVER_EVENT_SIGNAL");
-      consumed = actorImpl.EmitHoverEventSignal(event);
+      consumed = actorImpl.DispatchHoverEvent(event);
     }
 
     if(consumed)
@@ -140,7 +140,7 @@ Dali::Actor EmitGeoHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, c
   for(; rIter != actorLists.rend(); rIter++)
   {
     Actor* actorImpl(*rIter);
-    // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
+    // Only dispatch the event if the actor's hover signal has connections (or derived actor implementation requires hover).
     if(actorImpl->GetHoverRequired())
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_HOVER_EVENT_SIGNAL");
@@ -153,7 +153,8 @@ Dali::Actor EmitGeoHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, c
         HoverEventPtr newHoverEvent = HoverEvent::Clone(GetImplementation(hoverEvent));
         newHoverEvent->GetPoint(0).SetState(PointState::STARTED);
         actorImpl->SetHoverState(PointState::STARTED); //update state
-        if(actorImpl->EmitHoverEventSignal(Dali::HoverEvent(newHoverEvent.Get())))
+
+        if(actorImpl->DispatchHoverEvent(Dali::HoverEvent(newHoverEvent.Get())))
         {
           // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
           consumedActor = Dali::Actor(actorImpl);
@@ -162,7 +163,7 @@ Dali::Actor EmitGeoHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, c
       }
       else if(hoverEvent.GetState(0) != PointState::MOTION || actorImpl->IsDispatchHoverMotion())
       {
-        if(actorImpl->EmitHoverEventSignal(hoverEvent))
+        if(actorImpl->DispatchHoverEvent(hoverEvent))
         {
           // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
           consumedActor = Dali::Actor(actorImpl);

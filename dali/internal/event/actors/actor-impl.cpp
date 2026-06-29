@@ -1096,6 +1096,13 @@ bool Actor::EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch)
   return EmitConsumingSignal(*this, mInterceptTouchEventSignal, touch);
 }
 
+bool Actor::DispatchTouchEvent(const Dali::TouchEvent& touch)
+{
+  bool consumed = OnTouchEvent(touch);
+  consumed = EmitTouchEventSignal(touch) || consumed;
+  return consumed;
+}
+
 bool Actor::EmitTouchEventSignal(const Dali::TouchEvent& touch)
 {
   if(mScene && mScene->IsGeometryHittestEnabled())
@@ -1103,6 +1110,13 @@ bool Actor::EmitTouchEventSignal(const Dali::TouchEvent& touch)
     return EmitConsumingSignalOr(*this, mTouchEventSignal, touch);
   }
   return EmitConsumingSignal(*this, mTouchEventSignal, touch);
+}
+
+bool Actor::DispatchHoverEvent(const Dali::HoverEvent& event)
+{
+  bool consumed = OnHoverEvent(event);
+  consumed = EmitHoverEventSignal(event) || consumed;
+  return consumed;
 }
 
 bool Actor::EmitHoverEventSignal(const Dali::HoverEvent& event)
@@ -1113,6 +1127,13 @@ bool Actor::EmitHoverEventSignal(const Dali::HoverEvent& event)
 bool Actor::EmitInterceptWheelEventSignal(const Dali::WheelEvent& event)
 {
   return EmitConsumingSignal(*this, mInterceptWheelEventSignal, event);
+}
+
+bool Actor::DispatchWheelEvent(const Dali::WheelEvent& event)
+{
+  bool consumed = OnWheelEvent(event);
+  consumed = EmitWheelEventSignal(event) || consumed;
+  return consumed;
 }
 
 bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
@@ -1210,6 +1231,36 @@ void Actor::RequestRenderTaskReorder()
   {
     mScene->GetRenderTaskList().RequestReorder();
   }
+}
+
+bool Actor::HasIntrinsicTouchHandling() const
+{
+  return HasIntrinsicTouchHandlingExternal();
+}
+
+bool Actor::OnTouchEvent(const Dali::TouchEvent& touch)
+{
+  return OnTouchEventExternal(touch);
+}
+
+bool Actor::HasIntrinsicHoverHandling() const
+{
+  return HasIntrinsicHoverHandlingExternal();
+}
+
+bool Actor::OnHoverEvent(const Dali::HoverEvent& hover)
+{
+  return OnHoverEventExternal(hover);
+}
+
+bool Actor::HasIntrinsicWheelHandling() const
+{
+  return HasIntrinsicWheelHandlingExternal();
+}
+
+bool Actor::OnWheelEvent(const Dali::WheelEvent& wheel)
+{
+  return OnWheelEventExternal(wheel);
 }
 
 uint32_t Actor::AddCacheRenderer(Renderer& renderer)

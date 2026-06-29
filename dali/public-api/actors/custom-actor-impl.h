@@ -48,6 +48,7 @@ class CustomActor;
 class CustomActorImpl;
 class RelayoutContainer;
 class KeyEvent;
+class TouchEvent;
 class HoverEvent;
 class WheelEvent;
 struct Vector2;
@@ -377,6 +378,84 @@ public:
   {
     return nullptr;
   }
+
+  /**
+   * @brief Queries whether the implementation has built-in touch handling even when Actor::TouchEventSignal() has no callbacks.
+   *
+   * Returning true makes the owning actor participate in touch hit testing and allows
+   * OnTouchEvent() to be called without requiring a connected Actor::TouchEventSignal() callback.
+   *
+   * The default implementation returns false.
+   *
+   * @return True if the implementation has built-in touch handling, false otherwise
+   */
+  virtual bool HasIntrinsicTouchHandling() const;
+
+  /**
+   * @brief Called when the owning actor receives a touch event.
+   *
+   * This hook is called before Actor::TouchEventSignal() is emitted. If Actor::TouchEventSignal()
+   * has callbacks, the signal is emitted regardless of the value returned by this method.
+   * The event is consumed if either this method or Actor::TouchEventSignal() returns true.
+   *
+   * The default implementation returns false.
+   *
+   * @param[in] event The touch event
+   * @return True if the event is consumed, false otherwise
+   */
+  virtual bool OnTouchEvent(const TouchEvent& event);
+
+  /**
+   * @brief Queries whether the implementation has built-in hover handling even when Actor::HoverEventSignal() has no callbacks.
+   *
+   * Returning true makes the owning actor participate in hover hit testing and allows
+   * OnHoverEvent() to be called without requiring a connected Actor::HoverEventSignal() callback.
+   *
+   * The default implementation returns false.
+   *
+   * @return True if the implementation has built-in hover handling, false otherwise
+   */
+  virtual bool HasIntrinsicHoverHandling() const;
+
+  /**
+   * @brief Called when the owning actor receives a hover event.
+   *
+   * This hook is called before Actor::HoverEventSignal() is emitted. If Actor::HoverEventSignal()
+   * has callbacks, the signal is emitted regardless of the value returned by this method.
+   * The event is consumed if either this method or Actor::HoverEventSignal() returns true.
+   *
+   * The default implementation returns false.
+   *
+   * @param[in] event The hover event
+   * @return True if the event is consumed, false otherwise
+   */
+  virtual bool OnHoverEvent(const HoverEvent& event);
+
+  /**
+   * @brief Queries whether the implementation has built-in wheel handling even when Actor::WheelEventSignal() has no callbacks.
+   *
+   * Returning true makes the owning actor participate in wheel hit testing and allows
+   * OnWheelEvent() to be called without requiring a connected Actor::WheelEventSignal() callback.
+   *
+   * The default implementation returns false.
+   *
+   * @return True if the implementation has built-in wheel handling, false otherwise
+   */
+  virtual bool HasIntrinsicWheelHandling() const;
+
+  /**
+   * @brief Called when the owning actor receives a wheel event.
+   *
+   * This hook is called before Actor::WheelEventSignal() is emitted. If Actor::WheelEventSignal()
+   * has callbacks, the signal is emitted regardless of the value returned by this method.
+   * The event is consumed if either this method or Actor::WheelEventSignal() returns true.
+   *
+   * The default implementation returns false.
+   *
+   * @param[in] event The wheel event
+   * @return True if the event is consumed, false otherwise
+   */
+  virtual bool OnWheelEvent(const WheelEvent& event);
 
 protected: // For derived classes
   /**

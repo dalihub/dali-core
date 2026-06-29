@@ -59,6 +59,36 @@ void CustomActorImpl::RequestRenderTaskReorder()
   mOwner->RequestRenderTaskReorder();
 }
 
+bool CustomActorImpl::HasIntrinsicTouchHandling() const
+{
+  return false;
+}
+
+bool CustomActorImpl::OnTouchEvent(const TouchEvent& /*event*/)
+{
+  return false;
+}
+
+bool CustomActorImpl::HasIntrinsicHoverHandling() const
+{
+  return false;
+}
+
+bool CustomActorImpl::OnHoverEvent(const HoverEvent& /*event*/)
+{
+  return false;
+}
+
+bool CustomActorImpl::HasIntrinsicWheelHandling() const
+{
+  return false;
+}
+
+bool CustomActorImpl::OnWheelEvent(const WheelEvent& /*event*/)
+{
+  return false;
+}
+
 CustomActorImpl::CustomActorImpl(ActorFlags flags)
 : mOwner(nullptr),
   mFlags(flags)

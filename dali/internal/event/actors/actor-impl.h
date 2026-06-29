@@ -1322,8 +1322,21 @@ public:
    */
   bool GetTouchRequired() const
   {
-    return !mTouchEventSignal.Empty();
+    return !mTouchEventSignal.Empty() || HasIntrinsicTouchHandling();
   }
+
+  /**
+   * Query whether this actor implementation has built-in touch handling without requiring a connected touch signal.
+   * @return True if this actor implementation has built-in touch handling.
+   */
+  bool HasIntrinsicTouchHandling() const;
+
+  /**
+   * Called when a touch event is received by this actor.
+   * @param[in] touch The touch event
+   * @return True if the event is consumed.
+   */
+  bool OnTouchEvent(const Dali::TouchEvent& touch);
 
   /**
    * Set whether this view can focus by touch.
@@ -1367,8 +1380,21 @@ public:
    */
   bool GetHoverRequired() const
   {
-    return !mHoverEventSignal.Empty();
+    return !mHoverEventSignal.Empty() || HasIntrinsicHoverHandling();
   }
+
+  /**
+   * Query whether this actor implementation has built-in hover handling without requiring a connected hover signal.
+   * @return True if this actor implementation has built-in hover handling.
+   */
+  bool HasIntrinsicHoverHandling() const;
+
+  /**
+   * Called when a hover event is received by this actor.
+   * @param[in] hover The hover event
+   * @return True if the event is consumed.
+   */
+  bool OnHoverEvent(const Dali::HoverEvent& hover);
 
   /**
    * Query whether the application or derived actor type requires intercept wheel events.
@@ -1385,8 +1411,21 @@ public:
    */
   bool GetWheelEventRequired() const
   {
-    return !mWheelEventSignal.Empty();
+    return !mWheelEventSignal.Empty() || HasIntrinsicWheelHandling();
   }
+
+  /**
+   * Query whether this actor implementation has built-in wheel handling without requiring a connected wheel signal.
+   * @return True if this actor implementation has built-in wheel handling.
+   */
+  bool HasIntrinsicWheelHandling() const;
+
+  /**
+   * Called when a wheel event is received by this actor.
+   * @param[in] wheel The wheel event
+   * @return True if the event is consumed.
+   */
+  bool OnWheelEvent(const Dali::WheelEvent& wheel);
 
   /**
    * Query whether the actor captures all touch after it starts even if touch leaves its boundary.
@@ -1488,11 +1527,25 @@ public:
   bool EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch);
 
   /**
+   * Used by the EventProcessor to dispatch touch events.
+   * @param[in] touch The touch data.
+   * @return True if the event was consumed.
+   */
+  bool DispatchTouchEvent(const Dali::TouchEvent& touch);
+
+  /**
    * Used by the EventProcessor to emit touch event signals.
    * @param[in] touch The touch data.
    * @return True if the event was consumed.
    */
   bool EmitTouchEventSignal(const Dali::TouchEvent& touch);
+
+  /**
+   * Used by the EventProcessor to dispatch hover events.
+   * @param[in] event The hover event.
+   * @return True if the event was consumed.
+   */
+  bool DispatchHoverEvent(const Dali::HoverEvent& event);
 
   /**
    * Used by the EventProcessor to emit hover event signals.
@@ -1507,6 +1560,13 @@ public:
    * @return True if the event was intercepted.
    */
   bool EmitInterceptWheelEventSignal(const Dali::WheelEvent& event);
+
+  /**
+   * Used by the EventProcessor to dispatch wheel events.
+   * @param[in] event The wheel event.
+   * @return True if the event was consumed.
+   */
+  bool DispatchWheelEvent(const Dali::WheelEvent& event);
 
   /**
    * Used by the EventProcessor to emit wheel event signals.
@@ -2003,6 +2063,60 @@ private:
    */
   virtual void OnChildRemove(Actor& child)
   {
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called to query whether the implementation has built-in touch handling.
+   */
+  virtual bool HasIntrinsicTouchHandlingExternal() const
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called when the actor receives a touch event.
+   */
+  virtual bool OnTouchEventExternal(const Dali::TouchEvent& /*touch*/)
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called to query whether the implementation has built-in hover handling.
+   */
+  virtual bool HasIntrinsicHoverHandlingExternal() const
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called when the actor receives a hover event.
+   */
+  virtual bool OnHoverEventExternal(const Dali::HoverEvent& /*hover*/)
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called to query whether the implementation has built-in wheel handling.
+   */
+  virtual bool HasIntrinsicWheelHandlingExternal() const
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called when the actor receives a wheel event.
+   */
+  virtual bool OnWheelEventExternal(const Dali::WheelEvent& /*wheel*/)
+  {
+    return false;
   }
 
   /**

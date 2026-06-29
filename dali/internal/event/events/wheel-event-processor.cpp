@@ -88,12 +88,11 @@ Dali::Actor EmitWheelSignals(Dali::Actor actor, const Dali::WheelEvent& event)
 
     bool consumed(false);
 
-    // Only do the conversion and emit the signal if the actor's wheel signal has connections.
+    // Only dispatch the event if the actor's wheel signal has connections (or derived actor implementation requires wheel).
     if(actorImpl.GetWheelEventRequired())
     {
-      // Emit the signal to the parent
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_WHEEL_EVENT_SIGNAL");
-      consumed = actorImpl.EmitWheelEventSignal(event);
+      consumed = actorImpl.DispatchWheelEvent(event);
     }
 
     if(consumed)
