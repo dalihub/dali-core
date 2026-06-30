@@ -310,7 +310,7 @@ int32_t Scene::GetNativeId() const
   return GetImplementation(*this).GetNativeId();
 }
 
-Dali::GestureState Scene::GetLastPanGestureState()
+Dali::GestureState Scene::GetLastPanGestureState() const
 {
   return GetImplementation(*this).GetLastPanGestureState();
 }

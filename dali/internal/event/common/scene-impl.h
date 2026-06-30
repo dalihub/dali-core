@@ -318,7 +318,7 @@ public:
   /**
    * @copydoc Dali::Integration::Scene::GetLastPanGestureState
    */
-  Dali::GestureState GetLastPanGestureState();
+  Dali::GestureState GetLastPanGestureState() const;
 
   /**
    * Used by the EventProcessor to emit key event signals.
