@@ -162,14 +162,16 @@ DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperti
 
 // Signals
 
-static constexpr std::string_view SIGNAL_HOVERED                      = "hovered";
+static constexpr std::string_view SIGNAL_TOUCH_EVENT                  = "touchEvent";
+static constexpr std::string_view SIGNAL_HOVER_EVENT                  = "hoverEvent";
 static constexpr std::string_view SIGNAL_WHEEL_EVENT                  = "wheelEvent";
-static constexpr std::string_view SIGNAL_ON_SCENE                     = "onScene";
-static constexpr std::string_view SIGNAL_OFF_SCENE                    = "offScene";
+static constexpr std::string_view SIGNAL_SCENE_CONNECTED              = "sceneConnected";
+static constexpr std::string_view SIGNAL_SCENE_DISCONNECTED           = "sceneDisconnected";
 static constexpr std::string_view SIGNAL_ON_RELAYOUT                  = "onRelayout";
-static constexpr std::string_view SIGNAL_TOUCHED                      = "touched";
+static constexpr std::string_view SIGNAL_INTERCEPT_TOUCH_EVENT        = "interceptTouchEvent";
+static constexpr std::string_view SIGNAL_INTERCEPT_WHEEL_EVENT        = "interceptWheelEvent";
 static constexpr std::string_view SIGNAL_VISIBILITY_CHANGED           = "visibilityChanged";
-static constexpr std::string_view SIGNAL_INHERITED_VISIBILITY_CHANGED = "inheritedVisibilityChanged";
+static constexpr std::string_view SIGNAL_EFFECTIVE_VISIBILITY_CHANGED = "effectiveVisibilityChanged";
 static constexpr std::string_view SIGNAL_LAYOUT_DIRECTION_CHANGED     = "layoutDirectionChanged";
 static constexpr std::string_view SIGNAL_CHILD_ADDED                  = "childAdded";
 static constexpr std::string_view SIGNAL_CHILD_REMOVED                = "childRemoved";
@@ -203,37 +205,45 @@ static bool DoConnectSignal(BaseObject*                 object,
 
   std::string_view name = ToStdStringView(signalName);
 
-  if(name == SIGNAL_HOVERED)
+  if(name == SIGNAL_TOUCH_EVENT)
   {
-    actor->HoveredSignal().Connect(tracker, functor);
+    actor->TouchEventSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_HOVER_EVENT)
+  {
+    actor->HoverEventSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_WHEEL_EVENT)
   {
     actor->WheelEventSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_ON_SCENE)
+  else if(name == SIGNAL_INTERCEPT_TOUCH_EVENT)
   {
-    actor->OnSceneSignal().Connect(tracker, functor);
+    actor->InterceptTouchEventSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_OFF_SCENE)
+  else if(name == SIGNAL_INTERCEPT_WHEEL_EVENT)
   {
-    actor->OffSceneSignal().Connect(tracker, functor);
+    actor->InterceptWheelEventSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_SCENE_CONNECTED)
+  {
+    actor->SceneConnectedSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_SCENE_DISCONNECTED)
+  {
+    actor->SceneDisconnectedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_ON_RELAYOUT)
   {
     actor->OnRelayoutSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_TOUCHED)
-  {
-    actor->TouchedSignal().Connect(tracker, functor);
-  }
   else if(name == SIGNAL_VISIBILITY_CHANGED)
   {
     actor->VisibilityChangedSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_INHERITED_VISIBILITY_CHANGED)
+  else if(name == SIGNAL_EFFECTIVE_VISIBILITY_CHANGED)
   {
-    actor->InheritedVisibilityChangedSignal().Connect(tracker, functor);
+    actor->EffectiveVisibilityChangedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_LAYOUT_DIRECTION_CHANGED)
   {
@@ -290,17 +300,19 @@ bool DoAction(BaseObject*          object,
 
 TypeRegistration mType(typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties);
 
-SignalConnectorType signalConnector2(mType, SIGNAL_HOVERED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector3(mType, SIGNAL_WHEEL_EVENT.data(), &DoConnectSignal);
-SignalConnectorType signalConnector4(mType, SIGNAL_ON_SCENE.data(), &DoConnectSignal);
-SignalConnectorType signalConnector5(mType, SIGNAL_OFF_SCENE.data(), &DoConnectSignal);
-SignalConnectorType signalConnector6(mType, SIGNAL_ON_RELAYOUT.data(), &DoConnectSignal);
-SignalConnectorType signalConnector7(mType, SIGNAL_TOUCHED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector8(mType, SIGNAL_VISIBILITY_CHANGED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector9(mType, SIGNAL_INHERITED_VISIBILITY_CHANGED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector10(mType, SIGNAL_LAYOUT_DIRECTION_CHANGED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector11(mType, SIGNAL_CHILD_ADDED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector12(mType, SIGNAL_CHILD_REMOVED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector2(mType, SIGNAL_TOUCH_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector3(mType, SIGNAL_HOVER_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector4(mType, SIGNAL_WHEEL_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector5(mType, SIGNAL_INTERCEPT_TOUCH_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector6(mType, SIGNAL_INTERCEPT_WHEEL_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector7(mType, SIGNAL_SCENE_CONNECTED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector8(mType, SIGNAL_SCENE_DISCONNECTED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector9(mType, SIGNAL_CHILD_ADDED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector10(mType, SIGNAL_CHILD_REMOVED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector11(mType, SIGNAL_VISIBILITY_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector12(mType, SIGNAL_EFFECTIVE_VISIBILITY_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector13(mType, SIGNAL_LAYOUT_DIRECTION_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector14(mType, SIGNAL_ON_RELAYOUT.data(), &DoConnectSignal);
 
 TypeAction a1(mType, ACTION_SHOW.data(), &DoAction);
 TypeAction a2(mType, ACTION_HIDE.data(), &DoAction);
@@ -1079,28 +1091,28 @@ bool Actor::EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch)
 {
   if(mScene && mScene->IsGeometryHittestEnabled())
   {
-    return EmitConsumingSignalOr(*this, mInterceptTouchedSignal, touch);
+    return EmitConsumingSignalOr(*this, mInterceptTouchEventSignal, touch);
   }
-  return EmitConsumingSignal(*this, mInterceptTouchedSignal, touch);
+  return EmitConsumingSignal(*this, mInterceptTouchEventSignal, touch);
 }
 
 bool Actor::EmitTouchEventSignal(const Dali::TouchEvent& touch)
 {
   if(mScene && mScene->IsGeometryHittestEnabled())
   {
-    return EmitConsumingSignalOr(*this, mTouchedSignal, touch);
+    return EmitConsumingSignalOr(*this, mTouchEventSignal, touch);
   }
-  return EmitConsumingSignal(*this, mTouchedSignal, touch);
+  return EmitConsumingSignal(*this, mTouchEventSignal, touch);
 }
 
 bool Actor::EmitHoverEventSignal(const Dali::HoverEvent& event)
 {
-  return EmitConsumingSignal(*this, mHoveredSignal, event);
+  return EmitConsumingSignal(*this, mHoverEventSignal, event);
 }
 
 bool Actor::EmitInterceptWheelEventSignal(const Dali::WheelEvent& event)
 {
-  return EmitConsumingSignal(*this, mInterceptWheelSignal, event);
+  return EmitConsumingSignal(*this, mInterceptWheelEventSignal, event);
 }
 
 bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
@@ -1108,14 +1120,14 @@ bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
   return EmitConsumingSignal(*this, mWheelEventSignal, event);
 }
 
-void Actor::EmitVisibilityChangedSignal(bool visible, DevelActor::VisibilityChange::Type type)
+void Actor::EmitVisibilityChangedSignal(bool visible, VisibilityChangeType type)
 {
   EmitSignal(*this, mVisibilityChangedSignal, visible, type);
 }
 
-void Actor::EmitInheritedVisibilityChangedSignal(bool visible)
+void Actor::EmitEffectiveVisibilityChangedSignal(bool visible)
 {
-  EmitSignal(*this, mInheritedVisibilityChangedSignal, visible);
+  EmitSignal(*this, mEffectiveVisibilityChangedSignal, visible);
 }
 
 void Actor::EmitLayoutDirectionChangedSignal(LayoutDirection::Type type)
@@ -1139,12 +1151,12 @@ bool Actor::EmitHitTestResultSignal(Integration::Point point, Vector2 hitPointLo
   return hit;
 }
 
-DevelActor::ChildChangedSignalType& Actor::ChildAddedSignal()
+Dali::Actor::ChildAddedSignalType& Actor::ChildAddedSignal()
 {
   return mParentImpl.ChildAddedSignal();
 }
 
-DevelActor::ChildChangedSignalType& Actor::ChildRemovedSignal()
+Dali::Actor::ChildRemovedSignalType& Actor::ChildRemovedSignal()
 {
   return mParentImpl.ChildRemovedSignal();
 }
@@ -1235,16 +1247,16 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mParentOrigin(nullptr),
   mPivot(nullptr),
   mGestureData(nullptr),
-  mInterceptTouchedSignal(),
-  mTouchedSignal(),
-  mHoveredSignal(),
-  mInterceptWheelSignal(),
+  mTouchEventSignal(),
+  mHoverEventSignal(),
   mWheelEventSignal(),
-  mOnSceneSignal(),
-  mOffSceneSignal(),
+  mInterceptTouchEventSignal(),
+  mInterceptWheelEventSignal(),
+  mSceneConnectedSignal(),
+  mSceneDisconnectedSignal(),
   mOnRelayoutSignal(),
   mVisibilityChangedSignal(),
-  mInheritedVisibilityChangedSignal(),
+  mEffectiveVisibilityChangedSignal(),
   mLayoutDirectionChangedSignal(),
   mHitTestResultSignal(),
   mTargetOrientation(Quaternion::IDENTITY),
@@ -1264,7 +1276,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mKeyboardFocusable(false),
   mKeyboardFocusableChildren(true),
   mTouchFocusable(false),
-  mOnSceneSignalled(false),
+  mSceneConnectedSignalled(false),
   mInheritPosition(true),
   mInheritOrientation(true),
   mInheritScale(true),
@@ -1436,25 +1448,25 @@ void Actor::ConnectToSceneGraph()
 void Actor::NotifySceneConnection(bool notify)
 {
   // Actors can be removed (in a callback), before the on-scene state is reported.
-  // The actor may also have been reparented, in which case mOnSceneSignalled will be true.
-  if(OnScene() && !mOnSceneSignalled)
+  // The actor may also have been reparented, in which case mSceneConnectedSignalled will be true.
+  if(OnScene() && !mSceneConnectedSignalled)
   {
     if(notify)
     {
       // Notification for external (CustomActor) derived classes
       OnSceneConnectionExternal(mDepth);
 
-      if(!mOnSceneSignal.Empty())
+      if(!mSceneConnectedSignal.Empty())
       {
         Dali::Actor handle(this);
-        mOnSceneSignal.Emit(handle);
+        mSceneConnectedSignal.Emit(handle);
       }
     }
 
     // Guard against Remove during callbacks
     if(OnScene())
     {
-      mOnSceneSignalled = true; // signal required next time Actor is removed
+      mSceneConnectedSignalled = true; // signal required next time Actor is removed
     }
   }
 }
@@ -1493,26 +1505,26 @@ void Actor::DisconnectFromSceneGraph()
 void Actor::NotifySceneDisconnection(bool notify)
 {
   // Actors can be added (in a callback), before the off-scene state is reported.
-  // Also if the actor was added & removed before mOnSceneSignalled was set, then we don't notify here.
+  // Also if the actor was added & removed before mSceneConnectedSignalled was set, then we don't notify here.
   // only do this step if there is a scene, i.e. Core is not being shut down
-  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()) && !OnScene() && mOnSceneSignalled)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()) && !OnScene() && mSceneConnectedSignalled)
   {
     if(notify)
     {
-      // Notification for external (CustomeActor) derived classes
+      // Notification for external (CustomActor) derived classes
       OnSceneDisconnectionExternal();
 
-      if(!mOffSceneSignal.Empty())
+      if(!mSceneDisconnectedSignal.Empty())
       {
         Dali::Actor handle(this);
-        mOffSceneSignal.Emit(handle);
+        mSceneDisconnectedSignal.Emit(handle);
       }
     }
 
     // Guard against Add during callbacks
     if(!OnScene())
     {
-      mOnSceneSignalled = false; // signal required next time Actor is added
+      mSceneConnectedSignalled = false; // signal required next time Actor is added
     }
   }
 }
@@ -1543,14 +1555,14 @@ void Actor::RebuildDepthTree()
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
-void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
+void Actor::EmitEffectiveVisibilityChangedSignalRecursively(bool visible)
 {
-  ActorContainer inheritedVisibilityChangedList;
-  mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
+  ActorContainer effectiveVisibilityActors;
+  mParentImpl.CollectEffectiveVisibilityActorsRecursively(effectiveVisibilityActors);
   // Notify applications about the newly connected actors.
-  for(const auto& actor : inheritedVisibilityChangedList)
+  for(const auto& actor : effectiveVisibilityActors)
   {
-    actor->EmitInheritedVisibilityChangedSignal(visible);
+    actor->EmitEffectiveVisibilityChangedSignal(visible);
   }
 }
 
@@ -1717,7 +1729,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     // So we need to stack those actors, and then use it.
     GetVisibilityChangedActorStack().emplace_back(this);
 
-    EmitInheritedVisibilityChangedSignalRecursively(visiblility);
+    EmitEffectiveVisibilityChangedSignalRecursively(visiblility);
 
     // Pop the actor from the stack now
     GetVisibilityChangedActorStack().pop_back();
@@ -1898,11 +1910,11 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     GetVisibilityChangedActorStack().emplace_back(this);
 
     // Emit the signal on this actor and all its children
-    mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::SELF);
+    mParentImpl.EmitVisibilityChangedSignalRecursively(visible, VisibilityChangeType::SELF);
 
     if(emitInheritedVisible)
     {
-      EmitInheritedVisibilityChangedSignalRecursively(visible);
+      EmitEffectiveVisibilityChangedSignalRecursively(visible);
     }
 
     // Pop the actor from the stack now

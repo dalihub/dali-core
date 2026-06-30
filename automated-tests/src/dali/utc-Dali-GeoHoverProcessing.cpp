@@ -147,7 +147,7 @@ int UtcDaliGeoHoverNormalProcessing(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 localCoordinates;
@@ -249,7 +249,7 @@ int UtcDaliGeoHoverOutsideCameraNearFarPlanes(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   Vector2 screenCoordinates(sceneSize.x * 0.5f, sceneSize.y * 0.5f);
 
@@ -344,7 +344,7 @@ int UtcDaliGeoHoverInterrupted(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -382,12 +382,12 @@ int UtcDaliGeoHoverParentConsumer(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data, false);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Connect to root actor's hovered signal
   SignalData        rootData;
   HoverEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.HoveredSignal().Connect(&application, rootFunctor);
+  rootActor.HoverEventSignal().Connect(&application, rootFunctor);
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 actorCoordinates, rootCoordinates;
@@ -483,12 +483,12 @@ int UtcDaliGeoHoverInterruptedParentConsumer(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data, false);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Connect to root actor's hovered signal
   SignalData        rootData;
   HoverEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.HoveredSignal().Connect(&application, rootFunctor);
+  rootActor.HoverEventSignal().Connect(&application, rootFunctor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -563,7 +563,7 @@ int UtcDaliGeoHoverLeave(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -609,12 +609,12 @@ int UtcDaliGeoHoverLeaveParentConsumer(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data, false);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Connect to root actor's hovered signal
   SignalData        rootData;
   HoverEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.HoveredSignal().Connect(&application, rootFunctor);
+  rootActor.HoverEventSignal().Connect(&application, rootFunctor);
 
   // Set actor to require leave events
   actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
@@ -683,12 +683,12 @@ int UtcDaliGeoHoverLeaveWithDispatchMotion(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data, false);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Connect to root actor's hovered signal
   SignalData        rootData;
   HoverEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.HoveredSignal().Connect(&application, rootFunctor);
+  rootActor.HoverEventSignal().Connect(&application, rootFunctor);
 
   // Set actor to require leave events
   actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
@@ -762,7 +762,7 @@ int UtcDaliGeoHoverActorBecomesInsensitive(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -799,12 +799,12 @@ int UtcDaliGeoHoverActorBecomesInsensitiveParentConsumer(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data, false);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Connect to root actor's hovered signal
   SignalData        rootData;
   HoverEventFunctor rootFunctor(rootData, false);
-  rootActor.HoveredSignal().Connect(&application, rootFunctor);
+  rootActor.HoverEventSignal().Connect(&application, rootFunctor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -860,7 +860,7 @@ int UtcDaliGeoHoverActorBecomesUserInteractionDisabled(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -905,8 +905,8 @@ int UtcDaliGeoHoverMultipleLayers(void)
   application.Render();
 
   // Connect to layer1 and actor1
-  layer1.HoveredSignal().Connect(&application, functor);
-  actor1.HoveredSignal().Connect(&application, functor);
+  layer1.HoverEventSignal().Connect(&application, functor);
+  actor1.HoverEventSignal().Connect(&application, functor);
 
   // Hit in hittable area, actor1 should be hit
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -953,8 +953,8 @@ int UtcDaliGeoHoverMultipleLayers(void)
   application.Render();
 
   // Connect to layer2 and actor2
-  layer2.HoveredSignal().Connect(&application, functor);
-  actor2.HoveredSignal().Connect(&application, functor);
+  layer2.HoverEventSignal().Connect(&application, functor);
+  actor2.HoverEventSignal().Connect(&application, functor);
 
   // Emit an event, should hit layer2
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1030,7 +1030,7 @@ int UtcDaliGeoHoverMultipleRenderTasks(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1082,8 +1082,8 @@ int UtcDaliGeoHoverMultipleRenderTasksWithChildLayer(void)
   // Connect to layer's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
-  layer.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
+  layer.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1146,7 +1146,7 @@ int UtcDaliGeoHoverOffscreenRenderTasks(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1178,8 +1178,8 @@ int UtcDaliGeoHoverMultipleRenderableActors(void)
   // Connect to layer's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  parent.HoveredSignal().Connect(&application, functor);
-  actor.HoveredSignal().Connect(&application, functor);
+  parent.HoverEventSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1205,7 +1205,7 @@ int UtcDaliGeoHoverActorRemovedInSignal(void)
   // Connect to actor's hovered signal
   SignalData         data;
   RemoveActorFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Register for leave events
   actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
@@ -1275,7 +1275,7 @@ int UtcDaliGeoHoverActorSignalNotConsumed(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data, false);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1300,7 +1300,7 @@ int UtcDaliGeoHoverActorUnStaged(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1347,7 +1347,7 @@ int UtcDaliGeoHoverLeaveActorReadded(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started and motion
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1404,7 +1404,7 @@ int UtcDaliGeoHoverClippingActor(void)
   // Connect to actor's hovered signal.
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit an event within clipped area - we should have a hit.
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1416,7 +1416,7 @@ int UtcDaliGeoHoverClippingActor(void)
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  clippingChild.HoveredSignal().Connect(&application, functor);
+  clippingChild.HoverEventSignal().Connect(&application, functor);
 
   // Emit an event inside part of the child which is within the clipped area, we should have a hit.
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(30.0f, 30.0f)));
@@ -1444,7 +1444,7 @@ int UtcDaliGeoHoverActorHide(void)
   // Connect to actor's hovered signal
   SignalData        data;
   HoverEventFunctor functor(data);
-  actor.HoveredSignal().Connect(&application, functor);
+  actor.HoverEventSignal().Connect(&application, functor);
 
   // Emit a started
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -1490,12 +1490,12 @@ int UtcDaliGeoHoverEnsureDifferentConsumerReceivesInterrupted(void)
   // Connect to parent's hover signal
   SignalData        dataParent;
   HoverEventFunctor functorParent(dataParent);
-  parent.HoveredSignal().Connect(&application, functorParent);
+  parent.HoverEventSignal().Connect(&application, functorParent);
 
   // Connect to child's hovered signal but do not consume
   SignalData        dataChildNoConsume;
   HoverEventFunctor functorChildNoConsume(dataChildNoConsume, false);
-  child.HoveredSignal().Connect(&application, functorChildNoConsume);
+  child.HoverEventSignal().Connect(&application, functorChildNoConsume);
 
   // Create a functor to consume the event of the child, but don't connect just yet
   SignalData        dataChildConsume;
@@ -1512,7 +1512,7 @@ int UtcDaliGeoHoverEnsureDifferentConsumerReceivesInterrupted(void)
   resetData();
 
   // Connect to child's hover event and consume so it's a different consumer on interrupted
-  child.HoveredSignal().Connect(&application, functorChildConsume);
+  child.HoverEventSignal().Connect(&application, functorChildConsume);
 
   // Emit interrupted, all three methods should be called
   application.ProcessEvent(GenerateSingleHover(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));

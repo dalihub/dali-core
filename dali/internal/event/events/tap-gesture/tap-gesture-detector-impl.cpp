@@ -255,7 +255,7 @@ void TapGestureDetector::OnActorAttach(Actor& actor)
 
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Connect(this, &TapGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Connect(this, &TapGestureDetector::OnTouchEvent);
   }
 }
 
@@ -264,7 +264,7 @@ void TapGestureDetector::OnActorDetach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "TapGestureDetector detach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Disconnect(this, &TapGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Disconnect(this, &TapGestureDetector::OnTouchEvent);
   }
 }
 

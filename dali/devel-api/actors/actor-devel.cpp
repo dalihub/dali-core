@@ -39,24 +39,9 @@ Bounds CalculateCurrentScreenExtents(Actor actor)
   return GetImplementation(actor).CalculateCurrentScreenExtents();
 }
 
-VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor)
-{
-  return GetImplementation(actor).VisibilityChangedSignal();
-}
-
 Actor GetVisiblityChangedActor()
 {
   return Dali::Actor(Internal::Actor::GetVisiblityChangedActor().Get());
-}
-
-ChildChangedSignalType& ChildAddedSignal(Actor actor)
-{
-  return GetImplementation(actor).ChildAddedSignal();
-}
-
-ChildChangedSignalType& ChildRemovedSignal(Actor actor)
-{
-  return GetImplementation(actor).ChildRemovedSignal();
 }
 
 ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor)
@@ -64,14 +49,9 @@ ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor)
   return GetImplementation(actor).ChildOrderChangedSignal();
 }
 
-Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor)
+OnRelayoutSignalType& OnRelayoutSignal(Actor actor)
 {
-  return GetImplementation(actor).InterceptTouchedSignal();
-}
-
-Actor::WheelEventSignalType& InterceptWheelSignal(Actor actor)
-{
-  return GetImplementation(actor).InterceptWheelSignal();
+  return GetImplementation(actor).OnRelayoutSignal();
 }
 
 void SetNeedGesturePropagation(Actor actor, bool propagation)

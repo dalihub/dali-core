@@ -344,7 +344,7 @@ void PanGestureDetector::OnActorAttach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "PanGestureDetector attach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Connect(this, &PanGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Connect(this, &PanGestureDetector::OnTouchEvent);
   }
 }
 
@@ -353,7 +353,7 @@ void PanGestureDetector::OnActorDetach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "PanGestureDetector detach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Disconnect(this, &PanGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Disconnect(this, &PanGestureDetector::OnTouchEvent);
   }
 }
 

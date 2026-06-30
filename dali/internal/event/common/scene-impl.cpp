@@ -177,7 +177,7 @@ void Scene::Show()
   if(!mIsVisible)
   {
     mIsVisible = true;
-    mRootLayer->EmitInheritedVisibilityChangedSignalRecursively(true);
+    mRootLayer->EmitEffectiveVisibilityChangedSignalRecursively(true);
   }
 }
 
@@ -186,7 +186,7 @@ void Scene::Hide()
   if(mIsVisible)
   {
     mIsVisible = false;
-    mRootLayer->EmitInheritedVisibilityChangedSignalRecursively(false);
+    mRootLayer->EmitEffectiveVisibilityChangedSignalRecursively(false);
   }
 }
 
@@ -514,12 +514,12 @@ void Scene::EmitEventProcessingFinishedSignal()
   }
 }
 
-void Scene::EmitTouchedSignal(const Dali::TouchEvent& touch)
+void Scene::EmitTouchEventSignal(const Dali::TouchEvent& touch)
 {
   Dali::Integration::Scene handle(this);
-  if(!mTouchedSignal.Empty())
+  if(!mTouchEventSignal.Empty())
   {
-    mTouchedSignal.Emit(touch);
+    mTouchEventSignal.Emit(touch);
   }
 }
 
@@ -724,9 +724,9 @@ Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFin
   return mEventProcessingFinishedSignal;
 }
 
-Integration::Scene::TouchEventSignalType& Scene::TouchedSignal()
+Integration::Scene::TouchEventSignalType& Scene::TouchEventSignal()
 {
-  return mTouchedSignal;
+  return mTouchEventSignal;
 }
 
 Integration::Scene::WheelEventSignalType& Scene::WheelEventSignal()

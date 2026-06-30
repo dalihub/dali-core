@@ -307,7 +307,7 @@ int UtcDaliTouchEventNormalProcessing01(void)
   // Connect to actor's touch signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 localCoordinates;
@@ -373,7 +373,7 @@ int UtcDaliTouchEventCapturingActorMultiTouchClear(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Test multi-touch scenario: ID 0, 1, 2 DOWN -> MOTION -> ID 0 UP
   // Multi-touch down
@@ -419,7 +419,7 @@ int UtcDaliTouchEventNormalProcessing02(void)
   // Connect to actor's touched signal
   HandleData              handleData;
   TouchEventHandleFunctor functor(handleData);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 localCoordinates;
@@ -452,7 +452,7 @@ int UtcDaliTouchEventAPINegative(void)
   // Connect to actor's touched signal
   OutOfBoundsData    data;
   OutOfBoundsFunctor functor(data, true);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 localCoordinates;
@@ -502,7 +502,7 @@ int UtcDaliTouchEventOutsideCameraNearFarPlanes(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   Vector2 screenCoordinates(sceneSize.x * 0.5f, sceneSize.y * 0.5f);
 
@@ -591,7 +591,7 @@ int UtcDaliTouchEventInterrupted(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -628,12 +628,12 @@ int UtcDaliTouchEventParentConsumer(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Connect to root actor's touched signal
   SignalData        rootData;
   TouchEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.TouchedSignal().Connect(&application, rootFunctor);
+  rootActor.TouchEventSignal().Connect(&application, rootFunctor);
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 actorCoordinates, rootCoordinates;
@@ -728,12 +728,12 @@ int UtcDaliTouchEventInterruptedParentConsumer(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Connect to root actor's touched signal
   SignalData        rootData;
   TouchEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.TouchedSignal().Connect(&application, rootFunctor);
+  rootActor.TouchEventSignal().Connect(&application, rootFunctor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -807,7 +807,7 @@ int UtcDaliTouchEventLeave(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Set actor to require leave events
   actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
@@ -862,12 +862,12 @@ int UtcDaliTouchEventLeaveParentConsumer(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Connect to root actor's touched signal
   SignalData        rootData;
   TouchEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.TouchedSignal().Connect(&application, rootFunctor);
+  rootActor.TouchEventSignal().Connect(&application, rootFunctor);
 
   // Set actor to require leave events
   actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
@@ -943,7 +943,7 @@ int UtcDaliTouchEventActorBecomesInsensitive(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -979,12 +979,12 @@ int UtcDaliTouchEventActorBecomesInsensitiveParentConsumer(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Connect to root actor's touched signal
   SignalData        rootData;
   TouchEventFunctor rootFunctor(rootData); // Consumes signal
-  rootActor.TouchedSignal().Connect(&application, rootFunctor);
+  rootActor.TouchEventSignal().Connect(&application, rootFunctor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1029,7 +1029,7 @@ int UtcDaliTouchEventActorBecomesUserInteractionDisabled(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1073,8 +1073,8 @@ int UtcDaliTouchEventMultipleLayers(void)
   application.Render();
 
   // Connect to layer1 and actor1
-  layer1.TouchedSignal().Connect(&application, functor);
-  actor1.TouchedSignal().Connect(&application, functor);
+  layer1.TouchEventSignal().Connect(&application, functor);
+  actor1.TouchEventSignal().Connect(&application, functor);
 
   // Hit in hittable area, actor1 should be hit
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1121,8 +1121,8 @@ int UtcDaliTouchEventMultipleLayers(void)
   application.Render();
 
   // Connect to layer2 and actor2
-  layer2.TouchedSignal().Connect(&application, functor);
-  actor2.TouchedSignal().Connect(&application, functor);
+  layer2.TouchEventSignal().Connect(&application, functor);
+  actor2.TouchEventSignal().Connect(&application, functor);
 
   // Emit an event, should hit layer2
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1191,7 +1191,7 @@ int UtcDaliTouchEventMultipleRenderTasks(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1241,8 +1241,8 @@ int UtcDaliTouchEventMultipleRenderTasksWithChildLayer(void)
   // Connect to layer's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
-  layer.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
+  layer.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1303,7 +1303,7 @@ int UtcDaliTouchEventOffscreenRenderTasks(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1334,8 +1334,8 @@ int UtcDaliTouchEventMultipleRenderableActors(void)
   // Connect to layer's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  parent.TouchedSignal().Connect(&application, functor);
-  actor.TouchedSignal().Connect(&application, functor);
+  parent.TouchEventSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1360,7 +1360,7 @@ int UtcDaliTouchEventActorRemovedInSignal(void)
   // Connect to actor's touched signal
   SignalData         data;
   RemoveActorFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Register for leave events
   actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
@@ -1429,7 +1429,7 @@ int UtcDaliTouchEventActorSignalNotConsumed(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1453,7 +1453,7 @@ int UtcDaliTouchEventActorRemovedFromScene(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1491,7 +1491,7 @@ int UtcDaliTouchEventLayerConsumesTouch(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Add a layer to overlap the actor
   Layer layer = Layer::New();
@@ -1546,7 +1546,7 @@ int UtcDaliTouchEventLeaveActorReadded(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down and motion
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1602,7 +1602,7 @@ int UtcDaliTouchEventClippedActor(void)
   // Connect to actor's touch signal.
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit an event within clipped area - we should have a hit.
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1617,7 +1617,7 @@ int UtcDaliTouchEventClippedActor(void)
   // Now connect to the clippingChild's touch signal
   SignalData        clippingChildData;
   TouchEventFunctor clippingChildFunctor(clippingChildData);
-  clippingChild.TouchedSignal().Connect(&application, clippingChildFunctor);
+  clippingChild.TouchEventSignal().Connect(&application, clippingChildFunctor);
 
   // Emit an event within clipped child area - no hit on actor, but hit on clipped child.
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(40.0f, 40.0f)));
@@ -1658,7 +1658,7 @@ int UtcDaliTouchEventActorUnparented(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1701,7 +1701,7 @@ int UtcDaliTouchEventParentRemovedFromScene(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1744,12 +1744,12 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false /* Do not consume */);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Connect to parent's touched signal
   SignalData        parentData;
   TouchEventFunctor parentFunctor(parentData);
-  parent.TouchedSignal().Connect(&application, parentFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1796,7 +1796,7 @@ int UtcDaliTouchEventActorRemovedFromSceneDifferentConsumer(void)
   // Parent is now consumer, connect again to the touched signal of the actor so that it becomes the consumer
   SignalData        secondData;
   TouchEventFunctor secondFunctor(secondData /* Consume */);
-  actor.TouchedSignal().Connect(&application, secondFunctor);
+  actor.TouchEventSignal().Connect(&application, secondFunctor);
 
   // Unparent the actor
   actor.Unparent();
@@ -1837,17 +1837,17 @@ int UtcDaliTouchEventInterruptedDifferentConsumer(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false /* Do not consume */);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Connect to parent's touched signal
   SignalData        parentData;
   TouchEventFunctor parentFunctor(parentData, false /* Do not consume */);
-  parent.TouchedSignal().Connect(&application, parentFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
 
   // Connect to root's touched signal and consume
   SignalData        rootData;
   TouchEventFunctor rootFunctor(rootData);
-  rootActor.TouchedSignal().Connect(&application, rootFunctor);
+  rootActor.TouchEventSignal().Connect(&application, rootFunctor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -1870,7 +1870,7 @@ int UtcDaliTouchEventInterruptedDifferentConsumer(void)
   // Root is now consumer, connect to the touched signal of the parent so that it becomes the consumer
   SignalData        secondData;
   TouchEventFunctor secondFunctor(secondData /* Consume */);
-  parent.TouchedSignal().Connect(&application, secondFunctor);
+  parent.TouchEventSignal().Connect(&application, secondFunctor);
 
   // Emit an interrupted signal, all three should STILL be called
   application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(10.0f, 10.0f)));
@@ -1903,7 +1903,7 @@ int UtcDaliTouchEventGetRadius(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
@@ -1934,7 +1934,7 @@ int UtcDaliTouchEventGetEllipseRadius(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
@@ -1965,7 +1965,7 @@ int UtcDaliTouchEventGetAngle(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
@@ -1994,7 +1994,7 @@ int UtcDaliTouchEventGetPressure(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
@@ -2023,7 +2023,7 @@ int UtcDaliTouchEventUsage(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal with an angle
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -2048,7 +2048,7 @@ int UtcDaliTouchEventGetDeviceAPINegative(void)
   // Connect to actor's touched signal
   HandleData              handleData;
   TouchEventHandleFunctor functor(handleData);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   Vector2 screenCoordinates(10.0f, 10.0f);
   Vector2 localCoordinates;
@@ -2079,7 +2079,7 @@ int UtcDaliTouchEventGetMouseButtonPositive(void)
   // Connect to actor's touched signal
   HandleData              handleData;
   TouchEventHandleFunctor functor(handleData);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal with MouseButton
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
@@ -2108,7 +2108,7 @@ int UtcDaliTouchEventGetMouseButtonNagative(void)
   // Connect to actor's touched signal
   HandleData              handleData;
   TouchEventHandleFunctor functor(handleData);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal with MouseButton
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));
@@ -2138,7 +2138,7 @@ int UtcDaliTouchEventCapturePropertySet(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -2192,7 +2192,7 @@ int UtcDaliTouchEventCapturePropertySetWithMultiTouch(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Now set the capture property
   actor.SetProperty(DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START, true);
@@ -2246,7 +2246,7 @@ int UtcDaliTouchEventIntercept01(void)
   // Connect to actor's intercept touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false /* Do not consume */);
-  Dali::DevelActor::InterceptTouchedSignal(actor).Connect(&application, functor);
+  actor.InterceptTouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -2282,12 +2282,12 @@ int UtcDaliTouchEventIntercept02(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false /* Do not consume */);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Connect to parent's touched signal
   SignalData        parentData;
   TouchEventFunctor parentFunctor(parentData, false /* Do not consume */);
-  parent.TouchedSignal().Connect(&application, parentFunctor);
+  parent.TouchEventSignal().Connect(&application, parentFunctor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -2300,7 +2300,7 @@ int UtcDaliTouchEventIntercept02(void)
   // Connect to parent's intercept touched signal
   SignalData        interceptData;
   TouchEventFunctor interceptFunctor(interceptData, true /* Do intercept */);
-  Dali::DevelActor::InterceptTouchedSignal(parent).Connect(&application, interceptFunctor);
+  parent.InterceptTouchEventSignal().Connect(&application, interceptFunctor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f)));
@@ -2373,7 +2373,7 @@ int UtcDaliTouchEventIntercept03(void)
   // Connect to root actor's intercept touched signal
   SignalData        sceneData;
   TouchEventFunctor sceneFunctor(sceneData);
-  Dali::DevelActor::InterceptTouchedSignal(rootActor).Connect(&application, sceneFunctor);
+  rootActor.InterceptTouchEventSignal().Connect(&application, sceneFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -2406,7 +2406,7 @@ int UtcDaliTouchAreaOffset(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data, false /* Do not consume */);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   application.ProcessEvent(GenerateSingleTouch(PointState::DOWN, Vector2(110.0f, 110.0f)));
@@ -2484,7 +2484,7 @@ int UtcDaliTouchEventAllowOnlyOwnTouchPropertySet(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal outside of actor, we should not receive the event
   application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(110.0f, 110.0f)));
@@ -2559,7 +2559,7 @@ int UtcDaliTouchEventDispatchTouchMotionPropertySet(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal actor, we should receive the event
   application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(10.0f, 10.0f)));
@@ -2608,7 +2608,7 @@ int UtcDaliTouchEventDispatchTouchMotionMultiTouch(void)
   // Connect to actor's touched signal
   SignalData        data;
   TouchEventFunctor functor(data);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Set dispatch touch motion to false
   actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, false);
@@ -2675,7 +2675,7 @@ int UtcDaliTouchEventGetDeviceNamePositive(void)
   // Connect to actor's touched signal
   HandleData              handleData;
   TouchEventHandleFunctor functor(handleData);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
   Dali::String deviceName("hwKeyboard");
 
   // Emit a down signal with deviceName
@@ -2705,7 +2705,7 @@ int UtcDaliTouchEventGetDeviceNameNagative(void)
   // Connect to actor's touched signal
   HandleData              handleData;
   TouchEventHandleFunctor functor(handleData);
-  actor.TouchedSignal().Connect(&application, functor);
+  actor.TouchEventSignal().Connect(&application, functor);
 
   // Emit a down signal
   Dali::Integration::TouchEvent touchEvent = GenerateSingleTouch(PointState::DOWN, Vector2(10.0f, 10.0f));

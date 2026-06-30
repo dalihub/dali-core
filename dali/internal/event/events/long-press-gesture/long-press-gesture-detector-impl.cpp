@@ -168,7 +168,7 @@ void LongPressGestureDetector::OnActorAttach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector attach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Connect(this, &LongPressGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Connect(this, &LongPressGestureDetector::OnTouchEvent);
   }
 }
 
@@ -177,7 +177,7 @@ void LongPressGestureDetector::OnActorDetach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "LongPressGestureDetector detach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Disconnect(this, &LongPressGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Disconnect(this, &LongPressGestureDetector::OnTouchEvent);
   }
 }
 

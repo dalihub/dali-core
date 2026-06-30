@@ -237,7 +237,7 @@ struct VisibilityChangedFunctorData
   : actor(),
     changedActor(),
     visible(false),
-    type(DevelActor::VisibilityChange::SELF),
+    type(VisibilityChangeType::SELF),
     called(false)
   {
   }
@@ -247,11 +247,11 @@ struct VisibilityChangedFunctorData
     actor.Reset();
     changedActor.Reset();
     visible = false;
-    type    = DevelActor::VisibilityChange::SELF;
+    type    = VisibilityChangeType::SELF;
     called  = false;
   }
 
-  void Check(bool compareCalled, Actor compareChangedActor, Actor compareActor, bool compareVisible, DevelActor::VisibilityChange::Type compareType, const char* location)
+  void Check(bool compareCalled, Actor compareChangedActor, Actor compareActor, bool compareVisible, VisibilityChangeType compareType, const char* location)
   {
     DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
     if(compareChangedActor)
@@ -269,11 +269,11 @@ struct VisibilityChangedFunctorData
     DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
   }
 
-  Actor                              actor;
-  Actor                              changedActor;
-  bool                               visible;
-  DevelActor::VisibilityChange::Type type;
-  bool                               called;
+  Actor                actor;
+  Actor                changedActor;
+  bool                 visible;
+  VisibilityChangeType type;
+  bool                 called;
 };
 
 struct VisibilityChangedFunctor
@@ -283,7 +283,7 @@ struct VisibilityChangedFunctor
   {
   }
 
-  void operator()(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  void operator()(Actor actor, bool visible, VisibilityChangeType type)
   {
     data.actor        = actor;
     data.changedActor = DevelActor::GetVisiblityChangedActor();
@@ -297,17 +297,17 @@ struct VisibilityChangedFunctor
 
 struct VisibilityChangedLambdaFunctor
 {
-  VisibilityChangedLambdaFunctor(std::function<void(Actor, bool, DevelActor::VisibilityChange::Type)> functor)
+  VisibilityChangedLambdaFunctor(std::function<void(Actor, bool, VisibilityChangeType)> functor)
   : functor(functor)
   {
   }
 
-  void operator()(Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  void operator()(Actor actor, bool visible, VisibilityChangeType type)
   {
     functor(actor, visible, type);
   }
 
-  std::function<void(Actor, bool, DevelActor::VisibilityChange::Type)> functor;
+  std::function<void(Actor, bool, VisibilityChangeType)> functor;
 };
 
 struct VisibilityChangedVoidFunctor
@@ -325,9 +325,9 @@ struct VisibilityChangedVoidFunctor
   bool& mSignalCalled;
 };
 
-struct InheritedVisibilityChangedFunctorData
+struct EffectiveVisibilityChangedFunctorData
 {
-  InheritedVisibilityChangedFunctorData()
+  EffectiveVisibilityChangedFunctorData()
   : actor(),
     changedActor(),
     visible(false),
@@ -368,9 +368,9 @@ struct InheritedVisibilityChangedFunctorData
   bool  called;
 };
 
-struct InheritedVisibilityChangedFunctor
+struct EffectiveVisibilityChangedFunctor
 {
-  InheritedVisibilityChangedFunctor(InheritedVisibilityChangedFunctorData& dataVar)
+  EffectiveVisibilityChangedFunctor(EffectiveVisibilityChangedFunctorData& dataVar)
   : data(dataVar)
   {
   }
@@ -384,7 +384,7 @@ struct InheritedVisibilityChangedFunctor
     data.called            = true;
   }
 
-  InheritedVisibilityChangedFunctorData& data;
+  EffectiveVisibilityChangedFunctorData& data;
 };
 
 struct ChildOrderChangedFunctor
@@ -395,10 +395,10 @@ struct ChildOrderChangedFunctor
   {
   }
 
-  void operator()(Actor actor)
+  void operator()(Actor parent, Actor child)
   {
     mSignalCalled = true;
-    mActor        = actor;
+    mActor        = child;
   }
 
   bool&  mSignalCalled;
@@ -3508,7 +3508,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   END_TEST;
 }
 
-int UtcDaliActorTouchedSignal(void)
+int UtcDaliActorTouchEventSignal(void)
 {
   TestApplication application;
 
@@ -3522,7 +3522,7 @@ int UtcDaliActorTouchedSignal(void)
   application.Render();
 
   // connect to its touch signal
-  actor.TouchedSignal().Connect(TestTouchCallback);
+  actor.TouchEventSignal().Connect(TestTouchCallback);
 
   // simulate a touch event in the middle of the screen
   Vector2                  touchPoint(application.GetScene().GetSize() * 0.5);
@@ -3538,7 +3538,7 @@ int UtcDaliActorTouchedSignal(void)
   END_TEST;
 }
 
-int UtcDaliActorGeoTouchedSignal(void)
+int UtcDaliActorGeoTouchEventSignal(void)
 {
   TestApplication application;
 
@@ -3553,7 +3553,7 @@ int UtcDaliActorGeoTouchedSignal(void)
   application.Render();
 
   // connect to its touch signal
-  actor.TouchedSignal().Connect(TestTouchCallback);
+  actor.TouchEventSignal().Connect(TestTouchCallback);
 
   // simulate a touch event in the middle of the screen
   Vector2                  touchPoint(application.GetScene().GetSize() * 0.5);
@@ -3569,7 +3569,7 @@ int UtcDaliActorGeoTouchedSignal(void)
   END_TEST;
 }
 
-int UtcDaliActorHoveredSignal(void)
+int UtcDaliActorHoverEventSignal(void)
 {
   TestApplication application;
 
@@ -3583,7 +3583,7 @@ int UtcDaliActorHoveredSignal(void)
   application.Render();
 
   // connect to its hover signal
-  actor.HoveredSignal().Connect(TestCallback3);
+  actor.HoverEventSignal().Connect(TestCallback3);
 
   // simulate a hover event in the middle of the screen
   Vector2                  touchPoint(application.GetScene().GetSize() * 0.5);
@@ -3599,9 +3599,9 @@ int UtcDaliActorHoveredSignal(void)
   END_TEST;
 }
 
-int UtcDaliActorOnOffSceneSignal(void)
+int UtcDaliActorSceneConnectedDisconnectedSignal(void)
 {
-  tet_infoline("Testing Dali::Actor::OnSceneSignal() and OffSceneSignal()");
+  tet_infoline("Testing Dali::Actor::SceneConnectedSignal() and SceneDisconnectedSignal()");
 
   TestApplication application;
 
@@ -3611,8 +3611,8 @@ int UtcDaliActorOnOffSceneSignal(void)
 
   Actor parent = Actor::New();
   parent.SetProperty(Actor::Property::NAME, "parent");
-  parent.OnSceneSignal().Connect(OnSceneCallback);
-  parent.OffSceneSignal().Connect(OffSceneCallback);
+  parent.SceneConnectedSignal().Connect(OnSceneCallback);
+  parent.SceneDisconnectedSignal().Connect(OffSceneCallback);
   // sanity check
   DALI_TEST_CHECK(gOnSceneCallBackCalled == 0);
   DALI_TEST_CHECK(gOffSceneCallBackCalled == 0);
@@ -3631,8 +3631,8 @@ int UtcDaliActorOnOffSceneSignal(void)
 
   Actor child = Actor::New();
   child.SetProperty(Actor::Property::NAME, "child");
-  child.OnSceneSignal().Connect(OnSceneCallback);
-  child.OffSceneSignal().Connect(OffSceneCallback);
+  child.SceneConnectedSignal().Connect(OnSceneCallback);
+  child.SceneDisconnectedSignal().Connect(OffSceneCallback);
   parent.Add(child); // add child
   // onscene emitted, offscene not
   DALI_TEST_EQUALS(gOnSceneCallBackCalled, 1, TEST_LOCATION);
@@ -3795,7 +3795,7 @@ int UtcDaliActorHitTest(void)
     DALI_TEST_CHECK(!gTouchCallBackCalled);
 
     // connect to its touch signal
-    actor.TouchedSignal().Connect(TestTouchCallback);
+    actor.TouchEventSignal().Connect(TestTouchCallback);
 
     Dali::Integration::Point point;
     point.SetState(PointState::DOWN);
@@ -3879,7 +3879,7 @@ int UtcDaliActorGeoHitTest(void)
     DALI_TEST_CHECK(!gTouchCallBackCalled);
 
     // connect to its touch signal
-    actor.TouchedSignal().Connect(TestTouchCallback);
+    actor.TouchEventSignal().Connect(TestTouchCallback);
 
     Dali::Integration::Point point;
     point.SetState(PointState::DOWN);
@@ -4708,7 +4708,7 @@ int UtcDaliActorOnRelayoutSignal(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "actor");
-  actor.OnRelayoutSignal().Connect(OnRelayoutCallback);
+  DevelActor::OnRelayoutSignal(actor).Connect(OnRelayoutCallback);
 
   // Sanity check
   DALI_TEST_CHECK(!gOnRelayoutCallBackCalled);
@@ -4744,7 +4744,7 @@ int UtcDaliActorOnRelayoutSignalN(void)
 
     Actor actor = Actor::New();
     actor.SetProperty(Actor::Property::NAME, "actor");
-    actor.OnRelayoutSignal().Connect(OnRelayoutCallback);
+    DevelActor::OnRelayoutSignal(actor).Connect(OnRelayoutCallback);
 
     // Sanity check
     DALI_TEST_CHECK(!gOnRelayoutCallBackCalled);
@@ -6381,9 +6381,9 @@ int UtcDaliActorRaiseLower(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   // Connect ChildOrderChangedSignal
   bool                     orderChangedSignal(false);
@@ -6517,9 +6517,9 @@ int UtcDaliActorGeoTouchRaiseLower(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   // Connect ChildOrderChangedSignal
   bool                     orderChangedSignal(false);
@@ -6696,9 +6696,9 @@ int UtcDaliActorRaiseToTopLowerToBottom(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -6928,9 +6928,9 @@ int UtcDaliActorGeoTouchRaiseToTopLowerToBottom(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -7112,9 +7112,9 @@ int UtcDaliActorRaiseAbove(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   bool                     orderChangedSignal(false);
   Actor                    orderChangedActor;
@@ -7222,9 +7222,9 @@ int UtcDaliActorGeoTouchRaiseAbove(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   bool                     orderChangedSignal(false);
   Actor                    orderChangedActor;
@@ -7331,9 +7331,9 @@ int UtcDaliActorRaiseAbove2(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   bool                     orderChangedSignal(false);
   Actor                    orderChangedActor;
@@ -7443,9 +7443,9 @@ int UtcDaliActorGeoTouchRaiseAbove2(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   bool                     orderChangedSignal(false);
   Actor                    orderChangedActor;
@@ -7608,9 +7608,9 @@ int UtcDaliActorLowerBelow(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -7834,9 +7834,9 @@ int UtcDaliActorGeoTouchLowerBelow(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -8054,9 +8054,9 @@ int UtcDaliActorLowerBelow2(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -8275,9 +8275,9 @@ int UtcDaliActorGeoTouchLowerBelow2(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -8465,9 +8465,9 @@ int UtcDaliActorRaiseAboveDifferentParentsN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -8574,9 +8574,9 @@ int UtcDaliActorGeoTouchRaiseAboveDifferentParentsN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -8660,9 +8660,9 @@ int UtcDaliActorRaiseLowerWhenUnparentedTargetN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -8829,9 +8829,9 @@ int UtcDaliActorGeoTouchRaiseLowerWhenUnparentedTargetN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -8990,9 +8990,9 @@ int UtcDaliActorTestAllAPIwhenActorNotParented(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -9151,9 +9151,9 @@ int UtcDaliActorGeoTouchTestAllAPIwhenActorNotParented(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   Dali::Integration::Point point;
   point.SetDeviceId(1);
@@ -9307,9 +9307,9 @@ int UtcDaliActorRaiseAboveActorAndTargetTheSameN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   ResetTouchCallbacks();
 
@@ -9413,9 +9413,9 @@ int UtcDaliActorGeoTouchRaiseAboveActorAndTargetTheSameN(void)
 
   // connect to actor touch signals, will use touch callbacks to determine which actor is on top.
   // Only top actor will get touched.
-  actorA.TouchedSignal().Connect(TestTouchCallback);
-  actorB.TouchedSignal().Connect(TestTouchCallback2);
-  actorC.TouchedSignal().Connect(TestTouchCallback3);
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
 
   application.GetScene().SetGeometryHittestEnabled(true);
   ResetTouchCallbacks(application);
@@ -10192,11 +10192,11 @@ int utcDaliActorVisibilityChangeSignalSelf(void)
   Actor actor = Actor::New();
 
   VisibilityChangedFunctorData data;
-  DevelActor::VisibilityChangedSignal(actor).Connect(&application, VisibilityChangedFunctor(data));
+  actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(data));
 
   actor.SetProperty(Actor::Property::VISIBLE, false);
 
-  data.Check(true /* called */, actor, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true /* called */, actor, actor, false /* not visible */, VisibilityChangeType::SELF, TEST_LOCATION);
 
   tet_infoline("Ensure functor is not called if we attempt to change the visibility to what it already is at");
   data.Reset();
@@ -10208,7 +10208,7 @@ int utcDaliActorVisibilityChangeSignalSelf(void)
   data.Reset();
 
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  data.Check(true /* called */, actor, actor, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true /* called */, actor, actor, true /* visible */, VisibilityChangeType::SELF, TEST_LOCATION);
 
   tet_infoline("Set the visibility to current using properties, ensure not called");
   data.Reset();
@@ -10236,25 +10236,25 @@ int utcDaliActorVisibilityChangeSignalChildren(void)
   VisibilityChangedFunctorData grandChildData;
 
   tet_infoline("Only connect the child and grandchild, ensure they are called and not the parent");
-  DevelActor::VisibilityChangedSignal(child).Connect(&application, VisibilityChangedFunctor(childData));
-  DevelActor::VisibilityChangedSignal(grandChild).Connect(&application, VisibilityChangedFunctor(grandChildData));
+  child.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(childData));
+  grandChild.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(grandChildData));
 
   parent.SetProperty(Actor::Property::VISIBLE, false);
   parentData.Check(false /* not called */, TEST_LOCATION);
-  childData.Check(true /* called */, parent, child, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  grandChildData.Check(true /* called */, parent, grandChild, false /* not visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  childData.Check(true /* called */, parent, child, false /* not visible */, VisibilityChangeType::PARENT, TEST_LOCATION);
+  grandChildData.Check(true /* called */, parent, grandChild, false /* not visible */, VisibilityChangeType::PARENT, TEST_LOCATION);
 
   tet_infoline("Connect to the parent's signal as well and ensure all three are called");
   parentData.Reset();
   childData.Reset();
   grandChildData.Reset();
 
-  DevelActor::VisibilityChangedSignal(parent).Connect(&application, VisibilityChangedFunctor(parentData));
+  parent.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(parentData));
 
   parent.SetProperty(Actor::Property::VISIBLE, true);
-  parentData.Check(true /* called */, parent, parent, true /* visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
-  childData.Check(true /* called */, parent, child, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  grandChildData.Check(true /* called */, parent, grandChild, true /* visible */, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  parentData.Check(true /* called */, parent, parent, true /* visible */, VisibilityChangeType::SELF, TEST_LOCATION);
+  childData.Check(true /* called */, parent, child, true /* visible */, VisibilityChangeType::PARENT, TEST_LOCATION);
+  grandChildData.Check(true /* called */, parent, grandChild, true /* visible */, VisibilityChangeType::PARENT, TEST_LOCATION);
 
   tet_infoline("Ensure none of the functors are called if we attempt to change the visibility to what it already is at");
   parentData.Reset();
@@ -10281,7 +10281,7 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
   application.Render();
 
   VisibilityChangedFunctorData data;
-  DevelActor::VisibilityChangedSignal(actor).Connect(&application, VisibilityChangedFunctor(data));
+  actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(data));
 
   Animation animation = Animation::New(1.0f);
   animation.AnimateTo(Property(actor, Actor::Property::VISIBLE), false);
@@ -10293,7 +10293,7 @@ int utcDaliActorVisibilityChangeSignalAfterAnimation(void)
   tet_infoline("Play the animation and check the property value");
   animation.Play();
 
-  data.Check(true /* called */, actor, actor, false /* not visible */, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  data.Check(true /* called */, actor, actor, false /* not visible */, VisibilityChangeType::SELF, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::VISIBLE), false, TEST_LOCATION);
 
   tet_infoline("Animation not currently finished, so the current visibility should still be true");
@@ -10347,9 +10347,9 @@ int utcDaliActorInheritedVisibilityChangeSignal1(void)
   Actor actor       = Actor::New();
 
   VisibilityChangedFunctorData          visibilityData;
-  InheritedVisibilityChangedFunctorData data;
-  DevelActor::VisibilityChangedSignal(actor).Connect(&application, VisibilityChangedFunctor(visibilityData));
-  actor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(data));
+  EffectiveVisibilityChangedFunctorData data;
+  actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityData));
+  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(data));
 
   parentActor.Add(actor);
   visibilityData.Check(false, TEST_LOCATION);
@@ -10364,7 +10364,7 @@ int utcDaliActorInheritedVisibilityChangeSignal1(void)
   visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
-  visibilityData.Check(true, actor, actor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, false, VisibilityChangeType::SELF, TEST_LOCATION);
   data.Check(true, actor, actor, false, TEST_LOCATION);
 
   visibilityData.Reset();
@@ -10376,7 +10376,7 @@ int utcDaliActorInheritedVisibilityChangeSignal1(void)
   visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  visibilityData.Check(true, actor, actor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, true, VisibilityChangeType::SELF, TEST_LOCATION);
   data.Check(true, actor, actor, true, TEST_LOCATION);
 
   visibilityData.Reset();
@@ -10397,11 +10397,11 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   Actor childActor  = Actor::New();
 
   VisibilityChangedFunctorData          visibilityDataP, visibilityDataC;
-  InheritedVisibilityChangedFunctorData dataP, dataC;
-  DevelActor::VisibilityChangedSignal(parentActor).Connect(&application, VisibilityChangedFunctor(visibilityDataP));
-  DevelActor::VisibilityChangedSignal(childActor).Connect(&application, VisibilityChangedFunctor(visibilityDataC));
-  parentActor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataP));
-  childActor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataC));
+  EffectiveVisibilityChangedFunctorData dataP, dataC;
+  parentActor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityDataP));
+  childActor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityDataC));
+  parentActor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataP));
+  childActor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataC));
 
   visibilityDataP.Reset();
   visibilityDataC.Reset();
@@ -10439,7 +10439,7 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   dataC.Reset();
   childActor.SetProperty(Actor::Property::VISIBLE, false);
   visibilityDataP.Check(false, TEST_LOCATION);
-  visibilityDataC.Check(true, childActor, childActor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityDataC.Check(true, childActor, childActor, false, VisibilityChangeType::SELF, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
   dataC.Check(false, TEST_LOCATION);
 
@@ -10459,7 +10459,7 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   dataC.Reset();
   childActor.SetProperty(Actor::Property::VISIBLE, true);
   visibilityDataP.Check(false, TEST_LOCATION);
-  visibilityDataC.Check(true, childActor, childActor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityDataC.Check(true, childActor, childActor, true, VisibilityChangeType::SELF, TEST_LOCATION);
   dataP.Check(false, TEST_LOCATION);
   dataC.Check(true, childActor, childActor, true, TEST_LOCATION);
 
@@ -10468,8 +10468,8 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   dataP.Reset();
   dataC.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, false);
-  visibilityDataP.Check(true, parentActor, parentActor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
-  visibilityDataC.Check(true, parentActor, childActor, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  visibilityDataP.Check(true, parentActor, parentActor, false, VisibilityChangeType::SELF, TEST_LOCATION);
+  visibilityDataC.Check(true, parentActor, childActor, false, VisibilityChangeType::PARENT, TEST_LOCATION);
   dataP.Check(true, parentActor, parentActor, false, TEST_LOCATION);
   dataC.Check(true, parentActor, childActor, false, TEST_LOCATION);
 
@@ -10488,7 +10488,7 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   dataP.Reset();
   dataC.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, true);
-  visibilityDataP.Check(true, parentActor, parentActor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityDataP.Check(true, parentActor, parentActor, true, VisibilityChangeType::SELF, TEST_LOCATION);
   visibilityDataC.Check(false, TEST_LOCATION); ///< childActor is not a child of parentActor now.
   dataP.Check(true, parentActor, parentActor, true, TEST_LOCATION);
   dataC.Check(false, TEST_LOCATION);
@@ -10526,9 +10526,9 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   parentActor.Add(actor);
 
   VisibilityChangedFunctorData          visibilityData;
-  InheritedVisibilityChangedFunctorData data;
-  DevelActor::VisibilityChangedSignal(actor).Connect(&application, VisibilityChangedFunctor(visibilityData));
-  actor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(data));
+  EffectiveVisibilityChangedFunctorData data;
+  actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityData));
+  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(data));
 
   application.GetScene().Add(parentActor);
   data.Check(true, parentActor, actor, true, TEST_LOCATION);
@@ -10540,19 +10540,19 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   visibilityData.Reset();
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, false);
-  visibilityData.Check(true, parentActor, actor, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  visibilityData.Check(true, parentActor, actor, false, VisibilityChangeType::PARENT, TEST_LOCATION);
   data.Check(true, parentActor, actor, false, TEST_LOCATION);
 
   visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
-  visibilityData.Check(true, actor, actor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, false, VisibilityChangeType::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  visibilityData.Check(true, actor, actor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, true, VisibilityChangeType::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Prepare Case 2
@@ -10561,7 +10561,7 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, false);
-  visibilityData.Check(true, actor, actor, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, false, VisibilityChangeType::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Case 2
@@ -10570,7 +10570,7 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   visibilityData.Reset();
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, true);
-  visibilityData.Check(true, parentActor, actor, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  visibilityData.Check(true, parentActor, actor, true, VisibilityChangeType::PARENT, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Prepare Case 3
@@ -10579,13 +10579,13 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   visibilityData.Reset();
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, false);
-  visibilityData.Check(true, parentActor, actor, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  visibilityData.Check(true, parentActor, actor, false, VisibilityChangeType::PARENT, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   visibilityData.Reset();
   data.Reset();
   actor.SetProperty(Actor::Property::VISIBLE, true);
-  visibilityData.Check(true, actor, actor, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  visibilityData.Check(true, actor, actor, true, VisibilityChangeType::SELF, TEST_LOCATION);
   data.Check(false, TEST_LOCATION);
 
   // Case 3
@@ -10594,7 +10594,7 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
   visibilityData.Reset();
   data.Reset();
   parentActor.SetProperty(Actor::Property::VISIBLE, true);
-  visibilityData.Check(true, parentActor, actor, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  visibilityData.Check(true, parentActor, actor, true, VisibilityChangeType::PARENT, TEST_LOCATION);
   data.Check(true, parentActor, actor, true, TEST_LOCATION);
 
   END_TEST;
@@ -10603,9 +10603,9 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
 namespace
 {
 VisibilityChangedFunctorData          dataVPA, dataVPB, dataVCA, dataVCB, dataVCC;
-InheritedVisibilityChangedFunctorData dataPA, dataPB, dataCA, dataCB, dataCC;
+EffectiveVisibilityChangedFunctorData dataPA, dataPB, dataCA, dataCB, dataCC;
 
-void ResetInheritedVisibilityChangedFunctorData()
+void ResetEffectiveVisibilityChangedFunctorData()
 {
   dataVPA.Reset();
   dataVPB.Reset();
@@ -10644,19 +10644,19 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   parentB.Add(childB);
   parentB.Add(childC);
 
-  DevelActor::VisibilityChangedSignal(parentA).Connect(&application, VisibilityChangedFunctor(dataVPA));
-  DevelActor::VisibilityChangedSignal(parentB).Connect(&application, VisibilityChangedFunctor(dataVPB));
-  DevelActor::VisibilityChangedSignal(childA).Connect(&application, VisibilityChangedFunctor(dataVCA));
-  DevelActor::VisibilityChangedSignal(childB).Connect(&application, VisibilityChangedFunctor(dataVCB));
-  DevelActor::VisibilityChangedSignal(childC).Connect(&application, VisibilityChangedFunctor(dataVCC));
+  parentA.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVPA));
+  parentB.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVPB));
+  childA.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVCA));
+  childB.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVCB));
+  childC.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVCC));
 
-  parentA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
-  parentB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
-  childA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCA));
-  childB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCB));
-  childC.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCC));
+  parentA.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPA));
+  parentB.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPB));
+  childA.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCA));
+  childB.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCB));
+  childC.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCC));
 
-  ResetInheritedVisibilityChangedFunctorData();
+  ResetEffectiveVisibilityChangedFunctorData();
   application.GetScene().Add(parentA);
   dataVPA.Check(false, TEST_LOCATION);
   dataVPB.Check(false, TEST_LOCATION);
@@ -10669,24 +10669,24 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataCB.Check(true, parentA, childB, true, TEST_LOCATION);
   dataCC.Check(true, parentA, childC, true, TEST_LOCATION);
 
-  ResetInheritedVisibilityChangedFunctorData();
+  ResetEffectiveVisibilityChangedFunctorData();
   parentA.SetProperty(Actor::Property::VISIBLE, false);
-  dataVPA.Check(true, parentA, parentA, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
-  dataVPB.Check(true, parentA, parentB, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCA.Check(true, parentA, childA, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCB.Check(true, parentA, childB, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCC.Check(true, parentA, childC, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVPA.Check(true, parentA, parentA, false, VisibilityChangeType::SELF, TEST_LOCATION);
+  dataVPB.Check(true, parentA, parentB, false, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCA.Check(true, parentA, childA, false, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentA, childB, false, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentA, childC, false, VisibilityChangeType::PARENT, TEST_LOCATION);
   dataPA.Check(true, parentA, parentA, false, TEST_LOCATION);
   dataPB.Check(true, parentA, parentB, false, TEST_LOCATION);
   dataCA.Check(true, parentA, childA, false, TEST_LOCATION);
   dataCB.Check(true, parentA, childB, false, TEST_LOCATION);
   dataCC.Check(true, parentA, childC, false, TEST_LOCATION);
 
-  ResetInheritedVisibilityChangedFunctorData();
+  ResetEffectiveVisibilityChangedFunctorData();
   childA.SetProperty(Actor::Property::VISIBLE, false);
   dataVPA.Check(false, TEST_LOCATION);
   dataVPB.Check(false, TEST_LOCATION);
-  dataVCA.Check(true, childA, childA, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
+  dataVCA.Check(true, childA, childA, false, VisibilityChangeType::SELF, TEST_LOCATION);
   dataVCB.Check(false, TEST_LOCATION);
   dataVCC.Check(false, TEST_LOCATION);
   dataPA.Check(false, TEST_LOCATION);
@@ -10695,39 +10695,39 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataCB.Check(false, TEST_LOCATION);
   dataCC.Check(false, TEST_LOCATION);
 
-  ResetInheritedVisibilityChangedFunctorData();
+  ResetEffectiveVisibilityChangedFunctorData();
   parentB.SetProperty(Actor::Property::VISIBLE, false);
   dataVPA.Check(false, TEST_LOCATION);
-  dataVPB.Check(true, parentB, parentB, false, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
-  dataVCA.Check(true, parentB, childA, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCB.Check(true, parentB, childB, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCC.Check(true, parentB, childC, false, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVPB.Check(true, parentB, parentB, false, VisibilityChangeType::SELF, TEST_LOCATION);
+  dataVCA.Check(true, parentB, childA, false, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentB, childB, false, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentB, childC, false, VisibilityChangeType::PARENT, TEST_LOCATION);
   dataPA.Check(false, TEST_LOCATION);
   dataPB.Check(false, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
   dataCB.Check(false, TEST_LOCATION);
   dataCC.Check(false, TEST_LOCATION);
 
-  ResetInheritedVisibilityChangedFunctorData();
+  ResetEffectiveVisibilityChangedFunctorData();
   parentA.SetProperty(Actor::Property::VISIBLE, true);
-  dataVPA.Check(true, parentA, parentA, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
-  dataVPB.Check(true, parentA, parentB, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCA.Check(true, parentA, childA, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCB.Check(true, parentA, childB, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCC.Check(true, parentA, childC, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVPA.Check(true, parentA, parentA, true, VisibilityChangeType::SELF, TEST_LOCATION);
+  dataVPB.Check(true, parentA, parentB, true, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCA.Check(true, parentA, childA, true, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentA, childB, true, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentA, childC, true, VisibilityChangeType::PARENT, TEST_LOCATION);
   dataPA.Check(true, parentA, parentA, true, TEST_LOCATION);
   dataPB.Check(false, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
   dataCB.Check(false, TEST_LOCATION);
   dataCC.Check(false, TEST_LOCATION);
 
-  ResetInheritedVisibilityChangedFunctorData();
+  ResetEffectiveVisibilityChangedFunctorData();
   parentB.SetProperty(Actor::Property::VISIBLE, true);
   dataVPA.Check(false, TEST_LOCATION);
-  dataVPB.Check(true, parentB, parentB, true, DevelActor::VisibilityChange::SELF, TEST_LOCATION);
-  dataVCA.Check(true, parentB, childA, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCB.Check(true, parentB, childB, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
-  dataVCC.Check(true, parentB, childC, true, DevelActor::VisibilityChange::PARENT, TEST_LOCATION);
+  dataVPB.Check(true, parentB, parentB, true, VisibilityChangeType::SELF, TEST_LOCATION);
+  dataVCA.Check(true, parentB, childA, true, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCB.Check(true, parentB, childB, true, VisibilityChangeType::PARENT, TEST_LOCATION);
+  dataVCC.Check(true, parentB, childC, true, VisibilityChangeType::PARENT, TEST_LOCATION);
   dataPA.Check(false, TEST_LOCATION);
   dataPB.Check(true, parentB, parentB, true, TEST_LOCATION);
   dataCA.Check(false, TEST_LOCATION);
@@ -10765,23 +10765,23 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   actorD.Add(actorE);
 
   // Let we reuse dataVPA~dataVCC, to reduce code line.
-  ResetInheritedVisibilityChangedFunctorData();
+  ResetEffectiveVisibilityChangedFunctorData();
 
   // Write expcet result at dataVCA and dataVCB
   dataVCA.changedActor = actorC;
   dataVCA.actor        = actorC;
   dataVCA.visible      = false;
-  dataVCA.type         = DevelActor::VisibilityChange::SELF;
+  dataVCA.type         = VisibilityChangeType::SELF;
 
   dataVCB.changedActor = actorC;
   dataVCB.actor        = actorD;
   dataVCB.visible      = false;
-  dataVCB.type         = DevelActor::VisibilityChange::PARENT;
+  dataVCB.type         = VisibilityChangeType::PARENT;
 
   dataVCC.changedActor = actorC;
   dataVCC.actor        = actorE;
   dataVCC.visible      = false;
-  dataVCC.type         = DevelActor::VisibilityChange::PARENT;
+  dataVCC.type         = VisibilityChangeType::PARENT;
 
   bool actorDSignalCalled  = false;
   auto actorDSignalFunctor = [&]()
@@ -10794,32 +10794,32 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
       dataVPA.changedActor = actorA;
       dataVPA.actor        = actorA;
       dataVPA.visible      = false;
-      dataVPA.type         = DevelActor::VisibilityChange::SELF;
+      dataVPA.type         = VisibilityChangeType::SELF;
 
       dataVPB.changedActor = actorA;
       dataVPB.actor        = actorB;
       dataVPB.visible      = false;
-      dataVPB.type         = DevelActor::VisibilityChange::PARENT;
+      dataVPB.type         = VisibilityChangeType::PARENT;
 
       dataVCA.changedActor = actorA;
       dataVCA.actor        = actorC;
       dataVCA.visible      = false;
-      dataVCA.type         = DevelActor::VisibilityChange::PARENT;
+      dataVCA.type         = VisibilityChangeType::PARENT;
 
       dataVCB.changedActor = actorA;
       dataVCB.actor        = actorD;
       dataVCB.visible      = false;
-      dataVCB.type         = DevelActor::VisibilityChange::PARENT;
+      dataVCB.type         = VisibilityChangeType::PARENT;
 
       dataVCC.changedActor = actorA;
       dataVCC.actor        = actorE;
       dataVCC.visible      = false;
-      dataVCC.type         = DevelActor::VisibilityChange::PARENT;
+      dataVCC.type         = VisibilityChangeType::PARENT;
 
       // Make actorA invisible.
       actorA.SetProperty(Actor::Property::VISIBLE, false);
 
-      // Check InheritedVisibilityChanged callback
+      // Check EffectiveVisibilityChanged callback
       dataPA.Check(true, actorA, actorA, false, TEST_LOCATION);
       dataPB.Check(true, actorA, actorB, false, TEST_LOCATION);
       dataCA.Check(false, TEST_LOCATION);
@@ -10827,48 +10827,48 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
       dataCC.Check(false, TEST_LOCATION);
 
       // Change the expect result again
-      ResetInheritedVisibilityChangedFunctorData();
+      ResetEffectiveVisibilityChangedFunctorData();
 
       dataVCA.changedActor = actorC;
       dataVCA.actor        = actorC;
       dataVCA.visible      = false;
-      dataVCA.type         = DevelActor::VisibilityChange::SELF;
+      dataVCA.type         = VisibilityChangeType::SELF;
 
       dataVCB.changedActor = actorC;
       dataVCB.actor        = actorD;
       dataVCB.visible      = false;
-      dataVCB.type         = DevelActor::VisibilityChange::PARENT;
+      dataVCB.type         = VisibilityChangeType::PARENT;
 
       dataVCC.changedActor = actorC;
       dataVCC.actor        = actorE;
       dataVCC.visible      = false;
-      dataVCC.type         = DevelActor::VisibilityChange::PARENT;
+      dataVCC.type         = VisibilityChangeType::PARENT;
     }
   };
 
-  DevelActor::VisibilityChangedSignal(actorA).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  actorA.VisibilityChangedSignal().Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, VisibilityChangeType type)
   { dataVPA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
-  DevelActor::VisibilityChangedSignal(actorB).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  actorB.VisibilityChangedSignal().Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, VisibilityChangeType type)
   { dataVPB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
-  DevelActor::VisibilityChangedSignal(actorC).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  actorC.VisibilityChangedSignal().Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, VisibilityChangeType type)
   { dataVCA.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
-  DevelActor::VisibilityChangedSignal(actorD).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  actorD.VisibilityChangedSignal().Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, VisibilityChangeType type)
   {
     dataVCB.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION);
     actorDSignalFunctor(); }));
-  DevelActor::VisibilityChangedSignal(actorE).Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, DevelActor::VisibilityChange::Type type)
+  actorE.VisibilityChangedSignal().Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, VisibilityChangeType type)
   { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
-  actorA.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPA));
-  actorB.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataPB));
-  actorC.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCA));
-  actorD.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCB));
-  actorE.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(dataCC));
+  actorA.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPA));
+  actorB.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPB));
+  actorC.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCA));
+  actorD.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCB));
+  actorE.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCC));
 
   // Change C as invisible
   actorC.SetProperty(Actor::Property::VISIBLE, false);
 
-  // Check InheritedVisibilityChanged callback
+  // Check EffectiveVisibilityChanged callback
   dataPA.Check(false, TEST_LOCATION);
   dataPB.Check(false, TEST_LOCATION);
   dataCA.Check(true, actorC, actorC, false, TEST_LOCATION);
@@ -10886,8 +10886,8 @@ int utcDaliActorInheritedVisibilityChangeSignal5(void)
   Actor parentActor = Actor::New();
   Actor actor       = Actor::New();
 
-  InheritedVisibilityChangedFunctorData data;
-  actor.InheritedVisibilityChangedSignal().Connect(&application, InheritedVisibilityChangedFunctor(data));
+  EffectiveVisibilityChangedFunctorData data;
+  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(data));
 
   application.GetScene().Hide();
 
@@ -11088,7 +11088,7 @@ struct ChildAddedSignalCheck
   {
   }
 
-  void operator()(Actor childHandle)
+  void operator()(Actor parentHandle, Actor childHandle)
   {
     mSignalReceived = true;
     mChildHandle    = childHandle;
@@ -11112,7 +11112,7 @@ int UtcDaliChildAddedSignalP1(void)
   Actor childActor;
 
   ChildAddedSignalCheck signal(signalReceived, childActor);
-  DevelActor::ChildAddedSignal(stage.GetRootLayer()).Connect(&application, signal);
+  stage.GetRootLayer().ChildAddedSignal().Connect(&application, signal);
   DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   auto actorA = Actor::New();
@@ -11166,7 +11166,7 @@ int UtcDaliChildAddedSignalN(void)
   Actor childActor;
 
   ChildAddedSignalCheck signal(signalReceived, childActor);
-  DevelActor::ChildAddedSignal(stage.GetRootLayer()).Connect(&application, signal);
+  stage.GetRootLayer().ChildAddedSignal().Connect(&application, signal);
   DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   auto actorA = Actor::New();
@@ -11189,7 +11189,7 @@ struct ChildRemovedSignalCheck
   {
   }
 
-  void operator()(Actor childHandle)
+  void operator()(Actor parentHandle, Actor childHandle)
   {
     mSignalReceived = true;
     mChildHandle    = childHandle;
@@ -11213,7 +11213,7 @@ int UtcDaliChildRemovedSignalP1(void)
   Actor childActor;
 
   ChildRemovedSignalCheck signal(signalReceived, childActor);
-  DevelActor::ChildRemovedSignal(stage.GetRootLayer()).Connect(&application, signal);
+  stage.GetRootLayer().ChildRemovedSignal().Connect(&application, signal);
   DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   auto actorA = Actor::New();
@@ -11278,7 +11278,7 @@ int UtcDaliChildRemovedSignalN(void)
   Actor childActor;
 
   ChildRemovedSignalCheck signal(signalReceived, childActor);
-  DevelActor::ChildRemovedSignal(stage.GetRootLayer()).Connect(&application, signal);
+  stage.GetRootLayer().ChildRemovedSignal().Connect(&application, signal);
   DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
 
   auto actorA = Actor::New();
@@ -11316,10 +11316,10 @@ int UtcDaliChildMovedSignalP(void)
   ChildAddedSignalCheck   addedSignalB(addedBSignalReceived, childActor);
   ChildRemovedSignalCheck removedSignalB(removedBSignalReceived, childActor);
 
-  DevelActor::ChildAddedSignal(actorA).Connect(&application, addedSignalA);
-  DevelActor::ChildRemovedSignal(actorA).Connect(&application, removedSignalA);
-  DevelActor::ChildAddedSignal(actorB).Connect(&application, addedSignalB);
-  DevelActor::ChildRemovedSignal(actorB).Connect(&application, removedSignalB);
+  actorA.ChildAddedSignal().Connect(&application, addedSignalA);
+  actorA.ChildRemovedSignal().Connect(&application, removedSignalA);
+  actorB.ChildAddedSignal().Connect(&application, addedSignalB);
+  actorB.ChildRemovedSignal().Connect(&application, removedSignalB);
 
   DALI_TEST_EQUALS(addedASignalReceived, false, TEST_LOCATION);
   DALI_TEST_EQUALS(removedASignalReceived, false, TEST_LOCATION);
@@ -11376,8 +11376,8 @@ int UtcDaliActorSwitchParentP01(void)
 
   DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
 
-  child.OnSceneSignal().Connect(OnSceneCallback);
-  child.OffSceneSignal().Connect(OffSceneCallback);
+  child.SceneConnectedSignal().Connect(OnSceneCallback);
+  child.SceneDisconnectedSignal().Connect(OffSceneCallback);
 
   // sanity check
   DALI_TEST_CHECK(gOnSceneCallBackCalled == 0);
@@ -11395,12 +11395,12 @@ int UtcDaliActorSwitchParentP01(void)
 
   bool                  addSignalReceived = false;
   ChildAddedSignalCheck addedSignal(addSignalReceived, child);
-  DevelActor::ChildAddedSignal(application.GetScene().GetRootLayer()).Connect(&application, addedSignal);
+  application.GetScene().GetRootLayer().ChildAddedSignal().Connect(&application, addedSignal);
   DALI_TEST_EQUALS(addSignalReceived, false, TEST_LOCATION);
 
   bool                    removedSignalReceived = false;
   ChildRemovedSignalCheck removedSignal(removedSignalReceived, child);
-  DevelActor::ChildRemovedSignal(application.GetScene().GetRootLayer()).Connect(&application, removedSignal);
+  application.GetScene().GetRootLayer().ChildRemovedSignal().Connect(&application, removedSignal);
   DALI_TEST_EQUALS(removedSignalReceived, false, TEST_LOCATION);
 
   DevelActor::SwitchParent(child, parent2);
@@ -11433,8 +11433,8 @@ int UtcDaliActorSwitchParentP02(void)
 
   DALI_TEST_EQUALS(parent1.GetChildCount(), 0u, TEST_LOCATION);
 
-  child.OnSceneSignal().Connect(OnSceneCallback);
-  child.OffSceneSignal().Connect(OffSceneCallback);
+  child.SceneConnectedSignal().Connect(OnSceneCallback);
+  child.SceneDisconnectedSignal().Connect(OffSceneCallback);
 
   // sanity check
   DALI_TEST_CHECK(gOnSceneCallBackCalled == 0);
@@ -11452,12 +11452,12 @@ int UtcDaliActorSwitchParentP02(void)
 
   bool                  addSignalReceived = false;
   ChildAddedSignalCheck addedSignal(addSignalReceived, child);
-  DevelActor::ChildAddedSignal(root).Connect(&application, addedSignal);
+  root.ChildAddedSignal().Connect(&application, addedSignal);
   DALI_TEST_EQUALS(addSignalReceived, false, TEST_LOCATION);
 
   bool                    removedSignalReceived = false;
   ChildRemovedSignalCheck removedSignal(removedSignalReceived, child);
-  DevelActor::ChildRemovedSignal(root).Connect(&application, removedSignal);
+  root.ChildRemovedSignal().Connect(&application, removedSignal);
   DALI_TEST_EQUALS(removedSignalReceived, false, TEST_LOCATION);
 
   DevelActor::SwitchParent(child, parent2);
@@ -14224,13 +14224,13 @@ int UtcDaliActorAddRendererNegative(void)
   END_TEST;
 }
 
-int UtcDaliActorTouchedSignalNegative(void)
+int UtcDaliActorTouchEventSignalNegative(void)
 {
   TestApplication application;
   Dali::Actor     instance;
   try
   {
-    instance.TouchedSignal();
+    instance.TouchEventSignal();
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14291,13 +14291,13 @@ int UtcDaliActorGetRendererAtNegative(void)
   END_TEST;
 }
 
-int UtcDaliActorHoveredSignalNegative(void)
+int UtcDaliActorHoverEventSignalNegative(void)
 {
   TestApplication application;
   Dali::Actor     instance;
   try
   {
-    instance.HoveredSignal();
+    instance.HoverEventSignal();
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14323,13 +14323,13 @@ int UtcDaliActorLowerToBottomNegative(void)
   END_TEST;
 }
 
-int UtcDaliActorOnSceneSignalNegative(void)
+int UtcDaliActorSceneConnectedSignalNegative(void)
 {
   TestApplication application;
   Dali::Actor     instance;
   try
   {
-    instance.OnSceneSignal();
+    instance.SceneConnectedSignal();
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14339,13 +14339,13 @@ int UtcDaliActorOnSceneSignalNegative(void)
   END_TEST;
 }
 
-int UtcDaliActorOffSceneSignalNegative(void)
+int UtcDaliActorSceneDisconnectedSignalNegative(void)
 {
   TestApplication application;
   Dali::Actor     instance;
   try
   {
-    instance.OffSceneSignal();
+    instance.SceneDisconnectedSignal();
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14430,7 +14430,7 @@ int UtcDaliActorOnRelayoutSignalNegative(void)
   Dali::Actor     instance;
   try
   {
-    instance.OnRelayoutSignal();
+    DevelActor::OnRelayoutSignal(instance);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14970,8 +14970,8 @@ int UtcDaliActorDoesWantedHitTest(void)
     DALI_TEST_CHECK(!gHitTestTouchCallBackCalled);
 
     // connect to its touch signal
-    actor.TouchedSignal().Connect(TestTouchCallback);
-    lowerActor.TouchedSignal().Connect(TestTouchCallback2);
+    actor.TouchEventSignal().Connect(TestTouchCallback);
+    lowerActor.TouchEventSignal().Connect(TestTouchCallback2);
 
     // connect to its hit-test signal
     Dali::DevelActor::HitTestResultSignal(actor).Connect(TestHitTestTouchCallback);
@@ -15959,7 +15959,7 @@ int UtcDaliActorGetTouchRequired(void)
   Actor actor = Actor::New();
   DALI_TEST_CHECK(DevelActor::GetTouchRequired(actor) == false);
 
-  actor.TouchedSignal().Connect(TestTouchCallback);
+  actor.TouchEventSignal().Connect(TestTouchCallback);
   DALI_TEST_CHECK(DevelActor::GetTouchRequired(actor) == true);
 
   END_TEST;

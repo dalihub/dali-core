@@ -121,7 +121,7 @@ enum Type
    *  Actor actor = Actor::New();
    *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
    *  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(10, 20, 30, 40));
-   *  actor.TouchedSignal().Connect(OnTouchCallback);
+   *  actor.TouchEventSignal().Connect(OnTouchCallback);
    *
    * +---------------------+
    * |         ^           |
@@ -234,16 +234,6 @@ enum Type
 
 } // namespace Property
 
-namespace VisibilityChange
-{
-enum Type
-{
-  SELF,  ///< The visibility of the actor itself has changed.
-  PARENT ///< The visibility of a parent has changed.
-};
-
-} // namespace VisibilityChange
-
 namespace ChildrenDepthIndexPolicy
 {
 enum Type
@@ -254,30 +244,11 @@ enum Type
 
 } // namespace ChildrenDepthIndexPolicy
 
-using VisibilityChangedSignalType = Signal<void(Actor, bool, VisibilityChange::Type)>; ///< Signal type of VisibilityChangedSignalType
-
 /**
- * @brief This signal is emitted when the visible property of this or a parent actor is changed.
- *
- * A callback of the following type may be connected:
- * @code
- *   void YourCallbackName( Actor actor, bool visible, VisibilityChange::Type& type );
- * @endcode
- * actor: The actor, or child of actor, whose visibility has changed.
- * visible: If type is SELF, then this is true if this actor's VISIBILITY property is true. If Type is PARENT, this is true if a parent's VISIBILITY property has changed to true.
- * type: Whether the actor's visible property has changed or a parent's.
- * @return The signal to connect to
- * @pre The Actor has been initialized.
- * @note This signal is NOT emitted if the actor becomes transparent (or the reverse), it's ONLY linked with Actor::Property::VISIBLE.
- * @note For reference, an actor is only shown if it and it's parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
- */
-DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor);
-
-/**
- * @brief Get the actor who trigger the VisibilityChangedSignal or InheritedVisibilityChangedSignal signal.
- * @note The return value is "INVALID" if this API called outside of the VisibilityChangedSignal or InheritedVisibilityChangedSignal signal.
+ * @brief Get the actor who trigger the VisibilityChangedSignal or EffectiveVisibilityChangedSignal signal.
+ * @note The return value is "INVALID" if this API called outside of the VisibilityChangedSignal or EffectiveVisibilityChangedSignal signal.
  * "INVALID" don't mean the empty handle. It might return the valid handle. But it doesn't mean the visibility changed actor.
- * if this API called outside of VisibilityChangedSignal or InheritedVisibilityChangedSignal signal.
+ * if this API called outside of VisibilityChangedSignal or EffectiveVisibilityChangedSignal signal.
  *
  * For example, Let we assume some Actor tree looks like (root)A - B - C - D - E.
  * If we change C's visibility as false + Change A's visibility inside of D's VisibilityChangedSignal callback,
@@ -285,21 +256,21 @@ DALI_CORE_API VisibilityChangedSignalType& VisibilityChangedSignal(Actor actor);
  *
  * (Some codes here)                                                 --> GetVisiblityChangedActor() is INVALID
  * C.SetProperty(Actor::Property::VISIBLE, false)
- *   VisibilityChangedSignal(C, false, VisibilityChange::SELF)       --> GetVisiblityChangedActor() is Actor C
- *   VisibilityChangedSignal(D, false, VisibilityChange::PARENT)     --> GetVisiblityChangedActor() is Actor C
+ *   VisibilityChangedSignal(C, false, VisibilityChangeType::SELF)       --> GetVisiblityChangedActor() is Actor C
+ *   VisibilityChangedSignal(D, false, VisibilityChangeType::PARENT)     --> GetVisiblityChangedActor() is Actor C
  *     A.SetProperty(Actor::Property::VISIBLE, false)
- *       VisibilityChangedSignal(A, false, VisibilityChange::SELF)   --> GetVisiblityChangedActor() is Actor A
- *       VisibilityChangedSignal(B, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
- *       VisibilityChangedSignal(C, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
- *       VisibilityChangedSignal(D, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
- *       VisibilityChangedSignal(E, false, VisibilityChange::PARENT) --> GetVisiblityChangedActor() is Actor A
- *       InheritedVisibilityChangedSignal(A, false)                  --> GetVisiblityChangedActor() is Actor A
- *       InheritedVisibilityChangedSignal(B, false)                  --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(A, false, VisibilityChangeType::SELF)   --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(B, false, VisibilityChangeType::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(C, false, VisibilityChangeType::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(D, false, VisibilityChangeType::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       VisibilityChangedSignal(E, false, VisibilityChangeType::PARENT) --> GetVisiblityChangedActor() is Actor A
+ *       EffectiveVisibilityChangedSignal(A, false)                  --> GetVisiblityChangedActor() is Actor A
+ *       EffectiveVisibilityChangedSignal(B, false)                  --> GetVisiblityChangedActor() is Actor A
  *     (Some codes here)                                             --> GetVisiblityChangedActor() is Actor C
- *   VisibilityChangedSignal(E, false, VisibilityChange::PARENT)     --> GetVisiblityChangedActor() is Actor C
- *   InheritedVisibilityChangedSignal(C, false)                      --> GetVisiblityChangedActor() is Actor C
- *   InheritedVisibilityChangedSignal(D, false)                      --> GetVisiblityChangedActor() is Actor C
- *   InheritedVisibilityChangedSignal(E, false)                      --> GetVisiblityChangedActor() is Actor C
+ *   VisibilityChangedSignal(E, false, VisibilityChangeType::PARENT)     --> GetVisiblityChangedActor() is Actor C
+ *   EffectiveVisibilityChangedSignal(C, false)                      --> GetVisiblityChangedActor() is Actor C
+ *   EffectiveVisibilityChangedSignal(D, false)                      --> GetVisiblityChangedActor() is Actor C
+ *   EffectiveVisibilityChangedSignal(E, false)                      --> GetVisiblityChangedActor() is Actor C
  * (Some codes here)                                                 --> GetVisiblityChangedActor() is INVALID
  *
  * @return The actor who trigger the visibility changed signal.
@@ -380,49 +351,9 @@ DALI_CORE_API Bounds CalculateScreenExtents(Actor actor);
  */
 DALI_CORE_API Bounds CalculateCurrentScreenExtents(Actor actor);
 
-using ChildChangedSignalType = Signal<void(Actor)>; ///< Called when the actor has a child added or removed
+using ChildOrderChangedSignalType = Signal<void(Actor, Actor)>; ///< Used when the actor's children have changed order; first Actor is the parent, second is the child whose order changed
 
-/**
- * @brief This signal is emitted when a child is added to this actor.
- *
- * A callback of the following type may be connected:
- * @code
- *   void MyCallbackName( Actor child );
- * @endcode
- * child: The child that has been added.
- *
- * @note Use this signal with caution. Changing the parent of the actor
- * within this callback is possible, but DALi will prevent further signals
- * being sent.
- *
- * @return The signal to connect to
- * @pre The Actor has been initialized
- */
-DALI_CORE_API ChildChangedSignalType& ChildAddedSignal(Actor actor);
-
-/**
- * @brief This signal is emitted when a child is removed from this actor.
- *
- * A callback of the following type may be connected:
- * @code
- *   void MyCallbackName( Actor child );
- * @endcode
- * child: The child that has been removed.
- *
- * @note Use this signal with caution. Changing the parent of the actor
- * within this callback is possible, but DALi will prevent further signals
- * being sent.
- *
- * @note If the child actor is moved from one actor to another, then
- * this signal will be emitted followed immediately by an
- * ChildAddedSignal() on the new parent.
- *
- * @return The signal to connect to
- * @pre The Actor has been initialized
- */
-DALI_CORE_API ChildChangedSignalType& ChildRemovedSignal(Actor actor);
-
-using ChildOrderChangedSignalType = Signal<void(Actor)>; ///< Used when the actor's children have changed order
+using OnRelayoutSignalType = Signal<void(Actor)>; ///< Called when the actor is relaid out. @SINCE_2_5.29
 
 /**
  * @brief This signal is emitted when an actor's children change their sibling order
@@ -439,72 +370,19 @@ using ChildOrderChangedSignalType = Signal<void(Actor)>; ///< Used when the acto
 DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
 
 /**
- * @brief This signal is emitted when intercepting the actor's touch event.
+ * @brief This signal is emitted after the size has been set on the actor during relayout.
  *
  * A callback of the following type may be connected:
  * @code
  *   void MyCallbackName( Actor actor );
  * @endcode
- * actor The actor to intercept
+ * actor: The actor that was relaid out.
  *
- * @note TouchEvent callbacks are called from the last child in the order of the parent's actor.
- * The InterceptTouchEvent callback is to intercept the touch event in the parent.
- * So, if the parent interepts the touch event, the child cannot receive the touch event.
- *
- * @note example
- *   Actor parent = Actor::New();
- *   Actor child = Actor::New();
- *   parent.Add(child);
- *   child.TouchedSignal().Connect(&application, childFunctor);
- *   parent.TouchedSignal().Connect(&application, parentFunctor);
- * The touch event callbacks are called in the order childFunctor -> parentFunctor.
- *
- * If you connect interceptTouchSignal to parentActor.
- *   Dali::DevelActor::InterceptTouchedSignal(parent).Connect(&application, interceptFunctor);
- *
- * When interceptFunctor returns false, the touch event callbacks are called in the same order childFunctor -> parentFunctor.
- * If interceptFunctor returns true, it means that the TouchEvent was intercepted.
- * So the child actor will not be able to receive touch events.
- * Only the parentFunctor is called.
- *
+ * @SINCE_2_5.29
  * @return The signal to connect to
- * @pre The Actor has been initialized
+ * @pre The Actor has been initialized.
  */
-DALI_CORE_API Actor::TouchEventSignalType& InterceptTouchedSignal(Actor actor);
-
-/**
- * @brief This signal is emitted when intercepting the actor's wheel event.
- *
- * A callback of the following type may be connected:
- * @code
- *   void MyCallbackName( Actor actor );
- * @endcode
- * actor The actor to intercept
- *
- * @note WheelEvent callbacks are called from the last child in the order of the parent's actor.
- * The InterceptWheelEvent callback is to intercept the wheel event in the parent.
- * So, if the parent interepts the wheel event, the child cannot receive the Wheel event.
- *
- * @note example
- *   Actor parent = Actor::New();
- *   Actor child = Actor::New();
- *   parent.Add(child);
- *   child.WheelEventSignal().Connect(&application, childFunctor);
- *   parent.WheelEventSignal().Connect(&application, parentFunctor);
- * The wheel event callbacks are called in the order childFunctor -> parentFunctor.
- *
- * If you connect InterceptWheelSignal to parentActor.
- *   Dali::DevelActor::InterceptWheelSignal(parent).Connect(&application, interceptFunctor);
- *
- * When interceptFunctor returns false, the wheel event callbacks are called in the same order childFunctor -> parentFunctor.
- * If interceptFunctor returns true, it means that the WheelEvent was intercepted.
- * So the child actor will not be able to receive wheel events.
- * Only the parentFunctor is called.
- *
- * @return The signal to connect to
- * @pre The Actor has been initialized
- */
-DALI_CORE_API Actor::WheelEventSignalType& InterceptWheelSignal(Actor actor);
+DALI_CORE_API OnRelayoutSignalType& OnRelayoutSignal(Actor actor);
 
 /**
  * @brief This is used when the parent actor wants to listen to gesture events.
@@ -563,8 +441,8 @@ DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
  * @note example
  *   Actor topActor = Actor::New();
  *   Actor bottomActor = Actor::New();
- *   topActor.TouchedSignal().Connect(&application, topActorFunctor);
- *   bottomActor.TouchedSignal().Connect(&application, bottomActorFunctor);
+ *   topActor.TouchEventSignal().Connect(&application, topActorFunctor);
+ *   bottomActor.TouchEventSignal().Connect(&application, bottomActorFunctor);
  * The two actors have no relationship.
  * So when the topActor is touched, the event cannot be propagated to the bottomActor.
  *

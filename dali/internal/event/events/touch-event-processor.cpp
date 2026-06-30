@@ -494,7 +494,7 @@ struct TouchEventProcessor::Impl
 
     touchEventImpl->AddPoint(currentPoint);
 
-    localVars.processor.mScene.EmitTouchedSignal(touchEventHandle);
+    localVars.processor.mScene.EmitTouchEventSignal(touchEventHandle);
   }
 
   /**
@@ -947,7 +947,7 @@ struct TouchEventProcessor::Impl
 
         case PointState::DOWN:
         {
-          processor.mScene.EmitTouchedSignal(localVars.touchEventHandle);
+          processor.mScene.EmitTouchEventSignal(localVars.touchEventHandle);
           break;
         }
 

@@ -21,7 +21,7 @@
 #include <dali/public-api/actors/actor.h>
 
 /**
- * Functor to be connected to an Actor's TouchedSignal.
+ * Functor to be connected to an Actor's TouchEventSignal.
  * Allows the user to specify whether the functor should return true (consumed) or false.
  */
 struct TouchEventFunctorConsumeSetter

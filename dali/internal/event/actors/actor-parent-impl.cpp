@@ -563,8 +563,8 @@ void ActorParentImpl::InheritLayoutDirectionRecursively(Dali::LayoutDirection::T
 }
 
 void ActorParentImpl::EmitVisibilityChangedSignalRecursively(
-  bool                               visible,
-  DevelActor::VisibilityChange::Type type)
+  bool                 visible,
+  VisibilityChangeType type)
 {
   if(!visible && mOwner.OnScene())
   {
@@ -578,14 +578,14 @@ void ActorParentImpl::EmitVisibilityChangedSignalRecursively(
   {
     for(const auto& child : *mChildren)
     {
-      child->mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::PARENT);
+      child->mParentImpl.EmitVisibilityChangedSignalRecursively(visible, VisibilityChangeType::PARENT);
     }
   }
 }
 
-void ActorParentImpl::InheritVisibilityRecursively(ActorContainer& inheritedVisibilityChangedList)
+void ActorParentImpl::CollectEffectiveVisibilityActorsRecursively(ActorContainer& effectiveVisibilityActors)
 {
-  inheritedVisibilityChangedList.push_back(ActorPtr(&mOwner));
+  effectiveVisibilityActors.push_back(ActorPtr(&mOwner));
 
   if(mChildren)
   {
@@ -593,7 +593,7 @@ void ActorParentImpl::InheritVisibilityRecursively(ActorContainer& inheritedVisi
     {
       if(child->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>())
       {
-        child->mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
+        child->mParentImpl.CollectEffectiveVisibilityActorsRecursively(effectiveVisibilityActors);
       }
     }
   }
@@ -619,17 +619,17 @@ void ActorParentImpl::RequestRenderTaskReorderRecursively()
 
 void ActorParentImpl::EmitChildAddedSignal(Actor& child)
 {
-  EmitSignal(child, mChildAddedSignal);
+  EmitSignal(mOwner, mChildAddedSignal, Dali::Actor(&child));
 }
 
 void ActorParentImpl::EmitChildRemovedSignal(Actor& child)
 {
-  EmitSignal(child, mChildRemovedSignal);
+  EmitSignal(mOwner, mChildRemovedSignal, Dali::Actor(&child));
 }
 
 void ActorParentImpl::EmitOrderChangedAndRebuild(Actor& child)
 {
-  EmitSignal(child, mChildOrderChangedSignal);
+  EmitSignal(mOwner, mChildOrderChangedSignal, Dali::Actor(&child));
 
   if(mOwner.OnScene())
   {

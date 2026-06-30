@@ -62,7 +62,7 @@ struct Vector4;
  *
  * <h3>Multi-Touch Events:</h3>
  *
- * Touch or hover events are received via signals; see Actor::TouchedSignal() and Actor::HoveredSignal() for more details.
+ * Touch or hover events are received via signals; see Actor::TouchEventSignal() and Actor::HoverEventSignal() for more details.
  *
  * <i>Hit Testing Rules Summary:</i>
  *
@@ -215,16 +215,20 @@ struct Vector4;
  * @nosubgrouping
  *
  * Signals
- * | %Signal Name               | Method                                  |
- * |----------------------------|-----------------------------------------|
- * | touched                    | @ref TouchedSignal()                    |
- * | hovered                    | @ref HoveredSignal()                    |
- * | wheelEvent                 | @ref WheelEventSignal()                 |
- * | onScene                    | @ref OnSceneSignal()                    |
- * | offScene                   | @ref OffSceneSignal()                   |
- * | onRelayout                 | @ref OnRelayoutSignal()                 |
- * | layoutDirectionChanged     | @ref LayoutDirectionChangedSignal()     |
- * | inheritedVisibilityChanged | @ref InheritedVisibilityChangedSignal() |
+ * | %Signal Name               | Method                                      |
+ * |----------------------------|---------------------------------------------|
+ * | touchEvent                 | @ref TouchEventSignal()                     |
+ * | hoverEvent                 | @ref HoverEventSignal()                     |
+ * | wheelEvent                 | @ref WheelEventSignal()                     |
+ * | sceneConnected             | @ref SceneConnectedSignal()                 |
+ * | sceneDisconnected          | @ref SceneDisconnectedSignal()              |
+ * | childAdded                 | @ref ChildAddedSignal()                     |
+ * | childRemoved               | @ref ChildRemovedSignal()                   |
+ * | visibilityChanged          | @ref VisibilityChangedSignal()              |
+ * | effectiveVisibilityChanged | @ref EffectiveVisibilityChangedSignal()     |
+ * | layoutDirectionChanged     | @ref LayoutDirectionChangedSignal()         |
+ * | interceptTouchEvent        | @ref InterceptTouchEventSignal()            |
+ * | interceptWheelEvent        | @ref InterceptWheelEventSignal()            |
  *
  * @SINCE_1_0.0
  */
@@ -739,14 +743,16 @@ public:
 
   // Typedefs
 
-  using TouchEventSignalType                 = Signal<bool(Actor, TouchEvent)>;            ///< Touch signal type @SINCE_1_1.37
-  using HoverSignalType                      = Signal<bool(Actor, HoverEvent)>;            ///< Hover signal type @SINCE_1_0.0
-  using WheelEventSignalType                 = Signal<bool(Actor, WheelEvent)>;            ///< Wheel signal type @SINCE_1_0.0
-  using OnSceneSignalType                    = Signal<void(Actor)>;                        ///< Scene connection signal type @SINCE_1_9.24
-  using OffSceneSignalType                   = Signal<void(Actor)>;                        ///< Scene disconnection signal type @SINCE_1_9.24
-  using OnRelayoutSignalType                 = Signal<void(Actor)>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
-  using LayoutDirectionChangedSignalType     = Signal<void(Actor, LayoutDirection::Type)>; ///< Layout direction changes signal type. @SINCE_1_2.60
-  using InheritedVisibilityChangedSignalType = Signal<void(Actor, bool)>;                  ///< Signal type of InheritedVisibilityChangedSignalType. @SINCE_2_3.22
+  using TouchEventSignalType                 = Signal<bool(Actor, TouchEvent)>;                 ///< Touch signal type @SINCE_1_1.37
+  using HoverEventSignalType                 = Signal<bool(Actor, HoverEvent)>;                 ///< Hover signal type @SINCE_1_0.0
+  using WheelEventSignalType                 = Signal<bool(Actor, WheelEvent)>;                 ///< Wheel signal type @SINCE_1_0.0
+  using SceneConnectedSignalType             = Signal<void(Actor)>;                             ///< Scene connection signal type @SINCE_1_9.24
+  using SceneDisconnectedSignalType          = Signal<void(Actor)>;                             ///< Scene disconnection signal type @SINCE_1_9.24
+  using ChildAddedSignalType                 = Signal<void(Actor, Actor)>;                      ///< Called when the actor has a child added. @SINCE_2_5.29
+  using ChildRemovedSignalType               = Signal<void(Actor, Actor)>;                      ///< Called when the actor has a child removed. @SINCE_2_5.29
+  using VisibilityChangedSignalType          = Signal<void(Actor, bool, VisibilityChangeType)>; ///< Signal emitted when an actor's or a parent's visible property changes. @SINCE_2_5.29
+  using EffectiveVisibilityChangedSignalType = Signal<void(Actor, bool)>;                       ///< Signal type of EffectiveVisibilityChangedSignalType. @SINCE_2_3.22
+  using LayoutDirectionChangedSignalType     = Signal<void(Actor, LayoutDirection::Type)>;      ///< Layout direction changes signal type. @SINCE_1_2.60
 
   // Creation
 
@@ -1223,7 +1229,7 @@ public: // Signals
    * @return The signal to connect to
    * @pre The Actor has been initialized.
    */
-  TouchEventSignalType& TouchedSignal();
+  TouchEventSignalType& TouchEventSignal();
 
   /**
    * @brief This signal is emitted when hover input is received.
@@ -1238,7 +1244,7 @@ public: // Signals
    * @return The signal to connect to
    * @pre The Actor has been initialized.
    */
-  HoverSignalType& HoveredSignal();
+  HoverEventSignalType& HoverEventSignal();
 
   /**
    * @brief This signal is emitted when wheel event is received.
@@ -1254,6 +1260,86 @@ public: // Signals
    * @pre The Actor has been initialized.
    */
   WheelEventSignalType& WheelEventSignal();
+
+  /**
+   * @brief This signal is emitted when intercepting the actor's touch event.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool MyCallbackName( Actor actor, TouchEvent touch );
+   * @endcode
+   * actor: The actor to intercept.
+   * touch: The touch event.
+   *
+   * @note Touch event callbacks are called from the last child in the order of the parent's actor.
+   * The InterceptTouchEventSignal callback is to intercept the touch event in the parent.
+   * So, if the parent intercepts the touch event, the child cannot receive the touch event.
+   *
+   * @note For example:
+   * @code
+   *   Actor parent = Actor::New();
+   *   Actor child = Actor::New();
+   *   parent.Add(child);
+   *   child.TouchEventSignal().Connect(&application, childFunctor);
+   *   parent.TouchEventSignal().Connect(&application, parentFunctor);
+   * @endcode
+   * The touch event callbacks are called in the order childFunctor -> parentFunctor.
+   *
+   * If you connect InterceptTouchEventSignal to parentActor:
+   * @code
+   *   parent.InterceptTouchEventSignal().Connect(&application, interceptFunctor);
+   * @endcode
+   *
+   * When interceptFunctor returns false, the touch event callbacks are called in the same order.
+   * If interceptFunctor returns true, it means that the TouchEvent was intercepted.
+   * So the child actor will not be able to receive touch events.
+   * Only the parentFunctor is called.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   */
+  TouchEventSignalType& InterceptTouchEventSignal();
+
+  /**
+   * @brief This signal is emitted when intercepting the actor's wheel event.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool MyCallbackName( Actor actor, WheelEvent wheelEvent );
+   * @endcode
+   * actor: The actor to intercept.
+   * wheelEvent: The wheel event.
+   *
+   * @note Wheel event callbacks are called from the last child in the order of the parent's actor.
+   * The InterceptWheelEventSignal callback is to intercept the wheel event in the parent.
+   * So, if the parent intercepts the wheel event, the child cannot receive the wheel event.
+   *
+   * @note For example:
+   * @code
+   *   Actor parent = Actor::New();
+   *   Actor child = Actor::New();
+   *   parent.Add(child);
+   *   child.WheelEventSignal().Connect(&application, childFunctor);
+   *   parent.WheelEventSignal().Connect(&application, parentFunctor);
+   * @endcode
+   * The wheel event callbacks are called in the order childFunctor -> parentFunctor.
+   *
+   * If you connect InterceptWheelEventSignal to parentActor:
+   * @code
+   *   parent.InterceptWheelEventSignal().Connect(&application, interceptFunctor);
+   * @endcode
+   *
+   * When interceptFunctor returns false, the wheel event callbacks are called in the same order.
+   * If interceptFunctor returns true, it means that the WheelEvent was intercepted.
+   * So the child actor will not be able to receive wheel events.
+   * Only the parentFunctor is called.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   */
+  WheelEventSignalType& InterceptWheelEventSignal();
 
   /**
    * @brief This signal is emitted after the actor has been connected to the scene.
@@ -1277,7 +1363,7 @@ public: // Signals
    *
    * @endcode
    */
-  OnSceneSignalType& OnSceneSignal();
+  SceneConnectedSignalType& SceneConnectedSignal();
 
   /**
    * @brief This signal is emitted after the actor has been disconnected from the scene.
@@ -1301,15 +1387,97 @@ public: // Signals
    * @endcode
    *
    */
-  OffSceneSignalType& OffSceneSignal();
+  SceneDisconnectedSignalType& SceneDisconnectedSignal();
 
   /**
-   * @brief This signal is emitted after the size has been set on the actor during relayout
+   * @brief This signal is emitted when a child is added to this actor.
    *
-   * @SINCE_1_0.0
-   * @return The signal
+   * A callback of the following type may be connected:
+   * @code
+   *   void MyCallbackName( Actor parent, Actor child );
+   * @endcode
+   * parent: The actor to which the child was added.
+   * child: The child that has been added.
+   *
+   * @note Use this signal with caution. Changing the parent of the actor
+   * within this callback is possible, but DALi will prevent further signals
+   * being sent.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
    */
-  OnRelayoutSignalType& OnRelayoutSignal();
+  ChildAddedSignalType& ChildAddedSignal();
+
+  /**
+   * @brief This signal is emitted when a child is removed from this actor.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void MyCallbackName( Actor parent, Actor child );
+   * @endcode
+   * parent: The actor from which the child was removed.
+   * child: The child that has been removed.
+   *
+   * @note Use this signal with caution. Changing the parent of the actor
+   * within this callback is possible, but DALi will prevent further signals
+   * being sent.
+   *
+   * @note If the child actor is moved from one actor to another, then
+   * this signal will be emitted followed immediately by a
+   * ChildAddedSignal() on the new parent.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   */
+  ChildRemovedSignalType& ChildRemovedSignal();
+
+  /**
+   * @brief This signal is emitted when the visible property of this or a parent actor is changed.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Actor actor, bool visible, VisibilityChangeType type );
+   * @endcode
+   * @SINCE_2_5.29
+   * @param[out] actor  The actor, or child of the actor, whose visibility has changed.
+   * @param[out] visible If type is VisibilityChangeType::SELF, true means this actor's VISIBLE property became true.
+   *                     If type is VisibilityChangeType::PARENT, true means a parent's VISIBLE property changed to true.
+   * @param[out] type   Whether this actor's own visible property changed (SELF) or a parent's (PARENT).
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse); it is linked only with Actor::Property::VISIBLE.
+   * @note For reference, an actor is only shown if it and its parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
+   */
+  VisibilityChangedSignalType& VisibilityChangedSignal();
+
+  /**
+   * @brief This signal is emitted when the effective visibility of this actor changes.
+   *
+   * The effective visibility is true only when this actor and all its parents (up to the root layer)
+   * have their VISIBLE property set to true, and the actor is connected to the scene.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Actor actor, bool visible );
+   * @endcode
+   * actor: The actor whose effective visibility has changed.
+   * visible: Whether this actor's effective visibility is true.
+   * If true, it denotes one of two cases:
+   * One is that the VISIBLE property of this actor or one of its parent actors was originally false and has become true.
+   * Another is that this actor has been connected to the scene with the VISIBLE property of this actor and all of its parents set to true.
+   * If false, it also denotes one of two cases:
+   * One is that the VISIBLE property of this actor and all of its parent actors was originally true, but one of them has become false.
+   * Another is that the VISIBLE property of this actor and all of its parent actors are true, but this actor has been disconnected from the scene.
+   *
+   * @SINCE_2_3.22
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
+   * @note For reference, an actor is only shown if it and its parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
+   */
+  EffectiveVisibilityChangedSignalType& EffectiveVisibilityChangedSignal();
 
   /**
    * @brief This signal is emitted when the layout direction property of this or a parent actor is changed.
@@ -1318,7 +1486,7 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, LayoutDirection::Type type );
    * @endcode
-   * actor: The actor, or child of actor, whose layout direction has changed
+   * actor: The actor, or child of the actor, whose layout direction has changed.
    * type: Whether the actor's layout direction property has changed or a parent's.
    *
    * @SINCE_1_2.60
@@ -1326,30 +1494,6 @@ public: // Signals
    * @pre The Actor has been initialized.
    */
   LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
-
-  /**
-   * @brief This signal is emitted when the visible property of this actor or any of its parents (right up to the root layer) changes.
-   *
-   * A callback of the following type may be connected:
-   * @code
-   *   void YourCallbackName( Actor actor, bool visible );
-   * @endcode
-   * actor: The actor whose inherited visibility has changed.
-   * visible: This is true if this actor's inherited VISIBLE property is true.
-   * If it is true, it denotes one of the 2 cases.
-   * One is VISIBLE property of this actor or only one of the parent actors were originally false and it becomes true now.
-   * Another is this actor is connected on Scene now with that the VISIBLE property of this actor and all of its parent were true.
-   * If it is false, it also denotes one of the 2 cases.
-   * One is that VISIBLE property of this actor and all of the parent actors were originally true but one of them becomes false now.
-   * Another is VISIBLE property of this actor and all of the parent actors are true and this actor is disconnected from the Scene now.
-   *
-   * @SINCE_2_3.22
-   * @return The signal to connect to
-   * @pre The Actor has been initialized.
-   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
-   * @note For reference, an actor is only shown if it and it's parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
-   */
-  InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal();
 
 public: // Not intended for application developers
   /// @cond internal

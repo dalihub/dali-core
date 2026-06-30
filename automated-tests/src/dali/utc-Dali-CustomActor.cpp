@@ -1546,7 +1546,7 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
 
   Dali::WeakHandle<UnregisteredCustomActor> weakRef(custom);
   // should have actor signals
-  custom.ConnectSignal(&application, "offScene", [weakRef]()
+  custom.ConnectSignal(&application, "sceneDisconnected", [weakRef]()
   {
     DALI_TEST_EQUALS(weakRef.GetHandle().GetProperty<bool>(Actor::Property::CONNECTED_TO_SCENE), false, TEST_LOCATION);
   });

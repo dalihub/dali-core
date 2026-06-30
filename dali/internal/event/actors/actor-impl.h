@@ -1322,7 +1322,7 @@ public:
    */
   bool GetTouchRequired() const
   {
-    return !mTouchedSignal.Empty();
+    return !mTouchEventSignal.Empty();
   }
 
   /**
@@ -1358,7 +1358,7 @@ public:
    */
   bool GetInterceptTouchRequired() const
   {
-    return !mInterceptTouchedSignal.Empty();
+    return !mInterceptTouchEventSignal.Empty();
   }
 
   /**
@@ -1367,7 +1367,7 @@ public:
    */
   bool GetHoverRequired() const
   {
-    return !mHoveredSignal.Empty();
+    return !mHoverEventSignal.Empty();
   }
 
   /**
@@ -1376,7 +1376,7 @@ public:
    */
   bool GetInterceptWheelRequired() const
   {
-    return !mInterceptWheelSignal.Empty();
+    return !mInterceptWheelEventSignal.Empty();
   }
 
   /**
@@ -1520,13 +1520,13 @@ public:
    * @param[in] visible Whether the actor has become visible or not.
    * @param[in] type Whether the actor's visible property has changed or a parent's.
    */
-  void EmitVisibilityChangedSignal(bool visible, DevelActor::VisibilityChange::Type type);
+  void EmitVisibilityChangedSignal(bool visible, VisibilityChangeType type);
 
   /**
-   * @brief Emits the inherited visibility change signal for this actor.
+   * @brief Emits the effective visibility change signal for this actor.
    * @param[in] visible Whether the actor has become visible or not considering all parent Actors.
    */
-  void EmitInheritedVisibilityChangedSignal(bool visible);
+  void EmitEffectiveVisibilityChangedSignal(bool visible);
 
   /**
    * @brief Emits the layout direction change signal for this actor and all its children.
@@ -1544,43 +1544,19 @@ public:
   bool EmitHitTestResultSignal(Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp);
 
   /**
-   * @copydoc DevelActor::HitTestResultSignal()
+   * @copydoc Dali::Actor::TouchEventSignal()
    */
-  Dali::Actor::TouchEventSignalType& HitTestResultSignal()
+  Dali::Actor::TouchEventSignalType& TouchEventSignal()
   {
-    return mHitTestResultSignal;
+    return mTouchEventSignal;
   }
 
   /**
-   * @copydoc DevelActor::InterceptTouchedSignal()
+   * @copydoc Dali::Actor::HoverEventSignal()
    */
-  Dali::Actor::TouchEventSignalType& InterceptTouchedSignal()
+  Dali::Actor::HoverEventSignalType& HoverEventSignal()
   {
-    return mInterceptTouchedSignal;
-  }
-
-  /**
-   * @copydoc Dali::Actor::TouchedSignal()
-   */
-  Dali::Actor::TouchEventSignalType& TouchedSignal()
-  {
-    return mTouchedSignal;
-  }
-
-  /**
-   * @copydoc Dali::Actor::HoveredSignal()
-   */
-  Dali::Actor::HoverSignalType& HoveredSignal()
-  {
-    return mHoveredSignal;
-  }
-
-  /**
-   * @copydoc DevelActor::InterceptWheelSignal()
-   */
-  Dali::Actor::WheelEventSignalType& InterceptWheelSignal()
-  {
-    return mInterceptWheelSignal;
+    return mHoverEventSignal;
   }
 
   /**
@@ -1592,43 +1568,61 @@ public:
   }
 
   /**
-   * @copydoc Dali::Actor::OnSceneSignal()
+   * @copydoc Dali::Actor::InterceptTouchEventSignal()
    */
-  Dali::Actor::OnSceneSignalType& OnSceneSignal()
+  Dali::Actor::TouchEventSignalType& InterceptTouchEventSignal()
   {
-    return mOnSceneSignal;
+    return mInterceptTouchEventSignal;
   }
 
   /**
-   * @copydoc Dali::Actor::OffSceneSignal()
+   * @copydoc Dali::Actor::InterceptWheelEventSignal()
    */
-  Dali::Actor::OffSceneSignalType& OffSceneSignal()
+  Dali::Actor::WheelEventSignalType& InterceptWheelEventSignal()
   {
-    return mOffSceneSignal;
+    return mInterceptWheelEventSignal;
   }
 
   /**
-   * @copydoc Dali::Actor::OnRelayoutSignal()
+   * @copydoc Dali::Actor::SceneConnectedSignal()
    */
-  Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal()
+  Dali::Actor::SceneConnectedSignalType& SceneConnectedSignal()
   {
-    return mOnRelayoutSignal;
+    return mSceneConnectedSignal;
   }
 
   /**
-   * @copydoc DevelActor::VisibilityChangedSignal
+   * @copydoc Dali::Actor::SceneDisconnectedSignal()
    */
-  DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal()
+  Dali::Actor::SceneDisconnectedSignalType& SceneDisconnectedSignal()
+  {
+    return mSceneDisconnectedSignal;
+  }
+
+  /**
+   * @copydoc Dali::Actor::ChildAddedSignal()
+   */
+  Dali::Actor::ChildAddedSignalType& ChildAddedSignal();
+
+  /**
+   * @copydoc Dali::Actor::ChildRemovedSignal()
+   */
+  Dali::Actor::ChildRemovedSignalType& ChildRemovedSignal();
+
+  /**
+   * @copydoc Dali::Actor::VisibilityChangedSignal()
+   */
+  Dali::Actor::VisibilityChangedSignalType& VisibilityChangedSignal()
   {
     return mVisibilityChangedSignal;
   }
 
   /**
-   * @copydoc DevelActor::InheritedVisibilityChangedSignal
+   * @copydoc DevelActor::EffectiveVisibilityChangedSignal
    */
-  Dali::Actor::InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal()
+  Dali::Actor::EffectiveVisibilityChangedSignalType& EffectiveVisibilityChangedSignal()
   {
-    return mInheritedVisibilityChangedSignal;
+    return mEffectiveVisibilityChangedSignal;
   }
 
   /**
@@ -1640,14 +1634,20 @@ public:
   }
 
   /**
-   * @copydoc DevelActor::ChildAddedSignal
+   * @copydoc DevelActor::OnRelayoutSignal()
    */
-  DevelActor::ChildChangedSignalType& ChildAddedSignal();
+  DevelActor::OnRelayoutSignalType& OnRelayoutSignal()
+  {
+    return mOnRelayoutSignal;
+  }
 
   /**
-   * @copydoc DevelActor::ChildRemovedSignal
+   * @copydoc DevelActor::HitTestResultSignal()
    */
-  DevelActor::ChildChangedSignalType& ChildRemovedSignal();
+  Dali::Actor::TouchEventSignalType& HitTestResultSignal()
+  {
+    return mHitTestResultSignal;
+  }
 
   /**
    * @copydoc DevelActor::ChildOrderChangedSignal
@@ -1818,7 +1818,7 @@ public:
    * @param[in] visible The new visibility flag.
    * @param[in] sendMessage Whether to send a message to the update thread or not.
    */
-  void EmitInheritedVisibilityChangedSignalRecursively(bool visible);
+  void EmitEffectiveVisibilityChangedSignalRecursively(bool visible);
 
 public:
   // Default property extensions from Object
@@ -2143,16 +2143,16 @@ protected:
   ActorGestureData*  mGestureData;    ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
-  Dali::Actor::TouchEventSignalType                 mInterceptTouchedSignal;
-  Dali::Actor::TouchEventSignalType                 mTouchedSignal;
-  Dali::Actor::HoverSignalType                      mHoveredSignal;
-  Dali::Actor::WheelEventSignalType                 mInterceptWheelSignal;
+  Dali::Actor::TouchEventSignalType                 mTouchEventSignal;
+  Dali::Actor::HoverEventSignalType                 mHoverEventSignal;
   Dali::Actor::WheelEventSignalType                 mWheelEventSignal;
-  Dali::Actor::OnSceneSignalType                    mOnSceneSignal;
-  Dali::Actor::OffSceneSignalType                   mOffSceneSignal;
-  Dali::Actor::OnRelayoutSignalType                 mOnRelayoutSignal;
-  DevelActor::VisibilityChangedSignalType           mVisibilityChangedSignal;
-  Dali::Actor::InheritedVisibilityChangedSignalType mInheritedVisibilityChangedSignal;
+  Dali::Actor::TouchEventSignalType                 mInterceptTouchEventSignal;
+  Dali::Actor::WheelEventSignalType                 mInterceptWheelEventSignal;
+  Dali::Actor::SceneConnectedSignalType             mSceneConnectedSignal;
+  Dali::Actor::SceneDisconnectedSignalType          mSceneDisconnectedSignal;
+  DevelActor::OnRelayoutSignalType                  mOnRelayoutSignal;
+  Dali::Actor::VisibilityChangedSignalType          mVisibilityChangedSignal;
+  Dali::Actor::EffectiveVisibilityChangedSignalType mEffectiveVisibilityChangedSignal;
   Dali::Actor::LayoutDirectionChangedSignalType     mLayoutDirectionChangedSignal;
   Dali::Actor::TouchEventSignalType                 mHitTestResultSignal;
 
@@ -2177,7 +2177,7 @@ protected:
   bool       mKeyboardFocusableChildren : 1; ///< Whether the children of this actor can be focusable by keyboard navigation.
   bool       mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
 
-  bool mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
+  bool mSceneConnectedSignalled : 1;   ///< Set to true before SceneConnected signal is emitted, and false before SceneDisconnected
   bool mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
   bool mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.

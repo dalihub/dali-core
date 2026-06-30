@@ -211,14 +211,14 @@ bool Actor::IsIgnored() const
   return GetImplementation(*this).IsIgnored();
 }
 
-Actor::TouchEventSignalType& Actor::TouchedSignal()
+Actor::TouchEventSignalType& Actor::TouchEventSignal()
 {
-  return GetImplementation(*this).TouchedSignal();
+  return GetImplementation(*this).TouchEventSignal();
 }
 
-Actor::HoverSignalType& Actor::HoveredSignal()
+Actor::HoverEventSignalType& Actor::HoverEventSignal()
 {
-  return GetImplementation(*this).HoveredSignal();
+  return GetImplementation(*this).HoverEventSignal();
 }
 
 Actor::WheelEventSignalType& Actor::WheelEventSignal()
@@ -226,14 +226,49 @@ Actor::WheelEventSignalType& Actor::WheelEventSignal()
   return GetImplementation(*this).WheelEventSignal();
 }
 
-Actor::OnSceneSignalType& Actor::OnSceneSignal()
+Actor::TouchEventSignalType& Actor::InterceptTouchEventSignal()
 {
-  return GetImplementation(*this).OnSceneSignal();
+  return GetImplementation(*this).InterceptTouchEventSignal();
 }
 
-Actor::OffSceneSignalType& Actor::OffSceneSignal()
+Actor::WheelEventSignalType& Actor::InterceptWheelEventSignal()
 {
-  return GetImplementation(*this).OffSceneSignal();
+  return GetImplementation(*this).InterceptWheelEventSignal();
+}
+
+Actor::SceneConnectedSignalType& Actor::SceneConnectedSignal()
+{
+  return GetImplementation(*this).SceneConnectedSignal();
+}
+
+Actor::SceneDisconnectedSignalType& Actor::SceneDisconnectedSignal()
+{
+  return GetImplementation(*this).SceneDisconnectedSignal();
+}
+
+Actor::ChildAddedSignalType& Actor::ChildAddedSignal()
+{
+  return GetImplementation(*this).ChildAddedSignal();
+}
+
+Actor::ChildRemovedSignalType& Actor::ChildRemovedSignal()
+{
+  return GetImplementation(*this).ChildRemovedSignal();
+}
+
+Actor::VisibilityChangedSignalType& Actor::VisibilityChangedSignal()
+{
+  return GetImplementation(*this).VisibilityChangedSignal();
+}
+
+Actor::EffectiveVisibilityChangedSignalType& Actor::EffectiveVisibilityChangedSignal()
+{
+  return GetImplementation(*this).EffectiveVisibilityChangedSignal();
+}
+
+Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
+{
+  return GetImplementation(*this).LayoutDirectionChangedSignal();
 }
 
 uint32_t Actor::AddRenderer(Renderer& renderer)
@@ -275,21 +310,6 @@ uint32_t Actor::GetCacheRendererCount() const
 void Actor::RemoveCacheRenderer(Renderer& renderer)
 {
   GetImplementation(*this).RemoveCacheRenderer(GetImplementation(renderer));
-}
-
-Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
-{
-  return GetImplementation(*this).OnRelayoutSignal();
-}
-
-Actor::LayoutDirectionChangedSignalType& Actor::LayoutDirectionChangedSignal()
-{
-  return GetImplementation(*this).LayoutDirectionChangedSignal();
-}
-
-Actor::InheritedVisibilityChangedSignalType& Actor::InheritedVisibilityChangedSignal()
-{
-  return GetImplementation(*this).InheritedVisibilityChangedSignal();
 }
 
 Actor::Actor(Internal::Actor* internal)

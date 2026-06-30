@@ -259,7 +259,7 @@ int UtcDaliLongPressGestureDetectorNew(void)
   detector.Attach(actor);
 
   TouchEventFunctor touchFunctor;
-  actor.TouchedSignal().Connect(&application, touchFunctor);
+  actor.TouchEventSignal().Connect(&application, touchFunctor);
 
   Dali::Integration::TouchEvent touchEvent(1);
   Dali::Integration::Point      point;

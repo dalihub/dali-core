@@ -41,7 +41,7 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_WHEEL_PROCESSOR");
 #endif
 
-Dali::Actor EmitInterceptWheelSignals(Dali::Actor actor, const Dali::WheelEvent& wheelEvent)
+Dali::Actor EmitInterceptWheelEventSignals(Dali::Actor actor, const Dali::WheelEvent& wheelEvent)
 {
   Dali::Actor interceptedActor;
 
@@ -51,7 +51,7 @@ Dali::Actor EmitInterceptWheelSignals(Dali::Actor actor, const Dali::WheelEvent&
     if(parent)
     {
       // Recursively deliver events to the actor and its parents for intercept wheel event.
-      interceptedActor = EmitInterceptWheelSignals(parent, wheelEvent);
+      interceptedActor = EmitInterceptWheelEventSignals(parent, wheelEvent);
     }
 
     if(!interceptedActor)
@@ -182,7 +182,7 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
     Dali::Actor consumedActor;
 
     // Emit the intercept wheel event signal
-    Dali::Actor interceptedActor = EmitInterceptWheelSignals(hitTestResults.actor, wheelEventHandle);
+    Dali::Actor interceptedActor = EmitInterceptWheelEventSignals(hitTestResults.actor, wheelEventHandle);
     if(interceptedActor)
     {
       consumedActor = EmitWheelSignals(interceptedActor, wheelEventHandle);

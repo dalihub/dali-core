@@ -267,7 +267,7 @@ int UtcDaliTapGestureDetectorNew(void)
   detector.Attach(actor);
 
   TouchEventFunctor touchFunctor;
-  actor.TouchedSignal().Connect(&application, touchFunctor);
+  actor.TouchEventSignal().Connect(&application, touchFunctor);
 
   Dali::Integration::TouchEvent touchEvent(1);
   Dali::Integration::Point      point;
@@ -576,7 +576,7 @@ int UtcDaliTapGestureSignalReceptionChildHit(void)
   parent.Add(child);
 
   TouchEventFunctor touchFunctor;
-  child.TouchedSignal().Connect(&application, touchFunctor);
+  child.TouchEventSignal().Connect(&application, touchFunctor);
 
   // Render and notify
   application.SendNotification();
@@ -1192,7 +1192,8 @@ int UtcDaliTapGestureGetSourceSubType(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   // Helper: emit a touch tap with the given subclass; source=1 (PRIMARY) triggers the recognizer source update.
-  auto EmitTouchTapWithSubclass = [&](Device::Subclass::Type subclass) {
+  auto EmitTouchTapWithSubclass = [&](Device::Subclass::Type subclass)
+  {
     Dali::Integration::TouchEvent ev;
     Dali::Integration::Point      p;
     p.SetState(PointState::DOWN);
