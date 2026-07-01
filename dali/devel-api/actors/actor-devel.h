@@ -30,81 +30,87 @@ namespace Property
 {
 enum Type
 {
-  PARENT_ORIGIN            = Dali::Actor::Property::PARENT_ORIGIN,
-  PARENT_ORIGIN_X          = Dali::Actor::Property::PARENT_ORIGIN_X,
-  PARENT_ORIGIN_Y          = Dali::Actor::Property::PARENT_ORIGIN_Y,
-  PARENT_ORIGIN_Z          = Dali::Actor::Property::PARENT_ORIGIN_Z,
-  PIVOT                    = Dali::Actor::Property::PIVOT,
-  PIVOT_X                  = Dali::Actor::Property::PIVOT_X,
-  PIVOT_Y                  = Dali::Actor::Property::PIVOT_Y,
-  PIVOT_Z                  = Dali::Actor::Property::PIVOT_Z,
-  SIZE                     = Dali::Actor::Property::SIZE,
-  SIZE_WIDTH               = Dali::Actor::Property::SIZE_WIDTH,
-  SIZE_HEIGHT              = Dali::Actor::Property::SIZE_HEIGHT,
-  SIZE_DEPTH               = Dali::Actor::Property::SIZE_DEPTH,
-  POSITION                 = Dali::Actor::Property::POSITION,
-  POSITION_X               = Dali::Actor::Property::POSITION_X,
-  POSITION_Y               = Dali::Actor::Property::POSITION_Y,
-  POSITION_Z               = Dali::Actor::Property::POSITION_Z,
-  WORLD_POSITION           = Dali::Actor::Property::WORLD_POSITION,
-  WORLD_POSITION_X         = Dali::Actor::Property::WORLD_POSITION_X,
-  WORLD_POSITION_Y         = Dali::Actor::Property::WORLD_POSITION_Y,
-  WORLD_POSITION_Z         = Dali::Actor::Property::WORLD_POSITION_Z,
-  ORIENTATION              = Dali::Actor::Property::ORIENTATION,
-  WORLD_ORIENTATION        = Dali::Actor::Property::WORLD_ORIENTATION,
-  SCALE                    = Dali::Actor::Property::SCALE,
-  SCALE_X                  = Dali::Actor::Property::SCALE_X,
-  SCALE_Y                  = Dali::Actor::Property::SCALE_Y,
-  SCALE_Z                  = Dali::Actor::Property::SCALE_Z,
-  WORLD_SCALE              = Dali::Actor::Property::WORLD_SCALE,
-  VISIBLE                  = Dali::Actor::Property::VISIBLE,
-  COLOR                    = Dali::Actor::Property::COLOR,
-  COLOR_RED                = Dali::Actor::Property::COLOR_RED,
-  COLOR_GREEN              = Dali::Actor::Property::COLOR_GREEN,
-  COLOR_BLUE               = Dali::Actor::Property::COLOR_BLUE,
-  COLOR_ALPHA              = Dali::Actor::Property::COLOR_ALPHA,
-  WORLD_COLOR              = Dali::Actor::Property::WORLD_COLOR,
-  WORLD_MATRIX             = Dali::Actor::Property::WORLD_MATRIX,
-  NAME                     = Dali::Actor::Property::NAME,
-  SENSITIVE                = Dali::Actor::Property::SENSITIVE,
-  LEAVE_REQUIRED           = Dali::Actor::Property::LEAVE_REQUIRED,
-  INHERIT_ORIENTATION      = Dali::Actor::Property::INHERIT_ORIENTATION,
-  INHERIT_SCALE            = Dali::Actor::Property::INHERIT_SCALE,
-  COLOR_MODE               = Dali::Actor::Property::COLOR_MODE,
-  DRAW_MODE                = Dali::Actor::Property::DRAW_MODE,
-  SIZE_MODE_FACTOR         = Dali::Actor::Property::SIZE_MODE_FACTOR,
-  WIDTH_RESIZE_POLICY      = Dali::Actor::Property::WIDTH_RESIZE_POLICY,
-  HEIGHT_RESIZE_POLICY     = Dali::Actor::Property::HEIGHT_RESIZE_POLICY,
-  SIZE_SCALE_POLICY        = Dali::Actor::Property::SIZE_SCALE_POLICY,
-  WIDTH_FOR_HEIGHT         = Dali::Actor::Property::WIDTH_FOR_HEIGHT,
-  HEIGHT_FOR_WIDTH         = Dali::Actor::Property::HEIGHT_FOR_WIDTH,
-  PADDING                  = Dali::Actor::Property::PADDING,
-  MINIMUM_SIZE             = Dali::Actor::Property::MINIMUM_SIZE,
-  MAXIMUM_SIZE             = Dali::Actor::Property::MAXIMUM_SIZE,
-  INHERIT_POSITION         = Dali::Actor::Property::INHERIT_POSITION,
-  CLIPPING_MODE            = Dali::Actor::Property::CLIPPING_MODE,
-  LAYOUT_DIRECTION         = Dali::Actor::Property::LAYOUT_DIRECTION,
-  INHERIT_LAYOUT_DIRECTION = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
-  OPACITY                  = Dali::Actor::Property::OPACITY,
-  SCREEN_POSITION          = Dali::Actor::Property::SCREEN_POSITION,
-  POSITION_USES_PIVOT      = Dali::Actor::Property::POSITION_USES_PIVOT,
-  CULLED                   = Dali::Actor::Property::CULLED,
-  ID                       = Dali::Actor::Property::ID,
-  HIERARCHY_DEPTH          = Dali::Actor::Property::HIERARCHY_DEPTH,
-  IS_ROOT                  = Dali::Actor::Property::IS_ROOT,
-  IS_LAYER                 = Dali::Actor::Property::IS_LAYER,
-  CONNECTED_TO_SCENE       = Dali::Actor::Property::CONNECTED_TO_SCENE,
-  KEYBOARD_FOCUSABLE       = Dali::Actor::Property::KEYBOARD_FOCUSABLE,
-  UPDATE_AREA_HINT         = Dali::Actor::Property::UPDATE_AREA_HINT,
+  PARENT_ORIGIN                   = Dali::Actor::Property::PARENT_ORIGIN,
+  PARENT_ORIGIN_X                 = Dali::Actor::Property::PARENT_ORIGIN_X,
+  PARENT_ORIGIN_Y                 = Dali::Actor::Property::PARENT_ORIGIN_Y,
+  PARENT_ORIGIN_Z                 = Dali::Actor::Property::PARENT_ORIGIN_Z,
+  PIVOT                           = Dali::Actor::Property::PIVOT,
+  PIVOT_X                         = Dali::Actor::Property::PIVOT_X,
+  PIVOT_Y                         = Dali::Actor::Property::PIVOT_Y,
+  PIVOT_Z                         = Dali::Actor::Property::PIVOT_Z,
+  SIZE                            = Dali::Actor::Property::SIZE,
+  SIZE_WIDTH                      = Dali::Actor::Property::SIZE_WIDTH,
+  SIZE_HEIGHT                     = Dali::Actor::Property::SIZE_HEIGHT,
+  SIZE_DEPTH                      = Dali::Actor::Property::SIZE_DEPTH,
+  POSITION                        = Dali::Actor::Property::POSITION,
+  POSITION_X                      = Dali::Actor::Property::POSITION_X,
+  POSITION_Y                      = Dali::Actor::Property::POSITION_Y,
+  POSITION_Z                      = Dali::Actor::Property::POSITION_Z,
+  WORLD_POSITION                  = Dali::Actor::Property::WORLD_POSITION,
+  WORLD_POSITION_X                = Dali::Actor::Property::WORLD_POSITION_X,
+  WORLD_POSITION_Y                = Dali::Actor::Property::WORLD_POSITION_Y,
+  WORLD_POSITION_Z                = Dali::Actor::Property::WORLD_POSITION_Z,
+  ORIENTATION                     = Dali::Actor::Property::ORIENTATION,
+  WORLD_ORIENTATION               = Dali::Actor::Property::WORLD_ORIENTATION,
+  SCALE                           = Dali::Actor::Property::SCALE,
+  SCALE_X                         = Dali::Actor::Property::SCALE_X,
+  SCALE_Y                         = Dali::Actor::Property::SCALE_Y,
+  SCALE_Z                         = Dali::Actor::Property::SCALE_Z,
+  WORLD_SCALE                     = Dali::Actor::Property::WORLD_SCALE,
+  VISIBLE                         = Dali::Actor::Property::VISIBLE,
+  COLOR                           = Dali::Actor::Property::COLOR,
+  COLOR_RED                       = Dali::Actor::Property::COLOR_RED,
+  COLOR_GREEN                     = Dali::Actor::Property::COLOR_GREEN,
+  COLOR_BLUE                      = Dali::Actor::Property::COLOR_BLUE,
+  COLOR_ALPHA                     = Dali::Actor::Property::COLOR_ALPHA,
+  WORLD_COLOR                     = Dali::Actor::Property::WORLD_COLOR,
+  WORLD_MATRIX                    = Dali::Actor::Property::WORLD_MATRIX,
+  NAME                            = Dali::Actor::Property::NAME,
+  SENSITIVE                       = Dali::Actor::Property::SENSITIVE,
+  LEAVE_REQUIRED                  = Dali::Actor::Property::LEAVE_REQUIRED,
+  TOUCH_HIT_AREA_MARGIN           = Dali::Actor::Property::TOUCH_HIT_AREA_MARGIN,
+  ALLOW_SELF_INITIATED_TOUCH_ONLY = Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY,
+  DISPATCH_TOUCH_MOTION           = Dali::Actor::Property::DISPATCH_TOUCH_MOTION,
+  DISPATCH_HOVER_MOTION           = Dali::Actor::Property::DISPATCH_HOVER_MOTION,
+  INHERIT_ORIENTATION             = Dali::Actor::Property::INHERIT_ORIENTATION,
+  INHERIT_SCALE                   = Dali::Actor::Property::INHERIT_SCALE,
+  COLOR_MODE                      = Dali::Actor::Property::COLOR_MODE,
+  DRAW_MODE                       = Dali::Actor::Property::DRAW_MODE,
+  BLEND_EQUATION                  = Dali::Actor::Property::BLEND_EQUATION,
+  SIZE_MODE_FACTOR                = Dali::Actor::Property::SIZE_MODE_FACTOR,
+  WIDTH_RESIZE_POLICY             = Dali::Actor::Property::WIDTH_RESIZE_POLICY,
+  HEIGHT_RESIZE_POLICY            = Dali::Actor::Property::HEIGHT_RESIZE_POLICY,
+  SIZE_SCALE_POLICY               = Dali::Actor::Property::SIZE_SCALE_POLICY,
+  WIDTH_FOR_HEIGHT                = Dali::Actor::Property::WIDTH_FOR_HEIGHT,
+  HEIGHT_FOR_WIDTH                = Dali::Actor::Property::HEIGHT_FOR_WIDTH,
+  PADDING                         = Dali::Actor::Property::PADDING,
+  MINIMUM_SIZE                    = Dali::Actor::Property::MINIMUM_SIZE,
+  MAXIMUM_SIZE                    = Dali::Actor::Property::MAXIMUM_SIZE,
+  INHERIT_POSITION                = Dali::Actor::Property::INHERIT_POSITION,
+  CLIPPING_MODE                   = Dali::Actor::Property::CLIPPING_MODE,
+  LAYOUT_DIRECTION                = Dali::Actor::Property::LAYOUT_DIRECTION,
+  INHERIT_LAYOUT_DIRECTION        = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
+  OPACITY                         = Dali::Actor::Property::OPACITY,
+  SCREEN_POSITION                 = Dali::Actor::Property::SCREEN_POSITION,
+  POSITION_USES_PIVOT             = Dali::Actor::Property::POSITION_USES_PIVOT,
+  CULLED                          = Dali::Actor::Property::CULLED,
+  IGNORED                         = Dali::Actor::Property::IGNORED,
+  ID                              = Dali::Actor::Property::ID,
+  HIERARCHY_DEPTH                 = Dali::Actor::Property::HIERARCHY_DEPTH,
+  IS_ROOT                         = Dali::Actor::Property::IS_ROOT,
+  IS_LAYER                        = Dali::Actor::Property::IS_LAYER,
+  CONNECTED_TO_SCENE              = Dali::Actor::Property::CONNECTED_TO_SCENE,
+  KEYBOARD_FOCUSABLE              = Dali::Actor::Property::KEYBOARD_FOCUSABLE,
+  UPDATE_AREA_HINT                = Dali::Actor::Property::UPDATE_AREA_HINT,
 
   /**
-   * @brief Sets the sibling order of the actor so depth position can be defined within the same parent.
+   * @brief The draw order of this actor among its siblings; higher values are drawn on top.
    * @details Name "siblingOrder", type Property::INTEGER.
    * @note The initial value is 0.
-   * @note Raise, Lower, RaiseToTop, LowerToBottom, RaiseAbove and LowerBelow will override the
-   * sibling order. The values set by this Property will likely change.
+   * @note Calling Raise, Lower, RaiseToTop, LowerToBottom, RaiseAbove, or LowerBelow will
+   *       modify this value automatically.
    */
-  SIBLING_ORDER,
+  SIBLING_ORDER = Dali::Actor::Property::UPDATE_AREA_HINT + 1,
 
   /**
    * @brief If this actor receives a touch-start event, then all following touch events are sent to this actor until a touch-end.
@@ -112,48 +118,6 @@ enum Type
    * @note Default is false, i.e. actor under touch event will receive the touch even if touch started on this actor
    */
   CAPTURE_ALL_TOUCH_AFTER_START,
-
-  /**
-   * @brief If you set the TOUCH_AREA_MARGIN on an actor, when you touch the actor, the touch area is expand from the size of actor.
-   * @details Name "touchAreaMargin", type Property::EXTENTS.
-   * For example
-   * @code{.cpp}
-   *  Actor actor = Actor::New();
-   *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
-   *  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(10, 20, 30, 40));
-   *  actor.TouchEventSignal().Connect(OnTouchCallback);
-   *
-   * +---------------------+
-   * |         ^           |
-   * |         |           |
-   * |         |  30       |
-   * |         |           |
-   * |    +----+----+      |
-   * |    |         |      |
-   * | 10 |         | 20   |
-   * |<---+         +----->|
-   * |    |         |      |
-   * |    |         |      |
-   * |    +----+----+      |
-   * |         |           |
-   * |         |           |
-   * |         | 40        |
-   * |         |           |
-   * |         v           |
-   * +---------------------+
-   * @endcode
-   * The actual touched size is actor.width + touchAreaOffset.start + touchAreaOffset.end and actor.height + touchAreaOffset.top + touchAreaOffset.bottom
-   */
-  TOUCH_AREA_MARGIN,
-
-  /**
-   * @brief Determines which blend equation will be used to render renderers of this actor.
-   * @pre To use Advanced Blend Equation(DevelBlendEquation::MULTIPLY ~ DevelBlendEquation::LUMINOSITY), the color to be rendered should be pre-multipled alpha.
-   * @details Name "blendEquation", type Property::INTEGER.
-   * @note Color of each renderer will be blended with rendering framebuffer.
-   * @note To check the blend equation is supported in the system, use Dali::Capabilities::IsBlendEquationSupported
-   */
-  BLEND_EQUATION,
 
   /**
    * @brief Sets whether this actor can focus by touch. If user sets this to true, the actor will be focused when user touch it.
@@ -181,32 +145,11 @@ enum Type
   USER_INTERACTION_ENABLED,
 
   /**
-   * @brief It only receive for touch events that started from itself.
-   * @details Name "allowOnlyOwnTouch", type Property::BOOLEAN
-   * @note Default is false.
-   */
-  ALLOW_ONLY_OWN_TOUCH,
-
-  /**
    * @brief Whether the actor uses the update area of the texture instead of its own.
    * @details Name "useTextureUpdateArea", type Property::BOOLEAN
    * @note Default is false. If this set true, the value of Actor::Property::UPDATE_AREA_HINT is ignored and we assume the sizes of the actor and the texture are same.
    */
   USE_TEXTURE_UPDATE_AREA,
-
-  /**
-   * @brief Whether to send touch motion events or not.
-   * @details Name "dispatchTouchMotion", type Property::BOOLEAN
-   * @note Default is true.
-   */
-  DISPATCH_TOUCH_MOTION,
-
-  /**
-   * @brief Whether to send hover motion events or not.
-   * @details Name "dispatchHoverMotion", type Property::BOOLEAN
-   * @note Default is true.
-   */
-  DISPATCH_HOVER_MOTION,
 
   /**
    * @brief The policy of depth index generate.
@@ -215,14 +158,6 @@ enum Type
    * @note Only has effort under Behavior::LAYER_UI.
    */
   CHILDREN_DEPTH_INDEX_POLICY,
-
-  /**
-   * @brief The flag to identify whether the Actor and it's descendants are ignored or not.
-   * If true, it will not be rendered and will be excluded from render thread computation.
-   * @details Name "ignored", type Property::BOOLEAN
-   * @note Default is false.
-   */
-  IGNORED,
 
   /**
    * @brief The flag to identify whether the Actor is ignored or not at previous frame.
@@ -276,53 +211,6 @@ enum Type
  * @return The actor who trigger the visibility changed signal.
  */
 DALI_CORE_API Actor GetVisiblityChangedActor();
-
-/**
- * @brief Calculate the current position of the actor in screen coordinates using event-side properties.
- *
- * This function calculates the screen coordinates of an actor by automatically detecting
- * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
- *
- * For 2D calculation (when no 3D layers in ancestors):
- * - Uses 2D-specific optimizations
- * - Assumes orthographic projection and no camera rotation
- * - Z coordinates are treated as 0 for screen position calculation
- * - Faster calculation with 2D limitations
- *
- * For 3D calculation (when 3D layers exist in ancestors):
- * - Uses full 3D projection with view and projection matrices
- * - Supports perspective projection, camera rotation, and full 3D transforms
- * - Considers Z depth for proper screen coordinate projection
- * - More accurate but computationally expensive
- *
- * @return Returns the screen position of actor. Returns (0,0) if actor is not on scene.
- */
-DALI_CORE_API Vector2 CalculateScreenPosition(Actor actor);
-
-/**
- * Calculates screen position and size using event-side properties.
- *
- * This function calculates the bounding box screen coordinates and size of an actor
- * by automatically detecting whether to use 2D or 3D calculation based on the
- * actor's context and ancestor layers.
- *
- * For 2D calculation (when no 3D layers in ancestors):
- * - Uses 2D-specific optimizations
- * - Assumes orthographic projection and no camera rotation
- * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
- * - Faster calculation with 2D limitations
- *
- * For 3D calculation (when 3D layers exist in ancestors):
- * - Uses full 3D projection with view and projection matrices
- * - Supports perspective projection, camera rotation, and full 3D transforms
- * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
- * - Accounts for perspective foreshortening and 3D rotation effects
- * - More accurate but computationally expensive
- *
- * @return Rect containing position of top-left corner on screen and size respectively.
- *         Returns (0,0,0,0) if actor is not on scene.
- */
-DALI_CORE_API Bounds CalculateScreenExtents(Actor actor);
 
 /**
  * Calculates screen position and size from current node values.

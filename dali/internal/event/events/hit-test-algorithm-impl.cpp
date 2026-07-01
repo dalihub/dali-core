@@ -151,8 +151,8 @@ struct ActorTouchableCheck : public HitTestInterface
 
   bool ActorRequiresHitResultCheck(Actor* actor, Vector2 hitPointLocal) override
   {
-    // The Geometry way behaves like AllowedOnlyOwnTouch is enabled.
-    if(GetPoint().GetState() != PointState::STARTED && (GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY || actor->IsAllowedOnlyOwnTouch()) && ownActor != actor)
+    // The Geometry way behaves like AllowSelfInitiatedTouchOnly is enabled.
+    if(GetPoint().GetState() != PointState::STARTED && (GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY || actor->IsAllowSelfInitiatedTouchOnly()) && ownActor != actor)
     {
       return false;
     }

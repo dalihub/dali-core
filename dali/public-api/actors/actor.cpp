@@ -146,6 +146,16 @@ bool Actor::ScreenToLocal(float& localX, float& localY, float screenX, float scr
   return GetImplementation(*this).ScreenToLocal(localX, localY, screenX, screenY);
 }
 
+Vector2 Actor::CalculateScreenPosition() const
+{
+  return GetImplementation(*this).CalculateScreenPosition();
+}
+
+Bounds Actor::CalculateScreenExtents() const
+{
+  return GetImplementation(*this).CalculateScreenExtents();
+}
+
 void Actor::Raise()
 {
   GetImplementation(*this).Raise();

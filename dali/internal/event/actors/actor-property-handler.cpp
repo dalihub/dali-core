@@ -584,13 +584,13 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_AREA_MARGIN:
+    case Dali::Actor::Property::TOUCH_HIT_AREA_MARGIN:
     {
-      CheckValidAndSet(property, actor, &Actor::SetTouchAreaMargin);
+      CheckValidAndSet(property, actor, &Actor::SetTouchHitAreaMargin);
       break;
     }
 
-    case Dali::DevelActor::Property::BLEND_EQUATION:
+    case Dali::Actor::Property::BLEND_EQUATION:
     {
       CheckValidAndSet(property, actor, &Actor::SetBlendEquation);
       break;
@@ -614,10 +614,10 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH:
+    case Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
-      { actor.mAllowOnlyOwnTouch = value; });
+      { actor.mAllowSelfInitiatedTouchOnly = value; });
       break;
     }
 
@@ -632,14 +632,14 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION:
+    case Dali::Actor::Property::DISPATCH_TOUCH_MOTION:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
       { actor.mDispatchTouchMotion = value; });
       break;
     }
 
-    case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
+    case Dali::Actor::Property::DISPATCH_HOVER_MOTION:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
       { actor.mDispatchHoverMotion = value; });
@@ -656,7 +656,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::IGNORED:
+    case Dali::Actor::Property::IGNORED:
     {
       CheckValidAndSet<bool>(property, [&actor](bool value)
       {
@@ -1091,7 +1091,7 @@ const PropertyInputImpl* Actor::PropertyHandler::GetSceneObjectInputProperty(Pro
       property = &node.mCulled;
       break;
     }
-    case Dali::DevelActor::Property::IGNORED:
+    case Dali::Actor::Property::IGNORED:
     {
       property = &node.mIgnored;
       break;
@@ -1528,13 +1528,13 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_AREA_MARGIN:
+    case Dali::Actor::Property::TOUCH_HIT_AREA_MARGIN:
     {
-      value = actor.GetTouchAreaMargin();
+      value = actor.GetTouchHitAreaMargin();
       break;
     }
 
-    case Dali::DevelActor::Property::BLEND_EQUATION:
+    case Dali::Actor::Property::BLEND_EQUATION:
     {
       value = actor.GetBlendEquation();
       break;
@@ -1558,9 +1558,9 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH:
+    case Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY:
     {
-      value = actor.mAllowOnlyOwnTouch;
+      value = actor.mAllowSelfInitiatedTouchOnly;
       break;
     }
 
@@ -1570,13 +1570,13 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION:
+    case Dali::Actor::Property::DISPATCH_TOUCH_MOTION:
     {
       value = actor.mDispatchTouchMotion;
       break;
     }
 
-    case Dali::DevelActor::Property::DISPATCH_HOVER_MOTION:
+    case Dali::Actor::Property::DISPATCH_HOVER_MOTION:
     {
       value = actor.mDispatchHoverMotion;
       break;
@@ -1588,7 +1588,7 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::IGNORED:
+    case Dali::Actor::Property::IGNORED:
     {
       value = actor.IsIgnored();
       break;
@@ -1794,7 +1794,7 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
       break;
     }
 
-    case Dali::DevelActor::Property::IGNORED:
+    case Dali::Actor::Property::IGNORED:
     {
       value = actor.GetNode().IsIgnored();
       break;

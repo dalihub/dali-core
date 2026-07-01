@@ -386,7 +386,7 @@ void ParsePrimaryTouchPoint(
       {
         capturingTouchActorObserver.SetActor(hitActor);
       }
-      if(hitActor->IsAllowedOnlyOwnTouch() || isGeometry)
+      if(hitActor->IsAllowSelfInitiatedTouchOnly() || isGeometry)
       {
         ownTouchActorObserver.SetActor(hitActor);
       }

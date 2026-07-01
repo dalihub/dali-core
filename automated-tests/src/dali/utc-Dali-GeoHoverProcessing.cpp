@@ -695,8 +695,8 @@ int UtcDaliGeoHoverLeaveWithDispatchMotion(void)
   rootActor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
 
   // Sets the dispatch hover motion property to false. This means that hover motion events are not recived
-  actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, false);
-  rootActor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, false);
+  actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, false);
+  rootActor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, false);
 
   // Emit a started signal
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));

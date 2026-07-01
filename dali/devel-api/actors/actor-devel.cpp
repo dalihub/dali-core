@@ -24,16 +24,6 @@ namespace Dali
 {
 namespace DevelActor
 {
-Vector2 CalculateScreenPosition(Actor actor)
-{
-  return GetImplementation(actor).CalculateScreenPosition();
-}
-
-Bounds CalculateScreenExtents(Actor actor)
-{
-  return GetImplementation(actor).CalculateScreenExtents();
-}
-
 Bounds CalculateCurrentScreenExtents(Actor actor)
 {
   return GetImplementation(actor).CalculateCurrentScreenExtents();

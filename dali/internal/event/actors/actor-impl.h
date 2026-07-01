@@ -1398,30 +1398,30 @@ public:
   }
 
   /**
-   * Sets the touch area margin of an actor.
+   * Sets the touch hit area margin of an actor.
    * @param [in] offset The new extents of area.
    */
-  void SetTouchAreaMargin(const Extents& extents)
+  void SetTouchHitAreaMargin(const Extents& extents)
   {
-    mTouchAreaMargin = extents;
+    mTouchHitAreaMargin = extents;
   }
 
   /**
-   * Retrieve the Actor's touch area margin.
-   * @return The Actor's touch area margin.
+   * Retrieve the Actor's touch hit area margin.
+   * @return The Actor's touch hit area margin.
    */
-  const Extents& GetTouchAreaMargin() const
+  const Extents& GetTouchHitAreaMargin() const
   {
-    return mTouchAreaMargin;
+    return mTouchHitAreaMargin;
   }
 
   /**
-   * Query whether the actor will only receive own touch.
-   * @return true, if it only receives touches that started from itself.
+   * Query whether the actor only receives self-initiated touches.
+   * @return true if only touches that originated on this actor are received.
    */
-  bool IsAllowedOnlyOwnTouch() const
+  bool IsAllowSelfInitiatedTouchOnly() const
   {
-    return mAllowOnlyOwnTouch;
+    return mAllowSelfInitiatedTouchOnly;
   }
 
   /**
@@ -2156,11 +2156,11 @@ protected:
   Dali::Actor::LayoutDirectionChangedSignalType     mLayoutDirectionChangedSignal;
   Dali::Actor::TouchEventSignalType                 mHitTestResultSignal;
 
-  Quaternion mTargetOrientation; ///< Event-side storage for orientation
-  Vector4    mTargetColor;       ///< Event-side storage for color
-  Vector3    mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
-  Vector3    mTargetScale;       ///< Event-side storage for scale
-  Extents    mTouchAreaMargin;   ///< Extents info of touch area margin
+  Quaternion mTargetOrientation;  ///< Event-side storage for orientation
+  Vector4    mTargetColor;        ///< Event-side storage for color
+  Vector3    mTargetPosition;     ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Vector3    mTargetScale;        ///< Event-side storage for scale
+  Extents    mTouchHitAreaMargin; ///< Extents info of touch hit area margin
 
   std::string mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
@@ -2186,13 +2186,13 @@ protected:
   bool mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
   bool mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
 
-  bool mIsBlendEquationSet : 1;     ///< Flag to identify whether the Blend equation is set
-  bool mNeedGesturePropagation : 1; ///< Whether the parent listens for gesture events or not
-  bool mUserInteractionEnabled : 1; ///< Whether the actor should be enabled user interaction.
-  bool mAllowOnlyOwnTouch : 1;      ///< Whether the actor will only receive own touch. it only receives touches that started from itself.
-  bool mUseTextureUpdateArea : 1;   ///< Whether the actor uses the update area of the texture instead of its own.
-  bool mDispatchTouchMotion : 1;    ///< Whether to send touch motion events or not.
-  bool mDispatchHoverMotion : 1;    ///< Whether to send hover motion events or not.
+  bool mIsBlendEquationSet : 1;          ///< Flag to identify whether the Blend equation is set
+  bool mNeedGesturePropagation : 1;      ///< Whether the parent listens for gesture events or not
+  bool mUserInteractionEnabled : 1;      ///< Whether the actor should be enabled user interaction.
+  bool mAllowSelfInitiatedTouchOnly : 1; ///< Whether the actor only receives touches that originated on itself.
+  bool mUseTextureUpdateArea : 1;        ///< Whether the actor uses the update area of the texture instead of its own.
+  bool mDispatchTouchMotion : 1;         ///< Whether to send touch motion events or not.
+  bool mDispatchHoverMotion : 1;         ///< Whether to send hover motion events or not.
   bool mIsRenderTaskMappingActor : 1;
   bool mIgnored : 1; ///< Whether the actor is ignored or not.
 
