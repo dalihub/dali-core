@@ -1440,11 +1440,11 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, bool visible, VisibilityChangeType type );
    * @endcode
+   * actor: The actor, or child of the actor, whose visibility has changed.
+   * visible: If type is VisibilityChangeType::SELF, true means this actor's VISIBLE property became true.
+   *          If type is VisibilityChangeType::PARENT, true means a parent's VISIBLE property changed to true.
+   * type: Whether this actor's own visible property changed (SELF) or a parent's (PARENT).
    * @SINCE_2_5.29
-   * @param[out] actor  The actor, or child of the actor, whose visibility has changed.
-   * @param[out] visible If type is VisibilityChangeType::SELF, true means this actor's VISIBLE property became true.
-   *                     If type is VisibilityChangeType::PARENT, true means a parent's VISIBLE property changed to true.
-   * @param[out] type   Whether this actor's own visible property changed (SELF) or a parent's (PARENT).
    * @return The signal to connect to
    * @pre The Actor has been initialized.
    * @note This signal is NOT emitted if the actor becomes transparent (or the reverse); it is linked only with Actor::Property::VISIBLE.
