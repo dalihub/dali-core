@@ -1607,7 +1607,7 @@ int UtcDaliActorCalculateScreenExtents(void)
   application.Render();
 
   auto expectedExtent = Bounds{1.5f, 1.5f, 1.0f, 1.0f};
-  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  auto actualExtent   = actor.CalculateScreenExtents();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1634,7 +1634,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   application.Render();
 
   auto expectedExtent = Bounds{1.0f, 1.5f, 2.0f, 1.0f};
-  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  auto actualExtent   = actor.CalculateScreenExtents();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1646,7 +1646,7 @@ int UtcDaliActorCalculateScreenExtentsWithRotation(void)
   application.Render();
 
   expectedExtent = Bounds{1.5f, 1.0f, 1.0f, 2.0f};
-  actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  actualExtent   = actor.CalculateScreenExtents();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1712,7 +1712,7 @@ int UtcDaliActorCalculateScreenPositionWithRotation(void)
   application.Render();
 
   auto expectedPosition = Vector2(2.0f, 2.0f);
-  auto actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  auto actualPosition   = actor.CalculateScreenPosition();
   DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
@@ -1722,7 +1722,7 @@ int UtcDaliActorCalculateScreenPositionWithRotation(void)
   application.Render();
 
   expectedPosition = Vector2(2.0f, 2.0f);
-  actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  actualPosition   = actor.CalculateScreenPosition();
   DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
@@ -1780,12 +1780,12 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
   application.Render();
 
   auto expectedPosition = Vector2(2.0f, 2.0f);
-  auto actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  auto actualPosition   = actor.CalculateScreenPosition();
   DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   auto expectedExtent = Bounds{1.5f, 1.5f, 1.0f, 1.0f};
-  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  auto actualExtent   = actor.CalculateScreenExtents();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1801,12 +1801,12 @@ int UtcDaliActorCalculateCurrentScreenExtents(void)
 
   // Animate 50%.
   expectedPosition = Vector2(6.0f, 4.0f);
-  actualPosition   = DevelActor::CalculateScreenPosition(actor);
+  actualPosition   = actor.CalculateScreenPosition();
   DALI_TEST_EQUALS(expectedPosition.x, actualPosition.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedPosition.y, actualPosition.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
 
   expectedExtent = Bounds(4.5f, 0.5f, 3.0f, 7.0f);
-  actualExtent   = DevelActor::CalculateScreenExtents(actor);
+  actualExtent   = actor.CalculateScreenExtents();
   DALI_TEST_EQUALS(expectedExtent.x, actualExtent.x, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.y, actualExtent.y, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
   DALI_TEST_EQUALS(expectedExtent.width, actualExtent.width, Math::MACHINE_EPSILON_10000, TEST_LOCATION);
@@ -1884,8 +1884,8 @@ int UtcDaliActorCalculateScreenExtentsInCustomCameraAndLayer3D(void)
   Vector2 sceneSize = scene.GetSize();
 
   auto expectedExtent = Bounds{sceneSize.x * 0.5f + 1.5f, sceneSize.y * 0.5f + 14.5f, 1.0f, 3.0f};
-  auto actualExtent   = DevelActor::CalculateScreenExtents(actor);
-  auto actualPosition = DevelActor::CalculateScreenPosition(actor);
+  auto actualExtent   = actor.CalculateScreenExtents();
+  auto actualPosition = actor.CalculateScreenPosition();
   {
     std::ostringstream oss;
     oss << expectedExtent << "\n";
@@ -14124,12 +14124,12 @@ int UtcDaliActorTouchAreaOffsetPropertyP(void)
 {
   TestApplication application;
 
-  Actor   actor           = Actor::New();
-  Extents touchAreaMargin = actor.GetProperty(DevelActor::Property::TOUCH_AREA_MARGIN).Get<Extents>();
-  DALI_TEST_EQUALS(Extents(), touchAreaMargin, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(10, 20, 30, 40));
-  touchAreaMargin = actor.GetProperty(DevelActor::Property::TOUCH_AREA_MARGIN).Get<Extents>();
-  DALI_TEST_EQUALS(Extents(10, 20, 30, 40), touchAreaMargin, TEST_LOCATION);
+  Actor   actor              = Actor::New();
+  Extents touchHitAreaMargin = actor.GetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN).Get<Extents>();
+  DALI_TEST_EQUALS(Extents(), touchHitAreaMargin, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(10, 20, 30, 40));
+  touchHitAreaMargin = actor.GetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN).Get<Extents>();
+  DALI_TEST_EQUALS(Extents(10, 20, 30, 40), touchHitAreaMargin, TEST_LOCATION);
   END_TEST;
 }
 
@@ -14142,12 +14142,12 @@ int UtcDaliActorTouchAreaOffsetPropertyN(void)
   // Make sure setting invalid types does not cause a crash
   try
   {
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, 1.0f);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector2::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector3::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Vector4::ONE);
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Property::Map());
-    actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Property::Array());
+    actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, 1.0f);
+    actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Vector2::ONE);
+    actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Vector3::ONE);
+    actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Vector4::ONE);
+    actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Property::Map());
+    actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Property::Array());
     tet_result(TET_PASS);
   }
   catch(...)
@@ -14826,15 +14826,15 @@ int UtcDaliActorPropertyBlendEquation(void)
 
   if(!Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
   {
-    actor.SetProperty(Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
-    int equation = actor.GetProperty<int>(Dali::DevelActor::Property::BLEND_EQUATION);
+    actor.SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
+    int equation = actor.GetProperty<int>(Dali::Actor::Property::BLEND_EQUATION);
     DALI_TEST_EQUALS((Dali::DevelBlendEquation::SCREEN == equation), false, TEST_LOCATION);
   }
 
   if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
   {
-    actor.SetProperty(Dali::DevelActor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
-    int equation = actor.GetProperty<int>(Dali::DevelActor::Property::BLEND_EQUATION);
+    actor.SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
+    int equation = actor.GetProperty<int>(Dali::Actor::Property::BLEND_EQUATION);
     DALI_TEST_EQUALS((Dali::DevelBlendEquation::SCREEN == equation), true, TEST_LOCATION);
   }
 
@@ -15010,23 +15010,23 @@ int UtcDaliActorDoesWantedHitTest(void)
   END_TEST;
 }
 
-int UtcDaliActorAllowOnlyOwnTouchPropertyP(void)
+int UtcDaliActorAllowSelfInitiatedTouchOnlyPropertyP(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH).Get<bool>(), false, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, true);
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH).Get<bool>(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), Property::BOOLEAN, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH), "allowOnlyOwnTouch", TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY).Get<bool>(), false, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, true);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY), "allowSelfInitiatedTouchOnly", TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorAllowOnlyOwnTouchPropertyN(void)
+int UtcDaliActorAllowSelfInitiatedTouchOnlyPropertyN(void)
 {
   TestApplication application;
 
@@ -15035,12 +15035,12 @@ int UtcDaliActorAllowOnlyOwnTouchPropertyN(void)
   // Make sure setting invalid types does not cause a crash
   try
   {
-    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, 1.0f);
-    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Vector2::ONE);
-    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Vector3::ONE);
-    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Vector4::ONE);
-    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Property::Map());
-    actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, Property::Array());
+    actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, 1.0f);
+    actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, Vector2::ONE);
+    actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, Vector3::ONE);
+    actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, Vector4::ONE);
+    actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, Property::Map());
+    actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, Property::Array());
     tet_result(TET_PASS);
   }
   catch(...)
@@ -15970,14 +15970,14 @@ int UtcDaliActorDispatchTouchMotionPropertyP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION).Get<bool>(), true, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, false);
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION).Get<bool>(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::DISPATCH_TOUCH_MOTION), Property::BOOLEAN, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::DISPATCH_TOUCH_MOTION), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::DISPATCH_TOUCH_MOTION), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::DISPATCH_TOUCH_MOTION), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::DISPATCH_TOUCH_MOTION), "dispatchTouchMotion", TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::DISPATCH_TOUCH_MOTION).Get<bool>(), true, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, false);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::DISPATCH_TOUCH_MOTION).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(Actor::Property::DISPATCH_TOUCH_MOTION), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(Actor::Property::DISPATCH_TOUCH_MOTION), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(Actor::Property::DISPATCH_TOUCH_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(Actor::Property::DISPATCH_TOUCH_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(Actor::Property::DISPATCH_TOUCH_MOTION), "dispatchTouchMotion", TEST_LOCATION);
   END_TEST;
 }
 
@@ -15990,12 +15990,12 @@ int UtcDaliActorDispatchTouchMotionPropertyN(void)
   // Make sure setting invalid types does not cause a crash
   try
   {
-    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, 1.0f);
-    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Vector2::ONE);
-    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Vector3::ONE);
-    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Vector4::ONE);
-    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Property::Map());
-    actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, Property::Array());
+    actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, 1.0f);
+    actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, Vector2::ONE);
+    actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, Vector3::ONE);
+    actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, Vector4::ONE);
+    actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, Property::Map());
+    actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, Property::Array());
     tet_result(TET_PASS);
   }
   catch(...)
@@ -16010,14 +16010,14 @@ int UtcDaliActorDispatchHoverMotionPropertyP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION).Get<bool>(), true, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, false);
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION).Get<bool>(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::DISPATCH_HOVER_MOTION), Property::BOOLEAN, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::DISPATCH_HOVER_MOTION), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::DISPATCH_HOVER_MOTION), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::DISPATCH_HOVER_MOTION), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::DISPATCH_HOVER_MOTION), "dispatchHoverMotion", TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::DISPATCH_HOVER_MOTION).Get<bool>(), true, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, false);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::DISPATCH_HOVER_MOTION).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(Actor::Property::DISPATCH_HOVER_MOTION), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(Actor::Property::DISPATCH_HOVER_MOTION), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(Actor::Property::DISPATCH_HOVER_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(Actor::Property::DISPATCH_HOVER_MOTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(Actor::Property::DISPATCH_HOVER_MOTION), "dispatchHoverMotion", TEST_LOCATION);
   END_TEST;
 }
 
@@ -16030,12 +16030,12 @@ int UtcDaliActorDispatchHoverMotionPropertyN(void)
   // Make sure setting invalid types does not cause a crash
   try
   {
-    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, 1.0f);
-    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Vector2::ONE);
-    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Vector3::ONE);
-    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Vector4::ONE);
-    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Property::Map());
-    actor.SetProperty(DevelActor::Property::DISPATCH_HOVER_MOTION, Property::Array());
+    actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, 1.0f);
+    actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, Vector2::ONE);
+    actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, Vector3::ONE);
+    actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, Vector4::ONE);
+    actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, Property::Map());
+    actor.SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, Property::Array());
     tet_result(TET_PASS);
   }
   catch(...)
@@ -16089,16 +16089,16 @@ int UtcDaliActorIgnoredPropertyP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
-  actor.SetProperty(DevelActor::Property::IGNORED, true);
-  DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::IGNORED).Get<bool>(), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(DevelActor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyType(DevelActor::Property::IGNORED), Property::BOOLEAN, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyWritable(DevelActor::Property::IGNORED), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(DevelActor::Property::IGNORED), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(DevelActor::Property::IGNORED), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetPropertyName(DevelActor::Property::IGNORED), "ignored", TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
+  actor.SetProperty(Actor::Property::IGNORED, true);
+  DALI_TEST_EQUALS(actor.GetProperty(Actor::Property::IGNORED).Get<bool>(), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::IGNORED).Get<bool>(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyType(Actor::Property::IGNORED), Property::BOOLEAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyWritable(Actor::Property::IGNORED), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAnimatable(Actor::Property::IGNORED), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.IsPropertyAConstraintInput(Actor::Property::IGNORED), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetPropertyName(Actor::Property::IGNORED), "ignored", TEST_LOCATION);
   END_TEST;
 }
 
@@ -16146,7 +16146,7 @@ int UtcDaliActorIgnored01(void)
   child2.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   parent.Add(child2);
 
-  PropertyNotification notification = child2.AddPropertyNotification(DevelActor::Property::IGNORED, LessThanCondition(0.5f));
+  PropertyNotification notification = child2.AddPropertyNotification(Actor::Property::IGNORED, LessThanCondition(0.5f));
   notification.SetNotifyMode(PropertyNotification::NOTIFY_ON_CHANGED);
 
   // Connect NotifySignal
@@ -16158,8 +16158,8 @@ int UtcDaliActorIgnored01(void)
   auto TestIgnoredProperties = [&](Actor actor, bool event, bool current, bool world, const char* testLocation)
   {
     DALI_TEST_EQUALS(actor.IsIgnored(), event, testLocation);
-    DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::IGNORED), event, testLocation);
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::IGNORED), current, testLocation);
+    DALI_TEST_EQUALS(actor.GetProperty<bool>(Actor::Property::IGNORED), event, testLocation);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(Actor::Property::IGNORED), current, testLocation);
     DALI_TEST_EQUALS(actor.GetProperty<bool>(DevelActor::Property::WORLD_IGNORED), world, testLocation);
     DALI_TEST_EQUALS(actor.GetCurrentProperty<bool>(DevelActor::Property::WORLD_IGNORED), world, testLocation);
   };
@@ -16197,7 +16197,7 @@ int UtcDaliActorIgnored01(void)
   DALI_TEST_EQUALS(childPosition1, childPosition2, TEST_LOCATION);
   DALI_TEST_EQUALS(childPosition1, Vector3(100, 100, 0), TEST_LOCATION);
 
-  child2.SetProperty(DevelActor::Property::IGNORED, true);
+  child2.SetProperty(Actor::Property::IGNORED, true);
   parent.SetProperty(Actor::Property::POSITION, Vector2(200, 200));
 
   TestIgnoredProperties(parent, false, false, false, TEST_LOCATION);
@@ -16273,7 +16273,7 @@ int UtcDaliActorIgnoredConstraintInput(void)
   bool worldIgnored = true;
 
   Constraint constraint = Constraint::New<Vector4>(parent, Actor::Property::COLOR, TestConstraintIgnored(ignored, worldIgnored));
-  constraint.AddSource(Source(child, DevelActor::Property::IGNORED));
+  constraint.AddSource(Source(child, Actor::Property::IGNORED));
   constraint.AddSource(Source(child, DevelActor::Property::WORLD_IGNORED));
   constraint.ApplyPost();
 
@@ -16291,7 +16291,7 @@ int UtcDaliActorIgnoredConstraintInput(void)
 
   gTestConstraintCalled = false;
 
-  child.SetProperty(DevelActor::Property::IGNORED, true);
+  child.SetProperty(Actor::Property::IGNORED, true);
 
   DALI_TEST_EQUALS(gTestConstraintCalled, false, TEST_LOCATION);
   DALI_TEST_EQUALS(ignored, false, TEST_LOCATION);

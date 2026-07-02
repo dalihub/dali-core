@@ -25,6 +25,7 @@
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -520,6 +521,68 @@ public:
       LEAVE_REQUIRED,
 
       /**
+       * @brief Extends the touch hit area of an actor beyond (positive) or within (negative) its visual bounds.
+       *        Affects only touch detection, not rendering or layout.
+       * @details Name "touchHitAreaMargin", type Property::EXTENTS (start, end, top, bottom in pixels).
+       *          Positive values expand the hit area outward; negative values shrink it inward.
+       * @SINCE_2_5.29
+       * For example
+       * @code{.cpp}
+       *  Actor actor = Actor::New();
+       *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+       *  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(10, 20, 30, 40));
+       *  actor.TouchEventSignal().Connect(OnTouchCallback);
+       *
+       * +---------------------+
+       * |         ^           |
+       * |         |           |
+       * |         |  30       |
+       * |         |           |
+       * |    +----+----+      |
+       * |    |         |      |
+       * | 10 |         | 20   |
+       * |<---+         +----->|
+       * |    |         |      |
+       * |    |         |      |
+       * |    +----+----+      |
+       * |         |           |
+       * |         |           |
+       * |         | 40        |
+       * |         |           |
+       * +---------------------+
+       * |         v           |
+       * @endcode
+       * The actual hit width  = actor.width  + touchHitAreaMargin.start + touchHitAreaMargin.end
+       * The actual hit height = actor.height + touchHitAreaMargin.top   + touchHitAreaMargin.bottom
+       */
+      TOUCH_HIT_AREA_MARGIN,
+
+      /**
+       * @brief If true, the actor only receives touch events that originated on itself.
+       *        Touch events that started on another actor and moved into this actor's area are ignored.
+       * @details Name "allowSelfInitiatedTouchOnly", type Property::BOOLEAN
+       * @note Default is false.
+       * @SINCE_2_5.29
+       */
+      ALLOW_SELF_INITIATED_TOUCH_ONLY,
+
+      /**
+       * @brief If false, touch motion events (finger/pointer move while pressed) are not dispatched to this actor.
+       * @details Name "dispatchTouchMotion", type Property::BOOLEAN
+       * @note Default is true.
+       * @SINCE_2_5.29
+       */
+      DISPATCH_TOUCH_MOTION,
+
+      /**
+       * @brief If false, hover motion events (pointer move without press) are not dispatched to this actor.
+       * @details Name "dispatchHoverMotion", type Property::BOOLEAN
+       * @note Default is true.
+       * @SINCE_2_5.29
+       */
+      DISPATCH_HOVER_MOTION,
+
+      /**
        * @brief The flag whether a child actor inherits it's parent's orientation.
        * @details Name "inheritOrientation", type Property::BOOLEAN
        * @SINCE_1_0.0
@@ -548,6 +611,15 @@ public:
        *       In this scenario the clipping is ignored.
        */
       DRAW_MODE,
+
+      /**
+       * @brief The blend equation used when compositing renderers of this actor onto the framebuffer.
+       * @details Name "blendEquation", type Property::INTEGER.
+       * @note For advanced blend equations, the rendered color must use pre-multiplied alpha.
+       * @note Use Dali::Capabilities::IsBlendEquationSupported to check availability on the current system.
+       * @SINCE_2_5.29
+       */
+      BLEND_EQUATION,
 
       /**
        * @brief The size mode factor of an actor.
@@ -684,6 +756,14 @@ public:
        * @SINCE_1_9.17
        */
       CULLED,
+
+      /**
+       * @brief If true, the actor and all its descendants are excluded from rendering and render thread computation.
+       * @details Name "ignored", type Property::BOOLEAN
+       * @note Default is false.
+       * @SINCE_2_5.29
+       */
+      IGNORED,
 
       /**
        * @brief The unique ID of the actor.
@@ -1012,6 +1092,59 @@ public:
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
    */
   bool ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const;
+
+  /**
+   * @brief Calculates the position of the actor in screen coordinates using event-side properties.
+   *
+   * This function calculates the screen coordinates of the actor by automatically detecting
+   * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
+   *
+   * For 2D calculation (when no 3D layers in ancestors):
+   * - Uses 2D-specific optimizations
+   * - Assumes orthographic projection and no camera rotation
+   * - Z coordinates are treated as 0 for screen position calculation
+   * - Faster calculation with 2D limitations
+   *
+   * For 3D calculation (when 3D layers exist in ancestors):
+   * - Uses full 3D projection with view and projection matrices
+   * - Supports perspective projection, camera rotation, and full 3D transforms
+   * - Considers Z depth for proper screen coordinate projection
+   * - More accurate but computationally expensive
+   *
+   * @SINCE_2_5.29
+   * @return The screen position of the actor, or (0, 0) if the actor is not on the scene
+   * @pre The Actor has been initialized.
+   * @note Unlike Actor::Property::SCREEN_POSITION, which is based on the last known frame,
+   *       this function uses the current event-side property values.
+   */
+  Vector2 CalculateScreenPosition() const;
+
+  /**
+   * @brief Calculates the screen position and size of the actor using event-side properties.
+   *
+   * This function calculates the bounding box screen coordinates and size of the actor
+   * by automatically detecting whether to use 2D or 3D calculation based on the
+   * actor's context and ancestor layers.
+   *
+   * For 2D calculation (when no 3D layers in ancestors):
+   * - Uses 2D-specific optimizations
+   * - Assumes orthographic projection and no camera rotation
+   * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
+   * - Faster calculation with 2D limitations
+   *
+   * For 3D calculation (when 3D layers exist in ancestors):
+   * - Uses full 3D projection with view and projection matrices
+   * - Supports perspective projection, camera rotation, and full 3D transforms
+   * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
+   * - Accounts for perspective foreshortening and 3D rotation effects
+   * - More accurate but computationally expensive
+   *
+   * @SINCE_2_5.29
+   * @return The Rect containing the position of the top-left corner on screen and the size, respectively,
+   *         or (0, 0, 0, 0) if the actor is not on the scene
+   * @pre The Actor has been initialized.
+   */
+  Bounds CalculateScreenExtents() const;
 
   /**
    * @brief Raise actor above the next sibling actor.

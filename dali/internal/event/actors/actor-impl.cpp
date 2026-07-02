@@ -116,10 +116,15 @@ DALI_PROPERTY("worldMatrix", MATRIX, false, false, true, Dali::Actor::Property::
 DALI_PROPERTY("name", STRING, true, false, false, Dali::Actor::Property::NAME)
 DALI_PROPERTY("sensitive", BOOLEAN, true, false, false, Dali::Actor::Property::SENSITIVE)
 DALI_PROPERTY("leaveRequired", BOOLEAN, true, false, false, Dali::Actor::Property::LEAVE_REQUIRED)
+DALI_PROPERTY("touchHitAreaMargin", EXTENTS, true, false, false, Dali::Actor::Property::TOUCH_HIT_AREA_MARGIN)
+DALI_PROPERTY("allowSelfInitiatedTouchOnly", BOOLEAN, true, false, false, Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY)
+DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_TOUCH_MOTION)
+DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_HOVER_MOTION)
 DALI_PROPERTY("inheritOrientation", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_ORIENTATION)
 DALI_PROPERTY("inheritScale", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_SCALE)
 DALI_PROPERTY("colorMode", INTEGER, true, false, false, Dali::Actor::Property::COLOR_MODE)
 DALI_PROPERTY("drawMode", INTEGER, true, false, false, Dali::Actor::Property::DRAW_MODE)
+DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::Actor::Property::BLEND_EQUATION)
 DALI_PROPERTY("sizeModeFactor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR)
 DALI_PROPERTY("widthResizePolicy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY)
 DALI_PROPERTY("heightResizePolicy", STRING, true, false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY)
@@ -137,6 +142,7 @@ DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::Actor::Property::OPACITY
 DALI_PROPERTY("screenPosition", VECTOR2, false, false, false, Dali::Actor::Property::SCREEN_POSITION)
 DALI_PROPERTY("positionUsesPivot", BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_PIVOT)
 DALI_PROPERTY("culled", BOOLEAN, false, false, true, Dali::Actor::Property::CULLED)
+DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::Actor::Property::IGNORED)
 DALI_PROPERTY("id", INTEGER, false, false, false, Dali::Actor::Property::ID)
 DALI_PROPERTY("hierarchyDepth", INTEGER, false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH)
 DALI_PROPERTY("isRoot", BOOLEAN, false, false, false, Dali::Actor::Property::IS_ROOT)
@@ -146,17 +152,11 @@ DALI_PROPERTY("keyboardFocusable", BOOLEAN, true, false, false, Dali::Actor::Pro
 DALI_PROPERTY("updateAreaHint", VECTOR4, true, false, false, Dali::Actor::Property::UPDATE_AREA_HINT)
 DALI_PROPERTY("siblingOrder", INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER)
 DALI_PROPERTY("captureAllTouchAfterStart", BOOLEAN, true, false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START)
-DALI_PROPERTY("touchAreaMargin", EXTENTS, true, false, false, Dali::DevelActor::Property::TOUCH_AREA_MARGIN)
-DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelActor::Property::BLEND_EQUATION)
 DALI_PROPERTY("touchFocusable", BOOLEAN, true, false, false, Dali::DevelActor::Property::TOUCH_FOCUSABLE)
 DALI_PROPERTY("keyboardFocusableChildren", BOOLEAN, true, false, false, Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN)
 DALI_PROPERTY("userInteractionEnabled", BOOLEAN, true, false, false, Dali::DevelActor::Property::USER_INTERACTION_ENABLED)
-DALI_PROPERTY("allowOnlyOwnTouch", BOOLEAN, true, false, false, Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH)
 DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA)
-DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION)
-DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_HOVER_MOTION)
 DALI_PROPERTY("childrenDepthIndexPolicy", INTEGER, true, false, false, Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY)
-DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::DevelActor::Property::IGNORED)
 DALI_PROPERTY("worldIgnored", BOOLEAN, false, false, true, Dali::DevelActor::Property::WORLD_IGNORED)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
@@ -1263,7 +1263,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mTargetColor(Color::WHITE),
   mTargetPosition(Vector3::ZERO),
   mTargetScale(Vector3::ONE),
-  mTouchAreaMargin(0, 0, 0, 0),
+  mTouchHitAreaMargin(0, 0, 0, 0),
   mName(),
   mSortedDepth(0u),
   mDepth(0u),
@@ -1287,7 +1287,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mIsBlendEquationSet(false),
   mNeedGesturePropagation(false),
   mUserInteractionEnabled(true),
-  mAllowOnlyOwnTouch(false),
+  mAllowSelfInitiatedTouchOnly(false),
   mUseTextureUpdateArea(false),
   mDispatchTouchMotion(true),
   mDispatchHoverMotion(true),

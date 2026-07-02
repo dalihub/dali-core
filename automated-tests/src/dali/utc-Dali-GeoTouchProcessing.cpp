@@ -2628,7 +2628,7 @@ int UtcDaliGeoTouchAreaOffset(void)
   data.Reset();
 
   // set a bigger touch area
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(70, 70, 70, 70)); // left, right, top, bottom
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(70, 70, 70, 70)); // left, right, top, bottom
 
   // Render and notify
   application.SendNotification();
@@ -2644,7 +2644,7 @@ int UtcDaliGeoTouchAreaOffset(void)
   data.Reset();
 
   // set a offset touch area
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(-50, 100, 0, -50)); // left, right, top, bottom
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(-50, 100, 0, -50)); // left, right, top, bottom
 
   // Render and notify
   application.SendNotification();
@@ -2660,7 +2660,7 @@ int UtcDaliGeoTouchAreaOffset(void)
   data.Reset();
 
   // set a smaller touch area
-  actor.SetProperty(DevelActor::Property::TOUCH_AREA_MARGIN, Extents(-50, 0, -50, 0));
+  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(-50, 0, -50, 0));
 
   // Render and notify
   application.SendNotification();
@@ -2685,7 +2685,7 @@ int UtcDaliGeoTouchAreaOffset(void)
   END_TEST;
 }
 
-int UtcDaliGeoTouchEventAllowOnlyOwnTouchPropertySet(void)
+int UtcDaliGeoTouchEventAllowSelfInitiatedTouchOnlyPropertySet(void)
 {
   TestApplication application;
 
@@ -2705,9 +2705,9 @@ int UtcDaliGeoTouchEventAllowOnlyOwnTouchPropertySet(void)
   TouchEventFunctor functor(data);
   actor.TouchEventSignal().Connect(&application, functor);
 
-  // AllowOnlyOwnTouch is default. We don't turn this on/off.
+  // AllowSelfInitiatedTouchOnly is default. We don't turn this on/off.
   // Now set the only allow own touch property
-  // actor.SetProperty(DevelActor::Property::ALLOW_ONLY_OWN_TOUCH, true);
+  // actor.SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, true);
 
   // Emit a down signal outside of actor, we should not receive the event
   application.ProcessEvent(GenerateSingleTouch(PointState::STARTED, Vector2(110.0f, 110.0f)));
@@ -2783,7 +2783,7 @@ int UtcDaliGeoTouchEventDispatchTouchMotionPropertySet(void)
   data.Reset();
 
   // Now set the dispatch touch motion property
-  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, false);
+  actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, false);
 
   // Emit a motion signal actor, we should not receive the event
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(30.0f, 30.0f)));
@@ -2868,7 +2868,7 @@ int UtcDaliGeoTouchEventDispatchTouchMotionMultiTouch(void)
   actor.TouchEventSignal().Connect(&application, functor);
 
   // Set dispatch touch motion to false
-  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, false);
+  actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, false);
 
   // Emit a double touch down signal, both points are STARTED so it should be received
   application.ProcessEvent(GenerateDoubleTouch(PointState::STARTED, Vector2(10.0f, 10.0f), PointState::STARTED, Vector2(20.0f, 20.0f), 100));
@@ -2900,7 +2900,7 @@ int UtcDaliGeoTouchEventDispatchTouchMotionMultiTouch(void)
   data.Reset();
 
   // Now enable dispatch touch motion
-  actor.SetProperty(DevelActor::Property::DISPATCH_TOUCH_MOTION, true);
+  actor.SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, true);
 
   // Emit a down signal to restart touch sequence
   application.ProcessEvent(GenerateDoubleTouch(PointState::STARTED, Vector2(10.0f, 10.0f), PointState::STARTED, Vector2(20.0f, 20.0f), 200));
