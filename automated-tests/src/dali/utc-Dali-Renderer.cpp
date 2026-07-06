@@ -954,38 +954,38 @@ int UtcDaliRendererBlendOptions05(void)
   TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
   glAbstraction.EnableEnableDisableCallTrace(true);
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::MAX))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::MAX))
   {
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::MAX);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::MAX);
     int equationRgb = renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::MAX, equationRgb, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::MAX, equationRgb, TEST_LOCATION);
   }
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SCREEN))
   {
     renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SCREEN);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::SCREEN);
     int equation = renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION);
 
-    DALI_TEST_EQUALS((int)DevelBlendEquation::SCREEN, equation, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::SCREEN, equation, TEST_LOCATION);
     DALI_TEST_EQUALS(DevelRenderer::IsAdvancedBlendEquationApplied(renderer), true, TEST_LOCATION);
 
     application.SendNotification();
     application.Render();
   }
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::MULTIPLY))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SCREEN) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::MULTIPLY))
   {
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::ADD);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::ADD);
     renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION_RGB, DevelBlendEquation::SCREEN);
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION_ALPHA, DevelBlendEquation::MULTIPLY);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION_RGB, Dali::BlendEquation::SCREEN);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION_ALPHA, Dali::BlendEquation::MULTIPLY);
     int equationRgb   = renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION_RGB);
     int equationAlpha = renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION_ALPHA);
 
-    DALI_TEST_EQUALS((int)DevelBlendEquation::ADD, equationRgb, TEST_LOCATION);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::ADD, equationAlpha, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::ADD, equationRgb, TEST_LOCATION);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::ADD, equationAlpha, TEST_LOCATION);
     DALI_TEST_EQUALS(DevelRenderer::IsAdvancedBlendEquationApplied(renderer), false, TEST_LOCATION);
 
     application.SendNotification();
@@ -993,108 +993,108 @@ int UtcDaliRendererBlendOptions05(void)
   }
 
   tet_infoline("Error Checking\n");
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::MULTIPLY) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::OVERLAY) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::DARKEN) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::LIGHTEN) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::COLOR_DODGE) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::COLOR_BURN) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::HARD_LIGHT) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SOFT_LIGHT) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::DIFFERENCE) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::EXCLUSION) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::HUE) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SATURATION) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::COLOR) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::LUMINOSITY))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::MULTIPLY) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SCREEN) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::OVERLAY) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::DARKEN) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::LIGHTEN) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::COLOR_DODGE) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::COLOR_BURN) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::HARD_LIGHT) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SOFT_LIGHT) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::DIFFERENCE) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::EXCLUSION) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::HUE) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SATURATION) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::COLOR) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::LUMINOSITY))
   {
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::MULTIPLY);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::MULTIPLY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::MULTIPLY);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::MULTIPLY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_MULTIPLY, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SCREEN);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::SCREEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::SCREEN);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::SCREEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_SCREEN, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::OVERLAY);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::OVERLAY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::OVERLAY);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::OVERLAY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_OVERLAY, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::DARKEN);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::DARKEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::DARKEN);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::DARKEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_DARKEN, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::LIGHTEN);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::LIGHTEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::LIGHTEN);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::LIGHTEN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_LIGHTEN, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::COLOR_DODGE);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::COLOR_DODGE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::COLOR_DODGE);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::COLOR_DODGE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_COLORDODGE, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::COLOR_BURN);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::COLOR_BURN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::COLOR_BURN);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::COLOR_BURN, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_COLORBURN, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::HARD_LIGHT);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::HARD_LIGHT, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::HARD_LIGHT);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::HARD_LIGHT, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HARDLIGHT, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SOFT_LIGHT);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::SOFT_LIGHT, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::SOFT_LIGHT);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::SOFT_LIGHT, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_SOFTLIGHT, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::DIFFERENCE);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::DIFFERENCE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::DIFFERENCE);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::DIFFERENCE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_DIFFERENCE, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::EXCLUSION);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::EXCLUSION, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::EXCLUSION);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::EXCLUSION, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_EXCLUSION, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::HUE);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::HUE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::HUE);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::HUE, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_HUE, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SATURATION);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::SATURATION, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::SATURATION);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::SATURATION, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_SATURATION, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::COLOR);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::COLOR, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::COLOR);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::COLOR, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_COLOR, TEST_LOCATION);
 
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::LUMINOSITY);
-    DALI_TEST_EQUALS((int)DevelBlendEquation::LUMINOSITY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::LUMINOSITY);
+    DALI_TEST_EQUALS((int)Dali::BlendEquation::LUMINOSITY, renderer.GetProperty<int>(DevelRenderer::Property::BLEND_EQUATION), TEST_LOCATION);
     application.SendNotification();
     application.Render();
     DALI_TEST_EQUALS(glAbstraction.GetLastBlendEquationRgb(), GL_HSL_LUMINOSITY, TEST_LOCATION);
@@ -1435,7 +1435,7 @@ int UtcDaliRendererSetBlendMode08(void)
 
   tet_infoline("Test setting the blend mode to auto with opaque color and Advanced Blend Equation.");
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SCREEN))
   {
     Geometry geometry = CreateQuadGeometry();
     Shader   shader   = CreateShader();
@@ -1449,7 +1449,7 @@ int UtcDaliRendererSetBlendMode08(void)
 
     renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::AUTO);
     renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SCREEN);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::SCREEN);
 
     TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
     glAbstraction.EnableEnableDisableCallTrace(true);
@@ -1472,7 +1472,7 @@ int UtcDaliRendererSetBlendMode08b(void)
 
   tet_infoline("Test setting the blend mode to off with opaque color and Advanced Blend Equation.");
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SCREEN))
   {
     Geometry geometry = CreateQuadGeometry();
     Shader   shader   = CreateShader();
@@ -1486,7 +1486,7 @@ int UtcDaliRendererSetBlendMode08b(void)
 
     renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::OFF);
     renderer.SetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA, true);
-    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::SCREEN);
+    renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::SCREEN);
 
     TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
     glAbstraction.EnableEnableDisableCallTrace(true);
@@ -3012,19 +3012,19 @@ int UtcDaliRendererEnumProperties(void)
   CheckEnumerationProperty<StencilOperation::Type>(application, renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_FAIL, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT");
   CheckEnumerationProperty<StencilOperation::Type>(application, renderer, Renderer::Property::STENCIL_OPERATION_ON_Z_PASS, StencilOperation::KEEP, StencilOperation::REPLACE, StencilOperation::INCREMENT, "INCREMENT");
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::MAX) &&
-     Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::MIN))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::MAX) &&
+     Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::MIN))
   {
     application.SendNotification();
     application.Render();
-    CheckEnumerationProperty<DevelBlendEquation::Type>(application, renderer, DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::REVERSE_SUBTRACT, DevelBlendEquation::MAX, DevelBlendEquation::MIN, "MIN");
+    CheckEnumerationProperty<Dali::BlendEquation::Type>(application, renderer, DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::REVERSE_SUBTRACT, Dali::BlendEquation::MAX, Dali::BlendEquation::MIN, "MIN");
   }
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
+  if(Dali::Capabilities::IsBlendEquationSupported(Dali::BlendEquation::SCREEN))
   {
     application.SendNotification();
     application.Render();
-    CheckEnumerationProperty<DevelBlendEquation::Type>(application, renderer, DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::MIN, DevelBlendEquation::MULTIPLY, DevelBlendEquation::SCREEN, "SCREEN");
+    CheckEnumerationProperty<Dali::BlendEquation::Type>(application, renderer, DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::MIN, Dali::BlendEquation::MULTIPLY, Dali::BlendEquation::SCREEN, "SCREEN");
   }
 
   END_TEST;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ RendererContainer::RendererContainer(EventThreadServices& eventThreadServices, b
 {
 }
 
-uint32_t RendererContainer::Add(const SceneGraph::Node& node, Renderer& renderer, bool blending, DevelBlendEquation::Type blendEquation)
+uint32_t RendererContainer::Add(const SceneGraph::Node& node, Renderer& renderer, bool blending, Dali::BlendEquation::Type blendEquation)
 {
   if(blending)
   {
@@ -128,11 +128,11 @@ RendererPtr RendererContainer::GetRendererAt(uint32_t index) const
   return index < mRenderers.size() ? mRenderers[index] : nullptr;
 }
 
-void RendererContainer::SetBlending(DevelBlendEquation::Type blendEquation)
+void RendererContainer::SetBlending(Dali::BlendEquation::Type blendEquation)
 {
   for(const auto& renderer : mRenderers)
   {
-    renderer->SetBlendEquation(static_cast<DevelBlendEquation::Type>(blendEquation));
+    renderer->SetBlendEquation(blendEquation);
   }
 }
 

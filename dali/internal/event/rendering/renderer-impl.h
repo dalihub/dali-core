@@ -140,17 +140,17 @@ public:
   /**
    * @brief Set same Blend Equation for the RGB and alpha
    */
-  void SetBlendEquation(DevelBlendEquation::Type equationRgba);
+  void SetBlendEquation(Dali::BlendEquation::Type equationRgba);
 
   /**
    * @brief Set Blend Equation separately for the RGB and alpha
    */
-  void SetBlendEquation(DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha);
+  void SetBlendEquation(Dali::BlendEquation::Type equationRgb, Dali::BlendEquation::Type equationAlpha);
 
   /**
    * @brief Get Blend Equation of rgb and alpha
    */
-  void GetBlendEquation(DevelBlendEquation::Type& equationRgb, DevelBlendEquation::Type& equationAlpha) const;
+  void GetBlendEquation(Dali::BlendEquation::Type& equationRgb, Dali::BlendEquation::Type& equationAlpha) const;
 
   /**
    * @copydoc Dali::Renderer::SetIndexedDrawFirstElement

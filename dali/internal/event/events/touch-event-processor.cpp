@@ -100,12 +100,12 @@ bool HasPointState(const Dali::TouchEvent& event, PointState::Type targetState)
 
 bool ShouldEmitInterceptTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
-  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotion() || !HasPointState(event, PointState::MOTION));
+  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotionEnabled() || !HasPointState(event, PointState::MOTION));
 }
 
 bool ShouldEmitTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
-  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotion() || !HasPointState(event, PointState::MOTION));
+  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotionEnabled() || !HasPointState(event, PointState::MOTION));
 }
 
 // child -> parent
@@ -386,7 +386,7 @@ void ParsePrimaryTouchPoint(
       {
         capturingTouchActorObserver.SetActor(hitActor);
       }
-      if(hitActor->IsAllowSelfInitiatedTouchOnly() || isGeometry)
+      if(hitActor->IsAllowSelfInitiatedTouchOnlyEnabled() || isGeometry)
       {
         ownTouchActorObserver.SetActor(hitActor);
       }

@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/internal-constants.h>
@@ -42,6 +41,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
 namespace Dali
@@ -120,6 +120,15 @@ public:
    * Query whether the actor is connected to the Scene.
    */
   bool OnScene() const
+  {
+    return mIsOnScene;
+  }
+
+  /**
+   * Query whether the actor is connected to the Scene.
+   * @return True if the actor is connected to the Scene.
+   */
+  bool IsConnectedToScene() const
   {
     return mIsOnScene;
   }
@@ -232,7 +241,7 @@ public:
    *
    * @return Returns the screen position of actor. Returns (0,0) if actor is not on scene.
    */
-  const Vector2 CalculateScreenPosition() const;
+  Vector2 CalculateScreenPosition() const;
 
   /**
    * Calculates screen position and size using event-side properties.
@@ -335,10 +344,22 @@ public:
   void SetSize(const Vector3& size);
 
   /**
+   * Get the size of the actor.
+   * @return The size.
+   */
+  Vector3 GetSize() const;
+
+  /**
    * Set the width component of the Actor's size.
    * @param [in] width The new width component.
    */
   void SetWidth(float width);
+
+  /**
+   * Get the width component of the Actor's size.
+   * @return The width component.
+   */
+  float GetWidth() const;
 
   /**
    * Set the height component of the Actor's size.
@@ -347,10 +368,22 @@ public:
   void SetHeight(float height);
 
   /**
+   * Get the height component of the Actor's size.
+   * @return The height component.
+   */
+  float GetHeight() const;
+
+  /**
    * Set the depth component of the Actor's size.
    * @param [in] depth The new depth component.
    */
   void SetDepth(float depth);
+
+  /**
+   * Get the depth component of the Actor's size.
+   * @return The depth component.
+   */
+  float GetDepth() const;
 
   /**
    * Retrieve the Actor's size from event side.
@@ -384,10 +417,46 @@ public:
   void SetParentOrigin(const Vector3& origin);
 
   /**
-   * Retrieve the parent-origin of an actor.
-   * @return The parent-origin.
+   * Get the parent origin.
+   * @return The parent origin.
    */
-  const Vector3& GetCurrentParentOrigin() const;
+  const Vector3& GetParentOrigin() const;
+
+  /**
+   * Set the X component of the parent origin.
+   * @param [in] x The X component value.
+   */
+  void SetParentOriginX(float x);
+
+  /**
+   * Get the X component of the parent origin.
+   * @return The X component value.
+   */
+  float GetParentOriginX() const;
+
+  /**
+   * Set the Y component of the parent origin.
+   * @param [in] y The Y component value.
+   */
+  void SetParentOriginY(float y);
+
+  /**
+   * Get the Y component of the parent origin.
+   * @return The Y component value.
+   */
+  float GetParentOriginY() const;
+
+  /**
+   * Set the Z component of the parent origin.
+   * @param [in] z The Z component value.
+   */
+  void SetParentOriginZ(float z);
+
+  /**
+   * Get the Z component of the parent origin.
+   * @return The Z component value.
+   */
+  float GetParentOriginZ() const;
 
   /**
    * Set the pivot of an actor. This is expressed in 2D unit coordinates, such that
@@ -400,17 +469,53 @@ public:
   void SetPivot(const Vector3& pivot);
 
   /**
-   * Retrieve the anchor-point of an actor.
-   * @return The anchor-point.
+   * Get the pivot.
+   * @return The pivot.
    */
-  const Vector3& GetCurrentPivot() const;
+  const Vector3& GetPivot() const;
+
+  /**
+   * Set the X component of the pivot.
+   * @param [in] x The X component value.
+   */
+  void SetPivotX(float x);
+
+  /**
+   * Get the X component of the pivot.
+   * @return The X component value.
+   */
+  float GetPivotX() const;
+
+  /**
+   * Set the Y component of the pivot.
+   * @param [in] y The Y component value.
+   */
+  void SetPivotY(float y);
+
+  /**
+   * Get the Y component of the pivot.
+   * @return The Y component value.
+   */
+  float GetPivotY() const;
+
+  /**
+   * Set the Z component of the pivot.
+   * @param [in] z The Z component value.
+   */
+  void SetPivotZ(float z);
+
+  /**
+   * Get the Z component of the pivot.
+   * @return The Z component value.
+   */
+  float GetPivotZ() const;
 
   /**
    * If the position uses the pivot, return the pivot, otherwise
    * return top left.
    * @return The pivot for positioning.
    */
-  Vector3 GetPivotForPosition() const;
+  const Vector3& GetPivotForPosition() const;
 
   /**
    * Sets the position of the Actor.
@@ -438,17 +543,35 @@ public:
   void SetZ(float z);
 
   /**
+   * Get the position of an actor along the X-axis.
+   * @return The x position.
+   */
+  float GetX() const;
+
+  /**
+   * Get the position of an actor along the Y-axis.
+   * @return The y position.
+   */
+  float GetY() const;
+
+  /**
+   * Get the position of an actor along the Z-axis.
+   * @return The z position.
+   */
+  float GetZ() const;
+
+  /**
    * Translate an actor relative to its existing position.
    * @param[in] distance The actor will move by this distance.
    */
   void TranslateBy(const Vector3& distance);
 
   /**
-   * Retrieve the position of the Actor.
+   * Get the position of the actor as a Vector3.
    * The coordinates are relative to the Actor's parent.
    * @return the Actor's position.
    */
-  const Vector3& GetCurrentPosition() const;
+  const Vector3& GetPosition() const;
 
   /**
    * Retrieve the target position of the Actor.
@@ -461,22 +584,41 @@ public:
   }
 
   /**
-   * @copydoc Dali::Actor::GetCurrentWorldPosition()
+   * Retrieve the position of the Actor.
+   * The coordinates are relative to the Actor's parent.
+   * @return the Actor's position.
    */
-  const Vector3& GetCurrentWorldPosition() const;
+  const Vector3& GetCurrentPosition() const;
 
   /**
-   * @copydoc Dali::Actor::SetInheritPosition()
+   * Get the world position of the actor.
+   * @return The world position of the actor.
    */
-  void SetInheritPosition(bool inherit);
+  const Vector3& GetWorldPosition() const;
 
   /**
-   * @copydoc Dali::Actor::IsPositionInherited()
+   * Get the X component of the world position.
+   * @return The X component of the world position.
    */
-  bool IsPositionInherited() const
-  {
-    return mInheritPosition;
-  }
+  float GetWorldPositionX() const;
+
+  /**
+   * Get the Y component of the world position.
+   * @return The Y component of the world position.
+   */
+  float GetWorldPositionY() const;
+
+  /**
+   * Get the Z component of the world position.
+   * @return The Z component of the world position.
+   */
+  float GetWorldPositionZ() const;
+
+  /**
+   * Get the screen position of the actor.
+   * @return The screen position of the actor.
+   */
+  Vector2 GetScreenPosition() const;
 
   /**
    * Sets the orientation of the Actor.
@@ -505,10 +647,22 @@ public:
   void RotateBy(const Quaternion& relativeRotation);
 
   /**
+   * Get the orientation of the actor.
+   * @return The orientation.
+   */
+  const Quaternion& GetOrientation() const;
+
+  /**
    * Retreive the Actor's orientation.
    * @return the orientation.
    */
   const Quaternion& GetCurrentOrientation() const;
+
+  /**
+   * Get the world orientation of the actor.
+   * @return The world orientation.
+   */
+  const Quaternion& GetWorldOrientation() const;
 
   /**
    * Set whether a child actor inherits it's parent's orientation. Default is to inherit.
@@ -541,11 +695,6 @@ public:
   const Vector3& GetSizeModeFactor() const;
 
   /**
-   * @copydoc Dali::Actor::GetCurrentWorldOrientation()
-   */
-  const Quaternion& GetCurrentWorldOrientation() const;
-
-  /**
    * Sets a scale factor applied to an actor.
    * @param [in] scale A vector representing the scale factor for each axis.
    */
@@ -576,6 +725,30 @@ public:
   void ScaleBy(const Vector3& relativeScale);
 
   /**
+   * Get the scale factor applied to the actor.
+   * @return A vector representing the scale factor for each axis.
+   */
+  const Vector3& GetScale() const;
+
+  /**
+   * Get the X component of the scale factor.
+   * @return The X scale factor.
+   */
+  float GetScaleX() const;
+
+  /**
+   * Get the Y component of the scale factor.
+   * @return The Y scale factor.
+   */
+  float GetScaleY() const;
+
+  /**
+   * Get the Z component of the scale factor.
+   * @return The Z scale factor.
+   */
+  float GetScaleZ() const;
+
+  /**
    * Retrieve the scale factor applied to an actor.
    * @return A vector representing the scale factor for each axis.
    */
@@ -585,6 +758,12 @@ public:
    * @copydoc Dali::Actor::GetCurrentWorldScale()
    */
   const Vector3& GetCurrentWorldScale() const;
+
+  /**
+   * Get the world scale factor applied to the actor.
+   * @return A vector representing the world scale factor for each axis.
+   */
+  const Vector3& GetWorldScale() const;
 
   /**
    * @copydoc Dali::Actor::SetInheritScale()
@@ -598,11 +777,6 @@ public:
   {
     return mInheritScale;
   }
-
-  /**
-   * @copydoc Dali::Actor::GetCurrentWorldMatrix()
-   */
-  Matrix GetCurrentWorldMatrix() const;
 
   // Visibility
   /**
@@ -629,10 +803,22 @@ public:
   void SetOpacity(float opacity);
 
   /**
+   * Retrieve the actor's opacity (event-side cached value).
+   * @return The actor's opacity.
+   */
+  float GetOpacity() const;
+
+  /**
    * Retrieve the actor's opacity.
    * @return The actor's opacity.
    */
   float GetCurrentOpacity() const;
+
+  /**
+   * Set the clipping mode of an actor.
+   * @param[in] clippingMode The clipping mode to set.
+   */
+  void SetClippingMode(ClippingMode::Type clippingMode);
 
   /**
    * Retrieve the actor's clipping mode.
@@ -760,6 +946,42 @@ public:
   void SetColorBlue(float blue);
 
   /**
+   * Set the alpha component of the color.
+   * @param [in] alpha The new alpha component.
+   */
+  void SetColorAlpha(float alpha);
+
+  /**
+   * Get the actor's color.
+   * @return The color of the actor.
+   */
+  const Vector4& GetColor() const;
+
+  /**
+   * Get the red component of the color.
+   * @return The red component value.
+   */
+  float GetColorRed() const;
+
+  /**
+   * Get the green component of the color.
+   * @return The green component value.
+   */
+  float GetColorGreen() const;
+
+  /**
+   * Get the blue component of the color.
+   * @return The blue component value.
+   */
+  float GetColorBlue() const;
+
+  /**
+   * Get the alpha component of the color.
+   * @return The alpha component value.
+   */
+  float GetColorAlpha() const;
+
+  /**
    * Retrieve the actor's color.
    * @return The color.
    */
@@ -782,9 +1004,22 @@ public:
   }
 
   /**
-   * @copydoc Dali::Actor::GetCurrentWorldColor()
+   * Get the world color of the actor.
+   * @return The world color of the actor.
    */
-  const Vector4& GetCurrentWorldColor() const;
+  const Vector4& GetWorldColor() const;
+
+  /**
+   * Get the world matrix of the actor.
+   * @return The world matrix of the actor.
+   */
+  const Matrix& GetWorldMatrix() const;
+
+  /**
+   * Query whether the actor is culled.
+   * @return True if the actor is culled.
+   */
+  bool IsCulled() const;
 
   /**
    * @copydoc Dali::Actor::GetHierarchyDepth()
@@ -996,7 +1231,7 @@ public:
    *
    * @return Return if it is possible to relayout the actor
    */
-  bool RelayoutPossible(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
+  bool IsRelayoutPossible(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
 
   /**
    * @brief Returns if relayout is enabled and the actor is dirty
@@ -1144,9 +1379,9 @@ public:
   bool IsIgnored() const;
 
   /**
-   * @copydoc Dali::Actor::IsCurrentWorldIgnored
+   * @copydoc Dali::Actor::IsWorldIgnored
    */
-  bool IsCurrentWorldIgnored() const;
+  bool IsWorldIgnored() const;
 
   /**
    * @copydoc Dali::Actor::AddRenderer()
@@ -1176,12 +1411,12 @@ public:
   /**
    * @brief Set BlendEquation at each renderer that added on this Actor.
    */
-  void SetBlendEquation(DevelBlendEquation::Type blendEquation);
+  void SetBlendEquation(Dali::BlendEquation::Type blendEquation);
 
   /**
    * @brief Get Blend Equation that applied to this Actor
    */
-  DevelBlendEquation::Type GetBlendEquation() const;
+  Dali::BlendEquation::Type GetBlendEquation() const;
 
   /**
    * @brief Set this Actor is transparent or not without any affection on the child Actors.
@@ -1314,7 +1549,7 @@ public:
    */
   bool IsHittable() const
   {
-    return (IsUserInteractionEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsCurrentWorldIgnored());
+    return (IsUserInteractionEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsWorldIgnored());
   }
 
   /**
@@ -1416,28 +1651,55 @@ public:
   }
 
   /**
+   * Set whether the actor only receives self-initiated touches.
+   * @param[in] enabled true if only self-initiated touches should be received.
+   */
+  void SetAllowSelfInitiatedTouchOnlyEnabled(bool enabled)
+  {
+    mAllowSelfInitiatedTouchOnly = enabled;
+  }
+
+  /**
    * Query whether the actor only receives self-initiated touches.
    * @return true if only touches that originated on this actor are received.
    */
-  bool IsAllowSelfInitiatedTouchOnly() const
+  bool IsAllowSelfInitiatedTouchOnlyEnabled() const
   {
     return mAllowSelfInitiatedTouchOnly;
+  }
+
+  /**
+   * Set whether the actor should send touch motion events.
+   * @param[in] enabled true to send touch motion events.
+   */
+  void SetDispatchTouchMotionEnabled(bool enabled)
+  {
+    mDispatchTouchMotion = enabled;
   }
 
   /**
    * Query whether the actor send touch motion event.
    * @return true, it send touch motion event.
    */
-  bool IsDispatchTouchMotion() const
+  bool IsDispatchTouchMotionEnabled() const
   {
     return mDispatchTouchMotion;
+  }
+
+  /**
+   * Set whether the actor should send hover motion events.
+   * @param[in] enabled true to send hover motion events.
+   */
+  void SetDispatchHoverMotionEnabled(bool enabled)
+  {
+    mDispatchHoverMotion = enabled;
   }
 
   /**
    * Query whether the actor send hover motion event.
    * @return true, it send hover motion event.
    */
-  bool IsDispatchHoverMotion() const
+  bool IsDispatchHoverMotionEnabled() const
   {
     return mDispatchHoverMotion;
   }
@@ -1459,6 +1721,7 @@ public:
   {
     return mHoverState;
   }
+
   // Gestures
 
   /**
@@ -1653,6 +1916,19 @@ public:
    * @copydoc DevelActor::ChildOrderChangedSignal
    */
   DevelActor::ChildOrderChangedSignalType& ChildOrderChangedSignal();
+
+  /**
+   * @copydoc Dali::Actor::SetInheritPosition()
+   */
+  void SetInheritPosition(bool inherit);
+
+  /**
+   * @copydoc Dali::Actor::IsPositionInherited()
+   */
+  bool IsPositionInherited() const
+  {
+    return mInheritPosition;
+  }
 
 public:
   // For Animation
@@ -1921,10 +2197,52 @@ public:
     return *mScene;
   }
 
+  /**
+   * Set the layout direction of an actor.
+   * @param[in] direction The layout direction to set.
+   */
+  void SetLayoutDirection(LayoutDirection::Type direction);
+
   LayoutDirection::Type GetLayoutDirection() const
   {
     return mLayoutDirection;
   }
+
+  /**
+   * Set whether a child actor inherits it's parent's layout direction with enabled semantics.
+   * @param[in] enabled - true if the actor should inherit layout direction, false otherwise.
+   */
+  void SetInheritLayoutDirectionEnabled(bool enabled);
+
+  /**
+   * Query whether a child actor inherits it's parent's layout direction.
+   * @return true if the actor inherits layout direction, false otherwise.
+   */
+  bool IsInheritLayoutDirectionEnabled() const;
+
+  /**
+   * @brief Sets the update area hint of an actor.
+   * @param [in] updateAreaHint The update area hint.
+   */
+  void SetUpdateAreaHint(const Vector4& updateAreaHint);
+
+  /**
+   * @brief Gets the update area hint of an actor.
+   * @return The update area hint.
+   */
+  const Vector4& GetUpdateAreaHint() const;
+
+  /**
+   * Set whether the position uses the pivot point.
+   * @param[in] enabled true to use pivot for position.
+   */
+  void SetPositionUsesPivotEnabled(bool enabled);
+
+  /**
+   * Query whether the position uses the pivot point.
+   * @return true if position uses pivot, false otherwise.
+   */
+  bool IsPositionUsesPivotEnabled() const;
 
 private:
   struct SendMessage
@@ -2110,27 +2428,6 @@ private:
    */
   void LowerChildBelow(Actor& child, Actor& target) override;
 
-  /**
-   * Set whether a child actor inherits it's parent's layout direction. Default is to inherit.
-   * @param[in] inherit - true if the actor should inherit layout direction, false otherwise.
-   */
-  void SetInheritLayoutDirection(bool inherit);
-
-  /**
-   * Returns whether the actor inherits it's parent's layout direction.
-   * @return true if the actor inherits it's parent's layout direction, false otherwise.
-   */
-  bool IsLayoutDirectionInherited() const
-  {
-    return mInheritLayoutDirection;
-  }
-
-  /**
-   * @brief Sets the update area hint of an actor.
-   * @param [in] updateAreaHint The update area hint.
-   */
-  void SetUpdateAreaHint(const Vector4& updateAreaHint);
-
 protected:
   ActorParentImpl    mParentImpl;     ///< Implementation of ActorParent;
   ActorSizer         mSizer;          ///< Implementation for managing actor size
@@ -2160,6 +2457,7 @@ protected:
   Vector4    mTargetColor;        ///< Event-side storage for color
   Vector3    mTargetPosition;     ///< Event-side storage for position (not a pointer as most actors will have a position)
   Vector3    mTargetScale;        ///< Event-side storage for scale
+  Vector4    mUpdateAreaHint;     ///< Event-side storage for update area hint
   Extents    mTouchHitAreaMargin; ///< Extents info of touch hit area margin
 
   std::string mName;        ///< Name of the actor
@@ -2204,7 +2502,7 @@ protected:
   ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.
   PointState::Type                           mHoverState : 3;               ///< Stores the HoverEvent state of actor.
 
-  DevelBlendEquation::Type mBlendEquation : 16; ///< Cached: Determines which blend equation will be used to render renderers.
+  Dali::BlendEquation::Type mBlendEquation : 16; ///< Cached: Determines which blend equation will be used to render renderers.
 
   uint8_t mOffScreenRenderableBitField; ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 

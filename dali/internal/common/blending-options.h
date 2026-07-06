@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/rendering/renderer.h>
@@ -81,17 +80,17 @@ struct BlendingOptions
   /**
    * @copydoc Dali::RenderableActor::SetBlendEquation()
    */
-  void SetBlendEquation(DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha);
+  void SetBlendEquation(Dali::BlendEquation::Type equationRgb, Dali::BlendEquation::Type equationAlpha);
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendEquation()
    */
-  DevelBlendEquation::Type GetBlendEquationRgb() const;
+  Dali::BlendEquation::Type GetBlendEquationRgb() const;
 
   /**
    * @copydoc Dali::RenderableActor::GetBlendEquation()
    */
-  DevelBlendEquation::Type GetBlendEquationAlpha() const;
+  Dali::BlendEquation::Type GetBlendEquationAlpha() const;
 
   /**
    * Set the blend color.
@@ -122,7 +121,7 @@ struct BlendingOptions
    * Query whether input blend equation is advanced option.
    * @return True if input blend equation is advanced.
    */
-  static bool IsAdvancedBlendEquation(DevelBlendEquation::Type equation);
+  static bool IsAdvancedBlendEquation(Dali::BlendEquation::Type equation);
 
 private:
   // Undefined copy constructor.

@@ -171,7 +171,7 @@ AnimationPlaylist& ThreadLocalStorage::GetAnimationPlaylist()
   return mCore->GetAnimationPlaylist();
 }
 
-bool ThreadLocalStorage::IsBlendEquationSupported(DevelBlendEquation::Type blendEquation)
+bool ThreadLocalStorage::IsBlendEquationSupported(Dali::BlendEquation::Type blendEquation)
 {
   return mCore->GetGraphicsConfig().IsBlendEquationSupported(blendEquation);
 }

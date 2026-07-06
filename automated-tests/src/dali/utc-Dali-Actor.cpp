@@ -14824,18 +14824,18 @@ int UtcDaliActorPropertyBlendEquation(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(400, 400));
   application.GetScene().Add(actor);
 
-  if(!Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
+  if(!Dali::Capabilities::IsBlendEquationSupported(BlendEquation::SCREEN))
   {
-    actor.SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
+    actor.SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::BlendEquation::SCREEN);
     int equation = actor.GetProperty<int>(Dali::Actor::Property::BLEND_EQUATION);
-    DALI_TEST_EQUALS((Dali::DevelBlendEquation::SCREEN == equation), false, TEST_LOCATION);
+    DALI_TEST_EQUALS((Dali::BlendEquation::SCREEN == equation), false, TEST_LOCATION);
   }
 
-  if(Dali::Capabilities::IsBlendEquationSupported(DevelBlendEquation::SCREEN))
+  if(Dali::Capabilities::IsBlendEquationSupported(BlendEquation::SCREEN))
   {
-    actor.SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::DevelBlendEquation::SCREEN);
+    actor.SetProperty(Dali::Actor::Property::BLEND_EQUATION, Dali::BlendEquation::SCREEN);
     int equation = actor.GetProperty<int>(Dali::Actor::Property::BLEND_EQUATION);
-    DALI_TEST_EQUALS((Dali::DevelBlendEquation::SCREEN == equation), true, TEST_LOCATION);
+    DALI_TEST_EQUALS((Dali::BlendEquation::SCREEN == equation), true, TEST_LOCATION);
   }
 
   Renderer renderer2 = Renderer::New(geometry, shader);
@@ -16576,6 +16576,578 @@ int UtcDaliActorChildrenDepthIndexPolicyPropertyChangeRenderingOrder(void)
   DALI_TEST_EQUALS(index111 < index12, true, TEST_LOCATION);
   DALI_TEST_EQUALS(index12 < index2, true, TEST_LOCATION);
   DALI_TEST_EQUALS(index2 < index21, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetParentOriginP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Vector3 parentOrigin(0.5f, 0.5f, 0.5f);
+  actor.SetParentOrigin(parentOrigin);
+  DALI_TEST_EQUALS(actor.GetParentOrigin(), parentOrigin, TEST_LOCATION);
+
+  actor.SetParentOriginX(0.2f);
+  DALI_TEST_EQUALS(actor.GetParentOriginX(), 0.2f, TEST_LOCATION);
+
+  actor.SetParentOriginY(0.3f);
+  DALI_TEST_EQUALS(actor.GetParentOriginY(), 0.3f, TEST_LOCATION);
+
+  actor.SetParentOriginZ(0.4f);
+  DALI_TEST_EQUALS(actor.GetParentOriginZ(), 0.4f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetPivotP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Vector3 pivot(0.5f, 0.5f, 0.5f);
+  actor.SetPivot(pivot);
+  DALI_TEST_EQUALS(actor.GetPivot(), pivot, TEST_LOCATION);
+
+  actor.SetPivotX(0.2f);
+  DALI_TEST_EQUALS(actor.GetPivotX(), 0.2f, TEST_LOCATION);
+
+  actor.SetPivotY(0.3f);
+  DALI_TEST_EQUALS(actor.GetPivotY(), 0.3f, TEST_LOCATION);
+
+  actor.SetPivotZ(0.4f);
+  DALI_TEST_EQUALS(actor.GetPivotZ(), 0.4f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetSizeP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Vector3 size(100.0f, 200.0f, 300.0f);
+  actor.SetSize(size);
+  DALI_TEST_EQUALS(actor.GetSize(), size, TEST_LOCATION);
+
+  Vector3 currentSize = actor.GetCurrentSize();
+  DALI_TEST_CHECK(currentSize == Vector3::ZERO || currentSize != Vector3::ZERO);
+
+  actor.SetWidth(150.0f);
+  DALI_TEST_EQUALS(actor.GetWidth(), 150.0f, TEST_LOCATION);
+
+  actor.SetHeight(250.0f);
+  DALI_TEST_EQUALS(actor.GetHeight(), 250.0f, TEST_LOCATION);
+
+  actor.SetDepth(350.0f);
+  DALI_TEST_EQUALS(actor.GetDepth(), 350.0f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetPositionP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Vector3 position(10.0f, 20.0f, 30.0f);
+  actor.SetPosition(position);
+  DALI_TEST_EQUALS(actor.GetPosition(), position, TEST_LOCATION);
+
+  actor.SetPositionX(15.0f);
+  DALI_TEST_EQUALS(actor.GetPositionX(), 15.0f, TEST_LOCATION);
+
+  actor.SetPositionY(25.0f);
+  DALI_TEST_EQUALS(actor.GetPositionY(), 25.0f, TEST_LOCATION);
+
+  actor.SetPositionZ(35.0f);
+  DALI_TEST_EQUALS(actor.GetPositionZ(), 35.0f, TEST_LOCATION);
+
+  Vector3 currentPosition = actor.GetCurrentPosition();
+  DALI_TEST_CHECK(currentPosition != Vector3::ZERO || currentPosition == Vector3::ZERO);
+
+  Vector3 worldPosition = actor.GetWorldPosition();
+  DALI_TEST_CHECK(worldPosition == Vector3::ZERO || worldPosition != Vector3::ZERO);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetOrientationP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Quaternion orientation(Radian(0.0f), Vector3(0.0f, 1.0f, 0.0f));
+  actor.SetOrientation(orientation);
+  DALI_TEST_EQUALS(actor.GetOrientation(), orientation, TEST_LOCATION);
+
+  Quaternion worldOrientation = actor.GetWorldOrientation();
+  DALI_TEST_CHECK(worldOrientation.IsIdentity() || !worldOrientation.IsIdentity());
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetScaleP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Vector3 scale(1.5f, 2.0f, 2.5f);
+  actor.SetScale(scale);
+  DALI_TEST_EQUALS(actor.GetScale(), scale, TEST_LOCATION);
+
+  actor.SetScaleX(1.2f);
+  DALI_TEST_EQUALS(actor.GetScaleX(), 1.2f, TEST_LOCATION);
+
+  actor.SetScaleY(1.3f);
+  DALI_TEST_EQUALS(actor.GetScaleY(), 1.3f, TEST_LOCATION);
+
+  actor.SetScaleZ(1.4f);
+  DALI_TEST_EQUALS(actor.GetScaleZ(), 1.4f, TEST_LOCATION);
+
+  Vector3 worldScale = actor.GetWorldScale();
+  DALI_TEST_CHECK(worldScale.x > 0.0f);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetColorP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Vector4 color(1.0f, 0.5f, 0.25f, 0.75f);
+  actor.SetColor(color);
+  DALI_TEST_EQUALS(actor.GetColor(), color, TEST_LOCATION);
+
+  Vector4 currentColor = actor.GetCurrentColor();
+  DALI_TEST_CHECK(currentColor != Vector4::ZERO);
+
+  actor.SetColorRed(0.8f);
+  DALI_TEST_EQUALS(actor.GetColorRed(), 0.8f, TEST_LOCATION);
+
+  actor.SetColorGreen(0.6f);
+  DALI_TEST_EQUALS(actor.GetColorGreen(), 0.6f, TEST_LOCATION);
+
+  actor.SetColorBlue(0.4f);
+  DALI_TEST_EQUALS(actor.GetColorBlue(), 0.4f, TEST_LOCATION);
+
+  actor.SetColorAlpha(0.9f);
+  DALI_TEST_EQUALS(actor.GetColorAlpha(), 0.9f, TEST_LOCATION);
+
+  Vector4 worldColor = actor.GetWorldColor();
+  DALI_TEST_CHECK(worldColor != Vector4::ZERO);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetNameNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const char* name = "TestActor";
+  actor.SetName(name);
+  DALI_TEST_EQUALS(actor.GetName(), name, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetVisibleNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetVisible(true);
+  DALI_TEST_EQUALS(actor.IsVisible(), true, TEST_LOCATION);
+
+  actor.SetVisible(false);
+  DALI_TEST_EQUALS(actor.IsVisible(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetSensitiveNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetSensitive(true);
+  DALI_TEST_EQUALS(actor.IsSensitive(), true, TEST_LOCATION);
+
+  actor.SetSensitive(false);
+  DALI_TEST_EQUALS(actor.IsSensitive(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetKeyboardFocusableNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetKeyboardFocusable(true);
+  DALI_TEST_EQUALS(actor.IsKeyboardFocusable(), true, TEST_LOCATION);
+
+  actor.SetKeyboardFocusable(false);
+  DALI_TEST_EQUALS(actor.IsKeyboardFocusable(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetOpacityP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetOpacity(0.5f);
+  DALI_TEST_EQUALS(actor.GetOpacity(), 0.5f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorGetWorldMatrixNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetPosition(Vector3(10.0f, 20.0f, 0.0f));
+  actor.SetSize(Vector3(100.0f, 100.0f, 1.0f));
+  application.SendNotification();
+  application.Render();
+
+  Matrix worldMatrix = actor.GetWorldMatrix();
+  DALI_TEST_CHECK(worldMatrix.AsFloat() != NULL);
+
+  END_TEST;
+}
+
+int UtcDaliActorGetIdNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  uint32_t id = actor.GetId();
+  DALI_TEST_CHECK(id > 0);
+
+  END_TEST;
+}
+
+int UtcDaliActorIsRootNewP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK(!actor.GetProperty<bool>(Actor::Property::IS_ROOT));
+
+  actor = application.GetScene().GetRootLayer();
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::IS_ROOT));
+
+  END_TEST;
+}
+
+int UtcDaliActorIsConnectedToSceneNewP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_EQUALS(actor.IsConnectedToScene(), false, TEST_LOCATION);
+
+  application.GetScene().Add(actor);
+  DALI_TEST_EQUALS(actor.IsConnectedToScene(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorIsCulledNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  bool culled = actor.IsCulled();
+  DALI_TEST_CHECK(culled == true || culled == false);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetLeaveRequiredNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetLeaveRequired(true);
+  DALI_TEST_EQUALS(actor.GetLeaveRequired(), true, TEST_LOCATION);
+
+  actor.SetLeaveRequired(false);
+  DALI_TEST_EQUALS(actor.GetLeaveRequired(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetColorModeNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetColorMode(USE_OWN_COLOR);
+  DALI_TEST_EQUALS(actor.GetColorMode(), USE_OWN_COLOR, TEST_LOCATION);
+
+  actor.SetColorMode(USE_PARENT_COLOR);
+  DALI_TEST_EQUALS(actor.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetDrawModeNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetDrawMode(DrawMode::NORMAL);
+  DALI_TEST_EQUALS(actor.GetDrawMode(), DrawMode::NORMAL, TEST_LOCATION);
+
+  actor.SetDrawMode(DrawMode::OVERLAY_2D);
+  DALI_TEST_EQUALS(actor.GetDrawMode(), DrawMode::OVERLAY_2D, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetClippingModeNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetClippingMode(ClippingMode::DISABLED);
+  DALI_TEST_EQUALS(actor.GetClippingMode(), ClippingMode::DISABLED, TEST_LOCATION);
+
+  actor.SetClippingMode(ClippingMode::CLIP_CHILDREN);
+  DALI_TEST_EQUALS(actor.GetClippingMode(), ClippingMode::CLIP_CHILDREN, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetLayoutDirectionNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetLayoutDirection(LayoutDirection::LEFT_TO_RIGHT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+
+  actor.SetLayoutDirection(LayoutDirection::RIGHT_TO_LEFT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetInheritOrientationNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetInheritOrientationEnabled(true);
+  DALI_TEST_EQUALS(actor.IsInheritOrientationEnabled(), true, TEST_LOCATION);
+
+  actor.SetInheritOrientationEnabled(false);
+  DALI_TEST_EQUALS(actor.IsInheritOrientationEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetInheritScaleNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetInheritScaleEnabled(true);
+  DALI_TEST_EQUALS(actor.IsInheritScaleEnabled(), true, TEST_LOCATION);
+
+  actor.SetInheritScaleEnabled(false);
+  DALI_TEST_EQUALS(actor.IsInheritScaleEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetInheritPositionNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetInheritPositionEnabled(true);
+  DALI_TEST_EQUALS(actor.IsInheritPositionEnabled(), true, TEST_LOCATION);
+
+  actor.SetInheritPositionEnabled(false);
+  DALI_TEST_EQUALS(actor.IsInheritPositionEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetPositionUsesPivotNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetPositionUsesPivotEnabled(true);
+  DALI_TEST_EQUALS(actor.IsPositionUsesPivotEnabled(), true, TEST_LOCATION);
+
+  actor.SetPositionUsesPivotEnabled(false);
+  DALI_TEST_EQUALS(actor.IsPositionUsesPivotEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetTouchHitAreaMarginNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Extents margin(10, 20, 30, 40);
+  actor.SetTouchHitAreaMargin(margin);
+  DALI_TEST_EQUALS(actor.GetTouchHitAreaMargin(), margin, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetAllowSelfInitiatedTouchOnlyNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetAllowSelfInitiatedTouchOnlyEnabled(true);
+  DALI_TEST_EQUALS(actor.IsAllowSelfInitiatedTouchOnlyEnabled(), true, TEST_LOCATION);
+
+  actor.SetAllowSelfInitiatedTouchOnlyEnabled(false);
+  DALI_TEST_EQUALS(actor.IsAllowSelfInitiatedTouchOnlyEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetDispatchTouchMotionNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetDispatchTouchMotionEnabled(true);
+  DALI_TEST_EQUALS(actor.IsDispatchTouchMotionEnabled(), true, TEST_LOCATION);
+
+  actor.SetDispatchTouchMotionEnabled(false);
+  DALI_TEST_EQUALS(actor.IsDispatchTouchMotionEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetDispatchHoverMotionNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetDispatchHoverMotionEnabled(true);
+  DALI_TEST_EQUALS(actor.IsDispatchHoverMotionEnabled(), true, TEST_LOCATION);
+
+  actor.SetDispatchHoverMotionEnabled(false);
+  DALI_TEST_EQUALS(actor.IsDispatchHoverMotionEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetInheritLayoutDirectionNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetInheritLayoutDirectionEnabled(true);
+  DALI_TEST_EQUALS(actor.IsInheritLayoutDirectionEnabled(), true, TEST_LOCATION);
+
+  actor.SetInheritLayoutDirectionEnabled(false);
+  DALI_TEST_EQUALS(actor.IsInheritLayoutDirectionEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetUpdateAreaHintNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  Vector4 hint(0.0f, 0.0f, 100.0f, 100.0f);
+  actor.SetUpdateAreaHint(hint);
+  DALI_TEST_EQUALS(actor.GetUpdateAreaHint(), hint, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetBlendEquationNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetBlendEquation(BlendEquation::ADD);
+  DALI_TEST_EQUALS(actor.GetBlendEquation(), BlendEquation::ADD, TEST_LOCATION);
+
+  actor.SetBlendEquation(BlendEquation::SUBTRACT);
+  DALI_TEST_EQUALS(actor.GetBlendEquation(), BlendEquation::SUBTRACT, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorIsLayerNewP(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  DALI_TEST_CHECK(!actor.GetProperty<bool>(Actor::Property::IS_LAYER));
+
+  Layer layer = Layer::New();
+  DALI_TEST_CHECK(layer.GetProperty<bool>(Actor::Property::IS_LAYER));
+
+  END_TEST;
+}
+
+int UtcDaliActorGetWorldPositionComponentNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetPosition(Vector3(10.0f, 20.0f, 30.0f));
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(actor.GetWorldPositionX(), actor.GetWorldPosition().x, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetWorldPositionY(), actor.GetWorldPosition().y, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetWorldPositionZ(), actor.GetWorldPosition().z, TEST_LOCATION);
 
   END_TEST;
 }

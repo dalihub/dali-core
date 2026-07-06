@@ -143,8 +143,8 @@ public:
   ///@copydoc Actor::IsLayoutDirty
   bool IsLayoutDirty(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
 
-  ///@copydoc Actor::RelayoutPossible
-  bool RelayoutPossible(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
+  ///@copydoc Actor::IsRelayoutPossible
+  bool IsRelayoutPossible(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
 
   ///@copydoc Actor::RelayoutRequired
   bool RelayoutRequired(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
