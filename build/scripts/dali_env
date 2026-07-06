@@ -168,7 +168,7 @@ my $opt_envfile="setenv";
 my $opt_setenv=0;
 my $opt_help=0;
 my $opt_man=0;
-my $opt_vk_version="1.3.280.1";
+my $opt_vk_version="1.3.296.0";
 my $opt_vulkan=undef;
 my $opt_usd=0;
 
@@ -231,7 +231,12 @@ sub create_env
 
     copy($0, "$install_path/bin/dali_env");
     chmod(0755, "$install_path/bin/dali_env");
-    my $fastcov_src = "$root_path/../dali-core/build/scripts/fastcov.py";
+    my $fastcov_src = "$exec_path/fastcov.py"; # First time install, so in the same directory
+    if(! -e $fastcov_src)
+    {
+        # If using an old installation, then try to find it within dali-core
+        $fastcov_src = "$root_path/../dali-core/build/scripts/fastcov.py";
+    }
     copy($fastcov_src, "$install_path/bin/fastcov.py") or die "Failed to copy $fastcov_src to $install_path/bin/fastcov.py: $!";
     chmod(0755, "$install_path/bin/fastcov.py");
 }
