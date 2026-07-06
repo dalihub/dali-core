@@ -47,6 +47,17 @@ DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const TouchPoin
 DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Point& point);
 
 /**
+ * @brief Set the time (in ms) that the touch event occurred.
+ *
+ * This API is intended for integration layer code that needs to update the
+ * timestamp of a touch event received from DALi.
+ *
+ * @param[in] touchEvent The instance of TouchEvent.
+ * @param[in] time The time (in ms).
+ */
+DALI_CORE_API void SetTouchEventTime(Dali::TouchEvent touchEvent, uint64_t time);
+
+/**
  * Create a new hover data handle from timestamp and point.
  *
  * @param[in] timeStamp The time stamp of the hover event.

@@ -35,6 +35,11 @@ Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Poin
   return handle;
 }
 
+void SetTouchEventTime(Dali::TouchEvent touchEvent, uint64_t time)
+{
+  GetImplementation(touchEvent).SetTime(time);
+}
+
 Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const TouchPoint& point)
 {
   return NewHoverEvent(timeStamp, Integration::Point(point));

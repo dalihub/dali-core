@@ -16,7 +16,6 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/events/touch-event-devel.h>
 #include <dali/integration-api/events/touch-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -170,7 +169,7 @@ int UtcDaliTouchEventSetTime(void)
 
   DALI_TEST_EQUALS(123lu, touchEvent.GetTime(), TEST_LOCATION);
 
-  DevelTouchEvent::SetTime(touchEvent, 200lu);
+  Dali::Integration::SetTouchEventTime(touchEvent, 200lu);
   DALI_TEST_EQUALS(200lu, touchEvent.GetTime(), TEST_LOCATION);
 
   END_TEST;
