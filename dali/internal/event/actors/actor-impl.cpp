@@ -23,6 +23,7 @@
 #include <cmath>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/capabilities.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/hover-event.h>
@@ -33,7 +34,6 @@
 #include <dali/public-api/math/vector3.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/object/type-registry.h>
 
 #include <dali/integration-api/debug.h>

@@ -23,17 +23,31 @@
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_common
+ * @{
+ */
+
 namespace Capabilities
 {
 /**
- * @brief Returns whether the blend equation is supported in the system or not.
- * @param[in] blendEquation blend equation to be checked.
- * @return True if the blend equation supported.
+ * @brief Queries whether the given blend equation is supported on the current system.
+ *
+ * Some BlendEquation::Type values, such as the advanced blend equations (e.g. MULTIPLY,
+ * SCREEN, and so on), require OpenGL ES 3.2 or the KHR_blend_equation_advanced extension,
+ * and may not be supported on every device.
+ *
+ * @SINCE_2_5.30
+ * @param[in] blendEquation The blend equation to check.
+ * @return True if the blend equation is supported on the current system, false otherwise.
  */
 DALI_CORE_API bool IsBlendEquationSupported(BlendEquation::Type blendEquation);
 
 } // namespace Capabilities
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // DALI_CAPABILITIES_H
