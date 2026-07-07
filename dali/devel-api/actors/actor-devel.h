@@ -241,7 +241,7 @@ DALI_CORE_API Bounds CalculateCurrentScreenExtents(Actor actor);
 
 using ChildOrderChangedSignalType = Signal<void(Actor, Actor)>; ///< Used when the actor's children have changed order; first Actor is the parent, second is the child whose order changed
 
-using OnRelayoutSignalType = Signal<void(Actor)>; ///< Called when the actor is relaid out. @SINCE_2_5.29
+using OnRelayoutSignalType = Signal<void(Actor)>; ///< Called when the actor is relaid out.
 
 /**
  * @brief This signal is emitted when an actor's children change their sibling order
@@ -266,7 +266,6 @@ DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
  * @endcode
  * actor: The actor that was relaid out.
  *
- * @SINCE_2_5.29
  * @return The signal to connect to
  * @pre The Actor has been initialized.
  */

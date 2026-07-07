@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_GRAPHICS_CONFIG_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/public-api/rendering/renderer.h>
 
 namespace Dali::Integration
 {
@@ -45,7 +45,7 @@ public:
    * Returns current graphicses can support the blend equation
    * @Return true current graphicses support the blend equation
    */
-  virtual bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation) = 0;
+  virtual bool IsBlendEquationSupported(Dali::BlendEquation::Type blendEquation) = 0;
 
   /**
    * Returns shading language version.

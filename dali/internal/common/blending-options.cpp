@@ -147,7 +147,7 @@ void StoreBlendFactor(unsigned int& options, BlendFactor::Type factor, int bitSh
  * @param[in] factor The BlendEquation value.
  * @param[in] bitshift Used to shift to the correct part of options.
  */
-void StoreBlendEquation(unsigned int& options, DevelBlendEquation::Type factor, int bitShift)
+void StoreBlendEquation(unsigned int& options, Dali::BlendEquation::Type factor, int bitShift)
 {
   // Must be same order as BLENDING_EQUATIONS, below:
   enum
@@ -176,121 +176,121 @@ void StoreBlendEquation(unsigned int& options, DevelBlendEquation::Type factor, 
 
   switch(factor)
   {
-    case DevelBlendEquation::ADD:
+    case Dali::BlendEquation::ADD:
     {
       options |= (ADD_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::SUBTRACT:
+    case Dali::BlendEquation::SUBTRACT:
     {
       options |= (SUBTRACT_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::REVERSE_SUBTRACT:
+    case Dali::BlendEquation::REVERSE_SUBTRACT:
     {
       options |= (REVERSE_SUBTRACT_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::MIN:
+    case Dali::BlendEquation::MIN:
     {
       options |= (MIN_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::MAX:
+    case Dali::BlendEquation::MAX:
     {
       options |= (MAX_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::MULTIPLY:
+    case Dali::BlendEquation::MULTIPLY:
     {
       options |= (MULTIPLY_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::SCREEN:
+    case Dali::BlendEquation::SCREEN:
     {
       options |= (SCREEN_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::OVERLAY:
+    case Dali::BlendEquation::OVERLAY:
     {
       options |= (OVERLAY_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::DARKEN:
+    case Dali::BlendEquation::DARKEN:
     {
       options |= (DARKEN_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::LIGHTEN:
+    case Dali::BlendEquation::LIGHTEN:
     {
       options |= (LIGHTEN_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::COLOR_DODGE:
+    case Dali::BlendEquation::COLOR_DODGE:
     {
       options |= (COLOR_DODGE_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::COLOR_BURN:
+    case Dali::BlendEquation::COLOR_BURN:
     {
       options |= (COLOR_BURN_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::HARD_LIGHT:
+    case Dali::BlendEquation::HARD_LIGHT:
     {
       options |= (HARD_LIGHT_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::SOFT_LIGHT:
+    case Dali::BlendEquation::SOFT_LIGHT:
     {
       options |= (SOFT_LIGHT_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::DIFFERENCE:
+    case Dali::BlendEquation::DIFFERENCE:
     {
       options |= (DIFFERENCE_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::EXCLUSION:
+    case Dali::BlendEquation::EXCLUSION:
     {
       options |= (EXCLUSION_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::HUE:
+    case Dali::BlendEquation::HUE:
     {
       options |= (HUE_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::SATURATION:
+    case Dali::BlendEquation::SATURATION:
     {
       options |= (SATURATION_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::COLOR:
+    case Dali::BlendEquation::COLOR:
     {
       options |= (COLOR_BITVAL << bitShift);
       break;
     }
 
-    case DevelBlendEquation::LUMINOSITY:
+    case Dali::BlendEquation::LUMINOSITY:
     {
       options |= (LUMINOSITY_BITVAL << bitShift);
       break;
@@ -321,28 +321,28 @@ BlendFactor::Type BLENDING_FACTORS[BLENDING_FACTOR_COUNT] =
     BlendFactor::CONSTANT_ALPHA,
     BlendFactor::ONE_MINUS_CONSTANT_ALPHA};
 
-DevelBlendEquation::Type BLENDING_EQUATIONS[BLENDING_EQUATION_COUNT] =
+Dali::BlendEquation::Type BLENDING_EQUATIONS[BLENDING_EQUATION_COUNT] =
   {
-    DevelBlendEquation::ADD,
-    DevelBlendEquation::SUBTRACT,
-    DevelBlendEquation::REVERSE_SUBTRACT,
-    DevelBlendEquation::MIN,
-    DevelBlendEquation::MAX,
-    DevelBlendEquation::MULTIPLY,
-    DevelBlendEquation::SCREEN,
-    DevelBlendEquation::OVERLAY,
-    DevelBlendEquation::DARKEN,
-    DevelBlendEquation::LIGHTEN,
-    DevelBlendEquation::COLOR_DODGE,
-    DevelBlendEquation::COLOR_BURN,
-    DevelBlendEquation::HARD_LIGHT,
-    DevelBlendEquation::SOFT_LIGHT,
-    DevelBlendEquation::DIFFERENCE,
-    DevelBlendEquation::EXCLUSION,
-    DevelBlendEquation::HUE,
-    DevelBlendEquation::SATURATION,
-    DevelBlendEquation::COLOR,
-    DevelBlendEquation::LUMINOSITY};
+    Dali::BlendEquation::ADD,
+    Dali::BlendEquation::SUBTRACT,
+    Dali::BlendEquation::REVERSE_SUBTRACT,
+    Dali::BlendEquation::MIN,
+    Dali::BlendEquation::MAX,
+    Dali::BlendEquation::MULTIPLY,
+    Dali::BlendEquation::SCREEN,
+    Dali::BlendEquation::OVERLAY,
+    Dali::BlendEquation::DARKEN,
+    Dali::BlendEquation::LIGHTEN,
+    Dali::BlendEquation::COLOR_DODGE,
+    Dali::BlendEquation::COLOR_BURN,
+    Dali::BlendEquation::HARD_LIGHT,
+    Dali::BlendEquation::SOFT_LIGHT,
+    Dali::BlendEquation::DIFFERENCE,
+    Dali::BlendEquation::EXCLUSION,
+    Dali::BlendEquation::HUE,
+    Dali::BlendEquation::SATURATION,
+    Dali::BlendEquation::COLOR,
+    Dali::BlendEquation::LUMINOSITY};
 
 /**
  * Utility to retrieve one of the BlendFunc values.
@@ -368,7 +368,7 @@ BlendFactor::Type RetrieveBlendFactor(unsigned int options, int mask, int bitShi
  * @param[in] bitshift Used to shift to the correct part of options.
  * @return The blending equation.
  */
-DevelBlendEquation::Type RetrieveBlendEquation(unsigned int options, int mask, int bitShift)
+Dali::BlendEquation::Type RetrieveBlendEquation(unsigned int options, int mask, int bitShift)
 {
   unsigned int index = options & mask;
   index              = index >> bitShift;
@@ -390,7 +390,7 @@ BlendingOptions::BlendingOptions()
 {
   SetBlendFunc(BlendFactor::SRC_ALPHA, BlendFactor::ONE_MINUS_SRC_ALPHA, BlendFactor::ONE, BlendFactor::ONE_MINUS_SRC_ALPHA);
 
-  SetBlendEquation(DevelBlendEquation::ADD, DevelBlendEquation::ADD);
+  SetBlendEquation(Dali::BlendEquation::ADD, Dali::BlendEquation::ADD);
 }
 
 BlendingOptions::~BlendingOptions() = default;
@@ -435,7 +435,7 @@ BlendFactor::Type BlendingOptions::GetBlendDestFactorAlpha() const
   return RetrieveBlendFactor(mBitmask, MASK_DEST_FACTOR_ALPHA, SHIFT_TO_DEST_FACTOR_ALPHA);
 }
 
-void BlendingOptions::SetBlendEquation(DevelBlendEquation::Type equationRgb, DevelBlendEquation::Type equationAlpha)
+void BlendingOptions::SetBlendEquation(Dali::BlendEquation::Type equationRgb, Dali::BlendEquation::Type equationAlpha)
 {
   mBitmask &= CLEAR_BLEND_EQUATION_MASK; // Clear the BlendEquation values
 
@@ -443,12 +443,12 @@ void BlendingOptions::SetBlendEquation(DevelBlendEquation::Type equationRgb, Dev
   StoreBlendEquation(mBitmask, equationAlpha, SHIFT_TO_EQUATION_ALPHA);
 }
 
-DevelBlendEquation::Type BlendingOptions::GetBlendEquationRgb() const
+Dali::BlendEquation::Type BlendingOptions::GetBlendEquationRgb() const
 {
   return RetrieveBlendEquation(mBitmask, MASK_EQUATION_RGB, SHIFT_TO_EQUATION_RGB);
 }
 
-DevelBlendEquation::Type BlendingOptions::GetBlendEquationAlpha() const
+Dali::BlendEquation::Type BlendingOptions::GetBlendEquationAlpha() const
 {
   return RetrieveBlendEquation(mBitmask, MASK_EQUATION_ALPHA, SHIFT_TO_EQUATION_ALPHA);
 }
@@ -500,25 +500,25 @@ bool BlendingOptions::IsAdvancedBlendEquationIncluded(unsigned int bitmask)
           ((indexA >= BLENDING_EQUATION_ADVANCED_INDEX_START) && (indexA <= BLENDING_EQUATION_ADVANCED_INDEX_END)));
 }
 
-bool BlendingOptions::IsAdvancedBlendEquation(DevelBlendEquation::Type equation)
+bool BlendingOptions::IsAdvancedBlendEquation(Dali::BlendEquation::Type equation)
 {
   switch(equation)
   {
-    case DevelBlendEquation::MULTIPLY:
-    case DevelBlendEquation::SCREEN:
-    case DevelBlendEquation::OVERLAY:
-    case DevelBlendEquation::DARKEN:
-    case DevelBlendEquation::LIGHTEN:
-    case DevelBlendEquation::COLOR_DODGE:
-    case DevelBlendEquation::COLOR_BURN:
-    case DevelBlendEquation::HARD_LIGHT:
-    case DevelBlendEquation::SOFT_LIGHT:
-    case DevelBlendEquation::DIFFERENCE:
-    case DevelBlendEquation::EXCLUSION:
-    case DevelBlendEquation::HUE:
-    case DevelBlendEquation::SATURATION:
-    case DevelBlendEquation::COLOR:
-    case DevelBlendEquation::LUMINOSITY:
+    case Dali::BlendEquation::MULTIPLY:
+    case Dali::BlendEquation::SCREEN:
+    case Dali::BlendEquation::OVERLAY:
+    case Dali::BlendEquation::DARKEN:
+    case Dali::BlendEquation::LIGHTEN:
+    case Dali::BlendEquation::COLOR_DODGE:
+    case Dali::BlendEquation::COLOR_BURN:
+    case Dali::BlendEquation::HARD_LIGHT:
+    case Dali::BlendEquation::SOFT_LIGHT:
+    case Dali::BlendEquation::DIFFERENCE:
+    case Dali::BlendEquation::EXCLUSION:
+    case Dali::BlendEquation::HUE:
+    case Dali::BlendEquation::SATURATION:
+    case Dali::BlendEquation::COLOR:
+    case Dali::BlendEquation::LUMINOSITY:
     {
       return true;
     }

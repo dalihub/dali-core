@@ -82,7 +82,7 @@ const char* TOUCH_POINT_STATE[PointState::INTERRUPTED + 1] =
 bool ShouldEmitHoverEvent(const Actor& actorImpl, const Dali::HoverEvent& event)
 {
   PointState::Type state = event.GetState(0);
-  return actorImpl.GetHoverRequired() && (state != PointState::MOTION || actorImpl.IsDispatchHoverMotion());
+  return actorImpl.GetHoverRequired() && (state != PointState::MOTION || actorImpl.IsDispatchHoverMotionEnabled());
 }
 
 /**
@@ -160,7 +160,7 @@ Dali::Actor EmitGeoHoverSignals(std::list<Dali::Internal::Actor*>& actorLists, c
           break;
         }
       }
-      else if(hoverEvent.GetState(0) != PointState::MOTION || actorImpl->IsDispatchHoverMotion())
+      else if(hoverEvent.GetState(0) != PointState::MOTION || actorImpl->IsDispatchHoverMotionEnabled())
       {
         if(actorImpl->EmitHoverEventSignal(hoverEvent))
         {
@@ -440,7 +440,7 @@ struct HoverEventProcessor::Impl
         {
           localVars.consumedActor = EmitHoverSignals(hitActor, localVars.hoverEventHandle);
           // If IsDispatchHoverMotion is false, the move event was not dispatched. So consumedActor should keep the previous LastConsumedActor value.
-          if(!localVars.consumedActor && localVars.primaryPointState == PointState::MOTION && !GetImplementation(hitActor).IsDispatchHoverMotion())
+          if(!localVars.consumedActor && localVars.primaryPointState == PointState::MOTION && !GetImplementation(hitActor).IsDispatchHoverMotionEnabled())
           {
             localVars.consumedActor = Dali::Actor(processor.mLastConsumedActor.GetActor());
           }

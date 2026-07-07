@@ -152,7 +152,7 @@ struct ActorTouchableCheck : public HitTestInterface
   bool ActorRequiresHitResultCheck(Actor* actor, Vector2 hitPointLocal) override
   {
     // The Geometry way behaves like AllowSelfInitiatedTouchOnly is enabled.
-    if(GetPoint().GetState() != PointState::STARTED && (GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY || actor->IsAllowSelfInitiatedTouchOnly()) && ownActor != actor)
+    if(GetPoint().GetState() != PointState::STARTED && (GetPropagationType() == Integration::Scene::TouchPropagationType::GEOMETRY || actor->IsAllowSelfInitiatedTouchOnlyEnabled()) && ownActor != actor)
     {
       return false;
     }
@@ -262,7 +262,7 @@ std::shared_ptr<HitResult> HitTestActor(Actor&                renderTaskSourceAc
   // It don't need to mark sourceActor to MappingActor, because the mapping is not for the current RenderTask.
   if(!hitCheck.IsActorHittable(&actor))
   {
-    if(!(actor.IsRenderTaskMappingActor() && (&renderTaskSourceActor != &actor) && actor.GetCurrentWorldColor().a > FULLY_TRANSPARENT))
+    if(!(actor.IsRenderTaskMappingActor() && (&renderTaskSourceActor != &actor) && actor.GetWorldColor().a > FULLY_TRANSPARENT))
     {
       return nullptr;
     }
@@ -684,7 +684,7 @@ bool HitTestRenderTask(std::vector<std::shared_ptr<HitResult>>& hitResultList,
   GetCameraClippingPlane(renderTask, nearClippingPlane, farClippingPlane);
 
   // Recompute near and far clipping plane distance with the picking ray.
-  Vector3 centerDirection = renderTask.GetCameraActor()->GetCurrentWorldOrientation().Rotate(Dali::Vector3::ZAXIS);
+  Vector3 centerDirection = renderTask.GetCameraActor()->GetWorldOrientation().Rotate(Dali::Vector3::ZAXIS);
   centerDirection.Normalize();
   float projectionFactor              = centerDirection.Dot(Vector3(ray.direction));
   float projectedNearClippingDistance = nearClippingPlane / projectionFactor;

@@ -196,21 +196,21 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::PARENT_ORIGIN_X:
     {
-      const Vector3& current = actor.GetCurrentParentOrigin();
+      const Vector3& current = actor.GetParentOrigin();
       actor.SetParentOrigin(Vector3(property.Get<float>(), current.y, current.z));
       break;
     }
 
     case Dali::Actor::Property::PARENT_ORIGIN_Y:
     {
-      const Vector3& current = actor.GetCurrentParentOrigin();
+      const Vector3& current = actor.GetParentOrigin();
       actor.SetParentOrigin(Vector3(current.x, property.Get<float>(), current.z));
       break;
     }
 
     case Dali::Actor::Property::PARENT_ORIGIN_Z:
     {
-      const Vector3& current = actor.GetCurrentParentOrigin();
+      const Vector3& current = actor.GetParentOrigin();
       actor.SetParentOrigin(Vector3(current.x, current.y, property.Get<float>()));
       break;
     }
@@ -223,21 +223,21 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::PIVOT_X:
     {
-      const Vector3& current = actor.GetCurrentPivot();
+      const Vector3& current = actor.GetPivot();
       actor.SetPivot(Vector3(property.Get<float>(), current.y, current.z));
       break;
     }
 
     case Dali::Actor::Property::PIVOT_Y:
     {
-      const Vector3& current = actor.GetCurrentPivot();
+      const Vector3& current = actor.GetPivot();
       actor.SetPivot(Vector3(current.x, property.Get<float>(), current.z));
       break;
     }
 
     case Dali::Actor::Property::PIVOT_Z:
     {
-      const Vector3& current = actor.GetCurrentPivot();
+      const Vector3& current = actor.GetPivot();
       actor.SetPivot(Vector3(current.x, current.y, property.Get<float>()));
       break;
     }
@@ -561,7 +561,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
     {
-      CheckValidAndSet(property, actor, &Actor::SetInheritLayoutDirection);
+      CheckValidAndSet(property, actor, &Actor::SetInheritLayoutDirectionEnabled);
       break;
     }
 
@@ -1177,49 +1177,49 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
   {
     case Dali::Actor::Property::PARENT_ORIGIN:
     {
-      value = actor.GetCurrentParentOrigin();
+      value = actor.GetParentOrigin();
       break;
     }
 
     case Dali::Actor::Property::PARENT_ORIGIN_X:
     {
-      value = actor.GetCurrentParentOrigin().x;
+      value = actor.GetParentOrigin().x;
       break;
     }
 
     case Dali::Actor::Property::PARENT_ORIGIN_Y:
     {
-      value = actor.GetCurrentParentOrigin().y;
+      value = actor.GetParentOrigin().y;
       break;
     }
 
     case Dali::Actor::Property::PARENT_ORIGIN_Z:
     {
-      value = actor.GetCurrentParentOrigin().z;
+      value = actor.GetParentOrigin().z;
       break;
     }
 
     case Dali::Actor::Property::PIVOT:
     {
-      value = actor.GetCurrentPivot();
+      value = actor.GetPivot();
       break;
     }
 
     case Dali::Actor::Property::PIVOT_X:
     {
-      value = actor.GetCurrentPivot().x;
+      value = actor.GetPivot().x;
       break;
     }
 
     case Dali::Actor::Property::PIVOT_Y:
     {
-      value = actor.GetCurrentPivot().y;
+      value = actor.GetPivot().y;
       break;
     }
 
     case Dali::Actor::Property::PIVOT_Z:
     {
-      value = actor.GetCurrentPivot().z;
+      value = actor.GetPivot().z;
       break;
     }
 
@@ -1340,7 +1340,7 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
 
     case Dali::Actor::Property::NAME:
     {
-      value = Property::Value(actor.GetName().data());
+      value = Property::Value(Integration::ToDaliString(actor.GetName()));
       break;
     }
 
@@ -1464,7 +1464,7 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
 
     case Dali::Actor::Property::SCREEN_POSITION:
     {
-      value = actor.GetCurrentScreenPosition();
+      value = actor.GetScreenPosition();
       break;
     }
 
@@ -1482,7 +1482,7 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
 
     case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
     {
-      value = actor.IsLayoutDirectionInherited();
+      value = actor.IsInheritLayoutDirectionEnabled();
       break;
     }
 
@@ -1661,25 +1661,25 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
 
     case Dali::Actor::Property::WORLD_POSITION:
     {
-      value = actor.GetCurrentWorldPosition();
+      value = actor.GetWorldPosition();
       break;
     }
 
     case Dali::Actor::Property::WORLD_POSITION_X:
     {
-      value = actor.GetCurrentWorldPosition().x;
+      value = actor.GetWorldPosition().x;
       break;
     }
 
     case Dali::Actor::Property::WORLD_POSITION_Y:
     {
-      value = actor.GetCurrentWorldPosition().y;
+      value = actor.GetWorldPosition().y;
       break;
     }
 
     case Dali::Actor::Property::WORLD_POSITION_Z:
     {
-      value = actor.GetCurrentWorldPosition().z;
+      value = actor.GetWorldPosition().z;
       break;
     }
 
@@ -1691,7 +1691,7 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
 
     case Dali::Actor::Property::WORLD_ORIENTATION:
     {
-      value = actor.GetCurrentWorldOrientation();
+      value = actor.GetWorldOrientation();
       break;
     }
 
@@ -1758,19 +1758,19 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
 
     case Dali::Actor::Property::WORLD_COLOR:
     {
-      value = actor.GetCurrentWorldColor();
+      value = actor.GetWorldColor();
       break;
     }
 
     case Dali::Actor::Property::WORLD_MATRIX:
     {
-      value = actor.GetCurrentWorldMatrix();
+      value = actor.GetWorldMatrix();
       break;
     }
 
     case Dali::Actor::Property::VISIBLE:
     {
-      value = actor.IsVisible();
+      value = actor.GetNode().IsVisible();
       break;
     }
 
@@ -1802,7 +1802,7 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
 
     case Dali::DevelActor::Property::WORLD_IGNORED:
     {
-      value = actor.IsCurrentWorldIgnored();
+      value = actor.IsWorldIgnored();
       break;
     }
 

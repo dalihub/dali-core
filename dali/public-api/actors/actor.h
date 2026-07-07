@@ -28,6 +28,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 #undef SIZE_WIDTH // Defined in later versions of cstdint but is used in this header
@@ -72,7 +73,7 @@ struct Vector4;
  * - If an actor is made insensitive, then the actor and its children are not hittable; see Actor::Property::SENSITIVE.
  * - If an actor's visibility flag is unset, then none of its children are hittable either; see Actor::Property::VISIBLE.
  * - To be hittable, an actor must have a non-zero size.
- * - If an actor's world color is fully transparent, then it is not hittable; see GetCurrentWorldColor().
+ * - If an actor's world color is fully transparent, then it is not hittable; see GetWorldColor().
  *
  * <i>Hit Test Algorithm:</i>
  *
@@ -1077,7 +1078,790 @@ public:
    */
   void ScaleBy(const Vector3& relativeScale);
 
-  // Input Handling
+  // Property Accessors
+
+  /**
+   * @brief Sets the parent origin of the actor.
+   * @param[in] origin The parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOrigin(const Vector3& origin);
+
+  /**
+   * @brief Gets the parent origin of the actor.
+   * @return The parent origin
+   * @SINCE_2_5.30
+   */
+  Vector3 GetParentOrigin() const;
+
+  /**
+   * @brief Sets the X component of the parent origin.
+   * @param[in] x The x component of the parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOriginX(float x);
+
+  /**
+   * @brief Gets the X component of the parent origin.
+   * @return The X component of the parent origin
+   * @SINCE_2_5.30
+   */
+  float GetParentOriginX() const;
+
+  /**
+   * @brief Sets the Y component of the parent origin.
+   * @param[in] y The y component of the parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOriginY(float y);
+
+  /**
+   * @brief Gets the Y component of the parent origin.
+   * @return The Y component of the parent origin
+   * @SINCE_2_5.30
+   */
+  float GetParentOriginY() const;
+
+  /**
+   * @brief Sets the Z component of the parent origin.
+   * @param[in] z The z component of the parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOriginZ(float z);
+
+  /**
+   * @brief Gets the Z component of the parent origin.
+   * @return The Z component of the parent origin
+   * @SINCE_2_5.30
+   */
+  float GetParentOriginZ() const;
+
+  /**
+   * @brief Sets the pivot (anchor point) of the actor.
+   * @param[in] pivot The pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivot(const Vector3& pivot);
+
+  /**
+   * @brief Gets the pivot (anchor point) of the actor.
+   * @return The pivot
+   * @SINCE_2_5.30
+   */
+  Vector3 GetPivot() const;
+
+  /**
+   * @brief Sets the X component of the pivot (anchor point).
+   * @param[in] x The x component of the pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivotX(float x);
+
+  /**
+   * @brief Gets the X component of the pivot (anchor point).
+   * @return The X component of the pivot
+   * @SINCE_2_5.30
+   */
+  float GetPivotX() const;
+
+  /**
+   * @brief Sets the Y component of the pivot (anchor point).
+   * @param[in] y The y component of the pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivotY(float y);
+
+  /**
+   * @brief Gets the Y component of the pivot (anchor point).
+   * @return The Y component of the pivot
+   * @SINCE_2_5.30
+   */
+  float GetPivotY() const;
+
+  /**
+   * @brief Sets the Z component of the pivot (anchor point).
+   * @param[in] z The z component of the pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivotZ(float z);
+
+  /**
+   * @brief Gets the Z component of the pivot (anchor point).
+   * @return The Z component of the pivot
+   * @SINCE_2_5.30
+   */
+  float GetPivotZ() const;
+
+  /**
+   * @brief Sets the size of the actor.
+   * @param[in] size The size
+   * @SINCE_2_5.30
+   */
+  void SetSize(const Vector3& size);
+
+  /**
+   * @brief Gets the size of the actor.
+   * @return The size
+   * @SINCE_2_5.30
+   */
+  Vector3 GetSize() const;
+
+  /**
+   * @brief Gets the current size of the actor from the previous update.
+   * @return The current size of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetCurrentSize() const;
+
+  /**
+   * @brief Sets the width of the actor.
+   * @param[in] width The width
+   * @SINCE_2_5.30
+   */
+  void SetWidth(float width);
+
+  /**
+   * @brief Gets the width of the actor.
+   * @return The width of the actor
+   * @SINCE_2_5.30
+   */
+  float GetWidth() const;
+
+  /**
+   * @brief Sets the height of the actor.
+   * @param[in] height The height
+   * @SINCE_2_5.30
+   */
+  void SetHeight(float height);
+
+  /**
+   * @brief Gets the height of the actor.
+   * @return The height of the actor
+   * @SINCE_2_5.30
+   */
+  float GetHeight() const;
+
+  /**
+   * @brief Sets the depth of the actor.
+   * @param[in] depth The depth
+   * @SINCE_2_5.30
+   */
+  void SetDepth(float depth);
+
+  /**
+   * @brief Gets the depth of the actor.
+   * @return The depth of the actor
+   * @SINCE_2_5.30
+   */
+  float GetDepth() const;
+
+  /**
+   * @brief Sets the position of the actor.
+   * @param[in] position The position
+   * @SINCE_2_5.30
+   */
+  void SetPosition(const Vector3& position);
+
+  /**
+   * @brief Sets the X position of the actor.
+   * @param[in] x The X position
+   * @SINCE_2_5.30
+   */
+  void SetPositionX(float x);
+
+  /**
+   * @brief Gets the X position of the actor.
+   * @return The X position
+   * @SINCE_2_5.30
+   */
+  float GetPositionX() const;
+
+  /**
+   * @brief Sets the Y position of the actor.
+   * @param[in] y The Y position
+   * @SINCE_2_5.30
+   */
+  void SetPositionY(float y);
+
+  /**
+   * @brief Gets the Y position of the actor.
+   * @return The Y position
+   * @SINCE_2_5.30
+   */
+  float GetPositionY() const;
+
+  /**
+   * @brief Sets the Z position of the actor.
+   * @param[in] z The Z position
+   * @SINCE_2_5.30
+   */
+  void SetPositionZ(float z);
+
+  /**
+   * @brief Gets the Z position of the actor.
+   * @return The Z position
+   * @SINCE_2_5.30
+   */
+  float GetPositionZ() const;
+
+  /**
+   * @brief Gets the position of the actor.
+   * @return The position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetPosition() const;
+
+  /**
+   * @brief Gets the current position of the actor from the previous update.
+   * @return The current position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetCurrentPosition() const;
+
+  /**
+   * @brief Gets the world position of the actor.
+   * @return The world position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetWorldPosition() const;
+
+  /**
+   * @brief Gets the X component of the world position.
+   * @return The X component of the world position
+   * @SINCE_2_5.30
+   */
+  float GetWorldPositionX() const;
+
+  /**
+   * @brief Gets the Y component of the world position.
+   * @return The Y component of the world position
+   * @SINCE_2_5.30
+   */
+  float GetWorldPositionY() const;
+
+  /**
+   * @brief Gets the Z component of the world position.
+   * @return The Z component of the world position
+   * @SINCE_2_5.30
+   */
+  float GetWorldPositionZ() const;
+
+  /**
+   * @brief Sets the orientation of the actor.
+   * @param[in] orientation The orientation
+   * @SINCE_2_5.30
+   */
+  void SetOrientation(const Quaternion& orientation);
+
+  /**
+   * @brief Gets the orientation of the actor.
+   * @return The orientation
+   * @SINCE_2_5.30
+   */
+  Quaternion GetOrientation() const;
+
+  /**
+   * @brief Gets the world orientation of the actor.
+   * @return The world orientation
+   * @SINCE_2_5.30
+   */
+  Quaternion GetWorldOrientation() const;
+
+  /**
+   * @brief Sets the scale factor applied to the actor.
+   * @param[in] scale The scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScale(const Vector3& scale);
+
+  /**
+   * @brief Gets the scale factor applied to the actor.
+   * @return The scale factor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetScale() const;
+
+  /**
+   * @brief Sets the X scale factor applied to the actor.
+   * @param[in] scaleX The X scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScaleX(float scaleX);
+
+  /**
+   * @brief Gets the X scale factor applied to the actor.
+   * @return The X scale factor
+   * @SINCE_2_5.30
+   */
+  float GetScaleX() const;
+
+  /**
+   * @brief Sets the Y scale factor applied to the actor.
+   * @param[in] scaleY The Y scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScaleY(float scaleY);
+
+  /**
+   * @brief Gets the Y scale factor applied to the actor.
+   * @return The Y scale factor
+   * @SINCE_2_5.30
+   */
+  float GetScaleY() const;
+
+  /**
+   * @brief Sets the Z scale factor applied to the actor.
+   * @param[in] scaleZ The Z scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScaleZ(float scaleZ);
+
+  /**
+   * @brief Gets the Z scale factor applied to the actor.
+   * @return The Z scale factor
+   * @SINCE_2_5.30
+   */
+  float GetScaleZ() const;
+
+  /**
+   * @brief Gets the world scale factor applied to the actor.
+   * @return The world scale factor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetWorldScale() const;
+
+  /**
+   * @brief Sets the visibility flag of the actor.
+   * @param[in] visible True to set the actor visible
+   * @SINCE_2_5.30
+   */
+  void SetVisible(bool visible);
+
+  /**
+   * @brief Gets the visibility flag of the actor.
+   * @return True if the actor is visible
+   * @SINCE_2_5.30
+   */
+  bool IsVisible() const;
+
+  /**
+   * @brief Sets the color of the actor.
+   * @param[in] color The color
+   * @SINCE_2_5.30
+   */
+  void SetColor(const Vector4& color);
+
+  /**
+   * @brief Gets the color of the actor.
+   * @return The color of the actor
+   * @SINCE_2_5.30
+   */
+  Vector4 GetColor() const;
+
+  /**
+   * @brief Gets the current color of the actor from the previous update.
+   * @return The current color of the actor
+   * @SINCE_2_5.30
+   */
+  Vector4 GetCurrentColor() const;
+
+  /**
+   * @brief Sets the red component of the actor's color.
+   * @param[in] red The red component value
+   * @SINCE_2_5.30
+   */
+  void SetColorRed(float red);
+
+  /**
+   * @brief Gets the red component of the actor's color.
+   * @return The red component value
+   * @SINCE_2_5.30
+   */
+  float GetColorRed() const;
+
+  /**
+   * @brief Sets the green component of the actor's color.
+   * @param[in] green The green component value
+   * @SINCE_2_5.30
+   */
+  void SetColorGreen(float green);
+
+  /**
+   * @brief Gets the green component of the actor's color.
+   * @return The green component value
+   * @SINCE_2_5.30
+   */
+  float GetColorGreen() const;
+
+  /**
+   * @brief Sets the blue component of the actor's color.
+   * @param[in] blue The blue component value
+   * @SINCE_2_5.30
+   */
+  void SetColorBlue(float blue);
+
+  /**
+   * @brief Gets the blue component of the actor's color.
+   * @return The blue component value
+   * @SINCE_2_5.30
+   */
+  float GetColorBlue() const;
+
+  /**
+   * @brief Sets the alpha component of the actor's color.
+   * @param[in] alpha The alpha component value
+   * @note Equivalent to SetOpacity(). Both set the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  void SetColorAlpha(float alpha);
+
+  /**
+   * @brief Gets the alpha component of the actor's color.
+   * @return The alpha component value
+   * @note Equivalent to GetOpacity(). Both read the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  float GetColorAlpha() const;
+
+  /**
+   * @brief Gets the world color of the actor.
+   * @return The world color of the actor
+   * @SINCE_2_5.30
+   */
+  Vector4 GetWorldColor() const;
+
+  /**
+   * @brief Gets the world matrix of the actor.
+   * @return The world matrix of the actor
+   * @SINCE_2_5.30
+   */
+  Matrix GetWorldMatrix() const;
+
+  /**
+   * @brief Sets the name of the actor.
+   * @param[in] name The name
+   * @SINCE_2_5.30
+   */
+  void SetName(Dali::StringView name);
+
+  /**
+   * @brief Gets the name of the actor.
+   * @return The name of the actor
+   * @SINCE_2_5.30
+   */
+  Dali::String GetName() const;
+
+  /**
+   * @brief Sets the sensitivity flag of the actor.
+   * @param[in] sensitive True to make the actor sensitive
+   * @SINCE_2_5.30
+   */
+  void SetSensitive(bool sensitive);
+
+  /**
+   * @brief Gets the sensitivity flag of the actor.
+   * @return True if the actor is sensitive
+   * @SINCE_2_5.30
+   */
+  bool IsSensitive() const;
+
+  /**
+   * @brief Sets the leave required flag.
+   * @param[in] required Whether leave event is required
+   * @SINCE_2_5.30
+   */
+  void SetLeaveRequired(bool required);
+
+  /**
+   * @brief Gets the leave required flag.
+   * @return Whether leave event is required
+   * @SINCE_2_5.30
+   */
+  bool GetLeaveRequired() const;
+
+  /**
+   * @brief Sets the touch hit area margin.
+   * @param[in] margin The touch hit area margin
+   * @SINCE_2_5.30
+   */
+  void SetTouchHitAreaMargin(const Extents& margin);
+
+  /**
+   * @brief Gets the touch hit area margin.
+   * @return The touch hit area margin
+   * @SINCE_2_5.30
+   */
+  Extents GetTouchHitAreaMargin() const;
+
+  /**
+   * @brief Sets whether to allow only self-initiated touch events.
+   * @param[in] enabled True to allow only self-initiated touch
+   * @SINCE_2_5.30
+   */
+  void SetAllowSelfInitiatedTouchOnlyEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether only self-initiated touch events are allowed.
+   * @return True if only self-initiated touch is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsAllowSelfInitiatedTouchOnlyEnabled() const;
+
+  /**
+   * @brief Sets whether to dispatch touch motion events.
+   * @param[in] enabled True to dispatch touch motion events
+   * @SINCE_2_5.30
+   */
+  void SetDispatchTouchMotionEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether touch motion events are dispatched.
+   * @return True if touch motion dispatch is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsDispatchTouchMotionEnabled() const;
+
+  /**
+   * @brief Sets whether to dispatch hover motion events.
+   * @param[in] enabled True to dispatch hover motion events
+   * @SINCE_2_5.30
+   */
+  void SetDispatchHoverMotionEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether hover motion events are dispatched.
+   * @return True if hover motion dispatch is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsDispatchHoverMotionEnabled() const;
+
+  /**
+   * @brief Sets the inherit orientation flag.
+   * @param[in] inherit Whether to inherit orientation
+   * @SINCE_2_5.30
+   */
+  void SetInheritOrientationEnabled(bool inherit);
+
+  /**
+   * @brief Gets the inherit orientation flag.
+   * @return Whether orientation is inherited
+   * @SINCE_2_5.30
+   */
+  bool IsInheritOrientationEnabled() const;
+
+  /**
+   * @brief Sets the inherit scale flag.
+   * @param[in] inherit Whether to inherit scale
+   * @SINCE_2_5.30
+   */
+  void SetInheritScaleEnabled(bool inherit);
+
+  /**
+   * @brief Gets the inherit scale flag.
+   * @return Whether scale is inherited
+   * @SINCE_2_5.30
+   */
+  bool IsInheritScaleEnabled() const;
+
+  /**
+   * @brief Sets the inherit position flag.
+   * @param[in] inherit Whether to inherit position
+   * @SINCE_2_5.30
+   */
+  void SetInheritPositionEnabled(bool inherit);
+
+  /**
+   * @brief Gets the inherit position flag.
+   * @return Whether position is inherited
+   * @SINCE_2_5.30
+   */
+  bool IsInheritPositionEnabled() const;
+
+  /**
+   * @brief Sets the color mode.
+   * @param[in] colorMode The color mode
+   * @SINCE_2_5.30
+   */
+  void SetColorMode(ColorMode colorMode);
+
+  /**
+   * @brief Gets the color mode.
+   * @return The color mode
+   * @SINCE_2_5.30
+   */
+  ColorMode GetColorMode() const;
+
+  /**
+   * @brief Sets the draw mode.
+   * @param[in] drawMode The draw mode
+   * @SINCE_2_5.30
+   */
+  void SetDrawMode(DrawMode::Type drawMode);
+
+  /**
+   * @brief Gets the draw mode.
+   * @return The draw mode
+   * @SINCE_2_5.30
+   */
+  DrawMode::Type GetDrawMode() const;
+
+  /**
+   * @brief Sets the blend equation.
+   * @param[in] blendEquation The blend equation
+   * @SINCE_2_5.30
+   */
+  void SetBlendEquation(Dali::BlendEquation::Type blendEquation);
+
+  /**
+   * @brief Gets the blend equation.
+   * @return The blend equation
+   * @SINCE_2_5.30
+   */
+  Dali::BlendEquation::Type GetBlendEquation() const;
+
+  /**
+   * @brief Sets the clipping mode.
+   * @param[in] clippingMode The clipping mode
+   * @SINCE_2_5.30
+   */
+  void SetClippingMode(ClippingMode::Type clippingMode);
+
+  /**
+   * @brief Gets the clipping mode.
+   * @return The clipping mode
+   * @SINCE_2_5.30
+   */
+  ClippingMode::Type GetClippingMode() const;
+
+  /**
+   * @brief Sets the layout direction.
+   * @param[in] layoutDirection The layout direction
+   * @SINCE_2_5.30
+   */
+  void SetLayoutDirection(LayoutDirection::Type layoutDirection);
+
+  /**
+   * @brief Gets the layout direction.
+   * @return The layout direction
+   * @SINCE_2_5.30
+   */
+  LayoutDirection::Type GetLayoutDirection() const;
+
+  /**
+   * @brief Sets whether the child inherits the layout direction from the parent.
+   * @param[in] enabled True to inherit layout direction
+   * @SINCE_2_5.30
+   */
+  void SetInheritLayoutDirectionEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether the child inherits the layout direction from the parent.
+   * @return True if layout direction inheritance is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsInheritLayoutDirectionEnabled() const;
+
+  /**
+   * @brief Sets the opacity.
+   * @param[in] opacity The opacity
+   * @note Equivalent to SetColorAlpha(). Both set the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  void SetOpacity(float opacity);
+
+  /**
+   * @brief Gets the opacity.
+   * @return The opacity
+   * @note Equivalent to GetColorAlpha(). Both read the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  float GetOpacity() const;
+
+  /**
+   * @brief Sets the screen position of the actor.
+   * @return The screen position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector2 GetScreenPosition() const;
+
+  /**
+   * @brief Sets whether the position uses the pivot point.
+   * @param[in] enabled True to use pivot for position
+   * @SINCE_2_5.30
+   */
+  void SetPositionUsesPivotEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether the position uses the pivot point.
+   * @return True if position uses pivot
+   * @SINCE_2_5.30
+   */
+  bool IsPositionUsesPivotEnabled() const;
+
+  /**
+   * @brief Gets whether the actor is culled.
+   * @return Whether the actor is culled
+   * @SINCE_2_5.30
+   */
+  bool IsCulled() const;
+
+  /**
+   * @brief Gets the actor ID.
+   * @return The actor ID
+   * @SINCE_2_5.30
+   */
+  uint32_t GetId() const;
+
+  /**
+   * @brief Gets whether the actor is root.
+   * @return Whether the actor is root
+   * @SINCE_2_5.30
+   */
+  bool IsRoot() const;
+
+  /**
+   * @brief Gets whether the actor is a layer.
+   * @return Whether the actor is a layer
+   * @SINCE_2_5.30
+   */
+  bool IsLayer() const;
+
+  /**
+   * @brief Gets whether the actor is connected to scene.
+   * @return Whether the actor is connected to scene
+   * @SINCE_2_5.30
+   */
+  bool IsConnectedToScene() const;
+
+  /**
+   * @brief Sets whether the actor should be focusable by keyboard navigation.
+   * @param[in] focusable True to make the actor keyboard focusable
+   * @SINCE_2_5.30
+   */
+  void SetKeyboardFocusable(bool focusable);
+
+  /**
+   * @brief Gets whether the actor is keyboard focusable.
+   * @return True if the actor is keyboard focusable
+   * @SINCE_2_5.30
+   */
+  bool IsKeyboardFocusable() const;
+
+  /**
+   * @brief Sets the update area hint for the actor.
+   * @param[in] hint The update area hint
+   * @SINCE_2_5.30
+   */
+  void SetUpdateAreaHint(const Vector4& hint);
+
+  /**
+   * @brief Gets the update area hint for the actor.
+   * @return The update area hint
+   * @SINCE_2_5.30
+   */
+  Vector4 GetUpdateAreaHint() const;
+
+  // Coordinate Conversion
 
   /**
    * @brief Converts screen coordinates into the actor's coordinate system using the default camera.
@@ -1145,6 +1929,8 @@ public:
    * @pre The Actor has been initialized.
    */
   Bounds CalculateScreenExtents() const;
+
+  // Sibling Order
 
   /**
    * @brief Raise actor above the next sibling actor.

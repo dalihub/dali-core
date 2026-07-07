@@ -229,7 +229,7 @@ void RelayoutController::OnApplicationSceneCreated()
 void RelayoutController::RequestRelayoutRecursively(Dali::Internal::Actor& actorImpl)
 {
   // Only set dirty flag if doing relayout and not already marked as dirty
-  if(actorImpl.RelayoutPossible())
+  if(actorImpl.IsRelayoutPossible())
   {
     // If parent is not in relayout we are at the top of a new sub-tree
     Dali::Internal::Actor* parentImplPtr = actorImpl.GetParent();
@@ -258,7 +258,7 @@ void RelayoutController::RequestRelayoutRecursively(Dali::Internal::Actor& actor
 void RelayoutController::PropagateAll(Dali::Internal::Actor& actorImpl, Dimension::Type dimension, RawActorList& topOfSubTreeStack, RawActorList& potentialRedundantSubRoots)
 {
   // Only set dirty flag if doing relayout and not already marked as dirty
-  if(actorImpl.RelayoutPossible(dimension))
+  if(actorImpl.IsRelayoutPossible(dimension))
   {
     // Set dirty and negotiated flags
     actorImpl.SetLayoutDirty(true, dimension);

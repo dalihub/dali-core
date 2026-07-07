@@ -97,23 +97,23 @@ DALI_ENUM_TO_STRING_TABLE_BEGIN(BLEND_EQUATION)
   DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, ADD)
   DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, SUBTRACT)
   DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, REVERSE_SUBTRACT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, MIN)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, MAX)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, MULTIPLY)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, SCREEN)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, OVERLAY)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, DARKEN)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, LIGHTEN)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, COLOR_DODGE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, COLOR_BURN)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, HARD_LIGHT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, SOFT_LIGHT)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, DIFFERENCE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, EXCLUSION)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, HUE)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, SATURATION)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, COLOR)
-  DALI_ENUM_TO_STRING_WITH_SCOPE(DevelBlendEquation, LUMINOSITY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, MIN)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, MAX)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, MULTIPLY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, SCREEN)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, OVERLAY)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, DARKEN)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, LIGHTEN)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, COLOR_DODGE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, COLOR_BURN)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, HARD_LIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, SOFT_LIGHT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, DIFFERENCE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, EXCLUSION)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, HUE)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, SATURATION)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, COLOR)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(BlendEquation, LUMINOSITY)
 DALI_ENUM_TO_STRING_TABLE_END(BLEND_EQUATION)
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(BLEND_FACTOR)
@@ -345,26 +345,26 @@ void Renderer::GetBlendFunc(BlendFactor::Type& srcFactorRgb,
   destFactorAlpha = mBlendingOptions.GetBlendDestFactorAlpha();
 }
 
-void Renderer::SetBlendEquation(DevelBlendEquation::Type equationRgba)
+void Renderer::SetBlendEquation(Dali::BlendEquation::Type equationRgba)
 {
   mBlendingOptions.SetBlendEquation(equationRgba, equationRgba);
   SetBlendingOptionsMessage(GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask());
 }
 
-void Renderer::SetBlendEquation(DevelBlendEquation::Type equationRgb,
-                                DevelBlendEquation::Type equationAlpha)
+void Renderer::SetBlendEquation(Dali::BlendEquation::Type equationRgb,
+                                Dali::BlendEquation::Type equationAlpha)
 {
   if(BlendingOptions::IsAdvancedBlendEquation(equationRgb) || BlendingOptions::IsAdvancedBlendEquation(equationAlpha))
   {
-    DALI_LOG_ERROR("Advanced blend equation requires to be set by using SetBlendEquation( DevelBlendEquation::Type equationRgba ).");
+    DALI_LOG_ERROR("Advanced blend equation requires to be set by using SetBlendEquation( Dali::BlendEquation::Type equationRgba ).");
     return;
   }
   mBlendingOptions.SetBlendEquation(equationRgb, equationAlpha);
   SetBlendingOptionsMessage(GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask());
 }
 
-void Renderer::GetBlendEquation(DevelBlendEquation::Type& equationRgb,
-                                DevelBlendEquation::Type& equationAlpha) const
+void Renderer::GetBlendEquation(Dali::BlendEquation::Type& equationRgb,
+                                Dali::BlendEquation::Type& equationAlpha) const
 {
   // These are not animatable, the cached values are up-to-date.
   equationRgb   = mBlendingOptions.GetBlendEquationRgb();
@@ -413,7 +413,7 @@ bool Renderer::IsPreMultipliedAlphaEnabled() const
 
 bool Renderer::IsAdvancedBlendEquationApplied() const
 {
-  DevelBlendEquation::Type equationRgb, equationAlpha;
+  Dali::BlendEquation::Type equationRgb, equationAlpha;
   GetBlendEquation(equationRgb, equationAlpha);
 
   if(equationRgb != equationAlpha)
@@ -460,9 +460,9 @@ void Renderer::SetDefaultProperty(Property::Index        index,
     }
     case Dali::DevelRenderer::Property::BLEND_EQUATION:
     {
-      DevelBlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
+      Dali::BlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
 
-      if(Scripting::GetEnumerationProperty<DevelBlendEquation::Type>(propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue))
+      if(Scripting::GetEnumerationProperty<Dali::BlendEquation::Type>(propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue))
       {
         mBlendingOptions.SetBlendEquation(convertedValue, convertedValue);
         SetBlendingOptionsMessage(GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask());
@@ -471,16 +471,16 @@ void Renderer::SetDefaultProperty(Property::Index        index,
     }
     case Dali::Renderer::Property::BLEND_EQUATION_RGB:
     {
-      DevelBlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
+      Dali::BlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationRgb();
 
-      if(Scripting::GetEnumerationProperty<DevelBlendEquation::Type>(propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue))
+      if(Scripting::GetEnumerationProperty<Dali::BlendEquation::Type>(propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue))
       {
         if(mBlendingOptions.IsAdvancedBlendEquation(convertedValue))
         {
-          DALI_LOG_ERROR("Advanced blend equation requires to be set by using DevelBlendEquation::BLEND_EQUATION.");
+          DALI_LOG_ERROR("Advanced blend equation requires to be set by using Dali::BlendEquation::BLEND_EQUATION.");
           break;
         }
-        DevelBlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
+        Dali::BlendEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
         mBlendingOptions.SetBlendEquation(convertedValue, alphaEquation);
         SetBlendingOptionsMessage(GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask());
       }
@@ -488,16 +488,16 @@ void Renderer::SetDefaultProperty(Property::Index        index,
     }
     case Dali::Renderer::Property::BLEND_EQUATION_ALPHA:
     {
-      DevelBlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationAlpha();
+      Dali::BlendEquation::Type convertedValue = mBlendingOptions.GetBlendEquationAlpha();
 
-      if(Scripting::GetEnumerationProperty<DevelBlendEquation::Type>(propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue))
+      if(Scripting::GetEnumerationProperty<Dali::BlendEquation::Type>(propertyValue, BLEND_EQUATION_TABLE, BLEND_EQUATION_TABLE_COUNT, convertedValue))
       {
         if(mBlendingOptions.IsAdvancedBlendEquation(convertedValue))
         {
-          DALI_LOG_ERROR("Advanced blend equation requires to be set by using DevelBlendEquation::BLEND_EQUATION.");
+          DALI_LOG_ERROR("Advanced blend equation requires to be set by using Dali::BlendEquation::BLEND_EQUATION.");
           break;
         }
-        DevelBlendEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
+        Dali::BlendEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
         mBlendingOptions.SetBlendEquation(rgbEquation, convertedValue);
         SetBlendingOptionsMessage(GetEventThreadServices(), GetRendererSceneObject(), mBlendingOptions.GetBitmask());
       }

@@ -18,9 +18,9 @@
  */
 
 #include <dali/devel-api/common/vector-wrapper.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/internal/event/common/event-thread-services-holder.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/public-api/rendering/renderer.h>
 
 namespace Dali::Internal
 {
@@ -54,7 +54,7 @@ public:
    * @param[in] blending If blending equation should be applied to this renderer
    * @param[in] blendEquation The current blending equation
    */
-  uint32_t Add(const SceneGraph::Node& node, Renderer& renderer, bool blending, DevelBlendEquation::Type blendEquation);
+  uint32_t Add(const SceneGraph::Node& node, Renderer& renderer, bool blending, Dali::BlendEquation::Type blendEquation);
 
   /**
    * Remove the renderer, if present
@@ -100,7 +100,7 @@ public:
   /**
    * Set the blending equation for all renderers
    */
-  void SetBlending(DevelBlendEquation::Type blendEquation);
+  void SetBlending(Dali::BlendEquation::Type blendEquation);
 
 private:
   std::vector<RendererPtr> mRenderers; ///< The contained renderers

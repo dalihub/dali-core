@@ -150,49 +150,49 @@ constexpr Graphics::BlendFactor ConvertBlendFactor(BlendFactor::Type blendFactor
   }
 }
 
-constexpr Graphics::BlendOp ConvertBlendEquation(DevelBlendEquation::Type blendEquation)
+constexpr Graphics::BlendOp ConvertBlendEquation(Dali::BlendEquation::Type blendEquation)
 {
   switch(blendEquation)
   {
-    case DevelBlendEquation::ADD:
+    case Dali::BlendEquation::ADD:
       return Graphics::BlendOp::ADD;
-    case DevelBlendEquation::SUBTRACT:
+    case Dali::BlendEquation::SUBTRACT:
       return Graphics::BlendOp::SUBTRACT;
-    case DevelBlendEquation::REVERSE_SUBTRACT:
+    case Dali::BlendEquation::REVERSE_SUBTRACT:
       return Graphics::BlendOp::REVERSE_SUBTRACT;
-    case DevelBlendEquation::COLOR:
+    case Dali::BlendEquation::COLOR:
       return Graphics::BlendOp::COLOR;
-    case DevelBlendEquation::COLOR_BURN:
+    case Dali::BlendEquation::COLOR_BURN:
       return Graphics::BlendOp::COLOR_BURN;
-    case DevelBlendEquation::COLOR_DODGE:
+    case Dali::BlendEquation::COLOR_DODGE:
       return Graphics::BlendOp::COLOR_DODGE;
-    case DevelBlendEquation::DARKEN:
+    case Dali::BlendEquation::DARKEN:
       return Graphics::BlendOp::DARKEN;
-    case DevelBlendEquation::DIFFERENCE:
+    case Dali::BlendEquation::DIFFERENCE:
       return Graphics::BlendOp::DIFFERENCE;
-    case DevelBlendEquation::EXCLUSION:
+    case Dali::BlendEquation::EXCLUSION:
       return Graphics::BlendOp::EXCLUSION;
-    case DevelBlendEquation::HARD_LIGHT:
+    case Dali::BlendEquation::HARD_LIGHT:
       return Graphics::BlendOp::HARD_LIGHT;
-    case DevelBlendEquation::HUE:
+    case Dali::BlendEquation::HUE:
       return Graphics::BlendOp::HUE;
-    case DevelBlendEquation::LIGHTEN:
+    case Dali::BlendEquation::LIGHTEN:
       return Graphics::BlendOp::LIGHTEN;
-    case DevelBlendEquation::LUMINOSITY:
+    case Dali::BlendEquation::LUMINOSITY:
       return Graphics::BlendOp::LUMINOSITY;
-    case DevelBlendEquation::MAX:
+    case Dali::BlendEquation::MAX:
       return Graphics::BlendOp::MAX;
-    case DevelBlendEquation::MIN:
+    case Dali::BlendEquation::MIN:
       return Graphics::BlendOp::MIN;
-    case DevelBlendEquation::MULTIPLY:
+    case Dali::BlendEquation::MULTIPLY:
       return Graphics::BlendOp::MULTIPLY;
-    case DevelBlendEquation::OVERLAY:
+    case Dali::BlendEquation::OVERLAY:
       return Graphics::BlendOp::OVERLAY;
-    case DevelBlendEquation::SATURATION:
+    case Dali::BlendEquation::SATURATION:
       return Graphics::BlendOp::SATURATION;
-    case DevelBlendEquation::SCREEN:
+    case Dali::BlendEquation::SCREEN:
       return Graphics::BlendOp::SCREEN;
-    case DevelBlendEquation::SOFT_LIGHT:
+    case Dali::BlendEquation::SOFT_LIGHT:
       return Graphics::BlendOp::SOFT_LIGHT;
   }
   return Graphics::BlendOp{};

@@ -25,6 +25,7 @@
 #include <dali/devel-api/common/singleton-service.h>
 #include <dali/internal/event/common/scene-impl.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/update/update-proxy.h>
 
 namespace Dali
@@ -175,7 +176,7 @@ public:
    * @param[in] blendEquation blend equation to be checked.
    * @return True if the blend equation supported.
    */
-  bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation);
+  bool IsBlendEquationSupported(Dali::BlendEquation::Type blendEquation);
 
   /**
    * @brief Returns shading language version.
