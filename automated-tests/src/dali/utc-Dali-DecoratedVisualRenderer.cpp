@@ -17,11 +17,11 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/integration-api/rendering/decorated-visual-renderer.h>
 #include <dali/integration-api/rendering/visual-renderer.h>
+#include <dali/public-api/common/capabilities.h>
 #include <dali/public-api/dali-core.h>
 #include <cstdio>
 #include <string>
