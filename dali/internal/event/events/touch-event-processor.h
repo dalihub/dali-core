@@ -70,6 +70,12 @@ public:
    */
   bool ProcessTouchEvent(const Integration::TouchEvent& event);
 
+  /**
+   * Gets the last actor that consumed a touch event.
+   * @return The last consumed actor, or nullptr if no actor consumed the event.
+   */
+  const Actor* GetLastConsumedActor() const;
+
 private:
   // Not movable and not copyable
   TouchEventProcessor(const TouchEventProcessor&)            = delete;

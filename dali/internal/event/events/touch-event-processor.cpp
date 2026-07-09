@@ -1095,6 +1095,11 @@ bool TouchEventProcessor::ProcessTouchEvent(const Integration::TouchEvent& event
   return consumed;
 }
 
+const Actor* TouchEventProcessor::GetLastConsumedActor() const
+{
+  return mLastConsumedActor.GetActor();
+}
+
 void TouchEventProcessor::OnObservedActorDisconnected(Actor* actor)
 {
   if(mScene.IsGeometryHittestEnabled() && (actor == mLastConsumedActor.GetActor() || actor == mLastPrimaryHitActor.GetActor()))

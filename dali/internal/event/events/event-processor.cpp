@@ -174,9 +174,11 @@ void EventProcessor::ProcessEvents()
             uint32_t                actorId     = aItr->first;
             TouchPointsContainer&   touchPoints = aItr->second;
             Integration::TouchEvent touchEventInternal(touchEvent.time);
+            bool                    hasTouchDown = false;
 
             for(TouchPointsContainer::iterator tItr = touchPoints.begin(); tItr != touchPoints.end(); tItr++)
             {
+              hasTouchDown |= tItr->GetState() == PointState::DOWN;
               touchEventInternal.AddPoint(*tItr);
             }
 
@@ -184,6 +186,26 @@ void EventProcessor::ProcessEvents()
             if(result.first->second)
             {
               result.first->second->ProcessTouchEvent(touchEventInternal);
+              const Actor* consumedActor = result.first->second->GetLastConsumedActor();
+              if(hasTouchDown && consumedActor)
+              {
+                uint32_t consumedActorId = consumedActor->GetId();
+                if(consumedActorId != actorId && mTouchEventProcessors.find(consumedActorId) == mTouchEventProcessors.end())
+                {
+                  std::unique_ptr<TouchEventProcessor> touchEventProcessor = std::move(result.first->second);
+                  mTouchEventProcessors.erase(result.first);
+                  mTouchEventProcessors.emplace(consumedActorId, std::move(touchEventProcessor));
+                  actorId = consumedActorId;
+                }
+
+                for(TouchPointsContainer::iterator tItr = touchPoints.begin(); tItr != touchPoints.end(); tItr++)
+                {
+                  if(tItr->GetState() == PointState::DOWN)
+                  {
+                    mActorIdDeviceId[tItr->GetDeviceId()] = actorId;
+                  }
+                }
+              }
             }
           }
 
