@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/internal-constants.h>
@@ -42,6 +41,7 @@
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
 
 namespace Dali
@@ -120,6 +120,15 @@ public:
    * Query whether the actor is connected to the Scene.
    */
   bool OnScene() const
+  {
+    return mIsOnScene;
+  }
+
+  /**
+   * Query whether the actor is connected to the Scene.
+   * @return True if the actor is connected to the Scene.
+   */
+  bool IsConnectedToScene() const
   {
     return mIsOnScene;
   }
@@ -232,7 +241,7 @@ public:
    *
    * @return Returns the screen position of actor. Returns (0,0) if actor is not on scene.
    */
-  const Vector2 CalculateScreenPosition() const;
+  Vector2 CalculateScreenPosition() const;
 
   /**
    * Calculates screen position and size using event-side properties.
@@ -335,10 +344,22 @@ public:
   void SetSize(const Vector3& size);
 
   /**
+   * Get the size of the actor.
+   * @return The size.
+   */
+  Vector3 GetSize() const;
+
+  /**
    * Set the width component of the Actor's size.
    * @param [in] width The new width component.
    */
   void SetWidth(float width);
+
+  /**
+   * Get the width component of the Actor's size.
+   * @return The width component.
+   */
+  float GetWidth() const;
 
   /**
    * Set the height component of the Actor's size.
@@ -347,10 +368,22 @@ public:
   void SetHeight(float height);
 
   /**
+   * Get the height component of the Actor's size.
+   * @return The height component.
+   */
+  float GetHeight() const;
+
+  /**
    * Set the depth component of the Actor's size.
    * @param [in] depth The new depth component.
    */
   void SetDepth(float depth);
+
+  /**
+   * Get the depth component of the Actor's size.
+   * @return The depth component.
+   */
+  float GetDepth() const;
 
   /**
    * Retrieve the Actor's size from event side.
@@ -384,10 +417,46 @@ public:
   void SetParentOrigin(const Vector3& origin);
 
   /**
-   * Retrieve the parent-origin of an actor.
-   * @return The parent-origin.
+   * Get the parent origin.
+   * @return The parent origin.
    */
-  const Vector3& GetCurrentParentOrigin() const;
+  const Vector3& GetParentOrigin() const;
+
+  /**
+   * Set the X component of the parent origin.
+   * @param [in] x The X component value.
+   */
+  void SetParentOriginX(float x);
+
+  /**
+   * Get the X component of the parent origin.
+   * @return The X component value.
+   */
+  float GetParentOriginX() const;
+
+  /**
+   * Set the Y component of the parent origin.
+   * @param [in] y The Y component value.
+   */
+  void SetParentOriginY(float y);
+
+  /**
+   * Get the Y component of the parent origin.
+   * @return The Y component value.
+   */
+  float GetParentOriginY() const;
+
+  /**
+   * Set the Z component of the parent origin.
+   * @param [in] z The Z component value.
+   */
+  void SetParentOriginZ(float z);
+
+  /**
+   * Get the Z component of the parent origin.
+   * @return The Z component value.
+   */
+  float GetParentOriginZ() const;
 
   /**
    * Set the pivot of an actor. This is expressed in 2D unit coordinates, such that
@@ -400,17 +469,53 @@ public:
   void SetPivot(const Vector3& pivot);
 
   /**
-   * Retrieve the anchor-point of an actor.
-   * @return The anchor-point.
+   * Get the pivot.
+   * @return The pivot.
    */
-  const Vector3& GetCurrentPivot() const;
+  const Vector3& GetPivot() const;
+
+  /**
+   * Set the X component of the pivot.
+   * @param [in] x The X component value.
+   */
+  void SetPivotX(float x);
+
+  /**
+   * Get the X component of the pivot.
+   * @return The X component value.
+   */
+  float GetPivotX() const;
+
+  /**
+   * Set the Y component of the pivot.
+   * @param [in] y The Y component value.
+   */
+  void SetPivotY(float y);
+
+  /**
+   * Get the Y component of the pivot.
+   * @return The Y component value.
+   */
+  float GetPivotY() const;
+
+  /**
+   * Set the Z component of the pivot.
+   * @param [in] z The Z component value.
+   */
+  void SetPivotZ(float z);
+
+  /**
+   * Get the Z component of the pivot.
+   * @return The Z component value.
+   */
+  float GetPivotZ() const;
 
   /**
    * If the position uses the pivot, return the pivot, otherwise
    * return top left.
    * @return The pivot for positioning.
    */
-  Vector3 GetPivotForPosition() const;
+  const Vector3& GetPivotForPosition() const;
 
   /**
    * Sets the position of the Actor.
@@ -438,17 +543,35 @@ public:
   void SetZ(float z);
 
   /**
+   * Get the position of an actor along the X-axis.
+   * @return The x position.
+   */
+  float GetX() const;
+
+  /**
+   * Get the position of an actor along the Y-axis.
+   * @return The y position.
+   */
+  float GetY() const;
+
+  /**
+   * Get the position of an actor along the Z-axis.
+   * @return The z position.
+   */
+  float GetZ() const;
+
+  /**
    * Translate an actor relative to its existing position.
    * @param[in] distance The actor will move by this distance.
    */
   void TranslateBy(const Vector3& distance);
 
   /**
-   * Retrieve the position of the Actor.
+   * Get the position of the actor as a Vector3.
    * The coordinates are relative to the Actor's parent.
    * @return the Actor's position.
    */
-  const Vector3& GetCurrentPosition() const;
+  const Vector3& GetPosition() const;
 
   /**
    * Retrieve the target position of the Actor.
@@ -461,22 +584,41 @@ public:
   }
 
   /**
-   * @copydoc Dali::Actor::GetCurrentWorldPosition()
+   * Retrieve the position of the Actor.
+   * The coordinates are relative to the Actor's parent.
+   * @return the Actor's position.
    */
-  const Vector3& GetCurrentWorldPosition() const;
+  const Vector3& GetCurrentPosition() const;
 
   /**
-   * @copydoc Dali::Actor::SetInheritPosition()
+   * Get the world position of the actor.
+   * @return The world position of the actor.
    */
-  void SetInheritPosition(bool inherit);
+  const Vector3& GetWorldPosition() const;
 
   /**
-   * @copydoc Dali::Actor::IsPositionInherited()
+   * Get the X component of the world position.
+   * @return The X component of the world position.
    */
-  bool IsPositionInherited() const
-  {
-    return mInheritPosition;
-  }
+  float GetWorldPositionX() const;
+
+  /**
+   * Get the Y component of the world position.
+   * @return The Y component of the world position.
+   */
+  float GetWorldPositionY() const;
+
+  /**
+   * Get the Z component of the world position.
+   * @return The Z component of the world position.
+   */
+  float GetWorldPositionZ() const;
+
+  /**
+   * Get the screen position of the actor.
+   * @return The screen position of the actor.
+   */
+  Vector2 GetScreenPosition() const;
 
   /**
    * Sets the orientation of the Actor.
@@ -505,10 +647,22 @@ public:
   void RotateBy(const Quaternion& relativeRotation);
 
   /**
+   * Get the orientation of the actor.
+   * @return The orientation.
+   */
+  const Quaternion& GetOrientation() const;
+
+  /**
    * Retreive the Actor's orientation.
    * @return the orientation.
    */
   const Quaternion& GetCurrentOrientation() const;
+
+  /**
+   * Get the world orientation of the actor.
+   * @return The world orientation.
+   */
+  const Quaternion& GetWorldOrientation() const;
 
   /**
    * Set whether a child actor inherits it's parent's orientation. Default is to inherit.
@@ -541,11 +695,6 @@ public:
   const Vector3& GetSizeModeFactor() const;
 
   /**
-   * @copydoc Dali::Actor::GetCurrentWorldOrientation()
-   */
-  const Quaternion& GetCurrentWorldOrientation() const;
-
-  /**
    * Sets a scale factor applied to an actor.
    * @param [in] scale A vector representing the scale factor for each axis.
    */
@@ -576,6 +725,30 @@ public:
   void ScaleBy(const Vector3& relativeScale);
 
   /**
+   * Get the scale factor applied to the actor.
+   * @return A vector representing the scale factor for each axis.
+   */
+  const Vector3& GetScale() const;
+
+  /**
+   * Get the X component of the scale factor.
+   * @return The X scale factor.
+   */
+  float GetScaleX() const;
+
+  /**
+   * Get the Y component of the scale factor.
+   * @return The Y scale factor.
+   */
+  float GetScaleY() const;
+
+  /**
+   * Get the Z component of the scale factor.
+   * @return The Z scale factor.
+   */
+  float GetScaleZ() const;
+
+  /**
    * Retrieve the scale factor applied to an actor.
    * @return A vector representing the scale factor for each axis.
    */
@@ -585,6 +758,12 @@ public:
    * @copydoc Dali::Actor::GetCurrentWorldScale()
    */
   const Vector3& GetCurrentWorldScale() const;
+
+  /**
+   * Get the world scale factor applied to the actor.
+   * @return A vector representing the world scale factor for each axis.
+   */
+  const Vector3& GetWorldScale() const;
 
   /**
    * @copydoc Dali::Actor::SetInheritScale()
@@ -598,11 +777,6 @@ public:
   {
     return mInheritScale;
   }
-
-  /**
-   * @copydoc Dali::Actor::GetCurrentWorldMatrix()
-   */
-  Matrix GetCurrentWorldMatrix() const;
 
   // Visibility
   /**
@@ -629,10 +803,22 @@ public:
   void SetOpacity(float opacity);
 
   /**
+   * Retrieve the actor's opacity (event-side cached value).
+   * @return The actor's opacity.
+   */
+  float GetOpacity() const;
+
+  /**
    * Retrieve the actor's opacity.
    * @return The actor's opacity.
    */
   float GetCurrentOpacity() const;
+
+  /**
+   * Set the clipping mode of an actor.
+   * @param[in] clippingMode The clipping mode to set.
+   */
+  void SetClippingMode(ClippingMode::Type clippingMode);
 
   /**
    * Retrieve the actor's clipping mode.
@@ -760,6 +946,42 @@ public:
   void SetColorBlue(float blue);
 
   /**
+   * Set the alpha component of the color.
+   * @param [in] alpha The new alpha component.
+   */
+  void SetColorAlpha(float alpha);
+
+  /**
+   * Get the actor's color.
+   * @return The color of the actor.
+   */
+  const Vector4& GetColor() const;
+
+  /**
+   * Get the red component of the color.
+   * @return The red component value.
+   */
+  float GetColorRed() const;
+
+  /**
+   * Get the green component of the color.
+   * @return The green component value.
+   */
+  float GetColorGreen() const;
+
+  /**
+   * Get the blue component of the color.
+   * @return The blue component value.
+   */
+  float GetColorBlue() const;
+
+  /**
+   * Get the alpha component of the color.
+   * @return The alpha component value.
+   */
+  float GetColorAlpha() const;
+
+  /**
    * Retrieve the actor's color.
    * @return The color.
    */
@@ -782,9 +1004,22 @@ public:
   }
 
   /**
-   * @copydoc Dali::Actor::GetCurrentWorldColor()
+   * Get the world color of the actor.
+   * @return The world color of the actor.
    */
-  const Vector4& GetCurrentWorldColor() const;
+  const Vector4& GetWorldColor() const;
+
+  /**
+   * Get the world matrix of the actor.
+   * @return The world matrix of the actor.
+   */
+  const Matrix& GetWorldMatrix() const;
+
+  /**
+   * Query whether the actor is culled.
+   * @return True if the actor is culled.
+   */
+  bool IsCulled() const;
 
   /**
    * @copydoc Dali::Actor::GetHierarchyDepth()
@@ -996,7 +1231,7 @@ public:
    *
    * @return Return if it is possible to relayout the actor
    */
-  bool RelayoutPossible(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
+  bool IsRelayoutPossible(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) const;
 
   /**
    * @brief Returns if relayout is enabled and the actor is dirty
@@ -1144,9 +1379,9 @@ public:
   bool IsIgnored() const;
 
   /**
-   * @copydoc Dali::Actor::IsCurrentWorldIgnored
+   * @copydoc Dali::Actor::IsWorldIgnored
    */
-  bool IsCurrentWorldIgnored() const;
+  bool IsWorldIgnored() const;
 
   /**
    * @copydoc Dali::Actor::AddRenderer()
@@ -1176,12 +1411,12 @@ public:
   /**
    * @brief Set BlendEquation at each renderer that added on this Actor.
    */
-  void SetBlendEquation(DevelBlendEquation::Type blendEquation);
+  void SetBlendEquation(Dali::BlendEquation::Type blendEquation);
 
   /**
    * @brief Get Blend Equation that applied to this Actor
    */
-  DevelBlendEquation::Type GetBlendEquation() const;
+  Dali::BlendEquation::Type GetBlendEquation() const;
 
   /**
    * @brief Set this Actor is transparent or not without any affection on the child Actors.
@@ -1314,7 +1549,7 @@ public:
    */
   bool IsHittable() const
   {
-    return (IsUserInteractionEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetCurrentWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsCurrentWorldIgnored());
+    return (IsUserInteractionEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsWorldIgnored());
   }
 
   /**
@@ -1322,8 +1557,21 @@ public:
    */
   bool GetTouchRequired() const
   {
-    return !mTouchedSignal.Empty();
+    return !mTouchEventSignal.Empty() || HasIntrinsicTouchHandling();
   }
+
+  /**
+   * Query whether this actor implementation has built-in touch handling without requiring a connected touch signal.
+   * @return True if this actor implementation has built-in touch handling.
+   */
+  bool HasIntrinsicTouchHandling() const;
+
+  /**
+   * Called when a touch event is received by this actor.
+   * @param[in] touch The touch event
+   * @return True if the event is consumed.
+   */
+  bool OnTouchEvent(const Dali::TouchEvent& touch);
 
   /**
    * Set whether this view can focus by touch.
@@ -1358,7 +1606,7 @@ public:
    */
   bool GetInterceptTouchRequired() const
   {
-    return !mInterceptTouchedSignal.Empty();
+    return !mInterceptTouchEventSignal.Empty();
   }
 
   /**
@@ -1367,8 +1615,21 @@ public:
    */
   bool GetHoverRequired() const
   {
-    return !mHoveredSignal.Empty();
+    return !mHoverEventSignal.Empty() || HasIntrinsicHoverHandling();
   }
+
+  /**
+   * Query whether this actor implementation has built-in hover handling without requiring a connected hover signal.
+   * @return True if this actor implementation has built-in hover handling.
+   */
+  bool HasIntrinsicHoverHandling() const;
+
+  /**
+   * Called when a hover event is received by this actor.
+   * @param[in] hover The hover event
+   * @return True if the event is consumed.
+   */
+  bool OnHoverEvent(const Dali::HoverEvent& hover);
 
   /**
    * Query whether the application or derived actor type requires intercept wheel events.
@@ -1376,7 +1637,7 @@ public:
    */
   bool GetInterceptWheelRequired() const
   {
-    return !mInterceptWheelSignal.Empty();
+    return !mInterceptWheelEventSignal.Empty();
   }
 
   /**
@@ -1385,8 +1646,21 @@ public:
    */
   bool GetWheelEventRequired() const
   {
-    return !mWheelEventSignal.Empty();
+    return !mWheelEventSignal.Empty() || HasIntrinsicWheelHandling();
   }
+
+  /**
+   * Query whether this actor implementation has built-in wheel handling without requiring a connected wheel signal.
+   * @return True if this actor implementation has built-in wheel handling.
+   */
+  bool HasIntrinsicWheelHandling() const;
+
+  /**
+   * Called when a wheel event is received by this actor.
+   * @param[in] wheel The wheel event
+   * @return True if the event is consumed.
+   */
+  bool OnWheelEvent(const Dali::WheelEvent& wheel);
 
   /**
    * Query whether the actor captures all touch after it starts even if touch leaves its boundary.
@@ -1398,46 +1672,73 @@ public:
   }
 
   /**
-   * Sets the touch area margin of an actor.
+   * Sets the touch hit area margin of an actor.
    * @param [in] offset The new extents of area.
    */
-  void SetTouchAreaMargin(const Extents& extents)
+  void SetTouchHitAreaMargin(const Extents& extents)
   {
-    mTouchAreaMargin = extents;
+    mTouchHitAreaMargin = extents;
   }
 
   /**
-   * Retrieve the Actor's touch area margin.
-   * @return The Actor's touch area margin.
+   * Retrieve the Actor's touch hit area margin.
+   * @return The Actor's touch hit area margin.
    */
-  const Extents& GetTouchAreaMargin() const
+  const Extents& GetTouchHitAreaMargin() const
   {
-    return mTouchAreaMargin;
+    return mTouchHitAreaMargin;
   }
 
   /**
-   * Query whether the actor will only receive own touch.
-   * @return true, if it only receives touches that started from itself.
+   * Set whether the actor only receives self-initiated touches.
+   * @param[in] enabled true if only self-initiated touches should be received.
    */
-  bool IsAllowedOnlyOwnTouch() const
+  void SetAllowSelfInitiatedTouchOnlyEnabled(bool enabled)
   {
-    return mAllowOnlyOwnTouch;
+    mAllowSelfInitiatedTouchOnly = enabled;
+  }
+
+  /**
+   * Query whether the actor only receives self-initiated touches.
+   * @return true if only touches that originated on this actor are received.
+   */
+  bool IsAllowSelfInitiatedTouchOnlyEnabled() const
+  {
+    return mAllowSelfInitiatedTouchOnly;
+  }
+
+  /**
+   * Set whether the actor should send touch motion events.
+   * @param[in] enabled true to send touch motion events.
+   */
+  void SetDispatchTouchMotionEnabled(bool enabled)
+  {
+    mDispatchTouchMotion = enabled;
   }
 
   /**
    * Query whether the actor send touch motion event.
    * @return true, it send touch motion event.
    */
-  bool IsDispatchTouchMotion() const
+  bool IsDispatchTouchMotionEnabled() const
   {
     return mDispatchTouchMotion;
+  }
+
+  /**
+   * Set whether the actor should send hover motion events.
+   * @param[in] enabled true to send hover motion events.
+   */
+  void SetDispatchHoverMotionEnabled(bool enabled)
+  {
+    mDispatchHoverMotion = enabled;
   }
 
   /**
    * Query whether the actor send hover motion event.
    * @return true, it send hover motion event.
    */
-  bool IsDispatchHoverMotion() const
+  bool IsDispatchHoverMotionEnabled() const
   {
     return mDispatchHoverMotion;
   }
@@ -1459,6 +1760,7 @@ public:
   {
     return mHoverState;
   }
+
   // Gestures
 
   /**
@@ -1488,11 +1790,25 @@ public:
   bool EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch);
 
   /**
+   * Used by the EventProcessor to dispatch touch events.
+   * @param[in] touch The touch data.
+   * @return True if the event was consumed.
+   */
+  bool DispatchTouchEvent(const Dali::TouchEvent& touch);
+
+  /**
    * Used by the EventProcessor to emit touch event signals.
    * @param[in] touch The touch data.
    * @return True if the event was consumed.
    */
   bool EmitTouchEventSignal(const Dali::TouchEvent& touch);
+
+  /**
+   * Used by the EventProcessor to dispatch hover events.
+   * @param[in] event The hover event.
+   * @return True if the event was consumed.
+   */
+  bool DispatchHoverEvent(const Dali::HoverEvent& event);
 
   /**
    * Used by the EventProcessor to emit hover event signals.
@@ -1509,6 +1825,13 @@ public:
   bool EmitInterceptWheelEventSignal(const Dali::WheelEvent& event);
 
   /**
+   * Used by the EventProcessor to dispatch wheel events.
+   * @param[in] event The wheel event.
+   * @return True if the event was consumed.
+   */
+  bool DispatchWheelEvent(const Dali::WheelEvent& event);
+
+  /**
    * Used by the EventProcessor to emit wheel event signals.
    * @param[in] event The wheel event.
    * @return True if the event was consumed.
@@ -1520,13 +1843,13 @@ public:
    * @param[in] visible Whether the actor has become visible or not.
    * @param[in] type Whether the actor's visible property has changed or a parent's.
    */
-  void EmitVisibilityChangedSignal(bool visible, DevelActor::VisibilityChange::Type type);
+  void EmitVisibilityChangedSignal(bool visible, VisibilityChangeType type);
 
   /**
-   * @brief Emits the inherited visibility change signal for this actor.
+   * @brief Emits the effective visibility change signal for this actor.
    * @param[in] visible Whether the actor has become visible or not considering all parent Actors.
    */
-  void EmitInheritedVisibilityChangedSignal(bool visible);
+  void EmitEffectiveVisibilityChangedSignal(bool visible);
 
   /**
    * @brief Emits the layout direction change signal for this actor and all its children.
@@ -1544,43 +1867,19 @@ public:
   bool EmitHitTestResultSignal(Integration::Point point, Vector2 hitPointLocal, uint32_t timeStamp);
 
   /**
-   * @copydoc DevelActor::HitTestResultSignal()
+   * @copydoc Dali::Actor::TouchEventSignal()
    */
-  Dali::Actor::TouchEventSignalType& HitTestResultSignal()
+  Dali::Actor::TouchEventSignalType& TouchEventSignal()
   {
-    return mHitTestResultSignal;
+    return mTouchEventSignal;
   }
 
   /**
-   * @copydoc DevelActor::InterceptTouchedSignal()
+   * @copydoc Dali::Actor::HoverEventSignal()
    */
-  Dali::Actor::TouchEventSignalType& InterceptTouchedSignal()
+  Dali::Actor::HoverEventSignalType& HoverEventSignal()
   {
-    return mInterceptTouchedSignal;
-  }
-
-  /**
-   * @copydoc Dali::Actor::TouchedSignal()
-   */
-  Dali::Actor::TouchEventSignalType& TouchedSignal()
-  {
-    return mTouchedSignal;
-  }
-
-  /**
-   * @copydoc Dali::Actor::HoveredSignal()
-   */
-  Dali::Actor::HoverSignalType& HoveredSignal()
-  {
-    return mHoveredSignal;
-  }
-
-  /**
-   * @copydoc DevelActor::InterceptWheelSignal()
-   */
-  Dali::Actor::WheelEventSignalType& InterceptWheelSignal()
-  {
-    return mInterceptWheelSignal;
+    return mHoverEventSignal;
   }
 
   /**
@@ -1592,43 +1891,61 @@ public:
   }
 
   /**
-   * @copydoc Dali::Actor::OnSceneSignal()
+   * @copydoc Dali::Actor::InterceptTouchEventSignal()
    */
-  Dali::Actor::OnSceneSignalType& OnSceneSignal()
+  Dali::Actor::TouchEventSignalType& InterceptTouchEventSignal()
   {
-    return mOnSceneSignal;
+    return mInterceptTouchEventSignal;
   }
 
   /**
-   * @copydoc Dali::Actor::OffSceneSignal()
+   * @copydoc Dali::Actor::InterceptWheelEventSignal()
    */
-  Dali::Actor::OffSceneSignalType& OffSceneSignal()
+  Dali::Actor::WheelEventSignalType& InterceptWheelEventSignal()
   {
-    return mOffSceneSignal;
+    return mInterceptWheelEventSignal;
   }
 
   /**
-   * @copydoc Dali::Actor::OnRelayoutSignal()
+   * @copydoc Dali::Actor::SceneConnectedSignal()
    */
-  Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal()
+  Dali::Actor::SceneConnectedSignalType& SceneConnectedSignal()
   {
-    return mOnRelayoutSignal;
+    return mSceneConnectedSignal;
   }
 
   /**
-   * @copydoc DevelActor::VisibilityChangedSignal
+   * @copydoc Dali::Actor::SceneDisconnectedSignal()
    */
-  DevelActor::VisibilityChangedSignalType& VisibilityChangedSignal()
+  Dali::Actor::SceneDisconnectedSignalType& SceneDisconnectedSignal()
+  {
+    return mSceneDisconnectedSignal;
+  }
+
+  /**
+   * @copydoc Dali::Actor::ChildAddedSignal()
+   */
+  Dali::Actor::ChildAddedSignalType& ChildAddedSignal();
+
+  /**
+   * @copydoc Dali::Actor::ChildRemovedSignal()
+   */
+  Dali::Actor::ChildRemovedSignalType& ChildRemovedSignal();
+
+  /**
+   * @copydoc Dali::Actor::VisibilityChangedSignal()
+   */
+  Dali::Actor::VisibilityChangedSignalType& VisibilityChangedSignal()
   {
     return mVisibilityChangedSignal;
   }
 
   /**
-   * @copydoc DevelActor::InheritedVisibilityChangedSignal
+   * @copydoc DevelActor::EffectiveVisibilityChangedSignal
    */
-  Dali::Actor::InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal()
+  Dali::Actor::EffectiveVisibilityChangedSignalType& EffectiveVisibilityChangedSignal()
   {
-    return mInheritedVisibilityChangedSignal;
+    return mEffectiveVisibilityChangedSignal;
   }
 
   /**
@@ -1640,19 +1957,38 @@ public:
   }
 
   /**
-   * @copydoc DevelActor::ChildAddedSignal
+   * @copydoc DevelActor::OnRelayoutSignal()
    */
-  DevelActor::ChildChangedSignalType& ChildAddedSignal();
+  DevelActor::OnRelayoutSignalType& OnRelayoutSignal()
+  {
+    return mOnRelayoutSignal;
+  }
 
   /**
-   * @copydoc DevelActor::ChildRemovedSignal
+   * @copydoc DevelActor::HitTestResultSignal()
    */
-  DevelActor::ChildChangedSignalType& ChildRemovedSignal();
+  Dali::Actor::TouchEventSignalType& HitTestResultSignal()
+  {
+    return mHitTestResultSignal;
+  }
 
   /**
    * @copydoc DevelActor::ChildOrderChangedSignal
    */
   DevelActor::ChildOrderChangedSignalType& ChildOrderChangedSignal();
+
+  /**
+   * @copydoc Dali::Actor::SetInheritPosition()
+   */
+  void SetInheritPosition(bool inherit);
+
+  /**
+   * @copydoc Dali::Actor::IsPositionInherited()
+   */
+  bool IsPositionInherited() const
+  {
+    return mInheritPosition;
+  }
 
 public:
   // For Animation
@@ -1818,7 +2154,7 @@ public:
    * @param[in] visible The new visibility flag.
    * @param[in] sendMessage Whether to send a message to the update thread or not.
    */
-  void EmitInheritedVisibilityChangedSignalRecursively(bool visible);
+  void EmitEffectiveVisibilityChangedSignalRecursively(bool visible);
 
 public:
   // Default property extensions from Object
@@ -1921,10 +2257,52 @@ public:
     return *mScene;
   }
 
+  /**
+   * Set the layout direction of an actor.
+   * @param[in] direction The layout direction to set.
+   */
+  void SetLayoutDirection(LayoutDirection::Type direction);
+
   LayoutDirection::Type GetLayoutDirection() const
   {
     return mLayoutDirection;
   }
+
+  /**
+   * Set whether a child actor inherits it's parent's layout direction with enabled semantics.
+   * @param[in] enabled - true if the actor should inherit layout direction, false otherwise.
+   */
+  void SetInheritLayoutDirectionEnabled(bool enabled);
+
+  /**
+   * Query whether a child actor inherits it's parent's layout direction.
+   * @return true if the actor inherits layout direction, false otherwise.
+   */
+  bool IsInheritLayoutDirectionEnabled() const;
+
+  /**
+   * @brief Sets the update area hint of an actor.
+   * @param [in] updateAreaHint The update area hint.
+   */
+  void SetUpdateAreaHint(const Vector4& updateAreaHint);
+
+  /**
+   * @brief Gets the update area hint of an actor.
+   * @return The update area hint.
+   */
+  const Vector4& GetUpdateAreaHint() const;
+
+  /**
+   * Set whether the position uses the pivot point.
+   * @param[in] enabled true to use pivot for position.
+   */
+  void SetPositionUsesPivotEnabled(bool enabled);
+
+  /**
+   * Query whether the position uses the pivot point.
+   * @return true if position uses pivot, false otherwise.
+   */
+  bool IsPositionUsesPivotEnabled() const;
 
 private:
   struct SendMessage
@@ -2003,6 +2381,60 @@ private:
    */
   virtual void OnChildRemove(Actor& child)
   {
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called to query whether the implementation has built-in touch handling.
+   */
+  virtual bool HasIntrinsicTouchHandlingExternal() const
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called when the actor receives a touch event.
+   */
+  virtual bool OnTouchEventExternal(const Dali::TouchEvent& /*touch*/)
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called to query whether the implementation has built-in hover handling.
+   */
+  virtual bool HasIntrinsicHoverHandlingExternal() const
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called when the actor receives a hover event.
+   */
+  virtual bool OnHoverEventExternal(const Dali::HoverEvent& /*hover*/)
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called to query whether the implementation has built-in wheel handling.
+   */
+  virtual bool HasIntrinsicWheelHandlingExternal() const
+  {
+    return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called when the actor receives a wheel event.
+   */
+  virtual bool OnWheelEventExternal(const Dali::WheelEvent& /*wheel*/)
+  {
+    return false;
   }
 
   /**
@@ -2110,27 +2542,6 @@ private:
    */
   void LowerChildBelow(Actor& child, Actor& target) override;
 
-  /**
-   * Set whether a child actor inherits it's parent's layout direction. Default is to inherit.
-   * @param[in] inherit - true if the actor should inherit layout direction, false otherwise.
-   */
-  void SetInheritLayoutDirection(bool inherit);
-
-  /**
-   * Returns whether the actor inherits it's parent's layout direction.
-   * @return true if the actor inherits it's parent's layout direction, false otherwise.
-   */
-  bool IsLayoutDirectionInherited() const
-  {
-    return mInheritLayoutDirection;
-  }
-
-  /**
-   * @brief Sets the update area hint of an actor.
-   * @param [in] updateAreaHint The update area hint.
-   */
-  void SetUpdateAreaHint(const Vector4& updateAreaHint);
-
 protected:
   ActorParentImpl    mParentImpl;     ///< Implementation of ActorParent;
   ActorSizer         mSizer;          ///< Implementation for managing actor size
@@ -2143,24 +2554,25 @@ protected:
   ActorGestureData*  mGestureData;    ///< Optional Gesture data. Only created when actor requires gestures
 
   // Signals
-  Dali::Actor::TouchEventSignalType                 mInterceptTouchedSignal;
-  Dali::Actor::TouchEventSignalType                 mTouchedSignal;
-  Dali::Actor::HoverSignalType                      mHoveredSignal;
-  Dali::Actor::WheelEventSignalType                 mInterceptWheelSignal;
+  Dali::Actor::TouchEventSignalType                 mTouchEventSignal;
+  Dali::Actor::HoverEventSignalType                 mHoverEventSignal;
   Dali::Actor::WheelEventSignalType                 mWheelEventSignal;
-  Dali::Actor::OnSceneSignalType                    mOnSceneSignal;
-  Dali::Actor::OffSceneSignalType                   mOffSceneSignal;
-  Dali::Actor::OnRelayoutSignalType                 mOnRelayoutSignal;
-  DevelActor::VisibilityChangedSignalType           mVisibilityChangedSignal;
-  Dali::Actor::InheritedVisibilityChangedSignalType mInheritedVisibilityChangedSignal;
+  Dali::Actor::TouchEventSignalType                 mInterceptTouchEventSignal;
+  Dali::Actor::WheelEventSignalType                 mInterceptWheelEventSignal;
+  Dali::Actor::SceneConnectedSignalType             mSceneConnectedSignal;
+  Dali::Actor::SceneDisconnectedSignalType          mSceneDisconnectedSignal;
+  DevelActor::OnRelayoutSignalType                  mOnRelayoutSignal;
+  Dali::Actor::VisibilityChangedSignalType          mVisibilityChangedSignal;
+  Dali::Actor::EffectiveVisibilityChangedSignalType mEffectiveVisibilityChangedSignal;
   Dali::Actor::LayoutDirectionChangedSignalType     mLayoutDirectionChangedSignal;
   Dali::Actor::TouchEventSignalType                 mHitTestResultSignal;
 
-  Quaternion mTargetOrientation; ///< Event-side storage for orientation
-  Vector4    mTargetColor;       ///< Event-side storage for color
-  Vector3    mTargetPosition;    ///< Event-side storage for position (not a pointer as most actors will have a position)
-  Vector3    mTargetScale;       ///< Event-side storage for scale
-  Extents    mTouchAreaMargin;   ///< Extents info of touch area margin
+  Quaternion mTargetOrientation;  ///< Event-side storage for orientation
+  Vector4    mTargetColor;        ///< Event-side storage for color
+  Vector3    mTargetPosition;     ///< Event-side storage for position (not a pointer as most actors will have a position)
+  Vector3    mTargetScale;        ///< Event-side storage for scale
+  Vector4    mUpdateAreaHint;     ///< Event-side storage for update area hint
+  Extents    mTouchHitAreaMargin; ///< Extents info of touch hit area margin
 
   std::string mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
@@ -2177,7 +2589,7 @@ protected:
   bool       mKeyboardFocusableChildren : 1; ///< Whether the children of this actor can be focusable by keyboard navigation.
   bool       mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
 
-  bool mOnSceneSignalled : 1;          ///< Set to true before OnSceneConnection signal is emitted, and false before OnSceneDisconnection
+  bool mSceneConnectedSignalled : 1;   ///< Set to true before SceneConnected signal is emitted, and false before SceneDisconnected
   bool mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
   bool mInheritOrientation : 1;        ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale : 1;              ///< Cached: Whether the parent's scale should be inherited.
@@ -2186,13 +2598,13 @@ protected:
   bool mInheritLayoutDirection : 1;    ///< Whether the actor inherits the layout direction from parent.
   bool mCaptureAllTouchAfterStart : 1; ///< Whether the actor should capture all touch after touch starts even if the motion moves outside of the actor area.
 
-  bool mIsBlendEquationSet : 1;     ///< Flag to identify whether the Blend equation is set
-  bool mNeedGesturePropagation : 1; ///< Whether the parent listens for gesture events or not
-  bool mUserInteractionEnabled : 1; ///< Whether the actor should be enabled user interaction.
-  bool mAllowOnlyOwnTouch : 1;      ///< Whether the actor will only receive own touch. it only receives touches that started from itself.
-  bool mUseTextureUpdateArea : 1;   ///< Whether the actor uses the update area of the texture instead of its own.
-  bool mDispatchTouchMotion : 1;    ///< Whether to send touch motion events or not.
-  bool mDispatchHoverMotion : 1;    ///< Whether to send hover motion events or not.
+  bool mIsBlendEquationSet : 1;          ///< Flag to identify whether the Blend equation is set
+  bool mNeedGesturePropagation : 1;      ///< Whether the parent listens for gesture events or not
+  bool mUserInteractionEnabled : 1;      ///< Whether the actor should be enabled user interaction.
+  bool mAllowSelfInitiatedTouchOnly : 1; ///< Whether the actor only receives touches that originated on itself.
+  bool mUseTextureUpdateArea : 1;        ///< Whether the actor uses the update area of the texture instead of its own.
+  bool mDispatchTouchMotion : 1;         ///< Whether to send touch motion events or not.
+  bool mDispatchHoverMotion : 1;         ///< Whether to send hover motion events or not.
   bool mIsRenderTaskMappingActor : 1;
   bool mIgnored : 1; ///< Whether the actor is ignored or not.
 
@@ -2204,7 +2616,7 @@ protected:
   ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.
   PointState::Type                           mHoverState : 3;               ///< Stores the HoverEvent state of actor.
 
-  DevelBlendEquation::Type mBlendEquation : 16; ///< Cached: Determines which blend equation will be used to render renderers.
+  Dali::BlendEquation::Type mBlendEquation : 16; ///< Cached: Determines which blend equation will be used to render renderers.
 
   uint8_t mOffScreenRenderableBitField; ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 

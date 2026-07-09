@@ -351,7 +351,7 @@ public:
    * Emits the touched signal.
    * @param[in] touch The touch event details.
    */
-  void EmitTouchedSignal(const Dali::TouchEvent& touch);
+  void EmitTouchEventSignal(const Dali::TouchEvent& touch);
 
   /**
    * Used by the EventProcessor to emit wheel event signals.
@@ -445,9 +445,9 @@ public:
   Integration::Scene::EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
 
   /**
-   * @copydoc Integration::Scene::TouchedSignal()
+   * @copydoc Integration::Scene::TouchEventSignal()
    */
-  Integration::Scene::TouchEventSignalType& TouchedSignal();
+  Integration::Scene::TouchEventSignalType& TouchEventSignal();
 
   /**
    * @copydoc Integration::Scene::sWheelEventSignal()
@@ -559,7 +559,7 @@ private:
   Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;
 
   // The touch signal
-  Integration::Scene::TouchEventSignalType mTouchedSignal;
+  Integration::Scene::TouchEventSignalType mTouchEventSignal;
 
   // The wheel event signal
   Integration::Scene::WheelEventSignalType          mWheelEventSignal;

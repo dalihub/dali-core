@@ -613,7 +613,7 @@ public:
    * @return The touch signal to connect to
    * @note Motion events are not emitted.
    */
-  TouchEventSignalType& TouchedSignal();
+  TouchEventSignalType& TouchEventSignal();
 
   /**
    * @brief This signal is emitted when wheel event is received.

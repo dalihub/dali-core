@@ -106,7 +106,7 @@ void PinchGestureDetector::OnActorAttach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector attach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Connect(this, &PinchGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Connect(this, &PinchGestureDetector::OnTouchEvent);
   }
 }
 
@@ -115,7 +115,7 @@ void PinchGestureDetector::OnActorDetach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "PinchGestureDetector detach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Disconnect(this, &PinchGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Disconnect(this, &PinchGestureDetector::OnTouchEvent);
   }
 }
 

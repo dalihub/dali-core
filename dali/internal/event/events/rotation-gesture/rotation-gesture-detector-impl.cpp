@@ -103,7 +103,7 @@ void RotationGestureDetector::OnActorAttach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector attach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Connect(this, &RotationGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Connect(this, &RotationGestureDetector::OnTouchEvent);
   }
 }
 
@@ -112,7 +112,7 @@ void RotationGestureDetector::OnActorDetach(Actor& actor)
   DALI_LOG_INFO(gLogFilter, Debug::General, "RotationGestureDetector detach actor(%d)\n", actor.GetId());
   if(actor.OnScene() && actor.GetScene().IsGeometryHittestEnabled())
   {
-    actor.TouchedSignal().Disconnect(this, &RotationGestureDetector::OnTouchEvent);
+    actor.TouchEventSignal().Disconnect(this, &RotationGestureDetector::OnTouchEvent);
   }
 }
 

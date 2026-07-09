@@ -23,6 +23,7 @@
 #include <cmath>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/capabilities.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/hover-event.h>
@@ -33,7 +34,6 @@
 #include <dali/public-api/math/vector3.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/object/type-registry.h>
 
 #include <dali/integration-api/debug.h>
@@ -116,10 +116,15 @@ DALI_PROPERTY("worldMatrix", MATRIX, false, false, true, Dali::Actor::Property::
 DALI_PROPERTY("name", STRING, true, false, false, Dali::Actor::Property::NAME)
 DALI_PROPERTY("sensitive", BOOLEAN, true, false, false, Dali::Actor::Property::SENSITIVE)
 DALI_PROPERTY("leaveRequired", BOOLEAN, true, false, false, Dali::Actor::Property::LEAVE_REQUIRED)
+DALI_PROPERTY("touchHitAreaMargin", EXTENTS, true, false, false, Dali::Actor::Property::TOUCH_HIT_AREA_MARGIN)
+DALI_PROPERTY("allowSelfInitiatedTouchOnly", BOOLEAN, true, false, false, Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY)
+DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_TOUCH_MOTION)
+DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_HOVER_MOTION)
 DALI_PROPERTY("inheritOrientation", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_ORIENTATION)
 DALI_PROPERTY("inheritScale", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_SCALE)
 DALI_PROPERTY("colorMode", INTEGER, true, false, false, Dali::Actor::Property::COLOR_MODE)
 DALI_PROPERTY("drawMode", INTEGER, true, false, false, Dali::Actor::Property::DRAW_MODE)
+DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::Actor::Property::BLEND_EQUATION)
 DALI_PROPERTY("sizeModeFactor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR)
 DALI_PROPERTY("widthResizePolicy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY)
 DALI_PROPERTY("heightResizePolicy", STRING, true, false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY)
@@ -137,6 +142,7 @@ DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::Actor::Property::OPACITY
 DALI_PROPERTY("screenPosition", VECTOR2, false, false, false, Dali::Actor::Property::SCREEN_POSITION)
 DALI_PROPERTY("positionUsesPivot", BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_PIVOT)
 DALI_PROPERTY("culled", BOOLEAN, false, false, true, Dali::Actor::Property::CULLED)
+DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::Actor::Property::IGNORED)
 DALI_PROPERTY("id", INTEGER, false, false, false, Dali::Actor::Property::ID)
 DALI_PROPERTY("hierarchyDepth", INTEGER, false, false, false, Dali::Actor::Property::HIERARCHY_DEPTH)
 DALI_PROPERTY("isRoot", BOOLEAN, false, false, false, Dali::Actor::Property::IS_ROOT)
@@ -146,30 +152,26 @@ DALI_PROPERTY("keyboardFocusable", BOOLEAN, true, false, false, Dali::Actor::Pro
 DALI_PROPERTY("updateAreaHint", VECTOR4, true, false, false, Dali::Actor::Property::UPDATE_AREA_HINT)
 DALI_PROPERTY("siblingOrder", INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER)
 DALI_PROPERTY("captureAllTouchAfterStart", BOOLEAN, true, false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START)
-DALI_PROPERTY("touchAreaMargin", EXTENTS, true, false, false, Dali::DevelActor::Property::TOUCH_AREA_MARGIN)
-DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::DevelActor::Property::BLEND_EQUATION)
 DALI_PROPERTY("touchFocusable", BOOLEAN, true, false, false, Dali::DevelActor::Property::TOUCH_FOCUSABLE)
 DALI_PROPERTY("keyboardFocusableChildren", BOOLEAN, true, false, false, Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN)
 DALI_PROPERTY("userInteractionEnabled", BOOLEAN, true, false, false, Dali::DevelActor::Property::USER_INTERACTION_ENABLED)
-DALI_PROPERTY("allowOnlyOwnTouch", BOOLEAN, true, false, false, Dali::DevelActor::Property::ALLOW_ONLY_OWN_TOUCH)
 DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA)
-DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_TOUCH_MOTION)
-DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::DevelActor::Property::DISPATCH_HOVER_MOTION)
 DALI_PROPERTY("childrenDepthIndexPolicy", INTEGER, true, false, false, Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY)
-DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::DevelActor::Property::IGNORED)
 DALI_PROPERTY("worldIgnored", BOOLEAN, false, false, true, Dali::DevelActor::Property::WORLD_IGNORED)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
 // Signals
 
-static constexpr std::string_view SIGNAL_HOVERED                      = "hovered";
+static constexpr std::string_view SIGNAL_TOUCH_EVENT                  = "touchEvent";
+static constexpr std::string_view SIGNAL_HOVER_EVENT                  = "hoverEvent";
 static constexpr std::string_view SIGNAL_WHEEL_EVENT                  = "wheelEvent";
-static constexpr std::string_view SIGNAL_ON_SCENE                     = "onScene";
-static constexpr std::string_view SIGNAL_OFF_SCENE                    = "offScene";
+static constexpr std::string_view SIGNAL_SCENE_CONNECTED              = "sceneConnected";
+static constexpr std::string_view SIGNAL_SCENE_DISCONNECTED           = "sceneDisconnected";
 static constexpr std::string_view SIGNAL_ON_RELAYOUT                  = "onRelayout";
-static constexpr std::string_view SIGNAL_TOUCHED                      = "touched";
+static constexpr std::string_view SIGNAL_INTERCEPT_TOUCH_EVENT        = "interceptTouchEvent";
+static constexpr std::string_view SIGNAL_INTERCEPT_WHEEL_EVENT        = "interceptWheelEvent";
 static constexpr std::string_view SIGNAL_VISIBILITY_CHANGED           = "visibilityChanged";
-static constexpr std::string_view SIGNAL_INHERITED_VISIBILITY_CHANGED = "inheritedVisibilityChanged";
+static constexpr std::string_view SIGNAL_EFFECTIVE_VISIBILITY_CHANGED = "effectiveVisibilityChanged";
 static constexpr std::string_view SIGNAL_LAYOUT_DIRECTION_CHANGED     = "layoutDirectionChanged";
 static constexpr std::string_view SIGNAL_CHILD_ADDED                  = "childAdded";
 static constexpr std::string_view SIGNAL_CHILD_REMOVED                = "childRemoved";
@@ -203,37 +205,45 @@ static bool DoConnectSignal(BaseObject*                 object,
 
   std::string_view name = ToStdStringView(signalName);
 
-  if(name == SIGNAL_HOVERED)
+  if(name == SIGNAL_TOUCH_EVENT)
   {
-    actor->HoveredSignal().Connect(tracker, functor);
+    actor->TouchEventSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_HOVER_EVENT)
+  {
+    actor->HoverEventSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_WHEEL_EVENT)
   {
     actor->WheelEventSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_ON_SCENE)
+  else if(name == SIGNAL_INTERCEPT_TOUCH_EVENT)
   {
-    actor->OnSceneSignal().Connect(tracker, functor);
+    actor->InterceptTouchEventSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_OFF_SCENE)
+  else if(name == SIGNAL_INTERCEPT_WHEEL_EVENT)
   {
-    actor->OffSceneSignal().Connect(tracker, functor);
+    actor->InterceptWheelEventSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_SCENE_CONNECTED)
+  {
+    actor->SceneConnectedSignal().Connect(tracker, functor);
+  }
+  else if(name == SIGNAL_SCENE_DISCONNECTED)
+  {
+    actor->SceneDisconnectedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_ON_RELAYOUT)
   {
     actor->OnRelayoutSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_TOUCHED)
-  {
-    actor->TouchedSignal().Connect(tracker, functor);
-  }
   else if(name == SIGNAL_VISIBILITY_CHANGED)
   {
     actor->VisibilityChangedSignal().Connect(tracker, functor);
   }
-  else if(name == SIGNAL_INHERITED_VISIBILITY_CHANGED)
+  else if(name == SIGNAL_EFFECTIVE_VISIBILITY_CHANGED)
   {
-    actor->InheritedVisibilityChangedSignal().Connect(tracker, functor);
+    actor->EffectiveVisibilityChangedSignal().Connect(tracker, functor);
   }
   else if(name == SIGNAL_LAYOUT_DIRECTION_CHANGED)
   {
@@ -290,17 +300,19 @@ bool DoAction(BaseObject*          object,
 
 TypeRegistration mType(typeid(Dali::Actor), typeid(Dali::Handle), CreateActor, ActorDefaultProperties);
 
-SignalConnectorType signalConnector2(mType, SIGNAL_HOVERED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector3(mType, SIGNAL_WHEEL_EVENT.data(), &DoConnectSignal);
-SignalConnectorType signalConnector4(mType, SIGNAL_ON_SCENE.data(), &DoConnectSignal);
-SignalConnectorType signalConnector5(mType, SIGNAL_OFF_SCENE.data(), &DoConnectSignal);
-SignalConnectorType signalConnector6(mType, SIGNAL_ON_RELAYOUT.data(), &DoConnectSignal);
-SignalConnectorType signalConnector7(mType, SIGNAL_TOUCHED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector8(mType, SIGNAL_VISIBILITY_CHANGED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector9(mType, SIGNAL_INHERITED_VISIBILITY_CHANGED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector10(mType, SIGNAL_LAYOUT_DIRECTION_CHANGED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector11(mType, SIGNAL_CHILD_ADDED.data(), &DoConnectSignal);
-SignalConnectorType signalConnector12(mType, SIGNAL_CHILD_REMOVED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector2(mType, SIGNAL_TOUCH_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector3(mType, SIGNAL_HOVER_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector4(mType, SIGNAL_WHEEL_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector5(mType, SIGNAL_INTERCEPT_TOUCH_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector6(mType, SIGNAL_INTERCEPT_WHEEL_EVENT.data(), &DoConnectSignal);
+SignalConnectorType signalConnector7(mType, SIGNAL_SCENE_CONNECTED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector8(mType, SIGNAL_SCENE_DISCONNECTED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector9(mType, SIGNAL_CHILD_ADDED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector10(mType, SIGNAL_CHILD_REMOVED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector11(mType, SIGNAL_VISIBILITY_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector12(mType, SIGNAL_EFFECTIVE_VISIBILITY_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector13(mType, SIGNAL_LAYOUT_DIRECTION_CHANGED.data(), &DoConnectSignal);
+SignalConnectorType signalConnector14(mType, SIGNAL_ON_RELAYOUT.data(), &DoConnectSignal);
 
 TypeAction a1(mType, ACTION_SHOW.data(), &DoAction);
 TypeAction a2(mType, ACTION_HIDE.data(), &DoAction);
@@ -484,10 +496,44 @@ void Actor::SetParentOrigin(const Vector3& origin)
   }
 }
 
-const Vector3& Actor::GetCurrentParentOrigin() const
+const Vector3& Actor::GetParentOrigin() const
 {
   // Cached for event-thread access
-  return (mParentOrigin) ? *mParentOrigin : ParentOrigin::DEFAULT;
+  if(mParentOrigin)
+  {
+    return *mParentOrigin;
+  }
+  return ParentOrigin::DEFAULT;
+}
+
+void Actor::SetParentOriginX(float x)
+{
+  SetParentOrigin(Vector3(x, GetParentOrigin().y, GetParentOrigin().z));
+}
+
+float Actor::GetParentOriginX() const
+{
+  return GetParentOrigin().x;
+}
+
+void Actor::SetParentOriginY(float y)
+{
+  SetParentOrigin(Vector3(GetParentOrigin().x, y, GetParentOrigin().z));
+}
+
+float Actor::GetParentOriginY() const
+{
+  return GetParentOrigin().y;
+}
+
+void Actor::SetParentOriginZ(float z)
+{
+  SetParentOrigin(Vector3(GetParentOrigin().x, GetParentOrigin().y, z));
+}
+
+float Actor::GetParentOriginZ() const
+{
+  return GetParentOrigin().z;
 }
 
 void Actor::SetPivot(const Vector3& anchor)
@@ -511,10 +557,44 @@ void Actor::SetPivot(const Vector3& anchor)
   }
 }
 
-const Vector3& Actor::GetCurrentPivot() const
+const Vector3& Actor::GetPivot() const
 {
   // Cached for event-thread access
-  return (mPivot) ? *mPivot : Pivot::DEFAULT;
+  if(mPivot)
+  {
+    return *mPivot;
+  }
+  return Pivot::DEFAULT;
+}
+
+void Actor::SetPivotX(float x)
+{
+  SetPivot(Vector3(x, GetPivot().y, GetPivot().z));
+}
+
+float Actor::GetPivotX() const
+{
+  return GetPivot().x;
+}
+
+void Actor::SetPivotY(float y)
+{
+  SetPivot(Vector3(GetPivot().x, y, GetPivot().z));
+}
+
+float Actor::GetPivotY() const
+{
+  return GetPivot().y;
+}
+
+void Actor::SetPivotZ(float z)
+{
+  SetPivot(Vector3(GetPivot().x, GetPivot().y, z));
+}
+
+float Actor::GetPivotZ() const
+{
+  return GetPivot().z;
 }
 
 void Actor::SetPosition(const Vector3& position)
@@ -557,36 +637,54 @@ void Actor::TranslateBy(const Vector3& distance)
   SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mPosition, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeRelative, distance);
 }
 
+float Actor::GetX() const
+{
+  return mTargetPosition.x;
+}
+
+float Actor::GetY() const
+{
+  return mTargetPosition.y;
+}
+
+float Actor::GetZ() const
+{
+  return mTargetPosition.z;
+}
+
+const Vector3& Actor::GetPosition() const
+{
+  return mTargetPosition;
+}
+
 const Vector3& Actor::GetCurrentPosition() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetPosition();
 }
 
-const Vector3& Actor::GetCurrentWorldPosition() const
+const Vector3& Actor::GetWorldPosition() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetWorldPosition();
 }
 
-const Vector2 Actor::CalculateScreenPosition() const
+float Actor::GetWorldPositionX() const
 {
-  if(mScene)
-  {
-    if(mLayer3DParentsCount == 0)
-    {
-      // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
-      return CalculateActorScreenPosition(*this);
-    }
-    else
-    {
-      return CalculateActorScreenPositionRenderTaskList(*this);
-    }
-  }
-  return Vector2::ZERO;
+  return GetWorldPosition().x;
 }
 
-const Vector2 Actor::GetCurrentScreenPosition() const
+float Actor::GetWorldPositionY() const
+{
+  return GetWorldPosition().y;
+}
+
+float Actor::GetWorldPositionZ() const
+{
+  return GetWorldPosition().z;
+}
+
+Vector2 Actor::GetScreenPosition() const
 {
   if(mScene)
   {
@@ -598,6 +696,23 @@ const Vector2 Actor::GetCurrentScreenPosition() const
     else
     {
       return CalculateCurrentActorScreenPositionRenderTaskList(*this);
+    }
+  }
+  return Vector2::ZERO;
+}
+
+Vector2 Actor::CalculateScreenPosition() const
+{
+  if(mScene)
+  {
+    if(mLayer3DParentsCount == 0)
+    {
+      // We can assume that this actor is under 2d layer. Use faster, but imprecise algorithm
+      return CalculateActorScreenPosition(*this);
+    }
+    else
+    {
+      return CalculateActorScreenPositionRenderTaskList(*this);
     }
   }
   return Vector2::ZERO;
@@ -644,16 +759,32 @@ void Actor::RotateBy(const Quaternion& relativeRotation)
   SceneGraph::NodeTransformPropertyMessage<Quaternion>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mOrientation, &SceneGraph::TransformManagerPropertyHandler<Quaternion>::BakeRelative, relativeRotation);
 }
 
+const Quaternion& Actor::GetOrientation() const
+{
+  return mTargetOrientation;
+}
+
 const Quaternion& Actor::GetCurrentOrientation() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetOrientation();
 }
 
-const Quaternion& Actor::GetCurrentWorldOrientation() const
+const Quaternion& Actor::GetWorldOrientation() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetWorldOrientation();
+}
+
+void Actor::SetInheritOrientation(bool inherit)
+{
+  if(mInheritOrientation != inherit)
+  {
+    // non animatable so keep local copy
+    mInheritOrientation = inherit;
+    // node is being used in a separate thread; queue a message to set the value
+    SetInheritOrientationMessage(GetEventThreadServices(), GetNode(), inherit);
+  }
 }
 
 void Actor::SetScale(const Vector3& scale)
@@ -696,6 +827,26 @@ void Actor::ScaleBy(const Vector3& relativeScale)
   SceneGraph::NodeTransformPropertyMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mScale, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeRelativeMultiply, relativeScale);
 }
 
+const Vector3& Actor::GetScale() const
+{
+  return mTargetScale;
+}
+
+float Actor::GetScaleX() const
+{
+  return GetScale().x;
+}
+
+float Actor::GetScaleY() const
+{
+  return GetScale().y;
+}
+
+float Actor::GetScaleZ() const
+{
+  return GetScale().z;
+}
+
 const Vector3& Actor::GetCurrentScale() const
 {
   // node is being used in a separate thread; copy the value from the previous update
@@ -708,6 +859,11 @@ const Vector3& Actor::GetCurrentWorldScale() const
   return GetNode().GetWorldScale();
 }
 
+const Vector3& Actor::GetWorldScale() const
+{
+  return GetCurrentWorldScale();
+}
+
 void Actor::SetInheritScale(bool inherit)
 {
   if(mInheritScale != inherit)
@@ -717,11 +873,6 @@ void Actor::SetInheritScale(bool inherit)
     // node is being used in a separate thread; queue a message to set the value
     SetInheritScaleMessage(GetEventThreadServices(), GetNode(), inherit);
   }
-}
-
-Matrix Actor::GetCurrentWorldMatrix() const
-{
-  return GetNode().GetWorldMatrix();
 }
 
 ActorPtr Actor::GetVisiblityChangedActor()
@@ -740,8 +891,7 @@ void Actor::SetVisible(bool visible)
 
 bool Actor::IsVisible() const
 {
-  // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().IsVisible();
+  return mVisible;
 }
 
 void Actor::SetOpacity(float opacity)
@@ -754,15 +904,15 @@ void Actor::SetOpacity(float opacity)
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
 
+float Actor::GetOpacity() const
+{
+  return mTargetColor.a;
+}
+
 float Actor::GetCurrentOpacity() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetOpacity();
-}
-
-const Vector4& Actor::GetCurrentWorldColor() const
-{
-  return GetNode().GetWorldColor();
 }
 
 void Actor::SetColor(const Vector4& color)
@@ -805,21 +955,56 @@ void Actor::SetColorBlue(float blue)
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
 
+void Actor::SetColorAlpha(float alpha)
+{
+  mTargetColor.a = alpha;
+
+  // node is being used in a separate thread; queue a message to set the value & base value
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeW, alpha);
+
+  RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
+}
+
+const Vector4& Actor::GetColor() const
+{
+  return mTargetColor;
+}
+
+float Actor::GetColorRed() const
+{
+  return mTargetColor.r;
+}
+
+float Actor::GetColorGreen() const
+{
+  return mTargetColor.g;
+}
+
+float Actor::GetColorBlue() const
+{
+  return mTargetColor.b;
+}
+
+float Actor::GetColorAlpha() const
+{
+  return mTargetColor.a;
+}
+
 const Vector4& Actor::GetCurrentColor() const
 {
   // node is being used in a separate thread; copy the value from the previous update
   return GetNode().GetColor();
 }
 
-void Actor::SetInheritOrientation(bool inherit)
+const Vector4& Actor::GetWorldColor() const
 {
-  if(mInheritOrientation != inherit)
-  {
-    // non animatable so keep local copy
-    mInheritOrientation = inherit;
-    // node is being used in a separate thread; queue a message to set the value
-    SetInheritOrientationMessage(GetEventThreadServices(), GetNode(), inherit);
-  }
+  return GetNode().GetWorldColor();
+}
+
+void Actor::SetClippingMode(ClippingMode::Type clippingMode)
+{
+  mClippingMode = clippingMode;
+  SetClippingModeMessage(GetEventThreadServices(), GetNode(), mClippingMode);
 }
 
 void Actor::SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Type childrenDepthIndexPolicy)
@@ -870,9 +1055,19 @@ void Actor::SetSize(const Vector3& size)
   mSizer.SetSize(size);
 }
 
+Vector3 Actor::GetSize() const
+{
+  return GetTargetSize();
+}
+
 void Actor::SetWidth(float width)
 {
   mSizer.SetWidth(width);
+}
+
+float Actor::GetWidth() const
+{
+  return GetTargetSize().width;
 }
 
 void Actor::SetHeight(float height)
@@ -880,11 +1075,21 @@ void Actor::SetHeight(float height)
   mSizer.SetHeight(height);
 }
 
+float Actor::GetHeight() const
+{
+  return GetTargetSize().height;
+}
+
 void Actor::SetDepth(float depth)
 {
   mSizer.SetDepth(depth);
   // node is being used in a separate thread; queue a message to set the value & base value
   SceneGraph::NodeTransformComponentMessage<Vector3>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mSize, &SceneGraph::TransformManagerPropertyHandler<Vector3>::BakeZ, depth);
+}
+
+float Actor::GetDepth() const
+{
+  return GetTargetSize().depth;
 }
 
 Vector3 Actor::GetTargetSize() const
@@ -934,9 +1139,9 @@ bool Actor::IsLayoutDirty(Dimension::Type dimension) const
   return mSizer.IsLayoutDirty(dimension);
 }
 
-bool Actor::RelayoutPossible(Dimension::Type dimension) const
+bool Actor::IsRelayoutPossible(Dimension::Type dimension) const
 {
-  return mSizer.RelayoutPossible(dimension);
+  return mSizer.IsRelayoutPossible(dimension);
 }
 
 bool Actor::RelayoutRequired(Dimension::Type dimension) const
@@ -979,7 +1184,7 @@ void Actor::RemoveRenderer(uint32_t index)
   }
 }
 
-void Actor::SetBlendEquation(DevelBlendEquation::Type blendEquation)
+void Actor::SetBlendEquation(Dali::BlendEquation::Type blendEquation)
 {
   if(Dali::Capabilities::IsBlendEquationSupported(blendEquation))
   {
@@ -1003,7 +1208,7 @@ void Actor::SetBlendEquation(DevelBlendEquation::Type blendEquation)
   }
 }
 
-DevelBlendEquation::Type Actor::GetBlendEquation() const
+Dali::BlendEquation::Type Actor::GetBlendEquation() const
 {
   return mBlendEquation;
 }
@@ -1016,6 +1221,17 @@ void Actor::SetTransparent(bool transparent)
 bool Actor::IsTransparent() const
 {
   return GetNode().IsTransparent();
+}
+
+const Matrix& Actor::GetWorldMatrix() const
+{
+  return GetNode().GetWorldMatrix();
+}
+
+bool Actor::IsCulled() const
+{
+  // node is being used in a separate thread; copy the value from the previous update
+  return GetNode().IsCulled();
 }
 
 void Actor::SetDrawMode(DrawMode::Type drawMode)
@@ -1079,28 +1295,49 @@ bool Actor::EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch)
 {
   if(mScene && mScene->IsGeometryHittestEnabled())
   {
-    return EmitConsumingSignalOr(*this, mInterceptTouchedSignal, touch);
+    return EmitConsumingSignalOr(*this, mInterceptTouchEventSignal, touch);
   }
-  return EmitConsumingSignal(*this, mInterceptTouchedSignal, touch);
+  return EmitConsumingSignal(*this, mInterceptTouchEventSignal, touch);
+}
+
+bool Actor::DispatchTouchEvent(const Dali::TouchEvent& touch)
+{
+  bool consumed = OnTouchEvent(touch);
+  consumed = EmitTouchEventSignal(touch) || consumed;
+  return consumed;
 }
 
 bool Actor::EmitTouchEventSignal(const Dali::TouchEvent& touch)
 {
   if(mScene && mScene->IsGeometryHittestEnabled())
   {
-    return EmitConsumingSignalOr(*this, mTouchedSignal, touch);
+    return EmitConsumingSignalOr(*this, mTouchEventSignal, touch);
   }
-  return EmitConsumingSignal(*this, mTouchedSignal, touch);
+  return EmitConsumingSignal(*this, mTouchEventSignal, touch);
+}
+
+bool Actor::DispatchHoverEvent(const Dali::HoverEvent& event)
+{
+  bool consumed = OnHoverEvent(event);
+  consumed = EmitHoverEventSignal(event) || consumed;
+  return consumed;
 }
 
 bool Actor::EmitHoverEventSignal(const Dali::HoverEvent& event)
 {
-  return EmitConsumingSignal(*this, mHoveredSignal, event);
+  return EmitConsumingSignal(*this, mHoverEventSignal, event);
 }
 
 bool Actor::EmitInterceptWheelEventSignal(const Dali::WheelEvent& event)
 {
-  return EmitConsumingSignal(*this, mInterceptWheelSignal, event);
+  return EmitConsumingSignal(*this, mInterceptWheelEventSignal, event);
+}
+
+bool Actor::DispatchWheelEvent(const Dali::WheelEvent& event)
+{
+  bool consumed = OnWheelEvent(event);
+  consumed = EmitWheelEventSignal(event) || consumed;
+  return consumed;
 }
 
 bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
@@ -1108,14 +1345,14 @@ bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
   return EmitConsumingSignal(*this, mWheelEventSignal, event);
 }
 
-void Actor::EmitVisibilityChangedSignal(bool visible, DevelActor::VisibilityChange::Type type)
+void Actor::EmitVisibilityChangedSignal(bool visible, VisibilityChangeType type)
 {
   EmitSignal(*this, mVisibilityChangedSignal, visible, type);
 }
 
-void Actor::EmitInheritedVisibilityChangedSignal(bool visible)
+void Actor::EmitEffectiveVisibilityChangedSignal(bool visible)
 {
-  EmitSignal(*this, mInheritedVisibilityChangedSignal, visible);
+  EmitSignal(*this, mEffectiveVisibilityChangedSignal, visible);
 }
 
 void Actor::EmitLayoutDirectionChangedSignal(LayoutDirection::Type type)
@@ -1139,12 +1376,12 @@ bool Actor::EmitHitTestResultSignal(Integration::Point point, Vector2 hitPointLo
   return hit;
 }
 
-DevelActor::ChildChangedSignalType& Actor::ChildAddedSignal()
+Dali::Actor::ChildAddedSignalType& Actor::ChildAddedSignal()
 {
   return mParentImpl.ChildAddedSignal();
 }
 
-DevelActor::ChildChangedSignalType& Actor::ChildRemovedSignal()
+Dali::Actor::ChildRemovedSignalType& Actor::ChildRemovedSignal()
 {
   return mParentImpl.ChildRemovedSignal();
 }
@@ -1200,6 +1437,36 @@ void Actor::RequestRenderTaskReorder()
   }
 }
 
+bool Actor::HasIntrinsicTouchHandling() const
+{
+  return HasIntrinsicTouchHandlingExternal();
+}
+
+bool Actor::OnTouchEvent(const Dali::TouchEvent& touch)
+{
+  return OnTouchEventExternal(touch);
+}
+
+bool Actor::HasIntrinsicHoverHandling() const
+{
+  return HasIntrinsicHoverHandlingExternal();
+}
+
+bool Actor::OnHoverEvent(const Dali::HoverEvent& hover)
+{
+  return OnHoverEventExternal(hover);
+}
+
+bool Actor::HasIntrinsicWheelHandling() const
+{
+  return HasIntrinsicWheelHandlingExternal();
+}
+
+bool Actor::OnWheelEvent(const Dali::WheelEvent& wheel)
+{
+  return OnWheelEventExternal(wheel);
+}
+
 uint32_t Actor::AddCacheRenderer(Renderer& renderer)
 {
   const SceneGraph::Node& node = GetNode();
@@ -1235,23 +1502,24 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mParentOrigin(nullptr),
   mPivot(nullptr),
   mGestureData(nullptr),
-  mInterceptTouchedSignal(),
-  mTouchedSignal(),
-  mHoveredSignal(),
-  mInterceptWheelSignal(),
+  mTouchEventSignal(),
+  mHoverEventSignal(),
   mWheelEventSignal(),
-  mOnSceneSignal(),
-  mOffSceneSignal(),
+  mInterceptTouchEventSignal(),
+  mInterceptWheelEventSignal(),
+  mSceneConnectedSignal(),
+  mSceneDisconnectedSignal(),
   mOnRelayoutSignal(),
   mVisibilityChangedSignal(),
-  mInheritedVisibilityChangedSignal(),
+  mEffectiveVisibilityChangedSignal(),
   mLayoutDirectionChangedSignal(),
   mHitTestResultSignal(),
   mTargetOrientation(Quaternion::IDENTITY),
   mTargetColor(Color::WHITE),
   mTargetPosition(Vector3::ZERO),
   mTargetScale(Vector3::ONE),
-  mTouchAreaMargin(0, 0, 0, 0),
+  mUpdateAreaHint(Vector4::ZERO),
+  mTouchHitAreaMargin(0, 0, 0, 0),
   mName(),
   mSortedDepth(0u),
   mDepth(0u),
@@ -1264,7 +1532,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mKeyboardFocusable(false),
   mKeyboardFocusableChildren(true),
   mTouchFocusable(false),
-  mOnSceneSignalled(false),
+  mSceneConnectedSignalled(false),
   mInheritPosition(true),
   mInheritOrientation(true),
   mInheritScale(true),
@@ -1275,7 +1543,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mIsBlendEquationSet(false),
   mNeedGesturePropagation(false),
   mUserInteractionEnabled(true),
-  mAllowOnlyOwnTouch(false),
+  mAllowSelfInitiatedTouchOnly(false),
   mUseTextureUpdateArea(false),
   mDispatchTouchMotion(true),
   mDispatchHoverMotion(true),
@@ -1287,7 +1555,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::INCREASE),
   mClippingMode(ClippingMode::DISABLED),
   mHoverState(PointState::FINISHED),
-  mBlendEquation(DevelBlendEquation::ADD),
+  mBlendEquation(Dali::BlendEquation::ADD),
   mOffScreenRenderableBitField(EMPTY_OFF_SCREEN_RENDERABLE_BIT_FIELD)
 {
 }
@@ -1436,25 +1704,25 @@ void Actor::ConnectToSceneGraph()
 void Actor::NotifySceneConnection(bool notify)
 {
   // Actors can be removed (in a callback), before the on-scene state is reported.
-  // The actor may also have been reparented, in which case mOnSceneSignalled will be true.
-  if(OnScene() && !mOnSceneSignalled)
+  // The actor may also have been reparented, in which case mSceneConnectedSignalled will be true.
+  if(OnScene() && !mSceneConnectedSignalled)
   {
     if(notify)
     {
       // Notification for external (CustomActor) derived classes
       OnSceneConnectionExternal(mDepth);
 
-      if(!mOnSceneSignal.Empty())
+      if(!mSceneConnectedSignal.Empty())
       {
         Dali::Actor handle(this);
-        mOnSceneSignal.Emit(handle);
+        mSceneConnectedSignal.Emit(handle);
       }
     }
 
     // Guard against Remove during callbacks
     if(OnScene())
     {
-      mOnSceneSignalled = true; // signal required next time Actor is removed
+      mSceneConnectedSignalled = true; // signal required next time Actor is removed
     }
   }
 }
@@ -1493,26 +1761,26 @@ void Actor::DisconnectFromSceneGraph()
 void Actor::NotifySceneDisconnection(bool notify)
 {
   // Actors can be added (in a callback), before the off-scene state is reported.
-  // Also if the actor was added & removed before mOnSceneSignalled was set, then we don't notify here.
+  // Also if the actor was added & removed before mSceneConnectedSignalled was set, then we don't notify here.
   // only do this step if there is a scene, i.e. Core is not being shut down
-  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()) && !OnScene() && mOnSceneSignalled)
+  if(DALI_LIKELY(EventThreadServices::IsCoreRunning()) && !OnScene() && mSceneConnectedSignalled)
   {
     if(notify)
     {
-      // Notification for external (CustomeActor) derived classes
+      // Notification for external (CustomActor) derived classes
       OnSceneDisconnectionExternal();
 
-      if(!mOffSceneSignal.Empty())
+      if(!mSceneDisconnectedSignal.Empty())
       {
         Dali::Actor handle(this);
-        mOffSceneSignal.Emit(handle);
+        mSceneDisconnectedSignal.Emit(handle);
       }
     }
 
     // Guard against Add during callbacks
     if(!OnScene())
     {
-      mOnSceneSignalled = false; // signal required next time Actor is added
+      mSceneConnectedSignalled = false; // signal required next time Actor is added
     }
   }
 }
@@ -1543,14 +1811,14 @@ void Actor::RebuildDepthTree()
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
-void Actor::EmitInheritedVisibilityChangedSignalRecursively(bool visible)
+void Actor::EmitEffectiveVisibilityChangedSignalRecursively(bool visible)
 {
-  ActorContainer inheritedVisibilityChangedList;
-  mParentImpl.InheritVisibilityRecursively(inheritedVisibilityChangedList);
+  ActorContainer effectiveVisibilityActors;
+  mParentImpl.CollectEffectiveVisibilityActorsRecursively(effectiveVisibilityActors);
   // Notify applications about the newly connected actors.
-  for(const auto& actor : inheritedVisibilityChangedList)
+  for(const auto& actor : effectiveVisibilityActors)
   {
-    actor->EmitInheritedVisibilityChangedSignal(visible);
+    actor->EmitEffectiveVisibilityChangedSignal(visible);
   }
 }
 
@@ -1662,6 +1930,72 @@ void Actor::LowerBelow(Internal::Actor& target)
   CheckParentAndCall(mParent, *this, target, &ActorParent::LowerChildBelow);
 }
 
+void Actor::SetLayoutDirection(LayoutDirection::Type direction)
+{
+  mInheritLayoutDirection = false;
+  mParentImpl.InheritLayoutDirectionRecursively(direction, true);
+}
+
+void Actor::SetInheritLayoutDirectionEnabled(bool inherit)
+{
+  if(mInheritLayoutDirection != inherit)
+  {
+    mInheritLayoutDirection = inherit;
+
+    if(inherit && mParent)
+    {
+      mParentImpl.InheritLayoutDirectionRecursively(GetParent()->mLayoutDirection);
+    }
+  }
+}
+
+bool Actor::IsInheritLayoutDirectionEnabled() const
+{
+  return mInheritLayoutDirection;
+}
+
+void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
+{
+  mUpdateAreaHint = updateAreaHint;
+
+  // node is being used in a separate thread; queue a message to set the value & base value
+  SetUpdateAreaHintMessage(GetEventThreadServices(), GetNode(), updateAreaHint);
+}
+
+const Vector4& Actor::GetUpdateAreaHint() const
+{
+  return mUpdateAreaHint;
+}
+
+void Actor::SetPositionUsesPivotEnabled(bool enabled)
+{
+  mPositionUsesPivot = enabled;
+}
+
+bool Actor::IsPositionUsesPivotEnabled() const
+{
+  return mPositionUsesPivot;
+}
+
+void Actor::SetIgnored(bool ignored)
+{
+  // Always send message, even if the value hasn't changed, to ensure the Node is updated
+  mIgnored = ignored;
+
+  // Send a message to the update thread to set the ignored state on the Node.
+  SetIgnoredMessage(GetEventThreadServices(), GetNode(), ignored);
+}
+
+bool Actor::IsIgnored() const
+{
+  return mIgnored;
+}
+
+bool Actor::IsWorldIgnored() const
+{
+  return GetNode().IsWorldIgnored();
+}
+
 void Actor::SetParent(ActorParent* parent, bool notify)
 {
   bool emitInheritedVisible = false;
@@ -1717,7 +2051,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     // So we need to stack those actors, and then use it.
     GetVisibilityChangedActorStack().emplace_back(this);
 
-    EmitInheritedVisibilityChangedSignalRecursively(visiblility);
+    EmitEffectiveVisibilityChangedSignalRecursively(visiblility);
 
     // Pop the actor from the stack now
     GetVisibilityChangedActorStack().pop_back();
@@ -1750,9 +2084,13 @@ Bounds Actor::CalculateCurrentScreenExtents() const
   }
 }
 
-Vector3 Actor::GetPivotForPosition() const
+const Vector3& Actor::GetPivotForPosition() const
 {
-  return (mPositionUsesPivot ? GetCurrentPivot() : Pivot::TOP_LEFT);
+  if(mPositionUsesPivot)
+  {
+    return GetPivot();
+  }
+  return Pivot::TOP_LEFT;
 }
 
 bool Actor::GetCachedPropertyValue(Property::Index index, Property::Value& value) const
@@ -1898,11 +2236,11 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     GetVisibilityChangedActorStack().emplace_back(this);
 
     // Emit the signal on this actor and all its children
-    mParentImpl.EmitVisibilityChangedSignalRecursively(visible, DevelActor::VisibilityChange::SELF);
+    mParentImpl.EmitVisibilityChangedSignalRecursively(visible, VisibilityChangeType::SELF);
 
     if(emitInheritedVisible)
     {
-      EmitInheritedVisibilityChangedSignalRecursively(visible);
+      EmitEffectiveVisibilityChangedSignalRecursively(visible);
     }
 
     // Pop the actor from the stack now
@@ -1948,44 +2286,6 @@ void Actor::RaiseChildAbove(Actor& child, Actor& target)
 void Actor::LowerChildBelow(Actor& child, Actor& target)
 {
   mParentImpl.LowerChildBelow(child, target);
-}
-
-void Actor::SetInheritLayoutDirection(bool inherit)
-{
-  if(mInheritLayoutDirection != inherit)
-  {
-    mInheritLayoutDirection = inherit;
-
-    if(inherit && mParent)
-    {
-      mParentImpl.InheritLayoutDirectionRecursively(GetParent()->mLayoutDirection);
-    }
-  }
-}
-
-void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
-{
-  // node is being used in a separate thread; queue a message to set the value & base value
-  SetUpdateAreaHintMessage(GetEventThreadServices(), GetNode(), updateAreaHint);
-}
-
-void Actor::SetIgnored(bool ignored)
-{
-  // Always send message, even if the value hasn't changed, to ensure the Node is updated
-  mIgnored = ignored;
-
-  // Send a message to the update thread to set the ignored state on the Node.
-  SetIgnoredMessage(GetEventThreadServices(), GetNode(), ignored);
-}
-
-bool Actor::IsIgnored() const
-{
-  return mIgnored;
-}
-
-bool Actor::IsCurrentWorldIgnored() const
-{
-  return GetNode().IsWorldIgnored();
 }
 
 } // namespace Internal

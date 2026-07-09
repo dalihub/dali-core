@@ -100,12 +100,12 @@ bool HasPointState(const Dali::TouchEvent& event, PointState::Type targetState)
 
 bool ShouldEmitInterceptTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
-  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotion() || !HasPointState(event, PointState::MOTION));
+  return actorImpl.GetInterceptTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotionEnabled() || !HasPointState(event, PointState::MOTION));
 }
 
 bool ShouldEmitTouchEvent(const Actor& actorImpl, const Dali::TouchEvent& event)
 {
-  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotion() || !HasPointState(event, PointState::MOTION));
+  return actorImpl.GetTouchRequired() && (actorImpl.IsHittable() || HasPointState(event, PointState::INTERRUPTED)) && (actorImpl.IsDispatchTouchMotionEnabled() || !HasPointState(event, PointState::MOTION));
 }
 
 // child -> parent
@@ -195,11 +195,11 @@ Dali::Actor EmitTouchSignals(Dali::Actor actor, const Dali::TouchEvent& touchEve
 
     bool consumed(false);
 
-    // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
+    // Only dispatch the event if the actor's touch signal has connections (or derived actor implementation requires touch).
     if(ShouldEmitTouchEvent(actorImpl, touchEvent))
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
-      consumed = actorImpl.EmitTouchEventSignal(touchEvent);
+      consumed = actorImpl.DispatchTouchEvent(touchEvent);
     }
 
     if(consumed)
@@ -236,7 +236,7 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(std::list<ActorPtr>& actorLists, std
   {
     ActorPtr actorPtr  = *rIter;
     Actor*   actorImpl = actorPtr.Get();
-    // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
+    // Only dispatch the event if the actor's touch signal has connections (or derived actor implementation requires touch).
     if(ShouldEmitTouchEvent(*actorImpl, touchEvent))
     {
       // Check if actor is already in tracking list to avoid duplicates
@@ -246,7 +246,7 @@ Dali::Actor EmitGeoTouchSignalsWithTracking(std::list<ActorPtr>& actorLists, std
       }
 
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
-      if(actorImpl->EmitTouchEventSignal(touchEvent))
+      if(actorImpl->DispatchTouchEvent(touchEvent))
       {
         // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
         consumedActor = Dali::Actor(actorImpl);
@@ -269,11 +269,11 @@ Dali::Actor EmitGeoTouchSignals(std::list<ActorPtr>& actorLists, const Dali::Tou
   {
     ActorPtr actorPtr  = *rIter;
     Actor*   actorImpl = actorPtr.Get();
-    // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
+    // Only dispatch the event if the actor's touch signal has connections (or derived actor implementation requires touch).
     if(ShouldEmitTouchEvent(*actorImpl, touchEvent))
     {
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_TOUCH_EVENT_SIGNAL");
-      if(actorImpl->EmitTouchEventSignal(touchEvent))
+      if(actorImpl->DispatchTouchEvent(touchEvent))
       {
         // One of this actor's listeners has consumed the event so set this actor as the consumed actor.
         consumedActor = Dali::Actor(actorImpl);
@@ -386,7 +386,7 @@ void ParsePrimaryTouchPoint(
       {
         capturingTouchActorObserver.SetActor(hitActor);
       }
-      if(hitActor->IsAllowedOnlyOwnTouch() || isGeometry)
+      if(hitActor->IsAllowSelfInitiatedTouchOnlyEnabled() || isGeometry)
       {
         ownTouchActorObserver.SetActor(hitActor);
       }
@@ -494,7 +494,7 @@ struct TouchEventProcessor::Impl
 
     touchEventImpl->AddPoint(currentPoint);
 
-    localVars.processor.mScene.EmitTouchedSignal(touchEventHandle);
+    localVars.processor.mScene.EmitTouchEventSignal(touchEventHandle);
   }
 
   /**
@@ -947,7 +947,7 @@ struct TouchEventProcessor::Impl
 
         case PointState::DOWN:
         {
-          processor.mScene.EmitTouchedSignal(localVars.touchEventHandle);
+          processor.mScene.EmitTouchEventSignal(localVars.touchEventHandle);
           break;
         }
 

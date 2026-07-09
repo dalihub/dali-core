@@ -41,7 +41,7 @@ DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_WHEEL_PROCESSOR");
 #endif
 
-Dali::Actor EmitInterceptWheelSignals(Dali::Actor actor, const Dali::WheelEvent& wheelEvent)
+Dali::Actor EmitInterceptWheelEventSignals(Dali::Actor actor, const Dali::WheelEvent& wheelEvent)
 {
   Dali::Actor interceptedActor;
 
@@ -51,7 +51,7 @@ Dali::Actor EmitInterceptWheelSignals(Dali::Actor actor, const Dali::WheelEvent&
     if(parent)
     {
       // Recursively deliver events to the actor and its parents for intercept wheel event.
-      interceptedActor = EmitInterceptWheelSignals(parent, wheelEvent);
+      interceptedActor = EmitInterceptWheelEventSignals(parent, wheelEvent);
     }
 
     if(!interceptedActor)
@@ -88,12 +88,11 @@ Dali::Actor EmitWheelSignals(Dali::Actor actor, const Dali::WheelEvent& event)
 
     bool consumed(false);
 
-    // Only do the conversion and emit the signal if the actor's wheel signal has connections.
+    // Only dispatch the event if the actor's wheel signal has connections (or derived actor implementation requires wheel).
     if(actorImpl.GetWheelEventRequired())
     {
-      // Emit the signal to the parent
       DALI_TRACE_SCOPE(gTraceFilter, "DALI_EMIT_WHEEL_EVENT_SIGNAL");
-      consumed = actorImpl.EmitWheelEventSignal(event);
+      consumed = actorImpl.DispatchWheelEvent(event);
     }
 
     if(consumed)
@@ -138,9 +137,9 @@ bool IsActorWheelableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::Travers
     }
     case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
     {
-      if(actor.GetProperty<bool>(Dali::Actor::Property::VISIBLE) &&       // Actor is visible, if not visible then none of its children are visible.
-         actor.GetProperty<bool>(Dali::Actor::Property::SENSITIVE) &&     // Actor is sensitive, if insensitive none of its children should be hittable either.
-         (!actor.GetProperty<bool>(Dali::DevelActor::Property::IGNORED))) // Actor is not ignored, if ignored none of its children should be hittable either.
+      if(actor.GetProperty<bool>(Dali::Actor::Property::VISIBLE) &&   // Actor is visible, if not visible then none of its children are visible.
+         actor.GetProperty<bool>(Dali::Actor::Property::SENSITIVE) && // Actor is sensitive, if insensitive none of its children should be hittable either.
+         (!actor.GetProperty<bool>(Dali::Actor::Property::IGNORED)))  // Actor is not ignored, if ignored none of its children should be hittable either.
       {
         hittable = true;
       }
@@ -182,7 +181,7 @@ void WheelEventProcessor::ProcessWheelEvent(const Integration::WheelEvent& event
     Dali::Actor consumedActor;
 
     // Emit the intercept wheel event signal
-    Dali::Actor interceptedActor = EmitInterceptWheelSignals(hitTestResults.actor, wheelEventHandle);
+    Dali::Actor interceptedActor = EmitInterceptWheelEventSignals(hitTestResults.actor, wheelEventHandle);
     if(interceptedActor)
     {
       consumedActor = EmitWheelSignals(interceptedActor, wheelEventHandle);

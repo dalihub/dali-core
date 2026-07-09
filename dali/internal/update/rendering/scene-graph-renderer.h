@@ -697,6 +697,7 @@ private:
   bool mOwnsVisualProperties : 1;                      ///< Whether this renderer owns the VisualProperties
   bool mOwnsDecoratedVisualCornerRadiusProperties : 1; ///< Whether this renderer owns the DecoratedVisualCornerRadiusProperties
   bool mOwnsDecoratedVisualBorderlineProperties : 1;   ///< Whether this renderer owns the DecoratedVisualBorderlineProperties
+  bool mRendererAdded : 1;
 
   mutable uint8_t mDirtyUpdated; ///< Dirty flag that we can change 1 times per each frame.
 

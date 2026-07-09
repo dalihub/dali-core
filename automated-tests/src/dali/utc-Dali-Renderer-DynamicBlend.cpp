@@ -17,9 +17,9 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/common/capabilities.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/integration-api/debug.h>
+#include <dali/public-api/common/capabilities.h>
 #include <dali/public-api/dali-core.h>
 #include <mesh-builder.h>
 #include "test-graphics-command-buffer.h"
@@ -46,7 +46,7 @@ int UtcDaliRendererDynamicBlend01(void)
   auto& graphicsController = application.GetGraphicsController();
   graphicsController.SetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES,
                                          Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT |
-                                         Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
+                                           Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
 
   Geometry geometry = CreateQuadGeometry();
   Shader   shader   = CreateShader();
@@ -100,7 +100,7 @@ int UtcDaliRendererDynamicBlend02(void)
   auto&           graphicsController = application.GetGraphicsController();
   graphicsController.SetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES,
                                          Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT |
-                                         Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
+                                           Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
 
   Shader   shader   = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = Geometry::New();
@@ -157,7 +157,7 @@ int UtcDaliRendererDynamicBlend03(void)
   auto&           graphicsController = application.GetGraphicsController();
   graphicsController.SetDeviceLimitation(Graphics::DeviceCapability::SUPPORTED_DYNAMIC_STATES,
                                          Graphics::PipelineDynamicStateBits::COLOR_BLEND_ENABLE_BIT |
-                                         Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
+                                           Graphics::PipelineDynamicStateBits::COLOR_BLEND_EQUATION_BIT);
 
   Shader   shader   = Shader::New("VertexSource", "FragmentSource");
   Geometry geometry = Geometry::New();
@@ -166,7 +166,7 @@ int UtcDaliRendererDynamicBlend03(void)
   // Set blending options for advanced blend
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::ON);
   // Use MULTIPLY which triggers advanced blend
-  renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, DevelBlendEquation::MULTIPLY);
+  renderer.SetProperty(DevelRenderer::Property::BLEND_EQUATION, Dali::BlendEquation::MULTIPLY);
 
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);

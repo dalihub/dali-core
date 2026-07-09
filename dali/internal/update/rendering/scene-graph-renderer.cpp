@@ -172,6 +172,7 @@ Renderer::Renderer()
   mOwnsVisualProperties(false),
   mOwnsDecoratedVisualCornerRadiusProperties(false),
   mOwnsDecoratedVisualBorderlineProperties(false),
+  mRendererAdded(false),
   mDirtyUpdated(NOT_CHECKED),
   mMixColor(Color::WHITE),
   mDepthIndex(0)
@@ -193,6 +194,14 @@ Renderer::~Renderer()
   if(mOwnsDecoratedVisualBorderlineProperties)
   {
     delete mDecoratedVisualBorderlineProperties;
+  }
+
+  if(mRenderer && !mRendererAdded)
+  {
+    // Render::Renderer is not added to the RenderManager.
+    // This class owns and deletes it.
+    Render::Renderer* rendererPtr = mRenderer.Get();
+    delete rendererPtr;
   }
 }
 
@@ -622,6 +631,7 @@ void Renderer::ConnectToSceneGraph(RenderManagerDispatcher& renderManagerDispach
 
   OwnerKeyType<Render::Renderer> transferKeyOwnership(mRenderer);
   renderManagerDispacher.AddRenderer(transferKeyOwnership);
+  mRendererAdded = true;
 }
 
 // Called just before destroying the scene-graph renderer ( when the "event-thread renderer" is no longer referenced )
@@ -631,7 +641,8 @@ void Renderer::DisconnectFromSceneGraph(RenderManagerDispatcher& renderManagerDi
   if(mRenderer)
   {
     renderManagerDispacher.RemoveRenderer(mRenderer);
-    mRenderer = Render::RendererKey{};
+    mRenderer      = Render::RendererKey{};
+    mRendererAdded = false;
   }
 }
 

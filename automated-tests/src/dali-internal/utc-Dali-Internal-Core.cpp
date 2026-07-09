@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -98,7 +99,7 @@ int UtcDaliCoreProcessEvents(void)
   application.GetScene().Add(actor);
 
   RelayoutSignalHandler relayoutSignal(application);
-  actor.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
+  DevelActor::OnRelayoutSignal(actor).Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
 
   application.SendNotification();
 
@@ -125,7 +126,7 @@ int UtcDaliCoreProcessEventsStressTest(void)
   application.GetScene().Add(actor);
 
   RelayoutSignalHandler relayoutSignal(application);
-  actor.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
+  DevelActor::OnRelayoutSignal(actor).Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
 
   application.SendNotification();
 
@@ -169,7 +170,7 @@ int UtcDaliCoreForceRelayout(void)
   application.GetScene().Add(actor);
 
   RelayoutSignalHandler relayoutSignal(application);
-  actor.OnRelayoutSignal().Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
+  DevelActor::OnRelayoutSignal(actor).Connect(&relayoutSignal, &RelayoutSignalHandler::RelayoutCallback);
 
   // Call ForceRelayout before application.SendNotification();
   auto& core = application.GetCore();
@@ -205,7 +206,7 @@ int UtcDaliCoreForceRelayout2(void)
   application.GetScene().Add(actor);
 
   DoubleRelayoutSignalHandler relayoutSignal(application);
-  actor.OnRelayoutSignal().Connect(&relayoutSignal, &DoubleRelayoutSignalHandler::RelayoutCallback);
+  DevelActor::OnRelayoutSignal(actor).Connect(&relayoutSignal, &DoubleRelayoutSignalHandler::RelayoutCallback);
 
   // Call ForceRelayout before application.SendNotification();
   auto& core = application.GetCore();

@@ -219,6 +219,16 @@ inline bool operator!(Type t)
 } //namespace OffScreenRenderable
 
 /**
+ * @brief Enumeration for the visibility change type.
+ * @SINCE_2_5.29
+ */
+enum class VisibilityChangeType
+{
+  SELF,  ///< The visibility of the actor itself has changed. @SINCE_2_5.29
+  PARENT ///< The visibility of a parent has changed. @SINCE_2_5.29
+};
+
+/**
  * @}
  */
 } // namespace Dali

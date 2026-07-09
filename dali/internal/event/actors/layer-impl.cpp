@@ -115,7 +115,7 @@ LayerPtr Layer::NewRoot(LayerList& layerList)
   root->mIsOnScene = true;
 
   // The root actor will not emit a stage connection signal so set the signalled flag here as well
-  root->mOnSceneSignalled = true;
+  root->mSceneConnectedSignalled = true;
 
   // layer-list must be set for the root layer
   root->mLayerList = &layerList;
@@ -291,11 +291,11 @@ void Layer::SetTouchConsumed(bool consume)
   {
     if(consume)
     {
-      this->TouchedSignal().Connect(this, &Layer::OnTouched);
+      this->TouchEventSignal().Connect(this, &Layer::OnTouched);
     }
     else
     {
-      this->TouchedSignal().Disconnect(this, &Layer::OnTouched);
+      this->TouchEventSignal().Disconnect(this, &Layer::OnTouched);
     }
   }
   mTouchConsumed = consume;

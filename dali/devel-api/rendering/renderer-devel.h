@@ -23,41 +23,6 @@
 
 namespace Dali
 {
-namespace DevelBlendEquation
-{
-/**
- * @brief Enumeration for blend equation.
- */
-enum Type
-{
-  ADD              = Dali::BlendEquation::ADD,
-  SUBTRACT         = Dali::BlendEquation::SUBTRACT,
-  REVERSE_SUBTRACT = Dali::BlendEquation::REVERSE_SUBTRACT,
-
-  // OpenGL es 3.0 enumeration
-  MIN = 0x8007,
-  MAX = 0x8008,
-
-  // OpenGL es 3.2 or KHR_Blend_Equation_Advanced enumeration
-  MULTIPLY    = 0x9294,
-  SCREEN      = 0x9295,
-  OVERLAY     = 0x9296,
-  DARKEN      = 0x9297,
-  LIGHTEN     = 0x9298,
-  COLOR_DODGE = 0x9299,
-  COLOR_BURN  = 0x929A,
-  HARD_LIGHT  = 0x929B,
-  SOFT_LIGHT  = 0x929C,
-  DIFFERENCE  = 0x929E,
-  EXCLUSION   = 0x92A0,
-  HUE         = 0x92AD,
-  SATURATION  = 0x92AE,
-  COLOR       = 0x92AF,
-  LUMINOSITY  = 0x92B0
-};
-
-} // namespace DevelBlendEquation
-
 namespace DevelRenderer
 {
 /**

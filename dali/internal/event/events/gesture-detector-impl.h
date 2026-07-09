@@ -217,7 +217,7 @@ private:
   virtual void OnActorDestroyed(Object& object) = 0;
 
   /**
-   * @brief Callback for TouchedSignal signal
+   * @brief Callback for TouchEventSignal signal
    *
    * @param actor The actor
    * @param touch The touch event that has occurred

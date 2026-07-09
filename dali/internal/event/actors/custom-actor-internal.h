@@ -104,6 +104,54 @@ private:
   }
 
   /**
+   * @copydoc Internal::Actor::HasIntrinsicTouchHandlingExternal
+   */
+  bool HasIntrinsicTouchHandlingExternal() const override
+  {
+    return mImpl->HasIntrinsicTouchHandling();
+  }
+
+  /**
+   * @copydoc Internal::Actor::OnTouchEventExternal
+   */
+  bool OnTouchEventExternal(const Dali::TouchEvent& touch) override
+  {
+    return mImpl->OnTouchEvent(touch);
+  }
+
+  /**
+   * @copydoc Internal::Actor::HasIntrinsicHoverHandlingExternal
+   */
+  bool HasIntrinsicHoverHandlingExternal() const override
+  {
+    return mImpl->HasIntrinsicHoverHandling();
+  }
+
+  /**
+   * @copydoc Internal::Actor::OnHoverEventExternal
+   */
+  bool OnHoverEventExternal(const Dali::HoverEvent& hover) override
+  {
+    return mImpl->OnHoverEvent(hover);
+  }
+
+  /**
+   * @copydoc Internal::Actor::HasIntrinsicWheelHandlingExternal
+   */
+  bool HasIntrinsicWheelHandlingExternal() const override
+  {
+    return mImpl->HasIntrinsicWheelHandling();
+  }
+
+  /**
+   * @copydoc Internal::Actor::OnWheelEventExternal
+   */
+  bool OnWheelEventExternal(const Dali::WheelEvent& wheel) override
+  {
+    return mImpl->OnWheelEvent(wheel);
+  }
+
+  /**
    * @copydoc Internal::Actor::OnPropertySet
    */
   void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override

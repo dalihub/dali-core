@@ -76,7 +76,7 @@ public:
 
   bool IsMultisampledRenderToTextureSupported() override;
 
-  bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation) override;
+  bool IsBlendEquationSupported(BlendEquation::Type blendEquation) override;
 
   uint32_t GetShaderLanguageVersion() override;
 

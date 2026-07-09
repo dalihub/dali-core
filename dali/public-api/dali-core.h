@@ -38,6 +38,7 @@
 #include <dali/public-api/animation/spring-data.h>
 #include <dali/public-api/animation/time-period.h>
 
+#include <dali/public-api/common/capabilities.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-pair.h>

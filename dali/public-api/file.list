@@ -17,6 +17,7 @@ SET( public_api_src_files
   ${public_api_src_dir}/animation/path.cpp
   ${public_api_src_dir}/animation/spring-data.cpp
   ${public_api_src_dir}/animation/time-period.cpp
+  ${public_api_src_dir}/common/capabilities.cpp
   ${public_api_src_dir}/common/dali-common.cpp
   ${public_api_src_dir}/common/dali-string.cpp
   ${public_api_src_dir}/common/dali-string-view.cpp
@@ -124,6 +125,7 @@ SET( public_api_core_animation_header_files
 
 
 SET( public_api_core_common_header_files
+  ${public_api_src_dir}/common/capabilities.h
   ${public_api_src_dir}/common/constants.h
   ${public_api_src_dir}/common/dali-common.h
   ${public_api_src_dir}/common/dali-pair.h

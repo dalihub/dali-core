@@ -171,17 +171,17 @@ public:
   void LowerChildBelow(Actor& child, Actor& target) override;
 
   /**
-   * @copydoc DevelActor::ChildAddedSignal
+   * @copydoc Dali::Actor::ChildAddedSignal()
    */
-  DevelActor::ChildChangedSignalType& ChildAddedSignal()
+  Dali::Actor::ChildAddedSignalType& ChildAddedSignal()
   {
     return mChildAddedSignal;
   }
 
   /**
-   * @copydoc DevelActor::ChildRemovedSignal
+   * @copydoc Dali::Actor::ChildRemovedSignal()
    */
-  DevelActor::ChildChangedSignalType& ChildRemovedSignal()
+  Dali::Actor::ChildRemovedSignalType& ChildRemovedSignal()
   {
     return mChildRemovedSignal;
   }
@@ -236,15 +236,15 @@ public:
    * @param[in] visible The new visibility of the actor
    * @param[in] type Whether the actor's visible property has changed or a parent's
    */
-  void EmitVisibilityChangedSignalRecursively(bool                               visible,
-                                              DevelActor::VisibilityChange::Type type);
+  void EmitVisibilityChangedSignalRecursively(bool                 visible,
+                                              VisibilityChangeType type);
 
   /**
-   * @brief Propagates the actor's visibility on the actor tree, and retreives actor list to emit inherited-visibility-changed-signal.
+   * @brief Propagates the actor's visibility on the actor tree, and retreives actor list to emit effective-visibility-changed-signal.
    *
-   * @param[out] inheritedVisibilityChangedList On return, the list of actors whose inherited visibility is changed.
+   * @param[out] effectiveVisibilityActors On return, the list of actors whose effective visibility is changed.
    */
-  void InheritVisibilityRecursively(ActorContainer& inheritedVisibilityChangedList);
+  void CollectEffectiveVisibilityActorsRecursively(ActorContainer& effectiveVisibilityActors);
 
   /**
    * @brief Propagates request of RenderTask reordering to its' children.
@@ -274,8 +274,8 @@ private:
 
 private:
   Dali::Internal::Actor&                  mOwner; ///* Owning actor
-  DevelActor::ChildChangedSignalType      mChildAddedSignal;
-  DevelActor::ChildChangedSignalType      mChildRemovedSignal;
+  Dali::Actor::ChildAddedSignalType       mChildAddedSignal;
+  Dali::Actor::ChildRemovedSignalType     mChildRemovedSignal;
   DevelActor::ChildOrderChangedSignalType mChildOrderChangedSignal;
   ActorContainer*                         mChildren{nullptr}; ///< Container of referenced actors, lazily initialized
 };

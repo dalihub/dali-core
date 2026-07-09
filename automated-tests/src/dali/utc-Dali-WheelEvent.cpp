@@ -315,7 +315,7 @@ int UtcDaliWheelEventIntercept(void)
   // Connect to root actor's intercept wheel event signal
   SignalData                rootData;
   WheelEventReceivedFunctor rootFunctor(rootData); // Consumes signal
-  Dali::DevelActor::InterceptWheelSignal(rootActor).Connect(&application, rootFunctor);
+  rootActor.InterceptWheelEventSignal().Connect(&application, rootFunctor);
 
   Dali::Integration::WheelEvent newEvent(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
   application.ProcessEvent(newEvent);

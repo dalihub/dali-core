@@ -81,7 +81,28 @@ enum Type
 {
   ADD              = 0x8006, ///< The source and destination colors are added to each other. @SINCE_1_1.43
   SUBTRACT         = 0x800A, ///< Subtracts the destination from the source.                 @SINCE_1_1.43
-  REVERSE_SUBTRACT = 0x800B  ///< Subtracts the source from the destination.                 @SINCE_1_1.43
+  REVERSE_SUBTRACT = 0x800B, ///< Subtracts the source from the destination.                 @SINCE_1_1.43
+
+  // OpenGL es 3.0 enumeration
+  MIN = 0x8007, ///< Takes the minimum of the source and destination colors. @SINCE_2_5.30
+  MAX = 0x8008, ///< Takes the maximum of the source and destination colors. @SINCE_2_5.30
+
+  // OpenGL es 3.2 or KHR_Blend_Equation_Advanced enumeration
+  MULTIPLY    = 0x9294, ///< @SINCE_2_5.30
+  SCREEN      = 0x9295, ///< @SINCE_2_5.30
+  OVERLAY     = 0x9296, ///< @SINCE_2_5.30
+  DARKEN      = 0x9297, ///< @SINCE_2_5.30
+  LIGHTEN     = 0x9298, ///< @SINCE_2_5.30
+  COLOR_DODGE = 0x9299, ///< @SINCE_2_5.30
+  COLOR_BURN  = 0x929A, ///< @SINCE_2_5.30
+  HARD_LIGHT  = 0x929B, ///< @SINCE_2_5.30
+  SOFT_LIGHT  = 0x929C, ///< @SINCE_2_5.30
+  DIFFERENCE  = 0x929E, ///< @SINCE_2_5.30
+  EXCLUSION   = 0x92A0, ///< @SINCE_2_5.30
+  HUE         = 0x92AD, ///< @SINCE_2_5.30
+  SATURATION  = 0x92AE, ///< @SINCE_2_5.30
+  COLOR       = 0x92AF, ///< @SINCE_2_5.30
+  LUMINOSITY  = 0x92B0  ///< @SINCE_2_5.30
 };
 
 } // namespace BlendEquation

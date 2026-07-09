@@ -2654,10 +2654,10 @@ int UtcDaliTypeRegistryGeneratedInvokeMethodFiltersUnsupportedApi(void)
   expectNotInvokable(actorHandle, "New");
   expectNotInvokable(actorHandle, "DownCast");
   expectNotInvokable(actorHandle, "GetImplementation");
-  expectNotInvokable(actorHandle, "TouchedSignal");
-  expectNotInvokable(actorHandle, "HoveredSignal");
+  expectNotInvokable(actorHandle, "TouchEventSignal");
+  expectNotInvokable(actorHandle, "HoverEventSignal");
   expectNotInvokable(actorHandle, "WheelEventSignal");
-  expectNotInvokable(actorHandle, "OnSceneSignal");
+  expectNotInvokable(actorHandle, "SceneConnectedSignal");
 
   expectNotInvokable(animationHandle, "FinishedSignal");
   expectNotInvokable(animationHandle, "AnimateTo");
@@ -3178,7 +3178,7 @@ int UtcDaliTypeInfoGetSignalNameP(void)
 
   std::string name = Integration::ToStdString(typeInfo.GetSignalName(0));
 
-  DALI_TEST_EQUALS(name, "hovered", TEST_LOCATION);
+  DALI_TEST_EQUALS(name, "touchEvent", TEST_LOCATION);
 
   TypeInfo typeInfo2 = typeRegistry.GetTypeInfo("MyTestCustomActor");
 
@@ -3187,7 +3187,7 @@ int UtcDaliTypeInfoGetSignalNameP(void)
   for(std::size_t i = 0; i < typeInfo2.GetSignalCount(); i++)
   {
     std::string name = Integration::ToStdString(typeInfo2.GetSignalName(i));
-    if(name == "hovered")
+    if(name == "touchEvent")
     {
       foundSignal = true;
     }

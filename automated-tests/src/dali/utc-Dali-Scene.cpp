@@ -135,10 +135,10 @@ struct KeyEventReceivedFunctor
   KeyEventSignalData& signalData;
 };
 
-// Stores data that is populated in the touched signal callback and will be read by the TET cases
-struct TouchedSignalData
+// Stores data that is populated in the touch event signal callback and will be read by the TET cases
+struct TouchEventSignalData
 {
-  TouchedSignalData()
+  TouchEventSignalData()
   : functorCalled(false),
     createNewScene(false),
     newSceneCreated(false)
@@ -160,10 +160,10 @@ struct TouchedSignalData
   TouchEvent receivedTouchEvent;
 };
 
-// Functor that sets the data when touched signal is received
+// Functor that sets the data when touch event signal is received
 struct TouchFunctor
 {
-  TouchFunctor(TouchedSignalData& data)
+  TouchFunctor(TouchEventSignalData& data)
   : signalData(data),
     mRenderSurface{nullptr}
   {
@@ -202,8 +202,8 @@ struct TouchFunctor
     signalData.functorCalled = true;
   }
 
-  TouchedSignalData& signalData;
-  TestRenderSurface* mRenderSurface;
+  TouchEventSignalData& signalData;
+  TestRenderSurface*    mRenderSurface;
 };
 
 // Stores data that is populated in the wheel-event callback and will be read by the TET cases
@@ -910,10 +910,10 @@ int UtcDaliSceneCreateNewSceneDuringCoreEventProcessing(void)
 
   Dali::Integration::Scene scene = application.GetScene();
 
-  TouchedSignalData data;
+  TouchEventSignalData data;
   data.createNewScene = true;
   TouchFunctor functor(data);
-  scene.TouchedSignal().Connect(&application, functor);
+  scene.TouchEventSignal().Connect(&application, functor);
 
   // Render and notify.
   application.SendNotification();
@@ -1108,14 +1108,14 @@ int UtcDaliSceneSignalKeyEventN(void)
   END_TEST;
 }
 
-int UtcDaliSceneTouchedSignalP(void)
+int UtcDaliSceneTouchEventSignalP(void)
 {
   TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  TouchedSignalData data;
-  TouchFunctor      functor(data);
-  scene.TouchedSignal().Connect(&application, functor);
+  TouchEventSignalData data;
+  TouchFunctor         functor(data);
+  scene.TouchEventSignal().Connect(&application, functor);
 
   // Render and notify.
   application.SendNotification();
@@ -1143,7 +1143,7 @@ int UtcDaliSceneTouchedSignalP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.TouchedSignal().Connect(&DummyTouchCallback);
+  actor.TouchEventSignal().Connect(&DummyTouchCallback);
   scene.Add(actor);
 
   // Render and notify.
@@ -1220,14 +1220,14 @@ int UtcDaliSceneTouchedSignalP(void)
   END_TEST;
 }
 
-int UtcDaliSceneTouchedSignalN(void)
+int UtcDaliSceneTouchEventSignalN(void)
 {
   TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
-  TouchedSignalData data;
-  TouchFunctor      functor(data);
-  scene.TouchedSignal().Connect(&application, functor);
+  TouchEventSignalData data;
+  TouchFunctor         functor(data);
+  scene.TouchEventSignal().Connect(&application, functor);
 
   // Render and notify.
   application.SendNotification();
@@ -1266,7 +1266,7 @@ int UtcDaliSceneTouchedSignalN(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.TouchedSignal().Connect(&DummyTouchCallback);
+  actor.TouchEventSignal().Connect(&DummyTouchCallback);
   scene.Add(actor);
 
   // Render and notify.
@@ -3455,9 +3455,9 @@ int UtcDaliSceneGeoTouchedEnabledDisabled(void)
   DALI_TEST_EQUALS(scene.IsGeometryHittestEnabled(), false, TEST_LOCATION);
   DALI_TEST_EQUALS(scene.GetTouchPropagationType(), Dali::Integration::Scene::TouchPropagationType::PARENT, TEST_LOCATION);
 
-  TouchedSignalData data;
-  TouchFunctor      functor(data);
-  scene.TouchedSignal().Connect(&application, functor);
+  TouchEventSignalData data;
+  TouchFunctor         functor(data);
+  scene.TouchEventSignal().Connect(&application, functor);
 
   // Render and notify.
   application.SendNotification();
@@ -3496,7 +3496,7 @@ int UtcDaliSceneGeoTouchedEnabledDisabled(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
-  actor.TouchedSignal().Connect(&DummyTouchCallback);
+  actor.TouchEventSignal().Connect(&DummyTouchCallback);
   scene.Add(actor);
 
   // Render and notify.

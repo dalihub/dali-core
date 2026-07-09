@@ -145,9 +145,9 @@ int UtcDaliScriptingNewActorNegative(void)
     Actor handle   = NewActor(map);
     DALI_TEST_CHECK(handle);
     DALI_TEST_CHECK(!handle.WheelEventSignal().GetConnectionCount());
-    DALI_TEST_CHECK(!handle.OffSceneSignal().GetConnectionCount());
-    DALI_TEST_CHECK(!handle.OnSceneSignal().GetConnectionCount());
-    DALI_TEST_CHECK(!handle.TouchedSignal().GetConnectionCount());
+    DALI_TEST_CHECK(!handle.SceneDisconnectedSignal().GetConnectionCount());
+    DALI_TEST_CHECK(!handle.SceneConnectedSignal().GetConnectionCount());
+    DALI_TEST_CHECK(!handle.TouchEventSignal().GetConnectionCount());
   }
   END_TEST;
 }

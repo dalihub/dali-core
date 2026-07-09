@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,22 @@
  *
  */
 
+// CLASS HEADER
+#include <dali/public-api/common/capabilities.h>
+
 // INTERNAL INCLUDES
-#include <dali/devel-api/events/touch-event-devel.h>
-#include <dali/internal/event/events/touch-event-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
 {
-namespace DevelTouchEvent
+namespace Capabilities
 {
-void SetTime(TouchEvent touchEvent, uint64_t time)
+bool IsBlendEquationSupported(BlendEquation::Type blendEquation)
 {
-  GetImplementation(touchEvent).SetTime(time);
+  Dali::Internal::ThreadLocalStorage& tls = Dali::Internal::ThreadLocalStorage::Get();
+  return tls.IsBlendEquationSupported(blendEquation);
 }
-} // namespace DevelTouchEvent
+
+} // namespace Capabilities
 
 } // namespace Dali

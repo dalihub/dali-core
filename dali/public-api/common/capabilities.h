@@ -2,7 +2,7 @@
 #define DALI_CAPABILITIES_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,35 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/rendering/renderer-devel.h>
+#include <dali/public-api/rendering/renderer.h>
 
 namespace Dali
 {
+/**
+ * @addtogroup dali_core_common
+ * @{
+ */
+
 namespace Capabilities
 {
 /**
- * @brief Returns whether the blend equation is supported in the system or not.
- * @param[in] blendEquation blend equation to be checked.
- * @return True if the blend equation supported.
+ * @brief Queries whether the given blend equation is supported on the current system.
+ *
+ * Some BlendEquation::Type values, such as the advanced blend equations (e.g. MULTIPLY,
+ * SCREEN, and so on), require OpenGL ES 3.2 or the KHR_blend_equation_advanced extension,
+ * and may not be supported on every device.
+ *
+ * @SINCE_2_5.30
+ * @param[in] blendEquation The blend equation to check.
+ * @return True if the blend equation is supported on the current system, false otherwise.
  */
 DALI_CORE_API bool IsBlendEquationSupported(BlendEquation::Type blendEquation);
 
-/**
- * @brief Returns whether the blend equation is supported in the system or not.
- * @param[in] blendEquation blend equation to be checked.
- * @return True if the blend equation supported.
- */
-DALI_CORE_API bool IsBlendEquationSupported(DevelBlendEquation::Type blendEquation);
-
 } // namespace Capabilities
 
+/**
+ * @}
+ */
 } // namespace Dali
 
 #endif // DALI_CAPABILITIES_H

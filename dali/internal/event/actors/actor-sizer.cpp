@@ -304,7 +304,7 @@ bool ActorSizer::IsLayoutDirty(Dimension::Type dimension) const
   return mRelayoutData && mRelayoutData->IsLayoutDirty(dimension);
 }
 
-bool ActorSizer::RelayoutPossible(Dimension::Type dimension) const
+bool ActorSizer::IsRelayoutPossible(Dimension::Type dimension) const
 {
   return mRelayoutData && mRelayoutData->relayoutEnabled && !IsLayoutDirty(dimension);
 }

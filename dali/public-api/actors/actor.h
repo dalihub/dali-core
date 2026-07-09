@@ -25,8 +25,10 @@
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
+#include <dali/public-api/rendering/renderer.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 #undef SIZE_WIDTH // Defined in later versions of cstdint but is used in this header
@@ -62,7 +64,7 @@ struct Vector4;
  *
  * <h3>Multi-Touch Events:</h3>
  *
- * Touch or hover events are received via signals; see Actor::TouchedSignal() and Actor::HoveredSignal() for more details.
+ * Touch or hover events are received via signals; see Actor::TouchEventSignal() and Actor::HoverEventSignal() for more details.
  *
  * <i>Hit Testing Rules Summary:</i>
  *
@@ -71,7 +73,7 @@ struct Vector4;
  * - If an actor is made insensitive, then the actor and its children are not hittable; see Actor::Property::SENSITIVE.
  * - If an actor's visibility flag is unset, then none of its children are hittable either; see Actor::Property::VISIBLE.
  * - To be hittable, an actor must have a non-zero size.
- * - If an actor's world color is fully transparent, then it is not hittable; see GetCurrentWorldColor().
+ * - If an actor's world color is fully transparent, then it is not hittable; see GetWorldColor().
  *
  * <i>Hit Test Algorithm:</i>
  *
@@ -215,16 +217,20 @@ struct Vector4;
  * @nosubgrouping
  *
  * Signals
- * | %Signal Name               | Method                                  |
- * |----------------------------|-----------------------------------------|
- * | touched                    | @ref TouchedSignal()                    |
- * | hovered                    | @ref HoveredSignal()                    |
- * | wheelEvent                 | @ref WheelEventSignal()                 |
- * | onScene                    | @ref OnSceneSignal()                    |
- * | offScene                   | @ref OffSceneSignal()                   |
- * | onRelayout                 | @ref OnRelayoutSignal()                 |
- * | layoutDirectionChanged     | @ref LayoutDirectionChangedSignal()     |
- * | inheritedVisibilityChanged | @ref InheritedVisibilityChangedSignal() |
+ * | %Signal Name               | Method                                      |
+ * |----------------------------|---------------------------------------------|
+ * | touchEvent                 | @ref TouchEventSignal()                     |
+ * | hoverEvent                 | @ref HoverEventSignal()                     |
+ * | wheelEvent                 | @ref WheelEventSignal()                     |
+ * | sceneConnected             | @ref SceneConnectedSignal()                 |
+ * | sceneDisconnected          | @ref SceneDisconnectedSignal()              |
+ * | childAdded                 | @ref ChildAddedSignal()                     |
+ * | childRemoved               | @ref ChildRemovedSignal()                   |
+ * | visibilityChanged          | @ref VisibilityChangedSignal()              |
+ * | effectiveVisibilityChanged | @ref EffectiveVisibilityChangedSignal()     |
+ * | layoutDirectionChanged     | @ref LayoutDirectionChangedSignal()         |
+ * | interceptTouchEvent        | @ref InterceptTouchEventSignal()            |
+ * | interceptWheelEvent        | @ref InterceptWheelEventSignal()            |
  *
  * @SINCE_1_0.0
  */
@@ -516,6 +522,68 @@ public:
       LEAVE_REQUIRED,
 
       /**
+       * @brief Extends the touch hit area of an actor beyond (positive) or within (negative) its visual bounds.
+       *        Affects only touch detection, not rendering or layout.
+       * @details Name "touchHitAreaMargin", type Property::EXTENTS (start, end, top, bottom in pixels).
+       *          Positive values expand the hit area outward; negative values shrink it inward.
+       * @SINCE_2_5.29
+       * For example
+       * @code{.cpp}
+       *  Actor actor = Actor::New();
+       *  actor.SetProperty(Actor::Property::SIZE, Vector2(20.0f, 20.0f));
+       *  actor.SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, Extents(10, 20, 30, 40));
+       *  actor.TouchEventSignal().Connect(OnTouchCallback);
+       *
+       * +---------------------+
+       * |         ^           |
+       * |         |           |
+       * |         |  30       |
+       * |         |           |
+       * |    +----+----+      |
+       * |    |         |      |
+       * | 10 |         | 20   |
+       * |<---+         +----->|
+       * |    |         |      |
+       * |    |         |      |
+       * |    +----+----+      |
+       * |         |           |
+       * |         |           |
+       * |         | 40        |
+       * |         |           |
+       * +---------------------+
+       * |         v           |
+       * @endcode
+       * The actual hit width  = actor.width  + touchHitAreaMargin.start + touchHitAreaMargin.end
+       * The actual hit height = actor.height + touchHitAreaMargin.top   + touchHitAreaMargin.bottom
+       */
+      TOUCH_HIT_AREA_MARGIN,
+
+      /**
+       * @brief If true, the actor only receives touch events that originated on itself.
+       *        Touch events that started on another actor and moved into this actor's area are ignored.
+       * @details Name "allowSelfInitiatedTouchOnly", type Property::BOOLEAN
+       * @note Default is false.
+       * @SINCE_2_5.29
+       */
+      ALLOW_SELF_INITIATED_TOUCH_ONLY,
+
+      /**
+       * @brief If false, touch motion events (finger/pointer move while pressed) are not dispatched to this actor.
+       * @details Name "dispatchTouchMotion", type Property::BOOLEAN
+       * @note Default is true.
+       * @SINCE_2_5.29
+       */
+      DISPATCH_TOUCH_MOTION,
+
+      /**
+       * @brief If false, hover motion events (pointer move without press) are not dispatched to this actor.
+       * @details Name "dispatchHoverMotion", type Property::BOOLEAN
+       * @note Default is true.
+       * @SINCE_2_5.29
+       */
+      DISPATCH_HOVER_MOTION,
+
+      /**
        * @brief The flag whether a child actor inherits it's parent's orientation.
        * @details Name "inheritOrientation", type Property::BOOLEAN
        * @SINCE_1_0.0
@@ -544,6 +612,15 @@ public:
        *       In this scenario the clipping is ignored.
        */
       DRAW_MODE,
+
+      /**
+       * @brief The blend equation used when compositing renderers of this actor onto the framebuffer.
+       * @details Name "blendEquation", type Property::INTEGER.
+       * @note For advanced blend equations, the rendered color must use pre-multiplied alpha.
+       * @note Use Dali::Capabilities::IsBlendEquationSupported to check availability on the current system.
+       * @SINCE_2_5.29
+       */
+      BLEND_EQUATION,
 
       /**
        * @brief The size mode factor of an actor.
@@ -682,6 +759,14 @@ public:
       CULLED,
 
       /**
+       * @brief If true, the actor and all its descendants are excluded from rendering and render thread computation.
+       * @details Name "ignored", type Property::BOOLEAN
+       * @note Default is false.
+       * @SINCE_2_5.29
+       */
+      IGNORED,
+
+      /**
        * @brief The unique ID of the actor.
        * @details Name "id", type Property::INTEGER. Read-only
        * @SINCE_1_9.17
@@ -739,14 +824,16 @@ public:
 
   // Typedefs
 
-  using TouchEventSignalType                 = Signal<bool(Actor, TouchEvent)>;            ///< Touch signal type @SINCE_1_1.37
-  using HoverSignalType                      = Signal<bool(Actor, HoverEvent)>;            ///< Hover signal type @SINCE_1_0.0
-  using WheelEventSignalType                 = Signal<bool(Actor, WheelEvent)>;            ///< Wheel signal type @SINCE_1_0.0
-  using OnSceneSignalType                    = Signal<void(Actor)>;                        ///< Scene connection signal type @SINCE_1_9.24
-  using OffSceneSignalType                   = Signal<void(Actor)>;                        ///< Scene disconnection signal type @SINCE_1_9.24
-  using OnRelayoutSignalType                 = Signal<void(Actor)>;                        ///< Called when the actor is relaid out @SINCE_1_0.0
-  using LayoutDirectionChangedSignalType     = Signal<void(Actor, LayoutDirection::Type)>; ///< Layout direction changes signal type. @SINCE_1_2.60
-  using InheritedVisibilityChangedSignalType = Signal<void(Actor, bool)>;                  ///< Signal type of InheritedVisibilityChangedSignalType. @SINCE_2_3.22
+  using TouchEventSignalType                 = Signal<bool(Actor, TouchEvent)>;                 ///< Touch signal type @SINCE_1_1.37
+  using HoverEventSignalType                 = Signal<bool(Actor, HoverEvent)>;                 ///< Hover signal type @SINCE_1_0.0
+  using WheelEventSignalType                 = Signal<bool(Actor, WheelEvent)>;                 ///< Wheel signal type @SINCE_1_0.0
+  using SceneConnectedSignalType             = Signal<void(Actor)>;                             ///< Scene connection signal type @SINCE_1_9.24
+  using SceneDisconnectedSignalType          = Signal<void(Actor)>;                             ///< Scene disconnection signal type @SINCE_1_9.24
+  using ChildAddedSignalType                 = Signal<void(Actor, Actor)>;                      ///< Called when the actor has a child added. @SINCE_2_5.29
+  using ChildRemovedSignalType               = Signal<void(Actor, Actor)>;                      ///< Called when the actor has a child removed. @SINCE_2_5.29
+  using VisibilityChangedSignalType          = Signal<void(Actor, bool, VisibilityChangeType)>; ///< Signal emitted when an actor's or a parent's visible property changes. @SINCE_2_5.29
+  using EffectiveVisibilityChangedSignalType = Signal<void(Actor, bool)>;                       ///< Signal type of EffectiveVisibilityChangedSignalType. @SINCE_2_3.22
+  using LayoutDirectionChangedSignalType     = Signal<void(Actor, LayoutDirection::Type)>;      ///< Layout direction changes signal type. @SINCE_1_2.60
 
   // Creation
 
@@ -991,7 +1078,790 @@ public:
    */
   void ScaleBy(const Vector3& relativeScale);
 
-  // Input Handling
+  // Property Accessors
+
+  /**
+   * @brief Sets the parent origin of the actor.
+   * @param[in] origin The parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOrigin(const Vector3& origin);
+
+  /**
+   * @brief Gets the parent origin of the actor.
+   * @return The parent origin
+   * @SINCE_2_5.30
+   */
+  Vector3 GetParentOrigin() const;
+
+  /**
+   * @brief Sets the X component of the parent origin.
+   * @param[in] x The x component of the parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOriginX(float x);
+
+  /**
+   * @brief Gets the X component of the parent origin.
+   * @return The X component of the parent origin
+   * @SINCE_2_5.30
+   */
+  float GetParentOriginX() const;
+
+  /**
+   * @brief Sets the Y component of the parent origin.
+   * @param[in] y The y component of the parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOriginY(float y);
+
+  /**
+   * @brief Gets the Y component of the parent origin.
+   * @return The Y component of the parent origin
+   * @SINCE_2_5.30
+   */
+  float GetParentOriginY() const;
+
+  /**
+   * @brief Sets the Z component of the parent origin.
+   * @param[in] z The z component of the parent origin
+   * @SINCE_2_5.30
+   */
+  void SetParentOriginZ(float z);
+
+  /**
+   * @brief Gets the Z component of the parent origin.
+   * @return The Z component of the parent origin
+   * @SINCE_2_5.30
+   */
+  float GetParentOriginZ() const;
+
+  /**
+   * @brief Sets the pivot (anchor point) of the actor.
+   * @param[in] pivot The pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivot(const Vector3& pivot);
+
+  /**
+   * @brief Gets the pivot (anchor point) of the actor.
+   * @return The pivot
+   * @SINCE_2_5.30
+   */
+  Vector3 GetPivot() const;
+
+  /**
+   * @brief Sets the X component of the pivot (anchor point).
+   * @param[in] x The x component of the pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivotX(float x);
+
+  /**
+   * @brief Gets the X component of the pivot (anchor point).
+   * @return The X component of the pivot
+   * @SINCE_2_5.30
+   */
+  float GetPivotX() const;
+
+  /**
+   * @brief Sets the Y component of the pivot (anchor point).
+   * @param[in] y The y component of the pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivotY(float y);
+
+  /**
+   * @brief Gets the Y component of the pivot (anchor point).
+   * @return The Y component of the pivot
+   * @SINCE_2_5.30
+   */
+  float GetPivotY() const;
+
+  /**
+   * @brief Sets the Z component of the pivot (anchor point).
+   * @param[in] z The z component of the pivot
+   * @SINCE_2_5.30
+   */
+  void SetPivotZ(float z);
+
+  /**
+   * @brief Gets the Z component of the pivot (anchor point).
+   * @return The Z component of the pivot
+   * @SINCE_2_5.30
+   */
+  float GetPivotZ() const;
+
+  /**
+   * @brief Sets the size of the actor.
+   * @param[in] size The size
+   * @SINCE_2_5.30
+   */
+  void SetSize(const Vector3& size);
+
+  /**
+   * @brief Gets the size of the actor.
+   * @return The size
+   * @SINCE_2_5.30
+   */
+  Vector3 GetSize() const;
+
+  /**
+   * @brief Gets the current size of the actor from the previous update.
+   * @return The current size of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetCurrentSize() const;
+
+  /**
+   * @brief Sets the width of the actor.
+   * @param[in] width The width
+   * @SINCE_2_5.30
+   */
+  void SetWidth(float width);
+
+  /**
+   * @brief Gets the width of the actor.
+   * @return The width of the actor
+   * @SINCE_2_5.30
+   */
+  float GetWidth() const;
+
+  /**
+   * @brief Sets the height of the actor.
+   * @param[in] height The height
+   * @SINCE_2_5.30
+   */
+  void SetHeight(float height);
+
+  /**
+   * @brief Gets the height of the actor.
+   * @return The height of the actor
+   * @SINCE_2_5.30
+   */
+  float GetHeight() const;
+
+  /**
+   * @brief Sets the depth of the actor.
+   * @param[in] depth The depth
+   * @SINCE_2_5.30
+   */
+  void SetDepth(float depth);
+
+  /**
+   * @brief Gets the depth of the actor.
+   * @return The depth of the actor
+   * @SINCE_2_5.30
+   */
+  float GetDepth() const;
+
+  /**
+   * @brief Sets the position of the actor.
+   * @param[in] position The position
+   * @SINCE_2_5.30
+   */
+  void SetPosition(const Vector3& position);
+
+  /**
+   * @brief Sets the X position of the actor.
+   * @param[in] x The X position
+   * @SINCE_2_5.30
+   */
+  void SetPositionX(float x);
+
+  /**
+   * @brief Gets the X position of the actor.
+   * @return The X position
+   * @SINCE_2_5.30
+   */
+  float GetPositionX() const;
+
+  /**
+   * @brief Sets the Y position of the actor.
+   * @param[in] y The Y position
+   * @SINCE_2_5.30
+   */
+  void SetPositionY(float y);
+
+  /**
+   * @brief Gets the Y position of the actor.
+   * @return The Y position
+   * @SINCE_2_5.30
+   */
+  float GetPositionY() const;
+
+  /**
+   * @brief Sets the Z position of the actor.
+   * @param[in] z The Z position
+   * @SINCE_2_5.30
+   */
+  void SetPositionZ(float z);
+
+  /**
+   * @brief Gets the Z position of the actor.
+   * @return The Z position
+   * @SINCE_2_5.30
+   */
+  float GetPositionZ() const;
+
+  /**
+   * @brief Gets the position of the actor.
+   * @return The position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetPosition() const;
+
+  /**
+   * @brief Gets the current position of the actor from the previous update.
+   * @return The current position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetCurrentPosition() const;
+
+  /**
+   * @brief Gets the world position of the actor.
+   * @return The world position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetWorldPosition() const;
+
+  /**
+   * @brief Gets the X component of the world position.
+   * @return The X component of the world position
+   * @SINCE_2_5.30
+   */
+  float GetWorldPositionX() const;
+
+  /**
+   * @brief Gets the Y component of the world position.
+   * @return The Y component of the world position
+   * @SINCE_2_5.30
+   */
+  float GetWorldPositionY() const;
+
+  /**
+   * @brief Gets the Z component of the world position.
+   * @return The Z component of the world position
+   * @SINCE_2_5.30
+   */
+  float GetWorldPositionZ() const;
+
+  /**
+   * @brief Sets the orientation of the actor.
+   * @param[in] orientation The orientation
+   * @SINCE_2_5.30
+   */
+  void SetOrientation(const Quaternion& orientation);
+
+  /**
+   * @brief Gets the orientation of the actor.
+   * @return The orientation
+   * @SINCE_2_5.30
+   */
+  Quaternion GetOrientation() const;
+
+  /**
+   * @brief Gets the world orientation of the actor.
+   * @return The world orientation
+   * @SINCE_2_5.30
+   */
+  Quaternion GetWorldOrientation() const;
+
+  /**
+   * @brief Sets the scale factor applied to the actor.
+   * @param[in] scale The scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScale(const Vector3& scale);
+
+  /**
+   * @brief Gets the scale factor applied to the actor.
+   * @return The scale factor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetScale() const;
+
+  /**
+   * @brief Sets the X scale factor applied to the actor.
+   * @param[in] scaleX The X scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScaleX(float scaleX);
+
+  /**
+   * @brief Gets the X scale factor applied to the actor.
+   * @return The X scale factor
+   * @SINCE_2_5.30
+   */
+  float GetScaleX() const;
+
+  /**
+   * @brief Sets the Y scale factor applied to the actor.
+   * @param[in] scaleY The Y scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScaleY(float scaleY);
+
+  /**
+   * @brief Gets the Y scale factor applied to the actor.
+   * @return The Y scale factor
+   * @SINCE_2_5.30
+   */
+  float GetScaleY() const;
+
+  /**
+   * @brief Sets the Z scale factor applied to the actor.
+   * @param[in] scaleZ The Z scale factor
+   * @SINCE_2_5.30
+   */
+  void SetScaleZ(float scaleZ);
+
+  /**
+   * @brief Gets the Z scale factor applied to the actor.
+   * @return The Z scale factor
+   * @SINCE_2_5.30
+   */
+  float GetScaleZ() const;
+
+  /**
+   * @brief Gets the world scale factor applied to the actor.
+   * @return The world scale factor
+   * @SINCE_2_5.30
+   */
+  Vector3 GetWorldScale() const;
+
+  /**
+   * @brief Sets the visibility flag of the actor.
+   * @param[in] visible True to set the actor visible
+   * @SINCE_2_5.30
+   */
+  void SetVisible(bool visible);
+
+  /**
+   * @brief Gets the visibility flag of the actor.
+   * @return True if the actor is visible
+   * @SINCE_2_5.30
+   */
+  bool IsVisible() const;
+
+  /**
+   * @brief Sets the color of the actor.
+   * @param[in] color The color
+   * @SINCE_2_5.30
+   */
+  void SetColor(const Vector4& color);
+
+  /**
+   * @brief Gets the color of the actor.
+   * @return The color of the actor
+   * @SINCE_2_5.30
+   */
+  Vector4 GetColor() const;
+
+  /**
+   * @brief Gets the current color of the actor from the previous update.
+   * @return The current color of the actor
+   * @SINCE_2_5.30
+   */
+  Vector4 GetCurrentColor() const;
+
+  /**
+   * @brief Sets the red component of the actor's color.
+   * @param[in] red The red component value
+   * @SINCE_2_5.30
+   */
+  void SetColorRed(float red);
+
+  /**
+   * @brief Gets the red component of the actor's color.
+   * @return The red component value
+   * @SINCE_2_5.30
+   */
+  float GetColorRed() const;
+
+  /**
+   * @brief Sets the green component of the actor's color.
+   * @param[in] green The green component value
+   * @SINCE_2_5.30
+   */
+  void SetColorGreen(float green);
+
+  /**
+   * @brief Gets the green component of the actor's color.
+   * @return The green component value
+   * @SINCE_2_5.30
+   */
+  float GetColorGreen() const;
+
+  /**
+   * @brief Sets the blue component of the actor's color.
+   * @param[in] blue The blue component value
+   * @SINCE_2_5.30
+   */
+  void SetColorBlue(float blue);
+
+  /**
+   * @brief Gets the blue component of the actor's color.
+   * @return The blue component value
+   * @SINCE_2_5.30
+   */
+  float GetColorBlue() const;
+
+  /**
+   * @brief Sets the alpha component of the actor's color.
+   * @param[in] alpha The alpha component value
+   * @note Equivalent to SetOpacity(). Both set the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  void SetColorAlpha(float alpha);
+
+  /**
+   * @brief Gets the alpha component of the actor's color.
+   * @return The alpha component value
+   * @note Equivalent to GetOpacity(). Both read the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  float GetColorAlpha() const;
+
+  /**
+   * @brief Gets the world color of the actor.
+   * @return The world color of the actor
+   * @SINCE_2_5.30
+   */
+  Vector4 GetWorldColor() const;
+
+  /**
+   * @brief Gets the world matrix of the actor.
+   * @return The world matrix of the actor
+   * @SINCE_2_5.30
+   */
+  Matrix GetWorldMatrix() const;
+
+  /**
+   * @brief Sets the name of the actor.
+   * @param[in] name The name
+   * @SINCE_2_5.30
+   */
+  void SetName(Dali::StringView name);
+
+  /**
+   * @brief Gets the name of the actor.
+   * @return The name of the actor
+   * @SINCE_2_5.30
+   */
+  Dali::String GetName() const;
+
+  /**
+   * @brief Sets the sensitivity flag of the actor.
+   * @param[in] sensitive True to make the actor sensitive
+   * @SINCE_2_5.30
+   */
+  void SetSensitive(bool sensitive);
+
+  /**
+   * @brief Gets the sensitivity flag of the actor.
+   * @return True if the actor is sensitive
+   * @SINCE_2_5.30
+   */
+  bool IsSensitive() const;
+
+  /**
+   * @brief Sets the leave required flag.
+   * @param[in] required Whether leave event is required
+   * @SINCE_2_5.30
+   */
+  void SetLeaveRequired(bool required);
+
+  /**
+   * @brief Gets the leave required flag.
+   * @return Whether leave event is required
+   * @SINCE_2_5.30
+   */
+  bool GetLeaveRequired() const;
+
+  /**
+   * @brief Sets the touch hit area margin.
+   * @param[in] margin The touch hit area margin
+   * @SINCE_2_5.30
+   */
+  void SetTouchHitAreaMargin(const Extents& margin);
+
+  /**
+   * @brief Gets the touch hit area margin.
+   * @return The touch hit area margin
+   * @SINCE_2_5.30
+   */
+  Extents GetTouchHitAreaMargin() const;
+
+  /**
+   * @brief Sets whether to allow only self-initiated touch events.
+   * @param[in] enabled True to allow only self-initiated touch
+   * @SINCE_2_5.30
+   */
+  void SetAllowSelfInitiatedTouchOnlyEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether only self-initiated touch events are allowed.
+   * @return True if only self-initiated touch is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsAllowSelfInitiatedTouchOnlyEnabled() const;
+
+  /**
+   * @brief Sets whether to dispatch touch motion events.
+   * @param[in] enabled True to dispatch touch motion events
+   * @SINCE_2_5.30
+   */
+  void SetDispatchTouchMotionEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether touch motion events are dispatched.
+   * @return True if touch motion dispatch is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsDispatchTouchMotionEnabled() const;
+
+  /**
+   * @brief Sets whether to dispatch hover motion events.
+   * @param[in] enabled True to dispatch hover motion events
+   * @SINCE_2_5.30
+   */
+  void SetDispatchHoverMotionEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether hover motion events are dispatched.
+   * @return True if hover motion dispatch is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsDispatchHoverMotionEnabled() const;
+
+  /**
+   * @brief Sets the inherit orientation flag.
+   * @param[in] inherit Whether to inherit orientation
+   * @SINCE_2_5.30
+   */
+  void SetInheritOrientationEnabled(bool inherit);
+
+  /**
+   * @brief Gets the inherit orientation flag.
+   * @return Whether orientation is inherited
+   * @SINCE_2_5.30
+   */
+  bool IsInheritOrientationEnabled() const;
+
+  /**
+   * @brief Sets the inherit scale flag.
+   * @param[in] inherit Whether to inherit scale
+   * @SINCE_2_5.30
+   */
+  void SetInheritScaleEnabled(bool inherit);
+
+  /**
+   * @brief Gets the inherit scale flag.
+   * @return Whether scale is inherited
+   * @SINCE_2_5.30
+   */
+  bool IsInheritScaleEnabled() const;
+
+  /**
+   * @brief Sets the inherit position flag.
+   * @param[in] inherit Whether to inherit position
+   * @SINCE_2_5.30
+   */
+  void SetInheritPositionEnabled(bool inherit);
+
+  /**
+   * @brief Gets the inherit position flag.
+   * @return Whether position is inherited
+   * @SINCE_2_5.30
+   */
+  bool IsInheritPositionEnabled() const;
+
+  /**
+   * @brief Sets the color mode.
+   * @param[in] colorMode The color mode
+   * @SINCE_2_5.30
+   */
+  void SetColorMode(ColorMode colorMode);
+
+  /**
+   * @brief Gets the color mode.
+   * @return The color mode
+   * @SINCE_2_5.30
+   */
+  ColorMode GetColorMode() const;
+
+  /**
+   * @brief Sets the draw mode.
+   * @param[in] drawMode The draw mode
+   * @SINCE_2_5.30
+   */
+  void SetDrawMode(DrawMode::Type drawMode);
+
+  /**
+   * @brief Gets the draw mode.
+   * @return The draw mode
+   * @SINCE_2_5.30
+   */
+  DrawMode::Type GetDrawMode() const;
+
+  /**
+   * @brief Sets the blend equation.
+   * @param[in] blendEquation The blend equation
+   * @SINCE_2_5.30
+   */
+  void SetBlendEquation(Dali::BlendEquation::Type blendEquation);
+
+  /**
+   * @brief Gets the blend equation.
+   * @return The blend equation
+   * @SINCE_2_5.30
+   */
+  Dali::BlendEquation::Type GetBlendEquation() const;
+
+  /**
+   * @brief Sets the clipping mode.
+   * @param[in] clippingMode The clipping mode
+   * @SINCE_2_5.30
+   */
+  void SetClippingMode(ClippingMode::Type clippingMode);
+
+  /**
+   * @brief Gets the clipping mode.
+   * @return The clipping mode
+   * @SINCE_2_5.30
+   */
+  ClippingMode::Type GetClippingMode() const;
+
+  /**
+   * @brief Sets the layout direction.
+   * @param[in] layoutDirection The layout direction
+   * @SINCE_2_5.30
+   */
+  void SetLayoutDirection(LayoutDirection::Type layoutDirection);
+
+  /**
+   * @brief Gets the layout direction.
+   * @return The layout direction
+   * @SINCE_2_5.30
+   */
+  LayoutDirection::Type GetLayoutDirection() const;
+
+  /**
+   * @brief Sets whether the child inherits the layout direction from the parent.
+   * @param[in] enabled True to inherit layout direction
+   * @SINCE_2_5.30
+   */
+  void SetInheritLayoutDirectionEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether the child inherits the layout direction from the parent.
+   * @return True if layout direction inheritance is enabled
+   * @SINCE_2_5.30
+   */
+  bool IsInheritLayoutDirectionEnabled() const;
+
+  /**
+   * @brief Sets the opacity.
+   * @param[in] opacity The opacity
+   * @note Equivalent to SetColorAlpha(). Both set the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  void SetOpacity(float opacity);
+
+  /**
+   * @brief Gets the opacity.
+   * @return The opacity
+   * @note Equivalent to GetColorAlpha(). Both read the alpha channel of the actor's color property.
+   * @SINCE_2_5.30
+   */
+  float GetOpacity() const;
+
+  /**
+   * @brief Sets the screen position of the actor.
+   * @return The screen position of the actor
+   * @SINCE_2_5.30
+   */
+  Vector2 GetScreenPosition() const;
+
+  /**
+   * @brief Sets whether the position uses the pivot point.
+   * @param[in] enabled True to use pivot for position
+   * @SINCE_2_5.30
+   */
+  void SetPositionUsesPivotEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether the position uses the pivot point.
+   * @return True if position uses pivot
+   * @SINCE_2_5.30
+   */
+  bool IsPositionUsesPivotEnabled() const;
+
+  /**
+   * @brief Gets whether the actor is culled.
+   * @return Whether the actor is culled
+   * @SINCE_2_5.30
+   */
+  bool IsCulled() const;
+
+  /**
+   * @brief Gets the actor ID.
+   * @return The actor ID
+   * @SINCE_2_5.30
+   */
+  uint32_t GetId() const;
+
+  /**
+   * @brief Gets whether the actor is root.
+   * @return Whether the actor is root
+   * @SINCE_2_5.30
+   */
+  bool IsRoot() const;
+
+  /**
+   * @brief Gets whether the actor is a layer.
+   * @return Whether the actor is a layer
+   * @SINCE_2_5.30
+   */
+  bool IsLayer() const;
+
+  /**
+   * @brief Gets whether the actor is connected to scene.
+   * @return Whether the actor is connected to scene
+   * @SINCE_2_5.30
+   */
+  bool IsConnectedToScene() const;
+
+  /**
+   * @brief Sets whether the actor should be focusable by keyboard navigation.
+   * @param[in] focusable True to make the actor keyboard focusable
+   * @SINCE_2_5.30
+   */
+  void SetKeyboardFocusable(bool focusable);
+
+  /**
+   * @brief Gets whether the actor is keyboard focusable.
+   * @return True if the actor is keyboard focusable
+   * @SINCE_2_5.30
+   */
+  bool IsKeyboardFocusable() const;
+
+  /**
+   * @brief Sets the update area hint for the actor.
+   * @param[in] hint The update area hint
+   * @SINCE_2_5.30
+   */
+  void SetUpdateAreaHint(const Vector4& hint);
+
+  /**
+   * @brief Gets the update area hint for the actor.
+   * @return The update area hint
+   * @SINCE_2_5.30
+   */
+  Vector4 GetUpdateAreaHint() const;
+
+  // Coordinate Conversion
 
   /**
    * @brief Converts screen coordinates into the actor's coordinate system using the default camera.
@@ -1006,6 +1876,61 @@ public:
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
    */
   bool ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const;
+
+  /**
+   * @brief Calculates the position of the actor in screen coordinates using event-side properties.
+   *
+   * This function calculates the screen coordinates of the actor by automatically detecting
+   * whether to use 2D or 3D calculation based on the actor's context and ancestor layers.
+   *
+   * For 2D calculation (when no 3D layers in ancestors):
+   * - Uses 2D-specific optimizations
+   * - Assumes orthographic projection and no camera rotation
+   * - Z coordinates are treated as 0 for screen position calculation
+   * - Faster calculation with 2D limitations
+   *
+   * For 3D calculation (when 3D layers exist in ancestors):
+   * - Uses full 3D projection with view and projection matrices
+   * - Supports perspective projection, camera rotation, and full 3D transforms
+   * - Considers Z depth for proper screen coordinate projection
+   * - More accurate but computationally expensive
+   *
+   * @SINCE_2_5.29
+   * @return The screen position of the actor, or (0, 0) if the actor is not on the scene
+   * @pre The Actor has been initialized.
+   * @note Unlike Actor::Property::SCREEN_POSITION, which is based on the last known frame,
+   *       this function uses the current event-side property values.
+   */
+  Vector2 CalculateScreenPosition() const;
+
+  /**
+   * @brief Calculates the screen position and size of the actor using event-side properties.
+   *
+   * This function calculates the bounding box screen coordinates and size of the actor
+   * by automatically detecting whether to use 2D or 3D calculation based on the
+   * actor's context and ancestor layers.
+   *
+   * For 2D calculation (when no 3D layers in ancestors):
+   * - Uses 2D-specific optimizations
+   * - Assumes orthographic projection and no camera rotation
+   * - Transforms 4 corner points in 2D space (Z=0) for bounding box calculation
+   * - Faster calculation with 2D limitations
+   *
+   * For 3D calculation (when 3D layers exist in ancestors):
+   * - Uses full 3D projection with view and projection matrices
+   * - Supports perspective projection, camera rotation, and full 3D transforms
+   * - Transforms all 8 corners of the 3D bounding box for accurate screen extents
+   * - Accounts for perspective foreshortening and 3D rotation effects
+   * - More accurate but computationally expensive
+   *
+   * @SINCE_2_5.29
+   * @return The Rect containing the position of the top-left corner on screen and the size, respectively,
+   *         or (0, 0, 0, 0) if the actor is not on the scene
+   * @pre The Actor has been initialized.
+   */
+  Bounds CalculateScreenExtents() const;
+
+  // Sibling Order
 
   /**
    * @brief Raise actor above the next sibling actor.
@@ -1223,7 +2148,7 @@ public: // Signals
    * @return The signal to connect to
    * @pre The Actor has been initialized.
    */
-  TouchEventSignalType& TouchedSignal();
+  TouchEventSignalType& TouchEventSignal();
 
   /**
    * @brief This signal is emitted when hover input is received.
@@ -1238,7 +2163,7 @@ public: // Signals
    * @return The signal to connect to
    * @pre The Actor has been initialized.
    */
-  HoverSignalType& HoveredSignal();
+  HoverEventSignalType& HoverEventSignal();
 
   /**
    * @brief This signal is emitted when wheel event is received.
@@ -1254,6 +2179,86 @@ public: // Signals
    * @pre The Actor has been initialized.
    */
   WheelEventSignalType& WheelEventSignal();
+
+  /**
+   * @brief This signal is emitted when intercepting the actor's touch event.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool MyCallbackName( Actor actor, TouchEvent touch );
+   * @endcode
+   * actor: The actor to intercept.
+   * touch: The touch event.
+   *
+   * @note Touch event callbacks are called from the last child in the order of the parent's actor.
+   * The InterceptTouchEventSignal callback is to intercept the touch event in the parent.
+   * So, if the parent intercepts the touch event, the child cannot receive the touch event.
+   *
+   * @note For example:
+   * @code
+   *   Actor parent = Actor::New();
+   *   Actor child = Actor::New();
+   *   parent.Add(child);
+   *   child.TouchEventSignal().Connect(&application, childFunctor);
+   *   parent.TouchEventSignal().Connect(&application, parentFunctor);
+   * @endcode
+   * The touch event callbacks are called in the order childFunctor -> parentFunctor.
+   *
+   * If you connect InterceptTouchEventSignal to parentActor:
+   * @code
+   *   parent.InterceptTouchEventSignal().Connect(&application, interceptFunctor);
+   * @endcode
+   *
+   * When interceptFunctor returns false, the touch event callbacks are called in the same order.
+   * If interceptFunctor returns true, it means that the TouchEvent was intercepted.
+   * So the child actor will not be able to receive touch events.
+   * Only the parentFunctor is called.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   */
+  TouchEventSignalType& InterceptTouchEventSignal();
+
+  /**
+   * @brief This signal is emitted when intercepting the actor's wheel event.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool MyCallbackName( Actor actor, WheelEvent wheelEvent );
+   * @endcode
+   * actor: The actor to intercept.
+   * wheelEvent: The wheel event.
+   *
+   * @note Wheel event callbacks are called from the last child in the order of the parent's actor.
+   * The InterceptWheelEventSignal callback is to intercept the wheel event in the parent.
+   * So, if the parent intercepts the wheel event, the child cannot receive the wheel event.
+   *
+   * @note For example:
+   * @code
+   *   Actor parent = Actor::New();
+   *   Actor child = Actor::New();
+   *   parent.Add(child);
+   *   child.WheelEventSignal().Connect(&application, childFunctor);
+   *   parent.WheelEventSignal().Connect(&application, parentFunctor);
+   * @endcode
+   * The wheel event callbacks are called in the order childFunctor -> parentFunctor.
+   *
+   * If you connect InterceptWheelEventSignal to parentActor:
+   * @code
+   *   parent.InterceptWheelEventSignal().Connect(&application, interceptFunctor);
+   * @endcode
+   *
+   * When interceptFunctor returns false, the wheel event callbacks are called in the same order.
+   * If interceptFunctor returns true, it means that the WheelEvent was intercepted.
+   * So the child actor will not be able to receive wheel events.
+   * Only the parentFunctor is called.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   */
+  WheelEventSignalType& InterceptWheelEventSignal();
 
   /**
    * @brief This signal is emitted after the actor has been connected to the scene.
@@ -1277,7 +2282,7 @@ public: // Signals
    *
    * @endcode
    */
-  OnSceneSignalType& OnSceneSignal();
+  SceneConnectedSignalType& SceneConnectedSignal();
 
   /**
    * @brief This signal is emitted after the actor has been disconnected from the scene.
@@ -1301,15 +2306,97 @@ public: // Signals
    * @endcode
    *
    */
-  OffSceneSignalType& OffSceneSignal();
+  SceneDisconnectedSignalType& SceneDisconnectedSignal();
 
   /**
-   * @brief This signal is emitted after the size has been set on the actor during relayout
+   * @brief This signal is emitted when a child is added to this actor.
    *
-   * @SINCE_1_0.0
-   * @return The signal
+   * A callback of the following type may be connected:
+   * @code
+   *   void MyCallbackName( Actor parent, Actor child );
+   * @endcode
+   * parent: The actor to which the child was added.
+   * child: The child that has been added.
+   *
+   * @note Use this signal with caution. Changing the parent of the actor
+   * within this callback is possible, but DALi will prevent further signals
+   * being sent.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
    */
-  OnRelayoutSignalType& OnRelayoutSignal();
+  ChildAddedSignalType& ChildAddedSignal();
+
+  /**
+   * @brief This signal is emitted when a child is removed from this actor.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void MyCallbackName( Actor parent, Actor child );
+   * @endcode
+   * parent: The actor from which the child was removed.
+   * child: The child that has been removed.
+   *
+   * @note Use this signal with caution. Changing the parent of the actor
+   * within this callback is possible, but DALi will prevent further signals
+   * being sent.
+   *
+   * @note If the child actor is moved from one actor to another, then
+   * this signal will be emitted followed immediately by a
+   * ChildAddedSignal() on the new parent.
+   *
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   */
+  ChildRemovedSignalType& ChildRemovedSignal();
+
+  /**
+   * @brief This signal is emitted when the visible property of this or a parent actor is changed.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Actor actor, bool visible, VisibilityChangeType type );
+   * @endcode
+   * actor: The actor, or child of the actor, whose visibility has changed.
+   * visible: If type is VisibilityChangeType::SELF, true means this actor's VISIBLE property became true.
+   *          If type is VisibilityChangeType::PARENT, true means a parent's VISIBLE property changed to true.
+   * type: Whether this actor's own visible property changed (SELF) or a parent's (PARENT).
+   * @SINCE_2_5.29
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse); it is linked only with Actor::Property::VISIBLE.
+   * @note For reference, an actor is only shown if it and its parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
+   */
+  VisibilityChangedSignalType& VisibilityChangedSignal();
+
+  /**
+   * @brief This signal is emitted when the effective visibility of this actor changes.
+   *
+   * The effective visibility is true only when this actor and all its parents (up to the root layer)
+   * have their VISIBLE property set to true, and the actor is connected to the scene.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName( Actor actor, bool visible );
+   * @endcode
+   * actor: The actor whose effective visibility has changed.
+   * visible: Whether this actor's effective visibility is true.
+   * If true, it denotes one of two cases:
+   * One is that the VISIBLE property of this actor or one of its parent actors was originally false and has become true.
+   * Another is that this actor has been connected to the scene with the VISIBLE property of this actor and all of its parents set to true.
+   * If false, it also denotes one of two cases:
+   * One is that the VISIBLE property of this actor and all of its parent actors was originally true, but one of them has become false.
+   * Another is that the VISIBLE property of this actor and all of its parent actors are true, but this actor has been disconnected from the scene.
+   *
+   * @SINCE_2_3.22
+   * @return The signal to connect to
+   * @pre The Actor has been initialized.
+   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
+   * @note For reference, an actor is only shown if it and its parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
+   */
+  EffectiveVisibilityChangedSignalType& EffectiveVisibilityChangedSignal();
 
   /**
    * @brief This signal is emitted when the layout direction property of this or a parent actor is changed.
@@ -1318,7 +2405,7 @@ public: // Signals
    * @code
    *   void YourCallbackName( Actor actor, LayoutDirection::Type type );
    * @endcode
-   * actor: The actor, or child of actor, whose layout direction has changed
+   * actor: The actor, or child of the actor, whose layout direction has changed.
    * type: Whether the actor's layout direction property has changed or a parent's.
    *
    * @SINCE_1_2.60
@@ -1326,30 +2413,6 @@ public: // Signals
    * @pre The Actor has been initialized.
    */
   LayoutDirectionChangedSignalType& LayoutDirectionChangedSignal();
-
-  /**
-   * @brief This signal is emitted when the visible property of this actor or any of its parents (right up to the root layer) changes.
-   *
-   * A callback of the following type may be connected:
-   * @code
-   *   void YourCallbackName( Actor actor, bool visible );
-   * @endcode
-   * actor: The actor whose inherited visibility has changed.
-   * visible: This is true if this actor's inherited VISIBLE property is true.
-   * If it is true, it denotes one of the 2 cases.
-   * One is VISIBLE property of this actor or only one of the parent actors were originally false and it becomes true now.
-   * Another is this actor is connected on Scene now with that the VISIBLE property of this actor and all of its parent were true.
-   * If it is false, it also denotes one of the 2 cases.
-   * One is that VISIBLE property of this actor and all of the parent actors were originally true but one of them becomes false now.
-   * Another is VISIBLE property of this actor and all of the parent actors are true and this actor is disconnected from the Scene now.
-   *
-   * @SINCE_2_3.22
-   * @return The signal to connect to
-   * @pre The Actor has been initialized.
-   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
-   * @note For reference, an actor is only shown if it and it's parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
-   */
-  InheritedVisibilityChangedSignalType& InheritedVisibilityChangedSignal();
 
 public: // Not intended for application developers
   /// @cond internal
