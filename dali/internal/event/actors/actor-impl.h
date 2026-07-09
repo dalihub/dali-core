@@ -423,34 +423,16 @@ public:
   const Vector3& GetParentOrigin() const;
 
   /**
-   * Set the X component of the parent origin.
-   * @param [in] x The X component value.
-   */
-  void SetParentOriginX(float x);
-
-  /**
    * Get the X component of the parent origin.
    * @return The X component value.
    */
   float GetParentOriginX() const;
 
   /**
-   * Set the Y component of the parent origin.
-   * @param [in] y The Y component value.
-   */
-  void SetParentOriginY(float y);
-
-  /**
    * Get the Y component of the parent origin.
    * @return The Y component value.
    */
   float GetParentOriginY() const;
-
-  /**
-   * Set the Z component of the parent origin.
-   * @param [in] z The Z component value.
-   */
-  void SetParentOriginZ(float z);
 
   /**
    * Get the Z component of the parent origin.
@@ -475,34 +457,16 @@ public:
   const Vector3& GetPivot() const;
 
   /**
-   * Set the X component of the pivot.
-   * @param [in] x The X component value.
-   */
-  void SetPivotX(float x);
-
-  /**
    * Get the X component of the pivot.
    * @return The X component value.
    */
   float GetPivotX() const;
 
   /**
-   * Set the Y component of the pivot.
-   * @param [in] y The Y component value.
-   */
-  void SetPivotY(float y);
-
-  /**
    * Get the Y component of the pivot.
    * @return The Y component value.
    */
   float GetPivotY() const;
-
-  /**
-   * Set the Z component of the pivot.
-   * @param [in] z The Z component value.
-   */
-  void SetPivotZ(float z);
 
   /**
    * Get the Z component of the pivot.
@@ -815,12 +779,6 @@ public:
   float GetCurrentOpacity() const;
 
   /**
-   * Set the clipping mode of an actor.
-   * @param[in] clippingMode The clipping mode to set.
-   */
-  void SetClippingMode(ClippingMode::Type clippingMode);
-
-  /**
    * Retrieve the actor's clipping mode.
    * @return The actor's clipping mode (cached)
    */
@@ -865,38 +823,22 @@ public:
   }
 
   /**
-   * Sets whether an actor should be enabled all user interaction including touch, focus and activation.
-   * This value have higher priority over the sensitve and focusable in negative action,
-   * which means IsSensitive() or IsFocusable() and enable is false, actor will not emits touch or focus event.
-   * An actor is enabled by default.
-   *
-   * If the application wishes to temporarily disable user interaction:
-   * @code
-   * actor.SetUserInteractionEnabled(false);
-   * @endcode
-   *
-   * Then, to re-enable user interaction, the application should call:
-   * @code
-   * actor.SetUserInteractionEnabled(true);
-   * @endcode
-   *
-   * @see IsSensitive(), IsHittable(), IsKeyboardFocusable() and IsTouchFocusable().
-   * @note If an actor's disabled, child still can be enabled.
-   * @param[in]  enabled  true to enable user interaction, false otherwise.
+   * @copydoc Dali::Actor::SetEnabled()
+   * @note This value has higher priority than Sensitive/Focusable in the negative direction,
+   *       i.e. if IsSensitive() or IsFocusable() is true but enabled is false, the actor will not emit touch or focus events.
+   * @note If an actor is disabled, its children are still independently enabled by default.
    */
-  void SetUserInteractionEnabled(bool enabled)
+  void SetEnabled(bool enabled)
   {
-    mUserInteractionEnabled = enabled;
+    mEnabled = enabled;
   }
 
   /**
-   * Query whether an actor is enabled user interaction.
-   * @see SetSensitive(bool)
-   * @return true, if user interaction is enabled, false otherwise.
+   * @copydoc Dali::Actor::IsEnabled()
    */
-  bool IsUserInteractionEnabled() const
+  bool IsEnabled() const
   {
-    return mUserInteractionEnabled;
+    return mEnabled;
   }
 
   /**
@@ -944,12 +886,6 @@ public:
    * @param [in] blue The new blue value.
    */
   void SetColorBlue(float blue);
-
-  /**
-   * Set the alpha component of the color.
-   * @param [in] alpha The new alpha component.
-   */
-  void SetColorAlpha(float alpha);
 
   /**
    * Get the actor's color.
@@ -1497,35 +1433,50 @@ public:
   }
 
   /**
-   * @copydoc Dali::Actor::SetKeyboardFocusable()
+   * @copydoc Dali::Actor::SetFocusable()
    */
-  void SetKeyboardFocusable(bool focusable)
+  void SetFocusable(bool focusable)
   {
-    mKeyboardFocusable = focusable;
+    mFocusable = focusable;
   }
 
   /**
-   * @copydoc Dali::Actor::IsKeyboardFocusable()
+   * @copydoc Dali::Actor::IsFocusable()
    */
-  bool IsKeyboardFocusable() const
+  bool IsFocusable() const
   {
-    return mKeyboardFocusable;
+    return mFocusable;
   }
 
   /**
-   * @copydoc Dali::Actor::SetKeyboardFocusableChildren()
+   * @copydoc Dali::Actor::SetAllowDescendantFocusEnabled()
    */
-  void SetKeyboardFocusableChildren(bool focusable)
+  void SetAllowDescendantFocusEnabled(bool allowDescendantFocusEnabled)
   {
-    mKeyboardFocusableChildren = focusable;
+    mAllowDescendantFocus = allowDescendantFocusEnabled;
   }
 
   /**
-   * @copydoc Dali::Actor::AreChildrenKeyBoardFocusable()
+   * @copydoc Dali::Actor::IsAllowDescendantFocusEnabled()
    */
-  bool AreChildrenKeyBoardFocusable() const
+  bool IsAllowDescendantFocusEnabled() const
   {
-    return mKeyboardFocusableChildren;
+    return mAllowDescendantFocus;
+  }
+
+  /**
+   * @copydoc Dali::Actor::HasAncestorBlockingFocus()
+   */
+  bool HasAncestorBlockingFocus() const
+  {
+    for(Actor* parent = GetParent(); parent != nullptr; parent = parent->GetParent())
+    {
+      if(!parent->IsAllowDescendantFocusEnabled())
+      {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -1549,7 +1500,7 @@ public:
    */
   bool IsHittable() const
   {
-    return (IsUserInteractionEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsWorldIgnored());
+    return (IsEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsWorldIgnored());
   }
 
   /**
@@ -1574,21 +1525,19 @@ public:
   bool OnTouchEvent(const Dali::TouchEvent& touch);
 
   /**
-   * Set whether this view can focus by touch.
-   * @param[in] focusable focuable by touch.
+   * @copydoc Dali::Actor::SetFocusOnTouchEnabled()
    */
-  void SetTouchFocusable(bool focusable)
+  void SetFocusOnTouchEnabled(bool focusOnTouchEnabled)
   {
-    mTouchFocusable = focusable;
+    mFocusOnTouchEnabled = focusOnTouchEnabled;
   }
 
   /**
-   * This returns whether this actor can focus by touch.
-   * @return true if this actor can focus by touch.
+   * @copydoc Dali::Actor::IsFocusOnTouchEnabled()
    */
-  bool IsTouchFocusable() const
+  bool IsFocusOnTouchEnabled() const
   {
-    return mTouchFocusable;
+    return mFocusOnTouchEnabled;
   }
 
   /**
@@ -1690,15 +1639,6 @@ public:
   }
 
   /**
-   * Set whether the actor only receives self-initiated touches.
-   * @param[in] enabled true if only self-initiated touches should be received.
-   */
-  void SetAllowSelfInitiatedTouchOnlyEnabled(bool enabled)
-  {
-    mAllowSelfInitiatedTouchOnly = enabled;
-  }
-
-  /**
    * Query whether the actor only receives self-initiated touches.
    * @return true if only touches that originated on this actor are received.
    */
@@ -1708,30 +1648,12 @@ public:
   }
 
   /**
-   * Set whether the actor should send touch motion events.
-   * @param[in] enabled true to send touch motion events.
-   */
-  void SetDispatchTouchMotionEnabled(bool enabled)
-  {
-    mDispatchTouchMotion = enabled;
-  }
-
-  /**
    * Query whether the actor send touch motion event.
    * @return true, it send touch motion event.
    */
   bool IsDispatchTouchMotionEnabled() const
   {
     return mDispatchTouchMotion;
-  }
-
-  /**
-   * Set whether the actor should send hover motion events.
-   * @param[in] enabled true to send hover motion events.
-   */
-  void SetDispatchHoverMotionEnabled(bool enabled)
-  {
-    mDispatchHoverMotion = enabled;
   }
 
   /**
@@ -2257,12 +2179,6 @@ public:
     return *mScene;
   }
 
-  /**
-   * Set the layout direction of an actor.
-   * @param[in] direction The layout direction to set.
-   */
-  void SetLayoutDirection(LayoutDirection::Type direction);
-
   LayoutDirection::Type GetLayoutDirection() const
   {
     return mLayoutDirection;
@@ -2291,12 +2207,6 @@ public:
    * @return The update area hint.
    */
   const Vector4& GetUpdateAreaHint() const;
-
-  /**
-   * Set whether the position uses the pivot point.
-   * @param[in] enabled true to use pivot for position.
-   */
-  void SetPositionUsesPivotEnabled(bool enabled);
 
   /**
    * Query whether the position uses the pivot point.
@@ -2580,14 +2490,14 @@ protected:
 
   int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 
-  const bool mIsRoot : 1;                    ///< Flag to identify the root actor
-  const bool mIsLayer : 1;                   ///< Flag to identify that this is a layer
-  bool       mIsOnScene : 1;                 ///< Flag to identify whether the actor is on-scene
-  bool       mSensitive : 1;                 ///< Whether the actor emits touch event signals
-  bool       mLeaveRequired : 1;             ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
-  bool       mKeyboardFocusable : 1;         ///< Whether the actor should be focusable by keyboard navigation
-  bool       mKeyboardFocusableChildren : 1; ///< Whether the children of this actor can be focusable by keyboard navigation.
-  bool       mTouchFocusable : 1;            ///< Whether the actor should be focusable by touch
+  const bool mIsRoot : 1;               ///< Flag to identify the root actor
+  const bool mIsLayer : 1;              ///< Flag to identify that this is a layer
+  bool       mIsOnScene : 1;            ///< Flag to identify whether the actor is on-scene
+  bool       mSensitive : 1;            ///< Whether the actor emits touch event signals
+  bool       mLeaveRequired : 1;        ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
+  bool       mFocusable : 1;            ///< Whether the actor should be focusable, e.g. by keyboard navigation or accessibility
+  bool       mAllowDescendantFocus : 1; ///< Whether this actor allows its descendants to receive focus
+  bool       mFocusOnTouchEnabled : 1;  ///< Whether the actor is focused when the user touches it
 
   bool mSceneConnectedSignalled : 1;   ///< Set to true before SceneConnected signal is emitted, and false before SceneDisconnected
   bool mInheritPosition : 1;           ///< Cached: Whether the parent's position should be inherited.
@@ -2600,7 +2510,7 @@ protected:
 
   bool mIsBlendEquationSet : 1;          ///< Flag to identify whether the Blend equation is set
   bool mNeedGesturePropagation : 1;      ///< Whether the parent listens for gesture events or not
-  bool mUserInteractionEnabled : 1;      ///< Whether the actor should be enabled user interaction.
+  bool mEnabled : 1;                     ///< Whether the actor is enabled for user interaction.
   bool mAllowSelfInitiatedTouchOnly : 1; ///< Whether the actor only receives touches that originated on itself.
   bool mUseTextureUpdateArea : 1;        ///< Whether the actor uses the update area of the texture instead of its own.
   bool mDispatchTouchMotion : 1;         ///< Whether to send touch motion events or not.

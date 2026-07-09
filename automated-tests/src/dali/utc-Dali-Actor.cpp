@@ -64,6 +64,31 @@ static bool gTestConstraintCalled;
 
 LayoutDirection::Type gLayoutDirectionType;
 
+// Records the last PropertySetSignal emission, used to verify that the convenience
+// setter methods route through SetProperty() and therefore fire the signal.
+// Holds references to the test's locals because the signal connects to a copy of
+// this functor - value members on the copy would not propagate back to the test.
+struct ConvenienceSetterSignalCheck
+{
+  ConvenienceSetterSignalCheck(bool& signalReceived, Property::Index& index, Property::Value& value)
+  : mSignalReceived(signalReceived),
+    mIndex(index),
+    mValue(value)
+  {
+  }
+
+  void operator()(Handle& handle, Property::Index index, Property::Value value)
+  {
+    mSignalReceived = true;
+    mIndex          = index;
+    mValue          = value;
+  }
+
+  bool&            mSignalReceived;
+  Property::Index& mIndex;
+  Property::Value& mValue;
+};
+
 struct TestConstraint
 {
   void operator()(Vector4& color, const PropertyInputContainer& /* inputs */)
@@ -3275,98 +3300,98 @@ int UtcDaliActorGetLeaveRequired(void)
   END_TEST;
 }
 
-int UtcDaliActorSetKeyboardFocusable(void)
+int UtcDaliActorSetFocusable(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true);
-  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) == true);
+  actor.SetProperty(Actor::Property::FOCUSABLE, true);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::FOCUSABLE) == true);
 
-  actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, false);
-  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) == false);
+  actor.SetProperty(Actor::Property::FOCUSABLE, false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::FOCUSABLE) == false);
   END_TEST;
 }
 
-int UtcDaliActorIsKeyboardFocusable(void)
+int UtcDaliActorIsFocusable(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::KEYBOARD_FOCUSABLE) == false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::FOCUSABLE) == false);
   END_TEST;
 }
 
-int UtcDaliActorSetKeyboardFocusableChildren(void)
+int UtcDaliActorSetAllowDescendantFocus(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  actor.SetProperty(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, true);
-  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == true);
+  actor.SetProperty(Actor::Property::ALLOW_DESCENDANT_FOCUS, true);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::ALLOW_DESCENDANT_FOCUS) == true);
 
-  actor.SetProperty(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN, false);
-  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == false);
+  actor.SetProperty(Actor::Property::ALLOW_DESCENDANT_FOCUS, false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::ALLOW_DESCENDANT_FOCUS) == false);
   END_TEST;
 }
 
-int UtcDaliActorAreChildrenKeyBoardFocusable(void)
+int UtcDaliActorIsAllowDescendantFocus(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN) == true);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::ALLOW_DESCENDANT_FOCUS) == true);
   END_TEST;
 }
 
-int UtcDaliActorSetTouchFocusable(void)
+int UtcDaliActorSetFocusOnTouch(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true);
-  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE) == true);
+  actor.SetProperty(Actor::Property::FOCUS_ON_TOUCH, true);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::FOCUS_ON_TOUCH) == true);
 
-  actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, false);
-  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE) == false);
+  actor.SetProperty(Actor::Property::FOCUS_ON_TOUCH, false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::FOCUS_ON_TOUCH) == false);
   END_TEST;
 }
 
-int UtcDaliActorIsTouchFocusable(void)
+int UtcDaliActorIsFocusOnTouch(void)
 {
   TestApplication application;
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK(actor.GetProperty<bool>(DevelActor::Property::TOUCH_FOCUSABLE) == false);
+  DALI_TEST_CHECK(actor.GetProperty<bool>(Actor::Property::FOCUS_ON_TOUCH) == false);
   END_TEST;
 }
 
-int UtcDaliActorSetUserInteractionEnabled(void)
+int UtcDaliActorSetEnabled(void)
 {
   TestApplication application;
   Actor           actor = Actor::New();
 
-  bool enabled = !actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED);
+  bool enabled = !actor.GetProperty<bool>(Actor::Property::ENABLED);
 
-  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, enabled);
+  actor.SetProperty(Actor::Property::ENABLED, enabled);
 
-  DALI_TEST_CHECK(enabled == actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED));
+  DALI_TEST_CHECK(enabled == actor.GetProperty<bool>(Actor::Property::ENABLED));
   END_TEST;
 }
 
-int UtcDaliActorIsUserInteractionEnabled(void)
+int UtcDaliActorIsEnabled(void)
 {
   TestApplication application;
   Actor           actor = Actor::New();
-  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+  actor.SetProperty(Actor::Property::ENABLED, true);
 
-  DALI_TEST_CHECK(true == actor.GetProperty<bool>(DevelActor::Property::USER_INTERACTION_ENABLED));
+  DALI_TEST_CHECK(true == actor.GetProperty<bool>(Actor::Property::ENABLED));
   END_TEST;
 }
 
@@ -15928,7 +15953,7 @@ int UtcDaliActorIsHittable(void)
   parent.Add(actor);
 
   actor.SetProperty(Actor::Property::SENSITIVE, true);
-  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+  actor.SetProperty(Actor::Property::ENABLED, true);
   actor.SetProperty(Actor::Property::VISIBLE, true);
 
   application.SendNotification();
@@ -15940,9 +15965,9 @@ int UtcDaliActorIsHittable(void)
   DALI_TEST_CHECK(DevelActor::IsHittable(actor) == false);
   actor.SetProperty(Actor::Property::SENSITIVE, true);
 
-  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  actor.SetProperty(Actor::Property::ENABLED, false);
   DALI_TEST_CHECK(DevelActor::IsHittable(actor) == false);
-  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, true);
+  actor.SetProperty(Actor::Property::ENABLED, true);
 
   actor.SetProperty(Actor::Property::VISIBLE, false);
   application.SendNotification();
@@ -16792,17 +16817,85 @@ int UtcDaliActorSetGetSensitiveNewP(void)
   END_TEST;
 }
 
-int UtcDaliActorSetGetKeyboardFocusableNewP(void)
+int UtcDaliActorSetGetFocusableNewP(void)
 {
   TestApplication application;
   Actor           actor = Actor::New();
   application.GetScene().Add(actor);
 
-  actor.SetKeyboardFocusable(true);
-  DALI_TEST_EQUALS(actor.IsKeyboardFocusable(), true, TEST_LOCATION);
+  actor.SetFocusable(true);
+  DALI_TEST_EQUALS(actor.IsFocusable(), true, TEST_LOCATION);
 
-  actor.SetKeyboardFocusable(false);
-  DALI_TEST_EQUALS(actor.IsKeyboardFocusable(), false, TEST_LOCATION);
+  actor.SetFocusable(false);
+  DALI_TEST_EQUALS(actor.IsFocusable(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetFocusOnTouchEnabledNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetFocusOnTouchEnabled(true);
+  DALI_TEST_EQUALS(actor.IsFocusOnTouchEnabled(), true, TEST_LOCATION);
+
+  actor.SetFocusOnTouchEnabled(false);
+  DALI_TEST_EQUALS(actor.IsFocusOnTouchEnabled(), false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetAllowDescendantFocusEnabledNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetAllowDescendantFocusEnabled(false);
+  DALI_TEST_EQUALS(actor.IsAllowDescendantFocusEnabled(), false, TEST_LOCATION);
+
+  actor.SetAllowDescendantFocusEnabled(true);
+  DALI_TEST_EQUALS(actor.IsAllowDescendantFocusEnabled(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetEnabledNewP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  actor.SetEnabled(false);
+  DALI_TEST_EQUALS(actor.IsEnabled(), false, TEST_LOCATION);
+
+  actor.SetEnabled(true);
+  DALI_TEST_EQUALS(actor.IsEnabled(), true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorHasAncestorBlockingFocusP(void)
+{
+  TestApplication application;
+  Actor           parent = Actor::New();
+  Actor           child  = Actor::New();
+  application.GetScene().Add(parent);
+  parent.Add(child);
+
+  DALI_TEST_EQUALS(child.HasAncestorBlockingFocus(), false, TEST_LOCATION);
+
+  parent.SetAllowDescendantFocusEnabled(false);
+  DALI_TEST_EQUALS(child.HasAncestorBlockingFocus(), true, TEST_LOCATION);
+
+  // An actor's own ALLOW_DESCENDANT_FOCUS does not affect its own HasAncestorBlockingFocus() result.
+  parent.SetAllowDescendantFocusEnabled(true);
+  child.SetAllowDescendantFocusEnabled(false);
+  DALI_TEST_EQUALS(child.HasAncestorBlockingFocus(), false, TEST_LOCATION);
+
+  DALI_TEST_EQUALS(parent.HasAncestorBlockingFocus(), false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -17148,6 +17241,71 @@ int UtcDaliActorGetWorldPositionComponentNewP(void)
   DALI_TEST_EQUALS(actor.GetWorldPositionX(), actor.GetWorldPosition().x, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetWorldPositionY(), actor.GetWorldPosition().y, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetWorldPositionZ(), actor.GetWorldPosition().z, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorConvenienceSetterFiresPropertySetSignalP(void)
+{
+  TestApplication application;
+  tet_infoline("Test that a convenience setter fires the PropertySetSignal with the matching index and value");
+
+  Actor actor = Actor::New();
+
+  bool                         signalReceived(false);
+  Property::Index              index(Property::INVALID_INDEX);
+  Property::Value              value;
+  ConvenienceSetterSignalCheck check(signalReceived, index, value);
+  actor.PropertySetSignal().Connect(&application, check);
+
+  // The convenience setter must route through SetProperty(), so the signal fires
+  // with the property index and value - identical to calling SetProperty() directly.
+  const Vector3 position(10.0f, 20.0f, 30.0f);
+  actor.SetPosition(position);
+
+  DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::POSITION, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.Get<Vector3>(), position, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorConvenienceSettersFirePropertySetSignal02P(void)
+{
+  TestApplication application;
+  tet_infoline("Test that a range of convenience setters each fire the PropertySetSignal with the expected index");
+
+  Actor actor = Actor::New();
+
+  bool                         signalReceived(false);
+  Property::Index              index(Property::INVALID_INDEX);
+  Property::Value              value;
+  ConvenienceSetterSignalCheck check(signalReceived, index, value);
+  actor.PropertySetSignal().Connect(&application, check);
+
+  // Component setter (routes through POSITION_X).
+  signalReceived = false;
+  actor.SetPositionX(5.0f);
+  DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::POSITION_X, TEST_LOCATION);
+
+  // Alpha setter (its internal setter was removed; routes through COLOR_ALPHA).
+  signalReceived = false;
+  actor.SetColorAlpha(0.5f);
+  DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::COLOR_ALPHA, TEST_LOCATION);
+
+  // Enum setter (its internal setter was removed; routes through CLIPPING_MODE).
+  signalReceived = false;
+  actor.SetClippingMode(ClippingMode::CLIP_CHILDREN);
+  DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::CLIPPING_MODE, TEST_LOCATION);
+
+  // Bool setter (its internal setter was removed; routes through POSITION_USES_PIVOT).
+  signalReceived = false;
+  actor.SetPositionUsesPivotEnabled(true);
+  DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::POSITION_USES_PIVOT, TEST_LOCATION);
 
   END_TEST;
 }

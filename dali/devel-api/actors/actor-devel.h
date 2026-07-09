@@ -38,6 +38,7 @@ enum Type
   PIVOT_X                         = Dali::Actor::Property::PIVOT_X,
   PIVOT_Y                         = Dali::Actor::Property::PIVOT_Y,
   PIVOT_Z                         = Dali::Actor::Property::PIVOT_Z,
+  POSITION_USES_PIVOT             = Dali::Actor::Property::POSITION_USES_PIVOT,
   SIZE                            = Dali::Actor::Property::SIZE,
   SIZE_WIDTH                      = Dali::Actor::Property::SIZE_WIDTH,
   SIZE_HEIGHT                     = Dali::Actor::Property::SIZE_HEIGHT,
@@ -50,6 +51,7 @@ enum Type
   WORLD_POSITION_X                = Dali::Actor::Property::WORLD_POSITION_X,
   WORLD_POSITION_Y                = Dali::Actor::Property::WORLD_POSITION_Y,
   WORLD_POSITION_Z                = Dali::Actor::Property::WORLD_POSITION_Z,
+  SCREEN_POSITION                 = Dali::Actor::Property::SCREEN_POSITION,
   ORIENTATION                     = Dali::Actor::Property::ORIENTATION,
   WORLD_ORIENTATION               = Dali::Actor::Property::WORLD_ORIENTATION,
   SCALE                           = Dali::Actor::Property::SCALE,
@@ -57,14 +59,22 @@ enum Type
   SCALE_Y                         = Dali::Actor::Property::SCALE_Y,
   SCALE_Z                         = Dali::Actor::Property::SCALE_Z,
   WORLD_SCALE                     = Dali::Actor::Property::WORLD_SCALE,
+  INHERIT_POSITION                = Dali::Actor::Property::INHERIT_POSITION,
+  INHERIT_ORIENTATION             = Dali::Actor::Property::INHERIT_ORIENTATION,
+  INHERIT_SCALE                   = Dali::Actor::Property::INHERIT_SCALE,
   VISIBLE                         = Dali::Actor::Property::VISIBLE,
   COLOR                           = Dali::Actor::Property::COLOR,
   COLOR_RED                       = Dali::Actor::Property::COLOR_RED,
   COLOR_GREEN                     = Dali::Actor::Property::COLOR_GREEN,
   COLOR_BLUE                      = Dali::Actor::Property::COLOR_BLUE,
   COLOR_ALPHA                     = Dali::Actor::Property::COLOR_ALPHA,
+  OPACITY                         = Dali::Actor::Property::OPACITY,
   WORLD_COLOR                     = Dali::Actor::Property::WORLD_COLOR,
+  COLOR_MODE                      = Dali::Actor::Property::COLOR_MODE,
   WORLD_MATRIX                    = Dali::Actor::Property::WORLD_MATRIX,
+  DRAW_MODE                       = Dali::Actor::Property::DRAW_MODE,
+  BLEND_EQUATION                  = Dali::Actor::Property::BLEND_EQUATION,
+  CLIPPING_MODE                   = Dali::Actor::Property::CLIPPING_MODE,
   NAME                            = Dali::Actor::Property::NAME,
   SENSITIVE                       = Dali::Actor::Property::SENSITIVE,
   LEAVE_REQUIRED                  = Dali::Actor::Property::LEAVE_REQUIRED,
@@ -72,11 +82,10 @@ enum Type
   ALLOW_SELF_INITIATED_TOUCH_ONLY = Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY,
   DISPATCH_TOUCH_MOTION           = Dali::Actor::Property::DISPATCH_TOUCH_MOTION,
   DISPATCH_HOVER_MOTION           = Dali::Actor::Property::DISPATCH_HOVER_MOTION,
-  INHERIT_ORIENTATION             = Dali::Actor::Property::INHERIT_ORIENTATION,
-  INHERIT_SCALE                   = Dali::Actor::Property::INHERIT_SCALE,
-  COLOR_MODE                      = Dali::Actor::Property::COLOR_MODE,
-  DRAW_MODE                       = Dali::Actor::Property::DRAW_MODE,
-  BLEND_EQUATION                  = Dali::Actor::Property::BLEND_EQUATION,
+  FOCUSABLE                       = Dali::Actor::Property::FOCUSABLE,
+  FOCUS_ON_TOUCH                  = Dali::Actor::Property::FOCUS_ON_TOUCH,
+  ALLOW_DESCENDANT_FOCUS          = Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS,
+  ENABLED                         = Dali::Actor::Property::ENABLED,
   SIZE_MODE_FACTOR                = Dali::Actor::Property::SIZE_MODE_FACTOR,
   WIDTH_RESIZE_POLICY             = Dali::Actor::Property::WIDTH_RESIZE_POLICY,
   HEIGHT_RESIZE_POLICY            = Dali::Actor::Property::HEIGHT_RESIZE_POLICY,
@@ -86,13 +95,8 @@ enum Type
   PADDING                         = Dali::Actor::Property::PADDING,
   MINIMUM_SIZE                    = Dali::Actor::Property::MINIMUM_SIZE,
   MAXIMUM_SIZE                    = Dali::Actor::Property::MAXIMUM_SIZE,
-  INHERIT_POSITION                = Dali::Actor::Property::INHERIT_POSITION,
-  CLIPPING_MODE                   = Dali::Actor::Property::CLIPPING_MODE,
   LAYOUT_DIRECTION                = Dali::Actor::Property::LAYOUT_DIRECTION,
   INHERIT_LAYOUT_DIRECTION        = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
-  OPACITY                         = Dali::Actor::Property::OPACITY,
-  SCREEN_POSITION                 = Dali::Actor::Property::SCREEN_POSITION,
-  POSITION_USES_PIVOT             = Dali::Actor::Property::POSITION_USES_PIVOT,
   CULLED                          = Dali::Actor::Property::CULLED,
   IGNORED                         = Dali::Actor::Property::IGNORED,
   ID                              = Dali::Actor::Property::ID,
@@ -100,7 +104,6 @@ enum Type
   IS_ROOT                         = Dali::Actor::Property::IS_ROOT,
   IS_LAYER                        = Dali::Actor::Property::IS_LAYER,
   CONNECTED_TO_SCENE              = Dali::Actor::Property::CONNECTED_TO_SCENE,
-  KEYBOARD_FOCUSABLE              = Dali::Actor::Property::KEYBOARD_FOCUSABLE,
   UPDATE_AREA_HINT                = Dali::Actor::Property::UPDATE_AREA_HINT,
 
   /**
@@ -118,31 +121,6 @@ enum Type
    * @note Default is false, i.e. actor under touch event will receive the touch even if touch started on this actor
    */
   CAPTURE_ALL_TOUCH_AFTER_START,
-
-  /**
-   * @brief Sets whether this actor can focus by touch. If user sets this to true, the actor will be focused when user touch it.
-   * @code
-   * Actor actor = Actor::New();
-   * actor.SetProperty(Actor::Property::KEYBOARD_FOCUSABLE, true); // whether the actor can have focus or not with keyboard navigation.
-   * actor.SetProperty(DevelActor::Property::TOUCH_FOCUSABLE, true); // Whether the user can focus by touch, user can set focus by touching the actor.
-   * @endcode
-   * @details Name "touchFocusable", type Property::BOOLEAN.
-   */
-  TOUCH_FOCUSABLE,
-
-  /**
-   * @brief Whether the children of this actor can be focusable by keyboard navigation. If user sets this to false, the children of this actor will not be focused.
-   * @details Name "keyboardFocusableChildren", type Property::BOOLEAN.
-   * @note Default value is true.
-   */
-  KEYBOARD_FOCUSABLE_CHILDREN,
-
-  /**
-   * @brief The flag whether the actor should be enabled all user interaction including touch, focus and activation. this value have higher priority over the sensitve and focusable in negative action.
-   * @details Name "userInteractionEnabled", type Property::BOOLEAN.
-   * @note Default value is true.
-   */
-  USER_INTERACTION_ENABLED,
 
   /**
    * @brief Whether the actor uses the update area of the texture instead of its own.

@@ -910,7 +910,7 @@ int UtcDaliGeoTouchEventActorBecomesUserInteractionDisabled(void)
   data.Reset();
 
   // Change actor to disable user interaction.
-  actor.SetProperty(DevelActor::Property::USER_INTERACTION_ENABLED, false);
+  actor.SetProperty(Actor::Property::ENABLED, false);
 
   // Emit a motion signal, signalled with an interrupted
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(200.0f, 200.0f)));

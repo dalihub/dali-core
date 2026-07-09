@@ -139,9 +139,24 @@ void Actor::ScaleBy(const Vector3& relativeScale)
   GetImplementation(*this).ScaleBy(relativeScale);
 }
 
+// The property accessor methods below follow two deliberate conventions:
+//
+// - Setters route through SetProperty() rather than calling the matching internal
+//   Actor::SetXXX() directly. SetProperty() (via Object::SetProperty) is the single
+//   point that fires OnPropertySet() and the PropertySetSignal, so routing here
+//   guarantees that setting a property through this convenience API is observably
+//   identical to setting it via the property system. Calling the internal setter
+//   directly would silently skip those notifications. (SetResizePolicy() is an
+//   exception: it takes two arguments and has no single matching property.)
+//
+// - Getters call the internal GetXXX() directly instead of GetProperty(). There is
+//   no notification side-effect to centralise on the get side, so routing through
+//   GetProperty() would only add needless Property::Value boxing and risk returning
+//   the base value where a distinct current (animating) value is expected. The
+//   current value, where relevant, is exposed via separate GetCurrentXXX() methods.
 void Actor::SetParentOrigin(const Vector3& origin)
 {
-  GetImplementation(*this).SetParentOrigin(origin);
+  GetImplementation(*this).SetProperty(Actor::Property::PARENT_ORIGIN, origin);
 }
 
 Vector3 Actor::GetParentOrigin() const
@@ -151,7 +166,7 @@ Vector3 Actor::GetParentOrigin() const
 
 void Actor::SetParentOriginX(float x)
 {
-  GetImplementation(*this).SetParentOriginX(x);
+  GetImplementation(*this).SetProperty(Actor::Property::PARENT_ORIGIN_X, x);
 }
 
 float Actor::GetParentOriginX() const
@@ -161,7 +176,7 @@ float Actor::GetParentOriginX() const
 
 void Actor::SetParentOriginY(float y)
 {
-  GetImplementation(*this).SetParentOriginY(y);
+  GetImplementation(*this).SetProperty(Actor::Property::PARENT_ORIGIN_Y, y);
 }
 
 float Actor::GetParentOriginY() const
@@ -171,7 +186,7 @@ float Actor::GetParentOriginY() const
 
 void Actor::SetParentOriginZ(float z)
 {
-  GetImplementation(*this).SetParentOriginZ(z);
+  GetImplementation(*this).SetProperty(Actor::Property::PARENT_ORIGIN_Z, z);
 }
 
 float Actor::GetParentOriginZ() const
@@ -181,7 +196,7 @@ float Actor::GetParentOriginZ() const
 
 void Actor::SetPivot(const Vector3& pivot)
 {
-  GetImplementation(*this).SetPivot(pivot);
+  GetImplementation(*this).SetProperty(Actor::Property::PIVOT, pivot);
 }
 
 Vector3 Actor::GetPivot() const
@@ -191,7 +206,7 @@ Vector3 Actor::GetPivot() const
 
 void Actor::SetPivotX(float x)
 {
-  GetImplementation(*this).SetPivotX(x);
+  GetImplementation(*this).SetProperty(Actor::Property::PIVOT_X, x);
 }
 
 float Actor::GetPivotX() const
@@ -201,7 +216,7 @@ float Actor::GetPivotX() const
 
 void Actor::SetPivotY(float y)
 {
-  GetImplementation(*this).SetPivotY(y);
+  GetImplementation(*this).SetProperty(Actor::Property::PIVOT_Y, y);
 }
 
 float Actor::GetPivotY() const
@@ -211,7 +226,7 @@ float Actor::GetPivotY() const
 
 void Actor::SetPivotZ(float z)
 {
-  GetImplementation(*this).SetPivotZ(z);
+  GetImplementation(*this).SetProperty(Actor::Property::PIVOT_Z, z);
 }
 
 float Actor::GetPivotZ() const
@@ -221,7 +236,7 @@ float Actor::GetPivotZ() const
 
 void Actor::SetSize(const Vector3& size)
 {
-  GetImplementation(*this).SetSize(size);
+  GetImplementation(*this).SetProperty(Actor::Property::SIZE, size);
 }
 
 Vector3 Actor::GetSize() const
@@ -236,7 +251,7 @@ Vector3 Actor::GetCurrentSize() const
 
 void Actor::SetWidth(float width)
 {
-  GetImplementation(*this).SetWidth(width);
+  GetImplementation(*this).SetProperty(Actor::Property::SIZE_WIDTH, width);
 }
 
 float Actor::GetWidth() const
@@ -246,7 +261,7 @@ float Actor::GetWidth() const
 
 void Actor::SetHeight(float height)
 {
-  GetImplementation(*this).SetHeight(height);
+  GetImplementation(*this).SetProperty(Actor::Property::SIZE_HEIGHT, height);
 }
 
 float Actor::GetHeight() const
@@ -256,7 +271,7 @@ float Actor::GetHeight() const
 
 void Actor::SetDepth(float depth)
 {
-  GetImplementation(*this).SetDepth(depth);
+  GetImplementation(*this).SetProperty(Actor::Property::SIZE_DEPTH, depth);
 }
 
 float Actor::GetDepth() const
@@ -266,12 +281,12 @@ float Actor::GetDepth() const
 
 void Actor::SetPosition(const Vector3& position)
 {
-  GetImplementation(*this).SetPosition(position);
+  GetImplementation(*this).SetProperty(Actor::Property::POSITION, position);
 }
 
 void Actor::SetPositionX(float x)
 {
-  GetImplementation(*this).SetX(x);
+  GetImplementation(*this).SetProperty(Actor::Property::POSITION_X, x);
 }
 
 float Actor::GetPositionX() const
@@ -281,7 +296,7 @@ float Actor::GetPositionX() const
 
 void Actor::SetPositionY(float y)
 {
-  GetImplementation(*this).SetY(y);
+  GetImplementation(*this).SetProperty(Actor::Property::POSITION_Y, y);
 }
 
 float Actor::GetPositionY() const
@@ -291,7 +306,7 @@ float Actor::GetPositionY() const
 
 void Actor::SetPositionZ(float z)
 {
-  GetImplementation(*this).SetZ(z);
+  GetImplementation(*this).SetProperty(Actor::Property::POSITION_Z, z);
 }
 
 float Actor::GetPositionZ() const
@@ -331,7 +346,7 @@ float Actor::GetWorldPositionZ() const
 
 void Actor::SetOrientation(const Quaternion& orientation)
 {
-  GetImplementation(*this).SetOrientation(orientation);
+  GetImplementation(*this).SetProperty(Actor::Property::ORIENTATION, orientation);
 }
 
 Quaternion Actor::GetOrientation() const
@@ -346,7 +361,7 @@ Quaternion Actor::GetWorldOrientation() const
 
 void Actor::SetScale(const Vector3& scale)
 {
-  GetImplementation(*this).SetScale(scale);
+  GetImplementation(*this).SetProperty(Actor::Property::SCALE, scale);
 }
 
 Vector3 Actor::GetScale() const
@@ -356,7 +371,7 @@ Vector3 Actor::GetScale() const
 
 void Actor::SetScaleX(float scaleX)
 {
-  GetImplementation(*this).SetScaleX(scaleX);
+  GetImplementation(*this).SetProperty(Actor::Property::SCALE_X, scaleX);
 }
 
 float Actor::GetScaleX() const
@@ -366,7 +381,7 @@ float Actor::GetScaleX() const
 
 void Actor::SetScaleY(float scaleY)
 {
-  GetImplementation(*this).SetScaleY(scaleY);
+  GetImplementation(*this).SetProperty(Actor::Property::SCALE_Y, scaleY);
 }
 
 float Actor::GetScaleY() const
@@ -376,7 +391,7 @@ float Actor::GetScaleY() const
 
 void Actor::SetScaleZ(float scaleZ)
 {
-  GetImplementation(*this).SetScaleZ(scaleZ);
+  GetImplementation(*this).SetProperty(Actor::Property::SCALE_Z, scaleZ);
 }
 
 float Actor::GetScaleZ() const
@@ -391,7 +406,7 @@ Vector3 Actor::GetWorldScale() const
 
 void Actor::SetVisible(bool visible)
 {
-  GetImplementation(*this).SetVisible(visible);
+  GetImplementation(*this).SetProperty(Actor::Property::VISIBLE, visible);
 }
 
 bool Actor::IsVisible() const
@@ -401,7 +416,7 @@ bool Actor::IsVisible() const
 
 void Actor::SetColor(const Vector4& color)
 {
-  GetImplementation(*this).SetColor(color);
+  GetImplementation(*this).SetProperty(Actor::Property::COLOR, color);
 }
 
 Vector4 Actor::GetColor() const
@@ -416,7 +431,7 @@ Vector4 Actor::GetCurrentColor() const
 
 void Actor::SetColorRed(float red)
 {
-  GetImplementation(*this).SetColorRed(red);
+  GetImplementation(*this).SetProperty(Actor::Property::COLOR_RED, red);
 }
 
 float Actor::GetColorRed() const
@@ -426,7 +441,7 @@ float Actor::GetColorRed() const
 
 void Actor::SetColorGreen(float green)
 {
-  GetImplementation(*this).SetColorGreen(green);
+  GetImplementation(*this).SetProperty(Actor::Property::COLOR_GREEN, green);
 }
 
 float Actor::GetColorGreen() const
@@ -436,7 +451,7 @@ float Actor::GetColorGreen() const
 
 void Actor::SetColorBlue(float blue)
 {
-  GetImplementation(*this).SetColorBlue(blue);
+  GetImplementation(*this).SetProperty(Actor::Property::COLOR_BLUE, blue);
 }
 
 float Actor::GetColorBlue() const
@@ -446,7 +461,7 @@ float Actor::GetColorBlue() const
 
 void Actor::SetColorAlpha(float alpha)
 {
-  GetImplementation(*this).SetColorAlpha(alpha);
+  GetImplementation(*this).SetProperty(Actor::Property::COLOR_ALPHA, alpha);
 }
 
 float Actor::GetColorAlpha() const
@@ -466,7 +481,7 @@ Matrix Actor::GetWorldMatrix() const
 
 void Actor::SetName(Dali::StringView name)
 {
-  GetImplementation(*this).SetName(Integration::ToStdStringView(name));
+  GetImplementation(*this).SetProperty(Actor::Property::NAME, Dali::Property::Value(Dali::String(name)));
 }
 
 Dali::String Actor::GetName() const
@@ -476,7 +491,7 @@ Dali::String Actor::GetName() const
 
 void Actor::SetSensitive(bool sensitive)
 {
-  GetImplementation(*this).SetSensitive(sensitive);
+  GetImplementation(*this).SetProperty(Actor::Property::SENSITIVE, sensitive);
 }
 
 bool Actor::IsSensitive() const
@@ -486,7 +501,7 @@ bool Actor::IsSensitive() const
 
 void Actor::SetLeaveRequired(bool required)
 {
-  GetImplementation(*this).SetLeaveRequired(required);
+  GetImplementation(*this).SetProperty(Actor::Property::LEAVE_REQUIRED, required);
 }
 
 bool Actor::GetLeaveRequired() const
@@ -496,7 +511,7 @@ bool Actor::GetLeaveRequired() const
 
 void Actor::SetTouchHitAreaMargin(const Extents& margin)
 {
-  GetImplementation(*this).SetTouchHitAreaMargin(margin);
+  GetImplementation(*this).SetProperty(Actor::Property::TOUCH_HIT_AREA_MARGIN, margin);
 }
 
 Extents Actor::GetTouchHitAreaMargin() const
@@ -506,7 +521,7 @@ Extents Actor::GetTouchHitAreaMargin() const
 
 void Actor::SetAllowSelfInitiatedTouchOnlyEnabled(bool enabled)
 {
-  GetImplementation(*this).SetAllowSelfInitiatedTouchOnlyEnabled(enabled);
+  GetImplementation(*this).SetProperty(Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY, enabled);
 }
 
 bool Actor::IsAllowSelfInitiatedTouchOnlyEnabled() const
@@ -516,7 +531,7 @@ bool Actor::IsAllowSelfInitiatedTouchOnlyEnabled() const
 
 void Actor::SetDispatchTouchMotionEnabled(bool enabled)
 {
-  GetImplementation(*this).SetDispatchTouchMotionEnabled(enabled);
+  GetImplementation(*this).SetProperty(Actor::Property::DISPATCH_TOUCH_MOTION, enabled);
 }
 
 bool Actor::IsDispatchTouchMotionEnabled() const
@@ -526,7 +541,7 @@ bool Actor::IsDispatchTouchMotionEnabled() const
 
 void Actor::SetDispatchHoverMotionEnabled(bool enabled)
 {
-  GetImplementation(*this).SetDispatchHoverMotionEnabled(enabled);
+  GetImplementation(*this).SetProperty(Actor::Property::DISPATCH_HOVER_MOTION, enabled);
 }
 
 bool Actor::IsDispatchHoverMotionEnabled() const
@@ -536,7 +551,7 @@ bool Actor::IsDispatchHoverMotionEnabled() const
 
 void Actor::SetInheritOrientationEnabled(bool inherit)
 {
-  GetImplementation(*this).SetInheritOrientation(inherit);
+  GetImplementation(*this).SetProperty(Actor::Property::INHERIT_ORIENTATION, inherit);
 }
 
 bool Actor::IsInheritOrientationEnabled() const
@@ -546,7 +561,7 @@ bool Actor::IsInheritOrientationEnabled() const
 
 void Actor::SetInheritScaleEnabled(bool inherit)
 {
-  GetImplementation(*this).SetInheritScale(inherit);
+  GetImplementation(*this).SetProperty(Actor::Property::INHERIT_SCALE, inherit);
 }
 
 bool Actor::IsInheritScaleEnabled() const
@@ -556,7 +571,7 @@ bool Actor::IsInheritScaleEnabled() const
 
 void Actor::SetInheritPositionEnabled(bool inherit)
 {
-  GetImplementation(*this).SetInheritPosition(inherit);
+  GetImplementation(*this).SetProperty(Actor::Property::INHERIT_POSITION, inherit);
 }
 
 bool Actor::IsInheritPositionEnabled() const
@@ -566,7 +581,7 @@ bool Actor::IsInheritPositionEnabled() const
 
 void Actor::SetColorMode(ColorMode colorMode)
 {
-  GetImplementation(*this).SetColorMode(colorMode);
+  GetImplementation(*this).SetProperty(Actor::Property::COLOR_MODE, colorMode);
 }
 
 ColorMode Actor::GetColorMode() const
@@ -576,7 +591,7 @@ ColorMode Actor::GetColorMode() const
 
 void Actor::SetDrawMode(DrawMode::Type drawMode)
 {
-  GetImplementation(*this).SetDrawMode(drawMode);
+  GetImplementation(*this).SetProperty(Actor::Property::DRAW_MODE, drawMode);
 }
 
 DrawMode::Type Actor::GetDrawMode() const
@@ -586,7 +601,7 @@ DrawMode::Type Actor::GetDrawMode() const
 
 void Actor::SetBlendEquation(Dali::BlendEquation::Type blendEquation)
 {
-  GetImplementation(*this).SetBlendEquation(blendEquation);
+  GetImplementation(*this).SetProperty(Actor::Property::BLEND_EQUATION, blendEquation);
 }
 
 Dali::BlendEquation::Type Actor::GetBlendEquation() const
@@ -596,7 +611,7 @@ Dali::BlendEquation::Type Actor::GetBlendEquation() const
 
 void Actor::SetClippingMode(ClippingMode::Type clippingMode)
 {
-  GetImplementation(*this).SetClippingMode(clippingMode);
+  GetImplementation(*this).SetProperty(Actor::Property::CLIPPING_MODE, clippingMode);
 }
 
 ClippingMode::Type Actor::GetClippingMode() const
@@ -606,7 +621,7 @@ ClippingMode::Type Actor::GetClippingMode() const
 
 void Actor::SetLayoutDirection(LayoutDirection::Type layoutDirection)
 {
-  GetImplementation(*this).SetLayoutDirection(layoutDirection);
+  GetImplementation(*this).SetProperty(Actor::Property::LAYOUT_DIRECTION, layoutDirection);
 }
 
 LayoutDirection::Type Actor::GetLayoutDirection() const
@@ -616,7 +631,7 @@ LayoutDirection::Type Actor::GetLayoutDirection() const
 
 void Actor::SetInheritLayoutDirectionEnabled(bool enabled)
 {
-  GetImplementation(*this).SetInheritLayoutDirectionEnabled(enabled);
+  GetImplementation(*this).SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, enabled);
 }
 
 bool Actor::IsInheritLayoutDirectionEnabled() const
@@ -626,7 +641,7 @@ bool Actor::IsInheritLayoutDirectionEnabled() const
 
 void Actor::SetOpacity(float opacity)
 {
-  GetImplementation(*this).SetOpacity(opacity);
+  GetImplementation(*this).SetProperty(Actor::Property::OPACITY, opacity);
 }
 
 float Actor::GetOpacity() const
@@ -641,7 +656,7 @@ Vector2 Actor::GetScreenPosition() const
 
 void Actor::SetPositionUsesPivotEnabled(bool enabled)
 {
-  GetImplementation(*this).SetPositionUsesPivotEnabled(enabled);
+  GetImplementation(*this).SetProperty(Actor::Property::POSITION_USES_PIVOT, enabled);
 }
 
 bool Actor::IsPositionUsesPivotEnabled() const
@@ -674,19 +689,54 @@ bool Actor::IsConnectedToScene() const
   return GetImplementation(*this).IsConnectedToScene();
 }
 
-void Actor::SetKeyboardFocusable(bool focusable)
+void Actor::SetFocusable(bool focusable)
 {
-  GetImplementation(*this).SetKeyboardFocusable(focusable);
+  GetImplementation(*this).SetProperty(Actor::Property::FOCUSABLE, focusable);
 }
 
-bool Actor::IsKeyboardFocusable() const
+bool Actor::IsFocusable() const
 {
-  return GetImplementation(*this).IsKeyboardFocusable();
+  return GetImplementation(*this).IsFocusable();
+}
+
+void Actor::SetFocusOnTouchEnabled(bool focusOnTouchEnabled)
+{
+  GetImplementation(*this).SetProperty(Actor::Property::FOCUS_ON_TOUCH, focusOnTouchEnabled);
+}
+
+bool Actor::IsFocusOnTouchEnabled() const
+{
+  return GetImplementation(*this).IsFocusOnTouchEnabled();
+}
+
+void Actor::SetAllowDescendantFocusEnabled(bool allowDescendantFocusEnabled)
+{
+  GetImplementation(*this).SetProperty(Actor::Property::ALLOW_DESCENDANT_FOCUS, allowDescendantFocusEnabled);
+}
+
+bool Actor::IsAllowDescendantFocusEnabled() const
+{
+  return GetImplementation(*this).IsAllowDescendantFocusEnabled();
+}
+
+bool Actor::HasAncestorBlockingFocus() const
+{
+  return GetImplementation(*this).HasAncestorBlockingFocus();
+}
+
+void Actor::SetEnabled(bool enabled)
+{
+  GetImplementation(*this).SetProperty(Actor::Property::ENABLED, enabled);
+}
+
+bool Actor::IsEnabled() const
+{
+  return GetImplementation(*this).IsEnabled();
 }
 
 void Actor::SetUpdateAreaHint(const Vector4& hint)
 {
-  GetImplementation(*this).SetUpdateAreaHint(hint);
+  GetImplementation(*this).SetProperty(Actor::Property::UPDATE_AREA_HINT, hint);
 }
 
 Vector4 Actor::GetUpdateAreaHint() const
@@ -766,7 +816,7 @@ float Actor::GetRelayoutSize(Dimension::Type dimension) const
 
 void Actor::SetIgnored(bool ignored)
 {
-  GetImplementation(*this).SetIgnored(ignored);
+  GetImplementation(*this).SetProperty(Actor::Property::IGNORED, ignored);
 }
 
 bool Actor::IsIgnored() const
