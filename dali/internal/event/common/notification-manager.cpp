@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/queue/queue-benchmark-instrumentation.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
@@ -117,6 +118,12 @@ void NotificationManager::QueueMessage(MessageBase* message)
 
 void NotificationManager::UpdateCompleted()
 {
+  DALI_QB_SCOPE_TIMER(NM_UPDATE_COMPLETED);
+
+  // Time spent holding queueMutex to move the working queues into the
+  // completed queues.
+  DALI_QB_SCOPE_TIMER(NM_COMMIT);
+
   // queueMutex must be locked whilst accessing queues
   MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
   // Move messages from update working queue to completed queue
@@ -141,6 +148,8 @@ bool NotificationManager::MessagesToProcess()
 
 void NotificationManager::ProcessMessages()
 {
+  DALI_QB_SCOPE_TIMER(NM_PROCESS_MESSAGES);
+
   // queueMutex must be locked whilst accessing queues
   {
     MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
