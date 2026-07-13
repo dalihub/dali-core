@@ -86,6 +86,7 @@ DALI_PROPERTY("pivot", VECTOR3, true, false, true, Dali::Actor::Property::PIVOT)
 DALI_PROPERTY("pivotX", FLOAT, true, false, true, Dali::Actor::Property::PIVOT_X)
 DALI_PROPERTY("pivotY", FLOAT, true, false, true, Dali::Actor::Property::PIVOT_Y)
 DALI_PROPERTY("pivotZ", FLOAT, true, false, true, Dali::Actor::Property::PIVOT_Z)
+DALI_PROPERTY("positionUsesPivot", BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_PIVOT)
 DALI_PROPERTY("size", VECTOR3, true, true, true, Dali::Actor::Property::SIZE)
 DALI_PROPERTY("sizeWidth", FLOAT, true, true, true, Dali::Actor::Property::SIZE_WIDTH)
 DALI_PROPERTY("sizeHeight", FLOAT, true, true, true, Dali::Actor::Property::SIZE_HEIGHT)
@@ -98,6 +99,7 @@ DALI_PROPERTY("worldPosition", VECTOR3, false, false, true, Dali::Actor::Propert
 DALI_PROPERTY("worldPositionX", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_X)
 DALI_PROPERTY("worldPositionY", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_Y)
 DALI_PROPERTY("worldPositionZ", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_Z)
+DALI_PROPERTY("screenPosition", VECTOR2, false, false, false, Dali::Actor::Property::SCREEN_POSITION)
 DALI_PROPERTY("orientation", ROTATION, true, true, true, Dali::Actor::Property::ORIENTATION)
 DALI_PROPERTY("worldOrientation", ROTATION, false, false, true, Dali::Actor::Property::WORLD_ORIENTATION)
 DALI_PROPERTY("scale", VECTOR3, true, true, true, Dali::Actor::Property::SCALE)
@@ -105,14 +107,22 @@ DALI_PROPERTY("scaleX", FLOAT, true, true, true, Dali::Actor::Property::SCALE_X)
 DALI_PROPERTY("scaleY", FLOAT, true, true, true, Dali::Actor::Property::SCALE_Y)
 DALI_PROPERTY("scaleZ", FLOAT, true, true, true, Dali::Actor::Property::SCALE_Z)
 DALI_PROPERTY("worldScale", VECTOR3, false, false, true, Dali::Actor::Property::WORLD_SCALE)
+DALI_PROPERTY("inheritPosition", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_POSITION)
+DALI_PROPERTY("inheritOrientation", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_ORIENTATION)
+DALI_PROPERTY("inheritScale", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_SCALE)
 DALI_PROPERTY("visible", BOOLEAN, true, true, true, Dali::Actor::Property::VISIBLE)
 DALI_PROPERTY("color", VECTOR4, true, true, true, Dali::Actor::Property::COLOR)
 DALI_PROPERTY("colorRed", FLOAT, true, true, true, Dali::Actor::Property::COLOR_RED)
 DALI_PROPERTY("colorGreen", FLOAT, true, true, true, Dali::Actor::Property::COLOR_GREEN)
 DALI_PROPERTY("colorBlue", FLOAT, true, true, true, Dali::Actor::Property::COLOR_BLUE)
 DALI_PROPERTY("colorAlpha", FLOAT, true, true, true, Dali::Actor::Property::COLOR_ALPHA)
+DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::Actor::Property::OPACITY)
 DALI_PROPERTY("worldColor", VECTOR4, false, false, true, Dali::Actor::Property::WORLD_COLOR)
+DALI_PROPERTY("colorMode", INTEGER, true, false, false, Dali::Actor::Property::COLOR_MODE)
 DALI_PROPERTY("worldMatrix", MATRIX, false, false, true, Dali::Actor::Property::WORLD_MATRIX)
+DALI_PROPERTY("drawMode", INTEGER, true, false, false, Dali::Actor::Property::DRAW_MODE)
+DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::Actor::Property::BLEND_EQUATION)
+DALI_PROPERTY("clippingMode", STRING, true, false, false, Dali::Actor::Property::CLIPPING_MODE)
 DALI_PROPERTY("name", STRING, true, false, false, Dali::Actor::Property::NAME)
 DALI_PROPERTY("sensitive", BOOLEAN, true, false, false, Dali::Actor::Property::SENSITIVE)
 DALI_PROPERTY("leaveRequired", BOOLEAN, true, false, false, Dali::Actor::Property::LEAVE_REQUIRED)
@@ -120,11 +130,10 @@ DALI_PROPERTY("touchHitAreaMargin", EXTENTS, true, false, false, Dali::Actor::Pr
 DALI_PROPERTY("allowSelfInitiatedTouchOnly", BOOLEAN, true, false, false, Dali::Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY)
 DALI_PROPERTY("dispatchTouchMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_TOUCH_MOTION)
 DALI_PROPERTY("dispatchHoverMotion", BOOLEAN, true, false, false, Dali::Actor::Property::DISPATCH_HOVER_MOTION)
-DALI_PROPERTY("inheritOrientation", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_ORIENTATION)
-DALI_PROPERTY("inheritScale", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_SCALE)
-DALI_PROPERTY("colorMode", INTEGER, true, false, false, Dali::Actor::Property::COLOR_MODE)
-DALI_PROPERTY("drawMode", INTEGER, true, false, false, Dali::Actor::Property::DRAW_MODE)
-DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::Actor::Property::BLEND_EQUATION)
+DALI_PROPERTY("focusable", BOOLEAN, true, false, false, Dali::Actor::Property::FOCUSABLE)
+DALI_PROPERTY("focusOnTouch", BOOLEAN, true, false, false, Dali::Actor::Property::FOCUS_ON_TOUCH)
+DALI_PROPERTY("allowDescendantFocus", BOOLEAN, true, false, false, Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS)
+DALI_PROPERTY("enabled", BOOLEAN, true, false, false, Dali::Actor::Property::ENABLED)
 DALI_PROPERTY("sizeModeFactor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR)
 DALI_PROPERTY("widthResizePolicy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY)
 DALI_PROPERTY("heightResizePolicy", STRING, true, false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY)
@@ -134,13 +143,8 @@ DALI_PROPERTY("heightForWidth", BOOLEAN, true, false, false, Dali::Actor::Proper
 DALI_PROPERTY("padding", VECTOR4, true, false, false, Dali::Actor::Property::PADDING)
 DALI_PROPERTY("minimumSize", VECTOR2, true, false, false, Dali::Actor::Property::MINIMUM_SIZE)
 DALI_PROPERTY("maximumSize", VECTOR2, true, false, false, Dali::Actor::Property::MAXIMUM_SIZE)
-DALI_PROPERTY("inheritPosition", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_POSITION)
-DALI_PROPERTY("clippingMode", STRING, true, false, false, Dali::Actor::Property::CLIPPING_MODE)
 DALI_PROPERTY("layoutDirection", STRING, true, false, false, Dali::Actor::Property::LAYOUT_DIRECTION)
 DALI_PROPERTY("inheritLayoutDirection", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION)
-DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::Actor::Property::OPACITY)
-DALI_PROPERTY("screenPosition", VECTOR2, false, false, false, Dali::Actor::Property::SCREEN_POSITION)
-DALI_PROPERTY("positionUsesPivot", BOOLEAN, true, false, false, Dali::Actor::Property::POSITION_USES_PIVOT)
 DALI_PROPERTY("culled", BOOLEAN, false, false, true, Dali::Actor::Property::CULLED)
 DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::Actor::Property::IGNORED)
 DALI_PROPERTY("id", INTEGER, false, false, false, Dali::Actor::Property::ID)
@@ -148,13 +152,9 @@ DALI_PROPERTY("hierarchyDepth", INTEGER, false, false, false, Dali::Actor::Prope
 DALI_PROPERTY("isRoot", BOOLEAN, false, false, false, Dali::Actor::Property::IS_ROOT)
 DALI_PROPERTY("isLayer", BOOLEAN, false, false, false, Dali::Actor::Property::IS_LAYER)
 DALI_PROPERTY("connectedToScene", BOOLEAN, false, false, false, Dali::Actor::Property::CONNECTED_TO_SCENE)
-DALI_PROPERTY("keyboardFocusable", BOOLEAN, true, false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE)
 DALI_PROPERTY("updateAreaHint", VECTOR4, true, false, false, Dali::Actor::Property::UPDATE_AREA_HINT)
 DALI_PROPERTY("siblingOrder", INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER)
 DALI_PROPERTY("captureAllTouchAfterStart", BOOLEAN, true, false, false, Dali::DevelActor::Property::CAPTURE_ALL_TOUCH_AFTER_START)
-DALI_PROPERTY("touchFocusable", BOOLEAN, true, false, false, Dali::DevelActor::Property::TOUCH_FOCUSABLE)
-DALI_PROPERTY("keyboardFocusableChildren", BOOLEAN, true, false, false, Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN)
-DALI_PROPERTY("userInteractionEnabled", BOOLEAN, true, false, false, Dali::DevelActor::Property::USER_INTERACTION_ENABLED)
 DALI_PROPERTY("useTextureUpdateArea", BOOLEAN, true, false, false, Dali::DevelActor::Property::USE_TEXTURE_UPDATE_AREA)
 DALI_PROPERTY("childrenDepthIndexPolicy", INTEGER, true, false, false, Dali::DevelActor::Property::CHILDREN_DEPTH_INDEX_POLICY)
 DALI_PROPERTY("worldIgnored", BOOLEAN, false, false, true, Dali::DevelActor::Property::WORLD_IGNORED)
@@ -506,29 +506,14 @@ const Vector3& Actor::GetParentOrigin() const
   return ParentOrigin::DEFAULT;
 }
 
-void Actor::SetParentOriginX(float x)
-{
-  SetParentOrigin(Vector3(x, GetParentOrigin().y, GetParentOrigin().z));
-}
-
 float Actor::GetParentOriginX() const
 {
   return GetParentOrigin().x;
 }
 
-void Actor::SetParentOriginY(float y)
-{
-  SetParentOrigin(Vector3(GetParentOrigin().x, y, GetParentOrigin().z));
-}
-
 float Actor::GetParentOriginY() const
 {
   return GetParentOrigin().y;
-}
-
-void Actor::SetParentOriginZ(float z)
-{
-  SetParentOrigin(Vector3(GetParentOrigin().x, GetParentOrigin().y, z));
 }
 
 float Actor::GetParentOriginZ() const
@@ -567,29 +552,14 @@ const Vector3& Actor::GetPivot() const
   return Pivot::DEFAULT;
 }
 
-void Actor::SetPivotX(float x)
-{
-  SetPivot(Vector3(x, GetPivot().y, GetPivot().z));
-}
-
 float Actor::GetPivotX() const
 {
   return GetPivot().x;
 }
 
-void Actor::SetPivotY(float y)
-{
-  SetPivot(Vector3(GetPivot().x, y, GetPivot().z));
-}
-
 float Actor::GetPivotY() const
 {
   return GetPivot().y;
-}
-
-void Actor::SetPivotZ(float z)
-{
-  SetPivot(Vector3(GetPivot().x, GetPivot().y, z));
 }
 
 float Actor::GetPivotZ() const
@@ -955,16 +925,6 @@ void Actor::SetColorBlue(float blue)
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
 
-void Actor::SetColorAlpha(float alpha)
-{
-  mTargetColor.a = alpha;
-
-  // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeW, alpha);
-
-  RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
-}
-
 const Vector4& Actor::GetColor() const
 {
   return mTargetColor;
@@ -999,12 +959,6 @@ const Vector4& Actor::GetCurrentColor() const
 const Vector4& Actor::GetWorldColor() const
 {
   return GetNode().GetWorldColor();
-}
-
-void Actor::SetClippingMode(ClippingMode::Type clippingMode)
-{
-  mClippingMode = clippingMode;
-  SetClippingModeMessage(GetEventThreadServices(), GetNode(), mClippingMode);
 }
 
 void Actor::SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Type childrenDepthIndexPolicy)
@@ -1303,7 +1257,7 @@ bool Actor::EmitInterceptTouchEventSignal(const Dali::TouchEvent& touch)
 bool Actor::DispatchTouchEvent(const Dali::TouchEvent& touch)
 {
   bool consumed = OnTouchEvent(touch);
-  consumed = EmitTouchEventSignal(touch) || consumed;
+  consumed      = EmitTouchEventSignal(touch) || consumed;
   return consumed;
 }
 
@@ -1319,7 +1273,7 @@ bool Actor::EmitTouchEventSignal(const Dali::TouchEvent& touch)
 bool Actor::DispatchHoverEvent(const Dali::HoverEvent& event)
 {
   bool consumed = OnHoverEvent(event);
-  consumed = EmitHoverEventSignal(event) || consumed;
+  consumed      = EmitHoverEventSignal(event) || consumed;
   return consumed;
 }
 
@@ -1336,7 +1290,7 @@ bool Actor::EmitInterceptWheelEventSignal(const Dali::WheelEvent& event)
 bool Actor::DispatchWheelEvent(const Dali::WheelEvent& event)
 {
   bool consumed = OnWheelEvent(event);
-  consumed = EmitWheelEventSignal(event) || consumed;
+  consumed      = EmitWheelEventSignal(event) || consumed;
   return consumed;
 }
 
@@ -1529,9 +1483,9 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mIsOnScene(false),
   mSensitive(true),
   mLeaveRequired(false),
-  mKeyboardFocusable(false),
-  mKeyboardFocusableChildren(true),
-  mTouchFocusable(false),
+  mFocusable(false),
+  mAllowDescendantFocus(true),
+  mFocusOnTouchEnabled(false),
   mSceneConnectedSignalled(false),
   mInheritPosition(true),
   mInheritOrientation(true),
@@ -1542,7 +1496,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mCaptureAllTouchAfterStart(false),
   mIsBlendEquationSet(false),
   mNeedGesturePropagation(false),
-  mUserInteractionEnabled(true),
+  mEnabled(true),
   mAllowSelfInitiatedTouchOnly(false),
   mUseTextureUpdateArea(false),
   mDispatchTouchMotion(true),
@@ -1930,12 +1884,6 @@ void Actor::LowerBelow(Internal::Actor& target)
   CheckParentAndCall(mParent, *this, target, &ActorParent::LowerChildBelow);
 }
 
-void Actor::SetLayoutDirection(LayoutDirection::Type direction)
-{
-  mInheritLayoutDirection = false;
-  mParentImpl.InheritLayoutDirectionRecursively(direction, true);
-}
-
 void Actor::SetInheritLayoutDirectionEnabled(bool inherit)
 {
   if(mInheritLayoutDirection != inherit)
@@ -1965,11 +1913,6 @@ void Actor::SetUpdateAreaHint(const Vector4& updateAreaHint)
 const Vector4& Actor::GetUpdateAreaHint() const
 {
   return mUpdateAreaHint;
-}
-
-void Actor::SetPositionUsesPivotEnabled(bool enabled)
-{
-  mPositionUsesPivot = enabled;
 }
 
 bool Actor::IsPositionUsesPivotEnabled() const

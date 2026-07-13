@@ -1450,7 +1450,7 @@ int UtcDaliCameraActorDefaultPropertiesInherited(void)
       {"isRoot", Property::BOOLEAN, false, false, false, Dali::Actor::Property::IS_ROOT},
       {"isLayer", Property::BOOLEAN, false, false, false, Dali::Actor::Property::IS_LAYER},
       {"connectedToScene", Property::BOOLEAN, false, false, false, Dali::Actor::Property::CONNECTED_TO_SCENE},
-      {"keyboardFocusable", Property::BOOLEAN, true, false, false, Dali::Actor::Property::KEYBOARD_FOCUSABLE},
+      {"focusable", Property::BOOLEAN, true, false, false, Dali::Actor::Property::FOCUSABLE},
       {"siblingOrder", Property::INTEGER, true, false, false, Dali::DevelActor::Property::SIBLING_ORDER},
       // camera own
       {"type", Property::INTEGER, true, false, true, Dali::CameraActor::Property::TYPE},

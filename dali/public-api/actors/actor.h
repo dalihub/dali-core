@@ -250,6 +250,8 @@ public:
      */
     enum
     {
+      // --- Transform: position ---
+
       /**
        * @brief The origin of an actor, within its parent's area.
        * @details Name "parentOrigin", type Property::VECTOR3, constraint-input
@@ -305,6 +307,16 @@ public:
        * @SINCE_1_0.0
        */
       PIVOT_Z,
+
+      /**
+       * @brief Determines whether the pivot should be used to determine the position of the actor.
+       * @details Name "positionUsesPivot", type Property::BOOLEAN.
+       * @note This is true by default.
+       * @note If false, then the top-left of the actor is used for the position.
+       * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
+       * @SINCE_1_9.17
+       */
+      POSITION_USES_PIVOT,
 
       /**
        * @brief The size of an actor.
@@ -393,6 +405,19 @@ public:
       WORLD_POSITION_Z,
 
       /**
+       * @brief Returns the screen position of the Actor
+       * @details Name "screenPosition", type Property::VECTOR2. Read-only
+       * @note Automatically detects 2D or 3D calculation based on actor context and ancestor layers.
+       * @note For 2D: Uses optimized calculation with orthographic projection (Z=0, only Z-axis rotation considered).
+       * @note For 3D: Uses full 3D projection with perspective and camera rotation.
+       * @note The last known frame is used for the calculation. May not match a position value just set.
+       * @SINCE_1_9.17
+       */
+      SCREEN_POSITION,
+
+      // --- Transform: orientation & scale ---
+
+      /**
        * @brief The orientation of an actor.
        * @details Name "orientation", type Property::ROTATION, animatable / constraint-input
        * @SINCE_1_0.0
@@ -443,6 +468,29 @@ public:
       WORLD_SCALE,
 
       /**
+       * @brief The flag whether a child actor inherits it's parent's position.
+       * @details Name "inheritPosition", type Property::BOOLEAN.
+       * @SINCE_1_1.24
+       */
+      INHERIT_POSITION,
+
+      /**
+       * @brief The flag whether a child actor inherits it's parent's orientation.
+       * @details Name "inheritOrientation", type Property::BOOLEAN
+       * @SINCE_1_0.0
+       */
+      INHERIT_ORIENTATION,
+
+      /**
+       * @brief The flag whether a child actor inherits it's parent's scale.
+       * @details Name "inheritScale", type Property::BOOLEAN
+       * @SINCE_1_0.0
+       */
+      INHERIT_SCALE,
+
+      // --- Rendering: color, visibility & mode ---
+
+      /**
        * @brief The visibility flag of an actor.
        * @details Name "visible", type Property::BOOL, animatable / constraint-input
        * @SINCE_1_0.0
@@ -481,9 +529,18 @@ public:
       /**
        * @brief The alpha component of an actor's color.
        * @details Name "colorAlpha", type Property::FLOAT, animatable / constraint-input
+       * @note This is the same underlying value as Property::OPACITY; setting one also changes the other.
        * @SINCE_1_0.0
        */
       COLOR_ALPHA,
+
+      /**
+       * @brief The opacity of the actor.
+       * @details Name "opacity", type Property::FLOAT.
+       * @note This is the same underlying value as Property::COLOR_ALPHA; setting one also changes the other.
+       * @SINCE_1_9.17
+       */
+      OPACITY,
 
       /**
        * @brief The world color of an actor.
@@ -493,6 +550,13 @@ public:
       WORLD_COLOR,
 
       /**
+       * @brief The color mode of an actor.
+       * @details Name "colorMode", type ColorMode (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_0.0
+       */
+      COLOR_MODE,
+
+      /**
        * @brief The world matrix of an actor.
        * @details Name "worldMatrix", type Property::MATRIX, read-only / constraint-input
        * @SINCE_1_0.0
@@ -500,11 +564,43 @@ public:
       WORLD_MATRIX,
 
       /**
+       * @brief The draw mode of an actor.
+       * @details Name "drawMode", type DrawMode::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_0.0
+       * @note DrawMode::OVERLAY_2D and CLIPPING_MODE set to ClippingMode::CLIP_TO_BOUNDING_BOX cannot be used together.
+       *       In this scenario the clipping is ignored.
+       */
+      DRAW_MODE,
+
+      /**
+       * @brief The blend equation used when compositing renderers of this actor onto the framebuffer.
+       * @details Name "blendEquation", type Property::INTEGER.
+       * @note For advanced blend equations, the rendered color must use pre-multiplied alpha.
+       * @note Use Dali::Capabilities::IsBlendEquationSupported to check availability on the current system.
+       * @SINCE_2_5.29
+       */
+      BLEND_EQUATION,
+
+      /**
+       * @brief The clipping mode of an actor.
+       * @details Name "clippingMode", type ClippingMode::Type (Property::INTEGER) or Property::STRING.
+       * @SINCE_1_2_5
+       * @see ClippingMode::Type for supported values.
+       * @note ClippingMode::CLIP_TO_BOUNDING_BOX and DRAW_MODE set to DrawMode::OVERLAY_2D cannot be used together.
+       *       In this scenario the clipping is ignored.
+       */
+      CLIPPING_MODE,
+
+      // --- Identity ---
+
+      /**
        * @brief The name of an actor.
        * @details Name "name", type Property::STRING
        * @SINCE_1_0.0
        */
       NAME,
+
+      // --- Interaction: touch, hover & focus ---
 
       /**
        * @brief The flag whether an actor should emit touch or hover signals.
@@ -584,43 +680,48 @@ public:
       DISPATCH_HOVER_MOTION,
 
       /**
-       * @brief The flag whether a child actor inherits it's parent's orientation.
-       * @details Name "inheritOrientation", type Property::BOOLEAN
-       * @SINCE_1_0.0
+       * @brief The flag whether the actor should be focusable, e.g. by keyboard navigation or accessibility.
+       * @details Name "focusable", type Property::BOOLEAN.
+       * @SINCE_1_9.17
        */
-      INHERIT_ORIENTATION,
+      FOCUSABLE,
 
       /**
-       * @brief The flag whether a child actor inherits it's parent's scale.
-       * @details Name "inheritScale", type Property::BOOLEAN
-       * @SINCE_1_0.0
+       * @brief If true, the actor is focused when the user touches it.
+       * @details Name "focusOnTouch", type Property::BOOLEAN
+       * @note Default is false.
+       * @note If Property::FOCUSABLE is false, this has no effect.
+       * @code
+       * Actor actor = Actor::New();
+       * actor.SetProperty(Actor::Property::FOCUSABLE, true);      // whether the actor can have focus or not, e.g. with keyboard navigation.
+       * actor.SetProperty(Actor::Property::FOCUS_ON_TOUCH, true); // the actor will be focused when the user touches it.
+       * @endcode
+       * @SINCE_2_5.30
        */
-      INHERIT_SCALE,
+      FOCUS_ON_TOUCH,
 
       /**
-       * @brief The color mode of an actor.
-       * @details Name "colorMode", type ColorMode (Property::INTEGER) or Property::STRING.
-       * @SINCE_1_0.0
+       * @brief If false, none of this actor's descendants can receive focus.
+       * @details Name "allowDescendantFocus", type Property::BOOLEAN
+       * @note Default is true.
+       * @note This is checked against every ancestor of a candidate actor, so setting it to false on any
+       *       actor in the hierarchy blocks focus for that whole subtree, not just its immediate children.
+       * @SINCE_2_5.30
        */
-      COLOR_MODE,
+      ALLOW_DESCENDANT_FOCUS,
 
       /**
-       * @brief The draw mode of an actor.
-       * @details Name "drawMode", type DrawMode::Type (Property::INTEGER) or Property::STRING.
-       * @SINCE_1_0.0
-       * @note DrawMode::OVERLAY_2D and CLIPPING_MODE set to ClippingMode::CLIP_TO_BOUNDING_BOX cannot be used together.
-       *       In this scenario the clipping is ignored.
+       * @brief The flag whether the actor is enabled for user interaction, including touch, focus, and activation.
+       * @details Name "enabled", type Property::BOOLEAN
+       * @note Default is true.
+       * @note If false, this overrides Property::SENSITIVE and Property::FOCUSABLE, i.e. the actor will not emit touch
+       *       or focus events even if they are true. Disabling an actor does not disable its children; each actor's
+       *       Property::ENABLED is independent.
+       * @SINCE_2_5.30
        */
-      DRAW_MODE,
+      ENABLED,
 
-      /**
-       * @brief The blend equation used when compositing renderers of this actor onto the framebuffer.
-       * @details Name "blendEquation", type Property::INTEGER.
-       * @note For advanced blend equations, the rendered color must use pre-multiplied alpha.
-       * @note Use Dali::Capabilities::IsBlendEquationSupported to check availability on the current system.
-       * @SINCE_2_5.29
-       */
-      BLEND_EQUATION,
+      // --- Layout & size negotiation ---
 
       /**
        * @brief The size mode factor of an actor.
@@ -691,23 +792,6 @@ public:
       MAXIMUM_SIZE,
 
       /**
-       * @brief The flag whether a child actor inherits it's parent's position.
-       * @details Name "inheritPosition", type Property::BOOLEAN.
-       * @SINCE_1_1.24
-       */
-      INHERIT_POSITION,
-
-      /**
-       * @brief The clipping mode of an actor.
-       * @details Name "clippingMode", type ClippingMode::Type (Property::INTEGER) or Property::STRING.
-       * @SINCE_1_2_5
-       * @see ClippingMode::Type for supported values.
-       * @note ClippingMode::CLIP_TO_BOUNDING_BOX and DRAW_MODE set to DrawMode::OVERLAY_2D cannot be used together.
-       *       In this scenario the clipping is ignored.
-       */
-      CLIPPING_MODE,
-
-      /**
        * @brief The direction of the layout.
        * @details Name "layoutDirection", type LayoutDirection::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_2.60
@@ -722,33 +806,7 @@ public:
        */
       INHERIT_LAYOUT_DIRECTION,
 
-      /**
-       * @brief The opacity of the actor.
-       * @details Name "opacity", type Property::FLOAT.
-       * @SINCE_1_9.17
-       */
-      OPACITY,
-
-      /**
-       * @brief Returns the screen position of the Actor
-       * @details Name "screenPosition", type Property::VECTOR2. Read-only
-       * @note Automatically detects 2D or 3D calculation based on actor context and ancestor layers.
-       * @note For 2D: Uses optimized calculation with orthographic projection (Z=0, only Z-axis rotation considered).
-       * @note For 3D: Uses full 3D projection with perspective and camera rotation.
-       * @note The last known frame is used for the calculation. May not match a position value just set.
-       * @SINCE_1_9.17
-       */
-      SCREEN_POSITION,
-
-      /**
-       * @brief Determines whether the pivot should be used to determine the position of the actor.
-       * @details Name "positionUsesPivot", type Property::BOOLEAN.
-       * @note This is true by default.
-       * @note If false, then the top-left of the actor is used for the position.
-       * @note Setting this to false will allow scaling or rotation around the anchor-point without affecting the actor's position.
-       * @SINCE_1_9.17
-       */
-      POSITION_USES_PIVOT,
+      // --- Structural / read-only state ---
 
       /**
        * @brief Returns whether the actor is culled or not.
@@ -804,12 +862,7 @@ public:
        */
       CONNECTED_TO_SCENE,
 
-      /**
-       * @brief The flag whether the actor should be focusable by keyboard navigation.
-       * @details Name "keyboardFocusable", type Property::BOOLEAN.
-       * @SINCE_1_9.17
-       */
-      KEYBOARD_FOCUSABLE,
+      // --- Misc ---
 
       /**
        * @brief Sets the update area hint of the actor.
@@ -1834,18 +1887,68 @@ public:
   bool IsConnectedToScene() const;
 
   /**
-   * @brief Sets whether the actor should be focusable by keyboard navigation.
-   * @param[in] focusable True to make the actor keyboard focusable
+   * @brief Sets whether the actor should be focusable, e.g. by keyboard navigation or accessibility.
+   * @param[in] focusable True to make the actor focusable
    * @SINCE_2_5.30
    */
-  void SetKeyboardFocusable(bool focusable);
+  void SetFocusable(bool focusable);
 
   /**
-   * @brief Gets whether the actor is keyboard focusable.
-   * @return True if the actor is keyboard focusable
+   * @brief Gets whether the actor is focusable.
+   * @return True if the actor is focusable
    * @SINCE_2_5.30
    */
-  bool IsKeyboardFocusable() const;
+  bool IsFocusable() const;
+
+  /**
+   * @brief Sets whether the actor is focused when the user touches it.
+   * @param[in] focusOnTouchEnabled True to focus the actor when it is touched
+   * @SINCE_2_5.30
+   */
+  void SetFocusOnTouchEnabled(bool focusOnTouchEnabled);
+
+  /**
+   * @brief Gets whether the actor is focused when the user touches it.
+   * @return True if the actor is focused when it is touched
+   * @SINCE_2_5.30
+   */
+  bool IsFocusOnTouchEnabled() const;
+
+  /**
+   * @brief Sets whether this actor allows its descendants to receive focus.
+   * @param[in] allowDescendantFocusEnabled True to allow descendants of this actor to receive focus
+   * @SINCE_2_5.30
+   */
+  void SetAllowDescendantFocusEnabled(bool allowDescendantFocusEnabled);
+
+  /**
+   * @brief Gets whether this actor allows its descendants to receive focus.
+   * @return True if descendants of this actor are allowed to receive focus
+   * @SINCE_2_5.30
+   */
+  bool IsAllowDescendantFocusEnabled() const;
+
+  /**
+   * @brief Checks whether any ancestor of this actor disallows descendant focus.
+   * @return True if an ancestor's Property::ALLOW_DESCENDANT_FOCUS is false, false otherwise
+   * @note This only checks ancestors; it does not check this actor's own Property::ALLOW_DESCENDANT_FOCUS.
+   * @SINCE_2_5.30
+   */
+  bool HasAncestorBlockingFocus() const;
+
+  /**
+   * @brief Sets whether the actor is enabled for user interaction, including touch, focus, and activation.
+   * @param[in] enabled True to enable user interaction on the actor
+   * @SINCE_2_5.30
+   */
+  void SetEnabled(bool enabled);
+
+  /**
+   * @brief Gets whether the actor is enabled for user interaction.
+   * @return True if the actor is enabled for user interaction
+   * @SINCE_2_5.30
+   */
+  bool IsEnabled() const;
 
   /**
    * @brief Sets the update area hint for the actor.

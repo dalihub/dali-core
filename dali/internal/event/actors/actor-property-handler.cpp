@@ -565,9 +565,15 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
+    case Dali::Actor::Property::FOCUSABLE:
     {
-      CheckValidAndSet(property, actor, &Actor::SetKeyboardFocusable);
+      CheckValidAndSet(property, actor, &Actor::SetFocusable);
+      break;
+    }
+
+    case Dali::Actor::Property::FOCUS_ON_TOUCH:
+    {
+      CheckValidAndSet(property, actor, &Actor::SetFocusOnTouchEnabled);
       break;
     }
 
@@ -596,21 +602,15 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_FOCUSABLE:
+    case Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS:
     {
-      CheckValidAndSet(property, actor, &Actor::SetTouchFocusable);
+      CheckValidAndSet(property, actor, &Actor::SetAllowDescendantFocusEnabled);
       break;
     }
 
-    case Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN:
+    case Dali::Actor::Property::ENABLED:
     {
-      CheckValidAndSet(property, actor, &Actor::SetKeyboardFocusableChildren);
-      break;
-    }
-
-    case Dali::DevelActor::Property::USER_INTERACTION_ENABLED:
-    {
-      CheckValidAndSet(property, actor, &Actor::SetUserInteractionEnabled);
+      CheckValidAndSet(property, actor, &Actor::SetEnabled);
       break;
     }
 
@@ -1516,9 +1516,15 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::Actor::Property::KEYBOARD_FOCUSABLE:
+    case Dali::Actor::Property::FOCUSABLE:
     {
-      value = actor.IsKeyboardFocusable();
+      value = actor.IsFocusable();
+      break;
+    }
+
+    case Dali::Actor::Property::FOCUS_ON_TOUCH:
+    {
+      value = actor.IsFocusOnTouchEnabled();
       break;
     }
 
@@ -1540,21 +1546,15 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::DevelActor::Property::TOUCH_FOCUSABLE:
+    case Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS:
     {
-      value = actor.IsTouchFocusable();
+      value = actor.IsAllowDescendantFocusEnabled();
       break;
     }
 
-    case Dali::DevelActor::Property::KEYBOARD_FOCUSABLE_CHILDREN:
+    case Dali::Actor::Property::ENABLED:
     {
-      value = actor.AreChildrenKeyBoardFocusable();
-      break;
-    }
-
-    case Dali::DevelActor::Property::USER_INTERACTION_ENABLED:
-    {
-      value = actor.IsUserInteractionEnabled();
+      value = actor.IsEnabled();
       break;
     }
 
