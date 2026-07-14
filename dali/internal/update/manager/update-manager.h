@@ -431,7 +431,7 @@ public:
    * @note the default value of updateScene should match that in EventThreadServices::ReserveMessageSlot.
    * @return A pointer to the first char allocated for the message.
    */
-  uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene = true);
+  [[nodiscard]] uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene = true);
 
   /**
    * Called by the event-thread to signal that FlushQueue will be called

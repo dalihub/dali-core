@@ -818,6 +818,12 @@ void UpdateManager::AddRenderer(OwnerKeyType<Renderer>& rendererKeyPointer)
   RendererKey           rendererKey = rendererKeyPointer.Release();
   SceneGraph::Renderer* renderer    = rendererKey.Get();
 
+  // Skip if renderer is null
+  if(!renderer)
+  {
+    return;
+  }
+
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer);
 
   renderer->ConnectToSceneGraph(mImpl->renderManagerDispatcher);

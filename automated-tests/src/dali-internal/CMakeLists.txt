@@ -24,6 +24,7 @@ SET(TC_SOURCES
   utc-Dali-Internal-Handles.cpp
   utc-Dali-Internal-IndexedConstStringMap.cpp
   utc-Dali-Internal-IndexedIntegerMap.cpp
+  utc-Dali-Internal-LocklessPointerRing.cpp
   utc-Dali-Internal-LongPressGesture.cpp
   utc-Dali-Internal-MatrixUtils.cpp
   utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
@@ -94,6 +95,11 @@ IF (HAVE_NO_SELF_MOVE)
   ADD_COMPILE_OPTIONS( -Wno-self-move )
 ENDIF()
 
+CHECK_CXX_COMPILER_FLAG(-Wno-unused-command-line-argument HAVE_NO_UNUSED_COMMAND_LINE_ARGUMENT)
+IF (HAVE_NO_UNUSED_COMMAND_LINE_ARGUMENT)
+  ADD_COMPILE_OPTIONS( -Wno-unused-command-line-argument )
+ENDIF()
+
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
   SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
@@ -109,7 +115,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
   ${${CAPI_LIB}_LIBRARIES}
-  --coverage -ldl
+  --coverage -ldl -pthread
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

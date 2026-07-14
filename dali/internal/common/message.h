@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/type-abstraction.h>
+#include <type_traits>
 
 namespace Dali
 {
@@ -50,6 +51,36 @@ public:
 
 private:
 };
+
+/**
+ * @brief Helper trait to detect if a type has IsValid() method
+ */
+template<typename T, typename = void>
+struct has_is_valid : std::false_type
+{
+};
+
+template<typename T>
+struct has_is_valid<T, std::void_t<decltype(std::declval<T>().IsValid())>> : std::true_type
+{
+};
+
+/**
+ * @brief Helper function to check validity before processing
+ */
+template<typename T>
+inline bool IsValidObject(const T* obj)
+{
+  if constexpr(has_is_valid<T>::value)
+  {
+    return obj->IsValid();
+  }
+  else
+  {
+    (void)obj; // Suppress unused parameter warning for types without IsValid()
+    return true; // Objects without IsValid() are always considered valid
+  }
+}
 
 /**
  * Templated message which calls a member function of an object.
@@ -87,7 +118,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)();
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)();
+    }
   }
 
 private:
@@ -136,7 +170,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param1);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param1);
+    }
   }
 
 private:
@@ -190,7 +227,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param1, param2);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param1, param2);
+    }
   }
 
 private:
@@ -247,7 +287,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param1, param2, param3);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param1, param2, param3);
+    }
   }
 
 private:
@@ -308,7 +351,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param1, param2, param3, param4);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param1, param2, param3, param4);
+    }
   }
 
 private:
@@ -373,7 +419,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param1, param2, param3, param4, param5);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param1, param2, param3, param4, param5);
+    }
   }
 
 private:
@@ -442,7 +491,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param1, param2, param3, param4, param5, param6);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param1, param2, param3, param4, param5, param6);
+    }
   }
 
 private:
@@ -491,7 +543,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)();
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)();
+    }
   }
 
 private:
@@ -540,7 +595,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param);
+    }
   }
 
 private:
@@ -593,7 +651,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param2, param3);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param2, param3);
+    }
   }
 
 private:
@@ -650,7 +711,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param2, param3, param4);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param2, param3, param4);
+    }
   }
 
 private:
@@ -711,7 +775,10 @@ public:
    */
   void Process() override
   {
-    (object->*memberFunction)(param2, param3, param4, param5);
+    if(IsValidObject(object))
+    {
+      (object->*memberFunction)(param2, param3, param4, param5);
+    }
   }
 
 private:

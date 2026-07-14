@@ -434,6 +434,12 @@ void RenderManager::AddRenderer(OwnerKeyType<Render::Renderer>& rendererKeyPoint
 {
   Render::RendererKey renderer = rendererKeyPointer.Release();
 
+  // Skip if renderer is null
+  if(!renderer.Get())
+  {
+    return;
+  }
+
   // Initialize the renderer as we are now in render thread
   renderer->Initialize(mImpl->graphicsController, mImpl->programController, *(mImpl->uniformBufferManager.get()), *(mImpl->pipelineCache.get()), mImpl->terminatedNativeDrawManager, mImpl->sharedUniformBufferViewContainer);
 

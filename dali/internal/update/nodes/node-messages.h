@@ -63,7 +63,7 @@ public:
   using MemberFunction = void (AnimatableProperty<P>::*)(typename ParameterType<P>::PassingType);
 
   /**
-   * Create a message.
+   * Send a message.
    * @note The node is expected to be const in the thread which sends this message.
    * However it can be modified when Process() is called in a different thread.
    * @param[in] eventThreadServices The object used to send messages to the scene graph
@@ -139,7 +139,7 @@ private:
 };
 
 /**
- * Templated message which bakes a Node property.
+ * Templated message which bakes a Node property component.
  */
 template<typename P>
 class NodePropertyComponentMessage : public NodePropertyMessageBase
@@ -223,6 +223,9 @@ private:
   float                  mParam;
 };
 
+/**
+ * Templated message which sets a Node transform property.
+ */
 template<typename P>
 class NodeTransformPropertyMessage : public NodePropertyMessageBase
 {
@@ -230,7 +233,7 @@ public:
   using MemberFunction = void (TransformManagerPropertyHandler<P>::*)(const P&);
 
   /**
-   * Create a message.
+   * Send a message.
    * @note The node is expected to be const in the thread which sends this message.
    * However it can be modified when Process() is called in a different thread.
    * @param[in] eventThreadServices The object used to send messages to the scene graph
@@ -262,6 +265,10 @@ public:
    */
   void Process() override
   {
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mNode->GetTransformId())))
+    {
+      return; // Will be set correctly when Node is fully initialized
+    }
     (mProperty->*mMemberFunction)(mParam);
   }
 
@@ -296,6 +303,9 @@ private:
   P                                   mParam;
 };
 
+/**
+ * Templated message which sets a Node transform property component.
+ */
 template<typename P>
 class NodeTransformComponentMessage : public NodePropertyMessageBase
 {
@@ -335,6 +345,10 @@ public:
    */
   void Process() override
   {
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mNode->GetTransformId())))
+    {
+      return; // Will be set correctly when Node is fully initialized
+    }
     (mProperty->*mMemberFunction)(mParam);
   }
 

@@ -77,7 +77,7 @@ public:
    * @param[in] updateScene If set to true, denotes that the message will cause the scene graph node tree to require an update
    * @return A pointer to the first char allocated for the message
    */
-  uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene);
+  [[nodiscard]] uint32_t* ReserveMessageSlot(uint32_t size, bool updateScene);
 
   /**
    * Flushes the message queue
@@ -109,13 +109,6 @@ public:
    * Query for the capacity of the current message queue
    */
   std::size_t GetCapacity() const;
-
-private:
-  /**
-   * Helper to call Process and destructor on each queued message
-   * @param[in] minorQueue The queue to process.
-   */
-  void ProcessMinorQueue(char* minorQueue);
 
 private:
   // Not copyable:
