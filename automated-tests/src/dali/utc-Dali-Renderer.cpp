@@ -4855,7 +4855,7 @@ int utcDaliRendererPartialUpdateChangeUniform(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -4965,7 +4965,7 @@ int utcDaliRendererPartialUpdateAddRemoveRenderer(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -5059,7 +5059,7 @@ int utcDaliRendererPartialUpdateRenderingBehavior(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -6156,7 +6156,7 @@ int utcDaliRendererPartialUpdateUpdateAreaExtents(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();

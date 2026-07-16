@@ -15,6 +15,7 @@
  *
  */
 
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/events/hover-event-integ.h>
@@ -76,10 +77,10 @@ struct TouchHookCustomActorImpl : public Test::Impl::TestCustomActor
     return mConsumeTouchEvent;
   }
 
-  bool mHasIntrinsicTouchHandling;
-  bool mConsumeTouchEvent;
+  bool     mHasIntrinsicTouchHandling;
+  bool     mConsumeTouchEvent;
   uint32_t mTouchEventCallCount{0u};
-  Actor mLastHitActor;
+  Actor    mLastHitActor;
 };
 
 CustomActor CreateTouchHookCustomActor(TouchHookCustomActorImpl*& impl, bool hasIntrinsicTouchHandling, bool consumeTouchEvent)
@@ -93,7 +94,7 @@ CustomActor CreateTouchHookCustomActor(TouchHookCustomActorImpl*& impl, bool has
 void ConfigureTouchHookActor(Actor actor)
 {
   Geometry geometry = CreateQuadGeometry();
-  Shader shader = CreateShader();
+  Shader   shader   = CreateShader();
   Renderer renderer = Renderer::New(geometry, shader);
   actor.AddRenderer(renderer);
 
@@ -146,10 +147,10 @@ struct HoverHookCustomActorImpl : public Test::Impl::TestCustomActor
     return mConsumeHoverEvent;
   }
 
-  bool mHasIntrinsicHoverHandling;
-  bool mConsumeHoverEvent;
+  bool     mHasIntrinsicHoverHandling;
+  bool     mConsumeHoverEvent;
   uint32_t mHoverEventCallCount{0u};
-  Actor mLastHitActor;
+  Actor    mLastHitActor;
 };
 
 CustomActor CreateHoverHookCustomActor(HoverHookCustomActorImpl*& impl, bool hasIntrinsicHoverHandling, bool consumeHoverEvent)
@@ -200,10 +201,10 @@ struct WheelHookCustomActorImpl : public Test::Impl::TestCustomActor
     return mConsumeWheelEvent;
   }
 
-  bool mHasIntrinsicWheelHandling;
-  bool mConsumeWheelEvent;
+  bool     mHasIntrinsicWheelHandling;
+  bool     mConsumeWheelEvent;
   uint32_t mWheelEventCallCount{0u};
-  Vector2 mLastPoint;
+  Vector2  mLastPoint;
 };
 
 CustomActor CreateWheelHookCustomActor(WheelHookCustomActorImpl*& impl, bool hasIntrinsicWheelHandling, bool consumeWheelEvent)
@@ -248,8 +249,8 @@ int UtcDaliCustomActorTouchHookConsumesWithoutSignal(void)
   ConfigureTouchHookActor(lowerActor);
   lowerActor.TouchEventSignal().Connect(OnTouchHookLowerActorTouched);
 
-  TouchHookCustomActorImpl* impl = nullptr;
-  CustomActor hookActor = CreateTouchHookCustomActor(impl, true, true);
+  TouchHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateTouchHookCustomActor(impl, true, true);
   ConfigureTouchHookActor(hookActor);
 
   application.GetScene().Add(lowerActor);
@@ -275,8 +276,8 @@ int UtcDaliCustomActorTouchHookFallsThroughWhenNotConsumed(void)
   ConfigureTouchHookActor(lowerActor);
   lowerActor.TouchEventSignal().Connect(OnTouchHookLowerActorTouched);
 
-  TouchHookCustomActorImpl* impl = nullptr;
-  CustomActor hookActor = CreateTouchHookCustomActor(impl, true, false);
+  TouchHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateTouchHookCustomActor(impl, true, false);
   ConfigureTouchHookActor(hookActor);
 
   application.GetScene().Add(lowerActor);
@@ -301,8 +302,8 @@ int UtcDaliCustomActorHoverHookConsumesWithoutSignal(void)
   ConfigureTouchHookActor(lowerActor);
   lowerActor.HoverEventSignal().Connect(OnHoverHookLowerActorHovered);
 
-  HoverHookCustomActorImpl* impl = nullptr;
-  CustomActor hookActor = CreateHoverHookCustomActor(impl, true, true);
+  HoverHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateHoverHookCustomActor(impl, true, true);
   ConfigureTouchHookActor(hookActor);
 
   application.GetScene().Add(lowerActor);
@@ -328,8 +329,8 @@ int UtcDaliCustomActorHoverHookFallsThroughWhenNotConsumed(void)
   ConfigureTouchHookActor(lowerActor);
   lowerActor.HoverEventSignal().Connect(OnHoverHookLowerActorHovered);
 
-  HoverHookCustomActorImpl* impl = nullptr;
-  CustomActor hookActor = CreateHoverHookCustomActor(impl, true, false);
+  HoverHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateHoverHookCustomActor(impl, true, false);
   ConfigureTouchHookActor(hookActor);
 
   application.GetScene().Add(lowerActor);
@@ -353,8 +354,8 @@ int UtcDaliCustomActorWheelHookConsumesWithoutSignal(void)
   ConfigureTouchHookActor(parentActor);
   parentActor.WheelEventSignal().Connect(OnWheelHookParentActorWheeled);
 
-  WheelHookCustomActorImpl* impl = nullptr;
-  CustomActor hookActor = CreateWheelHookCustomActor(impl, true, true);
+  WheelHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateWheelHookCustomActor(impl, true, true);
   ConfigureTouchHookActor(hookActor);
 
   application.GetScene().Add(parentActor);
@@ -379,8 +380,8 @@ int UtcDaliCustomActorWheelHookFallsThroughWhenNotConsumed(void)
   ConfigureTouchHookActor(parentActor);
   parentActor.WheelEventSignal().Connect(OnWheelHookParentActorWheeled);
 
-  WheelHookCustomActorImpl* impl = nullptr;
-  CustomActor hookActor = CreateWheelHookCustomActor(impl, true, false);
+  WheelHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateWheelHookCustomActor(impl, true, false);
   ConfigureTouchHookActor(hookActor);
 
   application.GetScene().Add(parentActor);
@@ -1513,7 +1514,7 @@ int UtcDaliCustomActorImplCalculateChildSizeBase(void)
   Test::TestCustomActor custom = Test::TestCustomActor::NewNegoSize();
 
   Actor child = Actor::New();
-  child.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(child, Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
   child.SetProperty(Actor::Property::SIZE, Vector2(150, 150));
 
   application.SendNotification();
@@ -1543,8 +1544,8 @@ int UtcDaliCustomActorImplRelayoutDependentOnChildrenBase(void)
   v = customNotNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::ALL_DIMENSIONS);
   DALI_TEST_CHECK(v == true);
 
-  customNego.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
-  customNotNego.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(customNego, Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(customNotNego, Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
 
   v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::ALL_DIMENSIONS);
   DALI_TEST_CHECK(v == true);
@@ -1554,8 +1555,8 @@ int UtcDaliCustomActorImplRelayoutDependentOnChildrenBase(void)
   application.SendNotification();
   application.Render();
 
-  customNego.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
-  customNotNego.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(customNego, Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(customNotNego, Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
   v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
   DALI_TEST_CHECK(v == false);
   v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::HEIGHT);
@@ -1568,8 +1569,8 @@ int UtcDaliCustomActorImplRelayoutDependentOnChildrenBase(void)
   application.SendNotification();
   application.Render();
 
-  customNego.SetResizePolicy(Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::WIDTH);
-  customNotNego.SetResizePolicy(Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(customNego, Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::WIDTH);
+  DevelActor::SetResizePolicy(customNotNego, Dali::ResizePolicy::USE_NATURAL_SIZE, Dali::Dimension::HEIGHT);
   v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::WIDTH);
   DALI_TEST_CHECK(v == true);
   v = customNego.TestRelayoutDependentOnChildrenBase(Dali::Dimension::HEIGHT);

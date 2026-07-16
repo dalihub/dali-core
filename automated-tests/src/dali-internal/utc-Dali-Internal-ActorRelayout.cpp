@@ -23,9 +23,9 @@
 #include <iostream>
 
 // Internal headers are allowed here
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
-
 using namespace Dali;
 using Dali::Internal::Actor;
 
@@ -56,14 +56,14 @@ int UtcDaliActorSizer_CalculateSize(void)
   // But, current broken behaviour is to depend on children. Retain this behaviour for now.
   DALI_TEST_EQUALS(testActorImpl.RelayoutDependentOnChildren(Dimension::ALL_DIMENSIONS), true, TEST_LOCATION);
 
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor[Dali::Actor::Property::SIZE] = Vector2(150.0f, 100.0f); // Should automatically set preferred size
   scene.Add(actor);
 
   DALI_TEST_EQUALS(actorImpl.IsRelayoutEnabled(), true, TEST_LOCATION);
 
   testActorImpl.SetNaturalSize(Vector3(150.0f, 180.0f, 150.0f));
-  actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   application.SendNotification();
   application.Render();
 
@@ -73,29 +73,29 @@ int UtcDaliActorSizer_CalculateSize(void)
 
   testActorImpl.SetWidthForHeightFactor(3.5f);
   testActorImpl.SetHeightForWidthFactor(1.7f);
-  actor.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::DIMENSION_DEPENDENCY, Dimension::WIDTH);
   application.SendNotification();
   application.Render();
 
   size = Vector3(actor[Dali::Actor::Property::SIZE]);
   DALI_TEST_EQUALS(size.width, 3.5f * 180.0f, 0.00001f, TEST_LOCATION);
 
-  actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH);
-  actor.SetResizePolicy(ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
   application.SendNotification();
   application.Render();
   size = Vector3(actor[Dali::Actor::Property::SIZE]);
   DALI_TEST_EQUALS(size.height, 1.7f * 150.0f, 0.00001f, TEST_LOCATION);
 
   auto child = Test::TestCustomActor::New();
-  child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(child, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   child.SetProperty(Dali::Actor::Property::SIZE, Vector2(20.0f, 40.0f));
   auto& childImpl = GetImplementation(child);
   actor.Add(child);
   actor.TestRelayoutRequest();
 
   tet_infoline("Test actor takes child size");
-  actor.SetResizePolicy(ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIT_TO_CHILDREN, Dimension::ALL_DIMENSIONS);
   application.SendNotification();
   application.Render();
   Vector3 parentSize = actor[Dali::Actor::Property::SIZE];
@@ -104,7 +104,7 @@ int UtcDaliActorSizer_CalculateSize(void)
 
   tet_infoline("Test child actor is the right factor of the parent");
   actor[Dali::Actor::Property::SIZE] = Vector2(150.0f, 100.0f); // Should automatically set preferred size
-  child.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(child, ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
   child[Dali::DevelActor::Property::SIZE_MODE_FACTOR] = Vector3(0.5f, 1.0f, 1.0f);
 
   childImpl.RelayoutRequest();
@@ -116,7 +116,7 @@ int UtcDaliActorSizer_CalculateSize(void)
   DALI_TEST_EQUALS(childSize.height, 100.0f, 0.00001f, TEST_LOCATION);
 
   tet_infoline("Test child actor is the right delta of the parent");
-  child.SetResizePolicy(ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(child, ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
   child[Dali::DevelActor::Property::SIZE_MODE_FACTOR] = Vector3(-40.0f, -20.0f, 1.0f);
   child.TestRelayoutRequest();
   application.SendNotification();

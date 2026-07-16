@@ -2025,59 +2025,6 @@ public:
    */
   void LowerBelow(Actor target);
 
-  // SIZE NEGOTIATION
-
-  /**
-   * @brief Sets the resize policy to be used for the given dimension(s).
-   *
-   * @SINCE_1_0.0
-   * @param[in] policy The resize policy to use
-   * @param[in] dimension The dimension(s) to set policy for. Can be a bitfield of multiple dimensions
-   */
-  void SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension);
-
-  /**
-   * @brief Returns the resize policy used for a single dimension.
-   *
-   * @SINCE_1_0.0
-   * @param[in] dimension The dimension to get policy for
-   * @return Return the dimension resize policy. If more than one dimension is requested, just return the first one found
-   */
-  ResizePolicy::Type GetResizePolicy(Dimension::Type dimension) const;
-
-  /**
-   * @brief Calculates the height of the actor given a width.
-   *
-   * The natural size is used for default calculation.
-   * size 0 is treated as aspect ratio 1:1.
-   *
-   * @SINCE_1_0.0
-   * @param[in] width Width to use
-   * @return Return the height based on the width
-   */
-  float GetHeightForWidth(float width);
-
-  /**
-   * @brief Calculates the width of the actor given a height.
-   *
-   * The natural size is used for default calculation.
-   * size 0 is treated as aspect ratio 1:1.
-   *
-   * @SINCE_1_0.0
-   * @param[in] height Height to use
-   * @return Return the width based on the height
-   */
-  float GetWidthForHeight(float height);
-
-  /**
-   * @brief Returns the value of negotiated dimension for the given dimension.
-   *
-   * @SINCE_1_0.0
-   * @param[in] dimension The dimension to retrieve
-   * @return Return the value of the negotiated dimension. If more than one dimension is requested, just return the first one found
-   */
-  float GetRelayoutSize(Dimension::Type dimension) const;
-
   /**
    * @brief Sets a flag to identify whether the Actor is ignored or not.
    * If the actor is marked as ignored, it will not be rendered and will be excluded from render thread computation.

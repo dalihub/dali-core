@@ -430,7 +430,7 @@ float ActorSizer::GetWidthForHeightBase(float height)
 float ActorSizer::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
 {
   // Fill to parent, taking size mode factor into account
-  switch(child.GetResizePolicy(dimension))
+  switch(GetImplementation(child).GetResizePolicy(dimension))
   {
     case ResizePolicy::FILL_TO_PARENT:
     {

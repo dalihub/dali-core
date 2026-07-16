@@ -789,31 +789,6 @@ void Actor::LowerBelow(Actor target)
   GetImplementation(*this).LowerBelow(GetImplementation(target));
 }
 
-void Actor::SetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension)
-{
-  GetImplementation(*this).SetResizePolicy(policy, dimension);
-}
-
-ResizePolicy::Type Actor::GetResizePolicy(Dimension::Type dimension) const
-{
-  return GetImplementation(*this).GetResizePolicy(dimension);
-}
-
-float Actor::GetHeightForWidth(float width)
-{
-  return GetImplementation(*this).GetHeightForWidth(width);
-}
-
-float Actor::GetWidthForHeight(float height)
-{
-  return GetImplementation(*this).GetWidthForHeight(height);
-}
-
-float Actor::GetRelayoutSize(Dimension::Type dimension) const
-{
-  return GetImplementation(*this).GetRelayoutSize(dimension);
-}
-
 void Actor::SetIgnored(bool ignored)
 {
   GetImplementation(*this).SetProperty(Actor::Property::IGNORED, ignored);
