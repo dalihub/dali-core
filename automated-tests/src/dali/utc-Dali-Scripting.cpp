@@ -354,7 +354,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
     actor.SetProperty(Actor::Property::INHERIT_ORIENTATION, false);
     actor.SetProperty(Actor::Property::INHERIT_SCALE, false);
-    actor.SetProperty(Actor::Property::SIZE_MODE_FACTOR, Vector3::ONE);
+    actor.SetProperty(DevelActor::Property::SIZE_MODE_FACTOR, Vector3::ONE);
 
     application.GetScene().Add(actor);
     application.SendNotification();

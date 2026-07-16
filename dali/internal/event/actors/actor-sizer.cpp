@@ -439,14 +439,14 @@ float ActorSizer::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Ty
 
     case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
     {
-      Property::Value value               = child.GetProperty(Dali::Actor::Property::SIZE_MODE_FACTOR);
+      Property::Value value               = child.GetProperty(Dali::DevelActor::Property::SIZE_MODE_FACTOR);
       Vector3         childSizeModeFactor = value.Get<Vector3>();
       return GetLatestSize(dimension) * GetDimensionValue(childSizeModeFactor, dimension);
     }
 
     case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
     {
-      Property::Value value               = child.GetProperty(Dali::Actor::Property::SIZE_MODE_FACTOR);
+      Property::Value value               = child.GetProperty(Dali::DevelActor::Property::SIZE_MODE_FACTOR);
       Vector3         childSizeModeFactor = value.Get<Vector3>();
       return GetLatestSize(dimension) + GetDimensionValue(childSizeModeFactor, dimension);
     }

@@ -721,75 +721,7 @@ public:
        */
       ENABLED,
 
-      // --- Layout & size negotiation ---
-
-      /**
-       * @brief The size mode factor of an actor.
-       * @details Name "sizeModeFactor", type Property::VECTOR3.
-       * @SINCE_1_0.0
-       * @see Actor::SetSizeModeFactor()
-       */
-      SIZE_MODE_FACTOR,
-
-      /**
-       * @brief The resize policy for the width of an actor.
-       * @details Name "widthResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
-       * @SINCE_1_0.0
-       * @see Actor::SetResizePolicy()
-       */
-      WIDTH_RESIZE_POLICY,
-
-      /**
-       * @brief The resize policy for the height of an actor.
-       * @details Name "heightResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
-       * @SINCE_1_0.0
-       * @see Actor::SetResizePolicy()
-       */
-      HEIGHT_RESIZE_POLICY,
-
-      /**
-       * @brief The size scale policy of an actor.
-       * @details Name "sizeScalePolicy", type SizeScalePolicy::Type (Property::INTEGER) or Property::STRING.
-       * @SINCE_1_0.0
-       */
-      SIZE_SCALE_POLICY,
-
-      /**
-       * @brief The flag to determine the width dependent on the height.
-       * @details Name "widthForHeight", type Property::BOOLEAN.
-       * @SINCE_1_0.0
-       * @see Actor::SetResizePolicy()
-       */
-      WIDTH_FOR_HEIGHT,
-
-      /**
-       * @brief The flag to determine the height dependent on the width.
-       * @details Name "heightForWidth", type Property::BOOLEAN.
-       * @SINCE_1_0.0
-       * @see Actor::SetResizePolicy()
-       */
-      HEIGHT_FOR_WIDTH,
-
-      /**
-       * @brief The padding of an actor for use in layout.
-       * @details Name "padding", type Property::VECTOR4.
-       * @SINCE_1_0.0
-       */
-      PADDING,
-
-      /**
-       * @brief The minimum size an actor can be assigned in size negotiation.
-       * @details Name "minimumSize", type Property::VECTOR2.
-       * @SINCE_1_0.0
-       */
-      MINIMUM_SIZE,
-
-      /**
-       * @brief The maximum size an actor can be assigned in size negotiation.
-       * @details Name "maximumSize", type Property::VECTOR2.
-       * @SINCE_1_0.0
-       */
-      MAXIMUM_SIZE,
+      // --- Layout ---
 
       /**
        * @brief The direction of the layout.

@@ -86,15 +86,6 @@ enum Type
   FOCUS_ON_TOUCH                  = Dali::Actor::Property::FOCUS_ON_TOUCH,
   ALLOW_DESCENDANT_FOCUS          = Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS,
   ENABLED                         = Dali::Actor::Property::ENABLED,
-  SIZE_MODE_FACTOR                = Dali::Actor::Property::SIZE_MODE_FACTOR,
-  WIDTH_RESIZE_POLICY             = Dali::Actor::Property::WIDTH_RESIZE_POLICY,
-  HEIGHT_RESIZE_POLICY            = Dali::Actor::Property::HEIGHT_RESIZE_POLICY,
-  SIZE_SCALE_POLICY               = Dali::Actor::Property::SIZE_SCALE_POLICY,
-  WIDTH_FOR_HEIGHT                = Dali::Actor::Property::WIDTH_FOR_HEIGHT,
-  HEIGHT_FOR_WIDTH                = Dali::Actor::Property::HEIGHT_FOR_WIDTH,
-  PADDING                         = Dali::Actor::Property::PADDING,
-  MINIMUM_SIZE                    = Dali::Actor::Property::MINIMUM_SIZE,
-  MAXIMUM_SIZE                    = Dali::Actor::Property::MAXIMUM_SIZE,
   LAYOUT_DIRECTION                = Dali::Actor::Property::LAYOUT_DIRECTION,
   INHERIT_LAYOUT_DIRECTION        = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
   CULLED                          = Dali::Actor::Property::CULLED,
@@ -143,6 +134,65 @@ enum Type
    * @note Disconnected actor from scene also be marks as ignored.
    */
   WORLD_IGNORED,
+
+  /**
+   * @brief The size mode factor of an actor.
+   * @details Name "sizeModeFactor", type Property::VECTOR3.
+   * @see Actor::SetSizeModeFactor()
+   */
+  SIZE_MODE_FACTOR,
+
+  /**
+   * @brief The resize policy for the width of an actor.
+   * @details Name "widthResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+   * @see Actor::SetResizePolicy()
+   */
+  WIDTH_RESIZE_POLICY,
+
+  /**
+   * @brief The resize policy for the height of an actor.
+   * @details Name "heightResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+   * @see Actor::SetResizePolicy()
+   */
+  HEIGHT_RESIZE_POLICY,
+
+  /**
+   * @brief The size scale policy of an actor.
+   * @details Name "sizeScalePolicy", type SizeScalePolicy::Type (Property::INTEGER) or Property::STRING.
+   */
+  SIZE_SCALE_POLICY,
+
+  /**
+   * @brief The flag to determine the width dependent on the height.
+   * @details Name "widthForHeight", type Property::BOOLEAN.
+   * @see Actor::SetResizePolicy()
+   */
+  WIDTH_FOR_HEIGHT,
+
+  /**
+   * @brief The flag to determine the height dependent on the width.
+   * @details Name "heightForWidth", type Property::BOOLEAN.
+   * @see Actor::SetResizePolicy()
+   */
+  HEIGHT_FOR_WIDTH,
+
+  /**
+   * @brief The padding of an actor for use in layout.
+   * @details Name "padding", type Property::VECTOR4.
+   */
+  PADDING,
+
+  /**
+   * @brief The minimum size an actor can be assigned in size negotiation.
+   * @details Name "minimumSize", type Property::VECTOR2.
+   */
+  MINIMUM_SIZE,
+
+  /**
+   * @brief The maximum size an actor can be assigned in size negotiation.
+   * @details Name "maximumSize", type Property::VECTOR2.
+   */
+  MAXIMUM_SIZE,
 };
 
 } // namespace Property

@@ -14727,7 +14727,7 @@ int UtcDaliAnimationAnimateBetweenInvalidParameters(void)
       // not mathing properties (VECTOR2, VECTOR4)
       KeyFrames keyframes = KeyFrames::New();
       keyframes.Add(0.5f, Property::Value(Vector4(1, 2, 3, 4)));
-      animation.AnimateBetween(Property(actor, Actor::Property::MAXIMUM_SIZE), keyframes);
+      animation.AnimateBetween(Property(actor, DevelActor::Property::MAXIMUM_SIZE), keyframes);
     },
     "Target types could not be convert to Property type");
 
