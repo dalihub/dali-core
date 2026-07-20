@@ -455,7 +455,7 @@ Actor CreateActorWithContent(uint32_t width, uint32_t height)
   Actor   actor = CreateRenderableActor(image);
 
   // Setup dimensions and position so actor is not skipped by culling.
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Actor::Property::SIZE, Vector2(width, height));
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
@@ -1273,7 +1273,7 @@ int UtcDaliActorSetSize01(void)
   DALI_TEST_EQUALS(vector.depth, actor.GetCurrentProperty<float>(Actor::Property::SIZE_DEPTH), TEST_LOCATION);
 
   // Change the resize policy and check whether the size stays the same
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   currentSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
   DALI_TEST_EQUALS(currentSize, vector, Math::MACHINE_EPSILON_0, TEST_LOCATION);
@@ -1285,7 +1285,7 @@ int UtcDaliActorSetSize01(void)
   DALI_TEST_EQUALS(currentSize, Vector3(0.1f, 0.2f, 0.0f), Math::MACHINE_EPSILON_0, TEST_LOCATION);
 
   // Change the resize policy again and check whether the new size stays the same
-  actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
   currentSize = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
   DALI_TEST_EQUALS(currentSize, Vector3(0.1f, 0.2f, 0.0f), Math::MACHINE_EPSILON_0, TEST_LOCATION);
@@ -1485,7 +1485,7 @@ int UtcDaliActorSetSizeIndividual(void)
   DALI_TEST_EQUALS(sizeDepth, vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION);
 
   // Change the resize policy and check whether the size stays the same
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   sizeWidth = actor.GetProperty(Actor::Property::SIZE_WIDTH).Get<float>();
   DALI_TEST_EQUALS(sizeWidth, vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION);
@@ -1497,7 +1497,7 @@ int UtcDaliActorSetSizeIndividual(void)
   DALI_TEST_EQUALS(sizeDepth, vector.depth, Math::MACHINE_EPSILON_0, TEST_LOCATION);
 
   // Change the resize policy again and check whether the size stays the same
-  actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
 
   sizeWidth = actor.GetProperty(Actor::Property::SIZE_WIDTH).Get<float>();
   DALI_TEST_EQUALS(sizeWidth, vector.width, Math::MACHINE_EPSILON_0, TEST_LOCATION);
@@ -1516,7 +1516,7 @@ int UtcDaliActorSetSizeIndividual02(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   Vector3 vector(100.0f, 200.0f, 400.0f);
@@ -4461,10 +4461,10 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   DALI_TEST_EQUALS(actor.GetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY).Get<String>(), "USE_NATURAL_SIZE", TEST_LOCATION);
 
   // Set resize policy for all dimensions
-  actor.SetResizePolicy(ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS);
   for(unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    DALI_TEST_EQUALS(actor.GetResizePolicy(static_cast<Dimension::Type>(1 << i)), ResizePolicy::USE_NATURAL_SIZE, TEST_LOCATION);
+    DALI_TEST_EQUALS(DevelActor::GetResizePolicy(actor, static_cast<Dimension::Type>(1 << i)), ResizePolicy::USE_NATURAL_SIZE, TEST_LOCATION);
   }
 
   // Set individual dimensions
@@ -4484,8 +4484,8 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   actor.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, widthPolicyEnum);
   actor.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, heightPolicyEnum);
 
-  DALI_TEST_EQUALS(static_cast<int>(actor.GetResizePolicy(Dimension::WIDTH)), static_cast<int>(widthPolicyEnum), TEST_LOCATION);
-  DALI_TEST_EQUALS(static_cast<int>(actor.GetResizePolicy(Dimension::HEIGHT)), static_cast<int>(heightPolicyEnum), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int>(DevelActor::GetResizePolicy(actor, Dimension::WIDTH)), static_cast<int>(widthPolicyEnum), TEST_LOCATION);
+  DALI_TEST_EQUALS(static_cast<int>(DevelActor::GetResizePolicy(actor, Dimension::HEIGHT)), static_cast<int>(heightPolicyEnum), TEST_LOCATION);
 
   END_TEST;
 }
@@ -4611,7 +4611,7 @@ int UtcDaliActorGetHeightForWidth(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_EQUALS(actor.GetHeightForWidth(1.0f), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetHeightForWidth(actor, 1.0f), 1.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -4622,7 +4622,7 @@ int UtcDaliActorGetWidthForHeight(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_EQUALS(actor.GetWidthForHeight(1.0f), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetWidthForHeight(actor, 1.0f), 1.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -4636,16 +4636,16 @@ int UtcDaliActorGetRelayoutSize(void)
   // Add actor to stage
   application.GetScene().Add(actor);
 
-  DALI_TEST_EQUALS(actor.GetRelayoutSize(Dimension::WIDTH), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetRelayoutSize(actor, Dimension::WIDTH), 0.0f, TEST_LOCATION);
 
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::WIDTH);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::WIDTH);
   actor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 0.0f));
 
   // Flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(actor.GetRelayoutSize(Dimension::WIDTH), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(DevelActor::GetRelayoutSize(actor, Dimension::WIDTH), 1.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -4741,7 +4741,7 @@ int UtcDaliActorOnRelayoutSignal(void)
   // Add actor to stage
   application.GetScene().Add(actor);
 
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 2.0));
 
   // Flush the queue and render once
@@ -4777,7 +4777,7 @@ int UtcDaliActorOnRelayoutSignalN(void)
     // Add actor to stage
     application.GetScene().Add(actor);
 
-    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     actor.SetProperty(Actor::Property::SIZE, Vector2(1.0f, 2.0));
 
     // OnRelayout will not be emitted
@@ -5683,7 +5683,7 @@ int UtcDaliActorPropertyClippingActorDrawOrder(void)
     Actor   actor = CreateRenderableActor(image);
 
     // Setup dimensions and position so actor is not skipped by culling.
-    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     actor.SetProperty(Actor::Property::SIZE, Vector2(16.0f, 16.0f));
 
     if(i == 0)
@@ -7589,7 +7589,7 @@ int UtcDaliActorLowerBelow(void)
 
   Actor container = Actor::New();
   container.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  container.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(container, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   stage.Add(container);
 
   container.Add(actorA);
@@ -7813,7 +7813,7 @@ int UtcDaliActorGeoTouchLowerBelow(void)
 
   Actor container = Actor::New();
   container.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  container.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(container, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   container.SetProperty(Actor::Property::NAME, "container");
   stage.Add(container);
 
@@ -8035,7 +8035,7 @@ int UtcDaliActorLowerBelow2(void)
 
   Actor container = Actor::New();
   container.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  container.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(container, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   stage.Add(container);
 
   container.Add(actorA);
@@ -8255,7 +8255,7 @@ int UtcDaliActorGeoTouchLowerBelow2(void)
 
   Actor container = Actor::New();
   container.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
-  container.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(container, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   stage.Add(container);
 
   container.Add(actorA);
@@ -11611,7 +11611,7 @@ int utcDaliActorGetSizeAfterAnimation(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, actorSize);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   // Size should be updated without rendering.
@@ -11809,7 +11809,7 @@ int utcDaliActorGetSizeAfterAnimation2(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, actorSize);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   // Size should be updated without rendering.
@@ -11888,17 +11888,17 @@ int utcDaliActorRelayoutAndAnimation(void)
   {
     Actor parentA = Actor::New();
     parentA.SetProperty(Actor::Property::SIZE, parentSize);
-    parentA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(parentA, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(parentA);
 
     Actor parentB = Actor::New();
     parentB.SetProperty(Actor::Property::SIZE, parentSize);
-    parentB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(parentB, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(parentB);
 
     Actor actor = Actor::New();
     actor.SetProperty(Actor::Property::SIZE, actorSize);
-    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     parentA.Add(actor);
 
     Vector3 size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
@@ -11944,17 +11944,17 @@ int utcDaliActorRelayoutAndAnimation(void)
   {
     Actor parentA = Actor::New();
     parentA.SetProperty(Actor::Property::SIZE, parentSize);
-    parentA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(parentA, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(parentA);
 
     Actor parentB = Actor::New();
     parentB.SetProperty(Actor::Property::SIZE, parentSize);
-    parentB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(parentB, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     application.GetScene().Add(parentB);
 
     Actor actor = Actor::New();
     actor.SetProperty(Actor::Property::SIZE, actorSize);
-    actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+    DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
     parentA.Add(actor);
 
     Vector3 size = actor.GetProperty(Actor::Property::SIZE).Get<Vector3>();
@@ -12039,7 +12039,7 @@ int utcDaliActorPartialUpdate(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -12143,7 +12143,7 @@ int utcDaliActorPartialUpdateSetColor(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -12261,7 +12261,7 @@ int utcDaliActorPartialUpdateSetProperty(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   actor.RegisterProperty(SHADER_SHADOW_COLOR_PROPERTY_NAME, Vector4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -12360,13 +12360,13 @@ int utcDaliActorPartialUpdateTwoActors(void)
   Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::POSITION, Vector3(100.0f, 100.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(50.0f, 50.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   Actor actor2 = CreateRenderableActor();
   actor2.SetProperty(Actor::Property::POSITION, Vector3(150.0f, 150.0f, 0.0f));
   actor2.SetProperty(Actor::Property::SIZE, Vector3(100.0f, 100.0f, 0.0f));
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor2);
 
   application.SendNotification();
@@ -12436,7 +12436,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint01(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(64.0f, 64.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
   actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(0.0f, 0.0f, 64.0f, 64.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -12545,7 +12545,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint02(void)
   Actor actor = CreateRenderableActor();
   actor.SetProperty(Actor::Property::POSITION, Vector3(64.0f, 64.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -12630,7 +12630,7 @@ int utcDaliActorPartialUpdateActorsWithSizeHint03(void)
   actor.SetProperty(Actor::Property::POSITION, Vector3(64.0f, 64.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
   actor.SetProperty(Actor::Property::UPDATE_AREA_HINT, Vector4(0.0f, 0.0f, 64.0f, 64.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -12892,7 +12892,7 @@ int utcDaliActorPartialUpdateChangeVisibility(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -12968,7 +12968,7 @@ int utcDaliActorPartialUpdateOnOffScene(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -13221,13 +13221,13 @@ int utcDaliActorPartialUpdateNotRenderableActor(void)
   parent[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   parent[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   parent[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  parent.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(parent, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(parent);
 
   Actor child                   = CreateRenderableActor();
   child[Actor::Property::PIVOT] = Pivot::TOP_LEFT;
   child[Actor::Property::SIZE]  = Vector3(16.0f, 16.0f, 0.0f);
-  child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(child, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   parent.Add(child);
 
   application.SendNotification();
@@ -13277,7 +13277,7 @@ int utcDaliActorPartialUpdateChangeTransparency(void)
   actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -13417,14 +13417,14 @@ int utcDaliActorPartialUpdateChangeParentOpacity(void)
   parent[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   parent[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   parent[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  parent.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(parent, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(parent);
 
   Texture texture               = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 16u, 16u);
   Actor   child                 = CreateRenderableActor(texture);
   child[Actor::Property::PIVOT] = Pivot::TOP_LEFT;
   child[Actor::Property::SIZE]  = Vector3(16.0f, 16.0f, 0.0f);
-  child.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(child, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   parent.Add(child);
 
   application.SendNotification();
@@ -13486,7 +13486,7 @@ int utcDaliActorPartialUpdateAddRemoveRenderer(void)
   actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -13565,7 +13565,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   actor1[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor1[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   actor1[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor1, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor1);
 
   // Add a new actor
@@ -13573,7 +13573,7 @@ int utcDaliActorPartialUpdate3DTransform(void)
   actor2[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor2[Actor::Property::POSITION] = Vector3(160.0f, 160.0f, 0.0f);
   actor2[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor2);
 
   application.SendNotification();
@@ -13720,7 +13720,7 @@ int utcDaliActorPartialUpdateOneActorMultipleRenderers(void)
   actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -13806,7 +13806,7 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
   actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   actor[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   // Create another actor which has the same renderer with actor1
@@ -13816,7 +13816,7 @@ int utcDaliActorPartialUpdateMultipleActorsOneRenderer(void)
   actor2[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor2[Actor::Property::POSITION] = Vector3(16.0f, 16.0f, 0.0f);
   actor2[Actor::Property::SIZE]     = Vector3(16.0f, 16.0f, 0.0f);
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor2);
 
   application.SendNotification();
@@ -13882,7 +13882,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea01(void)
   actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
   actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   // Create a native image.
   TestNativeImagePointer testNativeImage = TestNativeImage::New(64u, 64u);
@@ -13955,7 +13955,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea02(void)
   actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
   actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   // Create a native image.
   TestNativeImagePointer testNativeImage1 = TestNativeImage::New(64u, 64u);
@@ -14039,7 +14039,7 @@ int utcDaliActorPartialUpdateUseTextureUpdateArea03(void)
   actor[Actor::Property::POSITION]         = Vector3(0.0f, 0.0f, 0.0f);
   actor[Actor::Property::SIZE]             = Vector3(64.0f, 64.0f, 0.0f);
   actor[Actor::Property::UPDATE_AREA_HINT] = Vector4(0.0f, 0.0f, 32.0f, 32.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
 
   application.GetScene().Add(actor);
 
@@ -14439,7 +14439,7 @@ int UtcDaliActorSetResizePolicyNegative(void)
   {
     Dali::ResizePolicy::Type arg1 = ResizePolicy::USE_NATURAL_SIZE;
     Dali::Dimension::Type    arg2 = Dimension::ALL_DIMENSIONS;
-    instance.SetResizePolicy(arg1, arg2);
+    DevelActor::SetResizePolicy(instance, arg1, arg2);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14488,7 +14488,7 @@ int UtcDaliActorGetHeightForWidthNegative(void)
   try
   {
     float arg1 = 0.0f;
-    instance.GetHeightForWidth(arg1);
+    DevelActor::GetHeightForWidth(instance, arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14505,7 +14505,7 @@ int UtcDaliActorGetWidthForHeightNegative(void)
   try
   {
     float arg1 = 0.0f;
-    instance.GetWidthForHeight(arg1);
+    DevelActor::GetWidthForHeight(instance, arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14773,7 +14773,7 @@ int UtcDaliActorGetRelayoutSizeNegative(void)
   try
   {
     Dali::Dimension::Type arg1 = Dimension::HEIGHT;
-    instance.GetRelayoutSize(arg1);
+    DevelActor::GetRelayoutSize(instance, arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -14790,7 +14790,7 @@ int UtcDaliActorGetResizePolicyNegative(void)
   try
   {
     Dali::Dimension::Type arg1 = Dimension::ALL_DIMENSIONS;
-    instance.GetResizePolicy(arg1);
+    DevelActor::GetResizePolicy(instance, arg1);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -15089,9 +15089,9 @@ int UtcDaliActorCalculateWorldTransform01(void)
   branchActor[Actor::Property::POSITION] = Vector3(100.0f, 100.0f, 0.0f);
   leafActor[Actor::Property::POSITION]   = Vector3(100.0f, 50.0f, 30.0f);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PARENT_ORIGIN]   = ParentOrigin::TOP_LEFT;
@@ -15139,9 +15139,9 @@ int UtcDaliActorCalculateWorldTransform02(void)
   branchActor[Actor::Property::POSITION] = Vector3(100.0f, 100.0f, 0.0f);
   leafActor[Actor::Property::POSITION]   = Vector3(100.0f, 50.0f, 30.0f);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
@@ -15183,9 +15183,9 @@ int UtcDaliActorCalculateWorldTransform03(void)
   branchActor[Actor::Property::POSITION] = Vector3(100.0f, 100.0f, 0.0f);
   leafActor[Actor::Property::POSITION]   = Vector3(100.0f, 50.0f, 30.0f);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PIVOT]   = Pivot::TOP_LEFT;
@@ -15227,9 +15227,9 @@ int UtcDaliActorCalculateWorldTransform04(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
@@ -15271,9 +15271,9 @@ int UtcDaliActorCalculateWorldTransform05(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
@@ -15318,9 +15318,9 @@ int UtcDaliActorCalculateWorldTransform06(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
@@ -15366,9 +15366,9 @@ int UtcDaliActorCalculateWorldTransform07(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   // Set pivot to the same value as parent origin
   rootActor[Actor::Property::PIVOT]         = Pivot::CENTER;
@@ -15631,9 +15631,9 @@ int UtcDaliActorCalculateWorldColor01(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   rootActor[Actor::Property::COLOR] = Color::WHITE;
   Vector4 testColor1(1.0f, 1.0f, 0.5f, 0.8f);
@@ -15684,9 +15684,9 @@ int UtcDaliActorCalculateWorldColor02(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   rootActor[Actor::Property::COLOR]   = Color::WHITE;
   branchActor[Actor::Property::COLOR] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
@@ -15723,9 +15723,9 @@ int UtcDaliActorCalculateWorldColor03(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   rootActor[Actor::Property::COLOR]   = Color::WHITE * 0.9f;
   branchActor[Actor::Property::COLOR] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
@@ -15762,9 +15762,9 @@ int UtcDaliActorCalculateWorldColor04(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   rootActor[Actor::Property::COLOR]   = Color::WHITE * 0.9f;
   branchActor[Actor::Property::COLOR] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
@@ -15801,9 +15801,9 @@ int UtcDaliActorCalculateInheritedVisible01(void)
   rootActor[Actor::Property::SCALE]       = Vector3(2.0f, 2.0f, 2.0f);
   rootActor[Actor::Property::ORIENTATION] = AngleAxis(Degree(90.0f), Vector3::ZAXIS);
 
-  rootActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  branchActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  leafActor.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(rootActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
   application.GetScene().Add(rootActor);
   rootActor.Add(branchActor);

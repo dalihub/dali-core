@@ -1089,7 +1089,7 @@ int UtcDaliVisualRendererPartialUpdate01(void)
   actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION] = Vector3(68.0f, 68.0f, 0.0f);
   actor[Actor::Property::SIZE]     = Vector3(56.0f, 56.0f, 0.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -1317,7 +1317,7 @@ int UtcDaliVisualRendererPartialUpdate02(void)
   actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION] = Vector3(68.0f, 68.0f, 0.0f);
   actor[Actor::Property::SIZE]     = Vector3(56.0f, 56.0f, 0.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -1531,7 +1531,7 @@ int UtcDaliVisualRendererPartialUpdate03(void)
   actor[Actor::Property::PIVOT]    = Pivot::TOP_LEFT;
   actor[Actor::Property::POSITION] = Vector3(68.0f, 68.0f, 0.0f);
   actor[Actor::Property::SIZE]     = Vector3(56.0f, 56.0f, 0.0f);
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();

@@ -90,6 +90,31 @@ bool GetTouchRequired(Actor actor)
   return GetImplementation(actor).GetTouchRequired();
 }
 
+void SetResizePolicy(Actor actor, ResizePolicy::Type policy, Dimension::Type dimension)
+{
+  return GetImplementation(actor).SetResizePolicy(policy, dimension);
+}
+
+ResizePolicy::Type GetResizePolicy(Actor actor, Dimension::Type dimension)
+{
+  return GetImplementation(actor).GetResizePolicy(dimension);
+}
+
+float GetHeightForWidth(Actor actor, float width)
+{
+  return GetImplementation(actor).GetHeightForWidth(width);
+}
+
+float GetWidthForHeight(Actor actor, float height)
+{
+  return GetImplementation(actor).GetWidthForHeight(height);
+}
+
+float GetRelayoutSize(Actor actor, Dimension::Type dimension)
+{
+  return GetImplementation(actor).GetRelayoutSize(dimension);
+}
+
 } // namespace DevelActor
 
 } // namespace Dali
