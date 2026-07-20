@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ int UtcDaliActorSizer_CalculateSize(void)
   tet_infoline("Test child actor is the right factor of the parent");
   actor[Dali::Actor::Property::SIZE] = Vector2(150.0f, 100.0f); // Should automatically set preferred size
   child.SetResizePolicy(ResizePolicy::SIZE_RELATIVE_TO_PARENT, Dimension::ALL_DIMENSIONS);
-  child[Dali::Actor::Property::SIZE_MODE_FACTOR] = Vector3(0.5f, 1.0f, 1.0f);
+  child[Dali::DevelActor::Property::SIZE_MODE_FACTOR] = Vector3(0.5f, 1.0f, 1.0f);
 
   childImpl.RelayoutRequest();
   application.SendNotification();
@@ -117,7 +117,7 @@ int UtcDaliActorSizer_CalculateSize(void)
 
   tet_infoline("Test child actor is the right delta of the parent");
   child.SetResizePolicy(ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT, Dimension::ALL_DIMENSIONS);
-  child[Dali::Actor::Property::SIZE_MODE_FACTOR] = Vector3(-40.0f, -20.0f, 1.0f);
+  child[Dali::DevelActor::Property::SIZE_MODE_FACTOR] = Vector3(-40.0f, -20.0f, 1.0f);
   child.TestRelayoutRequest();
   application.SendNotification();
   application.Render();

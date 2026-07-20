@@ -667,19 +667,19 @@ int UtcDaliHitTestAlgorithmOrder1(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(green);
@@ -722,33 +722,33 @@ int UtcDaliHitTestAlgorithmOrder2(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor red                                        = Actor::New();
-  red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor red                                             = Actor::New();
+  red[Dali::Actor::Property::NAME]                      = "Red";
+  red[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  red[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  red[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor yellow                                        = Actor::New();
-  yellow[Dali::Actor::Property::NAME]                 = "Yellow";
-  yellow[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  yellow[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  yellow[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  yellow[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor yellow                                             = Actor::New();
+  yellow[Dali::Actor::Property::NAME]                      = "Yellow";
+  yellow[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  yellow[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  yellow[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  yellow[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(green);
@@ -802,26 +802,26 @@ int UtcDaliHitTestAlgorithmOrder3(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor red                                        = Actor::New();
-  red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor red                                             = Actor::New();
+  red[Dali::Actor::Property::NAME]                      = "Red";
+  red[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  red[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  red[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(green);
@@ -874,33 +874,33 @@ int UtcDaliHitTestAlgorithmInMultipleLayer(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Layer layer                                        = Layer::New();
-  layer[Dali::Actor::Property::NAME]                 = "Layer";
-  layer[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  layer[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  layer[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  layer[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Layer layer                                             = Layer::New();
+  layer[Dali::Actor::Property::NAME]                      = "Layer";
+  layer[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  layer[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  layer[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  layer[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor red                                        = Actor::New();
-  red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor red                                             = Actor::New();
+  red[Dali::Actor::Property::NAME]                      = "Red";
+  red[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  red[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  red[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(layer);
@@ -945,26 +945,26 @@ int UtcDaliHitTestAlgorithmOffSceneMappingActor(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor red                                        = Actor::New();
-  red[Dali::Actor::Property::NAME]                 = "Red";
-  red[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  red[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  red[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  red[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor red                                             = Actor::New();
+  red[Dali::Actor::Property::NAME]                      = "Red";
+  red[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  red[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  red[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  red[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(green);
@@ -1016,12 +1016,12 @@ int UtcDaliHitTestAlgorithmScreenToFrameBufferFunction(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(green);
 
@@ -1064,19 +1064,19 @@ int UtcDaliHitTestAlgorithmExclusiveMultiple(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(green);

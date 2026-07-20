@@ -432,13 +432,13 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::SIZE_MODE_FACTOR:
+    case Dali::DevelActor::Property::SIZE_MODE_FACTOR:
     {
       actor.SetSizeModeFactor(property.Get<Vector3>());
       break;
     }
 
-    case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
+    case Dali::DevelActor::Property::WIDTH_RESIZE_POLICY:
     {
       ResizePolicy::Type type = actor.mSizer.GetResizePolicy(Dimension::WIDTH);
       if(Scripting::GetEnumerationProperty<ResizePolicy::Type>(property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type))
@@ -448,7 +448,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
+    case Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY:
     {
       ResizePolicy::Type type = actor.mSizer.GetResizePolicy(Dimension::HEIGHT);
       if(Scripting::GetEnumerationProperty<ResizePolicy::Type>(property, RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT, type))
@@ -458,7 +458,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::SIZE_SCALE_POLICY:
+    case Dali::DevelActor::Property::SIZE_SCALE_POLICY:
     {
       SizeScalePolicy::Type type = actor.mSizer.GetSizeScalePolicy();
       if(Scripting::GetEnumerationProperty<SizeScalePolicy::Type>(property, SIZE_SCALE_POLICY_TABLE, SIZE_SCALE_POLICY_TABLE_COUNT, type))
@@ -468,7 +468,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
+    case Dali::DevelActor::Property::WIDTH_FOR_HEIGHT:
     {
       if(property.Get<bool>())
       {
@@ -477,7 +477,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
+    case Dali::DevelActor::Property::HEIGHT_FOR_WIDTH:
     {
       if(property.Get<bool>())
       {
@@ -486,7 +486,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::PADDING:
+    case Dali::DevelActor::Property::PADDING:
     {
       Vector4 padding = property.Get<Vector4>();
       actor.SetPadding(Vector2(padding.x, padding.y), Dimension::WIDTH);
@@ -494,7 +494,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::MINIMUM_SIZE:
+    case Dali::DevelActor::Property::MINIMUM_SIZE:
     {
       Vector2 size = property.Get<Vector2>();
       actor.SetMinimumSize(size.x, Dimension::WIDTH);
@@ -502,7 +502,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::MAXIMUM_SIZE:
+    case Dali::DevelActor::Property::MAXIMUM_SIZE:
     {
       Vector2 size = property.Get<Vector2>();
       actor.SetMaximumSize(size.x, Dimension::WIDTH);
@@ -1386,43 +1386,43 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::Actor::Property::SIZE_MODE_FACTOR:
+    case Dali::DevelActor::Property::SIZE_MODE_FACTOR:
     {
       value = actor.GetSizeModeFactor();
       break;
     }
 
-    case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
+    case Dali::DevelActor::Property::WIDTH_RESIZE_POLICY:
     {
       value = Scripting::GetLinearEnumerationName<ResizePolicy::Type>(actor.mSizer.GetResizePolicy(Dimension::WIDTH), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT);
       break;
     }
 
-    case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
+    case Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY:
     {
       value = Scripting::GetLinearEnumerationName<ResizePolicy::Type>(actor.mSizer.GetResizePolicy(Dimension::HEIGHT), RESIZE_POLICY_TABLE, RESIZE_POLICY_TABLE_COUNT);
       break;
     }
 
-    case Dali::Actor::Property::SIZE_SCALE_POLICY:
+    case Dali::DevelActor::Property::SIZE_SCALE_POLICY:
     {
       value = actor.mSizer.GetSizeScalePolicy();
       break;
     }
 
-    case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
+    case Dali::DevelActor::Property::WIDTH_FOR_HEIGHT:
     {
       value = (actor.mSizer.GetResizePolicy(Dimension::WIDTH) == ResizePolicy::DIMENSION_DEPENDENCY) && (actor.mSizer.GetDimensionDependency(Dimension::WIDTH) == Dimension::HEIGHT);
       break;
     }
 
-    case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
+    case Dali::DevelActor::Property::HEIGHT_FOR_WIDTH:
     {
       value = (actor.mSizer.GetResizePolicy(Dimension::HEIGHT) == ResizePolicy::DIMENSION_DEPENDENCY) && (actor.mSizer.GetDimensionDependency(Dimension::HEIGHT) == Dimension::WIDTH);
       break;
     }
 
-    case Dali::Actor::Property::PADDING:
+    case Dali::DevelActor::Property::PADDING:
     {
       Vector2 widthPadding  = actor.GetPadding(Dimension::WIDTH);
       Vector2 heightPadding = actor.GetPadding(Dimension::HEIGHT);
@@ -1430,13 +1430,13 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::Actor::Property::MINIMUM_SIZE:
+    case Dali::DevelActor::Property::MINIMUM_SIZE:
     {
       value = Vector2(actor.GetMinimumSize(Dimension::WIDTH), actor.GetMinimumSize(Dimension::HEIGHT));
       break;
     }
 
-    case Dali::Actor::Property::MAXIMUM_SIZE:
+    case Dali::DevelActor::Property::MAXIMUM_SIZE:
     {
       value = Vector2(actor.GetMaximumSize(Dimension::WIDTH), actor.GetMaximumSize(Dimension::HEIGHT));
       break;
