@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/size-negotiated-actor.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/public-api/actors/custom-actor.h>
@@ -228,7 +229,11 @@ private:
    */
   void OnRelayout(const Vector2& size, RelayoutContainer& container) override
   {
-    mImpl->OnRelayout(size, container);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      sizeNegotiatedImpl->OnRelayout(size, container);
+    }
   }
 
   /**
@@ -236,7 +241,11 @@ private:
    */
   void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override
   {
-    mImpl->OnSetResizePolicy(policy, dimension);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      sizeNegotiatedImpl->OnSetResizePolicy(policy, dimension);
+    }
   }
 
   /**
@@ -244,7 +253,12 @@ private:
    */
   Vector3 GetNaturalSize() const override
   {
-    return mImpl->GetNaturalSize();
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      return sizeNegotiatedImpl->GetNaturalSize();
+    }
+    return Vector3();
   }
 
   /**
@@ -252,7 +266,12 @@ private:
    */
   float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
   {
-    return mImpl->CalculateChildSize(child, dimension);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      return sizeNegotiatedImpl->CalculateChildSize(child, dimension);
+    }
+    return 0.0f;
   }
 
   /**
@@ -260,7 +279,12 @@ private:
    */
   float GetHeightForWidth(float width) override
   {
-    return mImpl->GetHeightForWidth(width);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      return sizeNegotiatedImpl->GetHeightForWidth(width);
+    }
+    return 0.0f;
   }
 
   /**
@@ -268,7 +292,12 @@ private:
    */
   float GetWidthForHeight(float height) override
   {
-    return mImpl->GetWidthForHeight(height);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      return sizeNegotiatedImpl->GetWidthForHeight(height);
+    }
+    return 0.0f;
   }
 
   /**
@@ -276,7 +305,12 @@ private:
    */
   bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
   {
-    return mImpl->RelayoutDependentOnChildren(dimension);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      return sizeNegotiatedImpl->RelayoutDependentOnChildren(dimension);
+    }
+    return false;
   }
 
   /**
@@ -284,7 +318,11 @@ private:
    */
   void OnCalculateRelayoutSize(Dimension::Type dimension) override
   {
-    return mImpl->OnCalculateRelayoutSize(dimension);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      sizeNegotiatedImpl->OnCalculateRelayoutSize(dimension);
+    }
   }
 
   /**
@@ -292,7 +330,11 @@ private:
    */
   void OnLayoutNegotiated(float size, Dimension::Type dimension) override
   {
-    return mImpl->OnLayoutNegotiated(size, dimension);
+    SizeNegotiatedActor* sizeNegotiatedImpl = dynamic_cast<SizeNegotiatedActor*>(mImpl.Get());
+    if(sizeNegotiatedImpl)
+    {
+      sizeNegotiatedImpl->OnLayoutNegotiated(size, dimension);
+    }
   }
 
   /**

@@ -367,7 +367,8 @@ int UtcDaliCustomActorTouchFinalizeHookRunsAfterSignal(void)
 
   std::vector<int> dispatchOrder;
   impl->mDispatchOrder = &dispatchOrder;
-  hookActor.TouchEventSignal().Connect(&application, [&dispatchOrder](Actor, TouchEvent) {
+  hookActor.TouchEventSignal().Connect(&application, [&dispatchOrder](Actor, TouchEvent)
+  {
     dispatchOrder.push_back(2);
     return false;
   });
@@ -472,7 +473,8 @@ int UtcDaliCustomActorHoverFinalizeHookRunsAfterSignal(void)
 
   std::vector<int> dispatchOrder;
   impl->mDispatchOrder = &dispatchOrder;
-  hookActor.HoverEventSignal().Connect(&application, [&dispatchOrder](Actor, HoverEvent) {
+  hookActor.HoverEventSignal().Connect(&application, [&dispatchOrder](Actor, HoverEvent)
+  {
     dispatchOrder.push_back(2);
     return false;
   });
@@ -539,7 +541,8 @@ int UtcDaliCustomActorWheelFinalizeHookRunsAfterSignal(void)
 
   std::vector<int> dispatchOrder;
   impl->mDispatchOrder = &dispatchOrder;
-  hookActor.WheelEventSignal().Connect(&application, [&dispatchOrder](Actor, WheelEvent) {
+  hookActor.WheelEventSignal().Connect(&application, [&dispatchOrder](Actor, WheelEvent)
+  {
     dispatchOrder.push_back(2);
     return false;
   });
@@ -1952,39 +1955,6 @@ struct UnregisteredCustomActor : public Dali::CustomActorImpl
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override
   {
   }
-  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container) override
-  {
-  }
-  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override
-  {
-  }
-  virtual Vector3 GetNaturalSize() override
-  {
-    return Vector3();
-  }
-  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
-  {
-    return 0.f;
-  }
-  virtual float GetHeightForWidth(float width) override
-  {
-    return 0.f;
-  }
-  virtual float GetWidthForHeight(float height) override
-  {
-    return 0.f;
-  }
-  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
-  {
-    return false;
-  }
-  virtual void OnCalculateRelayoutSize(Dimension::Type dimension) override
-  {
-  }
-  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) override
-  {
-  }
-
   void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
   }
@@ -2814,5 +2784,83 @@ int UtcDaliCustomActorImplSetRemoveCacheRenderer(void)
   application.Render();
 
   tet_result(TET_PASS);
+  END_TEST;
+}
+
+namespace
+{
+
+/**
+ * Minimal SizeNegotiatedActor-derived class with stub implementations
+ */
+class SizeNegotiatedActorDerived : public SizeNegotiatedActor
+{
+public:
+  /**
+   * Constructor
+   */
+  SizeNegotiatedActorDerived() = default;
+
+  /**
+   * Destructor
+   */
+  ~SizeNegotiatedActorDerived() override = default;
+
+  // From SizeNegotiatedActor
+  void OnRelayout(const Dali::Vector2& size, Dali::RelayoutContainer& container) override
+  {
+  }
+
+  void OnSetResizePolicy(Dali::ResizePolicy::Type policy, Dali::Dimension::Type dimension) override
+  {
+  }
+
+  Dali::Vector3 GetNaturalSize() override
+  {
+    return Dali::Vector3(0.0f, 0.0f, 0.0f);
+  }
+
+  float CalculateChildSize(const Dali::Actor& child, Dali::Dimension::Type dimension) override
+  {
+    return CalculateChildSizeBase(child, dimension);
+  }
+
+  float GetHeightForWidth(float width) override
+  {
+    return GetHeightForWidthBase(width);
+  }
+
+  float GetWidthForHeight(float height) override
+  {
+    return GetWidthForHeightBase(height);
+    ;
+  }
+
+  bool RelayoutDependentOnChildren(Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS) override
+  {
+    return RelayoutDependentOnChildrenBase(dimension);
+  }
+
+  void OnCalculateRelayoutSize(Dali::Dimension::Type dimension) override
+  {
+  }
+
+  void OnLayoutNegotiated(float size, Dali::Dimension::Type dimension) override
+  {
+  }
+};
+
+} // unnamed namespace
+
+int UtcDaliSizeNegotiatedActorNoCustomActorImpl(void)
+{
+  TestApplication application;
+
+  SizeNegotiatedActorDerived derived;
+  Actor                      child;
+  DALI_TEST_EQUALS(derived.CalculateChildSize(child, Dimension::ALL_DIMENSIONS), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(derived.GetHeightForWidth(10.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(derived.GetWidthForHeight(10.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(derived.RelayoutDependentOnChildren(), false, TEST_LOCATION);
   END_TEST;
 }

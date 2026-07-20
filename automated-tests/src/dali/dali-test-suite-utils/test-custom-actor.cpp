@@ -390,7 +390,7 @@ void TestCustomActor::OnCalculateRelayoutSize(Dimension::Type dimension)
 
 float TestCustomActor::CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension)
 {
-  return CustomActorImpl::CalculateChildSizeBase(child, dimension);
+  return SizeNegotiatedActor::CalculateChildSizeBase(child, dimension);
 }
 
 void TestCustomActor::OnLayoutNegotiated(float size, Dimension::Type dimension)
@@ -399,7 +399,7 @@ void TestCustomActor::OnLayoutNegotiated(float size, Dimension::Type dimension)
 
 bool TestCustomActor::RelayoutDependentOnChildren(Dimension::Type dimension)
 {
-  return CustomActorImpl::RelayoutDependentOnChildrenBase(dimension);
+  return SizeNegotiatedActor::RelayoutDependentOnChildrenBase(dimension);
 }
 
 void TestCustomActor::SetTransparent(bool transparent)
