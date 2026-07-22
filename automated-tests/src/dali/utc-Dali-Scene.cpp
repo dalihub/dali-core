@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -1634,7 +1635,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle0(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   // consume the orientating changing flag by first rendering
@@ -1706,7 +1707,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle90(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -1785,7 +1786,7 @@ int UtcDaliSceneScreenRotatedWithAngle90(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -1864,7 +1865,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle90(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -1943,7 +1944,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle180(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2021,7 +2022,7 @@ int UtcDaliSceneScreenRotatedWithAngle180(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2099,7 +2100,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle180(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   // consume the orientating changing flag by first rendering
@@ -2171,7 +2172,7 @@ int UtcDaliSceneSurfaceRotatedWithAngle270(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2250,7 +2251,7 @@ int UtcDaliSceneScreenRotatedWithAngle270(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2329,7 +2330,7 @@ int UtcDaliSceneSurfaceAndScreenRotatedWithAngle270(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2406,7 +2407,7 @@ int UtcDaliSceneSetSurfaceRotationCompletedAcknowledgementWithAngle90(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2487,7 +2488,7 @@ int UtcDaliSceneSetScreenRotationCompletedAcknowledgementWithAngle90(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2568,7 +2569,7 @@ int UtcDaliSceneSetSurfaceAndScreenRotationCompletedAcknowledgementWithAngle90(v
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -2651,7 +2652,7 @@ int UtcDaliSceneSurfaceRotatedPartialUpdate(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
   actor.SetProperty(Actor::Property::SIZE, Vector3(32.0f, 32.0f, 0.0f));
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -3267,7 +3268,7 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   DALI_TEST_CHECK(defaultScene);
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor1, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   defaultScene.Add(actor1);
 
@@ -3283,7 +3284,7 @@ int UtcDaliSceneKeepRenderingMultipleScene(void)
   application.AddScene(scene);
 
   Actor actor2 = CreateRenderableActor();
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   scene.Add(actor2);
 
@@ -3583,7 +3584,7 @@ int UtcDaliSceneRemoveSceneObjectAndRender01(void)
   DALI_TEST_CHECK(defaultScene);
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor1, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   defaultScene.Add(actor1);
 
@@ -3599,7 +3600,7 @@ int UtcDaliSceneRemoveSceneObjectAndRender01(void)
   application.AddScene(scene);
 
   Actor actor2 = CreateRenderableActor();
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   scene.Add(actor2);
 
@@ -3643,7 +3644,7 @@ int UtcDaliSceneRemoveSceneObjectAndRender02(void)
   DALI_TEST_CHECK(defaultScene);
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor1, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   defaultScene.Add(actor1);
 
@@ -3659,7 +3660,7 @@ int UtcDaliSceneRemoveSceneObjectAndRender02(void)
   application.AddScene(scene);
 
   Actor actor2 = CreateRenderableActor();
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   scene.Add(actor2);
 
@@ -3868,7 +3869,7 @@ int UtcDaliSceneSetForceRenderingMultipleScene(void)
   auto defaultScene = application.GetScene();
 
   Actor actor1 = CreateRenderableActor();
-  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor1, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor1.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   defaultScene.Add(actor1);
 
@@ -3882,7 +3883,7 @@ int UtcDaliSceneSetForceRenderingMultipleScene(void)
   application.AddScene(scene);
 
   Actor actor2 = CreateRenderableActor();
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor2.SetProperty(Actor::Property::SIZE, Vector2(10.0f, 10.0f));
   scene.Add(actor2);
 

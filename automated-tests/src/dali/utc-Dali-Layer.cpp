@@ -16,6 +16,7 @@
  */
 
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -1018,7 +1019,7 @@ int utcDaliLayerPartialUpdate(void)
   actor1.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor1.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor1.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
-  actor1.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor1, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer1.Add(actor1);
 
   Actor actor2 = CreateRenderableActor();
@@ -1026,7 +1027,7 @@ int utcDaliLayerPartialUpdate(void)
   actor2.SetProperty(Actor::Property::POSITION, Vector3(32.0f, 16.0f, 0.0f));
   actor2.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actor2.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
-  actor2.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer2.Add(actor2);
 
   application.SendNotification();
@@ -1117,7 +1118,7 @@ int utcDaliLayerUnderClippingNode(void)
   // Before that policy fixed, let we use full-size clipper.
   Actor parentClipper = CreateRenderableActor();
   parentClipper.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
-  parentClipper.SetResizePolicy(ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(parentClipper, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   parentClipper.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
 
   application.GetScene().Add(layer1);
@@ -1136,7 +1137,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
   actorA.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
-  actorA.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actorA, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer2.Add(actorA);
 
   Actor actorB = CreateRenderableActor();
@@ -1146,7 +1147,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorB.SetProperty(Actor::Property::NAME, "ActorB");
   actorB.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actorB.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
-  actorB.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actorB, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actorA.Add(actorB);
 
   Actor actorC = CreateRenderableActor();
@@ -1155,7 +1156,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorC.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actorC.SetProperty(Actor::Property::NAME, "ActorC");
   actorC.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
-  actorC.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actorC, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer2.Add(actorC);
 
   Actor actorD = CreateRenderableActor();
@@ -1165,7 +1166,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorD.SetProperty(Actor::Property::NAME, "ActorD");
   actorD.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actorD.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
-  actorD.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actorD, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actorC.Add(actorD);
 
   application.SendNotification();

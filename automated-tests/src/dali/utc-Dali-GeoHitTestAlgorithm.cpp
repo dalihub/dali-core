@@ -536,19 +536,19 @@ int UtcDaliGeoHitTestAlgorithmOrder(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(green);
@@ -594,19 +594,19 @@ int UtcDaliGeoHitTestAlgorithmExclusiveMultiple(void)
   Dali::Integration::Scene scene = application.GetScene();
   Vector2                  stageSize(scene.GetSize());
 
-  Actor blue                                        = Actor::New();
-  blue[Dali::Actor::Property::NAME]                 = "Blue";
-  blue[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  blue[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  blue[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  blue[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor blue                                             = Actor::New();
+  blue[Dali::Actor::Property::NAME]                      = "Blue";
+  blue[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  blue[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  blue[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  blue[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
-  Actor green                                        = Actor::New();
-  green[Dali::Actor::Property::NAME]                 = "Green";
-  green[Dali::Actor::Property::PIVOT]                = Pivot::CENTER;
-  green[Dali::Actor::Property::PARENT_ORIGIN]        = ParentOrigin::CENTER;
-  green[Dali::Actor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
-  green[Dali::Actor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
+  Actor green                                             = Actor::New();
+  green[Dali::Actor::Property::NAME]                      = "Green";
+  green[Dali::Actor::Property::PIVOT]                     = Pivot::CENTER;
+  green[Dali::Actor::Property::PARENT_ORIGIN]             = ParentOrigin::CENTER;
+  green[Dali::DevelActor::Property::WIDTH_RESIZE_POLICY]  = ResizePolicy::FILL_TO_PARENT;
+  green[Dali::DevelActor::Property::HEIGHT_RESIZE_POLICY] = ResizePolicy::FILL_TO_PARENT;
 
   scene.Add(blue);
   scene.Add(green);

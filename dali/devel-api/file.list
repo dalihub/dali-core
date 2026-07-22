@@ -14,6 +14,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/common/addon-binder.cpp
   ${devel_api_src_dir}/common/hash.cpp
   ${devel_api_src_dir}/common/singleton-service.cpp
+  ${devel_api_src_dir}/common/stage.cpp
   ${devel_api_src_dir}/events/hit-test-algorithm.cpp
   ${devel_api_src_dir}/events/hover-event-devel.cpp
   ${devel_api_src_dir}/events/key-event-devel.cpp
@@ -80,6 +81,7 @@ SET( devel_api_core_common_header_files
   ${devel_api_src_dir}/common/ref-counted-dali-vector.h
   ${devel_api_src_dir}/common/set-wrapper.h
   ${devel_api_src_dir}/common/singleton-service.h
+  ${devel_api_src_dir}/common/stage.h
   ${devel_api_src_dir}/common/vector-wrapper.h
 )
 

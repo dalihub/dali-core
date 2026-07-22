@@ -93,7 +93,7 @@ int UtcDaliCoreProcessEvents(void)
   Vector3 position(100.0f, 100.0f, 0.0f);
 
   Actor actor = Actor::New();
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Actor::Property::SIZE, size);
   actor.SetProperty(Actor::Property::POSITION, position);
   application.GetScene().Add(actor);
@@ -120,7 +120,7 @@ int UtcDaliCoreProcessEventsStressTest(void)
   Vector3 position(100.0f, 100.0f, 0.0f);
 
   Actor actor = Actor::New();
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Actor::Property::SIZE, size);
   actor.SetProperty(Actor::Property::POSITION, position);
   application.GetScene().Add(actor);
@@ -164,7 +164,7 @@ int UtcDaliCoreForceRelayout(void)
   Vector3 position(100.0f, 100.0f, 0.0f);
 
   Actor actor = Actor::New();
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Actor::Property::SIZE, size);
   actor.SetProperty(Actor::Property::POSITION, position);
   application.GetScene().Add(actor);
@@ -200,7 +200,7 @@ int UtcDaliCoreForceRelayout2(void)
   Vector3 position(100.0f, 100.0f, 0.0f);
 
   Actor actor = Actor::New();
-  actor.SetResizePolicy(ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
+  DevelActor::SetResizePolicy(actor, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actor.SetProperty(Actor::Property::SIZE, size);
   actor.SetProperty(Actor::Property::POSITION, position);
   application.GetScene().Add(actor);

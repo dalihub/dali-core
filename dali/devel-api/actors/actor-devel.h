@@ -86,15 +86,6 @@ enum Type
   FOCUS_ON_TOUCH                  = Dali::Actor::Property::FOCUS_ON_TOUCH,
   ALLOW_DESCENDANT_FOCUS          = Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS,
   ENABLED                         = Dali::Actor::Property::ENABLED,
-  SIZE_MODE_FACTOR                = Dali::Actor::Property::SIZE_MODE_FACTOR,
-  WIDTH_RESIZE_POLICY             = Dali::Actor::Property::WIDTH_RESIZE_POLICY,
-  HEIGHT_RESIZE_POLICY            = Dali::Actor::Property::HEIGHT_RESIZE_POLICY,
-  SIZE_SCALE_POLICY               = Dali::Actor::Property::SIZE_SCALE_POLICY,
-  WIDTH_FOR_HEIGHT                = Dali::Actor::Property::WIDTH_FOR_HEIGHT,
-  HEIGHT_FOR_WIDTH                = Dali::Actor::Property::HEIGHT_FOR_WIDTH,
-  PADDING                         = Dali::Actor::Property::PADDING,
-  MINIMUM_SIZE                    = Dali::Actor::Property::MINIMUM_SIZE,
-  MAXIMUM_SIZE                    = Dali::Actor::Property::MAXIMUM_SIZE,
   LAYOUT_DIRECTION                = Dali::Actor::Property::LAYOUT_DIRECTION,
   INHERIT_LAYOUT_DIRECTION        = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
   CULLED                          = Dali::Actor::Property::CULLED,
@@ -143,6 +134,60 @@ enum Type
    * @note Disconnected actor from scene also be marks as ignored.
    */
   WORLD_IGNORED,
+
+  /**
+   * @brief The size mode factor of an actor.
+   * @details Name "sizeModeFactor", type Property::VECTOR3.
+   */
+  SIZE_MODE_FACTOR,
+
+  /**
+   * @brief The resize policy for the width of an actor.
+   * @details Name "widthResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+   */
+  WIDTH_RESIZE_POLICY,
+
+  /**
+   * @brief The resize policy for the height of an actor.
+   * @details Name "heightResizePolicy", type ResizePolicy::Type (Property::INTEGER) or Property::STRING.
+   */
+  HEIGHT_RESIZE_POLICY,
+
+  /**
+   * @brief The size scale policy of an actor.
+   * @details Name "sizeScalePolicy", type SizeScalePolicy::Type (Property::INTEGER) or Property::STRING.
+   */
+  SIZE_SCALE_POLICY,
+
+  /**
+   * @brief The flag to determine the width dependent on the height.
+   * @details Name "widthForHeight", type Property::BOOLEAN.
+   */
+  WIDTH_FOR_HEIGHT,
+
+  /**
+   * @brief The flag to determine the height dependent on the width.
+   * @details Name "heightForWidth", type Property::BOOLEAN.
+   */
+  HEIGHT_FOR_WIDTH,
+
+  /**
+   * @brief The padding of an actor for use in layout.
+   * @details Name "padding", type Property::VECTOR4.
+   */
+  PADDING,
+
+  /**
+   * @brief The minimum size an actor can be assigned in size negotiation.
+   * @details Name "minimumSize", type Property::VECTOR2.
+   */
+  MINIMUM_SIZE,
+
+  /**
+   * @brief The maximum size an actor can be assigned in size negotiation.
+   * @details Name "maximumSize", type Property::VECTOR2.
+   */
+  MAXIMUM_SIZE,
 };
 
 } // namespace Property
@@ -287,6 +332,57 @@ DALI_CORE_API void SetNeedGesturePropagation(Actor actor, bool propagation);
  * @param [in] newParent An actor to be a new parent of this actor.
  */
 DALI_CORE_API void SwitchParent(Actor actor, Actor newParent);
+
+/**
+ * @brief Sets the resize policy to be used for the given dimension(s).
+ *
+ * @param[in] actor The actor to set resize policy for
+ * @param[in] policy The resize policy to use
+ * @param[in] dimension The dimension(s) to set policy for. Can be a bitfield of multiple dimensions
+ */
+DALI_CORE_API void SetResizePolicy(Actor actor, ResizePolicy::Type policy, Dimension::Type dimension);
+
+/**
+ * @brief Returns the resize policy used for a single dimension.
+ *
+ * @param[in] actor The actor to get resize policy from
+ * @param[in] dimension The dimension to get policy for
+ * @return Return the dimension resize policy. If more than one dimension is requested, just return the first one found
+ */
+DALI_CORE_API ResizePolicy::Type GetResizePolicy(Actor actor, Dimension::Type dimension);
+
+/**
+ * @brief Calculates the height of the actor given a width.
+ *
+ * The natural size is used for default calculation.
+ * size 0 is treated as aspect ratio 1:1.
+ *
+ * @param[in] actor The actor to calculate height for
+ * @param[in] width Width to use
+ * @return Return the height based on the width
+ */
+DALI_CORE_API float GetHeightForWidth(Actor actor, float width);
+
+/**
+ * @brief Calculates the width of the actor given a height.
+ *
+ * The natural size is used for default calculation.
+ * size 0 is treated as aspect ratio 1:1.
+ *
+ * @param[in] actor The actor to calculate width for
+ * @param[in] height Height to use
+ * @return Return the width based on the height
+ */
+DALI_CORE_API float GetWidthForHeight(Actor actor, float height);
+
+/**
+ * @brief Returns the value of negotiated dimension for the given dimension.
+ *
+ * @param[in] actor The actor to get relayout size from
+ * @param[in] dimension The dimension to retrieve
+ * @return Return the value of the negotiated dimension. If more than one dimension is requested, just return the first one found
+ */
+DALI_CORE_API float GetRelayoutSize(Actor actor, Dimension::Type dimension);
 
 /**
  * @brief This signal is emitted when an actor is hit through hit-test.
