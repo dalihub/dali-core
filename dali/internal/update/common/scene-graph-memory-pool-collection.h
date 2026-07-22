@@ -20,6 +20,7 @@
 // EXTERNAL INCLDUES
 #include <cstdint> ///< for uint32_t
 #include <memory>  ///< for std::unique_ptr
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/memory-pool-interface.h>

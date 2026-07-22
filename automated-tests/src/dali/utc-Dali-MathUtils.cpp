@@ -19,7 +19,9 @@
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
+#include <cmath>
 #include <iostream>
+#include <limits>
 
 using namespace Dali;
 
@@ -316,13 +318,27 @@ int UtcDaliMathUtilsRoundP(void)
   END_TEST;
 }
 
+int UtcDaliMathUtilsSpecialValuesP(void)
+{
+  const float infinity = std::numeric_limits<float>::infinity();
+  const float nan      = std::numeric_limits<float>::quiet_NaN();
+
+  DALI_TEST_CHECK(std::isnan(Internal::MathUtils::Floor(nan)));
+  DALI_TEST_CHECK(std::isinf(Internal::MathUtils::Floor(infinity)) && Internal::MathUtils::Floor(infinity) > 0.0f);
+  DALI_TEST_CHECK(std::isinf(Internal::MathUtils::Floor(-infinity)) && Internal::MathUtils::Floor(-infinity) < 0.0f);
+  DALI_TEST_EQUALS(GetRangedEpsilon(infinity, 1.0f), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(nan, 1.0f), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+  DALI_TEST_EQUALS(GetRangedEpsilon(1.0f, nan), Math::MACHINE_EPSILON_10000, TEST_LOCATION);
+
+  // Both extremes must complete without signed overflow or an exponent-sized loop.
+  DALI_TEST_CHECK(std::isnan(Round(1.0f, std::numeric_limits<int32_t>::min())));
+  DALI_TEST_CHECK(std::isnan(Round(1.0f, std::numeric_limits<int32_t>::max())));
+
+  END_TEST;
+}
+
 int UtcDaliMathUtilsConstExprP(void)
 {
-#if !defined(__clang__)
-  // fabsf be constexpr after c++23.
-  // Until now, gcc pass this UTC, but clang doesn't. So, exclude clang for now.
-  // TODO : Remove this define after c++ version is updated over c++23.
-
   // Equals
   constexpr float zero  = 0.0f;
   constexpr float v1    = 1.49f;
@@ -381,7 +397,6 @@ int UtcDaliMathUtilsConstExprP(void)
   static_assert(Equals(ShortestDistanceInDomain(2.1f, 2.3f, 2.0f, 5.0f), 0.2f, 0.02f));
   static_assert(Equals(ShortestDistanceInDomain(2.2f, 3.69f, 2.0f, 5.0f), 1.49f, 0.02f));
   static_assert(Equals(ShortestDistanceInDomain(2.2f, 3.71f, 2.0f, 5.0f), -1.49f, 0.02f));
-#endif
 
   // Always pass if compile success.
   DALI_TEST_CHECK(true);

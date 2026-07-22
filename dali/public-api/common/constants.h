@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <math.h> // M_PI
+#include <math.h> // Kept for dependent public math headers that use fabsf.
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/compile-time-math.h>
@@ -91,6 +91,10 @@ static constexpr Vector3 DEFAULT(CENTER);
  */
 namespace Color
 {
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif
+
 // Subset of X11 Colors (CSS colors)
 // https://www.w3.org/TR/css-color-3
 static constexpr Vector4 ALICE_BLUE(240.0f / 255.0f, 248.0f / 255.0f, 1.0f, 1.0f);                         //#F0F8FF
@@ -258,9 +262,9 @@ static constexpr float MACHINE_EPSILON_1000  = Epsilon<1000>::value;
 static constexpr float MACHINE_EPSILON_10000 = Epsilon<10000>::value;
 
 // float is preferred to double for performance on ARM targets
-static constexpr float PI            = static_cast<float>(M_PI);   ///< Pi
-static constexpr float PI_2          = static_cast<float>(M_PI_2); ///< Pi/2
-static constexpr float PI_4          = static_cast<float>(M_PI_4); ///< Pi/4
+static constexpr float PI            = 3.14159265358979323846f; ///< Pi
+static constexpr float PI_2          = PI * 0.5f;               ///< Pi/2
+static constexpr float PI_4          = PI * 0.25f;              ///< Pi/4
 static constexpr float PI_OVER_180   = Dali::Math::PI / 180.0f;    ///< Constant used to convert degree to radian
 static constexpr float ONE80_OVER_PI = 180.0f / Dali::Math::PI;    ///< Constant used to convert radian to degree
 

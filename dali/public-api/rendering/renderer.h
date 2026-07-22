@@ -73,6 +73,13 @@ enum Type
 
 namespace BlendEquation
 {
+#ifdef DIFFERENCE
+#undef DIFFERENCE
+#endif
+#ifdef COLOR
+#undef COLOR
+#endif
+
 /**
  * @brief Enumeration for blend equation.
  * @SINCE_1_1.43

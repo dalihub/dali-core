@@ -45,7 +45,7 @@
 #define DALI_INTERNAL __attribute__((visibility("hidden")))
 #endif
 #else
-#ifdef WIN32
+#ifdef _WIN32
 /** Visibility attribute to show declarations */
 #define DALI_EXPORT_API __declspec(dllexport)
 
@@ -173,7 +173,7 @@ public:
  * @SINCE_1_0.0
  */
 #if defined(DEBUG_ENABLED)
-#if defined(WIN32)
+#if defined(_WIN32)
 #define ASSERT_LOCATION __FUNCSIG__
 #else
 #define ASSERT_LOCATION __PRETTY_FUNCTION__

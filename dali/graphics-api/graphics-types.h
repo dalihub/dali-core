@@ -218,6 +218,13 @@ enum class BlendFactor
   ONE_MINUS_SRC1_ALPHA     = 18,
 };
 
+#ifdef DIFFERENCE
+#undef DIFFERENCE
+#endif
+#ifdef COLOR
+#undef COLOR
+#endif
+
 /**
  * @brief Blend operators
  */

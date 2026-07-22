@@ -45,7 +45,14 @@ Then you can create a dali-env folder in your home folder with:
 
          $ dali-core/build/scripts/dali_env -c
 
-This will also download any dependencies that the dali repositories require.
+This also downloads and installs the dependencies required by the DALi
+repositories. In particular, it installs the verified TizenVG revision used by
+DALi's canvas and vector-animation backends into `dali-env/opt`.
+
+The public Tizen repository and verified revision are used by default. Mirrors
+or a newer verified revision can be selected before creating the environment:
+
+         $ TIZENVG_REPOSITORY=<repository> TIZENVG_REVISION=<commit> dali-core/build/scripts/dali_env -c
 
 You can save the environment variables to a file:
 

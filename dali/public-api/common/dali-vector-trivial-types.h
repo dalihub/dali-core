@@ -18,6 +18,14 @@
  *
  */
 
+// The Windows SDK defines CopyMemory as an object-like macro.  Keep it hidden
+// while referring to VectorBase::CopyMemory and restore it on exit.
+#if defined(CopyMemory)
+#pragma push_macro("CopyMemory")
+#undef CopyMemory
+#define DALI_VECTOR_TRIVIAL_RESTORE_COPY_MEMORY_MACRO
+#endif
+
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
@@ -200,5 +208,10 @@ protected: // API for deriving classes
 /// @endcond
 
 } // namespace Dali
+
+#if defined(DALI_VECTOR_TRIVIAL_RESTORE_COPY_MEMORY_MACRO)
+#pragma pop_macro("CopyMemory")
+#undef DALI_VECTOR_TRIVIAL_RESTORE_COPY_MEMORY_MACRO
+#endif
 
 #endif // DALI_VECTOR_TRIVIAL_TYPE_H

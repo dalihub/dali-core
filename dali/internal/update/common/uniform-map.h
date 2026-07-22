@@ -18,6 +18,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <cstddef> // std::size_t
 #include <cstdint> // uint32_t
 #include <map>
 #include <memory> ///< std::unique_ptr
@@ -42,7 +43,7 @@ namespace SceneGraph
 class UniformPropertyMapping
 {
 public:
-  using Hash = unsigned long;
+  using Hash = std::size_t;
   /**
    * Constructor
    */

@@ -18,6 +18,14 @@
  *
  */
 
+// The Windows SDK defines CopyMemory as an object-like macro.  Keep it hidden
+// across the vector implementation headers and restore it for the consumer.
+#if defined(CopyMemory)
+#pragma push_macro("CopyMemory")
+#undef CopyMemory
+#define DALI_VECTOR_RESTORE_COPY_MEMORY_MACRO
+#endif
+
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
@@ -820,5 +828,10 @@ public: // API
  * @}
  */
 } // namespace Dali
+
+#if defined(DALI_VECTOR_RESTORE_COPY_MEMORY_MACRO)
+#pragma pop_macro("CopyMemory")
+#undef DALI_VECTOR_RESTORE_COPY_MEMORY_MACRO
+#endif
 
 #endif // DALI_VECTOR_H

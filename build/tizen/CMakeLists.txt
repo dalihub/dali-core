@@ -40,8 +40,10 @@ OPTION(ENABLE_LOW_SPEC_MEMORY_MANAGEMENT "Enable Memory management for low spec 
 OPTION(ENABLE_GPU_MEMORY_PROFILE "Enable GPU memory profiling" OFF)
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
-  SET(dali-windows-dependencies_DIR "${CMAKE_INSTALL_PREFIX}/share/dali-windows-dependencies")
-  FIND_PACKAGE( dali-windows-dependencies REQUIRED )
+  IF(STATIC)
+    MESSAGE(FATAL_ERROR "Static Windows builds are not supported: the public ABI currently uses dllimport/dllexport")
+  ENDIF()
+  FIND_PACKAGE( dali-windows-dependencies CONFIG REQUIRED )
 ENDIF()
 
 SET( VCPKG_INCLUDE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
@@ -61,11 +63,6 @@ ELSE()
 ENDIF()
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
-
-  IF(NOT DEFINED STATIC)
-    ADD_DEFINITIONS( "-DBUILDING_DALI_CORE" )
-  ENDIF()
-
 ELSEIF( UNIX )
 
   IF( NOT ${ENABLE_EXPORTALL} )
@@ -252,11 +249,21 @@ IF(ENABLE_INVOKE_METHOD_WRAPPERS)
 ENDIF()
 
 SET(LIBTYPE SHARED)
-IF(DEFINED STATIC)
+IF(STATIC)
   SET(LIBTYPE STATIC)
 ENDIF()
 
 ADD_LIBRARY( ${name} ${LIBTYPE} ${SOURCES} )
+IF(WIN32 AND NOT STATIC)
+  # dllexport belongs only to the core DLL. Consumers and linker tests must
+  # see the public declarations as dllimport.
+  TARGET_COMPILE_DEFINITIONS(${name} PRIVATE BUILDING_DALI_CORE)
+ENDIF()
+TARGET_INCLUDE_DIRECTORIES(${name}
+  PUBLIC
+    $<BUILD_INTERFACE:${ROOT_SRC_DIR}>
+    $<INSTALL_INTERFACE:include>
+)
 
 # pthread required due to gcc issue
 IF( WIN32 )
@@ -268,10 +275,13 @@ ELSEIF( UNIX )
   ENDIF()
 ENDIF()
 
-TARGET_LINK_LIBRARIES( ${name}
-  ${OPTIONAL_LIBS}
-  ${COVERAGE}
-)
+IF(WIN32)
+  # dali-windows-dependencies is needed to build the DLL, but none of its
+  # headers or symbols are part of the public core ABI.
+  TARGET_LINK_LIBRARIES(${name} PRIVATE ${OPTIONAL_LIBS} ${COVERAGE})
+ELSE()
+  TARGET_LINK_LIBRARIES(${name} ${OPTIONAL_LIBS} ${COVERAGE})
+ENDIF()
 
 SET_TARGET_PROPERTIES( ${name}
   PROPERTIES
@@ -313,8 +323,11 @@ IF( INSTALL_CMAKE_MODULES )
     install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
   ENDIF()
 ELSE()
-  # Install the library so file and symlinks.
-  INSTALL( TARGETS ${name} DESTINATION ${LIB_DIR} )
+  INSTALL(TARGETS ${name}
+    LIBRARY DESTINATION ${LIB_DIR}
+    ARCHIVE DESTINATION ${LIB_DIR}
+    RUNTIME DESTINATION ${BIN_DIR}
+  )
 ENDIF()
 
 
