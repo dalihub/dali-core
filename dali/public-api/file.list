@@ -104,7 +104,6 @@ SET( public_api_core_actors_header_files
   ${public_api_src_dir}/actors/camera-actor.h
   ${public_api_src_dir}/actors/custom-actor.h
   ${public_api_src_dir}/actors/custom-actor-impl.h
-  ${public_api_src_dir}/actors/draw-mode.h
   ${public_api_src_dir}/actors/layer.h
 )
 

@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/animation/animation-data.h>
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-value.h>

@@ -41,6 +41,27 @@ enum ColorMode
 };
 
 /**
+ * @brief DrawMode to determine how the Actor and its children will be drawn.
+ *
+ * @SINCE_1_0.0
+ */
+namespace DrawMode
+{
+/**
+ * @brief Enumeration for the instance of how the actor and it's children will be drawn.
+ *
+ * @SINCE_1_0.0
+ * @see Dali::Actor::SetDrawMode()
+ */
+enum Type
+{
+  NORMAL     = 0, ///< @brief binary 00. The default draw-mode @SINCE_1_0.0
+  OVERLAY_2D = 1  ///< @brief binary 01. Draw the actor and its children as an overlay @SINCE_1_0.0
+};
+
+} // namespace DrawMode
+
+/**
  * @brief Enumeration for layout Dimensions.
  * @SINCE_1_0.0
  */

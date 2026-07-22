@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/handle.h>
