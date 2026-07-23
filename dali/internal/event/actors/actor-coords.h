@@ -325,16 +325,16 @@ Matrix CalculateActorWorldTransform(const Actor& actor);
 Vector4 CalculateActorWorldColor(const Actor& actor);
 
 /**
- * Get the inherited visibility of the actor.
+ * Get the on-scene visibility of the actor.
  *
- * This calcualtes the visible of the actor from scratch using
- * only event side properties. It does not rely on the update thread
- * to have already calculated the visible.
+ * This calculates the on-scene visibility of the actor from scratch using only event side
+ * properties. It is true only when the actor is connected to a visible scene and neither it
+ * nor any of its ancestors is hidden. It does not rely on the update thread.
  *
- * @param[in] actor The actor to calculate the inherited visible for
- * @return the inherited visible
+ * @param[in] actor The actor to calculate the on-scene visibility for
+ * @return True if the actor is connected to a visible scene and its whole ancestor chain is visible
  */
-bool CalculateActorInheritedVisible(const Actor& actor);
+bool CalculateActorOnSceneVisible(const Actor& actor);
 
 /**
  * @brief Get the rotate of the actor look at specific position.

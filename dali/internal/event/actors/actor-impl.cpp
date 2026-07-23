@@ -864,6 +864,11 @@ bool Actor::IsVisible() const
   return mVisible;
 }
 
+bool Actor::IsOnSceneVisible() const
+{
+  return CalculateActorOnSceneVisible(*this);
+}
+
 void Actor::SetOpacity(float opacity)
 {
   mTargetColor.a = opacity;
@@ -1304,6 +1309,11 @@ void Actor::EmitVisibilityChangedSignal(bool visible, VisibilityChangeType type)
   EmitSignal(*this, mVisibilityChangedSignal, visible, type);
 }
 
+void Actor::EmitOnSceneVisibilityChangedSignal(bool visible)
+{
+  EmitSignal(*this, mOnSceneVisibilityChangedSignal, visible);
+}
+
 void Actor::EmitEffectiveVisibilityChangedSignal(bool visible)
 {
   EmitSignal(*this, mEffectiveVisibilityChangedSignal, visible);
@@ -1465,6 +1475,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mSceneDisconnectedSignal(),
   mOnRelayoutSignal(),
   mVisibilityChangedSignal(),
+  mOnSceneVisibilityChangedSignal(),
   mEffectiveVisibilityChangedSignal(),
   mLayoutDirectionChangedSignal(),
   mHitTestResultSignal(),
@@ -1765,11 +1776,21 @@ void Actor::RebuildDepthTree()
   DALI_LOG_TIMER_END(depthTimer, gLogFilter, Debug::Concise, "Depth tree traversal time: ");
 }
 
-void Actor::EmitEffectiveVisibilityChangedSignalRecursively(bool visible)
+void Actor::EmitOnSceneVisibilityChangedSignalRecursively(bool visible)
 {
   ActorContainer effectiveVisibilityActors;
   mParentImpl.CollectEffectiveVisibilityActorsRecursively(effectiveVisibilityActors);
   // Notify applications about the newly connected actors.
+  for(const auto& actor : effectiveVisibilityActors)
+  {
+    actor->EmitOnSceneVisibilityChangedSignal(visible);
+  }
+}
+
+void Actor::EmitEffectiveVisibilityChangedSignalRecursively(bool visible)
+{
+  ActorContainer effectiveVisibilityActors;
+  mParentImpl.CollectEffectiveVisibilityActorsRecursively(effectiveVisibilityActors);
   for(const auto& actor : effectiveVisibilityActors)
   {
     actor->EmitEffectiveVisibilityChangedSignal(visible);
@@ -1941,8 +1962,8 @@ bool Actor::IsWorldIgnored() const
 
 void Actor::SetParent(ActorParent* parent, bool notify)
 {
-  bool emitInheritedVisible = false;
-  bool visiblility          = true;
+  bool emitOnSceneVisible = false;
+  bool visiblility        = true;
   if(parent)
   {
     DALI_ASSERT_ALWAYS(!mParent && "Actor cannot have 2 parents");
@@ -1957,7 +1978,7 @@ void Actor::SetParent(ActorParent* parent, bool notify)
       // Instruct each actor to create a corresponding node in the scene graph
       ConnectToScene(parentActor->GetHierarchyDepth(), parentActor->GetLayer3DParentCount(), notify);
 
-      emitInheritedVisible = CalculateActorInheritedVisible(*this);
+      emitOnSceneVisible = CalculateActorOnSceneVisible(*this);
     }
 
     // Resolve the name and index for the child properties if any
@@ -1968,8 +1989,8 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     if(!EventThreadServices::IsShuttingDown() && // Don't emit signals or send messages during Core destruction
        OnScene())
     {
-      emitInheritedVisible = CalculateActorInheritedVisible(*this);
-      visiblility          = false;
+      emitOnSceneVisible = CalculateActorOnSceneVisible(*this);
+      visiblility        = false;
     }
 
     mParent = nullptr;
@@ -1987,14 +2008,16 @@ void Actor::SetParent(ActorParent* parent, bool notify)
     mScene = nullptr;
   }
 
-  if(emitInheritedVisible)
+  if(emitOnSceneVisible)
   {
     // Push the actor at the stack.
     // Note that another actor's visibility could be changed during visibility change callback.
     // So we need to stack those actors, and then use it.
     GetVisibilityChangedActorStack().emplace_back(this);
 
-    EmitEffectiveVisibilityChangedSignalRecursively(visiblility);
+    // Scene connection/disconnection only affects on-scene visibility, not the pure VISIBLE-property chain,
+    // so the effective visibility signal is intentionally not emitted here.
+    EmitOnSceneVisibilityChangedSignalRecursively(visiblility);
 
     // Pop the actor from the stack now
     GetVisibilityChangedActorStack().pop_back();
@@ -2169,7 +2192,10 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
       RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
     }
 
-    bool emitInheritedVisible = this->GetParent() ? CalculateActorInheritedVisible(*(this->GetParent())) : (OnScene() && mScene->IsVisible());
+    // On-scene visibility additionally requires the actor to be connected to a visible scene.
+    bool emitOnSceneVisible = this->GetParent() ? CalculateActorOnSceneVisible(*(this->GetParent())) : (OnScene() && mScene->IsVisible());
+    // Effective visibility only considers the VISIBLE property of all ancestors, regardless of scene connection.
+    bool emitEffectiveVisible = this->GetParent() ? this->GetParent()->IsEffectivelyVisible() : true;
 
     mVisible = visible;
 
@@ -2181,7 +2207,12 @@ void Actor::SetVisibleInternal(bool visible, SendMessage::Type sendMessage)
     // Emit the signal on this actor and all its children
     mParentImpl.EmitVisibilityChangedSignalRecursively(visible, VisibilityChangeType::SELF);
 
-    if(emitInheritedVisible)
+    if(emitOnSceneVisible)
+    {
+      EmitOnSceneVisibilityChangedSignalRecursively(visible);
+    }
+
+    if(emitEffectiveVisible)
     {
       EmitEffectiveVisibilityChangedSignalRecursively(visible);
     }

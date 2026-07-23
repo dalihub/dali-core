@@ -44,6 +44,16 @@ OnRelayoutSignalType& OnRelayoutSignal(Actor actor)
   return GetImplementation(actor).OnRelayoutSignal();
 }
 
+OnSceneVisibilityChangedSignalType& OnSceneVisibilityChangedSignal(Actor actor)
+{
+  return GetImplementation(actor).OnSceneVisibilityChangedSignal();
+}
+
+bool IsOnSceneVisible(Actor actor)
+{
+  return GetImplementation(actor).IsOnSceneVisible();
+}
+
 void SetNeedGesturePropagation(Actor actor, bool propagation)
 {
   return GetImplementation(actor).SetNeedGesturePropagation(propagation);
@@ -67,11 +77,6 @@ Matrix GetWorldTransform(Actor actor)
 Vector4 GetWorldColor(Actor actor)
 {
   return CalculateActorWorldColor(GetImplementation(actor));
-}
-
-bool IsEffectivelyVisible(Actor actor)
-{
-  return CalculateActorInheritedVisible(GetImplementation(actor));
 }
 
 void LookAt(Actor actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)

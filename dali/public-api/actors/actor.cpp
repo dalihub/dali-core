@@ -414,6 +414,11 @@ bool Actor::IsVisible() const
   return GetImplementation(*this).IsVisible();
 }
 
+bool Actor::IsEffectivelyVisible() const
+{
+  return GetImplementation(*this).IsEffectivelyVisible();
+}
+
 void Actor::SetColor(const Vector4& color)
 {
   GetImplementation(*this).SetProperty(Actor::Property::COLOR, color);
@@ -732,6 +737,11 @@ void Actor::SetEnabled(bool enabled)
 bool Actor::IsEnabled() const
 {
   return GetImplementation(*this).IsEnabled();
+}
+
+bool Actor::IsEffectivelyEnabled() const
+{
+  return GetImplementation(*this).IsEffectivelyEnabled();
 }
 
 void Actor::SetUpdateAreaHint(const Vector4& hint)
