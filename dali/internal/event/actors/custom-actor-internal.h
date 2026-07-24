@@ -152,6 +152,30 @@ private:
   }
 
   /**
+   * @copydoc Internal::Actor::OnFinalizeTouchEventDispatchExternal
+   */
+  void OnFinalizeTouchEventDispatchExternal(const Dali::TouchEvent& touch) override
+  {
+    mImpl->OnFinalizeTouchEventDispatch(touch);
+  }
+
+  /**
+   * @copydoc Internal::Actor::OnFinalizeHoverEventDispatchExternal
+   */
+  void OnFinalizeHoverEventDispatchExternal(const Dali::HoverEvent& hover) override
+  {
+    mImpl->OnFinalizeHoverEventDispatch(hover);
+  }
+
+  /**
+   * @copydoc Internal::Actor::OnFinalizeWheelEventDispatchExternal
+   */
+  void OnFinalizeWheelEventDispatchExternal(const Dali::WheelEvent& wheel) override
+  {
+    mImpl->OnFinalizeWheelEventDispatch(wheel);
+  }
+
+  /**
    * @copydoc Internal::Actor::OnPropertySet
    */
   void OnPropertySet(Property::Index index, const Property::Value& propertyValue) override

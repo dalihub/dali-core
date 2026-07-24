@@ -1612,6 +1612,21 @@ public:
   bool OnWheelEvent(const Dali::WheelEvent& wheel);
 
   /**
+   * Called after the touch event signal has been emitted.
+   */
+  void OnFinalizeTouchEventDispatch(const Dali::TouchEvent& touch);
+
+  /**
+   * Called after the hover event signal has been emitted.
+   */
+  void OnFinalizeHoverEventDispatch(const Dali::HoverEvent& hover);
+
+  /**
+   * Called after the wheel event signal has been emitted.
+   */
+  void OnFinalizeWheelEventDispatch(const Dali::WheelEvent& wheel);
+
+  /**
    * Query whether the actor captures all touch after it starts even if touch leaves its boundary.
    * @return true, if it captures all touch after start
    */
@@ -2345,6 +2360,30 @@ private:
   virtual bool OnWheelEventExternal(const Dali::WheelEvent& /*wheel*/)
   {
     return false;
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called after the actor's touch event signal has been emitted.
+   */
+  virtual void OnFinalizeTouchEventDispatchExternal(const Dali::TouchEvent& /*touch*/)
+  {
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called after the actor's hover event signal has been emitted.
+   */
+  virtual void OnFinalizeHoverEventDispatchExternal(const Dali::HoverEvent& /*hover*/)
+  {
+  }
+
+  /**
+   * For use in external (CustomActor) derived classes.
+   * This is called after the actor's wheel event signal has been emitted.
+   */
+  virtual void OnFinalizeWheelEventDispatchExternal(const Dali::WheelEvent& /*wheel*/)
+  {
   }
 
   /**

@@ -457,6 +457,36 @@ public:
    */
   virtual bool OnWheelEvent(const WheelEvent& event);
 
+  /**
+   * @brief Called after Actor::TouchEventSignal() has been emitted for a touch event.
+   *
+   * This hook is called regardless of whether OnTouchEvent() or Actor::TouchEventSignal()
+   * consumed the event. It does not affect the event's consumed state.
+   *
+   * @param[in] event The touch event
+   */
+  virtual void OnFinalizeTouchEventDispatch(const TouchEvent& event);
+
+  /**
+   * @brief Called after Actor::HoverEventSignal() has been emitted for a hover event.
+   *
+   * This hook is called regardless of whether OnHoverEvent() or Actor::HoverEventSignal()
+   * consumed the event. It does not affect the event's consumed state.
+   *
+   * @param[in] event The hover event
+   */
+  virtual void OnFinalizeHoverEventDispatch(const HoverEvent& event);
+
+  /**
+   * @brief Called after Actor::WheelEventSignal() has been emitted for a wheel event.
+   *
+   * This hook is called regardless of whether OnWheelEvent() or Actor::WheelEventSignal()
+   * consumed the event. It does not affect the event's consumed state.
+   *
+   * @param[in] event The wheel event
+   */
+  virtual void OnFinalizeWheelEventDispatch(const WheelEvent& event);
+
 protected: // For derived classes
   /**
    * @brief Enumeration for the constructor flags.

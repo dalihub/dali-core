@@ -89,6 +89,18 @@ bool CustomActorImpl::OnWheelEvent(const WheelEvent& /*event*/)
   return false;
 }
 
+void CustomActorImpl::OnFinalizeTouchEventDispatch(const TouchEvent& /*event*/)
+{
+}
+
+void CustomActorImpl::OnFinalizeHoverEventDispatch(const HoverEvent& /*event*/)
+{
+}
+
+void CustomActorImpl::OnFinalizeWheelEventDispatch(const WheelEvent& /*event*/)
+{
+}
+
 CustomActorImpl::CustomActorImpl(ActorFlags flags)
 : mOwner(nullptr),
   mFlags(flags)
