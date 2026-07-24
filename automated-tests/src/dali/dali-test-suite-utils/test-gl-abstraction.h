@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstring> // for strcmp
+#include <iomanip> // for std::setprecision
 #include <map>
 #include <sstream>
 #include <string>
@@ -57,6 +58,15 @@ struct ActiveUniform
   GLint       size{0};
   GLint       offset{0};
 };
+
+// Helper function to convert float to string with 6 decimal precision
+inline std::string FloatToString(GLfloat value)
+{
+  std::ostringstream oss;
+  oss.imbue(std::locale::classic());
+  oss << std::fixed << std::setprecision(6) << value;
+  return oss.str();
+}
 
 class DALI_CORE_API TestGlAbstraction : public Dali::Integration::GlAbstraction
 {
@@ -1357,7 +1367,7 @@ public:
 
   inline void Uniform1f(GLint location, GLfloat value) override
   {
-    std::string params = std::to_string(value);
+    std::string params = FloatToString(value);
     AddUniformCallToTraceStack(location, params);
 
     if(!mProgramUniforms1f.SetUniformValue(mCurrentProgram, location, value))
@@ -1371,7 +1381,7 @@ public:
     std::string params;
     for(int i = 0; i < count; ++i)
     {
-      params = params + std::to_string(v[i]) + ",";
+      params = params + FloatToString(v[i]) + ",";
     }
 
     AddUniformCallToTraceStack(location, params);
@@ -1418,7 +1428,7 @@ public:
 
   inline void Uniform2f(GLint location, GLfloat x, GLfloat y) override
   {
-    std::string params = std::to_string(x) + "," + std::to_string(y);
+    std::string params = FloatToString(x) + "," + FloatToString(y);
     AddUniformCallToTraceStack(location, params);
 
     if(!mProgramUniforms2f.SetUniformValue(mCurrentProgram,
@@ -1462,7 +1472,7 @@ public:
 
   inline void Uniform3f(GLint location, GLfloat x, GLfloat y, GLfloat z) override
   {
-    std::string params = std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
+    std::string params = FloatToString(x) + "," + FloatToString(y) + "," + FloatToString(z);
     AddUniformCallToTraceStack(location, params);
 
     if(!mProgramUniforms3f.SetUniformValue(mCurrentProgram,
@@ -1507,7 +1517,7 @@ public:
 
   inline void Uniform4f(GLint location, GLfloat x, GLfloat y, GLfloat z, GLfloat w) override
   {
-    std::string params = std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z) + "," + std::to_string(w);
+    std::string params = FloatToString(x) + "," + FloatToString(y) + "," + FloatToString(z) + "," + FloatToString(w);
     AddUniformCallToTraceStack(location, params);
 
     if(!mProgramUniforms4f.SetUniformValue(mCurrentProgram,

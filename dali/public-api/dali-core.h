@@ -23,7 +23,6 @@
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 #include <dali/public-api/actors/custom-actor.h>
-#include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/actors/layer.h>
 
 #include <dali/public-api/animation/alpha-function.h>

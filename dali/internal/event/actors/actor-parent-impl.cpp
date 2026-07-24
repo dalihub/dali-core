@@ -103,7 +103,7 @@ void ActorParentImpl::Add(Actor& child, bool notify)
         EmitChildAddedSignal(child);
       }
 
-      child.mParentImpl.InheritLayoutDirectionRecursively(mOwner.GetLayoutDirection());
+      child.mParentImpl.InheritLayoutDirectionRecursively(mOwner.GetEffectiveLayoutDirection());
 
       // Only put in a relayout request if there is a suitable dependency
       if(mOwner.RelayoutDependentOnChildren())

@@ -350,12 +350,13 @@ struct VisibilityChangedVoidFunctor
   bool& mSignalCalled;
 };
 
-struct EffectiveVisibilityChangedFunctorData
+struct OnSceneVisibilityChangedFunctorData
 {
-  EffectiveVisibilityChangedFunctorData()
+  OnSceneVisibilityChangedFunctorData()
   : actor(),
     changedActor(),
     visible(false),
+    calculatedVisible(false),
     called(false)
   {
   }
@@ -393,9 +394,9 @@ struct EffectiveVisibilityChangedFunctorData
   bool  called;
 };
 
-struct EffectiveVisibilityChangedFunctor
+struct OnSceneVisibilityChangedFunctor
 {
-  EffectiveVisibilityChangedFunctor(EffectiveVisibilityChangedFunctorData& dataVar)
+  OnSceneVisibilityChangedFunctor(OnSceneVisibilityChangedFunctorData& dataVar)
   : data(dataVar)
   {
   }
@@ -405,11 +406,11 @@ struct EffectiveVisibilityChangedFunctor
     data.actor             = actor;
     data.changedActor      = DevelActor::GetVisiblityChangedActor();
     data.visible           = visible;
-    data.calculatedVisible = DevelActor::IsEffectivelyVisible(actor);
+    data.calculatedVisible = DevelActor::IsOnSceneVisible(actor);
     data.called            = true;
   }
 
-  EffectiveVisibilityChangedFunctorData& data;
+  OnSceneVisibilityChangedFunctorData& data;
 };
 
 struct ChildOrderChangedFunctor
@@ -10363,18 +10364,18 @@ int utcDaliActorVisibilityChangeSignalByName(void)
   END_TEST;
 }
 
-int utcDaliActorInheritedVisibilityChangeSignal1(void)
+int utcDaliActorOnSceneVisibilityChangeSignal1(void)
 {
   TestApplication application;
-  tet_infoline("Check that the inherited visibility change signal is called when the visibility changes for the actor itself");
+  tet_infoline("Check that the on-scene visibility change signal is called when the visibility changes for the actor itself");
 
   Actor parentActor = Actor::New();
   Actor actor       = Actor::New();
 
-  VisibilityChangedFunctorData          visibilityData;
-  EffectiveVisibilityChangedFunctorData data;
+  VisibilityChangedFunctorData        visibilityData;
+  OnSceneVisibilityChangedFunctorData data;
   actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityData));
-  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(data));
+  DevelActor::OnSceneVisibilityChangedSignal(actor).Connect(&application, OnSceneVisibilityChangedFunctor(data));
 
   parentActor.Add(actor);
   visibilityData.Check(false, TEST_LOCATION);
@@ -10413,20 +10414,20 @@ int utcDaliActorInheritedVisibilityChangeSignal1(void)
   END_TEST;
 }
 
-int utcDaliActorInheritedVisibilityChangeSignal2(void)
+int utcDaliActorOnSceneVisibilityChangeSignal2(void)
 {
   TestApplication application;
-  tet_infoline("Check that the inherited visibility change signal is called when the actor or one of the parent become on scene or off scene");
+  tet_infoline("Check that the on-scene visibility change signal is called when the actor or one of the parent become on scene or off scene");
 
   Actor parentActor = Actor::New();
   Actor childActor  = Actor::New();
 
-  VisibilityChangedFunctorData          visibilityDataP, visibilityDataC;
-  EffectiveVisibilityChangedFunctorData dataP, dataC;
+  VisibilityChangedFunctorData        visibilityDataP, visibilityDataC;
+  OnSceneVisibilityChangedFunctorData dataP, dataC;
   parentActor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityDataP));
   childActor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityDataC));
-  parentActor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataP));
-  childActor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataC));
+  DevelActor::OnSceneVisibilityChangedSignal(parentActor).Connect(&application, OnSceneVisibilityChangedFunctor(dataP));
+  DevelActor::OnSceneVisibilityChangedSignal(childActor).Connect(&application, OnSceneVisibilityChangedFunctor(dataC));
 
   visibilityDataP.Reset();
   visibilityDataC.Reset();
@@ -10541,19 +10542,19 @@ int utcDaliActorInheritedVisibilityChangeSignal2(void)
   END_TEST;
 }
 
-int utcDaliActorInheritedVisibilityChangeSignal3(void)
+int utcDaliActorOnSceneVisibilityChangeSignal3(void)
 {
   TestApplication application;
-  tet_infoline("Check that the inherited visibility change signal is called when the visibility changes for the parent actor");
+  tet_infoline("Check that the on-scene visibility change signal is called when the visibility changes for the parent actor");
 
   Actor parentActor = Actor::New();
   Actor actor       = Actor::New();
   parentActor.Add(actor);
 
-  VisibilityChangedFunctorData          visibilityData;
-  EffectiveVisibilityChangedFunctorData data;
+  VisibilityChangedFunctorData        visibilityData;
+  OnSceneVisibilityChangedFunctorData data;
   actor.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(visibilityData));
-  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(data));
+  DevelActor::OnSceneVisibilityChangedSignal(actor).Connect(&application, OnSceneVisibilityChangedFunctor(data));
 
   application.GetScene().Add(parentActor);
   data.Check(true, parentActor, actor, true, TEST_LOCATION);
@@ -10627,10 +10628,10 @@ int utcDaliActorInheritedVisibilityChangeSignal3(void)
 
 namespace
 {
-VisibilityChangedFunctorData          dataVPA, dataVPB, dataVCA, dataVCB, dataVCC;
-EffectiveVisibilityChangedFunctorData dataPA, dataPB, dataCA, dataCB, dataCC;
+VisibilityChangedFunctorData        dataVPA, dataVPB, dataVCA, dataVCB, dataVCC;
+OnSceneVisibilityChangedFunctorData dataPA, dataPB, dataCA, dataCB, dataCC;
 
-void ResetEffectiveVisibilityChangedFunctorData()
+void ResetOnSceneVisibilityChangedFunctorData()
 {
   dataVPA.Reset();
   dataVPB.Reset();
@@ -10646,10 +10647,10 @@ void ResetEffectiveVisibilityChangedFunctorData()
 }
 } // namespace
 
-int utcDaliActorInheritedVisibilityChangeSignal4(void)
+int utcDaliActorOnSceneVisibilityChangeSignal4(void)
 {
   TestApplication application;
-  tet_infoline("Check that the inherited visibility change signal is in tree");
+  tet_infoline("Check that the on-scene visibility change signal is in tree");
 
   /**
    * ParentA
@@ -10675,13 +10676,13 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   childB.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVCB));
   childC.VisibilityChangedSignal().Connect(&application, VisibilityChangedFunctor(dataVCC));
 
-  parentA.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPA));
-  parentB.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPB));
-  childA.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCA));
-  childB.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCB));
-  childC.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCC));
+  DevelActor::OnSceneVisibilityChangedSignal(parentA).Connect(&application, OnSceneVisibilityChangedFunctor(dataPA));
+  DevelActor::OnSceneVisibilityChangedSignal(parentB).Connect(&application, OnSceneVisibilityChangedFunctor(dataPB));
+  DevelActor::OnSceneVisibilityChangedSignal(childA).Connect(&application, OnSceneVisibilityChangedFunctor(dataCA));
+  DevelActor::OnSceneVisibilityChangedSignal(childB).Connect(&application, OnSceneVisibilityChangedFunctor(dataCB));
+  DevelActor::OnSceneVisibilityChangedSignal(childC).Connect(&application, OnSceneVisibilityChangedFunctor(dataCC));
 
-  ResetEffectiveVisibilityChangedFunctorData();
+  ResetOnSceneVisibilityChangedFunctorData();
   application.GetScene().Add(parentA);
   dataVPA.Check(false, TEST_LOCATION);
   dataVPB.Check(false, TEST_LOCATION);
@@ -10694,7 +10695,7 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataCB.Check(true, parentA, childB, true, TEST_LOCATION);
   dataCC.Check(true, parentA, childC, true, TEST_LOCATION);
 
-  ResetEffectiveVisibilityChangedFunctorData();
+  ResetOnSceneVisibilityChangedFunctorData();
   parentA.SetProperty(Actor::Property::VISIBLE, false);
   dataVPA.Check(true, parentA, parentA, false, VisibilityChangeType::SELF, TEST_LOCATION);
   dataVPB.Check(true, parentA, parentB, false, VisibilityChangeType::PARENT, TEST_LOCATION);
@@ -10707,7 +10708,7 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataCB.Check(true, parentA, childB, false, TEST_LOCATION);
   dataCC.Check(true, parentA, childC, false, TEST_LOCATION);
 
-  ResetEffectiveVisibilityChangedFunctorData();
+  ResetOnSceneVisibilityChangedFunctorData();
   childA.SetProperty(Actor::Property::VISIBLE, false);
   dataVPA.Check(false, TEST_LOCATION);
   dataVPB.Check(false, TEST_LOCATION);
@@ -10720,7 +10721,7 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataCB.Check(false, TEST_LOCATION);
   dataCC.Check(false, TEST_LOCATION);
 
-  ResetEffectiveVisibilityChangedFunctorData();
+  ResetOnSceneVisibilityChangedFunctorData();
   parentB.SetProperty(Actor::Property::VISIBLE, false);
   dataVPA.Check(false, TEST_LOCATION);
   dataVPB.Check(true, parentB, parentB, false, VisibilityChangeType::SELF, TEST_LOCATION);
@@ -10733,7 +10734,7 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataCB.Check(false, TEST_LOCATION);
   dataCC.Check(false, TEST_LOCATION);
 
-  ResetEffectiveVisibilityChangedFunctorData();
+  ResetOnSceneVisibilityChangedFunctorData();
   parentA.SetProperty(Actor::Property::VISIBLE, true);
   dataVPA.Check(true, parentA, parentA, true, VisibilityChangeType::SELF, TEST_LOCATION);
   dataVPB.Check(true, parentA, parentB, true, VisibilityChangeType::PARENT, TEST_LOCATION);
@@ -10746,7 +10747,7 @@ int utcDaliActorInheritedVisibilityChangeSignal4(void)
   dataCB.Check(false, TEST_LOCATION);
   dataCC.Check(false, TEST_LOCATION);
 
-  ResetEffectiveVisibilityChangedFunctorData();
+  ResetOnSceneVisibilityChangedFunctorData();
   parentB.SetProperty(Actor::Property::VISIBLE, true);
   dataVPA.Check(false, TEST_LOCATION);
   dataVPB.Check(true, parentB, parentB, true, VisibilityChangeType::SELF, TEST_LOCATION);
@@ -10790,7 +10791,7 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   actorD.Add(actorE);
 
   // Let we reuse dataVPA~dataVCC, to reduce code line.
-  ResetEffectiveVisibilityChangedFunctorData();
+  ResetOnSceneVisibilityChangedFunctorData();
 
   // Write expcet result at dataVCA and dataVCB
   dataVCA.changedActor = actorC;
@@ -10852,7 +10853,7 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
       dataCC.Check(false, TEST_LOCATION);
 
       // Change the expect result again
-      ResetEffectiveVisibilityChangedFunctorData();
+      ResetOnSceneVisibilityChangedFunctorData();
 
       dataVCA.changedActor = actorC;
       dataVCA.actor        = actorC;
@@ -10884,11 +10885,11 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   actorE.VisibilityChangedSignal().Connect(&application, VisibilityChangedLambdaFunctor([&](Actor actor, bool visible, VisibilityChangeType type)
   { dataVCC.Check(false, DevelActor::GetVisiblityChangedActor(), actor, visible, type, TEST_LOCATION); }));
 
-  actorA.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPA));
-  actorB.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataPB));
-  actorC.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCA));
-  actorD.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCB));
-  actorE.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataCC));
+  DevelActor::OnSceneVisibilityChangedSignal(actorA).Connect(&application, OnSceneVisibilityChangedFunctor(dataPA));
+  DevelActor::OnSceneVisibilityChangedSignal(actorB).Connect(&application, OnSceneVisibilityChangedFunctor(dataPB));
+  DevelActor::OnSceneVisibilityChangedSignal(actorC).Connect(&application, OnSceneVisibilityChangedFunctor(dataCA));
+  DevelActor::OnSceneVisibilityChangedSignal(actorD).Connect(&application, OnSceneVisibilityChangedFunctor(dataCB));
+  DevelActor::OnSceneVisibilityChangedSignal(actorE).Connect(&application, OnSceneVisibilityChangedFunctor(dataCC));
 
   // Change C as invisible
   actorC.SetProperty(Actor::Property::VISIBLE, false);
@@ -10903,16 +10904,16 @@ int utcDaliActorVisibilityChangeSignalDurintVisibilityChanged(void)
   END_TEST;
 }
 
-int utcDaliActorInheritedVisibilityChangeSignal5(void)
+int utcDaliActorOnSceneVisibilityChangeSignal5(void)
 {
   TestApplication application;
-  tet_infoline("Check that the inherited visibility change signal is called when the scene visibility is changed");
+  tet_infoline("Check that the on-scene visibility change signal is called when the scene visibility is changed");
 
   Actor parentActor = Actor::New();
   Actor actor       = Actor::New();
 
-  EffectiveVisibilityChangedFunctorData data;
-  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(data));
+  OnSceneVisibilityChangedFunctorData data;
+  DevelActor::OnSceneVisibilityChangedSignal(actor).Connect(&application, OnSceneVisibilityChangedFunctor(data));
 
   application.GetScene().Hide();
 
@@ -10962,6 +10963,163 @@ int utcDaliActorInheritedVisibilityChangeSignal5(void)
   END_TEST;
 }
 
+// -----------------------------------------------------------------------------
+// EffectiveVisibilityChangedSignal : pure VISIBLE-property-chain visibility,
+// independent of scene connection and scene visibility.
+// -----------------------------------------------------------------------------
+struct EffectiveVisibilityChangedFunctorData
+{
+  EffectiveVisibilityChangedFunctorData()
+  : actor(),
+    changedActor(),
+    visible(false),
+    calculatedVisible(false),
+    called(false)
+  {
+  }
+
+  void Reset()
+  {
+    actor.Reset();
+    changedActor.Reset();
+    visible = false;
+    called  = false;
+  }
+
+  void Check(bool compareCalled, Actor compareChangedActor, Actor compareActor, bool compareVisible, const char* location)
+  {
+    DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
+    if(compareChangedActor)
+    {
+      DALI_TEST_EQUALS(changedActor, compareChangedActor, TEST_INNER_LOCATION(location));
+    }
+    DALI_TEST_EQUALS(actor, compareActor, TEST_INNER_LOCATION(location));
+    DALI_TEST_EQUALS(calculatedVisible, visible, TEST_INNER_LOCATION(location));
+    DALI_TEST_EQUALS(visible, compareVisible, TEST_INNER_LOCATION(location));
+  }
+
+  void Check(bool compareCalled, const char* location)
+  {
+    DALI_TEST_EQUALS(called, compareCalled, TEST_INNER_LOCATION(location));
+  }
+
+  Actor actor;
+  Actor changedActor;
+  bool  visible;
+  bool  calculatedVisible;
+  bool  called;
+};
+
+struct EffectiveVisibilityChangedFunctor
+{
+  EffectiveVisibilityChangedFunctor(EffectiveVisibilityChangedFunctorData& dataVar)
+  : data(dataVar)
+  {
+  }
+
+  void operator()(Actor actor, bool visible)
+  {
+    data.actor             = actor;
+    data.changedActor      = DevelActor::GetVisiblityChangedActor();
+    data.visible           = visible;
+    data.calculatedVisible = actor.IsEffectivelyVisible();
+    data.called            = true;
+  }
+
+  EffectiveVisibilityChangedFunctorData& data;
+};
+
+int UtcDaliActorEffectiveVisibilityChangeSignal01(void)
+{
+  TestApplication application;
+  tet_infoline("Check EffectiveVisibilityChangedSignal is emitted from the VISIBLE property chain of the actor and its ancestors");
+
+  Actor parentActor = Actor::New();
+  Actor actor       = Actor::New();
+  parentActor.Add(actor);
+  application.GetScene().Add(parentActor);
+
+  EffectiveVisibilityChangedFunctorData dataP, dataC;
+  parentActor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataP));
+  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(dataC));
+
+  // Hiding the parent flips the effective visibility of both parent and child.
+  dataP.Reset();
+  dataC.Reset();
+  parentActor.SetProperty(Actor::Property::VISIBLE, false);
+  dataP.Check(true, parentActor, parentActor, false, TEST_LOCATION);
+  dataC.Check(true, parentActor, actor, false, TEST_LOCATION);
+
+  // Changing the child while an ancestor is hidden does not change effective visibility.
+  dataP.Reset();
+  dataC.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  dataP.Check(false, TEST_LOCATION);
+  dataC.Check(false, TEST_LOCATION);
+
+  // Showing the parent again only flips the parent; the child keeps its own VISIBLE == false.
+  dataP.Reset();
+  dataC.Reset();
+  parentActor.SetProperty(Actor::Property::VISIBLE, true);
+  dataP.Check(true, parentActor, parentActor, true, TEST_LOCATION);
+  dataC.Check(false, TEST_LOCATION);
+
+  // Now showing the child flips only the child.
+  dataP.Reset();
+  dataC.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, true);
+  dataP.Check(false, TEST_LOCATION);
+  dataC.Check(true, actor, actor, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorEffectiveVisibilityChangeSignal02(void)
+{
+  TestApplication application;
+  tet_infoline("Check EffectiveVisibilityChangedSignal ignores scene connection and scene visibility, reacting only to the VISIBLE property chain");
+
+  Actor parentActor = Actor::New();
+  Actor actor       = Actor::New();
+
+  EffectiveVisibilityChangedFunctorData data;
+  actor.EffectiveVisibilityChangedSignal().Connect(&application, EffectiveVisibilityChangedFunctor(data));
+
+  // Off scene: changing VISIBLE still emits, because effective visibility is scene-independent.
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, false);
+  data.Check(true, Dali::Actor(), actor, false, TEST_LOCATION);
+
+  data.Reset();
+  actor.SetProperty(Actor::Property::VISIBLE, true);
+  data.Check(true, Dali::Actor(), actor, true, TEST_LOCATION);
+
+  // Connecting to a parent / scene does NOT emit (scene attachment is not part of effective visibility).
+  data.Reset();
+  parentActor.Add(actor);
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  application.GetScene().Add(parentActor);
+  data.Check(false, TEST_LOCATION);
+
+  // Scene show/hide does NOT emit.
+  data.Reset();
+  application.GetScene().Hide();
+  data.Check(false, TEST_LOCATION);
+
+  data.Reset();
+  application.GetScene().Show();
+  data.Check(false, TEST_LOCATION);
+
+  // Disconnecting from the scene does NOT emit.
+  data.Reset();
+  actor.Unparent();
+  data.Check(false, TEST_LOCATION);
+
+  END_TEST;
+}
+
 static void LayoutDirectionChanged(Actor actor, LayoutDirection::Type type)
 {
   gLayoutDirectionType = type;
@@ -10972,48 +11130,50 @@ int UtcDaliActorLayoutDirectionProperty(void)
   TestApplication application;
   tet_infoline("Check layout direction property");
 
+  // Fresh actors default to LayoutDirection::INHERIT as their set direction, resolving to LEFT_TO_RIGHT effectively.
   Actor actor0 = Actor::New();
-  DALI_TEST_EQUALS(actor0.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor0.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   application.GetScene().Add(actor0);
 
   application.SendNotification();
   application.Render();
 
   Actor actor1 = Actor::New();
-  DALI_TEST_EQUALS(actor1.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor2 = Actor::New();
-  DALI_TEST_EQUALS(actor2.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor3 = Actor::New();
-  DALI_TEST_EQUALS(actor3.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor4 = Actor::New();
-  DALI_TEST_EQUALS(actor4.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor4.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor5 = Actor::New();
-  DALI_TEST_EQUALS(actor5.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor5.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor6 = Actor::New();
-  DALI_TEST_EQUALS(actor6.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor6.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor7 = Actor::New();
-  DALI_TEST_EQUALS(actor7.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor7.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor8 = Actor::New();
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor9 = Actor::New();
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   actor1.Add(actor2);
   gLayoutDirectionType = LayoutDirection::LEFT_TO_RIGHT;
   actor2.LayoutDirectionChangedSignal().Connect(LayoutDirectionChanged);
 
-  DALI_TEST_EQUALS(actor1.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), true, TEST_LOCATION);
+  // Fresh actor inherits by default; setting an explicit direction turns inheritance off.
+  DALI_TEST_EQUALS(actor1.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
   actor1.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT);
-  DALI_TEST_EQUALS(actor1.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(actor1.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor2.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
   DALI_TEST_EQUALS(gLayoutDirectionType, LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
-  actor1.SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, true);
+  actor1.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::INHERIT);
   actor0.Add(actor1);
-  DALI_TEST_EQUALS(actor1.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor2.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   application.GetScene().Add(actor3);
   actor3.Add(actor4);
@@ -11025,32 +11185,83 @@ int UtcDaliActorLayoutDirectionProperty(void)
   actor3.SetProperty(Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT");
   actor5.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT);
 
-  DALI_TEST_EQUALS(actor8.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), true, TEST_LOCATION);
-  actor8.SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, false);
-  DALI_TEST_EQUALS(actor8.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  // Freezing the current effective direction as an explicit value stops inheritance.
+  actor8.SetLayoutDirection(actor8.GetEffectiveLayoutDirection());
+  DALI_TEST_EQUALS(actor8.GetLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   actor7.SetProperty(Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT");
 
-  DALI_TEST_EQUALS(actor3.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor4.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor5.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor6.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor7.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor4.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor5.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor6.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor7.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   actor8.SetProperty(Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT");
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
   actor7.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT);
-  DALI_TEST_EQUALS(actor7.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor7.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
-  actor8.SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, true);
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  actor8.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::INHERIT);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorLayoutDirectionLegacyProperty(void)
+{
+  TestApplication application;
+  tet_infoline("Check the legacy layout direction properties kept for NUI binding compatibility");
+
+  Actor parent = Actor::New();
+  Actor child  = Actor::New();
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  // Fresh actors inherit. The legacy INHERIT flag reads true, and the legacy direction resolves to
+  // LEFT_TO_RIGHT - the legacy getter never returns INHERIT, unlike the new-API policy getter.
+  DALI_TEST_EQUALS(parent.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+
+  // Setting the legacy direction sets an explicit value and turns inheritance off (old 2-value behaviour).
+  parent.SetProperty(DevelActor::Property::LAYOUT_DIRECTION_LEGACY, LayoutDirection::RIGHT_TO_LEFT);
+  DALI_TEST_EQUALS(parent.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), false, TEST_LOCATION);
+  // The legacy and unified APIs share the same underlying state.
+  DALI_TEST_EQUALS(parent.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+
+  // The inheriting child resolves to the parent's direction. The legacy getter returns the resolved value
+  // (RIGHT_TO_LEFT), never INHERIT, while the new-API policy getter reports INHERIT.
+  DALI_TEST_EQUALS(child.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+
+  // A string value is accepted too (the legacy property is registered as STRING).
+  child.SetProperty(DevelActor::Property::LAYOUT_DIRECTION_LEGACY, "LEFT_TO_RIGHT");
+  DALI_TEST_EQUALS(child.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), false, TEST_LOCATION);
+
+  // Setting the legacy INHERIT flag true re-enables inheritance (maps to LayoutDirection::INHERIT).
+  child.SetProperty(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY, true);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+
+  // Setting the legacy INHERIT flag false freezes the current resolved direction as an explicit value.
+  child.SetProperty(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY, false);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
   END_TEST;
 }
@@ -11081,7 +11292,7 @@ int UtcDaliActorLayoutDirectionSignal(void)
   tet_infoline("Check changing layout direction property sends a signal");
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS(actor.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   application.GetScene().Add(actor);
   bool                   signalCalled = false;
   LayoutDirectionFunctor layoutDirectionFunctor(signalCalled);
@@ -15787,11 +15998,11 @@ int UtcDaliActorCalculateWorldColor04(void)
   END_TEST;
 }
 
-int UtcDaliActorCalculateInheritedVisible01(void)
+int UtcDaliActorIsOnSceneVisible01(void)
 {
   TestApplication application;
 
-  tet_infoline("Test basic calculation");
+  tet_infoline("Test DevelActor::IsOnSceneVisible: true only when connected to a visible scene and the whole ancestor VISIBLE chain is true");
 
   Actor rootActor   = Actor::New();
   Actor branchActor = Actor::New();
@@ -15812,63 +16023,160 @@ int UtcDaliActorCalculateInheritedVisible01(void)
   application.SendNotification();
   application.Render(0);
 
-  auto CheckInheritedVisible = [&](Actor actor, bool expectVisible, bool expectInheritedVisible, const char* location)
+  auto CheckOnSceneVisible = [&](Actor actor, bool expectVisible, bool expectOnSceneVisible, const char* location)
   {
     DALI_TEST_EQUALS(expectVisible, actor.GetProperty<bool>(Actor::Property::VISIBLE), location);
-    DALI_TEST_EQUALS(expectInheritedVisible, DevelActor::IsEffectivelyVisible(actor), location);
+    DALI_TEST_EQUALS(expectOnSceneVisible, DevelActor::IsOnSceneVisible(actor), location);
   };
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, true, true, TEST_LOCATION);
 
   branchActor.SetProperty(Actor::Property::VISIBLE, false);
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, false, false, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, true, false, TEST_LOCATION);
 
   application.GetScene().Hide();
 
-  CheckInheritedVisible(rootActor, true, false, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, false, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, false, false, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, true, false, TEST_LOCATION);
 
   application.GetScene().Show();
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, false, false, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, true, false, TEST_LOCATION);
 
   leafActor.SetProperty(Actor::Property::VISIBLE, false);
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, false, false, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, false, false, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, false, false, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, false, false, TEST_LOCATION);
 
   branchActor.SetProperty(Actor::Property::VISIBLE, true);
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, false, false, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, false, false, TEST_LOCATION);
 
   branchActor.Unparent();
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, true, false, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, false, false, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, true, false, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, false, false, TEST_LOCATION);
 
   leafActor.SetProperty(Actor::Property::VISIBLE, true);
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, true, false, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, true, false, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, true, false, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, true, false, TEST_LOCATION);
 
   rootActor.Add(branchActor);
 
-  CheckInheritedVisible(rootActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(branchActor, true, true, TEST_LOCATION);
-  CheckInheritedVisible(leafActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(rootActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(branchActor, true, true, TEST_LOCATION);
+  CheckOnSceneVisible(leafActor, true, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorIsEffectivelyVisible01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test Actor::IsEffectivelyVisible: self + ancestor VISIBLE chain, independent of scene connection and scene visibility");
+
+  Actor rootActor   = Actor::New();
+  Actor branchActor = Actor::New();
+  Actor leafActor   = Actor::New();
+  rootActor.Add(branchActor);
+  branchActor.Add(leafActor);
+
+  auto Check = [&](Actor actor, bool expected, const char* location)
+  {
+    DALI_TEST_EQUALS(expected, actor.IsEffectivelyVisible(), location);
+  };
+
+  // Off scene: effective visibility already reflects the VISIBLE chain (scene-independent).
+  Check(rootActor, true, TEST_LOCATION);
+  Check(branchActor, true, TEST_LOCATION);
+  Check(leafActor, true, TEST_LOCATION);
+
+  // Hiding an ancestor makes the whole subtree effectively invisible, without changing their own flags.
+  branchActor.SetProperty(Actor::Property::VISIBLE, false);
+  Check(rootActor, true, TEST_LOCATION);
+  Check(branchActor, false, TEST_LOCATION);
+  Check(leafActor, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, leafActor.IsVisible(), TEST_LOCATION); // own flag unchanged
+
+  branchActor.SetProperty(Actor::Property::VISIBLE, true);
+  Check(leafActor, true, TEST_LOCATION);
+
+  // Connecting to the scene does not change effective visibility.
+  application.GetScene().Add(rootActor);
+  Check(leafActor, true, TEST_LOCATION);
+
+  // Hiding the whole scene does NOT affect effective visibility (unlike IsOnSceneVisible).
+  application.GetScene().Hide();
+  Check(rootActor, true, TEST_LOCATION);
+  Check(branchActor, true, TEST_LOCATION);
+  Check(leafActor, true, TEST_LOCATION);
+  application.GetScene().Show();
+
+  // The actor's own VISIBLE flag flips only itself.
+  leafActor.SetProperty(Actor::Property::VISIBLE, false);
+  Check(rootActor, true, TEST_LOCATION);
+  Check(branchActor, true, TEST_LOCATION);
+  Check(leafActor, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorIsEffectivelyEnabled01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test Actor::IsEffectivelyEnabled: self + ancestor ENABLED chain, independent of scene connection");
+
+  Actor rootActor   = Actor::New();
+  Actor branchActor = Actor::New();
+  Actor leafActor   = Actor::New();
+  rootActor.Add(branchActor);
+  branchActor.Add(leafActor);
+
+  auto Check = [&](Actor actor, bool expected, const char* location)
+  {
+    DALI_TEST_EQUALS(expected, actor.IsEffectivelyEnabled(), location);
+  };
+
+  // Default enabled true along the chain, even off scene.
+  Check(rootActor, true, TEST_LOCATION);
+  Check(branchActor, true, TEST_LOCATION);
+  Check(leafActor, true, TEST_LOCATION);
+
+  // Disabling an ancestor disables the subtree effectively, without changing their own flags.
+  branchActor.SetProperty(Actor::Property::ENABLED, false);
+  Check(rootActor, true, TEST_LOCATION);
+  Check(branchActor, false, TEST_LOCATION);
+  Check(leafActor, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, leafActor.IsEnabled(), TEST_LOCATION); // own flag unchanged
+
+  branchActor.SetProperty(Actor::Property::ENABLED, true);
+  Check(leafActor, true, TEST_LOCATION);
+
+  // Independent of scene connection.
+  application.GetScene().Add(rootActor);
+  Check(leafActor, true, TEST_LOCATION);
+
+  // The actor's own ENABLED flag flips only itself.
+  leafActor.SetProperty(Actor::Property::ENABLED, false);
+  Check(rootActor, true, TEST_LOCATION);
+  Check(branchActor, true, TEST_LOCATION);
+  Check(leafActor, false, TEST_LOCATION);
 
   END_TEST;
 }
@@ -17051,6 +17359,11 @@ int UtcDaliActorSetGetLayoutDirectionNewP(void)
   actor.SetLayoutDirection(LayoutDirection::RIGHT_TO_LEFT);
   DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
+  // INHERIT is reported by the policy getter; the effective getter always resolves to a concrete direction.
+  actor.SetLayoutDirection(LayoutDirection::INHERIT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -17178,11 +17491,13 @@ int UtcDaliActorSetGetInheritLayoutDirectionNewP(void)
   Actor           actor = Actor::New();
   application.GetScene().Add(actor);
 
-  actor.SetInheritLayoutDirectionEnabled(true);
-  DALI_TEST_EQUALS(actor.IsInheritLayoutDirectionEnabled(), true, TEST_LOCATION);
+  // Inheritance is now expressed through LayoutDirection::INHERIT on the single SetLayoutDirection API.
+  actor.SetLayoutDirection(LayoutDirection::INHERIT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
 
-  actor.SetInheritLayoutDirectionEnabled(false);
-  DALI_TEST_EQUALS(actor.IsInheritLayoutDirectionEnabled(), false, TEST_LOCATION);
+  actor.SetLayoutDirection(LayoutDirection::RIGHT_TO_LEFT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
   END_TEST;
 }

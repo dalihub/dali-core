@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/handle.h>
@@ -493,6 +492,9 @@ public:
       /**
        * @brief The visibility flag of an actor.
        * @details Name "visible", type Property::BOOL, animatable / constraint-input
+       * @note If false, this actor's children are not shown either; this is checked against every ancestor, so setting
+       *       it to false on any actor in the hierarchy hides that whole subtree. This does not change the children's
+       *       own Property::VISIBLE value; each child keeps its value and becomes visible again once no ancestor is hidden.
        * @SINCE_1_0.0
        */
       VISIBLE,
@@ -715,8 +717,10 @@ public:
        * @details Name "enabled", type Property::BOOLEAN
        * @note Default is true.
        * @note If false, this overrides Property::SENSITIVE and Property::FOCUSABLE, i.e. the actor will not emit touch
-       *       or focus events even if they are true. Disabling an actor does not disable its children; each actor's
-       *       Property::ENABLED is independent.
+       *       or focus events even if they are true. Disabling an actor also disables its children; this is checked
+       *       against every ancestor, so setting it to false on any actor in the hierarchy disables that whole subtree.
+       *       Note that this does not change the children's own Property::ENABLED value; each child keeps its value and
+       *       becomes effectively enabled again once no ancestor is disabled.
        * @SINCE_2_5.30
        */
       ENABLED,
@@ -728,15 +732,11 @@ public:
        * @details Name "layoutDirection", type LayoutDirection::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_2.60
        * @see LayoutDirection::Type for supported values.
+       * @note Set to LayoutDirection::INHERIT to inherit the direction from the parent. Getting this property returns
+       *       the direction set on the actor and may be LayoutDirection::INHERIT; use GetEffectiveLayoutDirection()
+       *       to get the resolved direction actually used for layout.
        */
       LAYOUT_DIRECTION,
-
-      /**
-       * @brief Determines whether child actors inherit the layout direction from a parent.
-       * @details Name "layoutDirectionInheritance", type Property::BOOLEAN.
-       * @SINCE_1_2.60
-       */
-      INHERIT_LAYOUT_DIRECTION,
 
       // --- Structural / read-only state ---
 
@@ -1418,6 +1418,9 @@ public:
   /**
    * @brief Sets the visibility flag of the actor.
    * @param[in] visible True to set the actor visible
+   * @note If false, this actor's children are not shown either; this is checked against every ancestor, so setting
+   *       it to false on any actor in the hierarchy hides that whole subtree. This does not change the children's
+   *       own visibility flag; each child keeps its value and becomes visible again once no ancestor is hidden.
    * @SINCE_2_5.30
    */
   void SetVisible(bool visible);
@@ -1425,9 +1428,26 @@ public:
   /**
    * @brief Gets the visibility flag of the actor.
    * @return True if the actor is visible
+   * @note This returns the actor's own flag, not its effective visibility; it can return true while the actor is
+   *       hidden because an ancestor is not visible.
    * @SINCE_2_5.30
    */
   bool IsVisible() const;
+
+  /**
+   * @brief Returns whether the actor and all of its ancestors are visible.
+   *
+   * Unlike IsVisible(), which only reflects the actor's own Property::VISIBLE value,
+   * this walks up the scene hierarchy and returns false if this actor or any ancestor
+   * is not visible.
+   *
+   * @note This only considers the Property::VISIBLE flag of the actor and its ancestors. It does not
+   *       account for scene attachment, on-screen position, opacity or culling, so a true result does
+   *       not by itself guarantee that the actor is actually drawn.
+   * @return True if neither the actor nor any ancestor is hidden
+   * @SINCE_2_5.32
+   */
+  bool IsEffectivelyVisible() const;
 
   /**
    * @brief Sets the color of the actor.
@@ -1720,31 +1740,26 @@ public:
 
   /**
    * @brief Sets the layout direction.
-   * @param[in] layoutDirection The layout direction
+   * @param[in] layoutDirection The layout direction. Set to LayoutDirection::INHERIT to inherit from the parent.
    * @SINCE_2_5.30
    */
   void SetLayoutDirection(LayoutDirection::Type layoutDirection);
 
   /**
-   * @brief Gets the layout direction.
-   * @return The layout direction
+   * @brief Gets the layout direction set on this actor.
+   * @return The layout direction. May be LayoutDirection::INHERIT if the actor inherits from its parent.
+   * @note To get the resolved direction actually used for layout (always LEFT_TO_RIGHT or RIGHT_TO_LEFT),
+   *       use GetEffectiveLayoutDirection().
    * @SINCE_2_5.30
    */
   LayoutDirection::Type GetLayoutDirection() const;
 
   /**
-   * @brief Sets whether the child inherits the layout direction from the parent.
-   * @param[in] enabled True to inherit layout direction
-   * @SINCE_2_5.30
+   * @brief Gets the effective layout direction resolved through the inheritance chain.
+   * @return The resolved layout direction, always LEFT_TO_RIGHT or RIGHT_TO_LEFT (never INHERIT).
+   * @SINCE_2_5.32
    */
-  void SetInheritLayoutDirectionEnabled(bool enabled);
-
-  /**
-   * @brief Gets whether the child inherits the layout direction from the parent.
-   * @return True if layout direction inheritance is enabled
-   * @SINCE_2_5.30
-   */
-  bool IsInheritLayoutDirectionEnabled() const;
+  LayoutDirection::Type GetEffectiveLayoutDirection() const;
 
   /**
    * @brief Sets the opacity.
@@ -1871,6 +1886,9 @@ public:
   /**
    * @brief Sets whether the actor is enabled for user interaction, including touch, focus, and activation.
    * @param[in] enabled True to enable user interaction on the actor
+   * @note If false, this actor's children are disabled too; this is checked against every ancestor, so setting
+   *       it to false on any actor in the hierarchy disables that whole subtree. This does not change the children's
+   *       own enabled flag; each child keeps its value and becomes effectively enabled again once no ancestor is disabled.
    * @SINCE_2_5.30
    */
   void SetEnabled(bool enabled);
@@ -1878,9 +1896,23 @@ public:
   /**
    * @brief Gets whether the actor is enabled for user interaction.
    * @return True if the actor is enabled for user interaction
+   * @note This returns the actor's own flag, not its effective state; it can return true while the actor is
+   *       disabled because an ancestor is not enabled.
    * @SINCE_2_5.30
    */
   bool IsEnabled() const;
+
+  /**
+   * @brief Returns whether the actor and all of its ancestors are enabled.
+   *
+   * Unlike IsEnabled(), which only reflects the actor's own Property::ENABLED value,
+   * this walks up the scene hierarchy and returns false if this actor or any ancestor
+   * is disabled.
+   *
+   * @return True if neither the actor nor any ancestor is disabled
+   * @SINCE_2_5.32
+   */
+  bool IsEffectivelyEnabled() const;
 
   /**
    * @brief Sets the update area hint for the actor.
@@ -2356,27 +2388,26 @@ public: // Signals
   /**
    * @brief This signal is emitted when the effective visibility of this actor changes.
    *
-   * The effective visibility is true only when this actor and all its parents (up to the root layer)
-   * have their VISIBLE property set to true, and the actor is connected to the scene.
+   * The effective visibility is true only when this actor and all of its parents (up to the root)
+   * have their VISIBLE property set to true. It is resolved purely from the VISIBLE property along
+   * the ancestor chain and, like Actor::IsEffectivelyVisible(), does not consider scene attachment,
+   * on-screen position, opacity or culling.
    *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName( Actor actor, bool visible );
    * @endcode
    * actor: The actor whose effective visibility has changed.
-   * visible: Whether this actor's effective visibility is true.
-   * If true, it denotes one of two cases:
-   * One is that the VISIBLE property of this actor or one of its parent actors was originally false and has become true.
-   * Another is that this actor has been connected to the scene with the VISIBLE property of this actor and all of its parents set to true.
-   * If false, it also denotes one of two cases:
-   * One is that the VISIBLE property of this actor and all of its parent actors was originally true, but one of them has become false.
-   * Another is that the VISIBLE property of this actor and all of its parent actors are true, but this actor has been disconnected from the scene.
+   * visible: Whether this actor's effective visibility has become true or false. This happens when the
+   *          VISIBLE property of this actor or one of its ancestors changes while every other actor in
+   *          the chain is visible.
    *
    * @SINCE_2_3.22
    * @return The signal to connect to
    * @pre The Actor has been initialized.
-   * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
-   * @note For reference, an actor is only shown if it and its parents (up to the root actor) are also visible, are not transparent, and this actor has a non-zero size.
+   * @note This signal is only linked with Actor::Property::VISIBLE; it is NOT emitted when the actor is
+   *       connected to or disconnected from the scene, nor when it becomes transparent (or the reverse).
+   * @see Actor::IsEffectivelyVisible()
    */
   EffectiveVisibilityChangedSignalType& EffectiveVisibilityChangedSignal();
 

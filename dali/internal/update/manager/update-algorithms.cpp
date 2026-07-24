@@ -27,7 +27,7 @@
 #include <dali/internal/update/animation/scene-graph-constraint-container.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/public-api/actors/draw-mode.h>
+#include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/vector3.h>
 

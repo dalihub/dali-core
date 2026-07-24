@@ -761,6 +761,30 @@ public:
   bool IsVisible() const;
 
   /**
+   * @copydoc Dali::Actor::IsEffectivelyVisible()
+   */
+  bool IsEffectivelyVisible() const
+  {
+    if(!IsVisible())
+    {
+      return false;
+    }
+    for(Actor* parent = GetParent(); parent != nullptr; parent = parent->GetParent())
+    {
+      if(!parent->IsVisible())
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @copydoc Dali::DevelActor::IsOnSceneVisible()
+   */
+  bool IsOnSceneVisible() const;
+
+  /**
    * Sets the opacity of an actor.
    * @param [in] opacity The new opacity.
    */
@@ -839,6 +863,25 @@ public:
   bool IsEnabled() const
   {
     return mEnabled;
+  }
+
+  /**
+   * @copydoc Dali::Actor::IsEffectivelyEnabled()
+   */
+  bool IsEffectivelyEnabled() const
+  {
+    if(!IsEnabled())
+    {
+      return false;
+    }
+    for(Actor* parent = GetParent(); parent != nullptr; parent = parent->GetParent())
+    {
+      if(!parent->IsEnabled())
+      {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -1768,8 +1811,14 @@ public:
   void EmitVisibilityChangedSignal(bool visible, VisibilityChangeType type);
 
   /**
+   * @brief Emits the on-scene visibility change signal for this actor.
+   * @param[in] visible Whether the actor has become visible or not considering all parent Actors and scene connection.
+   */
+  void EmitOnSceneVisibilityChangedSignal(bool visible);
+
+  /**
    * @brief Emits the effective visibility change signal for this actor.
-   * @param[in] visible Whether the actor has become visible or not considering all parent Actors.
+   * @param[in] visible Whether the actor has become visible or not considering all parent Actors' VISIBLE property.
    */
   void EmitEffectiveVisibilityChangedSignal(bool visible);
 
@@ -1863,7 +1912,15 @@ public:
   }
 
   /**
-   * @copydoc DevelActor::EffectiveVisibilityChangedSignal
+   * @copydoc DevelActor::OnSceneVisibilityChangedSignal
+   */
+  Dali::Actor::EffectiveVisibilityChangedSignalType& OnSceneVisibilityChangedSignal()
+  {
+    return mOnSceneVisibilityChangedSignal;
+  }
+
+  /**
+   * @copydoc Dali::Actor::EffectiveVisibilityChangedSignal
    */
   Dali::Actor::EffectiveVisibilityChangedSignalType& EffectiveVisibilityChangedSignal()
   {
@@ -2072,9 +2129,14 @@ public:
   void RebuildDepthTree();
 
   /**
-   * Emits the visibility flag of an actor.
-   * @param[in] visible The new visibility flag.
-   * @param[in] sendMessage Whether to send a message to the update thread or not.
+   * Emits the on-scene visibility change signal for this actor and all its effectively visible children.
+   * @param[in] visible The new on-scene visibility flag.
+   */
+  void EmitOnSceneVisibilityChangedSignalRecursively(bool visible);
+
+  /**
+   * Emits the effective visibility change signal for this actor and all its effectively visible children.
+   * @param[in] visible The new effective visibility flag.
    */
   void EmitEffectiveVisibilityChangedSignalRecursively(bool visible);
 
@@ -2179,7 +2241,24 @@ public:
     return *mScene;
   }
 
+  /**
+   * @brief Sets the layout direction. LayoutDirection::INHERIT enables inheritance from the parent.
+   * @param[in] direction The layout direction to set.
+   */
+  void SetLayoutDirection(LayoutDirection::Type direction);
+
+  /**
+   * @brief Gets the layout direction set on this actor (may be LayoutDirection::INHERIT).
+   */
   LayoutDirection::Type GetLayoutDirection() const
+  {
+    return mInheritLayoutDirection ? LayoutDirection::INHERIT : mLayoutDirection;
+  }
+
+  /**
+   * @brief Gets the effective (resolved) layout direction, always LEFT_TO_RIGHT or RIGHT_TO_LEFT.
+   */
+  LayoutDirection::Type GetEffectiveLayoutDirection() const
   {
     return mLayoutDirection;
   }
@@ -2473,6 +2552,7 @@ protected:
   Dali::Actor::SceneDisconnectedSignalType          mSceneDisconnectedSignal;
   DevelActor::OnRelayoutSignalType                  mOnRelayoutSignal;
   Dali::Actor::VisibilityChangedSignalType          mVisibilityChangedSignal;
+  Dali::Actor::EffectiveVisibilityChangedSignalType mOnSceneVisibilityChangedSignal;
   Dali::Actor::EffectiveVisibilityChangedSignalType mEffectiveVisibilityChangedSignal;
   Dali::Actor::LayoutDirectionChangedSignalType     mLayoutDirectionChangedSignal;
   Dali::Actor::TouchEventSignalType                 mHitTestResultSignal;

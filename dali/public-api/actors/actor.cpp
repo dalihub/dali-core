@@ -414,6 +414,11 @@ bool Actor::IsVisible() const
   return GetImplementation(*this).IsVisible();
 }
 
+bool Actor::IsEffectivelyVisible() const
+{
+  return GetImplementation(*this).IsEffectivelyVisible();
+}
+
 void Actor::SetColor(const Vector4& color)
 {
   GetImplementation(*this).SetProperty(Actor::Property::COLOR, color);
@@ -629,14 +634,9 @@ LayoutDirection::Type Actor::GetLayoutDirection() const
   return GetImplementation(*this).GetLayoutDirection();
 }
 
-void Actor::SetInheritLayoutDirectionEnabled(bool enabled)
+LayoutDirection::Type Actor::GetEffectiveLayoutDirection() const
 {
-  GetImplementation(*this).SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, enabled);
-}
-
-bool Actor::IsInheritLayoutDirectionEnabled() const
-{
-  return GetImplementation(*this).IsInheritLayoutDirectionEnabled();
+  return GetImplementation(*this).GetEffectiveLayoutDirection();
 }
 
 void Actor::SetOpacity(float opacity)
@@ -732,6 +732,11 @@ void Actor::SetEnabled(bool enabled)
 bool Actor::IsEnabled() const
 {
   return GetImplementation(*this).IsEnabled();
+}
+
+bool Actor::IsEffectivelyEnabled() const
+{
+  return GetImplementation(*this).IsEffectivelyEnabled();
 }
 
 void Actor::SetUpdateAreaHint(const Vector4& hint)

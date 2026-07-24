@@ -87,7 +87,6 @@ enum Type
   ALLOW_DESCENDANT_FOCUS          = Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS,
   ENABLED                         = Dali::Actor::Property::ENABLED,
   LAYOUT_DIRECTION                = Dali::Actor::Property::LAYOUT_DIRECTION,
-  INHERIT_LAYOUT_DIRECTION        = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
   CULLED                          = Dali::Actor::Property::CULLED,
   IGNORED                         = Dali::Actor::Property::IGNORED,
   ID                              = Dali::Actor::Property::ID,
@@ -188,6 +187,22 @@ enum Type
    * @details Name "maximumSize", type Property::VECTOR2.
    */
   MAXIMUM_SIZE,
+
+  /**
+   * @brief Legacy layout direction property (LEFT_TO_RIGHT / RIGHT_TO_LEFT only).
+   * @details Name "layoutDirectionLegacy", type LayoutDirection::Type (Property::INTEGER) or Property::STRING.
+   * @note Deprecated. Exists only for NUI(TizenFX) binding compatibility. Getting it returns the resolved
+   *       direction (never INHERIT). Use Dali::Actor::Property::LAYOUT_DIRECTION in new code.
+   */
+  LAYOUT_DIRECTION_LEGACY,
+
+  /**
+   * @brief Legacy layout direction inheritance flag.
+   * @details Name "inheritLayoutDirectionLegacy", type Property::BOOLEAN.
+   * @note Deprecated. Exists only for NUI(TizenFX) binding compatibility. Use
+   *       Dali::Actor::Property::LAYOUT_DIRECTION with LayoutDirection::INHERIT in new code.
+   */
+  INHERIT_LAYOUT_DIRECTION_LEGACY,
 };
 
 } // namespace Property
@@ -203,12 +218,12 @@ enum Type
 } // namespace ChildrenDepthIndexPolicy
 
 /**
- * @brief Get the actor who trigger the VisibilityChangedSignal or EffectiveVisibilityChangedSignal signal.
- * @note The return value is "INVALID" if this API called outside of the VisibilityChangedSignal or EffectiveVisibilityChangedSignal signal.
+ * @brief Get the actor who trigger the VisibilityChangedSignal, EffectiveVisibilityChangedSignal or OnSceneVisibilityChangedSignal signal.
+ * @note The return value is "INVALID" if this API called outside of the VisibilityChangedSignal, EffectiveVisibilityChangedSignal or OnSceneVisibilityChangedSignal signal.
  * "INVALID" don't mean the empty handle. It might return the valid handle. But it doesn't mean the visibility changed actor.
- * if this API called outside of VisibilityChangedSignal or EffectiveVisibilityChangedSignal signal.
+ * if this API called outside of VisibilityChangedSignal, EffectiveVisibilityChangedSignal or OnSceneVisibilityChangedSignal signal.
  *
- * For example, Let we assume some Actor tree looks like (root)A - B - C - D - E.
+ * For example, suppose an Actor tree looks like (root)A - B - C - D - E.
  * If we change C's visibility as false + Change A's visibility inside of D's VisibilityChangedSignal callback,
  * The result of this API will like this.
  *
@@ -266,6 +281,8 @@ using ChildOrderChangedSignalType = Signal<void(Actor, Actor)>; ///< Used when t
 
 using OnRelayoutSignalType = Signal<void(Actor)>; ///< Called when the actor is relaid out.
 
+using OnSceneVisibilityChangedSignalType = Signal<void(Actor, bool)>; ///< Called when the actor's on-scene visibility changes.
+
 /**
  * @brief This signal is emitted when an actor's children change their sibling order
  *
@@ -293,6 +310,34 @@ DALI_CORE_API ChildOrderChangedSignalType& ChildOrderChangedSignal(Actor actor);
  * @pre The Actor has been initialized.
  */
 DALI_CORE_API OnRelayoutSignalType& OnRelayoutSignal(Actor actor);
+
+/**
+ * @brief This signal is emitted when the on-scene visibility of this actor changes.
+ *
+ * The on-scene visibility is true only when this actor and all of its parents (up to the root layer)
+ * have their VISIBLE property set to true, and the actor is connected to a visible scene. In other
+ * words it reflects whether the actor is actually taking part in the scene (ignoring opacity, on-screen
+ * position and culling).
+ *
+ * A callback of the following type may be connected:
+ * @code
+ *   void YourCallbackName( Actor actor, bool visible );
+ * @endcode
+ * actor: The actor whose on-scene visibility has changed.
+ * visible: Whether this actor's on-scene visibility is true.
+ * If true, it denotes one of two cases:
+ * One is that the VISIBLE property of this actor or one of its parent actors was originally false and has become true.
+ * Another is that this actor has been connected to the scene with the VISIBLE property of this actor and all of its parents set to true.
+ * If false, it also denotes one of two cases:
+ * One is that the VISIBLE property of this actor and all of its parent actors was originally true, but one of them has become false.
+ * Another is that the VISIBLE property of this actor and all of its parent actors are true, but this actor has been disconnected from the scene.
+ *
+ * @return The signal to connect to
+ * @pre The Actor has been initialized.
+ * @note This signal is NOT emitted if the actor becomes transparent (or the reverse).
+ * @note For a pure ancestor-chain visibility signal that ignores scene connection, use Actor::EffectiveVisibilityChangedSignal().
+ */
+DALI_CORE_API OnSceneVisibilityChangedSignalType& OnSceneVisibilityChangedSignal(Actor actor);
 
 /**
  * @brief This is used when the parent actor wants to listen to gesture events.
@@ -444,19 +489,21 @@ DALI_CORE_API Matrix GetWorldTransform(Actor actor);
 DALI_CORE_API Vector4 GetWorldColor(Actor actor);
 
 /**
- * Get the effective visibility of the actor.
+ * @brief Returns the on-scene visibility of the actor.
  *
- * This calculates the effective visibility of the actor from scratch using
- * only event side properties. It does not rely on the update thread
- * to have already calculated the visibility.
+ * The on-scene visibility is true only when this actor and all of its parents (up to the root layer)
+ * have their VISIBLE property set to true, and the actor is connected to a visible scene. In other
+ * words it reflects whether the actor is actually taking part in the scene (ignoring opacity, on-screen
+ * position and culling).
  *
- * The effective visibility takes into account the actor's own visibility
- * property as well as the visibility of all its parents in the hierarchy.
+ * This is the value tracked by DevelActor::OnSceneVisibilityChangedSignal(). It is calculated from
+ * scratch using only event-side properties, so it does not rely on the update thread.
  *
- * @param[in] actor The actor to calculate the effective visibility for
- * @return False if the actor or any of its parents is not visible, or if the scene is off. True otherwise.
+ * @param[in] actor The actor to query
+ * @return True if the actor is connected to a visible scene and neither it nor any ancestor is hidden
+ * @note For a pure ancestor-chain visibility query that ignores scene connection, use Actor::IsEffectivelyVisible().
  */
-DALI_CORE_API bool IsEffectivelyVisible(Actor actor);
+DALI_CORE_API bool IsOnSceneVisible(Actor actor);
 
 /**
  * Rotate the actor look at specific position.

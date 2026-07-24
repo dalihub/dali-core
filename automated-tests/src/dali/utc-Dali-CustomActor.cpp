@@ -264,6 +264,9 @@ int UtcDaliCustomActorTouchHookConsumesWithoutSignal(void)
   DALI_TEST_EQUALS(impl->mTouchEventCallCount, 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(impl->mLastHitActor, hookActor, TEST_LOCATION);
   DALI_TEST_CHECK(!gTouchHookLowerActorTouched);
+
+  // Reset self-reference count to avoid memory leak.
+  impl->mLastHitActor.Reset();
   END_TEST;
 }
 
@@ -290,6 +293,9 @@ int UtcDaliCustomActorTouchHookFallsThroughWhenNotConsumed(void)
 
   DALI_TEST_CHECK(impl->mTouchEventCallCount >= 1u);
   DALI_TEST_CHECK(gTouchHookLowerActorTouched);
+
+  // Reset self-reference count to avoid memory leak.
+  impl->mLastHitActor.Reset();
   END_TEST;
 }
 
@@ -317,6 +323,9 @@ int UtcDaliCustomActorHoverHookConsumesWithoutSignal(void)
   DALI_TEST_CHECK(impl->mHoverEventCallCount >= 1u);
   DALI_TEST_EQUALS(impl->mLastHitActor, hookActor, TEST_LOCATION);
   DALI_TEST_CHECK(!gHoverHookLowerActorHovered);
+
+  // Reset self-reference count to avoid memory leak.
+  impl->mLastHitActor.Reset();
   END_TEST;
 }
 
@@ -343,6 +352,9 @@ int UtcDaliCustomActorHoverHookFallsThroughWhenNotConsumed(void)
 
   DALI_TEST_CHECK(impl->mHoverEventCallCount >= 1u);
   DALI_TEST_CHECK(gHoverHookLowerActorHovered);
+
+  // Reset self-reference count to avoid memory leak.
+  impl->mLastHitActor.Reset();
   END_TEST;
 }
 

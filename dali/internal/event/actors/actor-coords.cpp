@@ -867,21 +867,21 @@ Vector4 CalculateActorWorldColor(const Actor& actor)
   return worldColor;
 }
 
-bool CalculateActorInheritedVisible(const Actor& actor)
+bool CalculateActorOnSceneVisible(const Actor& actor)
 {
-  bool inheritedVisible = false;
+  bool onSceneVisible = false;
   if(actor.OnScene())
   {
     const auto& scene         = actor.GetScene();
-    inheritedVisible          = scene.IsVisible();
+    onSceneVisible            = scene.IsVisible();
     const Actor* currentActor = &actor;
-    while(inheritedVisible && currentActor)
+    while(onSceneVisible && currentActor)
     {
-      inheritedVisible &= currentActor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
+      onSceneVisible &= currentActor->GetProperty(Dali::Actor::Property::VISIBLE).Get<bool>();
       currentActor = currentActor->GetParent();
     }
   }
-  return inheritedVisible;
+  return onSceneVisible;
 }
 
 Quaternion CalculateActorLookAtOrientation(const Actor& actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)

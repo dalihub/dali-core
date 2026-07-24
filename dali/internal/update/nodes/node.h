@@ -33,7 +33,6 @@
 #include <dali/internal/update/nodes/partial-rendering-data.h>
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 #include <dali/public-api/actors/actor-enumerations.h>
-#include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/common/dali-utility.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/vector3.h>
@@ -1205,18 +1204,18 @@ protected:
   uint32_t mDepthIndex;    ///< Depth index of the node
 
   // flags, compressed to bitfield
-  NodePropertyFlags  mDirtyFlags;                  ///< Dirty flags for each of the Node properties
-  DrawMode::Type     mDrawMode : 3;                ///< How the Node and its children should be drawn
-  ColorMode          mColorMode : 3;               ///< Determines whether mWorldColor is inherited, 2 bits is enough
-  ClippingMode::Type mClippingMode : 3;            ///< The clipping mode of this node
-  bool               mIsRoot : 1;                  ///< True if the node cannot have a parent
-  bool               mIsLayer : 1;                 ///< True if the node is a layer
-  bool               mIsCamera : 1;                ///< True if the node is a camera
-  bool               mPositionUsesPivot : 1; ///< True if the node should use the anchor-point when calculating the position
-  bool               mTransparent : 1;             ///< True if this node is transparent. This value do not affect children.
-  bool               mUpdateAreaChanged : 1;       ///< True if the update area of the node is changed.
-  bool               mUpdateAreaUseSize : 1;       ///< True if the update area of the node is same as node size.
-  bool               mUseTextureUpdateArea : 1;    ///< Whether the actor uses the update area of the texture instead of its own.
+  NodePropertyFlags  mDirtyFlags;               ///< Dirty flags for each of the Node properties
+  DrawMode::Type     mDrawMode : 3;             ///< How the Node and its children should be drawn
+  ColorMode          mColorMode : 3;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
+  ClippingMode::Type mClippingMode : 3;         ///< The clipping mode of this node
+  bool               mIsRoot : 1;               ///< True if the node cannot have a parent
+  bool               mIsLayer : 1;              ///< True if the node is a layer
+  bool               mIsCamera : 1;             ///< True if the node is a camera
+  bool               mPositionUsesPivot : 1;    ///< True if the node should use the anchor-point when calculating the position
+  bool               mTransparent : 1;          ///< True if this node is transparent. This value do not affect children.
+  bool               mUpdateAreaChanged : 1;    ///< True if the update area of the node is changed.
+  bool               mUpdateAreaUseSize : 1;    ///< True if the update area of the node is same as node size.
+  bool               mUseTextureUpdateArea : 1; ///< Whether the actor uses the update area of the texture instead of its own.
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

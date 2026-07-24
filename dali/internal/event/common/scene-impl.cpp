@@ -177,7 +177,7 @@ void Scene::Show()
   if(!mIsVisible)
   {
     mIsVisible = true;
-    mRootLayer->EmitEffectiveVisibilityChangedSignalRecursively(true);
+    mRootLayer->EmitOnSceneVisibilityChangedSignalRecursively(true);
   }
 }
 
@@ -186,7 +186,7 @@ void Scene::Hide()
   if(mIsVisible)
   {
     mIsVisible = false;
-    mRootLayer->EmitEffectiveVisibilityChangedSignalRecursively(false);
+    mRootLayer->EmitOnSceneVisibilityChangedSignalRecursively(false);
   }
 }
 

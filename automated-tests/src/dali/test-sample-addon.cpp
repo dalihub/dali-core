@@ -20,8 +20,6 @@
 
 #include <cstring>
 
-static const std::string DUMMY_ADDON_NAME = "SampleAddOn";
-
 int StringLen(const char* str)
 {
   return strlen(str);
