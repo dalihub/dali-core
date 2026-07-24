@@ -2241,7 +2241,24 @@ public:
     return *mScene;
   }
 
+  /**
+   * @brief Sets the layout direction. LayoutDirection::INHERIT enables inheritance from the parent.
+   * @param[in] direction The layout direction to set.
+   */
+  void SetLayoutDirection(LayoutDirection::Type direction);
+
+  /**
+   * @brief Gets the layout direction set on this actor (may be LayoutDirection::INHERIT).
+   */
   LayoutDirection::Type GetLayoutDirection() const
+  {
+    return mInheritLayoutDirection ? LayoutDirection::INHERIT : mLayoutDirection;
+  }
+
+  /**
+   * @brief Gets the effective (resolved) layout direction, always LEFT_TO_RIGHT or RIGHT_TO_LEFT.
+   */
+  LayoutDirection::Type GetEffectiveLayoutDirection() const
   {
     return mLayoutDirection;
   }

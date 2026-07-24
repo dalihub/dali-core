@@ -634,14 +634,9 @@ LayoutDirection::Type Actor::GetLayoutDirection() const
   return GetImplementation(*this).GetLayoutDirection();
 }
 
-void Actor::SetInheritLayoutDirectionEnabled(bool enabled)
+LayoutDirection::Type Actor::GetEffectiveLayoutDirection() const
 {
-  GetImplementation(*this).SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, enabled);
-}
-
-bool Actor::IsInheritLayoutDirectionEnabled() const
-{
-  return GetImplementation(*this).IsInheritLayoutDirectionEnabled();
+  return GetImplementation(*this).GetEffectiveLayoutDirection();
 }
 
 void Actor::SetOpacity(float opacity)

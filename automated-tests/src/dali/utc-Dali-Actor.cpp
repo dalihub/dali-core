@@ -11130,48 +11130,50 @@ int UtcDaliActorLayoutDirectionProperty(void)
   TestApplication application;
   tet_infoline("Check layout direction property");
 
+  // Fresh actors default to LayoutDirection::INHERIT as their set direction, resolving to LEFT_TO_RIGHT effectively.
   Actor actor0 = Actor::New();
-  DALI_TEST_EQUALS(actor0.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor0.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   application.GetScene().Add(actor0);
 
   application.SendNotification();
   application.Render();
 
   Actor actor1 = Actor::New();
-  DALI_TEST_EQUALS(actor1.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor2 = Actor::New();
-  DALI_TEST_EQUALS(actor2.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor3 = Actor::New();
-  DALI_TEST_EQUALS(actor3.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor4 = Actor::New();
-  DALI_TEST_EQUALS(actor4.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor4.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor5 = Actor::New();
-  DALI_TEST_EQUALS(actor5.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor5.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor6 = Actor::New();
-  DALI_TEST_EQUALS(actor6.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor6.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor7 = Actor::New();
-  DALI_TEST_EQUALS(actor7.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor7.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor8 = Actor::New();
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   Actor actor9 = Actor::New();
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   actor1.Add(actor2);
   gLayoutDirectionType = LayoutDirection::LEFT_TO_RIGHT;
   actor2.LayoutDirectionChangedSignal().Connect(LayoutDirectionChanged);
 
-  DALI_TEST_EQUALS(actor1.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), true, TEST_LOCATION);
+  // Fresh actor inherits by default; setting an explicit direction turns inheritance off.
+  DALI_TEST_EQUALS(actor1.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
   actor1.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::RIGHT_TO_LEFT);
-  DALI_TEST_EQUALS(actor1.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(actor1.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor2.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
   DALI_TEST_EQUALS(gLayoutDirectionType, LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
-  actor1.SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, true);
+  actor1.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::INHERIT);
   actor0.Add(actor1);
-  DALI_TEST_EQUALS(actor1.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor2.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor1.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor2.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   application.GetScene().Add(actor3);
   actor3.Add(actor4);
@@ -11183,32 +11185,83 @@ int UtcDaliActorLayoutDirectionProperty(void)
   actor3.SetProperty(Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT");
   actor5.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT);
 
-  DALI_TEST_EQUALS(actor8.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), true, TEST_LOCATION);
-  actor8.SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, false);
-  DALI_TEST_EQUALS(actor8.GetProperty<bool>(Actor::Property::INHERIT_LAYOUT_DIRECTION), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  // Freezing the current effective direction as an explicit value stops inheritance.
+  actor8.SetLayoutDirection(actor8.GetEffectiveLayoutDirection());
+  DALI_TEST_EQUALS(actor8.GetLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   actor7.SetProperty(Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT");
 
-  DALI_TEST_EQUALS(actor3.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor4.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor5.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor6.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor7.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor3.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor4.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor5.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor6.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor7.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
 
   actor8.SetProperty(Actor::Property::LAYOUT_DIRECTION, "RIGHT_TO_LEFT");
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
   actor7.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::LEFT_TO_RIGHT);
-  DALI_TEST_EQUALS(actor7.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor7.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
-  actor8.SetProperty(Actor::Property::INHERIT_LAYOUT_DIRECTION, true);
-  DALI_TEST_EQUALS(actor8.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor9.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  actor8.SetProperty(Actor::Property::LAYOUT_DIRECTION, LayoutDirection::INHERIT);
+  DALI_TEST_EQUALS(actor8.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor9.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorLayoutDirectionLegacyProperty(void)
+{
+  TestApplication application;
+  tet_infoline("Check the legacy layout direction properties kept for NUI binding compatibility");
+
+  Actor parent = Actor::New();
+  Actor child  = Actor::New();
+  parent.Add(child);
+  application.GetScene().Add(parent);
+
+  // Fresh actors inherit. The legacy INHERIT flag reads true, and the legacy direction resolves to
+  // LEFT_TO_RIGHT - the legacy getter never returns INHERIT, unlike the new-API policy getter.
+  DALI_TEST_EQUALS(parent.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+
+  // Setting the legacy direction sets an explicit value and turns inheritance off (old 2-value behaviour).
+  parent.SetProperty(DevelActor::Property::LAYOUT_DIRECTION_LEGACY, LayoutDirection::RIGHT_TO_LEFT);
+  DALI_TEST_EQUALS(parent.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), false, TEST_LOCATION);
+  // The legacy and unified APIs share the same underlying state.
+  DALI_TEST_EQUALS(parent.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+
+  // The inheriting child resolves to the parent's direction. The legacy getter returns the resolved value
+  // (RIGHT_TO_LEFT), never INHERIT, while the new-API policy getter reports INHERIT.
+  DALI_TEST_EQUALS(child.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::RIGHT_TO_LEFT), TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+
+  // A string value is accepted too (the legacy property is registered as STRING).
+  child.SetProperty(DevelActor::Property::LAYOUT_DIRECTION_LEGACY, "LEFT_TO_RIGHT");
+  DALI_TEST_EQUALS(child.GetProperty<int>(DevelActor::Property::LAYOUT_DIRECTION_LEGACY), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), false, TEST_LOCATION);
+
+  // Setting the legacy INHERIT flag true re-enables inheritance (maps to LayoutDirection::INHERIT).
+  child.SetProperty(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY, true);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+
+  // Setting the legacy INHERIT flag false freezes the current resolved direction as an explicit value.
+  child.SetProperty(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY, false);
+  DALI_TEST_EQUALS(child.GetProperty<bool>(DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
   END_TEST;
 }
@@ -11239,7 +11292,7 @@ int UtcDaliActorLayoutDirectionSignal(void)
   tet_infoline("Check changing layout direction property sends a signal");
 
   Actor actor = Actor::New();
-  DALI_TEST_EQUALS(actor.GetProperty<int>(Actor::Property::LAYOUT_DIRECTION), static_cast<int>(LayoutDirection::LEFT_TO_RIGHT), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
   application.GetScene().Add(actor);
   bool                   signalCalled = false;
   LayoutDirectionFunctor layoutDirectionFunctor(signalCalled);
@@ -17306,6 +17359,11 @@ int UtcDaliActorSetGetLayoutDirectionNewP(void)
   actor.SetLayoutDirection(LayoutDirection::RIGHT_TO_LEFT);
   DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
+  // INHERIT is reported by the policy getter; the effective getter always resolves to a concrete direction.
+  actor.SetLayoutDirection(LayoutDirection::INHERIT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetEffectiveLayoutDirection(), LayoutDirection::LEFT_TO_RIGHT, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -17433,11 +17491,13 @@ int UtcDaliActorSetGetInheritLayoutDirectionNewP(void)
   Actor           actor = Actor::New();
   application.GetScene().Add(actor);
 
-  actor.SetInheritLayoutDirectionEnabled(true);
-  DALI_TEST_EQUALS(actor.IsInheritLayoutDirectionEnabled(), true, TEST_LOCATION);
+  // Inheritance is now expressed through LayoutDirection::INHERIT on the single SetLayoutDirection API.
+  actor.SetLayoutDirection(LayoutDirection::INHERIT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::INHERIT, TEST_LOCATION);
 
-  actor.SetInheritLayoutDirectionEnabled(false);
-  DALI_TEST_EQUALS(actor.IsInheritLayoutDirectionEnabled(), false, TEST_LOCATION);
+  actor.SetLayoutDirection(LayoutDirection::RIGHT_TO_LEFT);
+  DALI_TEST_EQUALS(actor.GetLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetEffectiveLayoutDirection(), LayoutDirection::RIGHT_TO_LEFT, TEST_LOCATION);
 
   END_TEST;
 }

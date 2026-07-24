@@ -97,6 +97,7 @@ DALI_ENUM_TO_STRING_TABLE_END(CLIPPING_MODE)
 DALI_ENUM_TO_STRING_TABLE_BEGIN(LAYOUT_DIRECTION)
   DALI_ENUM_TO_STRING_WITH_SCOPE(LayoutDirection, LEFT_TO_RIGHT)
   DALI_ENUM_TO_STRING_WITH_SCOPE(LayoutDirection, RIGHT_TO_LEFT)
+  DALI_ENUM_TO_STRING_WITH_SCOPE(LayoutDirection, INHERIT)
 DALI_ENUM_TO_STRING_TABLE_END(LAYOUT_DIRECTION)
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN(CHILDREN_DEPTH_INDEX_POLICY)
@@ -549,6 +550,17 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
 
     case Dali::Actor::Property::LAYOUT_DIRECTION:
     {
+      LayoutDirection::Type direction = actor.GetLayoutDirection();
+      if(Scripting::GetEnumerationProperty<LayoutDirection::Type>(property, LAYOUT_DIRECTION_TABLE, LAYOUT_DIRECTION_TABLE_COUNT, direction))
+      {
+        actor.SetLayoutDirection(direction);
+      }
+      break;
+    }
+
+    // Legacy layout direction properties, kept for NUI(TizenFX) binding compatibility. See DevelActor::Property.
+    case Dali::DevelActor::Property::LAYOUT_DIRECTION_LEGACY:
+    {
       Dali::LayoutDirection::Type direction = actor.mLayoutDirection;
       actor.mInheritLayoutDirection         = false;
 
@@ -559,7 +571,7 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
+    case Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY:
     {
       CheckValidAndSet(property, actor, &Actor::SetInheritLayoutDirectionEnabled);
       break;
@@ -1476,11 +1488,18 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
 
     case Dali::Actor::Property::LAYOUT_DIRECTION:
     {
+      value = actor.GetLayoutDirection();
+      break;
+    }
+
+    // Legacy layout direction properties, kept for NUI(TizenFX) binding compatibility. See DevelActor::Property.
+    case Dali::DevelActor::Property::LAYOUT_DIRECTION_LEGACY:
+    {
       value = actor.mLayoutDirection;
       break;
     }
 
-    case Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION:
+    case Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY:
     {
       value = actor.IsInheritLayoutDirectionEnabled();
       break;

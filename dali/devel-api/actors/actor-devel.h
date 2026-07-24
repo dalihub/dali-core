@@ -87,7 +87,6 @@ enum Type
   ALLOW_DESCENDANT_FOCUS          = Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS,
   ENABLED                         = Dali::Actor::Property::ENABLED,
   LAYOUT_DIRECTION                = Dali::Actor::Property::LAYOUT_DIRECTION,
-  INHERIT_LAYOUT_DIRECTION        = Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION,
   CULLED                          = Dali::Actor::Property::CULLED,
   IGNORED                         = Dali::Actor::Property::IGNORED,
   ID                              = Dali::Actor::Property::ID,
@@ -188,6 +187,22 @@ enum Type
    * @details Name "maximumSize", type Property::VECTOR2.
    */
   MAXIMUM_SIZE,
+
+  /**
+   * @brief Legacy layout direction property (LEFT_TO_RIGHT / RIGHT_TO_LEFT only).
+   * @details Name "layoutDirectionLegacy", type LayoutDirection::Type (Property::INTEGER) or Property::STRING.
+   * @note Deprecated. Exists only for NUI(TizenFX) binding compatibility. Getting it returns the resolved
+   *       direction (never INHERIT). Use Dali::Actor::Property::LAYOUT_DIRECTION in new code.
+   */
+  LAYOUT_DIRECTION_LEGACY,
+
+  /**
+   * @brief Legacy layout direction inheritance flag.
+   * @details Name "inheritLayoutDirectionLegacy", type Property::BOOLEAN.
+   * @note Deprecated. Exists only for NUI(TizenFX) binding compatibility. Use
+   *       Dali::Actor::Property::LAYOUT_DIRECTION with LayoutDirection::INHERIT in new code.
+   */
+  INHERIT_LAYOUT_DIRECTION_LEGACY,
 };
 
 } // namespace Property

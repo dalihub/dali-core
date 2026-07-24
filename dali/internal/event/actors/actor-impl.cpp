@@ -135,7 +135,6 @@ DALI_PROPERTY("focusOnTouch", BOOLEAN, true, false, false, Dali::Actor::Property
 DALI_PROPERTY("allowDescendantFocus", BOOLEAN, true, false, false, Dali::Actor::Property::ALLOW_DESCENDANT_FOCUS)
 DALI_PROPERTY("enabled", BOOLEAN, true, false, false, Dali::Actor::Property::ENABLED)
 DALI_PROPERTY("layoutDirection", STRING, true, false, false, Dali::Actor::Property::LAYOUT_DIRECTION)
-DALI_PROPERTY("inheritLayoutDirection", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_LAYOUT_DIRECTION)
 DALI_PROPERTY("culled", BOOLEAN, false, false, true, Dali::Actor::Property::CULLED)
 DALI_PROPERTY("ignored", BOOLEAN, true, false, true, Dali::Actor::Property::IGNORED)
 DALI_PROPERTY("id", INTEGER, false, false, false, Dali::Actor::Property::ID)
@@ -158,6 +157,8 @@ DALI_PROPERTY("heightForWidth", BOOLEAN, true, false, false, Dali::DevelActor::P
 DALI_PROPERTY("padding", VECTOR4, true, false, false, Dali::DevelActor::Property::PADDING)
 DALI_PROPERTY("minimumSize", VECTOR2, true, false, false, Dali::DevelActor::Property::MINIMUM_SIZE)
 DALI_PROPERTY("maximumSize", VECTOR2, true, false, false, Dali::DevelActor::Property::MAXIMUM_SIZE)
+DALI_PROPERTY("layoutDirectionLegacy", STRING, true, false, false, Dali::DevelActor::Property::LAYOUT_DIRECTION_LEGACY)
+DALI_PROPERTY("inheritLayoutDirectionLegacy", BOOLEAN, true, false, false, Dali::DevelActor::Property::INHERIT_LAYOUT_DIRECTION_LEGACY)
 DALI_PROPERTY_TABLE_END(DEFAULT_ACTOR_PROPERTY_START_INDEX, ActorDefaultProperties)
 
 // Signals
@@ -1903,6 +1904,19 @@ void Actor::RaiseAbove(Internal::Actor& target)
 void Actor::LowerBelow(Internal::Actor& target)
 {
   CheckParentAndCall(mParent, *this, target, &ActorParent::LowerChildBelow);
+}
+
+void Actor::SetLayoutDirection(LayoutDirection::Type direction)
+{
+  if(direction == LayoutDirection::INHERIT)
+  {
+    SetInheritLayoutDirectionEnabled(true);
+  }
+  else
+  {
+    mInheritLayoutDirection = false;
+    mParentImpl.InheritLayoutDirectionRecursively(direction, true);
+  }
 }
 
 void Actor::SetInheritLayoutDirectionEnabled(bool inherit)

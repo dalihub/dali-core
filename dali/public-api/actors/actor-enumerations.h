@@ -204,7 +204,8 @@ namespace LayoutDirection
 enum Type
 {
   LEFT_TO_RIGHT, ///< Layout direction is from Left to Right direction. @SINCE_1_2.60
-  RIGHT_TO_LEFT  ///< Layout direction is from Right to Left direction. @SINCE_1_2.60
+  RIGHT_TO_LEFT, ///< Layout direction is from Right to Left direction. @SINCE_1_2.60
+  INHERIT        ///< Layout direction is inherited from the parent. @SINCE_2_5.32
 };
 
 } // namespace LayoutDirection

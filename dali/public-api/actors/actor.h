@@ -732,15 +732,11 @@ public:
        * @details Name "layoutDirection", type LayoutDirection::Type (Property::INTEGER) or Property::STRING.
        * @SINCE_1_2.60
        * @see LayoutDirection::Type for supported values.
+       * @note Set to LayoutDirection::INHERIT to inherit the direction from the parent. Getting this property returns
+       *       the direction set on the actor and may be LayoutDirection::INHERIT; use GetEffectiveLayoutDirection()
+       *       to get the resolved direction actually used for layout.
        */
       LAYOUT_DIRECTION,
-
-      /**
-       * @brief Determines whether child actors inherit the layout direction from a parent.
-       * @details Name "layoutDirectionInheritance", type Property::BOOLEAN.
-       * @SINCE_1_2.60
-       */
-      INHERIT_LAYOUT_DIRECTION,
 
       // --- Structural / read-only state ---
 
@@ -1744,31 +1740,26 @@ public:
 
   /**
    * @brief Sets the layout direction.
-   * @param[in] layoutDirection The layout direction
+   * @param[in] layoutDirection The layout direction. Set to LayoutDirection::INHERIT to inherit from the parent.
    * @SINCE_2_5.30
    */
   void SetLayoutDirection(LayoutDirection::Type layoutDirection);
 
   /**
-   * @brief Gets the layout direction.
-   * @return The layout direction
+   * @brief Gets the layout direction set on this actor.
+   * @return The layout direction. May be LayoutDirection::INHERIT if the actor inherits from its parent.
+   * @note To get the resolved direction actually used for layout (always LEFT_TO_RIGHT or RIGHT_TO_LEFT),
+   *       use GetEffectiveLayoutDirection().
    * @SINCE_2_5.30
    */
   LayoutDirection::Type GetLayoutDirection() const;
 
   /**
-   * @brief Sets whether the child inherits the layout direction from the parent.
-   * @param[in] enabled True to inherit layout direction
-   * @SINCE_2_5.30
+   * @brief Gets the effective layout direction resolved through the inheritance chain.
+   * @return The resolved layout direction, always LEFT_TO_RIGHT or RIGHT_TO_LEFT (never INHERIT).
+   * @SINCE_2_5.32
    */
-  void SetInheritLayoutDirectionEnabled(bool enabled);
-
-  /**
-   * @brief Gets whether the child inherits the layout direction from the parent.
-   * @return True if layout direction inheritance is enabled
-   * @SINCE_2_5.30
-   */
-  bool IsInheritLayoutDirectionEnabled() const;
+  LayoutDirection::Type GetEffectiveLayoutDirection() const;
 
   /**
    * @brief Sets the opacity.
