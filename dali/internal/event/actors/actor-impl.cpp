@@ -1264,6 +1264,7 @@ bool Actor::DispatchTouchEvent(const Dali::TouchEvent& touch)
 {
   bool consumed = OnTouchEvent(touch);
   consumed      = EmitTouchEventSignal(touch) || consumed;
+  OnFinalizeTouchEventDispatch(touch);
   return consumed;
 }
 
@@ -1280,6 +1281,7 @@ bool Actor::DispatchHoverEvent(const Dali::HoverEvent& event)
 {
   bool consumed = OnHoverEvent(event);
   consumed      = EmitHoverEventSignal(event) || consumed;
+  OnFinalizeHoverEventDispatch(event);
   return consumed;
 }
 
@@ -1297,6 +1299,7 @@ bool Actor::DispatchWheelEvent(const Dali::WheelEvent& event)
 {
   bool consumed = OnWheelEvent(event);
   consumed      = EmitWheelEventSignal(event) || consumed;
+  OnFinalizeWheelEventDispatch(event);
   return consumed;
 }
 
@@ -1430,6 +1433,21 @@ bool Actor::HasIntrinsicWheelHandling() const
 bool Actor::OnWheelEvent(const Dali::WheelEvent& wheel)
 {
   return OnWheelEventExternal(wheel);
+}
+
+void Actor::OnFinalizeTouchEventDispatch(const Dali::TouchEvent& touch)
+{
+  OnFinalizeTouchEventDispatchExternal(touch);
+}
+
+void Actor::OnFinalizeHoverEventDispatch(const Dali::HoverEvent& hover)
+{
+  OnFinalizeHoverEventDispatchExternal(hover);
+}
+
+void Actor::OnFinalizeWheelEventDispatch(const Dali::WheelEvent& wheel)
+{
+  OnFinalizeWheelEventDispatchExternal(wheel);
 }
 
 uint32_t Actor::AddCacheRenderer(Renderer& renderer)
