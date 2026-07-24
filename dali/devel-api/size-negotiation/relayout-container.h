@@ -24,47 +24,34 @@
 
 namespace Dali
 {
-/**
- * @addtogroup dali_core_size_negotiation
- * @{
- */
-
 class RelayoutContainer;
 using RelayoutContainerPtr = RelayoutContainer*;
 
 /**
  * @brief Interface to encapsulate information required for relayout.
- * @SINCE_1_0.0
  */
 class RelayoutContainer
 {
 public:
   /**
    * @brief Default constructor.
-   *
-   * @SINCE_1_0.0
    */
   RelayoutContainer() = default;
 
   /**
    * @brief Virtual destructor.
-   * @SINCE_1_0.0
    */
   virtual ~RelayoutContainer() = default;
 
   /**
    * @brief Adds relayout information to the container if it doesn't already exist.
    *
-   * @SINCE_1_0.0
    * @param actor The actor to relayout
    * @param size The size to relayout
    */
   virtual void Add(const Actor& actor, const Vector2& size) = 0;
 };
 
-/**
- * @}
- */
 } // namespace Dali
 
 #endif // DALI_RELAYOUT_CONTAINER_H

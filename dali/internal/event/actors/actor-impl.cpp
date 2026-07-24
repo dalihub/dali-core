@@ -40,6 +40,7 @@
 #include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/string-utils.h>
 
+#include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/internal/event/actors/actor-coords.h>
 #include <dali/internal/event/actors/actor-parent.h>
 #include <dali/internal/event/actors/actor-property-handler.h>
@@ -53,7 +54,6 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/nodes/node-messages.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 
 using Dali::Integration::ToStdStringView;
 using Dali::Internal::SceneGraph::AnimatableProperty;

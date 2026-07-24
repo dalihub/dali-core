@@ -63,6 +63,10 @@ SET( devel_api_core_addons_header_files
   ${devel_api_src_dir}/addons/addon-dispatch-table.h
 )
 
+SET( devel_api_core_size_negotiation_header_files
+  ${devel_api_src_dir}/size-negotiation/relayout-container.h
+)
+
 SET( devel_api_core_animation_header_files
   ${devel_api_src_dir}/animation/animation-data.h
   ${devel_api_src_dir}/animation/path-constrainer.h
@@ -161,6 +165,7 @@ SET( SOURCES ${SOURCES}
 SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_core_actors_header_files}
   ${devel_api_core_addons_header_files}
+  ${devel_api_core_size_negotiation_header_files}
   ${devel_api_core_animation_header_files}
   ${devel_api_core_common_header_files}
   ${devel_api_core_events_header_files}

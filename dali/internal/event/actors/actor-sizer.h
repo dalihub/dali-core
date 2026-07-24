@@ -17,9 +17,9 @@
  * limitations under the License.
  */
 
+#include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/public-api/math/vector3.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 
 namespace Dali::Internal
 {

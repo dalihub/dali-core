@@ -139,8 +139,6 @@
 #include <dali/public-api/signals/signal-slot-observers.h>
 #include <dali/public-api/signals/slot-delegate.h>
 
-#include <dali/public-api/size-negotiation/relayout-container.h>
-
 #include <dali/public-api/update/frame-callback-interface.h>
 #include <dali/public-api/update/update-proxy.h>
 

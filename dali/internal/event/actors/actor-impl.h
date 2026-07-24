@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/common/const-string.h>
 #include <dali/internal/common/internal-constants.h>
@@ -42,7 +43,6 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/rendering/renderer.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 
 namespace Dali
 {
