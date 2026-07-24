@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdint> // uint32_t
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
@@ -27,6 +28,94 @@
 
 namespace Dali
 {
+namespace Internal
+{
+namespace MathUtils
+{
+/**
+ * The C++17 standard does not require the cmath functions used below to be
+ * constexpr.  Keep small, platform-independent implementations here so that
+ * the public math helpers remain usable in constant expressions on every
+ * supported compiler.
+ */
+constexpr float Abs(float x)
+{
+  // Using <= also turns -0.0f into +0.0f, matching fabsf.
+  return x <= 0.0f ? -x : x;
+}
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
+constexpr bool IsNaN(float x)
+{
+  return x != x;
+}
+
+constexpr float Floor(float x)
+{
+  // A conversion from NaN, infinity, or an out-of-range float to an integer is
+  // undefined.  Such finite values are already integral at float precision;
+  // infinities and NaNs must be returned unchanged, as floorf does.
+  if(IsNaN(x) || x <= -2147483648.0f || x >= 2147483648.0f)
+  {
+    return x;
+  }
+
+  // Preserve the sign of zero.
+  if(x == 0.0f)
+  {
+    return x;
+  }
+
+  const int32_t i = static_cast<int32_t>(x);
+  return (x < 0.0f && static_cast<float>(i) != x) ? static_cast<float>(i - 1) : static_cast<float>(i);
+}
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+constexpr float PowerOfTen(int64_t exponent)
+{
+  // These are the limits at which a base-10 power overflows or underflows a
+  // float.  Check them before taking the magnitude, which also makes every
+  // signed input (including INT64_MIN) safe.
+  if(exponent > 38)
+  {
+    return std::numeric_limits<float>::infinity();
+  }
+  if(exponent < -45)
+  {
+    return 0.0f;
+  }
+
+  const bool negativeExponent = exponent < 0;
+  uint64_t   magnitude        = static_cast<uint64_t>(negativeExponent ? -exponent : exponent);
+
+  // Accumulate in double and round once to float.  For negative exponents,
+  // taking the reciprocal at the end avoids the cumulative error from
+  // repeatedly multiplying the inexact float value 0.1f.
+  double result = 1.0;
+  double base   = 10.0;
+  while(magnitude != 0u)
+  {
+    if((magnitude & 1u) != 0u)
+    {
+      result *= base;
+    }
+    magnitude >>= 1u;
+    if(magnitude != 0u)
+    {
+      base *= base;
+    }
+  }
+  return static_cast<float>(negativeExponent ? 1.0 / result : result);
+}
+
+} // namespace MathUtils
+} // namespace Internal
+
 /**
  * @addtogroup dali_core_math
  * @{
@@ -130,29 +219,34 @@ constexpr const T Lerp(const float offset, const T& low, const T& high)
  */
 constexpr float GetRangedEpsilon(float a, float b)
 {
-  const float   absA = fabsf(a);
-  const float   absB = fabsf(b);
-  const float   absF = absA > absB ? absA : absB;
-  const int32_t absI = static_cast<int32_t>(absF); // truncated
+  const float absA = Internal::MathUtils::Abs(a);
+  const float absB = Internal::MathUtils::Abs(b);
+
+  if(Internal::MathUtils::IsNaN(absA) || Internal::MathUtils::IsNaN(absB))
+  {
+    return Math::MACHINE_EPSILON_10000;
+  }
+
+  const float absF = absA > absB ? absA : absB;
 
   float epsilon = Math::MACHINE_EPSILON_10000;
   if(absF < 0.1f)
   {
     return Math::MACHINE_EPSILON_0;
   }
-  else if(absI < 2)
+  else if(absF < 2.0f)
   {
     return Math::MACHINE_EPSILON_1;
   }
-  else if(absI < 20)
+  else if(absF < 20.0f)
   {
     return Math::MACHINE_EPSILON_10;
   }
-  else if(absI < 200)
+  else if(absF < 200.0f)
   {
     return Math::MACHINE_EPSILON_100;
   }
-  else if(absI < 2000)
+  else if(absF < 2000.0f)
   {
     return Math::MACHINE_EPSILON_1000;
   }
@@ -188,7 +282,7 @@ constexpr bool EqualsZero(float value)
  */
 constexpr bool Equals(float a, float b)
 {
-  return (fabsf(a - b) <= GetRangedEpsilon(a, b));
+  return (Internal::MathUtils::Abs(a - b) <= GetRangedEpsilon(a, b));
 }
 
 /**
@@ -202,7 +296,7 @@ constexpr bool Equals(float a, float b)
  */
 constexpr bool Equals(float a, float b, float epsilon)
 {
-  return (fabsf(a - b) <= epsilon);
+  return (Internal::MathUtils::Abs(a - b) <= epsilon);
 }
 
 /**
@@ -215,9 +309,10 @@ constexpr bool Equals(float a, float b, float epsilon)
  */
 constexpr float Round(float value, int32_t pos)
 {
-  float temp = value * powf(10.f, static_cast<float>(pos));
-  temp       = floorf(temp + 0.5f);
-  temp *= powf(10.f, static_cast<float>(-pos));
+  const int64_t exponent = static_cast<int64_t>(pos);
+  float         temp     = value * Internal::MathUtils::PowerOfTen(exponent);
+  temp                    = Internal::MathUtils::Floor(temp + 0.5f);
+  temp *= Internal::MathUtils::PowerOfTen(-exponent);
   return temp;
 }
 
@@ -261,9 +356,9 @@ constexpr float WrapInDomain(float x, float start, float end)
   float domain = end - start;
   x -= start;
 
-  if(fabsf(domain) > Math::MACHINE_EPSILON_1)
+  if(Internal::MathUtils::Abs(domain) > Math::MACHINE_EPSILON_1)
   {
-    return start + (x - floorf(x / domain) * domain);
+    return start + (x - Internal::MathUtils::Floor(x / domain) * domain);
   }
 
   return start;

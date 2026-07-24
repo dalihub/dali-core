@@ -348,6 +348,23 @@ int UtcDaliOrderedSetRelease(void)
   delete released;
   DALI_TEST_EQUALS(deleted, true, TEST_LOCATION);
 
+  // Exercise the const-iterator overload as well. Checked STL iterators used
+  // by MSVC Debug builds make this a distinct path.
+  deleted           = false;
+  OwnedClass* second = new OwnedClass(deleted);
+  set.PushBack(second);
+
+  const auto& constSet  = set;
+  auto        constIter = constSet.Find(second);
+  DALI_TEST_CHECK(constIter != constSet.End());
+
+  released = set.Release(constIter);
+  DALI_TEST_CHECK(set.IsEmpty());
+  DALI_TEST_EQUALS(deleted, false, TEST_LOCATION);
+
+  delete released;
+  DALI_TEST_EQUALS(deleted, true, TEST_LOCATION);
+
   END_TEST;
 }
 

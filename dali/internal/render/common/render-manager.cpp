@@ -1003,7 +1003,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
               if(it == programUsageCount.end())
               {
-                programUsageCount[key] = Graphics::ProgramResourceBindingInfo{.program = key, .count = 1};
+                programUsageCount[key] = Graphics::ProgramResourceBindingInfo{key, 1u};
               }
               else
               {

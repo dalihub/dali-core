@@ -73,14 +73,16 @@ constexpr HashType INITIAL_HASH_VALUE = 5381;
 [[maybe_unused]] inline HashType HashRawByteBufferMultipleComponent(const uint8_t* __restrict__ buffer, std::size_t bufferSize, HashType& hash)
 {
   // TODO : use ARM_NEON here in future
-  static constexpr HashType SCALE_LEVEL_1 = Dali::Power<33, 1>::value;
-  static constexpr HashType SCALE_LEVEL_2 = Dali::Power<33, 2>::value;
-  static constexpr HashType SCALE_LEVEL_3 = Dali::Power<33, 3>::value;
-  static constexpr HashType SCALE_LEVEL_4 = Dali::Power<33, 4>::value;
-  static constexpr HashType SCALE_LEVEL_5 = Dali::Power<33, 5>::value;
-  static constexpr HashType SCALE_LEVEL_6 = Dali::Power<33, 6>::value;
-  static constexpr HashType SCALE_LEVEL_7 = Dali::Power<33, 7>::value;
-  static constexpr HashType SCALE_LEVEL_8 = Dali::Power<33, 8>::value;
+  // Keep these calculations in HashType. Dali::Power stores its result in an
+  // enum, which MSVC evaluates as 32-bit and truncates 33^7 and 33^8.
+  static constexpr HashType SCALE_LEVEL_1 = 33u;
+  static constexpr HashType SCALE_LEVEL_2 = SCALE_LEVEL_1 * 33u;
+  static constexpr HashType SCALE_LEVEL_3 = SCALE_LEVEL_2 * 33u;
+  static constexpr HashType SCALE_LEVEL_4 = SCALE_LEVEL_3 * 33u;
+  static constexpr HashType SCALE_LEVEL_5 = SCALE_LEVEL_4 * 33u;
+  static constexpr HashType SCALE_LEVEL_6 = SCALE_LEVEL_5 * 33u;
+  static constexpr HashType SCALE_LEVEL_7 = SCALE_LEVEL_6 * 33u;
+  static constexpr HashType SCALE_LEVEL_8 = SCALE_LEVEL_7 * 33u;
 
   while(bufferSize & (~0x7)) // bufferSize >= 8
   {

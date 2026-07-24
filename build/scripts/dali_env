@@ -34,6 +34,9 @@ my @system_packages = (
     "automake",
     "cmake",
     "g++",
+    "git",
+    "meson",
+    "ninja-build",
     "pkg-config",
     "libtool",
     "ccache",
@@ -161,6 +164,12 @@ else
 my $src_path         = "$root_path/src-packages";
 my $sbs_path         = "$root_path/target";
 my $install_path     = "$root_path/opt";
+my $tizenvg_repo     = exists $ENV{TIZENVG_REPOSITORY}
+                        ? $ENV{TIZENVG_REPOSITORY}
+                        : "git://git.tizen.org/platform/core/graphics/tizenvg.git";
+my $tizenvg_revision = exists $ENV{TIZENVG_REVISION}
+                        ? $ENV{TIZENVG_REVISION}
+                        : "ae039a6154a258a8fa19f23b25285acd73d2f6c1";
 
 my $opt_create=0;
 my $opt_force;
@@ -239,6 +248,39 @@ sub create_env
     }
     copy($fastcov_src, "$install_path/bin/fastcov.py") or die "Failed to copy $fastcov_src to $install_path/bin/fastcov.py: $!";
     chmod(0755, "$install_path/bin/fastcov.py");
+}
+
+################################################################################
+
+sub install_tizenvg
+{
+    my $source_path = "$src_path/tizenvg";
+    my $build_path  = "$source_path/builddir";
+
+    print "Installing TizenVG revision $tizenvg_revision\n";
+
+    system('git', 'clone', '--branch', 'tizen', $tizenvg_repo, $source_path) == 0
+      or die "Failed to clone TizenVG from $tizenvg_repo\n";
+    system('git', '-C', $source_path, 'checkout', '--detach', $tizenvg_revision) == 0
+      or die "Failed to checkout TizenVG revision $tizenvg_revision\n";
+
+    system('meson', 'setup', $build_path, $source_path,
+           '--backend', 'ninja',
+           '--buildtype', 'release',
+           '--default-library', 'shared',
+           '--prefix', $install_path,
+           '--libdir', "$install_path/lib",
+           '-Dtools=svg2png') == 0
+      or die "Failed to configure TizenVG\n";
+    system('meson', 'compile', '-C', $build_path) == 0
+      or die "Failed to build TizenVG\n";
+    system('meson', 'install', '-C', $build_path) == 0
+      or die "Failed to install TizenVG\n";
+
+    -e "$install_path/include/thorvg.h"
+      or die "TizenVG header was not installed\n";
+    -e "$install_path/lib/pkgconfig/thorvg.pc"
+      or die "TizenVG pkg-config metadata was not installed\n";
 }
 
 ################################################################################
@@ -851,6 +893,8 @@ if($opt_create)
     create_link();
 
     create_env();
+
+    install_tizenvg();
 
     # do this after source directory structure created in create_env
     check_source_packages();
