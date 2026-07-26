@@ -44,6 +44,10 @@ IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
     MESSAGE(FATAL_ERROR "Static Windows builds are not supported: the public ABI currently uses dllimport/dllexport")
   ENDIF()
   FIND_PACKAGE( dali-windows-dependencies CONFIG REQUIRED )
+  GET_TARGET_PROPERTY(DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIRS
+    dali-windows-dependencies::dali-windows-dependencies
+    INTERFACE_INCLUDE_DIRECTORIES)
+  LIST(GET DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIRS 0 DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIR)
 ENDIF()
 
 SET( VCPKG_INCLUDE_DIR "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include")
@@ -145,7 +149,7 @@ ENDIF()
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
 
-  ADD_COMPILE_OPTIONS( /FIdali-windows-dependencies.h ) # Adds missing definitions.
+  ADD_COMPILE_OPTIONS( /FI "${DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIR}/dali-windows-dependencies.h" ) # Adds missing definitions.
   ADD_COMPILE_OPTIONS( /vmg )                           # Avoids a 'reinterpret_cast' compile error while compiling signals and callbacks.
   ADD_COMPILE_OPTIONS( /wd4251 )                        # Ignores warning C4251: "'identifier' : class 'type' needs to have dll-interface to be used by clients of class 'type2'"
 

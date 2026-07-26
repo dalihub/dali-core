@@ -59,4 +59,5 @@ compile_commands.json
 dali.info
 libdali2-core.so*
 /build/tizen-cmake/doc
+/_build/
 file-list.cmake
