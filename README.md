@@ -203,33 +203,31 @@ repository's build directory.
 
 ### Using the runtime environment
 
-After installing the required DALi repositories, apply the runtime environment
-to the current PowerShell with dot-sourcing:
+After installing the required DALi repositories, you must apply the runtime
+environment to your PowerShell session. Open PowerShell and run:
 
 ```powershell
 cd <workspace>
 . .\dali-env\setenv.ps1
 ```
 
-For a Debug installation use:
+This is required every time you open a new PowerShell terminal to develop or run
+DALi applications. It sets up all necessary environment variables like
+`DALI_PREFIX`, `PATH`, and `LD_LIBRARY_PATH` equivalents.
+
+For a Debug installation, use:
 
 ```powershell
 . .\dali-env\setenv.ps1 -Configuration Debug
 ```
 
-To set a custom window resolution, add environment variables before launching an application:
+To set a custom window resolution before launching an application:
 
 ```powershell
 . .\dali-env\setenv.ps1
 $env:DALI_WINDOW_WIDTH = "1920"
 $env:DALI_WINDOW_HEIGHT = "1080"
 & "$env:DALI_PREFIX\bin\your-application.example.exe"
-```
-
-Alternatively, open a new PowerShell with the environment already applied:
-
-```powershell
-.\windows-dependencies\dali-shell.ps1
 ```
 
 ## 4. Building for macOS
