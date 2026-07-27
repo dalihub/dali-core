@@ -55,8 +55,11 @@ public:
   using Iterator      = typename ListContainer::iterator;
   using ConstIterator = typename ListContainer::const_iterator;
 
-  // Find helper map container.
-  using MapContainer = typename Dali::Integration::OpenHashMap<const T*, Iterator, Hash, KeyEqual>;
+  // OpenHashMap uses flat, zero-initialized storage, so keep only a pointer in
+  // it.  The iterator itself is constructed normally in separately allocated
+  // storage.  This also supports checked STL iterators used by MSVC Debug and
+  // _GLIBCXX_DEBUG without copying their object representation.
+  using MapContainer = typename Dali::Integration::OpenHashMap<const T*, Iterator*, Hash, KeyEqual>;
 
   using SizeType = uint32_t;
 
@@ -178,7 +181,7 @@ public:
     {
       return End();
     }
-    return *mapIter;
+    return **mapIter;
   }
   ConstIterator Find(const T* object) const
   {
@@ -187,7 +190,7 @@ public:
     {
       return End();
     }
-    return *mapIter;
+    return ConstIterator(**mapIter);
   }
 
   /**
@@ -200,7 +203,7 @@ public:
   {
     DALI_ASSERT_DEBUG(Find(object) == End());
     auto newIter = mList.insert(mList.end(), object);
-    mMap.Insert(object, newIter);
+    mMap.Insert(object, new Iterator(newIter));
   }
 
   /**
@@ -232,7 +235,7 @@ public:
     if(iter != mList.end())
     {
       // Erase mMap first.
-      [[maybe_unused]] bool erased = mMap.Erase(*iter);
+      [[maybe_unused]] bool erased = EraseFromCache(*iter);
       DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
       // Erase owned object.
@@ -250,7 +253,7 @@ public:
     if(iter != mList.end())
     {
       // Erase mMap first.
-      [[maybe_unused]] bool erased = mMap.Erase(*iter);
+      [[maybe_unused]] bool erased = EraseFromCache(*iter);
       DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
       // Erase owned object.
@@ -275,7 +278,7 @@ public:
     T* result = (*iter);
 
     // Erase mMap first.
-    [[maybe_unused]] bool erased = mMap.Erase(*iter);
+    [[maybe_unused]] bool erased = EraseFromCache(*iter);
     DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
     // Erase without delete reference
@@ -284,10 +287,10 @@ public:
   }
   T* Release(ConstIterator iter)
   {
-    const T* result = (*iter);
+    T* result = (*iter);
 
     // Erase mMap first.
-    [[maybe_unused]] bool erased = mMap.Erase(result);
+    [[maybe_unused]] bool erased = EraseFromCache(result);
     DALI_ASSERT_DEBUG(erased && "Item must be exist at OrderedSet");
 
     // Erase without delete reference
@@ -308,7 +311,7 @@ public:
         delete iter;
       }
     }
-    mMap.Release();
+    ReleaseCacheMap();
     mList.clear();
   }
 
@@ -317,10 +320,10 @@ public:
    */
   void ReorderCacheMap()
   {
-    mMap.Clear();
+    ReleaseCacheMap();
     for(auto iter = mList.begin(), iterEnd = mList.end(); iter != iterEnd; ++iter)
     {
-      mMap.Insert(*iter, iter);
+      mMap.Insert(*iter, new Iterator(iter));
     }
   }
 
@@ -328,6 +331,22 @@ private:
   // Delete copy operation.
   OrderedSet(const OrderedSet&)            = delete;
   OrderedSet& operator=(const OrderedSet&) = delete;
+
+  bool EraseFromCache(const T* object)
+  {
+    Iterator** cachedIterator = mMap.Find(object);
+    if(cachedIterator)
+    {
+      delete *cachedIterator;
+    }
+    return mMap.Erase(object);
+  }
+
+  void ReleaseCacheMap()
+  {
+    mMap.ForEach([](const T* const&, Iterator*& iterator) { delete iterator; });
+    mMap.Release();
+  }
 
 private:
   MapContainer  mMap{};  ///< Helper cache map to find item fast.

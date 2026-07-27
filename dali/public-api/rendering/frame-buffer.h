@@ -25,6 +25,10 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/rendering/texture.h>
 
+#ifdef COLOR
+#undef COLOR
+#endif
+
 namespace Dali
 {
 /**

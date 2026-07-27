@@ -15,6 +15,15 @@
  *
  */
 
+// A precompiled Windows SDK header may define CopyMemory as a macro.  Hide it
+// while defining the VectorBase member and restore it after this translation
+// unit's implementation.
+#if defined(CopyMemory)
+#pragma push_macro("CopyMemory")
+#undef CopyMemory
+#define DALI_VECTOR_BASE_CPP_RESTORE_COPY_MEMORY_MACRO
+#endif
+
 // CLASS HEADER
 #include <dali/public-api/common/dali-vector-base.h>
 
@@ -274,3 +283,8 @@ void VectorBase::CopyMemory(uint8_t* destination, const uint8_t* source, SizeTyp
 }
 
 } // namespace Dali
+
+#if defined(DALI_VECTOR_BASE_CPP_RESTORE_COPY_MEMORY_MACRO)
+#pragma pop_macro("CopyMemory")
+#undef DALI_VECTOR_BASE_CPP_RESTORE_COPY_MEMORY_MACRO
+#endif

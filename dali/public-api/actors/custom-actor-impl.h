@@ -264,101 +264,6 @@ public:
   void RequestRenderTaskReorder();
 
   /**
-   * @brief Called after the size negotiation has been finished for this control.
-   *
-   * The control is expected to assign this given size to itself/its children.
-   *
-   * Should be overridden by derived classes if they need to layout
-   * actors differently after certain operations like add or remove
-   * actors, resize or after changing specific properties.
-   *
-   * @SINCE_1_0.0
-   * @param[in]      size       The allocated size
-   * @param[in,out]  container  The control should add actors to this container that it is not able
-   *                            to allocate a size for
-   * @note  As this function is called from inside the size negotiation algorithm, you cannot
-   * call RequestRelayout (the call would just be ignored).
-   */
-  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container) = 0;
-
-  /**
-   * @brief Notification for deriving classes.
-   *
-   * @SINCE_1_0.0
-   * @param[in] policy The policy being set
-   * @param[in] dimension The dimension the policy is being set for
-   */
-  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) = 0;
-
-  /**
-   * @brief Returns the natural size of the actor.
-   *
-   * @SINCE_1_0.0
-   * @return The actor's natural size
-   */
-  virtual Vector3 GetNaturalSize() = 0;
-
-  /**
-   * @brief Calculates the size for a child.
-   *
-   * @SINCE_1_0.0
-   * @param[in] child The child actor to calculate the size for
-   * @param[in] dimension The dimension to calculate the size for. E.g. width or height
-   * @return Return the calculated size for the given dimension
-   */
-  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) = 0;
-
-  /**
-   * @brief This method is called during size negotiation when a height is required for a given width.
-   *
-   * Derived classes should override this if they wish to customize the height returned.
-   *
-   * @SINCE_1_0.0
-   * @param[in] width Width to use
-   * @return The height based on the width
-   */
-  virtual float GetHeightForWidth(float width) = 0;
-
-  /**
-   * @brief This method is called during size negotiation when a width is required for a given height.
-   *
-   * Derived classes should override this if they wish to customize the width returned.
-   *
-   * @SINCE_1_0.0
-   * @param[in] height Height to use
-   * @return The width based on the width
-   */
-  virtual float GetWidthForHeight(float height) = 0;
-
-  /**
-   * @brief Determines if this actor is dependent on its children for relayout.
-   *
-   * @SINCE_1_0.0
-   * @param[in] dimension The dimension(s) to check for
-   * @return Return if the actor is dependent on it's children
-   */
-  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) = 0;
-
-  /**
-   * @brief Virtual method to notify deriving classes that relayout dependencies have been
-   * met and the size for this object is about to be calculated for the given dimension.
-   *
-   * @SINCE_1_0.0
-   * @param[in] dimension The dimension that is about to be calculated
-   */
-  virtual void OnCalculateRelayoutSize(Dimension::Type dimension) = 0;
-
-  /**
-   * @brief Virtual method to notify deriving classes that the size for a dimension
-   * has just been negotiated.
-   *
-   * @SINCE_1_0.0
-   * @param[in] size The new size for the given dimension
-   * @param[in] dimension The dimension that was just negotiated
-   */
-  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) = 0;
-
-  /**
    * @brief Set this CustomActor is transparent or not without any affection on the child Actors.
    */
   void SetTransparent(bool transparent);
@@ -457,6 +362,36 @@ public:
    */
   virtual bool OnWheelEvent(const WheelEvent& event);
 
+  /**
+   * @brief Called after Actor::TouchEventSignal() has been emitted for a touch event.
+   *
+   * This hook is called regardless of whether OnTouchEvent() or Actor::TouchEventSignal()
+   * consumed the event. It does not affect the event's consumed state.
+   *
+   * @param[in] event The touch event
+   */
+  virtual void OnFinalizeTouchEventDispatch(const TouchEvent& event);
+
+  /**
+   * @brief Called after Actor::HoverEventSignal() has been emitted for a hover event.
+   *
+   * This hook is called regardless of whether OnHoverEvent() or Actor::HoverEventSignal()
+   * consumed the event. It does not affect the event's consumed state.
+   *
+   * @param[in] event The hover event
+   */
+  virtual void OnFinalizeHoverEventDispatch(const HoverEvent& event);
+
+  /**
+   * @brief Called after Actor::WheelEventSignal() has been emitted for a wheel event.
+   *
+   * This hook is called regardless of whether OnWheelEvent() or Actor::WheelEventSignal()
+   * consumed the event. It does not affect the event's consumed state.
+   *
+   * @param[in] event The wheel event
+   */
+  virtual void OnFinalizeWheelEventDispatch(const WheelEvent& event);
+
 protected: // For derived classes
   /**
    * @brief Enumeration for the constructor flags.
@@ -481,56 +416,6 @@ protected: // For derived classes
    * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
   CustomActorImpl(ActorFlags flags);
-
-  // Size negotiation helpers
-
-  /**
-   * @brief Requests a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene).
-   *
-   * This method can also be called from a derived class every time it needs a different size.
-   * At the end of event processing, the relayout process starts and
-   * all controls which requested Relayout will have their sizes (re)negotiated.
-   *
-   * @SINCE_1_0.0
-   * @note RelayoutRequest() can be called multiple times; the size negotiation is still
-   * only performed once, i.e. there is no need to keep track of this in the calling side.
-   */
-  void RelayoutRequest();
-
-  /**
-   * @brief Provides the Actor implementation of GetHeightForWidth.
-   * @SINCE_1_0.0
-   * @param[in] width Width to use
-   * @return The height based on the width
-   */
-  float GetHeightForWidthBase(float width);
-
-  /**
-   * @brief Provides the Actor implementation of GetWidthForHeight.
-   * @SINCE_1_0.0
-   * @param[in] height Height to use
-   * @return The width based on the height
-   */
-  float GetWidthForHeightBase(float height);
-
-  /**
-   * @brief Calculates the size for a child using the base actor object.
-   *
-   * @SINCE_1_0.0
-   * @param[in] child The child actor to calculate the size for
-   * @param[in] dimension The dimension to calculate the size for. E.g. width or height
-   * @return Return the calculated size for the given dimension. If more than one dimension is requested, just return the first one found
-   */
-  float CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension);
-
-  /**
-   * @brief Determines if this actor is dependent on its children for relayout from the base class.
-   *
-   * @SINCE_1_0.0
-   * @param[in] dimension The dimension(s) to check for
-   * @return Return if the actor is dependent on it's children
-   */
-  bool RelayoutDependentOnChildrenBase(Dimension::Type dimension = Dimension::ALL_DIMENSIONS);
 
 public: // Not intended for application developers
   /**

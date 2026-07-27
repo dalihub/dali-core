@@ -6,6 +6,7 @@ SET( devel_api_src_files
   ${devel_api_src_dir}/actors/actor-devel.cpp
   ${devel_api_src_dir}/actors/camera-actor-devel.cpp
   ${devel_api_src_dir}/actors/custom-actor-devel.cpp
+  ${devel_api_src_dir}/actors/size-negotiated-actor.cpp
   ${devel_api_src_dir}/actors/drawable-actor.cpp
   ${devel_api_src_dir}/animation/animation-data.cpp
   ${devel_api_src_dir}/animation/animation-devel.cpp
@@ -52,6 +53,7 @@ SET( devel_api_core_actors_header_files
   ${devel_api_src_dir}/actors/actor-devel.h
   ${devel_api_src_dir}/actors/camera-actor-devel.h
   ${devel_api_src_dir}/actors/custom-actor-devel.h
+  ${devel_api_src_dir}/actors/size-negotiated-actor.h
   ${devel_api_src_dir}/actors/drawable-actor.h
   ${devel_api_src_dir}/actors/layer-devel.h
 )
@@ -59,6 +61,10 @@ SET( devel_api_core_actors_header_files
 SET( devel_api_core_addons_header_files
   ${devel_api_src_dir}/addons/addon-base.h
   ${devel_api_src_dir}/addons/addon-dispatch-table.h
+)
+
+SET( devel_api_core_size_negotiation_header_files
+  ${devel_api_src_dir}/size-negotiation/relayout-container.h
 )
 
 SET( devel_api_core_animation_header_files
@@ -159,6 +165,7 @@ SET( SOURCES ${SOURCES}
 SET( DEVEL_API_HEADERS ${DEVEL_API_HEADERS}
   ${devel_api_core_actors_header_files}
   ${devel_api_core_addons_header_files}
+  ${devel_api_core_size_negotiation_header_files}
   ${devel_api_core_animation_header_files}
   ${devel_api_core_common_header_files}
   ${devel_api_core_events_header_files}

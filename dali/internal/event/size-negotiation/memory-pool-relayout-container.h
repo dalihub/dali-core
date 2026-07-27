@@ -2,7 +2,7 @@
 #define DALI_INTERNAL_MEMORY_POOL_RELAYOUT_CONTAINER_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@
 #include <memory> // for std::unique_ptr
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/size-negotiation/relayout-container.h>
 
 #include <dali/integration-api/ordered-set.h>
 #include <dali/internal/common/memory-pool-object-allocator.h>

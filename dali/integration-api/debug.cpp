@@ -365,6 +365,8 @@ ThresholdFilter::ThresholdFilter(ThresholdFilter::Milliseconds thresholdMilliSec
 {
 }
 
+ThresholdFilter::~ThresholdFilter() = default;
+
 ScopeTracer::ScopeTracer(ThresholdFilter* filter, const char* messagePrefix, const char* module, const char* function, const int line)
 : mMessagePrefix(messagePrefix),
   mModule(module),

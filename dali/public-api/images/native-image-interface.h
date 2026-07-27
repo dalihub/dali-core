@@ -30,6 +30,10 @@
 
 namespace Dali
 {
+#ifdef NO_ERROR
+#undef NO_ERROR
+#endif
+
 /**
  * @addtogroup dali_core_images
  * @{

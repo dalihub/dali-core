@@ -13,8 +13,11 @@
          * [SMACK enabled Targets](#smack-enabled-targets)
          * [DEBUG Builds](#debug-builds)
       * [3. Building for MS Windows](#3-building-for-ms-windows)
-         * Build with the Visual Studio project
-         * Build with CMake
+         * [Requirements](#requirements)
+         * [Workspace layout](#workspace-layout)
+         * [Installing Windows dependencies](#installing-windows-dependencies)
+         * [Building and installing dali-core](#building-and-installing-dali-core)
+         * [Using the runtime environment](#using-the-runtime-environment)
       * [4. Building for macOS](#4-building-for-macos)
          * [macOS Dependencies](#macos-dependencies)
          * [Build the repository](#build-the-repository)
@@ -100,50 +103,132 @@ See the README.md in dali-core/automated-tests.
 
 ## 3. Building for MS Windows
 
-Third party dependencies are built using vcpkg. Instructions on how to install vcpkg can be found in the
-vcpkg-script folder in the windows-dependencies repository.
+The current Windows backend is built with CMake, Ninja, and MSVC. The supported
+entry point is the repository-local PowerShell script described below. It
+configures, builds, and installs dali-core in one command, so users do not need
+to set vcpkg or installation paths manually.
 
-- Download the windows-dependencies repository from DaliHub
+For the complete Windows SDK workflow, including binary dependency releases,
+TizenVG handling, dali-adaptor, dali-ui, and samples, see the
+[windows-dependencies quick start](https://github.com/dalihub/windows-dependencies/blob/master/WINDOWS-DEVELOPMENT-QUICKSTART-ko.md).
 
-         $ git clone https://github.com/dalihub/windows-dependencies.git
+### Requirements
 
-- Read the windows-dependencies/vcpkg-script/Readme.md file for more instructions on how to build and install the third-party dependencies.
+- Windows 10 or Windows 11, x64
+- Visual Studio 2022 or Build Tools 2022
+- The `Desktop development with C++` workload
+- MSVC v143 x64/x86 build tools
+- A Windows 10 or Windows 11 SDK
+- CMake tools for Windows
+- Git for Windows
+- Windows PowerShell 5.1 or PowerShell 7
 
-### Build with the Visual Studio project
-  Read the windows-dependencies/README.md file for more instructions on how to build and run DALi for MS Windows.
+The scripts locate Visual Studio, CMake, and Ninja automatically. A Git Bash
+shell is not required.
 
-### Build with CMake
+### Workspace layout
 
-  * Requirements
-    It's required the version 3.12.2 of CMake and a Git Bash Shell.
+Clone `dali-core` and `windows-dependencies` below the same parent directory.
+The parent path and drive are not fixed. A complete DALi workspace normally
+uses this layout:
 
-  * Notes and troubleshoting:
-    It should be possible to use the MS Visual studio Developer Command Prompt (https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs) to build DALi from the command line.
-    However, the CMake version installed with MS Visual Studio 2017 is a bit out of date and some VCPKG modules require a higher version.
-    This instructions have been tested with CMake 3.12.2 on a Git Bash shell.
+```text
+<workspace>\
+  dali-core\
+  dali-adaptor\
+  dali-ui\
+  windows-dependencies\
+```
 
-  * Define an environment variable to set the path to the VCPKG folder
+The scripts create or use these sibling directories:
 
-    $ export VCPKG_FOLDER=C:/Users/username/Workspace/VCPKG_TOOL
+```text
+<workspace>\WindowsDependenciesSDK\  # third-party headers, libraries, and tools
+<workspace>\dali-env\                # installed DALi headers, libraries, and runtime files
+```
 
-  * Define an environment variable to set the path where DALi is going to be installed.
+Do not set `VCPKG_FOLDER`, `DALI_ENV_FOLDER`, `DALI_WINDOWS_SDK_ROOT`, or
+`DALI_PREFIX` for the standard workspace layout. The scripts derive all paths
+from the repository locations.
 
-    $ export DALI_ENV_FOLDER=C:/Users/username/Workspace/dali-env
+### Installing Windows dependencies
 
-  * Execute the following commands to create the makefiles, build and install DALi.
+Open PowerShell and run:
 
-    $ cmake -g Ninja . -DCMAKE_TOOLCHAIN_FILE=$VCPKG_FOLDER/vcpkg/scripts/buildsystems/vcpkg.cmake -DENABLE_PKG_CONFIGURE=OFF -DENABLE_LINK_TEST=OFF -DCMAKE_INSTALL_PREFIX=$DALI_ENV_FOLDER -DINSTALL_CMAKE_MODULES=ON
-    $ cmake --build . --target install
+```powershell
+cd <workspace>\windows-dependencies
+.\install.ps1
+```
 
+`install.ps1` first downloads the `windows-sdk-latest` prerelease and verifies
+its SHA-256 checksum. If no usable release is available, it builds the same
+`WindowsDependenciesSDK` layout from source. On the Samsung network it also
+tries to build TizenVG into that SDK; outside the network it continues without
+TizenVG when the internal repository is unavailable.
 
-  * Options:
-    - CMAKE_TOOLCHAIN_FILE       ---> Needed to find packages installed by VCPKG.
-    - ENABLE_PKG_CONFIGURE       ---> Whether to install pkg configure files (not currently working on MS Windows. CMake modules used instead).
-    - ENABLE_LINK_TEST           ---> Whether to enable the link test (not currently working on MS Windows).
-    - CMAKE_INSTALL_PREFIX       ---> Were DALi is installed.
-    - INSTALL_CMAKE_MODULES      ---> Whether to install the CMake modules (Used by the CMake command find_package() to find previously installed libraries).
-    - ENABLE_DEBUG               ---> Whether to build with debug enabled.
-    - ENABLE_GPU_MEMORY_PROFILE  ---> Whether to build with GPU memory profiler enabled.
+To test an SDK release from another GitHub fork, specify the repository:
+
+```powershell
+.\install.ps1 -ReleaseRepository "owner/windows-dependencies"
+```
+
+### Building and installing dali-core
+
+Run the build script from the dali-core repository:
+
+```powershell
+cd <workspace>\dali-core
+.\build\windows\build.ps1
+```
+
+The default configuration is `Release`. Intermediate files are kept in
+`dali-core\_build\windows`, and the install target writes to
+`<workspace>\dali-env`.
+
+Useful options are:
+
+```powershell
+# Remove only dali-core\_build\windows before rebuilding.
+.\build\windows\build.ps1 -Clean
+
+# Build and install a Debug configuration.
+.\build\windows\build.ps1 -Configuration Debug
+
+# Select the parallel build job count.
+.\build\windows\build.ps1 -Jobs 4
+```
+
+`-Clean` does not remove `WindowsDependenciesSDK`, `dali-env`, or another DALi
+repository's build directory.
+
+### Using the runtime environment
+
+After installing the required DALi repositories, you must apply the runtime
+environment to your PowerShell session. Open PowerShell and run:
+
+```powershell
+cd <workspace>
+. .\dali-env\setenv.ps1
+```
+
+This is required every time you open a new PowerShell terminal to develop or run
+DALi applications. It sets up all necessary environment variables like
+`DALI_PREFIX`, `PATH`, and `LD_LIBRARY_PATH` equivalents.
+
+For a Debug installation, use:
+
+```powershell
+. .\dali-env\setenv.ps1 -Configuration Debug
+```
+
+To set a custom window resolution before launching an application:
+
+```powershell
+. .\dali-env\setenv.ps1
+$env:DALI_WINDOW_WIDTH = "1920"
+$env:DALI_WINDOW_HEIGHT = "1080"
+& "$env:DALI_PREFIX\bin\your-application.example.exe"
+```
 
 ## 4. Building for macOS
 

@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <cstring>
 #include <iostream>
+#include <limits>
 #include <locale>
 #include <memory>
 #include <sstream>
@@ -79,6 +80,10 @@ namespace Integration
 {
 namespace Log
 {
+#ifdef ERROR
+#undef ERROR
+#endif
+
 enum DebugPriority
 {
   DEBUG,
@@ -560,6 +565,12 @@ public:
    * @return New allocated filter with threshold and environment.
    */
   static ThresholdFilter* New(ThresholdFilter::Milliseconds thresholdMilliSeconds, const char* environmentVariableName);
+
+  /**
+   * @brief Destructor.
+   * Allow std::unique_ptr<Impl> with incomplete type.
+   */
+  ~ThresholdFilter();
 
   /**
    * @brief Check whether this filter is enabled or not.

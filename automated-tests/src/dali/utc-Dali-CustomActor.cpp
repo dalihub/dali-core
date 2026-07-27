@@ -26,6 +26,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <vector>
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 #include "test-custom-actor.h"
@@ -72,15 +73,32 @@ struct TouchHookCustomActorImpl : public Test::Impl::TestCustomActor
 
   bool OnTouchEvent(const TouchEvent& event) override
   {
+    if(mDispatchOrder)
+    {
+      mDispatchOrder->push_back(1);
+    }
     ++mTouchEventCallCount;
     mLastHitActor = event.GetHitActor(0);
     return mConsumeTouchEvent;
   }
 
-  bool     mHasIntrinsicTouchHandling;
-  bool     mConsumeTouchEvent;
-  uint32_t mTouchEventCallCount{0u};
-  Actor    mLastHitActor;
+  void OnFinalizeTouchEventDispatch(const TouchEvent& event) override
+  {
+    if(mDispatchOrder)
+    {
+      mDispatchOrder->push_back(3);
+    }
+    ++mFinalizeTouchEventCallCount;
+    mLastFinalizedHitActor = event.GetHitActor(0);
+  }
+
+  bool              mHasIntrinsicTouchHandling;
+  bool              mConsumeTouchEvent;
+  uint32_t          mTouchEventCallCount{0u};
+  uint32_t          mFinalizeTouchEventCallCount{0u};
+  Actor             mLastHitActor;
+  Actor             mLastFinalizedHitActor;
+  std::vector<int>* mDispatchOrder{nullptr};
 };
 
 CustomActor CreateTouchHookCustomActor(TouchHookCustomActorImpl*& impl, bool hasIntrinsicTouchHandling, bool consumeTouchEvent)
@@ -142,15 +160,32 @@ struct HoverHookCustomActorImpl : public Test::Impl::TestCustomActor
 
   bool OnHoverEvent(const HoverEvent& event) override
   {
+    if(mDispatchOrder)
+    {
+      mDispatchOrder->push_back(1);
+    }
     ++mHoverEventCallCount;
     mLastHitActor = event.GetHitActor(0);
     return mConsumeHoverEvent;
   }
 
-  bool     mHasIntrinsicHoverHandling;
-  bool     mConsumeHoverEvent;
-  uint32_t mHoverEventCallCount{0u};
-  Actor    mLastHitActor;
+  void OnFinalizeHoverEventDispatch(const HoverEvent& event) override
+  {
+    if(mDispatchOrder)
+    {
+      mDispatchOrder->push_back(3);
+    }
+    ++mFinalizeHoverEventCallCount;
+    mLastFinalizedHitActor = event.GetHitActor(0);
+  }
+
+  bool              mHasIntrinsicHoverHandling;
+  bool              mConsumeHoverEvent;
+  uint32_t          mHoverEventCallCount{0u};
+  uint32_t          mFinalizeHoverEventCallCount{0u};
+  Actor             mLastHitActor;
+  Actor             mLastFinalizedHitActor;
+  std::vector<int>* mDispatchOrder{nullptr};
 };
 
 CustomActor CreateHoverHookCustomActor(HoverHookCustomActorImpl*& impl, bool hasIntrinsicHoverHandling, bool consumeHoverEvent)
@@ -196,15 +231,32 @@ struct WheelHookCustomActorImpl : public Test::Impl::TestCustomActor
 
   bool OnWheelEvent(const WheelEvent& event) override
   {
+    if(mDispatchOrder)
+    {
+      mDispatchOrder->push_back(1);
+    }
     ++mWheelEventCallCount;
     mLastPoint = event.GetPoint();
     return mConsumeWheelEvent;
   }
 
-  bool     mHasIntrinsicWheelHandling;
-  bool     mConsumeWheelEvent;
-  uint32_t mWheelEventCallCount{0u};
-  Vector2  mLastPoint;
+  void OnFinalizeWheelEventDispatch(const WheelEvent& event) override
+  {
+    if(mDispatchOrder)
+    {
+      mDispatchOrder->push_back(3);
+    }
+    ++mFinalizeWheelEventCallCount;
+    mLastFinalizedPoint = event.GetPoint();
+  }
+
+  bool              mHasIntrinsicWheelHandling;
+  bool              mConsumeWheelEvent;
+  uint32_t          mWheelEventCallCount{0u};
+  uint32_t          mFinalizeWheelEventCallCount{0u};
+  Vector2           mLastPoint;
+  Vector2           mLastFinalizedPoint;
+  std::vector<int>* mDispatchOrder{nullptr};
 };
 
 CustomActor CreateWheelHookCustomActor(WheelHookCustomActorImpl*& impl, bool hasIntrinsicWheelHandling, bool consumeWheelEvent)
@@ -262,6 +314,7 @@ int UtcDaliCustomActorTouchHookConsumesWithoutSignal(void)
   application.ProcessEvent(GenerateTouchHookEvent());
 
   DALI_TEST_EQUALS(impl->mTouchEventCallCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl->mFinalizeTouchEventCallCount, 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(impl->mLastHitActor, hookActor, TEST_LOCATION);
   DALI_TEST_CHECK(!gTouchHookLowerActorTouched);
 
@@ -299,6 +352,52 @@ int UtcDaliCustomActorTouchHookFallsThroughWhenNotConsumed(void)
   END_TEST;
 }
 
+int UtcDaliCustomActorTouchFinalizeHookRunsAfterSignal(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor lowerActor = Actor::New();
+  ConfigureTouchHookActor(lowerActor);
+  lowerActor.TouchEventSignal().Connect(OnTouchHookLowerActorTouched);
+
+  TouchHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateTouchHookCustomActor(impl, true, false);
+  ConfigureTouchHookActor(hookActor);
+
+  std::vector<int> dispatchOrder;
+  impl->mDispatchOrder = &dispatchOrder;
+  hookActor.TouchEventSignal().Connect(&application, [&dispatchOrder](Actor, TouchEvent)
+  {
+    dispatchOrder.push_back(2);
+    return false;
+  });
+
+  application.GetScene().Add(lowerActor);
+  application.GetScene().Add(hookActor);
+  application.SendNotification();
+  application.Render();
+
+  gTouchHookLowerActorTouched = false;
+  application.ProcessEvent(GenerateTouchHookEvent());
+
+  DALI_TEST_CHECK(dispatchOrder.size() >= 3u);
+  DALI_TEST_EQUALS(dispatchOrder.size() % 3u, 0u, TEST_LOCATION);
+  for(std::size_t i = 0u; i < dispatchOrder.size(); i += 3u)
+  {
+    DALI_TEST_EQUALS(dispatchOrder[i], 1, TEST_LOCATION);
+    DALI_TEST_EQUALS(dispatchOrder[i + 1u], 2, TEST_LOCATION);
+    DALI_TEST_EQUALS(dispatchOrder[i + 2u], 3, TEST_LOCATION);
+  }
+  DALI_TEST_CHECK(impl->mFinalizeTouchEventCallCount >= 1u);
+  DALI_TEST_EQUALS(impl->mLastFinalizedHitActor, hookActor, TEST_LOCATION);
+  DALI_TEST_CHECK(gTouchHookLowerActorTouched);
+
+  impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
+  END_TEST;
+}
+
 int UtcDaliCustomActorHoverHookConsumesWithoutSignal(void)
 {
   TestApplication application;
@@ -321,6 +420,7 @@ int UtcDaliCustomActorHoverHookConsumesWithoutSignal(void)
   application.ProcessEvent(GenerateHoverHookEvent());
 
   DALI_TEST_CHECK(impl->mHoverEventCallCount >= 1u);
+  DALI_TEST_CHECK(impl->mFinalizeHoverEventCallCount >= 1u);
   DALI_TEST_EQUALS(impl->mLastHitActor, hookActor, TEST_LOCATION);
   DALI_TEST_CHECK(!gHoverHookLowerActorHovered);
 
@@ -358,6 +458,48 @@ int UtcDaliCustomActorHoverHookFallsThroughWhenNotConsumed(void)
   END_TEST;
 }
 
+int UtcDaliCustomActorHoverFinalizeHookRunsAfterSignal(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor lowerActor = Actor::New();
+  ConfigureTouchHookActor(lowerActor);
+  lowerActor.HoverEventSignal().Connect(OnHoverHookLowerActorHovered);
+
+  HoverHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateHoverHookCustomActor(impl, true, false);
+  ConfigureTouchHookActor(hookActor);
+
+  std::vector<int> dispatchOrder;
+  impl->mDispatchOrder = &dispatchOrder;
+  hookActor.HoverEventSignal().Connect(&application, [&dispatchOrder](Actor, HoverEvent)
+  {
+    dispatchOrder.push_back(2);
+    return false;
+  });
+
+  application.GetScene().Add(lowerActor);
+  application.GetScene().Add(hookActor);
+  application.SendNotification();
+  application.Render();
+
+  gHoverHookLowerActorHovered = false;
+  application.ProcessEvent(GenerateHoverHookEvent());
+
+  DALI_TEST_EQUALS(dispatchOrder.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(dispatchOrder[0], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(dispatchOrder[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(dispatchOrder[2], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl->mFinalizeHoverEventCallCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl->mLastFinalizedHitActor, hookActor, TEST_LOCATION);
+  DALI_TEST_CHECK(gHoverHookLowerActorHovered);
+
+  impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
+  END_TEST;
+}
+
 int UtcDaliCustomActorWheelHookConsumesWithoutSignal(void)
 {
   TestApplication application;
@@ -379,8 +521,47 @@ int UtcDaliCustomActorWheelHookConsumesWithoutSignal(void)
   application.ProcessEvent(GenerateWheelHookEvent());
 
   DALI_TEST_EQUALS(impl->mWheelEventCallCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl->mFinalizeWheelEventCallCount, 1u, TEST_LOCATION);
   DALI_TEST_EQUALS(impl->mLastPoint, Vector2(50.0f, 50.0f), TEST_LOCATION);
   DALI_TEST_CHECK(!gWheelHookParentActorWheeled);
+  END_TEST;
+}
+
+int UtcDaliCustomActorWheelFinalizeHookRunsAfterSignal(void)
+{
+  TestApplication application;
+
+  Actor parentActor = Actor::New();
+  ConfigureTouchHookActor(parentActor);
+  parentActor.WheelEventSignal().Connect(OnWheelHookParentActorWheeled);
+
+  WheelHookCustomActorImpl* impl      = nullptr;
+  CustomActor               hookActor = CreateWheelHookCustomActor(impl, true, false);
+  ConfigureTouchHookActor(hookActor);
+
+  std::vector<int> dispatchOrder;
+  impl->mDispatchOrder = &dispatchOrder;
+  hookActor.WheelEventSignal().Connect(&application, [&dispatchOrder](Actor, WheelEvent)
+  {
+    dispatchOrder.push_back(2);
+    return false;
+  });
+
+  application.GetScene().Add(parentActor);
+  parentActor.Add(hookActor);
+  application.SendNotification();
+  application.Render();
+
+  gWheelHookParentActorWheeled = false;
+  application.ProcessEvent(GenerateWheelHookEvent());
+
+  DALI_TEST_EQUALS(dispatchOrder.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(dispatchOrder[0], 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(dispatchOrder[1], 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(dispatchOrder[2], 3, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl->mFinalizeWheelEventCallCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(impl->mLastFinalizedPoint, Vector2(50.0f, 50.0f), TEST_LOCATION);
+  DALI_TEST_CHECK(gWheelHookParentActorWheeled);
   END_TEST;
 }
 
@@ -1774,39 +1955,6 @@ struct UnregisteredCustomActor : public Dali::CustomActorImpl
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override
   {
   }
-  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container) override
-  {
-  }
-  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override
-  {
-  }
-  virtual Vector3 GetNaturalSize() override
-  {
-    return Vector3();
-  }
-  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
-  {
-    return 0.f;
-  }
-  virtual float GetHeightForWidth(float width) override
-  {
-    return 0.f;
-  }
-  virtual float GetWidthForHeight(float height) override
-  {
-    return 0.f;
-  }
-  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
-  {
-    return false;
-  }
-  virtual void OnCalculateRelayoutSize(Dimension::Type dimension) override
-  {
-  }
-  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) override
-  {
-  }
-
   void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
   }
@@ -2636,5 +2784,83 @@ int UtcDaliCustomActorImplSetRemoveCacheRenderer(void)
   application.Render();
 
   tet_result(TET_PASS);
+  END_TEST;
+}
+
+namespace
+{
+
+/**
+ * Minimal SizeNegotiatedActor-derived class with stub implementations
+ */
+class SizeNegotiatedActorDerived : public SizeNegotiatedActor
+{
+public:
+  /**
+   * Constructor
+   */
+  SizeNegotiatedActorDerived() = default;
+
+  /**
+   * Destructor
+   */
+  ~SizeNegotiatedActorDerived() override = default;
+
+  // From SizeNegotiatedActor
+  void OnRelayout(const Dali::Vector2& size, Dali::RelayoutContainer& container) override
+  {
+  }
+
+  void OnSetResizePolicy(Dali::ResizePolicy::Type policy, Dali::Dimension::Type dimension) override
+  {
+  }
+
+  Dali::Vector3 GetNaturalSize() override
+  {
+    return Dali::Vector3(0.0f, 0.0f, 0.0f);
+  }
+
+  float CalculateChildSize(const Dali::Actor& child, Dali::Dimension::Type dimension) override
+  {
+    return CalculateChildSizeBase(child, dimension);
+  }
+
+  float GetHeightForWidth(float width) override
+  {
+    return GetHeightForWidthBase(width);
+  }
+
+  float GetWidthForHeight(float height) override
+  {
+    return GetWidthForHeightBase(height);
+    ;
+  }
+
+  bool RelayoutDependentOnChildren(Dali::Dimension::Type dimension = Dali::Dimension::ALL_DIMENSIONS) override
+  {
+    return RelayoutDependentOnChildrenBase(dimension);
+  }
+
+  void OnCalculateRelayoutSize(Dali::Dimension::Type dimension) override
+  {
+  }
+
+  void OnLayoutNegotiated(float size, Dali::Dimension::Type dimension) override
+  {
+  }
+};
+
+} // unnamed namespace
+
+int UtcDaliSizeNegotiatedActorNoCustomActorImpl(void)
+{
+  TestApplication application;
+
+  SizeNegotiatedActorDerived derived;
+  Actor                      child;
+  DALI_TEST_EQUALS(derived.CalculateChildSize(child, Dimension::ALL_DIMENSIONS), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(derived.GetHeightForWidth(10.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(derived.GetWidthForHeight(10.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(derived.RelayoutDependentOnChildren(), false, TEST_LOCATION);
   END_TEST;
 }
