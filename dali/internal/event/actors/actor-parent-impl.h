@@ -195,11 +195,53 @@ public:
   }
 
   /**
-   * Traverse the actor tree, inserting actors into the depth tree in sibling order.
+   * Traverse the actor tree, inserting actors into the depth tree in render order.
    * @param[in] sceneGraphNodeDepths A vector capturing the nodes and their depth index
    * @param[in,out] depthIndex The current depth index (traversal index)
+   * @note Children are visited in render order: ascending Property::DEPTH_INDEX, with ties
+   *       broken by sibling order. mChildren itself is never reordered.
    */
   void DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths, int32_t& depthIndex);
+
+  /**
+   * @brief Whether any direct child has a non-default (non-zero) Property::DEPTH_INDEX.
+   * @return true if at least one child overrides its render order.
+   * @note When false, callers can iterate mChildren directly (render order == sibling order).
+   */
+  bool HasNonZeroDepthIndexChildren() const
+  {
+    return mChildrenWithNonZeroDepthIndex > 0u;
+  }
+
+  /**
+   * @brief Get the children in render order (ascending Property::DEPTH_INDEX, ties broken by sibling order).
+   * @details The result is cached and only recomputed when the render order actually changes
+   *          (a child's DEPTH_INDEX changes, a child is added/removed, or siblings are reordered).
+   *          mChildren is never modified. Only call this when HasNonZeroDepthIndexChildren() is true;
+   *          otherwise render order equals sibling order and mChildren can be iterated directly.
+   * @return A reference to the cached children in ascending render order. Valid until the
+   *         next structural / order / DEPTH_INDEX change on this parent.
+   */
+  const ActorContainer& GetChildrenInDepthOrder();
+
+  /**
+   * @brief Maintain the non-zero DEPTH_INDEX child counter when a child's DEPTH_INDEX changes.
+   * @param[in] oldDepthIndex The child's previous DEPTH_INDEX
+   * @param[in] newDepthIndex The child's new DEPTH_INDEX
+   */
+  void NotifyChildDepthIndexChanged(int32_t oldDepthIndex, int32_t newDepthIndex)
+  {
+    if(oldDepthIndex == 0 && newDepthIndex != 0)
+    {
+      ++mChildrenWithNonZeroDepthIndex;
+    }
+    else if(oldDepthIndex != 0 && newDepthIndex == 0)
+    {
+      --mChildrenWithNonZeroDepthIndex;
+    }
+    // Any DEPTH_INDEX change (even between two non-zero values) alters render order.
+    mRenderOrderCacheDirty = true;
+  }
 
   /**
    * Helper to recursively connect a tree of actors.
@@ -277,7 +319,10 @@ private:
   Dali::Actor::ChildAddedSignalType       mChildAddedSignal;
   Dali::Actor::ChildRemovedSignalType     mChildRemovedSignal;
   DevelActor::ChildOrderChangedSignalType mChildOrderChangedSignal;
-  ActorContainer*                         mChildren{nullptr}; ///< Container of referenced actors, lazily initialized
+  ActorContainer*                         mChildren{nullptr};                 ///< Container of referenced actors, lazily initialized
+  ActorContainer*                         mRenderOrderCache{nullptr};         ///< Cached children in render order, lazily allocated only when DEPTH_INDEX is used
+  uint32_t                                mChildrenWithNonZeroDepthIndex{0u}; ///< Count of children whose Property::DEPTH_INDEX != 0, for the render-order fast path
+  bool                                    mRenderOrderCacheDirty{true};       ///< Whether mRenderOrderCache needs rebuilding
 };
 
 } // namespace Internal

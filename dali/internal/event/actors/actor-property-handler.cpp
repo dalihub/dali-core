@@ -527,6 +527,17 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
+    case Dali::Actor::Property::DEPTH_INDEX:
+    {
+      int value;
+
+      if(property.Get(value))
+      {
+        actor.SetDepthIndex(value);
+      }
+      break;
+    }
+
     case Dali::Actor::Property::CLIPPING_MODE:
     {
       ClippingMode::Type convertedValue = actor.mClippingMode;
@@ -1472,6 +1483,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       {
         value = 0;
       }
+      break;
+    }
+
+    case Dali::Actor::Property::DEPTH_INDEX:
+    {
+      value = actor.GetDepthIndex();
       break;
     }
 

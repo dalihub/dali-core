@@ -199,6 +199,22 @@ public:
   ActorContainer& GetChildrenInternal();
 
   /**
+   * @copydoc Dali::Internal::ActorParentImpl::HasNonZeroDepthIndexChildren
+   */
+  bool HasNonZeroDepthIndexChildren() const
+  {
+    return mParentImpl.HasNonZeroDepthIndexChildren();
+  }
+
+  /**
+   * @copydoc Dali::Internal::ActorParentImpl::GetChildrenInDepthOrder
+   */
+  const ActorContainer& GetChildrenInDepthOrder()
+  {
+    return mParentImpl.GetChildrenInDepthOrder();
+  }
+
+  /**
    * @copydoc Dali::Internal::ActorParent::FindChildByName
    */
   ActorPtr FindChildByName(const std::string_view& actorName) override;
@@ -1054,6 +1070,23 @@ public:
   }
 
   void SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Type childrenDepthIndexPolicy);
+
+  /**
+   * @brief Set the render(draw) order of this actor among its siblings (Property::DEPTH_INDEX).
+   * @details Higher values are drawn on top. Actors with an equal value fall back to sibling order.
+   *          This does NOT change the sibling order (mChildren), only the draw/hit-test order.
+   * @param[in] depthIndex The new render order
+   */
+  void SetDepthIndex(int32_t depthIndex);
+
+  /**
+   * @brief Get the render(draw) order of this actor among its siblings (Property::DEPTH_INDEX).
+   * @return The current render order
+   */
+  inline int32_t GetDepthIndex() const
+  {
+    return mDepthIndex;
+  }
 
 public:
   // Size negotiation virtual functions
@@ -2607,6 +2640,7 @@ protected:
   std::string mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+  int32_t     mDepthIndex;  ///< Render(draw) order sort key among siblings (Property::DEPTH_INDEX). Does NOT change sibling order.
 
   int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 

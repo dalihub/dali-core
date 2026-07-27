@@ -604,6 +604,16 @@ DrawMode::Type Actor::GetDrawMode() const
   return GetImplementation(*this).GetDrawMode();
 }
 
+void Actor::SetDepthIndex(int32_t depthIndex)
+{
+  GetImplementation(*this).SetProperty(Actor::Property::DEPTH_INDEX, depthIndex);
+}
+
+int32_t Actor::GetDepthIndex() const
+{
+  return GetImplementation(*this).GetDepthIndex();
+}
+
 void Actor::SetBlendEquation(Dali::BlendEquation::Type blendEquation)
 {
   GetImplementation(*this).SetProperty(Actor::Property::BLEND_EQUATION, blendEquation);
