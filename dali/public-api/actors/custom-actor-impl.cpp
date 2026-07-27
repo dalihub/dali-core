@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,31 +124,6 @@ Internal::CustomActor* CustomActorImpl::GetOwner() const
 bool CustomActorImpl::IsRelayoutEnabled() const
 {
   return (mFlags & DISABLE_SIZE_NEGOTIATION) == 0;
-}
-
-void CustomActorImpl::RelayoutRequest()
-{
-  mOwner->RelayoutRequest();
-}
-
-float CustomActorImpl::GetHeightForWidthBase(float width)
-{
-  return mOwner->GetHeightForWidthBase(width);
-}
-
-float CustomActorImpl::GetWidthForHeightBase(float height)
-{
-  return mOwner->GetWidthForHeightBase(height);
-}
-
-float CustomActorImpl::CalculateChildSizeBase(const Dali::Actor& child, Dimension::Type dimension)
-{
-  return mOwner->CalculateChildSizeBase(child, dimension);
-}
-
-bool CustomActorImpl::RelayoutDependentOnChildrenBase(Dimension::Type dimension)
-{
-  return mOwner->RelayoutDependentOnChildrenBase(dimension);
 }
 
 void CustomActorImpl::SetTransparent(bool transparent)

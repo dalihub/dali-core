@@ -171,47 +171,6 @@ struct MyTestCustomActor : public CustomActorImpl
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) override
   {
   }
-  virtual Vector3 GetNaturalSize() override
-  {
-    return Vector3(0.0f, 0.0f, 0.0f);
-  }
-
-  virtual float GetHeightForWidth(float width) override
-  {
-    return 0.0f;
-  }
-
-  virtual float GetWidthForHeight(float height) override
-  {
-    return 0.0f;
-  }
-
-  virtual void OnRelayout(const Vector2& size, RelayoutContainer& container) override
-  {
-  }
-
-  virtual void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override
-  {
-  }
-
-  virtual void OnCalculateRelayoutSize(Dimension::Type dimension) override
-  {
-  }
-
-  virtual float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
-  {
-    return 0.0f;
-  }
-
-  virtual void OnLayoutNegotiated(float size, Dimension::Type dimension) override
-  {
-  }
-
-  virtual bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
-  {
-    return false;
-  }
-
   void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
   {
   }
@@ -4084,38 +4043,6 @@ private: // Overrides
   {
   }
   void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) override
-  {
-  }
-  void OnRelayout(const Vector2& size, RelayoutContainer& container) override
-  {
-  }
-  void OnSetResizePolicy(ResizePolicy::Type policy, Dimension::Type dimension) override
-  {
-  }
-  Vector3 GetNaturalSize() override
-  {
-    return Vector3::ONE;
-  }
-  float CalculateChildSize(const Dali::Actor& child, Dimension::Type dimension) override
-  {
-    return 100.0f;
-  }
-  float GetHeightForWidth(float width) override
-  {
-    return 100.0f;
-  }
-  float GetWidthForHeight(float height) override
-  {
-    return 100.0f;
-  }
-  bool RelayoutDependentOnChildren(Dimension::Type dimension = Dimension::ALL_DIMENSIONS) override
-  {
-    return false;
-  }
-  void OnCalculateRelayoutSize(Dimension::Type dimension) override
-  {
-  }
-  void OnLayoutNegotiated(float size, Dimension::Type dimension) override
   {
   }
 
