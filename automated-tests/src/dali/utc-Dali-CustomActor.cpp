@@ -16,6 +16,7 @@
  */
 
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/events/hover-event-integ.h>

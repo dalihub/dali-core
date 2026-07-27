@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/common/const-string.h>

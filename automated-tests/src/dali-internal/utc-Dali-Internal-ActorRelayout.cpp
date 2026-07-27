@@ -24,6 +24,7 @@
 
 // Internal headers are allowed here
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
 using namespace Dali;

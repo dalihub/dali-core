@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/internal/event/actors/actor-impl.h>
 
 #include <dali/public-api/math/vector2.h>

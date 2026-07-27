@@ -1,5 +1,6 @@
 #include "test-custom-actor.h"
 
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/integration-api/string-utils.h>
 
 using namespace Dali;

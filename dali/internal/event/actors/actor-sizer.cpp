@@ -21,6 +21,7 @@
 #include <cfloat>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
 #include <dali/internal/event/animation/animation-impl.h>

@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
