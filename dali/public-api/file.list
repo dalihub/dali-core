@@ -239,11 +239,6 @@ SET( public_api_core_rendering_header_files
 )
 
 
-SET( public_api_core_size_negotiation_header_files
-  ${public_api_src_dir}/size-negotiation/relayout-container.h
-)
-
-
 SET( public_api_core_signals_header_files
   ${public_api_src_dir}/signals/base-signal.h
   ${public_api_src_dir}/signals/callback.h
@@ -279,7 +274,6 @@ SET( PUBLIC_API_HEADERS ${PUBLIC_API_HEADERS}
   ${public_api_core_object_header_files}
   ${public_api_core_render_tasks_header_files}
   ${public_api_core_rendering_header_files}
-  ${public_api_core_size_negotiation_header_files}
   ${public_api_core_signals_header_files}
   ${public_api_core_update_header_files}
 )
