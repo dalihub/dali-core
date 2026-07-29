@@ -614,7 +614,7 @@ bool CameraActor::BuildPickingRay(const Vector2& screenCoordinates,
                                   Vector4&       rayDirection,
                                   bool           isDrawnOnFramebuffer)
 {
-  Viewport viewport(0, 0, screenSize.x, screenSize.y);
+  Viewport viewport(0, 0, static_cast<int32_t>(screenSize.x), static_cast<int32_t>(screenSize.y));
   return BuildPickingRay(screenCoordinates, viewport, rayOrigin, rayDirection, isDrawnOnFramebuffer);
 }
 

@@ -359,7 +359,7 @@ public:
         double r2       = -omega0 * (zeta + sqrtTerm);
         double A        = r2 / (r2 - r1);
         double B        = 1.0 - A;
-        result          = 1.0 - A * std::exp(r1 * springProgress) - B * std::exp(r2 * springProgress);
+        result          = static_cast<float>(1.0 - A * std::exp(r1 * springProgress) - B * std::exp(r2 * springProgress));
       }
 
       // Heuristic. if the progress variable becomes 1.0 and the result is almost 1.0 too, return 1.0f.

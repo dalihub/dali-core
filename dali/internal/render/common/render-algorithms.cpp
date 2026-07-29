@@ -186,22 +186,22 @@ inline Graphics::Rect2D RecalculateRect(Graphics::Rect2D rect, int orientation, 
   // So, re-calculation is needed.
   if(orientation == 90)
   {
-    newRect.x      = viewport.height - (rect.y + rect.height);
+    newRect.x      = static_cast<int32_t>(viewport.height - (rect.y + rect.height));
     newRect.y      = rect.x;
     newRect.width  = rect.height;
     newRect.height = rect.width;
   }
   else if(orientation == 180)
   {
-    newRect.x      = viewport.width - (rect.x + rect.width);
-    newRect.y      = viewport.height - (rect.y + rect.height);
+    newRect.x      = static_cast<int32_t>(viewport.width - (rect.x + rect.width));
+    newRect.y      = static_cast<int32_t>(viewport.height - (rect.y + rect.height));
     newRect.width  = rect.width;
     newRect.height = rect.height;
   }
   else if(orientation == 270)
   {
     newRect.x      = rect.y;
-    newRect.y      = viewport.width - (rect.x + rect.width);
+    newRect.y      = static_cast<int32_t>(viewport.width - (rect.x + rect.width));
     newRect.width  = rect.height;
     newRect.height = rect.width;
   }
