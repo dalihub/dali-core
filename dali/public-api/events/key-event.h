@@ -214,10 +214,9 @@ public:
    * @SINCE_1_9.27
    * @return The unique key code for the key pressed
    *
-   * @remarks We recommend not to use this key code value directly because its meaning
-   * might be changed in the future. Currently, it means a platform-specific key code.
-   * You need to use IsKey() to know what a key event means instead of direct comparison
-   * of key code value.
+   * @remarks Named keys (e.g. Return, Back, arrow and media keys) resolve to the same
+   * DALI_KEY_* value on every platform, but other keys remain platform-specific and
+   * may change. Prefer IsKey() over comparing this value directly.
    */
   int32_t GetKeyCode() const;
 
