@@ -26,9 +26,9 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/common/hash.h>
 
-static_assert(sizeof(std::string) <= 32,
-              "std::string exceeds Dali::String inline storage (32 bytes). "
-              "Implementation must be updated to use heap allocation.");
+static_assert(sizeof(std::string) <= DALI_STRING_STORAGE_SIZE,
+              "std::string exceeds Dali::String inline storage. "
+              "Update DALI_STRING_STORAGE_SIZE in platform-defines.h for this toolchain.");
 static_assert(alignof(std::string) <= 8,
               "std::string alignment exceeds Dali::String inline storage alignment (8).");
 

@@ -131,6 +131,7 @@ SET( public_api_core_common_header_files
   ${public_api_src_dir}/common/dali-string.h
   ${public_api_src_dir}/common/dali-string-view.h
   ${public_api_src_dir}/common/dali-utility.h
+  ${public_api_src_dir}/common/platform-defines.h
   ${public_api_src_dir}/common/dali-vector-base.h
   ${public_api_src_dir}/common/dali-vector-complex-types.h
   ${public_api_src_dir}/common/dali-vector-trivial-types.h

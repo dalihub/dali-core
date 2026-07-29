@@ -19,6 +19,7 @@
 #include <dali/public-api/object/property-key.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/stream-operators.h> // Ensures operator<<(ostream&, const Property::Key&) is exported (DALI_CORE_API)
 #include <dali/integration-api/string-utils.h>
 
 namespace Dali

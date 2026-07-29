@@ -296,11 +296,6 @@ SET_TARGET_PROPERTIES( ${name}
 )
 
 IF( INSTALL_CMAKE_MODULES )
-  IF( ENABLE_DEBUG )
-    SET( BIN_DIR "${BIN_DIR}/debug" )
-    SET( LIB_DIR "${LIB_DIR}/debug" )
-  ENDIF()
-
   # Install the library files.
   INSTALL( TARGETS ${name}
     EXPORT ${name}-targets
@@ -324,8 +319,10 @@ IF( INSTALL_CMAKE_MODULES )
   INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}-config.cmake DESTINATION share/${name} )
 
   # Install the pdb file.
+  # Use the TARGET_PDB_FILE generator expression so the path resolves correctly for both
+  # single-config (Ninja: <build>/${name}.pdb) and multi-config (VS: <build>/Debug/${name}.pdb) generators.
   IF( ENABLE_DEBUG AND WIN32 )
-    install( FILES ${CMAKE_CURRENT_BINARY_DIR}/Debug/${name}.pdb DESTINATION ${BIN_DIR} )
+    install( FILES $<TARGET_PDB_FILE:${name}> DESTINATION ${BIN_DIR} )
   ENDIF()
 ELSE()
   INSTALL(TARGETS ${name}
