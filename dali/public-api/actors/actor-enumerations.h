@@ -30,14 +30,20 @@ namespace Dali
 /**
  * @brief Enumeration for Actor color mode.
  *
+ * Determines how an actor's own color (Actor::Property::COLOR) combines with its parent's color to
+ * produce the actor's world color (Actor::Property::WORLD_COLOR), which is the color actually used
+ * when the actor is drawn.
+ *
  * @SINCE_1_0.0
+ * @see Actor::SetColorMode()
+ * @see Actor::Property::COLOR_MODE
  */
 enum ColorMode
 {
-  USE_OWN_COLOR,                 ///< Actor will use its own color @SINCE_1_0.0
-  USE_PARENT_COLOR,              ///< Actor will use its parent color @SINCE_1_0.0
-  USE_OWN_MULTIPLY_PARENT_COLOR, ///< Actor will blend its color with its parents color. @SINCE_1_0.0
-  USE_OWN_MULTIPLY_PARENT_ALPHA  ///< Actor will blend its alpha with its parents alpha. This means when parent fades in or out child does as well. This is the default. @SINCE_1_0.0
+  USE_OWN_COLOR,                 ///< The actor uses its own color and ignores the parent's color entirely. @SINCE_1_0.0
+  USE_PARENT_COLOR,              ///< The actor uses its parent's world color and ignores its own color. @SINCE_1_0.0
+  USE_OWN_MULTIPLY_PARENT_COLOR, ///< The actor multiplies its own color (all four channels) with its parent's world color. @SINCE_1_0.0
+  USE_OWN_MULTIPLY_PARENT_ALPHA  ///< The actor uses its own RGB, but multiplies its alpha by the parent's alpha, so it fades in and out together with the parent. This is the default. @SINCE_1_0.0
 };
 
 /**
@@ -52,11 +58,12 @@ namespace DrawMode
  *
  * @SINCE_1_0.0
  * @see Dali::Actor::SetDrawMode()
+ * @see Actor::Property::DRAW_MODE
  */
 enum Type
 {
-  NORMAL     = 0, ///< @brief binary 00. The default draw-mode @SINCE_1_0.0
-  OVERLAY_2D = 1  ///< @brief binary 01. Draw the actor and its children as an overlay @SINCE_1_0.0
+  NORMAL     = 0, ///< The actor and its children are drawn in the normal depth order. This is the default. @SINCE_1_0.0
+  OVERLAY_2D = 1  ///< The actor and its children are drawn on top of all NORMAL siblings, ignoring depth testing. Within the overlay, children draw over parents and later siblings over earlier ones. Cannot be combined with ClippingMode::CLIP_TO_BOUNDING_BOX (the clipping is then ignored). @SINCE_1_0.0
 };
 
 } // namespace DrawMode
@@ -181,12 +188,14 @@ namespace ClippingMode
 /**
  * @brief Enumeration for ClippingMode types.
  * @SINCE_1_2_5
+ * @see Dali::Actor::SetClippingMode()
+ * @see Actor::Property::CLIPPING_MODE
  */
 enum Type
 {
-  DISABLED,            ///< This Actor will not clip its children. @SINCE_1_2_5
-  CLIP_CHILDREN,       ///< This Actor will clip itself and all children to within the pixel areas of this actors renderers. @SINCE_1_2_5
-  CLIP_TO_BOUNDING_BOX ///< This Actor will clip itself and all children to within a screen-aligned rectangle encompassing its boundaries. @SINCE_1_2.61
+  DISABLED,            ///< This Actor will not clip its children. This is the default. @SINCE_1_2_5
+  CLIP_CHILDREN,       ///< This Actor clips itself and all its children to the pixel areas of this actor's own renderers, so the shape drawn by the renderers defines the clip region. @SINCE_1_2_5
+  CLIP_TO_BOUNDING_BOX ///< This Actor clips itself and all its children to a screen-aligned rectangle (an axis-aligned bounding box) enclosing its bounds, which is cheaper than CLIP_CHILDREN but ignores rotation. Cannot be combined with DrawMode::OVERLAY_2D (the clipping is then ignored). @SINCE_1_2.61
 };
 
 } // namespace ClippingMode
@@ -211,29 +220,62 @@ enum Type
 } // namespace LayoutDirection
 
 /**
- * @brief Enumeration for the OffScreenRenderable of the Actor
+ * @brief Enumeration describing whether an Actor owns off-screen render tasks that must be reordered
+ *        relative to the actor, and in which direction they draw.
+ *
+ * Off-screen renderables are render tasks that render into an off-screen buffer whose output is then
+ * composited with the scene. The value indicates whether such tasks exist and whether they draw content
+ * in front of (FORWARD) or behind (BACKWARD) this actor, so the rendering order can be resolved correctly.
+ *
  * @SINCE_2_3.43
  */
 namespace OffScreenRenderable
 {
+/**
+ * @brief Enumeration for the OffScreenRenderable types.
+ *
+ * @note The values are bit flags, so FORWARD and BACKWARD can be combined (see BOTH). The provided
+ *       operator& and operator! allow testing which directions are present.
+ * @SINCE_2_3.43
+ */
 enum class Type
 {
-  NONE     = 0,                  // The Actor has no OffScreenRenderables. @SINCE_2_3.43
-  FORWARD  = 1,                  // The Actor has RenderTasks those need reorder. And the Tasks will draw Actors those placed in front of the Actor. @SINCE_2_3.43
-  BACKWARD = 2,                  // The Actor has RenderTasks those need reorder, And the Tasks will draw Actors those placed behinde of the Actor. @SINCE_2_3.43
-  BOTH     = FORWARD | BACKWARD, // The Actor has RenderTasks for the both of FORWARD and BACKWARD. @SINCE_2_3.43
+  NONE     = 0,                  ///< The Actor has no off-screen renderables. @SINCE_2_3.43
+  FORWARD  = 1,                  ///< The Actor has render tasks that need reordering and that draw actors positioned in front of this Actor. @SINCE_2_3.43
+  BACKWARD = 2,                  ///< The Actor has render tasks that need reordering and that draw actors positioned behind this Actor. @SINCE_2_3.43
+  BOTH     = FORWARD | BACKWARD, ///< The Actor has render tasks for both the FORWARD and BACKWARD directions. @SINCE_2_3.43
 };
 
+/**
+ * @brief Bitwise AND operator, used to test which direction flags are set in a value.
+ * @param[in] lhs The left-hand operand
+ * @param[in] rhs The right-hand operand
+ * @return The bitwise AND of the two operands
+ * @SINCE_2_3.43
+ */
 inline Type operator&(Type lhs, Type rhs)
 {
   return static_cast<Type>(static_cast<int>(lhs) & static_cast<int>(rhs));
 }
 
+/**
+ * @brief Equality operator.
+ * @param[in] lhs The left-hand operand
+ * @param[in] rhs The right-hand operand
+ * @return True if both operands have the same value
+ * @SINCE_2_3.43
+ */
 inline bool operator==(Type lhs, Type rhs)
 {
   return static_cast<int>(lhs) == static_cast<int>(rhs);
 }
 
+/**
+ * @brief Logical NOT operator, used to test whether a value is NONE (no flags set).
+ * @param[in] t The operand to test
+ * @return True if the value is NONE, false if any direction flag is set
+ * @SINCE_2_3.43
+ */
 inline bool operator!(Type t)
 {
   return !static_cast<int>(t);
@@ -241,13 +283,18 @@ inline bool operator!(Type t)
 } //namespace OffScreenRenderable
 
 /**
- * @brief Enumeration for the visibility change type.
+ * @brief Enumeration identifying whose Property::VISIBLE change triggered a VisibilityChangedSignal.
+ *
+ * Passed as the third argument to the Actor::VisibilityChangedSignal() callback to distinguish a change
+ * of the actor's own visibility from a change inherited from one of its parents.
+ *
  * @SINCE_2_5.29
+ * @see Actor::VisibilityChangedSignal()
  */
 enum class VisibilityChangeType
 {
-  SELF,  ///< The visibility of the actor itself has changed. @SINCE_2_5.29
-  PARENT ///< The visibility of a parent has changed. @SINCE_2_5.29
+  SELF,  ///< This actor's own Property::VISIBLE value changed. @SINCE_2_5.29
+  PARENT ///< A parent's Property::VISIBLE value changed, affecting this actor's shown state. @SINCE_2_5.29
 };
 
 /**
