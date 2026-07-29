@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [ValidateSet("Debug", "Release")]
-  [string]$Configuration = "Release",
+  [string]$Configuration = "Debug",
   [string]$VcpkgRoot = "",
   [switch]$Clean,
   [int]$Jobs = 8
