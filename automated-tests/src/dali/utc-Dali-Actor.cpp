@@ -770,6 +770,147 @@ int UtcDaliActorAddN(void)
   END_TEST;
 }
 
+int UtcDaliActorInsertAboveP(void)
+{
+  tet_infoline("Testing Actor::InsertAbove");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  // Sibling order (bottom -> top): a, b, c
+  DALI_TEST_EQUALS(parent.GetChildCount(), 3u, TEST_LOCATION);
+
+  // Insert a brand new (parentless) actor immediately above b -> a, b, d, c
+  Actor d = Actor::New();
+  parent.InsertAbove(d, b);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), c, TEST_LOCATION);
+
+  // Re-position an existing child: move a immediately above c -> b, d, c, a
+  parent.InsertAbove(a, c);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), a, TEST_LOCATION);
+
+  // Reparent a child from another parent, inserting it above d -> b, d, e, c, a
+  Actor otherParent = Actor::New();
+  Actor e           = Actor::New();
+  otherParent.Add(e);
+  DALI_TEST_EQUALS(otherParent.GetChildCount(), 1u, TEST_LOCATION);
+
+  parent.InsertAbove(e, d);
+  DALI_TEST_EQUALS(otherParent.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(e.GetParent(), parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), e, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(4), a, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorInsertBelowP(void)
+{
+  tet_infoline("Testing Actor::InsertBelow");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  // Sibling order (bottom -> top): a, b, c
+
+  // Insert a brand new (parentless) actor immediately below b -> a, d, b, c
+  Actor d = Actor::New();
+  parent.InsertBelow(d, b);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), c, TEST_LOCATION);
+
+  // Re-position an existing child: move c immediately below a -> c, a, d, b
+  parent.InsertBelow(c, a);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), b, TEST_LOCATION);
+
+  // Reparent a child from another parent, inserting it below d -> c, a, e, d, b
+  Actor otherParent = Actor::New();
+  Actor e           = Actor::New();
+  otherParent.Add(e);
+
+  parent.InsertBelow(e, d);
+  DALI_TEST_EQUALS(otherParent.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(e.GetParent(), parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), e, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(4), b, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorInsertN(void)
+{
+  tet_infoline("Testing Actor::InsertAbove/InsertBelow negative cases");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+
+  // Inserting an actor relative to itself asserts
+  try
+  {
+    parent.InsertAbove(a, a);
+    tet_printf("Assertion test failed - no Exception\n");
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "&child != &target", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  // Target that is not a child of the parent -> no-op, child not added
+  Actor stranger = Actor::New();
+  Actor newChild = Actor::New();
+  parent.InsertAbove(newChild, stranger);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 2u, TEST_LOCATION);
+  DALI_TEST_CHECK(!newChild.GetParent());
+
+  END_TEST;
+}
+
 int UtcDaliActorRemoveN(void)
 {
   tet_infoline("Testing Actor::Remove");
@@ -841,6 +982,92 @@ int UtcDaliActorRemoveP(void)
   application.GetScene().Remove(parent);
 
   DALI_TEST_CHECK(parent.GetChildCount() == 1);
+  END_TEST;
+}
+
+int UtcDaliActorRemoveAllP(void)
+{
+  tet_infoline("Testing Actor::RemoveAll");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 3u, TEST_LOCATION);
+
+  parent.RemoveAll();
+
+  // Parent is emptied and each former child is detached.
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_CHECK(!a.GetParent());
+  DALI_TEST_CHECK(!b.GetParent());
+  DALI_TEST_CHECK(!c.GetParent());
+
+  // The handles are still alive (referenced by the test), and can be re-added.
+  parent.Add(a);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 1u, TEST_LOCATION);
+
+  // RemoveAll on an actor with no children is a no-op.
+  Actor empty = Actor::New();
+  empty.RemoveAll();
+  DALI_TEST_EQUALS(empty.GetChildCount(), 0u, TEST_LOCATION);
+
+  // RemoveAll called twice: second call is a no-op.
+  parent.RemoveAll();
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+  parent.RemoveAll();
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+// Counts ChildRemoved emissions and records the parent's child count observed at each emission.
+struct RemoveAllSignalCheck
+{
+  RemoveAllSignalCheck(int& removedCount, int& childCountAtEmit)
+  : mRemovedCount(removedCount),
+    mChildCountAtEmit(childCountAtEmit)
+  {
+  }
+
+  void operator()(Actor parent, Actor child)
+  {
+    ++mRemovedCount;
+    // Every ChildRemoved must observe the parent as already fully emptied.
+    mChildCountAtEmit = static_cast<int>(parent.GetChildCount());
+  }
+
+  int& mRemovedCount;
+  int& mChildCountAtEmit;
+};
+
+int UtcDaliActorRemoveAllSignals(void)
+{
+  tet_infoline("Testing Actor::RemoveAll emits ChildRemoved per child, and the parent is already empty at emit time");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+
+  int                  childCountAtEmit = -1;
+  int                  removedCount     = 0;
+  RemoveAllSignalCheck removedCheck(removedCount, childCountAtEmit);
+  parent.ChildRemovedSignal().Connect(&application, removedCheck);
+
+  parent.RemoveAll();
+
+  DALI_TEST_EQUALS(removedCount, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(childCountAtEmit, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -11415,6 +11642,106 @@ int UtcDaliChildAddedSignalN(void)
   auto actorB = Actor::New();
   actorA.Add(actorB);
   DALI_TEST_EQUALS(signalReceived, false, TEST_LOCATION);
+  END_TEST;
+}
+
+// Records, at the moment ChildAddedSignal fires, the sibling index of the added child within
+// its parent. Used to verify the child is already at its final insert position when notified.
+struct ChildAddedPositionCheck
+{
+  ChildAddedPositionCheck(int& indexAtEmit)
+  : mIndexAtEmit(indexAtEmit)
+  {
+  }
+
+  void operator()(Actor parent, Actor child)
+  {
+    mIndexAtEmit = -1;
+    for(uint32_t i = 0; i < parent.GetChildCount(); ++i)
+    {
+      if(parent.GetChildAt(i) == child)
+      {
+        mIndexAtEmit = static_cast<int>(i);
+        break;
+      }
+    }
+  }
+
+  int& mIndexAtEmit;
+};
+
+int UtcDaliActorInsertAddedSignalPosition(void)
+{
+  tet_infoline("Testing Actor::InsertAbove/InsertBelow emit ChildAdded only after the child is at its final position");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  // Sibling order (bottom -> top): a, b, c
+
+  int                     indexAtEmit = -99;
+  ChildAddedPositionCheck posCheck(indexAtEmit);
+  parent.ChildAddedSignal().Connect(&application, posCheck);
+
+  // Insert d immediately above b. At the moment ChildAdded fires, d must already sit at index 2
+  // (a, b, d, c) - NOT at the top where a naive Add-then-move would have transiently placed it.
+  Actor d = Actor::New();
+  parent.InsertAbove(d, b);
+  DALI_TEST_EQUALS(indexAtEmit, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), d, TEST_LOCATION);
+
+  // Insert e immediately below b -> a, e, b, d, c ; ChildAdded must see e at index 1.
+  indexAtEmit = -99;
+  Actor e     = Actor::New();
+  parent.InsertBelow(e, b);
+  DALI_TEST_EQUALS(indexAtEmit, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), e, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorInsertSignals(void)
+{
+  tet_infoline("Testing Actor::InsertAbove/InsertBelow emit ChildAdded and ChildOrderChanged signals");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+
+  bool                     orderChangedSignal(false);
+  Actor                    orderChangedActor;
+  ChildOrderChangedFunctor orderFunctor(orderChangedSignal, orderChangedActor);
+  DevelActor::ChildOrderChangedSignal(parent).Connect(&application, orderFunctor);
+
+  bool                  addedSignal(false);
+  Actor                 addedActor;
+  ChildAddedSignalCheck addedCheck(addedSignal, addedActor);
+  parent.ChildAddedSignal().Connect(&application, addedCheck);
+
+  // Inserting a fresh child emits ChildAdded only; it has no previous order, so
+  // ChildOrderChanged must NOT be emitted.
+  Actor c = Actor::New();
+  parent.InsertAbove(c, a);
+  DALI_TEST_EQUALS(addedSignal, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(addedActor, c, TEST_LOCATION);
+  DALI_TEST_EQUALS(orderChangedSignal, false, TEST_LOCATION);
+
+  // Re-positioning an existing child emits ChildOrderChanged only (no re-add).
+  addedSignal        = false;
+  orderChangedSignal = false;
+  parent.InsertBelow(c, a);
+  DALI_TEST_EQUALS(addedSignal, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(orderChangedSignal, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(orderChangedActor, c, TEST_LOCATION);
+
   END_TEST;
 }
 

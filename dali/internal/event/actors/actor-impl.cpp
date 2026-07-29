@@ -1627,9 +1627,24 @@ void Actor::Add(Actor& child, bool notify)
   mParentImpl.Add(child, notify);
 }
 
+void Actor::InsertAbove(Internal::Actor& child, Internal::Actor& target)
+{
+  InsertChild(child, target, true);
+}
+
+void Actor::InsertBelow(Internal::Actor& child, Internal::Actor& target)
+{
+  InsertChild(child, target, false);
+}
+
 void Actor::Remove(Actor& child, bool notify)
 {
   mParentImpl.Remove(child, notify);
+}
+
+void Actor::RemoveAll()
+{
+  mParentImpl.RemoveAll();
 }
 
 void Actor::SwitchParent(Actor& newParent)
@@ -2319,6 +2334,11 @@ void Actor::RaiseChildAbove(Actor& child, Actor& target)
 void Actor::LowerChildBelow(Actor& child, Actor& target)
 {
   mParentImpl.LowerChildBelow(child, target);
+}
+
+void Actor::InsertChild(Actor& child, Actor& target, bool above)
+{
+  mParentImpl.InsertChild(child, target, above);
 }
 
 } // namespace Internal

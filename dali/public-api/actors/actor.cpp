@@ -69,9 +69,24 @@ void Actor::Add(Actor actor)
   GetImplementation(*this).Add(GetImplementation(actor));
 }
 
+void Actor::InsertAbove(Actor child, Actor target)
+{
+  GetImplementation(*this).InsertAbove(GetImplementation(child), GetImplementation(target));
+}
+
+void Actor::InsertBelow(Actor child, Actor target)
+{
+  GetImplementation(*this).InsertBelow(GetImplementation(child), GetImplementation(target));
+}
+
 void Actor::Remove(Actor actor)
 {
   GetImplementation(*this).Remove(GetImplementation(actor));
+}
+
+void Actor::RemoveAll()
+{
+  GetImplementation(*this).RemoveAll();
 }
 
 void Actor::Unparent()

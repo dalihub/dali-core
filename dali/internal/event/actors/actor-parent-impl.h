@@ -67,6 +67,11 @@ public:
   void Remove(Actor& child, bool notify = true) override;
 
   /**
+   * @copydoc Dali::Internal::ActorParent::RemoveAll()
+   */
+  void RemoveAll() override;
+
+  /**
    * Retrieve the number of children held by the actor.
    * @return The number of children
    */
@@ -169,6 +174,11 @@ public:
    * @return true if order has been modified
    */
   void LowerChildBelow(Actor& child, Actor& target) override;
+
+  /**
+   * @copydoc Dali::Internal::ActorParent::InsertChild()
+   */
+  void InsertChild(Actor& child, Actor& target, bool above) override;
 
   /**
    * @copydoc Dali::Actor::ChildAddedSignal()
@@ -295,6 +305,19 @@ public:
   void RequestRenderTaskReorderRecursively();
 
 private:
+  /**
+   * @brief Adds a child Actor to this ActorParent, optionally at a specific sibling position.
+   *
+   * Shared implementation behind Add() and InsertChild(). When @p insertRelativeTo is null the
+   * child is appended (topmost); otherwise it is inserted directly adjacent to that sibling so
+   * that ChildAddedSignal is emitted only once, after the child is at its final position.
+   * @param[in] child The child to add
+   * @param[in] notify Emits notification if set to true
+   * @param[in] insertRelativeTo The existing sibling to position the child next to, or null to append
+   * @param[in] above If true, the child is placed immediately above @p insertRelativeTo; otherwise below
+   */
+  void AddChild(Actor& child, bool notify, Actor* insertRelativeTo, bool above);
+
   /**
    * @brief Emits the ChildAdded signal for this actor
    * @param[in] child The child actor that has been added

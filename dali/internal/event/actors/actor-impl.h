@@ -166,9 +166,24 @@ public:
   void Add(Actor& child, bool notify = true) override;
 
   /**
+   * @copydoc Dali::Actor::InsertAbove()
+   */
+  void InsertAbove(Internal::Actor& child, Internal::Actor& target);
+
+  /**
+   * @copydoc Dali::Actor::InsertBelow()
+   */
+  void InsertBelow(Internal::Actor& child, Internal::Actor& target);
+
+  /**
    * @copydoc Dali::Internal::ActorParent::Remove()
    */
   void Remove(Actor& child, bool notify = true) override;
+
+  /**
+   * @copydoc Dali::Actor::RemoveAll()
+   */
+  void RemoveAll() override;
 
   /**
    * @copydoc Dali::DevelActor::SwitchParent()
@@ -2603,6 +2618,11 @@ private:
    * @copydoc ActorParent::LowerChildBelow()
    */
   void LowerChildBelow(Actor& child, Actor& target) override;
+
+  /**
+   * @copydoc ActorParent::InsertChild()
+   */
+  void InsertChild(Actor& child, Actor& target, bool above) override;
 
 protected:
   ActorParentImpl    mParentImpl;     ///< Implementation of ActorParent;

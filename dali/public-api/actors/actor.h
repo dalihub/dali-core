@@ -935,6 +935,42 @@ public:
   void Add(Actor child);
 
   /**
+   * @brief Adds a child Actor to this Actor, positioned immediately above the target sibling.
+   *
+   * This is a convenience for Add() followed by sibling reordering in a single step.
+   * @SINCE_2_5.35
+   * @param[in] child The child to add
+   * @param[in] target The sibling to position the child above; must already be a child of this Actor
+   * @pre This Actor (the parent) has been initialized.
+   * @pre The child actor has been initialized.
+   * @pre The child actor is not the same as the parent actor.
+   * @pre The target actor is a child of this Actor.
+   * @post The child will be referenced by its parent.
+   * @note If the child already has a parent, it will be removed from the old parent
+   * and reparented to this actor. This may change child's position, color,
+   * scale etc as it now inherits them from this actor.
+   */
+  void InsertAbove(Actor child, Actor target);
+
+  /**
+   * @brief Adds a child Actor to this Actor, positioned immediately below the target sibling.
+   *
+   * This is a convenience for Add() followed by sibling reordering in a single step.
+   * @SINCE_2_5.35
+   * @param[in] child The child to add
+   * @param[in] target The sibling to position the child below; must already be a child of this Actor
+   * @pre This Actor (the parent) has been initialized.
+   * @pre The child actor has been initialized.
+   * @pre The child actor is not the same as the parent actor.
+   * @pre The target actor is a child of this Actor.
+   * @post The child will be referenced by its parent.
+   * @note If the child already has a parent, it will be removed from the old parent
+   * and reparented to this actor. This may change child's position, color,
+   * scale etc as it now inherits them from this actor.
+   */
+  void InsertBelow(Actor child, Actor target);
+
+  /**
    * @brief Removes a child Actor from this Actor.
    *
    * If the actor was not a child of this actor, this is a no-op.
@@ -944,6 +980,16 @@ public:
    * @pre The child actor is not the same as the parent actor.
    */
   void Remove(Actor child);
+
+  /**
+   * @brief Removes all child Actors from this Actor.
+   *
+   * If the actor has no children, this is a no-op.
+   * @SINCE_2_5.35
+   * @pre This Actor has been initialized.
+   * @post The children will be unreferenced. Any child not referenced elsewhere will be destroyed.
+   */
+  void RemoveAll();
 
   /**
    * @brief Removes an actor from its parent.
