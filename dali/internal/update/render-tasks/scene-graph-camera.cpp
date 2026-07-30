@@ -814,7 +814,7 @@ Dali::BoundsInteger Camera::GetOrthographicClippingBox() const
   const float halfWidth  = mProjectionDirection.Get() == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize * aspect : orthographicSize;
   const float halfHeight = mProjectionDirection.Get() == DevelCameraActor::ProjectionDirection::VERTICAL ? orthographicSize : orthographicSize / aspect;
 
-  return Dali::BoundsInteger(-halfWidth, -halfHeight, halfWidth * 2.0f, halfHeight * 2.0f);
+  return Dali::BoundsInteger(static_cast<int32_t>(-halfWidth), static_cast<int32_t>(-halfHeight), static_cast<int32_t>(halfWidth * 2.0f), static_cast<int32_t>(halfHeight * 2.0f));
 }
 
 uint32_t Camera::UpdateProjection()

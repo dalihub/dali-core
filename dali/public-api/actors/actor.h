@@ -1067,7 +1067,14 @@ public:
 
   /**
    * @brief Sets the parent origin of the actor.
+   *
+   * The parent origin is the point within the parent's area from which the actor's position is measured.
+   * Each component is normalized in the range [0, 1], where (0, 0, 0.5) is the top-left of the parent
+   * (see ParentOrigin::TOP_LEFT) and (1, 1, 0.5) is the bottom-right (see ParentOrigin::BOTTOM_RIGHT).
+   *
    * @param[in] origin The parent origin
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN
    * @SINCE_2_5.30
    */
   void SetParentOrigin(const Vector3& origin);
@@ -1075,13 +1082,17 @@ public:
   /**
    * @brief Gets the parent origin of the actor.
    * @return The parent origin
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN
    * @SINCE_2_5.30
    */
   Vector3 GetParentOrigin() const;
 
   /**
    * @brief Sets the X component of the parent origin.
-   * @param[in] x The x component of the parent origin
+   * @param[in] x The x component of the parent origin, normalized in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN_X
    * @SINCE_2_5.30
    */
   void SetParentOriginX(float x);
@@ -1089,13 +1100,17 @@ public:
   /**
    * @brief Gets the X component of the parent origin.
    * @return The X component of the parent origin
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN_X
    * @SINCE_2_5.30
    */
   float GetParentOriginX() const;
 
   /**
    * @brief Sets the Y component of the parent origin.
-   * @param[in] y The y component of the parent origin
+   * @param[in] y The y component of the parent origin, normalized in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN_Y
    * @SINCE_2_5.30
    */
   void SetParentOriginY(float y);
@@ -1103,13 +1118,17 @@ public:
   /**
    * @brief Gets the Y component of the parent origin.
    * @return The Y component of the parent origin
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN_Y
    * @SINCE_2_5.30
    */
   float GetParentOriginY() const;
 
   /**
    * @brief Sets the Z component of the parent origin.
-   * @param[in] z The z component of the parent origin
+   * @param[in] z The z component of the parent origin, normalized in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN_Z
    * @SINCE_2_5.30
    */
   void SetParentOriginZ(float z);
@@ -1117,13 +1136,23 @@ public:
   /**
    * @brief Gets the Z component of the parent origin.
    * @return The Z component of the parent origin
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PARENT_ORIGIN_Z
    * @SINCE_2_5.30
    */
   float GetParentOriginZ() const;
 
   /**
    * @brief Sets the pivot (anchor point) of the actor.
+   *
+   * The pivot is the point within the actor's own area that is aligned to the parent origin, and about
+   * which the actor is scaled and rotated. Each component is normalized in the range [0, 1], where
+   * (0, 0, 0.5) is the top-left of the actor (see AnchorPoint::TOP_LEFT) and (0.5, 0.5, 0.5) is its
+   * center (see AnchorPoint::CENTER).
+   *
    * @param[in] pivot The pivot
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT
    * @SINCE_2_5.30
    */
   void SetPivot(const Vector3& pivot);
@@ -1131,13 +1160,17 @@ public:
   /**
    * @brief Gets the pivot (anchor point) of the actor.
    * @return The pivot
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT
    * @SINCE_2_5.30
    */
   Vector3 GetPivot() const;
 
   /**
    * @brief Sets the X component of the pivot (anchor point).
-   * @param[in] x The x component of the pivot
+   * @param[in] x The x component of the pivot, normalized in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT_X
    * @SINCE_2_5.30
    */
   void SetPivotX(float x);
@@ -1145,13 +1178,17 @@ public:
   /**
    * @brief Gets the X component of the pivot (anchor point).
    * @return The X component of the pivot
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT_X
    * @SINCE_2_5.30
    */
   float GetPivotX() const;
 
   /**
    * @brief Sets the Y component of the pivot (anchor point).
-   * @param[in] y The y component of the pivot
+   * @param[in] y The y component of the pivot, normalized in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT_Y
    * @SINCE_2_5.30
    */
   void SetPivotY(float y);
@@ -1159,13 +1196,17 @@ public:
   /**
    * @brief Gets the Y component of the pivot (anchor point).
    * @return The Y component of the pivot
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT_Y
    * @SINCE_2_5.30
    */
   float GetPivotY() const;
 
   /**
    * @brief Sets the Z component of the pivot (anchor point).
-   * @param[in] z The z component of the pivot
+   * @param[in] z The z component of the pivot, normalized in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT_Z
    * @SINCE_2_5.30
    */
   void SetPivotZ(float z);
@@ -1173,20 +1214,29 @@ public:
   /**
    * @brief Gets the Z component of the pivot (anchor point).
    * @return The Z component of the pivot
+   * @pre The actor has been initialized.
+   * @see Actor::Property::PIVOT_Z
    * @SINCE_2_5.30
    */
   float GetPivotZ() const;
 
   /**
    * @brief Sets the size of the actor.
-   * @param[in] size The size
+   * @param[in] size The new size (width, height, depth)
+   * @pre The actor has been initialized.
+   * @note This sets the target size; the current size retrieved via GetCurrentSize() only reaches this
+   *       value on the next update, and may differ while a size animation is in progress.
+   * @see Actor::Property::SIZE
    * @SINCE_2_5.30
    */
   void SetSize(const Vector3& size);
 
   /**
-   * @brief Gets the size of the actor.
-   * @return The size
+   * @brief Gets the target size of the actor.
+   * @return The size that was last set (the target of any ongoing animation), which may differ from the current size
+   * @pre The actor has been initialized.
+   * @see GetCurrentSize()
+   * @see Actor::Property::SIZE
    * @SINCE_2_5.30
    */
   Vector3 GetSize() const;
@@ -1194,6 +1244,9 @@ public:
   /**
    * @brief Gets the current size of the actor from the previous update.
    * @return The current size of the actor
+   * @pre The actor has been initialized.
+   * @note Unlike GetSize(), this reflects the value produced by the last update, so during an animation
+   *       it returns the actor's size at the current frame rather than the animation's target.
    * @SINCE_2_5.30
    */
   Vector3 GetCurrentSize() const;
@@ -1201,6 +1254,8 @@ public:
   /**
    * @brief Sets the width of the actor.
    * @param[in] width The width
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SIZE_WIDTH
    * @SINCE_2_5.30
    */
   void SetWidth(float width);
@@ -1208,6 +1263,8 @@ public:
   /**
    * @brief Gets the width of the actor.
    * @return The width of the actor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SIZE_WIDTH
    * @SINCE_2_5.30
    */
   float GetWidth() const;
@@ -1215,6 +1272,8 @@ public:
   /**
    * @brief Sets the height of the actor.
    * @param[in] height The height
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SIZE_HEIGHT
    * @SINCE_2_5.30
    */
   void SetHeight(float height);
@@ -1222,6 +1281,8 @@ public:
   /**
    * @brief Gets the height of the actor.
    * @return The height of the actor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SIZE_HEIGHT
    * @SINCE_2_5.30
    */
   float GetHeight() const;
@@ -1229,6 +1290,8 @@ public:
   /**
    * @brief Sets the depth of the actor.
    * @param[in] depth The depth
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SIZE_DEPTH
    * @SINCE_2_5.30
    */
   void SetDepth(float depth);
@@ -1236,13 +1299,22 @@ public:
   /**
    * @brief Gets the depth of the actor.
    * @return The depth of the actor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SIZE_DEPTH
    * @SINCE_2_5.30
    */
   float GetDepth() const;
 
   /**
    * @brief Sets the position of the actor.
-   * @param[in] position The position
+   *
+   * The position is an offset of the actor's pivot from its parent origin, expressed in the parent's
+   * local coordinate system.
+   *
+   * @param[in] position The new position
+   * @pre The actor has been initialized.
+   * @note Whether the parent's position is added to this value is controlled by Property::INHERIT_POSITION.
+   * @see Actor::Property::POSITION
    * @SINCE_2_5.30
    */
   void SetPosition(const Vector3& position);
@@ -1250,6 +1322,8 @@ public:
   /**
    * @brief Sets the X position of the actor.
    * @param[in] x The X position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::POSITION_X
    * @SINCE_2_5.30
    */
   void SetPositionX(float x);
@@ -1257,6 +1331,8 @@ public:
   /**
    * @brief Gets the X position of the actor.
    * @return The X position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::POSITION_X
    * @SINCE_2_5.30
    */
   float GetPositionX() const;
@@ -1264,6 +1340,8 @@ public:
   /**
    * @brief Sets the Y position of the actor.
    * @param[in] y The Y position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::POSITION_Y
    * @SINCE_2_5.30
    */
   void SetPositionY(float y);
@@ -1271,6 +1349,8 @@ public:
   /**
    * @brief Gets the Y position of the actor.
    * @return The Y position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::POSITION_Y
    * @SINCE_2_5.30
    */
   float GetPositionY() const;
@@ -1278,6 +1358,8 @@ public:
   /**
    * @brief Sets the Z position of the actor.
    * @param[in] z The Z position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::POSITION_Z
    * @SINCE_2_5.30
    */
   void SetPositionZ(float z);
@@ -1285,13 +1367,18 @@ public:
   /**
    * @brief Gets the Z position of the actor.
    * @return The Z position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::POSITION_Z
    * @SINCE_2_5.30
    */
   float GetPositionZ() const;
 
   /**
    * @brief Gets the position of the actor.
-   * @return The position of the actor
+   * @return The position of the actor, relative to its parent
+   * @pre The actor has been initialized.
+   * @note This returns the target position; use GetCurrentPosition() for the value from the last update.
+   * @see Actor::Property::POSITION
    * @SINCE_2_5.30
    */
   Vector3 GetPosition() const;
@@ -1299,13 +1386,20 @@ public:
   /**
    * @brief Gets the current position of the actor from the previous update.
    * @return The current position of the actor
+   * @pre The actor has been initialized.
+   * @note Unlike GetPosition(), this reflects the value produced by the last update, so during an
+   *       animation it returns the actor's position at the current frame rather than the target.
    * @SINCE_2_5.30
    */
   Vector3 GetCurrentPosition() const;
 
   /**
    * @brief Gets the world position of the actor.
-   * @return The world position of the actor
+   * @return The actor's position in world coordinates, after applying all inherited transforms
+   * @pre The actor has been initialized.
+   * @note This is a read-only value derived from the last update; it is meaningful only while the actor
+   *       is connected to the scene.
+   * @see Actor::Property::WORLD_POSITION
    * @SINCE_2_5.30
    */
   Vector3 GetWorldPosition() const;
@@ -1313,6 +1407,8 @@ public:
   /**
    * @brief Gets the X component of the world position.
    * @return The X component of the world position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::WORLD_POSITION_X
    * @SINCE_2_5.30
    */
   float GetWorldPositionX() const;
@@ -1320,6 +1416,8 @@ public:
   /**
    * @brief Gets the Y component of the world position.
    * @return The Y component of the world position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::WORLD_POSITION_Y
    * @SINCE_2_5.30
    */
   float GetWorldPositionY() const;
@@ -1327,41 +1425,58 @@ public:
   /**
    * @brief Gets the Z component of the world position.
    * @return The Z component of the world position
+   * @pre The actor has been initialized.
+   * @see Actor::Property::WORLD_POSITION_Z
    * @SINCE_2_5.30
    */
   float GetWorldPositionZ() const;
 
   /**
    * @brief Sets the orientation of the actor.
-   * @param[in] orientation The orientation
+   * @param[in] orientation The new orientation
+   * @pre The actor has been initialized.
+   * @note Whether the parent's orientation is combined with this value is controlled by Property::INHERIT_ORIENTATION.
+   * @see Actor::Property::ORIENTATION
    * @SINCE_2_5.30
    */
   void SetOrientation(const Quaternion& orientation);
 
   /**
    * @brief Gets the orientation of the actor.
-   * @return The orientation
+   * @return The orientation, relative to its parent
+   * @pre The actor has been initialized.
+   * @see Actor::Property::ORIENTATION
    * @SINCE_2_5.30
    */
   Quaternion GetOrientation() const;
 
   /**
    * @brief Gets the world orientation of the actor.
-   * @return The world orientation
+   * @return The actor's orientation in world space, after applying all inherited transforms
+   * @pre The actor has been initialized.
+   * @note This is a read-only value derived from the last update; it is meaningful only while the actor
+   *       is connected to the scene.
+   * @see Actor::Property::WORLD_ORIENTATION
    * @SINCE_2_5.30
    */
   Quaternion GetWorldOrientation() const;
 
   /**
    * @brief Sets the scale factor applied to the actor.
-   * @param[in] scale The scale factor
+   * @param[in] scale The scale factor (1.0 in each axis means no scaling)
+   * @pre The actor has been initialized.
+   * @note Scaling is applied about the pivot; whether the parent's scale is combined with this value is
+   *       controlled by Property::INHERIT_SCALE.
+   * @see Actor::Property::SCALE
    * @SINCE_2_5.30
    */
   void SetScale(const Vector3& scale);
 
   /**
    * @brief Gets the scale factor applied to the actor.
-   * @return The scale factor
+   * @return The scale factor, relative to its parent
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SCALE
    * @SINCE_2_5.30
    */
   Vector3 GetScale() const;
@@ -1369,6 +1484,8 @@ public:
   /**
    * @brief Sets the X scale factor applied to the actor.
    * @param[in] scaleX The X scale factor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SCALE_X
    * @SINCE_2_5.30
    */
   void SetScaleX(float scaleX);
@@ -1376,6 +1493,8 @@ public:
   /**
    * @brief Gets the X scale factor applied to the actor.
    * @return The X scale factor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SCALE_X
    * @SINCE_2_5.30
    */
   float GetScaleX() const;
@@ -1383,6 +1502,8 @@ public:
   /**
    * @brief Sets the Y scale factor applied to the actor.
    * @param[in] scaleY The Y scale factor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SCALE_Y
    * @SINCE_2_5.30
    */
   void SetScaleY(float scaleY);
@@ -1390,6 +1511,8 @@ public:
   /**
    * @brief Gets the Y scale factor applied to the actor.
    * @return The Y scale factor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SCALE_Y
    * @SINCE_2_5.30
    */
   float GetScaleY() const;
@@ -1397,6 +1520,8 @@ public:
   /**
    * @brief Sets the Z scale factor applied to the actor.
    * @param[in] scaleZ The Z scale factor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SCALE_Z
    * @SINCE_2_5.30
    */
   void SetScaleZ(float scaleZ);
@@ -1404,13 +1529,19 @@ public:
   /**
    * @brief Gets the Z scale factor applied to the actor.
    * @return The Z scale factor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::SCALE_Z
    * @SINCE_2_5.30
    */
   float GetScaleZ() const;
 
   /**
    * @brief Gets the world scale factor applied to the actor.
-   * @return The world scale factor
+   * @return The actor's scale in world space, after applying all inherited transforms
+   * @pre The actor has been initialized.
+   * @note This is a read-only value derived from the last update; it is meaningful only while the actor
+   *       is connected to the scene.
+   * @see Actor::Property::WORLD_SCALE
    * @SINCE_2_5.30
    */
   Vector3 GetWorldScale() const;
@@ -1421,6 +1552,9 @@ public:
    * @note If false, this actor's children are not shown either; this is checked against every ancestor, so setting
    *       it to false on any actor in the hierarchy hides that whole subtree. This does not change the children's
    *       own visibility flag; each child keeps its value and becomes visible again once no ancestor is hidden.
+   * @pre The actor has been initialized.
+   * @see IsEffectivelyVisible()
+   * @see Actor::Property::VISIBLE
    * @SINCE_2_5.30
    */
   void SetVisible(bool visible);
@@ -1430,6 +1564,9 @@ public:
    * @return True if the actor is visible
    * @note This returns the actor's own flag, not its effective visibility; it can return true while the actor is
    *       hidden because an ancestor is not visible.
+   * @pre The actor has been initialized.
+   * @see IsEffectivelyVisible()
+   * @see Actor::Property::VISIBLE
    * @SINCE_2_5.30
    */
   bool IsVisible() const;
@@ -1445,13 +1582,21 @@ public:
    *       account for scene attachment, on-screen position, opacity or culling, so a true result does
    *       not by itself guarantee that the actor is actually drawn.
    * @return True if neither the actor nor any ancestor is hidden
+   * @pre The actor has been initialized.
+   * @see IsVisible()
+   * @see EffectiveVisibilityChangedSignal()
    * @SINCE_2_5.32
    */
   bool IsEffectivelyVisible() const;
 
   /**
    * @brief Sets the color of the actor.
-   * @param[in] color The color
+   * @param[in] color The color, with each component (red, green, blue, alpha) in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @note The alpha component is the same underlying value as the opacity; how it combines with the
+   *       parent's color is controlled by Property::COLOR_MODE.
+   * @see SetOpacity()
+   * @see Actor::Property::COLOR
    * @SINCE_2_5.30
    */
   void SetColor(const Vector4& color);
@@ -1459,6 +1604,8 @@ public:
   /**
    * @brief Gets the color of the actor.
    * @return The color of the actor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR
    * @SINCE_2_5.30
    */
   Vector4 GetColor() const;
@@ -1466,13 +1613,18 @@ public:
   /**
    * @brief Gets the current color of the actor from the previous update.
    * @return The current color of the actor
+   * @pre The actor has been initialized.
+   * @note Unlike GetColor(), this reflects the value produced by the last update, so during an
+   *       animation it returns the actor's color at the current frame rather than the target.
    * @SINCE_2_5.30
    */
   Vector4 GetCurrentColor() const;
 
   /**
    * @brief Sets the red component of the actor's color.
-   * @param[in] red The red component value
+   * @param[in] red The red component value, in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_RED
    * @SINCE_2_5.30
    */
   void SetColorRed(float red);
@@ -1480,13 +1632,17 @@ public:
   /**
    * @brief Gets the red component of the actor's color.
    * @return The red component value
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_RED
    * @SINCE_2_5.30
    */
   float GetColorRed() const;
 
   /**
    * @brief Sets the green component of the actor's color.
-   * @param[in] green The green component value
+   * @param[in] green The green component value, in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_GREEN
    * @SINCE_2_5.30
    */
   void SetColorGreen(float green);
@@ -1494,13 +1650,17 @@ public:
   /**
    * @brief Gets the green component of the actor's color.
    * @return The green component value
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_GREEN
    * @SINCE_2_5.30
    */
   float GetColorGreen() const;
 
   /**
    * @brief Sets the blue component of the actor's color.
-   * @param[in] blue The blue component value
+   * @param[in] blue The blue component value, in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_BLUE
    * @SINCE_2_5.30
    */
   void SetColorBlue(float blue);
@@ -1508,14 +1668,19 @@ public:
   /**
    * @brief Gets the blue component of the actor's color.
    * @return The blue component value
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_BLUE
    * @SINCE_2_5.30
    */
   float GetColorBlue() const;
 
   /**
    * @brief Sets the alpha component of the actor's color.
-   * @param[in] alpha The alpha component value
+   * @param[in] alpha The alpha component value, in the range [0, 1] (0 fully transparent, 1 fully opaque)
    * @note Equivalent to SetOpacity(). Both set the alpha channel of the actor's color property.
+   * @pre The actor has been initialized.
+   * @see SetOpacity()
+   * @see Actor::Property::COLOR_ALPHA
    * @SINCE_2_5.30
    */
   void SetColorAlpha(float alpha);
@@ -1524,20 +1689,31 @@ public:
    * @brief Gets the alpha component of the actor's color.
    * @return The alpha component value
    * @note Equivalent to GetOpacity(). Both read the alpha channel of the actor's color property.
+   * @pre The actor has been initialized.
+   * @see GetOpacity()
+   * @see Actor::Property::COLOR_ALPHA
    * @SINCE_2_5.30
    */
   float GetColorAlpha() const;
 
   /**
    * @brief Gets the world color of the actor.
-   * @return The world color of the actor
+   * @return The actor's color in world space, after applying inherited color according to Property::COLOR_MODE
+   * @pre The actor has been initialized.
+   * @note This is a read-only value derived from the last update; it is meaningful only while the actor
+   *       is connected to the scene.
+   * @see Actor::Property::WORLD_COLOR
    * @SINCE_2_5.30
    */
   Vector4 GetWorldColor() const;
 
   /**
    * @brief Gets the world matrix of the actor.
-   * @return The world matrix of the actor
+   * @return The actor's transform (position, orientation and scale) in world space, as a matrix
+   * @pre The actor has been initialized.
+   * @note This is a read-only value derived from the last update; it is meaningful only while the actor
+   *       is connected to the scene.
+   * @see Actor::Property::WORLD_MATRIX
    * @SINCE_2_5.30
    */
   Matrix GetWorldMatrix() const;
@@ -1545,6 +1721,9 @@ public:
   /**
    * @brief Sets the name of the actor.
    * @param[in] name The name
+   * @pre The actor has been initialized.
+   * @note The name need not be unique; use FindChildByName() to search for an actor by name.
+   * @see Actor::Property::NAME
    * @SINCE_2_5.30
    */
   void SetName(Dali::StringView name);
@@ -1552,13 +1731,20 @@ public:
   /**
    * @brief Gets the name of the actor.
    * @return The name of the actor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::NAME
    * @SINCE_2_5.30
    */
   Dali::String GetName() const;
 
   /**
    * @brief Sets the sensitivity flag of the actor.
-   * @param[in] sensitive True to make the actor sensitive
+   * @param[in] sensitive True to make the actor emit touch and hover signals
+   * @pre The actor has been initialized.
+   * @note If false, neither the actor nor its children are hittable. This is independent of Property::ENABLED,
+   *       which, when false, overrides this flag.
+   * @see IsSensitive()
+   * @see Actor::Property::SENSITIVE
    * @SINCE_2_5.30
    */
   void SetSensitive(bool sensitive);
@@ -1566,125 +1752,176 @@ public:
   /**
    * @brief Gets the sensitivity flag of the actor.
    * @return True if the actor is sensitive
+   * @pre The actor has been initialized.
+   * @note This returns the actor's own flag; the actor may still be insensitive in practice if an
+   *       ancestor is insensitive.
+   * @see Actor::Property::SENSITIVE
    * @SINCE_2_5.30
    */
   bool IsSensitive() const;
 
   /**
-   * @brief Sets the leave required flag.
-   * @param[in] required Whether leave event is required
+   * @brief Sets whether the actor requires a notification when a touch or hover point leaves its bounds.
+   * @param[in] required True if a "Leave" state event is required
+   * @pre The actor has been initialized.
+   * @note When enabled, the actor receives a touch or hover event with a "Leave" state once the primary
+   *       point moves outside its bounds.
+   * @see Actor::Property::LEAVE_REQUIRED
    * @SINCE_2_5.30
    */
   void SetLeaveRequired(bool required);
 
   /**
-   * @brief Gets the leave required flag.
-   * @return Whether leave event is required
+   * @brief Gets whether the actor requires a notification when a touch or hover point leaves its bounds.
+   * @return True if a "Leave" state event is required
+   * @pre The actor has been initialized.
+   * @see Actor::Property::LEAVE_REQUIRED
    * @SINCE_2_5.30
    */
   bool GetLeaveRequired() const;
 
   /**
    * @brief Sets the touch hit area margin.
-   * @param[in] margin The touch hit area margin
+   *
+   * Extends (positive values) or shrinks (negative values) the actor's touch hit area beyond its visual
+   * bounds. This affects only touch detection, not rendering or layout.
+   *
+   * @param[in] margin The margin (start, end, top, bottom in pixels) applied around the actor's bounds
+   * @pre The actor has been initialized.
+   * @see Actor::Property::TOUCH_HIT_AREA_MARGIN
    * @SINCE_2_5.30
    */
   void SetTouchHitAreaMargin(const Extents& margin);
 
   /**
    * @brief Gets the touch hit area margin.
-   * @return The touch hit area margin
+   * @return The touch hit area margin (start, end, top, bottom in pixels)
+   * @pre The actor has been initialized.
+   * @see Actor::Property::TOUCH_HIT_AREA_MARGIN
    * @SINCE_2_5.30
    */
   Extents GetTouchHitAreaMargin() const;
 
   /**
-   * @brief Sets whether to allow only self-initiated touch events.
-   * @param[in] enabled True to allow only self-initiated touch
+   * @brief Sets whether the actor only receives touch events that originated on itself.
+   * @param[in] enabled True to ignore touch events that started on another actor and moved into this actor's area
+   * @pre The actor has been initialized.
+   * @note Default is false.
+   * @see Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY
    * @SINCE_2_5.30
    */
   void SetAllowSelfInitiatedTouchOnlyEnabled(bool enabled);
 
   /**
-   * @brief Gets whether only self-initiated touch events are allowed.
+   * @brief Gets whether the actor only receives touch events that originated on itself.
    * @return True if only self-initiated touch is enabled
+   * @pre The actor has been initialized.
+   * @see Actor::Property::ALLOW_SELF_INITIATED_TOUCH_ONLY
    * @SINCE_2_5.30
    */
   bool IsAllowSelfInitiatedTouchOnlyEnabled() const;
 
   /**
-   * @brief Sets whether to dispatch touch motion events.
+   * @brief Sets whether touch motion events (pointer move while pressed) are dispatched to the actor.
    * @param[in] enabled True to dispatch touch motion events
+   * @pre The actor has been initialized.
+   * @note Default is true. When false, down and up events are still dispatched, but not motion events.
+   * @see Actor::Property::DISPATCH_TOUCH_MOTION
    * @SINCE_2_5.30
    */
   void SetDispatchTouchMotionEnabled(bool enabled);
 
   /**
-   * @brief Gets whether touch motion events are dispatched.
+   * @brief Gets whether touch motion events are dispatched to the actor.
    * @return True if touch motion dispatch is enabled
+   * @pre The actor has been initialized.
+   * @see Actor::Property::DISPATCH_TOUCH_MOTION
    * @SINCE_2_5.30
    */
   bool IsDispatchTouchMotionEnabled() const;
 
   /**
-   * @brief Sets whether to dispatch hover motion events.
+   * @brief Sets whether hover motion events (pointer move without press) are dispatched to the actor.
    * @param[in] enabled True to dispatch hover motion events
+   * @pre The actor has been initialized.
+   * @note Default is true.
+   * @see Actor::Property::DISPATCH_HOVER_MOTION
    * @SINCE_2_5.30
    */
   void SetDispatchHoverMotionEnabled(bool enabled);
 
   /**
-   * @brief Gets whether hover motion events are dispatched.
+   * @brief Gets whether hover motion events are dispatched to the actor.
    * @return True if hover motion dispatch is enabled
+   * @pre The actor has been initialized.
+   * @see Actor::Property::DISPATCH_HOVER_MOTION
    * @SINCE_2_5.30
    */
   bool IsDispatchHoverMotionEnabled() const;
 
   /**
-   * @brief Sets the inherit orientation flag.
-   * @param[in] inherit Whether to inherit orientation
+   * @brief Sets whether the actor inherits its parent's orientation.
+   * @param[in] inherit True to combine the parent's orientation with this actor's own orientation
+   * @pre The actor has been initialized.
+   * @note Default is true.
+   * @see Actor::Property::INHERIT_ORIENTATION
    * @SINCE_2_5.30
    */
   void SetInheritOrientationEnabled(bool inherit);
 
   /**
-   * @brief Gets the inherit orientation flag.
-   * @return Whether orientation is inherited
+   * @brief Gets whether the actor inherits its parent's orientation.
+   * @return True if orientation is inherited
+   * @pre The actor has been initialized.
+   * @see Actor::Property::INHERIT_ORIENTATION
    * @SINCE_2_5.30
    */
   bool IsInheritOrientationEnabled() const;
 
   /**
-   * @brief Sets the inherit scale flag.
-   * @param[in] inherit Whether to inherit scale
+   * @brief Sets whether the actor inherits its parent's scale.
+   * @param[in] inherit True to combine the parent's scale with this actor's own scale
+   * @pre The actor has been initialized.
+   * @note Default is true.
+   * @see Actor::Property::INHERIT_SCALE
    * @SINCE_2_5.30
    */
   void SetInheritScaleEnabled(bool inherit);
 
   /**
-   * @brief Gets the inherit scale flag.
-   * @return Whether scale is inherited
+   * @brief Gets whether the actor inherits its parent's scale.
+   * @return True if scale is inherited
+   * @pre The actor has been initialized.
+   * @see Actor::Property::INHERIT_SCALE
    * @SINCE_2_5.30
    */
   bool IsInheritScaleEnabled() const;
 
   /**
-   * @brief Sets the inherit position flag.
-   * @param[in] inherit Whether to inherit position
+   * @brief Sets whether the actor inherits its parent's position.
+   * @param[in] inherit True to add the parent's position to this actor's own position
+   * @pre The actor has been initialized.
+   * @note Default is true.
+   * @see Actor::Property::INHERIT_POSITION
    * @SINCE_2_5.30
    */
   void SetInheritPositionEnabled(bool inherit);
 
   /**
-   * @brief Gets the inherit position flag.
-   * @return Whether position is inherited
+   * @brief Gets whether the actor inherits its parent's position.
+   * @return True if position is inherited
+   * @pre The actor has been initialized.
+   * @see Actor::Property::INHERIT_POSITION
    * @SINCE_2_5.30
    */
   bool IsInheritPositionEnabled() const;
 
   /**
-   * @brief Sets the color mode.
+   * @brief Sets the color mode, which controls how the actor's color combines with its parent's color.
    * @param[in] colorMode The color mode
+   * @pre The actor has been initialized.
+   * @see ColorMode for the supported values.
+   * @see Actor::Property::COLOR_MODE
    * @SINCE_2_5.30
    */
   void SetColorMode(ColorMode colorMode);
@@ -1692,13 +1929,18 @@ public:
   /**
    * @brief Gets the color mode.
    * @return The color mode
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MODE
    * @SINCE_2_5.30
    */
   ColorMode GetColorMode() const;
 
   /**
-   * @brief Sets the draw mode.
+   * @brief Sets the draw mode, which controls how the actor's renderers are drawn (e.g. as a 2D overlay).
    * @param[in] drawMode The draw mode
+   * @pre The actor has been initialized.
+   * @see DrawMode::Type for the supported values.
+   * @see Actor::Property::DRAW_MODE
    * @SINCE_2_5.30
    */
   void SetDrawMode(DrawMode::Type drawMode);
@@ -1706,27 +1948,40 @@ public:
   /**
    * @brief Gets the draw mode.
    * @return The draw mode
+   * @pre The actor has been initialized.
+   * @see Actor::Property::DRAW_MODE
    * @SINCE_2_5.30
    */
   DrawMode::Type GetDrawMode() const;
 
   /**
-   * @brief Sets the blend equation.
+   * @brief Sets the blend equation used when compositing the actor's renderers onto the framebuffer.
    * @param[in] blendEquation The blend equation
+   * @pre The actor has been initialized.
+   * @note For advanced blend equations, the rendered color must use pre-multiplied alpha. Use
+   *       Dali::Capabilities::IsBlendEquationSupported to check availability on the current system.
+   * @see Actor::Property::BLEND_EQUATION
    * @SINCE_2_5.30
    */
   void SetBlendEquation(Dali::BlendEquation::Type blendEquation);
 
   /**
-   * @brief Gets the blend equation.
+   * @brief Gets the blend equation used when compositing the actor's renderers onto the framebuffer.
    * @return The blend equation
+   * @pre The actor has been initialized.
+   * @see Actor::Property::BLEND_EQUATION
    * @SINCE_2_5.30
    */
   Dali::BlendEquation::Type GetBlendEquation() const;
 
   /**
-   * @brief Sets the clipping mode.
+   * @brief Sets the clipping mode, which controls whether the actor clips its children to its own bounds.
    * @param[in] clippingMode The clipping mode
+   * @pre The actor has been initialized.
+   * @note ClippingMode::CLIP_TO_BOUNDING_BOX and a draw mode of DrawMode::OVERLAY_2D cannot be used
+   *       together; in that case the clipping is ignored.
+   * @see ClippingMode::Type for the supported values.
+   * @see Actor::Property::CLIPPING_MODE
    * @SINCE_2_5.30
    */
   void SetClippingMode(ClippingMode::Type clippingMode);
@@ -1734,6 +1989,8 @@ public:
   /**
    * @brief Gets the clipping mode.
    * @return The clipping mode
+   * @pre The actor has been initialized.
+   * @see Actor::Property::CLIPPING_MODE
    * @SINCE_2_5.30
    */
   ClippingMode::Type GetClippingMode() const;
@@ -1741,6 +1998,9 @@ public:
   /**
    * @brief Sets the layout direction.
    * @param[in] layoutDirection The layout direction. Set to LayoutDirection::INHERIT to inherit from the parent.
+   * @pre The actor has been initialized.
+   * @see GetEffectiveLayoutDirection()
+   * @see Actor::Property::LAYOUT_DIRECTION
    * @SINCE_2_5.30
    */
   void SetLayoutDirection(LayoutDirection::Type layoutDirection);
@@ -1750,6 +2010,8 @@ public:
    * @return The layout direction. May be LayoutDirection::INHERIT if the actor inherits from its parent.
    * @note To get the resolved direction actually used for layout (always LEFT_TO_RIGHT or RIGHT_TO_LEFT),
    *       use GetEffectiveLayoutDirection().
+   * @pre The actor has been initialized.
+   * @see Actor::Property::LAYOUT_DIRECTION
    * @SINCE_2_5.30
    */
   LayoutDirection::Type GetLayoutDirection() const;
@@ -1757,78 +2019,112 @@ public:
   /**
    * @brief Gets the effective layout direction resolved through the inheritance chain.
    * @return The resolved layout direction, always LEFT_TO_RIGHT or RIGHT_TO_LEFT (never INHERIT).
+   * @pre The actor has been initialized.
+   * @see GetLayoutDirection()
    * @SINCE_2_5.32
    */
   LayoutDirection::Type GetEffectiveLayoutDirection() const;
 
   /**
-   * @brief Sets the opacity.
-   * @param[in] opacity The opacity
+   * @brief Sets the opacity of the actor.
+   * @param[in] opacity The opacity, in the range [0, 1] (0 fully transparent, 1 fully opaque)
    * @note Equivalent to SetColorAlpha(). Both set the alpha channel of the actor's color property.
+   * @pre The actor has been initialized.
+   * @see SetColorAlpha()
+   * @see Actor::Property::OPACITY
    * @SINCE_2_5.30
    */
   void SetOpacity(float opacity);
 
   /**
-   * @brief Gets the opacity.
+   * @brief Gets the opacity of the actor.
    * @return The opacity
    * @note Equivalent to GetColorAlpha(). Both read the alpha channel of the actor's color property.
+   * @pre The actor has been initialized.
+   * @see GetColorAlpha()
+   * @see Actor::Property::OPACITY
    * @SINCE_2_5.30
    */
   float GetOpacity() const;
 
   /**
-   * @brief Sets the screen position of the actor.
+   * @brief Gets the screen position of the actor.
    * @return The screen position of the actor
+   * @pre The actor has been initialized.
+   * @note This is based on the last known frame and may not match a position value just set. For a value
+   *       computed from the current event-side properties, use CalculateScreenPosition().
+   * @see CalculateScreenPosition()
+   * @see Actor::Property::SCREEN_POSITION
    * @SINCE_2_5.30
    */
   Vector2 GetScreenPosition() const;
 
   /**
-   * @brief Sets whether the position uses the pivot point.
-   * @param[in] enabled True to use pivot for position
+   * @brief Sets whether the pivot is used to determine the actor's position.
+   * @param[in] enabled True to position the actor by its pivot; false to position it by its top-left corner
+   * @pre The actor has been initialized.
+   * @note Default is true. Setting this to false allows scaling or rotation about the pivot without
+   *       affecting the actor's position.
+   * @see Actor::Property::POSITION_USES_PIVOT
    * @SINCE_2_5.30
    */
   void SetPositionUsesPivotEnabled(bool enabled);
 
   /**
-   * @brief Gets whether the position uses the pivot point.
-   * @return True if position uses pivot
+   * @brief Gets whether the pivot is used to determine the actor's position.
+   * @return True if the position uses the pivot
+   * @pre The actor has been initialized.
+   * @see Actor::Property::POSITION_USES_PIVOT
    * @SINCE_2_5.30
    */
   bool IsPositionUsesPivotEnabled() const;
 
   /**
    * @brief Gets whether the actor is culled.
-   * @return Whether the actor is culled
+   * @return True if the actor is out of the view frustum and therefore not drawn
+   * @pre The actor has been initialized.
+   * @note This is a read-only value derived from the last update.
+   * @see Actor::Property::CULLED
    * @SINCE_2_5.30
    */
   bool IsCulled() const;
 
   /**
-   * @brief Gets the actor ID.
+   * @brief Gets the unique ID of the actor.
    * @return The actor ID
+   * @pre The actor has been initialized.
+   * @see FindChildById()
+   * @see Actor::Property::ID
    * @SINCE_2_5.30
    */
   uint32_t GetId() const;
 
   /**
-   * @brief Gets whether the actor is root.
-   * @return Whether the actor is root
+   * @brief Gets whether the actor is the root actor, which is owned by the Scene.
+   * @return True if the actor is the root actor
+   * @pre The actor has been initialized.
+   * @see Actor::Property::IS_ROOT
    * @SINCE_2_5.30
    */
   bool IsRoot() const;
 
   /**
-   * @brief Gets whether the actor is a layer.
-   * @return Whether the actor is a layer
+   * @brief Gets whether the actor is of class Dali::Layer.
+   * @return True if the actor is a layer
+   * @pre The actor has been initialized.
+   * @see Actor::Property::IS_LAYER
    * @SINCE_2_5.30
    */
   bool IsLayer() const;
 
   /**
-   * @brief Gets whether the actor is connected to scene.
-   * @return Whether the actor is connected to scene
+   * @brief Gets whether the actor is connected to the scene.
+   *
+   * When an actor is connected, it is directly or indirectly parented to the root actor.
+   *
+   * @return True if the actor is connected to the scene
+   * @pre The actor has been initialized.
+   * @see Actor::Property::CONNECTED_TO_SCENE
    * @SINCE_2_5.30
    */
   bool IsConnectedToScene() const;
@@ -1836,6 +2132,8 @@ public:
   /**
    * @brief Sets whether the actor should be focusable, e.g. by keyboard navigation or accessibility.
    * @param[in] focusable True to make the actor focusable
+   * @pre The actor has been initialized.
+   * @see Actor::Property::FOCUSABLE
    * @SINCE_2_5.30
    */
   void SetFocusable(bool focusable);
@@ -1843,6 +2141,8 @@ public:
   /**
    * @brief Gets whether the actor is focusable.
    * @return True if the actor is focusable
+   * @pre The actor has been initialized.
+   * @see Actor::Property::FOCUSABLE
    * @SINCE_2_5.30
    */
   bool IsFocusable() const;
@@ -1850,6 +2150,10 @@ public:
   /**
    * @brief Sets whether the actor is focused when the user touches it.
    * @param[in] focusOnTouchEnabled True to focus the actor when it is touched
+   * @pre The actor has been initialized.
+   * @note Default is false. This has no effect unless the actor is also focusable (see SetFocusable()).
+   * @see SetFocusable()
+   * @see Actor::Property::FOCUS_ON_TOUCH
    * @SINCE_2_5.30
    */
   void SetFocusOnTouchEnabled(bool focusOnTouchEnabled);
@@ -1857,6 +2161,8 @@ public:
   /**
    * @brief Gets whether the actor is focused when the user touches it.
    * @return True if the actor is focused when it is touched
+   * @pre The actor has been initialized.
+   * @see Actor::Property::FOCUS_ON_TOUCH
    * @SINCE_2_5.30
    */
   bool IsFocusOnTouchEnabled() const;
@@ -1864,6 +2170,10 @@ public:
   /**
    * @brief Sets whether this actor allows its descendants to receive focus.
    * @param[in] allowDescendantFocusEnabled True to allow descendants of this actor to receive focus
+   * @pre The actor has been initialized.
+   * @note Default is true. Setting this to false blocks focus for the whole subtree beneath this actor.
+   * @see HasAncestorBlockingFocus()
+   * @see Actor::Property::ALLOW_DESCENDANT_FOCUS
    * @SINCE_2_5.30
    */
   void SetAllowDescendantFocusEnabled(bool allowDescendantFocusEnabled);
@@ -1871,6 +2181,8 @@ public:
   /**
    * @brief Gets whether this actor allows its descendants to receive focus.
    * @return True if descendants of this actor are allowed to receive focus
+   * @pre The actor has been initialized.
+   * @see Actor::Property::ALLOW_DESCENDANT_FOCUS
    * @SINCE_2_5.30
    */
   bool IsAllowDescendantFocusEnabled() const;
@@ -1879,6 +2191,8 @@ public:
    * @brief Checks whether any ancestor of this actor disallows descendant focus.
    * @return True if an ancestor's Property::ALLOW_DESCENDANT_FOCUS is false, false otherwise
    * @note This only checks ancestors; it does not check this actor's own Property::ALLOW_DESCENDANT_FOCUS.
+   * @pre The actor has been initialized.
+   * @see IsAllowDescendantFocusEnabled()
    * @SINCE_2_5.30
    */
   bool HasAncestorBlockingFocus() const;
@@ -1889,6 +2203,9 @@ public:
    * @note If false, this actor's children are disabled too; this is checked against every ancestor, so setting
    *       it to false on any actor in the hierarchy disables that whole subtree. This does not change the children's
    *       own enabled flag; each child keeps its value and becomes effectively enabled again once no ancestor is disabled.
+   * @pre The actor has been initialized.
+   * @see IsEffectivelyEnabled()
+   * @see Actor::Property::ENABLED
    * @SINCE_2_5.30
    */
   void SetEnabled(bool enabled);
@@ -1898,6 +2215,9 @@ public:
    * @return True if the actor is enabled for user interaction
    * @note This returns the actor's own flag, not its effective state; it can return true while the actor is
    *       disabled because an ancestor is not enabled.
+   * @pre The actor has been initialized.
+   * @see IsEffectivelyEnabled()
+   * @see Actor::Property::ENABLED
    * @SINCE_2_5.30
    */
   bool IsEnabled() const;
@@ -1910,20 +2230,31 @@ public:
    * is disabled.
    *
    * @return True if neither the actor nor any ancestor is disabled
+   * @pre The actor has been initialized.
+   * @see IsEnabled()
    * @SINCE_2_5.32
    */
   bool IsEffectivelyEnabled() const;
 
   /**
    * @brief Sets the update area hint for the actor.
-   * @param[in] hint The update area hint
+   *
+   * Overrides the area (position and size) used to calculate the actor's damaged area. The position is
+   * relative to the center of the actor and is also the center of the damaged area, and the whole hint is
+   * affected by the actor's model-view matrix.
+   *
+   * @param[in] hint The update area hint (x, y, width, height)
+   * @pre The actor has been initialized.
+   * @see Actor::Property::UPDATE_AREA_HINT
    * @SINCE_2_5.30
    */
   void SetUpdateAreaHint(const Vector4& hint);
 
   /**
    * @brief Gets the update area hint for the actor.
-   * @return The update area hint
+   * @return The update area hint (x, y, width, height)
+   * @pre The actor has been initialized.
+   * @see Actor::Property::UPDATE_AREA_HINT
    * @SINCE_2_5.30
    */
   Vector4 GetUpdateAreaHint() const;
@@ -2064,6 +2395,7 @@ public:
    *
    * @SINCE_2_4.21
    * @param[in] ignored True to make the actor be ignored.
+   * @see Actor::Property::IGNORED
    */
   void SetIgnored(bool ignored);
 
@@ -2072,6 +2404,7 @@ public:
    *
    * @SINCE_2_4.21
    * @return Return True if the Actor is ignored.
+   * @see Actor::Property::IGNORED
    */
   bool IsIgnored() const;
 
