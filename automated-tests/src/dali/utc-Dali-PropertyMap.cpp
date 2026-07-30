@@ -296,7 +296,17 @@ int UtcDaliPropertyMapConstOperator(void)
   }
   catch(DaliException& e)
   {
-    DALI_TEST_ASSERT(e, "!\"Invalid Key\"", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "Invalid Key", TEST_LOCATION);
+  }
+
+  try
+  {
+    constMap[999];
+    tet_result(TET_FAIL);
+  }
+  catch(DaliException& e)
+  {
+    DALI_TEST_ASSERT(e, "Invalid Key", TEST_LOCATION);
   }
 
   END_TEST;

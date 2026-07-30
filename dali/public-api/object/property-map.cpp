@@ -449,7 +449,7 @@ const Property::Value& Property::Map::operator[](Dali::StringView key) const
     }
   }
 
-  DALI_ASSERT_ALWAYS(!"Invalid Key");
+  DALI_ABORT("Invalid Key");
 }
 
 Property::Value& Property::Map::operator[](Dali::StringView key)
@@ -491,7 +491,7 @@ const Property::Value& Property::Map::operator[](Property::Index key) const
     }
   }
 
-  DALI_ASSERT_ALWAYS(!"Invalid Key");
+  DALI_ABORT("Invalid Key");
 }
 
 Property::Value& Property::Map::operator[](Property::Index key)

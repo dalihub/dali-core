@@ -1,6 +1,8 @@
 #ifndef DALI_INTERNAL_MEMORY_POOL_KEY_H
 #define DALI_INTERNAL_MEMORY_POOL_KEY_H
 
+#include <cstdint>
+
 /*
  * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
@@ -170,9 +172,13 @@ public:
     return key != INVALID;
   }
 
-  uint32_t Value() const
+  std::uintptr_t Value() const
   {
-    return reinterpret_cast<uint32_t>(key);
+#if defined(__LP64__)
+    return key;
+#else
+    return reinterpret_cast<std::uintptr_t>(key);
+#endif
   }
 
 private:

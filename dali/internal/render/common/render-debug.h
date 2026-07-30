@@ -23,7 +23,7 @@
 
 #ifdef DALI_PRINT_RENDER_INFO
 
-#define DALI_PRINT_RENDER_START(x) Render::PrintFrameStart(x);
+#define DALI_PRINT_RENDER_START() Render::PrintFrameStart();
 #define DALI_PRINT_RENDER_END() Render::PrintFrameEnd();
 #define DALI_PRINT_RENDER_INSTRUCTION(x) Render::PrintRenderInstruction(x);
 #define DALI_PRINT_RENDER_LIST(x) Render::PrintRenderList(x);
@@ -31,7 +31,7 @@
 
 #else // DALI_PRINT_RENDER_INFO
 
-#define DALI_PRINT_RENDER_START(x)
+#define DALI_PRINT_RENDER_START()
 #define DALI_PRINT_RENDER_END()
 #define DALI_PRINT_RENDER_INSTRUCTION(x)
 #define DALI_PRINT_RENDER_LIST(x)
