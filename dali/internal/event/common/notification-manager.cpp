@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/threading/mutex.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/queue/queue-benchmark-instrumentation.h>
 #include <dali/integration-api/trace.h>
+#include <dali/internal/common/lockless-pointer-ring.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 #include <dali/internal/event/common/notifier-interface.h>
@@ -36,55 +38,159 @@ namespace Internal
 {
 namespace
 {
-typedef std::vector<std::pair<CompleteNotificationInterface*, CompleteNotificationInterface::ParameterList>> InterfaceContainer;
-
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
-/**
- * helper to move elements from one container to another
- * @param from where to move
- * @param to move target
- */
-void MoveElements(InterfaceContainer& from, InterfaceContainer& to)
-{
-  to.insert(to.end(),
-            std::make_move_iterator(from.begin()),
-            std::make_move_iterator(from.end()));
-  from.clear();
-}
-} // namespace
+using MessageQueueMutex  = Dali::Mutex;
+using MessageContainer   = OwnerContainer<MessageBase*>;
+using InterfaceContainer = std::vector<std::pair<CompleteNotificationInterface*, NotificationManager::NotificationParameterList>>;
 
-using MessageQueueMutex = Dali::Mutex;
-using MessageContainer  = OwnerContainer<MessageBase*>;
+// One batch = everything QueueMessage()/QueueNotification() accumulated during a
+// single Update frame. Handed over to the Event thread as one pointer via the
+// lockless ring, instead of serializing each notification individually - this
+// mirrors the granularity of the original mutex design (MoveFrom/MoveElements
+// operating on whole containers), so the hand-off cost is O(1) in notification
+// count.
+struct NotificationBatch
+{
+  MessageContainer   messages;   ///< owns its MessageBase* pointers
+  InterfaceContainer interfaces; ///< non-owning: params are stored by value, interface pointers are never owned here
+
+  void Clear()
+  {
+    // OwnerContainer::Clear() deletes owned MessageBase* pointers - this is the
+    // correct, single point of ownership release for messages once Process()
+    // has been called on them (or, during teardown, without Process() - see
+    // Impl::~Impl()).
+    messages.Clear();
+    interfaces.clear();
+  }
+};
+
+// Small: one batch is produced per non-empty UpdateCompleted() call (at most
+// once per Update frame), and the Event thread drains on every ProcessMessages()
+// call (at most once per frame too) - so in steady state at most 1-2 batches are
+// ever in flight. Sized with headroom for the Event thread falling a couple of
+// frames behind before this becomes a genuine backpressure signal.
+constexpr std::size_t NOTIFICATION_RING_CAPACITY = 8;
+constexpr std::size_t MAX_FREE_BATCH_COUNT       = 4; ///< cap on how many idle NotificationBatch objects we keep pre-allocated
+
+} // namespace
 
 struct NotificationManager::Impl
 {
-  Impl()
-  {
-    // reserve space on the vectors to avoid reallocs
-    // applications typically have up-to 20-30 notifications at startup
-    updateCompletedMessageQueue.Reserve(32);
-    updateWorkingMessageQueue.Reserve(32);
-    eventMessageQueue.Reserve(32);
+  Impl() = default;
 
-    // only a few manager objects get complete notifications (animation, render list, property notifications, ...)
-    updateCompletedInterfaceQueue.reserve(4);
-    updateWorkingInterfaceQueue.reserve(4);
-    eventInterfaceQueue.reserve(4);
+  ~Impl()
+  {
+    // Delete any batches still sitting in the lockless ring that were committed
+    // by the Update thread but never consumed by the Event thread (e.g. the
+    // application is shutting down before the next ProcessMessages() call).
+    // NOTE: by the time this destructor runs, both producer and consumer
+    // threads must already be stopped/joined - a precondition of
+    // NotificationManager teardown - so draining here without additional
+    // synchronization is safe.
+    NotificationBatch* drained[NOTIFICATION_RING_CAPACITY];
+    std::size_t        count = notificationRing.Drain(drained, NOTIFICATION_RING_CAPACITY);
+    for(std::size_t i = 0; i < count; ++i)
+    {
+      // Do NOT call Process()/NotifyCompleted() during teardown - just release
+      // ownership of anything still queued. Clear() deletes owned MessageBase*.
+      drained[i]->Clear();
+      delete drained[i];
+    }
+
+    // Anything still sitting in workingMessages/workingInterfaces (i.e. queued
+    // this frame but UpdateCompleted() never ran, or ran and rolled back) is
+    // cleaned up automatically: workingMessages is an OwnerContainer and will
+    // delete any owned pointers in its own destructor; workingInterfaces is
+    // non-owning.
+
+    // Free pool batches and any batches still waiting to be recycled.
+    for(auto* batch : batchFreeQueue) delete batch;
+    for(auto* batch : batchRecycleQueue) delete batch;
   }
 
-  ~Impl() = default;
+  /**
+   * @brief Get a NotificationBatch ready to fill, reusing a recycled one if available.
+   * @note Update thread only. batchFreeQueue is exclusively owned by this
+   * function/thread - see the note on RecycleBatch() for why the cap on
+   * total pooled batches is enforced here, not there.
+   */
+  NotificationBatch* AcquireBatch()
+  {
+    if(batchFreeQueue.empty())
+    {
+      // Pull anything the Event thread has finished with into the free pool.
+      // Mirrors MessageQueue::ReserveMessageSlot()'s recycleQueue -> freeQueue
+      // refill: only touches the mutex when the free pool is actually empty,
+      // not on every call. The MAX_FREE_BATCH_COUNT cap is applied HERE,
+      // entirely on this (the producer) thread, rather than in RecycleBatch()
+      // - see that function's comment for why.
+      MessageQueueMutex::ScopedLock lock(batchPoolMutex);
+      while(!batchRecycleQueue.empty())
+      {
+        NotificationBatch* batch = batchRecycleQueue.back();
+        batchRecycleQueue.pop_back();
 
-  // queueMutex must be locked whilst accessing queue
-  MessageQueueMutex queueMutex;
-  // three queues for objects owned by notification manager
-  MessageContainer updateCompletedMessageQueue;
-  MessageContainer updateWorkingMessageQueue;
-  MessageContainer eventMessageQueue;
-  // three queues for objects referenced by notification manager
-  InterfaceContainer updateCompletedInterfaceQueue;
-  InterfaceContainer updateWorkingInterfaceQueue;
-  InterfaceContainer eventInterfaceQueue;
+        if(batchFreeQueue.size() < MAX_FREE_BATCH_COUNT)
+        {
+          batchFreeQueue.push_back(batch);
+        }
+        else
+        {
+          delete batch;
+        }
+      }
+    }
+
+    if(!batchFreeQueue.empty())
+    {
+      NotificationBatch* batch = batchFreeQueue.back();
+      batchFreeQueue.pop_back();
+      return batch;
+    }
+
+    return new NotificationBatch();
+  }
+
+  /**
+   * @brief Return a fully-drained (Clear()'d) batch to the recycle pool.
+   * @note Called from BOTH threads: the Event thread (ProcessMessages(), the
+   * normal path) and the Update thread (UpdateCompleted()'s rollback path,
+   * when Push() finds the ring full). Because of this, this function MUST
+   * NEVER read or write batchFreeQueue - that container is documented as
+   * Update-thread-exclusive (see AcquireBatch()), and touching it from the
+   * Event-thread call path here would be an unsynchronized cross-thread
+   * access (a real data race) on a container that elsewhere is deliberately
+   * accessed without a lock. This function only ever touches
+   * batchRecycleQueue, which is always accessed under batchPoolMutex from
+   * both threads. Any cap on total pooled batch count is therefore enforced
+   * later, in AcquireBatch(), when batches are moved out of
+   * batchRecycleQueue into batchFreeQueue on the producer thread - exactly
+   * mirroring how MessageQueue::recycleQueue has no cap of its own, and
+   * MAX_FREE_BUFFER_COUNT is only applied when ReserveMessageSlot() drains
+   * recycleQueue into freeQueue.
+   */
+  void RecycleBatch(NotificationBatch* batch)
+  {
+    MessageQueueMutex::ScopedLock lock(batchPoolMutex);
+    batchRecycleQueue.push_back(batch);
+  }
+
+  // Lockless SPSC ring of whole-batch pointers.
+  // Producer (Update thread): UpdateCompleted()
+  // Consumer (Event thread): MessagesToProcess(), ProcessMessages()
+  LocklessPointerRing<NotificationBatch, NOTIFICATION_RING_CAPACITY> notificationRing;
+
+  MessageQueueMutex               batchPoolMutex;    ///< guards batchRecycleQueue only
+  std::vector<NotificationBatch*> batchRecycleQueue; ///< batches returned by the Event thread, awaiting reuse (mutex-protected, shared)
+  std::vector<NotificationBatch*> batchFreeQueue;    ///< Update-thread-only pool of ready-to-fill batches (no locking needed)
+
+  // Working containers (Update thread only): accumulate QueueMessage()/
+  // QueueNotification() calls across the frame, moved into a batch wholesale
+  // in UpdateCompleted() - not serialized item-by-item.
+  MessageContainer   workingMessages;
+  InterfaceContainer workingInterfaces;
 };
 
 NotificationManager::NotificationManager()
@@ -99,103 +205,128 @@ NotificationManager::~NotificationManager()
 
 void NotificationManager::QueueNotification(CompleteNotificationInterface* instance, NotificationParameterList&& parameter)
 {
-  // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-
-  mImpl->updateWorkingInterfaceQueue.emplace_back(instance, std::move(parameter));
+  // Update thread only - no lock needed, this container is never touched by
+  // the Event thread directly (only ever moved wholesale into a batch).
+  mImpl->workingInterfaces.emplace_back(instance, std::move(parameter));
 }
 
 void NotificationManager::QueueMessage(MessageBase* message)
 {
   DALI_ASSERT_DEBUG(NULL != message);
 
-  // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-
-  mImpl->updateWorkingMessageQueue.PushBack(message);
+  // Update thread only - see QueueNotification() above.
+  mImpl->workingMessages.PushBack(message);
 }
 
 void NotificationManager::UpdateCompleted()
 {
-  // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-  // Move messages from update working queue to completed queue
-  // note that in theory its possible for update completed to have last frames
-  // events as well still hanging around. we need to keep them as well
-  mImpl->updateCompletedMessageQueue.MoveFrom(mImpl->updateWorkingMessageQueue);
+  DALI_QB_SCOPE_TIMER(NM_UPDATE_COMPLETED);
 
-  // move pointers from interface queue
-  MoveElements(mImpl->updateWorkingInterfaceQueue, mImpl->updateCompletedInterfaceQueue);
+  if(mImpl->workingMessages.Empty() && mImpl->workingInterfaces.empty())
+  {
+    return; // Nothing accumulated this frame - matches old code's behaviour of a no-op UpdateCompleted() when idle.
+  }
 
-  // finally the lock is released
+  NotificationBatch* batch = mImpl->AcquireBatch();
+
+  // O(1)-ish move of whole containers, NOT per-notification serialization.
+  // This is the same operation the pre-lockless mutex design performed
+  // (MoveFrom / MoveElements) - the only thing that has changed is HOW the
+  // resulting batch crosses the thread boundary (an atomic pointer Push()
+  // below, instead of holding a mutex for the equivalent MoveFrom() calls).
+  batch->messages.MoveFrom(mImpl->workingMessages);
+  batch->interfaces.swap(mImpl->workingInterfaces);
+
+  bool pushed;
+  {
+    DALI_QB_SCOPE_TIMER(NM_COMMIT);
+    pushed = mImpl->notificationRing.Push(batch);
+  }
+
+  if(pushed)
+  {
+    // Nothing further to do: Push() already made the batch visible to the
+    // Event thread. workingMessages/workingInterfaces are empty again,
+    // ready to accumulate next frame's notifications.
+  }
+  else
+  {
+    // Ring full - extremely unlikely (would mean the Event thread has fallen
+    // more than NOTIFICATION_RING_CAPACITY frames behind). Move the data back
+    // out of the batch so nothing is lost, and retry next frame.
+    mImpl->workingMessages.MoveFrom(batch->messages);
+    mImpl->workingInterfaces.swap(batch->interfaces);
+    mImpl->RecycleBatch(batch);
+
+    DALI_QB_COUNT(NM_BUFFER_FULL_EVENTS);
+    DALI_LOG_WARNING("NotificationManager: notification ring full, deferring batch to next frame\n");
+  }
 }
 
 bool NotificationManager::MessagesToProcess()
 {
-  // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
-
-  return ((0u < mImpl->updateCompletedMessageQueue.Count()) ||
-          (0u < mImpl->updateCompletedInterfaceQueue.size()));
+  // Best-effort hint - see the caveat on LocklessPointerRing::GetApproximateDepth().
+  return mImpl->notificationRing.GetApproximateDepth() > 0;
 }
 
 void NotificationManager::ProcessMessages()
 {
-  // queueMutex must be locked whilst accessing queues
-  {
-    MessageQueueMutex::ScopedLock lock(mImpl->queueMutex);
+  DALI_QB_SCOPE_TIMER(NM_PROCESS_MESSAGES);
 
-    // Move messages from update completed queue to event queue
-    // note that in theory its possible for event queue to have
-    // last frames events as well still hanging around so need to keep them
-    mImpl->eventMessageQueue.MoveFrom(mImpl->updateCompletedMessageQueue);
-    MoveElements(mImpl->updateCompletedInterfaceQueue, mImpl->eventInterfaceQueue);
-  }
-  // end of scope, lock is released
+  NotificationBatch* drained[NOTIFICATION_RING_CAPACITY];
+  std::size_t        count = mImpl->notificationRing.Drain(drained, NOTIFICATION_RING_CAPACITY);
 
-  MessageContainer::Iterator       iter = mImpl->eventMessageQueue.Begin();
-  const MessageContainer::Iterator end  = mImpl->eventMessageQueue.End();
-  if(iter != end)
-  {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
-    {
-      oss << "[" << mImpl->eventMessageQueue.Count() << "]";
-    });
-    for(; iter != end; ++iter)
-    {
-      (*iter)->Process();
-    }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
-    {
-      oss << "[" << mImpl->eventMessageQueue.Count() << "]";
-    });
-  }
-  // release the processed messages from event side queue
-  mImpl->eventMessageQueue.Clear();
+  uint32_t messageCount   = 0;
+  uint32_t interfaceCount = 0;
 
-  InterfaceContainer::iterator       iter2 = mImpl->eventInterfaceQueue.begin();
-  const InterfaceContainer::iterator end2  = mImpl->eventInterfaceQueue.end();
-  if(iter2 != end2)
+  for(std::size_t i = 0; i < count; ++i)
   {
-    DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
+    NotificationBatch* batch = drained[i];
+
+    if(!batch->messages.Empty())
     {
-      oss << "[" << mImpl->eventInterfaceQueue.size() << "]";
-    });
-    for(; iter2 != end2; ++iter2)
-    {
-      CompleteNotificationInterface* interface = iter2->first;
-      if(interface)
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
+                                              { oss << "[" << batch->messages.Count() << "]"; });
+      for(auto iter = batch->messages.Begin(), end = batch->messages.End(); iter != end; ++iter)
       {
-        interface->NotifyCompleted(std::move(iter2->second));
+        MessageBase* message = *iter;
+        if(message)
+        {
+          message->Process();
+          ++messageCount;
+        }
       }
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_PROCESS_MESSAGE", [&](std::ostringstream& oss)
+                                            { oss << "[" << batch->messages.Count() << "]"; });
     }
-    DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
+
+    if(!batch->interfaces.empty())
     {
-      oss << "[" << mImpl->eventInterfaceQueue.size() << "]";
-    });
+      DALI_TRACE_BEGIN_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
+                                              { oss << "[" << batch->interfaces.size() << "]"; });
+      for(auto& pair : batch->interfaces)
+      {
+        CompleteNotificationInterface* iface = pair.first;
+        if(iface)
+        {
+          iface->NotifyCompleted(std::move(pair.second));
+          ++interfaceCount;
+        }
+      }
+      DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_NOTIFICATION_NOTIFY_COMPLETED", [&](std::ostringstream& oss)
+                                            { oss << "[" << batch->interfaces.size() << "]"; });
+    }
+
+    // Clear() deletes the now-processed MessageBase* pointers (OwnerContainer
+    // ownership semantics - same single point of deletion as the old design's
+    // eventMessageQueue.Clear()), then the emptied batch shell goes back to
+    // the recycle pool instead of being freed and reallocated every frame.
+    batch->Clear();
+    mImpl->RecycleBatch(batch);
   }
-  // just clear the container, we dont own the objects
-  mImpl->eventInterfaceQueue.clear();
+
+  (void)messageCount;
+  (void)interfaceCount;
 }
 
 } // namespace Internal
