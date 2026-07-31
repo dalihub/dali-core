@@ -445,7 +445,7 @@ public:
    * Constructor
    */
   SimpleTestCustomActor()
-  : CustomActorImpl(ActorFlags(DISABLE_SIZE_NEGOTIATION))
+  : CustomActorImpl()
   {
   }
 

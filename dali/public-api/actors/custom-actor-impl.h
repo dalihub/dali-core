@@ -383,25 +383,10 @@ public:
 
 protected: // For derived classes
   /**
-   * @brief Enumeration for the constructor flags.
-   * @SINCE_1_0.0
-   */
-  enum ActorFlags
-  {
-    ACTOR_BEHAVIOUR_DEFAULT  = 0,      ///< Use to provide default behaviour (size negotiation is on, event callbacks are not called). @SINCE_1_2_10
-    DISABLE_SIZE_NEGOTIATION = 1 << 0, ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
-
-    LAST_ACTOR_FLAG ///< Special marker for last actor flag @SINCE_1_0.0
-  };
-
-  static constexpr int32_t ACTOR_FLAG_COUNT = Log<LAST_ACTOR_FLAG - 1>::value + 1; ///< Value for deriving classes to continue on the flag enum
-
-  /**
    * @brief Creates a CustomActorImpl.
-   * @SINCE_1_0.0
-   * @param[in] flags Bitfield of ActorFlags to define behaviour
+   * @SINCE_2_4.36
    */
-  CustomActorImpl(ActorFlags flags);
+  CustomActorImpl();
 
 public: // Not intended for application developers
   /**
@@ -424,17 +409,8 @@ public: // Not intended for application developers
    */
   Internal::CustomActor* GetOwner() const;
 
-  /**
-   * @brief Returns whether relayout is enabled.
-   * @SINCE_1_0.0
-   * @return Return true if relayout is enabled on the custom actor
-   * @note Called when ownership of the CustomActorImpl is passed to a CustomActor.
-   */
-  bool IsRelayoutEnabled() const;
-
 private:
   Internal::CustomActor* mOwner; ///< Internal owner of this custom actor implementation
-  ActorFlags             mFlags; ///< ActorFlags flags to determine behaviour
 };
 
 /**

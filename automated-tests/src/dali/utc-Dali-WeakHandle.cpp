@@ -35,7 +35,7 @@ struct MyTestCustomActor : public CustomActorImpl
   typedef Signal<void(float)> SignalTypeFloat;
 
   MyTestCustomActor()
-  : CustomActorImpl(ActorFlags())
+  : CustomActorImpl()
   {
   }
 

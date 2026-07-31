@@ -1,5 +1,6 @@
 #include "test-custom-actor.h"
 
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/integration-api/string-utils.h>
 
@@ -30,6 +31,7 @@ TestCustomActor TestCustomActor::NewNegoSize()
   Impl::TestCustomActor* impl = new Impl::TestCustomActor(true);
   TestCustomActor        custom(*impl); // takes ownership
   custom.SetProperty(Dali::Actor::Property::NAME, "SizeNegotiationActor");
+  DevelActor::SetRelayoutEnabled(custom, true);
 
   impl->Initialize();
 
@@ -251,7 +253,7 @@ TestCustomActor TestCustomActor::DownCast(BaseHandle handle)
 namespace Impl
 {
 TestCustomActor::TestCustomActor()
-: CustomActorImpl(ActorFlags(DISABLE_SIZE_NEGOTIATION)),
+: CustomActorImpl(),
   mDaliProperty(Property::INVALID_INDEX),
   mSizeSet(Vector3::ZERO),
   mTargetSize(Vector3::ZERO),
@@ -262,7 +264,7 @@ TestCustomActor::TestCustomActor()
 }
 
 TestCustomActor::TestCustomActor(bool nego)
-: CustomActorImpl(ActorFlags()),
+: CustomActorImpl(),
   mDaliProperty(Property::INVALID_INDEX),
   mSizeSet(Vector3::ZERO),
   mTargetSize(Vector3::ZERO),

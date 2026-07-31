@@ -121,6 +121,11 @@ float GetRelayoutSize(Actor actor, Dimension::Type dimension)
   return GetImplementation(actor).GetRelayoutSize(dimension);
 }
 
+void SetRelayoutEnabled(Actor actor, bool relayoutEnabled)
+{
+  GetImplementation(actor).SetRelayoutEnabled(relayoutEnabled);
+}
+
 } // namespace DevelActor
 
 } // namespace Dali

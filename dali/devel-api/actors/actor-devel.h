@@ -543,6 +543,14 @@ DALI_CORE_API bool IsHittable(Actor actor);
  */
 DALI_CORE_API bool GetTouchRequired(Actor actor);
 
+/**
+ * Set whether relayout is enabled on the actor.
+ *
+ * @param[in] actor The actor to modify
+ * @param[in] relayoutEnabled Whether relayout should be enabled or disabled
+ */
+DALI_CORE_API void SetRelayoutEnabled(Actor actor, bool relayoutEnabled);
+
 } // namespace DevelActor
 
 } // namespace Dali

@@ -140,7 +140,7 @@ struct MyTestCustomActor : public CustomActorImpl
   typedef Signal<void(float)> SignalTypeFloat;
 
   MyTestCustomActor()
-  : CustomActorImpl(ActorFlags())
+  : CustomActorImpl()
   {
   }
 
@@ -4003,7 +4003,7 @@ class TestObject : public CustomActorImpl
 {
 public: // Construction / Destruction
   TestObject()
-  : CustomActorImpl(ACTOR_BEHAVIOUR_DEFAULT)
+  : CustomActorImpl()
   {
   }
   ~TestObject()                            = default;
