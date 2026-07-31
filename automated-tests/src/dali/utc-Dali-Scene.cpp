@@ -3068,7 +3068,7 @@ int UtcDaliSceneSignalInterceptKeyEventN(void)
   END_TEST;
 }
 
-int UtcDaliSceneSignalKeyEventMonitorP(void)
+int UtcDaliSceneSignalKeyEventDelayedP(void)
 {
   TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
@@ -3077,45 +3077,45 @@ int UtcDaliSceneSignalKeyEventMonitorP(void)
   KeyEventReceivedFunctor functor(data);
   scene.KeyEventSignal().Connect(&application, functor);
 
-  KeyEventSignalData      monitorData;
-  KeyEventReceivedFunctor monitorFunctor(monitorData);
-  scene.KeyEventMonitorSignal().Connect(&application, monitorFunctor);
+  KeyEventSignalData      delayedData;
+  KeyEventReceivedFunctor delayedFunctor(delayedData);
+  scene.KeyEventDelayedSignal().Connect(&application, delayedFunctor);
 
   Dali::Integration::KeyEvent event("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   application.ProcessEvent(event);
 
-  DALI_TEST_EQUALS(false, monitorData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, delayedData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   data.Reset();
-  monitorData.Reset();
+  delayedData.Reset();
 
   Dali::Integration::KeyEvent event3("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
   event3.receiveTime = 330;
   application.ProcessEvent(event3);
 
-  DALI_TEST_EQUALS(true, monitorData.functorCalled, TEST_LOCATION);
-  DALI_TEST_CHECK(event3.keyModifier == monitorData.receivedKeyEvent.GetKeyModifier());
-  DALI_TEST_CHECK(event3.keyName == monitorData.receivedKeyEvent.GetKeyName());
-  DALI_TEST_CHECK(event3.keyString == monitorData.receivedKeyEvent.GetKeyString());
-  DALI_TEST_CHECK(event3.receiveTime == monitorData.receivedKeyEvent.GetReceiveTime());
-  DALI_TEST_CHECK(event3.state == static_cast<Dali::Integration::KeyEvent::State>(monitorData.receivedKeyEvent.GetState()));
+  DALI_TEST_EQUALS(true, delayedData.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK(event3.keyModifier == delayedData.receivedKeyEvent.GetKeyModifier());
+  DALI_TEST_CHECK(event3.keyName == delayedData.receivedKeyEvent.GetKeyName());
+  DALI_TEST_CHECK(event3.keyString == delayedData.receivedKeyEvent.GetKeyString());
+  DALI_TEST_CHECK(event3.receiveTime == delayedData.receivedKeyEvent.GetReceiveTime());
+  DALI_TEST_CHECK(event3.state == static_cast<Dali::Integration::KeyEvent::State>(delayedData.receivedKeyEvent.GetState()));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   data.Reset();
-  monitorData.Reset();
+  delayedData.Reset();
 
   END_TEST;
 }
 
-int UtcDaliSceneSignalKeyEventMonitorN(void)
+int UtcDaliSceneSignalKeyEventDelayedN(void)
 {
   TestApplication          application;
   Dali::Integration::Scene scene = application.GetScene();
 
   KeyEventSignalData      data;
   KeyEventReceivedFunctor functor(data);
-  scene.KeyEventMonitorSignal().Connect(&application, functor);
+  scene.KeyEventDelayedSignal().Connect(&application, functor);
 
   // Check that a non-pressed key events data is not modified.
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
