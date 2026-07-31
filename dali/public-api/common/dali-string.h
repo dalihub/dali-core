@@ -22,6 +22,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/platform-defines.h>
 
 namespace Dali
 {
@@ -299,8 +300,8 @@ public: // Not intended for Application Developers
   /// @endcond
 
 private:
-  static constexpr size_t StorageSize  = 32; ///< Opaque storage sized for std::string
-  static constexpr size_t StorageAlign = 8;  ///< Opaque storage aligned for std::string
+  static constexpr uint32_t StorageSize  = DALI_STRING_STORAGE_SIZE; ///< Opaque storage sized for std::string (see platform-defines.h)
+  static constexpr uint32_t StorageAlign = 8;                        ///< Opaque storage aligned for std::string
   alignas(StorageAlign) uint8_t mStorage[StorageSize];
 };
 

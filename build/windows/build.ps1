@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [ValidateSet("Debug", "Release")]
-  [string]$Configuration = "Release",
+  [string]$Configuration = "Debug",
   [string]$VcpkgRoot = "",
   [switch]$Clean,
   [int]$Jobs = 8
@@ -39,7 +39,7 @@ Invoke-DaliCMakeProject `
   -Clean:$Clean `
   -Jobs $Jobs
 
-Install-DaliRuntimeScripts -Context $Context
+Install-DaliRuntimeScripts -Context $Context -Configuration $Configuration
 Assert-DaliPaths -Paths @(
   (Join-Path $Context.InstallPrefix "bin\dali2-core.dll"),
   (Join-Path $Context.InstallPrefix "share\dali2-core\dali2-core-config.cmake")
