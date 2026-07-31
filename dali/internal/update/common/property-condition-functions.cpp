@@ -79,7 +79,7 @@ ConditionFunction LessThan::GetFunction(Property::Type valueType)
 bool LessThan::EvalBoolean(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
 {
   const float arg0 = arg[0];
-  return (value.GetBoolean() < arg0);
+  return (static_cast<float>(value.GetBoolean()) < arg0);
 }
 
 bool LessThan::EvalInteger(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
@@ -168,7 +168,7 @@ ConditionFunction GreaterThan::GetFunction(Property::Type valueType)
 bool GreaterThan::EvalBoolean(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
 {
   const float arg0 = arg[0];
-  return (value.GetBoolean() > arg0);
+  return (static_cast<float>(value.GetBoolean()) > arg0);
 }
 
 bool GreaterThan::EvalInteger(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
@@ -256,7 +256,7 @@ ConditionFunction Inside::GetFunction(Property::Type valueType)
 
 bool Inside::EvalBoolean(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
 {
-  const bool valueBoolean = value.GetBoolean();
+  const float valueBoolean = static_cast<float>(value.GetBoolean());
   return ((valueBoolean > arg[0]) && (valueBoolean < arg[1]));
 }
 
@@ -345,7 +345,7 @@ ConditionFunction Outside::GetFunction(Property::Type valueType)
 
 bool Outside::EvalBoolean(const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg)
 {
-  const bool valueBoolean = value.GetBoolean();
+  const float valueBoolean = static_cast<float>(value.GetBoolean());
   return ((valueBoolean < arg[0]) || (valueBoolean > arg[1]));
 }
 

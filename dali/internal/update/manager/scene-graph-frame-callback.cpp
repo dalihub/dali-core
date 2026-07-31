@@ -89,7 +89,9 @@ FrameCallback::RequestFlags FrameCallback::Update(float elapsedSeconds, bool nod
     }
   }
 
-  return static_cast<FrameCallback::RequestFlags>(continueCalling | (keepRendering << 1));
+  const uint32_t requests = (continueCalling ? static_cast<uint32_t>(FrameCallback::CONTINUE_CALLING) : 0u) |
+                            (keepRendering ? static_cast<uint32_t>(FrameCallback::KEEP_RENDERING) : 0u);
+  return static_cast<FrameCallback::RequestFlags>(requests);
 }
 
 void FrameCallback::Notify(Dali::UpdateProxy::NotifySyncPoint syncPoint)
