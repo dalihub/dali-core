@@ -103,7 +103,7 @@ public:
    */
   Class* operator->() const
   {
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(_WIN64)
     return Class::Get(key);
 #else
     return static_cast<Class*>(key);
@@ -116,7 +116,7 @@ public:
    */
   Class* Get() const
   {
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(_WIN64)
     return Class::Get(key);
 #else
     return static_cast<Class*>(key);
@@ -174,7 +174,7 @@ public:
 
   std::uintptr_t Value() const
   {
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(_WIN64)
     return key;
 #else
     return reinterpret_cast<std::uintptr_t>(key);
@@ -183,7 +183,7 @@ public:
 
 private:
   // Ensure that INVALID constant can't be used directly.
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(_WIN64)
   static const KeyType INVALID{0xffffffff}; ///< Null or Invalid constant.
 #else
   static constexpr KeyType INVALID{nullptr};

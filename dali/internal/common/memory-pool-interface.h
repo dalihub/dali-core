@@ -52,7 +52,7 @@ class MemoryPoolInterface
 public:
   using SizeType = uint32_t;
 
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(_WIN64)
   using KeyType = uint32_t;
 #else
   using KeyType = void*;

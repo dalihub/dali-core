@@ -86,6 +86,9 @@ public:
    */
   ~TouchEventCombiner();
 
+  TouchEventCombiner(const TouchEventCombiner& rhs);
+  TouchEventCombiner& operator=(const TouchEventCombiner& rhs);
+
 public:
   /**
    * Allows the caller to pass in a point which is processed and the TouchEvent and/or HoverEvent is appropriately filled with the new,

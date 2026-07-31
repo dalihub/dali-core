@@ -2646,7 +2646,7 @@ protected:
   ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.
   PointState::Type                           mHoverState : 3;               ///< Stores the HoverEvent state of actor.
 
-  Dali::BlendEquation::Type mBlendEquation : 16; ///< Cached: Determines which blend equation will be used to render renderers.
+  Dali::BlendEquation::Type mBlendEquation : 17; ///< Cached: Determines which blend equation will be used to render renderers.
 
   uint8_t mOffScreenRenderableBitField; ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 

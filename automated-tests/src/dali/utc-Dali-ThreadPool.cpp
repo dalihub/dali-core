@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <array>
 #include <iostream>
 #include <type_traits>
 
@@ -143,13 +144,13 @@ int UtcDaliThreadPoolSubmitTasksCopyArray(void)
     gThreadPool.Initialize(0u);
   }
 
-  std::array<uint8_t, 1024 * 1024> dataSrc;
+  std::vector<uint8_t> dataSrc(1024 * 1024);
   for(auto i = 0; i < decltype(i)(dataSrc.size()); ++i)
   {
     dataSrc[i] = (std::rand() % 0xff);
   }
 
-  std::array<uint8_t, 1024 * 1024> dataDst;
+  std::vector<uint8_t> dataDst(1024 * 1024);
 
   // each task copies 1kb od data
   std::vector<Dali::Task> tasks;

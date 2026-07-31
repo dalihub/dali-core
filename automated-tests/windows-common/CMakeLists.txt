@@ -1,0 +1,196 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
+
+PROJECT(dali-core-common-tests LANGUAGES CXX)
+
+IF(NOT WIN32)
+  MESSAGE(FATAL_ERROR "The DALi core common Windows tests must be built for Windows.")
+ENDIF()
+
+SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_EXTENSIONS OFF)
+
+INCLUDE(GNUInstallDirs)
+FIND_PACKAGE(dali-windows-dependencies CONFIG REQUIRED)
+
+GET_TARGET_PROPERTY(DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIRS
+  dali-windows-dependencies::dali-windows-dependencies
+  INTERFACE_INCLUDE_DIRECTORIES)
+LIST(GET DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIRS 0 DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIR)
+
+SET(ROOT_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+SET(SOURCES "")
+INCLUDE("${ROOT_SRC_DIR}/dali/internal/file.list")
+INCLUDE("${ROOT_SRC_DIR}/dali/integration-api/file.list")
+INCLUDE("${ROOT_SRC_DIR}/dali/public-api/file.list")
+INCLUDE("${ROOT_SRC_DIR}/dali/devel-api/file.list")
+INCLUDE("${ROOT_SRC_DIR}/dali/graphics-api/file.list")
+INCLUDE("${ROOT_SRC_DIR}/dali/internal/file-windows.list")
+
+SET(INVOKE_METHOD_GENERATOR "${ROOT_SRC_DIR}/scripts/dali-invoke-method-generator.py")
+SET(INVOKE_METHOD_GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/invoke-method")
+SET(INVOKE_METHOD_PUBLIC_API_CPP "${INVOKE_METHOD_GENERATED_DIR}/public-api-invoke-methods.cpp")
+FILE(GLOB_RECURSE INVOKE_METHOD_PUBLIC_API_HEADERS CONFIGURE_DEPENDS "${ROOT_SRC_DIR}/dali/public-api/*.h")
+FILE(GLOB_RECURSE INVOKE_METHOD_REGISTRATION_SCAN_FILES CONFIGURE_DEPENDS
+  "${ROOT_SRC_DIR}/dali/*.cpp"
+  "${ROOT_SRC_DIR}/dali/*.h"
+  "${ROOT_SRC_DIR}/dali/*.hpp"
+)
+
+FIND_PACKAGE(Python3 COMPONENTS Interpreter REQUIRED)
+ADD_CUSTOM_COMMAND(
+  OUTPUT "${INVOKE_METHOD_PUBLIC_API_CPP}"
+  COMMAND "${Python3_EXECUTABLE}" "${INVOKE_METHOD_GENERATOR}"
+          --scan-root "${ROOT_SRC_DIR}/dali/public-api"
+          --include-prefix dali/public-api
+          --namespace Dali
+          --auto-export-api DALI_CORE_API
+          --registration-scan-root "${ROOT_SRC_DIR}/dali"
+          --output "${INVOKE_METHOD_PUBLIC_API_CPP}"
+  DEPENDS "${INVOKE_METHOD_GENERATOR}"
+          ${INVOKE_METHOD_PUBLIC_API_HEADERS}
+          ${INVOKE_METHOD_REGISTRATION_SCAN_FILES}
+  COMMENT "Generating DALi invoke-method wrappers for Windows common tests"
+  VERBATIM
+)
+LIST(APPEND SOURCES "${INVOKE_METHOD_PUBLIC_API_CPP}")
+
+ADD_LIBRARY(dali-core-test-objects OBJECT ${SOURCES})
+TARGET_INCLUDE_DIRECTORIES(dali-core-test-objects PRIVATE "${ROOT_SRC_DIR}")
+TARGET_COMPILE_DEFINITIONS(dali-core-test-objects PRIVATE
+  BUILDING_DALI_CORE
+  $<$<CONFIG:Debug>:DEBUG_ENABLED>
+  NOMINMAX
+  WIN32_LEAN_AND_MEAN
+)
+TARGET_COMPILE_OPTIONS(dali-core-test-objects PRIVATE
+  /FI
+  "${DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIR}/dali-windows-dependencies.h"
+  /vmg
+  /wd4251
+  /utf-8
+)
+TARGET_LINK_LIBRARIES(dali-core-test-objects PRIVATE dali-windows-dependencies::dali-windows-dependencies)
+
+SET(PUBLIC_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/dali")
+SET(INTERNAL_TEST_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/dali-internal")
+
+SET(DALI_TEST_SOURCE_LIST_ONLY ON)
+INCLUDE("${PUBLIC_TEST_DIR}/CMakeLists.txt")
+SET(PUBLIC_TC_RELATIVE ${TC_SOURCE_LIST})
+SET(PUBLIC_ALL_RELATIVE ${TC_SOURCES})
+
+INCLUDE("${INTERNAL_TEST_DIR}/CMakeLists.txt")
+SET(INTERNAL_TC_RELATIVE ${TC_SOURCE_LIST})
+SET(INTERNAL_ALL_RELATIVE ${TC_SOURCES})
+UNSET(DALI_TEST_SOURCE_LIST_ONLY)
+
+LIST(REMOVE_ITEM PUBLIC_ALL_RELATIVE dali-test-suite-utils/test-harness.cpp)
+LIST(REMOVE_ITEM INTERNAL_ALL_RELATIVE ../dali/dali-test-suite-utils/test-harness.cpp)
+LIST(REMOVE_ITEM INTERNAL_ALL_RELATIVE
+  utc-Dali-Internal-GpuBuffer.cpp
+  utc-Dali-Internal-PipelineCache.cpp
+)
+
+FUNCTION(MAKE_ABSOLUTE_LIST OUTPUT BASE_DIR)
+  SET(RESULT "")
+  FOREACH(SOURCE IN LISTS ARGN)
+    LIST(APPEND RESULT "${BASE_DIR}/${SOURCE}")
+  ENDFOREACH()
+  SET(${OUTPUT} ${RESULT} PARENT_SCOPE)
+ENDFUNCTION()
+
+MAKE_ABSOLUTE_LIST(PUBLIC_TC_SOURCES "${PUBLIC_TEST_DIR}" ${PUBLIC_TC_RELATIVE})
+MAKE_ABSOLUTE_LIST(PUBLIC_ALL_SOURCES "${PUBLIC_TEST_DIR}" ${PUBLIC_ALL_RELATIVE})
+MAKE_ABSOLUTE_LIST(INTERNAL_TC_SOURCES "${INTERNAL_TEST_DIR}" ${INTERNAL_TC_RELATIVE})
+MAKE_ABSOLUTE_LIST(INTERNAL_ALL_SOURCES "${INTERNAL_TEST_DIR}" ${INTERNAL_ALL_RELATIVE})
+LIST(APPEND INTERNAL_ALL_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/windows-unsupported-tests.cpp")
+
+FUNCTION(GENERATE_TEST_HEADER OUTPUT_HEADER ARRAY_NAME)
+  SET(TEST_DECLARATIONS "")
+  SET(TEST_ENTRIES "")
+  FOREACH(TEST_SOURCE IN LISTS ARGN)
+    FILE(READ "${TEST_SOURCE}" TEST_CONTENT)
+    STRING(REGEX MATCH "void[ \t]+[A-Za-z0-9_]+_startup\\(void\\)" STARTUP_MATCH "${TEST_CONTENT}")
+    STRING(REGEX MATCH "void[ \t]+[A-Za-z0-9_]+_cleanup\\(void\\)" CLEANUP_MATCH "${TEST_CONTENT}")
+    STRING(REGEX REPLACE "^void[ \t]+|\\(void\\)$" "" STARTUP_NAME "${STARTUP_MATCH}")
+    STRING(REGEX REPLACE "^void[ \t]+|\\(void\\)$" "" CLEANUP_NAME "${CLEANUP_MATCH}")
+    IF(STARTUP_NAME STREQUAL "")
+      SET(STARTUP_NAME "nullptr")
+    ELSE()
+      STRING(APPEND TEST_DECLARATIONS "extern void ${STARTUP_NAME}(void);\n")
+    ENDIF()
+    IF(CLEANUP_NAME STREQUAL "")
+      SET(CLEANUP_NAME "nullptr")
+    ELSE()
+      STRING(APPEND TEST_DECLARATIONS "extern void ${CLEANUP_NAME}(void);\n")
+    ENDIF()
+
+    # Keep this in sync with scripts/retriever.sh: testcase names are not
+    # required to start with an uppercase "Utc" prefix.
+    STRING(REGEX MATCHALL "(^|[\r\n])[ \t]*int[ \t]+[A-Za-z_][A-Za-z0-9_]*\\(void\\)" TEST_MATCHES "${TEST_CONTENT}")
+    FOREACH(TEST_MATCH IN LISTS TEST_MATCHES)
+      STRING(STRIP "${TEST_MATCH}" TEST_MATCH)
+      STRING(REGEX REPLACE "^int[ \t]+|\\(void\\)$" "" TEST_NAME "${TEST_MATCH}")
+      STRING(APPEND TEST_DECLARATIONS "extern int ${TEST_NAME}(void);\n")
+      STRING(APPEND TEST_ENTRIES "  {\"${TEST_NAME}\", ${TEST_NAME}, ${STARTUP_NAME}, ${CLEANUP_NAME}},\n")
+    ENDFOREACH()
+  ENDFOREACH()
+
+  FILE(WRITE "${OUTPUT_HEADER}"
+    "#pragma once\n#include <testcase.h>\n\n${TEST_DECLARATIONS}\n"
+    "inline testcase ${ARRAY_NAME}[] = {\n${TEST_ENTRIES}  {nullptr, nullptr, nullptr, nullptr}\n};\n")
+ENDFUNCTION()
+
+SET(PUBLIC_HEADER "${CMAKE_CURRENT_BINARY_DIR}/dali-core-testcases.h")
+SET(INTERNAL_HEADER "${CMAKE_CURRENT_BINARY_DIR}/dali-internal-testcases.h")
+GENERATE_TEST_HEADER("${PUBLIC_HEADER}" gDaliCoreTests ${PUBLIC_TC_SOURCES})
+GENERATE_TEST_HEADER("${INTERNAL_HEADER}" gDaliInternalTests ${INTERNAL_TC_SOURCES})
+
+FUNCTION(ADD_CORE_TEST_RUNNER TARGET ARRAY_NAME HEADER_NAME SUITE_LABEL)
+  ADD_EXECUTABLE(${TARGET} src/common-test-main.cpp ${ARGN})
+  TARGET_INCLUDE_DIRECTORIES(${TARGET} PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_BINARY_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../src/common"
+    "${PUBLIC_TEST_DIR}"
+    "${PUBLIC_TEST_DIR}/dali-test-suite-utils"
+    "${INTERNAL_TEST_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+  )
+  TARGET_COMPILE_DEFINITIONS(${TARGET} PRIVATE
+    BUILDING_DALI_CORE
+    $<$<CONFIG:Debug>:DEBUG_ENABLED>
+    DALI_TEST_HEADER=\"${HEADER_NAME}\"
+    DALI_TEST_ARRAY=${ARRAY_NAME}
+    DALI_TEST_SUITE=\"${SUITE_LABEL}\"
+    __restrict__=__restrict
+    _USE_MATH_DEFINES
+    NOMINMAX
+    WIN32_LEAN_AND_MEAN
+  )
+  TARGET_COMPILE_OPTIONS(${TARGET} PRIVATE /vmg /utf-8 /W3)
+  TARGET_SOURCES(${TARGET} PRIVATE $<TARGET_OBJECTS:dali-core-test-objects>)
+  TARGET_LINK_LIBRARIES(${TARGET} PRIVATE dali-windows-dependencies::dali-windows-dependencies)
+  INSTALL(TARGETS ${TARGET} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+ENDFUNCTION()
+
+ADD_CORE_TEST_RUNNER(tct-dali-core gDaliCoreTests dali-core-testcases.h public ${PUBLIC_ALL_SOURCES})
+ADD_CORE_TEST_RUNNER(tct-dali-internal-core gDaliInternalTests dali-internal-testcases.h internal ${INTERNAL_ALL_SOURCES})
+
+TARGET_COMPILE_DEFINITIONS(tct-dali-core PRIVATE ADDON_LIBS_PATH="${CMAKE_CURRENT_BINARY_DIR}")
+SET_TARGET_PROPERTIES(tct-dali-core PROPERTIES ENABLE_EXPORTS ON)
+
+ADD_LIBRARY(SampleAddOn MODULE "${PUBLIC_TEST_DIR}/test-sample-addon.cpp")
+TARGET_INCLUDE_DIRECTORIES(SampleAddOn PRIVATE "${ROOT_SRC_DIR}")
+TARGET_COMPILE_DEFINITIONS(SampleAddOn PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+TARGET_COMPILE_OPTIONS(SampleAddOn PRIVATE
+  /FI
+  "${DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIR}/dali-windows-dependencies.h"
+  /utf-8
+)
+TARGET_LINK_LIBRARIES(SampleAddOn PRIVATE
+  tct-dali-core
+  dali-windows-dependencies::dali-windows-dependencies
+)
+FILE(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/addons.txt" CONTENT "$<TARGET_FILE_NAME:SampleAddOn>\n")

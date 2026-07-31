@@ -125,6 +125,8 @@ SET(TC_SOURCES
         utc-Dali-WheelEvent.cpp
 )
 
+SET(TC_SOURCE_LIST ${TC_SOURCES})
+
 LIST(APPEND TC_SOURCES
         dali-test-suite-utils/mesh-builder.cpp
         dali-test-suite-utils/dali-test-suite-utils.cpp
@@ -154,6 +156,10 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/test-addon-manager.cpp
         dali-test-suite-utils/test-render-surface-if.cpp
 )
+
+IF(DALI_TEST_SOURCE_LIST_ONLY)
+  RETURN()
+ENDIF()
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
      dali2-core

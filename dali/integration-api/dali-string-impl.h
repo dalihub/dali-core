@@ -87,8 +87,8 @@ public:
   static String ToDaliString(std::string&& stdString) noexcept;
 
 private:
-  static constexpr size_t StorageSize  = 32; ///< Storage size for std::string
-  static constexpr size_t StorageAlign = 8;  ///< Storage alignment for std::string
+  static constexpr size_t StorageSize  = sizeof(std::string);  ///< Storage size for std::string
+  static constexpr size_t StorageAlign = alignof(std::string); ///< Storage alignment for std::string
   alignas(StorageAlign) char mStorage[StorageSize];
 };
 

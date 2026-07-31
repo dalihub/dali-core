@@ -15,7 +15,7 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 
 #include <atomic>
 #include <chrono>
@@ -414,7 +414,7 @@ int UtcDaliInternalLocklessPointerRingConcurrentSpsc(void)
 
   TestApplication application;
 
-  constexpr std::size_t                  CAPACITY = 16;
+  static constexpr std::size_t           CAPACITY = 16;
   LocklessPointerRing<Payload, CAPACITY> ring;
 
   constexpr int TARGET_COUNT = 20000;

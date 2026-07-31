@@ -32,7 +32,7 @@ namespace Dali
 class TestNativeImage;
 typedef IntrusivePtr<TestNativeImage> TestNativeImagePointer;
 
-class DALI_CORE_API TestNativeImage : public Dali::NativeImageInterface
+class TestNativeImage : public Dali::NativeImageInterface
 {
 public:
   static TestNativeImagePointer New(uint32_t width, uint32_t height);
