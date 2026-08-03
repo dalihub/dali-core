@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/events/key-event-devel.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -3050,6 +3051,43 @@ int UtcDaliSceneSignalInterceptKeyEventP(void)
   DALI_TEST_CHECK(event4.keyString == interceptData.receivedKeyEvent.GetKeyString());
   DALI_TEST_CHECK(event4.state == static_cast<Dali::Integration::KeyEvent::State>(interceptData.receivedKeyEvent.GetState()));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliSceneSignalInterceptKeyEventAlreadyProcessed(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+
+  KeyEventSignalData      data;
+  KeyEventReceivedFunctor functor(data);
+  scene.KeyEventSignal().Connect(&application, functor);
+
+  KeyEventGeneratedSignalData      interceptData;
+  KeyEventGeneratedReceivedFunctor interceptFunctor(interceptData);
+  scene.InterceptKeyEventSignal().Connect(&application, interceptFunctor);
+
+  // An event that has already been through the intercept stage must skip it and go
+  // straight on to the key event signal, otherwise accessibility re-injection loops forever.
+  Dali::Integration::KeyEvent event("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  event.interceptProcessed = true;
+  application.ProcessEvent(event);
+
+  DALI_TEST_EQUALS(false, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  // The flag must also be readable back off the handle the signal delivered.
+  DALI_TEST_EQUALS(true, DevelKeyEvent::IsInterceptProcessed(data.receivedKeyEvent), TEST_LOCATION);
+
+  data.Reset();
+  interceptData.Reset();
+
+  // The same event without the flag is intercepted as usual.
+  Dali::Integration::KeyEvent event2("i", "", "i", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "i", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event2);
+
+  DALI_TEST_EQUALS(true, interceptData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+
   END_TEST;
 }
 

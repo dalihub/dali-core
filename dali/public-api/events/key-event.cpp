@@ -23,6 +23,13 @@
 
 namespace Dali
 {
+KeyEvent KeyEvent::New()
+{
+  Internal::KeyEventPtr internal = Internal::KeyEvent::New();
+
+  return KeyEvent(internal.Get());
+}
+
 KeyEvent::KeyEvent()
 : BaseHandle()
 {
@@ -51,11 +58,6 @@ bool KeyEvent::IsCtrlModifier() const
 bool KeyEvent::IsAltModifier() const
 {
   return GetImplementation(*this).IsAltModifier();
-}
-
-bool KeyEvent::IsNoInterceptModifier() const
-{
-  return GetImplementation(*this).IsNoInterceptModifier();
 }
 
 const Dali::String& KeyEvent::GetCompose() const
@@ -103,7 +105,7 @@ int32_t KeyEvent::GetKeyModifier() const
   return GetImplementation(*this).GetKeyModifier();
 }
 
-unsigned long KeyEvent::GetTime() const
+uint32_t KeyEvent::GetTime() const
 {
   return GetImplementation(*this).GetTime();
 }
@@ -126,6 +128,71 @@ uint32_t KeyEvent::GetWindowId() const
 uint32_t KeyEvent::GetReceiveTime() const
 {
   return GetImplementation(*this).GetReceiveTime();
+}
+
+void KeyEvent::SetCompose(const Dali::String& compose)
+{
+  GetImplementation(*this).SetCompose(compose);
+}
+
+void KeyEvent::SetDeviceName(const Dali::String& deviceName)
+{
+  GetImplementation(*this).SetDeviceName(deviceName);
+}
+
+void KeyEvent::SetDeviceClass(Device::Class::Type deviceClass)
+{
+  GetImplementation(*this).SetDeviceClass(deviceClass);
+}
+
+void KeyEvent::SetDeviceSubclass(Device::Subclass::Type deviceSubclass)
+{
+  GetImplementation(*this).SetDeviceSubclass(deviceSubclass);
+}
+
+void KeyEvent::SetKeyName(const Dali::String& keyName)
+{
+  GetImplementation(*this).SetKeyName(keyName);
+}
+
+void KeyEvent::SetKeyString(const Dali::String& keyString)
+{
+  GetImplementation(*this).SetKeyString(keyString);
+}
+
+void KeyEvent::SetLogicalKey(const Dali::String& logicalKey)
+{
+  GetImplementation(*this).SetLogicalKey(logicalKey);
+}
+
+void KeyEvent::SetKeyCode(int32_t keyCode)
+{
+  GetImplementation(*this).SetKeyCode(keyCode);
+}
+
+void KeyEvent::SetKeyModifier(int32_t keyModifier)
+{
+  GetImplementation(*this).SetKeyModifier(keyModifier);
+}
+
+void KeyEvent::SetTime(uint32_t time)
+{
+  GetImplementation(*this).SetTime(time);
+}
+
+void KeyEvent::SetState(KeyEvent::State state)
+{
+  GetImplementation(*this).SetState(state);
+}
+
+void KeyEvent::SetRepeat(bool repeat)
+{
+  GetImplementation(*this).SetRepeat(repeat);
+}
+
+void KeyEvent::SetWindowId(uint32_t windowId)
+{
+  GetImplementation(*this).SetWindowId(windowId);
 }
 
 KeyEvent::KeyEvent(Internal::KeyEvent* internal)

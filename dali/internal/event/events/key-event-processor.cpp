@@ -64,6 +64,7 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
   KeyEventPtr keyEvent(new KeyEvent(event.keyName, event.logicalKey, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<Dali::KeyEvent::State>(event.state), event.compose, event.deviceName, event.deviceClass, event.deviceSubclass));
   keyEvent->SetRepeat(event.isRepeat);
+  keyEvent->SetInterceptProcessed(event.interceptProcessed);
   keyEvent->SetWindowId(event.windowId);
   keyEvent->SetReceiveTime(event.receiveTime);
 
@@ -74,15 +75,17 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
     oss << "[name:" << event.keyName << ", code:" << event.keyCode << ", state:" << KEY_EVENT_STATES[event.state] << ", time:" << event.time << ", recieveTime:" << event.receiveTime << "]";
   });
 
-  if(event.receiveTime > 0 && (event.receiveTime >= event.time + KEY_EVENT_DELAY_THRESHOLD_MS))
+  // Both times are 32-bit millisecond ticks, so compare their difference rather than
+  // adding the threshold to event.time, which would overflow near the tick wrap-around.
+  if(event.receiveTime > 0 && event.receiveTime >= event.time && (event.receiveTime - event.time >= KEY_EVENT_DELAY_THRESHOLD_MS))
   {
-    DALI_LOG_RELEASE_INFO("KeyEvent is delayed : occurred time %d ms, received time %d ms \n", event.time, event.receiveTime);
+    DALI_LOG_RELEASE_INFO("KeyEvent is delayed : occurred time %u ms, received time %u ms \n", event.time, event.receiveTime);
     mScene.EmitKeyEventDelayedSignal(keyEventHandle);
   }
 
   // Emit the key event signal from the scene.
   bool consumed = false;
-  if(!keyEventHandle.IsNoInterceptModifier())
+  if(!keyEvent->IsInterceptProcessed())
   {
     consumed = mScene.EmitInterceptKeyEventSignal(keyEventHandle);
   }

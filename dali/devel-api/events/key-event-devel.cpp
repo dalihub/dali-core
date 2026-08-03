@@ -23,19 +23,12 @@ namespace Dali
 {
 namespace DevelKeyEvent
 {
-KeyEvent New()
-{
-  Internal::KeyEventPtr internal = Internal::KeyEvent::New();
-
-  return KeyEvent(internal.Get());
-}
-
 KeyEvent New(const Dali::String&          keyName,
              const Dali::String&          logicalKey,
              const Dali::String&          keyString,
-             int                          keyCode,
-             int                          keyModifier,
-             unsigned long                timeStamp,
+             int32_t                      keyCode,
+             int32_t                      keyModifier,
+             uint32_t                     timeStamp,
              const Dali::KeyEvent::State& keyState,
              const Dali::String&          compose,
              const Dali::String&          deviceName,
@@ -47,49 +40,14 @@ KeyEvent New(const Dali::String&          keyName,
   return KeyEvent(internal.Get());
 }
 
-void SetKeyName(KeyEvent keyEvent, const Dali::String& keyName)
+bool IsInterceptProcessed(const KeyEvent& keyEvent)
 {
-  GetImplementation(keyEvent).SetKeyName(keyName);
+  return GetImplementation(keyEvent).IsInterceptProcessed();
 }
 
-void SetKeyString(KeyEvent keyEvent, const Dali::String& keyString)
+void SetInterceptProcessed(KeyEvent keyEvent, bool interceptProcessed)
 {
-  GetImplementation(keyEvent).SetKeyString(keyString);
-}
-
-void SetKeyCode(KeyEvent keyEvent, int32_t keyCode)
-{
-  GetImplementation(keyEvent).SetKeyCode(keyCode);
-}
-
-void SetKeyModifier(KeyEvent keyEvent, int32_t keyModifier)
-{
-  GetImplementation(keyEvent).SetKeyModifier(keyModifier);
-}
-
-void SetNoInterceptModifier(KeyEvent keyEvent, bool noIntercept)
-{
-  GetImplementation(keyEvent).SetNoInterceptModifier(noIntercept);
-}
-
-void SetTime(KeyEvent keyEvent, unsigned long time)
-{
-  GetImplementation(keyEvent).SetTime(time);
-}
-
-void SetState(KeyEvent keyEvent, const KeyEvent::State& state)
-{
-  GetImplementation(keyEvent).SetState(state);
-}
-
-void SetRepeat(KeyEvent keyEvent, const bool repeat)
-{
-  GetImplementation(keyEvent).SetRepeat(repeat);
-}
-
-void SetWindowId(KeyEvent keyEvent, uint32_t windowId)
-{
-  GetImplementation(keyEvent).SetWindowId(windowId);
+  GetImplementation(keyEvent).SetInterceptProcessed(interceptProcessed);
 }
 
 } // namespace DevelKeyEvent

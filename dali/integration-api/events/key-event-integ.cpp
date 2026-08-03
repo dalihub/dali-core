@@ -39,6 +39,7 @@ KeyEvent::KeyEvent()
   deviceClass(Device::Class::NONE),
   deviceSubclass(Device::Subclass::NONE),
   isRepeat(false),
+  interceptProcessed(false),
   windowId(0),
   receiveTime(0)
 {
@@ -47,9 +48,9 @@ KeyEvent::KeyEvent()
 KeyEvent::KeyEvent(const Dali::String&          keyName,
                    const Dali::String&          logicalKey,
                    const Dali::String&          keyString,
-                   int                          keyCode,
-                   int                          keyModifier,
-                   unsigned long                timeStamp,
+                   int32_t                      keyCode,
+                   int32_t                      keyModifier,
+                   uint32_t                     timeStamp,
                    const State&                 keyState,
                    const Dali::String&          compose,
                    const Dali::String&          deviceName,
@@ -68,8 +69,29 @@ KeyEvent::KeyEvent(const Dali::String&          keyName,
   deviceClass(deviceClass),
   deviceSubclass(deviceSubclass),
   isRepeat(false),
+  interceptProcessed(false),
   windowId(0),
   receiveTime(0)
+{
+}
+
+KeyEvent::KeyEvent(const Dali::KeyEvent& keyEvent)
+: Event(Key),
+  keyName(keyEvent.GetKeyName()),
+  logicalKey(keyEvent.GetLogicalKey()),
+  keyString(keyEvent.GetKeyString()),
+  keyCode(keyEvent.GetKeyCode()),
+  keyModifier(keyEvent.GetKeyModifier()),
+  time(keyEvent.GetTime()),
+  state(static_cast<State>(keyEvent.GetState())),
+  compose(keyEvent.GetCompose()),
+  deviceName(keyEvent.GetDeviceName()),
+  deviceClass(keyEvent.GetDeviceClass()),
+  deviceSubclass(keyEvent.GetDeviceSubclass()),
+  isRepeat(keyEvent.IsRepeat()),
+  interceptProcessed(GetImplementation(keyEvent).IsInterceptProcessed()),
+  windowId(keyEvent.GetWindowId()),
+  receiveTime(keyEvent.GetReceiveTime())
 {
 }
 
@@ -87,6 +109,7 @@ KeyEvent::KeyEvent(const KeyEvent& rhs)
   deviceClass(rhs.deviceClass),
   deviceSubclass(rhs.deviceSubclass),
   isRepeat(rhs.isRepeat),
+  interceptProcessed(rhs.interceptProcessed),
   windowId(rhs.windowId),
   receiveTime(rhs.receiveTime)
 {
