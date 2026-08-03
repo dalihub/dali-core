@@ -2716,3 +2716,69 @@ int UtcDaliTouchEventGetDeviceNameNagative(void)
 
   END_TEST;
 }
+
+int UtcDaliIntegrationTouchEventFromHandle(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData        data;
+  TouchEventFunctor functor(data);
+  actor.TouchEventSignal().Connect(&application, functor);
+
+  // Feeding an application created event back into the core goes through this conversion,
+  // so the time and every point of it has to survive.
+  Dali::TouchEvent handle = Dali::TouchEvent::New(132u);
+  handle.AddPoint(1, PointState::DOWN, Vector2(10.0f, 20.0f));
+  handle.AddPoint(2, PointState::MOTION, Vector2(30.0f, 40.0f), Device::Class::MOUSE, Device::Subclass::FINGER, "mouse-0", MouseButton::SECONDARY);
+
+  Dali::Integration::TouchEvent touchEvent(handle);
+
+  DALI_TEST_EQUALS(touchEvent.type, Dali::Integration::Event::Touch, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchEvent.time, 132u, TEST_LOCATION);
+  DALI_TEST_EQUALS(touchEvent.GetPointCount(), 2u, TEST_LOCATION);
+
+  const Integration::Point& firstPoint = touchEvent.GetPoint(0);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceId(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetState(), PointState::DOWN, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetScreenPosition(), Vector2(10.0f, 20.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceClass(), Device::Class::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceSubclass(), Device::Subclass::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetMouseButton(), MouseButton::INVALID, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceName(), "", TEST_LOCATION);
+
+  const Integration::Point& secondPoint = touchEvent.GetPoint(1);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceId(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetState(), PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetScreenPosition(), Vector2(30.0f, 40.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceClass(), Device::Class::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceSubclass(), Device::Subclass::FINGER, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetMouseButton(), MouseButton::SECONDARY, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceName(), "mouse-0", TEST_LOCATION);
+
+  // The converted event must be processable by the core, this is what feeding it does
+  application.ProcessEvent(touchEvent);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(132u, data.receivedTouch.time, TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, data.receivedTouch.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).hitActor, actor, TEST_LOCATION);
+  DALI_TEST_EQUALS(data.receivedTouch.GetPoint(0).local, Vector2(10.0f, 20.0f), 0.1f, TEST_LOCATION);
+  data.Reset();
+
+  // An event with no points must convert to an event with no points, not to stale values.
+  Dali::Integration::TouchEvent emptyEvent(Dali::TouchEvent::New(0u));
+  DALI_TEST_EQUALS(emptyEvent.time, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(emptyEvent.GetPointCount(), 0u, TEST_LOCATION);
+
+  END_TEST;
+}

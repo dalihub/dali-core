@@ -28,7 +28,7 @@ HoverEvent::HoverEvent()
 {
 }
 
-HoverEvent::HoverEvent(unsigned long time)
+HoverEvent::HoverEvent(uint32_t time)
 : mPoints(),
   mTime(time)
 {
@@ -42,7 +42,7 @@ HoverEventPtr HoverEvent::Clone(const HoverEvent& rhs)
   return hoverEvent;
 }
 
-unsigned long HoverEvent::GetTime() const
+uint32_t HoverEvent::GetTime() const
 {
   return mTime;
 }

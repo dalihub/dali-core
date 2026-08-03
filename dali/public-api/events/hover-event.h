@@ -49,11 +49,29 @@ struct Vector2;
  * When a multi-touch event occurs, each touch point represents the points that are currently being
  * hovered or the points where a hover has stopped.
  * @SINCE_1_0.0
+ *
+ * @note The setters are intended for hover events that the application creates itself with New().
+ * As this class is a handle to a reference-counted object, modifying a hover event received from a
+ * signal also changes what the other observers of that event see, even if the handle was received
+ * as a const reference and then copied.
  */
 class DALI_CORE_API HoverEvent : public BaseHandle
 {
 public:
   // Construction & Destruction
+
+  /**
+   * @brief Creates an initialized HoverEvent with no points.
+   *
+   * The points of the hover event are added with AddPoint().
+   * This is intended for applications that need to synthesize a hover event,
+   * e.g. to feed it to a window with Window::FeedHoverEvent().
+   *
+   * @SINCE_2_5.34
+   * @param[in] time The time (in ms) that the hover event occurred
+   * @return A handle to a newly allocated Dali resource
+   */
+  static HoverEvent New(uint32_t time);
 
   /**
    * @brief An uninitialized HoverEvent instance.
@@ -113,7 +131,7 @@ public:
    * @SINCE_1_9.25
    * @return The time (in ms) that the hover event occurred
    */
-  unsigned long GetTime() const;
+  uint32_t GetTime() const;
 
   /**
    * @brief Returns the total number of points in this hover event.
@@ -211,6 +229,49 @@ public:
    * @return The device name string
    */
   const Dali::String& GetDeviceName(uint32_t point) const;
+
+  // Setters
+
+  /**
+   * @brief Sets the time (in ms) that the hover event occurred.
+   *
+   * @SINCE_2_5.34
+   * @param[in] time The time (in ms)
+   */
+  void SetTime(uint32_t time);
+
+  /**
+   * @brief Adds a point to this hover event.
+   *
+   * The first point added is the primary point.
+   *
+   * @SINCE_2_5.34
+   * @param[in] deviceId The unique device ID of the device used for the point
+   * @param[in] state The state of the point
+   * @param[in] screenPosition The co-ordinates relative to the top-left of the screen
+   *
+   * @note The hit-actor and the local position of the point are not set here,
+   * they are filled in by DALi when the hover event is processed.
+   */
+  void AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition);
+
+  /**
+   * @brief Adds a point to this hover event with the information of the device it originated from.
+   *
+   * The first point added is the primary point.
+   *
+   * @SINCE_2_5.34
+   * @param[in] deviceId The unique device ID of the device used for the point
+   * @param[in] state The state of the point
+   * @param[in] screenPosition The co-ordinates relative to the top-left of the screen
+   * @param[in] deviceClass The class of the device the point originated from
+   * @param[in] deviceSubclass The subclass of the device the point originated from
+   * @param[in] deviceName The name of the device the point originated from
+   *
+   * @note The hit-actor and the local position of the point are not set here,
+   * they are filled in by DALi when the hover event is processed.
+   */
+  void AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName);
 
 public: // Not intended for application developers
   /// @cond internal

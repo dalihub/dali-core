@@ -16,7 +16,6 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/integration-api/events/touch-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
 
@@ -34,9 +33,11 @@ void utc_dali_hover_event_cleanup(void)
 
 namespace
 {
-TouchPoint GenerateTouchPoint()
+HoverEvent GenerateHoverEvent()
 {
-  return TouchPoint(1, PointState::STARTED, 100.0f, 200.0f);
+  HoverEvent hoverEvent = HoverEvent::New(123u);
+  hoverEvent.AddPoint(1, PointState::STARTED, Vector2(100.0f, 200.0f));
+  return hoverEvent;
 }
 } // namespace
 
@@ -49,7 +50,7 @@ int UtcDaliHoverEventConstructorP(void)
 
 int UtcDaliHoverEventCopyConstructorP(void)
 {
-  HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(123u, GenerateTouchPoint());
+  HoverEvent hoverEvent = GenerateHoverEvent();
   DALI_TEST_CHECK(hoverEvent);
 
   const auto refCount = hoverEvent.GetBaseObject().ReferenceCount();
@@ -65,7 +66,7 @@ int UtcDaliHoverEventCopyConstructorP(void)
 
 int UtcDaliHoverEventMoveConstructorP(void)
 {
-  HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(123u, GenerateTouchPoint());
+  HoverEvent hoverEvent = GenerateHoverEvent();
   DALI_TEST_CHECK(hoverEvent);
 
   const auto refCount = hoverEvent.GetBaseObject().ReferenceCount();
@@ -80,7 +81,7 @@ int UtcDaliHoverEventMoveConstructorP(void)
 
 int UtcDaliHoverEventCopyAssignmentP(void)
 {
-  HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(123u, GenerateTouchPoint());
+  HoverEvent hoverEvent = GenerateHoverEvent();
   DALI_TEST_CHECK(hoverEvent);
 
   const auto refCount = hoverEvent.GetBaseObject().ReferenceCount();
@@ -99,7 +100,7 @@ int UtcDaliHoverEventCopyAssignmentP(void)
 
 int UtcDaliHoverEventMoveAssignmentP(void)
 {
-  HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(123u, GenerateTouchPoint());
+  HoverEvent hoverEvent = GenerateHoverEvent();
   DALI_TEST_CHECK(hoverEvent);
 
   const auto refCount = hoverEvent.GetBaseObject().ReferenceCount();
@@ -117,14 +118,10 @@ int UtcDaliHoverEventMoveAssignmentP(void)
 
 int UtcDaliHoverEventCopyConstructorWithPointP(void)
 {
-  Dali::Integration::Point point;
-
   Vector2 touchPoint(10.0, 20.0);
-  point.SetDeviceId(1);
-  point.SetState(PointState::DOWN);
-  point.SetScreenPosition(Vector2(touchPoint.x, touchPoint.y));
 
-  HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(123u, point);
+  HoverEvent hoverEvent = HoverEvent::New(123u);
+  hoverEvent.AddPoint(1, PointState::DOWN, Vector2(touchPoint.x, touchPoint.y));
   DALI_TEST_CHECK(hoverEvent);
 
   const auto refCount = hoverEvent.GetBaseObject().ReferenceCount();
@@ -140,14 +137,10 @@ int UtcDaliHoverEventCopyConstructorWithPointP(void)
 
 int UtcDaliHoverEventMoveConstructorWithPointP(void)
 {
-  Dali::Integration::Point point;
-
   Vector2 touchPoint(10.0, 20.0);
-  point.SetDeviceId(1);
-  point.SetState(PointState::DOWN);
-  point.SetScreenPosition(Vector2(touchPoint.x, touchPoint.y));
 
-  HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(123u, point);
+  HoverEvent hoverEvent = HoverEvent::New(123u);
+  hoverEvent.AddPoint(1, PointState::DOWN, Vector2(touchPoint.x, touchPoint.y));
   DALI_TEST_CHECK(hoverEvent);
 
   const auto refCount = hoverEvent.GetBaseObject().ReferenceCount();

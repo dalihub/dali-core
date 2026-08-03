@@ -53,6 +53,11 @@ class KeyEvent;
  * IMF(Input Method Framework) keyboard to the internal core. In future IMF may communicate via its own
  * module.
  * @SINCE_1_0.0
+ *
+ * @note The setters are intended for key events that the application creates itself with New().
+ * As this class is a handle to a reference-counted object, modifying a key event received from a
+ * signal also changes what the other observers of that event see, even if the handle was received
+ * as a const reference and then copied.
  */
 class DALI_CORE_API KeyEvent : public BaseHandle
 {

@@ -59,11 +59,29 @@ struct Vector2;
  * If data does need to be stored in the application, then only the required data should be saved (retrieved using the methods of this class).
  *
  * Should not use this in a TouchEvent container as it is just a handle and the internal object can change.
+ *
+ * @note The setters are intended for touch events that the application creates itself with New().
+ * As this class is a handle to a reference-counted object, modifying a touch event received from a
+ * signal also changes what the other observers of that event see, even if the handle was received
+ * as a const reference and then copied.
  */
 class DALI_CORE_API TouchEvent : public BaseHandle
 {
 public:
   // Construction & Destruction
+
+  /**
+   * @brief Creates an initialized TouchEvent with no points.
+   *
+   * The points of the touch event are added with AddPoint().
+   * This is intended for applications that need to synthesize a touch event,
+   * e.g. to feed it to a window with Window::FeedTouchEvent().
+   *
+   * @SINCE_2_5.34
+   * @param[in] time The time (in ms) that the touch event occurred
+   * @return A handle to a newly allocated Dali resource
+   */
+  static TouchEvent New(uint32_t time);
 
   /**
    * @brief An uninitialized TouchEvent instance.
@@ -124,7 +142,7 @@ public:
    * @SINCE_1_9.26
    * @return The time (in ms) that the touch event occurred
    */
-  unsigned long GetTime() const;
+  uint32_t GetTime() const;
 
   /**
    * @brief Returns the total number of points in this TouchEvent.
@@ -283,6 +301,50 @@ public:
    * @return The device name string
    */
   const Dali::String& GetDeviceName(uint32_t point) const;
+
+  // Setters
+
+  /**
+   * @brief Sets the time (in ms) that the touch event occurred.
+   *
+   * @SINCE_2_5.34
+   * @param[in] time The time (in ms)
+   */
+  void SetTime(uint32_t time);
+
+  /**
+   * @brief Adds a point to this touch event.
+   *
+   * The first point added is the primary point.
+   *
+   * @SINCE_2_5.34
+   * @param[in] deviceId The unique device ID of the device used for the point
+   * @param[in] state The state of the point
+   * @param[in] screenPosition The co-ordinates relative to the top-left of the screen
+   *
+   * @note The hit-actor and the local position of the point are not set here,
+   * they are filled in by DALi when the touch event is processed.
+   */
+  void AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition);
+
+  /**
+   * @brief Adds a point to this touch event with the information of the device it originated from.
+   *
+   * The first point added is the primary point.
+   *
+   * @SINCE_2_5.34
+   * @param[in] deviceId The unique device ID of the device used for the point
+   * @param[in] state The state of the point
+   * @param[in] screenPosition The co-ordinates relative to the top-left of the screen
+   * @param[in] deviceClass The class of the device the point originated from
+   * @param[in] deviceSubclass The subclass of the device the point originated from
+   * @param[in] deviceName The name of the device the point originated from
+   * @param[in] mouseButton The mouse button pressed, if the point originated from a mouse
+   *
+   * @note The hit-actor and the local position of the point are not set here,
+   * they are filled in by DALi when the touch event is processed.
+   */
+  void AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, MouseButton::Type mouseButton);
 
 public: // Not intended for application developers
   /// @cond internal

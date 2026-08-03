@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_TOUCH_INTEG_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #include <dali/devel-api/events/touch-point.h>
 #include <dali/integration-api/events/point.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/touch-event.h>
 
 namespace Dali
@@ -45,35 +44,6 @@ DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const TouchPoin
  * @return A new touch data handle.
  */
 DALI_CORE_API Dali::TouchEvent NewTouchEvent(uint32_t timeStamp, const Dali::Integration::Point& point);
-
-/**
- * @brief Set the time (in ms) that the touch event occurred.
- *
- * This API is intended for integration layer code that needs to update the
- * timestamp of a touch event received from DALi.
- *
- * @param[in] touchEvent The instance of TouchEvent.
- * @param[in] time The time (in ms).
- */
-DALI_CORE_API void SetTouchEventTime(Dali::TouchEvent touchEvent, uint64_t time);
-
-/**
- * Create a new hover data handle from timestamp and point.
- *
- * @param[in] timeStamp The time stamp of the hover event.
- * @param[in] point The point on screen where the hover occurred.
- * @return A new hover data handle.
- */
-DALI_CORE_API Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const TouchPoint& point);
-
-/**
- * Create a new hover data handle from timestamp and point.
- *
- * @param[in] timeStamp The time stamp of the hpver event.
- * @param[in] point The point on screen where the hover occurred.
- * @return A new hover data handle.
- */
-DALI_CORE_API Dali::HoverEvent NewHoverEvent(uint32_t timeStamp, const Dali::Integration::Point& point);
 
 } // namespace Integration
 

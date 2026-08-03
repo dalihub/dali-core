@@ -17,9 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/events/hover-event-devel.h>
 #include <dali/integration-api/events/hover-event-integ.h>
-#include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
