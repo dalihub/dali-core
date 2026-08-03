@@ -304,37 +304,52 @@ public: // Called by Core
    *
    * @param[in] value The time value in milliseconds
    */
-  void SetLongPressMinimumHoldingTime(uint32_t value);
+  void SetLongPressGestureMinimumHoldingTime(uint32_t value);
 
   /**
    * @return The minimum holding time required to be recognized as a long press gesture in milliseconds
    */
-  uint32_t GetLongPressMinimumHoldingTime() const;
+  uint32_t GetLongPressGestureMinimumHoldingTime() const;
 
   /**
-   * @brief Sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+   * @brief Sets the maximum interval allowed between the taps of a multi tap gesture (millisecond)
    *
-   * @param[in] time The time value in milliseconds
+   * @param[in] interval The interval in milliseconds
    */
-  void SetTapMaximumAllowedTime(uint32_t time);
+  void SetTapGestureMaximumMultiTapInterval(uint32_t interval);
 
   /**
-   * @brief Sets the recognizer time required to be recognized as a tap gesture (millisecond)
+   * @return The maximum interval allowed between the taps of a multi tap gesture in milliseconds
+   */
+  uint32_t GetTapGestureMaximumMultiTapInterval() const;
+
+  /**
+   * @brief Sets the maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
    *
    * This time is from touch down to touch up to recognize the tap gesture.
    *
    * @param[in] time The time value in milliseconds
    */
-  void SetTapRecognizerTime(uint32_t time);
+  void SetTapGestureMaximumHoldingTime(uint32_t time);
 
   /**
-   * @brief Sets the recognizer distance required to be recognized as a tap gesture
+   * @return The maximum time the touch point can be held down while still being recognized as a tap gesture in milliseconds
+   */
+  uint32_t GetTapGestureMaximumHoldingTime() const;
+
+  /**
+   * @brief Sets the maximum distance the touch point can move while still being recognized as a tap gesture
    *
    * This distance is from touch down to touch up to recognize the tap gesture.
    *
-   * @param[in] distance The distance
+   * @param[in] distance The distance in pixels
    */
-  void SetTapMaximumMotionAllowedDistance(float distance);
+  void SetTapGestureMaximumMotionDistance(float distance);
+
+  /**
+   * @return The maximum distance the touch point can move while still being recognized as a tap gesture
+   */
+  float GetTapGestureMaximumMotionDistance() const;
 
 public: // needed for PanGesture
   /**

@@ -1054,7 +1054,7 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
   const uint32_t kMinumumHolding1 = 5000;
   const uint32_t kMinumumHolding2 = 3000;
 
-  Dali::Integration::SetLongPressMinimumHoldingTime(kMinumumHolding1);
+  Dali::Integration::SetLongPressGestureMinimumHoldingTime(kMinumumHolding1);
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
@@ -1073,9 +1073,11 @@ int UtcDaliLongPressGestureSetMinimumHoldingTime(void)
   detector.DetectedSignal().Connect(&application, functor);
 
   DALI_TEST_EQUALS(DevelLongPressGestureDetector::GetMinimumHoldingTime(detector), kMinumumHolding1, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetLongPressGestureMinimumHoldingTime(), kMinumumHolding1, TEST_LOCATION);
 
-  Dali::Integration::SetLongPressMinimumHoldingTime(kMinumumHolding2);
+  Dali::Integration::SetLongPressGestureMinimumHoldingTime(kMinumumHolding2);
   DALI_TEST_EQUALS(DevelLongPressGestureDetector::GetMinimumHoldingTime(detector), kMinumumHolding2, TEST_LOCATION);
+  DALI_TEST_EQUALS(Dali::Integration::GetLongPressGestureMinimumHoldingTime(), kMinumumHolding2, TEST_LOCATION);
 
   END_TEST;
 }

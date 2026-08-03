@@ -142,28 +142,52 @@ void SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value)
   eventProcessor.SetRotationGestureMinimumTouchEventsAfterStart(value);
 }
 
-void SetLongPressMinimumHoldingTime(unsigned int value)
+void SetLongPressGestureMinimumHoldingTime(uint32_t time)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetLongPressMinimumHoldingTime(value);
+  eventProcessor.SetLongPressGestureMinimumHoldingTime(time);
 }
 
-void SetTapMaximumAllowedTime(uint32_t time)
+uint32_t GetLongPressGestureMinimumHoldingTime()
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetTapMaximumAllowedTime(time);
+  return eventProcessor.GetLongPressGestureMinimumHoldingTime();
 }
 
-void SetTapRecognizerTime(uint32_t time)
+void SetTapGestureMaximumMultiTapInterval(uint32_t interval)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetTapRecognizerTime(time);
+  eventProcessor.SetTapGestureMaximumMultiTapInterval(interval);
 }
 
-void SetTapMaximumMotionAllowedDistance(float distance)
+uint32_t GetTapGestureMaximumMultiTapInterval()
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetTapMaximumMotionAllowedDistance(distance);
+  return eventProcessor.GetTapGestureMaximumMultiTapInterval();
+}
+
+void SetTapGestureMaximumHoldingTime(uint32_t time)
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetTapGestureMaximumHoldingTime(time);
+}
+
+uint32_t GetTapGestureMaximumHoldingTime()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetTapGestureMaximumHoldingTime();
+}
+
+void SetTapGestureMaximumMotionDistance(float distance)
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetTapGestureMaximumMotionDistance(distance);
+}
+
+float GetTapGestureMaximumMotionDistance()
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  return eventProcessor.GetTapGestureMaximumMotionDistance();
 }
 
 } // namespace Integration

@@ -573,7 +573,7 @@ int UtcDaliTapGestureRecognizerTripleTap(void)
   END_TEST;
 }
 
-int UtcDaliTapGestureSetMaximumAllowedTime(void)
+int UtcDaliTapGestureSetMaximumMultiTapInterval(void)
 {
   TestApplication application;
 
@@ -592,15 +592,16 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
 
   try
   {
-    Dali::Integration::SetTapMaximumAllowedTime(0);
+    Dali::Integration::SetTapGestureMaximumMultiTapInterval(0);
   }
   catch(...)
   {
     DALI_TEST_CHECK(false); // Should not get here
   }
 
-  // Reduce the maximum allowable time. 500 -> 100
-  Dali::Integration::SetTapMaximumAllowedTime(100);
+  // Reduce the maximum multi tap interval. 500 -> 100
+  Dali::Integration::SetTapGestureMaximumMultiTapInterval(100);
+  DALI_TEST_EQUALS(Dali::Integration::GetTapGestureMaximumMultiTapInterval(), 100u, TEST_LOCATION);
 
   SignalData             data;
   GestureReceivedFunctor functor(data);
@@ -620,16 +621,16 @@ int UtcDaliTapGestureSetMaximumAllowedTime(void)
 
   application.SendNotification();
 
-  // The double tap fails because the maximum allowed time has been exceeded
+  // The double tap fails because the maximum multi tap interval has been exceeded
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  // reset maximum allowed time
-  Dali::Integration::SetTapMaximumAllowedTime(500);
+  // reset maximum multi tap interval
+  Dali::Integration::SetTapGestureMaximumMultiTapInterval(500);
 
   END_TEST;
 }
 
-int UtcDaliTapGestureSetRecognizerTime(void)
+int UtcDaliTapGestureSetMaximumHoldingTime(void)
 {
   TestApplication application;
 
@@ -648,15 +649,16 @@ int UtcDaliTapGestureSetRecognizerTime(void)
 
   try
   {
-    Dali::Integration::SetTapRecognizerTime(0);
+    Dali::Integration::SetTapGestureMaximumHoldingTime(0);
   }
   catch(...)
   {
     DALI_TEST_CHECK(false); // Should not get here
   }
 
-  // Reduce the recognizer time. 500 -> 100
-  Dali::Integration::SetTapRecognizerTime(100);
+  // Reduce the maximum holding time. 500 -> 100
+  Dali::Integration::SetTapGestureMaximumHoldingTime(100);
+  DALI_TEST_EQUALS(Dali::Integration::GetTapGestureMaximumHoldingTime(), 100u, TEST_LOCATION);
 
   SignalData             data;
   GestureReceivedFunctor functor(data);
@@ -677,16 +679,16 @@ int UtcDaliTapGestureSetRecognizerTime(void)
 
   application.SendNotification();
 
-  // The tap fails because the recognizer time has been exceeded
+  // The tap fails because the maximum holding time has been exceeded
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  // reset recognizer time
-  Dali::Integration::SetTapRecognizerTime(500);
+  // reset maximum holding time
+  Dali::Integration::SetTapGestureMaximumHoldingTime(500);
 
   END_TEST;
 }
 
-int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
+int UtcDaliTapGestureSetMaximumMotionDistance(void)
 {
   TestApplication application;
 
@@ -705,7 +707,7 @@ int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
 
   try
   {
-    Dali::Integration::SetTapMaximumMotionAllowedDistance(-1.0f);
+    Dali::Integration::SetTapGestureMaximumMotionDistance(-1.0f);
   }
   catch(...)
   {
@@ -713,7 +715,8 @@ int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
   }
 
   // increase the distance. 20 -> 50
-  Dali::Integration::SetTapMaximumMotionAllowedDistance(50);
+  Dali::Integration::SetTapGestureMaximumMotionDistance(50);
+  DALI_TEST_EQUALS(Dali::Integration::GetTapGestureMaximumMotionDistance(), 50.0f, TEST_LOCATION);
 
   SignalData             data;
   GestureReceivedFunctor functor(data);
@@ -738,7 +741,7 @@ int UtcDaliTapGestureSetMaximumMotionAllowedDistance(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // reset distance
-  Dali::Integration::SetTapMaximumMotionAllowedDistance(20);
+  Dali::Integration::SetTapGestureMaximumMotionDistance(20);
 
   END_TEST;
 }
