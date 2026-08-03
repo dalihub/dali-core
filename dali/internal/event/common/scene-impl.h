@@ -367,10 +367,10 @@ public:
   bool EmitWheelEventGeneratedSignal(const Dali::WheelEvent& event);
 
   /**
-   * Used by the EventProcessor to emit key event monitor signals.
+   * Used by the EventProcessor to emit delayed key event signals.
    * @param[in] event The key event.
    */
-  void EmitKeyEventMonitorSignal(const Dali::KeyEvent& event);
+  void EmitKeyEventDelayedSignal(const Dali::KeyEvent& event);
 
   /**
    * @copydoc Dali::Integration::Scene::AddFrameRenderedCallback
@@ -437,7 +437,7 @@ public:
   /**
    * @copydoc Integration::Scene::KeyEventSignal()
    */
-  Integration::Scene::KeyEventSignalType& KeyEventMonitorSignal();
+  Integration::Scene::KeyEventSignalType& KeyEventDelayedSignal();
 
   /**
    * @copydoc Integration::Scene::SignalEventProcessingFinished()
@@ -553,7 +553,7 @@ private:
   Integration::Scene::KeyEventSignalType          mKeyEventSignal;
   Integration::Scene::KeyEventGeneratedSignalType mKeyEventGeneratedSignal;
   Integration::Scene::KeyEventGeneratedSignalType mInterceptKeyEventSignal;
-  Integration::Scene::KeyEventSignalType          mKeyEventMonitorSignal;
+  Integration::Scene::KeyEventSignalType          mKeyEventDelayedSignal;
 
   // The event processing finished signal
   Integration::Scene::EventProcessingFinishedSignalType mEventProcessingFinishedSignal;

@@ -40,7 +40,7 @@ namespace Internal
 {
 namespace
 {
-const uint32_t DEFAULT_MONITOR_KEY_EVENT_TIME = 330u;
+const uint32_t KEY_EVENT_DELAY_THRESHOLD_MS = 330u;
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
 
@@ -74,10 +74,10 @@ void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
     oss << "[name:" << event.keyName << ", code:" << event.keyCode << ", state:" << KEY_EVENT_STATES[event.state] << ", time:" << event.time << ", recieveTime:" << event.receiveTime << "]";
   });
 
-  if(event.receiveTime > 0 && (event.receiveTime >= event.time + DEFAULT_MONITOR_KEY_EVENT_TIME))
+  if(event.receiveTime > 0 && (event.receiveTime >= event.time + KEY_EVENT_DELAY_THRESHOLD_MS))
   {
     DALI_LOG_RELEASE_INFO("KeyEvent is delayed : occurred time %d ms, received time %d ms \n", event.time, event.receiveTime);
-    mScene.EmitKeyEventMonitorSignal(keyEventHandle);
+    mScene.EmitKeyEventDelayedSignal(keyEventHandle);
   }
 
   // Emit the key event signal from the scene.

@@ -586,17 +586,21 @@ public:
   KeyEventGeneratedSignalType& InterceptKeyEventSignal();
 
   /**
-   * @brief The user would connect to this signal to monitor a KeyEvent at window.
-   * This signal is emitted when KeyEvent is generated.
+   * @brief The user would connect to this signal to be notified that a KeyEvent was delayed.
+   *
+   * This signal is emitted only when the elapsed time between the timestamp the key event was
+   * given by the input system and the time it reached DALi exceeds a predefined threshold.
+   * It is emitted before the KeyEvent is dispatched, and is emitted regardless of whether
+   * the KeyEvent is subsequently consumed.
    *
    * A Callback of the following type may be connected:
    * @code
-   *  bool YourCallbackName(KeyEvent event);
+   *  void YourCallbackName(KeyEvent event);
    * @endcode
    *
    * @return The signal to connect to
    */
-  KeyEventSignalType& KeyEventMonitorSignal();
+  KeyEventSignalType& KeyEventDelayedSignal();
 
   /**
    * @brief This signal is emitted when the screen is touched and when the touch ends

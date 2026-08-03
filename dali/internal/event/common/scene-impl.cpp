@@ -539,12 +539,12 @@ bool Scene::EmitWheelEventGeneratedSignal(const Dali::WheelEvent& event)
   return mWheelEventGeneratedSignal.Emit(event);
 }
 
-void Scene::EmitKeyEventMonitorSignal(const Dali::KeyEvent& event)
+void Scene::EmitKeyEventDelayedSignal(const Dali::KeyEvent& event)
 {
-  if(!mKeyEventMonitorSignal.Empty())
+  if(!mKeyEventDelayedSignal.Empty())
   {
     Dali::Integration::Scene handle(this);
-    mKeyEventMonitorSignal.Emit(event);
+    mKeyEventDelayedSignal.Emit(event);
   }
 }
 
@@ -714,9 +714,9 @@ Integration::Scene::KeyEventGeneratedSignalType& Scene::InterceptKeyEventSignal(
   return mInterceptKeyEventSignal;
 }
 
-Integration::Scene::KeyEventSignalType& Scene::KeyEventMonitorSignal()
+Integration::Scene::KeyEventSignalType& Scene::KeyEventDelayedSignal()
 {
-  return mKeyEventMonitorSignal;
+  return mKeyEventDelayedSignal;
 }
 
 Integration::Scene::EventProcessingFinishedSignalType& Scene::EventProcessingFinishedSignal()
