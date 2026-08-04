@@ -1175,7 +1175,7 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners)
           ++iter;
         }
       }
-      mImpl->activatedRendererCount = mImpl->renderers.Count();
+      mImpl->activatedRendererCount = static_cast<uint32_t>(mImpl->renderers.Count());
 
       while(!deactivatedRenderers.Empty())
       {

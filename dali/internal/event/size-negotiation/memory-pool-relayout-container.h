@@ -102,7 +102,7 @@ public:
    *
    * @param capacity The new capacity for the container
    */
-  void Reserve(size_t capacity);
+  void Reserve(uint32_t capacity);
 
   /**
    * @brief Reset the container, freeing all memory

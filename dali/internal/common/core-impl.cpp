@@ -889,7 +889,7 @@ void Core::LogMemoryPools() const
     "  RelayoutItems:       %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n",
     SIZE_CONV(relayoutItemPoolCapacity, Dali::Internal::MemoryPoolRelayoutContainer::RelayoutInfo, relayoutItemPoolSize));
 
-  uint32_t updateQCapacity = mUpdateManager->GetUpdateMessageQueueCapacity();
+  uint32_t updateQCapacity = static_cast<uint32_t>(mUpdateManager->GetUpdateMessageQueueCapacity());
 
   DALI_LOG_RELEASE_INFO(
     "\n"

@@ -887,7 +887,7 @@ public:
    */
   uint32_t GetExclusiveRenderTaskCount()
   {
-    return mExclusiveRenderTasks.size();
+    return static_cast<uint32_t>(mExclusiveRenderTasks.size());
   }
 
   /**

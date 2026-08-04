@@ -96,7 +96,7 @@ UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)
     return it->second;
   }
 
-  ProgramIndex programIndex = mUniformIndexMaps.size();
+  ProgramIndex programIndex = static_cast<ProgramIndex>(mUniformIndexMaps.size());
 
   // Create index map for program from uniform map
   UniformIndexMappings currentUniformIndexMap;
@@ -142,7 +142,7 @@ UniformBlock::ProgramIndex UniformBlock::GetProgramIndex(const Program& program)
       uniform.uniformOffset = uniformInfo.offset;
 
       const auto typeSize        = uniform.propertyValue->GetValueSize();
-      uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+      uniform.arrayElementStride = static_cast<uint32_t>(uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize);
       uniform.matrixStride       = uniformInfo.matrixStride;
 
       uniform.state = UniformIndexMap::State::INITIALIZED;
@@ -219,7 +219,7 @@ void UniformBlock::WriteDynUniform(
   else
   {
     const auto typeSize = propertyValue->GetValueSize();
-    ubo.Write(valueAddress, typeSize, dest);
+    ubo.Write(valueAddress, static_cast<uint32_t>(typeSize), dest);
   }
 }
 

@@ -121,7 +121,7 @@ public:
     size_t alignment = alignof(StringEntry);
 
     // Construct the value.
-    StringEntry* newItem = new(allocator.Allocate(allocSize, alignment)) StringEntry(length);
+    StringEntry* newItem = new(allocator.Allocate(static_cast<uint32_t>(allocSize), static_cast<uint32_t>(alignment))) StringEntry(static_cast<uint16_t>(length));
 
     // Copy the string information.
     char* strBuffer = const_cast<char*>(newItem->GetStringData());
@@ -206,7 +206,7 @@ private:
   unsigned FindBucket(std::string_view name)
   {
     unsigned bucketSize    = mBuckets;
-    unsigned fullHashValue = std::hash<std::string_view>{}(name);
+    uint32_t fullHashValue = static_cast<uint32_t>(std::hash<std::string_view>{}(name));
     unsigned bucketNumber  = fullHashValue & (bucketSize - 1);
     // point to the start of the hashvalue segment.
     unsigned* hashTable = reinterpret_cast<unsigned*>(mTable + mBuckets + 1);

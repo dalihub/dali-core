@@ -95,7 +95,7 @@ public: // Main API
     if(iter == mCharPtrIndexList.cend() || iter->first != comparableKey)
     {
       // Emplace new element back.
-      std::uint32_t newElementIndex = mKeyElementPool.size();
+      std::uint32_t newElementIndex = static_cast<std::uint32_t>(mKeyElementPool.size());
       mKeyElementPool.emplace_back(key, element);
 
       // Add new index into mCharPtrIndexList.
@@ -130,7 +130,7 @@ public: // Main API
     if(iter == mCharPtrIndexList.cend() || iter->first != comparableKey)
     {
       // Emplace new element back.
-      std::uint32_t newElementIndex = mKeyElementPool.size();
+      std::uint32_t newElementIndex = static_cast<std::uint32_t>(mKeyElementPool.size());
       mKeyElementPool.emplace_back(key, std::move(element));
 
       // Add new index into mCharPtrIndexList.

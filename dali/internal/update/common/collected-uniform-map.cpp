@@ -53,7 +53,7 @@ void CollectedUniformMap::AddMappings(const UniformMap& uniformMap)
 
       bool found = false;
 
-      for(UniformMap::SizeType j = 0, jCount = mUniformMap.Count(); j < jCount; ++j)
+      for(UniformMap::SizeType j = 0, jCount = static_cast<UniformMap::SizeType>(mUniformMap.Count()); j < jCount; ++j)
       {
         if(mUniformMap[j].uniformName == uniformName)
         {
@@ -72,7 +72,7 @@ void CollectedUniformMap::AddMappings(const UniformMap& uniformMap)
     {
       mUniformMap.Reserve(mUniformMap.Count() + newUniformMappings.Count());
 
-      for(UniformMap::SizeType i = 0, iCount = newUniformMappings.Count(); i < iCount; ++i)
+      for(UniformMap::SizeType i = 0, iCount = static_cast<UniformMap::SizeType>(newUniformMappings.Count()); i < iCount; ++i)
       {
         mUniformMap.PushBack(newUniformMappings[i]);
       }

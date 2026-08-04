@@ -54,7 +54,7 @@ public:
 
   uint32_t ActivateCount() const
   {
-    return mActiveConstraints.Count();
+    return static_cast<uint32_t>(mActiveConstraints.Count());
   }
 
   void Apply();
