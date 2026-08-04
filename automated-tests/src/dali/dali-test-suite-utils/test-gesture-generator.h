@@ -94,6 +94,21 @@ void TestMovePan(TestApplication& application, Vector2 pos, uint32_t time = 400)
 void TestEndPan(TestApplication& application, Vector2 pos, uint32_t time = 500);
 
 /**
+ * Cancels an active pan gesture at position pos.
+ */
+void TestCancelPan(TestApplication& application, Vector2 pos, uint32_t time = 500);
+
+/**
+ * Adds a second touch to an active one-touch pan.
+ *
+ * A PanGestureDetector whose maximum touch count is one receives CANCELLED.
+ */
+void TestAddSecondTouchToPan(TestApplication& application,
+                             Vector2          primaryPosition,
+                             Vector2          secondPosition,
+                             uint32_t         time = 500);
+
+/**
  * Triggers the timer to begin a tap gesture
  */
 void TestTriggerTap(TestApplication& application);
