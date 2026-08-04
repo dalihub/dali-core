@@ -21,7 +21,10 @@
 // EXTERNAL INCLUDES
 #include <chrono>
 #include <cstdarg>
+#include <cstdlib>
 #include <memory>
+#include <optional>
+#include <string>
 
 namespace Dali
 {
@@ -35,6 +38,28 @@ Dali::DebugPropertyValueMap   gValueMap;
 
 namespace Integration
 {
+namespace
+{
+std::optional<std::string> GetEnvironmentVariableValue(const char* variableName)
+{
+#if defined(_MSC_VER)
+  char*       value  = nullptr;
+  std::size_t length = 0u;
+  if(_dupenv_s(&value, &length, variableName) != 0 || value == nullptr)
+  {
+    return std::nullopt;
+  }
+
+  std::string result(value);
+  std::free(value);
+  return result;
+#else
+  const char* value = std::getenv(variableName);
+  return value ? std::optional<std::string>(value) : std::nullopt;
+#endif
+}
+} // namespace
+
 namespace Log
 {
 namespace
@@ -137,25 +162,29 @@ static FilterList& GetActiveFilters()
 
 Filter* Filter::New(LogLevel level, bool trace, const char* environmentVariableName)
 {
-  char* environmentVariableValue = getenv(environmentVariableName);
+  const auto environmentVariableValue = GetEnvironmentVariableValue(environmentVariableName);
   if(environmentVariableValue)
   {
-    unsigned int envLevel(0);
-    char         envTraceString(0);
-    sscanf(environmentVariableValue, "%u,%c", &envLevel, &envTraceString);
+    unsigned int environmentLogLevel(0);
+    char         environmentTraceOption(0);
+#if defined(_MSC_VER)
+    sscanf_s(environmentVariableValue->c_str(), "%u,%c", &environmentLogLevel, &environmentTraceOption, 1u);
+#else
+    sscanf(environmentVariableValue->c_str(), "%u,%c", &environmentLogLevel, &environmentTraceOption);
+#endif
 
-    if(envLevel > Verbose)
+    if(environmentLogLevel > Verbose)
     {
-      envLevel = Verbose;
+      environmentLogLevel = Verbose;
     }
-    level = LogLevel(envLevel);
+    level = LogLevel(environmentLogLevel);
 
     // Just use 'f' and 't' as it's faster than doing full string comparisons
-    if(envTraceString == 't')
+    if(environmentTraceOption == 't')
     {
       trace = true;
     }
-    else if(envTraceString == 'f')
+    else if(environmentTraceOption == 'f')
     {
       trace = false;
     }
@@ -314,10 +343,10 @@ ThresholdFilter* ThresholdFilter::New(ThresholdFilter::Milliseconds thresholdMil
 {
   try
   {
-    char* environmentVariableValue = getenv(environmentVariableName);
+    const auto environmentVariableValue = GetEnvironmentVariableValue(environmentVariableName);
     if(environmentVariableValue)
     {
-      thresholdMilliSeconds = static_cast<Milliseconds>(std::atoi(environmentVariableValue));
+      thresholdMilliSeconds = static_cast<Milliseconds>(std::atoi(environmentVariableValue->c_str()));
     }
   }
   catch(...)

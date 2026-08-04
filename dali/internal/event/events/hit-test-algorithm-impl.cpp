@@ -818,7 +818,7 @@ bool HitTestRenderTaskList(const Vector2&                                 sceneS
     Vector2                                 convertedScreenCoordinates;
     renderTask.GetViewport(viewport);
     if(ConvertScreenCoordinates(convertedScreenCoordinates, screenCoordinates, renderTask) &&
-       HitTestRenderTask(hitResults, renderTask, hitCommonInformation, Vector2(viewport.width, viewport.height), convertedScreenCoordinates, hitCheck))
+       HitTestRenderTask(hitResults, renderTask, hitCommonInformation, Vector2(static_cast<float>(viewport.width), static_cast<float>(viewport.height)), convertedScreenCoordinates, hitCheck))
     {
       results.actor            = Dali::Actor(hitResults.front()->mActor);
       results.renderTask       = RenderTaskPtr(&renderTask);

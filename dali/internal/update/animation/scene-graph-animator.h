@@ -678,15 +678,15 @@ protected:
 
 struct AnimateByInteger
 {
-  AnimateByInteger(const int& relativeValue)
+  AnimateByInteger(const int32_t& relativeValue)
   : mRelative(relativeValue)
   {
   }
 
-  float operator()(float alpha, float blendPoint, const int32_t& property)
+  int32_t operator()(float alpha, float blendPoint, const int32_t& property)
   {
     // integers need to be correctly rounded
-    return roundf(static_cast<float>(property) + static_cast<float>(mRelative) * alpha);
+    return static_cast<int32_t>(roundf(static_cast<float>(property) + static_cast<float>(mRelative) * alpha));
   }
 
   int32_t mRelative;
@@ -694,15 +694,15 @@ struct AnimateByInteger
 
 struct AnimateToInteger
 {
-  AnimateToInteger(const int& targetValue)
+  AnimateToInteger(const int32_t& targetValue)
   : mTarget(targetValue)
   {
   }
 
-  float operator()(float alpha, float blendPoint, const int32_t& property)
+  int32_t operator()(float alpha, float blendPoint, const int32_t& property)
   {
     // integers need to be correctly rounded
-    return roundf(static_cast<float>(property) + (static_cast<float>(mTarget - property) * alpha));
+    return static_cast<int32_t>(roundf(static_cast<float>(property) + (static_cast<float>(mTarget - property) * alpha)));
   }
 
   int32_t mTarget;

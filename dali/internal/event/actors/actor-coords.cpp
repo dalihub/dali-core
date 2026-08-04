@@ -59,10 +59,10 @@ bool GetViewportExtentsFromRenderTask(const RenderTask& renderTask, Bounds& view
   {
     Viewport viewport;
     renderTask.GetViewport(viewport);
-    viewportExtent.x      = viewport.x;
-    viewportExtent.y      = viewport.y;
-    viewportExtent.width  = viewport.width;
-    viewportExtent.height = viewport.height;
+    viewportExtent.x      = static_cast<float>(viewport.x);
+    viewportExtent.y      = static_cast<float>(viewport.y);
+    viewportExtent.width  = static_cast<float>(viewport.width);
+    viewportExtent.height = static_cast<float>(viewport.height);
   }
   return true;
 }
