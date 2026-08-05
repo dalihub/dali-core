@@ -149,6 +149,23 @@ void TestEndPan(TestApplication& application, Vector2 pos, uint32_t time)
   application.ProcessEvent(GenerateSingleTouch(PointState::UP, pos, time));
 }
 
+void TestCancelPan(TestApplication& application, Vector2 pos, uint32_t time)
+{
+  application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, pos, time));
+}
+
+void TestAddSecondTouchToPan(TestApplication& application,
+                             Vector2          primaryPosition,
+                             Vector2          secondPosition,
+                             uint32_t         time)
+{
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION,
+                                               primaryPosition,
+                                               PointState::DOWN,
+                                               secondPosition,
+                                               time));
+}
+
 void TestTriggerTap(TestApplication& application)
 {
   application.GetPlatform().TriggerTimer();
