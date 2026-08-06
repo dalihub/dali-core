@@ -146,8 +146,21 @@ namespace Dali::Internal::QueueBenchmark
  */
 inline bool IsEnabled()
 {
-  const char* env = std::getenv("DALI_QUEUE_BENCHMARK");
-  return env && (std::atoi(env) != 0);
+#if defined(_MSC_VER)
+  char*       environmentVariableValue = nullptr;
+  std::size_t length = 0u;
+  if(_dupenv_s(&environmentVariableValue, &length, "DALI_QUEUE_BENCHMARK") != 0 || environmentVariableValue == nullptr)
+  {
+    return false;
+  }
+
+  const bool enabled = std::atoi(environmentVariableValue) != 0;
+  std::free(environmentVariableValue);
+  return enabled;
+#else
+  const char* environmentVariableValue = std::getenv("DALI_QUEUE_BENCHMARK");
+  return environmentVariableValue && (std::atoi(environmentVariableValue) != 0);
+#endif
 }
 
 /**

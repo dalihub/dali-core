@@ -151,7 +151,15 @@ void DumpToFile(std::string_view path)
     return;
   }
 
+#if defined(_MSC_VER)
+  FILE* file = nullptr;
+  if(fopen_s(&file, std::string(path).c_str(), "w") != 0)
+  {
+    file = nullptr;
+  }
+#else
   FILE* file = std::fopen(std::string(path).c_str(), "w");
+#endif
   if(!file)
   {
     return;
