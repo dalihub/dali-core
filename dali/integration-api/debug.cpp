@@ -64,8 +64,21 @@ namespace Log
 {
 namespace
 {
+constexpr const char* DISABLE_LOG_FALLBACK_ENVIRONMENT_VARIABLE = "DALI_LOG_DISABLE_FALLBACK";
+
 void FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_list args)
 {
+  static const bool fallbackDisabled = []
+  {
+    const auto environmentVariableValue = GetEnvironmentVariableValue(DISABLE_LOG_FALLBACK_ENVIRONMENT_VARIABLE);
+    return environmentVariableValue && std::atoi(environmentVariableValue->c_str()) != 0;
+  }();
+
+  if(DALI_UNLIKELY(fallbackDisabled))
+  {
+    return;
+  }
+
   if(format != nullptr)
   {
     char* buffer       = nullptr;
