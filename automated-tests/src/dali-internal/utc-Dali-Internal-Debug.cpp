@@ -88,6 +88,8 @@ void utc_dali_internal_debug_cleanup()
 
 int UtcDaliDebugLogPrintP(void)
 {
+  DALI_TEST_CHECK(SetEnvironmentVariable("DALI_LOG_DISABLE_FALLBACK", "1"));
+
   TestApplication application;
 
   tet_infoline("UtcDaliDebugLogPrintP() Test dali default log macros");
@@ -109,6 +111,9 @@ int UtcDaliDebugLogPrintP(void)
   DALI_TEST_EQUALS(CheckCapturedLogContainString(Debug::DebugPriority::DEBUG, expectLogString), true, TEST_LOCATION);
 
   Debug::UninstallLogFunction();
+
+  DALI_LOG_ERROR("This fallback log should be suppressed\n");
+  DALI_TEST_CHECK(ClearEnvironmentVariable("DALI_LOG_DISABLE_FALLBACK"));
 
   END_TEST;
 }
