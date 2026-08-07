@@ -137,6 +137,15 @@ public:
   }
 
   /**
+   * Check if this OwnerKeyType owns a valid object.
+   * @return true if the key is valid (not null).
+   */
+  bool IsValid() const
+  {
+    return mKey.Get() != nullptr;
+  }
+
+  /**
    * Reset the pointer, deleting any owned object.
    */
   void Reset()

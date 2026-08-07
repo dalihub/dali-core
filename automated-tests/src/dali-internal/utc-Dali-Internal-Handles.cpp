@@ -25,9 +25,13 @@
 
 // Internal headers are allowed here
 #include <dali/internal/common/owner-key-type.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/rendering/renderer-impl.h>
+#define private public
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/manager/update-proxy-property-modifier.h>
+#undef private
 #include <dali/internal/update/rendering/scene-graph-renderer.h>
 
 using namespace Dali;
@@ -50,6 +54,34 @@ int UtcDaliCameraActorConstructorRefObject(void)
   CameraActor actor(NULL);
 
   DALI_TEST_CHECK(!actor);
+  END_TEST;
+}
+
+int UtcDaliUpdateProxyPropertyModifierRemoveLifecycleObserver(void)
+{
+  class TestLifecycleObserver : public Internal::UpdateProxy::PropertyModifier::LifecycleObserver
+  {
+  public:
+    void ObjectDestroyed() override
+    {
+      mObjectDestroyed = true;
+    }
+
+    bool mObjectDestroyed{false};
+  };
+
+  TestApplication application;
+  auto&           updateManager = Internal::ThreadLocalStorage::Get().GetUpdateManager();
+
+  TestLifecycleObserver observer;
+  {
+    Internal::UpdateProxy::PropertyModifier modifier(updateManager);
+    modifier.AddLifecycleObserver(observer);
+    modifier.RemoveLifecycleObserver(observer);
+  }
+
+  DALI_TEST_CHECK(!observer.mObjectDestroyed);
+
   END_TEST;
 }
 

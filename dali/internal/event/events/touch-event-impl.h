@@ -56,7 +56,7 @@ public:
    * @brief Constructor
    * @param[in]  time  The time the event occurred
    */
-  TouchEvent(unsigned long time)
+  TouchEvent(uint32_t time)
   : mTime(time)
   {
   }
@@ -80,7 +80,7 @@ public:
   /**
    * @copydoc Dali::TouchEvent::GetTime()
    */
-  inline unsigned long GetTime() const
+  inline uint32_t GetTime() const
   {
     return mTime;
   }
@@ -215,7 +215,7 @@ public:
    *
    * @param[in] time The time (in ms)
    */
-  void SetTime(uint64_t time);
+  void SetTime(uint32_t time);
 
 private:
   /**
@@ -228,7 +228,7 @@ private:
 private:
   std::vector<Integration::Point> mPoints;     ///< Container of the points for this touch event.
   Dali::RenderTask                mRenderTask; ///< The render task used to generate this touch event.
-  unsigned long                   mTime{0u};   ///< The time (in ms) that the touch event occurred.
+  uint32_t                        mTime{0u};   ///< The time (in ms) that the touch event occurred.
 };
 
 } // namespace Internal

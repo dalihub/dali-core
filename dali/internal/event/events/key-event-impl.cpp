@@ -25,11 +25,7 @@ namespace Dali
 {
 namespace
 {
-const uint32_t MODIFIER_SHIFT        = 0x1;
-const uint32_t MODIFIER_CTRL         = 0x2;
-const uint32_t MODIFIER_ALT          = 0x4;
-const uint32_t MODIFIER_NO_INTERCEPT = (1U << 31);
-const int32_t  KEY_INVALID_CODE      = -1;
+const int32_t KEY_INVALID_CODE = -1;
 } // namespace
 
 namespace Internal
@@ -38,26 +34,27 @@ KeyEvent::KeyEvent()
 : mKeyName(""),
   mLogicalKey(""),
   mKeyString(""),
+  mCompose(""),
+  mDeviceName(""),
   mKeyCode(KEY_INVALID_CODE),
   mKeyModifier(0),
   mTime(0),
+  mReceiveTime(0),
+  mWindowId(0),
   mState(Dali::KeyEvent::DOWN),
-  mCompose(""),
-  mDeviceName(""),
   mDeviceClass(Device::Class::NONE),
   mDeviceSubclass(Device::Subclass::NONE),
   mIsRepeat(false),
-  mWindowId(0),
-  mReceiveTime(0)
+  mInterceptProcessed(false)
 {
 }
 
 KeyEvent::KeyEvent(const Dali::String&          keyName,
                    const Dali::String&          logicalKey,
                    const Dali::String&          keyString,
-                   int                          keyCode,
-                   int                          keyModifier,
-                   unsigned long                timeStamp,
+                   int32_t                      keyCode,
+                   int32_t                      keyModifier,
+                   uint32_t                     timeStamp,
                    const Dali::KeyEvent::State& keyState,
                    const Dali::String&          compose,
                    const Dali::String&          deviceName,
@@ -66,17 +63,18 @@ KeyEvent::KeyEvent(const Dali::String&          keyName,
 : mKeyName(keyName),
   mLogicalKey(logicalKey),
   mKeyString(keyString),
+  mCompose(compose),
+  mDeviceName(deviceName),
   mKeyCode(keyCode),
   mKeyModifier(keyModifier),
   mTime(timeStamp),
+  mReceiveTime(0),
+  mWindowId(0),
   mState(keyState),
-  mCompose(compose),
-  mDeviceName(deviceName),
   mDeviceClass(deviceClass),
   mDeviceSubclass(deviceSubclass),
   mIsRepeat(false),
-  mWindowId(0),
-  mReceiveTime(0)
+  mInterceptProcessed(false)
 {
 }
 
@@ -89,9 +87,9 @@ KeyEventPtr KeyEvent::New()
 KeyEventPtr KeyEvent::New(const Dali::String&          keyName,
                           const Dali::String&          logicalKey,
                           const Dali::String&          keyString,
-                          int                          keyCode,
-                          int                          keyModifier,
-                          unsigned long                timeStamp,
+                          int32_t                      keyCode,
+                          int32_t                      keyModifier,
+                          uint32_t                     timeStamp,
                           const Dali::KeyEvent::State& keyState,
                           const Dali::String&          compose,
                           const Dali::String&          deviceName,
@@ -104,22 +102,22 @@ KeyEventPtr KeyEvent::New(const Dali::String&          keyName,
 
 bool KeyEvent::IsShiftModifier() const
 {
-  return ((MODIFIER_SHIFT & mKeyModifier) == MODIFIER_SHIFT);
+  return (mKeyModifier & Dali::KeyEvent::SHIFT) != 0;
 }
 
 bool KeyEvent::IsCtrlModifier() const
 {
-  return ((MODIFIER_CTRL & mKeyModifier) == MODIFIER_CTRL);
+  return (mKeyModifier & Dali::KeyEvent::CTRL) != 0;
 }
 
 bool KeyEvent::IsAltModifier() const
 {
-  return ((MODIFIER_ALT & mKeyModifier) == MODIFIER_ALT);
+  return (mKeyModifier & Dali::KeyEvent::ALT) != 0;
 }
 
-bool KeyEvent::IsNoInterceptModifier() const
+bool KeyEvent::IsInterceptProcessed() const
 {
-  return ((MODIFIER_NO_INTERCEPT & mKeyModifier) == MODIFIER_NO_INTERCEPT);
+  return mInterceptProcessed;
 }
 
 const Dali::String& KeyEvent::GetCompose() const
@@ -167,7 +165,7 @@ int32_t KeyEvent::GetKeyModifier() const
   return mKeyModifier;
 }
 
-unsigned long KeyEvent::GetTime() const
+uint32_t KeyEvent::GetTime() const
 {
   return mTime;
 }
@@ -192,6 +190,26 @@ uint32_t KeyEvent::GetReceiveTime() const
   return mReceiveTime;
 }
 
+void KeyEvent::SetCompose(const Dali::String& compose)
+{
+  mCompose = compose;
+}
+
+void KeyEvent::SetDeviceName(const Dali::String& deviceName)
+{
+  mDeviceName = deviceName;
+}
+
+void KeyEvent::SetDeviceClass(Device::Class::Type deviceClass)
+{
+  mDeviceClass = deviceClass;
+}
+
+void KeyEvent::SetDeviceSubclass(Device::Subclass::Type deviceSubclass)
+{
+  mDeviceSubclass = deviceSubclass;
+}
+
 void KeyEvent::SetKeyName(const Dali::String& keyName)
 {
   mKeyName = keyName;
@@ -200,6 +218,11 @@ void KeyEvent::SetKeyName(const Dali::String& keyName)
 void KeyEvent::SetKeyString(const Dali::String& keyString)
 {
   mKeyString = keyString;
+}
+
+void KeyEvent::SetLogicalKey(const Dali::String& logicalKey)
+{
+  mLogicalKey = logicalKey;
 }
 
 void KeyEvent::SetKeyCode(int32_t keyCode)
@@ -212,19 +235,12 @@ void KeyEvent::SetKeyModifier(int32_t keyModifier)
   mKeyModifier = keyModifier;
 }
 
-void KeyEvent::SetNoInterceptModifier(bool noIntercept)
+void KeyEvent::SetInterceptProcessed(bool interceptProcessed)
 {
-  if(noIntercept)
-  {
-    mKeyModifier |= MODIFIER_NO_INTERCEPT;
-  }
-  else
-  {
-    mKeyModifier &= ~MODIFIER_NO_INTERCEPT;
-  }
+  mInterceptProcessed = interceptProcessed;
 }
 
-void KeyEvent::SetTime(unsigned long time)
+void KeyEvent::SetTime(uint32_t time)
 {
   mTime = time;
 }

@@ -26,14 +26,6 @@ namespace Dali
 namespace DevelKeyEvent
 {
 /**
- * @brief Creates an initialized KeyEvent as default.
- *
- * @SINCE_2_2.45
- * @return A handle to a newly allocated Dali resource
- */
-DALI_CORE_API KeyEvent New();
-
-/**
  * @brief Creates an initialized KeyEvent.
  *
  * @SINCE_1_9.27
@@ -53,9 +45,9 @@ DALI_CORE_API KeyEvent New();
 DALI_CORE_API KeyEvent New(const Dali::String&          keyName,
                            const Dali::String&          logicalKey,
                            const Dali::String&          keyString,
-                           int                          keyCode,
-                           int                          keyModifier,
-                           unsigned long                timeStamp,
+                           int32_t                      keyCode,
+                           int32_t                      keyModifier,
+                           uint32_t                     timeStamp,
                            const Dali::KeyEvent::State& keyState,
                            const Dali::String&          compose,
                            const Dali::String&          deviceName,
@@ -63,85 +55,24 @@ DALI_CORE_API KeyEvent New(const Dali::String&          keyName,
                            const Device::Subclass::Type deviceSubclass);
 
 /**
- * @brief Set the name given to the key pressed
+ * @brief Queries whether the key event has already been through the intercept stage.
  *
- * @SINCE_1_9.27
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] keyName The name given to the key pressed.
- */
-DALI_CORE_API void SetKeyName(KeyEvent keyEvent, const Dali::String& keyName);
-
-/**
- * @brief Set the actual string of input characters that should be used for input editors.
- *
- * @SINCE_1_9.27
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] keyString The actual string of input characters
- */
-DALI_CORE_API void SetKeyString(KeyEvent keyEvent, const Dali::String& keyString);
-
-/**
- * @brief Set the unique key code for the key pressed.
- *
- * @SINCE_1_9.27
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] keyCode The unique key code for the key pressed
- */
-DALI_CORE_API void SetKeyCode(KeyEvent keyEvent, int32_t keyCode);
-
-/**
- * @brief Set the key modifier for special keys like Shift, Alt and Ctrl which modify the next key pressed.
- *
- * @SINCE_1_9.27
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] keyModifier The key modifier
- */
-DALI_CORE_API void SetKeyModifier(KeyEvent keyEvent, int32_t keyModifier);
-
-/**
- * @brief Set the no-intercept key modifier.
- *
- * @SINCE_2_3.13
  * @param[in] keyEvent The instance of KeyEvent
- * @param[in] noIntercept The value of the modifier
+ * @return True if the key event has already been through the intercept stage
  */
-DALI_CORE_API void SetNoInterceptModifier(KeyEvent keyEvent, bool noIntercept);
+DALI_CORE_API bool IsInterceptProcessed(const KeyEvent& keyEvent);
 
 /**
- * @brief Set the time (in ms) that the key event occurred.
+ * @brief Marks the key event as having been through the intercept stage.
  *
- * @SINCE_1_9.27
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] time The time (in ms)
- */
-DALI_CORE_API void SetTime(KeyEvent keyEvent, unsigned long time);
-
-/**
- * @brief Set the state of the key event.
+ * Accessibility hands a key event to its remote client and consumes it. If the client
+ * does not consume it, the event is marked and fed back to the window; the mark stops
+ * the intercept stage from running a second time and looping forever.
  *
- * @SINCE_1_9.27
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] state The state of the key event
+ * @param[in] keyEvent The instance of KeyEvent
+ * @param[in] interceptProcessed Whether the key event has been through the intercept stage
  */
-DALI_CORE_API void SetState(KeyEvent keyEvent, const KeyEvent::State& state);
-
-/**
- * @brief Set whether to repeat key event.
- *
- * @SINCE_2_2.44
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] repeat Whether the key event is a repeating key.
- */
-DALI_CORE_API void SetRepeat(KeyEvent keyEvent, const bool repeat);
-
-/**
- * @brief Sets window id where key event occurred.
- *
- * @SINCE_2_3.5
- * @param[in] keyEvent The instance of KeyEvent.
- * @param[in] windowId The window id where key event occurred.
- */
-DALI_CORE_API void SetWindowId(KeyEvent keyEvent, uint32_t windowId);
+DALI_CORE_API void SetInterceptProcessed(KeyEvent keyEvent, bool interceptProcessed);
 
 } // namespace DevelKeyEvent
 

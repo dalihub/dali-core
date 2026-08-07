@@ -625,6 +625,33 @@ int UtcDaliPropertyNotificationOutside(void)
   END_TEST;
 }
 
+int UtcDaliPropertyNotificationBooleanConditions(void)
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliPropertyNotificationBooleanConditions");
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+
+  const Property::Index propertyIndex = actor.RegisterProperty("booleanCondition", false);
+  PropertyNotification  greaterThan   = actor.AddPropertyNotification(propertyIndex, GreaterThanCondition(0.5f));
+  PropertyNotification  inside        = actor.AddPropertyNotification(propertyIndex, InsideCondition(0.5f, 1.5f));
+  PropertyNotification  outside       = actor.AddPropertyNotification(propertyIndex, OutsideCondition(-0.5f, 0.5f));
+
+  Wait(application, DEFAULT_WAIT_PERIOD);
+  DALI_TEST_CHECK(!greaterThan.GetNotifyResult());
+  DALI_TEST_CHECK(!inside.GetNotifyResult());
+  DALI_TEST_CHECK(!outside.GetNotifyResult());
+
+  actor.SetProperty(propertyIndex, true);
+  Wait(application, DEFAULT_WAIT_PERIOD);
+  DALI_TEST_CHECK(greaterThan.GetNotifyResult());
+  DALI_TEST_CHECK(inside.GetNotifyResult());
+  DALI_TEST_CHECK(outside.GetNotifyResult());
+
+  END_TEST;
+}
+
 int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
 {
   TestApplication application;

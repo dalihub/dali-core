@@ -167,10 +167,60 @@ int UtcDaliTouchEventSetTime(void)
   TouchEvent touchEvent = Dali::Integration::NewTouchEvent(123u, GenerateTouchPoint());
   DALI_TEST_CHECK(touchEvent);
 
-  DALI_TEST_EQUALS(123lu, touchEvent.GetTime(), TEST_LOCATION);
+  DALI_TEST_EQUALS(123u, touchEvent.GetTime(), TEST_LOCATION);
 
-  Dali::Integration::SetTouchEventTime(touchEvent, 200lu);
-  DALI_TEST_EQUALS(200lu, touchEvent.GetTime(), TEST_LOCATION);
+  touchEvent.SetTime(200u);
+  DALI_TEST_EQUALS(200u, touchEvent.GetTime(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTouchEventNew(void)
+{
+  TestApplication application;
+
+  TouchEvent touchEvent = TouchEvent::New(123u);
+  DALI_TEST_CHECK(touchEvent);
+
+  DALI_TEST_EQUALS(123u, touchEvent.GetTime(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, touchEvent.GetPointCount(), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliTouchEventAddPoint(void)
+{
+  TestApplication application;
+
+  TouchEvent touchEvent = TouchEvent::New(123u);
+  DALI_TEST_CHECK(touchEvent);
+
+  touchEvent.AddPoint(1, PointState::DOWN, Vector2(10.0f, 20.0f));
+
+  DALI_TEST_EQUALS(1u, touchEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, touchEvent.GetDeviceId(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::DOWN, touchEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(10.0f, 20.0f), touchEvent.GetScreenPosition(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Class::NONE, touchEvent.GetDeviceClass(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Subclass::NONE, touchEvent.GetDeviceSubclass(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(MouseButton::INVALID, touchEvent.GetMouseButton(0), TEST_LOCATION);
+  DALI_TEST_EQUALS("", touchEvent.GetDeviceName(0), TEST_LOCATION);
+
+  // The hit-actor and the local position are filled in when the event is processed
+  DALI_TEST_CHECK(!touchEvent.GetHitActor(0));
+  DALI_TEST_EQUALS(Vector2::ZERO, touchEvent.GetLocalPosition(0), TEST_LOCATION);
+
+  // Add a second point with the device information
+  touchEvent.AddPoint(2, PointState::MOTION, Vector2(30.0f, 40.0f), Device::Class::MOUSE, Device::Subclass::NONE, "mouse-0", MouseButton::SECONDARY);
+
+  DALI_TEST_EQUALS(2u, touchEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, touchEvent.GetDeviceId(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, touchEvent.GetState(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(30.0f, 40.0f), touchEvent.GetScreenPosition(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Class::MOUSE, touchEvent.GetDeviceClass(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Subclass::NONE, touchEvent.GetDeviceSubclass(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(MouseButton::SECONDARY, touchEvent.GetMouseButton(1), TEST_LOCATION);
+  DALI_TEST_EQUALS("mouse-0", touchEvent.GetDeviceName(1), TEST_LOCATION);
 
   END_TEST;
 }

@@ -136,7 +136,7 @@ public:
    */
   void RemoveLifecycleObserver(LifecycleObserver& observer)
   {
-    std::remove(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer);
+    mLifecycleObservers.erase(std::remove(mLifecycleObservers.begin(), mLifecycleObservers.end(), &observer), mLifecycleObservers.end());
   }
 
   /**

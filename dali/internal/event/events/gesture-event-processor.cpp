@@ -361,12 +361,12 @@ void GestureEventProcessor::SetRotationGestureMinimumTouchEventsAfterStart(uint3
   mRotationGestureProcessor.SetMinimumTouchEventsAfterStart(value);
 }
 
-void GestureEventProcessor::SetLongPressMinimumHoldingTime(uint32_t value)
+void GestureEventProcessor::SetLongPressGestureMinimumHoldingTime(uint32_t value)
 {
   mLongPressGestureProcessor.SetMinimumHoldingTime(value);
 }
 
-uint32_t GestureEventProcessor::GetLongPressMinimumHoldingTime() const
+uint32_t GestureEventProcessor::GetLongPressGestureMinimumHoldingTime() const
 {
   return mLongPressGestureProcessor.GetMinimumHoldingTime();
 }
@@ -376,19 +376,34 @@ const PanGestureProcessor& GestureEventProcessor::GetPanGestureProcessor()
   return mPanGestureProcessor;
 }
 
-void GestureEventProcessor::SetTapMaximumAllowedTime(uint32_t time)
+void GestureEventProcessor::SetTapGestureMaximumMultiTapInterval(uint32_t time)
 {
-  mTapGestureProcessor.SetMaximumAllowedTime(time);
+  mTapGestureProcessor.SetMaximumMultiTapInterval(time);
 }
 
-void GestureEventProcessor::SetTapRecognizerTime(uint32_t time)
+uint32_t GestureEventProcessor::GetTapGestureMaximumMultiTapInterval() const
 {
-  mTapGestureProcessor.SetRecognizerTime(time);
+  return mTapGestureProcessor.GetMaximumMultiTapInterval();
 }
 
-void GestureEventProcessor::SetTapMaximumMotionAllowedDistance(float distance)
+void GestureEventProcessor::SetTapGestureMaximumHoldingTime(uint32_t time)
 {
-  mTapGestureProcessor.SetMaximumMotionAllowedDistance(distance);
+  mTapGestureProcessor.SetMaximumHoldingTime(time);
+}
+
+uint32_t GestureEventProcessor::GetTapGestureMaximumHoldingTime() const
+{
+  return mTapGestureProcessor.GetMaximumHoldingTime();
+}
+
+void GestureEventProcessor::SetTapGestureMaximumMotionDistance(float distance)
+{
+  mTapGestureProcessor.SetMaximumMotionDistance(distance);
+}
+
+float GestureEventProcessor::GetTapGestureMaximumMotionDistance() const
+{
+  return mTapGestureProcessor.GetMaximumMotionDistance();
 }
 
 const TapGestureProcessor& GestureEventProcessor::GetTapGestureProcessor()

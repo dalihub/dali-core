@@ -156,21 +156,21 @@ inline Graphics::Viewport ViewportFromClippingBox(const Uint16Pair& sceneSize, C
   {
     if(orientation == 90)
     {
-      viewport.x = sceneSize.GetY() - (clippingBox.y + clippingBox.height);
-      viewport.y = clippingBox.x;
+      viewport.x = sceneSize.GetY() - static_cast<float>(clippingBox.y + clippingBox.height);
+      viewport.y = static_cast<float>(clippingBox.x);
     }
     else // orientation == 270
     {
-      viewport.x = clippingBox.y;
-      viewport.y = sceneSize.GetX() - (clippingBox.x + clippingBox.width);
+      viewport.x = static_cast<float>(clippingBox.y);
+      viewport.y = sceneSize.GetX() - static_cast<float>(clippingBox.x + clippingBox.width);
     }
     viewport.width  = static_cast<float>(clippingBox.height);
     viewport.height = static_cast<float>(clippingBox.width);
   }
   else if(orientation == 180)
   {
-    viewport.x = sceneSize.GetX() - (clippingBox.x + clippingBox.width);
-    viewport.y = sceneSize.GetY() - (clippingBox.y + clippingBox.height);
+    viewport.x = sceneSize.GetX() - static_cast<float>(clippingBox.x + clippingBox.width);
+    viewport.y = sceneSize.GetY() - static_cast<float>(clippingBox.y + clippingBox.height);
   }
   viewport.minDepth = 0;
   viewport.maxDepth = 1;

@@ -58,9 +58,9 @@ public:
   KeyEvent(const Dali::String&          keyName,
            const Dali::String&          logicalKey,
            const Dali::String&          keyString,
-           int                          keyCode,
-           int                          keyModifier,
-           unsigned long                timeStamp,
+           int32_t                      keyCode,
+           int32_t                      keyModifier,
+           uint32_t                     timeStamp,
            const Dali::KeyEvent::State& keyState,
            const Dali::String&          compose,
            const Dali::String&          deviceName,
@@ -92,9 +92,9 @@ public:
   static KeyEventPtr New(const Dali::String&          keyName,
                          const Dali::String&          logicalKey,
                          const Dali::String&          keyString,
-                         int                          keyCode,
-                         int                          keyModifier,
-                         unsigned long                timeStamp,
+                         int32_t                      keyCode,
+                         int32_t                      keyModifier,
+                         uint32_t                     timeStamp,
                          const Dali::KeyEvent::State& keyState,
                          const Dali::String&          compose,
                          const Dali::String&          deviceName,
@@ -117,9 +117,9 @@ public:
   bool IsAltModifier() const;
 
   /**
-   * @copydoc Dali::KeyEvent::IsNoInterceptModifier()
+   * @copydoc Dali::DevelKeyEvent::IsInterceptProcessed()
    */
-  bool IsNoInterceptModifier() const;
+  bool IsInterceptProcessed() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetCompose()
@@ -169,7 +169,7 @@ public:
   /**
    * @copydoc Dali::KeyEvent::GetTime()
    */
-  unsigned long GetTime() const;
+  uint32_t GetTime() const;
 
   /**
    * @copydoc Dali::KeyEvent::GetState()
@@ -192,6 +192,26 @@ public:
   uint32_t GetReceiveTime() const;
 
   /**
+   * @copydoc Dali::KeyEvent::SetCompose()
+   */
+  void SetCompose(const Dali::String& compose);
+
+  /**
+   * @copydoc Dali::KeyEvent::SetDeviceName()
+   */
+  void SetDeviceName(const Dali::String& deviceName);
+
+  /**
+   * @copydoc Dali::KeyEvent::SetDeviceClass()
+   */
+  void SetDeviceClass(Device::Class::Type deviceClass);
+
+  /**
+   * @copydoc Dali::KeyEvent::SetDeviceSubclass()
+   */
+  void SetDeviceSubclass(Device::Subclass::Type deviceSubclass);
+
+  /**
    * @brief Set the name given to the key pressed
    *
    * @param[in] keyName The name given to the key pressed.
@@ -204,6 +224,11 @@ public:
    * @param[in] The actual string of input characters
    */
   void SetKeyString(const Dali::String& keyString);
+
+  /**
+   * @copydoc Dali::KeyEvent::SetLogicalKey()
+   */
+  void SetLogicalKey(const Dali::String& logicalKey);
 
   /**
    * @brief Set the unique key code for the key pressed.
@@ -220,18 +245,16 @@ public:
   void SetKeyModifier(int32_t keyModifier);
 
   /**
-   * @brief Set the no-intercept key modifier.
-   *
-   * @param[in] noIntercept The value of the modifier
+   * @copydoc Dali::DevelKeyEvent::SetInterceptProcessed()
    */
-  void SetNoInterceptModifier(bool noIntercept);
+  void SetInterceptProcessed(bool interceptProcessed);
 
   /**
    * @brief Set the time (in ms) that the key event occurred.
    *
    * @param[in] time The time (in ms)
    */
-  void SetTime(unsigned long time);
+  void SetTime(uint32_t time);
 
   /**
    * @brief Set the state of the key event.
@@ -277,20 +300,21 @@ private:
   KeyEvent& operator=(KeyEvent&& rhs)      = delete; ///< Deleted move assignment operator
 
 private:
-  Dali::String           mKeyName;        ///< The name of the key pressed
-  Dali::String           mLogicalKey;     ///< The logical key symbol
-  Dali::String           mKeyString;      ///< The string of input characters
-  int                    mKeyCode;        ///< TThe unique key code
-  int                    mKeyModifier;    ///< The key modifier
-  unsigned long          mTime;           ///< The time that the key event occurred.
-  Dali::KeyEvent::State  mState;          ///< The state of the key event.
-  Dali::String           mCompose;        ///< The key compose
-  Dali::String           mDeviceName;     ///< The name of device the key event originated from
-  Device::Class::Type    mDeviceClass;    ///< The class of device the key event originated from
-  Device::Subclass::Type mDeviceSubclass; ///< The subclass of device the key event originated from
-  bool                   mIsRepeat;       ///< Whether the key referenced by the event is a repeating key.
-  uint32_t               mWindowId;       ///< The window id where key event occurred.
-  uint32_t               mReceiveTime;    ///< The time when the key event was received.
+  Dali::String           mKeyName;            ///< The name of the key pressed
+  Dali::String           mLogicalKey;         ///< The logical key symbol
+  Dali::String           mKeyString;          ///< The string of input characters
+  Dali::String           mCompose;            ///< The key compose
+  Dali::String           mDeviceName;         ///< The name of device the key event originated from
+  int32_t                mKeyCode;            ///< The unique key code
+  int32_t                mKeyModifier;        ///< The key modifier
+  uint32_t               mTime;               ///< The time (in ms) that the key event occurred.
+  uint32_t               mReceiveTime;        ///< The time when the key event was received.
+  uint32_t               mWindowId;           ///< The window id where key event occurred.
+  Dali::KeyEvent::State  mState;              ///< The state of the key event.
+  Device::Class::Type    mDeviceClass;        ///< The class of device the key event originated from
+  Device::Subclass::Type mDeviceSubclass;     ///< The subclass of device the key event originated from
+  bool                   mIsRepeat;           ///< Whether the key referenced by the event is a repeating key.
+  bool                   mInterceptProcessed; ///< Whether the key event has already been through the intercept stage.
 };
 
 } // namespace Internal

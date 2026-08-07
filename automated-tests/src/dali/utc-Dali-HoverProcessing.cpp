@@ -17,9 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/events/hover-event-devel.h>
 #include <dali/integration-api/events/hover-event-integ.h>
-#include <dali/integration-api/events/touch-integ.h>
 #include <dali/integration-api/render-task-list-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -1549,26 +1547,112 @@ int UtcDaliHoverEventCreate(void)
 {
   TestApplication application;
 
-  Dali::HoverEvent hoverEvent = DevelHoverEvent::New(100);
+  Dali::HoverEvent hoverEvent = Dali::HoverEvent::New(100u);
   DALI_TEST_CHECK(hoverEvent);
 
   // Emit a started signal
-  DALI_TEST_EQUALS(100, hoverEvent.GetTime(), TEST_LOCATION);
-  DALI_TEST_EQUALS(0, hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(100u, hoverEvent.GetTime(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, hoverEvent.GetPointCount(), TEST_LOCATION);
+
+  hoverEvent.SetTime(200u);
+  DALI_TEST_EQUALS(200u, hoverEvent.GetTime(), TEST_LOCATION);
 
   END_TEST;
 }
 
-int UtcDaliHoverEventIntegNewHoverEvent(void)
+int UtcDaliHoverEventAddPoint(void)
 {
-  uint32_t         timestamp = 92858u;
-  TouchPoint       tp(1, PointState::STARTED, 34.4f, 123.89f, 5.0f, 7.0f);
-  Dali::HoverEvent hoverEvent = Dali::Integration::NewHoverEvent(timestamp, tp);
+  TestApplication application;
 
-  DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 1u, TEST_LOCATION);
-  DALI_TEST_EQUALS(hoverEvent.GetState(0), PointState::STARTED, TEST_LOCATION);
-  DALI_TEST_EQUALS(hoverEvent.GetLocalPosition(0), Vector2(5.0f, 7.0f), TEST_LOCATION);
-  DALI_TEST_EQUALS(hoverEvent.GetScreenPosition(0), Vector2(34.4f, 123.89f), TEST_LOCATION);
+  Dali::HoverEvent hoverEvent = Dali::HoverEvent::New(100u);
+  DALI_TEST_CHECK(hoverEvent);
+
+  hoverEvent.AddPoint(1, PointState::STARTED, Vector2(10.0f, 20.0f));
+
+  DALI_TEST_EQUALS(1u, hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1, hoverEvent.GetDeviceId(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::STARTED, hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(10.0f, 20.0f), hoverEvent.GetScreenPosition(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Class::NONE, hoverEvent.GetDeviceClass(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Subclass::NONE, hoverEvent.GetDeviceSubclass(0), TEST_LOCATION);
+  DALI_TEST_EQUALS("", hoverEvent.GetDeviceName(0), TEST_LOCATION);
+
+  // The hit-actor and the local position are filled in when the event is processed
+  DALI_TEST_CHECK(!hoverEvent.GetHitActor(0));
+  DALI_TEST_EQUALS(Vector2::ZERO, hoverEvent.GetLocalPosition(0), TEST_LOCATION);
+
+  // Add a second point with the device information
+  hoverEvent.AddPoint(2, PointState::MOTION, Vector2(30.0f, 40.0f), Device::Class::MOUSE, Device::Subclass::NONE, "mouse-0");
+
+  DALI_TEST_EQUALS(2u, hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2, hoverEvent.GetDeviceId(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, hoverEvent.GetState(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector2(30.0f, 40.0f), hoverEvent.GetScreenPosition(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Class::MOUSE, hoverEvent.GetDeviceClass(1), TEST_LOCATION);
+  DALI_TEST_EQUALS(Device::Subclass::NONE, hoverEvent.GetDeviceSubclass(1), TEST_LOCATION);
+  DALI_TEST_EQUALS("mouse-0", hoverEvent.GetDeviceName(1), TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliIntegrationHoverEventFromHandle(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  application.SendNotification();
+  application.Render();
+
+  SignalData        data;
+  HoverEventFunctor functor(data);
+  actor.HoverEventSignal().Connect(&application, functor);
+
+  // Feeding an application created event back into the core goes through this conversion,
+  // so the time and every point of it has to survive.
+  Dali::HoverEvent handle = Dali::HoverEvent::New(132u);
+  handle.AddPoint(1, PointState::STARTED, Vector2(10.0f, 20.0f));
+  handle.AddPoint(2, PointState::MOTION, Vector2(30.0f, 40.0f), Device::Class::MOUSE, Device::Subclass::FINGER, "mouse-0");
+
+  Dali::Integration::HoverEvent hoverEvent(handle);
+
+  DALI_TEST_EQUALS(hoverEvent.type, Dali::Integration::Event::Hover, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverEvent.time, 132u, TEST_LOCATION);
+  DALI_TEST_EQUALS(hoverEvent.GetPointCount(), 2u, TEST_LOCATION);
+
+  const Integration::Point& firstPoint = hoverEvent.GetPoint(0);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceId(), 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetState(), PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetScreenPosition(), Vector2(10.0f, 20.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceClass(), Device::Class::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceSubclass(), Device::Subclass::NONE, TEST_LOCATION);
+  DALI_TEST_EQUALS(firstPoint.GetDeviceName(), "", TEST_LOCATION);
+
+  const Integration::Point& secondPoint = hoverEvent.GetPoint(1);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceId(), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetState(), PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetScreenPosition(), Vector2(30.0f, 40.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceClass(), Device::Class::MOUSE, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceSubclass(), Device::Subclass::FINGER, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondPoint.GetDeviceName(), "mouse-0", TEST_LOCATION);
+
+  // The converted event must be processable by the core, this is what feeding it does
+  application.ProcessEvent(hoverEvent);
+
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(132u, data.hoverEvent.GetTime(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, data.hoverEvent.GetPointCount(), TEST_LOCATION);
+  DALI_TEST_CHECK(data.hoverEvent.GetHitActor(0) == actor);
+  DALI_TEST_EQUALS(Vector2(10.0f, 20.0f), data.hoverEvent.GetLocalPosition(0), 0.1f, TEST_LOCATION);
+  data.Reset();
+
+  // An event with no points must convert to an event with no points, not to stale values.
+  Dali::Integration::HoverEvent emptyEvent(Dali::HoverEvent::New(0u));
+  DALI_TEST_EQUALS(emptyEvent.time, 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(emptyEvent.GetPointCount(), 0u, TEST_LOCATION);
 
   END_TEST;
 }

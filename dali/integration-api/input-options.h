@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_INPUT_OPTIONS_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,28 @@ namespace Dali
 {
 namespace Integration
 {
+/**
+ * @brief The default minimum holding time required to be recognized as a long press gesture (millisecond)
+ */
+constexpr uint32_t DEFAULT_LONG_PRESS_GESTURE_MINIMUM_HOLDING_TIME = 500u;
+
+/**
+ * @brief The default maximum interval allowed between the taps of a multi tap gesture (millisecond)
+ */
+constexpr uint32_t DEFAULT_TAP_GESTURE_MAXIMUM_MULTI_TAP_INTERVAL = 330u;
+
+/**
+ * @brief The default maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
+ */
+constexpr uint32_t DEFAULT_TAP_GESTURE_MAXIMUM_HOLDING_TIME = 330u;
+
+/**
+ * @brief The default maximum distance the touch point can move while still being recognized as a tap gesture (pixel)
+ *
+ * @todo Set this according to DPI
+ */
+constexpr float DEFAULT_TAP_GESTURE_MAXIMUM_MOTION_DISTANCE = 20.0f;
+
 /**
  * @brief Called by adaptor to set the pan gesture prediction mode from
  * an environment variable
@@ -192,57 +214,88 @@ DALI_CORE_API void SetRotationGestureMinimumTouchEvents(uint32_t value);
 DALI_CORE_API void SetRotationGestureMinimumTouchEventsAfterStart(uint32_t value);
 
 /**
- * @brief Sets the minimum holding time required to be recognized as a long press gesture
- *
- * @param[in] value The time value in milliseconds
- */
-DALI_CORE_API void SetLongPressMinimumHoldingTime(unsigned int value);
-
-/**
- * @brief Sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
- *
- * This is the maximum allowable time interval to recognize as multi-tap.
- * If taps come in within this time, they are recognized as multi-tap.
- *
- * @note If it's a double tap, it's like this:
- * |(touch down <--recognizerTime--> touch up) <--  wihtin maximumAllowedTime --> (touch down <--recognizerTime--> touch up)|
- *
- * @see SetTapRecognizerTime()
+ * @brief Sets the minimum holding time required to be recognized as a long press gesture (millisecond)
  *
  * @param[in] time The time value in milliseconds
+ * @note The value must be greater than 0, otherwise it is ignored.
  */
-DALI_CORE_API void SetTapMaximumAllowedTime(uint32_t time);
+DALI_CORE_API void SetLongPressGestureMinimumHoldingTime(uint32_t time);
 
 /**
- * @brief Sets the recognizer time required to be recognized as a tap gesture (millisecond)
+ * @brief Retrieves the minimum holding time required to be recognized as a long press gesture (millisecond)
+ *
+ * @return The time value in milliseconds
+ */
+DALI_CORE_API uint32_t GetLongPressGestureMinimumHoldingTime();
+
+/**
+ * @brief Sets the maximum interval allowed between the taps of a multi tap gesture (millisecond)
+ *
+ * If the next tap starts within this interval, the taps are recognized as a multi-tap.
+ * Otherwise, they are recognized as separate single taps.
+ *
+ * @note If it's a double tap, it's like this:
+ * |(touch down <--maximumHoldingTime--> touch up) <-- within maximumMultiTapInterval --> (touch down <--maximumHoldingTime--> touch up)|
+ *
+ * @see SetTapGestureMaximumHoldingTime()
+ *
+ * @param[in] interval The interval in milliseconds
+ * @note The value must be greater than 0, otherwise it is ignored.
+ */
+DALI_CORE_API void SetTapGestureMaximumMultiTapInterval(uint32_t interval);
+
+/**
+ * @brief Retrieves the maximum interval allowed between the taps of a multi tap gesture (millisecond)
+ *
+ * @return The interval in milliseconds
+ */
+DALI_CORE_API uint32_t GetTapGestureMaximumMultiTapInterval();
+
+/**
+ * @brief Sets the maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
  *
  * This time is from touch down to touch up to recognize the tap gesture.
  *
- * @note The tab is like below:
- * touch down <--recognizerTime--> touch up
- * If the time between touch down and touch up is longer than recognizer time, it is not recognized as a tap gesture.
+ * @note The tap is like below:
+ * touch down <--maximumHoldingTime--> touch up
+ * If the time between touch down and touch up is longer than this time, it is not recognized as a tap gesture.
  *
- * @see SetTapMaximumAllowedTime()
+ * @see SetTapGestureMaximumMultiTapInterval()
  *
  * @param[in] time The time value in milliseconds
+ * @note The value must be greater than 0, otherwise it is ignored.
  */
-DALI_CORE_API void SetTapRecognizerTime(uint32_t time);
+DALI_CORE_API void SetTapGestureMaximumHoldingTime(uint32_t time);
 
 /**
- * @brief Sets the recognizer distance required to be recognized as a tap gesture
+ * @brief Retrieves the maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
+ *
+ * @return The time value in milliseconds
+ */
+DALI_CORE_API uint32_t GetTapGestureMaximumHoldingTime();
+
+/**
+ * @brief Sets the maximum distance the touch point can move while still being recognized as a tap gesture
  *
  * This distance is from touch down to touch up to recognize the tap gesture.
  *
- * @note The tab is like below:
- * touch down <--distance--> touch up
- * If the distance between touch down and touch up is longer than distance, it is not recognized as a tap gesture.
- * Default value is 20
+ * @note The tap is like below:
+ * touch down <--maximumMotionDistance--> touch up
+ * If the touch point moves further than this distance, it is not recognized as a tap gesture.
  *
- * @see SetTapMaximumMotionAllowedDistance()
+ * @see DEFAULT_TAP_GESTURE_MAXIMUM_MOTION_DISTANCE
  *
- * @param[in] distance The distance
+ * @param[in] distance The distance in pixels
+ * @note A negative value is ignored.
  */
-DALI_CORE_API void SetTapMaximumMotionAllowedDistance(float distance);
+DALI_CORE_API void SetTapGestureMaximumMotionDistance(float distance);
+
+/**
+ * @brief Retrieves the maximum distance the touch point can move while still being recognized as a tap gesture
+ *
+ * @return The distance in pixels
+ */
+DALI_CORE_API float GetTapGestureMaximumMotionDistance();
 
 } // namespace Integration
 

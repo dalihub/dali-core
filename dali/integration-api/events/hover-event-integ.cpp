@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/hover-event-integ.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/event/events/hover-event-impl.h>
+
 namespace Dali
 {
 namespace Integration
@@ -30,6 +33,19 @@ HoverEvent::HoverEvent()
 HoverEvent::HoverEvent(uint32_t time)
 : MultiPointEvent(Hover, time)
 {
+}
+
+HoverEvent::HoverEvent(const Dali::HoverEvent& hoverEvent)
+: MultiPointEvent(Hover, GetImplementation(hoverEvent).GetTime())
+{
+  const Internal::HoverEvent& impl       = GetImplementation(hoverEvent);
+  const uint32_t              pointCount = impl.GetPointCount();
+  points.reserve(pointCount);
+
+  for(uint32_t i = 0; i < pointCount; ++i)
+  {
+    AddPoint(impl.GetPoint(i));
+  }
 }
 
 HoverEvent::HoverEvent(const HoverEvent& rhs)

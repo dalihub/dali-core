@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <atomic>
+
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/message.h>
@@ -446,6 +449,10 @@ public:
    */
   void SetParentOrigin(const Vector3& origin)
   {
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    {
+      return; // Will be set correctly when Node is fully initialized
+    }
     mParentOrigin.Set(origin);
   }
 
@@ -469,6 +476,10 @@ public:
    */
   void SetPivot(const Vector3& anchor)
   {
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    {
+      return; // Will be set correctly when Node is fully initialized
+    }
     mPivot.Set(anchor);
   }
 
@@ -505,10 +516,11 @@ public:
    */
   void SetInheritPosition(bool inherit)
   {
-    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      mTransformManagerData.Manager()->SetInheritPosition(mTransformManagerData.Id(), inherit);
+      return; // Will be set correctly when Node is fully initialized
     }
+    mTransformManagerData.Manager()->SetInheritPosition(mTransformManagerData.Id(), inherit);
   }
 
   /**
@@ -544,10 +556,11 @@ public:
    */
   void SetInheritOrientation(bool inherit)
   {
-    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      mTransformManagerData.Manager()->SetInheritOrientation(mTransformManagerData.Id(), inherit);
+      return; // Will be set correctly when Node is fully initialized
     }
+    mTransformManagerData.Manager()->SetInheritOrientation(mTransformManagerData.Id(), inherit);
   }
 
   /**
@@ -583,10 +596,11 @@ public:
    */
   void SetInheritScale(bool inherit)
   {
-    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      mTransformManagerData.Manager()->SetInheritScale(mTransformManagerData.Id(), inherit);
+      return; // Will be set correctly when Node is fully initialized
     }
+    mTransformManagerData.Manager()->SetInheritScale(mTransformManagerData.Id(), inherit);
   }
 
   /**
@@ -804,11 +818,12 @@ public:
    */
   void SetIgnored(const bool ignored)
   {
-    if(DALI_LIKELY(TransformManager::IsValidTransformId(mTransformManagerData.Id())))
+    if(DALI_UNLIKELY(!TransformManager::IsValidTransformId(mTransformManagerData.Id())))
     {
-      SetAllDirtyFlags(); // TODO : Should we reset dirty flag more good way?
-      mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), ignored);
+      return; // Will be set correctly when Node is fully initialized
     }
+    SetAllDirtyFlags(); // TODO : Should we reset dirty flag more good way?
+    mTransformManagerData.Manager()->SetIgnored(mTransformManagerData.Id(), ignored);
   }
 
   /**
@@ -872,7 +887,7 @@ public:
    */
   uint32_t GetExclusiveRenderTaskCount()
   {
-    return mExclusiveRenderTasks.size();
+    return static_cast<uint32_t>(mExclusiveRenderTasks.size());
   }
 
   /**
@@ -1100,6 +1115,15 @@ protected:
    */
   void SetParent(Node& parentNode);
 
+  /**
+   * @brief Check if the node is valid for message processing.
+   * @return True if the node is valid and safe to process messages.
+   */
+  bool IsValid() const
+  {
+    return mValid.load(std::memory_order_acquire);
+  }
+
 protected:
   /**
    * Protected constructor; See also Node::New()
@@ -1202,6 +1226,8 @@ protected:
   uint32_t mClippingDepth; ///< The number of stencil clipping nodes deep this node is
   uint32_t mScissorDepth;  ///< The number of scissor clipping nodes deep this node is
   uint32_t mDepthIndex;    ///< Depth index of the node
+
+  std::atomic<bool> mValid{true}; ///< True if the node is valid and can process messages. Set to false during teardown. Uses atomic for cross-thread visibility.
 
   // flags, compressed to bitfield
   NodePropertyFlags  mDirtyFlags;               ///< Dirty flags for each of the Node properties

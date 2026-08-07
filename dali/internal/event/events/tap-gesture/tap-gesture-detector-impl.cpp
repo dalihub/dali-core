@@ -211,7 +211,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Dal
       else
       {
         mTappedActor = tappedActor;
-        mWaitTime    = mGestureEventProcessor.GetTapGestureProcessor().GetMaximumAllowedTime();
+        mWaitTime    = mGestureEventProcessor.GetTapGestureProcessor().GetMaximumMultiTapInterval();
         mTimerId     = platformAbstraction.StartTimer(mWaitTime, MakeCallback(this, &TapGestureDetector::TimerCallback));
       }
     }
@@ -302,11 +302,11 @@ void TapGestureDetector::ProcessTouchEvent(Scene& scene, const Integration::Touc
     Size                       size                 = scene.GetSize();
     const TapGestureProcessor& mTapGestureProcessor = mGestureEventProcessor.GetTapGestureProcessor();
 
-    uint32_t maximumAllowedTime           = mTapGestureProcessor.GetMaximumAllowedTime();
-    uint32_t recognizerTime               = mTapGestureProcessor.GetRecognizerTime();
-    float    maximumMotionAllowedDistance = mTapGestureProcessor.GetMaximumMotionAllowedDistance();
+    uint32_t maximumMultiTapInterval = mTapGestureProcessor.GetMaximumMultiTapInterval();
+    uint32_t maximumHoldingTime      = mTapGestureProcessor.GetMaximumHoldingTime();
+    float    maximumMotionDistance   = mTapGestureProcessor.GetMaximumMotionDistance();
 
-    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), maximumAllowedTime, recognizerTime, maximumMotionAllowedDistance);
+    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), maximumMultiTapInterval, maximumHoldingTime, maximumMotionDistance);
   }
   mGestureRecognizer->SendEvent(scene, event);
 }

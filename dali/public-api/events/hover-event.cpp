@@ -19,11 +19,19 @@
 #include <dali/public-api/events/hover-event.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/events/point.h>
 #include <dali/internal/event/events/hover-event-impl.h>
 #include <dali/public-api/actors/actor.h>
 
 namespace Dali
 {
+HoverEvent HoverEvent::New(uint32_t time)
+{
+  Internal::HoverEventPtr internal(new Internal::HoverEvent(time));
+
+  return HoverEvent(internal.Get());
+}
+
 HoverEvent::HoverEvent()
 : BaseHandle()
 {
@@ -39,7 +47,7 @@ HoverEvent& HoverEvent::operator=(const HoverEvent& rhs) = default;
 
 HoverEvent& HoverEvent::operator=(HoverEvent&& rhs) noexcept = default;
 
-unsigned long HoverEvent::GetTime() const
+uint32_t HoverEvent::GetTime() const
 {
   return GetImplementation(*this).GetTime();
 }
@@ -87,6 +95,31 @@ Device::Subclass::Type HoverEvent::GetDeviceSubclass(uint32_t point) const
 const Dali::String& HoverEvent::GetDeviceName(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceName(point);
+}
+
+void HoverEvent::SetTime(uint32_t time)
+{
+  GetImplementation(*this).SetTime(time);
+}
+
+void HoverEvent::AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition)
+{
+  AddPoint(deviceId, state, screenPosition, Device::Class::NONE, Device::Subclass::NONE, Dali::String());
+}
+
+void HoverEvent::AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName)
+{
+  Integration::Point point;
+  point.SetDeviceId(deviceId);
+  point.SetState(state);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(deviceClass);
+  point.SetDeviceSubclass(deviceSubclass);
+
+  Dali::String name(deviceName);
+  point.SetDeviceName(name);
+
+  GetImplementation(*this).AddPoint(point);
 }
 
 HoverEvent::HoverEvent(Internal::HoverEvent* internal)

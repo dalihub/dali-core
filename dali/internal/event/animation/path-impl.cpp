@@ -97,7 +97,7 @@ Property::Value Path::GetDefaultProperty(Property::Index index) const
   {
     Property::Value           value(Property::ARRAY);
     Property::Array*          array      = value.GetArray();
-    Property::Array::SizeType pointCount = mPoint.Count();
+    Property::Array::SizeType pointCount = static_cast<Property::Array::SizeType>(mPoint.Count());
 
     if(array)
     {
@@ -113,7 +113,7 @@ Property::Value Path::GetDefaultProperty(Property::Index index) const
   {
     Property::Value           value(Property::ARRAY);
     Property::Array*          array             = value.GetArray();
-    Property::Array::SizeType controlpointCount = mControlPoint.Count();
+    Property::Array::SizeType controlpointCount = static_cast<Property::Array::SizeType>(mControlPoint.Count());
 
     if(array)
     {

@@ -179,7 +179,7 @@ public:
    */
   uint8_t GetColorAttachmentCount() const
   {
-    return mCreateInfo.colorAttachments.size();
+    return static_cast<uint8_t>(mCreateInfo.colorAttachments.size());
   }
 
   Graphics::Framebuffer* GetGraphicsObject()

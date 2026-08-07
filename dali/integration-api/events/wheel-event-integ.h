@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_WHEEL_EVENT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/math/vector2.h>
 
 namespace Dali
@@ -62,6 +63,15 @@ struct DALI_CORE_API WheelEvent : public Event
    * @param[in]  timeStamp  The time the wheel is being rolled.
    */
   WheelEvent(Type type, int direction, unsigned int modifiers, Vector2 point, int delta, unsigned int timeStamp);
+
+  /**
+   * Constructor which creates a WheelEvent instance from a Dali::WheelEvent.
+   *
+   * This can be used to convert a wheel event received from DALi, or created by an
+   * application, back into an event that can be fed to the core.
+   * @param[in]  wheelEvent  The wheel event to copy from.
+   */
+  explicit WheelEvent(const Dali::WheelEvent& wheelEvent);
 
   /**
    * Copy constructor.

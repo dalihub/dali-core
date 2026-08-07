@@ -818,6 +818,12 @@ void UpdateManager::AddRenderer(OwnerKeyType<Renderer>& rendererKeyPointer)
   RendererKey           rendererKey = rendererKeyPointer.Release();
   SceneGraph::Renderer* renderer    = rendererKey.Get();
 
+  // Skip if renderer is null
+  if(!renderer)
+  {
+    return;
+  }
+
   DALI_LOG_INFO(gLogFilter, Debug::General, "[%x] AddRenderer\n", renderer);
 
   renderer->ConnectToSceneGraph(mImpl->renderManagerDispatcher);
@@ -1169,7 +1175,7 @@ void UpdateManager::UpdateRenderers(PropertyOwnerContainer& postPropertyOwners)
           ++iter;
         }
       }
-      mImpl->activatedRendererCount = mImpl->renderers.Count();
+      mImpl->activatedRendererCount = static_cast<uint32_t>(mImpl->renderers.Count());
 
       while(!deactivatedRenderers.Empty())
       {

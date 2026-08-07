@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/integration-api/events/touch-event-integ.h>
 
+// INTERNAL INCLUDES
+#include <dali/internal/event/events/touch-event-impl.h>
+
 namespace Dali
 {
 namespace Integration
@@ -30,6 +33,19 @@ TouchEvent::TouchEvent()
 TouchEvent::TouchEvent(uint32_t time)
 : MultiPointEvent(Touch, time)
 {
+}
+
+TouchEvent::TouchEvent(const Dali::TouchEvent& touchEvent)
+: MultiPointEvent(Touch, GetImplementation(touchEvent).GetTime())
+{
+  const Internal::TouchEvent& impl       = GetImplementation(touchEvent);
+  const uint32_t              pointCount = impl.GetPointCount();
+  points.reserve(pointCount);
+
+  for(uint32_t i = 0; i < pointCount; ++i)
+  {
+    AddPoint(impl.GetPoint(i));
+  }
 }
 
 TouchEvent::TouchEvent(const TouchEvent& rhs)

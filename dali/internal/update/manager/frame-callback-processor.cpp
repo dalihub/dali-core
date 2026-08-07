@@ -115,7 +115,7 @@ void FrameCallbackProcessor::NotifyFrameCallback(FrameCallbackInterface* frameCa
 
 bool FrameCallbackProcessor::Update(float elapsedSeconds)
 {
-  bool keepRendering = false;
+  uint32_t keepRenderingRequests = 0u;
 
   if(mNodeHierarchyChanged && !mRootNodeTravelerMap.empty())
   {
@@ -173,7 +173,7 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
         frameCallbackTimeChecker.emplace_back(end - start, ++frameIndex);
       }
 #endif
-      keepRendering |= (requests & FrameCallback::KEEP_RENDERING);
+      keepRenderingRequests |= static_cast<uint32_t>(requests & FrameCallback::KEEP_RENDERING);
       return (requests & FrameCallback::CONTINUE_CALLING) == 0; });
     mFrameCallbacks.erase(iter, mFrameCallbacks.end());
 
@@ -198,7 +198,7 @@ bool FrameCallbackProcessor::Update(float elapsedSeconds)
 
   mNodeHierarchyChanged = false;
 
-  return keepRendering;
+  return keepRenderingRequests != 0u;
 }
 
 SceneGraphTravelerPtr FrameCallbackProcessor::GetSceneGraphTraveler(Node* rootNode)

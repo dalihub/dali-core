@@ -17,7 +17,6 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
-#include <dali/devel-api/events/wheel-event-devel.h>
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/public-api/dali-core.h>
 #include <stdlib.h>
@@ -83,7 +82,7 @@ int UtcDaliWheelEventConstructor(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
 
   DALI_TEST_EQUALS(Dali::WheelEvent::MOUSE_WHEEL, event.GetType(), TEST_LOCATION); // check type
@@ -100,7 +99,7 @@ int UtcDaliWheelEventIsShiftModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
 
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetModifiers(), TEST_LOCATION);
@@ -115,7 +114,7 @@ int UtcDaliWheelEventIsCtrlModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
 
   DALI_TEST_EQUALS(CTRL_MODIFIER, event.GetModifiers(), TEST_LOCATION);
@@ -129,7 +128,7 @@ int UtcDaliWheelEventIsAltModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, ALT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, ALT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
 
   DALI_TEST_EQUALS(ALT_MODIFIER, event.GetModifiers(), TEST_LOCATION);
@@ -143,7 +142,7 @@ int UtcDaliWheelEventIsNotShiftModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
 
   DALI_TEST_EQUALS(CTRL_MODIFIER, event.GetModifiers(), TEST_LOCATION); // check different modifier used
@@ -157,7 +156,7 @@ int UtcDaliWheelEventIsNotCtrlModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, ALT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, ALT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
 
   DALI_TEST_EQUALS(ALT_MODIFIER, event.GetModifiers(), TEST_LOCATION); // check different modifier used
@@ -171,7 +170,7 @@ int UtcDaliWheelEventIsNotAltModifier(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
 
   DALI_TEST_EQUALS(SHIFT_MODIFIER, event.GetModifiers(), TEST_LOCATION); // check different modifier used
@@ -185,11 +184,11 @@ int UtcDaliWheelEventANDModifer(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
   DALI_TEST_EQUALS(true, event.IsCtrlModifier() && event.IsShiftModifier(), TEST_LOCATION);
 
-  Dali::WheelEvent newEvent = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent newEvent = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_EQUALS(false, newEvent.IsCtrlModifier() && newEvent.IsShiftModifier(), TEST_LOCATION);
   END_TEST;
 }
@@ -199,11 +198,11 @@ int UtcDaliWheelEventORModifer(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Dali::WheelEvent event = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent event = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_AND_CTRL_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_CHECK(event);
   DALI_TEST_EQUALS(true, event.IsCtrlModifier() || event.IsAltModifier(), TEST_LOCATION);
 
-  Dali::WheelEvent newEvent = DevelWheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
+  Dali::WheelEvent newEvent = Dali::WheelEvent::New(Dali::WheelEvent::MOUSE_WHEEL, 1, SHIFT_MODIFIER, Vector2(1.0f, 1.0f), 1, 1000u);
   DALI_TEST_EQUALS(false, newEvent.IsCtrlModifier() && newEvent.IsAltModifier(), TEST_LOCATION);
   END_TEST;
 }
@@ -342,5 +341,26 @@ int UtcDaliWheelEventIntercept(void)
   application.ProcessEvent(event);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
+  END_TEST;
+}
+
+int UtcDaliIntegrationWheelEventFromHandle(void)
+{
+  TestApplication application;
+
+  // Feeding an event back into the core goes through this conversion, so every field has to
+  // survive it. A field missed here is silently dropped on the way back in.
+  Dali::WheelEvent handle = Dali::WheelEvent::New(Dali::WheelEvent::CUSTOM_WHEEL, 1, SHIFT_MODIFIER, Vector2(2.0f, 3.0f), -1, 1000u);
+
+  Dali::Integration::WheelEvent wheelEvent(handle);
+
+  DALI_TEST_EQUALS(wheelEvent.Event::type, Dali::Integration::Event::Wheel, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelEvent.type, Dali::Integration::WheelEvent::CUSTOM_WHEEL, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelEvent.direction, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelEvent.modifiers, SHIFT_MODIFIER, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelEvent.point, Vector2(2.0f, 3.0f), TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelEvent.delta, -1, TEST_LOCATION);
+  DALI_TEST_EQUALS(wheelEvent.timeStamp, 1000u, TEST_LOCATION);
+
   END_TEST;
 }

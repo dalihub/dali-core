@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace Dali
 namespace Internal
 {
 
-TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime, uint32_t recognizerTime, float maximumMotionAllowedDistance)
+TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumMultiTapInterval, uint32_t maximumHoldingTime, float maximumMotionDistance)
 : GestureRecognizer(screenSize, GestureType::TAP),
   mObserver(observer),
   mState(CLEAR),
@@ -44,9 +44,9 @@ TapGestureRecognizer::TapGestureRecognizer(Observer& observer, Vector2 screenSiz
   mTouchTime(0u),
   mLastTapTime(0u),
   mDeltaBetweenTouchDownTouchUp(0u),
-  mMaximumAllowedTime(maximumAllowedTime),
-  mRecognizerTime(recognizerTime),
-  mMaximumMotionAllowedDistance(maximumMotionAllowedDistance)
+  mMaximumMultiTapInterval(maximumMultiTapInterval),
+  mMaximumHoldingTime(maximumHoldingTime),
+  mMaximumMotionDistance(maximumMotionDistance)
 {
 }
 
@@ -76,7 +76,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         if(pointState == PointState::UP)
         {
           mDeltaBetweenTouchDownTouchUp = event.time - mTouchTime;
-          if(mDeltaBetweenTouchDownTouchUp < mRecognizerTime)
+          if(mDeltaBetweenTouchDownTouchUp < mMaximumHoldingTime)
           {
             EmitSingleTap(event.time, point);
             mState = REGISTERED;
@@ -84,7 +84,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           else // Clear if the time between touch down and touch up is long.
           {
             mState = CLEAR;
-            DALI_LOG_RELEASE_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mRecognizerTime);
+            DALI_LOG_RELEASE_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mMaximumHoldingTime);
           }
         }
         else if(pointState == PointState::INTERRUPTED)
@@ -99,16 +99,16 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
         if(pointState == PointState::UP)
         {
           mDeltaBetweenTouchDownTouchUp = event.time - mTouchTime;
-          if(mDeltaBetweenTouchDownTouchUp < mRecognizerTime)
+          if(mDeltaBetweenTouchDownTouchUp < mMaximumHoldingTime)
           {
             const Vector2& screen(point.GetScreenPosition());
             Vector2        distanceDelta(std::abs(mTouchPosition.x - screen.x),
                                          std::abs(mTouchPosition.y - screen.y));
-            if(distanceDelta.x > mMaximumMotionAllowedDistance ||
-               distanceDelta.y > mMaximumMotionAllowedDistance)
+            if(distanceDelta.x > mMaximumMotionDistance ||
+               distanceDelta.y > mMaximumMotionDistance)
             {
               mState = CLEAR;
-              DALI_LOG_RELEASE_INFO("There is a long distance between touch down and touch up. (%f or %f > %f)\n", distanceDelta.x, distanceDelta.y, mMaximumMotionAllowedDistance);
+              DALI_LOG_RELEASE_INFO("There is a long distance between touch down and touch up. (%f or %f > %f)\n", distanceDelta.x, distanceDelta.y, mMaximumMotionDistance);
             }
             else
             {
@@ -118,7 +118,7 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           else // Clear if the time between touch down and touch up is long.
           {
             mState = CLEAR;
-            DALI_LOG_RELEASE_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mRecognizerTime);
+            DALI_LOG_RELEASE_INFO("time between touch down and touch up is long. (%dms > %dms)\n", mDeltaBetweenTouchDownTouchUp, mMaximumHoldingTime);
           }
         }
         else if(pointState == PointState::DOWN)
@@ -130,9 +130,9 @@ void TapGestureRecognizer::SendEvent(const Integration::TouchEvent& event)
           uint32_t timeDelta = event.time - mLastTapTime;
           mTouchTime         = event.time;
 
-          if(distanceDelta.x > mMaximumMotionAllowedDistance ||
-             distanceDelta.y > mMaximumMotionAllowedDistance ||
-             timeDelta > mMaximumAllowedTime) // If the time between tabs is long, it starts over from SetupForTouchDown.
+          if(distanceDelta.x > mMaximumMotionDistance ||
+             distanceDelta.y > mMaximumMotionDistance ||
+             timeDelta > mMaximumMultiTapInterval) // If the time between tabs is long, it starts over from SetupForTouchDown.
           {
             SetupForTouchDown(event, point);
           }
@@ -191,8 +191,8 @@ void TapGestureRecognizer::EmitPossibleState(const Integration::TouchEvent& even
 
 bool TapGestureRecognizer::UpdateCurrentActor()
 {
-  Dali::Actor currentActor = GetCurrentGesturedActor();
-  Actor* currentInternalActor = currentActor ? &GetImplementation(currentActor) : nullptr;
+  Dali::Actor currentActor         = GetCurrentGesturedActor();
+  Actor*      currentInternalActor = currentActor ? &GetImplementation(currentActor) : nullptr;
 
   if(currentInternalActor != mCurrentActor.GetActor())
   {
@@ -208,19 +208,19 @@ void TapGestureRecognizer::Update(const GestureRequest& request)
   // Nothing to do.
 }
 
-void TapGestureRecognizer::SetMaximumAllowedTime(uint32_t time)
+void TapGestureRecognizer::SetMaximumMultiTapInterval(uint32_t time)
 {
-  mMaximumAllowedTime = time;
+  mMaximumMultiTapInterval = time;
 }
 
-void TapGestureRecognizer::SetRecognizerTime(uint32_t time)
+void TapGestureRecognizer::SetMaximumHoldingTime(uint32_t time)
 {
-  mRecognizerTime = time;
+  mMaximumHoldingTime = time;
 }
 
-void TapGestureRecognizer::SetMaximumMotionAllowedDistance(float distance)
+void TapGestureRecognizer::SetMaximumMotionDistance(float distance)
 {
-  mMaximumMotionAllowedDistance = distance;
+  mMaximumMotionDistance = distance;
 }
 
 void TapGestureRecognizer::EmitGesture(GestureState state, uint32_t time)
@@ -236,11 +236,11 @@ void TapGestureRecognizer::EmitSingleTap(uint32_t time, const Integration::Point
   Vector2         distanceDelta(std::abs(mTouchPosition.x - screen.x),
                                 std::abs(mTouchPosition.y - screen.y));
 
-  if(distanceDelta.x > mMaximumMotionAllowedDistance ||
-     distanceDelta.y > mMaximumMotionAllowedDistance)
+  if(distanceDelta.x > mMaximumMotionDistance ||
+     distanceDelta.y > mMaximumMotionDistance)
   {
     event.state = GestureState::CANCELLED;
-    DALI_LOG_RELEASE_INFO("There is a long distance between touch down and touch up. (%f or %f > %f)\n", distanceDelta.x, distanceDelta.y, mMaximumMotionAllowedDistance);
+    DALI_LOG_RELEASE_INFO("There is a long distance between touch down and touch up. (%f or %f > %f)\n", distanceDelta.x, distanceDelta.y, mMaximumMotionDistance);
   }
   EmitTap(time, event);
 }

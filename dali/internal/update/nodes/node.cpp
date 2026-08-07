@@ -142,6 +142,10 @@ Node::~Node()
 
 void Node::OnDestroy()
 {
+  // Mark node as invalid so pending messages will skip processing
+  // Use release semantics to ensure all prior writes are visible before invalidation
+  mValid.store(false, std::memory_order_release);
+
   // Animators, Constraints etc. should be disconnected from the child's properties.
   PropertyOwner::Destroy();
 }

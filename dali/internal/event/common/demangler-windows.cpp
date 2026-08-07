@@ -28,14 +28,14 @@ namespace Internal
 std::string DemangleClassName(const char* typeIdName)
 {
   std::string name  = typeIdName;
-  int         index = name.find_last_of(' ');
+  int32_t     index = static_cast<int32_t>(name.find_last_of(' '));
 
   if(0 <= index)
   {
     name = name.substr(index + 1, name.size() - index);
   }
 
-  index = name.find_last_of(':');
+  index = static_cast<int32_t>(name.find_last_of(':'));
 
   if(0 <= index)
   {

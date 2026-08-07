@@ -23,6 +23,13 @@
 
 namespace Dali
 {
+WheelEvent WheelEvent::New(Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp)
+{
+  Internal::WheelEventPtr internal = Internal::WheelEvent::New(type, direction, modifiers, point, delta, timeStamp);
+
+  return WheelEvent(internal.Get());
+}
+
 WheelEvent::WheelEvent()
 : BaseHandle()
 {

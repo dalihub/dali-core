@@ -67,14 +67,24 @@ struct DALI_CORE_API KeyEvent : public Event
   KeyEvent(const Dali::String&          keyName,
            const Dali::String&          logicalKey,
            const Dali::String&          keyString,
-           int                          keyCode,
-           int                          keyModifier,
-           unsigned long                timeStamp,
+           int32_t                      keyCode,
+           int32_t                      keyModifier,
+           uint32_t                     timeStamp,
            const State&                 keyState,
            const Dali::String&          compose,
            const Dali::String&          deviceName,
            const Device::Class::Type    deviceClass,
            const Device::Subclass::Type deviceSubclass);
+
+  /**
+   * @brief Constructor which creates a KeyEvent instance from a Dali::KeyEvent.
+   *
+   * Every field is carried over, so an event that is fed back into the core keeps the
+   * state it was given. @see Dali::Integration::SceneHolder::FeedKeyEvent()
+   *
+   * @param[in] keyEvent The key event to copy from.
+   */
+  explicit KeyEvent(const Dali::KeyEvent& keyEvent);
 
   /**
    * Copy constructor.
@@ -106,17 +116,17 @@ struct DALI_CORE_API KeyEvent : public Event
   /**
    * The unique key code for the key pressed.
    */
-  int keyCode;
+  int32_t keyCode;
 
   /**
    * The key modifier for special keys like shift and alt
    */
-  int keyModifier;
+  int32_t keyModifier;
 
   /**
    * The time (in ms) that the key event occurred.
    */
-  unsigned long time;
+  uint32_t time;
 
   /**
    * State of the key event.
@@ -148,6 +158,15 @@ struct DALI_CORE_API KeyEvent : public Event
    * Whether the key referenced by the event is a repeating key.
    */
   bool isRepeat;
+
+  /**
+   * Whether the key event has already been through the intercept stage.
+   *
+   * Set when accessibility feeds an unconsumed key event back to the window; it stops the
+   * intercept stage from running a second time and looping forever. Anything that rebuilds
+   * a KeyEvent on the way back into the core must carry this over.
+   */
+  bool interceptProcessed;
 
   /**
    * Window id where key event occurred.

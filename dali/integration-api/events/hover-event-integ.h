@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_HOVER_EVENT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,15 @@ struct DALI_CORE_API HoverEvent : public MultiPointEvent
    * @param[in]  time  The time the event occurred.
    */
   HoverEvent(uint32_t time);
+
+  /**
+   * Constructor which creates a HoverEvent instance from a Dali::HoverEvent.
+   *
+   * All the points of the given hover event are copied, so this can be used to
+   * convert a hover event created by an application. @see Dali::HoverEvent::New()
+   * @param[in]  hoverEvent  The hover event to copy from.
+   */
+  explicit HoverEvent(const Dali::HoverEvent& hoverEvent);
 
   /**
    * Copy constructor.

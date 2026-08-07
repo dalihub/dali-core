@@ -80,7 +80,7 @@ void FrameBuffer::AttachColorTexture(const Render::TextureKey& texture, uint32_t
       texture->Create(0 | Graphics::TextureUsageFlagBits::COLOR_ATTACHMENT | Graphics::TextureUsageFlagBits::SAMPLE);
     }
 
-    uint32_t                  attachmentId = mCreateInfo.colorAttachments.size();
+    uint32_t                  attachmentId = static_cast<uint32_t>(mCreateInfo.colorAttachments.size());
     Graphics::ColorAttachment colorAttachment{attachmentId, texture->GetGraphicsObject(), layer, mipmapLevel, texture->GetPixelFormat()};
     mCreateInfo.colorAttachments.push_back(colorAttachment);
 

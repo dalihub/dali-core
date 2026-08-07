@@ -52,11 +52,11 @@ public:
    * @param[in] coreEventInterface Used to send events to Core.
    * @param[in]  screenSize  The size of the screen.
    * @param[in]  request     The tap gesture request.
-   * @param[in]  maximumAllowedTime    The maximum allowed time required in milliseconds.
-   * @param[in]  recognizerTime    This recognizer time required in milliseconds.
-   * @param[in]  maximumMotionAllowedDistance    This recognizer distance required.
+   * @param[in]  maximumMultiTapInterval    The maximum interval allowed between the taps of a multi tap gesture in milliseconds.
+   * @param[in]  maximumHoldingTime    The maximum time the touch point can be held down in milliseconds.
+   * @param[in]  maximumMotionDistance    The maximum distance the touch point can move in pixels.
    */
-  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumAllowedTime, uint32_t recognizerTime, float maximumMotionAllowedDistance);
+  TapGestureRecognizer(Observer& observer, Vector2 screenSize, const TapGestureRequest& request, uint32_t maximumMultiTapInterval, uint32_t maximumHoldingTime, float maximumMotionDistance);
 
   /**
    * Virtual destructor.
@@ -80,27 +80,27 @@ public:
   void Update(const GestureRequest& request) override;
 
   /**
-   * @brief This method sets the maximum allowed time required to be recognized as a multi tap gesture (millisecond)
+   * @brief This method sets the maximum interval allowed between the taps of a multi tap gesture (millisecond)
    *
    * @param[in] time The time value in milliseconds
    */
-  void SetMaximumAllowedTime(uint32_t time);
+  void SetMaximumMultiTapInterval(uint32_t time);
 
   /**
-   * @brief This method sets the recognizer time required to be recognized as a tap gesture (millisecond)
+   * @brief This method sets the maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
    *
    * @param[in] time The time value in milliseconds
    */
-  void SetRecognizerTime(uint32_t time);
+  void SetMaximumHoldingTime(uint32_t time);
 
   /**
-   * @brief This method sets the recognizer distance required to be recognized as a tap gesture
+   * @brief This method sets the maximum distance the touch point can move while still being recognized as a tap gesture
    *
    * This distance is from touch down to touch up to recognize the tap gesture.
    *
    * @param[in] distance The distance
    */
-  void SetMaximumMotionAllowedDistance(float distance);
+  void SetMaximumMotionDistance(float distance);
 
 private:
   /**
@@ -184,9 +184,9 @@ private:
   uint32_t      mTouchTime;                    ///< The touch down time.
   uint32_t      mLastTapTime;                  ///< Time last tap gesture was registered
   uint32_t      mDeltaBetweenTouchDownTouchUp; ///< Time from touchdown to touchup
-  uint32_t      mMaximumAllowedTime;           ///< The maximum allowed time required to be recognized as a multi tap gesture (millisecond)
-  uint32_t      mRecognizerTime;               ///< The recognizer time required to be recognized as a tap gesture (millisecond)
-  float         mMaximumMotionAllowedDistance; ///< The recognizer distance required to be recognized as a tap gesture
+  uint32_t      mMaximumMultiTapInterval;      ///< The maximum interval allowed between the taps of a multi tap gesture (millisecond)
+  uint32_t      mMaximumHoldingTime;           ///< The maximum time the touch point can be held down while still being recognized as a tap gesture (millisecond)
+  float         mMaximumMotionDistance;        ///< The maximum distance the touch point can move while still being recognized as a tap gesture
   ActorObserver mCurrentActor;                 ///< The current actor that was hit-tested at the touch position
 };
 

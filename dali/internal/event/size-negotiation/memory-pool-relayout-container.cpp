@@ -76,7 +76,7 @@ size_t MemoryPoolRelayoutContainer::Size() const
   return mRelayoutInfos.Count();
 }
 
-void MemoryPoolRelayoutContainer::Reserve(size_t capacity)
+void MemoryPoolRelayoutContainer::Reserve(uint32_t capacity)
 {
   mRelayoutInfos.Reserve(capacity);
 }

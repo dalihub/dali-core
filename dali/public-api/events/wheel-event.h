@@ -67,6 +67,23 @@ public:
   // Construction & Destruction
 
   /**
+   * @brief Creates an initialized WheelEvent.
+   *
+   * This is intended for applications that need to synthesize a wheel event,
+   * e.g. to feed it to a window with Window::FeedWheelEvent().
+   *
+   * @SINCE_2_5.34
+   * @param[in] type      The type of the wheel event
+   * @param[in] direction The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
+   * @param[in] modifiers Modifier keys pressed during the event (such as shift, alt and control)
+   * @param[in] point     The co-ordinates of the cursor relative to the top-left of the screen
+   * @param[in] delta     The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
+   * @param[in] timeStamp The time the wheel is being rolled
+   * @return A handle to a newly allocated Dali resource
+   */
+  static WheelEvent New(Type type, int32_t direction, uint32_t modifiers, Vector2 point, int32_t delta, uint32_t timeStamp);
+
+  /**
    * @brief An uninitialized WheelEvent instance.
    *
    * Calling member functions with an uninitialized WheelEvent handle is not allowed.

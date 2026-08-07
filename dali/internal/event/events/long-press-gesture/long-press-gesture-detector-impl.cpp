@@ -193,7 +193,7 @@ bool LongPressGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent 
 
 uint32_t LongPressGestureDetector::GetMinimumHoldingTime() const
 {
-  return mGestureEventProcessor.GetLongPressMinimumHoldingTime();
+  return mGestureEventProcessor.GetLongPressGestureMinimumHoldingTime();
 }
 
 bool LongPressGestureDetector::CheckGestureDetector(const GestureEvent* gestureEvent, Actor* actor, RenderTaskPtr renderTask)

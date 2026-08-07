@@ -52,7 +52,7 @@ public:
    * @brief Constructor
    * @param[in]  time  The time the event occurred
    */
-  HoverEvent(unsigned long time);
+  HoverEvent(uint32_t time);
 
   /**
    * @brief Clones the HoverEvent object.
@@ -68,7 +68,7 @@ public:
   /**
    * @copydoc Dali::HoverEvent::GetTime()
    */
-  unsigned long GetTime() const;
+  uint32_t GetTime() const;
 
   /**
    * @copydoc Dali::HoverEvent::GetPointCount()
@@ -145,6 +145,14 @@ public:
   // Setters
 
   /**
+   * @copydoc Dali::HoverEvent::SetTime()
+   */
+  void SetTime(uint32_t time)
+  {
+    mTime = time;
+  }
+
+  /**
    * @brief Adds a point to this hover event.
    * @param[in]  point  The point to add to the hover event.
    */
@@ -167,7 +175,7 @@ private:
 
 private:
   std::vector<Integration::Point> mPoints; ///< Container of the points for this hover event
-  unsigned long                   mTime;   ///< The time (in ms) that the hover event occurred
+  uint32_t                        mTime;   ///< The time (in ms) that the hover event occurred
 };
 
 } // namespace Internal

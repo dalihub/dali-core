@@ -50,6 +50,24 @@ bool CheckCapturedLogContainString(Debug::DebugPriority priority, std::string st
   return ret;
 }
 
+bool SetEnvironmentVariable(const char* name, const char* value)
+{
+#if defined(_WIN32)
+  return _putenv_s(name, value) == 0;
+#else
+  return setenv(name, value, 1) == 0;
+#endif
+}
+
+bool ClearEnvironmentVariable(const char* name)
+{
+#if defined(_WIN32)
+  return _putenv_s(name, "") == 0;
+#else
+  return unsetenv(name) == 0;
+#endif
+}
+
 // Define static dummy filter, for line coverage.
 DALI_INIT_TIME_CHECKER_FILTER(gDummyTimeCheckerFilter, SOME_ENVORINMENT);
 } // namespace
@@ -91,6 +109,21 @@ int UtcDaliDebugLogPrintP(void)
   DALI_TEST_EQUALS(CheckCapturedLogContainString(Debug::DebugPriority::DEBUG, expectLogString), true, TEST_LOCATION);
 
   Debug::UninstallLogFunction();
+
+  END_TEST;
+}
+
+int UtcDaliDebugLogDisabledP(void)
+{
+  DALI_TEST_CHECK(SetEnvironmentVariable("DALI_LOG_DISABLE", "1"));
+
+  Debug::InstallLogFunction(LogCaptureFunction);
+
+  DALI_LOG_ERROR("This log should be suppressed\n");
+  DALI_TEST_EQUALS(gCapturedLog.empty(), true, TEST_LOCATION);
+
+  Debug::UninstallLogFunction();
+  DALI_TEST_CHECK(ClearEnvironmentVariable("DALI_LOG_DISABLE"));
 
   END_TEST;
 }
@@ -208,6 +241,35 @@ int UtcDaliDebugTimeCheckerScopeTracerP(void)
   DALI_TEST_EQUALS(CheckCapturedLogContainString(Debug::DebugPriority::INFO, expectLogString), true, TEST_LOCATION);
 
   Debug::UninstallLogFunction();
+
+  END_TEST;
+}
+
+int UtcDaliDebugEnvironmentConfigurationP(void)
+{
+  TestApplication application;
+
+  constexpr const char* FILTER_ENVIRONMENT    = "DALI_UTC_DEBUG_FILTER";
+  constexpr const char* THRESHOLD_ENVIRONMENT = "DALI_UTC_DEBUG_THRESHOLD";
+
+  DALI_TEST_CHECK(SetEnvironmentVariable(FILTER_ENVIRONMENT, "99,t"));
+  auto* verboseTraceFilter = Debug::Filter::New(Debug::NoLogging, false, FILTER_ENVIRONMENT);
+
+  DALI_TEST_CHECK(SetEnvironmentVariable(FILTER_ENVIRONMENT, "1,f"));
+  auto* conciseFilter = Debug::Filter::New(Debug::Verbose, true, FILTER_ENVIRONMENT);
+
+  DALI_TEST_CHECK(SetEnvironmentVariable(THRESHOLD_ENVIRONMENT, "-1"));
+  auto* disabledThreshold = Dali::Integration::TimeChecker::ThresholdFilter::New(0u, THRESHOLD_ENVIRONMENT);
+
+  DALI_TEST_CHECK(ClearEnvironmentVariable(FILTER_ENVIRONMENT));
+  DALI_TEST_CHECK(ClearEnvironmentVariable(THRESHOLD_ENVIRONMENT));
+
+  DALI_TEST_CHECK(verboseTraceFilter->IsEnabledFor(Debug::Verbose));
+  DALI_TEST_CHECK(verboseTraceFilter->IsTraceEnabled());
+  DALI_TEST_CHECK(conciseFilter->IsEnabledFor(Debug::Concise));
+  DALI_TEST_CHECK(!conciseFilter->IsEnabledFor(Debug::General));
+  DALI_TEST_CHECK(!conciseFilter->IsTraceEnabled());
+  DALI_TEST_CHECK(!disabledThreshold->IsEnabled());
 
   END_TEST;
 }

@@ -466,7 +466,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     vertexShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
     vertexShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::TEXT);
     const std::vector<char>& vertexShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::VERTEX_SHADER);
-    vertexShaderCreateInfo.SetSourceSize(vertexShaderSrc.size());
+    vertexShaderCreateInfo.SetSourceSize(static_cast<uint32_t>(vertexShaderSrc.size()));
     vertexShaderCreateInfo.SetSourceData(static_cast<const void*>(vertexShaderSrc.data()));
     vertexShaderCreateInfo.SetShaderVersion(shaderData->GetVertexShaderVersion());
     auto vertexShader = mGraphicsController->CreateShader(vertexShaderCreateInfo, nullptr);
@@ -475,7 +475,7 @@ Program* Renderer::PrepareProgram(const SceneGraph::RenderInstruction& instructi
     fragmentShaderCreateInfo.SetPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
     fragmentShaderCreateInfo.SetSourceMode(Graphics::ShaderSourceMode::TEXT);
     const std::vector<char>& fragmentShaderSrc = shaderData->GetShaderForPipelineStage(Graphics::PipelineStage::FRAGMENT_SHADER);
-    fragmentShaderCreateInfo.SetSourceSize(fragmentShaderSrc.size());
+    fragmentShaderCreateInfo.SetSourceSize(static_cast<uint32_t>(fragmentShaderSrc.size()));
     fragmentShaderCreateInfo.SetSourceData(static_cast<const void*>(fragmentShaderSrc.data()));
     fragmentShaderCreateInfo.SetShaderVersion(shaderData->GetFragmentShaderVersion());
     auto fragmentShader = mGraphicsController->CreateShader(fragmentShaderCreateInfo, nullptr);
@@ -588,7 +588,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
         mRenderCallbackTextureBindings.emplace_back(graphicsTexture);
         renderCallbackInput.textureBindings[i++] = properties.nativeHandle;
       }
-      info.textureCount = mRenderCallbackTextureBindings.size();
+      info.textureCount = static_cast<uint32_t>(mRenderCallbackTextureBindings.size());
       info.textureList  = mRenderCallbackTextureBindings.data();
     }
 
@@ -1073,7 +1073,7 @@ void Renderer::FillUniformBuffer(Program&                             program,
         uniform.uniformBlockIndex = uniformInfo.bufferIndex;
 
         const auto typeSize        = iter.propertyValue->GetValueSize();
-        uniform.arrayElementStride = uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize;
+        uniform.arrayElementStride = static_cast<uint32_t>(uniformInfo.elementCount > 0 ? (uniformInfo.elementStride ? uniformInfo.elementStride : typeSize) : typeSize);
         uniform.matrixStride       = uniformInfo.matrixStride;
 
         uniform.state = UniformIndexMap::State::INITIALIZED;
@@ -1122,7 +1122,7 @@ void Renderer::WriteDynUniform(
   else
   {
     const auto typeSize = propertyValue->GetValueSize();
-    ubo.Write(valueAddress, typeSize, dest);
+    ubo.Write(valueAddress, static_cast<uint32_t>(typeSize), dest);
   }
 }
 

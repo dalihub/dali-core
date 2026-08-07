@@ -19,6 +19,7 @@
 #include <dali/public-api/events/touch-event.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/events/point.h>
 #include <dali/internal/event/events/touch-event-impl.h>
 #include <dali/public-api/actors/actor.h>
 
@@ -26,6 +27,13 @@
 
 namespace Dali
 {
+TouchEvent TouchEvent::New(uint32_t time)
+{
+  Internal::TouchEventPtr internal(new Internal::TouchEvent(time));
+
+  return TouchEvent(internal.Get());
+}
+
 TouchEvent::TouchEvent() = default;
 
 TouchEvent::TouchEvent(const TouchEvent& other) = default;
@@ -38,7 +46,7 @@ TouchEvent& TouchEvent::operator=(const TouchEvent& other) = default;
 
 TouchEvent& TouchEvent::operator=(TouchEvent&& other) noexcept = default;
 
-unsigned long TouchEvent::GetTime() const
+uint32_t TouchEvent::GetTime() const
 {
   return GetImplementation(*this).GetTime();
 }
@@ -116,6 +124,32 @@ RenderTask TouchEvent::GetRenderTask() const
 const Dali::String& TouchEvent::GetDeviceName(uint32_t point) const
 {
   return GetImplementation(*this).GetDeviceName(point);
+}
+
+void TouchEvent::SetTime(uint32_t time)
+{
+  GetImplementation(*this).SetTime(time);
+}
+
+void TouchEvent::AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition)
+{
+  AddPoint(deviceId, state, screenPosition, Device::Class::NONE, Device::Subclass::NONE, Dali::String(), MouseButton::INVALID);
+}
+
+void TouchEvent::AddPoint(int32_t deviceId, PointState::Type state, const Vector2& screenPosition, Device::Class::Type deviceClass, Device::Subclass::Type deviceSubclass, const Dali::String& deviceName, MouseButton::Type mouseButton)
+{
+  Integration::Point point;
+  point.SetDeviceId(deviceId);
+  point.SetState(state);
+  point.SetScreenPosition(screenPosition);
+  point.SetDeviceClass(deviceClass);
+  point.SetDeviceSubclass(deviceSubclass);
+  point.SetMouseButton(mouseButton);
+
+  Dali::String name(deviceName);
+  point.SetDeviceName(name);
+
+  GetImplementation(*this).AddPoint(point);
 }
 
 TouchEvent::TouchEvent(Internal::TouchEvent* internal)

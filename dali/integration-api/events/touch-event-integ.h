@@ -2,7 +2,7 @@
 #define DALI_INTEGRATION_TOUCH_EVENT_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,15 @@ struct DALI_CORE_API TouchEvent : public MultiPointEvent
    * @param[in]  time  The time the event occurred.
    */
   TouchEvent(uint32_t time);
+
+  /**
+   * Constructor which creates a TouchEvent instance from a Dali::TouchEvent.
+   *
+   * All the points of the given touch event are copied, so this can be used to
+   * convert a touch event created by an application. @see Dali::TouchEvent::New()
+   * @param[in]  touchEvent  The touch event to copy from.
+   */
+  explicit TouchEvent(const Dali::TouchEvent& touchEvent);
 
   /**
    * Copy constructor.

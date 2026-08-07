@@ -88,7 +88,7 @@ public: // Main API
     if(iter == mKeyIndexList.cend() || iter->first != key)
     {
       // Emplace new element back.
-      std::uint32_t newElementIndex = mKeyElementPool.size();
+      std::uint32_t newElementIndex = static_cast<std::uint32_t>(mKeyElementPool.size());
       mKeyElementPool.emplace_back(key, element);
 
       // Add new index into mKeyIndexList list.
@@ -120,7 +120,7 @@ public: // Main API
     if(iter == mKeyIndexList.cend() || iter->first != key)
     {
       // Emplace new element back.
-      std::uint32_t newElementIndex = mKeyElementPool.size();
+      std::uint32_t newElementIndex = static_cast<std::uint32_t>(mKeyElementPool.size());
       mKeyElementPool.emplace_back(key, std::move(element));
 
       // Add new index into mKeyIndexList list.

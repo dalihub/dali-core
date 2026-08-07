@@ -98,7 +98,7 @@ DALI_CORE_API std::string ToStdString(const Property::Value& value);
  */
 inline Property::Value ToPropertyValue(std::string str)
 {
-  Dali::String daliString(StringView(str.data(), str.size()));
+  Dali::String daliString(StringView(str.data(), static_cast<uint32_t>(str.size())));
   return Property::Value(std::move(daliString));
 }
 
@@ -126,7 +126,7 @@ DALI_CORE_API bool GetStdString(const Property::Value& value, std::string& out);
  */
 inline Property::Array& AddToArray(Property::Array& array, const std::string& str)
 {
-  array.Add(Property::Value(StringView(str.data(), str.size())));
+  array.Add(Property::Value(StringView(str.data(), static_cast<uint32_t>(str.size()))));
   return array;
 }
 
@@ -142,8 +142,8 @@ inline Property::Array& AddToArray(Property::Array& array, const std::string& st
  */
 inline Property::Map& InsertToMap(Property::Map& map, const std::string& key, const std::string& value)
 {
-  Dali::String keyString(StringView(key.data(), key.size()));
-  Dali::String valueString(StringView(value.data(), value.size()));
+  Dali::String keyString(StringView(key.data(), static_cast<uint32_t>(key.size())));
+  Dali::String valueString(StringView(value.data(), static_cast<uint32_t>(value.size())));
   map.Insert(std::move(keyString), Property::Value(std::move(valueString)));
   return map;
 }
@@ -160,7 +160,7 @@ inline Property::Map& InsertToMap(Property::Map& map, const std::string& key, co
  */
 inline Property::Map& InsertToMap(Property::Map& map, const std::string& key, Property::Value value)
 {
-  Dali::String keyString(StringView(key.data(), key.size()));
+  Dali::String keyString(StringView(key.data(), static_cast<uint32_t>(key.size())));
   map.Insert(std::move(keyString), value);
   return map;
 }
@@ -178,8 +178,8 @@ inline Property::Map& InsertToMap(Property::Map& map, const std::string& key, Pr
  */
 inline Property::Map& InsertToMap(Property::Map& map, std::string_view key, const std::string& value)
 {
-  Dali::String keyString(StringView(key.data(), key.size()));
-  Dali::String valueString(StringView(value.data(), value.size()));
+  Dali::String keyString(StringView(key.data(), static_cast<uint32_t>(key.size())));
+  Dali::String valueString(StringView(value.data(), static_cast<uint32_t>(value.size())));
   map.Insert(std::move(keyString), Property::Value(std::move(valueString)));
   return map;
 }
@@ -197,7 +197,7 @@ inline Property::Map& InsertToMap(Property::Map& map, std::string_view key, cons
  */
 inline Property::Map& InsertToMap(Property::Map& map, std::string_view key, Property::Value value)
 {
-  Dali::String keyString(StringView(key.data(), key.size()));
+  Dali::String keyString(StringView(key.data(), static_cast<uint32_t>(key.size())));
   map.Insert(std::move(keyString), std::move(value));
   return map;
 }
@@ -242,7 +242,7 @@ inline std::string_view ToStdStringView(const String& string)
  */
 inline StringView ToDaliStringView(const std::string& string)
 {
-  return StringView(string.data(), string.size());
+  return StringView(string.data(), static_cast<uint32_t>(string.size()));
 }
 
 /**
@@ -256,7 +256,7 @@ inline StringView ToDaliStringView(const std::string& string)
  */
 inline StringView ToDaliStringView(std::string_view view)
 {
-  return StringView(view.data(), view.size());
+  return StringView(view.data(), static_cast<uint32_t>(view.size()));
 }
 
 /**
@@ -269,7 +269,7 @@ inline StringView ToDaliStringView(std::string_view view)
  */
 inline String ToDaliString(const std::string& string)
 {
-  return String(StringView(string.data(), string.size()));
+  return String(StringView(string.data(), static_cast<uint32_t>(string.size())));
 }
 
 /**
@@ -282,7 +282,7 @@ inline String ToDaliString(const std::string& string)
  */
 inline String ToDaliString(std::string_view view)
 {
-  return String(StringView(view.data(), view.size()));
+  return String(StringView(view.data(), static_cast<uint32_t>(view.size())));
 }
 
 /**

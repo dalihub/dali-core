@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -43,10 +44,6 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
-constexpr uint32_t DEFAULT_MAXIMUM_ALLOWED_TIME = 330u;
-constexpr uint32_t DEFAULT_RECOGNIZER_TIME      = 330u;
-// TODO: Set these according to DPI
-constexpr float DEFAULT_MAXIMUM_MOTION_ALLOWED = 20.0f;
 
 /**
  * Creates a TapGesture and asks the specified detector to emit its detected signal.
@@ -96,9 +93,9 @@ TapGestureProcessor::TapGestureProcessor()
   mMaxTouchesRequired(1),
   mCurrentTapEvent(nullptr),
   mPossibleProcessed(false),
-  mMaximumAllowedTime(DEFAULT_MAXIMUM_ALLOWED_TIME),
-  mRecognizerTime(DEFAULT_RECOGNIZER_TIME),
-  mMaximumMotionAllowedDistance(DEFAULT_MAXIMUM_MOTION_ALLOWED)
+  mMaximumMultiTapInterval(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_MULTI_TAP_INTERVAL),
+  mMaximumHoldingTime(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_HOLDING_TIME),
+  mMaximumMotionDistance(Integration::DEFAULT_TAP_GESTURE_MAXIMUM_MOTION_DISTANCE)
 {
 }
 
@@ -188,7 +185,7 @@ void TapGestureProcessor::AddGestureDetector(TapGestureDetector* gestureDetector
     request.maxTouches = mMaxTouchesRequired;
 
     Size size          = scene.GetSize();
-    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), mMaximumAllowedTime, mRecognizerTime, mMaximumMotionAllowedDistance);
+    mGestureRecognizer = new TapGestureRecognizer(*this, Vector2(size.width, size.height), static_cast<const TapGestureRequest&>(request), mMaximumMultiTapInterval, mMaximumHoldingTime, mMaximumMotionDistance);
   }
   else
   {
@@ -238,61 +235,61 @@ void TapGestureProcessor::GestureDetectorUpdated(TapGestureDetector* gestureDete
   // Nothing to do.
 }
 
-void TapGestureProcessor::SetMaximumAllowedTime(uint32_t time)
+void TapGestureProcessor::SetMaximumMultiTapInterval(uint32_t time)
 {
   if(time == 0u)
   {
-    DALI_LOG_ERROR("MaximumAllowedTime must be greater than zero.");
+    DALI_LOG_ERROR("MaximumMultiTapInterval must be greater than zero.");
     return;
   }
-  if(mMaximumAllowedTime != time)
+  if(mMaximumMultiTapInterval != time)
   {
-    mMaximumAllowedTime = time;
+    mMaximumMultiTapInterval = time;
 
     if(mGestureRecognizer)
     {
       TapGestureRecognizer* tapRecognizer = dynamic_cast<TapGestureRecognizer*>(mGestureRecognizer.Get());
       if(tapRecognizer)
       {
-        tapRecognizer->SetMaximumAllowedTime(time);
+        tapRecognizer->SetMaximumMultiTapInterval(time);
       }
     }
   }
 }
 
-uint32_t TapGestureProcessor::GetMaximumAllowedTime() const
+uint32_t TapGestureProcessor::GetMaximumMultiTapInterval() const
 {
-  return mMaximumAllowedTime;
+  return mMaximumMultiTapInterval;
 }
 
-void TapGestureProcessor::SetRecognizerTime(uint32_t time)
+void TapGestureProcessor::SetMaximumHoldingTime(uint32_t time)
 {
   if(time == 0u)
   {
-    DALI_LOG_ERROR("RecognizerTime must be greater than zero.");
+    DALI_LOG_ERROR("MaximumHoldingTime must be greater than zero.");
     return;
   }
-  if(mRecognizerTime != time)
+  if(mMaximumHoldingTime != time)
   {
-    mRecognizerTime = time;
+    mMaximumHoldingTime = time;
 
     if(mGestureRecognizer)
     {
       TapGestureRecognizer* tapRecognizer = dynamic_cast<TapGestureRecognizer*>(mGestureRecognizer.Get());
       if(tapRecognizer)
       {
-        tapRecognizer->SetRecognizerTime(time);
+        tapRecognizer->SetMaximumHoldingTime(time);
       }
     }
   }
 }
 
-uint32_t TapGestureProcessor::GetRecognizerTime() const
+uint32_t TapGestureProcessor::GetMaximumHoldingTime() const
 {
-  return mRecognizerTime;
+  return mMaximumHoldingTime;
 }
 
-void TapGestureProcessor::SetMaximumMotionAllowedDistance(float distance)
+void TapGestureProcessor::SetMaximumMotionDistance(float distance)
 {
   if(distance < 0.0f)
   {
@@ -300,21 +297,21 @@ void TapGestureProcessor::SetMaximumMotionAllowedDistance(float distance)
     return;
   }
 
-  mMaximumMotionAllowedDistance = distance;
+  mMaximumMotionDistance = distance;
 
   if(mGestureRecognizer)
   {
     TapGestureRecognizer* tapRecognizer = dynamic_cast<TapGestureRecognizer*>(mGestureRecognizer.Get());
     if(tapRecognizer)
     {
-      tapRecognizer->SetMaximumMotionAllowedDistance(distance);
+      tapRecognizer->SetMaximumMotionDistance(distance);
     }
   }
 }
 
-float TapGestureProcessor::GetMaximumMotionAllowedDistance() const
+float TapGestureProcessor::GetMaximumMotionDistance() const
 {
-  return mMaximumMotionAllowedDistance;
+  return mMaximumMotionDistance;
 }
 
 void TapGestureProcessor::UpdateDetection()

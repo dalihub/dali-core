@@ -258,7 +258,7 @@ bool Geometry::Draw(
         commandBuffer.BindIndexBuffer(*ibo, 0, mIndexType);
       }
 
-      commandBuffer.DrawIndexed(numIndices, instanceCount, firstIndexOffset, 0, 0);
+      commandBuffer.DrawIndexed(numIndices, instanceCount, static_cast<uint32_t>(firstIndexOffset), 0, 0);
     }
   }
   else

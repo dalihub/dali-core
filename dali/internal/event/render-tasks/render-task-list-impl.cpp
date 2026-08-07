@@ -331,7 +331,7 @@ void RenderTaskList::ReorderTasks(Dali::Internal::LayerList& layerList)
 
     // Default Task should have the lowest OrderIndex number.
     int32_t  orderIndex   = GetTask(0u)->GetOrderIndex();
-    uint32_t subTreeCount = renderableData.size();
+    uint32_t subTreeCount = static_cast<uint32_t>(renderableData.size());
     for(uint32_t i = subTreeCount - 1; i < subTreeCount; --i)
     {
       auto subTree = renderableData[i];

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/input-options.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/scene-impl.h>
@@ -41,7 +42,6 @@ namespace Internal
 namespace
 {
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
-const unsigned long DEFAULT_MINIMUM_HOLDING_TIME = 500u;
 
 /**
  * Creates a LongPressGesture and asks the specified detector to emit its detected signal.
@@ -120,7 +120,7 @@ LongPressGestureProcessor::LongPressGestureProcessor()
   mMinTouchesRequired(1),
   mMaxTouchesRequired(1),
   mCurrentLongPressEvent(nullptr),
-  mMinimumHoldingTime(DEFAULT_MINIMUM_HOLDING_TIME)
+  mMinimumHoldingTime(Integration::DEFAULT_LONG_PRESS_GESTURE_MINIMUM_HOLDING_TIME)
 {
 }
 

@@ -173,8 +173,8 @@ Property::Value& Property::Map::GetValue(SizeType position) const
 {
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
-  SizeType numStringKeys = mImpl->mStringValueContainer.size();
-  SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
+  SizeType numStringKeys = static_cast<SizeType>(mImpl->mStringValueContainer.size());
+  SizeType numIndexKeys  = static_cast<SizeType>(mImpl->mIndexValueContainer.size());
   DALI_ASSERT_ALWAYS(position < (numStringKeys + numIndexKeys) && "position out-of-bounds");
 
   if(position < numStringKeys)
@@ -193,7 +193,7 @@ Dali::String Property::Map::GetKey(SizeType position) const
 
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
-  SizeType numStringKeys = mImpl->mStringValueContainer.size();
+  SizeType numStringKeys = static_cast<SizeType>(mImpl->mStringValueContainer.size());
   DALI_ASSERT_ALWAYS(position < numStringKeys && "position out-of-bounds");
 
   // Return copy of Dali::String directly
@@ -204,8 +204,8 @@ Property::Key Property::Map::GetKeyAt(SizeType position) const
 {
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
-  SizeType numStringKeys = mImpl->mStringValueContainer.size();
-  SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
+  SizeType numStringKeys = static_cast<SizeType>(mImpl->mStringValueContainer.size());
+  SizeType numIndexKeys  = static_cast<SizeType>(mImpl->mIndexValueContainer.size());
   DALI_ASSERT_ALWAYS(position < (numStringKeys + numIndexKeys) && "position out-of-bounds");
 
   if(position < numStringKeys)
@@ -226,7 +226,7 @@ StringValuePair& Property::Map::GetPair(SizeType position) const
 
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
-  SizeType numStringKeys = mImpl->mStringValueContainer.size();
+  SizeType numStringKeys = static_cast<SizeType>(mImpl->mStringValueContainer.size());
 
   DALI_ASSERT_ALWAYS(position < (numStringKeys) && "position out-of-bounds");
 
@@ -237,8 +237,8 @@ KeyValuePair Property::Map::GetKeyValue(SizeType position) const
 {
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
 
-  SizeType numStringKeys = mImpl->mStringValueContainer.size();
-  SizeType numIndexKeys  = mImpl->mIndexValueContainer.size();
+  SizeType numStringKeys = static_cast<SizeType>(mImpl->mStringValueContainer.size());
+  SizeType numIndexKeys  = static_cast<SizeType>(mImpl->mIndexValueContainer.size());
   DALI_ASSERT_ALWAYS(position < (numStringKeys + numIndexKeys) && "position out-of-bounds");
 
   if(position < numStringKeys)
@@ -449,7 +449,7 @@ const Property::Value& Property::Map::operator[](Dali::StringView key) const
     }
   }
 
-  DALI_ASSERT_ALWAYS(!"Invalid Key");
+  DALI_ABORT("Invalid Key");
 }
 
 Property::Value& Property::Map::operator[](Dali::StringView key)
@@ -491,7 +491,7 @@ const Property::Value& Property::Map::operator[](Property::Index key) const
     }
   }
 
-  DALI_ASSERT_ALWAYS(!"Invalid Key");
+  DALI_ABORT("Invalid Key");
 }
 
 Property::Value& Property::Map::operator[](Property::Index key)
