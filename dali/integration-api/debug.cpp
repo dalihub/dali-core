@@ -64,17 +64,24 @@ namespace Log
 {
 namespace
 {
-constexpr const char* DISABLE_LOG_FALLBACK_ENVIRONMENT_VARIABLE = "DALI_LOG_DISABLE_FALLBACK";
+constexpr const char* DISABLE_LOG_ENVIRONMENT_VARIABLE = "DALI_LOG_DISABLE";
 
-void FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_list args)
+bool IsLogDisabled()
 {
-  static const bool fallbackDisabled = []
+  static const bool logDisabled = []
   {
-    const auto environmentVariableValue = GetEnvironmentVariableValue(DISABLE_LOG_FALLBACK_ENVIRONMENT_VARIABLE);
+    const auto environmentVariableValue = GetEnvironmentVariableValue(DISABLE_LOG_ENVIRONMENT_VARIABLE);
     return environmentVariableValue && std::atoi(environmentVariableValue->c_str()) != 0;
   }();
 
-  if(DALI_UNLIKELY(fallbackDisabled))
+  return logDisabled;
+}
+
+void FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_list args)
+{
+  static const bool logDisabled = IsLogDisabled();
+
+  if(DALI_UNLIKELY(logDisabled))
   {
     return;
   }
@@ -139,7 +146,12 @@ void InstallLogFunction(const LogFunction& logFunction)
   // TLS stores a pointer to an object.
   // It needs to be allocated on the heap, because TLS will destroy it when the thread exits.
 
-  gthreadLocalLogFunction = logFunction;
+  static const bool logDisabled = IsLogDisabled();
+
+  if(DALI_LIKELY(!logDisabled))
+  {
+    gthreadLocalLogFunction = logFunction;
+  }
 }
 
 void UninstallLogFunction()

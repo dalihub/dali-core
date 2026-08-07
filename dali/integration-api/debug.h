@@ -132,7 +132,6 @@ using LogFunction = void (*)(DebugPriority, std::string&);
  * This should be done by the adaptor.
  * The log function can be different for each thread.
  * If a log function is not installed, the log message will be print at stderr.
- * Set DALI_LOG_DISABLE_FALLBACK to a non-zero value to suppress this fallback output.
  * @param logFunction the log function to install
  * @param logOpts the log options to save in thread
  */
