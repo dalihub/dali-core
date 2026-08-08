@@ -321,6 +321,7 @@ int UtcDaliCustomActorTouchHookConsumesWithoutSignal(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 
@@ -350,6 +351,7 @@ int UtcDaliCustomActorTouchHookFallsThroughWhenNotConsumed(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 
@@ -427,6 +429,7 @@ int UtcDaliCustomActorHoverHookConsumesWithoutSignal(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 
@@ -456,6 +459,7 @@ int UtcDaliCustomActorHoverHookFallsThroughWhenNotConsumed(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 
