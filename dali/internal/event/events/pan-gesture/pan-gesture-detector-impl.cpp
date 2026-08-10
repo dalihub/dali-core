@@ -364,6 +364,7 @@ void PanGestureDetector::OnActorDestroyed(Object& object)
 
 bool PanGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
+  Dali::PanGestureDetector handle = Dali::PanGestureDetector(this); ///< Keep reference until HandleEvent finished.
   return HandleEvent(actor, touch);
 }
 

@@ -118,6 +118,7 @@ void RotationGestureDetector::OnActorDetach(Actor& actor)
 
 bool RotationGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
+  Dali::RotationGestureDetector handle = Dali::RotationGestureDetector(this); ///< Keep reference until HandleEvent finished.
   return HandleEvent(actor, touch);
 }
 

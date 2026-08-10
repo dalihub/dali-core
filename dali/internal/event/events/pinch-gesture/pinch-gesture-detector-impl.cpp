@@ -126,6 +126,7 @@ void PinchGestureDetector::OnActorDestroyed(Object& object)
 
 bool PinchGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
+  Dali::PinchGestureDetector handle = Dali::PinchGestureDetector(this); ///< Keep reference until HandleEvent finished.
   return HandleEvent(actor, touch);
 }
 
