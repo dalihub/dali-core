@@ -58,6 +58,7 @@ ActorParentImpl::ActorParentImpl(Actor& owner)
 ActorParentImpl::~ActorParentImpl()
 {
   delete mChildren;
+  delete mRenderOrderCache;
 }
 
 void ActorParentImpl::Add(Actor& child, bool notify)
@@ -92,6 +93,13 @@ void ActorParentImpl::Add(Actor& child, bool notify)
     {
       // Do this first, since user callbacks from within SetParent() may need to remove child
       mChildren->push_back(ActorPtr(&child));
+
+      // Keep the render-order fast-path counter in sync with the child's DEPTH_INDEX.
+      if(child.GetDepthIndex() != 0)
+      {
+        ++mChildrenWithNonZeroDepthIndex;
+      }
+      mRenderOrderCacheDirty = true;
 
       // SetParent asserts that child can be added
       child.SetParent(&mOwner, notify);
@@ -132,6 +140,13 @@ void ActorParentImpl::Remove(Actor& child, bool notify)
     {
       // Keep handle for OnChildRemove notification
       removed = (*iter);
+
+      // Keep the render-order fast-path counter in sync with the child's DEPTH_INDEX.
+      if(child.GetDepthIndex() != 0)
+      {
+        --mChildrenWithNonZeroDepthIndex;
+      }
+      mRenderOrderCacheDirty = true;
 
       // Do this first, since user callbacks from within SetParent() may need to add the child
       mChildren->erase(iter);
@@ -433,27 +448,62 @@ void ActorParentImpl::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths
   // Create/add to children of this node
   if(mChildren)
   {
+    // Visit children in render order (ascending DEPTH_INDEX, ties broken by sibling order).
+    // When no child overrides its DEPTH_INDEX, render order == sibling order, so we take the
+    // fast path over mChildren directly without copying/sorting. mChildren is never modified.
+    const ActorContainer& orderedChildren = HasNonZeroDepthIndexChildren() ? GetChildrenInDepthOrder() : *mChildren;
+
     if(mOwner.GetChildrenDepthIndexPolicy() == DevelActor::ChildrenDepthIndexPolicy::INCREASE)
     {
-      for(const auto& actor : *mChildren)
+      for(const auto& child : orderedChildren)
       {
         ++depthIndex;
-        actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+        child->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
       }
     }
     else
     {
       int32_t       maxDepthIndex   = depthIndex;
       const int32_t childDepthIndex = ++depthIndex;
-      for(const auto& actor : *mChildren)
+      for(const auto& child : orderedChildren)
       {
         depthIndex = childDepthIndex;
-        actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+        child->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
         maxDepthIndex = Max(maxDepthIndex, depthIndex);
       }
       depthIndex = maxDepthIndex;
     }
   }
+}
+
+const ActorContainer& ActorParentImpl::GetChildrenInDepthOrder()
+{
+  if(!mRenderOrderCache)
+  {
+    mRenderOrderCache = new ActorContainer();
+  }
+
+  // The cache is rebuilt only when the render order actually changed (DEPTH_INDEX,
+  // add/remove or sibling reorder). In steady state this is a cheap read.
+  if(mRenderOrderCacheDirty)
+  {
+    ActorContainer& cache = *mRenderOrderCache;
+    if(mChildren)
+    {
+      cache = *mChildren; // copy the sibling-ordered list, then reorder by DEPTH_INDEX
+
+      // Stable sort keeps sibling order for children sharing the same DEPTH_INDEX.
+      std::stable_sort(cache.begin(), cache.end(), [](const ActorPtr& lhs, const ActorPtr& rhs)
+      { return lhs->GetDepthIndex() < rhs->GetDepthIndex(); });
+    }
+    else
+    {
+      cache.clear();
+    }
+    mRenderOrderCacheDirty = false;
+  }
+
+  return *mRenderOrderCache;
 }
 
 void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, uint32_t layer3DParentsCount, uint32_t depth)
@@ -629,6 +679,9 @@ void ActorParentImpl::EmitChildRemovedSignal(Actor& child)
 
 void ActorParentImpl::EmitOrderChangedAndRebuild(Actor& child)
 {
+  // A sibling reorder changes the tie-break between children of equal DEPTH_INDEX.
+  mRenderOrderCacheDirty = true;
+
   EmitSignal(mOwner, mChildOrderChangedSignal, Dali::Actor(&child));
 
   if(mOwner.OnScene())

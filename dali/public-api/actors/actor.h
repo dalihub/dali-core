@@ -575,6 +575,20 @@ public:
       DRAW_MODE,
 
       /**
+       * @brief The draw order of this actor among its siblings, independent of sibling order.
+       * @details Name "depthIndex", type Property::INTEGER.
+       * @SINCE_2_5.35
+       * @note The default value is 0. Higher values are drawn on top of lower ones.
+       *       Actors with an equal depthIndex fall back to their sibling order.
+       * @note This controls draw order only. It is unrelated to the actor's Z position
+       *       (Property::POSITION_Z). Unlike Raise(), Lower(), etc., it does NOT change sibling
+       *       order or the index returned by GetChildAt(); it only affects the draw (and hit-test) order.
+       * @note Only effective under Layer::Behavior::LAYER_UI with
+       *       DevelActor::ChildrenDepthIndexPolicy::INCREASE (the default policy).
+       */
+      DEPTH_INDEX,
+
+      /**
        * @brief The blend equation used when compositing renderers of this actor onto the framebuffer.
        * @details Name "blendEquation", type Property::INTEGER.
        * @note For advanced blend equations, the rendered color must use pre-multiplied alpha.
@@ -1953,6 +1967,31 @@ public:
    * @SINCE_2_5.30
    */
   DrawMode::Type GetDrawMode() const;
+
+  /**
+   * @brief Sets the draw order of this actor among its siblings, independent of sibling order.
+   * @param[in] depthIndex The draw order. Higher values are drawn on top of lower ones.
+   *                       Actors with an equal value fall back to their sibling order.
+   * @pre The actor has been initialized.
+   * @note The default value is 0.
+   * @note This controls draw order only. It is unrelated to the actor's Z position
+   *       (Property::POSITION_Z). Unlike Raise(), Lower(), etc., it does NOT change sibling
+   *       order or the index returned by GetChildAt(); it only affects the draw (and hit-test) order.
+   * @note Only effective under Layer::Behavior::LAYER_UI with
+   *       DevelActor::ChildrenDepthIndexPolicy::INCREASE (the default policy).
+   * @see Actor::Property::DEPTH_INDEX
+   * @SINCE_2_5.35
+   */
+  void SetDepthIndex(int32_t depthIndex);
+
+  /**
+   * @brief Gets the draw order of this actor among its siblings.
+   * @return The draw order
+   * @pre The actor has been initialized.
+   * @see Actor::Property::DEPTH_INDEX
+   * @SINCE_2_5.35
+   */
+  int32_t GetDepthIndex() const;
 
   /**
    * @brief Sets the blend equation used when compositing the actor's renderers onto the framebuffer.

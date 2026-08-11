@@ -17625,3 +17625,405 @@ int UtcDaliActorConvenienceSettersFirePropertySetSignal02P(void)
 
   END_TEST;
 }
+
+int UtcDaliActorSetGetDepthIndexP(void)
+{
+  TestApplication application;
+  tet_infoline("Test Actor::Property::DEPTH_INDEX: render order independent of sibling order");
+
+  Actor parent = Actor::New();
+  application.GetScene().Add(parent);
+
+  // Create 5 child actors in sibling order 1,2,3,4,5.
+  std::vector<Actor> children;
+  for(int i = 0; i < 5; ++i)
+  {
+    Actor child = Actor::New();
+    parent.Add(child);
+    children.push_back(child);
+  }
+
+  // Default DEPTH_INDEX is 0 for all.
+  for(int i = 0; i < 5; ++i)
+  {
+    DALI_TEST_EQUALS(children[i].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+  }
+
+  // Setting DEPTH_INDEX via property works.
+  children[2].SetProperty(Actor::Property::DEPTH_INDEX, 100);
+  DALI_TEST_EQUALS(children[2].GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  children[4].SetProperty(Actor::Property::DEPTH_INDEX, -10);
+  DALI_TEST_EQUALS(children[4].GetProperty<int>(Actor::Property::DEPTH_INDEX), -10, TEST_LOCATION);
+
+  // Sibling order (GetChildAt) is NOT affected by DEPTH_INDEX.
+  // Children are still in add order: 0,1,2,3,4 despite their DEPTH_INDEX values.
+  DALI_TEST_EQUALS(parent.GetChildAt(0), children[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), children[1], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), children[2], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), children[3], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(4), children[4], TEST_LOCATION);
+
+  // Raise/Lower (sibling order APIs) don't change DEPTH_INDEX.
+  children[1].Raise();
+  DALI_TEST_EQUALS(children[1].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  children[3].RaiseToTop();
+  DALI_TEST_EQUALS(children[3].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  // DEPTH_INDEX change doesn't affect sibling order.
+  children[0].SetProperty(Actor::Property::DEPTH_INDEX, 50);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), children[0], TEST_LOCATION); // still at index 0
+  DALI_TEST_EQUALS(children[0].GetProperty<int>(Actor::Property::DEPTH_INDEX), 50, TEST_LOCATION);
+
+  // Multiple DEPTH_INDEX assignments and retrieval.
+  children[1].SetProperty(Actor::Property::DEPTH_INDEX, 25);
+  children[1].SetProperty(Actor::Property::DEPTH_INDEX, 75);
+  DALI_TEST_EQUALS(children[1].GetProperty<int>(Actor::Property::DEPTH_INDEX), 75, TEST_LOCATION);
+
+  // Reset to default.
+  children[0].SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  children[1].SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  children[2].SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  DALI_TEST_EQUALS(children[0].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(children[1].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(children[2].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorDepthIndexDoesNotAffectSiblingOrderP(void)
+{
+  TestApplication application;
+  tet_infoline("Test that DEPTH_INDEX changes affect only render order, not sibling order operations");
+
+  Actor parent = Actor::New();
+  application.GetScene().Add(parent);
+
+  Actor child1 = Actor::New();
+  Actor child2 = Actor::New();
+  Actor child3 = Actor::New();
+
+  parent.Add(child1);
+  parent.Add(child2);
+  parent.Add(child3);
+
+  // Raise child1 visually via DEPTH_INDEX.
+  child1.SetProperty(Actor::Property::DEPTH_INDEX, 100);
+
+  // Sibling order remains add order: child1, child2, child3.
+  DALI_TEST_EQUALS(parent.GetChildAt(0), child1, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), child2, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), child3, TEST_LOCATION);
+
+  // Even with high DEPTH_INDEX, child1 is still at index 0.
+  DALI_TEST_EQUALS(parent.GetChildAt(0).GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  // Sibling order APIs still move based on the mChildren order, not DEPTH_INDEX.
+  // child1 is at index 0 (bottom); Raise() swaps it up one step in mChildren.
+  child1.Raise();
+  DALI_TEST_EQUALS(parent.GetChildAt(0), child2, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), child1, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), child3, TEST_LOCATION);
+
+  // DEPTH_INDEX is preserved across sibling order changes.
+  DALI_TEST_EQUALS(child1.GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorDepthIndexRenderAndHitOrder(void)
+{
+  tet_infoline("Test that DEPTH_INDEX changes the render order (verified via hit-test: top actor is hit)\n");
+
+  TestApplication          application;
+  Dali::Integration::Scene scene(application.GetScene());
+
+  // Three fully-overlapping actors, added in order A, B, C.
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  Actor actors[] = {actorA, actorB, actorC};
+  for(auto& actor : actors)
+  {
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+    actor.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  }
+
+  scene.Add(actorA);
+  scene.Add(actorB);
+  scene.Add(actorC);
+
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
+
+  application.SendNotification();
+  application.Render();
+
+  // A single touch point; only the top-most (last rendered) actor is hit.
+  Dali::Integration::Point point;
+  point.SetDeviceId(1);
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(10.f, 10.f));
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint(point);
+
+  // Default: sibling order decides, so C (added last) is on top and gets the touch.
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C
+
+  // Raise A above the others purely via DEPTH_INDEX (no sibling reorder).
+  actorA.SetProperty(Actor::Property::DEPTH_INDEX, 100);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, true, TEST_LOCATION); // A now on top
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Give B an even higher DEPTH_INDEX so it goes above A.
+  actorB.SetProperty(Actor::Property::DEPTH_INDEX, 200);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, true, TEST_LOCATION); // B now on top
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Reset DEPTH_INDEX to default: render order falls back to sibling order, C on top again.
+  actorA.SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  actorB.SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C again
+
+  END_TEST;
+}
+
+int UtcDaliActorDepthIndexSetBeforeAddAndRemove(void)
+{
+  tet_infoline("Test DEPTH_INDEX set before Add (and Remove) keeps the non-zero-DEPTH_INDEX child counter correct\n");
+
+  TestApplication          application;
+  Dali::Integration::Scene scene(application.GetScene());
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  Actor actors[] = {actorA, actorB, actorC};
+  for(auto& actor : actors)
+  {
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+    actor.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  }
+
+  // Set DEPTH_INDEX on A *before* it is parented. This makes Add() see a non-zero
+  // DEPTH_INDEX child and take the counter-increment path.
+  actorA.SetProperty(Actor::Property::DEPTH_INDEX, 100);
+  DALI_TEST_EQUALS(actorA.GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  scene.Add(actorA); // added with a non-zero DEPTH_INDEX
+  scene.Add(actorB);
+  scene.Add(actorC);
+
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
+
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Point point;
+  point.SetDeviceId(1);
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(10.f, 10.f));
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint(point);
+
+  // A was added last-in-render-order because of its pre-set DEPTH_INDEX, so it is on top.
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, true, TEST_LOCATION); // A on top via pre-set DEPTH_INDEX
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Remove A while it still has a non-zero DEPTH_INDEX: exercises the counter-decrement path.
+  scene.Remove(actorA);
+  application.SendNotification();
+  application.Render();
+
+  // With A gone and B, C at default DEPTH_INDEX, render order falls back to sibling order (C on top).
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C on top
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetDepthIndexMethodP(void)
+{
+  TestApplication application;
+  tet_infoline("Test Actor::SetDepthIndex() / GetDepthIndex()");
+
+  Actor actor = Actor::New();
+
+  // Default value.
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 0, TEST_LOCATION);
+
+  // Setter / getter round-trip, and consistency with the property.
+  actor.SetDepthIndex(100);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<int32_t>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  // Negative values are valid.
+  actor.SetDepthIndex(-10);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), -10, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<int32_t>(Actor::Property::DEPTH_INDEX), -10, TEST_LOCATION);
+
+  // Setting the same value again is a no-op.
+  actor.SetDepthIndex(-10);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), -10, TEST_LOCATION);
+
+  // The property setter is visible through the getter.
+  actor.SetProperty(Actor::Property::DEPTH_INDEX, 55);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 55, TEST_LOCATION);
+
+  // Reset to the default.
+  actor.SetDepthIndex(0);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<int32_t>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  // Works while on the scene too.
+  application.GetScene().Add(actor);
+  actor.SetDepthIndex(7);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 7, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetDepthIndexFiresPropertySetSignalP(void)
+{
+  TestApplication application;
+  tet_infoline("Test that SetDepthIndex() routes through SetProperty() and fires the PropertySetSignal");
+
+  Actor actor = Actor::New();
+
+  bool                         signalReceived(false);
+  Property::Index              index(Property::INVALID_INDEX);
+  Property::Value              value;
+  ConvenienceSetterSignalCheck check(signalReceived, index, value);
+  actor.PropertySetSignal().Connect(&application, check);
+
+  actor.SetDepthIndex(42);
+
+  DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::DEPTH_INDEX, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.Get<int32_t>(), 42, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetDepthIndexMethodRenderAndHitOrder(void)
+{
+  tet_infoline("Test that SetDepthIndex() changes the render order (verified via hit-test)\n");
+
+  TestApplication          application;
+  Dali::Integration::Scene scene(application.GetScene());
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parent.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+  parent.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  application.GetScene().Add(parent);
+
+  // Three fully-overlapping actors, added in order A, B, C.
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  Actor actors[] = {actorA, actorB, actorC};
+  for(auto& actor : actors)
+  {
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+    actor.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  }
+
+  parent.Add(actorA);
+  parent.Add(actorB);
+  parent.Add(actorC);
+
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
+
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Point point;
+  point.SetDeviceId(1);
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(10.f, 10.f));
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint(point);
+
+  // Default: sibling order decides, so C (added last) is on top.
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C
+
+  // Raise A above the others purely via SetDepthIndex().
+  actorA.SetDepthIndex(100);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, true, TEST_LOCATION); // A now on top
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Sibling order is unaffected.
+  DALI_TEST_EQUALS(parent.GetChildAt(0), actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), actorC, TEST_LOCATION);
+
+  // Lower A below the others via a negative depth index.
+  actorA.SetDepthIndex(-100);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C on top again
+
+  END_TEST;
+}
