@@ -275,6 +275,7 @@ void TapGestureDetector::OnActorDestroyed(Object& object)
 
 bool TapGestureDetector::OnTouchEvent(Dali::Actor actor, Dali::TouchEvent touch)
 {
+  Dali::TapGestureDetector handle = Dali::TapGestureDetector(this); ///< Keep reference until HandleEvent finished.
   return HandleEvent(actor, touch);
 }
 

@@ -23,6 +23,7 @@
 #include <memory> // for unique_ptr
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/common/vector-wrapper.h>
 #include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/ordered-set.h>

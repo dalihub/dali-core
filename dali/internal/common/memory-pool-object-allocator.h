@@ -57,7 +57,7 @@ public:
   : mPool(nullptr),
     mMemoryPoolEnabled(true)
   {
-#if !defined(__LP64__) && defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
+#if !defined(__LP64__) && !defined(_WIN64) && defined(LOW_SPEC_MEMORY_MANAGEMENT_ENABLED)
     if(!forceUseMemoryPool)
     {
       mMemoryPoolEnabled = false;

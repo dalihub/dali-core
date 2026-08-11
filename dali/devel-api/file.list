@@ -49,6 +49,7 @@ SET( devel_api_src_files
 # Add devel header files here DALi internal developer files used by Adaptor & Toolkit
 SET( devel_api_core_actors_header_files
   ${devel_api_src_dir}/actors/actor-devel.h
+  ${devel_api_src_dir}/actors/actor-enumerations-devel.h
   ${devel_api_src_dir}/actors/camera-actor-devel.h
   ${devel_api_src_dir}/actors/custom-actor-devel.h
   ${devel_api_src_dir}/actors/size-negotiated-actor.h

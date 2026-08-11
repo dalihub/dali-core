@@ -18,6 +18,7 @@
  *
  */
 
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/actors/size-negotiated-actor.h>
 #include <dali/devel-api/object/property-helper-devel.h>
 #include <dali/integration-api/scene.h>

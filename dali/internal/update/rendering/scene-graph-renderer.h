@@ -685,7 +685,7 @@ private:
 
   Dali::Extents mUpdateAreaExtents;
 
-  BlendMode::Type                mBlendMode : 3;            ///< Local copy of the mode of blending
+  BlendMode::Type                mBlendMode : 4;            ///< Local copy of the mode of blending
   DevelRenderer::Rendering::Type mRenderingBehavior : 2;    ///< The rendering behavior
   Decay                          mUpdateDecay : 2;          ///< Update decay (aging)
   bool                           mRegenerateUniformMap : 1; ///< true if the map should be regenerated

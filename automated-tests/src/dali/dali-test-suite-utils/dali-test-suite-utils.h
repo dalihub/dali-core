@@ -20,9 +20,11 @@
 
 // EXTERNAL INCLUDES
 #include <cstdarg>
+#include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <type_traits>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -39,6 +41,17 @@ void tet_printf(const char* format, ...);
 #include "test-actor-utils.h"
 #include "test-application.h"
 #include "test-gesture-generator.h"
+
+#if defined(_MSC_VER)
+static inline int setenv(const char* name, const char* value, int overwrite)
+{
+  if(!overwrite && std::getenv(name) != nullptr)
+  {
+    return 0;
+  }
+  return _putenv_s(name, value);
+}
+#endif
 
 using namespace Dali;
 
@@ -58,9 +71,8 @@ constexpr int32_t basenameIndex(const char* const path, const int32_t index = 0,
            : (slashIndex + 1);
 }
 
-#define __FILELINE__ ({ static const int32_t basenameIdx = basenameIndex( __FILE__ ); \
-                         static_assert (basenameIdx >= 0, "compile-time basename" );   \
-                         &(__FILE__ ":" STRINGIZE(__LINE__))[basenameIdx]; })
+#define __FILELINE__ (&(__FILE__ ":" STRINGIZE(__LINE__))[basenameIndex(__FILE__)])
+
 
 #define TEST_LOCATION __FILELINE__
 #define TEST_INNER_LOCATION(x) (std::string(x) + " (" + STRINGIZE(__LINE__) + ")").c_str()
@@ -123,6 +135,18 @@ inline void DALI_TEST_EQUALS(Type value1, Type value2, const char* location)
   {
     tet_result(TET_PASS);
   }
+}
+
+template<typename Type1,
+         typename Type2,
+         std::enable_if_t<std::is_arithmetic_v<Type1> &&
+                            std::is_arithmetic_v<Type2> &&
+                            !std::is_same_v<Type1, Type2>,
+                          int> = 0>
+inline void DALI_TEST_EQUALS(Type1 value1, Type2 value2, const char* location)
+{
+  using CommonType = std::common_type_t<Type1, Type2>;
+  DALI_TEST_EQUALS<CommonType>(static_cast<CommonType>(value1), static_cast<CommonType>(value2), location);
 }
 
 /**

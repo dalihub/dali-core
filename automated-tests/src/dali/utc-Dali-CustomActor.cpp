@@ -16,6 +16,7 @@
  */
 
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/actors/custom-actor-devel.h>
 #include <dali/devel-api/object/type-registry-helper.h>
 #include <dali/integration-api/events/hover-event-integ.h>
@@ -320,6 +321,7 @@ int UtcDaliCustomActorTouchHookConsumesWithoutSignal(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 
@@ -349,6 +351,7 @@ int UtcDaliCustomActorTouchHookFallsThroughWhenNotConsumed(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 
@@ -426,6 +429,7 @@ int UtcDaliCustomActorHoverHookConsumesWithoutSignal(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 
@@ -455,6 +459,7 @@ int UtcDaliCustomActorHoverHookFallsThroughWhenNotConsumed(void)
 
   // Reset self-reference count to avoid memory leak.
   impl->mLastHitActor.Reset();
+  impl->mLastFinalizedHitActor.Reset();
   END_TEST;
 }
 

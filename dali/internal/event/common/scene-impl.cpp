@@ -19,6 +19,7 @@
 #include <dali/internal/event/common/scene-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>

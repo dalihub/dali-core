@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/actors/size-negotiated-actor.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actors/actor-impl.h>

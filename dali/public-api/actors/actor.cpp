@@ -69,9 +69,24 @@ void Actor::Add(Actor actor)
   GetImplementation(*this).Add(GetImplementation(actor));
 }
 
+void Actor::InsertAbove(Actor child, Actor target)
+{
+  GetImplementation(*this).InsertAbove(GetImplementation(child), GetImplementation(target));
+}
+
+void Actor::InsertBelow(Actor child, Actor target)
+{
+  GetImplementation(*this).InsertBelow(GetImplementation(child), GetImplementation(target));
+}
+
 void Actor::Remove(Actor actor)
 {
   GetImplementation(*this).Remove(GetImplementation(actor));
+}
+
+void Actor::RemoveAll()
+{
+  GetImplementation(*this).RemoveAll();
 }
 
 void Actor::Unparent()
@@ -602,6 +617,16 @@ void Actor::SetDrawMode(DrawMode::Type drawMode)
 DrawMode::Type Actor::GetDrawMode() const
 {
   return GetImplementation(*this).GetDrawMode();
+}
+
+void Actor::SetDepthIndex(int32_t depthIndex)
+{
+  GetImplementation(*this).SetProperty(Actor::Property::DEPTH_INDEX, depthIndex);
+}
+
+int32_t Actor::GetDepthIndex() const
+{
+  return GetImplementation(*this).GetDepthIndex();
 }
 
 void Actor::SetBlendEquation(Dali::BlendEquation::Type blendEquation)

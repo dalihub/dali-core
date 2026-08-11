@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/public-api/math/vector3.h>

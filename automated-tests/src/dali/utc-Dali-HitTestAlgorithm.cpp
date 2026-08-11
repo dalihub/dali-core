@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/integration-api/events/touch-event-integ.h>
@@ -1288,7 +1289,7 @@ int UtcDaliHitTestAlgorithmBuildPickingRay02(void)
   DALI_TEST_EQUALS(direction, Vector3(0.144f, 0.24f, -0.96f), 0.01f, TEST_LOCATION);
 
   // For offscreen picking ray
-  camPos = Vector3(offscreenCameraActor[Actor::Property::POSITION]);
+  camPos = offscreenCameraActor[Actor::Property::POSITION].operator Vector3();
 
   const float ELLIPSION = 0.001f; ///< tiny margin to avoid non-hitting cases
 

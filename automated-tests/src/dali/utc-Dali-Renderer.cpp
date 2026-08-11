@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/property-map-devel.h>
 #include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/signals/render-callback.h>
@@ -3217,43 +3218,50 @@ int UtcDaliRendererBlendModeUseActorOpacity(void)
   scene.GetRootLayer().SetProperty(Layer::Property::BEHAVIOR, Layer::LAYER_3D);
   scene.Add(actor);
 
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& commandBufferTrace = application.GetGraphicsController().mCommandBufferCallStack;
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::USE_ACTOR_OPACITY);
-  actor.AddRenderer(renderer);
-  application.GetScene().Add(actor);
+
+  commandBufferTrace.Reset();
 
   application.SendNotification();
   application.Render();
 
   // Check the default depth-write status first.
-  DALI_TEST_CHECK(glAbstraction.GetLastDepthMask());
+  TraceCallStack::NamedParams depthWriteEnabled;
+  depthWriteEnabled["enabled"] << "T";
+  DALI_TEST_CHECK(commandBufferTrace.FindMethodAndParams("SetDepthWriteEnable", depthWriteEnabled));
 
   // Turn off depth-writing.
   actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 0.5));
+  commandBufferTrace.Reset();
 
   application.SendNotification();
   application.Render();
 
   // Check depth-write is now disabled.
-  DALI_TEST_CHECK(!glAbstraction.GetLastDepthMask());
+  TraceCallStack::NamedParams depthWriteDisabled;
+  depthWriteDisabled["enabled"] << "F";
+  DALI_TEST_CHECK(commandBufferTrace.FindMethodAndParams("SetDepthWriteEnable", depthWriteDisabled));
 
   // Turn on depth-writing.
   actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 1));
+  commandBufferTrace.Reset();
 
   application.SendNotification();
   application.Render();
 
   // Check depth-write is now enabled.
-  DALI_TEST_CHECK(glAbstraction.GetLastDepthMask());
+  DALI_TEST_CHECK(commandBufferTrace.FindMethodAndParams("SetDepthWriteEnable", depthWriteEnabled));
 
   // Turn off depth-writing.
   actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 0.0));
+  commandBufferTrace.Reset();
 
   application.SendNotification();
   application.Render();
 
-  // if actor alpha is 0, SetDepthWriteEnable is not called so GetLastDepthMask returns default value true;
-  DALI_TEST_CHECK(glAbstraction.GetLastDepthMask());
+  // A fully transparent actor is culled, so no depth-write command should be recorded.
+  DALI_TEST_EQUALS(commandBufferTrace.CountMethod("SetDepthWriteEnable"), 0, TEST_LOCATION);
 
   END_TEST;
 }

@@ -15,7 +15,6 @@
  *
  */
 
-#include <dali-test-suite-utils.h>
 #include <dali/devel-api/addons/addon-base.h>
 
 #include <cstring>
@@ -39,7 +38,6 @@ public:
     info.name    = "SampleAddOn";
     info.version = Dali::DALI_ADDON_VERSION(1, 0, 0);
     info.next    = nullptr;
-    tet_printf("SampleAddOn: GetAddOnInfo() : name = %s\n", info.name.c_str());
   }
 
   /**

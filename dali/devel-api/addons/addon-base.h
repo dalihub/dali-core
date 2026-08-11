@@ -256,22 +256,27 @@ inline void AddOnConstructorInternal()
 
 /**
  * Macro must be used in order to auto-register AddOn with the AddOnManager.
- * Note: The macro requires GCC/Clang compiler and currently only Linux-based environment
- * is supported.
  */
 #define REGISTER_ADDON_CLASS(ADDON_CLASS_WITH_FULL_NAMESPACE) \
   namespace Dali                                              \
   {                                                           \
   namespace AddOns                                            \
   {                                                           \
-  __attribute__((constructor)) void AddOnConstructor()        \
-  {                                                           \
-    AddOnConstructorInternal();                               \
-  }                                                           \
   AddOnBase* AddOnBase::mSingleton = nullptr;                 \
   AddOnBase* CreateAddOn()                                    \
   {                                                           \
     return new ADDON_CLASS_WITH_FULL_NAMESPACE();             \
+  }                                                           \
+  namespace                                                   \
+  {                                                           \
+  struct AddOnRegistrar                                       \
+  {                                                           \
+    AddOnRegistrar()                                          \
+    {                                                         \
+      AddOnConstructorInternal();                             \
+    }                                                         \
+  };                                                          \
+  AddOnRegistrar gAddOnRegistrar;                             \
   }                                                           \
   }                                                           \
   }

@@ -24,6 +24,7 @@
 #include <dali/public-api/math/vector3.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-relayouter.h>
@@ -522,6 +523,17 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
         {
           parent->SetSiblingOrderOfChild(actor, value);
         }
+      }
+      break;
+    }
+
+    case Dali::Actor::Property::DEPTH_INDEX:
+    {
+      int value;
+
+      if(property.Get(value))
+      {
+        actor.SetDepthIndex(value);
       }
       break;
     }
@@ -1471,6 +1483,12 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       {
         value = 0;
       }
+      break;
+    }
+
+    case Dali::Actor::Property::DEPTH_INDEX:
+    {
+      value = actor.GetDepthIndex();
       break;
     }
 

@@ -69,11 +69,17 @@ void EmitLongPressSignal(
     oss << "[" << gestureDetectors.size() << "]";
   });
 
-  Dali::Actor                                    actorHandle(actor);
-  const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
-  for(GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter)
+  std::vector<GestureDetectorPtr> detectorSnapshot;
+  detectorSnapshot.reserve(gestureDetectors.size());
+  for(GestureDetector* detector : gestureDetectors)
   {
-    static_cast<LongPressGestureDetector*>(*iter)->EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));
+    detectorSnapshot.emplace_back(detector);
+  }
+
+  Dali::Actor actorHandle(actor);
+  for(const GestureDetectorPtr& detector : detectorSnapshot)
+  {
+    static_cast<LongPressGestureDetector*>(detector.Get())->EmitLongPressGestureSignal(actorHandle, Dali::LongPressGesture(longPress.Get()));
   }
 
   DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_EMIT_LONG_PRESS_GESTURE_SIGNAL", [&](std::ostringstream& oss)

@@ -34,6 +34,7 @@
 #include <dali/public-api/math/vector3.h>
 
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 
 #include <dali/integration-api/debug.h>
@@ -121,6 +122,7 @@ DALI_PROPERTY("worldColor", VECTOR4, false, false, true, Dali::Actor::Property::
 DALI_PROPERTY("colorMode", INTEGER, true, false, false, Dali::Actor::Property::COLOR_MODE)
 DALI_PROPERTY("worldMatrix", MATRIX, false, false, true, Dali::Actor::Property::WORLD_MATRIX)
 DALI_PROPERTY("drawMode", INTEGER, true, false, false, Dali::Actor::Property::DRAW_MODE)
+DALI_PROPERTY("depthIndex", INTEGER, true, false, false, Dali::Actor::Property::DEPTH_INDEX)
 DALI_PROPERTY("blendEquation", INTEGER, true, false, false, Dali::Actor::Property::BLEND_EQUATION)
 DALI_PROPERTY("clippingMode", STRING, true, false, false, Dali::Actor::Property::CLIPPING_MODE)
 DALI_PROPERTY("name", STRING, true, false, false, Dali::Actor::Property::NAME)
@@ -977,6 +979,30 @@ void Actor::SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Ty
   }
 }
 
+void Actor::SetDepthIndex(int32_t depthIndex)
+{
+  if(mDepthIndex == depthIndex)
+  {
+    return;
+  }
+
+  // Keep the parent's non-zero depth-index child counter up to date so that the
+  // depth-tree build and hit-test can take a fast path when no override is set.
+  if(Actor* parent = GetParent())
+  {
+    parent->mParentImpl.NotifyChildDepthIndexChanged(mDepthIndex, depthIndex);
+  }
+  mDepthIndex = depthIndex;
+
+  // Draw order changed: rebuild the depth tree. Note we do NOT touch mChildren,
+  // so sibling order / GetChildAt() are unaffected.
+  RequestRenderTaskReorder();
+  if(mScene)
+  {
+    mScene->RequestRebuildDepthTree();
+  }
+}
+
 void Actor::SetSizeModeFactor(const Vector3& factor)
 {
   mSizer.SetSizeModeFactor(factor);
@@ -1507,6 +1533,7 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mName(),
   mSortedDepth(0u),
   mDepth(0u),
+  mDepthIndex(0),
   mLayer3DParentsCount(0),
   mIsRoot(ROOT_LAYER == derivedType),
   mIsLayer(LAYER == derivedType || ROOT_LAYER == derivedType),
@@ -1600,9 +1627,24 @@ void Actor::Add(Actor& child, bool notify)
   mParentImpl.Add(child, notify);
 }
 
+void Actor::InsertAbove(Internal::Actor& child, Internal::Actor& target)
+{
+  InsertChild(child, target, true);
+}
+
+void Actor::InsertBelow(Internal::Actor& child, Internal::Actor& target)
+{
+  InsertChild(child, target, false);
+}
+
 void Actor::Remove(Actor& child, bool notify)
 {
   mParentImpl.Remove(child, notify);
+}
+
+void Actor::RemoveAll()
+{
+  mParentImpl.RemoveAll();
 }
 
 void Actor::SwitchParent(Actor& newParent)
@@ -2292,6 +2334,11 @@ void Actor::RaiseChildAbove(Actor& child, Actor& target)
 void Actor::LowerChildBelow(Actor& child, Actor& target)
 {
   mParentImpl.LowerChildBelow(child, target);
+}
+
+void Actor::InsertChild(Actor& child, Actor& target, bool above)
+{
+  mParentImpl.InsertChild(child, target, above);
 }
 
 } // namespace Internal

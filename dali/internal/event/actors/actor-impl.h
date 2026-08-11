@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/size-negotiation/relayout-container.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/internal/common/const-string.h>
@@ -165,9 +166,24 @@ public:
   void Add(Actor& child, bool notify = true) override;
 
   /**
+   * @copydoc Dali::Actor::InsertAbove()
+   */
+  void InsertAbove(Internal::Actor& child, Internal::Actor& target);
+
+  /**
+   * @copydoc Dali::Actor::InsertBelow()
+   */
+  void InsertBelow(Internal::Actor& child, Internal::Actor& target);
+
+  /**
    * @copydoc Dali::Internal::ActorParent::Remove()
    */
   void Remove(Actor& child, bool notify = true) override;
+
+  /**
+   * @copydoc Dali::Actor::RemoveAll()
+   */
+  void RemoveAll() override;
 
   /**
    * @copydoc Dali::DevelActor::SwitchParent()
@@ -196,6 +212,22 @@ public:
    * @note The internal container is lazily initialized so ensure you check the child count before using the value returned by this method.
    */
   ActorContainer& GetChildrenInternal();
+
+  /**
+   * @copydoc Dali::Internal::ActorParentImpl::HasNonZeroDepthIndexChildren
+   */
+  bool HasNonZeroDepthIndexChildren() const
+  {
+    return mParentImpl.HasNonZeroDepthIndexChildren();
+  }
+
+  /**
+   * @copydoc Dali::Internal::ActorParentImpl::GetChildrenInDepthOrder
+   */
+  const ActorContainer& GetChildrenInDepthOrder()
+  {
+    return mParentImpl.GetChildrenInDepthOrder();
+  }
 
   /**
    * @copydoc Dali::Internal::ActorParent::FindChildByName
@@ -1053,6 +1085,23 @@ public:
   }
 
   void SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Type childrenDepthIndexPolicy);
+
+  /**
+   * @brief Set the render(draw) order of this actor among its siblings (Property::DEPTH_INDEX).
+   * @details Higher values are drawn on top. Actors with an equal value fall back to sibling order.
+   *          This does NOT change the sibling order (mChildren), only the draw/hit-test order.
+   * @param[in] depthIndex The new render order
+   */
+  void SetDepthIndex(int32_t depthIndex);
+
+  /**
+   * @brief Get the render(draw) order of this actor among its siblings (Property::DEPTH_INDEX).
+   * @return The current render order
+   */
+  inline int32_t GetDepthIndex() const
+  {
+    return mDepthIndex;
+  }
 
 public:
   // Size negotiation virtual functions
@@ -2570,6 +2619,11 @@ private:
    */
   void LowerChildBelow(Actor& child, Actor& target) override;
 
+  /**
+   * @copydoc ActorParent::InsertChild()
+   */
+  void InsertChild(Actor& child, Actor& target, bool above) override;
+
 protected:
   ActorParentImpl    mParentImpl;     ///< Implementation of ActorParent;
   ActorSizer         mSizer;          ///< Implementation for managing actor size
@@ -2606,6 +2660,7 @@ protected:
   std::string mName;        ///< Name of the actor
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+  int32_t     mDepthIndex;  ///< Render(draw) order sort key among siblings (Property::DEPTH_INDEX). Does NOT change sibling order.
 
   int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 
@@ -2645,7 +2700,7 @@ protected:
   ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.
   PointState::Type                           mHoverState : 3;               ///< Stores the HoverEvent state of actor.
 
-  Dali::BlendEquation::Type mBlendEquation : 16; ///< Cached: Determines which blend equation will be used to render renderers.
+  Dali::BlendEquation::Type mBlendEquation : 17; ///< Cached: Determines which blend equation will be used to render renderers.
 
   uint8_t mOffScreenRenderableBitField; ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 

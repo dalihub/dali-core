@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/events/key-event-devel.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/events/key-event-integ.h>

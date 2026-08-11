@@ -345,14 +345,13 @@ bool IsOverlayRoot(const Actor& actor, const bool isParentOverlay)
   return false;
 }
 
-bool IsHitClipped(const Actor&                                   actor,
-                  const Dali::Layer::Behavior                    layerBehavior,
-                  const Integration::Scene::TouchPropagationType propagationType,
-                  const Ray&                                     ray,
-                  const float&                                   projectedNearClippingDistance,
-                  const float&                                   projectedFarClippingDistance)
+bool IsHitClipped(const Actor&                 actor,
+                  const Dali::Layer::Behavior  layerBehavior,
+                  const Ray&                   ray,
+                  const float&                 projectedNearClippingDistance,
+                  const float&                 projectedFarClippingDistance)
 {
-  bool isClippingRequired = (layerBehavior != Dali::Layer::LAYER_3D) && ((actor.GetClippingMode() != ClippingMode::DISABLED) || (propagationType == Integration::Scene::TouchPropagationType::GEOMETRY));
+  bool isClippingRequired = (layerBehavior != Dali::Layer::LAYER_3D) && (actor.GetClippingMode() != ClippingMode::DISABLED);
   if(isClippingRequired)
   {
     if(!actor.IsLayer() && !IsActorPickable(ray, projectedNearClippingDistance, projectedFarClippingDistance, actor))
@@ -413,7 +412,7 @@ bool HitTestActorOnce(std::vector<std::shared_ptr<HitResult>>& hitResultList,
     return false;
   }
 
-  if(IsHitClipped(currentActor, layerBehavior, hitCheck.GetPropagationType(), ray, projectedNearClippingDistance, projectedFarClippingDistance))
+  if(IsHitClipped(currentActor, layerBehavior, ray, projectedNearClippingDistance, projectedFarClippingDistance))
   {
     return false;
   }
@@ -458,18 +457,23 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
     return false;
   }
 
-  if(IsHitClipped(currentActor, layerBehavior, hitCheck.GetPropagationType(), ray, projectedNearClippingDistance, projectedFarClippingDistance))
+  if(IsHitClipped(currentActor, layerBehavior, ray, projectedNearClippingDistance, projectedFarClippingDistance))
   {
     return false;
   }
 
   if(currentActor.GetChildCount() > 0)
   {
-    ActorContainer&                  children = currentActor.GetChildrenInternal();
-    ActorContainer::reverse_iterator endIter  = children.rend();
-    for(ActorContainer::reverse_iterator iter = children.rbegin(); endIter != iter; ++iter)
+    // Children in render order (ascending Property::DEPTH_INDEX, ties broken by sibling order).
+    // When no child overrides its DEPTH_INDEX, render order == sibling order, so we use mChildren
+    // directly. Iterate top-most (last drawn) to bottom-most so the actor on top is hit first.
+    const ActorContainer& orderedChildren = currentActor.HasNonZeroDepthIndexChildren()
+                                              ? currentActor.GetChildrenInDepthOrder()
+                                              : currentActor.GetChildrenInternal();
+
+    for(auto iter = orderedChildren.rbegin(), endIter = orderedChildren.rend(); iter != endIter; ++iter)
     {
-      Actor& childActor = *((*iter).Get());
+      Actor& childActor = *(iter->Get());
       if(childActor.IsLayer())
       {
         continue;
@@ -554,11 +558,16 @@ void RetrieveValidActorTrees(std::vector<Actor*>&                       validAct
     return;
   }
 
-  ActorContainer&          children = parentActor.GetChildrenInternal();
-  ActorContainer::iterator endIter  = children.end();
-  for(ActorContainer::iterator iter = children.begin(); endIter != iter; ++iter)
+  // Collect overlay roots in ascending render order (Property::DEPTH_INDEX, ties broken by sibling
+  // order) so that, once the caller iterates the result in reverse, the top-most overlay is
+  // hit-tested first - consistent with the depth-tree render order. mChildren is not modified.
+  const ActorContainer& orderedChildren = parentActor.HasNonZeroDepthIndexChildren()
+                                            ? parentActor.GetChildrenInDepthOrder()
+                                            : parentActor.GetChildrenInternal();
+
+  for(auto iter = orderedChildren.begin(), endIter = orderedChildren.end(); iter != endIter; ++iter)
   {
-    Actor& childActor = *((*iter).Get());
+    Actor& childActor = *(iter->Get());
     if(childActor.IsLayer())
     {
       continue;

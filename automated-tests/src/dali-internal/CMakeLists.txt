@@ -45,6 +45,8 @@ SET(TC_SOURCES
   utc-Dali-Internal-TransformManagerProperty.cpp
 )
 
+SET(TC_SOURCE_LIST ${TC_SOURCES})
+
 LIST(APPEND TC_SOURCES
   ../dali/dali-test-suite-utils/mesh-builder.cpp
   ../dali/dali-test-suite-utils/test-custom-actor.cpp
@@ -73,6 +75,10 @@ LIST(APPEND TC_SOURCES
   ../dali/dali-test-suite-utils/test-addon-manager.cpp
   ../dali/dali-test-suite-utils/test-render-surface-if.cpp
 )
+
+IF(DALI_TEST_SOURCE_LIST_ONLY)
+  RETURN()
+ENDIF()
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
   dali2-core

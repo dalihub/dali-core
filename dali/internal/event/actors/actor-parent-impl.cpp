@@ -58,9 +58,15 @@ ActorParentImpl::ActorParentImpl(Actor& owner)
 ActorParentImpl::~ActorParentImpl()
 {
   delete mChildren;
+  delete mRenderOrderCache;
 }
 
 void ActorParentImpl::Add(Actor& child, bool notify)
+{
+  AddChild(child, notify, nullptr, false);
+}
+
+void ActorParentImpl::AddChild(Actor& child, bool notify, Actor* insertRelativeTo, bool above)
 {
   DALI_ASSERT_ALWAYS(&mOwner != &child && "Cannot add actor to itself");
   DALI_ASSERT_ALWAYS(!child.IsRoot() && "Cannot add root actor");
@@ -90,8 +96,31 @@ void ActorParentImpl::Add(Actor& child, bool notify)
     // Guard against Add() during previous OnChildRemove callback
     if(!child.GetParent())
     {
-      // Do this first, since user callbacks from within SetParent() may need to remove child
-      mChildren->push_back(ActorPtr(&child));
+      // Do this first, since user callbacks from within SetParent() may need to remove child.
+      // When an anchor is given, insert directly at the final position so the child is where it
+      // belongs before any notification below; otherwise append (topmost).
+      if(insertRelativeTo)
+      {
+        auto iter = std::find(mChildren->begin(), mChildren->end(), insertRelativeTo);
+        if(iter != mChildren->end() && above)
+        {
+          ++iter; // insert directly after the anchor -> immediately above it
+        }
+        // If the anchor vanished (e.g. removed during the old parent's OnChildRemove), insert()
+        // with end() falls back to appending.
+        mChildren->insert(iter, ActorPtr(&child));
+      }
+      else
+      {
+        mChildren->push_back(ActorPtr(&child));
+      }
+
+      // Keep the render-order fast-path counter in sync with the child's DEPTH_INDEX.
+      if(child.GetDepthIndex() != 0)
+      {
+        ++mChildrenWithNonZeroDepthIndex;
+      }
+      mRenderOrderCacheDirty = true;
 
       // SetParent asserts that child can be added
       child.SetParent(&mOwner, notify);
@@ -133,6 +162,13 @@ void ActorParentImpl::Remove(Actor& child, bool notify)
       // Keep handle for OnChildRemove notification
       removed = (*iter);
 
+      // Keep the render-order fast-path counter in sync with the child's DEPTH_INDEX.
+      if(child.GetDepthIndex() != 0)
+      {
+        --mChildrenWithNonZeroDepthIndex;
+      }
+      mRenderOrderCacheDirty = true;
+
       // Do this first, since user callbacks from within SetParent() may need to add the child
       mChildren->erase(iter);
 
@@ -157,6 +193,42 @@ void ActorParentImpl::Remove(Actor& child, bool notify)
     // Notification for derived classes
     mOwner.OnChildRemove(child);
     EmitChildRemovedSignal(child);
+  }
+}
+
+void ActorParentImpl::RemoveAll()
+{
+  if(!mChildren || mChildren->empty())
+  {
+    // no children to remove
+    return;
+  }
+
+  // Detach the whole container up front so that any re-entrant callback (OnChildRemove /
+  // ChildRemoved) observes an already-empty parent and cannot disturb the sequence we iterate.
+  // The local container keeps every child referenced until its notification has been sent.
+  ActorContainer removedChildren;
+  std::swap(removedChildren, *mChildren);
+
+  // All children are leaving, so reset the render-order fast-path bookkeeping in one shot.
+  mChildrenWithNonZeroDepthIndex = 0u;
+  mRenderOrderCacheDirty         = true;
+
+  for(auto& childPtr : removedChildren)
+  {
+    Actor& child = *childPtr;
+    DALI_ASSERT_DEBUG(child.GetParent() == &mOwner);
+    child.SetParent(nullptr); // This causes scene-graph disconnection & related notifications
+
+    // Notification for derived classes and applications, mirroring Remove().
+    mOwner.OnChildRemove(child);
+    EmitChildRemovedSignal(child);
+  }
+
+  // Only put in a relayout request if there is a suitable dependency
+  if(mOwner.RelayoutDependentOnChildren())
+  {
+    mOwner.RelayoutRequest();
   }
 }
 
@@ -423,6 +495,50 @@ void ActorParentImpl::LowerChildBelow(Actor& child, Actor& target)
   }
 }
 
+void ActorParentImpl::InsertChild(Actor& child, Actor& target, bool above)
+{
+  DALI_ASSERT_ALWAYS(&child != &target && "Cannot insert actor relative to itself");
+
+  // The target must already be one of our children for the relative position to be meaningful.
+  if(target.GetParent() != &mOwner)
+  {
+    DALI_LOG_WARNING("Target Actor must be a child of this actor, insertion not done.\n");
+    return;
+  }
+
+  if(child.GetParent() != &mOwner)
+  {
+    // Fresh insertion (new child or reparented from elsewhere): add it directly at the final
+    // position. This reparents from any old parent (with ChildRemoved), connects to the scene,
+    // and emits ChildAddedSignal exactly once, after the child is where it belongs - never at an
+    // intermediate top-of-list position. No ChildOrderChanged: the child had no previous order.
+    AddChild(child, true, &target, above);
+    return;
+  }
+
+  // Pure sibling reorder: the child is already ours, so move it adjacent to the target and
+  // report it as an order change (no re-add).
+  auto childIter = std::find(mChildren->begin(), mChildren->end(), &child);
+  if(childIter == mChildren->end())
+  {
+    return;
+  }
+
+  ActorPtr childPtr(&child); // ensure the actor remains referenced across erase/insert.
+  mChildren->erase(childIter);
+
+  // Erasing invalidates iterators, so locate the target afterwards.
+  auto targetIter = std::find(mChildren->begin(), mChildren->end(), &target);
+  if(above)
+  {
+    ++targetIter; // insert directly after the target -> immediately above it
+  }
+  mChildren->insert(targetIter, childPtr);
+
+  RequestRenderTaskReorderRecursively();
+  EmitOrderChangedAndRebuild(child);
+}
+
 void ActorParentImpl::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths>& sceneGraphNodeDepths,
                                              int32_t&                              depthIndex)
 {
@@ -433,27 +549,62 @@ void ActorParentImpl::DepthTraverseActorTree(OwnerPointer<SceneGraph::NodeDepths
   // Create/add to children of this node
   if(mChildren)
   {
+    // Visit children in render order (ascending DEPTH_INDEX, ties broken by sibling order).
+    // When no child overrides its DEPTH_INDEX, render order == sibling order, so we take the
+    // fast path over mChildren directly without copying/sorting. mChildren is never modified.
+    const ActorContainer& orderedChildren = HasNonZeroDepthIndexChildren() ? GetChildrenInDepthOrder() : *mChildren;
+
     if(mOwner.GetChildrenDepthIndexPolicy() == DevelActor::ChildrenDepthIndexPolicy::INCREASE)
     {
-      for(const auto& actor : *mChildren)
+      for(const auto& child : orderedChildren)
       {
         ++depthIndex;
-        actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+        child->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
       }
     }
     else
     {
       int32_t       maxDepthIndex   = depthIndex;
       const int32_t childDepthIndex = ++depthIndex;
-      for(const auto& actor : *mChildren)
+      for(const auto& child : orderedChildren)
       {
         depthIndex = childDepthIndex;
-        actor->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
+        child->mParentImpl.DepthTraverseActorTree(sceneGraphNodeDepths, depthIndex);
         maxDepthIndex = Max(maxDepthIndex, depthIndex);
       }
       depthIndex = maxDepthIndex;
     }
   }
+}
+
+const ActorContainer& ActorParentImpl::GetChildrenInDepthOrder()
+{
+  if(!mRenderOrderCache)
+  {
+    mRenderOrderCache = new ActorContainer();
+  }
+
+  // The cache is rebuilt only when the render order actually changed (DEPTH_INDEX,
+  // add/remove or sibling reorder). In steady state this is a cheap read.
+  if(mRenderOrderCacheDirty)
+  {
+    ActorContainer& cache = *mRenderOrderCache;
+    if(mChildren)
+    {
+      cache = *mChildren; // copy the sibling-ordered list, then reorder by DEPTH_INDEX
+
+      // Stable sort keeps sibling order for children sharing the same DEPTH_INDEX.
+      std::stable_sort(cache.begin(), cache.end(), [](const ActorPtr& lhs, const ActorPtr& rhs)
+      { return lhs->GetDepthIndex() < rhs->GetDepthIndex(); });
+    }
+    else
+    {
+      cache.clear();
+    }
+    mRenderOrderCacheDirty = false;
+  }
+
+  return *mRenderOrderCache;
 }
 
 void ActorParentImpl::RecursiveConnectToScene(ActorContainer& connectionList, uint32_t layer3DParentsCount, uint32_t depth)
@@ -629,6 +780,9 @@ void ActorParentImpl::EmitChildRemovedSignal(Actor& child)
 
 void ActorParentImpl::EmitOrderChangedAndRebuild(Actor& child)
 {
+  // A sibling reorder changes the tie-break between children of equal DEPTH_INDEX.
+  mRenderOrderCacheDirty = true;
+
   EmitSignal(mOwner, mChildOrderChangedSignal, Dali::Actor(&child));
 
   if(mOwner.OnScene())

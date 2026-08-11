@@ -20,6 +20,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/threading/thread.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>
@@ -769,6 +770,147 @@ int UtcDaliActorAddN(void)
   END_TEST;
 }
 
+int UtcDaliActorInsertAboveP(void)
+{
+  tet_infoline("Testing Actor::InsertAbove");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  // Sibling order (bottom -> top): a, b, c
+  DALI_TEST_EQUALS(parent.GetChildCount(), 3u, TEST_LOCATION);
+
+  // Insert a brand new (parentless) actor immediately above b -> a, b, d, c
+  Actor d = Actor::New();
+  parent.InsertAbove(d, b);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), c, TEST_LOCATION);
+
+  // Re-position an existing child: move a immediately above c -> b, d, c, a
+  parent.InsertAbove(a, c);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), a, TEST_LOCATION);
+
+  // Reparent a child from another parent, inserting it above d -> b, d, e, c, a
+  Actor otherParent = Actor::New();
+  Actor e           = Actor::New();
+  otherParent.Add(e);
+  DALI_TEST_EQUALS(otherParent.GetChildCount(), 1u, TEST_LOCATION);
+
+  parent.InsertAbove(e, d);
+  DALI_TEST_EQUALS(otherParent.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(e.GetParent(), parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), e, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(4), a, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorInsertBelowP(void)
+{
+  tet_infoline("Testing Actor::InsertBelow");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  // Sibling order (bottom -> top): a, b, c
+
+  // Insert a brand new (parentless) actor immediately below b -> a, d, b, c
+  Actor d = Actor::New();
+  parent.InsertBelow(d, b);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), b, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), c, TEST_LOCATION);
+
+  // Re-position an existing child: move c immediately below a -> c, a, d, b
+  parent.InsertBelow(c, a);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), b, TEST_LOCATION);
+
+  // Reparent a child from another parent, inserting it below d -> c, a, e, d, b
+  Actor otherParent = Actor::New();
+  Actor e           = Actor::New();
+  otherParent.Add(e);
+
+  parent.InsertBelow(e, d);
+  DALI_TEST_EQUALS(otherParent.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 5u, TEST_LOCATION);
+  DALI_TEST_EQUALS(e.GetParent(), parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), c, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), a, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), e, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), d, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(4), b, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorInsertN(void)
+{
+  tet_infoline("Testing Actor::InsertAbove/InsertBelow negative cases");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+
+  // Inserting an actor relative to itself asserts
+  try
+  {
+    parent.InsertAbove(a, a);
+    tet_printf("Assertion test failed - no Exception\n");
+    tet_result(TET_FAIL);
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT(e);
+    DALI_TEST_ASSERT(e, "&child != &target", TEST_LOCATION);
+  }
+  catch(...)
+  {
+    tet_printf("Assertion test failed - wrong Exception\n");
+    tet_result(TET_FAIL);
+  }
+
+  // Target that is not a child of the parent -> no-op, child not added
+  Actor stranger = Actor::New();
+  Actor newChild = Actor::New();
+  parent.InsertAbove(newChild, stranger);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 2u, TEST_LOCATION);
+  DALI_TEST_CHECK(!newChild.GetParent());
+
+  END_TEST;
+}
+
 int UtcDaliActorRemoveN(void)
 {
   tet_infoline("Testing Actor::Remove");
@@ -840,6 +982,92 @@ int UtcDaliActorRemoveP(void)
   application.GetScene().Remove(parent);
 
   DALI_TEST_CHECK(parent.GetChildCount() == 1);
+  END_TEST;
+}
+
+int UtcDaliActorRemoveAllP(void)
+{
+  tet_infoline("Testing Actor::RemoveAll");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 3u, TEST_LOCATION);
+
+  parent.RemoveAll();
+
+  // Parent is emptied and each former child is detached.
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+  DALI_TEST_CHECK(!a.GetParent());
+  DALI_TEST_CHECK(!b.GetParent());
+  DALI_TEST_CHECK(!c.GetParent());
+
+  // The handles are still alive (referenced by the test), and can be re-added.
+  parent.Add(a);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 1u, TEST_LOCATION);
+
+  // RemoveAll on an actor with no children is a no-op.
+  Actor empty = Actor::New();
+  empty.RemoveAll();
+  DALI_TEST_EQUALS(empty.GetChildCount(), 0u, TEST_LOCATION);
+
+  // RemoveAll called twice: second call is a no-op.
+  parent.RemoveAll();
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+  parent.RemoveAll();
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+// Counts ChildRemoved emissions and records the parent's child count observed at each emission.
+struct RemoveAllSignalCheck
+{
+  RemoveAllSignalCheck(int& removedCount, int& childCountAtEmit)
+  : mRemovedCount(removedCount),
+    mChildCountAtEmit(childCountAtEmit)
+  {
+  }
+
+  void operator()(Actor parent, Actor child)
+  {
+    ++mRemovedCount;
+    // Every ChildRemoved must observe the parent as already fully emptied.
+    mChildCountAtEmit = static_cast<int>(parent.GetChildCount());
+  }
+
+  int& mRemovedCount;
+  int& mChildCountAtEmit;
+};
+
+int UtcDaliActorRemoveAllSignals(void)
+{
+  tet_infoline("Testing Actor::RemoveAll emits ChildRemoved per child, and the parent is already empty at emit time");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+
+  int                  childCountAtEmit = -1;
+  int                  removedCount     = 0;
+  RemoveAllSignalCheck removedCheck(removedCount, childCountAtEmit);
+  parent.ChildRemovedSignal().Connect(&application, removedCheck);
+
+  parent.RemoveAll();
+
+  DALI_TEST_EQUALS(removedCount, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(childCountAtEmit, 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildCount(), 0u, TEST_LOCATION);
+
   END_TEST;
 }
 
@@ -11417,6 +11645,106 @@ int UtcDaliChildAddedSignalN(void)
   END_TEST;
 }
 
+// Records, at the moment ChildAddedSignal fires, the sibling index of the added child within
+// its parent. Used to verify the child is already at its final insert position when notified.
+struct ChildAddedPositionCheck
+{
+  ChildAddedPositionCheck(int& indexAtEmit)
+  : mIndexAtEmit(indexAtEmit)
+  {
+  }
+
+  void operator()(Actor parent, Actor child)
+  {
+    mIndexAtEmit = -1;
+    for(uint32_t i = 0; i < parent.GetChildCount(); ++i)
+    {
+      if(parent.GetChildAt(i) == child)
+      {
+        mIndexAtEmit = static_cast<int>(i);
+        break;
+      }
+    }
+  }
+
+  int& mIndexAtEmit;
+};
+
+int UtcDaliActorInsertAddedSignalPosition(void)
+{
+  tet_infoline("Testing Actor::InsertAbove/InsertBelow emit ChildAdded only after the child is at its final position");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  Actor c      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+  parent.Add(c);
+  // Sibling order (bottom -> top): a, b, c
+
+  int                     indexAtEmit = -99;
+  ChildAddedPositionCheck posCheck(indexAtEmit);
+  parent.ChildAddedSignal().Connect(&application, posCheck);
+
+  // Insert d immediately above b. At the moment ChildAdded fires, d must already sit at index 2
+  // (a, b, d, c) - NOT at the top where a naive Add-then-move would have transiently placed it.
+  Actor d = Actor::New();
+  parent.InsertAbove(d, b);
+  DALI_TEST_EQUALS(indexAtEmit, 2, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), d, TEST_LOCATION);
+
+  // Insert e immediately below b -> a, e, b, d, c ; ChildAdded must see e at index 1.
+  indexAtEmit = -99;
+  Actor e     = Actor::New();
+  parent.InsertBelow(e, b);
+  DALI_TEST_EQUALS(indexAtEmit, 1, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), e, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorInsertSignals(void)
+{
+  tet_infoline("Testing Actor::InsertAbove/InsertBelow emit ChildAdded and ChildOrderChanged signals");
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  Actor a      = Actor::New();
+  Actor b      = Actor::New();
+  parent.Add(a);
+  parent.Add(b);
+
+  bool                     orderChangedSignal(false);
+  Actor                    orderChangedActor;
+  ChildOrderChangedFunctor orderFunctor(orderChangedSignal, orderChangedActor);
+  DevelActor::ChildOrderChangedSignal(parent).Connect(&application, orderFunctor);
+
+  bool                  addedSignal(false);
+  Actor                 addedActor;
+  ChildAddedSignalCheck addedCheck(addedSignal, addedActor);
+  parent.ChildAddedSignal().Connect(&application, addedCheck);
+
+  // Inserting a fresh child emits ChildAdded only; it has no previous order, so
+  // ChildOrderChanged must NOT be emitted.
+  Actor c = Actor::New();
+  parent.InsertAbove(c, a);
+  DALI_TEST_EQUALS(addedSignal, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(addedActor, c, TEST_LOCATION);
+  DALI_TEST_EQUALS(orderChangedSignal, false, TEST_LOCATION);
+
+  // Re-positioning an existing child emits ChildOrderChanged only (no re-add).
+  addedSignal        = false;
+  orderChangedSignal = false;
+  parent.InsertBelow(c, a);
+  DALI_TEST_EQUALS(addedSignal, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(orderChangedSignal, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(orderChangedActor, c, TEST_LOCATION);
+
+  END_TEST;
+}
+
 struct ChildRemovedSignalCheck
 {
   ChildRemovedSignalCheck(bool& signalReceived, Actor& childHandle)
@@ -17621,6 +17949,408 @@ int UtcDaliActorConvenienceSettersFirePropertySetSignal02P(void)
   actor.SetPositionUsesPivotEnabled(true);
   DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
   DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::POSITION_USES_PIVOT, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetDepthIndexP(void)
+{
+  TestApplication application;
+  tet_infoline("Test Actor::Property::DEPTH_INDEX: render order independent of sibling order");
+
+  Actor parent = Actor::New();
+  application.GetScene().Add(parent);
+
+  // Create 5 child actors in sibling order 1,2,3,4,5.
+  std::vector<Actor> children;
+  for(int i = 0; i < 5; ++i)
+  {
+    Actor child = Actor::New();
+    parent.Add(child);
+    children.push_back(child);
+  }
+
+  // Default DEPTH_INDEX is 0 for all.
+  for(int i = 0; i < 5; ++i)
+  {
+    DALI_TEST_EQUALS(children[i].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+  }
+
+  // Setting DEPTH_INDEX via property works.
+  children[2].SetProperty(Actor::Property::DEPTH_INDEX, 100);
+  DALI_TEST_EQUALS(children[2].GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  children[4].SetProperty(Actor::Property::DEPTH_INDEX, -10);
+  DALI_TEST_EQUALS(children[4].GetProperty<int>(Actor::Property::DEPTH_INDEX), -10, TEST_LOCATION);
+
+  // Sibling order (GetChildAt) is NOT affected by DEPTH_INDEX.
+  // Children are still in add order: 0,1,2,3,4 despite their DEPTH_INDEX values.
+  DALI_TEST_EQUALS(parent.GetChildAt(0), children[0], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), children[1], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), children[2], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(3), children[3], TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(4), children[4], TEST_LOCATION);
+
+  // Raise/Lower (sibling order APIs) don't change DEPTH_INDEX.
+  children[1].Raise();
+  DALI_TEST_EQUALS(children[1].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  children[3].RaiseToTop();
+  DALI_TEST_EQUALS(children[3].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  // DEPTH_INDEX change doesn't affect sibling order.
+  children[0].SetProperty(Actor::Property::DEPTH_INDEX, 50);
+  DALI_TEST_EQUALS(parent.GetChildAt(0), children[0], TEST_LOCATION); // still at index 0
+  DALI_TEST_EQUALS(children[0].GetProperty<int>(Actor::Property::DEPTH_INDEX), 50, TEST_LOCATION);
+
+  // Multiple DEPTH_INDEX assignments and retrieval.
+  children[1].SetProperty(Actor::Property::DEPTH_INDEX, 25);
+  children[1].SetProperty(Actor::Property::DEPTH_INDEX, 75);
+  DALI_TEST_EQUALS(children[1].GetProperty<int>(Actor::Property::DEPTH_INDEX), 75, TEST_LOCATION);
+
+  // Reset to default.
+  children[0].SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  children[1].SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  children[2].SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  DALI_TEST_EQUALS(children[0].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(children[1].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(children[2].GetProperty<int>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorDepthIndexDoesNotAffectSiblingOrderP(void)
+{
+  TestApplication application;
+  tet_infoline("Test that DEPTH_INDEX changes affect only render order, not sibling order operations");
+
+  Actor parent = Actor::New();
+  application.GetScene().Add(parent);
+
+  Actor child1 = Actor::New();
+  Actor child2 = Actor::New();
+  Actor child3 = Actor::New();
+
+  parent.Add(child1);
+  parent.Add(child2);
+  parent.Add(child3);
+
+  // Raise child1 visually via DEPTH_INDEX.
+  child1.SetProperty(Actor::Property::DEPTH_INDEX, 100);
+
+  // Sibling order remains add order: child1, child2, child3.
+  DALI_TEST_EQUALS(parent.GetChildAt(0), child1, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), child2, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), child3, TEST_LOCATION);
+
+  // Even with high DEPTH_INDEX, child1 is still at index 0.
+  DALI_TEST_EQUALS(parent.GetChildAt(0).GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  // Sibling order APIs still move based on the mChildren order, not DEPTH_INDEX.
+  // child1 is at index 0 (bottom); Raise() swaps it up one step in mChildren.
+  child1.Raise();
+  DALI_TEST_EQUALS(parent.GetChildAt(0), child2, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(1), child1, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), child3, TEST_LOCATION);
+
+  // DEPTH_INDEX is preserved across sibling order changes.
+  DALI_TEST_EQUALS(child1.GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorDepthIndexRenderAndHitOrder(void)
+{
+  tet_infoline("Test that DEPTH_INDEX changes the render order (verified via hit-test: top actor is hit)\n");
+
+  TestApplication          application;
+  Dali::Integration::Scene scene(application.GetScene());
+
+  // Three fully-overlapping actors, added in order A, B, C.
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  Actor actors[] = {actorA, actorB, actorC};
+  for(auto& actor : actors)
+  {
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+    actor.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  }
+
+  scene.Add(actorA);
+  scene.Add(actorB);
+  scene.Add(actorC);
+
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
+
+  application.SendNotification();
+  application.Render();
+
+  // A single touch point; only the top-most (last rendered) actor is hit.
+  Dali::Integration::Point point;
+  point.SetDeviceId(1);
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(10.f, 10.f));
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint(point);
+
+  // Default: sibling order decides, so C (added last) is on top and gets the touch.
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C
+
+  // Raise A above the others purely via DEPTH_INDEX (no sibling reorder).
+  actorA.SetProperty(Actor::Property::DEPTH_INDEX, 100);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, true, TEST_LOCATION); // A now on top
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Give B an even higher DEPTH_INDEX so it goes above A.
+  actorB.SetProperty(Actor::Property::DEPTH_INDEX, 200);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, true, TEST_LOCATION); // B now on top
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Reset DEPTH_INDEX to default: render order falls back to sibling order, C on top again.
+  actorA.SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  actorB.SetProperty(Actor::Property::DEPTH_INDEX, 0);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C again
+
+  END_TEST;
+}
+
+int UtcDaliActorDepthIndexSetBeforeAddAndRemove(void)
+{
+  tet_infoline("Test DEPTH_INDEX set before Add (and Remove) keeps the non-zero-DEPTH_INDEX child counter correct\n");
+
+  TestApplication          application;
+  Dali::Integration::Scene scene(application.GetScene());
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  Actor actors[] = {actorA, actorB, actorC};
+  for(auto& actor : actors)
+  {
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+    actor.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  }
+
+  // Set DEPTH_INDEX on A *before* it is parented. This makes Add() see a non-zero
+  // DEPTH_INDEX child and take the counter-increment path.
+  actorA.SetProperty(Actor::Property::DEPTH_INDEX, 100);
+  DALI_TEST_EQUALS(actorA.GetProperty<int>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  scene.Add(actorA); // added with a non-zero DEPTH_INDEX
+  scene.Add(actorB);
+  scene.Add(actorC);
+
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
+
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Point point;
+  point.SetDeviceId(1);
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(10.f, 10.f));
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint(point);
+
+  // A was added last-in-render-order because of its pre-set DEPTH_INDEX, so it is on top.
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, true, TEST_LOCATION); // A on top via pre-set DEPTH_INDEX
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Remove A while it still has a non-zero DEPTH_INDEX: exercises the counter-decrement path.
+  scene.Remove(actorA);
+  application.SendNotification();
+  application.Render();
+
+  // With A gone and B, C at default DEPTH_INDEX, render order falls back to sibling order (C on top).
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C on top
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetDepthIndexMethodP(void)
+{
+  TestApplication application;
+  tet_infoline("Test Actor::SetDepthIndex() / GetDepthIndex()");
+
+  Actor actor = Actor::New();
+
+  // Default value.
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 0, TEST_LOCATION);
+
+  // Setter / getter round-trip, and consistency with the property.
+  actor.SetDepthIndex(100);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 100, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<int32_t>(Actor::Property::DEPTH_INDEX), 100, TEST_LOCATION);
+
+  // Negative values are valid.
+  actor.SetDepthIndex(-10);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), -10, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<int32_t>(Actor::Property::DEPTH_INDEX), -10, TEST_LOCATION);
+
+  // Setting the same value again is a no-op.
+  actor.SetDepthIndex(-10);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), -10, TEST_LOCATION);
+
+  // The property setter is visible through the getter.
+  actor.SetProperty(Actor::Property::DEPTH_INDEX, 55);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 55, TEST_LOCATION);
+
+  // Reset to the default.
+  actor.SetDepthIndex(0);
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<int32_t>(Actor::Property::DEPTH_INDEX), 0, TEST_LOCATION);
+
+  // Works while on the scene too.
+  application.GetScene().Add(actor);
+  actor.SetDepthIndex(7);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(actor.GetDepthIndex(), 7, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetDepthIndexFiresPropertySetSignalP(void)
+{
+  TestApplication application;
+  tet_infoline("Test that SetDepthIndex() routes through SetProperty() and fires the PropertySetSignal");
+
+  Actor actor = Actor::New();
+
+  bool                         signalReceived(false);
+  Property::Index              index(Property::INVALID_INDEX);
+  Property::Value              value;
+  ConvenienceSetterSignalCheck check(signalReceived, index, value);
+  actor.PropertySetSignal().Connect(&application, check);
+
+  actor.SetDepthIndex(42);
+
+  DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::DEPTH_INDEX, TEST_LOCATION);
+  DALI_TEST_EQUALS(value.Get<int32_t>(), 42, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliActorSetDepthIndexMethodRenderAndHitOrder(void)
+{
+  tet_infoline("Test that SetDepthIndex() changes the render order (verified via hit-test)\n");
+
+  TestApplication          application;
+  Dali::Integration::Scene scene(application.GetScene());
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  parent.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+  parent.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  application.GetScene().Add(parent);
+
+  // Three fully-overlapping actors, added in order A, B, C.
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+
+  Actor actors[] = {actorA, actorB, actorC};
+  for(auto& actor : actors)
+  {
+    actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
+    actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+    actor.SetProperty(DevelActor::Property::WIDTH_RESIZE_POLICY, "FILL_TO_PARENT");
+    actor.SetProperty(DevelActor::Property::HEIGHT_RESIZE_POLICY, "FILL_TO_PARENT");
+  }
+
+  parent.Add(actorA);
+  parent.Add(actorB);
+  parent.Add(actorC);
+
+  actorA.TouchEventSignal().Connect(TestTouchCallback);
+  actorB.TouchEventSignal().Connect(TestTouchCallback2);
+  actorC.TouchEventSignal().Connect(TestTouchCallback3);
+
+  application.SendNotification();
+  application.Render();
+
+  Dali::Integration::Point point;
+  point.SetDeviceId(1);
+  point.SetState(PointState::DOWN);
+  point.SetScreenPosition(Vector2(10.f, 10.f));
+  Dali::Integration::TouchEvent touchEvent;
+  touchEvent.AddPoint(point);
+
+  // Default: sibling order decides, so C (added last) is on top.
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C
+
+  // Raise A above the others purely via SetDepthIndex().
+  actorA.SetDepthIndex(100);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, true, TEST_LOCATION); // A now on top
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, false, TEST_LOCATION);
+
+  // Sibling order is unaffected.
+  DALI_TEST_EQUALS(parent.GetChildAt(0), actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetChildAt(2), actorC, TEST_LOCATION);
+
+  // Lower A below the others via a negative depth index.
+  actorA.SetDepthIndex(-100);
+  application.SendNotification();
+  application.Render();
+
+  ResetTouchCallbacks();
+  application.ProcessEvent(touchEvent);
+  DALI_TEST_EQUALS(gTouchCallBackCalled, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled2, false, TEST_LOCATION);
+  DALI_TEST_EQUALS(gTouchCallBackCalled3, true, TEST_LOCATION); // C on top again
 
   END_TEST;
 }

@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/actor-devel.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/public-api/dali-core.h>
@@ -483,8 +484,8 @@ int UtcDaliGeoHitTestAlgorithmOverlay(void)
   //Hit in the intersection red, green. Should pick the red actor since it is an child of overlay.
   HitTest(scene, Vector2(stageSize.x * 15.0f / 24.0f, stageSize.y * 11.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
   tet_printf("%d %d %d , %f %f\n", results.actor == red ? 1 : 0, results.actor == green ? 1 : 0, results.actor == blue ? 1 : 0, results.actorCoordinates.x, results.actorCoordinates.y);
-  DALI_TEST_CHECK(results.actor == green);
-  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 5.0f / 12.0f, actorSize.y * 1.0f / 12.0f), TEST_LOCATION);
+  DALI_TEST_CHECK(results.actor == red);
+  DALI_TEST_EQUALS(results.actorCoordinates, Vector2(actorSize.x * 3.0f / 12.0f, actorSize.y * 11.0f / 12.0f), TEST_LOCATION);
 
   //Hit in the intersection blue, green. Should pick the blue actor since it is an overlay.
   HitTest(scene, Vector2(stageSize.x * 11.0f / 24.0f, stageSize.y * 13.0f / 24.0f), results, &DefaultIsActorTouchableFunction, Dali::Integration::Scene::TouchPropagationType::GEOMETRY);
@@ -822,7 +823,7 @@ int UtcDaliGeoHitTestAlgorithmBuildPickingRay02(void)
   DALI_TEST_EQUALS(direction, Vector3(0.144f, 0.24f, -0.96f), 0.01f, TEST_LOCATION);
 
   // For offscreen picking ray
-  camPos = Vector3(offscreenCameraActor[Actor::Property::POSITION]);
+  camPos = offscreenCameraActor[Actor::Property::POSITION].operator Vector3();
 
   const float ELLIPSION = 0.001f; ///< tiny margin to avoid non-hitting cases
 

@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/devel-api/actors/actor-enumerations-devel.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali

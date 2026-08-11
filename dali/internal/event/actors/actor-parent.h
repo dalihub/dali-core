@@ -1,7 +1,7 @@
 #ifndef DALI_INTERNAL_ACTOR_PARENT_H
 #define DALI_INTERNAL_ACTOR_PARENT_H
 /*
- * Copyright (c) 2024 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use actor file except in compliance with the License.
@@ -60,6 +60,12 @@ public:
    * @note If notify is false, Add() method must be called after this method.
    */
   virtual void Remove(Actor& child, bool notify = true) = 0;
+
+  /**
+   * Removes all child Actors from this Actor.
+   * @post The children will be unreferenced, each with an OnChildRemove callback and ChildRemoved signal.
+   */
+  virtual void RemoveAll() = 0;
 
   /**
    * Retrieve the number of children held by the actor.
@@ -153,6 +159,17 @@ public:
    * @return true if order has been modified
    */
   virtual void LowerChildBelow(Actor& child, Actor& target) = 0;
+
+  /**
+   * @brief Insert the child immediately above or below the target actor within the siblings list.
+   *
+   * The child is reparented into this actor if it is not already a child, then positioned
+   * directly adjacent to the target.
+   * @param[in] child The actor to insert
+   * @param[in] target The target actor, which must already be a child of this actor
+   * @param[in] above If true, the child is placed immediately above the target; otherwise below
+   */
+  virtual void InsertChild(Actor& child, Actor& target, bool above) = 0;
 };
 
 } // namespace Internal
