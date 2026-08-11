@@ -317,7 +317,7 @@ protected:
 
   DepthFunction::Type            mDepthFunction : 4;             ///< Local copy of the depth function
   FaceCullingMode::Type          mFaceCullingMode : 3;           ///< Local copy of the mode of face culling
-  BlendMode::Type                mBlendMode : 3;                 ///< Local copy of the mode of blending
+  BlendMode::Type                mBlendMode : 4;                 ///< Local copy of the mode of blending
   DepthWriteMode::Type           mDepthWriteMode : 3;            ///< Local copy of the depth write mode
   DepthTestMode::Type            mDepthTestMode : 3;             ///< Local copy of the depth test mode
   DevelRenderer::Rendering::Type mRenderingBehavior : 2;         ///< The rendering behavior

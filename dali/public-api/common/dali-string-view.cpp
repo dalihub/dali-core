@@ -65,7 +65,14 @@ StringView::StringView(const char* str)
 
 StringView::StringView(const char* str, uint32_t length)
 {
-  new(mStorage) std::string_view(str, length);
+  if(str)
+  {
+    new(mStorage) std::string_view(str, length);
+  }
+  else
+  {
+    new(mStorage) std::string_view();
+  }
 }
 
 StringView::StringView(const String& str)

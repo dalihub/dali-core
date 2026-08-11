@@ -15,11 +15,12 @@
  */
 
 #include <dali-test-suite-utils.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 
 #include <dali/integration-api/queue/queue-benchmark-instrumentation.h>
 
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <string>
 
@@ -52,6 +53,24 @@ void DeleteFile(const char* path)
   std::remove(path);
 }
 
+void SetEnvironmentVariable(const char* name, const char* value)
+{
+#if defined(_WIN32)
+  _putenv_s(name, value);
+#else
+  setenv(name, value, 1);
+#endif
+}
+
+void UnsetEnvironmentVariable(const char* name)
+{
+#if defined(_WIN32)
+  _putenv_s(name, "");
+#else
+  unsetenv(name);
+#endif
+}
+
 } // namespace
 
 void utc_dali_internal_queuebenchmark_startup()
@@ -69,7 +88,7 @@ int UtcDaliInternalQueueBenchmarkDisabledP(void)
   tet_infoline("UtcDaliInternalQueueBenchmarkDisabledP - Benchmark disabled");
 
   // Ensure env var is not set (default state)
-  unsetenv("DALI_QUEUE_BENCHMARK");
+  UnsetEnvironmentVariable("DALI_QUEUE_BENCHMARK");
 
   // Verify IsEnabled returns false
   DALI_TEST_CHECK(QueueBenchmark::IsEnabled() == false);
@@ -105,7 +124,7 @@ int UtcDaliInternalQueueBenchmarkEnabledP(void)
   tet_infoline("UtcDaliInternalQueueBenchmarkEnabledP - Benchmark enabled");
 
   // Set env var to enable benchmark
-  setenv("DALI_QUEUE_BENCHMARK", "1", 1);
+  SetEnvironmentVariable("DALI_QUEUE_BENCHMARK", "1");
 
   // Verify IsEnabled returns true
   DALI_TEST_CHECK(QueueBenchmark::IsEnabled() == true);
@@ -189,7 +208,7 @@ int UtcDaliInternalQueueBenchmarkOverflowP(void)
   tet_infoline("UtcDaliInternalQueueBenchmarkOverflowP - Test overflow handling");
 
   // Enable benchmark
-  setenv("DALI_QUEUE_BENCHMARK", "1", 1);
+  SetEnvironmentVariable("DALI_QUEUE_BENCHMARK", "1");
 
   auto& log = QueueBenchmark::GetLog(QueueBenchmark::Channel::MQ_RESERVE_MESSAGE_SLOT);
 
@@ -218,7 +237,7 @@ int UtcDaliInternalQueueBenchmarkPercentileP(void)
   tet_infoline("UtcDaliInternalQueueBenchmarkPercentileP - Test percentile calculations");
 
   // Enable benchmark
-  setenv("DALI_QUEUE_BENCHMARK", "1", 1);
+  SetEnvironmentVariable("DALI_QUEUE_BENCHMARK", "1");
 
   // Create sorted test data
   std::vector<std::int64_t> samples = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
@@ -267,7 +286,7 @@ int UtcDaliInternalQueueBenchmarkNamesP(void)
   tet_infoline("UtcDaliInternalQueueBenchmarkNamesP - Test name functions");
 
   // Enable benchmark
-  setenv("DALI_QUEUE_BENCHMARK", "1", 1);
+  SetEnvironmentVariable("DALI_QUEUE_BENCHMARK", "1");
 
   // Test ChannelName
   DALI_TEST_CHECK(std::string(QueueBenchmark::ChannelName(QueueBenchmark::Channel::MQ_FLUSH_QUEUE)) == "MQ_FlushQueue");

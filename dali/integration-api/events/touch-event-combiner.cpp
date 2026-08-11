@@ -87,6 +87,10 @@ TouchEventCombiner::TouchEventCombiner(uint32_t minMotionTime, Vector2 minMotion
 
 TouchEventCombiner::~TouchEventCombiner() = default;
 
+TouchEventCombiner::TouchEventCombiner(const TouchEventCombiner& rhs) = default;
+
+TouchEventCombiner& TouchEventCombiner::operator=(const TouchEventCombiner& rhs) = default;
+
 TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent(const Point& point, uint32_t time, TouchEvent& touchEvent, HoverEvent& hoverEvent, bool isMultiTouchEvent)
 {
   TouchEventCombiner::EventDispatchType dispatchEvent(TouchEventCombiner::DISPATCH_NONE);

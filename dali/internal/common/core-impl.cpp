@@ -858,11 +858,11 @@ void Core::LogMemoryPools() const
   mRelayoutController->GetMemoryPoolCapacity(relayoutItemPoolCapacity, relayoutItemPoolSize);
 
 #define SIZE_CONV(cap, type, sz) \
-  cap, ((cap + (1 << 9)) >> 10), TypeSizeWithAlignment<type>::size, cap / TypeSizeWithAlignment<type>::size, sz * 100 / cap
+  cap, ((cap + (1 << 9)) >> 10), TypeSizeWithAlignment<type>::size, cap / TypeSizeWithAlignment<type>::size, (cap == 0u ? 0u : sz * 100u / cap)
 
   DALI_LOG_RELEASE_INFO(
     "\n"
-    "Memory Pool capacities and fill%:\n"
+    "Memory Pool capacities and fill%%:\n"
     "  Animations:          %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
     "  RenderItems:         %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"
     "  Renderers:           %10u byte (%9u KB) [%4zu byte * %6zu items] %3u%%\n"

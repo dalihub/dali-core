@@ -78,14 +78,14 @@ int UtcDaliActorSizer_CalculateSize(void)
   application.SendNotification();
   application.Render();
 
-  size = Vector3(actor[Dali::Actor::Property::SIZE]);
+  size = actor[Dali::Actor::Property::SIZE].operator Vector3();
   DALI_TEST_EQUALS(size.width, 3.5f * 180.0f, 0.00001f, TEST_LOCATION);
 
   DevelActor::SetResizePolicy(actor, ResizePolicy::USE_NATURAL_SIZE, Dimension::WIDTH);
   DevelActor::SetResizePolicy(actor, ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT);
   application.SendNotification();
   application.Render();
-  size = Vector3(actor[Dali::Actor::Property::SIZE]);
+  size = actor[Dali::Actor::Property::SIZE].operator Vector3();
   DALI_TEST_EQUALS(size.height, 1.7f * 150.0f, 0.00001f, TEST_LOCATION);
 
   auto child = Test::TestCustomActor::New();

@@ -88,7 +88,7 @@ void DummyMemoryPool::FreeThreadSafe(void* memory)
 
 void* DummyMemoryPool::GetPtrFromKey(DummyMemoryPool::KeyType key)
 {
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(_WIN64)
   DALI_ASSERT_ALWAYS(false && "We don't allow to use DummyMemoryPool for 64bit OS");
   return nullptr;
 #else
@@ -99,7 +99,7 @@ void* DummyMemoryPool::GetPtrFromKey(DummyMemoryPool::KeyType key)
 
 DummyMemoryPool::KeyType DummyMemoryPool::GetKeyFromPtr(void* ptr)
 {
-#if defined(__LP64__)
+#if defined(__LP64__) || defined(_WIN64)
   DALI_ASSERT_ALWAYS(false && "We don't allow to use DummyMemoryPool for 64bit OS");
   return -1;
 #else

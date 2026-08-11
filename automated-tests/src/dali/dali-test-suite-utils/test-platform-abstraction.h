@@ -37,7 +37,7 @@ namespace Dali
 /**
  * Concrete implementation of the platform abstraction class.
  */
-class DALI_CORE_API TestPlatformAbstraction : public Dali::Integration::PlatformAbstraction
+class TestPlatformAbstraction : public Dali::Integration::PlatformAbstraction
 {
 public:
   /**

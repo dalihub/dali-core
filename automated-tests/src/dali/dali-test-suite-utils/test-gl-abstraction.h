@@ -68,7 +68,7 @@ inline std::string FloatToString(GLfloat value)
   return oss.str();
 }
 
-class DALI_CORE_API TestGlAbstraction : public Dali::Integration::GlAbstraction
+class TestGlAbstraction : public Dali::Integration::GlAbstraction
 {
 public:
   static const int MAX_ATTRIBUTE_CACHE_SIZE{64};

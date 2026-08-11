@@ -24,7 +24,7 @@
 
 namespace Dali
 {
-class DALI_CORE_API TestRenderController : public Dali::Integration::RenderController
+class TestRenderController : public Dali::Integration::RenderController
 {
 public:
   TestRenderController();

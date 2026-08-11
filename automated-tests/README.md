@@ -5,6 +5,32 @@ The current test environment from Tizen is the Web-TCT test suite. This was writ
 
 Each of the DALi repositories, **dali-core**, **dali-adaptor** and **dali-toolkit**, have their own test suites under the `automated-tests` folder. Within the src folder are a number of secondary folders - these correspond to 'API' tests  and internal (for desktop testing only)
 
+Testing on Windows
+==================
+
+The Windows runner reuses the existing `dali` and `dali-internal` UTC
+sources. It builds the core implementation into a test-only object library so
+that internal symbols remain testable without changing the product DLL ABI.
+
+From PowerShell:
+
+    cd automated-tests
+    .\build.ps1
+    .\execute.ps1
+
+Useful filters include:
+
+    .\execute.ps1 -Modules dali
+    .\execute.ps1 -Modules dali-internal
+    .\execute.ps1 -TestCase UtcDaliActorNew
+    .\execute.ps1 -Prefix UtcDaliActor
+    .\execute.ps1 -Labels windows-unsupported -List
+
+Results are written below `results\windows\<timestamp>` as per-test logs,
+`summary.json`, and `junit.xml`. Tests that require ELF
+`dlsym(RTLD_NEXT)` symbol interposition are retained in the test registry and
+reported as explicit Windows skips.
+
 Installation
 ------------
 
