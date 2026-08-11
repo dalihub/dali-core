@@ -41,15 +41,16 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-pair.h>
-#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-string-view.h>
+#include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/dali-utility.h>
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/dali-vector-base.h>
 #include <dali/public-api/common/dali-vector-complex-types.h>
 #include <dali/public-api/common/dali-vector-trivial-types.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/extents.h>
 #include <dali/public-api/common/intrusive-ptr.h>
+#include <dali/public-api/common/open-hash-map-managed.h>
 #include <dali/public-api/common/platform-defines.h>
 #include <dali/public-api/common/shared-ptr.h>
 #include <dali/public-api/common/type-traits.h>
@@ -101,6 +102,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/indirect-value.h>
+#include <dali/public-api/object/invoke-method.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-conditions.h>
@@ -114,6 +116,7 @@
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/type-info-id.h>
 #include <dali/public-api/object/weak-handle.h>
 
 #include <dali/public-api/render-tasks/render-task-list.h>
@@ -136,6 +139,7 @@
 #include <dali/public-api/signals/connection-tracker.h>
 #include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/signals/functor-delegate.h>
+#include <dali/public-api/signals/signal-connection-pool.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 #include <dali/public-api/signals/slot-delegate.h>
