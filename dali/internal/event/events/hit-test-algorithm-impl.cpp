@@ -345,14 +345,13 @@ bool IsOverlayRoot(const Actor& actor, const bool isParentOverlay)
   return false;
 }
 
-bool IsHitClipped(const Actor&                                   actor,
-                  const Dali::Layer::Behavior                    layerBehavior,
-                  const Integration::Scene::TouchPropagationType propagationType,
-                  const Ray&                                     ray,
-                  const float&                                   projectedNearClippingDistance,
-                  const float&                                   projectedFarClippingDistance)
+bool IsHitClipped(const Actor&                 actor,
+                  const Dali::Layer::Behavior  layerBehavior,
+                  const Ray&                   ray,
+                  const float&                 projectedNearClippingDistance,
+                  const float&                 projectedFarClippingDistance)
 {
-  bool isClippingRequired = (layerBehavior != Dali::Layer::LAYER_3D) && ((actor.GetClippingMode() != ClippingMode::DISABLED) || (propagationType == Integration::Scene::TouchPropagationType::GEOMETRY));
+  bool isClippingRequired = (layerBehavior != Dali::Layer::LAYER_3D) && (actor.GetClippingMode() != ClippingMode::DISABLED);
   if(isClippingRequired)
   {
     if(!actor.IsLayer() && !IsActorPickable(ray, projectedNearClippingDistance, projectedFarClippingDistance, actor))
@@ -413,7 +412,7 @@ bool HitTestActorOnce(std::vector<std::shared_ptr<HitResult>>& hitResultList,
     return false;
   }
 
-  if(IsHitClipped(currentActor, layerBehavior, hitCheck.GetPropagationType(), ray, projectedNearClippingDistance, projectedFarClippingDistance))
+  if(IsHitClipped(currentActor, layerBehavior, ray, projectedNearClippingDistance, projectedFarClippingDistance))
   {
     return false;
   }
@@ -458,7 +457,7 @@ bool HitTestActorRecursively(std::vector<std::shared_ptr<HitResult>>& hitResultL
     return false;
   }
 
-  if(IsHitClipped(currentActor, layerBehavior, hitCheck.GetPropagationType(), ray, projectedNearClippingDistance, projectedFarClippingDistance))
+  if(IsHitClipped(currentActor, layerBehavior, ray, projectedNearClippingDistance, projectedFarClippingDistance))
   {
     return false;
   }
