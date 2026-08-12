@@ -139,10 +139,7 @@ public:
    */
   Value* Insert(const Key& key, const Value& value)
   {
-    if(mOccupied * 4u >= mCapacity * 3u) // >= 75% load
-    {
-      Grow();
-    }
+    EnsureCapacityForInsert();
 
     const Key empty     = TraitsType::Empty();
     const Key tombstone = TraitsType::Tombstone();
@@ -433,6 +430,39 @@ private:
     h *= 0xff51afd7ed558ccdULL;
     h ^= h >> 33;
     return static_cast<uint32_t>(h) & mask;
+  }
+
+  void EnsureCapacityForInsert()
+  {
+    if(mCapacity == 0u)
+    {
+      Grow();
+      return;
+    }
+
+    if(mOccupied * 4u >= mCapacity * 3u) // >= 75% occupied (live + tombstones)
+    {
+      if(mSize * 8u >= mCapacity * 5u) // >= 62.5% live
+      {
+        // The live entries need more room.
+        Grow();
+      }
+      else
+      {
+        // Tombstones, rather than live entries, reached the load limit.
+        // Rebuild at the current capacity so short-lived keys cannot make
+        // the table grow indefinitely.
+        //
+        // The live threshold is deliberately lower than the occupied one. If
+        // both were 75%, a table whose live count sits just below the limit
+        // would be rebuilt again after only a handful of inserts — at 767 live
+        // entries in a 1024 table, every second insert triggers a full rebuild.
+        // Growing once at 62.5% leaves at least 12.5% of the table free after
+        // each compaction, which bounds the rebuild rate while still keeping
+        // capacity proportional to the live count rather than to the churn count.
+        RehashTo(mCapacity);
+      }
+    }
   }
 
   void Grow()

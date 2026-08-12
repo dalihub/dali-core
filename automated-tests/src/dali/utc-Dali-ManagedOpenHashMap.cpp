@@ -75,8 +75,20 @@ struct IntEqual
   }
 };
 
-using StringIntMap = ManagedOpenHashMap<std::string, int, StdStringHash, StdStringEqual>;
-using IntIntMap    = ManagedOpenHashMap<uint32_t, int, IntHash, IntEqual>;
+// Hash that sends every key to the same bucket. Keys then occupy consecutive
+// slots via linear probing, which makes the position of a tombstone inside a
+// probe chain deterministic instead of dependent on std::hash values.
+struct CollidingIntHash
+{
+  size_t operator()(const uint32_t&) const noexcept
+  {
+    return 0u;
+  }
+};
+
+using StringIntMap    = ManagedOpenHashMap<std::string, int, StdStringHash, StdStringEqual>;
+using IntIntMap       = ManagedOpenHashMap<uint32_t, int, IntHash, IntEqual>;
+using CollidingIntMap = ManagedOpenHashMap<uint32_t, int, CollidingIntHash, IntEqual>;
 
 } // anonymous namespace
 
@@ -248,6 +260,54 @@ int UtcDaliManagedOpenHashMapGrowth(void)
     DALI_TEST_CHECK(val != nullptr);
     DALI_TEST_EQUALS(*val, i, TEST_LOCATION);
   }
+
+  END_TEST;
+}
+
+int UtcDaliManagedOpenHashMapTombstoneCompaction(void)
+{
+  tet_infoline("ManagedOpenHashMap Insert and TryInsert compact tombstones without growing");
+
+  IntIntMap map;
+  for(uint32_t i = 1u; i <= 6u; ++i)
+  {
+    map.Insert(i, static_cast<int>(i));
+  }
+
+  const uint32_t capacityBefore = map.Capacity();
+  DALI_TEST_EQUALS(capacityBefore, 8u, TEST_LOCATION);
+
+  for(uint32_t i = 1u; i <= 6u; ++i)
+  {
+    DALI_TEST_CHECK(map.Erase(i));
+  }
+
+  map.Insert(100u, 999);
+
+  DALI_TEST_EQUALS(map.Capacity(), capacityBefore, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(*map.Find(100u), 999, TEST_LOCATION);
+
+  IntIntMap tryInsertMap;
+  for(uint32_t i = 1u; i <= 6u; ++i)
+  {
+    DALI_TEST_CHECK(tryInsertMap.TryInsert(i, static_cast<int>(i)).second);
+  }
+
+  const uint32_t tryInsertCapacityBefore = tryInsertMap.Capacity();
+  DALI_TEST_EQUALS(tryInsertCapacityBefore, 8u, TEST_LOCATION);
+
+  for(uint32_t i = 1u; i <= 6u; ++i)
+  {
+    DALI_TEST_CHECK(tryInsertMap.Erase(i));
+  }
+
+  auto result = tryInsertMap.TryInsert(100u, 999);
+
+  DALI_TEST_CHECK(result.second);
+  DALI_TEST_EQUALS(*result.first, 999, TEST_LOCATION);
+  DALI_TEST_EQUALS(tryInsertMap.Capacity(), tryInsertCapacityBefore, TEST_LOCATION);
+  DALI_TEST_EQUALS(tryInsertMap.Size(), 1u, TEST_LOCATION);
 
   END_TEST;
 }
@@ -625,6 +685,66 @@ int UtcDaliManagedOpenHashMapTombstoneChain(void)
   // "b" and "c" should still be findable (may need to probe past tombstone)
   DALI_TEST_EQUALS(*map.Find("b"), 2, TEST_LOCATION);
   DALI_TEST_EQUALS(*map.Find("c"), 3, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliManagedOpenHashMapTombstoneReuseInProbeChain(void)
+{
+  tet_infoline("ManagedOpenHashMap Insert and TryInsert reuse a tombstone found earlier in the probe chain");
+
+  // Keys 1..3 all hash to bucket 0, so they occupy slots 0, 1 and 2. Erasing key
+  // 1 leaves a tombstone at the head of the chain. A later insert of a new key
+  // must probe past the two live entries to the first empty slot, then go back
+  // and reuse that tombstone instead of consuming the empty slot.
+  //
+  // Occupancy stays at 3/8, below the load limit, so the capacity check does not
+  // rehash the tombstone away before the insert reaches it.
+
+  // Insert() path.
+  {
+    CollidingIntMap map;
+    map.Insert(1u, 10);
+    map.Insert(2u, 20);
+    map.Insert(3u, 30);
+    DALI_TEST_EQUALS(map.Capacity(), 8u, TEST_LOCATION);
+
+    DALI_TEST_CHECK(map.Erase(1u));
+    DALI_TEST_EQUALS(map.Size(), 2u, TEST_LOCATION);
+
+    map.Insert(4u, 40);
+
+    DALI_TEST_EQUALS(map.Capacity(), 8u, TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Size(), 3u, TEST_LOCATION);
+    DALI_TEST_EQUALS(*map.Find(4u), 40, TEST_LOCATION);
+
+    // The rest of the chain is still reachable through the reused slot.
+    DALI_TEST_EQUALS(*map.Find(2u), 20, TEST_LOCATION);
+    DALI_TEST_EQUALS(*map.Find(3u), 30, TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Find(1u), static_cast<int*>(nullptr), TEST_LOCATION);
+  }
+
+  // TryInsert() path — same chain, separate implementation.
+  {
+    CollidingIntMap map;
+    DALI_TEST_CHECK(map.TryInsert(1u, 10).second);
+    DALI_TEST_CHECK(map.TryInsert(2u, 20).second);
+    DALI_TEST_CHECK(map.TryInsert(3u, 30).second);
+    DALI_TEST_EQUALS(map.Capacity(), 8u, TEST_LOCATION);
+
+    DALI_TEST_CHECK(map.Erase(1u));
+    DALI_TEST_EQUALS(map.Size(), 2u, TEST_LOCATION);
+
+    auto result = map.TryInsert(4u, 40);
+
+    DALI_TEST_EQUALS(result.second, true, TEST_LOCATION);
+    DALI_TEST_EQUALS(*result.first, 40, TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Capacity(), 8u, TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Size(), 3u, TEST_LOCATION);
+    DALI_TEST_EQUALS(*map.Find(2u), 20, TEST_LOCATION);
+    DALI_TEST_EQUALS(*map.Find(3u), 30, TEST_LOCATION);
+    DALI_TEST_EQUALS(map.Find(1u), static_cast<int*>(nullptr), TEST_LOCATION);
+  }
 
   END_TEST;
 }

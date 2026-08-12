@@ -73,6 +73,17 @@ struct IntEqual
   }
 };
 
+// Hash that sends every key to the same bucket. Keys then occupy consecutive
+// slots via linear probing, which makes the position of a tombstone inside a
+// probe chain deterministic instead of dependent on std::hash values.
+struct CollidingPtrHash
+{
+  size_t operator()(int* const&) const noexcept
+  {
+    return 0u;
+  }
+};
+
 } // anonymous namespace
 
 // Specialize traits for uint32_t keys: 0 = empty, 1 = tombstone
@@ -151,11 +162,12 @@ int UtcDaliOpenHashMapVerifyNoInfiniteLoop(void)
   END_TEST;
 }
 
-int UtcDaliOpenHashMapVerifyLoadFactorGrowth(void)
+int UtcDaliOpenHashMapTombstoneCompaction(void)
 {
-  tet_infoline("VERIFY: Load factor with tombstones triggers unnecessary growth");
+  tet_infoline("VERIFY: Tombstone load triggers same-capacity compaction");
 
-  // This test verifies that tombstones cause table to grow unnecessarily
+  // Tombstones contribute to probe length, but they must not be treated as
+  // live entries when choosing whether to increase the table capacity.
   OpenHashMap<int*, int, PtrHash, PtrEqual> map;
 
   // Insert 6 entries into capacity-8 table
@@ -178,25 +190,16 @@ int UtcDaliOpenHashMapVerifyLoadFactorGrowth(void)
 
   DALI_TEST_EQUALS(map.Size(), 0u, TEST_LOCATION);
 
-  // Insert 1 entry - with 6 tombstones, mOccupied will be 7
-  // 7/8 = 87.5% > 75%, should trigger growth
+  // Inserting with 6 tombstones reaches the occupied-slot limit. The map
+  // should compact those tombstones at the current capacity, not grow.
   int newKey = 100;
   map.Insert(&newKey, 999);
 
   uint32_t capAfter = map.Capacity();
 
-  // Verify the table grew despite only having 1 live entry
-  if(capAfter > capBefore)
-  {
-    tet_infoline("CONFIRMED: Table grew from 8 to 16 with only 1 live entry due to tombstones");
-    DALI_TEST_EQUALS(capAfter, 16u, TEST_LOCATION);
-  }
-  else
-  {
-    tet_infoline("Table did not grow - claim needs verification");
-  }
-
+  DALI_TEST_EQUALS(capAfter, capBefore, TEST_LOCATION);
   DALI_TEST_EQUALS(map.Size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(*map.Find(&newKey), 999, TEST_LOCATION);
 
   END_TEST;
 }
@@ -241,6 +244,46 @@ int UtcDaliOpenHashMapVerifyHighCollisions(void)
 
   DALI_TEST_EQUALS(foundCount, 50, TEST_LOCATION);
   tet_infoline("SUCCESS: All 50 entries foundable with constant hash");
+
+  END_TEST;
+}
+
+int UtcDaliOpenHashMapTombstoneReuseInProbeChain(void)
+{
+  tet_infoline("Insert reuses a tombstone found earlier in the probe chain");
+
+  // All keys hash to bucket 0, so the first three occupy slots 0, 1 and 2.
+  // Erasing the first leaves a tombstone at the head of the chain. Inserting a
+  // new key must probe past the two live entries to the first empty slot, then
+  // go back and reuse that tombstone instead of consuming the empty slot.
+  //
+  // Occupancy stays at 3/8, below the load limit, so the capacity check does not
+  // rehash the tombstone away before the insert reaches it.
+  OpenHashMap<int*, int, CollidingPtrHash, PtrEqual> map;
+
+  int keys[4];
+  for(int i = 0; i < 3; ++i)
+  {
+    keys[i] = i;
+    map.Insert(&keys[i], i * 10);
+  }
+  DALI_TEST_EQUALS(map.Capacity(), 8u, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Size(), 3u, TEST_LOCATION);
+
+  DALI_TEST_CHECK(map.Erase(&keys[0]));
+  DALI_TEST_EQUALS(map.Size(), 2u, TEST_LOCATION);
+
+  keys[3] = 3;
+  map.Insert(&keys[3], 30);
+
+  DALI_TEST_EQUALS(map.Capacity(), 8u, TEST_LOCATION);
+  DALI_TEST_EQUALS(map.Size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(*map.Find(&keys[3]), 30, TEST_LOCATION);
+
+  // The rest of the chain is still reachable through the reused slot.
+  DALI_TEST_EQUALS(*map.Find(&keys[1]), 10, TEST_LOCATION);
+  DALI_TEST_EQUALS(*map.Find(&keys[2]), 20, TEST_LOCATION);
+  DALI_TEST_CHECK(map.Find(&keys[0]) == nullptr);
 
   END_TEST;
 }
