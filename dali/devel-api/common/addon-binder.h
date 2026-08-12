@@ -44,7 +44,7 @@ namespace AddOn
  *   // signature. It will generate member function with correct binding.
  *
  *   // LoadBitmap
- *   ADDON_BIND_FUNCTION( LoadBitmap, bool(const Dali::ImageLoader::Input&, Dali::Devel::PixelBuffer&) );
+ *   ADDON_BIND_FUNCTION( LoadBitmap, bool(const Dali::ImageLoader::Input&, Dali::PixelBuffer&) );
  *
  *   // LoadHeader
  *   ADDON_BIND_FUNCTION( LoadHeader, bool(const Dali::ImageLoader::Input&, unsigned int&, unsigned int&) );
