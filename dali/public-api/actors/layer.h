@@ -92,9 +92,13 @@ public:
      */
     enum
     {
-      NOT_IN_USE_1 = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX,
-      NOT_IN_USE_2,
-      BEHAVIOR, ///< name "behavior", type integer or string @SINCE_1_0.0
+      /**
+       * @brief The behavior of the layer.
+       * @details Name "behavior", type Property::INTEGER or Property::STRING.
+       * @note The valid string values are "LAYER_UI" and "LAYER_3D".
+       * @SINCE_1_0.0
+       */
+      BEHAVIOR = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX,
 
       /**
        * @brief The current depth of the layer.
