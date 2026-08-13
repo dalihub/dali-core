@@ -96,9 +96,7 @@ int UtcDaliPropertyMapMoveConstructor(void)
   // Calling some methods on map1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
   DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
@@ -124,9 +122,7 @@ int UtcDaliPropertyMapMoveAssignmentOperator(void)
   // Calling some methods on map1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
   DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
@@ -156,9 +152,7 @@ int UtcDaliPropertyMapMovedMapP1(void)
   // Calling some methods on map1 will debug assert
   const char* exceptionMessage = "Cannot use an object previously used as an r-value";
   DALI_TEST_ASSERTION(map1.GetValue(0), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.GetKey(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyAt(1), exceptionMessage);
-  DALI_TEST_ASSERTION(map1.GetPair(0), exceptionMessage);
   DALI_TEST_ASSERTION(map1.GetKeyValue(0), exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)["key"], exceptionMessage);
   DALI_TEST_ASSERTION(const_cast<const Property::Map&>(map1)[0], exceptionMessage);
@@ -343,42 +337,6 @@ int UtcDaliPropertyMapGetValue(void)
   END_TEST;
 }
 
-// deprecated API, only retrieve the key from the string-value pairs
-int UtcDaliPropertyMapGetKey(void)
-{
-  Property::Map map;
-  map["hello"]                = 1;
-  map["world"]                = 2;
-  map[Actor::Property::COLOR] = Color::MAGENTA;
-
-  DALI_TEST_CHECK(std::string(map.GetKey(0).CStr()) == "hello");
-  DALI_TEST_CHECK(std::string(map.GetKey(1).CStr()) == "world");
-
-  // Wrong type
-  try
-  {
-    map.GetKey(2);
-    tet_result(TET_FAIL);
-  }
-  catch(DaliException& e)
-  {
-    DALI_TEST_ASSERT(e, "position", TEST_LOCATION);
-  }
-
-  // Out of bounds
-  try
-  {
-    map.GetKey(3);
-    tet_result(TET_FAIL);
-  }
-  catch(DaliException& e)
-  {
-    DALI_TEST_ASSERT(e, "position", TEST_LOCATION);
-  }
-
-  END_TEST;
-}
-
 int UtcDaliPropertyMapGetKeyAt(void)
 {
   Property::Map map;
@@ -393,44 +351,7 @@ int UtcDaliPropertyMapGetKeyAt(void)
   // Out of bounds
   try
   {
-    map.GetKey(3);
-    tet_result(TET_FAIL);
-  }
-  catch(DaliException& e)
-  {
-    DALI_TEST_ASSERT(e, "position", TEST_LOCATION);
-  }
-
-  END_TEST;
-}
-
-int UtcDaliPropertyMapGetPair(void)
-{
-  Property::Map map;
-  map["hello"]                = 1;
-  map["world"]                = 2;
-  map[Actor::Property::COLOR] = Color::MAGENTA;
-
-  DALI_TEST_CHECK(map.GetPair(0).first == "hello");
-  DALI_TEST_CHECK(map.GetPair(0).second.Get<int>() == 1);
-  DALI_TEST_CHECK(map.GetPair(1).first == "world");
-  DALI_TEST_CHECK(map.GetPair(1).second.Get<int>() == 2);
-
-  // Wrong Type
-  try
-  {
-    map.GetPair(2);
-    tet_result(TET_FAIL);
-  }
-  catch(DaliException& e)
-  {
-    DALI_TEST_ASSERT(e, "position", TEST_LOCATION);
-  }
-
-  // Out of bounds
-  try
-  {
-    map.GetPair(3);
+    map.GetKeyAt(3);
     tet_result(TET_FAIL);
   }
   catch(DaliException& e)
@@ -458,7 +379,7 @@ int UtcDaliPropertyMapGetKeyValue(void)
   // Out of bounds
   try
   {
-    map.GetPair(3);
+    map.GetKeyValue(3);
     tet_result(TET_FAIL);
   }
   catch(DaliException& e)

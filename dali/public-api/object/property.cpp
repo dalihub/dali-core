@@ -25,26 +25,14 @@
 namespace Dali
 {
 Property::Property(Handle& obj, Property::Index propIndex)
-: Property(obj, propIndex, Property::INVALID_COMPONENT_INDEX)
-{
-}
-
-Property::Property(Handle& obj, Property::Index propIndex, int32_t compIndex)
 : object(obj),
-  propertyIndex(propIndex),
-  componentIndex(compIndex)
+  propertyIndex(propIndex)
 {
 }
 
 Property::Property(Handle& obj, Dali::String propertyName)
-: Property(obj, propertyName, Property::INVALID_COMPONENT_INDEX)
-{
-}
-
-Property::Property(Handle& obj, Dali::String propertyName, int32_t compIndex)
 : object(obj),
-  propertyIndex(Property::INVALID_INDEX),
-  componentIndex(compIndex)
+  propertyIndex(Property::INVALID_INDEX)
 {
   propertyIndex = object.GetPropertyIndex(propertyName);
 }

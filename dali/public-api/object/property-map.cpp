@@ -187,19 +187,6 @@ Property::Value& Property::Map::GetValue(SizeType position) const
   }
 }
 
-Dali::String Property::Map::GetKey(SizeType position) const
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetKey() is deprecated and will be removed from next release.\n");
-
-  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
-
-  SizeType numStringKeys = static_cast<SizeType>(mImpl->mStringValueContainer.size());
-  DALI_ASSERT_ALWAYS(position < numStringKeys && "position out-of-bounds");
-
-  // Return copy of Dali::String directly
-  return Dali::String(mImpl->mStringValueContainer[position].first);
-}
-
 Property::Key Property::Map::GetKeyAt(SizeType position) const
 {
   DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
@@ -218,19 +205,6 @@ Property::Key Property::Map::GetKeyAt(SizeType position) const
     Key key(mImpl->mIndexValueContainer[position - numStringKeys].first);
     return key;
   }
-}
-
-StringValuePair& Property::Map::GetPair(SizeType position) const
-{
-  DALI_LOG_WARNING_NOFN("DEPRECATION WARNING: GetPair() is deprecated and will be removed from next release.\n");
-
-  DALI_ASSERT_ALWAYS(mImpl && "Cannot use an object previously used as an r-value");
-
-  SizeType numStringKeys = static_cast<SizeType>(mImpl->mStringValueContainer.size());
-
-  DALI_ASSERT_ALWAYS(position < (numStringKeys) && "position out-of-bounds");
-
-  return mImpl->mStringValueContainer[position];
 }
 
 KeyValuePair Property::Map::GetKeyValue(SizeType position) const
