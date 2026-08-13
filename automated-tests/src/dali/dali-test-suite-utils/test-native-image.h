@@ -83,10 +83,6 @@ public:
     mCallStack.PushCall("GetTextureTarget", "");
     return GL_TEXTURE_EXTERNAL_OES;
   };
-  inline virtual bool ApplyNativeFragmentShader(Dali::String& shader) override
-  {
-    return ApplyNativeFragmentShader(shader, 1);
-  }
   inline virtual bool ApplyNativeFragmentShader(Dali::String& shaderStr, int mask) override
   {
     mCallStack.PushCall("ApplyNativeFragmentShader", "");

@@ -2,7 +2,7 @@
 #define DALI_PIXEL_DATA_H
 
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -168,15 +168,6 @@ public:
    * @return The pixel format
    */
   Pixel::Format GetPixelFormat() const;
-
-  /**
-   * @brief Gets the stride of the buffer in pixels.
-   *
-   * @SINCE_2_1.10
-   * @DEPRECATED_2_4.8 Use GetStrideBytes() instead.
-   * @return The stride of the buffer in pixels. 0 means the buffer is tightly packed.
-   */
-  uint32_t GetStride() const;
 
   /**
    * @brief Gets the stride of the buffer in bytes.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,11 +76,6 @@ uint32_t PixelData::GetHeight() const
 Pixel::Format PixelData::GetPixelFormat() const
 {
   return GetImplementation(*this).GetPixelFormat();
-}
-
-uint32_t PixelData::GetStride() const
-{
-  return GetImplementation(*this).GetStride();
 }
 
 uint32_t PixelData::GetStrideBytes() const

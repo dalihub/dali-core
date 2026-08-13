@@ -216,17 +216,6 @@ public:
   virtual void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) = 0;
 
   /**
-   * @brief Sets OffScreenRenderableType of this Actor.
-   * This method is called by child class to set type itself.
-   *
-   * @SINCE_2_3.43
-   * @DEPRECATED_2_4.17 Use RegisterOffScreenRenderableType() instead.
-   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
-   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
-   */
-  void SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
-
-  /**
    * @brief Register OffScreenRenderableType of this Actor.
    * This method is called by child class to set type itself.
    *

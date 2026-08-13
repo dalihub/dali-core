@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,6 @@ int UtcDaliPixelData02(void)
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == 0); ///< Legacy code. Can we remove it?
   DALI_TEST_CHECK(pixelData.GetStrideBytes() == 0);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::L8);
 
@@ -82,7 +81,6 @@ int UtcDaliPixelData03(void)
   DALI_TEST_CHECK(pixelData);
   DALI_TEST_CHECK(pixelData.GetWidth() == width);
   DALI_TEST_CHECK(pixelData.GetHeight() == height);
-  DALI_TEST_CHECK(pixelData.GetStride() == width); ///< Legacy code. Can we remove it?
   DALI_TEST_CHECK(pixelData.GetStrideBytes() == strideBytes);
   DALI_TEST_CHECK(pixelData.GetPixelFormat() == Pixel::RGB888);
 
