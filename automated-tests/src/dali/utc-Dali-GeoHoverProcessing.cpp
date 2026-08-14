@@ -1521,3 +1521,47 @@ int UtcDaliGeoHoverEnsureDifferentConsumerReceivesInterrupted(void)
 
   END_TEST;
 }
+
+int UtcDaliGeoHoverMultipleCallbacksOnOneActor(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor rootActor(application.GetScene().GetRootLayer());
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect two callbacks to the SAME actor's hovered signal. The first consumes,
+  // the second one, connected last, does not.
+  SignalData        consumingData;
+  HoverEventFunctor consumingFunctor(consumingData, true);
+  actor.HoverEventSignal().Connect(&application, consumingFunctor);
+
+  SignalData        passiveData;
+  HoverEventFunctor passiveFunctor(passiveData, false);
+  actor.HoverEventSignal().Connect(&application, passiveFunctor);
+
+  // The root actor only receives the event if the actor below did not consume it,
+  // so it is the probe for whether the two return values were combined with OR.
+  SignalData        rootData;
+  HoverEventFunctor rootFunctor(rootData, false);
+  rootActor.HoverEventSignal().Connect(&application, rootFunctor);
+
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
+
+  // Every connected callback on the actor runs; combining does not short-circuit.
+  DALI_TEST_EQUALS(true, consumingData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, passiveData.functorCalled, TEST_LOCATION);
+
+  // With geometry hittest enabled the results are combined with OR, so the actor
+  // consumed the event and it never reached its parent.
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
