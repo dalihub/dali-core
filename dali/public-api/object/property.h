@@ -124,36 +124,12 @@ struct DALI_CORE_API Property
    * @brief Creates a Property instance.
    *
    * @SINCE_1_0.0
-   * @DEPRECATED_2_4.42
-   * @param[in] object A valid handle to the target object
-   * @param[in] propertyIndex The index of a property
-   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
-   */
-  Property(Handle& object, Property::Index propertyIndex, int32_t componentIndex);
-
-  /**
-   * @brief Creates a Property instance.
-   *
-   * @SINCE_1_0.0
    * @param[in] object A valid handle to the target object
    * @param[in] propertyName The property name
    * @note This performs a property index query and is therefore slower than
    * constructing a Property directly with the index.
    */
   Property(Handle& object, Dali::String propertyName);
-
-  /**
-   * @brief Creates a Property instance.
-   *
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_4.42
-   * @param[in] object A valid handle to the target object
-   * @param[in] propertyName The property name
-   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4. -1 for main property (default is -1)
-   * @note This performs a property index query and is therefore slower than
-   * constructing a Property directly with the index.
-   */
-  Property(Handle& object, Dali::String propertyName, int32_t componentIndex);
 
   /**
    * @brief Non-virtual destructor; Property is not intended as a base class.
@@ -164,8 +140,6 @@ struct DALI_CORE_API Property
   Handle& object; ///< A valid handle to the target object.
 
   Index propertyIndex; ///< The index of a property provided by object.
-
-  int32_t componentIndex; ///< @DEPRECATED_2_4.42 Index of a property sub component, for use with Vector2, Vector3 and Vector4, -1 if using main property
 };
 
 /**

@@ -16130,25 +16130,6 @@ int UtcDaliKeyFramesAddNegative01(void)
   END_TEST;
 }
 
-int UtcDaliKeyFramesAddNegative02(void)
-{
-  TestApplication application;
-  Dali::KeyFrames instance;
-  try
-  {
-    float                 arg1(0.0f);
-    Dali::Property::Value arg2;
-    Dali::AlphaFunction   arg3;
-    instance.Add(arg1, arg2, arg3);
-    DALI_TEST_CHECK(false); // Should not get here
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK(true); // We expect an assert
-  }
-  END_TEST;
-}
-
 int UtcDaliKeyFramesGetTypeNegative(void)
 {
   TestApplication application;

@@ -593,6 +593,56 @@ int UtcDaliActorSetName(void)
   END_TEST;
 }
 
+//& purpose: Tests Actor annotation storage is optional, copied, and clearable.
+int UtcDaliActorAnnotation(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  String annotationId;
+  String annotationType;
+  String annotationInfo;
+  DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+
+  // An empty annotation info is stored and reported as empty.
+  actor.SetAnnotation("sample.actor", "Tizen.Entity.Sample", "");
+
+  annotationId   = "changed.actor";
+  annotationType = "Changed.Entity";
+  annotationInfo = "changed.entityinfo";
+  DALI_TEST_CHECK(actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "sample.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Tizen.Entity.Sample", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "", TEST_LOCATION);
+
+  actor.ClearAnnotation();
+  DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+
+  // Annotation info is stored and copied alongside the annotation id and type.
+  actor.SetAnnotation("sample.actor", "Tizen.Entity.Sample", "sample.entityinfo");
+
+  annotationId   = "changed.actor";
+  annotationType = "Changed.Entity";
+  annotationInfo = "changed.entityinfo";
+  DALI_TEST_CHECK(actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "sample.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Tizen.Entity.Sample", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "sample.entityinfo", TEST_LOCATION);
+
+  // Setting again overwrites the previous annotation.
+  actor.SetAnnotation("second.actor", "Second.Entity", "second.entityinfo");
+  DALI_TEST_CHECK(actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "second.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Second.Entity", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "second.entityinfo", TEST_LOCATION);
+
+  actor.ClearAnnotation();
+  DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+
+  END_TEST;
+}
+
 int UtcDaliActorGetId(void)
 {
   tet_infoline("Testing Dali::Actor::UtcDaliActo.GetProperty< int >( Actor::Property::ID )");

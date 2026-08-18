@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -301,7 +301,7 @@ bool Path::SampleAt(float t, Vector3& position, Vector3& tangent) const
       Vector4 cVect(point0.x, controlPoint0.x, controlPoint1.x, point1.x);
 
       Vector4 A  = BezierBasis * cVect;
-      position.x = sVect.Dot4(A);
+      position.x = sVect.Dot(A);
       tangent.x  = sVectDerivative.Dot(Vector3(A));
 
       //Y
@@ -311,7 +311,7 @@ bool Path::SampleAt(float t, Vector3& position, Vector3& tangent) const
       cVect.w = point1.y;
 
       A          = BezierBasis * cVect;
-      position.y = sVect.Dot4(A);
+      position.y = sVect.Dot(A);
       tangent.y  = sVectDerivative.Dot(Vector3(A));
 
       //Z
@@ -321,7 +321,7 @@ bool Path::SampleAt(float t, Vector3& position, Vector3& tangent) const
       cVect.w = point1.z;
 
       A          = BezierBasis * cVect;
-      position.z = sVect.Dot4(A);
+      position.z = sVect.Dot(A);
       tangent.z  = sVectDerivative.Dot(Vector3(A));
 
       tangent.Normalize();
@@ -362,21 +362,21 @@ bool Path::SamplePosition(float t, Vector3& position) const
 
       //X
       Vector4 cVect(point0.x, controlPoint0.x, controlPoint1.x, point1.x);
-      position.x = sVect.Dot4(BezierBasis * cVect);
+      position.x = sVect.Dot(BezierBasis * cVect);
 
       //Y
       cVect.x    = point0.y;
       cVect.y    = controlPoint0.y;
       cVect.z    = controlPoint1.y;
       cVect.w    = point1.y;
-      position.y = sVect.Dot4(BezierBasis * cVect);
+      position.y = sVect.Dot(BezierBasis * cVect);
 
       //Z
       cVect.x    = point0.z;
       cVect.y    = controlPoint0.z;
       cVect.z    = controlPoint1.z;
       cVect.w    = point1.z;
-      position.z = sVect.Dot4(BezierBasis * cVect);
+      position.z = sVect.Dot(BezierBasis * cVect);
     }
 
     done = true;

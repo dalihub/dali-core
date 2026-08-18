@@ -453,16 +453,6 @@ struct DALI_CORE_API Vector4
   float Dot3(const Vector4& other) const;
 
   /**
-   * @brief Returns the 4d dot product of this vector and another vector.
-   *
-   * @SINCE_1_0.0
-   * @DEPRECATED_2_4.19 Use Dot instead.
-   * @param[in] other The other vector
-   * @return The dot product
-   */
-  float Dot4(const Vector4& other) const;
-
-  /**
    * @brief Returns the cross produce of this vector and another vector.
    *
    * The cross produce of two vectors is a vector which is perpendicular to the plane of the

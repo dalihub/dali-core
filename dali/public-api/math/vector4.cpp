@@ -123,11 +123,6 @@ float Vector4::Dot3(const Vector4& other) const
   return x * other.x + y * other.y + z * other.z;
 }
 
-float Vector4::Dot4(const Vector4& other) const
-{
-  return Dot(other);
-}
-
 Vector4 Vector4::Cross(const Vector4& other) const
 {
   MATH_INCREASE_BY(PerformanceMonitor::FLOAT_POINT_MULTIPLY, 6);

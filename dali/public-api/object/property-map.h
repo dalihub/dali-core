@@ -156,19 +156,6 @@ public:
   Value& GetValue(SizeType position) const;
 
   /**
-   * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
-   *
-   * @brief Retrieves the key at the specified position.
-   *
-   * @SINCE_1_0.0
-   * @param[in] position The specified position
-   * @return A const reference to the key at the specified position
-   *
-   * @note Will assert if position >= Count()
-   */
-  Dali::String GetKey(SizeType position) const DALI_DEPRECATED_API;
-
-  /**
    * @brief Retrieve the key at the specified position.
    *
    * @SINCE_1_2.7
@@ -178,19 +165,6 @@ public:
    * @note Will assert if position >= Count()
    */
   Key GetKeyAt(SizeType position) const;
-
-  /**
-   * DEPRECATED_1_1.39 Position based retrieval is no longer supported after extending the key type to both Index and String.
-   *
-   * @brief Retrieves the key & the value at the specified position.
-   *
-   * @SINCE_1_0.0
-   * @param[in] position The specified position
-   * @return A reference to the pair of key and value at the specified position
-   *
-   * @note Will assert if position >= Count() or key at position is an index key.
-   */
-  StringValuePair& GetPair(SizeType position) const DALI_DEPRECATED_API;
 
   /**
    * @brief Retrieve the key & the value at the specified position.

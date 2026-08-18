@@ -216,17 +216,6 @@ public:
   virtual void GetOffScreenRenderTasks(Dali::Vector<Dali::RenderTask>& tasks, bool isForward) = 0;
 
   /**
-   * @brief Sets OffScreenRenderableType of this Actor.
-   * This method is called by child class to set type itself.
-   *
-   * @SINCE_2_3.43
-   * @DEPRECATED_2_4.17 Use RegisterOffScreenRenderableType() instead.
-   * @param[in] offScreenRenderableType OffScreenRenderableType for this Actor.
-   * It could be one of NONE, FORWARD, BACKWARD, and BOTH.
-   */
-  void SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType);
-
-  /**
    * @brief Register OffScreenRenderableType of this Actor.
    * This method is called by child class to set type itself.
    *
@@ -401,9 +390,6 @@ protected: // For derived classes
   {
     ACTOR_BEHAVIOUR_DEFAULT  = 0,      ///< Use to provide default behaviour (size negotiation is on, event callbacks are not called). @SINCE_1_2_10
     DISABLE_SIZE_NEGOTIATION = 1 << 0, ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm @SINCE_1_0.0
-    NOT_IN_USE_1             = 1 << 1,
-    NOT_IN_USE_2             = 1 << 2,
-    NOT_IN_USE_3             = 1 << 3,
 
     LAST_ACTOR_FLAG ///< Special marker for last actor flag @SINCE_1_0.0
   };

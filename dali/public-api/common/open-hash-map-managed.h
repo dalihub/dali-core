@@ -402,10 +402,10 @@ public:
       }
     }
 
-    const Entry*       mEntries{nullptr};
-    uint32_t           mCapacity{0u};
-    uint32_t           mIndex{0u};
-    ConstKeyValuePair  mCurrent{};
+    const Entry*      mEntries{nullptr};
+    uint32_t          mCapacity{0u};
+    uint32_t          mIndex{0u};
+    ConstKeyValuePair mCurrent{};
   };
 
 public:
@@ -437,7 +437,7 @@ public:
    * Use move semantics or manually copy entries via ForEach() + Insert().
    * @SINCE_2_5.20
    */
-  ManagedOpenHashMap(const ManagedOpenHashMap&)            = delete;
+  ManagedOpenHashMap(const ManagedOpenHashMap&) = delete;
 
   /**
    * @brief Copy assignment operator is deleted.
@@ -1072,6 +1072,37 @@ private:
     return static_cast<uint32_t>(h) & mask;
   }
 
+  void EnsureCapacityForInsert()
+  {
+    if(mCapacity == 0u)
+    {
+      Grow();
+      return;
+    }
+
+    if(mOccupied * 4u >= mCapacity * 3u) // >= 75% occupied (live + tombstones)
+    {
+      if(mSize * 8u >= mCapacity * 5u) // >= 62.5% live
+      {
+        Grow();
+      }
+      else
+      {
+        // Reclaim tombstones without increasing capacity. Otherwise a
+        // bounded set of short-lived keys can grow the table indefinitely.
+        //
+        // The live threshold is deliberately lower than the occupied one. If
+        // both were 75%, a table whose live count sits just below the limit
+        // would be rebuilt again after only a handful of inserts — at 767 live
+        // entries in a 1024 table, every second insert triggers a full rebuild.
+        // Growing once at 62.5% leaves at least 12.5% of the table free after
+        // each compaction, which bounds the rebuild rate while still keeping
+        // capacity proportional to the live count rather than to the churn count.
+        RehashTo(mCapacity);
+      }
+    }
+  }
+
   void Grow()
   {
     RehashTo((mCapacity == 0u) ? INITIAL_CAPACITY : mCapacity * 2u);
@@ -1143,10 +1174,7 @@ private:
   template<typename K, typename V>
   Value* InsertImpl(K&& key, V&& value)
   {
-    if(mOccupied * 4u >= mCapacity * 3u) // >= 75% load
-    {
-      Grow();
-    }
+    EnsureCapacityForInsert();
 
     const uint32_t mask           = mCapacity - 1u;
     uint32_t       idx            = HashIndex(key, mask);
@@ -1206,10 +1234,7 @@ private:
   template<typename K, typename V>
   InsertResult TryInsertImpl(K&& key, V&& value)
   {
-    if(mOccupied * 4u >= mCapacity * 3u) // >= 75% load
-    {
-      Grow();
-    }
+    EnsureCapacityForInsert();
 
     const uint32_t mask           = mCapacity - 1u;
     uint32_t       idx            = HashIndex(key, mask);
@@ -1225,7 +1250,7 @@ private:
         // Key not present — insert here (or at earlier tombstone).
         if(firstTombstone >= 0)
         {
-          idx = static_cast<uint32_t>(firstTombstone);
+          idx                 = static_cast<uint32_t>(firstTombstone);
           mEntries[idx].key   = Dali::Forward<K>(key);
           mEntries[idx].value = Dali::Forward<V>(value);
           // Reusing a tombstone doesn't increase mOccupied.

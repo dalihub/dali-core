@@ -509,6 +509,21 @@ Dali::String Actor::GetName() const
   return Dali::String(GetImplementation(*this).GetName().data());
 }
 
+void Actor::SetAnnotation(Dali::StringView annotationId, Dali::StringView annotationType, Dali::StringView annotationInfo)
+{
+  GetImplementation(*this).SetAnnotation(annotationId, annotationType, annotationInfo);
+}
+
+bool Actor::GetAnnotation(Dali::String& annotationId, Dali::String& annotationType, Dali::String& annotationInfo) const
+{
+  return GetImplementation(*this).GetAnnotation(annotationId, annotationType, annotationInfo);
+}
+
+void Actor::ClearAnnotation()
+{
+  GetImplementation(*this).ClearAnnotation();
+}
+
 void Actor::SetSensitive(bool sensitive)
 {
   GetImplementation(*this).SetProperty(Actor::Property::SENSITIVE, sensitive);

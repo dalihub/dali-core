@@ -574,48 +574,15 @@ int UtcDaliVector4DotVector302P(void)
   END_TEST;
 }
 
-int UtcDaliVector4Dot4P(void)
-{
-  DALI_TEST_EQUALS(Vector4::XAXIS.Dot4(Vector4::YAXIS), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::XAXIS.Dot4(Vector4::ZAXIS), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::YAXIS.Dot4(Vector4::ZAXIS), 0.0f, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(Vector4::XAXIS.Dot4(Vector4::XAXIS), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::YAXIS.Dot4(Vector4::YAXIS), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::ZAXIS.Dot4(Vector4::ZAXIS), 1.0f, TEST_LOCATION);
-
-  DALI_TEST_EQUALS(Vector4(1.0f, 0.0f, 0.0f, 1.0f).Dot4(Vector4(1.0f, 0.0f, 0.0f, 1.0f)), 2.0f, TEST_LOCATION);
-
-  for(float x = 0; x < 6.0f; x += 1.0f)
-  {
-    Vector4 v0(cosf(x), sinf(x), 0.0f, 1.0f);
-    Vector4 v1(sinf(x), -cosf(x), 0.0f, 1.0f);
-    DALI_TEST_EQUALS(v0.Dot4(v1), 1.0f, 0.0001f, TEST_LOCATION);
-    DALI_TEST_EQUALS(v0.Dot4(v0), 2.0f, 0.0001f, TEST_LOCATION);
-
-    v0 = Vector4(cosf(x), 0.0f, sinf(x), 0.0f);
-    v1 = Vector4(sinf(x), 0.0f, -cosf(x), 0.0f);
-    DALI_TEST_EQUALS(v0.Dot4(v1), 0.0f, 0.0001f, TEST_LOCATION);
-    DALI_TEST_EQUALS(v0.Dot4(v0), 1.0f, 0.0001f, TEST_LOCATION);
-  }
-
-  Vector4 v0(12.0f, 7.0f, 9.0f, 3.0f);
-  v0.Normalize3();
-
-  Vector4 v1 = v0 * 2.0f;
-  DALI_TEST_EQUALS(v0.Dot4(v1), 2.0f + 3.0f * 6.0f, 0.001f, TEST_LOCATION);
-  END_TEST;
-}
-
 int UtcDaliVector4Dot3P(void)
 {
-  DALI_TEST_EQUALS(Vector4::XAXIS.Dot4(Vector4::YAXIS), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::XAXIS.Dot4(Vector4::ZAXIS), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::YAXIS.Dot4(Vector4::ZAXIS), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4::XAXIS.Dot(Vector4::YAXIS), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4::XAXIS.Dot(Vector4::ZAXIS), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4::YAXIS.Dot(Vector4::ZAXIS), 0.0f, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(Vector4::XAXIS.Dot4(Vector4::XAXIS), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::YAXIS.Dot4(Vector4::YAXIS), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Vector4::ZAXIS.Dot4(Vector4::ZAXIS), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4::XAXIS.Dot(Vector4::XAXIS), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4::YAXIS.Dot(Vector4::YAXIS), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4::ZAXIS.Dot(Vector4::ZAXIS), 1.0f, TEST_LOCATION);
 
   DALI_TEST_EQUALS(Vector4(1.0f, 0.0f, 0.0f, 1.0f).Dot3(Vector4(1.0f, 0.0f, 0.0f, 1.0f)), 1.0f, TEST_LOCATION);
 

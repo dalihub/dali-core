@@ -529,7 +529,7 @@ int UtcDaliPropertyValueCopyConstructorMapP(void)
   Property::Value value2(value1);
   DALI_TEST_EQUALS(value1.GetType(), value2.GetType(), TEST_LOCATION);
   DALI_TEST_EQUALS(value1.GetMap()->Count(), value2.GetMap()->Count(), TEST_LOCATION);
-  DALI_TEST_EQUALS(value1.GetMap()->GetKey(0), value2.GetMap()->GetKey(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(value1.GetMap()->GetKeyAt(0).stringKey, value2.GetMap()->GetKeyAt(0).stringKey, TEST_LOCATION);
 
   END_TEST;
 }
@@ -777,7 +777,7 @@ int UtcDaliPropertyValueAssignmentOperatorMapP(void)
   copy = value;
   Property::Map map;
   copy.Get(map);
-  DALI_TEST_CHECK(std::string(map.GetKey(0).CStr()) == "key");
+  DALI_TEST_CHECK(std::string(map.GetKeyAt(0).stringKey.CStr()) == "key");
   END_TEST;
 }
 

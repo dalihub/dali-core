@@ -34,11 +34,6 @@ void CustomActorImpl::OnPropertySet(Property::Index index, const Property::Value
 {
 }
 
-void CustomActorImpl::SetOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
-{
-  RegisterOffScreenRenderableType(offScreenRenderableType);
-}
-
 void CustomActorImpl::RegisterOffScreenRenderableType(OffScreenRenderable::Type offScreenRenderableType)
 {
   mOwner->RegisterOffScreenRenderableType(offScreenRenderableType);

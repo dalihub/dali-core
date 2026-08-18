@@ -145,15 +145,6 @@ public:
    * @brief Apply custom fragment prefix for rendering native image.
    *
    * @param[in,out] shader shader code that will be applied fragment prefix.
-   * @DEPRECATED_2_4.33
-   * @return True if the shader is changed.
-   */
-  virtual bool ApplyNativeFragmentShader(Dali::String& shader) = 0;
-
-  /**
-   * @brief Apply custom fragment prefix for rendering native image.
-   *
-   * @param[in,out] shader shader code that will be applied fragment prefix.
    * @param[in] mask the mask of samplers those uses native image.
    *                 For example, if mask = 0x5, 1st and 3rd samplers become native samplers.
    * @SINCE_2_4.33

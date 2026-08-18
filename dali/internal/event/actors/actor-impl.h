@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -100,6 +101,21 @@ public:
    * @param[in] name The new name.
    */
   void SetName(std::string_view name);
+
+  /**
+   * @copydoc Dali::Actor::SetAnnotation
+   */
+  void SetAnnotation(Dali::StringView annotationId, Dali::StringView annotationType, Dali::StringView annotationInfo);
+
+  /**
+   * @copydoc Dali::Actor::GetAnnotation
+   */
+  bool GetAnnotation(Dali::String& annotationId, Dali::String& annotationType, Dali::String& annotationInfo) const;
+
+  /**
+   * @copydoc Dali::Actor::ClearAnnotation
+   */
+  void ClearAnnotation();
 
   /**
    * @copydoc Dali::Actor::GetId
@@ -2657,7 +2673,15 @@ protected:
   Vector4    mUpdateAreaHint;     ///< Event-side storage for update area hint
   Extents    mTouchHitAreaMargin; ///< Extents info of touch hit area margin
 
-  std::string mName;        ///< Name of the actor
+  struct Annotation
+  {
+    Dali::String annotationId;
+    Dali::String annotationType;
+    Dali::String annotationInfo;
+  };
+
+  std::string                   mName;       ///< Name of the actor
+  std::unique_ptr<Annotation>   mAnnotation; ///< Optional application-defined metadata
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
   int32_t     mDepthIndex;  ///< Render(draw) order sort key among siblings (Property::DEPTH_INDEX). Does NOT change sibling order.
