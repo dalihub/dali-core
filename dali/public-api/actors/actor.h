@@ -1798,6 +1798,38 @@ public:
   Dali::String GetName() const;
 
   /**
+   * @brief Sets application-defined annotation data on the actor.
+   *
+   * The annotation ID, annotation type and annotation info are copied and retained by the actor. Annotation
+   * data is not an Actor property and does not participate in property notifications,
+   * serialization, or the update/render thread.
+   *
+   * @SINCE_2_5.36
+   * @param[in] annotationId The application-defined annotation identifier.
+   * @param[in] annotationType The application-defined annotation type.
+   * @param[in] annotationInfo Additional application-defined annotation information. Free-form; may be empty.
+   */
+  void SetAnnotation(Dali::StringView annotationId, Dali::StringView annotationType, Dali::StringView annotationInfo);
+
+  /**
+   * @brief Gets the application-defined annotation identifier, type and info stored on the actor.
+   *
+   * @SINCE_2_5.36
+   * @param[out] annotationId The stored application-defined annotation identifier.
+   * @param[out] annotationType The stored application-defined annotation type.
+   * @param[out] annotationInfo The stored additional annotation information. Empty when none was set.
+   * @return @c true if annotation data is set; otherwise @c false.
+   */
+  bool GetAnnotation(Dali::String& annotationId, Dali::String& annotationType, Dali::String& annotationInfo) const;
+
+  /**
+   * @brief Removes the application-defined annotation data from the actor.
+   *
+   * @SINCE_2_5.36
+   */
+  void ClearAnnotation();
+
+  /**
    * @brief Sets the sensitivity flag of the actor.
    * @param[in] sensitive True to make the actor emit touch and hover signals
    * @pre The actor has been initialized.
