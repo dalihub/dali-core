@@ -600,10 +600,13 @@ int UtcDaliActorAnnotation(void)
 
   Actor actor = Actor::New();
 
-  String annotationId;
-  String annotationType;
-  String annotationInfo;
+  String annotationId("unchanged.actor");
+  String annotationType("Unchanged.Entity");
+  String annotationInfo("unchanged.entityinfo");
   DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "unchanged.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Unchanged.Entity", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "unchanged.entityinfo", TEST_LOCATION);
 
   // An empty annotation info is stored and reported as empty.
   actor.SetAnnotation("sample.actor", "Tizen.Entity.Sample", "");
@@ -617,7 +620,14 @@ int UtcDaliActorAnnotation(void)
   DALI_TEST_EQUALS(annotationInfo, "", TEST_LOCATION);
 
   actor.ClearAnnotation();
+
+  annotationId   = "unchanged.actor";
+  annotationType = "Unchanged.Entity";
+  annotationInfo = "unchanged.entityinfo";
   DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "unchanged.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Unchanged.Entity", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "unchanged.entityinfo", TEST_LOCATION);
 
   // Annotation info is stored and copied alongside the annotation id and type.
   actor.SetAnnotation("sample.actor", "Tizen.Entity.Sample", "sample.entityinfo");
@@ -638,7 +648,14 @@ int UtcDaliActorAnnotation(void)
   DALI_TEST_EQUALS(annotationInfo, "second.entityinfo", TEST_LOCATION);
 
   actor.ClearAnnotation();
+
+  annotationId   = "unchanged.actor";
+  annotationType = "Unchanged.Entity";
+  annotationInfo = "unchanged.entityinfo";
   DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "unchanged.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Unchanged.Entity", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "unchanged.entityinfo", TEST_LOCATION);
 
   END_TEST;
 }
