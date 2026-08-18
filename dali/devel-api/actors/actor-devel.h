@@ -551,6 +551,16 @@ DALI_CORE_API bool GetTouchRequired(Actor actor);
  */
 DALI_CORE_API void SetRelayoutEnabled(Actor actor, bool relayoutEnabled);
 
+/**
+ * @brief Retrieves the actor's target size.
+ *
+ * @param[in] actor The actor to get the target size from
+ * @return The actor's target size
+ * @note This return is the value that was set using SetSize or the target size of an animation.
+ *       It may not match the current value in some cases, i.e. when the animation is progressing or the maximum or minimum size is set.
+ */
+DALI_CORE_API Vector3 GetTargetSize(const Actor& actor);
+
 } // namespace DevelActor
 
 } // namespace Dali

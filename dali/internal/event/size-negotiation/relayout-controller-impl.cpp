@@ -25,6 +25,7 @@
 #endif // defined(DEBUG_ENABLED)
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/actors/actor-devel.h>
 #include <dali/devel-api/object/type-registry.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
@@ -67,7 +68,7 @@ void PrintChildren(Dali::Actor actor, int level)
 
   output << ", " << actor.GetProperty<Dali::String>(Dali::Actor::Property::NAME);
 
-  output << " - Pos: " << actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION) << " Size: " << actor.GetTargetSize();
+  output << " - Pos: " << actor.GetCurrentProperty<Vector3>(Dali::Actor::Property::POSITION) << " Size: " << DevelActor::GetTargetSize(actor);
 
   output << ", Dirty: (" << (GetImplementation(actor).IsLayoutDirty(Dimension::WIDTH) ? "TRUE" : "FALSE") << "," << (GetImplementation(actor).IsLayoutDirty(Dimension::HEIGHT) ? "TRUE" : "FALSE") << ")";
   output << ", Negotiated: (" << (GetImplementation(actor).IsLayoutNegotiated(Dimension::WIDTH) ? "TRUE" : "FALSE") << "," << (GetImplementation(actor).IsLayoutNegotiated(Dimension::HEIGHT) ? "TRUE" : "FALSE") << ")";
