@@ -93,6 +93,15 @@ enum DebugPriority
 };
 
 /**
+ * @brief Checks whether DALi logging is disabled.
+ *
+ * The value of the DALI_LOG_DISABLE environment variable is read once and cached.
+ *
+ * @return True if DALi logging is disabled.
+ */
+DALI_CORE_API bool IsLogDisabled();
+
+/**
  * Used by logging macros to log a message
  * @param level debug level
  * @param format string format
