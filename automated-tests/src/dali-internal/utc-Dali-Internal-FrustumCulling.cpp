@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/actors/actor-devel.h>
 #include <mesh-builder.h>
 
 using namespace Dali;
@@ -133,7 +134,7 @@ int UtcFrustumLeftCullP(void)
   float offset    = -0.01f;
   Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), Pivot::CENTER_RIGHT);
 
-  float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
+  float   radius    = DevelActor::GetTargetSize(meshActor).Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(-radius / sceneSize.width + offset, 0.5f, 0.5f));
   meshActor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
@@ -177,7 +178,7 @@ int UtcFrustumRightCullP(void)
   float offset    = 1.01f;
   Actor meshActor = CreateMeshActorToScene(application, Vector3(offset, 0.5f, 0.5f), Pivot::CENTER_LEFT);
 
-  float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
+  float   radius    = DevelActor::GetTargetSize(meshActor).Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
 
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(radius / sceneSize.width + offset, 0.5f, 0.5f));
@@ -222,7 +223,7 @@ int UtcFrustumTopCullP(void)
   float offset    = -0.01f;
   Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), Pivot::BOTTOM_CENTER);
 
-  float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
+  float   radius    = DevelActor::GetTargetSize(meshActor).Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
 
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.5f, -radius / sceneSize.width + offset, 0.5f));
@@ -268,7 +269,7 @@ int UtcFrustumBottomCullP(void)
   float offset    = 1.01f;
   Actor meshActor = CreateMeshActorToScene(application, Vector3(0.5f, offset, 0.5f), Pivot::TOP_CENTER);
 
-  float   radius    = meshActor.GetTargetSize().Length() * 0.5f;
+  float   radius    = DevelActor::GetTargetSize(meshActor).Length() * 0.5f;
   Vector2 sceneSize = application.GetScene().GetSize();
 
   meshActor.SetProperty(Actor::Property::PARENT_ORIGIN, Vector3(0.5f, radius / sceneSize.width + offset, 0.5f));
@@ -316,7 +317,7 @@ int UtcFrustumNearCullP(void)
   Actor   meshActor    = CreateMeshActorToScene(application);
   Vector3 meshPosition = meshActor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
 
-  float radius   = meshActor.GetTargetSize().Length() * 0.5f;
+  float radius   = DevelActor::GetTargetSize(meshActor).Length() * 0.5f;
   float offset   = radius + 0.1f;
   meshPosition.z = cameraDepth - nearPlane + offset;
   meshActor.SetProperty(Actor::Property::POSITION, meshPosition);
@@ -344,7 +345,7 @@ int UtcFrustumNearCullN(void)
   Actor   meshActor    = CreateMeshActorToScene(application);
   Vector3 meshPosition = meshActor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
 
-  float offset   = meshActor.GetTargetSize().z - 0.1f;
+  float offset   = DevelActor::GetTargetSize(meshActor).z - 0.1f;
   meshPosition.z = cameraDepth - nearPlane + offset;
   meshActor.SetProperty(Actor::Property::POSITION, meshPosition);
 
@@ -370,7 +371,7 @@ int UtcFrustumFarCullP(void)
   Actor   meshActor    = CreateMeshActorToScene(application);
   Vector3 meshPosition = meshActor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
 
-  float radius   = meshActor.GetTargetSize().Length() * 0.5f;
+  float radius   = DevelActor::GetTargetSize(meshActor).Length() * 0.5f;
   float offset   = radius + 0.1f;
   meshPosition.z = cameraDepth - farPlane - offset;
   meshActor.SetProperty(Actor::Property::POSITION, meshPosition);
@@ -398,7 +399,7 @@ int UtcFrustumFarCullN(void)
   Actor   meshActor    = CreateMeshActorToScene(application);
   Vector3 meshPosition = meshActor.GetCurrentProperty<Vector3>(Actor::Property::POSITION);
 
-  float offset   = meshActor.GetTargetSize().z - 0.1f;
+  float offset   = DevelActor::GetTargetSize(meshActor).z - 0.1f;
   meshPosition.z = cameraDepth - farPlane - offset;
   meshActor.SetProperty(Actor::Property::POSITION, meshPosition);
 

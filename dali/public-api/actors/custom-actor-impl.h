@@ -163,7 +163,7 @@ public:
    * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
    *
    * @SINCE_1_0.0
-   * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize
+   * @param[in] targetSize The target size.
    */
   virtual void OnSizeSet(const Vector3& targetSize) = 0;
 
@@ -172,7 +172,7 @@ public:
    *
    * @SINCE_1_0.0
    * @param[in] animation The object which is animating the owning actor
-   * @param[in] targetSize The target size. Note that this target size may not match the size returned via @ref Actor::GetTargetSize
+   * @param[in] targetSize The target size.
    */
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
 

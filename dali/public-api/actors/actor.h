@@ -1053,17 +1053,6 @@ public:
   // Positioning
 
   /**
-   * @brief Retrieves the actor's size.
-   *
-   * @SINCE_1_0.0
-   * @return The actor's target size
-   * @pre The actor has been initialized.
-   * @note This return is the value that was set using SetSize or the target size of an animation.
-   *       It may not match the current value in some cases, i.e. when the animation is progressing or the maximum or minimum size is set.
-   */
-  Vector3 GetTargetSize() const;
-
-  /**
    * @brief Returns the natural size of the actor.
    *
    * Deriving classes stipulate the natural size and by default an actor has a ZERO natural size.

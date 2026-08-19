@@ -126,6 +126,11 @@ void SetRelayoutEnabled(Actor actor, bool relayoutEnabled)
   GetImplementation(actor).SetRelayoutEnabled(relayoutEnabled);
 }
 
+Vector3 GetTargetSize(const Actor& actor)
+{
+  return GetImplementation(actor).GetTargetSize();
+}
+
 } // namespace DevelActor
 
 } // namespace Dali
