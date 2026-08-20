@@ -351,8 +351,11 @@ public:
 
   void VoidSlotVoidAlternative()
   {
+    // Body must differ from VoidSlotVoid to prevent MSVC ICF from merging
+    // them into a single function address (which would break signal
+    // disconnect-by-different-method tests).
+    mHandledCount += 2;
     mHandled = true;
-    ++mHandledCount;
   }
 
   void VoidSlotIntRef(int& p1)
@@ -839,8 +842,11 @@ public:
 
   void AlternativeVoidSlotVoid()
   {
+    // Body must differ from VoidSlotVoid to prevent MSVC ICF from merging
+    // them into a single function address (which would break signal
+    // disconnect-by-different-method tests).
+    mHandledCount += 2;
     mHandled = true;
-    ++mHandledCount;
   }
 
   void VoidSlotIntRef(int& p1)
