@@ -561,6 +561,16 @@ DALI_CORE_API void SetRelayoutEnabled(Actor actor, bool relayoutEnabled);
  */
 DALI_CORE_API Vector3 GetTargetSize(const Actor& actor);
 
+/**
+ * @brief Returns the natural size of the actor.
+ *
+ * Deriving classes stipulate the natural size and by default an actor has a ZERO natural size.
+ *
+ * @param[in] actor The actor to get the natural size from
+ * @return The actor's natural size
+ */
+DALI_CORE_API Vector3 GetNaturalSize(const Actor& actor);
+
 } // namespace DevelActor
 
 } // namespace Dali

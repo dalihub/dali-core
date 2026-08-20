@@ -131,6 +131,11 @@ Vector3 GetTargetSize(const Actor& actor)
   return GetImplementation(actor).GetTargetSize();
 }
 
+Vector3 GetNaturalSize(const Actor& actor)
+{
+  return GetImplementation(actor).GetNaturalSize();
+}
+
 } // namespace DevelActor
 
 } // namespace Dali
