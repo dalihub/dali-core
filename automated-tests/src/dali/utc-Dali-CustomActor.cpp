@@ -1933,7 +1933,7 @@ namespace Impl
 struct UnregisteredCustomActor : public Dali::CustomActorImpl
 {
   UnregisteredCustomActor()
-  : CustomActorImpl(ACTOR_BEHAVIOUR_DEFAULT)
+  : CustomActorImpl()
   {
   }
   virtual ~UnregisteredCustomActor()

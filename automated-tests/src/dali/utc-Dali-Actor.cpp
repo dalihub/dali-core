@@ -600,10 +600,13 @@ int UtcDaliActorAnnotation(void)
 
   Actor actor = Actor::New();
 
-  String annotationId;
-  String annotationType;
-  String annotationInfo;
+  String annotationId("unchanged.actor");
+  String annotationType("Unchanged.Entity");
+  String annotationInfo("unchanged.entityinfo");
   DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "unchanged.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Unchanged.Entity", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "unchanged.entityinfo", TEST_LOCATION);
 
   // An empty annotation info is stored and reported as empty.
   actor.SetAnnotation("sample.actor", "Tizen.Entity.Sample", "");
@@ -617,7 +620,14 @@ int UtcDaliActorAnnotation(void)
   DALI_TEST_EQUALS(annotationInfo, "", TEST_LOCATION);
 
   actor.ClearAnnotation();
+
+  annotationId   = "unchanged.actor";
+  annotationType = "Unchanged.Entity";
+  annotationInfo = "unchanged.entityinfo";
   DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "unchanged.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Unchanged.Entity", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "unchanged.entityinfo", TEST_LOCATION);
 
   // Annotation info is stored and copied alongside the annotation id and type.
   actor.SetAnnotation("sample.actor", "Tizen.Entity.Sample", "sample.entityinfo");
@@ -638,7 +648,14 @@ int UtcDaliActorAnnotation(void)
   DALI_TEST_EQUALS(annotationInfo, "second.entityinfo", TEST_LOCATION);
 
   actor.ClearAnnotation();
+
+  annotationId   = "unchanged.actor";
+  annotationType = "Unchanged.Entity";
+  annotationInfo = "unchanged.entityinfo";
   DALI_TEST_CHECK(!actor.GetAnnotation(annotationId, annotationType, annotationInfo));
+  DALI_TEST_EQUALS(annotationId, "unchanged.actor", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationType, "Unchanged.Entity", TEST_LOCATION);
+  DALI_TEST_EQUALS(annotationInfo, "unchanged.entityinfo", TEST_LOCATION);
 
   END_TEST;
 }
@@ -1859,19 +1876,19 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   Actor   actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 20.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetTargetSize());
+  DALI_TEST_CHECK(vector != DevelActor::GetTargetSize(actor));
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE));
 
   actor.SetProperty(Actor::Property::SIZE, vector);
 
-  DALI_TEST_CHECK(vector == actor.GetTargetSize());
+  DALI_TEST_CHECK(vector == DevelActor::GetTargetSize(actor));
   DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE));
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetTargetSize());
+  DALI_TEST_CHECK(vector == DevelActor::GetTargetSize(actor));
   DALI_TEST_CHECK(vector == actor.GetCurrentProperty<Vector3>(Actor::Property::SIZE));
 
   // Animation
@@ -1881,7 +1898,7 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   const Vector3 targetValue(10.0f, 20.0f, 30.0f);
   animation.AnimateTo(Property(actor, Actor::Property::SIZE), targetValue);
 
-  DALI_TEST_CHECK(actor.GetTargetSize() == vector);
+  DALI_TEST_CHECK(DevelActor::GetTargetSize(actor) == vector);
 
   application.GetScene().Add(actor);
 
@@ -1891,7 +1908,7 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f));
 
-  DALI_TEST_CHECK(actor.GetTargetSize() == targetValue);
+  DALI_TEST_CHECK(DevelActor::GetTargetSize(actor) == targetValue);
 
   END_TEST;
 }
@@ -15309,7 +15326,7 @@ int UtcDaliActorGetTargetSizeNegative(void)
   Dali::Actor     instance;
   try
   {
-    instance.GetTargetSize();
+    DevelActor::GetTargetSize(instance);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)

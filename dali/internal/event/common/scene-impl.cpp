@@ -496,6 +496,12 @@ bool Scene::EmitKeyEventGeneratedSignal(const Dali::KeyEvent& event)
 {
   // Emit the KeyEventGenerated signal when KeyEvent is generated
   Dali::Integration::Scene handle(this);
+  if(mGeometryHittest)
+  {
+    // Any connected callback consuming the event consumes it for all of them.
+    // Gated so that legacy applications keep the previous last-callback-wins behaviour.
+    return mKeyEventGeneratedSignal.EmitOr(event);
+  }
   return mKeyEventGeneratedSignal.Emit(event);
 }
 
@@ -503,6 +509,12 @@ bool Scene::EmitInterceptKeyEventSignal(const Dali::KeyEvent& event)
 {
   // Emit the InterceptKeyEvent signal
   Dali::Integration::Scene handle(this);
+  if(mGeometryHittest)
+  {
+    // Any connected callback consuming the event consumes it for all of them.
+    // Gated so that legacy applications keep the previous last-callback-wins behaviour.
+    return mInterceptKeyEventSignal.EmitOr(event);
+  }
   return mInterceptKeyEventSignal.Emit(event);
 }
 
@@ -537,6 +549,12 @@ bool Scene::EmitWheelEventGeneratedSignal(const Dali::WheelEvent& event)
 {
   // Emit the WheelEventGenerated signal when WheelEvent is generated
   Dali::Integration::Scene handle(this);
+  if(mGeometryHittest)
+  {
+    // Any connected callback consuming the event consumes it for all of them.
+    // Gated so that legacy applications keep the previous last-callback-wins behaviour.
+    return mWheelEventGeneratedSignal.EmitOr(event);
+  }
   return mWheelEventGeneratedSignal.Emit(event);
 }
 

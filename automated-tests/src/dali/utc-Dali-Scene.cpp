@@ -333,6 +333,50 @@ struct WheelEventGeneratedReceivedFunctor
   WheelEventGeneratedSignalData& signalData;
 };
 
+// Functor whose return value is fixed at construction time.
+// Used to verify how a consuming signal combines the return values of several
+// connected callbacks: last-callback-wins (Emit) or any-callback-wins (EmitOr).
+struct KeyEventGeneratedConsumeFunctor
+{
+  KeyEventGeneratedConsumeFunctor(KeyEventGeneratedSignalData& data, bool consume)
+  : signalData(data),
+    mConsume(consume)
+  {
+  }
+
+  bool operator()(KeyEvent keyEvent)
+  {
+    signalData.functorCalled    = true;
+    signalData.receivedKeyEvent = keyEvent;
+
+    return mConsume;
+  }
+
+  KeyEventGeneratedSignalData& signalData;
+  bool                         mConsume;
+};
+
+// As above, for the wheel event generated signal.
+struct WheelEventGeneratedConsumeFunctor
+{
+  WheelEventGeneratedConsumeFunctor(WheelEventGeneratedSignalData& data, bool consume)
+  : signalData(data),
+    mConsume(consume)
+  {
+  }
+
+  bool operator()(WheelEvent wheelEvent)
+  {
+    signalData.functorCalled      = true;
+    signalData.receivedWheelEvent = wheelEvent;
+
+    return mConsume;
+  }
+
+  WheelEventGeneratedSignalData& signalData;
+  bool                           mConsume;
+};
+
 void GenerateTouch(TestApplication& application, PointState::Type state, const Vector2& screenPosition)
 {
   Dali::Integration::TouchEvent touchEvent;
@@ -4044,6 +4088,108 @@ int UtcDaliSceneRequestFullUpdatePartialRendering(void)
   expectedRect1 = TestApplication::DEFAULT_SURFACE_RECT;
   DirtyRectChecker(damagedRects, {expectedRect1}, true, TEST_LOCATION);
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
+
+  END_TEST;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Multiple callbacks connected to one consuming signal, with geometry hittest
+// enabled.
+//
+// Scene combines the return values of the callbacks connected to its consuming
+// key/wheel signals with OR, so a single consuming callback consumes the event
+// for all of them.
+//
+// In each case the first callback consumes and the second one, connected last,
+// does not. An uncombined signal would let the second return value override the
+// first, leaving the event unconsumed so that it falls through to the scene's
+// plain (non-consuming) event signal. That signal is therefore the probe for
+// whether the event was consumed.
+///////////////////////////////////////////////////////////////////////////////
+
+int UtcDaliSceneKeyEventGeneratedSignalMultipleCallbacksGeometryOn(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  scene.SetGeometryHittestEnabled(true);
+
+  KeyEventSignalData      unconsumedData;
+  KeyEventReceivedFunctor unconsumedFunctor(unconsumedData);
+  scene.KeyEventSignal().Connect(&application, unconsumedFunctor);
+
+  KeyEventGeneratedSignalData     consumingData;
+  KeyEventGeneratedConsumeFunctor consumingFunctor(consumingData, true);
+  scene.KeyEventGeneratedSignal().Connect(&application, consumingFunctor);
+
+  KeyEventGeneratedSignalData     passiveData;
+  KeyEventGeneratedConsumeFunctor passiveFunctor(passiveData, false);
+  scene.KeyEventGeneratedSignal().Connect(&application, passiveFunctor);
+
+  Dali::Integration::KeyEvent event("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event);
+
+  // Every connected callback runs; combining the results does not short-circuit.
+  DALI_TEST_EQUALS(true, consumingData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, passiveData.functorCalled, TEST_LOCATION);
+
+  // The consuming callback wins, so the event does not reach the key event signal.
+  DALI_TEST_EQUALS(false, unconsumedData.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneInterceptKeyEventSignalMultipleCallbacksGeometryOn(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  scene.SetGeometryHittestEnabled(true);
+
+  KeyEventSignalData      unconsumedData;
+  KeyEventReceivedFunctor unconsumedFunctor(unconsumedData);
+  scene.KeyEventSignal().Connect(&application, unconsumedFunctor);
+
+  KeyEventGeneratedSignalData     consumingData;
+  KeyEventGeneratedConsumeFunctor consumingFunctor(consumingData, true);
+  scene.InterceptKeyEventSignal().Connect(&application, consumingFunctor);
+
+  KeyEventGeneratedSignalData     passiveData;
+  KeyEventGeneratedConsumeFunctor passiveFunctor(passiveData, false);
+  scene.InterceptKeyEventSignal().Connect(&application, passiveFunctor);
+
+  Dali::Integration::KeyEvent event("a", "", "a", 0, 0, 0, Dali::Integration::KeyEvent::DOWN, "a", DEFAULT_DEVICE_NAME, Device::Class::NONE, Device::Subclass::NONE);
+  application.ProcessEvent(event);
+
+  DALI_TEST_EQUALS(true, consumingData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, passiveData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, unconsumedData.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliSceneWheelEventGeneratedSignalMultipleCallbacksGeometryOn(void)
+{
+  TestApplication          application;
+  Dali::Integration::Scene scene = application.GetScene();
+  scene.SetGeometryHittestEnabled(true);
+
+  WheelEventSignalData      unconsumedData;
+  WheelEventReceivedFunctor unconsumedFunctor(unconsumedData);
+  scene.WheelEventSignal().Connect(&application, unconsumedFunctor);
+
+  WheelEventGeneratedSignalData     consumingData;
+  WheelEventGeneratedConsumeFunctor consumingFunctor(consumingData, true);
+  scene.WheelEventGeneratedSignal().Connect(&application, consumingFunctor);
+
+  WheelEventGeneratedSignalData     passiveData;
+  WheelEventGeneratedConsumeFunctor passiveFunctor(passiveData, false);
+  scene.WheelEventGeneratedSignal().Connect(&application, passiveFunctor);
+
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2(0.0f, 0.0f), 1, 1000u);
+  application.ProcessEvent(event);
+
+  DALI_TEST_EQUALS(true, consumingData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, passiveData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, unconsumedData.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }

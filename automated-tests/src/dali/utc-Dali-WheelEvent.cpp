@@ -364,3 +364,105 @@ int UtcDaliIntegrationWheelEventFromHandle(void)
 
   END_TEST;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Multiple callbacks connected to one actor's consuming wheel signals, with
+// geometry hittest enabled.
+//
+// The actor combines the return values of its connected wheel callbacks with
+// OR, so a single consuming callback consumes the event for all of them.
+//
+// In each case the first callback consumes and the second one, connected last,
+// does not. An uncombined signal would let the second return value override the
+// first, leaving the event unconsumed so that it kept propagating.
+///////////////////////////////////////////////////////////////////////////////
+
+int UtcDaliWheelEventGeoMultipleCallbacksOnOneActor(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor rootActor(application.GetScene().GetRootLayer());
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect two callbacks to the SAME actor's wheel event signal. The first
+  // consumes, the second one, connected last, does not.
+  SignalData                consumingData;
+  WheelEventReceivedFunctor consumingFunctor(consumingData, true);
+  actor.WheelEventSignal().Connect(&application, consumingFunctor);
+
+  SignalData                passiveData;
+  WheelEventReceivedFunctor passiveFunctor(passiveData, false);
+  actor.WheelEventSignal().Connect(&application, passiveFunctor);
+
+  // The root actor only receives the event if the actor below did not consume
+  // it, so it is the probe for whether the two return values were combined.
+  SignalData                rootData;
+  WheelEventReceivedFunctor rootFunctor(rootData, false);
+  rootActor.WheelEventSignal().Connect(&application, rootFunctor);
+
+  Vector2                       screenCoordinates(10.0f, 10.0f);
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+  application.ProcessEvent(event);
+
+  // Every connected callback on the actor runs; combining does not short-circuit.
+  DALI_TEST_EQUALS(true, consumingData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, passiveData.functorCalled, TEST_LOCATION);
+
+  // The consuming callback wins, so the event never reached the parent.
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliWheelEventGeoInterceptMultipleCallbacks(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+  Actor rootActor(application.GetScene().GetRootLayer());
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  application.GetScene().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect two callbacks to the SAME root actor's intercept wheel event
+  // signal. The first consumes, the second one, connected last, does not.
+  SignalData                consumingData;
+  WheelEventReceivedFunctor consumingFunctor(consumingData, true);
+  rootActor.InterceptWheelEventSignal().Connect(&application, consumingFunctor);
+
+  SignalData                passiveData;
+  WheelEventReceivedFunctor passiveFunctor(passiveData, false);
+  rootActor.InterceptWheelEventSignal().Connect(&application, passiveFunctor);
+
+  // The actor below only receives the event if the intercept did not consume it.
+  SignalData                actorData;
+  WheelEventReceivedFunctor actorFunctor(actorData, false);
+  actor.WheelEventSignal().Connect(&application, actorFunctor);
+
+  Vector2                       screenCoordinates(10.0f, 10.0f);
+  Dali::Integration::WheelEvent event(Dali::Integration::WheelEvent::MOUSE_WHEEL, 0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
+  application.ProcessEvent(event);
+
+  // Every connected intercept callback runs.
+  DALI_TEST_EQUALS(true, consumingData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, passiveData.functorCalled, TEST_LOCATION);
+
+  // The consuming callback wins, so the event was intercepted and never
+  // reached the actor below.
+  DALI_TEST_EQUALS(false, actorData.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}

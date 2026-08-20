@@ -96,9 +96,8 @@ void CustomActorImpl::OnFinalizeWheelEventDispatch(const WheelEvent& /*event*/)
 {
 }
 
-CustomActorImpl::CustomActorImpl(ActorFlags flags)
-: mOwner(nullptr),
-  mFlags(flags)
+CustomActorImpl::CustomActorImpl()
+: mOwner(nullptr)
 {
 }
 
@@ -114,11 +113,6 @@ void CustomActorImpl::Initialize(Internal::CustomActor& owner)
 Internal::CustomActor* CustomActorImpl::GetOwner() const
 {
   return mOwner;
-}
-
-bool CustomActorImpl::IsRelayoutEnabled() const
-{
-  return (mFlags & DISABLE_SIZE_NEGOTIATION) == 0;
 }
 
 void CustomActorImpl::SetTransparent(bool transparent)

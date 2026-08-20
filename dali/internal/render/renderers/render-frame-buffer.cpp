@@ -229,14 +229,13 @@ bool FrameBuffer::CreateGraphicsObjects()
       clearValues.clear();
       for(auto& attachments : mCreateInfo.colorAttachments)
       {
-        if(attachments.texture)
-        {
-          Graphics::AttachmentDescription desc{};
-          desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
-          desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
-          attachmentDescriptions.push_back(desc);
-          clearValues.emplace_back();
-        }
+        DALI_ASSERT_ALWAYS(attachments.texture && "Attached texture is invalid!\n");
+
+        Graphics::AttachmentDescription desc{};
+        desc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR);
+        desc.SetStoreOp(Graphics::AttachmentStoreOp::STORE);
+        attachmentDescriptions.push_back(desc);
+        clearValues.emplace_back();
       }
 
       if(mCreateInfo.depthStencilAttachment.depthTexture || mCreateInfo.depthStencilAttachment.stencilTexture ||
@@ -244,12 +243,12 @@ bool FrameBuffer::CreateGraphicsObjects()
       {
         Graphics::AttachmentDescription depthStencilDesc{};
         depthStencilDesc.SetLoadOp(Graphics::AttachmentLoadOp::CLEAR)
-          .SetStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
+          .SetStoreOp((mCreateInfo.depthStencilAttachment.stencilTexture || mCreateInfo.depthStencilAttachment.depthTexture) ? Graphics::AttachmentStoreOp::STORE : Graphics::AttachmentStoreOp::DONT_CARE);
 
         if(mCreateInfo.depthStencilAttachment.stencilTexture || mStencilBuffer)
         {
           depthStencilDesc.SetStencilLoadOp(Graphics::AttachmentLoadOp::CLEAR)
-            .SetStencilStoreOp(Graphics::AttachmentStoreOp::DONT_CARE);
+            .SetStencilStoreOp(mCreateInfo.depthStencilAttachment.stencilTexture ? Graphics::AttachmentStoreOp::STORE : Graphics::AttachmentStoreOp::DONT_CARE);
         }
         clearValues.emplace_back();
         clearValues.back().depthStencil.depth   = 1.0f;
@@ -264,7 +263,10 @@ bool FrameBuffer::CreateGraphicsObjects()
       RenderTargetGraphicsObjects::CreateRenderPass(*mGraphicsController, rpInfo);
 
       // Add default render pass (loadOp = dontcare)
-      attachmentDescriptions[0].SetLoadOp(Graphics::AttachmentLoadOp::DONT_CARE);
+      for(uint32_t i = 0; i < mCreateInfo.colorAttachments.size(); ++i)
+      {
+        attachmentDescriptions[i].SetLoadOp(Graphics::AttachmentLoadOp::DONT_CARE);
+      }
       RenderTargetGraphicsObjects::CreateRenderPassNoClear(*mGraphicsController, rpInfo);
 
       std::vector<Graphics::RenderPass*> renderPasses;

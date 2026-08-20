@@ -1343,11 +1343,19 @@ bool Actor::DispatchHoverEvent(const Dali::HoverEvent& event)
 
 bool Actor::EmitHoverEventSignal(const Dali::HoverEvent& event)
 {
+  if(mScene && mScene->IsGeometryHittestEnabled())
+  {
+    return EmitConsumingSignalOr(*this, mHoverEventSignal, event);
+  }
   return EmitConsumingSignal(*this, mHoverEventSignal, event);
 }
 
 bool Actor::EmitInterceptWheelEventSignal(const Dali::WheelEvent& event)
 {
+  if(mScene && mScene->IsGeometryHittestEnabled())
+  {
+    return EmitConsumingSignalOr(*this, mInterceptWheelEventSignal, event);
+  }
   return EmitConsumingSignal(*this, mInterceptWheelEventSignal, event);
 }
 
@@ -1361,6 +1369,10 @@ bool Actor::DispatchWheelEvent(const Dali::WheelEvent& event)
 
 bool Actor::EmitWheelEventSignal(const Dali::WheelEvent& event)
 {
+  if(mScene && mScene->IsGeometryHittestEnabled())
+  {
+    return EmitConsumingSignalOr(*this, mWheelEventSignal, event);
+  }
   return EmitConsumingSignal(*this, mWheelEventSignal, event);
 }
 

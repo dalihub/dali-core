@@ -49,7 +49,7 @@ int UtcDaliActorSizer_CalculateSize(void)
   auto& testActorImpl = Test::Impl::GetImpl(actor);
   auto& actorImpl     = GetImplementation(actor);
 
-  DALI_TEST_EQUALS(testActorImpl.IsRelayoutEnabled(), false, TEST_LOCATION);
+  DALI_TEST_EQUALS(actorImpl.IsRelayoutEnabled(), false, TEST_LOCATION);
 
   // With no relayouting, there are no default dependencies
   DALI_TEST_EQUALS(actorImpl.RelayoutDependentOnParent(Dimension::ALL_DIMENSIONS), false, TEST_LOCATION);

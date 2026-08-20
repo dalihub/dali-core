@@ -124,11 +124,6 @@ Actor Actor::GetParent() const
   return Actor(parent);
 }
 
-Vector3 Actor::GetTargetSize() const
-{
-  return GetImplementation(*this).GetTargetSize();
-}
-
 Vector3 Actor::GetNaturalSize() const
 {
   return GetImplementation(*this).GetNaturalSize();

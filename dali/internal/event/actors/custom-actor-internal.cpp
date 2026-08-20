@@ -40,7 +40,6 @@ CustomActor::CustomActor(const SceneGraph::Node& node, CustomActorImpl& extensio
 : Actor(Actor::BASIC, node),
   mImpl(&extension)
 {
-  SetRelayoutEnabled(extension.IsRelayoutEnabled());
 }
 
 CustomActor::~CustomActor() = default;

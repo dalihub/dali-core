@@ -628,7 +628,7 @@ void Core::RunProcessors()
           { oss << "[" << processor->GetProcessorName() << "]"; });
           processor->Process(false);
           DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss)
-          { oss << "[" << processor->GetProcessorName() << "]"; });
+          { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
         }
         else
         {
@@ -641,7 +641,7 @@ void Core::RunProcessors()
             { oss << "[" << processor->GetProcessorName() << "]"; });
             processor->Process(false);
             DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_PROCESSOR", [&](std::ostringstream& oss)
-            { oss << "[" << processor->GetProcessorName() << "]"; });
+            { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
           }
         }
       }
@@ -729,7 +729,7 @@ void Core::RunPostProcessors()
           { oss << "[" << processor->GetProcessorName() << "]"; });
           processor->Process(true);
           DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss)
-          { oss << "[" << processor->GetProcessorName() << "]"; });
+          { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
         }
         else
         {
@@ -742,7 +742,7 @@ void Core::RunPostProcessors()
             { oss << "[" << processor->GetProcessorName() << "]"; });
             processor->Process(true);
             DALI_TRACE_END_WITH_MESSAGE_GENERATOR(gTraceFilter, "DALI_CORE_RUN_POST_PROCESSOR", [&](std::ostringstream& oss)
-            { oss << "[" << processor->GetProcessorName() << "]"; });
+            { oss << "[END]"; }); // Do not use "processor" variable. It may be unregistered during Process()
           }
         }
       }

@@ -65,18 +65,6 @@ namespace Log
 namespace
 {
 constexpr const char* DISABLE_LOG_ENVIRONMENT_VARIABLE = "DALI_LOG_DISABLE";
-
-bool IsLogDisabled()
-{
-  static const bool logDisabled = []
-  {
-    const auto environmentVariableValue = GetEnvironmentVariableValue(DISABLE_LOG_ENVIRONMENT_VARIABLE);
-    return environmentVariableValue && std::atoi(environmentVariableValue->c_str()) != 0;
-  }();
-
-  return logDisabled;
-}
-
 void FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_list args)
 {
   static const bool logDisabled = IsLogDisabled();
@@ -115,6 +103,18 @@ void FormatPrintToStandardOutput(DebugPriority priority, const char* format, va_
   }
 }
 } // namespace
+
+bool IsLogDisabled()
+{
+  static const bool logDisabled = []
+  {
+    const auto environmentVariableValue = GetEnvironmentVariableValue(DISABLE_LOG_ENVIRONMENT_VARIABLE);
+    return environmentVariableValue && std::atoi(environmentVariableValue->c_str()) != 0;
+  }();
+
+  return logDisabled;
+}
+
 thread_local LogFunction gthreadLocalLogFunction = nullptr;
 
 /* Forward declarations */

@@ -664,6 +664,19 @@ public:
   {
     return Impl().template EmitReturn<Ret, Arg0>(arg0);
   }
+
+  /**
+   * @brief Emits the signal.
+   * If any one of the multiple callbacks returns true, the entire callback is consumed.
+   *
+   * @SINCE_2_5.36
+   * @param[in] arg0 The first value to pass to callbacks
+   * @return The values returned by every callback combined with operator|=, or a default constructed value if no callbacks are connected
+   */
+  Ret EmitOr(Arg0 arg0)
+  {
+    return Impl().template EmitReturnOr<Ret, Arg0>(arg0);
+  }
 };
 
 /**
