@@ -1053,16 +1053,6 @@ public:
   // Positioning
 
   /**
-   * @brief Returns the natural size of the actor.
-   *
-   * Deriving classes stipulate the natural size and by default an actor has a ZERO natural size.
-   *
-   * @SINCE_1_0.0
-   * @return The actor's natural size
-   */
-  Vector3 GetNaturalSize() const;
-
-  /**
    * @brief Translates an actor relative to its existing position.
    *
    * @SINCE_1_0.0
