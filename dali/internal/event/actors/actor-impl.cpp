@@ -421,6 +421,36 @@ void Actor::SetName(std::string_view name)
   DALI_LOG_SET_OBJECT_STRING(const_cast<SceneGraph::Node*>(&GetNode()), mName.c_str());
 }
 
+void Actor::SetAnnotation(std::string_view annotationId, std::string_view annotationType, std::string_view annotationInfo)
+{
+  if(!mAnnotation)
+  {
+    mAnnotation = std::make_unique<Annotation>();
+  }
+
+  mAnnotation->annotationId   = annotationId;
+  mAnnotation->annotationType = annotationType;
+  mAnnotation->annotationInfo = annotationInfo;
+}
+
+bool Actor::GetAnnotation(std::string& annotationId, std::string& annotationType, std::string& annotationInfo) const
+{
+  if(!mAnnotation)
+  {
+    return false;
+  }
+
+  annotationId   = mAnnotation->annotationId;
+  annotationType = mAnnotation->annotationType;
+  annotationInfo = mAnnotation->annotationInfo;
+  return true;
+}
+
+void Actor::ClearAnnotation()
+{
+  mAnnotation.reset();
+}
+
 uint32_t Actor::GetId() const
 {
   return GetNode().GetId();

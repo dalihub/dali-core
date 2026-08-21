@@ -1144,6 +1144,42 @@ public:
    */
   bool IsIgnored() const;
 
+  /**
+   * @brief Sets application-defined annotation data on the actor.
+   *
+   * The annotation ID, annotation type and annotation info are copied and retained by the actor. Annotation
+   * data is not an Actor property and does not participate in property notifications,
+   * serialization, or the update/render thread.
+   *
+   * @SINCE_2_4.46
+   * @param[in] annotationId The application-defined annotation identifier.
+   * @param[in] annotationType The application-defined annotation type.
+   * @param[in] annotationInfo Additional application-defined annotation information. Free-form; may be empty.
+   * @pre The actor has been initialized.
+   */
+  void SetAnnotation(std::string_view annotationId, std::string_view annotationType, std::string_view annotationInfo);
+
+  /**
+   * @brief Gets the application-defined annotation identifier, type and info stored on the actor.
+   *
+   * @SINCE_2_4.46
+   * @param[out] annotationId The stored application-defined annotation identifier when annotation data is set.
+   * @param[out] annotationType The stored application-defined annotation type when annotation data is set.
+   * @param[out] annotationInfo The stored additional annotation information when annotation data is set. May be empty.
+   * @return @c true if annotation data is set; otherwise @c false.
+   * @pre The actor has been initialized.
+   * @note The output parameters are not modified when no annotation data is set.
+   */
+  bool GetAnnotation(std::string& annotationId, std::string& annotationType, std::string& annotationInfo) const;
+
+  /**
+   * @brief Removes the application-defined annotation data from the actor.
+   *
+   * @SINCE_2_4.46
+   * @pre The actor has been initialized.
+   */
+  void ClearAnnotation();
+
 public: // Renderer
   /**
    * @brief Adds a renderer to this actor.

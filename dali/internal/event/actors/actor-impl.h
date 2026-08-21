@@ -19,6 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
+#include <memory>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -100,6 +101,21 @@ public:
    * @param[in] name The new name.
    */
   void SetName(std::string_view name);
+
+  /**
+   * @copydoc Dali::Actor::SetAnnotation
+   */
+  void SetAnnotation(std::string_view annotationId, std::string_view annotationType, std::string_view annotationInfo);
+
+  /**
+   * @copydoc Dali::Actor::GetAnnotation
+   */
+  bool GetAnnotation(std::string& annotationId, std::string& annotationType, std::string& annotationInfo) const;
+
+  /**
+   * @copydoc Dali::Actor::ClearAnnotation
+   */
+  void ClearAnnotation();
 
   /**
    * @copydoc Dali::Actor::GetId
@@ -2163,7 +2179,15 @@ protected:
   Vector3    mTargetScale;       ///< Event-side storage for scale
   Rect<int>  mTouchAreaOffset;   ///< touch area offset (left, right, bottom, top)
 
-  std::string mName;        ///< Name of the actor
+  struct Annotation
+  {
+    std::string annotationId;
+    std::string annotationType;
+    std::string annotationInfo;
+  };
+
+  std::string                   mName;       ///< Name of the actor
+  std::unique_ptr<Annotation>   mAnnotation; ///< Optional application-defined metadata
   uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
   int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
 

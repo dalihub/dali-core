@@ -208,6 +208,21 @@ bool Actor::IsIgnored() const
   return GetImplementation(*this).IsIgnored();
 }
 
+void Actor::SetAnnotation(std::string_view annotationId, std::string_view annotationType, std::string_view annotationInfo)
+{
+  GetImplementation(*this).SetAnnotation(annotationId, annotationType, annotationInfo);
+}
+
+bool Actor::GetAnnotation(std::string& annotationId, std::string& annotationType, std::string& annotationInfo) const
+{
+  return GetImplementation(*this).GetAnnotation(annotationId, annotationType, annotationInfo);
+}
+
+void Actor::ClearAnnotation()
+{
+  GetImplementation(*this).ClearAnnotation();
+}
+
 Actor::TouchEventSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
