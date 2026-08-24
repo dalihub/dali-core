@@ -17,6 +17,7 @@
 
 #include <dali-test-suite-utils.h>
 #include <dali/devel-api/actors/drawable-actor.h>
+#include <dali/devel-api/rendering/renderer-devel.h>
 #include <dali/devel-api/signals/render-callback.h>
 
 namespace
@@ -49,10 +50,24 @@ struct DrawableObject
     return false;
   }
 
-  Size          size{};
-  BoundsInteger clippingBox{};
-  Vector4       worldColor{};
-  bool          terminate{};
+  /**
+   * @brief Copies the texture bindings out so the test body can inspect them.
+   */
+  bool RenderAndCaptureTextures(const RenderCallbackInput& inputData)
+  {
+    size            = inputData.size;
+    textureBindings = inputData.textureBindings;
+    ++renderCount;
+
+    return false;
+  }
+
+  Size                   size{};
+  BoundsInteger          clippingBox{};
+  Vector4                worldColor{};
+  bool                   terminate{};
+  Dali::Vector<uint32_t> textureBindings{};
+  uint32_t               renderCount{0u};
 };
 } // namespace
 
@@ -72,7 +87,7 @@ int UtcDaliRendererSetRenderCallbackP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = Renderer::New(*callback);
+  auto renderer = DevelRenderer::New(*callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -107,7 +122,7 @@ int UtcDaliRendererSetRenderCallbackUnsafeP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = Renderer::New(*callback);
+  auto renderer = DevelRenderer::New(*callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -122,6 +137,53 @@ int UtcDaliRendererSetRenderCallbackUnsafeP(void)
   // render once again, for line coverage
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetRenderCallbackViaDevelP(void)
+{
+  tet_infoline("Testing DevelRenderer::SetRenderCallback() on an existing renderer");
+  TestApplication application;
+
+  DrawableObject first{};
+  DrawableObject second{};
+
+  auto firstCallback  = RenderCallback::New<DrawableObject>(&first, &DrawableObject::Render);
+  auto secondCallback = RenderCallback::New<DrawableObject>(&second, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  application.GetScene().Add(actor);
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+
+  // A renderer with neither geometry nor shader is only renderable once it has a callback,
+  // so attach one before adding the renderer to the actor.
+  Renderer renderer = Renderer::New();
+  DevelRenderer::SetRenderCallback(renderer, firstCallback.Get());
+  actor.AddRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(first.size, Size(100, 100), TEST_LOCATION);
+  DALI_TEST_EQUALS(second.size, Size(Vector2::ZERO), TEST_LOCATION);
+
+  // Replacing the callback drops the cached render target objects of the previous one.
+  DevelRenderer::SetRenderCallback(renderer, secondCallback.Get());
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(second.size, Size(100, 100), TEST_LOCATION);
+
+  // Clearing it makes the renderer non-renderable again, so the callback stops running.
+  second.size = Size(Vector2::ZERO);
+  DevelRenderer::SetRenderCallback(renderer, nullptr);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(second.size, Size(Vector2::ZERO), TEST_LOCATION);
 
   END_TEST;
 }
@@ -142,7 +204,7 @@ int UtcDaliRendererTerminateRenderCallbackP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = Renderer::New(*callback);
+  auto renderer = DevelRenderer::New(*callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -158,7 +220,7 @@ int UtcDaliRendererTerminateRenderCallbackP(void)
   application.SendNotification();
   application.Render();
 
-  renderer.TerminateRenderCallback(true);
+  DevelRenderer::TerminateRenderCallback(renderer, true);
 
   DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
 
@@ -191,7 +253,7 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = Renderer::New(*callback);
+  auto renderer = DevelRenderer::New(*callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -207,7 +269,7 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP(void)
   application.SendNotification();
   application.Render();
 
-  renderer.TerminateRenderCallback(true);
+  DevelRenderer::TerminateRenderCallback(renderer, true);
 
   DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
 
@@ -240,7 +302,7 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP2(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
   actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = Renderer::New(*callback);
+  auto renderer = DevelRenderer::New(*callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -256,7 +318,7 @@ int UtcDaliRendererTerminateRenderCallbackUnsafeP2(void)
   application.SendNotification();
   application.Render();
 
-  renderer.TerminateRenderCallback(false);
+  DevelRenderer::TerminateRenderCallback(renderer, false);
 
   DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
 
@@ -336,6 +398,109 @@ int UtcRenderCallbackTextureBindingP(void)
   END_TEST;
 }
 
+int UtcRenderCallbackTextureBindingNotUploaded(void)
+{
+  tet_infoline("Testing RenderCallback texture bindings for a texture that has not been uploaded");
+  TestApplication application;
+
+  auto&           graphicsController = application.GetGraphicsController();
+  TraceCallStack& gfxTrace           = graphicsController.mCallStack;
+  gfxTrace.Enable(true);
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::RenderAndCaptureTextures);
+
+  // A texture with no upload has no graphics object, so it has no native handle to report.
+  Texture notUploaded = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
+
+  // An uploaded texture does have one.
+  Texture   uploaded  = Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16);
+  auto*     data      = reinterpret_cast<uint8_t*>(malloc(16 * 16 * 4));
+  PixelData pixelData = PixelData::New(data, 16 * 16 * 4, 16, 16, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE);
+  uploaded.Upload(pixelData);
+
+  // Bind the un-uploaded one first, so a skipped entry would shift the uploaded one.
+  Dali::Vector<Texture> texturesToBind;
+  texturesToBind.PushBack(notUploaded);
+  texturesToBind.PushBack(uploaded);
+  callback->BindTextureResources(texturesToBind);
+
+  DrawableActor drawableActor = DrawableActor::New(*callback);
+  application.GetScene().Add(drawableActor);
+  drawableActor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+
+  gfxTrace.Reset();
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // The callback must still run - an unavailable texture is not a fatal condition.
+  DALI_TEST_EQUALS(drawable.renderCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.size, Size(100, 100), TEST_LOCATION);
+
+  // Every bound texture keeps its position, because the index is the only thing
+  // associating an entry with what the client bound.
+  DALI_TEST_EQUALS(drawable.textureBindings.Count(), 2u, TEST_LOCATION);
+
+  // The un-uploaded texture reports an invalid native handle.
+  DALI_TEST_EQUALS(drawable.textureBindings[0], 0u, TEST_LOCATION);
+
+  // Properties are only queried for the texture that actually has a graphics object, so
+  // exactly one of the two entries was resolved.
+  DALI_TEST_EQUALS(gfxTrace.CountMethod("GetTextureProperties"), 1, TEST_LOCATION);
+
+  // Uploading the remaining texture makes it resolvable on a later frame.
+  notUploaded.Upload(PixelData::New(reinterpret_cast<uint8_t*>(malloc(16 * 16 * 4)), 16 * 16 * 4, 16, 16, Pixel::Format::RGBA8888, PixelData::ReleaseFunction::FREE));
+
+  gfxTrace.Reset();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.renderCount, 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.textureBindings.Count(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gfxTrace.CountMethod("GetTextureProperties"), 2, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcRenderCallbackTextureBindingAllNotUploaded(void)
+{
+  tet_infoline("Testing RenderCallback texture bindings when no bound texture has been uploaded");
+  TestApplication application;
+
+  auto&           graphicsController = application.GetGraphicsController();
+  TraceCallStack& gfxTrace           = graphicsController.mCallStack;
+  gfxTrace.Enable(true);
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::RenderAndCaptureTextures);
+
+  Dali::Vector<Texture> texturesToBind;
+  texturesToBind.PushBack(Texture::New(Dali::TextureType::TEXTURE_2D, Pixel::Format::RGBA8888, 16, 16));
+  texturesToBind.PushBack(Texture::New(Dali::TextureType::TEXTURE_2D));
+  callback->BindTextureResources(texturesToBind);
+
+  DrawableActor drawableActor = DrawableActor::New(*callback);
+  application.GetScene().Add(drawableActor);
+  drawableActor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+
+  gfxTrace.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.renderCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.textureBindings.Count(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.textureBindings[0], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.textureBindings[1], 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gfxTrace.CountMethod("GetTextureProperties"), 0, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliDrawableActor2P(void)
 {
   tet_infoline("Testing Renderer:LSetRenderCallback() and check clipping box and color");
@@ -362,7 +527,7 @@ int UtcDaliDrawableActor2P(void)
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::COLOR, Color::MAROON * Vector4(1.0f, 1.0f, 1.0f, opacity));
 
-  auto renderer = Renderer::New(*callback);
+  auto renderer = DevelRenderer::New(*callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once
@@ -402,7 +567,7 @@ int UtcDaliDrawableActorSceneRotated(void)
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
 
-  auto renderer = Renderer::New(*callback);
+  auto renderer = DevelRenderer::New(*callback);
   actor.AddRenderer(renderer);
 
   // flush the queue and render once

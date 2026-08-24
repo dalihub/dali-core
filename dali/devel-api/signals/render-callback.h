@@ -38,15 +38,25 @@ namespace Dali
  *
  * This structure contains data to be passed into the RenderCallback
  * functor.
- *
- * @SINCE_2_1.30
  */
 struct DALI_CORE_API RenderCallbackInput
 {
-  Dali::Matrix           mvp;
-  Dali::Matrix           projection;
-  Dali::Size             size;
-  Dali::BoundsInteger    clippingBox; ///< in screen coordinates
+  Dali::Matrix        mvp;
+  Dali::Matrix        projection;
+  Dali::Size          size;
+  Dali::BoundsInteger clippingBox; ///< in screen coordinates
+
+  /**
+   * @brief Native handles of the textures bound with RenderCallback::BindTextureResources().
+   *
+   * Entries are in the same order as the list passed to BindTextureResources(), so the
+   * index is what associates an entry with the texture the client bound.
+   *
+   * An entry is 0 when the texture has no native handle yet - typically a texture that
+   * has been created but whose upload has not been processed on the render thread. The
+   * entry keeps its position in that case, so the client must check for 0 before use
+   * rather than assuming every entry is valid.
+   */
   Dali::Vector<uint32_t> textureBindings;
 
   Dali::Any eglContext;         ///< Storage for EGL Context
@@ -54,7 +64,7 @@ struct DALI_CORE_API RenderCallbackInput
 
   Dali::Matrix  view; // Added at end to avoid abi break.
   Dali::Vector4 worldColor;
-  bool          isTerminated; ///< Whether this callback is for terminate case, or not. @SINCE_2_4.35
+  bool          isTerminated; ///< Whether this callback is for terminate case, or not.
 };
 
 /**
@@ -66,8 +76,6 @@ struct DALI_CORE_API RenderCallbackInput
  * native API is context-less) to maintain state separation from DALi render state.
  *
  * The class wraps CallbackBase object ensuring its type-safe assignment
- *
- * @SINCE_2_1.14
  */
 class DALI_CORE_API RenderCallback
 {
@@ -84,15 +92,12 @@ public:
    * should be used with caution and is considered unsafe.
    *
    * The default mode is ISOLATED.
-   *
-   * @SINCE_2_3.12
    */
   enum class ExecutionMode
   {
     /**
      * @brief Native rendering commands will be isolated from DALi graphics pipline state
      * @details This mode is default and provides safest way of executing custom graphics API commands.
-     * @SINCE_2_3.12
      */
     ISOLATED,
 
@@ -100,13 +105,11 @@ public:
      * @brief Native rendering will be injected directly into DALi graphics pipeline
      * @details This mode is considered unsafe as it's directly injected into DALi rendering pipeline.
      * It inherits current graphics API state and may alter it.
-     * @SINCE_2_3.12
      */
     UNSAFE,
 
     /**
      * @brief Default mode is ISOLATED
-     * @SINCE_2_3.12
      */
     DEFAULT = ISOLATED
   };
@@ -123,8 +126,6 @@ public:
    * @param[in] object Object to invoke
    * @param[in] func Member function to invoke
    * @param[in] executionMode execution mode of custom code
-   *
-   * @SINCE_2_3.12
    */
   template<class T>
   RenderCallback(T* object, FuncType<T> func, ExecutionMode executionMode)
@@ -136,7 +137,6 @@ public:
   /**
    * @brief Creates new instance of RenderCallback
    *
-   * @SINCE_2_1.14
    * @param[in] object Object to invoke
    * @param[in] func Member function to invoke
    * @return Unique pointer to the RenderCallback instance
@@ -150,7 +150,6 @@ public:
   /**
    * @brief Creates new instance of RenderCallback
    *
-   * @SINCE_2_3.12
    * @param[in] object Object to invoke
    * @param[in] func Member function to invoke
    * @param[in] executionMode Execution mode of custom code
@@ -165,7 +164,6 @@ public:
   /**
    * @brief Explicit cast operator
    *
-   * @SINCE_2_1.14
    * @return casts RenderCallback to CallbackBase object
    */
   explicit operator Dali::CallbackBase*()
@@ -184,7 +182,11 @@ public:
    * to make sure the resource is alive when used inside the callback.
    *
    * @param[in] textures List of DALi textures to be bound to the callback
-   * @SINCE_2_1.30
+   *
+   * @note A texture may be bound before its content has been uploaded. Until the upload
+   *       has been processed on the render thread the texture has no native handle, and
+   *       RenderCallbackInput::textureBindings reports 0 for it while keeping its position
+   *       in the list. Check for 0 inside the callback before using an entry.
    */
   void BindTextureResources(Dali::Vector<Dali::Texture> textures)
   {
@@ -203,7 +205,6 @@ public:
   /**
    * @brief Explicit cast operator
    *
-   * @SINCE_2_1.14
    * @return casts RenderCallback to CallbackBase object
    */
   explicit operator Dali::CallbackBase&()
@@ -218,7 +219,6 @@ public:
    * providing DALi rendering related data (such as clipping box) as well as
    * Graphics native API related data (like EGLContext for GL).
    *
-   * @SINCE_2_1.30
    * @return Valid RenderCallbackInput structure
    */
   Dali::RenderCallbackInput& GetRenderCallbackInput()
@@ -229,7 +229,6 @@ public:
   /**
    * @brief Returns execution mode of the callback
    *
-   * @SINCE_2_3.12
    * @return Valid execution mode
    */
   [[nodiscard]] ExecutionMode GetExecutionMode() const

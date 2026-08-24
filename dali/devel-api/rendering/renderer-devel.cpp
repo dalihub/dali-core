@@ -23,6 +23,23 @@ namespace Dali
 {
 namespace DevelRenderer
 {
+Renderer New(RenderCallback& renderCallback)
+{
+  Internal::RendererPtr renderer = Internal::Renderer::New();
+  renderer->SetRenderCallback(&renderCallback);
+  return Renderer(renderer.Get());
+}
+
+void SetRenderCallback(Dali::Renderer renderer, RenderCallback* callback)
+{
+  GetImplementation(renderer).SetRenderCallback(callback);
+}
+
+void TerminateRenderCallback(Dali::Renderer renderer, bool invokeCallback)
+{
+  GetImplementation(renderer).TerminateRenderCallback(invokeCallback);
+}
+
 bool IsAdvancedBlendEquationApplied(const Renderer& renderer)
 {
   return GetImplementation(renderer).IsAdvancedBlendEquationApplied();
