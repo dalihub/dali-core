@@ -149,6 +149,11 @@ ENDIF()
 
 IF( WIN32 ) # WIN32 includes x64 as well according to the cmake doc.
 
+  # Use /Z7 (debug info embedded in .obj) instead of /Zi (shared .pdb) to avoid
+  # fatal error C1090: PDB API call failed during parallel compilation.
+  # Replace /Zi in CMake's default debug flags to avoid D9025 warning.
+  STRING(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+  STRING(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
   ADD_COMPILE_OPTIONS( /W3 /WX )                       # Treat all level 3 warnings as errors.
   ADD_COMPILE_OPTIONS( /FI "${DALI_WINDOWS_DEPENDENCIES_INCLUDE_DIR}/dali-windows-dependencies.h" ) # Adds missing definitions.
   ADD_COMPILE_OPTIONS( /vmg )                           # Avoids a 'reinterpret_cast' compile error while compiling signals and callbacks.
