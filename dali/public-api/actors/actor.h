@@ -74,6 +74,26 @@ struct Vector4;
  * - To be hittable, an actor must have a non-zero size.
  * - If an actor's world color is fully transparent, then it is not hittable; see GetWorldColor().
  *
+ * <i>Touch Propagation Modes:</i>
+ *
+ * - PARENT propagation
+ *   - The primary point is hit-tested for each event.
+ *   - Touch delivery starts at that hit actor and continues through its parents until consumed.
+ *   - For a multi-point event, the primary point chooses the delivery hierarchy. The other points
+ *     are included in the same event but do not select additional recipients.
+ * - GEOMETRY propagation
+ *   - A down point creates or joins a stream identified by its initial geometry hit.
+ *   - Before an owner is selected, touch delivery follows the coordinate candidates from front to back.
+ *     A candidate that did not consume an earlier event can consume a later event.
+ *   - The first consumer becomes the stable owner. Subsequent touch events are delivered to that owner
+ *     until interception or stream termination.
+ *   - Intercept signals follow the current owner's ancestor path, from the root toward the owner. Before
+ *     an owner exists, the initial hit actor's ancestor path is used.
+ *   - If a new owner displaces actors that previously received this stream, every displaced active
+ *     recipient receives exactly one interrupted event.
+ *   - Every point's local position is expressed in the actual recipient's coordinate system. Every
+ *     point's hit actor remains the stream's initial hit actor for the lifetime of that stream.
+ *
  * <i>Hit Test Algorithm:</i>
  *
  * - Scene
@@ -149,7 +169,7 @@ struct Vector4;
  *     @endcode
  *     For more information, see Property::DRAW_MODE.
  *
- * <i>Touch or hover Event Delivery:</i>
+ * <i>PARENT Touch or Hover Event Delivery:</i>
  *
  * - Delivery
  *   - The hit actor's touch or hover signal is emitted first; if it is not consumed by any of the listeners,
@@ -192,10 +212,10 @@ struct Vector4;
  *       }
  *     }
  *     @endcode
- *   - If there are several touch points, then the delivery is only to the first touch point's hit
+ *   - In PARENT propagation, if there are several touch points, then the delivery is only to the first touch point's hit
  *     actor (and its parents). There will be NO touch or hover signal delivery for the hit actors of the
  *     other touch points.
- *   - The local coordinates are from the top-left (0.0f, 0.0f, 0.5f) of the hit actor.
+ *   - In PARENT propagation, local coordinates are from the top-left (0.0f, 0.0f, 0.5f) of the hit actor.
  *
  * - Leave State
  *   - A "Leave" state is set when the first point exits the bounds of the previous first point's
@@ -2660,6 +2680,9 @@ public: // Signals
    * If interceptFunctor returns true, it means that the TouchEvent was intercepted.
    * So the child actor will not be able to receive touch events.
    * Only the parentFunctor is called.
+   *
+   * @note In GEOMETRY propagation, intercept callbacks traverse the current owner's ancestor path.
+   * Before an owner has been selected, they traverse the initial hit actor's ancestor path.
    *
    * @SINCE_2_5.29
    * @return The signal to connect to
