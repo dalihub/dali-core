@@ -571,10 +571,14 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     info.executionMode                                 = isolatedNotDirect ? Graphics::DrawNativeExecutionMode::ISOLATED : Graphics::DrawNativeExecutionMode::DIRECT;
     info.reserved                                      = nullptr;
 
-    auto& textureResources = mRenderCallback->GetTextureResources();
-
-    if(!textureResources.Empty())
+    // Unconditional: the input structure lives as long as the callback does, so an empty
+    // list has to overwrite whatever the previous one left behind.
     {
+      // Held for the whole walk. The event thread may call BindTextureResources() at any
+      // point, and that releases the storage the current list is using.
+      const auto  textureAccessor  = mRenderCallback->AccessTextureResources();
+      const auto& textureResources = textureAccessor.Get();
+
       mRenderCallbackTextureBindings.clear();
       renderCallbackInput.textureBindings.ResizeUninitialized(textureResources.Count());
       auto i = 0u;

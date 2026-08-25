@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/threading/mutex.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/math/matrix.h>
@@ -41,10 +42,15 @@ namespace Dali
  */
 struct DALI_CORE_API RenderCallbackInput
 {
-  Dali::Matrix        mvp;
-  Dali::Matrix        projection;
-  Dali::Size          size;
+  Dali::Matrix mvp;
+  Dali::Matrix view;
+  Dali::Matrix projection;
+
   Dali::BoundsInteger clippingBox; ///< in screen coordinates
+  Dali::Vector4       worldColor;
+  Dali::Size          size;
+
+  Dali::Any eglContext; ///< Storage for EGL Context
 
   /**
    * @brief Native handles of the textures bound with RenderCallback::BindTextureResources().
@@ -52,19 +58,13 @@ struct DALI_CORE_API RenderCallbackInput
    * Entries are in the same order as the list passed to BindTextureResources(), so the
    * index is what associates an entry with the texture the client bound.
    *
-   * An entry is 0 when the texture has no native handle yet - typically a texture that
-   * has been created but whose upload has not been processed on the render thread. The
-   * entry keeps its position in that case, so the client must check for 0 before use
-   * rather than assuming every entry is valid.
+   * An entry is 0 until DALi has created the GL texture behind it, and keeps its position
+   * meanwhile. Check for 0 before using an entry.
    */
   Dali::Vector<uint32_t> textureBindings;
 
-  Dali::Any eglContext;         ///< Storage for EGL Context
-  bool      usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
-
-  Dali::Matrix  view; // Added at end to avoid abi break.
-  Dali::Vector4 worldColor;
-  bool          isTerminated; ///< Whether this callback is for terminate case, or not.
+  bool usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
+  bool isTerminated;       ///< Whether this callback is for terminate case, or not.
 };
 
 /**
@@ -183,24 +183,58 @@ public:
    *
    * @param[in] textures List of DALi textures to be bound to the callback
    *
-   * @note A texture may be bound before its content has been uploaded. Until the upload
-   *       has been processed on the render thread the texture has no native handle, and
-   *       RenderCallbackInput::textureBindings reports 0 for it while keeping its position
-   *       in the list. Check for 0 inside the callback before using an entry.
+   * @note A texture may be bound before DALi has created the GL texture behind it, in
+   *       which case RenderCallbackInput::textureBindings reports 0 for it.
+   * @note Safe to call while the render thread is reading the previously bound list.
    */
   void BindTextureResources(Dali::Vector<Dali::Texture> textures)
   {
+    Dali::Mutex::ScopedLock lock(mTextureResourcesMutex);
     mTextureResources = std::move(textures);
   }
 
   /**
-   * @brief Returns list of DALi textures bound to the callback
+   * @brief Scoped read access to the list of DALi textures bound to the callback
    *
-   * @return list of textures
+   * BindTextureResources() replaces the list from the event thread, which releases the
+   * storage the previous one was using, so this accessor must stay alive for as long as
+   * the reference it hands out is in use.
+   *
+   * Scoped rather than copied on purpose: the render thread must not allocate, nor touch
+   * the reference count of an event thread object.
    */
-  [[nodiscard]] const Dali::Vector<Dali::Texture>& GetTextureResources() const
+  class TextureResourcesAccessor
   {
-    return mTextureResources;
+  public:
+    TextureResourcesAccessor(Dali::Mutex& mutex, const Dali::Vector<Dali::Texture>& resources)
+    : mLock(mutex),
+      mResources(resources)
+    {
+    }
+
+    /**
+     * @brief Returns the bound textures, valid for the lifetime of this accessor
+     *
+     * @return list of textures
+     */
+    [[nodiscard]] const Dali::Vector<Dali::Texture>& Get() const
+    {
+      return mResources;
+    }
+
+  private:
+    Dali::Mutex::ScopedLock            mLock;
+    const Dali::Vector<Dali::Texture>& mResources;
+  };
+
+  /**
+   * @brief Takes scoped read access to the textures bound to the callback
+   *
+   * @return An accessor that must outlive any use of the list it exposes
+   */
+  [[nodiscard]] TextureResourcesAccessor AccessTextureResources() const
+  {
+    return TextureResourcesAccessor(mTextureResourcesMutex, mTextureResources);
   }
   /**
    * @brief Explicit cast operator
@@ -241,6 +275,7 @@ private:
   Dali::RenderCallbackInput     mRenderCallbackInput;
   ExecutionMode                 mExecutionMode{ExecutionMode::DEFAULT};
   Dali::Vector<Dali::Texture>   mTextureResources{};
+  mutable Dali::Mutex           mTextureResourcesMutex{}; ///< Guards mTextureResources across the event and render threads
 };
 } // namespace Dali
 

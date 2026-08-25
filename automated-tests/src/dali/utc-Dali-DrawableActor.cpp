@@ -381,7 +381,7 @@ int UtcRenderCallbackTextureBindingP(void)
   Dali::Vector<Texture> texturesToBind;
   texturesToBind.PushBack(texture);
   callback->BindTextureResources(texturesToBind);
-  DALI_TEST_EQUALS(callback->GetTextureResources().Count(), texturesToBind.Count(), TEST_LOCATION);
+  DALI_TEST_EQUALS(callback->AccessTextureResources().Get().Count(), texturesToBind.Count(), TEST_LOCATION);
 
   DrawableActor drawableActor = DrawableActor::New(*callback);
   application.GetScene().Add(drawableActor);
@@ -461,6 +461,32 @@ int UtcRenderCallbackTextureBindingNotUploaded(void)
   DALI_TEST_EQUALS(drawable.renderCount, 2u, TEST_LOCATION);
   DALI_TEST_EQUALS(drawable.textureBindings.Count(), 2u, TEST_LOCATION);
   DALI_TEST_EQUALS(gfxTrace.CountMethod("GetTextureProperties"), 2, TEST_LOCATION);
+
+  // Re-binding replaces the list wholesale. The render thread works from a snapshot, so
+  // the storage the previous list used can be released without it walking freed memory.
+  Dali::Vector<Texture> rebound;
+  rebound.PushBack(uploaded);
+  callback->BindTextureResources(rebound);
+
+  gfxTrace.Reset();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.renderCount, 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.textureBindings.Count(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gfxTrace.CountMethod("GetTextureProperties"), 1, TEST_LOCATION);
+
+  // Binding an empty list unbinds everything. The input structure outlives a single
+  // frame, so the previous entries have to be cleared rather than left behind.
+  callback->BindTextureResources(Dali::Vector<Texture>());
+
+  gfxTrace.Reset();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.renderCount, 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.textureBindings.Count(), 0u, TEST_LOCATION);
+  DALI_TEST_EQUALS(gfxTrace.CountMethod("GetTextureProperties"), 0, TEST_LOCATION);
 
   END_TEST;
 }
