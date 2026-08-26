@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,11 @@ void TerminatedNativeDrawManager::RegisterTerminatedRenderCallback(const SceneGr
   Graphics::DrawNativeInfo info{};
   info.api      = Graphics::DrawNativeAPI::GLES;
   info.userData = renderCallbackInput.get();
+
+  // Submitted against a live render target, so the callback can use the native API. The
+  // graphics backend may still decline to execute the draw, in which case the callback is
+  // not invoked at all - see the note in Render::Renderer::TerminateRenderCallback().
+  renderCallbackInput->isNativeApiUsable = true;
 
   // Set storage for the context to be used
   info.executionMode = isolatedNotDirect ? Graphics::DrawNativeExecutionMode::ISOLATED : Graphics::DrawNativeExecutionMode::DIRECT;
@@ -128,7 +133,22 @@ void TerminatedNativeDrawManager::SubmitTerminatedRenderCallback(const SceneGrap
 
 void TerminatedNativeDrawManager::RenderTargetGraphicsObjectsDestroyed(const SceneGraph::RenderTargetGraphicsObjects* renderTargetGraphicsObjects)
 {
-  mTerminatedRenderTargets.erase(renderTargetGraphicsObjects);
+  auto iter = mTerminatedRenderTargets.find(renderTargetGraphicsObjects);
+  if(iter != mTerminatedRenderTargets.end())
+  {
+    // The render target these callbacks were queued against is gone, so the terminate draw
+    // can never be submitted. Invoke them here instead of dropping them - the callback has
+    // to be delivered exactly once - telling them the native API is no longer usable.
+    for(auto& callback : iter->second)
+    {
+      callback.renderCallbackInput->isNativeApiUsable = false;
+
+      // Passed as void*, matching how the graphics controller dispatches this callback -
+      // the dispatcher instantiated at the client side has to be the same one.
+      CallbackBase::ExecuteReturn<bool>(static_cast<Dali::CallbackBase&>(*callback.renderCallback), static_cast<void*>(callback.renderCallbackInput.get()));
+    }
+    mTerminatedRenderTargets.erase(iter);
+  }
 }
 
 } // namespace Dali::Internal::Render

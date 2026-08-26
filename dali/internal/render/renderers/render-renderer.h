@@ -495,8 +495,9 @@ public:
   {
     if(!mRenderCallbackInput)
     {
-      mRenderCallbackInput               = std::make_unique<RenderCallbackInput>();
-      mRenderCallbackInput->isTerminated = false;
+      mRenderCallbackInput                    = std::make_unique<RenderCallbackInput>();
+      mRenderCallbackInput->isTerminated      = false;
+      mRenderCallbackInput->isNativeApiUsable = true;
     }
     return *mRenderCallbackInput;
   }
@@ -786,6 +787,9 @@ private:
   RenderCallback*                      mRenderCallback{nullptr};
   std::unique_ptr<RenderCallbackInput> mRenderCallbackInput{nullptr};
   std::vector<Graphics::Texture*>      mRenderCallbackTextureBindings{};
+
+  /// A terminate invocation is delivered exactly once, whichever way it ends up happening.
+  bool mRenderCallbackTerminated{false};
 
   // Struct to get matched UBO block correctly.
   // Most of case the number of UBO is 1 or 2 usually. (VisualRenderer + RenderEffect case)

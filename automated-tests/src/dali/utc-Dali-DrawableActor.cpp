@@ -27,10 +27,12 @@ struct DrawableObject
   bool Render(const RenderCallbackInput& inputData)
   {
     // Store the size and clipping box of rendered area
-    size        = inputData.size;
-    clippingBox = inputData.clippingBox;
-    worldColor  = inputData.worldColor;
-    terminate   = inputData.isTerminated;
+    size            = inputData.size;
+    clippingBox     = inputData.clippingBox;
+    worldColor      = inputData.worldColor;
+    terminate       = inputData.isTerminated;
+    nativeApiUsable = inputData.isNativeApiUsable;
+    ++invokeCount;
 
     return false;
   }
@@ -66,6 +68,8 @@ struct DrawableObject
   BoundsInteger          clippingBox{};
   Vector4                worldColor{};
   bool                   terminate{};
+  bool                   nativeApiUsable{true};
+  uint32_t               invokeCount{0u};
   Dali::Vector<uint32_t> textureBindings{};
   uint32_t               renderCount{0u};
 };
@@ -233,6 +237,201 @@ int UtcDaliRendererTerminateRenderCallbackP(void)
   // render once again, for line coverage
   application.SendNotification();
   application.Render();
+
+  END_TEST;
+}
+
+int UtcDaliRendererTerminateRenderCallbackNeverDrawnP(void)
+{
+  tet_infoline("Testing Renderer::TerminateRenderCallback() for a callback that was never drawn");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  // Never added to an actor, so the callback is not associated with any render target and
+  // there is nothing to schedule the terminate invocation against.
+  auto renderer = DevelRenderer::New(*callback);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.invokeCount, 0u, TEST_LOCATION);
+
+  DevelRenderer::TerminateRenderCallback(renderer, true);
+
+  application.SendNotification();
+  application.Render();
+
+  // The terminate is delivered all the same - exactly once - reporting that the graphics
+  // API cannot be used from it.
+  DALI_TEST_EQUALS(drawable.invokeCount, 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.terminate, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.nativeApiUsable, false, TEST_LOCATION);
+
+  // ...and not again on subsequent frames, nor when the terminate is requested again.
+  DevelRenderer::TerminateRenderCallback(renderer, true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.invokeCount, 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererTerminateRenderCallbackRepeatedP(void)
+{
+  tet_infoline("Testing Renderer::TerminateRenderCallback() delivers once however often it is asked");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  application.GetScene().Add(actor);
+
+  auto renderer = DevelRenderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+
+  const uint32_t drawnCount = drawable.invokeCount;
+  DALI_TEST_CHECK(drawnCount > 0u);
+
+  DevelRenderer::TerminateRenderCallback(renderer, true);
+  actor.RemoveRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.invokeCount, drawnCount + 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.terminate, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.nativeApiUsable, true, TEST_LOCATION);
+
+  // Asking again changes nothing.
+  DevelRenderer::TerminateRenderCallback(renderer, true);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.invokeCount, drawnCount + 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererTerminateRenderCallbackReplacedP(void)
+{
+  tet_infoline("Testing Renderer::TerminateRenderCallback() after the callback has been replaced");
+  TestApplication application;
+
+  DrawableObject firstDrawable{};
+  DrawableObject secondDrawable{};
+
+  auto firstCallback  = RenderCallback::New<DrawableObject>(&firstDrawable, &DrawableObject::Render);
+  auto secondCallback = RenderCallback::New<DrawableObject>(&secondDrawable, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  application.GetScene().Add(actor);
+
+  auto renderer = DevelRenderer::New(*firstCallback);
+  actor.AddRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  DevelRenderer::TerminateRenderCallback(renderer, true);
+  actor.RemoveRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(firstDrawable.terminate, true, TEST_LOCATION);
+
+  // The replacement gets a terminate of its own - the delivery already made belongs to the
+  // callback that has been swapped out.
+  DevelRenderer::SetRenderCallback(renderer, secondCallback.Get());
+  actor.AddRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(secondDrawable.terminate, false, TEST_LOCATION);
+  DALI_TEST_CHECK(secondDrawable.invokeCount > 0u);
+
+  DevelRenderer::TerminateRenderCallback(renderer, true);
+  actor.RemoveRenderer(renderer);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(secondDrawable.terminate, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(secondDrawable.nativeApiUsable, true, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRendererTerminateRenderCallbackRenderTargetDestroyedP(void)
+{
+  tet_infoline("Testing Renderer::TerminateRenderCallback() when its render target is destroyed first");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  application.GetScene().Add(actor);
+
+  auto renderer = DevelRenderer::New(*callback);
+  actor.AddRenderer(renderer);
+
+  // Exclusive, so the offscreen target is the only one the callback is drawn into and
+  // therefore the only one the terminate can be queued against.
+  Texture     texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100u, 100u);
+  FrameBuffer frameBuffer = FrameBuffer::New(100u, 100u);
+  frameBuffer.AttachColorTexture(texture);
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.CreateTask();
+  task.SetSourceActor(actor);
+  task.SetExclusive(true);
+  task.SetFrameBuffer(frameBuffer);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+
+  const uint32_t drawnCount = drawable.invokeCount;
+  DALI_TEST_CHECK(drawnCount > 0u);
+
+  // Queue the terminate, then drop the render target it was queued against before the
+  // terminate draw can be submitted.
+  DevelRenderer::TerminateRenderCallback(renderer, true);
+  actor.RemoveRenderer(renderer);
+
+  task.SetFrameBuffer(FrameBuffer());
+  taskList.RemoveTask(task);
+  task.Reset();
+  frameBuffer.Reset();
+  texture.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  // Delivered all the same, reporting that the native API cannot be used from it.
+  DALI_TEST_EQUALS(drawable.invokeCount, drawnCount + 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.terminate, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.nativeApiUsable, false, TEST_LOCATION);
 
   END_TEST;
 }

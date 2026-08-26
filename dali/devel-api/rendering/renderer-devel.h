@@ -41,16 +41,36 @@ DALI_CORE_API Renderer New(RenderCallback& renderCallback);
 /**
  * @brief Sets the RenderCallback to be used for native rendering.
  *
+ * A callback that was already set is detached from its render targets first, without being
+ * told about it - replacing a callback is not the same as finishing with one, so it is left
+ * to the client to release what the outgoing callback created. Use TerminateRenderCallback()
+ * beforehand to have it release them itself.
+ *
  * @param[in] renderer A valid Renderer object
  * @param[in] callback Pointer to a valid RenderCallback object
  */
 DALI_CORE_API void SetRenderCallback(Dali::Renderer renderer, RenderCallback* callback);
 
 /**
- * @brief Removes the RenderCallback used for native rendering.
+ * @brief Detaches the RenderCallback from the render targets it has been drawn into.
+ *
+ * The callback itself stays set on the renderer, so a renderer that is still on the scene
+ * carries on being drawn and attaches again on the next frame. Remove the renderer from its
+ * actor to stop it for good.
  *
  * @param[in] renderer A valid Renderer object
- * @param[in] invokeCallback Invoke render callbacks forcibly if we need to catch terminate case at callback
+ * @param[in] invokeCallback Whether to invoke the callback one last time, with
+ *                           RenderCallbackInput::isTerminated set, so it can release what it
+ *                           created. Pass false to detach without telling the callback.
+ *
+ * @note The terminate invocation is asynchronous - it has to run in the context the
+ *       resources were created in, which a later frame provides. Whatever the callback
+ *       points at has to stay alive until then.
+ * @note It is delivered once for each render target the callback has been drawn into, and
+ *       only for the first request - asking again invokes nothing.
+ * @note It is delivered even when there is nothing left to release it in: the callback was
+ *       never drawn, or its render target has been destroyed. Check
+ *       RenderCallbackInput::isNativeApiUsable before making any native API call.
  */
 DALI_CORE_API void TerminateRenderCallback(Dali::Renderer renderer, bool invokeCallback);
 
