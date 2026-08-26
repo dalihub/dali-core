@@ -27,6 +27,7 @@
 #include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/trace.h>
 #include <dali/internal/common/core-impl.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 
@@ -42,6 +43,28 @@ static constexpr size_t WARNING_PRINT_THRESHOLD  = 100u;
 static constexpr size_t ASSERT_PROGRAM_THRESHOLD = 10000u;
 
 DALI_INIT_TRACE_FILTER(gTraceFilter, DALI_TRACE_PERFORMANCE_MARKER, false);
+
+/**
+ * Finds the actor that should own a multi-touch gesture for the given hit candidate list.
+ * Geometry event propagation groups the touch points by the actor each point hit on down, and a
+ * gesture detector is fed only with the points of the touch event delivered to its actor. A pinch
+ * or a rotation therefore can never be recognized when two points hit different actors, so the
+ * points are grouped by the nearest ancestor requiring such a gesture instead.
+ * @param[in] actorLists The hit candidate list, ordered from the outermost ancestor to the leaf.
+ * @return The nearest actor requiring a multi-touch gesture, or nullptr if there is none.
+ */
+Actor* FindMultiTouchGestureOwner(const std::list<Actor*>& actorLists)
+{
+  for(std::list<Actor*>::const_reverse_iterator rIter = actorLists.rbegin(), rEndIter = actorLists.rend(); rIter != rEndIter; ++rIter)
+  {
+    Actor* actor = *rIter;
+    if(actor && (actor->IsGestureRequired(GestureType::PINCH) || actor->IsGestureRequired(GestureType::ROTATION)))
+    {
+      return actor;
+    }
+  }
+  return nullptr;
+}
 } // unnamed namespace
 
 EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEventProcessor)
@@ -155,8 +178,13 @@ void EventProcessor::ProcessEvents()
 
               if(hitTestResults.actor)
               {
+                // Group the point by the nearest ancestor requiring a multi-touch gesture, so that the points of
+                // such a gesture stay in one touch event even when they hit different actors. Fall back to the hit
+                // actor itself when no ancestor requires one, to keep a gesture per point available.
+                Actor* gestureOwner = FindMultiTouchGestureOwner(hitTestResults.actorLists);
+                Actor* groupActor   = gestureOwner ? gestureOwner : &GetImplementation(hitTestResults.actor);
                 // Stores which actor the touch event hit.
-                mActorIdDeviceId[touchEvent.GetPoint(i).GetDeviceId()] = (&GetImplementation(hitTestResults.actor))->GetId();
+                mActorIdDeviceId[touchEvent.GetPoint(i).GetDeviceId()] = groupActor->GetId();
               }
             }
             // You can see which actor the touch event hit.
