@@ -48,6 +48,7 @@
 #include <dali/internal/event/update/frame-callback-interface-impl.h>
 
 #include <dali/internal/update/common/discard-queue.h>
+#include <dali/internal/update/common/property-batch-free-list.h>
 #include <dali/internal/update/common/scene-graph-memory-pool-collection.h>
 #include <dali/internal/update/manager/render-task-processor.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -408,6 +409,9 @@ void Core::RelayoutAndFlush(SceneContainer& scenes)
   }
 
   // Flush any queued messages for the update-thread
+  // Flush every pending property batch before FlushQueue() so batched
+  // changes are turned into messages in the same frame
+  FlushAllPropertyBatches();
   const bool messagesToProcess = mUpdateManager->FlushQueue();
 
   if(messagesToProcess)
