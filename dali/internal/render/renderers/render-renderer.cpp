@@ -201,6 +201,15 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
 
 Renderer::~Renderer()
 {
+  // Detach from the render targets the callback has been drawn into. Nothing is invoked -
+  // that only happens on an explicit terminate request - but the observer registrations
+  // have to go, or a render target outliving this renderer ends up notifying an object
+  // that is no longer there.
+  if(mRenderCallback)
+  {
+    TerminateRenderCallback(false);
+  }
+
   // Reset old pipeline
   ClearPipelineCache(true);
 }

@@ -436,6 +436,64 @@ int UtcDaliRendererTerminateRenderCallbackRenderTargetDestroyedP(void)
   END_TEST;
 }
 
+int UtcDaliRendererDestroyedWithoutTerminateRenderCallbackP(void)
+{
+  tet_infoline("Testing a render callback renderer destroyed without TerminateRenderCallback()");
+  TestApplication application;
+
+  DrawableObject drawable{};
+
+  auto callback = RenderCallback::New<DrawableObject>(&drawable, &DrawableObject::Render);
+
+  Actor actor = Actor::New();
+  actor.SetProperty(Actor::Property::SIZE, Vector2(100, 100));
+  application.GetScene().Add(actor);
+
+  Texture     texture     = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100u, 100u);
+  FrameBuffer frameBuffer = FrameBuffer::New(100u, 100u);
+  frameBuffer.AttachColorTexture(texture);
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     task     = taskList.CreateTask();
+  task.SetSourceActor(actor);
+  task.SetExclusive(true);
+  task.SetFrameBuffer(frameBuffer);
+
+  {
+    auto renderer = DevelRenderer::New(*callback);
+    actor.AddRenderer(renderer);
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_CHECK(drawable.invokeCount > 0u);
+
+    // Let the renderer go without ever asking for a terminate.
+    actor.RemoveRenderer(renderer);
+  }
+
+  application.SendNotification();
+  application.Render();
+
+  const uint32_t invokeCount = drawable.invokeCount;
+
+  // The render target outlives the renderer, so it must no longer be holding on to it.
+  task.SetFrameBuffer(FrameBuffer());
+  taskList.RemoveTask(task);
+  task.Reset();
+  frameBuffer.Reset();
+  texture.Reset();
+
+  application.SendNotification();
+  application.Render();
+
+  // No terminate was ever asked for, so the callback hears nothing about any of this.
+  DALI_TEST_EQUALS(drawable.invokeCount, invokeCount, TEST_LOCATION);
+  DALI_TEST_EQUALS(drawable.terminate, false, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRendererTerminateRenderCallbackUnsafeP(void)
 {
   tet_infoline("Testing Renderer:LTerminateRenderCallback() with Unsafe");
