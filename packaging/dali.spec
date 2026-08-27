@@ -1,7 +1,7 @@
 Name:       dali2
 Summary:    DALi 3D Engine
-Version:    2.5.35
-Release:    2
+Version:    2.5.36
+Release:    1
 Group:      System/Libraries
 License:    Apache-2.0 and BSD-3-Clause and MIT
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-core.git;a=summary

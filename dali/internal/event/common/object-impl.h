@@ -33,6 +33,7 @@
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/event/common/property-metadata.h>
 #include <dali/internal/update/common/property-base.h>
+#include <dali/internal/update/common/property-batch.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-object.h>
@@ -595,6 +596,49 @@ private:
    */
   void SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value);
 
+  /**
+   * @brief Gets the full current property value from the scene-graph (ignoring component index).
+   *
+   * Used for seeding a new batch entry when a component property is set.
+   * Unlike GetCurrentPropertyValue(), this always returns the whole underlying value
+   * regardless of entry.componentIndex.
+   *
+   * @param[in] entry The property metadata entry
+   * @return The full current property value
+   */
+  Property::Value GetFullCurrentPropertyValue(const PropertyMetadata& entry) const;
+
+  /**
+   * @brief Gets or creates the property batch for this Object.
+   *
+   * Lazily allocates a PropertyBatch from the thread-local free-list on first use.
+   * Also links the Object into the thread-local dirty list.
+   *
+   * @return Pointer to the PropertyBatch
+   */
+  PropertyBatch* GetOrCreateBatch();
+
+protected:
+  /**
+   * @brief Flushes the property batch and returns it to the free-list.
+   *
+   * @param[in] list The ThreadLocalDirtyList to unlink from (must be owningList)
+   *
+   * @pre list.mutex is held by caller
+   * @pre list == mPropertyBatch->owningList
+   *
+   * @note Public because FlushAllPropertyBatches() (a free function) calls
+   * object->FlushPropertyBatchLocked(list) directly on Object instances.
+   */
+  void FlushPropertyBatchLocked(ThreadLocalDirtyList& list);
+
+  /**
+   * @brief Releases any pending property batch on destruction.
+   *
+   * Called from ~Object(). Handles both same-thread and cross-thread cases.
+   */
+  void ReleasePendingPropertyBatch();
+
 protected:
   // mutable because it's lazy initialised and GetSceneObject has to be const so it can be called from const methods
   // const to prevent accidentally calling setters directly from event thread
@@ -613,6 +657,13 @@ private:
   PropertyNotificationContainer* mPropertyNotifications; ///< Container of owned property notifications.
 
   Handle::PropertySetSignalType mPropertySetSignal;
+
+  PropertyBatch* mPropertyBatch;  ///< 8 bytes, initially nullptr. Lazily allocated from thread-local free-list.
+
+  // Friend declarations for property batching free-list functions
+  friend void LinkIntoDirtyList(Object* object);
+  friend void UnlinkFromDirtyListLocked(Object* object, ThreadLocalDirtyList& list);
+  friend void FlushAllPropertyBatches();
 
 public:                        /// To be used at observer container changes only.
   bool mObserverNotifying : 1; ///< Whether we are currently notifying observers.

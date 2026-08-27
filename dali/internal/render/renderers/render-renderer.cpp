@@ -571,22 +571,39 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     info.executionMode                                 = isolatedNotDirect ? Graphics::DrawNativeExecutionMode::ISOLATED : Graphics::DrawNativeExecutionMode::DIRECT;
     info.reserved                                      = nullptr;
 
-    auto& textureResources = mRenderCallback->GetTextureResources();
-
-    if(!textureResources.Empty())
+    // Unconditional: the input structure lives as long as the callback does, so an empty
+    // list has to overwrite whatever the previous one left behind.
     {
+      // Held for the whole walk. The event thread may call BindTextureResources() at any
+      // point, and that releases the storage the current list is using.
+      const auto  textureAccessor  = mRenderCallback->AccessTextureResources();
+      const auto& textureResources = textureAccessor.Get();
+
       mRenderCallbackTextureBindings.clear();
       renderCallbackInput.textureBindings.ResizeUninitialized(textureResources.Count());
       auto i = 0u;
       for(auto& texture : textureResources)
       {
-        auto& textureImpl     = GetImplementation(texture);
-        auto  graphicsTexture = textureImpl.GetRenderTextureKey()->GetGraphicsObject();
+        auto& textureImpl = GetImplementation(texture);
+        auto  textureKey  = textureImpl.GetRenderTextureKey();
 
-        auto properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
+        // The graphics object does not exist until the texture has been uploaded (or is
+        // backed by a native image), so a texture bound before its upload has been
+        // processed has nothing to hand over yet. Report an invalid native handle rather
+        // than shifting the remaining entries, because the index into textureBindings is
+        // the only thing associating an entry with what the client bound.
+        Graphics::Texture* graphicsTexture = textureKey ? textureKey->GetGraphicsObject() : nullptr;
+        if(graphicsTexture)
+        {
+          auto properties = mGraphicsController->GetTextureProperties(*graphicsTexture);
 
-        mRenderCallbackTextureBindings.emplace_back(graphicsTexture);
-        renderCallbackInput.textureBindings[i++] = properties.nativeHandle;
+          mRenderCallbackTextureBindings.emplace_back(graphicsTexture);
+          renderCallbackInput.textureBindings[i++] = properties.nativeHandle;
+        }
+        else
+        {
+          renderCallbackInput.textureBindings[i++] = 0u;
+        }
       }
       info.textureCount = static_cast<uint32_t>(mRenderCallbackTextureBindings.size());
       info.textureList  = mRenderCallbackTextureBindings.data();

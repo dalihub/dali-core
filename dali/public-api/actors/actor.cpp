@@ -124,11 +124,6 @@ Actor Actor::GetParent() const
   return Actor(parent);
 }
 
-Vector3 Actor::GetNaturalSize() const
-{
-  return GetImplementation(*this).GetNaturalSize();
-}
-
 void Actor::TranslateBy(const Vector3& distance)
 {
   GetImplementation(*this).TranslateBy(distance);

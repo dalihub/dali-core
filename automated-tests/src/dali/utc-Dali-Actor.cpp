@@ -1864,7 +1864,7 @@ int UtcDaliActorGetNaturalSize(void)
   Actor   actor = Actor::New();
   Vector3 vector(0.0f, 0.0f, 0.0f);
 
-  DALI_TEST_CHECK(actor.GetNaturalSize() == vector);
+  DALI_TEST_CHECK(DevelActor::GetNaturalSize(actor) == vector);
 
   END_TEST;
 }
@@ -15362,7 +15362,7 @@ int UtcDaliActorGetNaturalSizeNegative(void)
   Dali::Actor     instance;
   try
   {
-    instance.GetNaturalSize();
+    DevelActor::GetNaturalSize(instance);
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)

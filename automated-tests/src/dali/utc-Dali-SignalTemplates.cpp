@@ -119,84 +119,131 @@ float StaticFloatCallbackFloatValueFloatValue(float value1, float value2)
 }
 
 int  totalCallbackCount = 0;
+
+// Each callback must have a unique function body to prevent MSVC's
+// Identical COMDAT Folding (ICF) from merging them into a single address.
+// If ICF merges them, all function pointers compare equal and BaseSignal
+// treats them as duplicates, only keeping the first connection.
+// The volatile sink prevents the optimizer from collapsing the bodies.
+volatile int gCallbackSink01 = 0;
+volatile int gCallbackSink02 = 0;
+volatile int gCallbackSink03 = 0;
+volatile int gCallbackSink04 = 0;
+volatile int gCallbackSink05 = 0;
+volatile int gCallbackSink06 = 0;
+volatile int gCallbackSink07 = 0;
+volatile int gCallbackSink08 = 0;
+volatile int gCallbackSink09 = 0;
+volatile int gCallbackSink10 = 0;
+volatile int gCallbackSink11 = 0;
+volatile int gCallbackSink12 = 0;
+volatile int gCallbackSink13 = 0;
+volatile int gCallbackSink14 = 0;
+volatile int gCallbackSink15 = 0;
+volatile int gCallbackSink16 = 0;
+volatile int gCallbackSink17 = 0;
+volatile int gCallbackSink18 = 0;
+volatile int gCallbackSink19 = 0;
+volatile int gCallbackSink20 = 0;
+
 void StaticVoidCallback01(void)
 {
+  gCallbackSink01 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback02(void)
 {
+  gCallbackSink02 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback03(void)
 {
+  gCallbackSink03 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback04(void)
 {
+  gCallbackSink04 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback05(void)
 {
+  gCallbackSink05 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback06(void)
 {
+  gCallbackSink06 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback07(void)
 {
+  gCallbackSink07 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback08(void)
 {
+  gCallbackSink08 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback09(void)
 {
+  gCallbackSink09 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback10(void)
 {
+  gCallbackSink10 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback11(void)
 {
+  gCallbackSink11 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback12(void)
 {
+  gCallbackSink12 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback13(void)
 {
+  gCallbackSink13 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback14(void)
 {
+  gCallbackSink14 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback15(void)
 {
+  gCallbackSink15 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback16(void)
 {
+  gCallbackSink16 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback17(void)
 {
+  gCallbackSink17 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback18(void)
 {
+  gCallbackSink18 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback19(void)
 {
+  gCallbackSink19 = 1;
   totalCallbackCount++;
 }
 void StaticVoidCallback20(void)
 {
+  gCallbackSink20 = 1;
   totalCallbackCount++;
 }
 

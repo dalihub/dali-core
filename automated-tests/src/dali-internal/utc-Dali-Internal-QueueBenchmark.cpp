@@ -21,6 +21,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -109,7 +110,8 @@ int UtcDaliInternalQueueBenchmarkDisabledP(void)
   QueueBenchmark::RecordValue(QueueBenchmark::ValueChannel::MQ_BACKLOG_BYTES, 1024);
 
   // Test DumpToFile - should not create file when nothing recorded
-  const char* testPath = "/tmp/test_queue_benchmark_disabled.csv";
+  std::string testPathStr = (std::filesystem::temp_directory_path() / "test_queue_benchmark_disabled.csv").string();
+  const char* testPath    = testPathStr.c_str();
   DeleteFile(testPath); // Clean up first
   QueueBenchmark::DumpToFile(testPath);
 
@@ -173,7 +175,8 @@ int UtcDaliInternalQueueBenchmarkEnabledP(void)
   DALI_TEST_CHECK(commitLog.writeIndex.load() > initialCommitIndex);
 
   // Test DumpToFile - verify CSV format
-  const char* testPath = "/tmp/test_queue_benchmark_enabled.csv";
+  std::string testPathStr = (std::filesystem::temp_directory_path() / "test_queue_benchmark_enabled.csv").string();
+  const char* testPath    = testPathStr.c_str();
   DeleteFile(testPath); // Clean up first
 
   QueueBenchmark::DumpToFile(testPath);

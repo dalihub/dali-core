@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <mutex>
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/object/handle-devel.h>
@@ -36,6 +37,9 @@
 #include <dali/internal/update/common/uniform-map.h>
 
 #include <dali/internal/update/common/animatable-property-messages.h>
+#include <dali/internal/update/common/property-batch-free-list.h>
+#include <dali/internal/update/common/property-batch-messages.h>
+#include <dali/internal/update/common/property-batch.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
@@ -1109,6 +1113,7 @@ Object::Object(const SceneGraph::PropertyOwner* sceneObject)
   mTypeInfo(nullptr),
   mConstraints(nullptr),
   mPropertyNotifications(nullptr),
+  mPropertyBatch(nullptr),
   mObserverNotifying(false),
   mObserverRemoved(false)
 {
@@ -1123,6 +1128,10 @@ Object::~Object()
       DALI_LOG_ERROR("~Object[%p] called from non-UI thread! something unknown issue will be happened!\n", this);
     }
   }
+
+  // Release any pending property batch before other teardown
+  // to prevent dangling pointer in dirty list)
+  ReleasePendingPropertyBatch();
 
   // Disable property notifications in scene graph
   DisablePropertyNotifications();
@@ -1630,162 +1639,152 @@ Property::Value Object::GetCurrentPropertyValue(const PropertyMetadata& entry) c
   return value;
 }
 
-void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value)
+// Property Update Batching
+
+Property::Value Object::GetFullCurrentPropertyValue(const PropertyMetadata& entry) const
 {
+  // Only called from SetSceneGraphProperty() when entry.componentIndex >= 0, i.e. only
+  // for the VECTOR2/3/4 component properties the type system allows to have components
+  // (see AddAnimatablePropertyComponent) - such an entry is always animatable, so there is
+  // no non-animatable branch here.
+  Property::Value value;
+
   switch(entry.GetType())
   {
-    case Property::BOOLEAN:
-    {
-      const AnimatableProperty<bool>* property = dynamic_cast<const AnimatableProperty<bool>*>(entry.GetSceneGraphProperty());
-      DALI_ASSERT_DEBUG(property);
-
-      SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-      break;
-    }
-
-    case Property::INTEGER:
-    {
-      const AnimatableProperty<int32_t>* property = dynamic_cast<const AnimatableProperty<int32_t>*>(entry.GetSceneGraphProperty());
-      DALI_ASSERT_DEBUG(property);
-
-      SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-      break;
-    }
-
-    case Property::FLOAT:
-    {
-      const AnimatableProperty<float>* property = dynamic_cast<const AnimatableProperty<float>*>(entry.GetSceneGraphProperty());
-      DALI_ASSERT_DEBUG(property);
-
-      SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-      break;
-    }
-
     case Property::VECTOR2:
     {
-      const AnimatableProperty<Vector2>* property = dynamic_cast<const AnimatableProperty<Vector2>*>(entry.GetSceneGraphProperty());
+      const SceneGraph::AnimatableProperty<Vector2>* property = static_cast<const SceneGraph::AnimatableProperty<Vector2>*>(entry.GetSceneGraphProperty());
       DALI_ASSERT_DEBUG(property);
-
-      switch(entry.componentIndex)
-      {
-        case 0:
-        {
-          SetValidSceneGraphProperty<Vector2, 0>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        case 1:
-        {
-          SetValidSceneGraphProperty<Vector2, 1>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        default:
-        {
-          SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-      }
+      // Always return full value, ignoring componentIndex
+      value = property->Get();
       break;
     }
 
     case Property::VECTOR3:
     {
-      const AnimatableProperty<Vector3>* property = dynamic_cast<const AnimatableProperty<Vector3>*>(entry.GetSceneGraphProperty());
+      const SceneGraph::AnimatableProperty<Vector3>* property = static_cast<const SceneGraph::AnimatableProperty<Vector3>*>(entry.GetSceneGraphProperty());
       DALI_ASSERT_DEBUG(property);
-
-      switch(entry.componentIndex)
-      {
-        case 0:
-        {
-          SetValidSceneGraphProperty<Vector3, 0>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        case 1:
-        {
-          SetValidSceneGraphProperty<Vector3, 1>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        case 2:
-        {
-          SetValidSceneGraphProperty<Vector3, 2>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        default:
-        {
-          SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-      }
+      // Always return full value, ignoring componentIndex
+      value = property->Get();
       break;
     }
 
     case Property::VECTOR4:
     {
-      const AnimatableProperty<Vector4>* property = dynamic_cast<const AnimatableProperty<Vector4>*>(entry.GetSceneGraphProperty());
+      const SceneGraph::AnimatableProperty<Vector4>* property = static_cast<const SceneGraph::AnimatableProperty<Vector4>*>(entry.GetSceneGraphProperty());
       DALI_ASSERT_DEBUG(property);
-
-      switch(entry.componentIndex)
-      {
-        case 0:
-        {
-          SetValidSceneGraphProperty<Vector4, 0>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        case 1:
-        {
-          SetValidSceneGraphProperty<Vector4, 1>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        case 2:
-        {
-          SetValidSceneGraphProperty<Vector4, 2>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        case 3:
-        {
-          SetValidSceneGraphProperty<Vector4, 3>(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-        default:
-        {
-          SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-          break;
-        }
-      }
-      break;
-    }
-
-    case Property::ROTATION:
-    {
-      const AnimatableProperty<Quaternion>* property = dynamic_cast<const AnimatableProperty<Quaternion>*>(entry.GetSceneGraphProperty());
-      DALI_ASSERT_DEBUG(property);
-
-      SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-      break;
-    }
-
-    case Property::MATRIX:
-    {
-      const AnimatableProperty<Matrix>* property = dynamic_cast<const AnimatableProperty<Matrix>*>(entry.GetSceneGraphProperty());
-      DALI_ASSERT_DEBUG(property);
-
-      SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
-      break;
-    }
-
-    case Property::MATRIX3:
-    {
-      const AnimatableProperty<Matrix3>* property = dynamic_cast<const AnimatableProperty<Matrix3>*>(entry.GetSceneGraphProperty());
-      DALI_ASSERT_DEBUG(property);
-
-      SetValidSceneGraphProperty(GetEventThreadServices(), *mUpdateObject, *property, value);
+      // Always return full value, ignoring componentIndex
+      value = property->Get();
       break;
     }
 
     default:
     {
-      // non-animatable scene graph property, do nothing
+      // Every type that can carry a componentIndex >= 0 is handled above.
+      DALI_ASSERT_DEBUG(false && "GetFullCurrentPropertyValue: invalid property type");
     }
+  } // switch(type)
+
+  return value;
+}
+
+PropertyBatch* Object::GetOrCreateBatch()
+{
+  if(mPropertyBatch == nullptr)
+  {
+    auto& freeList = GetThreadLocalBatchFreeList();
+    mPropertyBatch = freeList.Pop();
+    if(mPropertyBatch == nullptr)
+    {
+      mPropertyBatch = new PropertyBatch(); // Fallback to heap allocation
+    }
+
+    // This Object just became active this frame -- link it onto the
+    // thread-local dirty list exactly once.
+    LinkIntoDirtyList(this);
   }
+  return mPropertyBatch;
+}
+
+void Object::FlushPropertyBatchLocked(ThreadLocalDirtyList& list)
+{
+  // NOTE: relies on GetOrCreateBatch() never being linked into the dirty list without an
+  // Add() immediately following (true today, its only call site) -- an empty-but-linked
+  // batch would fail the !IsEmpty() check below and never be unlinked, stranding it in the
+  // dirty list forever.
+  if(mPropertyBatch != nullptr && !mPropertyBatch->IsEmpty())
+  {
+    DALI_ASSERT_DEBUG(mUpdateObject && "FlushPropertyBatchLocked: mUpdateObject is null");
+
+    FlushPropertyBatchMessage(GetEventThreadServices(), *mUpdateObject, *mPropertyBatch);
+
+    UnlinkFromDirtyListLocked(this, list);
+    mPropertyBatch->Clear(); // frees MATRIX/MATRIX3 heap values, resets count
+    GetThreadLocalBatchFreeList().Push(mPropertyBatch);
+    mPropertyBatch = nullptr; // Object back to 8 bytes idle
+  }
+}
+
+void Object::ReleasePendingPropertyBatch()
+{
+  // Called from ~Object(). Safe to call even if mPropertyBatch is already
+  // null (nothing pending).
+  if(mPropertyBatch == nullptr)
+  {
+    return;
+  }
+
+  if(EventThreadServices::IsEventThread())
+  {
+    // Same-thread case: the list we need is this thread's own. No message
+    // is sent for a destroyed Object's batched properties -- just unlink
+    // and return the buffer to the free-list.
+    auto&                       list = GetThreadLocalDirtyList();
+    std::lock_guard<std::mutex> lock(list.mutex);
+    UnlinkFromDirtyListLocked(this, list);
+    mPropertyBatch->Clear();
+    GetThreadLocalBatchFreeList().Push(mPropertyBatch);
+    mPropertyBatch = nullptr;
+    return;
+  }
+
+  // Cross-thread case: mPropertyBatch->mOwningList points directly at the
+  // owning thread's dirty list, so we can lock and unlink from the correct
+  // list without needing any kind of registry or thread-id lookup.
+  {
+    std::lock_guard<std::mutex> lock(mPropertyBatch->mOwningList->mutex);
+    UnlinkFromDirtyListLocked(this, *mPropertyBatch->mOwningList);
+  }
+
+  // The free-list is also thread_local and not safely reachable from a
+  // different thread, so the batch is freed outright here instead of being
+  // recycled.
+  mPropertyBatch->Clear();
+  delete mPropertyBatch;
+  mPropertyBatch = nullptr;
+}
+
+void Object::SetSceneGraphProperty(Property::Index index, const PropertyMetadata& entry, const Property::Value& value)
+{
+  // Instead of sending BakeMessage immediately, add to batch.
+  // entry.GetSceneGraphProperty() is the coalescing key, not `index`
+  PropertyBatch* batch = GetOrCreateBatch();
+
+  // Find() does the one O(count) scan this call needs (count is almost
+  // always 4): its result tells us both whether GetFullCurrentPropertyValue()
+  // is worth fetching (only when seeding a brand-new entry from a single
+  // component) and, if an entry already exists, hands it straight to Add()
+  // below so Add() doesn't have to repeat the scan.
+  const SceneGraph::PropertyBase* sceneGraphProperty = entry.GetSceneGraphProperty();
+  PropertyBatchEntry*             existing           = batch->Find(sceneGraphProperty);
+
+  Property::Value currentValue;
+  if(entry.componentIndex >= 0 && existing == nullptr)
+  {
+    currentValue = GetFullCurrentPropertyValue(entry);
+  }
+
+  batch->Add(index, entry.componentIndex, entry.GetType(), sceneGraphProperty, value, currentValue, existing);
 }
 
 } // namespace Internal

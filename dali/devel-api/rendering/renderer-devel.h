@@ -23,8 +23,37 @@
 
 namespace Dali
 {
+class RenderCallback;
+
 namespace DevelRenderer
 {
+/**
+ * @brief Creates a new Renderer that draws through a RenderCallback.
+ *
+ * The callback is injected into the graphics pipeline in place of the renderer's own
+ * drawing, so the renderer needs neither a geometry nor a shader.
+ *
+ * @param[in] renderCallback Valid RenderCallback
+ * @return A handle to the Renderer
+ */
+DALI_CORE_API Renderer New(RenderCallback& renderCallback);
+
+/**
+ * @brief Sets the RenderCallback to be used for native rendering.
+ *
+ * @param[in] renderer A valid Renderer object
+ * @param[in] callback Pointer to a valid RenderCallback object
+ */
+DALI_CORE_API void SetRenderCallback(Dali::Renderer renderer, RenderCallback* callback);
+
+/**
+ * @brief Removes the RenderCallback used for native rendering.
+ *
+ * @param[in] renderer A valid Renderer object
+ * @param[in] invokeCallback Invoke render callbacks forcibly if we need to catch terminate case at callback
+ */
+DALI_CORE_API void TerminateRenderCallback(Dali::Renderer renderer, bool invokeCallback);
+
 /**
  * The index of render queue used by the DrawCommand
  */

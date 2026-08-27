@@ -134,6 +134,7 @@ SET( internal_src_files
   ${internal_src_dir}/update/animation/scene-graph-constraint-container.cpp
   ${internal_src_dir}/update/common/collected-uniform-map.cpp
   ${internal_src_dir}/update/common/property-base.cpp
+  ${internal_src_dir}/update/common/property-batch.cpp
   ${internal_src_dir}/update/common/property-owner-messages.cpp
   ${internal_src_dir}/update/common/property-condition-functions.cpp
   ${internal_src_dir}/update/common/property-condition-step-functions.cpp

@@ -31,13 +31,6 @@ Renderer Renderer::New(Geometry& geometry, Shader& shader)
   return Renderer(renderer.Get());
 }
 
-Renderer Renderer::New(RenderCallback& renderCallback)
-{
-  Internal::RendererPtr renderer = Internal::Renderer::New();
-  renderer->SetRenderCallback(&renderCallback);
-  return Renderer(renderer.Get());
-}
-
 Renderer Renderer::New()
 {
   Internal::RendererPtr renderer = Internal::Renderer::New();
@@ -107,16 +100,6 @@ Shader Renderer::GetShader() const
 void Renderer::RemoveShader()
 {
   GetImplementation(*this).RemoveShader();
-}
-
-void Renderer::SetRenderCallback(RenderCallback* callback)
-{
-  GetImplementation(*this).SetRenderCallback(callback);
-}
-
-void Renderer::TerminateRenderCallback(bool invokeCallback)
-{
-  GetImplementation(*this).TerminateRenderCallback(invokeCallback);
 }
 
 Renderer::Renderer(Internal::Renderer* pointer)

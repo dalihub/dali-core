@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2026 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,9 @@ DrawableActor::DrawableActor(const Internal::SceneGraph::Node& node, RenderCallb
 
   rendererImpl->SetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR, DevelRenderer::Rendering::CONTINUOUSLY);
 
+  rendererImpl->SetRenderCallback(renderCallback);
+
   mRenderer = Dali::Renderer(rendererImpl.Get());
-  mRenderer.SetRenderCallback(renderCallback);
   AddRenderer(*rendererImpl.Get());
 }
 

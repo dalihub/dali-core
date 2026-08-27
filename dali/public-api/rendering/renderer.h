@@ -26,8 +26,6 @@
 
 namespace Dali
 {
-class RenderCallback;
-
 /**
  * @addtogroup dali_core_rendering_effects
  * @{
@@ -493,15 +491,6 @@ public:
   static Renderer New(Geometry& geometry, Shader& shader);
 
   /**
-   * @brief Creates a new Renderer object with RenderCallback.
-   *
-   * @SINCE_2_1.18
-   * @param[in] renderCallback Valid RenderCallback
-   * @return A handle to the Renderer
-   */
-  static Renderer New(RenderCallback& renderCallback);
-
-  /**
    * @brief Creates a new Renderer object without geometry and shader.
    * @post We should set Geometry and Shader before attach to actor. If not, exception throwed.
    *
@@ -649,22 +638,6 @@ public:
    * @SINCE_2_5.10
    */
   void RemoveShader();
-
-  /**
-   * @brief Sets RenderCallback to be used for native rendering
-   *
-   * @SINCE_2_1.15
-   * @param[in] callback Pointer to a valid RenderCallback object
-   */
-  void SetRenderCallback(RenderCallback* callback);
-
-  /**
-   * @brief Remove RenderCallback used for native rendering.
-   *
-   * @SINCE_2_4.35
-   * @param[in] invokeCallback Invoke render callbacks forcibly if we need to catch terminate case at callback.
-   */
-  void TerminateRenderCallback(bool invokeCallback);
 
 public:
   /// @cond internal
