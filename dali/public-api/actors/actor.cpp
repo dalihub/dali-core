@@ -22,6 +22,8 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 
@@ -254,7 +256,7 @@ Vector3 Actor::GetCurrentSize() const
   return GetImplementation(*this).GetCurrentSize();
 }
 
-void Actor::SetWidth(float width)
+void Actor::SetSizeWidth(float width)
 {
   GetImplementation(*this).SetProperty(Actor::Property::SIZE_WIDTH, width);
 }
@@ -264,7 +266,7 @@ float Actor::GetWidth() const
   return GetImplementation(*this).GetWidth();
 }
 
-void Actor::SetHeight(float height)
+void Actor::SetSizeHeight(float height)
 {
   GetImplementation(*this).SetProperty(Actor::Property::SIZE_HEIGHT, height);
 }
@@ -274,7 +276,7 @@ float Actor::GetHeight() const
   return GetImplementation(*this).GetHeight();
 }
 
-void Actor::SetDepth(float depth)
+void Actor::SetSizeDepth(float depth)
 {
   GetImplementation(*this).SetProperty(Actor::Property::SIZE_DEPTH, depth);
 }
@@ -352,6 +354,27 @@ float Actor::GetWorldPositionZ() const
 void Actor::SetOrientation(const Quaternion& orientation)
 {
   GetImplementation(*this).SetProperty(Actor::Property::ORIENTATION, orientation);
+}
+
+void Actor::SetOrientationAngle(const Radian& angle)
+{
+  Vector3 axis(Vector3::ZAXIS);
+  Radian  currentAngle;
+  GetOrientation().ToAxisAngle(axis, currentAngle);
+  SetOrientation(Quaternion(angle, axis));
+}
+
+void Actor::SetOrientationAngle(const Degree& angle)
+{
+  SetOrientationAngle(Radian(angle));
+}
+
+Radian Actor::GetOrientationAngle() const
+{
+  Vector3 axis;
+  Radian  angle;
+  GetOrientation().ToAxisAngle(axis, angle);
+  return angle;
 }
 
 Quaternion Actor::GetOrientation() const

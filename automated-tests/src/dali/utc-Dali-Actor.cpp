@@ -17371,13 +17371,13 @@ int UtcDaliActorSetGetSizeP(void)
   Vector3 currentSize = actor.GetCurrentSize();
   DALI_TEST_CHECK(currentSize == Vector3::ZERO || currentSize != Vector3::ZERO);
 
-  actor.SetWidth(150.0f);
+  actor.SetSizeWidth(150.0f);
   DALI_TEST_EQUALS(actor.GetWidth(), 150.0f, TEST_LOCATION);
 
-  actor.SetHeight(250.0f);
+  actor.SetSizeHeight(250.0f);
   DALI_TEST_EQUALS(actor.GetHeight(), 250.0f, TEST_LOCATION);
 
-  actor.SetDepth(350.0f);
+  actor.SetSizeDepth(350.0f);
   DALI_TEST_EQUALS(actor.GetDepth(), 350.0f, TEST_LOCATION);
 
   END_TEST;
@@ -17423,6 +17423,33 @@ int UtcDaliActorSetGetOrientationP(void)
 
   Quaternion worldOrientation = actor.GetWorldOrientation();
   DALI_TEST_CHECK(worldOrientation.IsIdentity() || !worldOrientation.IsIdentity());
+
+  END_TEST;
+}
+
+int UtcDaliActorSetGetOrientationAngleP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+
+  // The identity orientation has no axis, so the angle-only overload uses Z.
+  actor.SetOrientationAngle(Degree(30.0f));
+  DALI_TEST_EQUALS(actor.GetOrientation(), Quaternion(Degree(30.0f), Vector3::ZAXIS), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(30.0f)), 0.001f, TEST_LOCATION);
+
+  // Once an orientation axis exists, replacing the angle preserves that axis.
+  Vector3 axis(1.0f, 2.0f, 3.0f);
+  axis.Normalize();
+  actor.SetOrientation(Quaternion(Degree(15.0f), axis));
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(15.0f)), 0.001f, TEST_LOCATION);
+  actor.SetOrientationAngle(Radian(Degree(75.0f)));
+  DALI_TEST_EQUALS(actor.GetOrientation(), Quaternion(Degree(75.0f), axis), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(75.0f)), 0.001f, TEST_LOCATION);
+
+  // SetOrientationAngle is absolute: a second angle replaces rather than accumulates.
+  actor.SetOrientationAngle(Degree(20.0f));
+  DALI_TEST_EQUALS(actor.GetOrientation(), Quaternion(Degree(20.0f), axis), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(20.0f)), 0.001f, TEST_LOCATION);
 
   END_TEST;
 }

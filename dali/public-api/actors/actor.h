@@ -1315,9 +1315,9 @@ public:
    * @param[in] width The width
    * @pre The actor has been initialized.
    * @see Actor::Property::SIZE_WIDTH
-   * @SINCE_2_5.30
+   * @SINCE_2_5.38
    */
-  void SetWidth(float width);
+  void SetSizeWidth(float width);
 
   /**
    * @brief Gets the width of the actor.
@@ -1333,9 +1333,9 @@ public:
    * @param[in] height The height
    * @pre The actor has been initialized.
    * @see Actor::Property::SIZE_HEIGHT
-   * @SINCE_2_5.30
+   * @SINCE_2_5.38
    */
-  void SetHeight(float height);
+  void SetSizeHeight(float height);
 
   /**
    * @brief Gets the height of the actor.
@@ -1351,9 +1351,9 @@ public:
    * @param[in] depth The depth
    * @pre The actor has been initialized.
    * @see Actor::Property::SIZE_DEPTH
-   * @SINCE_2_5.30
+   * @SINCE_2_5.38
    */
-  void SetDepth(float depth);
+  void SetSizeDepth(float depth);
 
   /**
    * @brief Gets the depth of the actor.
@@ -1499,6 +1499,45 @@ public:
    * @SINCE_2_5.30
    */
   void SetOrientation(const Quaternion& orientation);
+
+  /**
+   * @brief Sets the angle component of the actor's orientation.
+   *
+   * The axis from the actor's target orientation is preserved. If the target
+   * orientation is the identity quaternion, for which no axis is defined, the
+   * Z axis is used. This replaces the orientation angle; it does not apply a
+   * relative rotation.
+   *
+   * @param[in] angle The new orientation angle
+   * @pre The actor has been initialized.
+   * @see Actor::Property::ORIENTATION
+   * @see RotateBy()
+   * @SINCE_2_5.38
+   */
+  void SetOrientationAngle(const Radian& angle);
+
+  /**
+   * @brief Sets the angle component of the actor's orientation.
+   *
+   * This overload converts @p angle to radians and preserves the current
+   * target orientation axis. See SetOrientationAngle(const Radian&).
+   *
+   * @param[in] angle The new orientation angle
+   * @pre The actor has been initialized.
+   * @SINCE_2_5.38
+   */
+  void SetOrientationAngle(const Degree& angle);
+
+  /**
+   * @brief Gets the angle component of the actor's target orientation.
+   *
+   * @return The orientation angle in radians
+   * @pre The actor has been initialized.
+   * @see SetOrientationAngle()
+   * @see GetOrientation()
+   * @SINCE_2_5.38
+   */
+  Radian GetOrientationAngle() const;
 
   /**
    * @brief Gets the orientation of the actor.
