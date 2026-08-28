@@ -4224,6 +4224,12 @@ int UtcDaliActorGeoHitTest(void)
                  hitTestData[index]->mTouchPoint.y,
                  hitTestData[index]->mResult);
 
+    // Finish this geometry stream so the next hit-test case does not reuse the same device route.
+    point.SetState(PointState::UP);
+    Dali::Integration::TouchEvent upEvent;
+    upEvent.AddPoint(point);
+    application.ProcessEvent(upEvent);
+
     ResetTouchCallbacks(application);
     ++index;
   }

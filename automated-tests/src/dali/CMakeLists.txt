@@ -38,6 +38,7 @@ SET(TC_SOURCES
         utc-Dali-GeoHitTestAlgorithm.cpp
         utc-Dali-GeoHoverProcessing.cpp
         utc-Dali-GeoTouchProcessing.cpp
+        utc-Dali-GeoTouchStream.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
         utc-Dali-Hash.cpp
