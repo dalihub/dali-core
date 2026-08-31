@@ -1267,15 +1267,15 @@ int UtcDaliInternalPropertyBatchMessageProcessing(void)
   application.GetScene().Add(actor);
 
   // Set properties that will be batched and sent via PropertyBatchMessage
-  actor.SetProperty(Dali::Actor::Property::COLOR_RED, 0.5f);
-  actor.SetProperty(Dali::Actor::Property::COLOR_GREEN, 0.75f);
+  actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER_RED, 0.5f);
+  actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER_GREEN, 0.75f);
 
   // Process messages (this triggers PropertyBatchMessage::Process)
   application.SendNotification();
   application.Render();
 
   // Verify color was applied
-  Vector4 color = actor.GetCurrentProperty<Vector4>(Dali::Actor::Property::COLOR);
+  Vector4 color = actor.GetCurrentProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color.r, 0.5f, TEST_LOCATION);
   DALI_TEST_EQUALS(color.g, 0.75f, TEST_LOCATION);
 
@@ -1590,12 +1590,12 @@ int UtcDaliInternalPropertyBatchGetFullCurrentPropertyValueVectorTypes(void)
     Dali::Actor actor = Dali::Actor::New();
     application.GetScene().Add(actor);
 
-    actor.SetProperty(Dali::Actor::Property::COLOR_RED, 0.5f);
-    actor.SetProperty(Dali::Actor::Property::COLOR_GREEN, 0.75f);
+    actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER_RED, 0.5f);
+    actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER_GREEN, 0.75f);
     application.SendNotification();
     application.Render();
 
-    Vector4 color = actor.GetCurrentProperty<Vector4>(Dali::Actor::Property::COLOR);
+    Vector4 color = actor.GetCurrentProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
     DALI_TEST_EQUALS(color.r, 0.5f, TEST_LOCATION);
     DALI_TEST_EQUALS(color.g, 0.75f, TEST_LOCATION);
 
@@ -1644,10 +1644,10 @@ int UtcDaliInternalPropertyBatchMessageProcessingAllTypes(void)
   DALI_TEST_EQUALS(pos.z, 300.0f, TEST_LOCATION);
 
   // Test VECTOR4 through batching message
-  actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(0.5f, 0.6f, 0.7f, 0.8f));
+  actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Vector4(0.5f, 0.6f, 0.7f, 0.8f));
   application.SendNotification();
   application.Render();
-  Vector4 color = actor.GetCurrentProperty<Vector4>(Dali::Actor::Property::COLOR);
+  Vector4 color = actor.GetCurrentProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color.r, 0.5f, TEST_LOCATION);
   DALI_TEST_EQUALS(color.g, 0.6f, TEST_LOCATION);
   DALI_TEST_EQUALS(color.b, 0.7f, TEST_LOCATION);

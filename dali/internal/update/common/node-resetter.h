@@ -82,7 +82,7 @@ public:
       --mActive;
 
       mNode->mVisible.RequestResetToBaseValue();
-      mNode->mColor.RequestResetToBaseValue();
+      mNode->mColorMultiplier.RequestResetToBaseValue();
     }
   };
 
@@ -100,7 +100,7 @@ public:
     mActive       = ACTIVE;
 
     mNode->mVisible.MarkAsDirty();
-    mNode->mColor.MarkAsDirty();
+    mNode->mColorMultiplier.MarkAsDirty();
   }
 
   /**
@@ -156,7 +156,7 @@ protected:
     mDisconnected(false)
   {
     mNode->mVisible.MarkAsDirty();
-    mNode->mColor.MarkAsDirty();
+    mNode->mColorMultiplier.MarkAsDirty();
   }
 
   Node* mNode; ///< The node that owns the properties

@@ -72,7 +72,7 @@ struct Vector4;
  * - If an actor is made insensitive, then the actor and its children are not hittable; see Actor::Property::SENSITIVE.
  * - If an actor's visibility flag is unset, then none of its children are hittable either; see Actor::Property::VISIBLE.
  * - To be hittable, an actor must have a non-zero size.
- * - If an actor's world color is fully transparent, then it is not hittable; see GetWorldColor().
+ * - If an actor's world color multiplier is fully transparent, then it is not hittable; see GetWorldColorMultiplier().
  *
  * <i>Touch Propagation Modes:</i>
  *
@@ -520,56 +520,98 @@ public:
       VISIBLE,
 
       /**
-       * @brief The color of an actor.
-       * @details Name "color", type Property::VECTOR4 or Property::VECTOR3, animatable / constraint-input
+       * @brief The component-wise color multiplier of an actor.
+       * @details Name "colorMultiplier", type Property::VECTOR4 or Property::VECTOR3, animatable / constraint-input
        * @note The alpha value will be 1.0f if a Vector3 type value is set.
+       * @SINCE_2_5.38
+       */
+      COLOR_MULTIPLIER,
+
+      /**
+       * @brief The color of an actor.
+       * @deprecated Use COLOR_MULTIPLIER instead.
        * @SINCE_1_0.0
        */
-      COLOR,
+      COLOR = COLOR_MULTIPLIER,
+
+      /**
+       * @brief The red component of an actor's color multiplier.
+       * @details Name "colorMultiplierRed", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_2_5.38
+       */
+      COLOR_MULTIPLIER_RED,
 
       /**
        * @brief The red component of an actor's color.
-       * @details Name "colorRed", type Property::FLOAT, animatable / constraint-input
+       * @deprecated Use COLOR_MULTIPLIER_RED instead.
        * @SINCE_1_0.0
        */
-      COLOR_RED,
+      COLOR_RED = COLOR_MULTIPLIER_RED,
+
+      /**
+       * @brief The green component of an actor's color multiplier.
+       * @details Name "colorMultiplierGreen", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_2_5.38
+       */
+      COLOR_MULTIPLIER_GREEN,
 
       /**
        * @brief The green component of an actor's color.
-       * @details Name "colorGreen", type Property::FLOAT, animatable / constraint-input
+       * @deprecated Use COLOR_MULTIPLIER_GREEN instead.
        * @SINCE_1_0.0
        */
-      COLOR_GREEN,
+      COLOR_GREEN = COLOR_MULTIPLIER_GREEN,
+
+      /**
+       * @brief The blue component of an actor's color multiplier.
+       * @details Name "colorMultiplierBlue", type Property::FLOAT, animatable / constraint-input
+       * @SINCE_2_5.38
+       */
+      COLOR_MULTIPLIER_BLUE,
 
       /**
        * @brief The blue component of an actor's color.
-       * @details Name "colorBlue", type Property::FLOAT, animatable / constraint-input
+       * @deprecated Use COLOR_MULTIPLIER_BLUE instead.
        * @SINCE_1_0.0
        */
-      COLOR_BLUE,
+      COLOR_BLUE = COLOR_MULTIPLIER_BLUE,
+
+      /**
+       * @brief The alpha component of an actor's color multiplier.
+       * @details Name "colorMultiplierAlpha", type Property::FLOAT, animatable / constraint-input
+       * @note This is the same underlying value as Property::OPACITY; setting one also changes the other.
+       * @SINCE_2_5.38
+       */
+      COLOR_MULTIPLIER_ALPHA,
 
       /**
        * @brief The alpha component of an actor's color.
-       * @details Name "colorAlpha", type Property::FLOAT, animatable / constraint-input
-       * @note This is the same underlying value as Property::OPACITY; setting one also changes the other.
+       * @deprecated Use COLOR_MULTIPLIER_ALPHA or OPACITY instead.
        * @SINCE_1_0.0
        */
-      COLOR_ALPHA,
+      COLOR_ALPHA = COLOR_MULTIPLIER_ALPHA,
 
       /**
        * @brief The opacity of the actor.
        * @details Name "opacity", type Property::FLOAT.
-       * @note This is the same underlying value as Property::COLOR_ALPHA; setting one also changes the other.
+       * @note This is the same underlying value as Property::COLOR_MULTIPLIER_ALPHA; setting one also changes the other.
        * @SINCE_1_9.17
        */
       OPACITY,
 
       /**
+       * @brief The inherited world color multiplier of an actor.
+       * @details Name "worldColorMultiplier", type Property::VECTOR4, read-only / constraint-input
+       * @SINCE_2_5.38
+       */
+      WORLD_COLOR_MULTIPLIER,
+
+      /**
        * @brief The world color of an actor.
-       * @details Name "worldColor", type Property::VECTOR4, read-only / constraint-input
+       * @deprecated Use WORLD_COLOR_MULTIPLIER instead.
        * @SINCE_1_0.0
        */
-      WORLD_COLOR,
+      WORLD_COLOR = WORLD_COLOR_MULTIPLIER,
 
       /**
        * @brief The color mode of an actor.
@@ -1688,119 +1730,233 @@ public:
   bool IsEffectivelyVisible() const;
 
   /**
-   * @brief Sets the color of the actor.
-   * @param[in] color The color, with each component (red, green, blue, alpha) in the range [0, 1]
+   * @brief Sets the component-wise color multiplier for the actor's rendered content.
+   *
+   * This does not create drawable content or set a background color. Each red, green, blue,
+   * and alpha component is multiplied with the corresponding component of the renderer color.
+   * For example, applying a red multiplier (1, 0, 0, 1) to white content (1, 1, 1, 1)
+   * produces red (1, 0, 0, 1). The default multiplier (1, 1, 1, 1) leaves content unchanged.
+   *
+   * @param[in] multiplier The RGBA multiplier, with each component in the range [0, 1]
    * @pre The actor has been initialized.
    * @note The alpha component is the same underlying value as the opacity; how it combines with the
-   *       parent's color is controlled by Property::COLOR_MODE.
+   *       parent's multiplier is controlled by Property::COLOR_MODE.
    * @see SetOpacity()
-   * @see Actor::Property::COLOR
+   * @see Actor::Property::COLOR_MULTIPLIER
+   * @SINCE_2_5.38
+   */
+  void SetColorMultiplier(const Vector4& multiplier);
+
+  /**
+   * @brief Sets the color of the actor.
+   * @deprecated Use SetColorMultiplier() instead.
+   * @param[in] color The color, with each component (red, green, blue, alpha) in the range [0, 1]
+   * @pre The actor has been initialized.
    * @SINCE_2_5.30
    */
   void SetColor(const Vector4& color);
 
   /**
+   * @brief Gets the target component-wise color multiplier of the actor.
+   * @return The target color multiplier
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MULTIPLIER
+   * @SINCE_2_5.38
+   */
+  Vector4 GetColorMultiplier() const;
+
+  /**
    * @brief Gets the color of the actor.
+   * @deprecated Use GetColorMultiplier() instead.
    * @return The color of the actor
    * @pre The actor has been initialized.
-   * @see Actor::Property::COLOR
    * @SINCE_2_5.30
    */
   Vector4 GetColor() const;
 
   /**
+   * @brief Gets the current component-wise color multiplier from the previous update.
+   * @return The current color multiplier
+   * @pre The actor has been initialized.
+   * @note Unlike GetColorMultiplier(), this reflects the value produced by the last update, so during
+   *       an animation it returns the actor's multiplier at the current frame rather than the target.
+   * @SINCE_2_5.38
+   */
+  Vector4 GetCurrentColorMultiplier() const;
+
+  /**
    * @brief Gets the current color of the actor from the previous update.
+   * @deprecated Use GetCurrentColorMultiplier() instead.
    * @return The current color of the actor
    * @pre The actor has been initialized.
-   * @note Unlike GetColor(), this reflects the value produced by the last update, so during an
-   *       animation it returns the actor's color at the current frame rather than the target.
    * @SINCE_2_5.30
    */
   Vector4 GetCurrentColor() const;
 
   /**
+   * @brief Sets the red component of the actor's color multiplier.
+   * @param[in] red The red multiplier, in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MULTIPLIER_RED
+   * @SINCE_2_5.38
+   */
+  void SetColorMultiplierRed(float red);
+
+  /**
    * @brief Sets the red component of the actor's color.
+   * @deprecated Use SetColorMultiplierRed() instead.
    * @param[in] red The red component value, in the range [0, 1]
    * @pre The actor has been initialized.
-   * @see Actor::Property::COLOR_RED
    * @SINCE_2_5.30
    */
   void SetColorRed(float red);
 
   /**
+   * @brief Gets the target red component of the actor's color multiplier.
+   * @return The red multiplier
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MULTIPLIER_RED
+   * @SINCE_2_5.38
+   */
+  float GetColorMultiplierRed() const;
+
+  /**
    * @brief Gets the red component of the actor's color.
+   * @deprecated Use GetColorMultiplierRed() instead.
    * @return The red component value
    * @pre The actor has been initialized.
-   * @see Actor::Property::COLOR_RED
    * @SINCE_2_5.30
    */
   float GetColorRed() const;
 
   /**
+   * @brief Sets the green component of the actor's color multiplier.
+   * @param[in] green The green multiplier, in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MULTIPLIER_GREEN
+   * @SINCE_2_5.38
+   */
+  void SetColorMultiplierGreen(float green);
+
+  /**
    * @brief Sets the green component of the actor's color.
+   * @deprecated Use SetColorMultiplierGreen() instead.
    * @param[in] green The green component value, in the range [0, 1]
    * @pre The actor has been initialized.
-   * @see Actor::Property::COLOR_GREEN
    * @SINCE_2_5.30
    */
   void SetColorGreen(float green);
 
   /**
+   * @brief Gets the target green component of the actor's color multiplier.
+   * @return The green multiplier
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MULTIPLIER_GREEN
+   * @SINCE_2_5.38
+   */
+  float GetColorMultiplierGreen() const;
+
+  /**
    * @brief Gets the green component of the actor's color.
+   * @deprecated Use GetColorMultiplierGreen() instead.
    * @return The green component value
    * @pre The actor has been initialized.
-   * @see Actor::Property::COLOR_GREEN
    * @SINCE_2_5.30
    */
   float GetColorGreen() const;
 
   /**
+   * @brief Sets the blue component of the actor's color multiplier.
+   * @param[in] blue The blue multiplier, in the range [0, 1]
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MULTIPLIER_BLUE
+   * @SINCE_2_5.38
+   */
+  void SetColorMultiplierBlue(float blue);
+
+  /**
    * @brief Sets the blue component of the actor's color.
+   * @deprecated Use SetColorMultiplierBlue() instead.
    * @param[in] blue The blue component value, in the range [0, 1]
    * @pre The actor has been initialized.
-   * @see Actor::Property::COLOR_BLUE
    * @SINCE_2_5.30
    */
   void SetColorBlue(float blue);
 
   /**
+   * @brief Gets the target blue component of the actor's color multiplier.
+   * @return The blue multiplier
+   * @pre The actor has been initialized.
+   * @see Actor::Property::COLOR_MULTIPLIER_BLUE
+   * @SINCE_2_5.38
+   */
+  float GetColorMultiplierBlue() const;
+
+  /**
    * @brief Gets the blue component of the actor's color.
+   * @deprecated Use GetColorMultiplierBlue() instead.
    * @return The blue component value
    * @pre The actor has been initialized.
-   * @see Actor::Property::COLOR_BLUE
    * @SINCE_2_5.30
    */
   float GetColorBlue() const;
 
   /**
-   * @brief Sets the alpha component of the actor's color.
-   * @param[in] alpha The alpha component value, in the range [0, 1] (0 fully transparent, 1 fully opaque)
-   * @note Equivalent to SetOpacity(). Both set the alpha channel of the actor's color property.
+   * @brief Sets the alpha component of the actor's color multiplier.
+   * @param[in] alpha The alpha multiplier, in the range [0, 1] (0 fully transparent, 1 fully opaque)
+   * @note Equivalent to SetOpacity().
    * @pre The actor has been initialized.
    * @see SetOpacity()
-   * @see Actor::Property::COLOR_ALPHA
+   * @see Actor::Property::COLOR_MULTIPLIER_ALPHA
+   * @SINCE_2_5.38
+   */
+  void SetColorMultiplierAlpha(float alpha);
+
+  /**
+   * @brief Sets the alpha component of the actor's color.
+   * @deprecated Use SetColorMultiplierAlpha() or SetOpacity() instead.
+   * @param[in] alpha The alpha component value, in the range [0, 1]
+   * @pre The actor has been initialized.
    * @SINCE_2_5.30
    */
   void SetColorAlpha(float alpha);
 
   /**
-   * @brief Gets the alpha component of the actor's color.
-   * @return The alpha component value
-   * @note Equivalent to GetOpacity(). Both read the alpha channel of the actor's color property.
+   * @brief Gets the target alpha component of the actor's color multiplier.
+   * @return The alpha multiplier
+   * @note Equivalent to GetOpacity().
    * @pre The actor has been initialized.
    * @see GetOpacity()
-   * @see Actor::Property::COLOR_ALPHA
+   * @see Actor::Property::COLOR_MULTIPLIER_ALPHA
+   * @SINCE_2_5.38
+   */
+  float GetColorMultiplierAlpha() const;
+
+  /**
+   * @brief Gets the alpha component of the actor's color.
+   * @deprecated Use GetColorMultiplierAlpha() or GetOpacity() instead.
+   * @return The alpha component value
+   * @pre The actor has been initialized.
    * @SINCE_2_5.30
    */
   float GetColorAlpha() const;
 
   /**
-   * @brief Gets the world color of the actor.
-   * @return The actor's color in world space, after applying inherited color according to Property::COLOR_MODE
+   * @brief Gets the inherited world color multiplier of the actor.
+   * @return The actor's world color multiplier after applying inheritance according to Property::COLOR_MODE
    * @pre The actor has been initialized.
    * @note This is a read-only value derived from the last update; it is meaningful only while the actor
    *       is connected to the scene.
-   * @see Actor::Property::WORLD_COLOR
+   * @see Actor::Property::WORLD_COLOR_MULTIPLIER
+   * @SINCE_2_5.38
+   */
+  Vector4 GetWorldColorMultiplier() const;
+
+  /**
+   * @brief Gets the world color of the actor.
+   * @deprecated Use GetWorldColorMultiplier() instead.
+   * @return The actor's world color
+   * @pre The actor has been initialized.
    * @SINCE_2_5.30
    */
   Vector4 GetWorldColor() const;
@@ -2187,9 +2343,9 @@ public:
   /**
    * @brief Sets the opacity of the actor.
    * @param[in] opacity The opacity, in the range [0, 1] (0 fully transparent, 1 fully opaque)
-   * @note Equivalent to SetColorAlpha(). Both set the alpha channel of the actor's color property.
+   * @note Equivalent to SetColorMultiplierAlpha(). Both set the alpha channel of the actor's color multiplier.
    * @pre The actor has been initialized.
-   * @see SetColorAlpha()
+   * @see SetColorMultiplierAlpha()
    * @see Actor::Property::OPACITY
    * @SINCE_2_5.30
    */
@@ -2198,9 +2354,9 @@ public:
   /**
    * @brief Gets the opacity of the actor.
    * @return The opacity
-   * @note Equivalent to GetColorAlpha(). Both read the alpha channel of the actor's color property.
+   * @note Equivalent to GetColorMultiplierAlpha(). Both read the alpha channel of the actor's color multiplier.
    * @pre The actor has been initialized.
-   * @see GetColorAlpha()
+   * @see GetColorMultiplierAlpha()
    * @see Actor::Property::OPACITY
    * @SINCE_2_5.30
    */

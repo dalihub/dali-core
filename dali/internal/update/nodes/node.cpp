@@ -100,8 +100,8 @@ Node::Node()
   mWorldMatrix(),
   mVisible(true),
   mCulled(false),
-  mColor(Color::WHITE),
-  mWorldColor(Color::WHITE),
+  mColorMultiplier(Color::WHITE),
+  mWorldColorMultiplier(Color::WHITE),
   mUpdateAreaHint(Vector4::ZERO),
   mClippingSortModifier(0u),
   mId(++mNodeCounter),
@@ -329,7 +329,7 @@ NodePropertyFlags Node::GetDirtyFlags() const
   }
 
   // Check whether the color property has changed
-  if(!mColor.IsClean())
+  if(!mColorMultiplier.IsClean())
   {
     flags |= NodePropertyFlags::COLOR;
   }
@@ -408,7 +408,7 @@ void Node::UpdatePartialRenderingData(bool isLayer3d, bool canSkipInfomationUpda
     return;
   }
 
-  const Vector4& worldColor = GetWorldColor();
+  const Vector4& worldColorMultiplier = GetWorldColorMultiplier();
 
   // TODO : Can't we get modelMatrix and size as const l-value at onces?
   const auto&    transformId = mTransformManagerData.Id();
@@ -417,7 +417,7 @@ void Node::UpdatePartialRenderingData(bool isLayer3d, bool canSkipInfomationUpda
 
   const Vector4& updatedPositionSize = CalculateNodeUpdateArea(isLayer3d, modelMatrix, size);
 
-  mPartialRenderingData.UpdateNodeInfomations(modelMatrix, worldColor, updatedPositionSize, size);
+  mPartialRenderingData.UpdateNodeInfomations(modelMatrix, worldColorMultiplier, updatedPositionSize, size);
 }
 
 Vector4 Node::CalculateNodeUpdateArea(bool isLayer3d, const Matrix& nodeWorldMatrix, const Vector3& nodeSize) const

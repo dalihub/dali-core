@@ -46,8 +46,8 @@ struct DALI_CORE_API RenderCallbackInput
   Dali::Matrix view;
   Dali::Matrix projection;
 
-  Dali::BoundsInteger clippingBox; ///< in screen coordinates
-  Dali::Vector4       worldColor;
+  Dali::BoundsInteger clippingBox;          ///< in screen coordinates
+  Dali::Vector4       worldColorMultiplier; ///< The inherited actor color multiplier. @SINCE_2_5.38
   Dali::Size          size;
 
   Dali::Any eglContext; ///< Storage for EGL Context

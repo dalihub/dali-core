@@ -958,61 +958,61 @@ public:
    * This final color is applied to the drawable elements of an actor.
    * @param [in] color The new color.
    */
-  void SetColor(const Vector4& color);
+  void SetColorMultiplier(const Vector4& color);
 
   /**
    * Set the red component of the color.
    * @param [in] red The new red component.
    */
-  void SetColorRed(float red);
+  void SetColorMultiplierRed(float red);
 
   /**
    * Set the green component of the color.
    * @param [in] green The new green component.
    */
-  void SetColorGreen(float green);
+  void SetColorMultiplierGreen(float green);
 
   /**
    * Set the blue component of the scale factor.
    * @param [in] blue The new blue value.
    */
-  void SetColorBlue(float blue);
+  void SetColorMultiplierBlue(float blue);
 
   /**
    * Get the actor's color.
    * @return The color of the actor.
    */
-  const Vector4& GetColor() const;
+  const Vector4& GetColorMultiplier() const;
 
   /**
    * Get the red component of the color.
    * @return The red component value.
    */
-  float GetColorRed() const;
+  float GetColorMultiplierRed() const;
 
   /**
    * Get the green component of the color.
    * @return The green component value.
    */
-  float GetColorGreen() const;
+  float GetColorMultiplierGreen() const;
 
   /**
    * Get the blue component of the color.
    * @return The blue component value.
    */
-  float GetColorBlue() const;
+  float GetColorMultiplierBlue() const;
 
   /**
    * Get the alpha component of the color.
    * @return The alpha component value.
    */
-  float GetColorAlpha() const;
+  float GetColorMultiplierAlpha() const;
 
   /**
    * Retrieve the actor's color.
    * @return The color.
    */
-  const Vector4& GetCurrentColor() const;
+  const Vector4& GetCurrentColorMultiplier() const;
 
   /**
    * Sets the actor's color mode.
@@ -1034,7 +1034,7 @@ public:
    * Get the world color of the actor.
    * @return The world color of the actor.
    */
-  const Vector4& GetWorldColor() const;
+  const Vector4& GetWorldColorMultiplier() const;
 
   /**
    * Get the world matrix of the actor.
@@ -1608,7 +1608,7 @@ public:
    */
   bool IsHittable() const
   {
-    return (IsEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetWorldColor().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsWorldIgnored());
+    return (IsEnabled()) && (!IsIgnored()) && IsSensitive() && IsVisible() && (GetWorldColorMultiplier().a > FULLY_TRANSPARENT) && IsNodeConnected() && (!IsWorldIgnored());
   }
 
   /**
@@ -2718,7 +2718,7 @@ protected:
 
   LayoutDirection::Type mLayoutDirection : 2; ///< Layout direction, Left to Right or Right to Left.
   DrawMode::Type        mDrawMode : 3;        ///< Cached: How the actor and its children should be drawn
-  ColorMode             mColorMode : 3;       ///< Cached: Determines whether mWorldColor is inherited
+  ColorMode             mColorMode : 3;       ///< Cached: Determines whether mWorldColorMultiplier is inherited
 
   DevelActor::ChildrenDepthIndexPolicy::Type mChildrenDepthIndexPolicy : 2; ///< Children's depth index generation policy. Only works under LAYER_UI
   ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.

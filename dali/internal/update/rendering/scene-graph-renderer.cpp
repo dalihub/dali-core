@@ -669,7 +669,7 @@ Renderer::OpacityType Renderer::GetOpacityType(uint32_t renderPass, const Node& 
     }
     case BlendMode::ON: // If the renderer should always be use blending
     {
-      float alpha = node.GetWorldColor().a * mMixColor.Get().a;
+      float alpha = node.GetWorldColorMultiplier().a * mMixColor.Get().a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;
@@ -702,7 +702,7 @@ Renderer::OpacityType Renderer::GetOpacityType(uint32_t renderPass, const Node& 
       }
 
       // renderer should determine opacity using the actor color
-      float alpha = node.GetWorldColor().a * mMixColor.Get().a;
+      float alpha = node.GetWorldColorMultiplier().a * mMixColor.Get().a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;
@@ -717,7 +717,7 @@ Renderer::OpacityType Renderer::GetOpacityType(uint32_t renderPass, const Node& 
     case BlendMode::USE_ACTOR_OPACITY: // the renderer should never use blending
     {
       // renderer should determine opacity using the actor color
-      float alpha = node.GetWorldColor().a;
+      float alpha = node.GetWorldColorMultiplier().a;
       if(alpha <= FULLY_TRANSPARENT)
       {
         opacityType = Renderer::TRANSPARENT;

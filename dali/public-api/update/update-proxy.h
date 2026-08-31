@@ -205,30 +205,51 @@ public:
   bool BakeScale(uint32_t id, const Vector3& scale);
 
   /**
-   * @brief Given the Actor ID, this retrieves that Actor's local color.
-   * @param[in]   id     The Actor ID
-   * @param[out]  color  Set to the Actor's current color, if Actor ID is valid
+   * @brief Given the Actor ID, retrieves that Actor's local color multiplier.
+   * @param[in]   id          The Actor ID
+   * @param[out]  multiplier  Set to the Actor's current color multiplier, if Actor ID is valid
    * @return Whether the method call was successful or not.
+   * @SINCE_2_5.38
+   */
+  bool GetColorMultiplier(uint32_t id, Vector4& multiplier) const;
+
+  /**
+   * @brief Given the Actor ID, retrieves that Actor's local color.
+   * @deprecated Use GetColorMultiplier() instead.
    * @SINCE_2_5.21
    */
   bool GetColor(uint32_t id, Vector4& color) const;
 
   /**
-   * @brief Allows setting an Actor's local color from the Frame callback function for the current frame only.
-   * @param[in]  id     The Actor ID
-   * @param[in]  color  The color to set
+   * @brief Allows setting an Actor's local color multiplier from the Frame callback function for the current frame only.
+   * @param[in]  id          The Actor ID
+   * @param[in]  multiplier  The color multiplier to set
    * @return Whether the method call was successful or not.
    * @note This will get reset to the internally calculated or previously baked value in the next frame, so will have to be set again.
+   * @SINCE_2_5.38
+   */
+  bool SetColorMultiplier(uint32_t id, const Vector4& multiplier);
+
+  /**
+   * @brief Allows setting an Actor's local color from the Frame callback function.
+   * @deprecated Use SetColorMultiplier() instead.
    * @SINCE_2_5.21
    */
   bool SetColor(uint32_t id, const Vector4& color);
 
   /**
-   * @brief Allows baking an Actor's local color from the Frame callback function.
-   * @param[in]  id     The Actor ID
-   * @param[in]  color  The color to bake
+   * @brief Allows baking an Actor's local color multiplier from the Frame callback function.
+   * @param[in]  id          The Actor ID
+   * @param[in]  multiplier  The color multiplier to bake
    * @return Whether the method call was successful or not.
    * @note The value is saved so will cause undesired effects if this property is being animated.
+   * @SINCE_2_5.38
+   */
+  bool BakeColorMultiplier(uint32_t id, const Vector4& multiplier);
+
+  /**
+   * @brief Allows baking an Actor's local color from the Frame callback function.
+   * @deprecated Use BakeColorMultiplier() instead.
    * @SINCE_2_5.21
    */
   bool BakeColor(uint32_t id, const Vector4& color);

@@ -236,41 +236,41 @@ bool UpdateProxy::BakeScale(uint32_t id, const Vector3& scale)
   return success;
 }
 
-bool UpdateProxy::GetColor(uint32_t id, Vector4& color) const
+bool UpdateProxy::GetColorMultiplier(uint32_t id, Vector4& multiplier) const
 {
   bool                    success = false;
   const SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    color   = node->mColor.Get();
-    success = true;
+    multiplier = node->mColorMultiplier.Get();
+    success    = true;
   }
 
   return success;
 }
 
-bool UpdateProxy::SetColor(uint32_t id, const Vector4& color)
+bool UpdateProxy::SetColorMultiplier(uint32_t id, const Vector4& multiplier)
 {
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    node->mColor.Set(color);
+    node->mColorMultiplier.Set(multiplier);
     node->SetDirtyFlag(SceneGraph::NodePropertyFlags::COLOR);
     mDirtyNodes.push_back(id);
-    AddResetter(*node, node->mColor);
+    AddResetter(*node, node->mColorMultiplier);
     success = true;
   }
   return success;
 }
 
-bool UpdateProxy::BakeColor(uint32_t id, const Vector4& color)
+bool UpdateProxy::BakeColorMultiplier(uint32_t id, const Vector4& multiplier)
 {
   bool              success = false;
   SceneGraph::Node* node    = GetNodeWithId(id);
   if(node)
   {
-    node->mColor.Bake(color);
+    node->mColorMultiplier.Bake(multiplier);
     success = true;
   }
   return success;

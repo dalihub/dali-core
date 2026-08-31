@@ -75,9 +75,14 @@ Matrix GetWorldTransform(Actor actor)
   return CalculateActorWorldTransform(GetImplementation(actor));
 }
 
+Vector4 GetWorldColorMultiplier(Actor actor)
+{
+  return CalculateActorWorldColorMultiplier(GetImplementation(actor));
+}
+
 Vector4 GetWorldColor(Actor actor)
 {
-  return CalculateActorWorldColor(GetImplementation(actor));
+  return GetWorldColorMultiplier(actor);
 }
 
 void LookAt(Actor actor, Vector3 target, Vector3 up, Vector3 localForward, Vector3 localUp)

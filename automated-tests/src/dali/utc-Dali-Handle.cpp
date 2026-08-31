@@ -347,18 +347,18 @@ int UtcDaliHandleIsPropertyWritable(void)
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::SCALE_Y));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::SCALE_Z));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::VISIBLE));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_RED));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_GREEN));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_BLUE));
-  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_ALPHA));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_MULTIPLIER));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_MULTIPLIER_RED));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_MULTIPLIER_GREEN));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_MULTIPLIER_BLUE));
+  DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::COLOR_MULTIPLIER_ALPHA));
   DALI_TEST_CHECK(true == actor.IsPropertyWritable(Actor::Property::OPACITY));
 
   // World-properties are not writable:
   DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_POSITION));
   DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_ORIENTATION));
   DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_SCALE));
-  DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_COLOR));
+  DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_COLOR_MULTIPLIER));
   DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_POSITION_X));
   DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_POSITION_Y));
   DALI_TEST_CHECK(false == actor.IsPropertyWritable(Actor::Property::WORLD_POSITION_Z));
@@ -396,18 +396,18 @@ int UtcDaliHandleIsPropertyAnimatable(void)
   DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::SCALE_Y));
   DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::SCALE_Z));
   DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::VISIBLE));
-  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR));
-  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_RED));
-  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_GREEN));
-  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_BLUE));
-  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_ALPHA));
+  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_MULTIPLIER));
+  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_MULTIPLIER_RED));
+  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_MULTIPLIER_GREEN));
+  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_MULTIPLIER_BLUE));
+  DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::COLOR_MULTIPLIER_ALPHA));
   DALI_TEST_CHECK(true == actor.IsPropertyAnimatable(Actor::Property::OPACITY));
 
   // World-properties can not be animated
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_POSITION));
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_ORIENTATION));
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_SCALE));
-  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_COLOR));
+  DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_COLOR_MULTIPLIER));
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_POSITION_X));
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_POSITION_Y));
   DALI_TEST_CHECK(false == actor.IsPropertyAnimatable(Actor::Property::WORLD_POSITION_Z));
@@ -444,16 +444,16 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::SCALE_Y));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::SCALE_Z));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::VISIBLE));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_RED));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_GREEN));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_BLUE));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_ALPHA));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_MULTIPLIER));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_MULTIPLIER_RED));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_MULTIPLIER_GREEN));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_MULTIPLIER_BLUE));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::COLOR_MULTIPLIER_ALPHA));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::OPACITY));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_POSITION));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_ORIENTATION));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_SCALE));
-  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_COLOR));
+  DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_COLOR_MULTIPLIER));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_POSITION_X));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_POSITION_Y));
   DALI_TEST_CHECK(true == actor.IsPropertyAConstraintInput(Actor::Property::WORLD_POSITION_Z));
@@ -484,7 +484,7 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK(Property::ROTATION == actor.GetPropertyType(Actor::Property::ORIENTATION));
   DALI_TEST_CHECK(Property::VECTOR3 == actor.GetPropertyType(Actor::Property::SCALE));
   DALI_TEST_CHECK(Property::BOOLEAN == actor.GetPropertyType(Actor::Property::VISIBLE));
-  DALI_TEST_CHECK(Property::VECTOR4 == actor.GetPropertyType(Actor::Property::COLOR));
+  DALI_TEST_CHECK(Property::VECTOR4 == actor.GetPropertyType(Actor::Property::COLOR_MULTIPLIER));
 
   // Register some dynamic properties
   Property::Index boolIndex     = actor.RegisterProperty("boolProperty", bool(true));
@@ -791,7 +791,7 @@ int UtcDaliHandleRegisterProperty03(void)
   application.Render();
 
   const Vector4 testColor(0.5f, 0.2f, 0.9f, 1.0f);
-  actor.SetProperty(Actor::Property::COLOR, testColor);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, testColor);
 
   application.SendNotification();
   application.Render();
@@ -801,22 +801,22 @@ int UtcDaliHandleRegisterProperty03(void)
   // No uniqueness tests are done on the properties. Check that the indices are different
 
   Property::Index key       = CORE_PROPERTY_MAX_INDEX + 1;
-  Property::Index testIndex = actor.RegisterUniqueProperty(key, "color", Color::BLACK);
+  Property::Index testIndex = actor.RegisterUniqueProperty(key, "colorMultiplier", Color::BLACK);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(testIndex != Actor::Property::COLOR, true, TEST_LOCATION);
+  DALI_TEST_EQUALS(testIndex != Actor::Property::COLOR_MULTIPLIER, true, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetPropertyCount(), defaultPropertyCount + 1, TEST_LOCATION); // Property count should be different
 
-  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(Actor::Property::COLOR), testColor, TEST_LOCATION); // Value should not have changed
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), testColor, TEST_LOCATION); // Value should not have changed
   DALI_TEST_EQUALS(actor.GetProperty<Vector4>(testIndex), Color::BLACK, TEST_LOCATION);           // Value should not have changed
 
   // Check that name lookup returns the default property
-  DALI_TEST_EQUALS((int)actor.GetPropertyIndex(Property::Key("color")), (int)Actor::Property::COLOR, TEST_LOCATION);
+  DALI_TEST_EQUALS((int)actor.GetPropertyIndex(Property::Key("colorMultiplier")), (int)Actor::Property::COLOR_MULTIPLIER, TEST_LOCATION);
 
   // Check that they have different scene graph properties
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR), Property::Value(testColor), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR_MULTIPLIER), Property::Value(testColor), 0.0001f, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(testIndex), Property::Value(Color::BLACK), 0.0001f, TEST_LOCATION);
 
   END_TEST;
@@ -947,7 +947,7 @@ int UtcDaliHandleGetProperty(void)
   DALI_TEST_CHECK(Vector3::ZERO == actor.GetProperty(Actor::Property::POSITION).Get<Vector3>());
   DALI_TEST_CHECK(Vector3::ONE == actor.GetProperty(Actor::Property::SCALE).Get<Vector3>());
   DALI_TEST_CHECK(true == actor.GetProperty(Actor::Property::VISIBLE).Get<bool>());
-  DALI_TEST_CHECK(Color::WHITE == actor.GetProperty(Actor::Property::COLOR).Get<Vector4>());
+  DALI_TEST_CHECK(Color::WHITE == actor.GetProperty(Actor::Property::COLOR_MULTIPLIER).Get<Vector4>());
   END_TEST;
 }
 
@@ -1914,12 +1914,12 @@ int UtcDaliHandlePropertySetProperties(void)
     CreatePropertyMap({
       {Actor::Property::SIZE, actorSize},
       {Actor::Property::PIVOT, pivot},
-      {"color", color},
+      {"colorMultiplier", color},
       {"invalid", Vector2::ZERO} // It should quietly ignore invalid data
     }));
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::SIZE).Get<Vector3>(), actorSize, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::PIVOT).Get<Vector3>(), pivot, TEST_LOCATION);
-  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::COLOR).Get<Vector4>(), color, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::COLOR_MULTIPLIER).Get<Vector4>(), color, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1935,13 +1935,13 @@ int UtcDaliHandleTemplateNew01(void)
     CreatePropertyMap({
       {Actor::Property::SIZE, actorSize},
       {Actor::Property::PIVOT, pivot},
-      {"color", color},
+      {"colorMultiplier", color},
       {"invalid", Vector2::ZERO} // It should quietly ignore invalid data
     }));
 
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::SIZE).Get<Vector3>(), actorSize, TEST_LOCATION);
   DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::PIVOT).Get<Vector3>(), pivot, TEST_LOCATION);
-  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::COLOR).Get<Vector4>(), color, TEST_LOCATION);
+  DALI_TEST_EQUALS(handle.GetProperty(Actor::Property::COLOR_MULTIPLIER).Get<Vector4>(), color, TEST_LOCATION);
 
   END_TEST;
 }
@@ -1958,7 +1958,7 @@ int UtcDaliHandleGetProperties(void)
       {Actor::Property::PARENT_ORIGIN, ParentOrigin::BOTTOM_CENTER},
       {Actor::Property::NAME, "Actor"},
       {Actor::Property::LEAVE_REQUIRED, true},
-      {"color", Color::RED},
+      {"colorMultiplier", Color::RED},
     }));
 
   Property::Map map;
@@ -2511,11 +2511,11 @@ int UtcDaliHandleIndexOperatorByIndexP02(void)
   Actor           actor = Actor::New();
 
   const Vector4 defaultActorColor(1.0f, 1.0f, 1.0f, 1.0f);
-  actor.SetProperty(Actor::Property::COLOR, defaultActorColor);
-  actor[Actor::Property::COLOR_RED] = 0.5f;
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, defaultActorColor);
+  actor[Actor::Property::COLOR_MULTIPLIER_RED] = 0.5f;
 
-  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::COLOR_RED), 0.5f, 0.001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(Actor::Property::COLOR), Vector4(0.5f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_RED), 0.5f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Vector4(0.5f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
 
   actor.SetProperty(Actor::Property::POSITION, Vector3(10.0f, 20.0f, 0.0f));
 
@@ -2530,10 +2530,10 @@ int UtcDaliHandleIndexOperatorByIndexP03(void)
   Actor           actor = Actor::New();
 
   const Vector4 defaultActorColor(1.0f, 1.0f, 1.0f, 1.0f);
-  actor.SetProperty(Actor::Property::COLOR, defaultActorColor);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, defaultActorColor);
 
   // Value under test is second to allow compiler to deduce type
-  DALI_TEST_VALUE_EQUALS(actor[Actor::Property::COLOR_RED], 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_VALUE_EQUALS(actor[Actor::Property::COLOR_MULTIPLIER_RED], 1.0f, 0.001f, TEST_LOCATION);
 
   actor.SetProperty(Actor::Property::POSITION, Vector3(10.0f, 20.0f, 0.0f));
 
@@ -2565,11 +2565,11 @@ int UtcDaliHandleIndexOperatorByNameP02(void)
   Actor           actor = Actor::New();
 
   const Vector4 defaultActorColor(1.0f, 1.0f, 1.0f, 1.0f);
-  actor.SetProperty(Actor::Property::COLOR, defaultActorColor);
-  actor["colorRed"] = 0.5f;
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, defaultActorColor);
+  actor["colorMultiplierRed"] = 0.5f;
 
-  DALI_TEST_VALUE_EQUALS(actor.GetProperty(Actor::Property::COLOR_RED), 0.5f, 0.001f, TEST_LOCATION);
-  DALI_TEST_VALUE_EQUALS(actor.GetProperty(Actor::Property::COLOR), Vector4(0.5f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
+  DALI_TEST_VALUE_EQUALS(actor.GetProperty(Actor::Property::COLOR_MULTIPLIER_RED), 0.5f, 0.001f, TEST_LOCATION);
+  DALI_TEST_VALUE_EQUALS(actor.GetProperty(Actor::Property::COLOR_MULTIPLIER), Vector4(0.5f, 1.0f, 1.0f, 1.0f), 0.001f, TEST_LOCATION);
 
   actor.SetProperty(Actor::Property::POSITION, Vector3(10.0f, 20.0f, 0.0f));
 

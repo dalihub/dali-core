@@ -618,26 +618,26 @@ public:
    */
   float GetOpacity() const
   {
-    auto& color = mColor.Get();
+    auto& color = mColorMultiplier.Get();
     return color.a;
   }
 
   /**
-   * Retrieve the color of the node.
-   * @return The color.
+   * Retrieve the color multiplier of the node.
+   * @return The color multiplier.
    */
-  const Vector4& GetColor() const
+  const Vector4& GetColorMultiplier() const
   {
-    return mColor.Get();
+    return mColorMultiplier.Get();
   }
 
   /**
    * Sets the color of the node derived from the color of all its parents.
    * @param[in] color The world color.
    */
-  void SetWorldColor(const Vector4& color)
+  void SetWorldColorMultiplier(const Vector4& color)
   {
-    mWorldColor.Set(color);
+    mWorldColorMultiplier.Set(color);
   }
 
   /**
@@ -645,7 +645,7 @@ public:
    * This method should only be called when the parents world color is up-to-date.
    * @pre The node has a parent.
    */
-  void InheritWorldColor()
+  void InheritWorldColorMultiplier()
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
@@ -654,20 +654,20 @@ public:
     bool shouldAvoidRepetitiveInheritance = mParent->GetCacheRendererCount() > 0u;
     if(shouldAvoidRepetitiveInheritance || mColorMode == USE_OWN_COLOR)
     {
-      mWorldColor.Set(mColor.Get());
+      mWorldColorMultiplier.Set(mColorMultiplier.Get());
     }
     else if(mColorMode == USE_OWN_MULTIPLY_PARENT_ALPHA) // default
     {
-      const Vector4& ownColor = mColor.Get();
-      mWorldColor.Set(ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColor().a);
+      const Vector4& ownColor = mColorMultiplier.Get();
+      mWorldColorMultiplier.Set(ownColor.r, ownColor.g, ownColor.b, ownColor.a * mParent->GetWorldColorMultiplier().a);
     }
     else if(mColorMode == USE_OWN_MULTIPLY_PARENT_COLOR)
     {
-      mWorldColor.Set(mParent->GetWorldColor() * mColor.Get());
+      mWorldColorMultiplier.Set(mParent->GetWorldColorMultiplier() * mColorMultiplier.Get());
     }
     else if(mColorMode == USE_PARENT_COLOR)
     {
-      mWorldColor.Set(mParent->GetWorldColor());
+      mWorldColorMultiplier.Set(mParent->GetWorldColorMultiplier());
     }
   }
 
@@ -676,9 +676,9 @@ public:
    * of all its parents, depending on the value of mColorMode.
    * @return The world color.
    */
-  const Vector4& GetWorldColor() const
+  const Vector4& GetWorldColorMultiplier() const
   {
-    return mWorldColor.Get();
+    return mWorldColorMultiplier.Get();
   }
 
   /**
@@ -1203,9 +1203,9 @@ public: // Default properties
 
   AnimatableProperty<bool>    mVisible;        ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<bool>    mCulled;         ///< True if the node is culled. This is not animatable. It is just double-buffered.
-  AnimatableProperty<Vector4> mColor;          ///< Color can be inherited from the Node hierarchy
-  InheritedColor              mWorldColor;     ///< Full inherited color
-  Vector4                     mUpdateAreaHint; ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
+  AnimatableProperty<Vector4> mColorMultiplier;      ///< Component-wise color multiplier
+  InheritedColor              mWorldColorMultiplier; ///< Full inherited color multiplier
+  Vector4                     mUpdateAreaHint;       ///< Update area hint is provided for damaged area calculation. (x, y, width, height)
 
   uint32_t       mClippingSortModifier; ///< Contains bit-packed clipping information for quick access when sorting
   const uint32_t mId;                   ///< The Unique ID of the node.
@@ -1232,7 +1232,7 @@ protected:
   // flags, compressed to bitfield
   NodePropertyFlags  mDirtyFlags;               ///< Dirty flags for each of the Node properties
   DrawMode::Type     mDrawMode : 3;             ///< How the Node and its children should be drawn
-  ColorMode          mColorMode : 3;            ///< Determines whether mWorldColor is inherited, 2 bits is enough
+  ColorMode          mColorMode : 3;            ///< Determines whether mWorldColorMultiplier is inherited, 2 bits is enough
   ClippingMode::Type mClippingMode : 3;         ///< The clipping mode of this node
   bool               mIsRoot : 1;               ///< True if the node cannot have a parent
   bool               mIsLayer : 1;              ///< True if the node is a layer

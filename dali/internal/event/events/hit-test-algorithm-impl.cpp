@@ -262,7 +262,7 @@ std::shared_ptr<HitResult> HitTestActor(Actor&                renderTaskSourceAc
   // It don't need to mark sourceActor to MappingActor, because the mapping is not for the current RenderTask.
   if(!hitCheck.IsActorHittable(&actor))
   {
-    if(!(actor.IsRenderTaskMappingActor() && (&renderTaskSourceActor != &actor) && actor.GetWorldColor().a > FULLY_TRANSPARENT))
+    if(!(actor.IsRenderTaskMappingActor() && (&renderTaskSourceActor != &actor) && actor.GetWorldColorMultiplier().a > FULLY_TRANSPARENT))
     {
       return nullptr;
     }

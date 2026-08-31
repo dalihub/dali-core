@@ -424,7 +424,7 @@ public:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
-   * @param[in] worldColor The world color of the node.
+   * @param[in] worldColorMultiplier The world color of the node.
    * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
@@ -440,7 +440,7 @@ public:
               const Matrix&                                        modelViewMatrix,
               const Matrix&                                        viewMatrix,
               const Matrix&                                        projectionMatrix,
-              const Vector4&                                       worldColor,
+              const Vector4&                                       worldColorMultiplier,
               const Vector3&                                       scale,
               const Vector3&                                       size,
               bool                                                 blend,
@@ -663,7 +663,7 @@ private:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
-   * @param[in] worldColor The world color of the node.
+   * @param[in] worldColorMultiplier The world color of the node.
    * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
@@ -677,7 +677,7 @@ private:
                           const Matrix&                        modelViewMatrix,
                           const Matrix&                        viewMatrix,
                           const Matrix&                        projectionMatrix,
-                          const Vector4&                       worldColor,
+                          const Vector4&                       worldColorMultiplier,
                           const Vector3&                       scale,
                           const Vector3&                       size,
                           std::size_t                          nodeIndex);

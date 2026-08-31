@@ -32,16 +32,16 @@ struct PartialRenderingData
   struct NodeInfomations
   {
     Matrix  modelMatrix{};         /// Model matrix
-    Vector4 worldColor{};          /// World Color
+    Vector4 worldColorMultiplier{};          /// World Color
     Vector4 updatedPositionSize{}; /// Updated position/size (x, y, width, height)
     Vector3 size{};                /// Size
 
     mutable size_t hash{0u}; /// Last frame's hash
 
-    static size_t CalculateHash(const Vector4& worldColor, const Vector4& updatedPositionSize, const Vector3& size, const Matrix& matrix)
+    static size_t CalculateHash(const Vector4& worldColorMultiplier, const Vector4& updatedPositionSize, const Vector3& size, const Matrix& matrix)
     {
       size_t hash = Dali::Internal::HashUtils::INITIAL_HASH_VALUE;
-      Dali::Internal::HashUtils::HashRawBuffer<float>(worldColor.AsFloat(), 4, hash);
+      Dali::Internal::HashUtils::HashRawBuffer<float>(worldColorMultiplier.AsFloat(), 4, hash);
       Dali::Internal::HashUtils::HashRawBuffer<float>(updatedPositionSize.AsFloat(), 4, hash);
       Dali::Internal::HashUtils::HashRawBuffer<float>(size.AsFloat(), 3, hash);
       Dali::Internal::HashUtils::HashRawBuffer<float>(matrix.AsFloat(), 16, hash);
@@ -52,7 +52,7 @@ struct PartialRenderingData
     {
       if(hash == 0u)
       {
-        hash = CalculateHash(worldColor, updatedPositionSize, size, modelMatrix);
+        hash = CalculateHash(worldColorMultiplier, updatedPositionSize, size, modelMatrix);
       }
       return hash;
     }
@@ -60,9 +60,9 @@ struct PartialRenderingData
   public:
     NodeInfomations() = default; // Default constructor
 
-    NodeInfomations(const Matrix& modelMatrix, const Vector4& worldColor, const Vector4& updatedPositionSize, const Vector3& size, size_t hash = 0u)
+    NodeInfomations(const Matrix& modelMatrix, const Vector4& worldColorMultiplier, const Vector4& updatedPositionSize, const Vector3& size, size_t hash = 0u)
     : modelMatrix(modelMatrix),
-      worldColor(worldColor),
+      worldColorMultiplier(worldColorMultiplier),
       updatedPositionSize(updatedPositionSize),
       size(size),
       hash(hash)
@@ -78,7 +78,7 @@ struct PartialRenderingData
       if(this != &rhs)
       {
         modelMatrix         = std::move(rhs.modelMatrix);
-        worldColor          = std::move(rhs.worldColor);
+        worldColorMultiplier          = std::move(rhs.worldColorMultiplier);
         updatedPositionSize = std::move(rhs.updatedPositionSize);
         size                = std::move(rhs.size);
 
@@ -116,7 +116,7 @@ struct PartialRenderingData
    * @brief Tests whether cache changed since last frame, and update node infomations
    * @return True if changed.
    */
-  bool UpdateNodeInfomations(const Matrix& modelMatrix, const Vector4& worldColor, const Vector4& updatedPositionSize, const Vector3& size)
+  bool UpdateNodeInfomations(const Matrix& modelMatrix, const Vector4& worldColorMultiplier, const Vector4& updatedPositionSize, const Vector3& size)
   {
     if(mUpdateDecay == Decay::UPDATED_CURRENT_FRAME)
     {
@@ -127,21 +127,21 @@ struct PartialRenderingData
     {
       mUpdated = true;
 
-      mNodeInfomations = NodeInfomations(modelMatrix, worldColor, updatedPositionSize, size, 0u);
+      mNodeInfomations = NodeInfomations(modelMatrix, worldColorMultiplier, updatedPositionSize, size, 0u);
     }
     else
     {
-      size_t hash = NodeInfomations::CalculateHash(worldColor, updatedPositionSize, size, modelMatrix);
+      size_t hash = NodeInfomations::CalculateHash(worldColorMultiplier, updatedPositionSize, size, modelMatrix);
 
       mUpdated = !(mNodeInfomations.GetHash() == hash &&        ///< Hash comparision first
-                   mNodeInfomations.worldColor == worldColor && ///< Full comparision one more time.
+                   mNodeInfomations.worldColorMultiplier == worldColorMultiplier && ///< Full comparision one more time.
                    mNodeInfomations.updatedPositionSize == updatedPositionSize &&
                    mNodeInfomations.size == size &&
                    mNodeInfomations.modelMatrix == modelMatrix); ///< Compare matrix last order
 
       if(mUpdated)
       {
-        mNodeInfomations = NodeInfomations(modelMatrix, worldColor, updatedPositionSize, size, hash);
+        mNodeInfomations = NodeInfomations(modelMatrix, worldColorMultiplier, updatedPositionSize, size, hash);
       }
     }
 

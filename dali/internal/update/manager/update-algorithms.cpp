@@ -69,7 +69,7 @@ inline void UpdateRootNodeOpacity(Layer& rootNode, NodePropertyFlags nodeDirtyFl
 {
   if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
-    rootNode.SetWorldColor(rootNode.GetColor());
+    rootNode.SetWorldColorMultiplier(rootNode.GetColorMultiplier());
   }
 }
 
@@ -78,7 +78,7 @@ inline void UpdateNodeOpacity(Node& node, NodePropertyFlags nodeDirtyFlags)
   // If opacity needs to be recalculated
   if(nodeDirtyFlags & NodePropertyFlags::COLOR)
   {
-    node.InheritWorldColor();
+    node.InheritWorldColorMultiplier();
   }
 }
 

@@ -186,22 +186,22 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
   uint32_t result4 = 0u;
 
   uint32_t   constraint1Tag = 1u;
-  Constraint constraint1    = Constraint::New<Vector4>(actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1));
+  Constraint constraint1    = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, TestConstraintRef<Vector4>(result1, 1));
   constraint1.SetTag(constraint1Tag);
   constraint1.Apply();
 
   uint32_t   constraint2Tag = 2u;
-  Constraint constraint2    = Constraint::New<Vector4>(actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result2, 2));
+  Constraint constraint2    = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, TestConstraintRef<Vector4>(result2, 2));
   constraint2.SetTag(constraint2Tag);
   constraint2.Apply();
 
   uint32_t   internalConstraint3Tag = Dali::ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START + 1u;
-  Constraint internalConstraint3    = Constraint::New<Vector4>(actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result3, 3));
+  Constraint internalConstraint3    = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, TestConstraintRef<Vector4>(result3, 3));
   Dali::Integration::ConstraintSetInternalTag(internalConstraint3, internalConstraint3Tag);
   internalConstraint3.Apply();
 
   uint32_t   internalConstraint4Tag = Dali::ConstraintTagRanges::INTERNAL_CONSTRAINT_TAG_START + 2u;
-  Constraint internalConstraint4    = Constraint::New<Vector4>(actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result4, 4));
+  Constraint internalConstraint4    = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, TestConstraintRef<Vector4>(result4, 4));
   Dali::Integration::ConstraintSetInternalTag(internalConstraint4, internalConstraint4Tag);
   internalConstraint4.Apply();
 
@@ -221,7 +221,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
 
   actor.RemoveConstraints();
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -237,7 +237,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
   constraint1.Apply();
   constraint2.Apply();
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -253,7 +253,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
 
   Dali::Integration::HandleRemoveConstraints(actor, internalConstraint4Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -267,7 +267,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
 
   Dali::Integration::HandleRemoveConstraints(actor, internalConstraint3Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -283,7 +283,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
   internalConstraint3.Apply();
   internalConstraint4.Apply();
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -299,7 +299,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
 
   Dali::Integration::HandleRemoveConstraints(actor, internalConstraint3Tag, internalConstraint4Tag + 100u);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -315,7 +315,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
   internalConstraint3.Apply();
   internalConstraint4.Apply();
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -331,7 +331,7 @@ int UtcDaliInternalConstraintHandleRemoveConstraints(void)
 
   Dali::Integration::HandleRemoveAllConstraints(actor);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();

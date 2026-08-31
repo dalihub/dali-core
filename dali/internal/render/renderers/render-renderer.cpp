@@ -546,7 +546,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Matrix&                                        modelViewMatrix,
                       const Matrix&                                        viewMatrix,
                       const Matrix&                                        projectionMatrix,
-                      const Vector4&                                       worldColor,
+                      const Vector4&                                       worldColorMultiplier,
                       const Vector3&                                       scale,
                       const Vector3&                                       size,
                       bool                                                 blend,
@@ -622,7 +622,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     renderCallbackInput.size       = size;
     renderCallbackInput.view       = viewMatrix;
     renderCallbackInput.projection = projectionMatrix;
-    renderCallbackInput.worldColor = worldColor;
+    renderCallbackInput.worldColorMultiplier = worldColorMultiplier;
 
     MatrixUtils::MultiplyProjectionMatrix(renderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
 
@@ -733,7 +733,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     if(queueIndex == 0)
     {
       std::size_t nodeIndex = BuildUniformIndexMap(node, *program);
-      WriteUniformBuffer(commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColor, scale, size, nodeIndex);
+      WriteUniformBuffer(commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColorMultiplier, scale, size, nodeIndex);
     }
 
     // @todo We should detect this case much earlier to prevent unnecessary work
@@ -883,7 +883,7 @@ void Renderer::WriteUniformBuffer(
   const Matrix&                        modelViewMatrix,
   const Matrix&                        viewMatrix,
   const Matrix&                        projectionMatrix,
-  const Vector4&                       worldColor,
+  const Vector4&                       worldColorMultiplier,
   const Vector3&                       scale,
   const Vector3&                       size,
   std::size_t                          nodeIndex)
@@ -990,7 +990,7 @@ void Renderer::WriteUniformBuffer(
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
 
     const Vector4& mixColor   = mRenderDataProvider->GetMixColor(); ///< Renderer's mix color
-    Vector4        finalColor = worldColor * mixColor;              ///< Applied Actor's original color to renderer's mix color
+    Vector4        finalColor = worldColorMultiplier * mixColor;              ///< Applied Actor's original color to renderer's mix color
     if(mPremultipliedAlphaEnabled)
     {
       const float alpha = finalColor.a;
@@ -999,7 +999,7 @@ void Renderer::WriteUniformBuffer(
       finalColor.b *= alpha;
     }
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), uboViews, finalColor);
-    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, worldColor);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, worldColorMultiplier);
 
     // Write uniforms from the uniform map
     // Uniforms for the Shared UniformBlock should not be in this map. If they are, they should be ignored.

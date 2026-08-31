@@ -74,7 +74,7 @@ public:
     updateProxy.GetPositionAndSize(mActorId, mPositionGetPositionAndSizeCall, mSizeGetPositionAndSizeCall);
     updateProxy.GetSize(mActorId, mSizeGetSizeCall);
     updateProxy.GetOrientation(mActorId, mOrientation);
-    updateProxy.GetColor(mActorId, mColor);
+    updateProxy.GetColorMultiplier(mActorId, mColor);
     updateProxy.GetScale(mActorId, mScale);
 
     updateProxy.GetWorldPositionScaleAndSize(mActorId, mWorldPosition, mWorldScale, mSizeGetWorldPositionAndSizeCall);
@@ -162,12 +162,12 @@ public:
     updateProxy.SetSize(mActorId, mSizeToSet);
     updateProxy.SetPosition(mActorId, mPositionToSet);
     updateProxy.SetOrientation(mActorId, mOrientationToSet);
-    updateProxy.SetColor(mActorId, mColorToSet);
+    updateProxy.SetColorMultiplier(mActorId, mColorToSet);
     updateProxy.SetScale(mActorId, mScaleToSet);
     updateProxy.SetUpdateArea(mActorId, mUpdateArea);
     updateProxy.GetSize(mActorId, mSizeAfterSetting);
     updateProxy.GetPosition(mActorId, mPositionAfterSetting);
-    updateProxy.GetColor(mActorId, mColorAfterSetting);
+    updateProxy.GetColorMultiplier(mActorId, mColorAfterSetting);
     updateProxy.GetScale(mActorId, mScaleAfterSetting);
     updateProxy.GetOrientation(mActorId, mOrientationAfterSetting);
     updateProxy.GetUpdateArea(mActorId, mUpdateAreaAfterSetting);
@@ -216,12 +216,12 @@ public:
     FrameCallbackBasic::Update(updateProxy, elapsedSeconds);
     updateProxy.BakeSize(mActorId, mSizeToSet);
     updateProxy.BakePosition(mActorId, mPositionToSet);
-    updateProxy.BakeColor(mActorId, mColorToSet);
+    updateProxy.BakeColorMultiplier(mActorId, mColorToSet);
     updateProxy.BakeScale(mActorId, mScaleToSet);
     updateProxy.BakeOrientation(mActorId, mOrientationToSet);
     updateProxy.GetSize(mActorId, mSizeAfterSetting);
     updateProxy.GetPosition(mActorId, mPositionAfterSetting);
-    updateProxy.GetColor(mActorId, mColorAfterSetting);
+    updateProxy.GetColorMultiplier(mActorId, mColorAfterSetting);
     updateProxy.GetScale(mActorId, mScaleAfterSetting);
     updateProxy.GetOrientation(mActorId, mOrientationAfterSetting);
 
@@ -874,7 +874,7 @@ int UtcDaliFrameCallbackGetters(void)
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor.SetProperty(Actor::Property::SIZE, actorSize);
-  actor.SetProperty(Actor::Property::COLOR, color);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   actor.SetProperty(Actor::Property::POSITION, position);
   actor.SetProperty(Actor::Property::SCALE, scale);
   actor.SetProperty(Actor::Property::ORIENTATION, orientation);
@@ -965,7 +965,7 @@ int UtcDaliFrameCallbackSetters(void)
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), Vector3::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR_MULTIPLIER).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), Quaternion(Radian(0.0f), Vector3::ZAXIS), TEST_LOCATION);
 
@@ -976,7 +976,7 @@ int UtcDaliFrameCallbackSetters(void)
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), Vector3::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR_MULTIPLIER).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), Quaternion(Radian(0.0f), Vector3::ZAXIS), TEST_LOCATION);
 
@@ -985,7 +985,7 @@ int UtcDaliFrameCallbackSetters(void)
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), Vector3::ZERO, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), Vector3(actorSize), TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR_MULTIPLIER).Get<Vector4>(), Color::WHITE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), Vector3::ONE, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), Quaternion(Radian(0.0f), Vector3::ZAXIS), TEST_LOCATION);
 
@@ -1033,7 +1033,7 @@ int UtcDaliFrameCallbackBake(void)
 
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::POSITION).Get<Vector3>(), positionToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SIZE).Get<Vector3>(), sizeToSet, TEST_LOCATION);
-  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR).Get<Vector4>(), colorToSet, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::COLOR_MULTIPLIER).Get<Vector4>(), colorToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::SCALE).Get<Vector3>(), scaleToSet, TEST_LOCATION);
   DALI_TEST_EQUALS(actor.GetCurrentProperty(Actor::Property::ORIENTATION).Get<Quaternion>(), orientationToSet, TEST_LOCATION);
 

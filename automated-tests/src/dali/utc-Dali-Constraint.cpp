@@ -493,7 +493,7 @@ int UtcDaliConstraintCloneCheckSourcesAndSetters(void)
   Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &UtcDaliConstraintClone::Function);
   constraint.AddSource(LocalSource(Actor::Property::SIZE));
   constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
-  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+  constraint.AddSource(LocalSource(Actor::Property::COLOR_MULTIPLIER));
   constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
   constraint.SetRemoveAction(Constraint::DISCARD);
   constraint.SetApplyRate(3u);
@@ -1801,7 +1801,7 @@ int UtcDaliConstraintAddSourceP(void)
   Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &UtcDaliConstraintAddSource::Function);
   constraint.AddSource(LocalSource(Actor::Property::SIZE));
   constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
-  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+  constraint.AddSource(LocalSource(Actor::Property::COLOR_MULTIPLIER));
   constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
   constraint.Apply();
 
@@ -1979,22 +1979,22 @@ int UtcDaliConstraintEnsureResetterAppliedOnSceneRemoval(void)
   // Check initial value is fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 1.0f, TEST_LOCATION);
 
   // Create a constraint whose value is discarded when it is removed
-  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, SetHalfOpacity);
+  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, SetHalfOpacity);
   constraint.SetRemoveAction(Constraint::RemoveAction::DISCARD);
   constraint.Apply();
 
   // Check value after one render, it should be constrained
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 0.5f, TEST_LOCATION);
 
   // Render another frame, ensure the other value has also been updated
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 0.5f, TEST_LOCATION);
 
   // Remove the actor from the stage and delete the constraint
   actor.Unparent();
@@ -2004,7 +2004,7 @@ int UtcDaliConstraintEnsureResetterAppliedOnSceneRemoval(void)
   // Check value while off-stage, it should be fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 1.0f, TEST_LOCATION);
 
   // Add the actor back to the stage and check the value, it should be fully opaque again
   application.GetScene().Add(actor);
@@ -2012,12 +2012,12 @@ int UtcDaliConstraintEnsureResetterAppliedOnSceneRemoval(void)
   // Check value when back on-stage, it should be fully opaque as the constraint is no longer applied to it.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 1.0f, TEST_LOCATION);
 
   // Render for another frame to ensure both buffers have the correct value
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 1.0f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2034,22 +2034,22 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   // Check initial value is fully opaque
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 1.0f, TEST_LOCATION);
 
   // Create a constraint whose value is discarded when it is removed
-  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, SetHalfOpacity);
+  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, SetHalfOpacity);
   constraint.SetRemoveAction(Constraint::RemoveAction::DISCARD);
   constraint.Apply();
 
   // Check value after one render, it should be constrained
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 0.5f, TEST_LOCATION);
 
   // Render another frame, ensure the other value has also been updated
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 0.5f, TEST_LOCATION);
 
   // Remove the actor from the stage
   actor.Unparent();
@@ -2057,23 +2057,23 @@ int UtcDaliConstraintOnActorAddedAndRemoved(void)
   // Check value while off-stage, the constraint is no longer being applied as it's off-stage
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 1.0f, TEST_LOCATION);
 
   // Check the other buffer, the constraint should not be applied to this either.
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 1.0f, TEST_LOCATION);
 
   // Add the actor back to the stage and check the value, the constraint should have been re-applied
   application.GetScene().Add(actor);
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 0.5f, TEST_LOCATION);
 
   // Render for another frame to ensure both buffers have the correct value
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, 0.5f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2280,18 +2280,18 @@ int UtcDaliConstraintComponentNonTransformPropertyConstraintP(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.25f, 0.25f, 0.25f, 0.25f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.25f, 0.25f, 0.25f, 0.25f));
   application.GetScene().Add(actor);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Vector4(0.25f, 0.25f, 0.25f, 0.25f), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Vector4(0.25f, 0.25f, 0.25f, 0.25f), TEST_LOCATION);
 
-  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_RED);   // Component 0
-  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_GREEN); // Component 1
-  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_BLUE);  // Component 2
-  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_ALPHA); // Component 3
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_MULTIPLIER_RED);   // Component 0
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_MULTIPLIER_GREEN); // Component 1
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_MULTIPLIER_BLUE);  // Component 2
+  ComponentTest::CheckComponentProperty(application, actor, Actor::Property::COLOR_MULTIPLIER_ALPHA); // Component 3
 
   END_TEST;
 }
@@ -2391,7 +2391,7 @@ int UtcDaliConstraintGetSourceCountP(void)
   constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
   DALI_TEST_EQUALS(constraint.GetSourceCount(), 2u, TEST_LOCATION);
 
-  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+  constraint.AddSource(LocalSource(Actor::Property::COLOR_MULTIPLIER));
   DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
 
   constraint.AddSource(LocalSource(Actor::Property::VISIBLE));
@@ -2453,7 +2453,7 @@ int UtcDaliConstraintGetSourceAtP(void)
   DALI_TEST_EQUALS(constraint.GetSourceCount(), 2u, TEST_LOCATION);
 
   // Add object source
-  constraint.AddSource(Source(sourceActor, Actor::Property::COLOR));
+  constraint.AddSource(Source(sourceActor, Actor::Property::COLOR_MULTIPLIER));
   DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
 
   // Add another local source
@@ -2471,7 +2471,7 @@ int UtcDaliConstraintGetSourceAtP(void)
 
   ConstraintSource source2 = constraint.GetSourceAt(2u);
   DALI_TEST_EQUALS(source2.sourceType, Dali::SourceType::OBJECT_PROPERTY, TEST_LOCATION);
-  DALI_TEST_EQUALS(source2.propertyIndex, static_cast<Property::Index>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(source2.propertyIndex, static_cast<Property::Index>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
   DALI_TEST_CHECK(source2.object == sourceActor);
 
   ConstraintSource source3 = constraint.GetSourceAt(3u);
@@ -2596,7 +2596,7 @@ int UtcDaliConstraintGetSourceAtWithClone(void)
   Constraint constraint = Constraint::New<Vector3>(actor, Actor::Property::POSITION, &BasicFunction<Vector3>);
   constraint.AddSource(LocalSource(Actor::Property::SIZE));
   constraint.AddSource(LocalSource(Actor::Property::ORIENTATION));
-  constraint.AddSource(LocalSource(Actor::Property::COLOR));
+  constraint.AddSource(LocalSource(Actor::Property::COLOR_MULTIPLIER));
 
   DALI_TEST_EQUALS(constraint.GetSourceCount(), 3u, TEST_LOCATION);
 

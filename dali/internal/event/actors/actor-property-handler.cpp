@@ -341,36 +341,36 @@ void Actor::PropertyHandler::SetDefaultProperty(Internal::Actor& actor, Property
       break;
     }
 
-    case Dali::Actor::Property::COLOR:
+    case Dali::Actor::Property::COLOR_MULTIPLIER:
     {
       CheckValidAndSet<Vector4>(property,
                                 [&property, &actor](Vector4& color)
       {
         color.a = (property.GetType() == Property::VECTOR4) ? color.a : 1.0f;
-        actor.SetColor(color);
+        actor.SetColorMultiplier(color);
       });
       break;
     }
 
-    case Dali::Actor::Property::COLOR_RED:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_RED:
     {
-      actor.SetColorRed(property.Get<float>());
+      actor.SetColorMultiplierRed(property.Get<float>());
       break;
     }
 
-    case Dali::Actor::Property::COLOR_GREEN:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:
     {
-      actor.SetColorGreen(property.Get<float>());
+      actor.SetColorMultiplierGreen(property.Get<float>());
       break;
     }
 
-    case Dali::Actor::Property::COLOR_BLUE:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:
     {
-      actor.SetColorBlue(property.Get<float>());
+      actor.SetColorMultiplierBlue(property.Get<float>());
       break;
     }
 
-    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:
     case Dali::Actor::Property::OPACITY:
     {
       CheckValidAndSet(property, actor, &Actor::SetOpacity);
@@ -806,31 +806,31 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
           break;
         }
 
-        case Dali::Actor::Property::COLOR:
+        case Dali::Actor::Property::COLOR_MULTIPLIER:
         {
           value.Get(actor.mTargetColor);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_RED:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_RED:
         {
           value.Get(actor.mTargetColor.r);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_GREEN:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:
         {
           value.Get(actor.mTargetColor.g);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_BLUE:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:
         {
           value.Get(actor.mTargetColor.b);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_ALPHA:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:
         case Dali::Actor::Property::OPACITY:
         {
           value.Get(actor.mTargetColor.a);
@@ -959,31 +959,31 @@ void Actor::PropertyHandler::OnNotifyDefaultPropertyAnimation(Internal::Actor& a
           break;
         }
 
-        case Dali::Actor::Property::COLOR:
+        case Dali::Actor::Property::COLOR_MULTIPLIER:
         {
           AdjustValue<Vector4>(actor.mTargetColor, value);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_RED:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_RED:
         {
           AdjustValue<float>(actor.mTargetColor.r, value);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_GREEN:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:
         {
           AdjustValue<float>(actor.mTargetColor.g, value);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_BLUE:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:
         {
           AdjustValue<float>(actor.mTargetColor.b, value);
           break;
         }
 
-        case Dali::Actor::Property::COLOR_ALPHA:
+        case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:
         case Dali::Actor::Property::OPACITY:
         {
           AdjustValue<float>(actor.mTargetColor.a, value);
@@ -1041,14 +1041,14 @@ const PropertyBase* Actor::PropertyHandler::GetSceneObjectAnimatableProperty(Pro
       property = &node.mVisible;
       break;
     }
-    case Dali::Actor::Property::COLOR:       // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_RED:   // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_GREEN: // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_BLUE:  // FALLTHROUGH
-    case Dali::Actor::Property::COLOR_ALPHA: // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER: // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_RED:        // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:      // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:       // FALLTHROUGH
+    case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:      // FALLTHROUGH
     case Dali::Actor::Property::OPACITY:
     {
-      property = &node.mColor;
+      property = &node.mColorMultiplier;
       break;
     }
     default:
@@ -1100,9 +1100,9 @@ const PropertyInputImpl* Actor::PropertyHandler::GetSceneObjectInputProperty(Pro
       property = &node.mWorldScale;
       break;
     }
-    case Dali::Actor::Property::WORLD_COLOR:
+    case Dali::Actor::Property::WORLD_COLOR_MULTIPLIER:
     {
-      property = &node.mWorldColor;
+      property = &node.mWorldColorMultiplier;
       break;
     }
     case Dali::Actor::Property::WORLD_MATRIX:
@@ -1146,7 +1146,7 @@ int32_t Actor::PropertyHandler::GetPropertyComponentIndex(Property::Index index)
     case Dali::Actor::Property::POSITION_X:
     case Dali::Actor::Property::WORLD_POSITION_X:
     case Dali::Actor::Property::SCALE_X:
-    case Dali::Actor::Property::COLOR_RED:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_RED:
     {
       componentIndex = 0;
       break;
@@ -1158,7 +1158,7 @@ int32_t Actor::PropertyHandler::GetPropertyComponentIndex(Property::Index index)
     case Dali::Actor::Property::POSITION_Y:
     case Dali::Actor::Property::WORLD_POSITION_Y:
     case Dali::Actor::Property::SCALE_Y:
-    case Dali::Actor::Property::COLOR_GREEN:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:
     {
       componentIndex = 1;
       break;
@@ -1170,13 +1170,13 @@ int32_t Actor::PropertyHandler::GetPropertyComponentIndex(Property::Index index)
     case Dali::Actor::Property::POSITION_Z:
     case Dali::Actor::Property::WORLD_POSITION_Z:
     case Dali::Actor::Property::SCALE_Z:
-    case Dali::Actor::Property::COLOR_BLUE:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:
     {
       componentIndex = 2;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:
     case Dali::Actor::Property::OPACITY:
     {
       componentIndex = 3;
@@ -1331,31 +1331,31 @@ bool Actor::PropertyHandler::GetCachedPropertyValue(const Internal::Actor& actor
       break;
     }
 
-    case Dali::Actor::Property::COLOR:
+    case Dali::Actor::Property::COLOR_MULTIPLIER:
     {
       value = actor.mTargetColor;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_RED:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_RED:
     {
       value = actor.mTargetColor.r;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_GREEN:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:
     {
       value = actor.mTargetColor.g;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_BLUE:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:
     {
       value = actor.mTargetColor.b;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:
     case Dali::Actor::Property::OPACITY:
     {
       value = actor.mTargetColor.a;
@@ -1762,40 +1762,40 @@ bool Actor::PropertyHandler::GetCurrentPropertyValue(const Internal::Actor& acto
       break;
     }
 
-    case Dali::Actor::Property::COLOR:
+    case Dali::Actor::Property::COLOR_MULTIPLIER:
     {
-      value = actor.GetCurrentColor();
+      value = actor.GetCurrentColorMultiplier();
       break;
     }
 
-    case Dali::Actor::Property::COLOR_RED:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_RED:
     {
-      value = actor.GetCurrentColor().r;
+      value = actor.GetCurrentColorMultiplier().r;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_GREEN:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_GREEN:
     {
-      value = actor.GetCurrentColor().g;
+      value = actor.GetCurrentColorMultiplier().g;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_BLUE:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_BLUE:
     {
-      value = actor.GetCurrentColor().b;
+      value = actor.GetCurrentColorMultiplier().b;
       break;
     }
 
-    case Dali::Actor::Property::COLOR_ALPHA:
+    case Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA:
     case Dali::Actor::Property::OPACITY:
     {
-      value = actor.GetCurrentColor().a;
+      value = actor.GetCurrentColorMultiplier().a;
       break;
     }
 
-    case Dali::Actor::Property::WORLD_COLOR:
+    case Dali::Actor::Property::WORLD_COLOR_MULTIPLIER:
     {
-      value = actor.GetWorldColor();
+      value = actor.GetWorldColorMultiplier();
       break;
     }
 

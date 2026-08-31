@@ -2802,7 +2802,7 @@ int UtcDaliPropertyRegistrationPropertyWritableN02(void)
   TypeInfo            typeInfo     = TypeRegistry::Get().GetTypeInfo(typeid(MyTestCustomActor));
   Internal::TypeInfo& typeInfoImpl = GetImplementation(typeInfo);
 
-  DALI_TEST_EQUALS(typeInfoImpl.IsPropertyWritable(Actor::Property::COLOR), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(typeInfoImpl.IsPropertyWritable(Actor::Property::COLOR_MULTIPLIER), true, TEST_LOCATION);
 
   END_TEST;
 }

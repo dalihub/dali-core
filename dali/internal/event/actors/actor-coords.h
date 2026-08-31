@@ -322,7 +322,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor);
  * @param[in] actor The actor to calculate the world color for
  * @return the world color
  */
-Vector4 CalculateActorWorldColor(const Actor& actor);
+Vector4 CalculateActorWorldColorMultiplier(const Actor& actor);
 
 /**
  * Get the on-scene visibility of the actor.
