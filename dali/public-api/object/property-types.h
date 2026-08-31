@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/extents.h>
+#include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/matrix.h>
@@ -140,6 +141,11 @@ template<>
 inline Property::Type Get<Extents>()
 {
   return Property::EXTENTS;
+}
+template<>
+inline Property::Type Get<Insets>()
+{
+  return Property::INSETS;
 }
 
 }; // namespace PropertyTypes

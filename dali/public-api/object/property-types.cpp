@@ -38,6 +38,7 @@ const char* const PROPERTY_TYPE_NAMES[] = {
   "ARRAY",
   "MAP",
   "EXTENTS",
+  "INSETS",
 };
 const uint32_t PROPERTY_TYPE_NAMES_COUNT = static_cast<uint32_t>(sizeof(PROPERTY_TYPE_NAMES) / sizeof(const char*));
 } // namespace

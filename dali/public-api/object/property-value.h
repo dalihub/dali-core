@@ -43,6 +43,7 @@ struct Vector4;
 class Matrix3;
 class Matrix;
 struct Extents;
+struct Insets;
 
 using KeyValuePair = Pair<Property::Key, Property::Value>;
 
@@ -196,6 +197,14 @@ public:
    * @param[in] extentsValue A collection of 4 uint16_t values
    */
   Value(const Extents& extentsValue);
+
+  /**
+   * @brief Creates an insets property value.
+   *
+   * @SINCE_2_5.38
+   * @param[in] insetsValue A collection of 4 float values
+   */
+  Value(const Insets& insetsValue);
 
   /**
    * @brief Creates an enumeration property value.
@@ -533,6 +542,16 @@ public:
    * @pre GetType() is a type convertible to Extents.
    */
   bool Get(Extents& extentsValue) const;
+
+  /**
+   * @brief Retrieves insets.
+   *
+   * @SINCE_2_5.38
+   * @param[out] insetsValue Insets, a collection of 4 float
+   * @return @c true if the value is successfully retrieved, @c false if the type is not convertible
+   * @pre GetType() is a type convertible to Insets.
+   */
+  bool Get(Insets& insetsValue) const;
 
   /**
    * @brief Get hash value of the value.

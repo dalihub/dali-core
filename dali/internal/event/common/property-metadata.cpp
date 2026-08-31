@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/extents.h>
+#include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/quaternion.h>
@@ -112,6 +113,12 @@ void PropertyMetadata::SetPropertyValue(const Property::Value& propertyValue)
     case Property::EXTENTS:
     {
       SetValue<Extents>(propertyValue, value);
+      break;
+    }
+
+    case Property::INSETS:
+    {
+      SetValue<Insets>(propertyValue, value);
       break;
     }
 
@@ -279,6 +286,7 @@ Property::Value PropertyMetadata::GetPropertyValue() const
       case Property::ARRAY:
       case Property::MAP:
       case Property::EXTENTS:
+      case Property::INSETS:
       case Property::BOOLEAN:
       case Property::INTEGER:
       case Property::FLOAT:
@@ -377,6 +385,7 @@ void PropertyMetadata::AdjustPropertyValueBy(const Property::Value& relativeProp
     case Property::ARRAY:
     case Property::MAP:
     case Property::EXTENTS:
+    case Property::INSETS:
     case Property::MATRIX:
     case Property::MATRIX3:
     {

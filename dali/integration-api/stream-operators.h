@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-string.h>
 #include <dali/public-api/common/extents.h>
+#include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/angle-axis.h> // incl vec3
 #include <dali/public-api/math/matrix3.h>    // incl vec3,mat
 #include <dali/public-api/math/quaternion.h> // incl vec4
@@ -171,6 +172,16 @@ std::ostream& operator<<(std::ostream& o, const Dali::AngleAxis& angleAxis);
  * @return The output stream operator
  */
 DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Extents& extents);
+
+/**
+ * @brief Converts the value of the insets into a string and insert in to an output stream.
+ *
+ * @SINCE_2_5.38
+ * @param[in] stream The output stream operator
+ * @param[in] insets The Insets to output
+ * @return The output stream operator
+ */
+DALI_CORE_API std::ostream& operator<<(std::ostream& stream, const Insets& insets);
 
 /**
  * @}

@@ -29,6 +29,7 @@
 #include <dali/integration-api/stream-operators.h>
 #include <dali/integration-api/string-utils.h>
 #include <dali/public-api/common/extents.h>
+#include <dali/public-api/common/insets.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
@@ -135,6 +136,12 @@ struct Property::Value::Impl
     ConstructInplace(mData.mExtents.member, std::move(extentsValue));
   }
 
+  Impl(Insets insetsValue)
+  {
+    SetType(Property::INSETS);
+    mData.mInsets.member = new Insets(std::move(insetsValue));
+  }
+
   Impl(Property::Map mapValue)
   {
     SetType(Property::MAP);
@@ -206,6 +213,11 @@ struct Property::Value::Impl
   const Extents& GetExtents() const
   {
     return mData.mExtents.member;
+  }
+
+  const Insets& GetInsets() const
+  {
+    return *(mData.mInsets.member);
   }
 
   const Vector2& GetVector2() const
@@ -353,6 +365,18 @@ struct Property::Value::Impl
         }
         break;
       }
+      case Property::INSETS:
+      {
+        if(isSameType)
+        {
+          *mData.mInsets.member = other.GetInsets();
+        }
+        else
+        {
+          mData.mInsets.member = new Insets(other.GetInsets());
+        }
+        break;
+      }
       case Property::VECTOR4:
       {
         if(isSameType)
@@ -492,6 +516,10 @@ struct Property::Value::Impl
       case Property::EXTENTS:
       {
         return mData.mExtents.member == other.mData.mExtents.member;
+      }
+      case Property::INSETS:
+      {
+        return *mData.mInsets.member == *other.mData.mInsets.member;
       }
       case Property::ARRAY:
       {
@@ -693,6 +721,14 @@ struct Property::Value::Impl
           Dali::Internal::HashUtils::HashRawValue(mData.mExtents.member.bottom, hash);
           break;
         }
+        case Property::INSETS:
+        {
+          Dali::Internal::HashUtils::HashRawValue(mData.mInsets.member->start, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mInsets.member->end, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mInsets.member->top, hash);
+          Dali::Internal::HashUtils::HashRawValue(mData.mInsets.member->bottom, hash);
+          break;
+        }
         case Property::ARRAY:
         {
           hash ^= mData.mArray.member.GetHash();
@@ -773,6 +809,11 @@ private:
       {
         using map = Property::Map;
         mData.mMap.member.~map();
+        break;
+      }
+      case Property::INSETS:
+      {
+        delete mData.mInsets.member;
         break;
       }
       case Property::VECTOR4:
@@ -864,6 +905,7 @@ private:
     UnionMember<Vector3>         mVector3;
     UnionMember<Property::Map>   mMap;
     UnionMember<Property::Array> mArray;
+    UnionMember<Insets*>         mInsets;
     UnionMember<Vector4*>        mVector4;
     UnionMember<Matrix3*>        mMatrix3;
     UnionMember<Matrix*>         mMatrix;
@@ -992,6 +1034,11 @@ Property::Value::Value(const Extents& extentsValue)
   Impl::New(mStorage, extentsValue);
 }
 
+Property::Value::Value(const Insets& insetsValue)
+{
+  Impl::New(mStorage, insetsValue);
+}
+
 Property::Value::Value(Type type)
 {
   switch(type)
@@ -1064,6 +1111,11 @@ Property::Value::Value(Type type)
     case Property::EXTENTS:
     {
       Impl::New(mStorage, Extents());
+      break;
+    }
+    case Property::INSETS:
+    {
+      Impl::New(mStorage, Insets());
       break;
     }
     case Property::NONE:
@@ -1469,6 +1521,30 @@ bool Property::Value::Get(Extents& extentsValue) const
   return converted;
 }
 
+bool Property::Value::Get(Insets& insetsValue) const
+{
+  bool converted = false;
+
+  const auto& obj = Read();
+
+  if(obj.GetType() == INSETS)
+  {
+    insetsValue = obj.GetInsets();
+    converted   = true;
+  }
+  else if(obj.GetType() == VECTOR4)
+  {
+    auto& vec4         = obj.GetVector4();
+    insetsValue.start  = vec4.x;
+    insetsValue.end    = vec4.y;
+    insetsValue.top    = vec4.z;
+    insetsValue.bottom = vec4.w;
+    converted          = true;
+  }
+
+  return converted;
+}
+
 std::size_t Property::Value::GetHash() const
 {
   return Read().GetHash();
@@ -1548,6 +1624,11 @@ std::ostream& operator<<(std::ostream& stream, const Property::Value& value)
     case Dali::Property::EXTENTS:
     {
       stream << obj.GetExtents();
+      break;
+    }
+    case Dali::Property::INSETS:
+    {
+      stream << obj.GetInsets();
       break;
     }
     case Dali::Property::NONE:

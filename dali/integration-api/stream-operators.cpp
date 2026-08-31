@@ -97,4 +97,9 @@ std::ostream& operator<<(std::ostream& stream, const Extents& extents)
   return stream << "[" << extents.start << ", " << extents.end << ", " << extents.top << ", " << extents.bottom << "]";
 }
 
+std::ostream& operator<<(std::ostream& stream, const Insets& insets)
+{
+  return stream << "[" << insets.start << ", " << insets.end << ", " << insets.top << ", " << insets.bottom << "]";
+}
+
 } //namespace Dali

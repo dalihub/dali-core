@@ -2021,6 +2021,9 @@ int UtcDaliHandleGetProperties(void)
       case Property::EXTENTS:
         DALI_TEST_EQUALS(value.Get<Extents>(), handleValue.Get<Extents>(), TEST_LOCATION);
         break;
+      case Property::INSETS:
+        DALI_TEST_CHECK(value.Get<Insets>() == handleValue.Get<Insets>());
+        break;
     }
   }
 
