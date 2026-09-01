@@ -1007,7 +1007,7 @@ int UtcDaliConstraintSetApplyRateCallbackCount01(void)
   // Dummy animation to make actor is always dirty.
   Animation animation = Animation::New(1);
   animation.AnimateTo(Property(actor, Actor::Property::OPACITY), 0.5f);
-  animation.SetLooping(true);
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
   animation.Play();
 
   application.SendNotification();
@@ -1207,7 +1207,7 @@ int UtcDaliConstraintSetApplyRateCallbackCount02(void)
   // Dummy animation to make actor is always dirty.
   Animation animation = Animation::New(1);
   animation.AnimateTo(Property(actor, Actor::Property::OPACITY), 0.5f);
-  animation.SetLooping(true);
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
   animation.Play();
 
   application.SendNotification();
