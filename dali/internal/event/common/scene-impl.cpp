@@ -66,7 +66,7 @@ Scene::Scene()
   mDepthBufferEnabled(false),
   mStencilBufferEnabled(false),
   mMSAAEnabled(false),
-  mPartialUpdateEnabled(true),
+  mPartialUpdateEnabled(false),
   mGeometryHittest(false),
   mIsVisible(true),
   mEventProcessor(*this, ThreadLocalStorage::GetInternal()->GetGestureEventProcessor()),
@@ -156,6 +156,14 @@ void Scene::Initialize(const Graphics::RenderTargetCreateInfo& createInfo,
   // Create scene graph object
   mSceneObject      = new SceneGraph::Scene(createInfo);
   mScenePolicyFlags = flags;
+
+  // Keep the event side cache in step with the flags handed to the scene graph object,
+  // otherwise the Is*Enabled() getters report the constructor defaults forever.
+  mDepthBufferEnabled   = (flags & ScenePolicyFlagBits::DEPTH_BUFFER_ENABLED);
+  mStencilBufferEnabled = (flags & ScenePolicyFlagBits::STENCIL_BUFFER_ENABLED);
+  mPartialUpdateEnabled = (flags & ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
+  mMSAAEnabled          = (flags & ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED);
+
   mSceneObject->SetScenePolicyFlags(flags);
   OwnerPointer<SceneGraph::Scene> transferOwnership(const_cast<SceneGraph::Scene*>(mSceneObject));
   AddSceneMessage(updateManager, transferOwnership);
