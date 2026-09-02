@@ -93,9 +93,9 @@ int UtcDaliVector3CopyConstructor(void)
   TestApplication application;
   Vector3         vec0(10.f, 20.f, 30.0f);
   Vector3         vec1(vec0);
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -104,9 +104,9 @@ int UtcDaliVector3MoveConstructor(void)
   TestApplication application;
   Vector3         vec0(10.f, 20.f, 30.0f);
   Vector3         vec1 = std::move(vec0);
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -117,9 +117,9 @@ int UtcDaliVector3CopyAssignment(void)
   Vector3         vec0(10.f, 20.f, 30.0f);
   Vector3         vec1;
   vec1 = vec0;
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -130,9 +130,9 @@ int UtcDaliVector3MoveAssignment(void)
   Vector3         vec0(10.f, 20.f, 30.0f);
   Vector3         vec1;
   vec1 = std::move(vec0);
-  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec1.z, 30.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -245,7 +245,7 @@ int UtcDaliVector3Multiply02P(void)
   Vector3         v0(2.0f, 3.0f, 4.0f);
   Vector3         r0(20.0f, 30.0f, 40.0f);
   Vector3         v2 = v0 * 10.f;
-  DALI_TEST_EQUALS(v2, r0, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(v2, r0, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -256,7 +256,7 @@ int UtcDaliVector3Multiply03P(void)
   Vector3         v1(10.0f, 20.0f, 30.0f);
   Vector3         r0(20.0f, 60.0f, 120.0f);
   v0 *= v1;
-  DALI_TEST_EQUALS(v0, r0, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(v0, r0, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -277,7 +277,7 @@ int UtcDaliVector3Multiply05P(void)
   Quaternion      rotation(Radian(Math::PI_2), Vector3::ZAXIS);
   Vector3         result(-Vector3::XAXIS);
   vec3 *= rotation;
-  DALI_TEST_EQUALS(vec3, result, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(vec3, result, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 

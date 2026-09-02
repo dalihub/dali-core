@@ -39,10 +39,10 @@ int UtcDaliRectCons01(void)
   TestApplication application;
 
   Rect<float> rect;
-  DALI_TEST_EQUALS(rect.x, 0.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.y, 0.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.width, 0.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.height, 0.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.x, 0.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, 0.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, 0.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, 0.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -51,10 +51,10 @@ int UtcDaliRectCons02(void)
   TestApplication application;
 
   Rect<float> rect(10.0f, 20.0f, 400.0f, 200.0f);
-  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -66,10 +66,10 @@ int UtcDaliRectCons03(void)
 
   Rect<float> r2(rect);
 
-  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -81,10 +81,10 @@ int UtcDaliRectCons04(void)
 
   Rect<float> rect(vec4);
 
-  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -96,10 +96,10 @@ int UtcDaliRectMoveConstructor(void)
 
   Rect<float> r2 = std::move(rect);
 
-  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -112,10 +112,10 @@ int UtcDaliRectMoveAssignmentOperator(void)
   Rect<float> r2;
   r2 = std::move(rect);
 
-  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -128,10 +128,10 @@ int UtcDaliRectAssignmentOperatorRect(void)
   Rect<float> r2;
   r2 = rect;
 
-  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.width, 400.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(r2.height, 200.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -144,10 +144,10 @@ int UtcDaliRectAssignmentOperatorVector4(void)
   Rect<float> rect;
   rect = vec4;
 
-  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.x, 10.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, 20.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, 400.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, 200.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -159,10 +159,10 @@ int UtcDaliRectSet(void)
 
   rect.Set(1.0f, 2.0f, 3.0f, 4.0f);
 
-  DALI_TEST_EQUALS(rect.x, 1.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.y, 2.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.width, 3.0f, 0.001, TEST_LOCATION);
-  DALI_TEST_EQUALS(rect.height, 4.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.x, 1.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.y, 2.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.width, 3.0f, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(rect.height, 4.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -194,7 +194,7 @@ int UtcDaliRectLeft(void)
 
   Rect<float> rf(10.0f, 20.0f, 400.0f, 200.0f);
 
-  DALI_TEST_EQUALS(rf.Left(), 10.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rf.Left(), 10.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -204,7 +204,7 @@ int UtcDaliRectRight(void)
 
   Rect<float> rf(10.0f, 20.0f, 400.0f, 200.0f);
 
-  DALI_TEST_EQUALS(rf.Right(), 410.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rf.Right(), 410.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -214,7 +214,7 @@ int UtcDaliRectTop(void)
 
   Rect<float> rf(10.0f, 20.0f, 400.0f, 200.0f);
 
-  DALI_TEST_EQUALS(rf.Top(), 20.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rf.Top(), 20.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -224,7 +224,7 @@ int UtcDaliRectBottom(void)
 
   Rect<float> rf(10.0f, 20.0f, 400.0f, 200.0f);
 
-  DALI_TEST_EQUALS(rf.Bottom(), 220.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rf.Bottom(), 220.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -234,7 +234,7 @@ int UtcDaliRectArea(void)
 
   Rect<float> rf(10.0f, 20.0f, 400.0f, 200.0f);
 
-  DALI_TEST_EQUALS(rf.Area(), 80000.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rf.Area(), 80000.0f, 0.001f, TEST_LOCATION);
   END_TEST;
 }
 

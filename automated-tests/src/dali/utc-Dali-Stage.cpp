@@ -133,7 +133,7 @@ int UtcDaliStageKeepRenderingP(void)
   while(keepUpdating)
   {
     application.SendNotification();
-    keepUpdating = application.Render(1000.0f /*1 second*/);
+    keepUpdating = application.Render(1000u /*1 second*/);
   }
 
   // Force rendering for the next 5 seconds
@@ -143,17 +143,17 @@ int UtcDaliStageKeepRenderingP(void)
   application.SendNotification();
 
   // Test that core keeps updating until 5 seconds have elapsed
-  keepUpdating = application.Render(1000.0f /*1 second*/);
+  keepUpdating = application.Render(1000u /*1 second*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*2 seconds*/);
+  keepUpdating = application.Render(1000u /*2 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*3 seconds*/);
+  keepUpdating = application.Render(1000u /*3 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*4 seconds*/);
+  keepUpdating = application.Render(1000u /*4 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*5 seconds*/);
+  keepUpdating = application.Render(1000u /*5 seconds*/);
   DALI_TEST_CHECK(keepUpdating);
-  keepUpdating = application.Render(1000.0f /*6 seconds*/); // After 5 sec
+  keepUpdating = application.Render(1000u /*6 seconds*/); // After 5 sec
   DALI_TEST_CHECK(!keepUpdating);
   END_TEST;
 }
@@ -167,7 +167,7 @@ int UtcDaliStageKeepRenderingN(void)
   while(keepUpdating)
   {
     application.SendNotification();
-    keepUpdating = application.Render(1000.0f /*1 second*/);
+    keepUpdating = application.Render(1000u /*1 second*/);
   }
 
   // A negative duration does not keep rendering
@@ -176,7 +176,7 @@ int UtcDaliStageKeepRenderingN(void)
 
   application.SendNotification();
 
-  keepUpdating = application.Render(1000.0f /*1 second*/);
+  keepUpdating = application.Render(1000u /*1 second*/);
   DALI_TEST_CHECK(!keepUpdating);
   END_TEST;
 }
