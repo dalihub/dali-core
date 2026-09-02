@@ -128,6 +128,16 @@ public:
   using AnyFunction = Any; ///< Interpolation function @SINCE_1_0.0
 
   /**
+   * @brief A loop count value which makes the animation repeat forever.
+   *
+   * Pass this to SetLoopCount() to loop indefinitely, and compare against
+   * GetLoopCount() to query whether the animation repeats forever.
+   *
+   * @SINCE_2_5.38
+   */
+  static constexpr int32_t INFINITE_LOOP = 0;
+
+  /**
    * @brief Enumeration for what to do when the animation ends, is stopped, or is destroyed.
    * @SINCE_1_0.0
    */
@@ -277,36 +287,25 @@ public:
   float GetDuration() const;
 
   /**
-   * @brief Sets whether the animation will loop.
+   * @brief Sets the number of times the animation will play.
    *
-   * This function resets the loop count and should not be used with SetLoopCount(int).
-   * Setting this parameter does not cause the animation to Play().
-   *
-   * @SINCE_1_0.0
-   * @param[in] looping True if the animation will loop
-   */
-  void SetLooping(bool looping);
-
-  /**
-   * @brief Enables looping for 'count' repeats.
-   *
-   * A zero is the same as SetLooping(true) i.e. repeat forever.
-   * This function resets the looping value and should not be used with SetLooping(bool).
+   * The loop count is initially 1, i.e. play once.
+   * Pass INFINITE_LOOP to repeat forever.
    * Setting this parameter does not cause the animation to Play().
    *
    * @SINCE_1_1.20
-   * @param[in] count The number of times to loop
+   * @param[in] count The number of times to play, or INFINITE_LOOP to repeat forever
    */
   void SetLoopCount(int32_t count);
 
   /**
-   * @brief Gets the loop count.
+   * @brief Gets the number of times the animation will play.
    *
-   * A zero is the same as SetLooping(true) ie repeat forever.
-   * The loop count is initially 1 for play once.
+   * The loop count is initially 1, i.e. play once.
+   * A return value of INFINITE_LOOP means the animation repeats forever.
    *
    * @SINCE_1_1.20
-   * @return The number of times to loop
+   * @return The number of times to play, or INFINITE_LOOP if it repeats forever
    */
   int32_t GetLoopCount();
 
@@ -319,14 +318,6 @@ public:
    * @return The current number of loops that have occured
    */
   int32_t GetCurrentLoop();
-
-  /**
-   * @brief Queries whether the animation will loop.
-   *
-   * @SINCE_1_0.0
-   * @return True if the animation will loop
-   */
-  bool IsLooping() const;
 
   /**
    * @brief Sets the end action of the animation.

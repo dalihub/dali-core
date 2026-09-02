@@ -424,7 +424,7 @@ int UtcDaliAnimationGetDurationP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationSetLoopingP(void)
+int UtcDaliAnimationSetLoopCountInfiniteP(void)
 {
   TestApplication application;
 
@@ -438,8 +438,8 @@ int UtcDaliAnimationSetLoopingP(void)
   animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
   // Start the animation
-  animation.SetLooping(true);
-  DALI_TEST_CHECK(animation.IsLooping());
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
+  DALI_TEST_EQUALS(animation.GetLoopCount(), Animation::INFINITE_LOOP, TEST_LOCATION);
   animation.Play();
 
   bool                 signalReceived(false);
@@ -469,8 +469,8 @@ int UtcDaliAnimationSetLoopingP(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
 
-  animation.SetLooping(false);
-  DALI_TEST_CHECK(!animation.IsLooping());
+  animation.SetLoopCount(1);
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 1, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
@@ -505,7 +505,7 @@ int UtcDaliAnimationSetLoopCountP(void)
 
   // Start the animation
   animation.SetLoopCount(3);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
   animation.Play();
 
   bool                 signalReceived(false);
@@ -579,7 +579,7 @@ int UtcDaliAnimationSetLoopCountP2(void)
 
   // Start the animation
   animation.SetLoopCount(3);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
   animation.Play();
 
   bool                 signalReceived(false);
@@ -602,8 +602,8 @@ int UtcDaliAnimationSetLoopCountP2(void)
   finishCheck.Reset();
 
   // Loop forever
-  animation.SetLooping(true);
-  DALI_TEST_CHECK(animation.IsLooping());
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
+  DALI_TEST_EQUALS(animation.GetLoopCount(), Animation::INFINITE_LOOP, TEST_LOCATION);
 
   application.Render(static_cast<unsigned int>(durationSeconds * intervalSeconds * 1000.0f));
   application.SendNotification();
@@ -624,7 +624,7 @@ int UtcDaliAnimationSetLoopCountP2(void)
 
   // Loop N again
   animation.SetLoopCount(3);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
   animation.Play();
 
   application.SendNotification();
@@ -641,8 +641,8 @@ int UtcDaliAnimationSetLoopCountP2(void)
   finishCheck.Reset();
 
   // loop forever
-  animation.SetLooping(true);
-  DALI_TEST_CHECK(animation.IsLooping());
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
+  DALI_TEST_EQUALS(animation.GetLoopCount(), Animation::INFINITE_LOOP, TEST_LOCATION);
 
   application.Render(static_cast<unsigned int>(durationSeconds * intervalSeconds * 1000.0f));
   application.SendNotification();
@@ -662,7 +662,7 @@ int UtcDaliAnimationSetLoopCountP2(void)
 
   // Loop N again
   animation.SetLoopCount(3);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * intervalSeconds * 1000.0f));
@@ -704,8 +704,8 @@ int UtcDaliAnimationSetLoopCountP3(void)
   animation.FinishedSignal().Connect(&application, finishCheck);
 
   // loop forever
-  animation.SetLooping(true);
-  DALI_TEST_CHECK(animation.IsLooping());
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
+  DALI_TEST_EQUALS(animation.GetLoopCount(), Animation::INFINITE_LOOP, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * intervalSeconds * 1000.0f));
@@ -726,7 +726,7 @@ int UtcDaliAnimationSetLoopCountP3(void)
 
   // Loop N again
   animation.SetLoopCount(3);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * intervalSeconds * 1000.0f));
@@ -769,7 +769,7 @@ int UtcDaliAnimationSetLoopCountP4(void)
 
   animation.SetLoopCount(1);
   animation.Play();
-  DALI_TEST_CHECK(!animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 1, TEST_LOCATION);
 
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
@@ -783,7 +783,7 @@ int UtcDaliAnimationSetLoopCountP4(void)
   finishCheck.Reset();
 
   animation.Play(); // again
-  DALI_TEST_CHECK(!animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 1, TEST_LOCATION);
 
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
@@ -813,7 +813,7 @@ int UtcDaliAnimationGetLoopCountP(void)
 
   // Start the animation
   animation.SetLoopCount(3);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
   DALI_TEST_CHECK(3 == animation.GetLoopCount());
 
   animation.Play();
@@ -835,11 +835,11 @@ int UtcDaliAnimationGetLoopCountP(void)
   application.SendNotification();
 
   animation.SetLoopCount(0);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 0, TEST_LOCATION);
   DALI_TEST_CHECK(0 == animation.GetLoopCount());
 
   animation.SetLoopCount(1);
-  DALI_TEST_CHECK(!animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 1, TEST_LOCATION);
   DALI_TEST_CHECK(1 == animation.GetLoopCount());
 
   END_TEST;
@@ -860,7 +860,7 @@ int UtcDaliAnimationGetCurrentLoopP(void)
 
   // Start the animation
   animation.SetLoopCount(3);
-  DALI_TEST_CHECK(animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
   DALI_TEST_CHECK(0 == animation.GetCurrentLoop());
   animation.Play();
 
@@ -905,15 +905,15 @@ int UtcDaliAnimationGetCurrentLoopP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationIsLoopingP(void)
+int UtcDaliAnimationInfiniteLoopP(void)
 {
   TestApplication application;
 
   Animation animation = Animation::New(1.0f);
-  DALI_TEST_CHECK(!animation.IsLooping());
+  DALI_TEST_EQUALS(animation.GetLoopCount(), 1, TEST_LOCATION);
 
-  animation.SetLooping(true);
-  DALI_TEST_CHECK(animation.IsLooping());
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
+  DALI_TEST_EQUALS(animation.GetLoopCount(), Animation::INFINITE_LOOP, TEST_LOCATION);
   END_TEST;
 }
 
@@ -2212,7 +2212,7 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
   tet_printf("SetSpeedFactor(0.5f)\n");
   animation.SetSpeedFactor(0.5f);
   animation.SetPlayRange(Vector2(0.3f, 0.8f));
-  animation.SetLooping(true);
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
 
   // Start the animation
   animation.Play();
@@ -3182,7 +3182,7 @@ int UtcDaliAnimationPlayRangeP(void)
 
   // Loop inside the range
   finishCheck.Reset();
-  animation.SetLooping(true);
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
   animation.Play();
   application.SendNotification();
   float intervalSeconds = 0.1f;
@@ -12861,7 +12861,7 @@ int UtcDaliAnimationPlayAfterP2(void)
     // Build the animation
     float     durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
-    animation.SetLooping(true);
+    animation.SetLoopCount(Animation::INFINITE_LOOP);
 
     bool                 signalReceived(false);
     AnimationFinishCheck finishCheck(signalReceived);
@@ -12910,7 +12910,7 @@ int UtcDaliAnimationPlayAfterP2(void)
       DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
     }
 
-    animation.SetLooping(false);
+    animation.SetLoopCount(1);
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
 
@@ -12928,7 +12928,7 @@ int UtcDaliAnimationPlayAfterP2(void)
     // Build the animation
     float     durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
-    animation.SetLooping(true);
+    animation.SetLoopCount(Animation::INFINITE_LOOP);
     animation.SetSpeedFactor(-1.0f); // Set SpeedFactor as < 0
 
     bool                 signalReceived(false);
@@ -12978,7 +12978,7 @@ int UtcDaliAnimationPlayAfterP2(void)
       DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), (targetPosition * 0.0f), TEST_LOCATION); // Not move - A delay time of TimePeriod in second
     }
 
-    animation.SetLooping(false);
+    animation.SetLoopCount(1);
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
 
@@ -13168,7 +13168,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
 
     float     durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
-    animation.SetLooping(true);
+    animation.SetLoopCount(Animation::INFINITE_LOOP);
 
     bool                 signalReceived(false);
     AnimationFinishCheck finishCheck(signalReceived);
@@ -13216,7 +13216,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
       DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), initialPosition, TEST_LOCATION);
     }
 
-    animation.SetLooping(false);
+    animation.SetLoopCount(1);
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
 
@@ -13234,7 +13234,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
 
     float     durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
-    animation.SetLooping(true);
+    animation.SetLoopCount(Animation::INFINITE_LOOP);
 
     bool                 signalReceived(false);
     AnimationFinishCheck finishCheck(signalReceived);
@@ -13286,7 +13286,7 @@ int UtcDaliAnimationSetLoopingModeP(void)
       DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), targetPosition, TEST_LOCATION);
     }
 
-    animation.SetLooping(false);
+    animation.SetLoopCount(1);
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
 
@@ -13314,7 +13314,7 @@ int UtcDaliAnimationSetLoopingModeP2(void)
     float     durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
     animation.SetLoopCount(3);
-    DALI_TEST_CHECK(animation.IsLooping());
+    DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
 
     bool                 signalReceived(false);
     AnimationFinishCheck finishCheck(signalReceived);
@@ -13376,7 +13376,7 @@ int UtcDaliAnimationSetLoopingModeP2(void)
     float     durationSeconds(1.0f);
     Animation animation = Animation::New(durationSeconds);
     animation.SetLoopCount(3);
-    DALI_TEST_CHECK(animation.IsLooping());
+    DALI_TEST_EQUALS(animation.GetLoopCount(), 3, TEST_LOCATION);
 
     bool                 signalReceived(false);
     AnimationFinishCheck finishCheck(signalReceived);
@@ -13896,8 +13896,8 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
   progressCheckBeta.CheckSignalNotReceived();
 
   // Start the animations unlimited looping
-  animationAlpha.SetLooping(true);
-  animationBeta.SetLooping(true);
+  animationAlpha.SetLoopCount(Animation::INFINITE_LOOP);
+  animationBeta.SetLoopCount(Animation::INFINITE_LOOP);
   animationAlpha.Play();
   animationBeta.Play();
 
@@ -13953,8 +13953,8 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
   progressCheckAlpha.Reset();
   progressCheckBeta.Reset();
 
-  animationAlpha.SetLooping(false);
-  animationBeta.SetLooping(false);
+  animationAlpha.SetLoopCount(1);
+  animationBeta.SetLoopCount(1);
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 2000.0f) + 1u /*just beyond the animation duration*/);
@@ -14184,7 +14184,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
   animation.SetDuration(durationSeconds);
 
   // Set Looping Unlmited
-  animation.SetLooping(true);
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
 
   bool finishedSignalReceived(false);
   bool progressSignalReceived(false);
@@ -14249,7 +14249,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
   }
   finishCheck.CheckSignalNotReceived();
 
-  animation.SetLooping(false);
+  animation.SetLoopCount(1);
   application.Render(0u);
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 10u);
@@ -14280,7 +14280,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
   animation.SetSpeedFactor(-1.0f);
 
   // Set Looping Unlmited
-  animation.SetLooping(true);
+  animation.SetLoopCount(Animation::INFINITE_LOOP);
 
   bool finishedSignalReceived(false);
   bool progressSignalReceived(false);
@@ -14349,7 +14349,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
   finishCheck.CheckSignalNotReceived();
 
   animation.Stop();
-  animation.SetLooping(false);
+  animation.SetLoopCount(1);
   animation.SetLoopCount(4);
   animation.Play();
   application.SendNotification(); // Send Stop event into update thread
@@ -15185,7 +15185,6 @@ int UtcDaliAnimationCountAndGetAnimationAt(void)
 
   DALI_TEST_EQUALS(animation.GetDuration(), animationReturned.GetDuration(), TEST_LOCATION);
   DALI_TEST_EQUALS(animation.GetLoopCount(), animationReturned.GetLoopCount(), TEST_LOCATION);
-  DALI_TEST_EQUALS(animation.IsLooping(), animationReturned.IsLooping(), TEST_LOCATION);
   DALI_TEST_EQUALS(animation.GetEndAction(), animationReturned.GetEndAction(), TEST_LOCATION);
   DALI_TEST_EQUALS(animation.GetState(), animationReturned.GetState(), TEST_LOCATION);
 
@@ -15193,23 +15192,6 @@ int UtcDaliAnimationCountAndGetAnimationAt(void)
   animation.Stop();
   animation.Clear();
 
-  END_TEST;
-}
-
-int UtcDaliAnimationSetLoopingNegative(void)
-{
-  TestApplication application;
-  Dali::Animation instance;
-  try
-  {
-    bool arg1(false);
-    instance.SetLooping(arg1);
-    DALI_TEST_CHECK(false); // Should not get here
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK(true); // We expect an assert
-  }
   END_TEST;
 }
 
@@ -16087,22 +16069,6 @@ int UtcDaliAnimationGetStateNegative(void)
   try
   {
     instance.GetState();
-    DALI_TEST_CHECK(false); // Should not get here
-  }
-  catch(...)
-  {
-    DALI_TEST_CHECK(true); // We expect an assert
-  }
-  END_TEST;
-}
-
-int UtcDaliAnimationIsLoopingNegative(void)
-{
-  TestApplication application;
-  Dali::Animation instance;
-  try
-  {
-    instance.IsLooping();
     DALI_TEST_CHECK(false); // Should not get here
   }
   catch(...)
@@ -17668,7 +17634,7 @@ int UtcDaliAnimationGetEventThreadVariablesForVariousCase(void)
 
     float     durationSeconds(2.0f);
     Animation animation = Animation::New(durationSeconds);
-    animation.SetLooping(true);
+    animation.SetLoopCount(Animation::INFINITE_LOOP);
 
     bool                 signalReceived(false);
     AnimationFinishCheck finishCheck(signalReceived);
@@ -17715,7 +17681,7 @@ int UtcDaliAnimationGetEventThreadVariablesForVariousCase(void)
       DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), finalPosition, TEST_LOCATION);
     }
 
-    animation.SetLooping(false);
+    animation.SetLoopCount(1);
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds * 1000.0f) + 1u /*just beyond the animation duration*/);
 
