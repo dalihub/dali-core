@@ -2014,7 +2014,7 @@ int UtcDaliCustomActorSetGetActorPropertyActionSignal(void)
   application.GetScene().Add(custom);
 
   // should have all actor properties
-  DALI_TEST_EQUALS(custom.GetPropertyType(Actor::Property::COLOR), Property::VECTOR4, TEST_LOCATION);
+  DALI_TEST_EQUALS(custom.GetPropertyType(Actor::Property::COLOR_MULTIPLIER), Property::VECTOR4, TEST_LOCATION);
   auto actorHandle = Actor::New();
   DALI_TEST_EQUALS(custom.GetPropertyCount(), actorHandle.GetPropertyCount(), TEST_LOCATION);
 

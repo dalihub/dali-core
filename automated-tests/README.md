@@ -226,7 +226,7 @@ Good Practices
 --------------
 Use DALI_TEST_EQUALS to test actual value against expected value, like this:
 
-    DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_ALPHA ), 0.9f, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetProperty< float >( Actor::Property::COLOR_MULTIPLIER_ALPHA ), 0.9f, TEST_LOCATION );
 
 This will speed up debugging in case the test some day fails. There is also a variant to test that value is greater than expected:
 

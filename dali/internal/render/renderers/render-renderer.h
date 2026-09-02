@@ -424,7 +424,7 @@ public:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
-   * @param[in] worldColor The world color of the node.
+   * @param[in] worldColorMultiplier The world color of the node.
    * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
@@ -440,7 +440,7 @@ public:
               const Matrix&                                        modelViewMatrix,
               const Matrix&                                        viewMatrix,
               const Matrix&                                        projectionMatrix,
-              const Vector4&                                       worldColor,
+              const Vector4&                                       worldColorMultiplier,
               const Vector3&                                       scale,
               const Vector3&                                       size,
               bool                                                 blend,
@@ -495,8 +495,9 @@ public:
   {
     if(!mRenderCallbackInput)
     {
-      mRenderCallbackInput               = std::make_unique<RenderCallbackInput>();
-      mRenderCallbackInput->isTerminated = false;
+      mRenderCallbackInput                    = std::make_unique<RenderCallbackInput>();
+      mRenderCallbackInput->isTerminated      = false;
+      mRenderCallbackInput->isNativeApiUsable = true;
     }
     return *mRenderCallbackInput;
   }
@@ -662,7 +663,7 @@ private:
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
-   * @param[in] worldColor The world color of the node.
+   * @param[in] worldColorMultiplier The world color of the node.
    * @param[in] scale Scale factor of the render item
    * @param[in] size Size of the render item
    * @param[in] blend If true, blending is enabled
@@ -676,7 +677,7 @@ private:
                           const Matrix&                        modelViewMatrix,
                           const Matrix&                        viewMatrix,
                           const Matrix&                        projectionMatrix,
-                          const Vector4&                       worldColor,
+                          const Vector4&                       worldColorMultiplier,
                           const Vector3&                       scale,
                           const Vector3&                       size,
                           std::size_t                          nodeIndex);
@@ -786,6 +787,9 @@ private:
   RenderCallback*                      mRenderCallback{nullptr};
   std::unique_ptr<RenderCallbackInput> mRenderCallbackInput{nullptr};
   std::vector<Graphics::Texture*>      mRenderCallbackTextureBindings{};
+
+  /// A terminate invocation is delivered exactly once, whichever way it ends up happening.
+  bool mRenderCallbackTerminated{false};
 
   // Struct to get matched UBO block correctly.
   // Most of case the number of UBO is 1 or 2 usually. (VisualRenderer + RenderEffect case)

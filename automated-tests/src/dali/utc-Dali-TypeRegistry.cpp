@@ -2605,10 +2605,10 @@ int UtcDaliTypeRegistryGeneratedInvokeMethodFiltersUnsupportedApi(void)
   DALI_TEST_CHECK(duration);
   DALI_TEST_EQUALS(*duration, 1.0f, TEST_LOCATION);
 
-  InvokeArguments setLoopingArguments;
-  setLoopingArguments.PushBack(Any(true));
-  DALI_TEST_CHECK(animationHandle.InvokeMethod("SetLooping", setLoopingArguments, result));
-  DALI_TEST_CHECK(animation.IsLooping());
+  InvokeArguments setLoopCountArguments;
+  setLoopCountArguments.PushBack(Any(int32_t(Animation::INFINITE_LOOP)));
+  DALI_TEST_CHECK(animationHandle.InvokeMethod("SetLoopCount", setLoopCountArguments, result));
+  DALI_TEST_EQUALS(animation.GetLoopCount(), Animation::INFINITE_LOOP, TEST_LOCATION);
 
   expectNotInvokable(actorHandle, "New");
   expectNotInvokable(actorHandle, "DownCast");
@@ -2802,7 +2802,7 @@ int UtcDaliPropertyRegistrationPropertyWritableN02(void)
   TypeInfo            typeInfo     = TypeRegistry::Get().GetTypeInfo(typeid(MyTestCustomActor));
   Internal::TypeInfo& typeInfoImpl = GetImplementation(typeInfo);
 
-  DALI_TEST_EQUALS(typeInfoImpl.IsPropertyWritable(Actor::Property::COLOR), true, TEST_LOCATION);
+  DALI_TEST_EQUALS(typeInfoImpl.IsPropertyWritable(Actor::Property::COLOR_MULTIPLIER), true, TEST_LOCATION);
 
   END_TEST;
 }

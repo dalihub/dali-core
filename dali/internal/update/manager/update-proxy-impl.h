@@ -149,19 +149,19 @@ public:
   bool BakeScale(uint32_t id, const Vector3& scale);
 
   /**
-   * @copydoc Dali::UpdateProxy::GetColor()
+   * @copydoc Dali::UpdateProxy::GetColorMultiplier()
    */
-  bool GetColor(uint32_t id, Vector4& color) const;
+  bool GetColorMultiplier(uint32_t id, Vector4& multiplier) const;
 
   /**
-   * @copydoc Dali::UpdateProxy::SetColor()
+   * @copydoc Dali::UpdateProxy::SetColorMultiplier()
    */
-  bool SetColor(uint32_t id, const Vector4& color);
+  bool SetColorMultiplier(uint32_t id, const Vector4& multiplier);
 
   /**
-   * @copydoc Dali::UpdateProxy::BakeColor()
+   * @copydoc Dali::UpdateProxy::BakeColorMultiplier()
    */
-  bool BakeColor(uint32_t id, const Vector4& color);
+  bool BakeColorMultiplier(uint32_t id, const Vector4& multiplier);
 
   /**
    * @brief Informs the update-proxy that the node hierarchy has changed.

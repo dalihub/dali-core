@@ -311,7 +311,7 @@ int UtcDaliPropertyMapGetValue(void)
   Property::Map map;
   map["hello"]                = 1;
   map["world"]                = 2;
-  map[Actor::Property::COLOR] = Color::MAGENTA;
+  map[Actor::Property::COLOR_MULTIPLIER] = Color::MAGENTA;
 
   Property::Value& value = map.GetValue(0);
   DALI_TEST_CHECK(value.Get<int>() == 1);
@@ -321,7 +321,7 @@ int UtcDaliPropertyMapGetValue(void)
   Property::Value& value2 = map.GetValue(2);
   DALI_TEST_CHECK(value2.Get<Vector4>() == Color::MAGENTA);
   value2 = Color::CYAN;
-  DALI_TEST_EQUALS(map[Actor::Property::COLOR].Get<Vector4>(), Color::CYAN, TEST_LOCATION);
+  DALI_TEST_EQUALS(map[Actor::Property::COLOR_MULTIPLIER].Get<Vector4>(), Color::CYAN, TEST_LOCATION);
 
   // Out of bounds
   try
@@ -342,11 +342,11 @@ int UtcDaliPropertyMapGetKeyAt(void)
   Property::Map map;
   map["hello"]                = 1;
   map["world"]                = 2;
-  map[Actor::Property::COLOR] = Color::MAGENTA;
+  map[Actor::Property::COLOR_MULTIPLIER] = Color::MAGENTA;
 
   DALI_TEST_CHECK(map.GetKeyAt(0) == "hello");
   DALI_TEST_CHECK(map.GetKeyAt(1) == "world");
-  DALI_TEST_CHECK(map.GetKeyAt(2) == Actor::Property::COLOR);
+  DALI_TEST_CHECK(map.GetKeyAt(2) == Actor::Property::COLOR_MULTIPLIER);
 
   // Out of bounds
   try
@@ -367,13 +367,13 @@ int UtcDaliPropertyMapGetKeyValue(void)
   Property::Map map;
   map["hello"]                = 1;
   map["world"]                = 2;
-  map[Actor::Property::COLOR] = Color::MAGENTA;
+  map[Actor::Property::COLOR_MULTIPLIER] = Color::MAGENTA;
 
   DALI_TEST_CHECK(map.GetKeyValue(0).first == "hello");
   DALI_TEST_CHECK(map.GetKeyValue(0).second.Get<int>() == 1);
   DALI_TEST_CHECK(map.GetKeyValue(1).first == "world");
   DALI_TEST_CHECK(map.GetKeyValue(1).second.Get<int>() == 2);
-  DALI_TEST_CHECK(map.GetKeyValue(2).first == Actor::Property::COLOR);
+  DALI_TEST_CHECK(map.GetKeyValue(2).first == Actor::Property::COLOR_MULTIPLIER);
   DALI_TEST_CHECK(map.GetKeyValue(2).second.Get<Vector4>() == Color::MAGENTA);
 
   // Out of bounds
@@ -773,9 +773,9 @@ int UtcDaliPropertyKeyConstructorP(void)
   DALI_TEST_EQUALS(key1.stringKey, "aKey", TEST_LOCATION);
   DALI_TEST_EQUALS(key1.indexKey, Property::INVALID_INDEX, TEST_LOCATION);
 
-  Property::Key key2(Actor::Property::COLOR);
+  Property::Key key2(Actor::Property::COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(key2.type, Property::Key::INDEX, TEST_LOCATION);
-  DALI_TEST_EQUALS(key2.indexKey, (Dali::Property::Index)Actor::Property::COLOR, TEST_LOCATION);
+  DALI_TEST_EQUALS(key2.indexKey, (Dali::Property::Index)Actor::Property::COLOR_MULTIPLIER, TEST_LOCATION);
   END_TEST;
 }
 

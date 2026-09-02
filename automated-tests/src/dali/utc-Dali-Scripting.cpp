@@ -163,7 +163,7 @@ int UtcDaliScriptingNewActorProperties(void)
   map["position"]           = Vector3::XAXIS;
   map["scale"]              = Vector3::ONE;
   map["visible"]            = false;
-  map["color"]              = Color::MAGENTA;
+  map["colorMultiplier"]    = Color::MAGENTA;
   map["name"]               = "MyActor";
   map["colorMode"]          = "USE_PARENT_COLOR";
   map["sensitive"]          = false;
@@ -185,7 +185,7 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::POSITION), Vector3::XAXIS, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector3>(Actor::Property::SCALE), Vector3::ONE, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetCurrentProperty<bool>(Actor::Property::VISIBLE), false, TEST_LOCATION);
-    DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::MAGENTA, TEST_LOCATION);
+    DALI_TEST_EQUALS(handle.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::MAGENTA, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetProperty<String>(Actor::Property::NAME), "MyActor", TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetProperty<ColorMode>(Actor::Property::COLOR_MODE), USE_PARENT_COLOR, TEST_LOCATION);
     DALI_TEST_EQUALS(handle.GetProperty<bool>(Actor::Property::SENSITIVE), false, TEST_LOCATION);
@@ -239,7 +239,7 @@ int UtcDaliScriptingNewAnimation(void)
 
   Property::Map map;
   map["actor"]         = "Actor1";
-  map["property"]      = "color";
+  map["property"]      = "colorMultiplier";
   map["value"]         = Color::MAGENTA;
   map["alphaFunction"] = "EASE_IN_OUT";
 
@@ -253,7 +253,7 @@ int UtcDaliScriptingNewAnimation(void)
 
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::NAME, "Actor1");
-  actor.SetProperty(Actor::Property::COLOR, Color::CYAN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::CYAN);
   application.GetScene().Add(actor);
 
   Animation anim = data.CreateAnimation(actor, 0.5f);
@@ -264,11 +264,11 @@ int UtcDaliScriptingNewAnimation(void)
   application.Render(500); // Start animation
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), (Color::MAGENTA + Color::CYAN) * 0.5f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), (Color::MAGENTA + Color::CYAN) * 0.5f, TEST_LOCATION);
 
   application.Render(500); // Halfway thru anim
   application.SendNotification();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::MAGENTA, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::MAGENTA, TEST_LOCATION);
 
   END_TEST;
 }
@@ -347,7 +347,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetProperty(Actor::Property::POSITION, Vector3::XAXIS);
     actor.SetProperty(Actor::Property::SCALE, Vector3::ZAXIS);
     actor.SetProperty(Actor::Property::VISIBLE, false);
-    actor.SetProperty(Actor::Property::COLOR, Color::MAGENTA);
+    actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAGENTA);
     actor.SetProperty(Actor::Property::NAME, "MyActor");
     actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER_LEFT);
     actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_RIGHT);
@@ -373,8 +373,8 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_EQUALS(map.Find("scale")->Get<Vector3>(), Vector3::ZAXIS, TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("visible"));
     DALI_TEST_EQUALS(map.Find("visible")->Get<bool>(), false, TEST_LOCATION);
-    DALI_TEST_CHECK(NULL != map.Find("color"));
-    DALI_TEST_EQUALS(map.Find("color")->Get<Vector4>(), Color::MAGENTA, TEST_LOCATION);
+    DALI_TEST_CHECK(NULL != map.Find("colorMultiplier"));
+    DALI_TEST_EQUALS(map.Find("colorMultiplier")->Get<Vector4>(), Color::MAGENTA, TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("name"));
     DALI_TEST_EQUALS(map.Find("name")->Get<String>(), "MyActor", TEST_LOCATION);
     DALI_TEST_CHECK(NULL != map.Find("pivot"));

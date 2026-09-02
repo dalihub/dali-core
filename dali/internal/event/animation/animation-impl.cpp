@@ -163,6 +163,7 @@ inline bool IsAnimatable(Property::Type type)
     case Property::ARRAY:
     case Property::MAP:
     case Property::EXTENTS:
+    case Property::INSETS:
     {
       break;
     }
@@ -405,11 +406,6 @@ float Animation::GetDuration() const
   return mDurationSeconds;
 }
 
-void Animation::SetLooping(bool on)
-{
-  SetLoopCount(on ? 0 : 1);
-}
-
 void Animation::SetLoopCount(int32_t count)
 {
   DALI_LOG_ANIMATION_INFO("Animation[%u] SetLoopCount[%d]\n", mAnimationId, count);
@@ -435,11 +431,6 @@ int32_t Animation::GetCurrentLoop()
   }
 
   return loopCount;
-}
-
-bool Animation::IsLooping() const
-{
-  return mLoopCount != 1;
 }
 
 void Animation::SetEndAction(EndAction action)

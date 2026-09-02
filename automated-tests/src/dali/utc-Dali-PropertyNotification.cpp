@@ -666,11 +666,11 @@ int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
   notification.NotifySignal().Connect(&TestCallback);
   notification = actor.AddPropertyNotification(Actor::Property::POSITION, 2, GreaterThanCondition(100.0f));
   notification.NotifySignal().Connect(&TestCallback);
-  notification = actor.AddPropertyNotification(Actor::Property::COLOR, 3, GreaterThanCondition(0.5f));
+  notification = actor.AddPropertyNotification(Actor::Property::COLOR_MULTIPLIER, 3, GreaterThanCondition(0.5f));
   notification.NotifySignal().Connect(&TestCallback);
 
   actor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move right to satisfy XAxis condition
@@ -695,7 +695,7 @@ int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
   // Change alpha Colour to satisfy w/alpha component condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK(gCallBackCalled);
   END_TEST;
@@ -715,11 +715,11 @@ int UtcDaliPropertyNotificationVectorComponentLessThan(void)
   notification.NotifySignal().Connect(&TestCallback);
   notification = actor.AddPropertyNotification(Actor::Property::POSITION, 2, LessThanCondition(-100.0f));
   notification.NotifySignal().Connect(&TestCallback);
-  notification = actor.AddPropertyNotification(Actor::Property::COLOR, 3, LessThanCondition(0.5f));
+  notification = actor.AddPropertyNotification(Actor::Property::COLOR_MULTIPLIER, 3, LessThanCondition(0.5f));
   notification.NotifySignal().Connect(&TestCallback);
 
   actor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move left to satisfy XAxis condition
@@ -744,7 +744,7 @@ int UtcDaliPropertyNotificationVectorComponentLessThan(void)
   // Change alpha Colour to satisfy w/alpha component condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK(gCallBackCalled);
   END_TEST;
@@ -764,12 +764,12 @@ int UtcDaliPropertyNotificationVectorComponentInside(void)
   notification.NotifySignal().Connect(&TestCallback);
   notification = actor.AddPropertyNotification(Actor::Property::POSITION, 2, InsideCondition(-100.0f, 100.0f));
   notification.NotifySignal().Connect(&TestCallback);
-  notification = actor.AddPropertyNotification(Actor::Property::COLOR, 3, InsideCondition(0.25f, 0.75f));
+  notification = actor.AddPropertyNotification(Actor::Property::COLOR_MULTIPLIER, 3, InsideCondition(0.25f, 0.75f));
   notification.NotifySignal().Connect(&TestCallback);
 
   // set outside all conditions
   actor.SetProperty(Actor::Property::POSITION, Vector3(200.0f, 200.0f, 200.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move x to inside condition
@@ -794,7 +794,7 @@ int UtcDaliPropertyNotificationVectorComponentInside(void)
   // change alpha to inside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 0.5f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK(gCallBackCalled);
   END_TEST;
@@ -814,12 +814,12 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
   notification.NotifySignal().Connect(&TestCallback);
   notification = actor.AddPropertyNotification(Actor::Property::POSITION, 2, OutsideCondition(-100.0f, 100.0f));
   notification.NotifySignal().Connect(&TestCallback);
-  notification = actor.AddPropertyNotification(Actor::Property::COLOR, 3, OutsideCondition(0.25f, 0.75f));
+  notification = actor.AddPropertyNotification(Actor::Property::COLOR_MULTIPLIER, 3, OutsideCondition(0.25f, 0.75f));
   notification.NotifySignal().Connect(&TestCallback);
 
   // set inside all conditions
   actor.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 0.5f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 0.5f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // Move x to outside condition
@@ -844,7 +844,7 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
   // change alpha to outside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetProperty(Actor::Property::COLOR, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK(gCallBackCalled);
   END_TEST;
@@ -922,10 +922,10 @@ int UtcDaliPropertyNotificationStepVector4(void)
   const float step      = 10.0f;
   float       initValue = 5.0f;
 
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::COLOR, StepCondition(step * 2, 0.0f));
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::COLOR_MULTIPLIER, StepCondition(step * 2, 0.0f));
   notification.NotifySignal().Connect(&TestCallback);
 
-  actor.SetProperty(Actor::Property::COLOR, Vector4(initValue, 0.0f, 0.0f, 0.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(initValue, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   // test both directions
@@ -933,28 +933,28 @@ int UtcDaliPropertyNotificationStepVector4(void)
   {
     // Move x to positive
     gCallBackCalled = false;
-    actor.SetProperty(Actor::Property::COLOR, Vector4(initValue + (i++ * step), 0.0f, 0.0f, 0.0f));
+    actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(initValue + (i++ * step), 0.0f, 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK(!gCallBackCalled);
 
-    actor.SetProperty(Actor::Property::COLOR, Vector4(initValue + (i++ * step), 0.0f, 0.0f, 0.0f));
+    actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(initValue + (i++ * step), 0.0f, 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK(gCallBackCalled);
   }
 
   initValue = -5.0f;
-  actor.SetProperty(Actor::Property::COLOR, Vector4(initValue, 0.0f, 0.0f, 0.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(initValue, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
   for(int i = 1; i < 10;)
   {
     // Move x to negative
     gCallBackCalled = false;
-    actor.SetProperty(Actor::Property::COLOR, Vector4(initValue - (i++ * step), 0.0f, 0.0f, 0.0f));
+    actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(initValue - (i++ * step), 0.0f, 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK(!gCallBackCalled);
 
-    actor.SetProperty(Actor::Property::COLOR, Vector4(initValue - (i++ * step), 0.0f, 0.0f, 0.0f));
+    actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(initValue - (i++ * step), 0.0f, 0.0f, 0.0f));
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK(gCallBackCalled);
   }

@@ -14,6 +14,7 @@ SET(TC_SOURCES
         utc-Dali-Any.cpp
         utc-Dali-BaseHandle.cpp
         utc-Dali-BaseObjectObserver.cpp
+        utc-Dali-Callback.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-CircularQueue.cpp
         utc-Dali-Common.cpp
@@ -38,11 +39,13 @@ SET(TC_SOURCES
         utc-Dali-GeoHitTestAlgorithm.cpp
         utc-Dali-GeoHoverProcessing.cpp
         utc-Dali-GeoTouchProcessing.cpp
+        utc-Dali-GeoTouchStream.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-HoverProcessing.cpp
+        utc-Dali-Insets.cpp
         utc-Dali-IntPair.cpp
         utc-Dali-IntrusivePtr.cpp
         utc-Dali-KeyEvent.cpp

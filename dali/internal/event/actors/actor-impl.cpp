@@ -112,13 +112,13 @@ DALI_PROPERTY("inheritPosition", BOOLEAN, true, false, false, Dali::Actor::Prope
 DALI_PROPERTY("inheritOrientation", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_ORIENTATION)
 DALI_PROPERTY("inheritScale", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_SCALE)
 DALI_PROPERTY("visible", BOOLEAN, true, true, true, Dali::Actor::Property::VISIBLE)
-DALI_PROPERTY("color", VECTOR4, true, true, true, Dali::Actor::Property::COLOR)
-DALI_PROPERTY("colorRed", FLOAT, true, true, true, Dali::Actor::Property::COLOR_RED)
-DALI_PROPERTY("colorGreen", FLOAT, true, true, true, Dali::Actor::Property::COLOR_GREEN)
-DALI_PROPERTY("colorBlue", FLOAT, true, true, true, Dali::Actor::Property::COLOR_BLUE)
-DALI_PROPERTY("colorAlpha", FLOAT, true, true, true, Dali::Actor::Property::COLOR_ALPHA)
+DALI_PROPERTY("colorMultiplier", VECTOR4, true, true, true, Dali::Actor::Property::COLOR_MULTIPLIER)
+DALI_PROPERTY("colorMultiplierRed", FLOAT, true, true, true, Dali::Actor::Property::COLOR_MULTIPLIER_RED)
+DALI_PROPERTY("colorMultiplierGreen", FLOAT, true, true, true, Dali::Actor::Property::COLOR_MULTIPLIER_GREEN)
+DALI_PROPERTY("colorMultiplierBlue", FLOAT, true, true, true, Dali::Actor::Property::COLOR_MULTIPLIER_BLUE)
+DALI_PROPERTY("colorMultiplierAlpha", FLOAT, true, true, true, Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA)
 DALI_PROPERTY("opacity", FLOAT, true, true, true, Dali::Actor::Property::OPACITY)
-DALI_PROPERTY("worldColor", VECTOR4, false, false, true, Dali::Actor::Property::WORLD_COLOR)
+DALI_PROPERTY("worldColorMultiplier", VECTOR4, false, false, true, Dali::Actor::Property::WORLD_COLOR_MULTIPLIER)
 DALI_PROPERTY("colorMode", INTEGER, true, false, false, Dali::Actor::Property::COLOR_MODE)
 DALI_PROPERTY("worldMatrix", MATRIX, false, false, true, Dali::Actor::Property::WORLD_MATRIX)
 DALI_PROPERTY("drawMode", INTEGER, true, false, false, Dali::Actor::Property::DRAW_MODE)
@@ -907,7 +907,7 @@ void Actor::SetOpacity(float opacity)
   mTargetColor.a = opacity;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeW, opacity);
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColorMultiplier, &AnimatableProperty<Vector4>::BakeW, opacity);
 
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
@@ -923,80 +923,80 @@ float Actor::GetCurrentOpacity() const
   return GetNode().GetOpacity();
 }
 
-void Actor::SetColor(const Vector4& color)
+void Actor::SetColorMultiplier(const Vector4& color)
 {
   mTargetColor = color;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::Bake, color);
+  SceneGraph::NodePropertyMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColorMultiplier, &AnimatableProperty<Vector4>::Bake, color);
 
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
 
-void Actor::SetColorRed(float red)
+void Actor::SetColorMultiplierRed(float red)
 {
   mTargetColor.r = red;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeX, red);
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColorMultiplier, &AnimatableProperty<Vector4>::BakeX, red);
 
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
 
-void Actor::SetColorGreen(float green)
+void Actor::SetColorMultiplierGreen(float green)
 {
   mTargetColor.g = green;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeY, green);
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColorMultiplier, &AnimatableProperty<Vector4>::BakeY, green);
 
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
 
-void Actor::SetColorBlue(float blue)
+void Actor::SetColorMultiplierBlue(float blue)
 {
   mTargetColor.b = blue;
 
   // node is being used in a separate thread; queue a message to set the value & base value
-  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColor, &AnimatableProperty<Vector4>::BakeZ, blue);
+  SceneGraph::NodePropertyComponentMessage<Vector4>::Send(GetEventThreadServices(), &GetNode(), &GetNode().mColorMultiplier, &AnimatableProperty<Vector4>::BakeZ, blue);
 
   RequestRenderingMessage(GetEventThreadServices().GetUpdateManager());
 }
 
-const Vector4& Actor::GetColor() const
+const Vector4& Actor::GetColorMultiplier() const
 {
   return mTargetColor;
 }
 
-float Actor::GetColorRed() const
+float Actor::GetColorMultiplierRed() const
 {
   return mTargetColor.r;
 }
 
-float Actor::GetColorGreen() const
+float Actor::GetColorMultiplierGreen() const
 {
   return mTargetColor.g;
 }
 
-float Actor::GetColorBlue() const
+float Actor::GetColorMultiplierBlue() const
 {
   return mTargetColor.b;
 }
 
-float Actor::GetColorAlpha() const
+float Actor::GetColorMultiplierAlpha() const
 {
   return mTargetColor.a;
 }
 
-const Vector4& Actor::GetCurrentColor() const
+const Vector4& Actor::GetCurrentColorMultiplier() const
 {
   // node is being used in a separate thread; copy the value from the previous update
-  return GetNode().GetColor();
+  return GetNode().GetColorMultiplier();
 }
 
-const Vector4& Actor::GetWorldColor() const
+const Vector4& Actor::GetWorldColorMultiplier() const
 {
-  return GetNode().GetWorldColor();
+  return GetNode().GetWorldColorMultiplier();
 }
 
 void Actor::SetChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::Type childrenDepthIndexPolicy)

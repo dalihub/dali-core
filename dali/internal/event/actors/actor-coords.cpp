@@ -829,7 +829,7 @@ Matrix CalculateActorWorldTransform(const Actor& actor)
   return worldMatrix;
 }
 
-Vector4 CalculateActorWorldColor(const Actor& actor)
+Vector4 CalculateActorWorldColorMultiplier(const Actor& actor)
 {
   std::vector<Dali::Actor>     descentList;
   std::vector<Dali::ColorMode> inheritanceModeList;
@@ -843,28 +843,28 @@ Vector4 CalculateActorWorldColor(const Actor& actor)
     currentActor = currentActor.GetParent();
   } while(inheritance != Dali::ColorMode::USE_OWN_COLOR && currentActor);
 
-  Vector4      worldColor;
+  Vector4      worldColorMultiplier;
   const size_t descentCount = descentList.size();
   for(size_t iter = 0u; iter < descentCount; ++iter)
   {
     auto i = descentCount - iter - 1u;
     if(inheritanceModeList[i] == USE_OWN_COLOR || i == descentList.size() - 1)
     {
-      worldColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR);
+      worldColorMultiplier = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
     }
     else if(inheritanceModeList[i] == USE_OWN_MULTIPLY_PARENT_ALPHA)
     {
-      Vector4 ownColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR);
-      worldColor       = Vector4(ownColor.r, ownColor.g, ownColor.b, ownColor.a * worldColor.a);
+      Vector4 ownColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
+      worldColorMultiplier       = Vector4(ownColor.r, ownColor.g, ownColor.b, ownColor.a * worldColorMultiplier.a);
     }
     else if(inheritanceModeList[i] == USE_OWN_MULTIPLY_PARENT_COLOR)
     {
-      Vector4 ownColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR);
-      worldColor *= ownColor;
+      Vector4 ownColor = descentList[i].GetProperty<Vector4>(Dali::Actor::Property::COLOR_MULTIPLIER);
+      worldColorMultiplier *= ownColor;
     }
   }
 
-  return worldColor;
+  return worldColorMultiplier;
 }
 
 bool CalculateActorOnSceneVisible(const Actor& actor)

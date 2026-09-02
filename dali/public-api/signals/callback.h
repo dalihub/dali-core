@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/unique-ptr.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
 namespace Dali
@@ -855,19 +856,22 @@ struct VoidFunctorDispatcherReturn3
 /**
  * @brief Thin template to provide type safety for member function callbacks.
  *
- * Version with two parameters and return value.
- * @SINCE_1_0.0
+ * Binds an object to one of its member functions, selecting the dispatcher that
+ * matches the member function's signature.
+ *
+ * @SINCE_2_5.38
+ * @see MakeCallback()
  */
 template<class T>
-class Callback : public CallbackBase
+class CallbackMember : public CallbackBase
 {
 public:
   /**
    * @brief Default constructor.
    *
-   * @SINCE_1_0.0
+   * @SINCE_2_5.38
    */
-  Callback()
+  CallbackMember()
   : CallbackBase()
   {
   }
@@ -876,60 +880,60 @@ public:
    * @brief Constructor for member function.
    *
    * Copies the function object.
-   * @SINCE_1_0.0
+   * @SINCE_2_5.38
    * @param[in] object The object to call
    * @param[in] memberFunction The member function of the object
    */
-  Callback(T* object, void (T::*memberFunction)(void))
+  CallbackMember(T* object, void (T::*memberFunction)(void))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher0<T>::Dispatch))
   {
   }
   template<typename P1>
-  Callback(T* object, void (T::*memberFunction)(P1))
+  CallbackMember(T* object, void (T::*memberFunction)(P1))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher1<T, P1>::Dispatch))
   {
   }
   template<typename P1, typename P2>
-  Callback(T* object, void (T::*memberFunction)(P1, P2))
+  CallbackMember(T* object, void (T::*memberFunction)(P1, P2))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher2<T, P1, P2>::Dispatch))
   {
   }
   template<typename P1, typename P2, typename P3>
-  Callback(T* object, void (T::*memberFunction)(P1, P2, P3))
+  CallbackMember(T* object, void (T::*memberFunction)(P1, P2, P3))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&Dispatcher3<T, P1, P2, P3>::Dispatch))
   {
   }
   template<typename R>
-  Callback(T* object, R (T::*memberFunction)(void))
+  CallbackMember(T* object, R (T::*memberFunction)(void))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn0<T, R>::Dispatch))
   {
   }
   template<typename R, typename P1>
-  Callback(T* object, R (T::*memberFunction)(P1))
+  CallbackMember(T* object, R (T::*memberFunction)(P1))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn1<T, R, P1>::Dispatch))
   {
   }
   template<typename R, typename P1, typename P2>
-  Callback(T* object, R (T::*memberFunction)(P1, P2))
+  CallbackMember(T* object, R (T::*memberFunction)(P1, P2))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn2<T, R, P1, P2>::Dispatch))
   {
   }
   template<typename R, typename P1, typename P2, typename P3>
-  Callback(T* object, R (T::*memberFunction)(P1, P2, P3))
+  CallbackMember(T* object, R (T::*memberFunction)(P1, P2, P3))
   : CallbackBase(object,
                  reinterpret_cast<CallbackBase::MemberFunction>(memberFunction),
                  reinterpret_cast<CallbackBase::Dispatcher>(&DispatcherReturn3<T, R, P1, P2, P3>::Dispatch))
@@ -1351,7 +1355,7 @@ inline CallbackBase* MakeCallback(R (*function)(Args... args))
 template<class T>
 inline CallbackBase* MakeCallback(T* object, void (T::*function)(void))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1366,7 +1370,7 @@ inline CallbackBase* MakeCallback(T* object, void (T::*function)(void))
 template<class T, typename P1>
 inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1381,7 +1385,7 @@ inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1))
 template<class T, typename P1, typename P2>
 inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1, P2))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1396,7 +1400,7 @@ inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1, P2))
 template<class T, typename P1, typename P2, typename P3>
 inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1, P2, P3))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1411,7 +1415,7 @@ inline CallbackBase* MakeCallback(T* object, void (T::*function)(P1, P2, P3))
 template<class T, typename R>
 inline CallbackBase* MakeCallback(T* object, R (T::*function)())
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1426,7 +1430,7 @@ inline CallbackBase* MakeCallback(T* object, R (T::*function)())
 template<class T, typename P1, typename R>
 inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1441,7 +1445,7 @@ inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1))
 template<class T, typename P1, typename P2, typename R>
 inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1, P2))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1456,7 +1460,7 @@ inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1, P2))
 template<class T, typename P1, typename P2, typename P3, typename R>
 inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1, P2, P3))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 
 /**
@@ -1471,7 +1475,7 @@ inline CallbackBase* MakeCallback(T* object, R (T::*function)(P1, P2, P3))
 template<class T, class Base>
 inline CallbackBase* MakeCallback(T* object, void (Base::*function)(void))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
 /**
  * @brief Creates a callback from a class's parent member function with no parameters.
@@ -1485,8 +1489,244 @@ inline CallbackBase* MakeCallback(T* object, void (Base::*function)(void))
 template<class T, class Base>
 inline CallbackBase* MakeCallback(T& object, void (Base::*function)(void))
 {
-  return new Callback<T>(object, function);
+  return new CallbackMember<T>(object, function);
 }
+
+/**
+ * @brief Move-only typed callback which owns the underlying CallbackBase.
+ *
+ * Provides a type-safe, owning alternative to passing a raw CallbackBase
+ * pointer around. The signature is given as a function type, for example
+ * @code
+ * Callback<void()>          OnFinished;
+ * Callback<bool(float)>     OnTick;
+ * Callback<void(int, int)>  OnResized;
+ * @endcode
+ *
+ * The primary template is not defined; only function-type specialisations
+ * are valid.
+ *
+ * @note Free functions may take any number of parameters. Member functions are
+ * limited to three, which is the arity of the underlying dispatchers.
+ *
+ * @SINCE_2_5.38
+ * @tparam Signature The function type of the callback
+ */
+template<typename Signature>
+class Callback;
+
+/**
+ * @brief Move-only typed callback with no return value.
+ *
+ * @SINCE_2_5.38
+ * @tparam Args The parameter types of the callback
+ */
+template<typename... Args>
+class Callback<void(Args...)>
+{
+public:
+  /**
+   * @brief Creates an empty callback.
+   * @SINCE_2_5.38
+   */
+  Callback() = default;
+
+  /**
+   * @brief Move constructor.
+   * @SINCE_2_5.38
+   */
+  Callback(Callback&&) noexcept = default;
+
+  /**
+   * @brief Move assignment operator.
+   * @SINCE_2_5.38
+   * @return A reference to this
+   */
+  Callback& operator=(Callback&&) noexcept = default;
+
+  Callback(const Callback&)            = delete;
+  Callback& operator=(const Callback&) = delete;
+
+  /**
+   * @brief Queries whether this callback holds a function to call.
+   * @SINCE_2_5.38
+   * @return True if a function is held
+   */
+  explicit operator bool() const
+  {
+    return static_cast<bool>(mCallback);
+  }
+
+  /**
+   * @brief Creates a callback from a free function.
+   * @SINCE_2_5.38
+   * @param[in] func The function to call
+   * @return The newly created callback
+   */
+  static Callback New(void (*func)(Args...))
+  {
+    return Callback(MakeCallback(func));
+  }
+
+  /**
+   * @brief Creates a callback from a class member function.
+   *
+   * @SINCE_2_5.38
+   * @tparam T The type of the object
+   * @param[in] obj The object to call the member function on
+   * @param[in] func The member function to call
+   * @return The newly created callback
+   * @note Member functions are limited to three parameters.
+   */
+  template<class T>
+  static Callback New(T* obj, void (T::*func)(Args...))
+  {
+    static_assert(sizeof...(Args) <= 3, "Dali::Callback supports at most three parameters for member functions");
+    return Callback(MakeCallback(obj, func));
+  }
+
+  /**
+   * @brief Calls the held function.
+   *
+   * Does nothing if this callback is empty.
+   * @SINCE_2_5.38
+   * @param[in] args The arguments to pass to the function
+   */
+  void Invoke(Args... args)
+  {
+    if(mCallback)
+    {
+      CallbackBase::Execute<Args...>(*mCallback, args...);
+    }
+  }
+
+  /**
+   * @brief Relinquishes ownership of the held callback.
+   *
+   * Used to hand the callback over to an API which takes a raw
+   * CallbackBase pointer and assumes ownership of it.
+   * @SINCE_2_5.38
+   * @return The held callback, ownership transferred to the caller
+   */
+  CallbackBase* Release()
+  {
+    return mCallback.Release();
+  }
+
+private:
+  explicit Callback(CallbackBase* callback)
+  : mCallback(callback)
+  {
+  }
+
+  UniquePtr<CallbackBase> mCallback;
+};
+
+/**
+ * @brief Move-only typed callback with a return value.
+ *
+ * @SINCE_2_5.38
+ * @tparam Ret The return type of the callback
+ * @tparam Args The parameter types of the callback
+ */
+template<typename Ret, typename... Args>
+class Callback<Ret(Args...)>
+{
+public:
+  /**
+   * @brief Creates an empty callback.
+   * @SINCE_2_5.38
+   */
+  Callback() = default;
+
+  /**
+   * @brief Move constructor.
+   * @SINCE_2_5.38
+   */
+  Callback(Callback&&) noexcept = default;
+
+  /**
+   * @brief Move assignment operator.
+   * @SINCE_2_5.38
+   * @return A reference to this
+   */
+  Callback& operator=(Callback&&) noexcept = default;
+
+  Callback(const Callback&)            = delete;
+  Callback& operator=(const Callback&) = delete;
+
+  /**
+   * @brief Queries whether this callback holds a function to call.
+   * @SINCE_2_5.38
+   * @return True if a function is held
+   */
+  explicit operator bool() const
+  {
+    return static_cast<bool>(mCallback);
+  }
+
+  /**
+   * @brief Creates a callback from a free function.
+   * @SINCE_2_5.38
+   * @param[in] func The function to call
+   * @return The newly created callback
+   */
+  static Callback New(Ret (*func)(Args...))
+  {
+    return Callback(MakeCallback(func));
+  }
+
+  /**
+   * @brief Creates a callback from a class member function.
+   *
+   * @SINCE_2_5.38
+   * @tparam T The type of the object
+   * @param[in] obj The object to call the member function on
+   * @param[in] func The member function to call
+   * @return The newly created callback
+   * @note Member functions are limited to three parameters.
+   */
+  template<class T>
+  static Callback New(T* obj, Ret (T::*func)(Args...))
+  {
+    static_assert(sizeof...(Args) <= 3, "Dali::Callback supports at most three parameters for member functions");
+    return Callback(MakeCallback(obj, func));
+  }
+
+  /**
+   * @brief Calls the held function.
+   *
+   * @SINCE_2_5.38
+   * @param[in] args The arguments to pass to the function
+   * @return The value returned by the function, or a value-initialised Ret if
+   * this callback is empty
+   */
+  Ret Invoke(Args... args)
+  {
+    return mCallback ? CallbackBase::ExecuteReturn<Ret, Args...>(*mCallback, args...) : Ret();
+  }
+
+  /**
+   * @brief Relinquishes ownership of the held callback.
+   *
+   * Used to hand the callback over to an API which takes a raw
+   * CallbackBase pointer and assumes ownership of it.
+   * @SINCE_2_5.38
+   * @return The held callback, ownership transferred to the caller
+   */
+  CallbackBase* Release()
+  {
+    return mCallback.Release();
+  }
+
+private:
+  explicit Callback(CallbackBase* callback)
+  : mCallback(callback)
+  {
+  }
+
+  UniquePtr<CallbackBase> mCallback;
+};
 
 /**
  * @}

@@ -1527,7 +1527,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::RED);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1536,7 +1536,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   DALI_TEST_EQUALS(damagedRects.size(), 1, TEST_LOCATION);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::BLUE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1596,7 +1596,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(index), 0.0f, TEST_LOCATION);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::RED);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1604,7 +1604,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::GREEN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::GREEN);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1612,7 +1612,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::RED);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1637,7 +1637,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   DALI_TEST_EQUALS(renderer.GetCurrentProperty<float>(index), -1.0f, TEST_LOCATION);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::GREEN);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::GREEN);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1645,7 +1645,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::BLUE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::BLUE);
 
   application.SendNotification();
   damagedRects.clear();
@@ -1653,7 +1653,7 @@ int UtcDaliDecoratedVisualRendererPartialUpdate(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // Update dummy property to damangeRect buffer aging
-  actor.SetProperty(Actor::Property::COLOR, Color::RED);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::RED);
 
   application.SendNotification();
   damagedRects.clear();

@@ -421,7 +421,11 @@ int UtcDaliSceneSetStencilBufferEnabled(void)
 
   Dali::Integration::Scene scene = application.GetScene();
 
-  // Test default value
+  // TestApplication creates its scene with STENCIL_BUFFER_ENABLED
+  DALI_TEST_CHECK(scene.IsStencilBufferEnabled());
+
+  // Test setting to false
+  scene.SetStencilBufferEnabled(false);
   DALI_TEST_CHECK(!scene.IsStencilBufferEnabled());
 
   // Test setting to true
@@ -636,16 +640,16 @@ int UtcDaliSceneSetDepthBufferEnabled(void)
 
   Dali::Integration::Scene scene = application.GetScene();
 
-  // Test default value
-  DALI_TEST_CHECK(!scene.IsDepthBufferEnabled());
-
-  // Test setting to true
-  scene.SetDepthBufferEnabled(true);
+  // TestApplication creates its scene with DEPTH_BUFFER_ENABLED
   DALI_TEST_CHECK(scene.IsDepthBufferEnabled());
 
   // Test setting to false
   scene.SetDepthBufferEnabled(false);
   DALI_TEST_CHECK(!scene.IsDepthBufferEnabled());
+
+  // Test setting to true
+  scene.SetDepthBufferEnabled(true);
+  DALI_TEST_CHECK(scene.IsDepthBufferEnabled());
   END_TEST;
 }
 

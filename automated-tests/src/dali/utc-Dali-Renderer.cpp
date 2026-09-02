@@ -1278,7 +1278,7 @@ int UtcDaliRendererSetBlendMode04b(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 0.5f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 0.5f));
   application.GetScene().Add(actor);
 
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::AUTO);
@@ -1310,7 +1310,7 @@ int UtcDaliRendererSetBlendMode04c(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Color::MAGENTA);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::MAGENTA);
   application.GetScene().Add(actor);
 
   renderer.SetProperty(Renderer::Property::BLEND_MODE, BlendMode::AUTO);
@@ -1690,7 +1690,7 @@ int UtcDaliRendererPreMultipledAlpha(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 0.5f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 0.5f));
   application.GetScene().Add(actor);
 
   Property::Value value = renderer.GetProperty(Renderer::Property::BLEND_PRE_MULTIPLIED_ALPHA);
@@ -3232,7 +3232,7 @@ int UtcDaliRendererBlendModeUseActorOpacity(void)
   DALI_TEST_CHECK(commandBufferTrace.FindMethodAndParams("SetDepthWriteEnable", depthWriteEnabled));
 
   // Turn off depth-writing.
-  actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 0.5));
+  actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5));
   commandBufferTrace.Reset();
 
   application.SendNotification();
@@ -3244,7 +3244,7 @@ int UtcDaliRendererBlendModeUseActorOpacity(void)
   DALI_TEST_CHECK(commandBufferTrace.FindMethodAndParams("SetDepthWriteEnable", depthWriteDisabled));
 
   // Turn on depth-writing.
-  actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 1));
+  actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 1));
   commandBufferTrace.Reset();
 
   application.SendNotification();
@@ -3254,7 +3254,7 @@ int UtcDaliRendererBlendModeUseActorOpacity(void)
   DALI_TEST_CHECK(commandBufferTrace.FindMethodAndParams("SetDepthWriteEnable", depthWriteEnabled));
 
   // Turn off depth-writing.
-  actor.SetProperty(Dali::Actor::Property::COLOR, Vector4(1, 1, 1, 0.0));
+  actor.SetProperty(Dali::Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.0));
   commandBufferTrace.Reset();
 
   application.SendNotification();
@@ -3710,7 +3710,7 @@ int UtcDaliRendererOpacity(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
   Property::Value value = renderer.GetProperty(Dali::Renderer::Property::OPACITY);
@@ -3765,7 +3765,7 @@ int UtcDaliRendererOpacityAnimation(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -3820,7 +3820,7 @@ int UtcDaliRendererMixColor(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, actorColor);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, actorColor);
   application.GetScene().Add(actor);
 
   Property::Value value;
@@ -3908,7 +3908,7 @@ int UtcDaliRendererMixColorAnimation01(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, actorColor);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, actorColor);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -4012,7 +4012,7 @@ int UtcDaliRendererMixColorAnimation02(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, actorColor);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, actorColor);
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -4150,7 +4150,7 @@ int UtcDaliRendererRenderingBehavior(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
   Property::Value value = renderer.GetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR);
@@ -4254,7 +4254,7 @@ int UtcDaliRendererRegenerateUniformMap(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
   application.SendNotification();
@@ -4308,7 +4308,7 @@ int UtcDaliRendererRenderAfterAddShader(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
   Property::Value value = renderer.GetProperty(DevelRenderer::Property::RENDERING_BEHAVIOR);
@@ -4385,7 +4385,7 @@ int UtcDaliRendererAddDrawCommands(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
   // Expect delivering a single draw call
@@ -4544,7 +4544,7 @@ int UtcDaliRendererCheckTextureBindingP(void)
   Actor actor = Actor::New();
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1.0f, 0.0f, 1.0f, 1.0f));
   application.GetScene().Add(actor);
 
   TestGraphicsController& graphics        = application.GetGraphicsController();
@@ -4610,7 +4610,7 @@ int UtcDaliRendererPreparePipeline(void)
 
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   application.GetScene().Add(actor);
 
   TraceCallStack& cmdBufCallstack   = graphics.mCommandBufferCallStack;
@@ -4669,7 +4669,7 @@ int UtcDaliRendererPreparePipelineMissingAttrs(void)
 
   actor.AddRenderer(renderer);
   actor.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   application.GetScene().Add(actor);
 
   TraceCallStack& cmdBufCallstack   = graphics.mCommandBufferCallStack;
@@ -4909,7 +4909,7 @@ int utcDaliRendererPartialUpdateChangeUniform(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // 3. Change the uniform value and another property together
-  actor.SetProperty(Actor::Property::COLOR, Color::YELLOW);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::YELLOW);
   renderer.SetProperty(colorIndex, Color::BLUE);
   application.SendNotification();
 

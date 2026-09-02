@@ -2636,6 +2636,17 @@ int UtcDaliTouchEventDispatchTouchMotionMultiTouch(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
+  // PARENT propagation preserves the original motion filter behavior even when another point is terminal.
+  // Touch and intercept callbacks are both suppressed if any point is MOTION.
+  SignalData        interceptData;
+  TouchEventFunctor interceptFunctor(interceptData, false);
+  actor.InterceptTouchEventSignal().Connect(&application, interceptFunctor);
+  application.ProcessEvent(GenerateDoubleTouch(PointState::MOTION, Vector2(30.0f, 30.0f), PointState::FINISHED, Vector2(35.0f, 35.0f), 135));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, interceptData.functorCalled, TEST_LOCATION);
+  data.Reset();
+  interceptData.Reset();
+
   // Emit a double touch where first point is FINISHED and second is STATIONARY (no MOTION)
   // Should receive the event
   application.ProcessEvent(GenerateDoubleTouch(PointState::FINISHED, Vector2(30.0f, 30.0f), PointState::STATIONARY, Vector2(35.0f, 35.0f), 140));

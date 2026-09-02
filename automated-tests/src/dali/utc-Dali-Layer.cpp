@@ -373,9 +373,9 @@ int UtcDaliLayerSetSortFunction(void)
   Actor actor  = CreateRenderableActor();
   Actor actor2 = CreateRenderableActor();
   actor.SetProperty(Actor::Property::SIZE, Vector2(1, 1));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actor2.SetProperty(Actor::Property::SIZE, Vector2(1, 1));
-  actor2.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor2.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
 
   // add to scene
   application.GetScene().Add(actor);
@@ -405,9 +405,9 @@ int UtcDaliLayerSetSortFunctionLayerUI(void)
   Actor actor  = CreateRenderableActor();
   Actor actor2 = CreateRenderableActor();
   actor.SetProperty(Actor::Property::SIZE, Vector2(1, 1));
-  actor.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actor2.SetProperty(Actor::Property::SIZE, Vector2(1, 1));
-  actor2.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor2.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
 
   // add to scene
   application.GetScene().Add(actor);
@@ -1019,7 +1019,7 @@ int utcDaliLayerPartialUpdate(void)
   actor1.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor1.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actor1.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor1.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor1.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   DevelActor::SetResizePolicy(actor1, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer1.Add(actor1);
 
@@ -1027,7 +1027,7 @@ int utcDaliLayerPartialUpdate(void)
   actor2.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
   actor2.SetProperty(Actor::Property::POSITION, Vector3(32.0f, 16.0f, 0.0f));
   actor2.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
-  actor2.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actor2.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   DevelActor::SetResizePolicy(actor2, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer2.Add(actor2);
 
@@ -1136,7 +1136,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorA.SetProperty(Actor::Property::POSITION, Vector3(16.0f, 16.0f, 0.0f));
   actorA.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actorA.SetProperty(Actor::Property::NAME, "ActorA");
-  actorA.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorA.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actorA.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   DevelActor::SetResizePolicy(actorA, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer2.Add(actorA);
@@ -1146,7 +1146,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorB.SetProperty(Actor::Property::POSITION, Vector3(-160.0f, -160.0f, 0.0f));
   actorB.SetProperty(Actor::Property::SIZE, Vector3(480.0f, 480.0f, 0.0f));
   actorB.SetProperty(Actor::Property::NAME, "ActorB");
-  actorB.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorB.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actorB.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   DevelActor::SetResizePolicy(actorB, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actorA.Add(actorB);
@@ -1156,7 +1156,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorC.SetProperty(Actor::Property::POSITION, Vector3(48.0f, 16.0f, 0.0f));
   actorC.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actorC.SetProperty(Actor::Property::NAME, "ActorC");
-  actorC.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorC.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   DevelActor::SetResizePolicy(actorC, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   layer2.Add(actorC);
 
@@ -1165,7 +1165,7 @@ int utcDaliLayerUnderClippingNode(void)
   actorD.SetProperty(Actor::Property::POSITION, Vector3(0.0f, 0.0f, 0.0f));
   actorD.SetProperty(Actor::Property::SIZE, Vector3(16.0f, 16.0f, 0.0f));
   actorD.SetProperty(Actor::Property::NAME, "ActorD");
-  actorD.SetProperty(Actor::Property::COLOR, Vector4(1, 1, 1, 0.5f)); // 50% transparent
+  actorD.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector4(1, 1, 1, 0.5f)); // 50% transparent
   actorD.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_TO_BOUNDING_BOX);
   DevelActor::SetResizePolicy(actorD, ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS);
   actorC.Add(actorD);

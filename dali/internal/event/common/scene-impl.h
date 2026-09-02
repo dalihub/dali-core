@@ -64,7 +64,7 @@ public:
    */
   static ScenePtr New(const Graphics::RenderTargetCreateInfo& createInfo, Size size,
                       int32_t windowOrientation = 0, int32_t screenOrientation = 0,
-                      ScenePolicyFlagBits flags = ScenePolicyFlagBits::DEFAULT);
+                      ScenePolicyFlagBits flags = ScenePolicyFlagBits::NONE);
 
   /**
    * virtual destructor

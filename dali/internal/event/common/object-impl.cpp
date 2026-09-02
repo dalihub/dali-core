@@ -1310,6 +1310,7 @@ Property::Index Object::RegisterSceneGraphProperty(ConstString name, Property::I
     case Property::ARRAY:
     case Property::MAP:
     case Property::EXTENTS:
+    case Property::INSETS:
     case Property::NONE:
     {
       DALI_ASSERT_ALWAYS(!"Property type is not animatable");

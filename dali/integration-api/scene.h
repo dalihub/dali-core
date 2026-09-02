@@ -53,7 +53,7 @@ class RenderTarget;
 using ScenePolicyFlags = uint8_t;
 enum class ScenePolicyFlagBits : ScenePolicyFlags
 {
-  DEFAULT                = 0,
+  NONE                   = 0,      ///< No policy is enabled.
   DEPTH_BUFFER_ENABLED   = 1 << 0, ///< Whether the depth buffer is available or not.
   STENCIL_BUFFER_ENABLED = 1 << 1, ///< Whether the stencil buffer is available or not.
   PARTIAL_UPDATE_ENABLED = 1 << 2, ///< Whether partial update is available or not.
@@ -111,7 +111,7 @@ public:
                    Size                                    size,
                    int32_t                                 windowOrientation = 0,
                    int32_t                                 screenOrientation = 0,
-                   ScenePolicyFlagBits                     flags             = ScenePolicyFlagBits::DEFAULT);
+                   ScenePolicyFlagBits                     flags             = ScenePolicyFlagBits::NONE);
 
   /**
    * @brief Downcast an Object handle to Scene handle.
@@ -481,9 +481,8 @@ public:
    *
    * @param[in] enabled True if the scene should update partial area
    * @note This is now the only way of setting partial update on the scene.
-   * The global environment variable is used to set the value for the main window
-   * on initialization; the application may change it afterwards through the window
-   * API.
+   * The environment variable provides the initial value for every scene on
+   * creation; the application may change it afterwards through the window API.
    */
   void SetPartialUpdateEnabled(bool enabled);
 

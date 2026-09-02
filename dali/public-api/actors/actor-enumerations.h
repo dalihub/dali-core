@@ -30,9 +30,8 @@ namespace Dali
 /**
  * @brief Enumeration for Actor color mode.
  *
- * Determines how an actor's own color (Actor::Property::COLOR) combines with its parent's color to
- * produce the actor's world color (Actor::Property::WORLD_COLOR), which is the color actually used
- * when the actor is drawn.
+ * Determines how an actor's own color multiplier (Actor::Property::COLOR_MULTIPLIER) combines with its
+ * parent's world color multiplier to produce Actor::Property::WORLD_COLOR_MULTIPLIER.
  *
  * @SINCE_1_0.0
  * @see Actor::SetColorMode()

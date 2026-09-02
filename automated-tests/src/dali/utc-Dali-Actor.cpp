@@ -2740,8 +2740,8 @@ int UtcDaliActorInheritOpacity(void)
   parent.Add(child);
   application.GetScene().Add(parent);
 
-  DALI_TEST_EQUALS(parent.GetProperty(Actor::Property::COLOR_ALPHA).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetProperty(Actor::Property::COLOR_ALPHA).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION);
 
   // flush the queue and render once
   application.SendNotification();
@@ -2749,18 +2749,18 @@ int UtcDaliActorInheritOpacity(void)
 
   parent.SetProperty(Actor::Property::OPACITY, 0.1f);
 
-  DALI_TEST_EQUALS(parent.GetProperty(Actor::Property::COLOR_ALPHA).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetProperty(Actor::Property::COLOR_ALPHA).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA).Get<float>(), 1.0f, 0.0001f, TEST_LOCATION);
 
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(parent.GetProperty(Actor::Property::WORLD_COLOR).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(parent.GetCurrentProperty(Actor::Property::COLOR_ALPHA).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(parent.GetCurrentProperty(Actor::Property::WORLD_COLOR).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetProperty(Actor::Property::WORLD_COLOR).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty(Actor::Property::WORLD_COLOR).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty(Actor::Property::COLOR_ALPHA).Get<float>(), 1.f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetProperty(Actor::Property::WORLD_COLOR_MULTIPLIER).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetCurrentProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA).Get<float>(), 0.1f, 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetCurrentProperty(Actor::Property::WORLD_COLOR_MULTIPLIER).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetProperty(Actor::Property::WORLD_COLOR_MULTIPLIER).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty(Actor::Property::WORLD_COLOR_MULTIPLIER).Get<Vector4>(), Vector4(1.f, 1.f, 1.f, 0.1f), 0.0001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA).Get<float>(), 1.f, 0.0001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3343,42 +3343,42 @@ int UtcDaliActorSetColor(void)
   Actor           actor = Actor::New();
   Vector4         color(1.0f, 1.0f, 1.0f, 0.5f);
 
-  DALI_TEST_CHECK(color != actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR));
+  DALI_TEST_CHECK(color != actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER));
 
-  actor.SetProperty(Actor::Property::COLOR, color);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(color == actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR));
+  DALI_TEST_CHECK(color == actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER));
 
-  actor.SetProperty(Actor::Property::COLOR, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR) + Vector4(-0.4f, -0.5f, -0.6f, -0.4f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER) + Vector4(-0.4f, -0.5f, -0.6f, -0.4f));
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Vector4(0.6f, 0.5f, 0.4f, 0.1f), actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4(0.6f, 0.5f, 0.4f, 0.1f), actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
 
   application.GetScene().Add(actor);
-  actor.SetProperty(Actor::Property::COLOR, color);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(color, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(color, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::COLOR, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR) + Vector4(1.1f, 1.1f, 1.1f, 1.1f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER) + Vector4(1.1f, 1.1f, 1.1f, 1.1f));
   // flush the queue and render once
   application.SendNotification();
   application.Render();
   // Actor color is not clamped
-  DALI_TEST_EQUALS(Vector4(2.1f, 2.1f, 2.1f, 1.6f), actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4(2.1f, 2.1f, 2.1f, 1.6f), actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
   // world color is clamped
-  DALI_TEST_EQUALS(Vector4(1.0f, 1.0f, 1.0f, 1.0f), actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), TEST_LOCATION);
+  DALI_TEST_EQUALS(Vector4(1.0f, 1.0f, 1.0f, 1.0f), actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::COLOR, color);
-  DALI_TEST_EQUALS(color, actor.GetProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
+  DALI_TEST_EQUALS(color, actor.GetProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
 
   Vector3 newColor(1.0f, 0.0f, 0.0f);
-  actor.SetProperty(Actor::Property::COLOR, newColor);
-  DALI_TEST_EQUALS(Vector4(newColor.r, newColor.g, newColor.b, 1.0f), actor.GetProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, newColor);
+  DALI_TEST_EQUALS(Vector4(newColor.r, newColor.g, newColor.b, 1.0f), actor.GetProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
 
   application.GetScene().Remove(actor);
   END_TEST;
@@ -3391,54 +3391,54 @@ int UtcDaliActorSetColorIndividual(void)
   Actor actor = Actor::New();
 
   Vector4 vector(0.7f, 0.8f, 0.9f, 0.6f);
-  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR));
+  DALI_TEST_CHECK(vector != actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER));
 
-  actor.SetProperty(Actor::Property::COLOR_RED, vector.r);
-  DALI_TEST_EQUALS(vector.r, actor.GetProperty<float>(Actor::Property::COLOR_RED), TEST_LOCATION);
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(vector.r, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).r, TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.r, actor.GetProperty<float>(Actor::Property::COLOR_RED), TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.r, actor.GetCurrentProperty<float>(Actor::Property::COLOR_RED), TEST_LOCATION);
-
-  actor.SetProperty(Actor::Property::COLOR_GREEN, vector.g);
-  DALI_TEST_EQUALS(vector.g, actor.GetProperty<float>(Actor::Property::COLOR_GREEN), TEST_LOCATION);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER_RED, vector.r);
+  DALI_TEST_EQUALS(vector.r, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_RED), TEST_LOCATION);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(vector.g, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).g, TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.g, actor.GetProperty<float>(Actor::Property::COLOR_GREEN), TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.g, actor.GetCurrentProperty<float>(Actor::Property::COLOR_GREEN), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.r, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).r, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.r, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_RED), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.r, actor.GetCurrentProperty<float>(Actor::Property::COLOR_MULTIPLIER_RED), TEST_LOCATION);
 
-  actor.SetProperty(Actor::Property::COLOR_BLUE, vector.b);
-  DALI_TEST_EQUALS(vector.b, actor.GetProperty<float>(Actor::Property::COLOR_BLUE), TEST_LOCATION);
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS(vector.b, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).b, TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.b, actor.GetProperty<float>(Actor::Property::COLOR_BLUE), TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.b, actor.GetCurrentProperty<float>(Actor::Property::COLOR_BLUE), TEST_LOCATION);
-
-  actor.SetProperty(Actor::Property::COLOR_ALPHA, vector.a);
-  DALI_TEST_EQUALS(vector.a, actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), TEST_LOCATION);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER_GREEN, vector.g);
+  DALI_TEST_EQUALS(vector.g, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_GREEN), TEST_LOCATION);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(vector.a, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.a, actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), TEST_LOCATION);
-  DALI_TEST_EQUALS(vector.a, actor.GetCurrentProperty<float>(Actor::Property::COLOR_ALPHA), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.g, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).g, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.g, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_GREEN), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.g, actor.GetCurrentProperty<float>(Actor::Property::COLOR_MULTIPLIER_GREEN), TEST_LOCATION);
 
-  DALI_TEST_EQUALS(vector, actor.GetProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
-  DALI_TEST_EQUALS(vector, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR), TEST_LOCATION);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER_BLUE, vector.b);
+  DALI_TEST_EQUALS(vector.b, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_BLUE), TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(vector.b, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).b, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.b, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_BLUE), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.b, actor.GetCurrentProperty<float>(Actor::Property::COLOR_MULTIPLIER_BLUE), TEST_LOCATION);
+
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER_ALPHA, vector.a);
+  DALI_TEST_EQUALS(vector.a, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_ALPHA), TEST_LOCATION);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(vector.a, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.a, actor.GetProperty<float>(Actor::Property::COLOR_MULTIPLIER_ALPHA), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector.a, actor.GetCurrentProperty<float>(Actor::Property::COLOR_MULTIPLIER_ALPHA), TEST_LOCATION);
+
+  DALI_TEST_EQUALS(vector, actor.GetProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
+  DALI_TEST_EQUALS(vector, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), TEST_LOCATION);
 
   actor.SetProperty(Actor::Property::OPACITY, 0.2f);
 
@@ -3446,7 +3446,7 @@ int UtcDaliActorSetColorIndividual(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(0.2f, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR).a, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.2f, actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER).a, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3457,11 +3457,11 @@ int UtcDaliActorGetCurrentColor(void)
   Actor           actor = Actor::New();
   Vector4         color(1.0f, 1.0f, 1.0f, 0.5f);
 
-  actor.SetProperty(Actor::Property::COLOR, color);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, color);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK(color == actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR));
+  DALI_TEST_CHECK(color == actor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER));
   END_TEST;
 }
 
@@ -3472,46 +3472,46 @@ int UtcDaliActorGetCurrentWorldColor(void)
 
   Actor   parent = Actor::New();
   Vector4 parentColor(1.0f, 0.5f, 0.0f, 0.8f);
-  parent.SetProperty(Actor::Property::COLOR, parentColor);
+  parent.SetProperty(Actor::Property::COLOR_MULTIPLIER, parentColor);
   application.GetScene().Add(parent);
 
   Actor   child = Actor::New();
   Vector4 childColor(0.5f, 0.6f, 0.5f, 1.0f);
-  child.SetProperty(Actor::Property::COLOR, childColor);
+  child.SetProperty(Actor::Property::COLOR_MULTIPLIER, childColor);
   parent.Add(child);
 
-  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::WHITE, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), Color::WHITE, TEST_LOCATION);
 
   // verify the default color mode
   DALI_TEST_EQUALS(USE_OWN_MULTIPLY_PARENT_ALPHA, child.GetProperty<ColorMode>(Actor::Property::COLOR_MODE), TEST_LOCATION);
 
   // The actors should not have a world color yet
-  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), Color::WHITE, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), Color::WHITE, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), Color::WHITE, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::COLOR), parentColor, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR), childColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), parentColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), childColor, TEST_LOCATION);
 
   // The actors should have a world color now
-  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), parentColor, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), Vector4(childColor.r, childColor.g, childColor.b, childColor.a * parentColor.a), TEST_LOCATION);
+  DALI_TEST_EQUALS(parent.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), parentColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), Vector4(childColor.r, childColor.g, childColor.b, childColor.a * parentColor.a), TEST_LOCATION);
 
   // use own color
   child.SetProperty(Actor::Property::COLOR_MODE, USE_OWN_COLOR);
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), childColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), childColor, TEST_LOCATION);
 
   // use parent color
   child.SetProperty(Actor::Property::COLOR_MODE, USE_PARENT_COLOR);
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR), childColor, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), parentColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), childColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), parentColor, TEST_LOCATION);
 
   // use parent alpha
   child.SetProperty(Actor::Property::COLOR_MODE, USE_OWN_MULTIPLY_PARENT_ALPHA);
@@ -3519,8 +3519,8 @@ int UtcDaliActorGetCurrentWorldColor(void)
   application.Render(0);
   Vector4 expectedColor(childColor);
   expectedColor.a *= parentColor.a;
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR), childColor, TEST_LOCATION);
-  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR), expectedColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER), childColor, TEST_LOCATION);
+  DALI_TEST_EQUALS(child.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER), expectedColor, TEST_LOCATION);
   END_TEST;
 }
 
@@ -3700,7 +3700,7 @@ int UtcDaliActorRemoveConstraints(void)
 
   Actor actor = Actor::New();
 
-  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR, TestConstraint());
+  Constraint constraint = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, TestConstraint());
   constraint.Apply();
   actor.RemoveConstraints();
 
@@ -3731,12 +3731,12 @@ int UtcDaliActorRemoveConstraintTag(void)
   unsigned int result2 = 0u;
 
   unsigned   constraint1Tag = 1u;
-  Constraint constraint1    = Constraint::New<Vector4>(actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1));
+  Constraint constraint1    = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, TestConstraintRef<Vector4>(result1, 1));
   constraint1.SetTag(constraint1Tag);
   constraint1.Apply();
 
   unsigned   constraint2Tag = 2u;
-  Constraint constraint2    = Constraint::New<Vector4>(actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result2, 2));
+  Constraint constraint2    = Constraint::New<Vector4>(actor, Actor::Property::COLOR_MULTIPLIER, TestConstraintRef<Vector4>(result2, 2));
   constraint2.SetTag(constraint2Tag);
   constraint2.Apply();
 
@@ -3753,7 +3753,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   actor.RemoveConstraints(constraint1Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -3766,7 +3766,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   constraint1.Apply();
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -3779,7 +3779,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   actor.RemoveConstraints(constraint2Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -3792,7 +3792,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   actor.RemoveConstraints(constraint1Tag);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -3806,7 +3806,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   constraint1.Apply();
   constraint2.Apply();
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -3819,7 +3819,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   result2 = 0;
   actor.RemoveConstraints(constraint1Tag, constraint2Tag + 1u);
   // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetProperty(Actor::Property::COLOR, Color::WHITE);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Color::WHITE);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -4223,6 +4223,12 @@ int UtcDaliActorGeoHitTest(void)
                  hitTestData[index]->mTouchPoint.x,
                  hitTestData[index]->mTouchPoint.y,
                  hitTestData[index]->mResult);
+
+    // Finish this geometry stream so the next hit-test case does not reuse the same device route.
+    point.SetState(PointState::UP);
+    Dali::Integration::TouchEvent upEvent;
+    upEvent.AddPoint(point);
+    application.ProcessEvent(upEvent);
 
     ResetTouchCallbacks(application);
     ++index;
@@ -4700,12 +4706,12 @@ const PropertyStringIndex PROPERTY_TABLE[] =
     {"scaleZ", Actor::Property::SCALE_Z, Property::FLOAT},
     {"worldScale", Actor::Property::WORLD_SCALE, Property::VECTOR3},
     {"visible", Actor::Property::VISIBLE, Property::BOOLEAN},
-    {"color", Actor::Property::COLOR, Property::VECTOR4},
-    {"colorRed", Actor::Property::COLOR_RED, Property::FLOAT},
-    {"colorGreen", Actor::Property::COLOR_GREEN, Property::FLOAT},
-    {"colorBlue", Actor::Property::COLOR_BLUE, Property::FLOAT},
-    {"colorAlpha", Actor::Property::COLOR_ALPHA, Property::FLOAT},
-    {"worldColor", Actor::Property::WORLD_COLOR, Property::VECTOR4},
+    {"colorMultiplier", Actor::Property::COLOR_MULTIPLIER, Property::VECTOR4},
+    {"colorMultiplierRed", Actor::Property::COLOR_MULTIPLIER_RED, Property::FLOAT},
+    {"colorMultiplierGreen", Actor::Property::COLOR_MULTIPLIER_GREEN, Property::FLOAT},
+    {"colorMultiplierBlue", Actor::Property::COLOR_MULTIPLIER_BLUE, Property::FLOAT},
+    {"colorMultiplierAlpha", Actor::Property::COLOR_MULTIPLIER_ALPHA, Property::FLOAT},
+    {"worldColorMultiplier", Actor::Property::WORLD_COLOR_MULTIPLIER, Property::VECTOR4},
     {"worldMatrix", Actor::Property::WORLD_MATRIX, Property::MATRIX},
     {"name", Actor::Property::NAME, Property::STRING},
     {"sensitive", Actor::Property::SENSITIVE, Property::BOOLEAN},
@@ -12777,7 +12783,7 @@ int utcDaliActorPartialUpdateSetColor(void)
   application.RenderWithPartialUpdate(damagedRects, clippingRect);
 
   // 2. Set new color
-  actor.SetProperty(Actor::Property::COLOR, Vector3(1.0f, 0.0f, 0.0f));
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, Vector3(1.0f, 0.0f, 0.0f));
   application.SendNotification();
 
   damagedRects.clear();
@@ -16241,10 +16247,10 @@ int UtcDaliActorCalculateWorldColor01(void)
   DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  rootActor[Actor::Property::COLOR] = Color::WHITE;
+  rootActor[Actor::Property::COLOR_MULTIPLIER] = Color::WHITE;
   Vector4 testColor1(1.0f, 1.0f, 0.5f, 0.8f);
-  branchActor[Actor::Property::COLOR] = testColor1;
-  leafActor[Actor::Property::COLOR]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
+  branchActor[Actor::Property::COLOR_MULTIPLIER] = testColor1;
+  leafActor[Actor::Property::COLOR_MULTIPLIER]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
 
   // Default is to inherit:
   leafActor[Actor::Property::COLOR_MODE] = ColorMode::USE_OWN_MULTIPLY_PARENT_ALPHA;
@@ -16255,22 +16261,22 @@ int UtcDaliActorCalculateWorldColor01(void)
 
   application.SendNotification();
   application.Render(16);
-  Vector4 color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR);
+  Vector4 color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, testColor1, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(16);
-  color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR);
+  color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, testColor1, TEST_LOCATION);
 
   application.SendNotification();
   application.Render(16);
-  color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR);
+  color = branchActor.GetCurrentProperty<Vector4>(Actor::Property::COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, testColor1, TEST_LOCATION);
 
-  color = DevelActor::GetWorldColor(leafActor);
+  color = DevelActor::GetWorldColorMultiplier(leafActor);
 
-  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR);
+  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, actualColor, 0.001f, TEST_LOCATION);
 
   END_TEST;
@@ -16294,9 +16300,9 @@ int UtcDaliActorCalculateWorldColor02(void)
   DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  rootActor[Actor::Property::COLOR]   = Color::WHITE;
-  branchActor[Actor::Property::COLOR] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
-  leafActor[Actor::Property::COLOR]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
+  rootActor[Actor::Property::COLOR_MULTIPLIER]   = Color::WHITE;
+  branchActor[Actor::Property::COLOR_MULTIPLIER] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
+  leafActor[Actor::Property::COLOR_MULTIPLIER]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
 
   leafActor[Actor::Property::COLOR_MODE] = ColorMode::USE_OWN_COLOR;
 
@@ -16307,9 +16313,9 @@ int UtcDaliActorCalculateWorldColor02(void)
   application.SendNotification();
   application.Render(0);
 
-  Vector4 color = DevelActor::GetWorldColor(leafActor);
+  Vector4 color = DevelActor::GetWorldColorMultiplier(leafActor);
 
-  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR);
+  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, actualColor, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(color, Vector4(0.1f, 0.5f, 0.5f, 0.8f), 0.001f, TEST_LOCATION);
   END_TEST;
@@ -16333,9 +16339,9 @@ int UtcDaliActorCalculateWorldColor03(void)
   DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  rootActor[Actor::Property::COLOR]   = Color::WHITE * 0.9f;
-  branchActor[Actor::Property::COLOR] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
-  leafActor[Actor::Property::COLOR]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
+  rootActor[Actor::Property::COLOR_MULTIPLIER]   = Color::WHITE * 0.9f;
+  branchActor[Actor::Property::COLOR_MULTIPLIER] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
+  leafActor[Actor::Property::COLOR_MULTIPLIER]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
 
   leafActor[Actor::Property::COLOR_MODE] = ColorMode::USE_PARENT_COLOR;
 
@@ -16346,9 +16352,9 @@ int UtcDaliActorCalculateWorldColor03(void)
   application.SendNotification();
   application.Render(0);
 
-  Vector4 color = DevelActor::GetWorldColor(leafActor);
+  Vector4 color = DevelActor::GetWorldColorMultiplier(leafActor);
 
-  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR);
+  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, actualColor, 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(color, Vector4(1.0f, 1.0f, 0.5f, 0.72f), 0.001f, TEST_LOCATION);
   END_TEST;
@@ -16372,9 +16378,9 @@ int UtcDaliActorCalculateWorldColor04(void)
   DevelActor::SetResizePolicy(branchActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
   DevelActor::SetResizePolicy(leafActor, ResizePolicy::FILL_TO_PARENT, Dimension::ALL_DIMENSIONS);
 
-  rootActor[Actor::Property::COLOR]   = Color::WHITE * 0.9f;
-  branchActor[Actor::Property::COLOR] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
-  leafActor[Actor::Property::COLOR]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
+  rootActor[Actor::Property::COLOR_MULTIPLIER]   = Color::WHITE * 0.9f;
+  branchActor[Actor::Property::COLOR_MULTIPLIER] = Vector4(1.0f, 1.0f, 0.5f, 0.8f);
+  leafActor[Actor::Property::COLOR_MULTIPLIER]   = Vector4(0.1f, 0.5f, 0.5f, 0.8f);
 
   leafActor[Actor::Property::COLOR_MODE] = ColorMode::USE_OWN_MULTIPLY_PARENT_COLOR;
 
@@ -16387,7 +16393,7 @@ int UtcDaliActorCalculateWorldColor04(void)
 
   Vector4 color = DevelActor::GetWorldColor(leafActor);
 
-  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR);
+  Vector4 actualColor = leafActor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER);
   DALI_TEST_EQUALS(color, actualColor, 0.001f, TEST_LOCATION);
 
   END_TEST;
@@ -16647,12 +16653,12 @@ int UtcDaliActorIsHittable(void)
 
   Actor   parent = Actor::New();
   Vector4 parentColor(1.0f, 0.5f, 0.0f, 0.8f);
-  parent.SetProperty(Actor::Property::COLOR, parentColor);
+  parent.SetProperty(Actor::Property::COLOR_MULTIPLIER, parentColor);
   application.GetScene().Add(parent);
 
   Actor   actor = Actor::New();
   Vector4 childColor(0.5f, 0.6f, 0.5f, 1.0f);
-  actor.SetProperty(Actor::Property::COLOR, childColor);
+  actor.SetProperty(Actor::Property::COLOR_MULTIPLIER, childColor);
   parent.Add(actor);
 
   actor.SetProperty(Actor::Property::SENSITIVE, true);
@@ -17000,7 +17006,7 @@ int UtcDaliActorIgnoredConstraintInput(void)
   bool ignored      = false;
   bool worldIgnored = true;
 
-  Constraint constraint = Constraint::New<Vector4>(parent, Actor::Property::COLOR, TestConstraintIgnored(ignored, worldIgnored));
+  Constraint constraint = Constraint::New<Vector4>(parent, Actor::Property::COLOR_MULTIPLIER, TestConstraintIgnored(ignored, worldIgnored));
   constraint.AddSource(Source(child, Actor::Property::IGNORED));
   constraint.AddSource(Source(child, DevelActor::Property::WORLD_IGNORED));
   constraint.ApplyPost();
@@ -17365,13 +17371,13 @@ int UtcDaliActorSetGetSizeP(void)
   Vector3 currentSize = actor.GetCurrentSize();
   DALI_TEST_CHECK(currentSize == Vector3::ZERO || currentSize != Vector3::ZERO);
 
-  actor.SetWidth(150.0f);
+  actor.SetSizeWidth(150.0f);
   DALI_TEST_EQUALS(actor.GetWidth(), 150.0f, TEST_LOCATION);
 
-  actor.SetHeight(250.0f);
+  actor.SetSizeHeight(250.0f);
   DALI_TEST_EQUALS(actor.GetHeight(), 250.0f, TEST_LOCATION);
 
-  actor.SetDepth(350.0f);
+  actor.SetSizeDepth(350.0f);
   DALI_TEST_EQUALS(actor.GetDepth(), 350.0f, TEST_LOCATION);
 
   END_TEST;
@@ -17421,6 +17427,33 @@ int UtcDaliActorSetGetOrientationP(void)
   END_TEST;
 }
 
+int UtcDaliActorSetGetOrientationAngleP(void)
+{
+  TestApplication application;
+  Actor           actor = Actor::New();
+
+  // The identity orientation has no axis, so the angle-only overload uses Z.
+  actor.SetOrientationAngle(Degree(30.0f));
+  DALI_TEST_EQUALS(actor.GetOrientation(), Quaternion(Degree(30.0f), Vector3::ZAXIS), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(30.0f)), 0.001f, TEST_LOCATION);
+
+  // Once an orientation axis exists, replacing the angle preserves that axis.
+  Vector3 axis(1.0f, 2.0f, 3.0f);
+  axis.Normalize();
+  actor.SetOrientation(Quaternion(Degree(15.0f), axis));
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(15.0f)), 0.001f, TEST_LOCATION);
+  actor.SetOrientationAngle(Radian(Degree(75.0f)));
+  DALI_TEST_EQUALS(actor.GetOrientation(), Quaternion(Degree(75.0f), axis), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(75.0f)), 0.001f, TEST_LOCATION);
+
+  // SetOrientationAngle is absolute: a second angle replaces rather than accumulates.
+  actor.SetOrientationAngle(Degree(20.0f));
+  DALI_TEST_EQUALS(actor.GetOrientation(), Quaternion(Degree(20.0f), axis), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetOrientationAngle(), Radian(Degree(20.0f)), 0.001f, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliActorSetGetScaleP(void)
 {
   TestApplication application;
@@ -17453,26 +17486,46 @@ int UtcDaliActorSetGetColorP(void)
   application.GetScene().Add(actor);
 
   Vector4 color(1.0f, 0.5f, 0.25f, 0.75f);
-  actor.SetColor(color);
-  DALI_TEST_EQUALS(actor.GetColor(), color, TEST_LOCATION);
+  actor.SetColorMultiplier(color);
+  DALI_TEST_EQUALS(actor.GetColorMultiplier(), color, TEST_LOCATION);
 
-  Vector4 currentColor = actor.GetCurrentColor();
+  Vector4 currentColor = actor.GetCurrentColorMultiplier();
   DALI_TEST_CHECK(currentColor != Vector4::ZERO);
 
-  actor.SetColorRed(0.8f);
-  DALI_TEST_EQUALS(actor.GetColorRed(), 0.8f, TEST_LOCATION);
+  // Verify the legacy API delegates to the color multiplier API.
+  const Vector4 legacyColor(0.2f, 0.4f, 0.6f, 0.8f);
+  actor.SetColor(legacyColor);
+  DALI_TEST_EQUALS(actor.GetColor(), legacyColor, TEST_LOCATION);
 
-  actor.SetColorGreen(0.6f);
-  DALI_TEST_EQUALS(actor.GetColorGreen(), 0.6f, TEST_LOCATION);
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(actor.GetCurrentColor(), legacyColor, TEST_LOCATION);
 
-  actor.SetColorBlue(0.4f);
-  DALI_TEST_EQUALS(actor.GetColorBlue(), 0.4f, TEST_LOCATION);
+  actor.SetColorMultiplierRed(0.8f);
+  DALI_TEST_EQUALS(actor.GetColorMultiplierRed(), 0.8f, TEST_LOCATION);
 
-  actor.SetColorAlpha(0.9f);
-  DALI_TEST_EQUALS(actor.GetColorAlpha(), 0.9f, TEST_LOCATION);
+  actor.SetColorMultiplierGreen(0.6f);
+  DALI_TEST_EQUALS(actor.GetColorMultiplierGreen(), 0.6f, TEST_LOCATION);
 
-  Vector4 worldColor = actor.GetWorldColor();
-  DALI_TEST_CHECK(worldColor != Vector4::ZERO);
+  actor.SetColorMultiplierBlue(0.4f);
+  DALI_TEST_EQUALS(actor.GetColorMultiplierBlue(), 0.4f, TEST_LOCATION);
+
+  actor.SetColorMultiplierAlpha(0.9f);
+  DALI_TEST_EQUALS(actor.GetColorMultiplierAlpha(), 0.9f, TEST_LOCATION);
+
+  Vector4 worldColorMultiplier = actor.GetWorldColorMultiplier();
+  DALI_TEST_CHECK(worldColorMultiplier != Vector4::ZERO);
+
+  // Verify the legacy component and world APIs delegate to the multiplier APIs.
+  actor.SetColorRed(0.7f);
+  actor.SetColorGreen(0.5f);
+  actor.SetColorBlue(0.3f);
+  actor.SetColorAlpha(0.1f);
+  DALI_TEST_EQUALS(actor.GetColorRed(), actor.GetColorMultiplierRed(), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetColorGreen(), actor.GetColorMultiplierGreen(), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetColorBlue(), actor.GetColorMultiplierBlue(), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetColorAlpha(), actor.GetColorMultiplierAlpha(), TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetWorldColor(), actor.GetWorldColorMultiplier(), TEST_LOCATION);
 
   END_TEST;
 }
@@ -17999,11 +18052,11 @@ int UtcDaliActorConvenienceSettersFirePropertySetSignal02P(void)
   DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
   DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::POSITION_X, TEST_LOCATION);
 
-  // Alpha setter (its internal setter was removed; routes through COLOR_ALPHA).
+  // Alpha multiplier setter routes through COLOR_MULTIPLIER_ALPHA.
   signalReceived = false;
-  actor.SetColorAlpha(0.5f);
+  actor.SetColorMultiplierAlpha(0.5f);
   DALI_TEST_EQUALS(signalReceived, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::COLOR_ALPHA, TEST_LOCATION);
+  DALI_TEST_EQUALS(index, (Property::Index)Actor::Property::COLOR_MULTIPLIER_ALPHA, TEST_LOCATION);
 
   // Enum setter (its internal setter was removed; routes through CLIPPING_MODE).
   signalReceived = false;

@@ -42,7 +42,7 @@ bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType t
     case Dali::HitTestAlgorithm::CHECK_ACTOR:
     {
       // Check whether the actor is visible and not fully transparent.
-      if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) && actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f) // not FULLY_TRANSPARENT
+      if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) && actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER).a > 0.01f) // not FULLY_TRANSPARENT
       {
         // Check whether the actor has the specific name "HittableActor"
         if(actor.GetProperty<String>(Actor::Property::NAME) == "HittableActor")
@@ -79,7 +79,7 @@ bool DefaultIsActorTouchableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::
     {
       if(actor.GetCurrentProperty<bool>(Actor::Property::VISIBLE) &&
          actor.GetProperty<bool>(Actor::Property::SENSITIVE) &&
-         actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR).a > 0.01f)
+         actor.GetCurrentProperty<Vector4>(Actor::Property::WORLD_COLOR_MULTIPLIER).a > 0.01f)
       {
         hittable = true;
       }

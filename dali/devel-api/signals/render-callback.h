@@ -46,8 +46,8 @@ struct DALI_CORE_API RenderCallbackInput
   Dali::Matrix view;
   Dali::Matrix projection;
 
-  Dali::BoundsInteger clippingBox; ///< in screen coordinates
-  Dali::Vector4       worldColor;
+  Dali::BoundsInteger clippingBox;          ///< in screen coordinates
+  Dali::Vector4       worldColorMultiplier; ///< The inherited actor color multiplier. @SINCE_2_5.38
   Dali::Size          size;
 
   Dali::Any eglContext; ///< Storage for EGL Context
@@ -65,6 +65,19 @@ struct DALI_CORE_API RenderCallbackInput
 
   bool usingOwnEglContext; ///< Uses own EGL context (owns GL state), custom code should be aware of it
   bool isTerminated;       ///< Whether this callback is for terminate case, or not.
+
+  /**
+   * @brief Whether the native API such as GL can be called from this invocation.
+   *
+   * A terminate invocation is delivered even when the resources it would have released are
+   * already gone - the render target was destroyed, or the backend cannot execute native
+   * rendering at that point. The callback is still told about it so it can release
+   * whatever it holds on the client side, but it must not make any native API call when
+   * this is false.
+   *
+   * Always true outside of the terminate case.
+   */
+  bool isNativeApiUsable;
 };
 
 /**
@@ -178,8 +191,10 @@ public:
    * callback execution providing native handles (like GL name) so they
    * can be used alongside with custom GL code.
    *
-   * Binding texture does not affect lifecycle and it's up to the client-side
-   * to make sure the resource is alive when used inside the callback.
+   * A bound texture is held for as long as it stays bound, so it cannot be released while
+   * the callback might still use it. Binding a different list drops the previous one right
+   * away though, so it is up to the client-side not to replace textures that the frame
+   * being rendered is still going to use.
    *
    * @param[in] textures List of DALi textures to be bound to the callback
    *
@@ -275,7 +290,7 @@ private:
   Dali::RenderCallbackInput     mRenderCallbackInput;
   ExecutionMode                 mExecutionMode{ExecutionMode::DEFAULT};
   Dali::Vector<Dali::Texture>   mTextureResources{};
-  mutable Dali::Mutex           mTextureResourcesMutex{}; ///< Guards mTextureResources across the event and render threads
+  mutable Dali::Mutex           mTextureResourcesMutex{}; ///< Guards mTextureResources across threads
 };
 } // namespace Dali
 

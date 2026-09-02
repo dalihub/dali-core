@@ -201,6 +201,15 @@ void Renderer::Initialize(Graphics::Controller& graphicsController, ProgramCache
 
 Renderer::~Renderer()
 {
+  // Detach from the render targets the callback has been drawn into. Nothing is invoked -
+  // that only happens on an explicit terminate request - but the observer registrations
+  // have to go, or a render target outliving this renderer ends up notifying an object
+  // that is no longer there.
+  if(mRenderCallback)
+  {
+    TerminateRenderCallback(false);
+  }
+
   // Reset old pipeline
   ClearPipelineCache(true);
 }
@@ -537,7 +546,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
                       const Matrix&                                        modelViewMatrix,
                       const Matrix&                                        viewMatrix,
                       const Matrix&                                        projectionMatrix,
-                      const Vector4&                                       worldColor,
+                      const Vector4&                                       worldColorMultiplier,
                       const Vector3&                                       scale,
                       const Vector3&                                       size,
                       bool                                                 blend,
@@ -613,7 +622,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     renderCallbackInput.size       = size;
     renderCallbackInput.view       = viewMatrix;
     renderCallbackInput.projection = projectionMatrix;
-    renderCallbackInput.worldColor = worldColor;
+    renderCallbackInput.worldColorMultiplier = worldColorMultiplier;
 
     MatrixUtils::MultiplyProjectionMatrix(renderCallbackInput.mvp, modelViewMatrix, projectionMatrix);
 
@@ -724,7 +733,7 @@ bool Renderer::Render(Graphics::CommandBuffer&                             comma
     if(queueIndex == 0)
     {
       std::size_t nodeIndex = BuildUniformIndexMap(node, *program);
-      WriteUniformBuffer(commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColor, scale, size, nodeIndex);
+      WriteUniformBuffer(commandBuffer, program, instruction, modelMatrix, modelViewMatrix, viewMatrix, projectionMatrix, worldColorMultiplier, scale, size, nodeIndex);
     }
 
     // @todo We should detect this case much earlier to prevent unnecessary work
@@ -874,7 +883,7 @@ void Renderer::WriteUniformBuffer(
   const Matrix&                        modelViewMatrix,
   const Matrix&                        viewMatrix,
   const Matrix&                        projectionMatrix,
-  const Vector4&                       worldColor,
+  const Vector4&                       worldColorMultiplier,
   const Vector3&                       scale,
   const Vector3&                       size,
   std::size_t                          nodeIndex)
@@ -981,7 +990,7 @@ void Renderer::WriteUniformBuffer(
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::SCALE), uboViews, scale);
 
     const Vector4& mixColor   = mRenderDataProvider->GetMixColor(); ///< Renderer's mix color
-    Vector4        finalColor = worldColor * mixColor;              ///< Applied Actor's original color to renderer's mix color
+    Vector4        finalColor = worldColorMultiplier * mixColor;              ///< Applied Actor's original color to renderer's mix color
     if(mPremultipliedAlphaEnabled)
     {
       const float alpha = finalColor.a;
@@ -990,7 +999,7 @@ void Renderer::WriteUniformBuffer(
       finalColor.b *= alpha;
     }
     WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::COLOR), uboViews, finalColor);
-    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, worldColor);
+    WriteDefaultUniformV2(program->GetDefaultUniform(Program::DefaultUniformIndex::ACTOR_COLOR), uboViews, worldColorMultiplier);
 
     // Write uniforms from the uniform map
     // Uniforms for the Shared UniformBlock should not be in this map. If they are, they should be ignored.
@@ -1370,11 +1379,16 @@ void Renderer::SetRenderCallback(RenderCallback* callback)
   {
     TerminateRenderCallback(false);
   }
-  mRenderCallback = callback;
+  mRenderCallback           = callback;
+  mRenderCallbackTerminated = false;
 }
 
 void Renderer::TerminateRenderCallback(bool invokeCallback)
 {
+  const bool alreadyTerminated = mRenderCallbackTerminated;
+
+  bool registered = false;
+
   if(mRenderCallbackInvokedTargets)
   {
     for(const auto* renderTargetGraphicsObjects : (*mRenderCallbackInvokedTargets))
@@ -1385,7 +1399,7 @@ void Renderer::TerminateRenderCallback(bool invokeCallback)
       }
 
       // We should invoke it at the matched context :(
-      if(invokeCallback && mRenderCallback)
+      if(invokeCallback && mRenderCallback && !alreadyTerminated)
       {
         auto& renderCallbackInput = GetRenderCallbackInput();
 
@@ -1400,9 +1414,39 @@ void Renderer::TerminateRenderCallback(bool invokeCallback)
 
         // We don't need callback input now. Move ownership to terminated native draw manager.
         mTerminatedNativeDrawManager->RegisterTerminatedRenderCallback(*renderTargetGraphicsObjects, mRenderCallback, std::move(mRenderCallbackInput));
+        registered = true;
       }
     }
     mRenderCallbackInvokedTargets.reset();
+  }
+
+  if(invokeCallback)
+  {
+    mRenderCallbackTerminated = true;
+  }
+
+  if(invokeCallback && mRenderCallback && !registered && !alreadyTerminated)
+  {
+    // The callback has never been drawn into any render target, so there is nothing to
+    // schedule the terminate invocation against - and nothing it could have created
+    // either, because the callback was never run in the first place. Deliver it here so
+    // the client still hears back exactly once, telling it the native API is off limits.
+    //
+    // Note that a target is recorded when the native draw is *recorded*, not when it is
+    // executed, so a callback whose draw the graphics backend declines to execute - the
+    // offscreen and no-surface-context cases the GLES backend currently hard-blocks -
+    // counts as registered here and gets no delivery at all. Such a callback never runs
+    // in the first place, so it has nothing to release; the gap goes away with the
+    // hard-block.
+    auto& renderCallbackInput = GetRenderCallbackInput();
+
+    renderCallbackInput.usingOwnEglContext = (mRenderCallback->GetExecutionMode() == RenderCallback::ExecutionMode::ISOLATED);
+    renderCallbackInput.isTerminated       = true;
+    renderCallbackInput.isNativeApiUsable  = false;
+
+    // Passed as void*, matching how the graphics controller dispatches this callback -
+    // the dispatcher instantiated at the client side has to be the same one.
+    CallbackBase::ExecuteReturn<bool>(static_cast<Dali::CallbackBase&>(*mRenderCallback), static_cast<void*>(&renderCallbackInput));
   }
 }
 

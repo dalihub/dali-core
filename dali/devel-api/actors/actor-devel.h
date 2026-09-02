@@ -64,13 +64,19 @@ enum Type
   INHERIT_ORIENTATION             = Dali::Actor::Property::INHERIT_ORIENTATION,
   INHERIT_SCALE                   = Dali::Actor::Property::INHERIT_SCALE,
   VISIBLE                         = Dali::Actor::Property::VISIBLE,
-  COLOR                           = Dali::Actor::Property::COLOR,
-  COLOR_RED                       = Dali::Actor::Property::COLOR_RED,
-  COLOR_GREEN                     = Dali::Actor::Property::COLOR_GREEN,
-  COLOR_BLUE                      = Dali::Actor::Property::COLOR_BLUE,
-  COLOR_ALPHA                     = Dali::Actor::Property::COLOR_ALPHA,
+  COLOR_MULTIPLIER                = Dali::Actor::Property::COLOR_MULTIPLIER,
+  COLOR                           = COLOR_MULTIPLIER,
+  COLOR_MULTIPLIER_RED            = Dali::Actor::Property::COLOR_MULTIPLIER_RED,
+  COLOR_RED                       = COLOR_MULTIPLIER_RED,
+  COLOR_MULTIPLIER_GREEN          = Dali::Actor::Property::COLOR_MULTIPLIER_GREEN,
+  COLOR_GREEN                     = COLOR_MULTIPLIER_GREEN,
+  COLOR_MULTIPLIER_BLUE           = Dali::Actor::Property::COLOR_MULTIPLIER_BLUE,
+  COLOR_BLUE                      = COLOR_MULTIPLIER_BLUE,
+  COLOR_MULTIPLIER_ALPHA          = Dali::Actor::Property::COLOR_MULTIPLIER_ALPHA,
+  COLOR_ALPHA                     = COLOR_MULTIPLIER_ALPHA,
   OPACITY                         = Dali::Actor::Property::OPACITY,
-  WORLD_COLOR                     = Dali::Actor::Property::WORLD_COLOR,
+  WORLD_COLOR_MULTIPLIER          = Dali::Actor::Property::WORLD_COLOR_MULTIPLIER,
+  WORLD_COLOR                     = WORLD_COLOR_MULTIPLIER,
   COLOR_MODE                      = Dali::Actor::Property::COLOR_MODE,
   WORLD_MATRIX                    = Dali::Actor::Property::WORLD_MATRIX,
   DRAW_MODE                       = Dali::Actor::Property::DRAW_MODE,
@@ -478,14 +484,24 @@ DALI_CORE_API Actor::TouchEventSignalType& HitTestResultSignal(Actor actor);
 DALI_CORE_API Matrix GetWorldTransform(Actor actor);
 
 /**
- * Get the world color of the actor.
+ * Get the inherited world color multiplier of the actor.
  *
- * This calcualtes the world color of the actor from scratch using
+ * This calculates the world color multiplier of the actor from scratch using
  * only event side properties. It does not rely on the update thread
- * to have already calculated the color.
+ * to have already calculated the multiplier.
+ *
+ * @param[in] actor The actor to calculate the world color multiplier for
+ * @return The world color multiplier
+ * @SINCE_2_5.38
+ */
+DALI_CORE_API Vector4 GetWorldColorMultiplier(Actor actor);
+
+/**
+ * Get the world color of the actor.
+ * @deprecated Use GetWorldColorMultiplier() instead.
  *
  * @param[in] actor The actor to calculate the world color for
- * @return the world color
+ * @return The world color
  */
 DALI_CORE_API Vector4 GetWorldColor(Actor actor);
 

@@ -110,11 +110,6 @@ public:
   float GetDuration() const;
 
   /**
-   * @copydoc Dali::Animation::SetLooping()
-   */
-  void SetLooping(bool on);
-
-  /**
    * @copydoc Dali::Animation::SetLoopCount()
    */
   void SetLoopCount(int32_t count);
@@ -128,11 +123,6 @@ public:
    * @copydoc Dali::Animation::GetCurrentLoop()
    */
   int32_t GetCurrentLoop();
-
-  /**
-   * @copydoc Dali::Animation::IsLooping()
-   */
-  bool IsLooping() const;
 
   /**
    * @copydoc Dali::Animation::SetEndAction()

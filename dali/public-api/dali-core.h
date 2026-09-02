@@ -49,6 +49,7 @@
 #include <dali/public-api/common/dali-vector-trivial-types.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/extents.h>
+#include <dali/public-api/common/insets.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/open-hash-map-managed.h>
 #include <dali/public-api/common/platform-defines.h>

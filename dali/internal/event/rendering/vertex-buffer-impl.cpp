@@ -112,6 +112,7 @@ uint32_t GetPropertyImplementationAlignment(Property::Type& propertyType)
     case Property::ARRAY:
     case Property::MAP:
     case Property::EXTENTS:
+    case Property::INSETS:
     {
       // already handled by higher level code
     }
@@ -376,6 +377,7 @@ uint32_t GetPropertyImplementationSize(Property::Type& propertyType)
     case Property::ARRAY:
     case Property::MAP:
     case Property::EXTENTS:
+    case Property::INSETS:
     {
       // already handled by higher level code
     }

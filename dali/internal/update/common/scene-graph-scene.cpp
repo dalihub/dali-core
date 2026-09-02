@@ -43,7 +43,7 @@ Scene::Scene(const Graphics::RenderTargetCreateInfo& createInfo)
   mDepthBufferEnabled(false),
   mStencilBufferEnabled(false),
   mMSAAEnabled(false),
-  mPartialUpdateEnabled(true),
+  mPartialUpdateEnabled(false),
   mHasRenderInstructionToScene(false),
   mRenderPassDirty(false)
 {
