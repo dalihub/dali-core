@@ -156,6 +156,22 @@ public:
   bool IsBufferUsageChangeableAtRuntime() const;
 
   /**
+   * @brief Checks whether this frame buffer was created with a depth attachment.
+   * @return True if a depth buffer is available
+   * @note This is the attachment requested on creation, not the runtime state
+   * narrowed by ChangeDepthStencilEnabled().
+   */
+  bool IsDepthBufferAvailable() const;
+
+  /**
+   * @brief Checks whether this frame buffer was created with a stencil attachment.
+   * @return True if a stencil buffer is available
+   * @note This is the attachment requested on creation, not the runtime state
+   * narrowed by ChangeDepthStencilEnabled().
+   */
+  bool IsStencilBufferAvailable() const;
+
+  /**
    * @brief Change depth and stencil buffers enableness for current instruction.
    * @param[in] depthEnabled Depth buffer used
    * @param[in] stencilEnabled Stencil buffer used

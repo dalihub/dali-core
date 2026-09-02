@@ -405,10 +405,6 @@ public:
 
   bool IsStencilBufferEnabled() const;
 
-  void SetMultiSampledAntiAliasingEnabled(bool enabled);
-
-  bool IsMultiSampledAntiAliasingEnabled() const;
-
   /**
    * @copydoc Dali::Integration::Scene::SetPartialUpdateEnabled()
    */
@@ -527,7 +523,6 @@ private:
   bool                mDepthTreeDirty : 1; ///< True if the depth tree needs recalculating
   bool                mDepthBufferEnabled : 1;
   bool                mStencilBufferEnabled : 1;
-  bool                mMSAAEnabled : 1;
   bool                mPartialUpdateEnabled : 1; ///< True if the partial update is enabled
   bool                mGeometryHittest : 1;      ///< True if the geometry hittest is enabled
   bool                mIsVisible : 1;            ///< True if this Scene is visible

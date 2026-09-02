@@ -265,16 +265,6 @@ bool Scene::IsStencilBufferEnabled() const
   return GetImplementation(*this).IsStencilBufferEnabled();
 }
 
-void Scene::SetMultiSampledAntiAliasingEnabled(bool enabled)
-{
-  GetImplementation(*this).SetMultiSampledAntiAliasingEnabled(enabled);
-}
-
-bool Scene::IsMultiSampledAntiAliasingEnabled() const
-{
-  return GetImplementation(*this).IsMultiSampledAntiAliasingEnabled();
-}
-
 void Scene::SetPartialUpdateEnabled(bool enabled)
 {
   GetImplementation(*this).SetPartialUpdateEnabled(enabled);

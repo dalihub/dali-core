@@ -57,7 +57,6 @@ enum class ScenePolicyFlagBits : ScenePolicyFlags
   DEPTH_BUFFER_ENABLED   = 1 << 0, ///< Whether the depth buffer is available or not.
   STENCIL_BUFFER_ENABLED = 1 << 1, ///< Whether the stencil buffer is available or not.
   PARTIAL_UPDATE_ENABLED = 1 << 2, ///< Whether partial update is available or not.
-  MULTI_SAMPLING_ENABLED = 1 << 3, ///< Whether multi-sampling anti-aliasing is available or not.
 };
 
 template<>
@@ -471,10 +470,6 @@ public:
   void SetStencilBufferEnabled(bool enabled);
 
   bool IsStencilBufferEnabled() const;
-
-  void SetMultiSampledAntiAliasingEnabled(bool enabled);
-
-  bool IsMultiSampledAntiAliasingEnabled() const;
 
   /**
    * @brief Sets whether the scene will update partial area or full area.

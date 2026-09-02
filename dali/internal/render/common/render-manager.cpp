@@ -966,10 +966,12 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
 
   std::unordered_map<Graphics::Program*, Graphics::ProgramResourceBindingInfo> programUsageCount;
 
-  bool depthBufferAvailable    = sceneObject->IsDepthBufferEnabled();
-  bool stencilBufferAvailable  = sceneObject->IsStencilBufferEnabled();
-  bool sceneNeedsDepthBuffer   = false;
-  bool sceneNeedsStencilBuffer = false;
+  // The scene policy applies to the scene's own render target. A framebuffer owns its
+  // own attachments, so instructions that render into one are judged by the framebuffer.
+  bool sceneDepthBufferAvailable   = sceneObject->IsDepthBufferEnabled();
+  bool sceneStencilBufferAvailable = sceneObject->IsStencilBufferEnabled();
+  bool sceneNeedsDepthBuffer       = false;
+  bool sceneNeedsStencilBuffer     = false;
 
   DALI_LOG_INFO(gLogFilter, Debug::General, "Instruction count: %d\n", instructionCount);
   for(uint32_t i = 0; i < instructionCount; ++i)
@@ -982,12 +984,14 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
       bool usesDepthBuffer   = false;
       bool usesStencilBuffer = false;
 
+      const bool depthBufferAvailable = instruction.mFrameBuffer ? instruction.mFrameBuffer->IsDepthBufferAvailable() : sceneDepthBufferAvailable;
+
       for(auto j = 0u; j < instruction.RenderListCount(); ++j)
       {
         const auto& renderList = instruction.GetRenderList(j);
         bool        autoDepthTestMode(depthBufferAvailable &&
-                               !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
-                               renderList->HasColorRenderItems());
+                                      !(renderList->GetSourceLayer()->IsDepthTestDisabled()) &&
+                                      renderList->HasColorRenderItems());
         for(auto k = 0u; k < renderList->Count(); ++k)
         {
           auto& item        = renderList->GetItem(k);
@@ -1131,6 +1135,11 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     // Mark that we will require a post-render step to be performed (includes swap-buffers).
     status.SetNeedsPostRender(true);
 
+    // Match the availability used by the usage scan above, so the AUTO depth/stencil
+    // decision made there stays consistent with what we render.
+    const bool depthBufferAvailable   = instruction.mFrameBuffer ? instruction.mFrameBuffer->IsDepthBufferAvailable() : sceneDepthBufferAvailable;
+    const bool stencilBufferAvailable = instruction.mFrameBuffer ? instruction.mFrameBuffer->IsStencilBufferAvailable() : sceneStencilBufferAvailable;
+
     BoundsInteger viewportRect;
 
     int32_t surfaceOrientation = sceneObject->GetSurfaceOrientation() + sceneObject->GetScreenOrientation();
@@ -1184,7 +1193,7 @@ void RenderManager::RenderScene(Integration::RenderStatus& status, Integration::
     {
       // @todo SceneObject should already have the depth clear / stencil clear in the clearValues array.
       // if the window has a depth/stencil buffer.
-      if((depthBufferAvailable || stencilBufferAvailable) &&
+      if((sceneDepthBufferAvailable || sceneStencilBufferAvailable) &&
          (currentClearValues.size() <= 1))
       {
         currentClearValues.emplace_back();

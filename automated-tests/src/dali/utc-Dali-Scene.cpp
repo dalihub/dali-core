@@ -702,41 +702,6 @@ int UtcDaliSceneDepthBufferClearWithLayer3D(void)
   END_TEST;
 }
 
-int UtcDaliSceneSetMSAAEnabled(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::Integration::Scene::SetMSAAEnabled");
-
-  Dali::Integration::Scene scene = application.GetScene();
-
-  // Test default value
-  DALI_TEST_CHECK(!scene.IsMultiSampledAntiAliasingEnabled());
-
-  Actor actor = CreateRenderableActor();
-  actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
-  scene.Add(actor);
-
-  // Test setting to true
-  scene.SetMultiSampledAntiAliasingEnabled(true);
-  DALI_TEST_CHECK(scene.IsMultiSampledAntiAliasingEnabled());
-
-  // Render the scene (ensures scene graph objects are updated
-  application.SendNotification();
-  application.Render();
-
-  actor.SetProperty(Actor::Property::OPACITY, 0.5f);
-
-  // Test setting to false
-  scene.SetMultiSampledAntiAliasingEnabled(false);
-  DALI_TEST_CHECK(!scene.IsMultiSampledAntiAliasingEnabled());
-
-  // Render the scene (ensures scene graph objects are updated)
-  application.SendNotification();
-  application.Render();
-
-  END_TEST;
-}
-
 int UtcDaliSceneRemove(void)
 {
   TestApplication application;

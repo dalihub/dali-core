@@ -65,7 +65,6 @@ Scene::Scene()
   mDepthTreeDirty(false),
   mDepthBufferEnabled(false),
   mStencilBufferEnabled(false),
-  mMSAAEnabled(false),
   mPartialUpdateEnabled(false),
   mGeometryHittest(false),
   mIsVisible(true),
@@ -162,7 +161,6 @@ void Scene::Initialize(const Graphics::RenderTargetCreateInfo& createInfo,
   mDepthBufferEnabled   = (flags & ScenePolicyFlagBits::DEPTH_BUFFER_ENABLED);
   mStencilBufferEnabled = (flags & ScenePolicyFlagBits::STENCIL_BUFFER_ENABLED);
   mPartialUpdateEnabled = (flags & ScenePolicyFlagBits::PARTIAL_UPDATE_ENABLED);
-  mMSAAEnabled          = (flags & ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED);
 
   mSceneObject->SetScenePolicyFlags(flags);
   OwnerPointer<SceneGraph::Scene> transferOwnership(const_cast<SceneGraph::Scene*>(mSceneObject));
@@ -648,26 +646,6 @@ void Scene::SetStencilBufferEnabled(bool enabled)
 bool Scene::IsStencilBufferEnabled() const
 {
   return mStencilBufferEnabled;
-}
-
-void Scene::SetMultiSampledAntiAliasingEnabled(bool enabled)
-{
-  mMSAAEnabled = enabled;
-  if(enabled)
-  {
-    mScenePolicyFlags |= ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED;
-  }
-  else
-  {
-    mScenePolicyFlags &= ~ScenePolicyFlagBits::MULTI_SAMPLING_ENABLED;
-  }
-  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
-  SetScenePolicyFlagsMessage(tls->GetEventThreadServices(), *mSceneObject, mScenePolicyFlags);
-}
-
-bool Scene::IsMultiSampledAntiAliasingEnabled() const
-{
-  return mMSAAEnabled;
 }
 
 void Scene::SetPartialUpdateEnabled(bool enabled)

@@ -311,6 +311,16 @@ bool FrameBuffer::IsBufferUsageChangeableAtRuntime() const
   return mIsBufferUsageChangeableAtRuntime;
 }
 
+bool FrameBuffer::IsDepthBufferAvailable() const
+{
+  return mDepthBuffer;
+}
+
+bool FrameBuffer::IsStencilBufferAvailable() const
+{
+  return mStencilBuffer;
+}
+
 void FrameBuffer::ChangeDepthStencilEnabled(bool depthEnabled, bool stencilEnabled)
 {
   if(DALI_LIKELY(mIsBufferUsageChangeableAtRuntime))
