@@ -14,6 +14,7 @@ SET(TC_SOURCES
         utc-Dali-Any.cpp
         utc-Dali-BaseHandle.cpp
         utc-Dali-BaseObjectObserver.cpp
+        utc-Dali-Callback.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-CircularQueue.cpp
         utc-Dali-Common.cpp
