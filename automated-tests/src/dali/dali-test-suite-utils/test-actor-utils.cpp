@@ -89,7 +89,7 @@ Actor CreateRenderableActor(Texture texture, const std::string& vertexShader, co
     renderer.SetTextures(textureSet);
 
     // Set actor to the size of the texture if set
-    actor.SetProperty(Actor::Property::SIZE, Vector2(texture.GetWidth(), texture.GetHeight()));
+    actor.SetProperty(Actor::Property::SIZE, Vector2(static_cast<float>(texture.GetWidth()), static_cast<float>(texture.GetHeight())));
   }
 
   return actor;
@@ -118,7 +118,7 @@ Actor CreateRenderableActor2(TextureSet textures, const std::string& vertexShade
     auto texture = textures.GetTexture(0);
 
     // Set actor to the size of the texture if set
-    actor.SetProperty(Actor::Property::SIZE, Vector2(texture.GetWidth(), texture.GetHeight()));
+    actor.SetProperty(Actor::Property::SIZE, Vector2(static_cast<float>(texture.GetWidth()), static_cast<float>(texture.GetHeight())));
   }
 
   return actor;

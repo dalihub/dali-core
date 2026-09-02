@@ -997,7 +997,7 @@ int UtcDaliHandleGetPropertyIndices(void)
   // Actor
   Actor actor = Actor::New();
   actor.GetPropertyIndices(indices);
-  int numDefaultProperties = indices.Size();
+  int numDefaultProperties = static_cast<int>(indices.Size());
   DALI_TEST_CHECK(numDefaultProperties > 0);
   DALI_TEST_EQUALS(numDefaultProperties, actor.GetPropertyCount(), TEST_LOCATION);
 
@@ -1064,7 +1064,7 @@ int UtcDaliHandleRegisterPropertyTypes(void)
       Actor actor = Actor::New();
       actor.RegisterProperty("manFromDelmonte", properties[i].value);
     }
-    catch(Dali::DaliException& e)
+    catch(const Dali::DaliException&)
     {
       exception = true;
     }
@@ -1907,7 +1907,7 @@ int UtcDaliHandlePropertySetProperties(void)
   TestApplication application;
   const Vector3   actorSize(10.0f, 20.0f, 30.0f);
   const Vector3   pivot(1.0f, 0.5f, 0.0f);
-  const Vector4   color(0.1f, 0.2, 0.3f, 0.4f);
+  const Vector4   color(0.1f, 0.2f, 0.3f, 0.4f);
 
   Handle handle = Actor::New();
   handle.SetProperties(
@@ -1929,7 +1929,7 @@ int UtcDaliHandleTemplateNew01(void)
   TestApplication application;
   const Vector3   actorSize(10.0f, 20.0f, 30.0f);
   const Vector3   pivot(1.0f, 0.5f, 0.0f);
-  const Vector4   color(0.1f, 0.2, 0.3f, 0.4f);
+  const Vector4   color(0.1f, 0.2f, 0.3f, 0.4f);
 
   Handle handle = Handle::New<Actor>(
     CreatePropertyMap({

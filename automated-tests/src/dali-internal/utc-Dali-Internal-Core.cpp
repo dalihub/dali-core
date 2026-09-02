@@ -140,7 +140,7 @@ int UtcDaliCoreProcessEventsStressTest(void)
 
   for(size_t i = 0; i < FORCIBLE_WAIT_FLUSHED_BUFFER_COUNT_THRESHOLD; ++i)
   {
-    Vector3 newSize = size + Vector3(i + 1, i + 1, 0);
+    Vector3 newSize = size + Vector3(static_cast<float>(i + 1), static_cast<float>(i + 1), static_cast<float>(0));
     actor.SetProperty(Actor::Property::SIZE, newSize);
     application.SendNotification();
     DALI_TEST_EQUALS(relayoutSignal.mSignalCalled, true, TEST_LOCATION);

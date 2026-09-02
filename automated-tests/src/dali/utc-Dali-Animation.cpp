@@ -2033,7 +2033,7 @@ int UtcDaliAnimationSetSpeedFactorP4(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), (targetPosition * 0.1f), 0.0001, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), (targetPosition * 0.1f), 0.0001f, TEST_LOCATION);
 
   application.Render(static_cast<unsigned int>(durationSeconds * 200.0f) + 1u /*just beyond the animation duration*/);
 
@@ -2224,7 +2224,7 @@ int UtcDaliAnimationSetSpeedFactorAndRange(void)
     unsigned int actorIndex = 0u;
     for(actorIndex = 0u; actorIndex < NUM_ENTRIES; ++actorIndex)
     {
-      DALI_TEST_EQUALS(actors[actorIndex].GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, testData[actorIndex].expected[frame], 0.001, TEST_LOCATION);
+      DALI_TEST_EQUALS(actors[actorIndex].GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, testData[actorIndex].expected[frame], 0.001f, TEST_LOCATION);
       if(!Equals(actors[actorIndex].GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, testData[actorIndex].expected[frame]))
       {
         tet_printf("Failed at frame %u, actorIndex %u\n", frame, actorIndex);
@@ -2311,7 +2311,7 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount01(void)
 
   for(unsigned int frame = 0; frame < NUM_FRAMES; ++frame)
   {
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, testData.expected[frame], 0.001, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, testData.expected[frame], 0.001f, TEST_LOCATION);
 
     application.Render(200); // 200 ms at half speed corresponds to 0.1 s
 
@@ -2326,7 +2326,7 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount01(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, 80.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, 80.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -2405,7 +2405,7 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount02(void)
 
   for(unsigned int frame = 0; frame < NUM_FRAMES; ++frame)
   {
-    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, testData.expected[frame], 0.001, TEST_LOCATION);
+    DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, testData.expected[frame], 0.001f, TEST_LOCATION);
 
     application.Render(200); // 200 ms at half speed corresponds to 0.1 s
 
@@ -2420,7 +2420,7 @@ int UtcDaliAnimationSetSpeedFactorRangeAndLoopCount02(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, 30.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION).x, 30.0f, 0.001f, TEST_LOCATION);
 
   END_TEST;
 }
@@ -3412,7 +3412,7 @@ int UtcDaliAnimationGetStateP(void)
   animation.Pause();
   DALI_TEST_EQUALS(animation.GetState(), Animation::PAUSED, TEST_LOCATION);
   application.SendNotification();
-  application.Render(0.f);
+  application.Render(static_cast<uint32_t>(0.f));
 
   // Loop 5 times
   for(int i = 0; i < 5; ++i)
@@ -12683,14 +12683,14 @@ int UtcDaliAnimationProgressCallbackP(void)
 
   application.SendNotification();
   application.Render(0);                        // start animation
-  application.Render(durationSeconds * 100.0f); // 20% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 20% progress
 
   tet_infoline("Animation at 20%");
 
   progressCheck.CheckSignalNotReceived();
 
   application.SendNotification();
-  application.Render(durationSeconds * 200.0f); // 40% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 200.0f)); // 40% progress
   application.SendNotification();
   tet_infoline("Animation at 40%");
   DALI_TEST_EQUALS(0.4f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -12700,7 +12700,7 @@ int UtcDaliAnimationProgressCallbackP(void)
   tet_infoline("Progress check reset");
   progressCheck.Reset();
 
-  application.Render(durationSeconds * 100.0f); // 50% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 50% progress
   tet_infoline("Animation at 50%");
   application.SendNotification();
 
@@ -12757,7 +12757,7 @@ int UtcDaliAnimationPlayAfterP(void)
     application.SendNotification();
     application.Render(0); // start animation
 
-    application.Render(durationSeconds * 200.f); // The intial delay time of PlayAfter
+    application.Render(static_cast<uint32_t>(durationSeconds * 200.f)); // The intial delay time of PlayAfter
     application.SendNotification();
     finishCheck.CheckSignalNotReceived();
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), (targetPosition * 0.0f), TEST_LOCATION); // Not move
@@ -12813,7 +12813,7 @@ int UtcDaliAnimationPlayAfterP(void)
     application.SendNotification();
     application.Render(0); // start animation
 
-    application.Render(durationSeconds * 200.f); // The intial delay time of PlayAfter
+    application.Render(static_cast<uint32_t>(durationSeconds * 200.f)); // The intial delay time of PlayAfter
     application.SendNotification();
     finishCheck.CheckSignalNotReceived();
     DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), (targetPosition * 1.0f), TEST_LOCATION); // Not move. NOTE SpeedFactor < 0 so 'targetPosition' is start position.
@@ -12881,7 +12881,7 @@ int UtcDaliAnimationPlayAfterP2(void)
       // The initial delay time of PlayAfter() applies only once in looping mode.
       if(iterations == 0)
       {
-        application.Render(durationSeconds * 200.f); // The intial delay time of PlayAfter
+        application.Render(static_cast<uint32_t>(durationSeconds * 200.f)); // The intial delay time of PlayAfter
         application.SendNotification();
         finishCheck.CheckSignalNotReceived();
         DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), (targetPosition * 0.0f), TEST_LOCATION); // Not move
@@ -12949,7 +12949,7 @@ int UtcDaliAnimationPlayAfterP2(void)
       // The initial delay time of PlayAfter() applies only once in looping mode.
       if(iterations == 0)
       {
-        application.Render(durationSeconds * 200.f); // The intial delay time of PlayAfter
+        application.Render(static_cast<uint32_t>(durationSeconds * 200.f)); // The intial delay time of PlayAfter
         application.SendNotification();
         finishCheck.CheckSignalNotReceived();
         DALI_TEST_EQUALS(actor.GetCurrentProperty<Vector3>(Actor::Property::POSITION), (targetPosition * 1.0f), TEST_LOCATION); // Not move. NOTE SpeedFactor < 0 so 'targetPosition' is start position.
@@ -13726,7 +13726,7 @@ int UtcDaliAnimationProgressSignalConnectionWithoutProgressMarkerP(void)
 
   application.SendNotification();
   application.Render(0);                        // start animation
-  application.Render(durationSeconds * 100.0f); // 10% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 10% progress
   application.SendNotification();
 
   tet_infoline("Ensure after animation has started playing that ProgressReachedSignal not emitted");
@@ -13797,7 +13797,7 @@ int UtcDaliAnimationMultipleProgressSignalsP(void)
 
   application.SendNotification();
   application.Render(0);                        // start animation
-  application.Render(durationSeconds * 100.0f); // 20% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 20% progress
 
   tet_infoline("Animation at 20% - No signals to be received");
 
@@ -13805,7 +13805,7 @@ int UtcDaliAnimationMultipleProgressSignalsP(void)
   progressCheckBeta.CheckSignalNotReceived();
 
   application.SendNotification();
-  application.Render(durationSeconds * 200.0f); // 40% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 200.0f)); // 40% progress
   application.SendNotification();
   tet_infoline("Animation at 40% - Alpha signal should be received");
   DALI_TEST_EQUALS(0.4f, animationAlpha.GetCurrentProgress(), TEST_LOCATION);
@@ -13817,7 +13817,7 @@ int UtcDaliAnimationMultipleProgressSignalsP(void)
   progressCheckAlpha.Reset();
   progressCheckBeta.Reset();
 
-  application.Render(durationSeconds * 100.0f); // 50% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 100.0f)); // 50% progress
   tet_infoline("Animation at 50% - Beta should receive signal, Alpha should not");
   application.SendNotification();
 
@@ -13903,7 +13903,7 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
 
   application.SendNotification();
   application.Render(0);                       // start animation
-  application.Render(durationSeconds * 20.0f); // 2% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 20.0f)); // 2% progress
   application.SendNotification();
   DALI_TEST_EQUALS(0.02f, animationAlpha.GetCurrentProgress(), TEST_LOCATION);
 
@@ -13917,7 +13917,7 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
   progressCheckBeta.Reset();
 
   application.SendNotification();
-  application.Render(durationSeconds * 960.0f); // 98% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 960.0f)); // 98% progress
   application.SendNotification();
   tet_infoline("Animation at 98% - No signal received");
   DALI_TEST_EQUALS(0.98f, animationAlpha.GetCurrentProgress(), TEST_LOCATION);
@@ -13926,7 +13926,7 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
   progressCheckBeta.CheckSignalNotReceived();
 
   application.SendNotification();
-  application.Render(durationSeconds * 40.0f); // 2% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 40.0f)); // 2% progress
   application.SendNotification();
   tet_infoline("Animation loop once and now 2% - Alpha and Beta should receive signal");
   application.SendNotification();
@@ -13941,7 +13941,7 @@ int UtcDaliAnimationMultipleProgressSignalsP2(void)
   progressCheckBeta.Reset();
 
   application.SendNotification();
-  application.Render(durationSeconds * 980.0f); // 100% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 980.0f)); // 100% progress
   application.SendNotification();
   tet_infoline("Animation loop one more time. and now 100% - Beta should receive signal, Alhpa sholud not");
   application.SendNotification();
@@ -14017,7 +14017,7 @@ int UtcDaliAnimationProgressSignalWithPlayAfterP(void)
 
   application.SendNotification();
   application.Render(0);                     // start animation
-  application.Render(delaySeconds * 500.0f); // 50% wait progress
+  application.Render(static_cast<uint32_t>(delaySeconds * 500.0f)); // 50% wait progress
 
   tet_infoline("Delay at 50% - No signals to be received");
 
@@ -14025,7 +14025,7 @@ int UtcDaliAnimationProgressSignalWithPlayAfterP(void)
   progressCheckBeta.CheckSignalNotReceived();
 
   application.SendNotification();
-  application.Render(delaySeconds * 500.0f + durationSeconds * 50.0f); // 100% wait, 5% progress
+  application.Render(static_cast<uint32_t>(delaySeconds * 500.0f + durationSeconds * 50.0f)); // 100% wait, 5% progress
   application.SendNotification();
   tet_infoline("Delay at 100%, Animation at 5% - Beta signal should be received");
   DALI_TEST_EQUALS(0.05f, animationBeta.GetCurrentProgress(), TEST_LOCATION);
@@ -14037,14 +14037,14 @@ int UtcDaliAnimationProgressSignalWithPlayAfterP(void)
   progressCheckAlpha.Reset();
   progressCheckBeta.Reset();
 
-  application.Render(durationSeconds * 200.0f); // 25% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 200.0f)); // 25% progress
   tet_infoline("Animation at 25% - No signals to be received");
   application.SendNotification();
 
   progressCheckAlpha.CheckSignalNotReceived();
   progressCheckBeta.CheckSignalNotReceived();
 
-  application.Render(durationSeconds * 200.0f); // 45% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 200.0f)); // 45% progress
   tet_infoline("Animation at 45% - Alpha should receive signal, Beta should not");
   application.SendNotification();
 
@@ -14126,7 +14126,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
     application.Render(0); // start animation
     finishCheck.CheckSignalNotReceived();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 25% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 25% progress
     DALI_TEST_EQUALS(0.25f, animation.GetCurrentProgress(), TEST_LOCATION);
 
     tet_infoline("Animation at 25%");
@@ -14134,7 +14134,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
     progressCheck.CheckSignalNotReceived();
 
     application.SendNotification();
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 50% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 50% progress
     application.SendNotification();
     tet_infoline("Animation at 50%");
     DALI_TEST_EQUALS(0.5f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -14144,7 +14144,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
     tet_infoline("Progress check reset");
     progressCheck.Reset();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 75% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 75% progress
     tet_infoline("Animation at 75%");
     application.SendNotification();
 
@@ -14152,7 +14152,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP(void)
 
     progressCheck.CheckSignalNotReceived();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 100% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 100% progress
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
@@ -14213,7 +14213,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
   {
     application.SendNotification();
     application.Render(0);                                // start animation
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 25% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 25% progress
     DALI_TEST_EQUALS(0.25f, animation.GetCurrentProgress(), TEST_LOCATION);
 
     tet_infoline("Animation at 25%");
@@ -14221,7 +14221,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
     progressCheck.CheckSignalNotReceived();
 
     application.SendNotification();
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 50% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 50% progress
     application.SendNotification();
     tet_infoline("Animation at 50%");
     DALI_TEST_EQUALS(0.5f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -14231,7 +14231,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
     tet_infoline("Progress check reset");
     progressCheck.Reset();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 75% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 75% progress
     tet_infoline("Animation at 75%");
     application.SendNotification();
 
@@ -14239,7 +14239,7 @@ int UtcDaliAnimationProgressCallbackWithLoopingP2(void)
 
     progressCheck.CheckSignalNotReceived();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 100% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 100% progress
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
@@ -14312,7 +14312,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     progressCheck.CheckSignalNotReceived();
 
     application.SendNotification();
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 25% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 25% progress
     DALI_TEST_EQUALS(0.75f, animation.GetCurrentProgress(), TEST_LOCATION);
 
     tet_infoline("Animation at 25%");
@@ -14320,7 +14320,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     progressCheck.CheckSignalNotReceived();
 
     application.SendNotification();
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 50% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 50% progress
     application.SendNotification();
     tet_infoline("Animation at 50%");
     DALI_TEST_EQUALS(0.5f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -14330,7 +14330,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     tet_infoline("Progress check reset");
     progressCheck.Reset();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 75% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 75% progress
     tet_infoline("Animation at 75%");
     application.SendNotification();
 
@@ -14338,7 +14338,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
 
     progressCheck.CheckSignalNotReceived();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 100% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 100% progress
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
@@ -14367,7 +14367,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     finishCheck.CheckSignalNotReceived();
 
     application.SendNotification();
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 25% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 25% progress
     DALI_TEST_EQUALS(0.75f, animation.GetCurrentProgress(), TEST_LOCATION);
 
     tet_infoline("Animation at 25%");
@@ -14375,7 +14375,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     progressCheck.CheckSignalNotReceived();
 
     application.SendNotification();
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 50% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 50% progress
     application.SendNotification();
     tet_infoline("Animation at 50%");
     DALI_TEST_EQUALS(0.5f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -14385,7 +14385,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
     tet_infoline("Progress check reset");
     progressCheck.Reset();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 75% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 75% progress
     tet_infoline("Animation at 75%");
     application.SendNotification();
 
@@ -14393,7 +14393,7 @@ int UtcDaliAnimationProgressCallbackNegativeSpeed(void)
 
     progressCheck.CheckSignalNotReceived();
 
-    application.Render(durationSeconds * 0.25 * 1000.0f); // 100% progress
+    application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 100% progress
     tet_infoline("Animation at 100%");
     application.SendNotification();
 
@@ -14452,7 +14452,7 @@ int UtcDaliAnimationProgressCallbackInvalidSignalN(void)
 
   application.SendNotification();
   application.Render(0);                                // start animation
-  application.Render(durationSeconds * 0.25 * 1000.0f); // 35% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 35% progress
   DALI_TEST_EQUALS(0.35f, animation.GetCurrentProgress(), TEST_LOCATION);
 
   tet_infoline("Animation at 35%");
@@ -14460,7 +14460,7 @@ int UtcDaliAnimationProgressCallbackInvalidSignalN(void)
   progressCheck.CheckSignalNotReceived();
 
   application.SendNotification();
-  application.Render(durationSeconds * 0.25 * 1000.0f); // 60% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 60% progress
   application.SendNotification();
   DALI_TEST_EQUALS(0.6f, animation.GetCurrentProgress(), TEST_LOCATION);
 
@@ -14468,14 +14468,14 @@ int UtcDaliAnimationProgressCallbackInvalidSignalN(void)
 
   progressCheck.CheckSignalNotReceived();
 
-  application.Render(durationSeconds * 0.25 * 1000.0f); // 85% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 85% progress
   tet_infoline("Animation at 85%");
   application.SendNotification();
   DALI_TEST_EQUALS(0.85f, animation.GetCurrentProgress(), TEST_LOCATION);
 
   progressCheck.CheckSignalNotReceived();
 
-  application.Render(durationSeconds * 0.25 * 1000.0f); // 90% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 90% progress
   tet_infoline("Animation over 90%");
   application.SendNotification();
 
@@ -14524,7 +14524,7 @@ int UtcDaliAnimationProgressCallbackLongDurationP(void)
 
   application.SendNotification();
   application.Render(0);                                // start animation
-  application.Render(durationSeconds * 0.25 * 1000.0f); // 25% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 25% progress
   DALI_TEST_EQUALS(0.25f, animation.GetCurrentProgress(), TEST_LOCATION);
 
   tet_infoline("Animation at 25%");
@@ -14532,7 +14532,7 @@ int UtcDaliAnimationProgressCallbackLongDurationP(void)
   progressCheck.CheckSignalNotReceived();
 
   application.SendNotification();
-  application.Render(durationSeconds * 0.25 * 1000.0f); // 50% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 50% progress
   application.SendNotification();
   tet_infoline("Animation at 50%");
   DALI_TEST_EQUALS(0.5f, animation.GetCurrentProgress(), TEST_LOCATION);
@@ -14542,7 +14542,7 @@ int UtcDaliAnimationProgressCallbackLongDurationP(void)
   tet_infoline("Progress check reset");
   progressCheck.Reset();
 
-  application.Render(durationSeconds * 0.25 * 1000.0f); // 75% progress
+  application.Render(static_cast<uint32_t>(durationSeconds * 0.25 * 1000.0f)); // 75% progress
   tet_infoline("Animation at 75%");
   application.SendNotification();
 

@@ -187,6 +187,7 @@ int UtcConnectionTrackerSignalDisconnectN(void)
   }
   catch(Dali::DaliException& e)
   {
+    (void)e;
     tet_result(TET_PASS);
   }
 

@@ -289,7 +289,7 @@ int UtcDaliCircularQueuePushBackN(void)
     cQ.PushBack(20);
     DALI_TEST_EQUALS(0, 1, TEST_LOCATION); // Failure
   }
-  catch(DaliException e)
+  catch(const DaliException&)
   {
     DALI_TEST_EQUALS(1, 1, TEST_LOCATION);
   }
@@ -325,7 +325,7 @@ int UtcDaliCircularQueueOperatorIndexN01(void)
     int v = cQ[0];
     DALI_TEST_EQUALS(v, 1, TEST_LOCATION);
   }
-  catch(DaliException e)
+  catch(const DaliException&)
   {
     DALI_TEST_CHECK(true);
   }
@@ -383,7 +383,7 @@ int UtcDaliCircularQueuePopFrontN01(void)
     (void)cQ.PopFront();
     DALI_TEST_CHECK(false);
   }
-  catch(DaliException e)
+  catch(const DaliException&)
   {
     DALI_TEST_CHECK(true);
   }
@@ -409,7 +409,7 @@ int UtcDaliCircularQueuePopFrontN02(void)
     (void)cQ.PopFront();
     DALI_TEST_CHECK(false);
   }
-  catch(DaliException e)
+  catch(const DaliException&)
   {
     DALI_TEST_CHECK(true);
   }

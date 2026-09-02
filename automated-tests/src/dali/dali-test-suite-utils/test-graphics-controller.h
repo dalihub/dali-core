@@ -544,7 +544,7 @@ public: // Test Functions
     auto& info = mCustomUniformBlocks.back();
     for(auto& member : info.members)
     {
-      member.bufferIndex = mCustomUniformBlocks.size();
+      member.bufferIndex = static_cast<uint32_t>(mCustomUniformBlocks.size());
     }
   }
 

@@ -251,11 +251,11 @@ uint32_t TestGraphicsReflection::GetVertexAttributeLocation(const std::string& n
   auto iter = std::find(mAttributes.begin(), mAttributes.end(), name);
   if(iter != mAttributes.end())
   {
-    return iter - mAttributes.begin();
+    return static_cast<uint32_t>(iter - mAttributes.begin());
   }
   else if(mController.AutoAttrCreation())
   {
-    uint32_t location = mAttributes.size();
+    uint32_t location = static_cast<uint32_t>(mAttributes.size());
     mAttributes.push_back(name);
     return location;
   }
@@ -287,7 +287,7 @@ std::vector<uint32_t> TestGraphicsReflection::GetVertexAttributeLocations() cons
 
 uint32_t TestGraphicsReflection::GetUniformBlockCount() const
 {
-  return mUniformBlocks.size();
+  return static_cast<uint32_t>(mUniformBlocks.size());
 }
 
 uint32_t TestGraphicsReflection::GetUniformBlockBinding(uint32_t index) const

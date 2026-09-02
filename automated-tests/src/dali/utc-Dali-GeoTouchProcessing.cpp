@@ -1073,7 +1073,7 @@ int UtcDaliGeoTouchEventMultipleRenderTasks(void)
   scene.Add(actor);
 
   // Create render task
-  Viewport   viewport(sceneSize.width * 0.5f, sceneSize.height * 0.5f, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+  Viewport   viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
   RenderTask renderTask(application.GetScene().GetRenderTaskList().CreateTask());
   renderTask.SetViewport(viewport);
   renderTask.SetInputEnabled(true);
@@ -1128,7 +1128,7 @@ int UtcDaliGeoTouchEventMultipleRenderTasksWithChildLayer(void)
   actor.Add(layer);
 
   // Create render task
-  Viewport   viewport(sceneSize.width * 0.5f, sceneSize.height * 0.5f, sceneSize.width * 0.5f, sceneSize.height * 0.5f);
+  Viewport   viewport(static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f), static_cast<int>(sceneSize.width * 0.5f), static_cast<int>(sceneSize.height * 0.5f));
   RenderTask renderTask(application.GetScene().GetRenderTaskList().CreateTask());
   renderTask.SetViewport(viewport);
   renderTask.SetInputEnabled(true);
@@ -1175,7 +1175,7 @@ int UtcDaliGeoTouchEventOffscreenRenderTasks(void)
   Vector2                  sceneSize(scene.GetSize());
 
   // FrameBufferImage for offscreen RenderTask
-  FrameBuffer frameBuffer = FrameBuffer::New(sceneSize.width, sceneSize.height);
+  FrameBuffer frameBuffer = FrameBuffer::New(static_cast<uint32_t>(sceneSize.width), static_cast<uint32_t>(sceneSize.height));
 
   // Create a renderable actor to display the FrameBufferImage
   Actor renderableActor = CreateRenderableActor(frameBuffer.GetColorTexture());
