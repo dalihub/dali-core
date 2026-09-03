@@ -770,8 +770,7 @@ int UtcDaliGeoTouchEventInterruptedParentConsumer(void)
   // Remove actor from scene
   application.GetScene().Remove(actor);
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
   data.Reset();
   rootData.Reset();
 
@@ -779,10 +778,12 @@ int UtcDaliGeoTouchEventInterruptedParentConsumer(void)
   application.SendNotification();
   application.Render();
 
-  // The stream was already terminated when its observed hit actor left the scene.
+  // The root owns the stream, so removing the different initial hit actor does not terminate it.
   application.ProcessEvent(GenerateSingleTouch(PointState::INTERRUPTED, Vector2(200.0f, 200.0f /* Outside actor */)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == rootData.receivedTouch.points[0].hitActor);
   data.Reset();
   rootData.Reset();
 
@@ -1750,10 +1751,10 @@ int UtcDaliGeoTouchEventActorRemovedFromSceneDifferentConsumer(void)
   // Unparent the actor
   actor.Unparent();
 
-  // The child was already terminated when the parent became owner; only the active owner is interrupted.
+  // The child was already terminated when the parent became owner. Removing the different initial
+  // hit actor leaves the active owner route intact.
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::INTERRUPTED, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
   data.Reset();
   parentData.Reset();
 
@@ -1767,7 +1768,9 @@ int UtcDaliGeoTouchEventActorRemovedFromSceneDifferentConsumer(void)
   // Emit a motion signal
   application.ProcessEvent(GenerateSingleTouch(PointState::MOTION, Vector2(10.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_CHECK(actor == parentData.receivedTouch.points[0].hitActor);
   data.Reset();
   parentData.Reset();
 
@@ -1779,13 +1782,20 @@ int UtcDaliGeoTouchEventActorRemovedFromSceneDifferentConsumer(void)
   // Unparent the actor
   actor.Unparent();
 
-  // Should receive an interrupted event for both actor functors & the parent as well as it was last consumer
+  // Reconnecting the initial hit actor does not replace the established parent owner.
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, parentData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, secondData.functorCalled, TEST_LOCATION);
   data.Reset();
   parentData.Reset();
   secondData.Reset();
+
+  // The original owner receives the physical terminal event exactly once.
+  application.ProcessEvent(GenerateSingleTouch(PointState::UP, Vector2(200.0f, 200.0f)));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, parentData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::UP, parentData.receivedTouch.points[0].state, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, secondData.functorCalled, TEST_LOCATION);
 
   END_TEST;
 }

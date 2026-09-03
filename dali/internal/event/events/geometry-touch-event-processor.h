@@ -108,12 +108,12 @@ private:
   void Clear(bool keepLastPrimaryObserver = false);
 
   Scene&                   mScene;                     ///< Used to deliver touch events
-  ActorObserver            mLastPrimaryHitActor;       ///< Stores the last primary point hit actor
+  ActorObserver            mLastPrimaryHitActor;       ///< Stores the current route actor; the primary hit before ownership
   ActorObserver            mLastConsumedActor;         ///< Stores the last consumed actor
   ActorObserver            mCapturingTouchActor;       ///< Stored the actor that captures touch
   ActorObserver            mOwnTouchActor;             ///< Stored the actor that own touch
   ActorObserver            mInterceptedTouchActor;     ///< Stores the intercepted actor
-  RenderTaskPtr            mLastRenderTask;            ///< The RenderTask used for the last hit actor
+  RenderTaskPtr            mLastRenderTask;            ///< The RenderTask used by the current route
   GeometryTouchStreamState mStreamState;               ///< Ordered state owned by this stream
   bool                     mProcessingTouchEvent;      ///< True while a routed event is being dispatched.
   bool                     mObservedActorDisconnected; ///< Defers terminal dispatch until the current callback returns.
