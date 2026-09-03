@@ -5936,3 +5936,63 @@ int UtcDaliRenderTaskExclusiveAddCacheRenderer(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskExclusiveAddCacheRendererWithZeroOpacity(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing that an opacity-zero actor is drawn only as an offscreen cache source");
+
+  TestGlAbstraction& gl        = application.GetGlAbstraction();
+  TraceCallStack&    drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Dali::Integration::Scene scene    = application.GetScene();
+  RenderTaskList           taskList = scene.GetRenderTaskList();
+
+  Texture image           = CreateTexture(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
+  Actor   renderableActor = CreateRenderableActor(image);
+  renderableActor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
+  renderableActor.SetProperty(Actor::Property::OPACITY, 0.0f);
+  scene.Add(renderableActor);
+
+  FrameBuffer frameBuffer        = FrameBuffer::New(100, 100);
+  Texture     frameBufferTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 100, 100);
+  frameBuffer.AttachColorTexture(frameBufferTexture);
+
+  Shader   cachedShader  = CreateShader();
+  Geometry quadGeometry  = CreateQuadGeometry();
+  Renderer cacheRenderer = Renderer::New(quadGeometry, cachedShader);
+  TextureSet textureSet  = TextureSet::New();
+  textureSet.SetTexture(0u, frameBufferTexture);
+  cacheRenderer.SetTextures(textureSet);
+  renderableActor.AddCacheRenderer(cacheRenderer);
+
+  // An opacity-zero actor is still culled from the normal onscreen render task.
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_EQUALS(drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays"), 0, TEST_LOCATION);
+
+  drawTrace.Reset();
+
+  CameraActor offscreenCameraActor = CameraActor::New(Size(TestApplication::DEFAULT_SURFACE_WIDTH, TestApplication::DEFAULT_SURFACE_HEIGHT));
+  scene.Add(offscreenCameraActor);
+
+  RenderTask exclusiveTask = taskList.CreateTask();
+  exclusiveTask.SetCameraActor(offscreenCameraActor);
+  exclusiveTask.SetSourceActor(renderableActor);
+  exclusiveTask.SetInputEnabled(false);
+  exclusiveTask.SetClearColor(Vector4(0.f, 0.f, 0.f, 0.f));
+  exclusiveTask.SetClearEnabled(true);
+  exclusiveTask.SetExclusive(true);
+  exclusiveTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS);
+  exclusiveTask.SetFrameBuffer(frameBuffer);
+
+  // The offscreen cache source must be submitted even though its onscreen opacity is zero.
+  application.SendNotification();
+  application.Render();
+  const int offscreenDrawCount = drawTrace.CountMethod("DrawElements") + drawTrace.CountMethod("DrawArrays");
+  DALI_TEST_GREATER(offscreenDrawCount, 0, TEST_LOCATION);
+
+  END_TEST;
+}
