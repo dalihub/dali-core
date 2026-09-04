@@ -215,7 +215,7 @@ bool RenderItem::UsesStencilBuffer() const
   {
     case RenderMode::AUTO:
     {
-      if(mNode->GetClippingId() != 0u) // If there is a clipping node, then we are either reading/writing the stencil buffer.
+      if(mClippingId != 0u) // If there is a clipping node, then we are either reading/writing the stencil buffer.
       {
         usesStencil = true;
       }

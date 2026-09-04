@@ -261,8 +261,8 @@ inline ClippingBox IntersectAABB(const ClippingBox& aabbA, const ClippingBox& aa
  */
 inline void SetupStencilClipping(const RenderItem& item, Graphics::CommandBuffer& commandBuffer, uint32_t& lastClippingDepth, uint32_t& lastClippingId)
 {
-  const Dali::Internal::SceneGraph::Node* node       = item.mNode;
-  const uint32_t                          clippingId = node->GetClippingId();
+  const uint32_t clippingId = item.mClippingId;
+
   // If there is no clipping Id, then either we haven't reached a clipping Node yet, or there aren't any.
   // Either way we can skip clipping setup for this renderer.
   if(clippingId == 0u)
@@ -273,7 +273,7 @@ inline void SetupStencilClipping(const RenderItem& item, Graphics::CommandBuffer
   }
   commandBuffer.SetStencilTestEnable(true);
 
-  const uint32_t clippingDepth = node->GetClippingDepth();
+  const uint32_t clippingDepth = item.mClippingDepth;
 
   // Pre-calculate a mask which has all bits set up to and including the current clipping depth.
   // EG. If depth is 3, the mask would be "111" in binary.
@@ -426,7 +426,7 @@ inline void RenderAlgorithms::SetupScissorClipping(
 {
   // Get the number of child scissors in the stack (do not include layer or root box).
   size_t         childStackDepth = mScissorStack.size() - 1u;
-  const uint32_t scissorDepth    = item.mNode->GetScissorDepth();
+  const uint32_t scissorDepth    = item.mScissorDepth;
   const bool     clippingNode    = item.mNode->GetClippingMode() == Dali::ClippingMode::CLIP_TO_BOUNDING_BOX;
   bool           traversedUpTree = false;
 

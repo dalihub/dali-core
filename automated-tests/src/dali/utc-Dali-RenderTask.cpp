@@ -4665,6 +4665,124 @@ int UtcDaliRenderTaskClippingMode04(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskOffscreenSourceDoesNotInheritParentStencilClipping(void)
+{
+  TestApplication application;
+
+  tet_infoline("Check that an offscreen render task starting below a clipping parent does not inherit the parent's stencil state.\n");
+
+  Actor clippingParent = CreateRenderableActor();
+  clippingParent.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  clippingParent.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
+  application.GetScene().Add(clippingParent);
+
+  Actor captureSource = CreateRenderableActor();
+  captureSource.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  clippingParent.Add(captureSource);
+
+  Texture     colorTexture = Texture::New(TextureType::TEXTURE_2D, Pixel::RGBA8888, 400u, 400u);
+  FrameBuffer frameBuffer  = FrameBuffer::New(400u, 400u);
+  frameBuffer.AttachColorTexture(colorTexture);
+
+  RenderTaskList taskList = application.GetScene().GetRenderTaskList();
+  RenderTask     captureTask = taskList.CreateTask();
+  captureTask.SetSourceActor(captureSource);
+  captureTask.SetBuiltinCameraActor(RenderTask::BuiltinCameraType::ATTACHED_TO_SCENE,
+                                    Size(400.0f, 400.0f),
+                                    Property::Map().Add(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT)
+                                                   .Add(Actor::Property::PIVOT, Pivot::CENTER));
+
+  captureTask.SetExclusive(false);
+  captureTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+  captureTask.SetFrameBuffer(frameBuffer);
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.ClearSubmitStack();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(!graphics.mSubmitStack.empty());
+  size_t   renderPassCount     = 0u;
+  size_t   drawCount           = 0u;
+  uint32_t stencilEnableCount  = 0u;
+  for(const auto& submission : graphics.mSubmitStack)
+  {
+    for(const auto* submittedCommandBuffer : submission.cmdBuffer)
+    {
+      auto* commandBuffer = static_cast<const TestGraphicsCommandBuffer*>(submittedCommandBuffer);
+      auto  stencilCommands = commandBuffer->GetChildCommandsByType(0 | CommandType::SET_STENCIL_TEST_ENABLE);
+
+      renderPassCount += commandBuffer->GetChildCommandsByType(0 | CommandType::BEGIN_RENDER_PASS).size();
+      drawCount += commandBuffer->GetChildCommandsByType(0 | CommandType::DRAW | CommandType::DRAW_INDEXED).size();
+
+      for(const auto* command : stencilCommands)
+      {
+        if(command->data.stencilTest.enabled)
+        {
+          ++stencilEnableCount;
+        }
+      }
+    }
+  }
+
+  tet_printf("Render passes: %zu, draws: %zu, stencil enables: %u\n", renderPassCount, drawCount, stencilEnableCount);
+  DALI_TEST_CHECK(renderPassCount >= 2u);
+  DALI_TEST_CHECK(drawCount >= 2u);
+  DALI_TEST_EQUALS(stencilEnableCount, 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskReusedRenderItemsUpdateStencilClipping(void)
+{
+  TestApplication application;
+
+  tet_infoline("Check that reused render items update their captured stencil clipping state.\n");
+
+  Actor clippingParent = CreateRenderableActor();
+  clippingParent.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  application.GetScene().Add(clippingParent);
+
+  Actor child = CreateRenderableActor();
+  child.SetProperty(Actor::Property::SIZE, Vector2(400.0f, 400.0f));
+  clippingParent.Add(child);
+
+  for(uint32_t i = 0u; i < 3u; ++i)
+  {
+    application.SendNotification();
+    application.Render();
+  }
+
+  TestGraphicsController& graphics = application.GetGraphicsController();
+  graphics.ClearSubmitStack();
+
+  clippingParent.SetProperty(Actor::Property::CLIPPING_MODE, ClippingMode::CLIP_CHILDREN);
+  application.SendNotification();
+  application.Render();
+
+  uint32_t stencilEnableCount = 0u;
+  for(const auto& submission : graphics.mSubmitStack)
+  {
+    for(const auto* submittedCommandBuffer : submission.cmdBuffer)
+    {
+      auto* commandBuffer = static_cast<const TestGraphicsCommandBuffer*>(submittedCommandBuffer);
+      auto  stencilCommands = commandBuffer->GetChildCommandsByType(0 | CommandType::SET_STENCIL_TEST_ENABLE);
+      for(const auto* command : stencilCommands)
+      {
+        if(command->data.stencilTest.enabled)
+        {
+          ++stencilEnableCount;
+        }
+      }
+    }
+  }
+
+  DALI_TEST_EQUALS(stencilEnableCount, 1u, TEST_LOCATION);
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskUploadOnly(void)
 {
   TestApplication application;
