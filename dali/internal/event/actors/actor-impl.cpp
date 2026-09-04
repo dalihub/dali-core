@@ -1607,7 +1607,6 @@ Actor::Actor(DerivedType derivedType, const SceneGraph::Node& node)
   mColorMode(Node::DEFAULT_COLOR_MODE),
   mChildrenDepthIndexPolicy(DevelActor::ChildrenDepthIndexPolicy::INCREASE),
   mClippingMode(ClippingMode::DISABLED),
-  mHoverState(PointState::FINISHED),
   mBlendEquation(Dali::BlendEquation::ADD),
   mOffScreenRenderableBitField(EMPTY_OFF_SCREEN_RENDERABLE_BIT_FIELD)
 {

@@ -1788,24 +1788,6 @@ public:
     return mDispatchHoverMotion;
   }
 
-  /**
-   * @brief Sets the hover state of actor
-   * @param state The PointState
-   */
-  void SetHoverState(PointState::Type state)
-  {
-    mHoverState = state;
-  }
-
-  /**
-   * @brief Gets the hover state of actor
-   * @return PointState::Type
-   */
-  PointState::Type GetHoverState() const
-  {
-    return mHoverState;
-  }
-
   // Gestures
 
   /**
@@ -2680,11 +2662,11 @@ protected:
     Dali::String annotationInfo;
   };
 
-  std::string                   mName;       ///< Name of the actor
-  std::unique_ptr<Annotation>   mAnnotation; ///< Optional application-defined metadata
-  uint32_t    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
-  int16_t     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
-  int32_t     mDepthIndex;  ///< Render(draw) order sort key among siblings (Property::DEPTH_INDEX). Does NOT change sibling order.
+  std::string                 mName;        ///< Name of the actor
+  std::unique_ptr<Annotation> mAnnotation;  ///< Optional application-defined metadata
+  uint32_t                    mSortedDepth; ///< The sorted depth index. A combination of tree traversal and sibling order.
+  int16_t                     mDepth;       ///< The depth in the hierarchy of the actor. Only 32,767 levels of depth are supported
+  int32_t                     mDepthIndex;  ///< Render(draw) order sort key among siblings (Property::DEPTH_INDEX). Does NOT change sibling order.
 
   int16_t mLayer3DParentsCount; ///< The number of layer with 3D behaviour in ancestors include this. It will be 0 if actor is not on scene.
 
@@ -2722,9 +2704,7 @@ protected:
 
   DevelActor::ChildrenDepthIndexPolicy::Type mChildrenDepthIndexPolicy : 2; ///< Children's depth index generation policy. Only works under LAYER_UI
   ClippingMode::Type                         mClippingMode : 3;             ///< Cached: Determines which clipping mode (if any) to use.
-  PointState::Type                           mHoverState : 3;               ///< Stores the HoverEvent state of actor.
-
-  Dali::BlendEquation::Type mBlendEquation : 17; ///< Cached: Determines which blend equation will be used to render renderers.
+  Dali::BlendEquation::Type                  mBlendEquation : 17;           ///< Cached: Determines which blend equation will be used to render renderers.
 
   uint8_t mOffScreenRenderableBitField; ///< Bit field to store the offscreen renderable type of this actor. 0xf0 is backward, 0x0f is forward.
 

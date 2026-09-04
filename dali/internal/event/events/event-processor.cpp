@@ -48,7 +48,8 @@ EventProcessor::EventProcessor(Scene& scene, GestureEventProcessor& gestureEvent
 : mScene(scene),
   mParentTouchEventProcessor(scene),
   mGeometryTouchStreamRouter(scene),
-  mHoverEventProcessor(scene),
+  mParentHoverEventProcessor(scene),
+  mGeometryHoverEventProcessor(scene),
   mGestureEventProcessor(gestureEventProcessor),
   mKeyEventProcessor(scene),
   mWheelEventProcessor(scene),
@@ -146,7 +147,21 @@ void EventProcessor::ProcessEvents()
 
       case Event::Hover:
       {
-        mHoverEventProcessor.ProcessHoverEvent(static_cast<const Integration::HoverEvent&>(event));
+        const bool parentHoverActive   = mParentHoverEventProcessor.HasActiveHover();
+        const bool geometryHoverActive = mGeometryHoverEventProcessor.HasActiveHover();
+
+        DALI_ASSERT_DEBUG(!(parentHoverActive && geometryHoverActive) && "Multiple hover processors cannot own the active lifecycle");
+
+        // Keep routing to the processor that owns the current lifecycle. The scene setting
+        // selects a processor only when no hover lifecycle is active.
+        if(geometryHoverActive || (!parentHoverActive && mScene.IsGeometryHittestEnabled()))
+        {
+          mGeometryHoverEventProcessor.ProcessHoverEvent(static_cast<const Integration::HoverEvent&>(event));
+        }
+        else
+        {
+          mParentHoverEventProcessor.ProcessHoverEvent(static_cast<const Integration::HoverEvent&>(event));
+        }
         break;
       }
 
@@ -172,7 +187,19 @@ void EventProcessor::ProcessEvents()
 void EventProcessor::SendInterruptedEvents(Dali::Internal::Actor* actor)
 {
   // TODO: Other event types should also be added if needed
-  mHoverEventProcessor.SendInterruptedHoverEvent(actor);
+  const bool parentHoverActive   = mParentHoverEventProcessor.HasActiveHover();
+  const bool geometryHoverActive = mGeometryHoverEventProcessor.HasActiveHover();
+
+  DALI_ASSERT_DEBUG(!(parentHoverActive && geometryHoverActive) && "Multiple hover processors cannot own the active lifecycle");
+
+  if(geometryHoverActive || (!parentHoverActive && mScene.IsGeometryHittestEnabled()))
+  {
+    mGeometryHoverEventProcessor.SendInterruptedHoverEvent(actor);
+  }
+  else
+  {
+    mParentHoverEventProcessor.SendInterruptedHoverEvent(actor);
+  }
 }
 
 } // namespace Internal

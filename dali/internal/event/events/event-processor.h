@@ -23,9 +23,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/events/geometry-hover-event-processor.h>
 #include <dali/internal/event/events/geometry-touch-stream-router.h>
-#include <dali/internal/event/events/hover-event-processor.h>
 #include <dali/internal/event/events/key-event-processor.h>
+#include <dali/internal/event/events/parent-hover-event-processor.h>
 #include <dali/internal/event/events/parent-touch-event-processor.h>
 #include <dali/internal/event/events/wheel-event-processor.h>
 
@@ -83,13 +84,14 @@ public:
   void SendInterruptedEvents(Dali::Internal::Actor* actor);
 
 private:
-  Scene&                    mScene;                     ///< The Scene events are processed for.
-  ParentTouchEventProcessor mParentTouchEventProcessor; ///< Processes PARENT touch events.
-  GeometryTouchStreamRouter mGeometryTouchStreamRouter; ///< Routes geometry touch streams.
-  HoverEventProcessor       mHoverEventProcessor;       ///< Processes hover events.
-  GestureEventProcessor&    mGestureEventProcessor;     ///< Processes gesture events.
-  KeyEventProcessor         mKeyEventProcessor;         ///< Processes key events.
-  WheelEventProcessor       mWheelEventProcessor;       ///< Processes wheel events.
+  Scene&                      mScene;                       ///< The Scene events are processed for.
+  ParentTouchEventProcessor   mParentTouchEventProcessor;   ///< Processes PARENT touch events.
+  GeometryTouchStreamRouter   mGeometryTouchStreamRouter;   ///< Routes geometry touch streams.
+  ParentHoverEventProcessor   mParentHoverEventProcessor;   ///< Processes PARENT hover events.
+  GeometryHoverEventProcessor mGeometryHoverEventProcessor; ///< Processes GEOMETRY hover events.
+  GestureEventProcessor&      mGestureEventProcessor;       ///< Processes gesture events.
+  KeyEventProcessor           mKeyEventProcessor;           ///< Processes key events.
+  WheelEventProcessor         mWheelEventProcessor;         ///< Processes wheel events.
 
   // Allow messages to be added safely to one queue, while processing (iterating through) the second queue.
   using EventQueue = std::queue<OwnerPointer<const Dali::Integration::Event>>;

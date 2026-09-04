@@ -23,6 +23,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <vector>
 
 using namespace Dali;
 
@@ -87,6 +88,12 @@ struct HoverEventFunctor
 
   SignalData& signalData;
   bool        returnValue;
+};
+
+struct HoverTraceEntry
+{
+  Actor            actor;
+  PointState::Type state;
 };
 
 // Functor that removes the actor when called.
@@ -227,6 +234,7 @@ int UtcDaliGeoHoverOutsideCameraNearFarPlanes(void)
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::CENTER);
   actor.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER);
+  actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
   scene.Add(actor);
 
   // Render and notify
@@ -552,6 +560,7 @@ int UtcDaliGeoHoverLeave(void)
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
   application.GetScene().Add(actor);
 
   // Render and notify
@@ -580,10 +589,10 @@ int UtcDaliGeoHoverLeave(void)
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
-  // Another motion event inside actor, signalled with start. This is because a new hover event was started on that actor.
+  // Re-entry synthesizes STARTED and then dispatches the same MOTION input.
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(10.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, data.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
 
   END_TEST;
@@ -635,7 +644,7 @@ int UtcDaliGeoHoverLeaveParentConsumer(void)
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::LEAVE, data.hoverEvent.GetState(0), TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::MOTION, rootData.hoverEvent.GetState(0), TEST_LOCATION);
-  DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
+  DALI_TEST_CHECK(rootActor == data.hoverEvent.GetHitActor(0));
   DALI_TEST_CHECK(rootActor == rootData.hoverEvent.GetHitActor(0));
   data.Reset();
   rootData.Reset();
@@ -649,11 +658,11 @@ int UtcDaliGeoHoverLeaveParentConsumer(void)
   data.Reset();
   rootData.Reset();
 
-  // Another motion event inside actor, signalled with start. This is because a new hover event was started on that actor.
+  // The actor re-enters with STARTED followed by MOTION. The already-active root gets MOTION.
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(10.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::MOTION, data.hoverEvent.GetState(0), TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::MOTION, rootData.hoverEvent.GetState(0), TEST_LOCATION);
   DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
   DALI_TEST_CHECK(actor == rootData.hoverEvent.GetHitActor(0));
@@ -710,10 +719,10 @@ int UtcDaliGeoHoverLeaveWithDispatchMotion(void)
   // Emit a motion signal outside of actor, should be signalled with a Leave
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(200.0f, 200.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  // The event is not received because DISPATCH_HOVER_MOTION is false.
+  // The previous consumer keeps the candidate walk stopped even though its MOTION callback is disabled.
   DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::LEAVE, data.hoverEvent.GetState(0), TEST_LOCATION);
-  DALI_TEST_CHECK(actor == data.hoverEvent.GetHitActor(0));
+  DALI_TEST_CHECK(rootActor == data.hoverEvent.GetHitActor(0));
   data.Reset();
   rootData.Reset();
 
@@ -724,7 +733,8 @@ int UtcDaliGeoHoverLeaveWithDispatchMotion(void)
   data.Reset();
   rootData.Reset();
 
-  // Another motion event inside actor, signalled with start. This is because a new hover event was started on that actor.
+  // The new actor always receives synthetic STARTED. The active root's disabled MOTION
+  // callback is skipped while its previous-consumer status still stops candidate traversal.
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
@@ -831,10 +841,11 @@ int UtcDaliGeoHoverActorBecomesInsensitiveParentConsumer(void)
   // Make root actor insensitive
   rootActor.SetProperty(Actor::Property::SENSITIVE, false);
 
-  // Because it is insensitive, it does not receive the event.
+  // The remaining active target becomes insensitive and receives one INTERRUPTED.
   application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(200.0f, 200.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, rootData.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, rootData.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
   rootData.Reset();
 
@@ -912,10 +923,11 @@ int UtcDaliGeoHoverMultipleLayers(void)
   DALI_TEST_CHECK(data.hoveredActor == actor1);
   data.Reset();
 
-  // Make layer1 insensitive, nothing should be hit
+  // Making the active subtree insensitive interrupts its active hover target.
   layer1.SetProperty(Actor::Property::SENSITIVE, false);
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
 
   // Make layer1 sensitive again, again actor1 will be hit
@@ -925,10 +937,11 @@ int UtcDaliGeoHoverMultipleLayers(void)
   DALI_TEST_CHECK(data.hoveredActor == actor1);
   data.Reset();
 
-  // Make rootActor insensitive, nothing should be hit
+  // Making the root insensitive interrupts the active hover target.
   rootActor.SetProperty(Actor::Property::SENSITIVE, false);
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
-  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
 
   // Make rootActor sensitive
@@ -960,11 +973,13 @@ int UtcDaliGeoHoverMultipleLayers(void)
   //DALI_TEST_CHECK( data.hoveredActor == layer2 ); // TODO: Uncomment this after removing renderable hack!
   data.Reset();
 
-  // Make layer2 insensitive, should hit actor1
+  // Make layer2 insensitive. Actor1 is dispatched first; the previously active
+  // actor2 then receives INTERRUPTED after current candidate dispatch completes.
   layer2.SetProperty(Actor::Property::SENSITIVE, false);
   application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(10.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
-  DALI_TEST_CHECK(data.hoveredActor == actor1);
+  DALI_TEST_CHECK(data.hoveredActor == actor2);
+  DALI_TEST_EQUALS(PointState::INTERRUPTED, data.hoverEvent.GetState(0), TEST_LOCATION);
   data.Reset();
 
   // Make layer2 sensitive again, should hit layer2
@@ -1013,6 +1028,7 @@ int UtcDaliGeoHoverMultipleRenderTasks(void)
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
   scene.Add(actor);
 
   // Create render task
@@ -1059,11 +1075,13 @@ int UtcDaliGeoHoverMultipleRenderTasksWithChildLayer(void)
   Actor actor = Actor::New();
   actor.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   actor.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actor.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
   scene.Add(actor);
 
   Layer layer = Layer::New();
   layer.SetProperty(Actor::Property::SIZE, Vector2(100.0f, 100.0f));
   layer.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  layer.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
   actor.Add(layer);
 
   // Create render task
@@ -1562,6 +1580,167 @@ int UtcDaliGeoHoverMultipleCallbacksOnOneActor(void)
   // With geometry hittest enabled the results are combined with OR, so the actor
   // consumed the event and it never reached its parent.
   DALI_TEST_EQUALS(false, rootData.functorCalled, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliGeoHoverOverlappingCandidates(void)
+{
+  TestApplication application;
+  application.GetScene().SetGeometryHittestEnabled(true);
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(225.0f, 100.0f));
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  application.GetScene().Add(parent);
+
+  Actor actorA = Actor::New();
+  actorA.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 100.0f));
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::LEAVE_REQUIRED, false);
+  parent.Add(actorA);
+
+  Actor actorB = Actor::New();
+  actorB.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 100.0f));
+  actorB.SetProperty(Actor::Property::POSITION, Vector2(75.0f, 0.0f));
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::LEAVE_REQUIRED, false);
+  parent.Add(actorB);
+
+  application.SendNotification();
+  application.Render();
+
+  std::vector<HoverTraceEntry> trace;
+  bool                         consumeActorA = true;
+  bool                         consumeActorB = false;
+
+  actorA.HoverEventSignal().Connect(&application, [&](Actor actor, HoverEvent event)
+  {
+    trace.push_back({actor, event.GetState(0)});
+    return consumeActorA;
+  });
+  actorB.HoverEventSignal().Connect(&application, [&](Actor actor, HoverEvent event)
+  {
+    trace.push_back({actor, event.GetState(0)});
+    return consumeActorB;
+  });
+  parent.HoverEventSignal().Connect(&application, [&](Actor actor, HoverEvent event)
+  {
+    trace.push_back({actor, event.GetState(0)});
+    return false;
+  });
+
+  // A consumes, so the unvisited parent is not part of the active prefix.
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(25.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 1u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::STARTED, TEST_LOCATION);
+  trace.clear();
+
+  // Enter the overlap. New B gets STARTED and the same MOTION input, then the
+  // unconsumed event falls through to the already-active, consuming A.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(100.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::MOTION, TEST_LOCATION);
+  trace.clear();
+
+  // Leaving A's geometry visits B and parent first, then delivers A's lifecycle LEAVE.
+  // GEOMETRY guarantees LEAVE even though LEAVE_REQUIRED is false.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(200.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].state, PointState::LEAVE, TEST_LOCATION);
+  trace.clear();
+
+  // Re-enter A. It consumes after STARTED and MOTION; B and parent leave after dispatch.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(25.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].state, PointState::LEAVE, TEST_LOCATION);
+  trace.clear();
+
+  // Consuming B still receives STARTED and MOTION for the entering input. The
+  // unvisited A leaves the active prefix after B's dispatch completes.
+  consumeActorB = true;
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(100.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::LEAVE, TEST_LOCATION);
+  trace.clear();
+
+  // On the next input B no longer consumes, so A re-enters and consumes after
+  // synthetic STARTED and the same MOTION input.
+  consumeActorB = false;
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(101.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::MOTION, TEST_LOCATION);
+  trace.clear();
+
+  // Terminal delivery ignores consumption and reaches every active target. The
+  // parent was never visited and must not have been saved as active.
+  consumeActorB = true;
+  application.ProcessEvent(GenerateSingleHover(PointState::FINISHED, Vector2(101.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::FINISHED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::FINISHED, TEST_LOCATION);
+  trace.clear();
+
+  // If both overlapping children return false, the flat candidate walk reaches
+  // their parent after both siblings.
+  consumeActorA = false;
+  consumeActorB = false;
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(102.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::STARTED, TEST_LOCATION);
+  trace.clear();
+
+  // A consuming front candidate cannot suppress terminal delivery to the rest
+  // of the active prefix.
+  consumeActorB = true;
+  application.ProcessEvent(GenerateSingleHover(PointState::FINISHED, Vector2(102.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::FINISHED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::FINISHED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::FINISHED, TEST_LOCATION);
 
   END_TEST;
 }
