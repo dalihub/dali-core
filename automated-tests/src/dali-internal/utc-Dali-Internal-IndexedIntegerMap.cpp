@@ -337,33 +337,33 @@ int UtcDaliIndexedIntegerMapStressTest(void)
     // We don't need to check whole key. Just compare near 0 and 256+2
     for(std::size_t j = 0; j < i && j < 4; j++)
     {
-      DALI_TEST_CHECK(!indexedMap.Register(keyList[j], -j - 1));
+      DALI_TEST_CHECK(!indexedMap.Register(keyList[j], -static_cast<int>(j) - 1));
     }
     for(std::size_t j = 256; j < i && j < 256 + 6; j++)
     {
-      DALI_TEST_CHECK(!indexedMap.Register(keyList[j], -j - 1));
+      DALI_TEST_CHECK(!indexedMap.Register(keyList[j], -static_cast<int>(j) - 1));
     }
 
     // Regist i'th keylist
-    DALI_TEST_CHECK(indexedMap.Register(keyList[i], i));
+    DALI_TEST_CHECK(indexedMap.Register(keyList[i], static_cast<int>(i)));
 
     // We don't need to check whole key. Just compare near 0 and 256+2 and end and i
     for(std::size_t j = 0; j < keyList.size() && j < 20; j++)
     {
-      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, j);
+      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, static_cast<int>(j));
     }
     for(std::size_t j = 256 - 18; j < keyList.size() && j < 256 + 22; j++)
     {
-      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, j);
+      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, static_cast<int>(j));
     }
     for(std::size_t j = keyList.size() - 20; j < keyList.size(); j++)
     {
-      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, j);
+      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, static_cast<int>(j));
     }
     // When i < 20 overflow occured, but dont care.
     for(std::size_t j = i - 20; j < keyList.size() && j < i + 20; j++)
     {
-      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, j);
+      IndexedMapGetValueTest(indexedMap, keyList[j], j <= i, static_cast<int>(j));
     }
 
     // Keylist have over 500 kind of keys. Print debug rarely.

@@ -807,14 +807,14 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
             mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
                              static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
                              GL_UNSIGNED_SHORT,
-                             reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+                             reinterpret_cast<void*>(static_cast<uintptr_t>(cmd.data.draw.drawIndexed.firstIndex)));
           }
           else
           {
             mGl.DrawElementsInstanced(GetTopology(currentPipeline->inputAssemblyState.topology),
                                       static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
                                       GL_UNSIGNED_SHORT,
-                                      reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex),
+                                      reinterpret_cast<void*>(static_cast<uintptr_t>(cmd.data.draw.drawIndexed.firstIndex)),
                                       cmd.data.draw.drawIndexed.instanceCount);
           }
         }
@@ -828,7 +828,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
           mGl.DrawElements(GetTopology(currentPipeline->inputAssemblyState.topology),
                            static_cast<GLsizei>(cmd.data.draw.drawIndexed.indexCount),
                            GL_UNSIGNED_SHORT,
-                           reinterpret_cast<void*>(cmd.data.draw.drawIndexed.firstIndex));
+                           reinterpret_cast<void*>(static_cast<uintptr_t>(cmd.data.draw.drawIndexed.firstIndex)));
         }
         isSkipCurrentDrawCall = false;
         break;
@@ -863,7 +863,7 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
       case CommandType::SET_VIEWPORT: // @todo Consider correcting for orientation here?
       {
         auto& rect = cmd.data.viewport.region;
-        mGl.Viewport(rect.x, rect.y, rect.width, rect.height);
+        mGl.Viewport(static_cast<Dali::GLint>(rect.x), static_cast<Dali::GLint>(rect.y), static_cast<Dali::GLsizei>(rect.width), static_cast<Dali::GLsizei>(rect.height));
         break;
       }
 
@@ -1037,9 +1037,9 @@ void TestGraphicsController::ProcessCommandBuffer(TestGraphicsCommandBuffer& com
                 uint32_t depthClearColor = 0u;
                 if(clearValues.size() == renderPass->attachments.size())
                 {
-                  depthClearColor = clearValues.back().depthStencil.depth;
+                  depthClearColor = static_cast<uint32_t>(clearValues.back().depthStencil.depth);
                 }
-                mGl.ClearDepthf(depthClearColor);
+                mGl.ClearDepthf(static_cast<Dali::GLclampf>(depthClearColor));
                 mask |= GL_DEPTH_BUFFER_BIT;
               }
               if(depthStencil.stencilLoadOp == Graphics::AttachmentLoadOp::CLEAR)
@@ -1118,7 +1118,7 @@ void TestGraphicsController::BindPipeline(TestGraphicsPipeline* pipeline)
                             GetGlType(attribute.format),
                             GL_FALSE, // Not normalized
                             stride,
-                            reinterpret_cast<void*>(attributeOffset));
+                            reinterpret_cast<void*>(static_cast<uintptr_t>(attributeOffset)));
     if(rate == Graphics::VertexInputRate::PER_VERTEX)
     {
       mGl.VertexAttribDivisor(attribute.location, 0);

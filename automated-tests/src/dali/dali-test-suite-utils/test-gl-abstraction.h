@@ -838,7 +838,11 @@ public:
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name) override
   {
+#if defined(_MSC_VER)
+    strncpy_s(name, 100, mAttribLocs[index].c_str(), _TRUNCATE);
+#else
     strncpy(name, mAttribLocs[index].c_str(), 99);
+#endif
     *type = mAttribTypes[index];
   }
 
@@ -864,7 +868,7 @@ public:
     auto        iter = std::find(mAttribLocs.begin(), mAttribLocs.end(), check);
     if(iter == mAttribLocs.end())
       return -1;
-    return iter - mAttribLocs.begin();
+    return static_cast<int>(iter - mAttribLocs.begin());
   }
 
   inline void GetBooleanv(GLenum pname, GLboolean* params) override
@@ -918,10 +922,10 @@ public:
         *params = mLinkStatus;
         break;
       case GL_PROGRAM_BINARY_LENGTH_OES:
-        *params = mProgramBinaryLength;
+        *params = static_cast<Dali::GLint>(mProgramBinaryLength);
         break;
       case GL_ACTIVE_UNIFORMS:
-        *params = mActiveUniforms.size();
+        *params = static_cast<GLint>(mActiveUniforms.size());
         break;
       case GL_ACTIVE_UNIFORM_MAX_LENGTH:
         *params = 100;
@@ -1189,13 +1193,21 @@ public:
     const int         shaderSourceLength = static_cast<int>(shaderSource.length());
     if(shaderSourceLength < bufsize)
     {
+#if defined(_MSC_VER)
+      strncpy_s(source, bufsize, shaderSource.c_str(), shaderSourceLength);
+#else
       strncpy(source, shaderSource.c_str(), shaderSourceLength);
+#endif
       *length = shaderSourceLength;
     }
     else
     {
       *length = bufsize - 1;
+#if defined(_MSC_VER)
+      strncpy_s(source, bufsize, shaderSource.c_str(), *length);
+#else
       strncpy(source, shaderSource.c_str(), *length);
+#endif
       source[*length] = 0x0;
     }
   }
@@ -1654,7 +1666,7 @@ public:
     namedParams["type"] << std::hex << type;
     namedParams["normalized"] << (normalized ? "T" : "F");
     namedParams["stride"] << stride;
-    namedParams["offset"] << std::to_string(reinterpret_cast<unsigned long>(ptr));
+    namedParams["offset"] << std::to_string(reinterpret_cast<uintptr_t>(ptr));
 
     mBufferTrace.PushCall("VertexAttribPointer", namedParams.str(), namedParams);
   }
@@ -1666,7 +1678,7 @@ public:
     namedParams["size"] << size;
     namedParams["type"] << std::hex << type;
     namedParams["stride"] << stride;
-    namedParams["offset"] << std::to_string(reinterpret_cast<unsigned long>(pointer));
+    namedParams["offset"] << std::to_string(reinterpret_cast<uintptr_t>(pointer));
 
     mBufferTrace.PushCall("VertexAttribIPointer", namedParams.str(), namedParams);
   }
@@ -1962,12 +1974,12 @@ public:
           }
           case GL_UNIFORM_SIZE:
           {
-            params[i] = mActiveUniforms[i].size;
+            params[i] = static_cast<Dali::GLint>(mActiveUniforms[i].size);
             break;
           }
           case GL_UNIFORM_NAME_LENGTH:
           {
-            params[i] = mActiveUniforms[i].name.length();
+            params[i] = static_cast<GLint>(mActiveUniforms[i].name.length());
             break;
           }
           case GL_UNIFORM_BLOCK_INDEX:
