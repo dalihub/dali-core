@@ -23,6 +23,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <vector>
 
 using namespace Dali;
 
@@ -87,6 +88,12 @@ struct HoverEventFunctor
 
   SignalData& signalData;
   bool        returnValue;
+};
+
+struct HoverTraceEntry
+{
+  Actor            actor;
+  PointState::Type state;
 };
 
 // Functor that removes the actor when called.
@@ -2028,6 +2035,121 @@ int UtcDaliHoverEventGetDeviceNameNagative(void)
   DALI_TEST_EQUALS(1u, data.hoverEvent.GetPointCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(PointState::STARTED, data.hoverEvent.GetState(0), TEST_LOCATION);
   DALI_TEST_EQUALS(data.hoverEvent.GetDeviceName(1), "", TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliHoverOverlappingSiblingsExclusive(void)
+{
+  TestApplication application;
+
+  Actor parent = Actor::New();
+  parent.SetProperty(Actor::Property::SIZE, Vector2(225.0f, 100.0f));
+  parent.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  parent.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  application.GetScene().Add(parent);
+
+  Actor actorA = Actor::New();
+  actorA.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 100.0f));
+  actorA.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actorA.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+  parent.Add(actorA);
+
+  Actor actorB = Actor::New();
+  actorB.SetProperty(Actor::Property::SIZE, Vector2(150.0f, 100.0f));
+  actorB.SetProperty(Actor::Property::POSITION, Vector2(75.0f, 0.0f));
+  actorB.SetProperty(Actor::Property::PIVOT, Pivot::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::PARENT_ORIGIN, ParentOrigin::TOP_LEFT);
+  actorB.SetProperty(Actor::Property::LEAVE_REQUIRED, true);
+  parent.Add(actorB);
+
+  application.SendNotification();
+  application.Render();
+
+  std::vector<HoverTraceEntry> trace;
+  bool                         consumeActorB = false;
+
+  actorA.HoverEventSignal().Connect(&application, [&](Actor actor, HoverEvent event)
+  {
+    trace.push_back({actor, event.GetState(0)});
+    return false;
+  });
+  actorB.HoverEventSignal().Connect(&application, [&](Actor actor, HoverEvent event)
+  {
+    trace.push_back({actor, event.GetState(0)});
+    return consumeActorB;
+  });
+  parent.HoverEventSignal().Connect(&application, [&](Actor actor, HoverEvent event)
+  {
+    trace.push_back({actor, event.GetState(0)});
+    return false;
+  });
+
+  // Enter A-only area. The event bubbles from A to its actual parent.
+  application.ProcessEvent(GenerateSingleHover(PointState::STARTED, Vector2(25.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::STARTED, TEST_LOCATION);
+  trace.clear();
+
+  // Enter the overlap. A leaves before the topmost B starts; A is not a fall-through target.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(100.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].state, PointState::STARTED, TEST_LOCATION);
+  trace.clear();
+
+  // Moving inside B keeps B as the exclusive target.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(200.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::MOTION, TEST_LOCATION);
+  trace.clear();
+
+  // Expose A again.
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(25.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 4u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::STARTED, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[3].state, PointState::STARTED, TEST_LOCATION);
+  trace.clear();
+
+  // Consuming on B stops parent bubbling, but does not change sibling targeting.
+  consumeActorB = true;
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(100.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 3u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorA, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::LEAVE, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[2].state, PointState::STARTED, TEST_LOCATION);
+  trace.clear();
+
+  // Not consuming resumes parent bubbling; the lower sibling A still receives nothing.
+  consumeActorB = false;
+  application.ProcessEvent(GenerateSingleHover(PointState::MOTION, Vector2(101.0f, 50.0f)));
+  DALI_TEST_EQUALS(trace.size(), 2u, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].actor, actorB, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[0].state, PointState::MOTION, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].actor, parent, TEST_LOCATION);
+  DALI_TEST_EQUALS(trace[1].state, PointState::MOTION, TEST_LOCATION);
 
   END_TEST;
 }
